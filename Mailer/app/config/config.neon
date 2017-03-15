@@ -1,0 +1,29 @@
+parameters:
+
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: Remp\*Module\Presenters\*Presenter
+
+
+session:
+	expiration: 14 days
+
+
+services:
+	router: App\RouterFactory::createRouter
+	- Remp\MailerModule\Repository\LayoutsRepository
+
+	filterLoader:
+		class: Remp\MailerModule\Helpers\FilterLoader
+		setup:
+			- register('userDate', [Remp\MailerModule\Helpers\UserDateHelper(), process])
+
+	nette.latteFactory:
+		setup:
+			- addFilter(null, [@filterLoader, 'load'])
+
+
+	# Forms
+	- Remp\MailerModule\Forms\LayoutFormFactory

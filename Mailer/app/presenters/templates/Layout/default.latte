@@ -1,0 +1,36 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Layouts</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2>Lorem ipsum <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+        <div class="actions">
+            <a n:href="Layout:new" class="btn palette-Cyan bg waves-effect">Add new layout</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr n:foreach="$layouts as $layout">
+                <td>{$layout->name}</td>
+                <td class="text-muted">{$layout->created_at|userDate}</td>
+                <td>
+                    <a n:href="Layout:Edit $layout->id" class="btn btn-xs btn-info waves-effect"><i class="zmdi zmdi-edit"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
