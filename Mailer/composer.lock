@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd9a3c025f6c5ba3120a4d0103cfac25",
+    "content-hash": "6daf739c479e22de06f8c51d25226ae9",
     "packages": [
         {
             "name": "bower-asset/animate.css",
@@ -367,44 +367,6 @@
                 "font",
                 "icons",
                 "material"
-            ]
-        },
-        {
-            "name": "bower-asset/summernote",
-            "version": "v0.8.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/summernote/summernote.git",
-                "reference": "9a5e5abe214f194d920b219c409322dfa7688c8c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/summernote/summernote/zipball/9a5e5abe214f194d920b219c409322dfa7688c8c",
-                "reference": "9a5e5abe214f194d920b219c409322dfa7688c8c",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/bootstrap": ">=3.0.1",
-                "bower-asset/jquery": ">=1.9.0"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "./dist/summernote.js",
-                    "./dist/summernote.css"
-                ],
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "Gruntfile.js",
-                    "MAINTAIN.md",
-                    "grunts",
-                    "node_modules",
-                    "bower_components",
-                    "test"
-                ]
-            },
-            "license": [
-                "MIT"
             ]
         },
         {
@@ -2044,9 +2006,97 @@
                 "nette"
             ],
             "time": "2017-01-29T19:39:20+00:00"
+        },
+        {
+            "name": "vlucas/phpdotenv",
+            "version": "v2.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vlucas/phpdotenv.git",
+                "reference": "3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c",
+                "reference": "3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8 || ^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dotenv\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause-Attribution"
+            ],
+            "authors": [
+                {
+                    "name": "Vance Lucas",
+                    "email": "vance@vancelucas.com",
+                    "homepage": "http://www.vancelucas.com"
+                }
+            ],
+            "description": "Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.",
+            "keywords": [
+                "dotenv",
+                "env",
+                "environment"
+            ],
+            "time": "2016-09-01T10:05:43+00:00"
         }
     ],
     "packages-dev": [
+        {
+            "name": "bower-asset/summernote",
+            "version": "v0.8.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/summernote/summernote.git",
+                "reference": "9a5e5abe214f194d920b219c409322dfa7688c8c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/summernote/summernote/zipball/9a5e5abe214f194d920b219c409322dfa7688c8c",
+                "reference": "9a5e5abe214f194d920b219c409322dfa7688c8c",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/bootstrap": ">=3.0.1",
+                "bower-asset/jquery": ">=1.9.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "./dist/summernote.js",
+                    "./dist/summernote.css"
+                ],
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "Gruntfile.js",
+                    "MAINTAIN.md",
+                    "grunts",
+                    "node_modules",
+                    "bower_components",
+                    "test"
+                ]
+            },
+            "license": [
+                "MIT"
+            ]
+        },
         {
             "name": "nette/tester",
             "version": "v1.7.1",

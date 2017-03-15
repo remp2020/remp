@@ -2,6 +2,9 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+$env = new Dotenv\Dotenv(__DIR__ . '/../');
+$env->load();
+
 $configurator = new Nette\Configurator;
 
 $configurator->setDebugMode(true); // enable for your remote IP

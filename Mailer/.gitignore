@@ -1,1 +1,2 @@
 app/config/config.local.neon
+.env

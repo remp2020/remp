@@ -4,28 +4,28 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Object;
-use Remp\MailerModule\Repository\LayoutsRepository;
+use Remp\MailerModule\Repository\ChannelsRepository;
 
-class LayoutFormFactory extends Object
+class ChannelFormFactory extends Object
 {
-    /** @var LayoutsRepository */
-    private $layoutsRepository;
+    /** @var ChannelsRepository */
+    private $channelsRepository;
 
     public $onCreate;
 
     public $onUpdate;
 
-    public function __construct(LayoutsRepository $layoutsRepository)
+    public function __construct(ChannelsRepository $channelsRepository)
     {
-        $this->layoutsRepository = $layoutsRepository;
+        $this->channelsRepository = $channelsRepository;
     }
 
     public function create($id)
     {
         $defaults = [];
         if (isset($id)) {
-            $layout = $this->layoutsRepository->find($id);
-            $defaults = $layout->toArray();
+            $channel = $this->channelsRepository->find($id);
+            $defaults = $channel->toArray();
         }
 
         $form = new Form;
@@ -36,10 +36,7 @@ class LayoutFormFactory extends Object
         $form->addText('name', 'Name')
             ->setRequired('Required');
 
-        $form->addTextArea('layout_text', 'Text version')
-            ->setAttribute('rows', 3);
-
-        $form->addTextArea('layout_html', 'HTML version');
+        $form->addCheckbox('consent_required', 'Required user consent');
 
         $form->setDefaults($defaults);
 
@@ -55,11 +52,11 @@ class LayoutFormFactory extends Object
     public function formSucceeded($form, $values)
     {
         if (!empty($values['id'])) {
-            $row = $this->layoutsRepository->find($values['id']);
-            $this->layoutsRepository->update($row, $values);
+            $row = $this->channelsRepository->find($values['id']);
+            $this->channelsRepository->update($row, $values);
             ($this->onUpdate)($row);
         } else {
-            $row = $this->layoutsRepository->add($values['name'], $values['layout_text'], $values['layout_html']);
+            $row = $this->channelsRepository->add($values['name'], $values['consent_required']);
             ($this->onCreate)($row);
         }
     }

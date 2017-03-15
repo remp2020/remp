@@ -41,7 +41,7 @@ class PhinxRegistrator
      */
     private function buildConfig()
     {
-        $env = getenv('CRM_ENV');
+        $env = getenv('ENV');
 
         $configData = [
             'paths' => [

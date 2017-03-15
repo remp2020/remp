@@ -1,4 +1,4 @@
-{form layoutForm}
+{form channelForm}
     {input id}
     <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
         {$error}<br>
@@ -7,20 +7,16 @@
     <div class="form-group fg-float m-b-30">
         <div class="fg-line">
             {input name, class => 'form-control fg-input'}
-            {label name, class => 'fg-label' /}
+            {label name, class => 'fg-label'}
         </div>
     </div>
 
     <div class="form-group fg-float m-b-30">
-        <div class="fg-line">
-            {input layout_text, class => 'form-control fg-input auto-size'}
-            {label layout_text, class => 'fg-label' /}
+        <div class="toggle-switch">
+            {label consent_required:, class => 'ts-label'}
+            {input consent_required:, hidden => 'hidden'}
+            <label for="frm-channelForm-consent_required" class="ts-helper"></label>
         </div>
-    </div>
-
-    <div class="form-group m-b-30">
-        {label layout_html /}
-        {input layout_html, class => 'form-control html-editor'}
     </div>
 
     {input save, class => 'btn btn-info waves-effect'}

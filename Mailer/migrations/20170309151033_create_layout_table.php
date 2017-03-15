@@ -8,8 +8,7 @@ class CreateLayoutTable extends AbstractMigration
     {
         $this->table('layouts')
             ->addColumn('name', 'string')
-            ->addColumn('created_at', 'datetime')
-            ->addColumn('updated_at', 'datetime')
+            ->addTimestamps()
             ->addColumn('layout_text', 'text', array('null' => true))
             ->addColumn('layout_html', 'text', array('null' => true))
             ->save();
