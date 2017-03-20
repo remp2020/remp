@@ -4,13 +4,19 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/Shopify/sarama"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"gitlab.com/remp/remp/go/cmd/beam/app"
 	"gitlab.com/remp/remp/go/cmd/beam/controller"
+)
+
+const (
+	brokerAddr = "localhost:9092"
 )
 
 func main() {
@@ -21,19 +27,52 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	app.MountSwaggerController(service, service.NewController("swagger"))
-	app.MountTrackController(service, controller.NewTrackController(service))
+	eventProducer, err := newProducer([]string{brokerAddr})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer eventProducer.Close()
 
-	server := &http.Server{
+	app.MountSwaggerController(service, service.NewController("swagger"))
+	app.MountTrackController(service, controller.NewTrackController(
+		service,
+		eventProducer,
+	))
+
+	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: service.Mux,
 	}
 
-	if err := server.ListenAndServe(); err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		service.LogError("startup", "err", err)
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	server.Shutdown(ctx)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	srv.Shutdown(ctx)
 
+}
+
+func newProducer(brokerList []string) (sarama.AsyncProducer, error) {
+
+	config := sarama.NewConfig()
+	config.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
+	config.Producer.Compression = sarama.CompressionSnappy   // Compress messages
+	config.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
+
+	producer, err := sarama.NewAsyncProducer(brokerList, config)
+	if err != nil {
+		return nil, err
+	}
+
+	// We will just log to STDOUT if we're not able to produce messages.
+	// Note: messages will only be returned here after all retry attempts are exhausted.
+	go func() {
+		for err := range producer.Errors() {
+			log.Println("Failed to write access log entry:", err)
+		}
+	}()
+
+	return producer, nil
 }

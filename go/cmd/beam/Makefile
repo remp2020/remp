@@ -1,32 +1,13 @@
 #! /usr/bin/make
-#
-# Makefile for REMP beam
-#
-# Targets:
-# - clean     delete all generated files
-# - gen  (re)generate all goagen-generated files.
-# - build     compile executable
-#
-# Meta targets:
-# - all is the default target, it runs all the targets in the order above.
-#
 
 GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen/"
 
-DEPEND=	bitbucket.org/pkg/inflect \
-	github.com/goadesign/goa \
-	github.com/goadesign/goa/goagen \
-	github.com/goadesign/goa/logging/logrus \
-	github.com/Sirupsen/logrus \
-	gopkg.in/yaml.v2 \
-	golang.org/x/tools/cmd/goimports
+all: clean gen build
 
-CURRENT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+build: gen build-only
 
-all: dep clean gen build
-
-dep:
-	@go get $(DEPEND)
+build-only:
+	@go build
 
 clean:
 	@rm -rf app
@@ -43,3 +24,11 @@ gen:
 
 build:
 	@go build -o beam
+
+lint:
+	@set -e; \
+	for package in $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)'); \
+	do golint -set_exit_status=true $$package; done
+
+vet:
+	@go vet $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)')
