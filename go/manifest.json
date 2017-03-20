@@ -1,0 +1,7 @@
+{
+    "dependencies": {
+        "github.com/goadesign/goa": {
+            "branch": "master"
+        }
+    }
+}

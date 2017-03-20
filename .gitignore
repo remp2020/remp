@@ -1,3 +1,6 @@
+.idea
+.env
+
 Mailer/vendor/
 Mailer/.idea/
 Mailer/www/assets/vendor/
