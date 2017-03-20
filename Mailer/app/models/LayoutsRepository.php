@@ -9,6 +9,8 @@ class LayoutsRepository extends Repository
 {
     protected $tableName = 'layouts';
 
+    protected $dataTableSearchable = ['name', 'layout_text', 'layout_html'];
+
     public function all()
     {
         return $this->getTable()->order('name ASC');
@@ -34,5 +36,22 @@ class LayoutsRepository extends Repository
     {
         $params['updated_at'] = new \DateTime();
         return parent::update($row, $data);
+    }
+
+    public function tableFilter($query, $order, $orderDirection)
+    {
+        $selection = $this->getTable()
+            ->order($order . ' ' . strtoupper($orderDirection));
+
+        if (!empty($query)) {
+            $where = [];
+            foreach ($this->dataTableSearchable as $col) {
+                $where[$col . ' LIKE ?'] = '%' . $query . '%';
+            }
+
+            $selection->whereOr($where);
+        }
+
+        return $selection->fetchAll();
     }
 }

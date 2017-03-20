@@ -12,21 +12,15 @@ session:
 
 
 services:
-	router: App\RouterFactory::createRouter
+	router: Remp\RouterFactory::createRouter
+
+	# Repositories
 	- Remp\MailerModule\Repository\LayoutsRepository
-	- Remp\MailerModule\Repository\ChannelsRepository
+	- Remp\MailerModule\Repository\NewslettersRepository
 
-	filterLoader:
-		class: Remp\MailerModule\Helpers\FilterLoader
-		setup:
-			- register('userDate', [Remp\MailerModule\Helpers\UserDateHelper(), process])
-			- register('boolean', [Remp\MailerModule\Helpers\BooleanHelper(), process])
-
-	nette.latteFactory:
-		setup:
-			- addFilter(null, [@filterLoader, 'load'])
-
+	# Factories
+	- Remp\MailerModule\DataTable\IDataTableFactory
 
 	# Forms
 	- Remp\MailerModule\Forms\LayoutFormFactory
-	- Remp\MailerModule\Forms\ChannelFormFactory
+	- Remp\MailerModule\Forms\NewsletterFormFactory

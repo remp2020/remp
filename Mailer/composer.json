@@ -32,7 +32,8 @@
         "bower-asset/google-material-color": "^1.3",
         "bower-asset/jquery-placeholder": "^2.3",
         "bower-asset/autosize": "^3.0",
-        "vlucas/phpdotenv": "^2.4"
+        "vlucas/phpdotenv": "^2.4",
+        "bower-asset/datatables.net": "^2.1"
     },
     "require-dev": {
         "nette/tester": "^1.6"

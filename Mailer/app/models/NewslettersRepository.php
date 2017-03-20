@@ -5,9 +5,11 @@ namespace Remp\MailerModule\Repository;
 use Nette\Database\Table\IRow;
 use Remp\MailerModule\Repository;
 
-class ChannelsRepository extends Repository
+class NewslettersRepository extends Repository
 {
-    protected $tableName = 'channels';
+    protected $tableName = 'newsletters';
+
+    protected $dataTableSearchable = ['name'];
 
     public function all()
     {
@@ -33,5 +35,24 @@ class ChannelsRepository extends Repository
     {
         $params['updated_at'] = new \DateTime();
         return parent::update($row, $data);
+    }
+
+    public function tableFilter($query, $order, $orderDirection)
+    {
+        $selection = $this->getTable()
+            ->select('newsletters.*, count(:newsletter_consents.id) AS subscribers')
+            ->order($order . ' ' . strtoupper($orderDirection))
+            ->group('newsletters.id');
+
+        if (!empty($query)) {
+            $where = [];
+            foreach ($this->dataTableSearchable as $col) {
+                $where[$col . ' LIKE ?'] = '%' . $query . '%';
+            }
+
+            $selection->whereOr($where);
+        }
+
+        return $selection->fetchAll();
     }
 }

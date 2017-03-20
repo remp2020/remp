@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "6daf739c479e22de06f8c51d25226ae9",
+    "content-hash": "53cf126ae19adcf29d2e68b428a54061",
     "packages": [
         {
             "name": "bower-asset/animate.css",
-            "version": "3.5.0",
+            "version": "3.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/daneden/animate.css.git",
-                "reference": "0a6a8abf551c9abff96de1b97232bf0fd9a48ba2"
+                "reference": "dac3dab7b59cb6072b5d0fe23eae3805e370a58c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/daneden/animate.css/zipball/0a6a8abf551c9abff96de1b97232bf0fd9a48ba2",
-                "reference": "0a6a8abf551c9abff96de1b97232bf0fd9a48ba2",
+                "url": "https://api.github.com/repos/daneden/animate.css/zipball/dac3dab7b59cb6072b5d0fe23eae3805e370a58c",
+                "reference": "dac3dab7b59cb6072b5d0fe23eae3805e370a58c",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -25,7 +25,6 @@
                 "bower-asset-main": "./animate.css",
                 "bower-asset-ignore": [
                     ".*",
-                    "source",
                     "*.yml",
                     "Gemfile",
                     "Gemfile.lock",
@@ -109,6 +108,47 @@
                 "mobile-first",
                 "responsive",
                 "web"
+            ]
+        },
+        {
+            "name": "bower-asset/datatables.net",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DataTables/Dist-DataTables.git",
+                "reference": "85726f829b5fa11bc6e4ce023c6962c488bc0171"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DataTables/Dist-DataTables/zipball/85726f829b5fa11bc6e4ce023c6962c488bc0171",
+                "reference": "85726f829b5fa11bc6e4ce023c6962c488bc0171",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.7"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "js/jquery.dataTables.js"
+                ],
+                "bower-asset-ignore": [
+                    "composer.json",
+                    "datatables.json",
+                    "package.json"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "DataTables for jQuery ",
+            "keywords": [
+                "DataTables",
+                "DataTables",
+                "filter",
+                "jQuery",
+                "sort",
+                "table"
             ]
         },
         {
@@ -289,16 +329,16 @@
         },
         {
             "name": "bower-asset/malihu-custom-scrollbar-plugin",
-            "version": "3.1.0",
+            "version": "3.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/malihu/malihu-custom-scrollbar-plugin.git",
-                "reference": "0e8b39f5d4e39e575dcfa0c8dca68a159d9d5a24"
+                "reference": "eac2b0af71a7ca06cc19e28d15ba60f6db2dfd29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/malihu/malihu-custom-scrollbar-plugin/zipball/0e8b39f5d4e39e575dcfa0c8dca68a159d9d5a24",
-                "reference": "0e8b39f5d4e39e575dcfa0c8dca68a159d9d5a24",
+                "url": "https://api.github.com/repos/malihu/malihu-custom-scrollbar-plugin/zipball/eac2b0af71a7ca06cc19e28d15ba60f6db2dfd29",
+                "reference": "eac2b0af71a7ca06cc19e28d15ba60f6db2dfd29",
                 "shasum": ""
             },
             "require": {
@@ -1150,16 +1190,16 @@
         },
         {
             "name": "nette/php-generator",
-            "version": "v2.6.0",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/php-generator.git",
-                "reference": "eff05975fee1645471d4371b7a0a7acb62a25b15"
+                "reference": "361f671c269e389c078da9cd2cd6a80164d9813d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/php-generator/zipball/eff05975fee1645471d4371b7a0a7acb62a25b15",
-                "reference": "eff05975fee1645471d4371b7a0a7acb62a25b15",
+                "url": "https://api.github.com/repos/nette/php-generator/zipball/361f671c269e389c078da9cd2cd6a80164d9813d",
+                "reference": "361f671c269e389c078da9cd2cd6a80164d9813d",
                 "shasum": ""
             },
             "require": {
@@ -1202,7 +1242,7 @@
             ],
             "description": "Nette PHP Generator",
             "homepage": "https://nette.org",
-            "time": "2017-02-24T19:24:08+00:00"
+            "time": "2017-03-14T15:50:04+00:00"
         },
         {
             "name": "nette/reflection",
@@ -1608,7 +1648,7 @@
         },
         {
             "name": "symfony/config",
-            "version": "v3.2.5",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
@@ -1664,7 +1704,7 @@
         },
         {
             "name": "symfony/console",
-            "version": "v3.2.5",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
@@ -1727,7 +1767,7 @@
         },
         {
             "name": "symfony/debug",
-            "version": "v3.2.5",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
@@ -1784,7 +1824,7 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v3.2.5",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
@@ -1892,7 +1932,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.5",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
@@ -2059,44 +2099,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "bower-asset/summernote",
-            "version": "v0.8.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/summernote/summernote.git",
-                "reference": "9a5e5abe214f194d920b219c409322dfa7688c8c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/summernote/summernote/zipball/9a5e5abe214f194d920b219c409322dfa7688c8c",
-                "reference": "9a5e5abe214f194d920b219c409322dfa7688c8c",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/bootstrap": ">=3.0.1",
-                "bower-asset/jquery": ">=1.9.0"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "./dist/summernote.js",
-                    "./dist/summernote.css"
-                ],
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "Gruntfile.js",
-                    "MAINTAIN.md",
-                    "grunts",
-                    "node_modules",
-                    "bower_components",
-                    "test"
-                ]
-            },
-            "license": [
-                "MIT"
-            ]
-        },
         {
             "name": "nette/tester",
             "version": "v1.7.1",

@@ -4,28 +4,28 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Object;
-use Remp\MailerModule\Repository\ChannelsRepository;
+use Remp\MailerModule\Repository\NewslettersRepository;
 
-class ChannelFormFactory extends Object
+class NewsletterFormFactory extends Object
 {
-    /** @var ChannelsRepository */
-    private $channelsRepository;
+    /** @var NewslettersRepository */
+    private $newslettersRepository;
 
     public $onCreate;
 
     public $onUpdate;
 
-    public function __construct(ChannelsRepository $channelsRepository)
+    public function __construct(NewslettersRepository $newslettersRepository)
     {
-        $this->channelsRepository = $channelsRepository;
+        $this->newslettersRepository = $newslettersRepository;
     }
 
     public function create($id)
     {
         $defaults = [];
         if (isset($id)) {
-            $channel = $this->channelsRepository->find($id);
-            $defaults = $channel->toArray();
+            $newsletter = $this->newslettersRepository->find($id);
+            $defaults = $newsletter->toArray();
         }
 
         $form = new Form;
@@ -52,11 +52,11 @@ class ChannelFormFactory extends Object
     public function formSucceeded($form, $values)
     {
         if (!empty($values['id'])) {
-            $row = $this->channelsRepository->find($values['id']);
-            $this->channelsRepository->update($row, $values);
+            $row = $this->newslettersRepository->find($values['id']);
+            $this->newslettersRepository->update($row, $values);
             ($this->onUpdate)($row);
         } else {
-            $row = $this->channelsRepository->add($values['name'], $values['consent_required']);
+            $row = $this->newslettersRepository->add($values['name'], $values['consent_required']);
             ($this->onCreate)($row);
         }
     }

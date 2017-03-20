@@ -24,9 +24,27 @@ final class LayoutPresenter extends BasePresenter
         $this->layoutFormFactory = $layoutFormFactory;
     }
 
-    public function renderDefault()
+    public function renderDefaultJsonData()
     {
-        $this->template->layouts = $this->layoutsRepository->all();
+        $request = $this->request->getParameters();
+
+        $layouts = $this->layoutsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
+        $result = [
+            'recordsTotal' => $this->layoutsRepository->totalCount(),
+            'recordsFiltered' => count($layouts),
+            'data' => []
+        ];
+
+        $layouts = array_slice($layouts, $request['start'], $request['length']);
+
+        foreach ($layouts as $layout) {
+            $result['data'][] = [
+                'RowId' => $layout->id,
+                $layout->name,
+                $layout->created_at,
+            ];
+        }
+        $this->presenter->sendJson($result);
     }
 
     public function renderEdit($id)

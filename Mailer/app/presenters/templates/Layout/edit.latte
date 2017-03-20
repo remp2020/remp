@@ -1,6 +1,7 @@
 {layout '../@layout.latte'}
 
-{block content}
+{block #content}
+
 <div class="c-header">
     <h2>Layouts</h2>
 </div>
@@ -12,10 +13,3 @@
         {include '@form.latte'}
     </div>
 </div>
-{/block}
-
-{block scripts}
-    {include parent}
-    <script src="/assets/js/ckeditor/ckeditor.js"></script>
-    <script src="/assets/vendor/autosize/dist/autosize.min.js"></script>
-{/block}
