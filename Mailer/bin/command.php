@@ -3,13 +3,17 @@
 
 use Remp\MailerModule\PhinxRegistrator;
 use Symfony\Component\Console\Application;
-use Nette\Database\DriverException;
-use Nette\InvalidArgumentException;
 
 $container = require __DIR__ . '/../app/bootstrap.php';
 $application = new Application();
 $application->setCatchExceptions(false);
 
 $phinxRegistrator = new PhinxRegistrator($application);
+
+$manager = $container->getByType('Remp\MailerModule\ApplicationManager');
+foreach ($manager->getCommands() as $command) {
+    $command = $container->getByType($command);
+    $application->add($command);
+}
 
 $application->run();

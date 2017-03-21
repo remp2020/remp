@@ -14,6 +14,12 @@ session:
 services:
 	router: Remp\RouterFactory::createRouter
 
+	applicationManager:
+	    class: Remp\MailerModule\ApplicationManager
+	    setup:
+	        - addCommand(Remp\MailerModule\Commands\HelloWorldCommand)
+
+
 	# Repositories
 	- Remp\MailerModule\Repository\UsersRepository
 	- Remp\MailerModule\Repository\LayoutsRepository
@@ -25,3 +31,6 @@ services:
 	# Forms
 	- Remp\MailerModule\Forms\LayoutFormFactory
 	- Remp\MailerModule\Forms\ListFormFactory
+
+	# Commands
+	- Remp\MailerModule\Commands\HelloWorldCommand
