@@ -5,9 +5,9 @@ namespace Remp\MailerModule\Repository;
 use Nette\Database\Table\IRow;
 use Remp\MailerModule\Repository;
 
-class NewslettersRepository extends Repository
+class ListsRepository extends Repository
 {
-    protected $tableName = 'newsletters';
+    protected $tableName = 'lists';
 
     protected $dataTableSearchable = ['name'];
 
@@ -40,9 +40,9 @@ class NewslettersRepository extends Repository
     public function tableFilter($query, $order, $orderDirection)
     {
         $selection = $this->getTable()
-            ->select('newsletters.*, count(:newsletter_consents.id) AS subscribers')
+            ->select('lists.*, count(:list_user_consents.id) AS subscribers')
             ->order($order . ' ' . strtoupper($orderDirection))
-            ->group('newsletters.id');
+            ->group('lists.id');
 
         if (!empty($query)) {
             $where = [];

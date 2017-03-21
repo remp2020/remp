@@ -15,12 +15,13 @@ services:
 	router: Remp\RouterFactory::createRouter
 
 	# Repositories
+	- Remp\MailerModule\Repository\UsersRepository
 	- Remp\MailerModule\Repository\LayoutsRepository
-	- Remp\MailerModule\Repository\NewslettersRepository
+	- Remp\MailerModule\Repository\ListsRepository
 
 	# Factories
 	- Remp\MailerModule\DataTable\IDataTableFactory
 
 	# Forms
 	- Remp\MailerModule\Forms\LayoutFormFactory
-	- Remp\MailerModule\Forms\NewsletterFormFactory
+	- Remp\MailerModule\Forms\ListFormFactory

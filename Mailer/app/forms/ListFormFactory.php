@@ -4,27 +4,27 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Object;
-use Remp\MailerModule\Repository\NewslettersRepository;
+use Remp\MailerModule\Repository\ListsRepository;
 
-class NewsletterFormFactory extends Object
+class ListFormFactory extends Object
 {
-    /** @var NewslettersRepository */
-    private $newslettersRepository;
+    /** @var ListsRepository */
+    private $listsRepository;
 
     public $onCreate;
 
     public $onUpdate;
 
-    public function __construct(NewslettersRepository $newslettersRepository)
+    public function __construct(ListsRepository $listsRepository)
     {
-        $this->newslettersRepository = $newslettersRepository;
+        $this->listsRepository = $listsRepository;
     }
 
     public function create($id)
     {
         $defaults = [];
         if (isset($id)) {
-            $newsletter = $this->newslettersRepository->find($id);
+            $newsletter = $this->listsRepository->find($id);
             $defaults = $newsletter->toArray();
         }
 
@@ -52,11 +52,11 @@ class NewsletterFormFactory extends Object
     public function formSucceeded($form, $values)
     {
         if (!empty($values['id'])) {
-            $row = $this->newslettersRepository->find($values['id']);
-            $this->newslettersRepository->update($row, $values);
+            $row = $this->listsRepository->find($values['id']);
+            $this->listsRepository->update($row, $values);
             ($this->onUpdate)($row);
         } else {
-            $row = $this->newslettersRepository->add($values['name'], $values['consent_required']);
+            $row = $this->listsRepository->add($values['name'], $values['consent_required']);
             ($this->onCreate)($row);
         }
     }
