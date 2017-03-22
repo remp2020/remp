@@ -1,12 +1,36 @@
 {
-    "memo": "729c72c192d298e38a0c2d1c65d8f9cc4a674bd0b80156d0cdf4f2b3fbf4e77d",
+    "memo": "142580ecbb3eb60d8c1d00a2e98e795476c5fb3a6cd7ccf1c1f3bf0bdc2a8055",
     "projects": [
+        {
+            "name": "github.com/Shopify/sarama",
+            "version": "v1.11.0",
+            "revision": "0fb560e5f7fbcaee2f75e3c34174320709f69944",
+            "packages": [
+                "."
+            ]
+        },
         {
             "name": "github.com/armon/go-metrics",
             "branch": "master",
             "revision": "93f237eba9b0602f3e73710416558854a81d9337",
             "packages": [
                 "."
+            ]
+        },
+        {
+            "name": "github.com/boltdb/bolt",
+            "version": "v1.3.0",
+            "revision": "583e8937c61f1af6513608ccc75c97b6abdf4ff9",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/davecgh/go-spew",
+            "version": "v1.1.0",
+            "revision": "a7a0063072ed89d04285d3d3362aa590ed9f7878",
+            "packages": [
+                "spew"
             ]
         },
         {
@@ -26,9 +50,33 @@
             ]
         },
         {
+            "name": "github.com/eapache/go-resiliency",
+            "version": "v1.0.0",
+            "revision": "6800482f2c813e689c88b7ed3282262385011890",
+            "packages": [
+                "breaker"
+            ]
+        },
+        {
+            "name": "github.com/eapache/go-xerial-snappy",
+            "branch": "master",
+            "revision": "bb955e01b9346ac19dc29eb16586c90ded99a98c",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/eapache/queue",
+            "version": "v1.0.2",
+            "revision": "ded5959c0d4e360646dc9e9908cff48666781367",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "github.com/goadesign/goa",
             "branch": "master",
-            "revision": "8ffa6c85e2654beddf6703d5fc1028c1c29c854f",
+            "revision": "4f95e6909e86c0cd66e4dc9046f1de457b922036",
             "packages": [
                 ".",
                 "client",
@@ -42,9 +90,116 @@
             ]
         },
         {
+            "name": "github.com/golang/snappy",
+            "branch": "master",
+            "revision": "553a641470496b2327abcac10b36396bd98e45c9",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/gorilla/context",
+            "version": "v1.1",
+            "revision": "a85d2e53ba63bdea074dbbbb5983f0516974e87b",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/gorilla/handlers",
+            "version": "v1.2",
+            "revision": "3a5767ca75ece5f7f1440b1d16975247f8d8b221",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/gorilla/mux",
+            "version": "v1.3.0",
+            "revision": "392c28fe23e1c45ddba891b0320b3b5df220beea",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/hashicorp/errwrap",
+            "branch": "master",
+            "revision": "7554cd9344cec97297fa6649b055a8c98c2a1e55",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/hashicorp/go-msgpack",
+            "branch": "master",
+            "revision": "fa3f63826f7c23912c15263591e65d54d080b458",
+            "packages": [
+                "codec"
+            ]
+        },
+        {
+            "name": "github.com/hashicorp/go-multierror",
+            "branch": "master",
+            "revision": "ed905158d87462226a13fe39ddf685ea65f1c11f",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/hashicorp/memberlist",
+            "branch": "f-all-join-errors",
+            "revision": "b6a7ac342234319bde5dca289ca23f17355fc17b",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/hashicorp/raft",
+            "branch": "master",
+            "revision": "5f09c4ffdbcd2a53768e78c47717415de12b6728",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/hashicorp/raft-boltdb",
+            "branch": "master",
+            "revision": "df631556b57507bd5d0ed4f87468fd93ab025bef",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/hashicorp/serf",
+            "version": "v0.8.1",
+            "revision": "d6574a5bb1226678d7010325fb6c985db20ee458",
+            "packages": [
+                "coordinate",
+                "serf"
+            ]
+        },
+        {
             "name": "github.com/inconshreveable/mousetrap",
             "branch": "master",
             "revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/influxdata/influxdb",
+            "version": "v1.2.2",
+            "revision": "97a34f096a58e761199de2ee04ee63f781d5363e",
+            "packages": [
+                "client/v2",
+                "models",
+                "pkg/escape"
+            ]
+        },
+        {
+            "name": "github.com/klauspost/crc32",
+            "version": "v1.1",
+            "revision": "cb6bfca970f6908083f26f39a79009d608efd5cd",
             "packages": [
                 "."
             ]
@@ -58,9 +213,41 @@
             ]
         },
         {
+            "name": "github.com/pierrec/lz4",
+            "branch": "master",
+            "revision": "90290f74b1b4d9c097f0a3b3c7eba2ef3875c699",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/pierrec/xxHash",
+            "version": "v0.1.1",
+            "revision": "f04d8931c4dcc407bf3db7cb16a10e620c39c8bc",
+            "packages": [
+                "xxHash32"
+            ]
+        },
+        {
+            "name": "github.com/pkg/errors",
+            "version": "v0.8.0",
+            "revision": "3866ebc348c54054262feae422da428fe6cf147d",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/rcrowley/go-metrics",
+            "branch": "master",
+            "revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "github.com/satori/go.uuid",
             "version": "v1.1.0",
-            "revision": "879c5887cd475cd7864858769793b2ceb0d44feb",
+            "revision": "03612e14496bef24a0d0c0b912407851329b64c7",
             "packages": [
                 "."
             ]
@@ -82,6 +269,36 @@
             ]
         },
         {
+            "name": "github.com/travisjeffery/jocko",
+            "branch": "master",
+            "revision": "03a75475d705e35c1313790d2c6f89d29ebb26ae",
+            "packages": [
+                ".",
+                "broker",
+                "commitlog",
+                "protocol",
+                "raft",
+                "serf",
+                "server"
+            ]
+        },
+        {
+            "name": "github.com/travisjeffery/simplelog",
+            "branch": "master",
+            "revision": "093f98c1b88ff5bb12fdd35d923c4873253cbc60",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tysontate/gommap",
+            "branch": "master",
+            "revision": "e87a6e482c2ceaa54bd76e0fb30d1f2d40dd3f01",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "github.com/zach-klippenstein/goregen",
             "branch": "master",
             "revision": "795b5e3961ea1912fde60af417ad85e86acc0d6a",
@@ -96,6 +313,14 @@
             "packages": [
                 "context",
                 "websocket"
+            ]
+        },
+        {
+            "name": "golang.org/x/sys",
+            "branch": "master",
+            "revision": "99f16d856c9836c42d24e7ab64ea72916925fa97",
+            "packages": [
+                "unix"
             ]
         }
     ]

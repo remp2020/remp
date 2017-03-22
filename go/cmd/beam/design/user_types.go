@@ -59,6 +59,7 @@ var TrackEvent = Type("TrackEvent", func() {
 
 var CommerceCheckout = Type("CommerceCheckout", func() {
 	Attribute("funnel_id", String)
+
 	Required("funnel_id")
 })
 
@@ -66,9 +67,13 @@ var CommercePayment = Type("CommercePayment", func() {
 	Attribute("transaction_id", String, "Public ID of transaction (variable symbol)")
 	Attribute("product_ids", ArrayOf(String), "Public IDs of selected products")
 	Attribute("revenue", Revenue, "Amount of money for given payment")
+
+	Required("revenue", "transaction_id", "product_ids")
 })
 
 var Revenue = Type("Revenue", func() {
 	Attribute("amount", Number, "Numeric amount of money")
 	Attribute("currency", String, "ISO 4217 representation of currency")
+
+	Required("amount", "currency")
 })
