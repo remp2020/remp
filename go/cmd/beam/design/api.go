@@ -21,5 +21,5 @@ var _ = API("beam", func() {
 		Status(400)
 		Media(ErrorMedia)
 	})
-	Host("localhost:8080")
+	Host("localhost:8081")
 })

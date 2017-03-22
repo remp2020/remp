@@ -35,4 +35,4 @@ beam-docker-build:
 docker-compose: beam-docker-build
 	@set -e; \
 	docker-compose down --rmi local; \
-	docker-compose up
+	docker-compose build --pull

@@ -1,24 +1,14 @@
 #! /usr/bin/make
 
-GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen/"
+GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen"
+DESIGN_PKG="gitlab.com/remp/remp/go/cmd/beam/design"
 
-DEPEND=	bitbucket.org/pkg/inflect \
-	github.com/goadesign/goa \
-	github.com/goadesign/goa/goagen \
-	github.com/goadesign/goa/logging/logrus \
-	github.com/Sirupsen/logrus \
-	gopkg.in/yaml.v2 \
-	golang.org/x/tools/cmd/goimports
-
-all: dep clean gen build
+all: clean gen build
 
 build: gen build-only
 
 build-only:
-	@go build
-
-dep:
-	@go get $(DEPEND)
+	go build
 
 clean:
 	@rm -rf app
@@ -28,31 +18,33 @@ clean:
 	@rm -f beam
 
 gen:
-	@cd $(GOAGEN_DIR) && go build
-	@$(GOAGEN_DIR)/goagen app     -d gitlab.com/remp/remp/go/cmd/beam/design
-	@$(GOAGEN_DIR)/goagen swagger -d gitlab.com/remp/remp/go/cmd/beam/design -o public
-	@rm $(GOAGEN_DIR)/goagen
+	set -e
+	cd $(GOAGEN_DIR) && go build
+	$(GOAGEN_DIR)/goagen app     -d $(DESIGN_PKG)
+	$(GOAGEN_DIR)/goagen swagger -d $(DESIGN_PKG)
+	rm $(GOAGEN_DIR)/goagen
 
-build: dep gen
-	@go build -o beam
+build: gen
+	go build -o beam
 
-build-static: dep gen
-	@CGO_ENABLED=0 go build -a -installsuffix cgo -o beam
+build-static: gen
+	CGO_ENABLED=0 go build -a -installsuffix cgo -o beam
 
 docker-build:
-	@docker build -t remp-beam_builder builder/
-	@docker run --rm -v $$PWD/../../:/src/build remp-beam_builder > beam.tar
+	set -e; \
+    docker build -t remp-beam_builder builder; \
+    docker run --rm -v $$PWD/../../:/src/build remp-beam_builder > beam.tar;
 
 docker-run: docker-build
-	@docker build -t remp-beam .
+	docker build -t remp-beam .
 
-install: dep gen
-	@go install
+install: gen
+	go install
 
 lint:
-	@set -e; \
+	set -e; \
 	for package in $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)'); \
 	do golint -set_exit_status=true $$package; done
 
 vet:
-	@go vet $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)')
+	go vet $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)')

@@ -35,6 +35,7 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
+	log.Println("connecting to broker:", c.BrokerAddr)
 	eventProducer, err := newProducer([]string{c.BrokerAddr})
 	if err != nil {
 		log.Fatalln(err)
@@ -47,7 +48,7 @@ func main() {
 		eventProducer,
 	))
 
-	log.Println("starting server: ", c.Addr)
+	log.Println("starting server:", c.Addr)
 	srv := &http.Server{
 		Addr:    c.Addr,
 		Handler: service.Mux,
@@ -79,7 +80,7 @@ func newProducer(brokerList []string) (sarama.AsyncProducer, error) {
 	// Note: messages will only be returned here after all retry attempts are exhausted.
 	go func() {
 		for err := range producer.Errors() {
-			log.Println("Failed to write access log entry:", err)
+			log.Println("Failed to write kafka producer entry:", err)
 		}
 	}()
 
