@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -e
+
+cp -a /src/build/. /go/src/gitlab.com/remp/remp/go &>/dev/null
+cd cmd/beam && make build-static &>/dev/null
+tar -cf - beam swagger

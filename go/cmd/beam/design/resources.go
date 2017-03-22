@@ -9,7 +9,7 @@ var _ = Resource("swagger", func() {
 		Headers("*")
 	})
 	NoSecurity()
-	Files("/swagger.json", "public/swagger/swagger.json")
+	Files("/swagger.json", "swagger/swagger.json")
 })
 
 var _ = Resource("track", func() {

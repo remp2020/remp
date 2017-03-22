@@ -11,15 +11,23 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
+	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/go/cmd/beam/app"
 	"gitlab.com/remp/remp/go/cmd/beam/controller"
 )
 
-const (
-	brokerAddr = "localhost:9092"
-)
-
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		errors.Wrap(err, "unable to load .env file")
+	}
+	var c Config
+	if err := envconfig.Process("beam", &c); err != nil {
+		errors.Wrap(err, "unable to process envconfig")
+	}
+
 	service := goa.New("beam")
 
 	service.Use(middleware.RequestID())
@@ -27,7 +35,7 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	eventProducer, err := newProducer([]string{brokerAddr})
+	eventProducer, err := newProducer([]string{c.BrokerAddr})
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -39,8 +47,9 @@ func main() {
 		eventProducer,
 	))
 
+	log.Println("starting server: ", c.Addr)
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    c.Addr,
 		Handler: service.Mux,
 	}
 
