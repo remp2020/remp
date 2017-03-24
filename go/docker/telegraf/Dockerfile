@@ -5,3 +5,17 @@
 FROM telegraf:1.2-alpine
 
 ADD telegraf.conf /etc/telegraf/
+
+WORKDIR /bin
+
+COPY dockerize-alpine-linux-amd64-v0.3.0.tar.gz ./dockerize.tar.gz
+
+RUN tar -xf dockerize.tar.gz
+
+RUN rm dockerize.tar.gz
+
+# TODO: wait until beam_events is ready
+
+# TODO: beam_events is actually not being created automatically right now, ches/kafka doesn't support it
+
+CMD ["dockerize", "-timeout", "1m", "-wait", "tcp://zookeeper:2181", "-wait", "tcp://influxdb:8086", "telegraf"]
