@@ -20,7 +20,7 @@ clean:
 gen:
 	set -e
 	cd $(GOAGEN_DIR) && go build
-	$(GOAGEN_DIR)/goagen app     -d $(DESIGN_PKG)
+	$(GOAGEN_DIR)/goagen app -d $(DESIGN_PKG)
 	$(GOAGEN_DIR)/goagen swagger -d $(DESIGN_PKG)
 	rm $(GOAGEN_DIR)/goagen
 

@@ -2,10 +2,8 @@ FROM alpine
 
 WORKDIR /bin
 
-COPY beam.tar .
+ADD beam.tar .
 
-RUN tar -xf beam.tar
+ADD dockerize-alpine-linux-amd64-v0.3.0.tar.gz .
 
-RUN rm beam.tar
-
-CMD ["beam"]
+CMD ["dockerize", "-timeout", "1m", "-wait", "tcp://zookeeper:2181", "beam"]
