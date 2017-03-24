@@ -42,13 +42,11 @@ services:
         restart: "unless-stopped"
 
     telegraf:
-        image: "telegraf:1.2-alpine"
+        build: "docker/telegraf"
         depends_on:
             - "influxdb"
             - "zookeeper"
             - "kafka"
-        volumes:
-            - "./docker/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
         restart: "unless-stopped"
 
 volumes:
