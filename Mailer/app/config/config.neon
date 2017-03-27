@@ -19,6 +19,7 @@ database:
 
 services:
 	router: Remp\RouterFactory::createRouter
+	environmentConfig: Remp\MailerModule\EnvironmentConfig
 
 	applicationManager:
 	    class: Remp\MailerModule\ApplicationManager
