@@ -28,3 +28,11 @@ build-only:
 build-simple: clear gen-only build-only
 
 pr: clear build lint vet test-only
+
+beam-docker-build:
+	@cd $(SUB_BEAM) && make docker-build
+
+docker-compose: beam-docker-build
+	@set -e; \
+	docker-compose down --rmi local; \
+	docker-compose build --pull

@@ -107,7 +107,7 @@ func (c *TrackController) pushEvent(system *app.TrackSystem, name string, tags m
 		return err
 	}
 	c.EventProducer.Input() <- &sarama.ProducerMessage{
-		Topic: "access_log",
+		Topic: "beam_events",
 		Key:   sarama.StringEncoder(system.APIKey),
 		Value: sarama.StringEncoder(p.String()),
 	}
