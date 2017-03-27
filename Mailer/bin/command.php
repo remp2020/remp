@@ -8,7 +8,7 @@ $container = require __DIR__ . '/../app/bootstrap.php';
 $application = new Application();
 $application->setCatchExceptions(false);
 
-$phinxRegistrator = new PhinxRegistrator($application);
+$phinxRegistrator = new PhinxRegistrator($application, $container->getByType('Remp\MailerModule\EnvironmentConfig'));
 
 $manager = $container->getByType('Remp\MailerModule\ApplicationManager');
 foreach ($manager->getCommands() as $command) {
