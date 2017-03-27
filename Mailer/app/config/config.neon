@@ -6,10 +6,16 @@ application:
 	mapping:
 		*: Remp\*Module\Presenters\*Presenter
 
-
 session:
 	expiration: 14 days
 
+database:
+    default:
+        dsn: @environmentConfig::getDsn()
+        user: @environmentConfig::get('DB_USER')
+        password: @environmentConfig::get('DB_PASS')
+        options:
+            lazy: yes
 
 services:
 	router: Remp\RouterFactory::createRouter

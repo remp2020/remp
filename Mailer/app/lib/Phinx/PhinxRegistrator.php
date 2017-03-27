@@ -7,6 +7,8 @@ use Symfony\Component\Console\Application;
 
 class PhinxRegistrator
 {
+    /** @var EnvironmentConfig */
+    private $environmentConfig;
 
     /** @var array Define phinx commands with aliases */
     private $command = [
@@ -20,9 +22,11 @@ class PhinxRegistrator
 
     /**
      * @param Application $application
+     * @param EnvironmentConfig $environmentConfig
      */
-    public function __construct(Application $application)
+    public function __construct(Application $application, EnvironmentConfig $environmentConfig)
     {
+        $this->environmentConfig = $environmentConfig;
         $config = new Config($this->buildConfig(), __FILE__);
 
         foreach ($this->command as $class => $commandName) {
@@ -54,12 +58,12 @@ class PhinxRegistrator
         ];
 
         $configData['environments'][$env] = [
-            'adapter' => getenv('DB_ADAPTER'),
-            'host' => getenv('DB_HOST'),
-            'name' => getenv('DB_NAME'),
-            'user' => getenv('DB_USER'),
-            'pass' => getenv('DB_PASS'),
-            'port' => getenv('DB_PORT'),
+            'adapter' => $this->environmentConfig->get('DB_ADAPTER'),
+            'host' => $this->environmentConfig->get('DB_HOST'),
+            'name' => $this->environmentConfig->get('DB_NAME'),
+            'user' => $this->environmentConfig->get('DB_USER'),
+            'pass' => $this->environmentConfig->get('DB_PASS'),
+            'port' => $this->environmentConfig->get('DB_PORT'),
             'charset' => 'utf8'
         ];
 

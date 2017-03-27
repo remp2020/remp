@@ -22,7 +22,7 @@ class HelloWorldCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument('name');
-        
+
         $output->writeln('');
         $output->writeln('<info>***** HELLO ' . strtoupper($name) . ' *****</info>');
         $output->writeln('');
