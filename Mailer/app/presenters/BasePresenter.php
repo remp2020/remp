@@ -17,7 +17,11 @@ abstract class BasePresenter extends Presenter
     {
         parent::startup();
 
-        // @TODO USER AUTHENTICATION
+        if (!$this->getUser()->isLoggedIn()) {
+            $this->redirect('Sign:In');
+        }
+
+        $this->template->currentUser = $this->getUser();
     }
 
     public function createComponentDataTable()
