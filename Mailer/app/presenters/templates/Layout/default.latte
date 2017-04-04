@@ -1,0 +1,16 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Layouts</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2>Lorem ipsum <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+        <div class="actions">
+            <a n:href="Layout:new" class="btn palette-Cyan bg waves-effect">Add new layout</a>
+        </div>
+    </div>
+    {control dataTable ['name', 'created_at' => ['header' => 'created at', 'render' => 'date']], 'Layout:edit', [['edit', 'palette-Cyan zmdi-edit']]}
+</div>

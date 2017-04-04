@@ -1,0 +1,58 @@
+#header {
+    background: url("../img/logo.png") no-repeat;
+    background-size: contain;
+}
+
+#s-user-alerts {
+    background: #f0f0f0;
+}
+
+.toggle-switch .ts-label {
+    min-width: 150px;
+    cursor: pointer;
+}
+
+.table-hover tbody tr {
+    cursor: pointer;
+}
+
+tr th.sorting:hover,
+tr th.sorting_asc:hover,
+tr th.sorting_desc:hover {
+    cursor: pointer;
+    color: #000;
+}
+
+tr th.sorting_asc:before {
+    font-family: 'Material-Design-Iconic-Font';
+    content: '\f2fe';
+    padding: 5px;
+}
+
+tr th.sorting_asc:hover:before {
+    font-family: 'Material-Design-Iconic-Font';
+    content: '\f303';
+    padding: 5px;
+}
+
+tr th.sorting:before {
+    font-family: 'Material-Design-Iconic-Font';
+    content: '\f2fe';
+    padding: 5px;
+    color: #999;
+}
+tr th.sorting:hover:before {
+    color: #000;
+}
+
+tr th.sorting_desc:before {
+    font-family: 'Material-Design-Iconic-Font';
+    content: '\f303';
+    padding: 5px;
+}
+
+tr th.sorting_desc:hover:before {
+    font-family: 'Material-Design-Iconic-Font';
+    content: '\f2fe';
+    padding: 5px;
+}

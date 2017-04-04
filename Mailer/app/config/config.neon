@@ -1,0 +1,47 @@
+parameters:
+    sso_host: http://crm.localhost.sk/
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: Remp\*Module\Presenters\*Presenter
+
+session:
+	expiration: 14 days
+
+database:
+    default:
+        dsn: @environmentConfig::getDsn()
+        user: @environmentConfig::get('DB_USER')
+        password: @environmentConfig::get('DB_PASS')
+        options:
+            lazy: yes
+
+services:
+	router: Remp\RouterFactory::createRouter
+	environmentConfig: Remp\MailerModule\EnvironmentConfig
+
+	console:
+	    class: Symfony\Component\Console\Application
+	    setup:
+	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
+	        - setCatchExceptions(true)
+
+	- Remp\MailerModule\Auth\Authenticator
+	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
+
+	# Repositories
+	- Remp\MailerModule\Repository\UsersRepository
+	- Remp\MailerModule\Repository\LayoutsRepository
+	- Remp\MailerModule\Repository\ListsRepository
+
+	# Factories
+	- Remp\MailerModule\DataTable\IDataTableFactory
+
+	# Forms
+	- Remp\MailerModule\Forms\SignInFormFactory
+	- Remp\MailerModule\Forms\LayoutFormFactory
+	- Remp\MailerModule\Forms\ListFormFactory
+
+	# Commands
+	- Remp\MailerModule\Commands\HelloWorldCommand

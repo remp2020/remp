@@ -1,0 +1,21 @@
+{layout '../@layout.latte'}
+
+{block content}
+<div class="c-header">
+    <h2>Newsletter lists</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2>Add new newsletter list<small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+    </div>
+    <div class="card-body card-padding">
+        {include '@form.latte'}
+    </div>
+</div>
+{/block}
+
+{block scripts}
+    {include parent}
+    <script src="/assets/js/ckeditor/ckeditor.js"></script>
+    <script src="/assets/vendor/autosize/dist/autosize.min.js"></script>
+{/block}
