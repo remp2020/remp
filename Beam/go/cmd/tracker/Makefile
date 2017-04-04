@@ -15,7 +15,7 @@ clean:
 	@rm -rf client
 	@rm -rf tool
 	@rm -rf public/swagger
-	@rm -f beam
+	@rm -f tracker
 
 gen:
 	set -e
@@ -25,18 +25,18 @@ gen:
 	rm $(GOAGEN_DIR)/goagen
 
 build: gen
-	go build -o beam
+	go build -o tracker
 
 build-static: gen
-	CGO_ENABLED=0 go build -a -installsuffix cgo -o beam
+	CGO_ENABLED=0 go build -a -installsuffix cgo -o tracker
 
 docker-build:
 	set -e; \
-    docker build -t remp-beam_builder builder; \
-    docker run --rm -v $$PWD/../../:/src/build remp-beam_builder > beam.tar;
+    docker build -t remp-beam_tracker_builder builder; \
+    docker run --rm -v $$PWD/../../:/src/build remp-beam_tracker_builder > tracker.tar;
 
 docker-run: docker-build
-	docker build -t remp-beam .
+	docker build -t remp-beam-tracker .
 
 install: gen
 	go install

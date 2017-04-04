@@ -1,6 +1,6 @@
 #! /usr/bin/make
 
-SUB_BEAM="cmd/beam"
+SUB_BEAM="go/cmd/tracker"
 
 clear:
 	@cd $(SUB_BEAM) && make clear
