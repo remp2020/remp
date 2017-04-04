@@ -7,9 +7,13 @@ class CreateListTable extends AbstractMigration
     public function change()
     {
         $this->table('lists')
+            ->addColumn('code', 'string')
             ->addColumn('name', 'string')
+            ->addColumn('description', 'text')
+            ->addColumn('is_consent_required', 'boolean', ['default' => false])
+            ->addColumn('is_locked', 'boolean', ['default' => true])
+            ->addColumn('is_public', 'boolean', ['default' => true])
             ->addTimestamps()
-            ->addColumn('consent_required', 'boolean', ['default' => true])
             ->save();
 
         $this->table('list_user_consents')

@@ -33,10 +33,18 @@ class ListFormFactory extends Object
 
         $form->addHidden('id', $id);
 
+        $form->addText('code', 'Code')
+            ->setRequired('Required');
+
         $form->addText('name', 'Name')
             ->setRequired('Required');
 
-        $form->addCheckbox('consent_required', 'Required user consent');
+        $form->addTextArea('description', 'Description')
+            ->setAttribute('rows', 3);
+
+        $form->addCheckbox('is_consent_required', 'Required user consent');
+        $form->addCheckbox('is_locked', 'Locked');
+        $form->addCheckbox('is_public', 'Public');
 
         $form->setDefaults($defaults);
 
@@ -56,7 +64,14 @@ class ListFormFactory extends Object
             $this->listsRepository->update($row, $values);
             ($this->onUpdate)($row);
         } else {
-            $row = $this->listsRepository->add($values['name'], $values['consent_required']);
+            $row = $this->listsRepository->add(
+                $values['code'],
+                    $values['name'],
+                    $values['description'],
+                    $values['is_consent_required'],
+                    $values['is_locked'],
+                    $values['is_public']
+            );
             ($this->onCreate)($row);
         }
     }

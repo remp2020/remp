@@ -49,9 +49,12 @@ final class ListPresenter extends BasePresenter
             $result['data'][] = [
                 'RowId' => $list->id,
                 $list->name,
-                $list->consent_required,
+                $list->code,
+                $list->is_consent_required,
+                $list->is_locked,
+                $list->is_public,
+                $list->is_consent_required == 1 ? $list->consents : $totalUsers - $list->consents,
                 $list->created_at,
-                $list->consent_required == 1 ? $list->subscribers : $totalUsers - $list->subscribers
             ];
         }
         $this->presenter->sendJson($result);

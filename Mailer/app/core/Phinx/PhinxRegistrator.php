@@ -12,12 +12,12 @@ class PhinxRegistrator
 
     /** @var array Define phinx commands with aliases */
     private $command = [
-        '\Phinx\Console\Command\Init' => 'init',
-        '\Phinx\Console\Command\Create' => 'create',
-        '\Phinx\Console\Command\Migrate' => 'migrate',
-        '\Phinx\Console\Command\Rollback' => 'rollback',
-        '\Phinx\Console\Command\Status' => 'status',
-        '\Phinx\Console\Command\Test' => 'test'
+        '\Phinx\Console\Command\Init' => 'migrate:init',
+        '\Phinx\Console\Command\Create' => 'migrate:create',
+        '\Phinx\Console\Command\Migrate' => 'migrate:migrate',
+        '\Phinx\Console\Command\Rollback' => 'migrate:rollback',
+        '\Phinx\Console\Command\Status' => 'migrate:status',
+        '\Phinx\Console\Command\Test' => 'migrate:test'
     ];
 
     /**

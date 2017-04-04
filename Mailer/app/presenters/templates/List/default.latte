@@ -12,5 +12,5 @@
             <a n:href="List:new" class="btn palette-Cyan bg waves-effect">Add new newsletter list</a>
         </div>
     </div>
-    {control dataTable ['name', 'consent_required' => ['header' => 'consent required', 'render' => 'boolean'], 'created_at' => ['header' => 'created at', 'render' => 'date'], 'subscribers' => ['header' => 'number of subscribers', 'render' => 'number', 'orderable' => false]], 'List:edit', [['edit', 'palette-Cyan zmdi-edit']]}
+    {control dataTable ['name', 'code', 'is_consent_required' => ['header' => 'consent required', 'render' => 'boolean'], 'is_locked' => ['header' => 'locked', 'render' => 'boolean'], 'is_public' => ['header' => 'public', 'render' => 'boolean'], 'subscribers' => ['header' => 'number of subscribers', 'render' => 'number', 'orderable' => false], 'created_at' => ['header' => 'created at', 'render' => 'date']], 'List:edit', [['edit', 'palette-Cyan zmdi-edit']]}
 </div>

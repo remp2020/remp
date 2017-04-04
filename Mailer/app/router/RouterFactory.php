@@ -9,21 +9,21 @@ use Nette\Application\Routers\Route;
 
 class RouterFactory
 {
-	use Nette\StaticClass;
+    use Nette\StaticClass;
 
-	/**
-	 * @return Nette\Application\IRouter
-	 */
-	public static function createRouter()
-	{
-		$router = new RouteList;
-		$router[] = new Route('<presenter>/<action>[/<id>]', [
+    /**
+     * @return Nette\Application\IRouter
+     */
+    public static function createRouter()
+    {
+        $router = new RouteList;
+        $router[] = new Route('<presenter>/<action>[/<id>]', [
             'module' => 'Mailer',
             'presenter' => 'Dashboard',
             'action' => 'default',
             'id' => NULL,
         ]);
-		return $router;
-	}
+        return $router;
+    }
 
 }

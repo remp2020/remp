@@ -14,7 +14,7 @@ class HelloWorldCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('hello')
+        $this->setName('test:hello')
             ->setDescription('Displays <info>Hello world</info> message')
             ->addArgument('name', InputArgument::OPTIONAL, 'Your name', 'WORLD');
     }

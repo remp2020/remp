@@ -21,10 +21,11 @@ services:
 	router: Remp\RouterFactory::createRouter
 	environmentConfig: Remp\MailerModule\EnvironmentConfig
 
-	applicationManager:
-	    class: Remp\MailerModule\ApplicationManager
+	console:
+	    class: Symfony\Component\Console\Application
 	    setup:
-	        - addCommand(Remp\MailerModule\Commands\HelloWorldCommand)
+	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
+	        - setCatchExceptions(true)
 
 	- Remp\MailerModule\Auth\Authenticator
 	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
