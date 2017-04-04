@@ -109,7 +109,7 @@ class AccountController extends Controller
         $account->fill($request->all());
         $account->save();
 
-        return redirect(route('accounts.index'))->with('success', 'Account created');
+        return redirect(route('accounts.index'))->with('success', 'Account updated');
     }
 
     /**
@@ -120,6 +120,7 @@ class AccountController extends Controller
      */
     public function destroy(Account $account)
     {
-        //
+        $account->delete();
+        return redirect(route('accounts.properties.index', $account))->with('success', 'Account removed');
     }
 }

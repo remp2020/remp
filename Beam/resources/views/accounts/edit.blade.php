@@ -9,10 +9,10 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Edit acount <small>{{ $account->name }}</small></h2>
+            <h2>Edit account <small>{{ $account->name }}</small></h2>
         </div>
         <div class="card-body card-padding">
-            {!! Form::model($account, ['route' => ['accounts.update', $account->id], 'method' => 'PATCH']) !!}
+            {!! Form::model($account, ['route' => ['accounts.update', $account], 'method' => 'PATCH']) !!}
             @include('accounts._form')
             {!! Form::close() !!}
         </div>

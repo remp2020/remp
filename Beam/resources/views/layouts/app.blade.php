@@ -2,7 +2,12 @@
 
 function route_active($routeName, $classes = '', $activeClasses = '')
 {
-    if (strpos(Route::currentRouteName(), $routeName) === 0) {
+    $currentRouteName = Route::currentRouteName();
+
+    $currentRouteSegmentsCount = count(explode(".", $currentRouteName));
+    $passedRouteSegmentsCount = count(explode(".", $routeName));
+
+    if (strpos($currentRouteName, $routeName) === 0 && abs($currentRouteSegmentsCount-$passedRouteSegmentsCount) <= 1) {
         return "class=\"{$classes} active {$activeClasses}\"";
     }
     return "class=\"{$classes}\"";
@@ -55,39 +60,14 @@ function route_active($routeName, $classes = '', $activeClasses = '')
             <ul class="dropdown-menu pull-right">
                 <li>
                     <a href="">
-                        <i class="palette-Red-400 bg zmdi zmdi-calendar"></i>
-                        <small>Calendar</small>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="">
                         <i class="palette-Green-400 bg zmdi zmdi-file-text"></i>
-                        <small>Files</small>
+                        <small>Beam</small>
                     </a>
                 </li>
                 <li>
                     <a href="">
                         <i class="palette-Light-Blue bg zmdi zmdi-email"></i>
-                        <small>Mail</small>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="palette-Orange-400 bg zmdi zmdi-trending-up"></i>
-                        <small>Analytics</small>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="palette-Purple-300 bg zmdi zmdi-view-headline"></i>
-                        <small>News</small>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="palette-Blue-Grey bg zmdi zmdi-image"></i>
-                        <small>Gallery</small>
+                        <small>Mailer</small>
                     </a>
                 </li>
             </ul>
@@ -126,7 +106,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 <section id="main">
     <aside id="s-user-alerts" class="sidebar">
         <div class="card">
-            <div class="card-header ch-img" style="background-image: url(http://lorempixel.com/320/200/abstract/); height: 200px;">
+            <div class="card-header ch-img" style="background:white; height: 200px;">
                 <button data-ma-action="sidebar-close" class="btn palette-Red-600 bg btn-float waves-effect waves-circle waves-float"><i class="zmdi zmdi-arrow-left"></i></button>
             </div>
             <div class="card-header">
@@ -156,16 +136,16 @@ function route_active($routeName, $classes = '', $activeClasses = '')
             <li {!! route_active('dashboard') !!}>
                 <a href="{{ route('dashboard') }}"><i class="zmdi zmdi-home"></i> Dashboard</a>
             </li>
-            <li {!! route_active('accounts', 'sub-menu', 'toggled') !!}>
+            <li {!! route_active('accounts') !!}>
                 <a href="{{ route('accounts.index') }}" ><i class="zmdi zmdi-view-quilt"></i> Accounts</a>
-                <ul>
-                    <li><a href="#">System Emails</a></li>
-                    <li><a href="#">Newsletter Emails</a></li>
-                </ul>
             </li>
-            <li class="sub-menu">
-                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-email"></i> Emails</a>
-
+            <li {!! route_active('accounts.properties', 'sub-menu') !!}>
+                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-email"></i> Properties</a>
+                <ul>
+                    @foreach (\App\Account::all() as $account)
+                    <li><a href="{{ route("accounts.properties.index", $account->id) }}">{{ $account->name }}</a></li>
+                    @endforeach
+                </ul>
             </li>
         </ul>
     </aside>
