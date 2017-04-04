@@ -1,32 +1,14 @@
 #! /usr/bin/make
-#
-# Makefile for REMP beam
-#
-# Targets:
-# - clean     delete all generated files
-# - gen  (re)generate all goagen-generated files.
-# - build     compile executable
-#
-# Meta targets:
-# - all is the default target, it runs all the targets in the order above.
-#
 
-GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen/"
+GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen"
+DESIGN_PKG="gitlab.com/remp/remp/Beam/go/cmd/tracker/design"
 
-DEPEND=	bitbucket.org/pkg/inflect \
-	github.com/goadesign/goa \
-	github.com/goadesign/goa/goagen \
-	github.com/goadesign/goa/logging/logrus \
-	github.com/Sirupsen/logrus \
-	gopkg.in/yaml.v2 \
-	golang.org/x/tools/cmd/goimports
+all: clean gen build
 
-CURRENT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+build: gen build-only
 
-all: dep clean gen build
-
-dep:
-	@go get $(DEPEND)
+build-only:
+	go build
 
 clean:
 	@rm -rf app
@@ -36,10 +18,33 @@ clean:
 	@rm -f beam
 
 gen:
-	@cd $(GOAGEN_DIR) && go build
-	@$(GOAGEN_DIR)/goagen app     -d gitlab.com/remp/remp/Beam/go/cmd/tracker/design
-	@$(GOAGEN_DIR)/goagen swagger -d gitlab.com/remp/remp/Beam/go/cmd/tracker/design -o public
-	@rm $(GOAGEN_DIR)/goagen
+	set -e
+	cd $(GOAGEN_DIR) && go build
+	$(GOAGEN_DIR)/goagen app -d $(DESIGN_PKG)
+	$(GOAGEN_DIR)/goagen swagger -d $(DESIGN_PKG)
+	rm $(GOAGEN_DIR)/goagen
 
-build:
-	@go build -o beam
+build: gen
+	go build -o beam
+
+build-static: gen
+	CGO_ENABLED=0 go build -a -installsuffix cgo -o beam
+
+docker-build:
+	set -e; \
+    docker build -t remp-beam_builder builder; \
+    docker run --rm -v $$PWD/../../:/src/build remp-beam_builder > beam.tar;
+
+docker-run: docker-build
+	docker build -t remp-beam .
+
+install: gen
+	go install
+
+lint:
+	set -e; \
+	for package in $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)'); \
+	do golint -set_exit_status=true $$package; done
+
+vet:
+	go vet $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)')

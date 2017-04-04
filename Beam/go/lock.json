@@ -1,12 +1,28 @@
 {
-    "memo": "729c72c192d298e38a0c2d1c65d8f9cc4a674bd0b80156d0cdf4f2b3fbf4e77d",
+    "memo": "26b77157746a392aabc7496ca46b876400fc67c3de06fe54c1203888d95c4f69",
     "projects": [
+        {
+            "name": "github.com/Shopify/sarama",
+            "version": "v1.11.0",
+            "revision": "0fb560e5f7fbcaee2f75e3c34174320709f69944",
+            "packages": [
+                "."
+            ]
+        },
         {
             "name": "github.com/armon/go-metrics",
             "branch": "master",
             "revision": "93f237eba9b0602f3e73710416558854a81d9337",
             "packages": [
                 "."
+            ]
+        },
+        {
+            "name": "github.com/davecgh/go-spew",
+            "version": "v1.1.0",
+            "revision": "346938d642f2ec3594ed81d874461961cd0faa76",
+            "packages": [
+                "spew"
             ]
         },
         {
@@ -26,9 +42,33 @@
             ]
         },
         {
+            "name": "github.com/eapache/go-resiliency",
+            "version": "v1.0.0",
+            "revision": "6800482f2c813e689c88b7ed3282262385011890",
+            "packages": [
+                "breaker"
+            ]
+        },
+        {
+            "name": "github.com/eapache/go-xerial-snappy",
+            "branch": "master",
+            "revision": "bb955e01b9346ac19dc29eb16586c90ded99a98c",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/eapache/queue",
+            "version": "v1.0.2",
+            "revision": "ded5959c0d4e360646dc9e9908cff48666781367",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "github.com/goadesign/goa",
             "branch": "master",
-            "revision": "8ffa6c85e2654beddf6703d5fc1028c1c29c854f",
+            "revision": "f6da11d0f06acc9dee555824e82a90b5eb81427c",
             "packages": [
                 ".",
                 "client",
@@ -42,6 +82,14 @@
             ]
         },
         {
+            "name": "github.com/golang/snappy",
+            "branch": "master",
+            "revision": "553a641470496b2327abcac10b36396bd98e45c9",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "github.com/inconshreveable/mousetrap",
             "branch": "master",
             "revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
@@ -50,9 +98,75 @@
             ]
         },
         {
+            "name": "github.com/influxdata/influxdb",
+            "version": "v1.2.2",
+            "revision": "1bcf3ae74c6b9c4897dab68d513d056277eb24f7",
+            "packages": [
+                "client/v2",
+                "models",
+                "pkg/escape"
+            ]
+        },
+        {
+            "name": "github.com/joho/godotenv",
+            "version": "v1.1",
+            "revision": "726cc8b906e3d31c70a9671c90a13716a8d3f50d",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/kelseyhightower/envconfig",
+            "version": "v1.3.0",
+            "revision": "f611eb38b3875cc3bd991ca91c51d06446afa14c",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/klauspost/crc32",
+            "version": "v1.1",
+            "revision": "cb6bfca970f6908083f26f39a79009d608efd5cd",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "github.com/manveru/faker",
             "branch": "master",
             "revision": "717f7cf83fb78669bfab612749c2e8ff63d5be11",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/pierrec/lz4",
+            "branch": "master",
+            "revision": "90290f74b1b4d9c097f0a3b3c7eba2ef3875c699",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/pierrec/xxHash",
+            "version": "v0.1.1",
+            "revision": "f051bb7f1d1aaf1b5a665d74fb6b0217712c69f7",
+            "packages": [
+                "xxHash32"
+            ]
+        },
+        {
+            "name": "github.com/pkg/errors",
+            "version": "v0.8.0",
+            "revision": "3866ebc348c54054262feae422da428fe6cf147d",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/rcrowley/go-metrics",
+            "branch": "master",
+            "revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
             "packages": [
                 "."
             ]
