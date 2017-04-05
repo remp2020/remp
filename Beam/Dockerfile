@@ -3,6 +3,8 @@ FROM php:7.1-fpm
 RUN apt-get update && apt-get install -y git libzip-dev \
     && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip
 
+ADD docker/php/log.conf /usr/local/etc/php-fpm.d/zz-log.conf
+
 ENV COMPOSER_HOME /composer
 
 ENV PATH /composer/vendor/bin:$PATH
@@ -10,6 +12,8 @@ ENV PATH /composer/vendor/bin:$PATH
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN composer global require "fxp/composer-asset-plugin:^1.3"
 
 VOLUME /var/www/html
 

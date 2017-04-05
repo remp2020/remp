@@ -1,7 +1,5 @@
 FROM ches/kafka
 
-USER kafka
-
 WORKDIR /kafka/bin
 
 ADD dockerize-alpine-linux-amd64-v0.3.0.tar.gz .
@@ -9,6 +7,14 @@ ADD dockerize-alpine-linux-amd64-v0.3.0.tar.gz .
 ADD kafka-start.sh .
 
 ADD create-topics.sh .
+
+USER root
+
+RUN chown kafka:kafka kafka-start.sh create-topics.sh
+
+RUN chmod 755 kafka-start.sh create-topics.sh
+
+USER kafka
 
 WORKDIR /kafka
 
