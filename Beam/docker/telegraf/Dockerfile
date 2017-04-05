@@ -2,7 +2,7 @@
 # docker-compose volume directive via relative path. As I didn't want to put explicit full path of my environment
 # here, using separate Dockerfile is probably the cleanest possible solution until this is fixed.
 
-FROM telegraf:1.2-alpine
+FROM telegraf:1.2
 
 ADD telegraf.conf /etc/telegraf/
 

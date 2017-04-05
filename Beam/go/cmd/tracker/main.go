@@ -48,9 +48,9 @@ func main() {
 		eventProducer,
 	))
 
-	log.Println("starting server:", c.Addr)
+	log.Println("starting server:", c.TrackerAddr)
 	srv := &http.Server{
-		Addr:    c.Addr,
+		Addr:    c.TrackerAddr,
 		Handler: service.Mux,
 	}
 

@@ -12,7 +12,7 @@ class PropertiesTable extends Migration
             $table->increments('id');
             $table->uuid('uuid');
             $table->string('name');
-            $table->integer('account_id');
+            $table->integer('account_id')->unsigned();
             $table->timestamps();
 
             $table->foreign('account_id')->references('id')->on('accounts');
