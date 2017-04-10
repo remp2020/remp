@@ -16,8 +16,8 @@ class DataTable extends AbstractWidget
     protected $config = [
         'dataSource' => '',
         'colSettings' => [],
-        'rowLink' => '',
         'tableId' => '',
+        'rowActions' => [],
     ];
 
     /**
@@ -41,8 +41,8 @@ class DataTable extends AbstractWidget
         return view("widgets.data_table", [
             'dataSource' => $this->config['dataSource'],
             'cols' => $cols,
-            'rowLink' => $this->config['rowLink'],
             'tableId' => Uuid::getFactory()->uuid4(),
+            'rowActions' => json_encode($this->config['rowActions'])
         ]);
     }
 }

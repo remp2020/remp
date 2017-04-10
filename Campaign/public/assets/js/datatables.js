@@ -80,13 +80,12 @@ $.fn.dataTables = {
 
         },
         actions: function (actionSettings) {
-            return function(data, type, row) {
+            return function(data) {
                 var actions = '';
-                $.each(actionSettings, function (key, action) {
-                    console.log(row);
-                    actions += '<a href="' + action[0] + '/' + row.RowId + '"><i class="btn btn-xs palette-Cyan bg waves-effect zmdi zmdi-' + action[1] + '"></i></a>\n';
+                data = $.parseJSON(data);
+                $.each(actionSettings, function(i, action) {
+                    actions += '<a href="' + data[action['name']] + '"><i class="btn btn-xs palette-Cyan bg waves-effect zmdi ' + action['class'] + '"></i></a>\n';
                 });
-
                 return actions;
             }
         }

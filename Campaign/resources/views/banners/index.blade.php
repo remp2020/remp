@@ -24,7 +24,10 @@
         {!! Widget::run('DataTable', [
             'colSettings' => ['name', 'width', 'height'],
             'dataSource' => action('BannerController@json'),
-            'rowLink' => 'banners.show',
+            'rowActions' => [
+                ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+            ],
         ]) !!}
     </div>
 

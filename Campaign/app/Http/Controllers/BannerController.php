@@ -6,6 +6,7 @@ use App\Banner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
 
@@ -22,21 +23,20 @@ class BannerController extends Controller
         return view('banners.index');
     }
 
-    public function json(Request $request, Datatables $datatables)
+    public function json(Datatables $datatables)
     {
-        $columns = array_pluck($request->input('columns'), 'name');
-        $columns = array_diff($columns, ['actions']);
-        $columns[] = 'id';
-
-        return $datatables->eloquent(Banner::select($columns))
+        $columns = ['id', 'name', 'width', 'height'];
+        $banners = Banner::select($columns);
+        return $datatables->of($banners)
             ->addColumn('actions', function(Banner $banner) {
-                return view('banners._actions', [
-                    'banner' => $banner,
+                return Json::encode([
+                    'show' => route('banners.show', $banner),
+                    'edit' => route('banners.edit', $banner) ,
                 ]);
             })
-            ->rawColumns([3])
-            ->removeColumn('id')
-            ->make();
+            ->rawColumns(['actions'])
+            ->setRowId('id')
+            ->make(true);
     }
 
     public function upload(Request $request)

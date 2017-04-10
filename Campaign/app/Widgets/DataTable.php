@@ -17,6 +17,7 @@ class DataTable extends AbstractWidget
         'dataSource' => '',
         'colSettings' => [],
         'tableId' => '',
+        'rowActions' => [],
     ];
 
     /**
@@ -41,6 +42,7 @@ class DataTable extends AbstractWidget
             'dataSource' => $this->config['dataSource'],
             'cols' => $cols,
             'tableId' => Uuid::getFactory()->uuid4(),
+            'rowActions' => json_encode($this->config['rowActions'])
         ]);
     }
 }

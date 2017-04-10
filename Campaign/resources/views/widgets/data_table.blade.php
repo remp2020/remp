@@ -52,19 +52,22 @@
             'columns': [
                 @foreach ($cols as $col)
                 {
+                    data: '{{ $col['name'] }}',
                     name: '{{ $col['name'] }}',
                     @if (isset($col['orderable']))
                         orderable: false,
                     @endif
                     @if (isset($col['render']))
-                    render: $.fn.dataTables.render.{!! $col['render'] !!}()
+                    render: $.fn.dataTables.render['{!! $col['render'] !!}']()
                     @endif
                 },
                 @endforeach
                 {
+                    data: 'actions',
                     name: 'actions',
                     orderable: false,
-                    searchable: false
+                    searchable: false,
+                    render: $.fn.dataTables.render.actions({!! $rowActions !!})
                 }
             ],
             'autoWidth': false,
