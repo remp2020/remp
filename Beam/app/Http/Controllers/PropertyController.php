@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Account;
 use App\Property;
 use Illuminate\Http\Request;
+use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
 
@@ -26,22 +27,15 @@ class PropertyController extends Controller
 
     public function json(Account $account, Request $request, Datatables $datatables)
     {
-        $columns = array_pluck($request->input('columns'), 'name');
-        $columns = array_diff($columns, ['actions']);
-        $columns[] = 'id';
-        $columns[] = 'account_id';
-
-        return $datatables->eloquent($account->properties()->getQuery()->select($columns))
-            ->addColumn('actions', function(Property $property) {
-                return view('properties._actions', [
-                    'account' => $property->account,
-                    'property' => $property,
+        $properties = $account->properties()->getQuery();
+        return $datatables->of($properties)
+            ->addColumn('actions', function(Property $property) use ($account) {
+                return Json::encode([
+                    'edit' => route('accounts.properties.edit', [$account, $property]),
                 ]);
             })
-            ->rawColumns([2])
-            ->removeColumn('id')
-            ->removeColumn('account_id')
-            ->make();
+            ->rawColumns(['actions'])
+            ->make(true);
     }
 
     /**

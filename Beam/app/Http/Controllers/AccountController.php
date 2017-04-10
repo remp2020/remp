@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Account;
 use Illuminate\Http\Request;
+use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
 use Yajra\Datatables\Helper;
@@ -22,19 +23,17 @@ class AccountController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
-        $columns = array_pluck($request->input('columns'), 'name');
-        $columns = array_diff($columns, ['actions']);
-        $columns[] = 'id';
+        $columns = ['id', 'name', 'created_at'];
+        $accounts = Account::select($columns);
 
-        return $datatables->eloquent(Account::select($columns))
+        return $datatables->of($accounts)
             ->addColumn('actions', function(Account $account) {
-                return view('accounts._actions', [
-                    'account' => $account,
+                return Json::encode([
+                    'edit' => route('accounts.edit', $account),
                 ]);
             })
-            ->rawColumns([2])
-            ->removeColumn('id')
-            ->make();
+            ->rawColumns(['actions'])
+            ->make(true);
     }
 
     /**

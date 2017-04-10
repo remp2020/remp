@@ -20,11 +20,15 @@
                 <a href="{{ route('accounts.create') }}" class="btn palette-Cyan bg waves-effect">Add new account</a>
             </div>
         </div>
-        @widget('DataTable', [
+
+        {!! Widget::run('DataTable', [
             'colSettings' => ['name', 'created_at' => ['header' => 'created at', 'render' => 'date']],
-            'rowActions' => [['edit/123', 'palette-Cyan zmdi-edit']],
             'dataSource' => action('AccountController@json'),
-        ])
+            'rowActions' => [
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+            ],
+        ]) !!}
+
     </div>
 
 @endsection
