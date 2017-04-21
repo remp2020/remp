@@ -12,7 +12,7 @@
             <h2>Add new banner <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
         </div>
         <div class="card-body card-padding">
-            {!! Form::model($banner, ['route' => 'banners.store']) !!}
+            {!! Form::model($banner, ['route' => 'banners.store', 'files' => true, 'id' => 'banner-form']) !!}
             @include('banners._form')
             {!! Form::close() !!}
         </div>

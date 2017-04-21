@@ -1,5 +1,5 @@
 @push('head')
-<link href="/assets/vendor/prism/themes/prism-coy.css" rel="stylesheet">
+<link href="/assets/css/prism/prism-vs.css" rel="stylesheet">
 <script src="/assets/vendor/prism/prism.js"></script>
 @endpush
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c2f0030545dfb7924aa697438373a105",
+    "content-hash": "664e7b23394f2f8ae9b5c9549ba11cfb",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -276,6 +276,50 @@
             ]
         },
         {
+            "name": "bower-asset/bootstrap-select",
+            "version": "v1.12.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silviomoreto/bootstrap-select.git",
+                "reference": "4eb040b7097fd8eab8184e54efe973ce8468e9b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silviomoreto/bootstrap-select/zipball/4eb040b7097fd8eab8184e54efe973ce8468e9b2",
+                "reference": "4eb040b7097fd8eab8184e54efe973ce8468e9b2",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.8"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "less/bootstrap-select.less",
+                    "dist/css/bootstrap-select.css",
+                    "dist/js/bootstrap-select.js"
+                ],
+                "bower-asset-ignore": [
+                    ".gitignore",
+                    "CONTRIBUTING.md",
+                    "Gruntfile.js",
+                    "README.md",
+                    "composer.json",
+                    "package.json",
+                    "test.html"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "keywords": [
+                "bootstrap",
+                "form",
+                "replacement",
+                "select"
+            ]
+        },
+        {
             "name": "bower-asset/datatables.net",
             "version": "2.1.1",
             "source": {
@@ -343,6 +387,22 @@
                 ]
             },
             "description": "Dropzone is an easy to use drag'n'drop library. It supports image previews and shows nice progress bars."
+        },
+        {
+            "name": "bower-asset/farbtastic",
+            "version": "1.3-patch1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mattfarina/farbtastic.git",
+                "reference": "4bb6bbf49b02940cf8e278ce54a70d299852b7b7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mattfarina/farbtastic/zipball/4bb6bbf49b02940cf8e278ce54a70d299852b7b7",
+                "reference": "4bb6bbf49b02940cf8e278ce54a70d299852b7b7",
+                "shasum": ""
+            },
+            "type": "bower-asset-library"
         },
         {
             "name": "bower-asset/google-material-color",
@@ -642,6 +702,49 @@
                 "MIT"
             ],
             "description": "Lightweight, robust, elegant syntax highlighting. A spin-off project from Dabblet."
+        },
+        {
+            "name": "bower-asset/sugar",
+            "version": "1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andrewplummer/Sugar.git",
+                "reference": "bc81f66e7bf5944d04f4c01a1487ec411f0e5b92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andrewplummer/Sugar/zipball/bc81f66e7bf5944d04f4c01a1487ec411f0e5b92",
+                "reference": "bc81f66e7bf5944d04f4c01a1487ec411f0e5b92",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "release/sugar.js",
+                "bower-asset-ignore": [
+                    "gulpfile.js",
+                    "package.json",
+                    "lib/",
+                    "docs/",
+                    "test/",
+                    "performance/",
+                    "node_modules/"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "A JavaScript utility library for working with native objects.",
+            "keywords": [
+                "browser",
+                "date",
+                "format",
+                "functional",
+                "parse",
+                "sugarjs",
+                "time",
+                "util",
+                "utility"
+            ]
         },
         {
             "name": "bower-asset/waves",
@@ -1314,16 +1417,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.4.17",
+            "version": "v5.4.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "f7675d59e3863a58ecdff1a5ee1dcd0cff788f4b"
+                "reference": "02444b7450350db17a7607c8a52f7268ebdb0dad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/f7675d59e3863a58ecdff1a5ee1dcd0cff788f4b",
-                "reference": "f7675d59e3863a58ecdff1a5ee1dcd0cff788f4b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/02444b7450350db17a7607c8a52f7268ebdb0dad",
+                "reference": "02444b7450350db17a7607c8a52f7268ebdb0dad",
                 "shasum": ""
             },
             "require": {
@@ -1439,7 +1542,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-04-03T13:07:39+00:00"
+            "time": "2017-04-16T13:33:34+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -2114,16 +2217,16 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.6",
+            "version": "v5.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e"
+                "reference": "56db4ed32a6d5c9824c3ecc1d2e538f663f47eb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e",
-                "reference": "81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/56db4ed32a6d5c9824c3ecc1d2e538f663f47eb4",
+                "reference": "56db4ed32a6d5c9824c3ecc1d2e538f663f47eb4",
                 "shasum": ""
             },
             "require": {
@@ -2164,7 +2267,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2017-02-13T07:52:53+00:00"
+            "time": "2017-04-20T17:32:18+00:00"
         },
         {
             "name": "symfony/class-loader",
@@ -3379,12 +3482,12 @@
             "version": "0.9.9",
             "source": {
                 "type": "git",
-                "url": "https://github.com/padraic/mockery.git",
+                "url": "https://github.com/mockery/mockery.git",
                 "reference": "6fdb61243844dc924071d3404bb23994ea0b6856"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/6fdb61243844dc924071d3404bb23994ea0b6856",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/6fdb61243844dc924071d3404bb23994ea0b6856",
                 "reference": "6fdb61243844dc924071d3404bb23994ea0b6856",
                 "shasum": ""
             },
@@ -3441,16 +3544,16 @@
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "5a5a9fc8025a08d8919be87d6884d5a92520cefe"
+                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/5a5a9fc8025a08d8919be87d6884d5a92520cefe",
-                "reference": "5a5a9fc8025a08d8919be87d6884d5a92520cefe",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/8e6e04167378abf1ddb4d3522d8755c5fd90d102",
+                "reference": "8e6e04167378abf1ddb4d3522d8755c5fd90d102",
                 "shasum": ""
             },
             "require": {
@@ -3479,7 +3582,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2017-01-26T22:05:40+00:00"
+            "time": "2017-04-12T18:52:22+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

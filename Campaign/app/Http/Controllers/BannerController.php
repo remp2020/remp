@@ -3,9 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Banner;
+use App\Http\Requests\BannerRequest;
+use App\Models\Dimension\Map as DimensionMap;
+use App\Models\Position\Map as PositionMap;
+use App\Models\Alignment\Map as AlignmentMap;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
@@ -13,10 +19,12 @@ use Yajra\Datatables\Datatables;
 class BannerController extends Controller
 {
     const BUCKET = 'banners';
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
+     * @internal param Dimensioner $dimensions
      */
     public function index()
     {
@@ -25,8 +33,7 @@ class BannerController extends Controller
 
     public function json(Datatables $datatables)
     {
-        $columns = ['id', 'name', 'width', 'height'];
-        $banners = Banner::select($columns);
+        $banners = Banner::query();
         return $datatables->of($banners)
             ->addColumn('actions', function(Banner $banner) {
                 return Json::encode([
@@ -67,33 +74,32 @@ class BannerController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param DimensionMap $dimensionMap
+     * @param PositionMap $positionMap
+     * @param AlignmentMap $alignmentMap
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(DimensionMap $dimensionMap, PositionMap $positionMap, AlignmentMap $alignmentMap)
     {
         return view('banners.create', [
             'banner' => new Banner,
+            'positions' => $positionMap->positions(),
+            'dimensions' => $dimensionMap->dimensions(),
+            'alignments' => $alignmentMap->alignments(),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param BannerRequest|Request $request
      * @return \Illuminate\Http\Response
+     * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(BannerRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'bail|required|max:255',
-            'storage_uri' => 'bail|required|unique:banners',
-            'width' => 'bail|required|integer',
-            'height' => 'bail|required|integer',
-        ]);
-
         $banner = new Banner();
         $banner->fill($request->all());
-        $banner->uuid = Uuid::uuid4();
         $banner->save();
 
         return redirect(route('banners.index'))->with('success', 'Account created');
@@ -135,13 +141,33 @@ class BannerController extends Controller
     public function update(Request $request, Banner $banner)
     {
         $this->validate($request, [
+            'file' => 'bail|mimes:jpeg,jpg,png,gif,bmp,svg',
             'name' => 'bail|required|max:255',
         ]);
+
+        $picture = $request->file('file');
+        if ($picture !== null) {
+            $this->uploadPicture($picture);
+        }
 
         $banner->fill($request->all());
         $banner->save();
 
         return redirect(route('banners.index'))->with('success', 'Banner updated');
+    }
+
+    private function uploadPicture(UploadedFile $picture)
+    {
+        $imageSize = getimagesize($picture->getRealPath());
+        if ($imageSize === false) {
+            throw new ValidationException('Unsupported type of file');
+        }
+
+        $uuid = Uuid::uuid4()->toString();
+        $filename = $uuid . '.' . $picture->getClientOriginalExtension();
+        $path = $picture->storeAs(static::BUCKET, $filename, 'cdn');
+
+        return [$imageSize[0], $imageSize[1], Storage::disk('cdn')->url($path)];
     }
 
     /**
@@ -155,4 +181,5 @@ class BannerController extends Controller
         $account->delete();
         return redirect(route('banners.properties.index', $account))->with('success', 'Account removed');
     }
+
 }
