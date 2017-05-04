@@ -13,6 +13,7 @@ class Map
     {
         foreach ($alignmentsConfig as $key => $dc) {
             $this->alignments[$key] = new Alignment(
+                $key,
                 $dc['name'],
                 $dc['style']
             );

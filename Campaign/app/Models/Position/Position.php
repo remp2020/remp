@@ -4,13 +4,16 @@ namespace App\Models\Position;
 
 class Position
 {
-    public $label;
+    public $key;
+
+    public $name;
 
     public $style;
 
-    public function __construct(string $label, array $style)
+    public function __construct(string $key, string $name, array $style)
     {
-        $this->label = $label;
+        $this->key = $key;
+        $this->name = $name;
         $this->style = $style;
     }
 }

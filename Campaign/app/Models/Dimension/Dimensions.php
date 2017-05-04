@@ -4,15 +4,18 @@ namespace App\Models\Dimension;
 
 class Dimensions
 {
-    public $label;
+    public $key;
+
+    public $name;
 
     public $width;
 
     public $height;
 
-    public function __construct($label, $width, $height)
+    public function __construct(string $key, string $name, $width, $height)
     {
-        $this->label = $label;
+        $this->key = $key;
+        $this->name = $name;
         $this->width = $width;
         $this->height = $height;
     }

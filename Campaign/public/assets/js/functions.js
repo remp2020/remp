@@ -361,8 +361,12 @@ $(document).ready(function(){
             // Change linked value
             var self = this;
             $(colorOutput).each(function() {
-                if (this.value && this.value !== self.color) {
+                if (this.value !== self.color) {
                     this.value = self.color;
+
+                    var e = document.createEvent('HTMLEvents');
+                    e.initEvent('input', true, true);
+                    this.dispatchEvent(e);
                 }
             });
 

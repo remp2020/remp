@@ -20,6 +20,17 @@ class BannerController extends Controller
 {
     const BUCKET = 'banners';
 
+    protected $dimensionMap;
+    protected $positionMap;
+    protected $alignmentMap;
+
+    public function __construct(DimensionMap $dm, PositionMap $pm, AlignmentMap $am)
+    {
+        $this->dimensionMap = $dm;
+        $this->positionMap = $pm;
+        $this->alignmentMap = $am;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -74,18 +85,18 @@ class BannerController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param DimensionMap $dimensionMap
-     * @param PositionMap $positionMap
-     * @param AlignmentMap $alignmentMap
      * @return \Illuminate\Http\Response
      */
-    public function create(DimensionMap $dimensionMap, PositionMap $positionMap, AlignmentMap $alignmentMap)
+    public function create()
     {
+        $banner = new Banner;
+        $banner->fill(old());
+
         return view('banners.create', [
-            'banner' => new Banner,
-            'positions' => $positionMap->positions(),
-            'dimensions' => $dimensionMap->dimensions(),
-            'alignments' => $alignmentMap->alignments(),
+            'banner' => $banner,
+            'positions' => $this->positionMap->positions(),
+            'dimensions' => $this->dimensionMap->dimensions(),
+            'alignments' => $this->alignmentMap->alignments(),
         ]);
     }
 
@@ -100,6 +111,7 @@ class BannerController extends Controller
     {
         $banner = new Banner();
         $banner->fill($request->all());
+
         $banner->save();
 
         return redirect(route('banners.index'))->with('success', 'Account created');
@@ -115,6 +127,9 @@ class BannerController extends Controller
     {
         return view('banners.show', [
             'banner' => $banner,
+            'positions' => $this->positionMap->positions(),
+            'dimensions' => $this->dimensionMap->dimensions(),
+            'alignments' => $this->alignmentMap->alignments(),
         ]);
     }
 
@@ -128,6 +143,9 @@ class BannerController extends Controller
     {
         return view('banners.edit', [
             'banner' => $banner,
+            'positions' => $this->positionMap->positions(),
+            'dimensions' => $this->dimensionMap->dimensions(),
+            'alignments' => $this->alignmentMap->alignments(),
         ]);
     }
 
@@ -154,20 +172,6 @@ class BannerController extends Controller
         $banner->save();
 
         return redirect(route('banners.index'))->with('success', 'Banner updated');
-    }
-
-    private function uploadPicture(UploadedFile $picture)
-    {
-        $imageSize = getimagesize($picture->getRealPath());
-        if ($imageSize === false) {
-            throw new ValidationException('Unsupported type of file');
-        }
-
-        $uuid = Uuid::uuid4()->toString();
-        $filename = $uuid . '.' . $picture->getClientOriginalExtension();
-        $path = $picture->storeAs(static::BUCKET, $filename, 'cdn');
-
-        return [$imageSize[0], $imageSize[1], Storage::disk('cdn')->url($path)];
     }
 
     /**

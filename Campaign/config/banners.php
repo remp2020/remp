@@ -7,7 +7,7 @@ return [
             'width' => '728px',
             'height' => '90px',
         ],
-        'medium-rectangle' => [
+        'medium_rectangle' => [
             'name' => 'Medium rectangle (300x250)',
             'width' => '300px',
             'height' => '250px',
@@ -17,29 +17,29 @@ return [
         'top_left' => [
             'name' => 'Top-Left',
             'style' => [
-                'top' => '0',
-                'left' => '0',
+                'top' => '0px',
+                'left' => '0px',
             ],
         ],
         'top_right' => [
             'name' => 'Top-Right',
             'style' => [
-                'top' => '0',
-                'right' => '0',
+                'top' => '0px',
+                'right' => '0px',
             ],
         ],
         'bottom_left' => [
             'name' => 'Bottom-Left',
             'style' => [
-                'bottom' => '0',
-                'left' => '0',
+                'bottom' => '0px',
+                'left' => '0px',
             ],
         ],
         'bottom_right' => [
             'name' => 'Bottom-Right',
             'style' => [
-                'bottom' => '0',
-                'right' => '0',
+                'bottom' => '0px',
+                'right' => '0px',
             ],
         ],
     ],

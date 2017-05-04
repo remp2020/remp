@@ -13,6 +13,7 @@ class Map
     {
         foreach ($dimensionsConfig as $key => $dc) {
             $this->dimensions[$key] = new Dimensions(
+                $key,
                 $dc['name'],
                 $dc['width'],
                 $dc['height']

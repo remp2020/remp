@@ -12,7 +12,9 @@
             <h2>Edit banner <small>{{ $banner->name }}</small></h2>
         </div>
         <div class="card-body card-padding">
-            {!! Form::model($banner, ['route' => ['banners.update', $banner], 'method' => 'PATCH', 'files' => true]) !!}
+            @include('banners._form_template')
+
+            {!! Form::model($banner, ['route' => ['banners.update', $banner], 'method' => 'PATCH', 'id' => 'banner-form']) !!}
             @include('banners._form')
             {!! Form::close() !!}
         </div>

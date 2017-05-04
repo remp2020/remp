@@ -22,7 +22,7 @@
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'width', 'height'],
+            'colSettings' => ['name', 'dimensions', 'position'],
             'dataSource' => route('banners.json'),
             'rowActions' => [
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],

@@ -9,9 +9,11 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Add new banner <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+            <h2>Add new banner</h2>
         </div>
         <div class="card-body card-padding">
+            @include('banners._form_template')
+
             {!! Form::model($banner, ['route' => 'banners.store', 'files' => true, 'id' => 'banner-form']) !!}
             @include('banners._form')
             {!! Form::close() !!}
