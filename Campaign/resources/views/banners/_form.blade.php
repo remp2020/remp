@@ -36,6 +36,8 @@
         textColor: '{{ $banner->text_color }}',
         backgroundColor: '{{ $banner->background_color }}',
         position: '{{ $banner->position ? $banner->position : key($positions->all()) }}',
+        show: true,
+        transition: '{{ $banner->transition }}',
 
         alignmentOptions: alignments,
         dimensionOptions: dimensions,

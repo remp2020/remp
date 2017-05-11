@@ -13,6 +13,7 @@ class BannersTable extends Migration
             $table->uuid('uuid');
             $table->string('name');
             $table->string('storage_uri');
+            $table->string('transition');
             $table->integer('height');
             $table->integer('width');
             $table->timestamps();

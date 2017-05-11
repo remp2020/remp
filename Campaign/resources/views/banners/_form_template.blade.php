@@ -18,6 +18,62 @@
     .cp-value {
         cursor: pointer;
     }
+
+    /* transitions */
+
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+        opacity: 0
+    }
+
+    .bounce-enter-active {
+        animation: bounce linear 0.5s;
+        animation-iteration-count: 1;
+        transform-origin: 50% 50%;
+    }
+    @keyframes bounce{
+        0% { transform: translate(0px,0px) }
+        15% { transform: translate(0px,-25px) }
+        30% { transform: translate(0px,0px) }
+        45% { transform: translate(0px,-15px) }
+        60% { transform: translate(0px,0px) }
+        75% {  transform: translate(0px,-5px) }
+        100% { transform: translate(0px,0px)  }
+    }
+
+    .shake-enter-active{
+        animation: shake linear 0.5s;
+        animation-iteration-count: 1;
+        transform-origin: 50% 50%;
+    }
+    @keyframes shake{
+        0% { transform: translate(0px,0px) }
+        10% { transform: translate(-10px,0px) }
+        20% { transform: translate(10px,0px) }
+        30% { transform: translate(-10px,0px) }
+        40% { transform: translate(10px,0px) }
+        50% { transform: translate(-10px,0px) }
+        60% { transform: translate(10px,0px) }
+        70% { transform: translate(-10px,0px) }
+        80% { transform: translate(10px,0px) }
+        90% { transform: translate(-10px,0px) }
+        100% { transform: translate(0px,0px) }
+    }
+
+    .fade-in-down-enter-active {
+        animation: fadeInDown ease 0.5s;
+        animation-iteration-count: 1;
+        transform-origin: 50% 50%;
+        animation-fill-mode:forwards; /*when the spec is finished*/
+    }
+
+    @keyframes fadeInDown{
+        0% { opacity: 0;  transform: translate(0px,-25px) }
+        100% { opacity: 1; transform: translate(0px,0px) }
+    }
+
 </style>
 
 <template id="banner-form-template">
@@ -76,6 +132,26 @@
                 <div class="fg-line">
                     <label for="Font size" class="fg-label">Font Size</label>
                     <input v-model="fontSize" class="form-control fg-input" name="font_size" type="number">
+                </div>
+            </div>
+
+            <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-swap"></i></span>
+                <div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="Text alignment" class="fg-label">Transition</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select v-model="transition" class="selectpicker" name="transition">
+                                <option value="none">None</option>
+                                <option value="fade">Fade</option>
+                                <option value="bounce">Bounce</option>
+                                <option value="shake">Shake</option>
+                                <option value="fade-in-down">Fade in down</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -149,23 +225,29 @@
 
         </div>
         <div class="col-md-7 col-md-offset-1">
-            <h4>Preview</h4>
+            <h4>
+                Preview
+                <span class="btn btn-default m-l-20" v-on:click="show = !show">Toggle banner</span>
+            </h4>
 
-            <a v-bind:href="targetUrl">
-                <div class="row p-relative">
-                    <img src="http://rempcampaign.local/assets/img/website_mockup.png" class="preview-image" alt="Mockup" width="100%">
-                    <div class="preview-box" v-bind:style="[
-                        positionOptions[position].style,
-                        dimensionOptions[dimensions],
-                        boxStyles
-                    ]">
-                        <p class="preview-text" v-bind:style="[
-                            alignmentOptions[textAlign].style,
-                            textStyles
-                        ]">@{{ text }}</p>
-                    </div>
-                </div>
-            </a>
+            <div class="row p-relative">
+                <img src="http://rempcampaign.local/assets/img/website_mockup.png" class="preview-image" alt="Mockup" height="700px">
+                <a v-bind:href="targetUrl" v-if="show">
+                    <transition appear v-bind:name="transition">
+                        <div class="preview-box" v-bind:style="[
+                            positionOptions[position].style,
+                            dimensionOptions[dimensions],
+                            boxStyles
+                        ]">
+                            <p class="preview-text" v-bind:style="[
+                                alignmentOptions[textAlign].style,
+                                textStyles
+                            ]">@{{ text }}</p>
+                        </div>
+                    </transition>
+                </a>
+            </div>
+
         </div>
     </div>
 </template>

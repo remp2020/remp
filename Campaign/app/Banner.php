@@ -52,6 +52,7 @@ class Banner extends Model
         'text_color',
         'background_color',
         'position',
+        'transition',
     ];
 
     protected static function boot()

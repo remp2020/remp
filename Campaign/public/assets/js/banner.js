@@ -42,6 +42,11 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
                 watch: {
                     'textColor': function(val, oldVal){
                         console.log(val, oldVal);
+                    },
+                    'transition': function () {
+                        var self = this;
+                        setTimeout(function() { self.show = false }, 100);
+                        setTimeout(function() { self.show = true }, 800);
                     }
                 }
             });
