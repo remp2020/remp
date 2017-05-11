@@ -12,7 +12,7 @@
             <h2>Edit banner <small>{{ $banner->name }}</small></h2>
         </div>
         <div class="card-body card-padding">
-            @include('banners._form_template')
+            @include('banners._vue_form')
 
             {!! Form::model($banner, ['route' => ['banners.update', $banner], 'method' => 'PATCH', 'id' => 'banner-form']) !!}
             @include('banners._form')

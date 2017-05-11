@@ -12,7 +12,7 @@
             <h2>Add new banner</h2>
         </div>
         <div class="card-body card-padding">
-            @include('banners._form_template')
+            @include('banners._vue_form')
 
             {!! Form::model($banner, ['route' => 'banners.store', 'files' => true, 'id' => 'banner-form']) !!}
             @include('banners._form')

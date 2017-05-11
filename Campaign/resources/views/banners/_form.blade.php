@@ -26,26 +26,14 @@
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
 
-    var bannerData = {
-        name: '{{ $banner->name }}',
-        dimensions: '{{ $banner->dimensions ? $banner->dimensions : key($dimensions->all()) }}',
-        text: '{{ $banner->text }}',
-        textAlign: '{{ $banner->text_align ? $banner->text_align : key($alignments->all()) }}',
-        fontSize: '{{ $banner->font_size }}',
-        targetUrl: '{{ $banner->target_url }}',
-        textColor: '{{ $banner->text_color }}',
-        backgroundColor: '{{ $banner->background_color }}',
-        position: '{{ $banner->position ? $banner->position : key($positions->all()) }}',
-        show: true,
-        transition: '{{ $banner->transition }}',
+    var banner = Campaign.banner.fromModel({!! $banner->toJson() !!});
+    banner.show = true;
+    banner.alignmentOptions = alignments;
+    banner.dimensionOptions = dimensions;
+    banner.positionOptions = positions;
 
-        alignmentOptions: alignments,
-        dimensionOptions: dimensions,
-        positionOptions: positions
-    };
-
-    Campaign.banner.init(positions, dimensions, alignments);
-    Campaign.banner.bindForm(bannerData);
+//    Campaign.banner.bindPreview(banner);
+    Campaign.banner.bindForm(banner);
 
 </script>
 

@@ -1,19 +1,11 @@
+@include('banners._vue_preview')
+
 <style type="text/css">
-    .preview-box {
-        color: white;
-        position: absolute;
-        white-space: pre-line;
-        display: table;
-        overflow: hidden;
-    }
-    .preview-text {
-        display: table-cell;
-        word-break:break-all;
-        vertical-align: middle;
-        padding: 5px 10px;
-    }
     .preview-image {
         opacity: 0.3;
+    }
+    .preview-box {
+        position: absolute;
     }
     .cp-value {
         cursor: pointer;
@@ -232,20 +224,9 @@
 
             <div class="row p-relative">
                 <img src="http://rempcampaign.local/assets/img/website_mockup.png" class="preview-image" alt="Mockup" height="700px">
-                <a v-bind:href="targetUrl" v-if="show">
-                    <transition appear v-bind:name="transition">
-                        <div class="preview-box" v-bind:style="[
-                            positionOptions[position].style,
-                            dimensionOptions[dimensions],
-                            boxStyles
-                        ]">
-                            <p class="preview-text" v-bind:style="[
-                                alignmentOptions[textAlign].style,
-                                textStyles
-                            ]">@{{ text }}</p>
-                        </div>
-                    </transition>
-                </a>
+                <div id="banner-preview">
+                    <banner-preview></banner-preview>
+                </div>
             </div>
 
         </div>

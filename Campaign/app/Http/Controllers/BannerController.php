@@ -57,31 +57,6 @@ class BannerController extends Controller
             ->make(true);
     }
 
-    public function upload(Request $request)
-    {
-        $this->validate($request, [
-            'file' => 'bail|required',
-        ]);
-        $picture = $request->file('file');
-
-        $imageSize = getimagesize($picture->getRealPath());
-        if ($imageSize === false) {
-            return Response::json([
-                'error' => true,
-                'message' => 'uploaded file is not a valid image',
-            ], 400);
-        }
-
-        $filename = Uuid::uuid4()->toString() . '.' . $picture->getClientOriginalExtension();
-        $path = $picture->storeAs(static::BUCKET, $filename, 'cdn');
-
-        return Response::json([
-            'uri' => Storage::disk('cdn')->url($path),
-            'width' => $imageSize[0],
-            'height' => $imageSize[1],
-        ], 200);
-    }
-
     /**
      * Show the form for creating a new resource.
      *
