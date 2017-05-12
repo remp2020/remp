@@ -8,12 +8,8 @@ use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Psy\Util\Json;
-use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
 
 class BannerController extends Controller
@@ -48,6 +44,7 @@ class BannerController extends Controller
         return $datatables->of($banners)
             ->addColumn('actions', function(Banner $banner) {
                 return Json::encode([
+                    '_id' => $banner->id,
                     'show' => route('banners.show', $banner),
                     'edit' => route('banners.edit', $banner) ,
                 ]);
