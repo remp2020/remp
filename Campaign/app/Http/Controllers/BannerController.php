@@ -10,6 +10,7 @@ use App\Models\Alignment\Map as AlignmentMap;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Psy\Util\Json;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
 
 class BannerController extends Controller
@@ -38,10 +39,10 @@ class BannerController extends Controller
         return view('banners.index');
     }
 
-    public function json(Datatables $datatables)
+    public function json(Datatables $dataTables)
     {
         $banners = Banner::query();
-        return $datatables->of($banners)
+        return $dataTables->of($banners)
             ->addColumn('actions', function(Banner $banner) {
                 return Json::encode([
                     '_id' => $banner->id,
@@ -124,22 +125,12 @@ class BannerController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Banner  $banner
+     * @param BannerRequest|Request $request
+     * @param  \App\Banner $banner
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Banner $banner)
+    public function update(BannerRequest $request, Banner $banner)
     {
-        $this->validate($request, [
-            'file' => 'bail|mimes:jpeg,jpg,png,gif,bmp,svg',
-            'name' => 'bail|required|max:255',
-        ]);
-
-        $picture = $request->file('file');
-        if ($picture !== null) {
-            $this->uploadPicture($picture);
-        }
-
         $banner->fill($request->all());
         $banner->save();
 
@@ -149,13 +140,32 @@ class BannerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Banner  $account
+     * @param  \App\Banner  $banner
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Banner $account)
+    public function destroy(Banner $banner)
     {
-        $account->delete();
-        return redirect(route('banners.properties.index', $account))->with('success', 'Account removed');
+        $banner->delete();
+        return redirect(route('banners.index'))->with('success', 'Banner removed');
     }
 
+    public function preview($uuid)
+    {
+        $banner = Banner::whereUuid($uuid)->first();
+        if (!$banner) {
+            throw new ResourceNotFoundException("banner [{$uuid}] was not found");
+        }
+        $positions = $this->positionMap->positions();
+        $dimensions = $this->dimensionMap->dimensions();
+        $alignments = $this->alignmentMap->alignments();
+
+        return response()
+            ->view('banners.preview', [
+                'banner' => $banner,
+                'positions' => [$banner->position => $positions[$banner->position]],
+                'dimensions' => [$banner->dimensions => $dimensions[$banner->dimensions]],
+                'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
+            ])
+            ->header('Content-Type', 'application/x-javascript');
+    }
 }

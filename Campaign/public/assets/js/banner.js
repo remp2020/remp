@@ -1,6 +1,6 @@
 Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
 
-(function($){
+(function(){
 
     'use strict';
 
@@ -23,23 +23,55 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
             }
         },
 
-        bindPreview: function(banner) {
+        bindPreview: function(banner, boxStyles) {
             return Vue.component('banner-preview', {
-                template: '#banner-preview-template',
+                template: '' +
+'<a v-bind:href="targetUrl" v-if="show" v-bind:style="linkStyles">' +
+    '<transition appear v-bind:name="transition">' +
+        '<div class="preview-box" v-bind:style="[' +
+            'positionOptions[position].style,' +
+            'dimensionOptions[dimensions],' +
+            'boxStyles,' +
+            'customBoxStyles' +
+        ']">'+
+            '<p class="preview-text" v-bind:style="[' +
+                'alignmentOptions[textAlign].style,' +
+                'textStyles' +
+            ']">{{ text }}</p>' +
+        '</div>' +
+    '</transition>'+
+'</a>',
                 data: function() {
                     return banner;
                 },
                 computed: {
+                    linkStyles: function() {
+                        return {
+                            textDecoration: 'none'
+                        }
+                    },
                     textStyles: function() {
                         return {
                             color: banner.textColor,
-                            fontSize: banner.fontSize + "px"
+                            fontSize: banner.fontSize + "px",
+                            display: 'table-cell',
+                            wordBreak: 'break-all',
+                            verticalAlign: 'middle',
+                            padding: '5px 10px'
                         };
                     },
                     boxStyles: function() {
                         return {
-                            backgroundColor: banner.backgroundColor
+                            backgroundColor: banner.backgroundColor,
+                            fontFamily: 'Noto Sans, sans-serif',
+                            color: 'white',
+                            whiteSpace: 'pre-line',
+                            display: 'table',
+                            overflow: 'hidden',
                         }
+                    },
+                    customBoxStyles: function() {
+                        return boxStyles;
                     }
                 }
             });
@@ -61,9 +93,6 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
                     'banner-preview': this.bindPreview(banner)
                 },
                 watch: {
-                    'textColor': function(val, oldVal){
-                        console.log(val, oldVal);
-                    },
                     'transition': function () {
                         var self = this;
                         setTimeout(function() { self.show = false }, 100);
@@ -79,4 +108,4 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
 
     }
 
-})(jQuery);
+})();
