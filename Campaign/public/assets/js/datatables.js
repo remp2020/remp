@@ -79,12 +79,18 @@ $.fn.dataTables = {
             }
 
         },
-        actions: function (actionSettings) {
+        actions: function (actionSettings, tableId) {
             return function(data) {
                 var actions = '';
                 data = $.parseJSON(data);
                 $.each(actionSettings, function(i, action) {
                     actions += '<a href="' + data[action['name']] + '"><i class="btn btn-xs palette-Cyan bg waves-effect zmdi ' + action['class'] + '"></i></a>\n';
+
+                    if (action['name'] === 'show' && typeof data['_id'] !== 'undefined') {
+                        $('#' + tableId).on('click', 'tr#' + data['_id'], function () {
+                            window.location.href = data[action['name']];
+                        });
+                    }
                 });
                 return actions;
             }

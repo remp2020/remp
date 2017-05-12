@@ -17,9 +17,11 @@ $(window).on('load', function () {
 
         }
     }
-})
+});
 
 $(document).ready(function(){
+
+    var $body = $('body');
 
     /* --------------------------------------------------------
         Scrollbar
@@ -49,12 +51,12 @@ $(document).ready(function(){
     ----------------------------------------------------------*/
     
     /* Bring search reset icon when focused */
-    $('body').on('focus', '.hs-input', function(){
+    $body.on('focus', '.hs-input', function(){
         $('.h-search').addClass('focused');
     });
     
     /* Take off reset icon if input length is 0, when blurred */
-    $('body').on('blur', '.hs-input', function(){
+    $body.on('blur', '.hs-input', function(){
         var x = $(this).val();
         
         if (!x.length > 0) {
@@ -66,7 +68,7 @@ $(document).ready(function(){
     /* --------------------------------------------------------
         User Alerts
     ----------------------------------------------------------*/
-    $('body').on('click', '[data-user-alert]', function(e) {
+    $body.on('click', '[data-user-alert]', function(e) {
         e.preventDefault();
         
         var u = $(this).data('user-alert');
@@ -235,7 +237,7 @@ $(document).ready(function(){
     /*
     * Profile Menu
     */
-    $('body').on('click', '.profile-menu > a', function(e){
+    $body.on('click', '.profile-menu > a', function(e){
         e.preventDefault();
         $(this).parent().toggleClass('toggled');
 	    $(this).next().slideToggle(200);
@@ -247,11 +249,11 @@ $(document).ready(function(){
 
     //Add blue animated border and remove with condition when focus and blur
     if($('.fg-line')[0]) {
-        $('body').on('focus', '.fg-line .form-control', function(){
+        $body.on('focus', '.fg-line .form-control', function(){
             $(this).closest('.fg-line').addClass('fg-toggled');
-        })
+        });
 
-        $('body').on('blur', '.form-control', function(){
+        $body.on('blur', '.form-control', function(){
             var p = $(this).closest('.form-group, .input-group');
             var i = p.find('.form-control').val();
 
@@ -345,12 +347,36 @@ $(document).ready(function(){
     /*
      * Color Picker
      */
-    if ($('.color-picker')[0]) {
-	    $('.color-picker').each(function(){
-            var colorOutput = $(this).closest('.cp-container').find('.cp-value');
-            $(this).farbtastic(colorOutput);
+    $('.color-picker').each(function(){
+        var colorOutput = $(this).closest('.cp-container').find('.cp-value');
+        $(this).farbtastic(function() {
+            colorOutput.bind('keyup', this.updateValue);
+
+            // Set background/foreground color
+            $(colorOutput).css({
+                backgroundColor: this.color,
+                color: this.hsl[2] > 0.5 ? '#000' : '#fff'
+            });
+
+            // Change linked value
+            var self = this;
+            $(colorOutput).each(function() {
+                if (this.value !== self.color) {
+                    this.value = self.color;
+
+                    var e = document.createEvent('HTMLEvents');
+                    e.initEvent('input', true, true);
+                    this.dispatchEvent(e);
+                }
+            });
+
+            colorOutput.trigger("farbtastic.change");
         });
-    }
+    });
+    $(document).on('click', '.cp-container .dropdown', function (e) {
+        // don't close colorpicker when clicked inside
+        e.stopPropagation();
+    });
 
     /*
      * HTML Editor
@@ -449,7 +475,7 @@ $(document).ready(function(){
     /*
      * Link prevent
      */
-    $('body').on('click', '.a-prevent', function(e){
+    $body.on('click', '.a-prevent', function(e){
         e.preventDefault();
     });
 
@@ -658,16 +684,16 @@ $(document).ready(function(){
                 '<div class="m-t-15">' +
                     '<button class="btn btn-sm btn-primary">Post</button>' +
                     '<button class="btn btn-sm btn-link wcc-cencel">Cancel</button>' +
-                '</div>'
+                '</div>';
 
 
-        $('body').on('click', '.wcc-toggle', function() {
+        $body.on('click', '.wcc-toggle', function() {
             $(this).parent().html(z);
             autosize($('.auto-size')); //Reload Auto size textarea
         });
 
         //Cancel
-        $('body').on('click', '.wcc-cencel', function(e) {
+        $body.on('click', '.wcc-cencel', function(e) {
             e.preventDefault();
 
             $(this).closest('.wc-comment').find('.wcc-inner').addClass('wcc-toggle').html('Write Something...')
@@ -678,7 +704,7 @@ $(document).ready(function(){
     /*
      * Skin Change
      */
-    $('body').on('click', '[data-skin]', function() {
+    $body.on('click', '[data-skin]', function() {
         var currentSkin = $('[data-current-skin]').data('current-skin');
         var skin = $(this).data('skin');
 

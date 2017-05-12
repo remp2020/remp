@@ -36,6 +36,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 
     <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
     <script src="/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.2/vue.js" integrity="sha256-yT1Lhw6corFKnwJkCtEEYf8KqHxUEoCmQ9x6fUQa3r4=" crossorigin="anonymous"></script>
 
     @stack('head')
 
@@ -254,6 +255,9 @@ function route_active($routeName, $classes = '', $activeClasses = '')
         index += 250;
         @endforeach
     });
+
+
+
 </script>
 
 @stack('scripts')

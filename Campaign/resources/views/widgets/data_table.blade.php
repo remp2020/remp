@@ -67,7 +67,7 @@
                     name: 'actions',
                     orderable: false,
                     searchable: false,
-                    render: $.fn.dataTables.render.actions({!! $rowActions !!})
+                    render: $.fn.dataTables.render.actions({!! $rowActions !!}, '{{ $tableId }}')
                 }
             ],
             'autoWidth': false,
