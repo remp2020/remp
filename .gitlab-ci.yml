@@ -4,10 +4,19 @@ stages:
 deploy:production:tyzden:
   stage: deploy
   script:
+    - cd Campaign && composer install && cd ..
+    - cd Mailer && composer install && cd ..
+    - cd Beam && composer install && cd ..
+
     - cp -fr ./* /data/web/remp2020.com/app
-    - cp /data/web/remp2020.com/.env.mailer /data/web/remp2020.com/app/Mailer/.env
-    - cp /data/web/remp2020.com/.env.campaign /data/web/remp2020.com/app/Campaign/.env
-    - cp /data/web/remp2020.com/.env.beam /data/web/remp2020.com/app/Beam/.env
+    - cd /data/web/remp2020.com
+
+    - cp .env.mailer app/Mailer/.env
+    - cp .env.campaign app/Campaign/.env
+    - cp .env.beam app/Beam/.env
+
+    - cd Campaign && php artisan migrate && cd ..
+
   environment:
     name: production/remp2020
     url: https://www.remp2020.com
