@@ -1,0 +1,18 @@
+stages:
+  - deploy
+
+deploy:production:tyzden:
+  stage: deploy
+  script:
+    - cp -fr ./* /data/web/remp2020.com/app
+    - cp /data/web/remp2020.com/.env.mailer /data/web/remp2020.com/app/Mailer/.env
+    - cp /data/web/remp2020.com/.env.campaign /data/web/remp2020.com/app/Campaign/.env
+    - cp /data/web/remp2020.com/.env.beam /data/web/remp2020.com/app/Beam/.env
+  environment:
+    name: production/remp2020
+    url: https://www.remp2020.com
+  tags:
+    - deploy
+    - remp2020
+  only:
+    - master
