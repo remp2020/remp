@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('banners/json', 'BannerController@json')->name('banners.json');
-Route::post('banners/upload', 'BannerController@upload')->name('banners.upload');
+Route::get('banners/preview/{uuid}', 'BannerController@preview')->name('banners.preview');
 Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
 Route::resource('banners', 'BannerController');

@@ -91,11 +91,31 @@
             <div class="row top10">
                 <div class="col-md-2"><strong>Preview</strong></div>
                 <div class="col-md-10">
-                    @include('banners._vue_preview')
-
                     <div id="banner-preview">
                         <banner-preview></banner-preview>
                     </div>
+                </div>
+            </div>
+            <div class="row top10">
+                <div class="col-md-2"><strong>JS snippet</strong></div>
+                <div class="col-md-10">
+                    @php
+                    $url = route('banners.preview', $banner->uuid);
+                    $snippet = <<<JS
+<script type="text/javascript">
+    (function () {
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = '{$url}';
+        var p = document.getElementsByTagName('script')[0];
+        p.parentNode.insertBefore(s, p);
+    })();
+</script>
+
+JS;
+                    @endphp
+                    <pre class="language-html"><code class="language-html">{{ $snippet }}</code></pre>
                 </div>
             </div>
         </div>
