@@ -1,0 +1,58 @@
+<div class="card">
+    <div class="pie-grid clearfix text-center">
+        <div n:ifset="$total_stat" class="col-xs-4 col-sm-6 col-md-2 pg-item">
+            <div class="pgi-title m-30 p-t-15 c-black">Total<br> {$total_stat}</div>
+        </div>
+        <div class="col-xs-4 col-sm-6 col-md-2 pg-item">
+            <div class="easy-pie" data-percent="{$delivered_stat['per']|number:0}">
+                <span class="ep-value c-black">{$delivered_stat['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Delivered<br> {$delivered_stat['value']}</div>
+        </div>
+        <div class="col-xs-4 col-sm-6 col-md-2 pg-item">
+            <div class="easy-pie" data-percent="{$opened_stat['per']|number:0}">
+                <span class="ep-value c-black">{$opened_stat['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Opened<br> {$opened_stat['value']}</div>
+        </div>
+        <div class="col-xs-4 col-sm-6 col-md-2 pg-item">
+            <div class="easy-pie" data-percent="{$clicked_stat['per']|number:0}">
+                <span class="ep-value c-black">{$clicked_stat['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Clicked<br>{$clicked_stat['value']}</div>
+        </div>
+        <div class="col-xs-4 col-sm-6 col-md-2 pg-item">
+            <div class="easy-pie" data-percent="{$dropped_stat['per']|number:0}">
+                <span class="ep-value c-black">{$dropped_stat['per']|number:0}</span>
+            </div>
+            <div class="pgi-title c-black">Dropped<br>{$dropped_stat['value']}</div>
+        </div>
+        <div class="col-xs-4 col-sm-6 col-md-2 pg-item">
+            <div class="easy-pie" data-percent="{$spam_stat['per']|number:0}">
+                <span class="ep-value c-black">{$spam_stat['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Spam<br>{$spam_stat['value']}</div>
+        </div>
+        <div n:ifset="$conversions" class="col-xs-4 col-sm-6 col-md-2 pg-item">
+            <div class="easy-pie" data-percent="{$conversions['per']|number:0}">
+                <span class="ep-value c-black">{$conversions['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Conversion<br>{$conversions['value']}</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.easy-pie').easyPieChart({
+            easing: 'easeOutBounce',
+            barColor: '#000',
+            trackColor: 'rgba(0, 0, 0, 0.2)',
+            scaleColor: false,
+            lineCap: 'square',
+            lineWidth: 2,
+            size: 75,
+            animate: 3000,
+        });
+    });
+</script>

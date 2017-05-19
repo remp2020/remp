@@ -7,7 +7,7 @@ use Remp\MailerModule\Repository;
 
 class LayoutsRepository extends Repository
 {
-    protected $tableName = 'layouts';
+    protected $tableName = 'mail_layouts';
 
     protected $dataTableSearchable = ['name', 'layout_text', 'layout_html'];
 

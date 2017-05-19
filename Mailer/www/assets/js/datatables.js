@@ -15,7 +15,7 @@ $.fn.dataTables = {
         }
 
         $('.ah-page .dropdown-menu').empty();
-        for (page = 0; page <= count / length; page++) {
+        for (page = 0; page < count / length; page++) {
             $('.ah-page .dropdown-menu').append('<li data-value="' + page + '"><a class="dropdown-item dropdown-item-button">Page ' + (page+1) + '</a></li>');
             if (start == page * length) {
                 $('.ah-page button').html('Page ' + (page+1));
@@ -83,7 +83,7 @@ $.fn.dataTables = {
             return function(data, type, row) {
                 var actions = '';
                 $.each(actionSettings, function (key, action) {
-                    actions += '<a href="' + action[0] + '/' + row.RowId + '"><i class="btn btn-xs palette-Cyan bg waves-effect zmdi zmdi-' + action[1] + '"></i></a>\n';
+                    actions += '<a href="' + action.link.replace('RowId', row.RowId) + '" title="' + key + '"><i class="btn btn-xs bg waves-effect zmdi ' + action.class + '"></i></a>\n';
                 });
 
                 return actions;

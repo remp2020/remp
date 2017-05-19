@@ -32,16 +32,21 @@ services:
 
 	# Repositories
 	- Remp\MailerModule\Repository\UsersRepository
+	- Remp\MailerModule\Repository\LogsRepository('2000-01-01 00:00:00')
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
+	- Remp\MailerModule\Repository\TemplatesRepository
 
 	# Factories
-	- Remp\MailerModule\DataTable\IDataTableFactory
+	- Remp\MailerModule\Components\IDataTableFactory
+	- Remp\MailerModule\Components\ITemplateStatsFactory
 
 	# Forms
 	- Remp\MailerModule\Forms\SignInFormFactory
 	- Remp\MailerModule\Forms\LayoutFormFactory
 	- Remp\MailerModule\Forms\ListFormFactory
+	- Remp\MailerModule\Forms\TemplateFormFactory
+	- Remp\MailerModule\Forms\TemplateTestFormFactory
 
 	# Commands
 	- Remp\MailerModule\Commands\HelloWorldCommand

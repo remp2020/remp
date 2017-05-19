@@ -98,12 +98,6 @@ $(document).ready(function(){
         });
     }
 
-
-
-
-
-
-
     /*
      * Calendar Widget
      */
@@ -685,5 +679,9 @@ $(document).ready(function(){
         $('[data-current-skin]').attr('data-current-skin', skin)
 
     });
+
+    $('select.order_after').on('change', function () {
+        $('input[type="radio"][name="order"][value="after"]').trigger('click');
+    })
 
 });

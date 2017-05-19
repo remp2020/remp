@@ -1,10 +1,9 @@
 <?php
+
 namespace Remp\MailerModule\Components;
 
-interface IDataTableFactory
+interface ITemplateStatsFactory
 {
-    /**
-     * @return DataTable
-     */
+    /** @return TemplateStats */
     public function create();
 }

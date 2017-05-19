@@ -35,7 +35,7 @@ class SignPresenter extends Presenter
 
         $presenter = $this;
         $this->signInFormFactory->onSignIn = function ($user) use ($presenter) {
-            $presenter->flashMessage("Welcome {$user->email}.");
+            $presenter->flashMessage("Welcome {$user->email}");
             $presenter->redirect('Dashboard:Default');
         };
 

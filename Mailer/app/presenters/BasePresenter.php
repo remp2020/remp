@@ -2,16 +2,15 @@
 
 namespace Remp\MailerModule\Presenters;
 
+use Kdyby\Autowired\AutowireComponentFactories;
+use Kdyby\Autowired\AutowireProperties;
 use Nette\Application\UI\Presenter;
-use Remp\MailerModule\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\IDataTableFactory;
 
 abstract class BasePresenter extends Presenter
 {
-    /**
-     * @var IDataTableFactory
-     * @inject
-     */
-    public $dataTableFactory;
+    use AutowireProperties;
+    use AutowireComponentFactories;
 
     public function startup()
     {
@@ -22,10 +21,5 @@ abstract class BasePresenter extends Presenter
         }
 
         $this->template->currentUser = $this->getUser();
-    }
-
-    public function createComponentDataTable()
-    {
-        return $this->dataTableFactory->create();
     }
 }
