@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\LayoutFormFactory;
 use Remp\MailerModule\Repository\LayoutsRepository;
 
@@ -22,6 +23,18 @@ final class LayoutPresenter extends BasePresenter
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->layoutFormFactory = $layoutFormFactory;
+    }
+
+    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    {
+        $dataTable = $dataTableFactory->create();
+        $dataTable
+            ->setColSetting('name')
+            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
+            ->setRowLink($this->link('Edit', 'RowId'))
+            ->setRowAction('edit', $this->link('Edit', 'RowId'),'palette-Cyan zmdi-edit');
+
+        return $dataTable;
     }
 
     public function renderDefaultJsonData()

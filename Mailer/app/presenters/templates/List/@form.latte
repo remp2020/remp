@@ -13,8 +13,8 @@
 
     <div class="form-group fg-float m-b-30">
         <div class="fg-line">
-            {input name, class => 'form-control fg-input'}
-            {label name, class => 'fg-label'}
+            {input title, class => 'form-control fg-input'}
+            {label title, class => 'fg-label'}
         </div>
     </div>
 
@@ -26,18 +26,33 @@
     </div>
 
     <div class="form-group m-b-30">
+        Order
+        <div n:foreach="$form['order']->getItems() as $key => $label" class="radio m-b-15">
+            {label order:$key}
+                {input order:$key}
+                <i class="input-helper"></i> {$label}
+                {if $key == 'after'}
+                    {input order_after, class => 'selectpicker order_after m-t-10'}
+                {/if}
+            {/label}
+        </div>
+    </div>
+
+    <div class="clearfix m-b-30"></div>
+
+    <div class="form-group m-b-30">
         <div class="toggle-switch" data-ts-color="cyan">
-            {label is_consent_required:, class => 'ts-label'}
-            {input is_consent_required:, hidden => 'hidden'}
-            <label for="frm-listForm-is_consent_required" class="ts-helper"></label>
+            {label auto_subscribe:, class => 'ts-label'}
+            {input auto_subscribe:, hidden => 'hidden'}
+            <label for="frm-listForm-auto_subscribe" class="ts-helper"></label>
         </div>
     </div>
 
     <div class="form-group m-b-30">
         <div class="toggle-switch" data-ts-color="cyan">
-            {label is_locked:, class => 'ts-label'}
-            {input is_locked:, hidden => 'hidden'}
-            <label for="frm-listForm-is_locked" class="ts-helper"></label>
+            {label locked:, class => 'ts-label'}
+            {input locked:, hidden => 'hidden'}
+            <label for="frm-listForm-locked" class="ts-helper"></label>
         </div>
     </div>
 

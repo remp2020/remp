@@ -26,6 +26,15 @@ class ListFormFactory extends Object
         if (isset($id)) {
             $newsletter = $this->listsRepository->find($id);
             $defaults = $newsletter->toArray();
+
+            if ($defaults['sorting'] == 1) {
+                $defaults['order'] = 'begin';
+            } elseif ($defaults['sorting'] == $this->listsRepository->totalCount()) {
+                $defaults['order'] = 'end';
+            } else {
+                $defaults['order'] = 'after';
+                $defaults['order_after'] = --$defaults['sorting'];
+            }
         }
 
         $form = new Form;
@@ -36,14 +45,20 @@ class ListFormFactory extends Object
         $form->addText('code', 'Code')
             ->setRequired('Required');
 
-        $form->addText('name', 'Name')
+        $form->addText('title', 'Title')
             ->setRequired('Required');
 
         $form->addTextArea('description', 'Description')
             ->setAttribute('rows', 3);
 
-        $form->addCheckbox('is_consent_required', 'Required user consent');
-        $form->addCheckbox('is_locked', 'Locked');
+        $order = ['begin' => 'At the beginning', 'end' => 'At the end', 'after' => 'After'];
+        $form->addRadioList('order', 'Order', $order);
+
+        $orderPairs = $this->listsRepository->all()->fetchPairs('sorting', 'title');
+        $form->addSelect('order_after', NULL, $orderPairs);
+
+        $form->addCheckbox('auto_subscribe', 'Required user consent');
+        $form->addCheckbox('locked', 'Locked');
         $form->addCheckbox('is_public', 'Public');
 
         $form->setDefaults($defaults);
@@ -59,6 +74,21 @@ class ListFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
+        switch ($values['order']) {
+            case 'begin':
+                $values['order'] = 1;
+                break;
+
+            case 'after':
+                $values['order'] = $values['order_after'];
+                break;
+
+            default:
+            case 'end':
+                $values['order'] = $this->listsRepository->totalCount();
+                break;
+        }
+
         if (!empty($values['id'])) {
             $row = $this->listsRepository->find($values['id']);
             $this->listsRepository->update($row, $values);
@@ -66,11 +96,12 @@ class ListFormFactory extends Object
         } else {
             $row = $this->listsRepository->add(
                 $values['code'],
-                    $values['name'],
-                    $values['description'],
-                    $values['is_consent_required'],
-                    $values['is_locked'],
-                    $values['is_public']
+                $values['title'],
+                $values['description'],
+                $values['order'],
+                $values['auto_subscribe'],
+                $values['locked'],
+                $values['is_public']
             );
             ($this->onCreate)($row);
         }

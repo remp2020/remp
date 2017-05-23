@@ -7,11 +7,30 @@
     background: #f0f0f0;
 }
 
+.label-muted {
+    color: #959595;
+    margin-bottom: 5px;
+}
+
+[data-columns]::before {
+    display:block;
+    visibility:hidden;
+    position:absolute;
+    font-size:1px;
+}
+
 .toggle-switch .ts-label {
     min-width: 150px;
     cursor: pointer;
 }
 
+.pg-item:nth-child(2n) {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+
+/***************/
+/* DATA TABLES */
+/***************/
 .table-hover tbody tr {
     cursor: pointer;
 }
