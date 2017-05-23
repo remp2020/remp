@@ -1,12 +1,12 @@
 stages:
   - deploy
 
-deploy:production:tyzden:
+deploy:production:
   stage: deploy
   script:
-    - cd Campaign && composer install && cd ..
-    - cd Mailer && composer install && cd ..
-    - cd Beam && composer install && cd ..
+    - cd Campaign && php ~/composer.phar install && cd ..
+    - cd Mailer && php ~/composer.phar install && cd ..
+    - cd Beam && php ~/composer.phar install && cd ..
 
     - cp -fr ./* /data/web/remp2020.com/app
     - cd /data/web/remp2020.com
