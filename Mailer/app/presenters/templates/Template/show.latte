@@ -1,0 +1,118 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Emails</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2>Show layout <span class="text-muted">{$mailTemplate->name}</span> <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+        <ul class="actions">
+            <li class="dropdown action-show">
+                <a href="" data-toggle="dropdown">
+                    <i class="zmdi zmdi-more-vert"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right dm-icon">
+                    <li>
+                        <a n:href="Edit $mailTemplate->id"><i class="zmdi zmdi-edit"></i> Edit Email</a>
+                    </li>
+                    <li>
+                        <a n:href="Duplicate! $mailTemplate->id"><i class="zmdi zmdi-copy"></i> Duplicate Email</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body card-padding">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h2>Settings</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Code:</strong> {$mailTemplate->code}</li>
+                    <li class="list-group-item"><strong>From:</strong> {$mailTemplate->from}</li>
+                    <li class="list-group-item"><strong>Subject:</strong> {$mailTemplate->subject}</li>
+                    <li class="list-group-item"><strong>Layout:</strong> <a n:href="Layout:Edit $mailTemplate->mail_layout_id">{$mailTemplate->mail_layout->name}</a></li>
+                    <li class="list-group-item"><strong>List:</strong> <a n:href="List:Edit $mailTemplate->mail_type_id">{$mailTemplate->mail_type->title}</a></li>
+                    <li class="list-group-item"><strong>Created:</strong> {$mailTemplate->created_at}</li>
+                    <li class="list-group-item"><strong>Updated:</strong> {$mailTemplate->updated_at}</li>
+                    <li class="list-group-item" n:if="$mailTemplate->autologin"><strong>Auto Login</strong></li>
+                    <li class="list-group-item" n:if="$mailTemplate->description"><strong>Description:</strong> {$mailTemplate->description}</li>
+                    <li class="list-group-item" n:if="$mailTemplate->copy_from"><strong>Copy From:</strong> <a n:href="show $mailTemplate->copy_from">{$mailTemplate->ref('copy_from')->name}</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h2>Test Email</h2>
+            </div>
+            <div class="card-body card-padding">
+                {include '@form_template_test.latte'}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        {control templateStats, $mailTemplate->id}
+        <div class="card">
+            <div class="card-header">
+                <h2>Source</h2>
+                <ul class="actions">
+                    <li class="dropdown action-show">
+                        <a href="" data-toggle="dropdown">
+                            <i class="zmdi zmdi-more-vert"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right dm-icon">
+                            <li>
+                                <a n:href="Preview $mailTemplate->id, type => 'html'" target="_blank"><i class="zmdi zmdi-search"></i> Preview HTML Version</a>
+                            </li>
+                            <li>
+                                <a n:href="Preview $mailTemplate->id, type => 'plain'" target="_blank"><i class="zmdi zmdi-search"></i> Preview Text Version</a>
+                            </li>
+                            <li>
+                                <a n:if="$mailTemplate->mail_type->is_public" n:href="Preview:Preview $mailTemplate->code" target="_blank"><i class="zmdi zmdi-search"></i> Preview Public Version</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <ul class="tab-nav tn-justified tn-icon" role="tablist">
+                    <li role="presentation" class="active">
+                        <a class="col-sx-6" href="#tab-1" aria-controls="tab-1" role="tab" data-toggle="tab" aria-expanded="true">
+                            Text Version
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a class="col-xs-6" href="#tab-2" aria-controls="tab-2" role="tab" data-toggle="tab" aria-expanded="true">
+                            HTML Version
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content p-0">
+                    <div role="tabpanel" class="tab-pane animated fadeIn active" id="tab-1">
+                        <pre class="palette-White bg b-0"><code>{$mailTemplate->mail_body_text}</code></pre>
+                    </div>
+                    <div role="tabpanel" class="tab-pane animated fadeIn" id="tab-2">
+                        <pre class="palette-White bg b-0"><code class="html">{$mailTemplate->mail_body_html}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h2>Log</h2>
+            </div>
+            <div class="card-body">
+                {control dataTableLogs}
+            </div>
+        </div>
+    </div>
+</div>

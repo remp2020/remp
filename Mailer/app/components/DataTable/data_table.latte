@@ -6,7 +6,7 @@
         </div>
 
         <ul class="ah-actions actions a-alt">
-            <li><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
+            <li n:if="!isset($tableSettings['remove-search'])"><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
             <li class="ah-length dropdown">
                 <button class="btn palette-Cyan bg" data-toggle="dropdown">10</button>
                 <ul class="dropdown-menu dropdown-menu-right">
@@ -29,8 +29,10 @@
     <table id="{$tableId}" class="table table-striped table-bordered table-hover" aria-busy="false">
         <thead>
         <tr>
-            <th n:foreach="$cols as $col">{isset($col['header']) ? $col['header'] : $col['name']}</th>
-            <th>actions</th>
+            <th n:foreach="$colSettings as $colName => $colSetting">
+                {isset($colSetting['header']) ? $colSetting['header'] : $colName}
+            </th>
+            <th n:if="!empty($rowActions)">actions</th>
         </tr>
         </thead>
         <tbody>
@@ -42,28 +44,41 @@
     $(document).ready(function() {
         var dataTable = $('#{$tableId|noescape}').DataTable({
             'columns': [
-                {foreach $cols as $col}
+                {foreach $colSettings as $colName => $colSetting}
                 {
-                    name: {$col['name']},
-                    {if isset($col['orderable'])}
-                    orderable: false,
-                    {/if}
-                    {if (isset($col['render']))}
-                    render: $.fn.dataTables.render.{$col['render']|noescape}()
-                    {/if}
+                    name: {$colName},
+                    {ifset $colSetting['orderable']}
+                    orderable: {$colSetting['orderable']},
+                    {/ifset}
+                    {ifset $colSetting['visible']}
+                    visible: {$colSetting['visible']},
+                    {/ifset}
+                    {ifset $colSetting['render']}
+                    render: $.fn.dataTables.render.{$colSetting['render']|noescape}()
+                    {/ifset}
                 },
                 {/foreach}
+                {if !empty($rowActions)}
                 {
                     name: 'actions',
                     orderable: false,
-                    render: $.fn.dataTables.render.actions({$rowActions|noescape})
+                    render: $.fn.dataTables.render.actions({json_encode($rowActions)|noescape})
                 }
+                {/if}
             ],
             'autoWidth': false,
             'sDom': 't',
             'processing': true,
             'serverSide': true,
-            'ajax': {$dataSource},
+            'ajax': {
+                'url': {$sourceUrl},
+                {ifset $tableSettings['add-params']}
+                'data': {$tableSettings['add-params']|noescape}
+                {/ifset}
+            },
+            {ifset $tableSettings['order']}
+            'order': {$tableSettings['order']|noescape},
+            {/ifset}
             'drawCallback': function(settings) {
                 $.fn.dataTables.pagination(settings);
             }
@@ -71,11 +86,11 @@
 
         $.fn.dataTables.navigation(dataTable);
 
-        {if !empty($rowLink)}
+        {ifset $rowLink}
         $('#{$tableId|noescape} tbody').on('click', 'tr', function () {
             var data = dataTable.row(this).data();
-            window.location.href = {$rowLink} + '/' + data.RowId;
-        } );
-        {/if}
+            window.location.href = {$rowLink}.replace('RowId', data.RowId);
+        });
+        {/ifset}
     });
 </script>

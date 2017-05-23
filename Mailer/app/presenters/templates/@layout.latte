@@ -11,6 +11,8 @@
     <link href="/assets/vendor/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
     <link href="/assets/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
     <link href="/assets/vendor/google-material-color/dist/palette.css" rel="stylesheet">
+    <link href="/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/github-gist.min.css" rel="stylesheet">
 
     <!-- CSS -->
     <link href="/assets/css/app.min.1.css" rel="stylesheet">
@@ -114,7 +116,7 @@
 <section id="main">
     <aside id="s-user-alerts" class="sidebar">
         <div class="card">
-            <div class="card-header ch-img" style="background-image: url(http://lorempixel.com/320/200/abstract/); height: 200px;">
+            <div class="card-header ch-img" style="height: 200px;">
                 <button data-ma-action="sidebar-close" class="btn palette-Red-600 bg btn-float waves-effect waves-circle waves-float"><i class="zmdi zmdi-arrow-left"></i></button>
             </div>
             <div class="card-header">
@@ -148,15 +150,7 @@
             <li class="m-b-15"></li>
             <li n:class="$presenter->isLinkCurrent('List:*') ? active"><a n:href="List:default"><i class="zmdi zmdi-arrow-split"></i> Newsletter lists</a></li>
             <li n:class="$presenter->isLinkCurrent('Layout:*') ? active"><a n:href="Layout:default"><i class="zmdi zmdi-widgets"></i> Layouts</a></li>
-            <li><a href="#"><i class="zmdi zmdi-view-quilt"></i> Templates</a></li>
-            <li class="m-b-15"></li>
-            <li class="sub-menu">
-                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-email"></i> Emails</a>
-                <ul>
-                    <li><a href="#">System Emails</a></li>
-                    <li><a href="#">Newsletter Emails</a></li>
-                </ul>
-            </li>
+            <li n:class="$presenter->isLinkCurrent('Template:*') ? active"><a n:href="Template:default"><i class="zmdi zmdi-view-quilt"></i> Emails</a></li>
             <li class="m-b-15"></li>
             <li n:class="$presenter->isLinkCurrent('Log:*') ? active"><a n:href="Log:default"><i class="zmdi zmdi-view-list-alt"></i> Logs</a></li>
         </ul>
@@ -232,6 +226,10 @@
 <script src="/assets/js/ckeditor/ckeditor.js"></script>
 <script src="/assets/vendor/autosize/dist/autosize.min.js"></script>
 <script src="/assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+<script src="/assets/vendor/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 
 <!-- Placeholder for IE9 -->
 <!--[if IE 9 ]>

@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\UsersRepository;
@@ -31,6 +32,24 @@ final class ListPresenter extends BasePresenter
         $this->listFormFactory = $listFormFactory;
     }
 
+    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    {
+        $dataTable = $dataTableFactory->create();
+        $dataTable
+            ->setColSetting('sorting', ['visible' => false])
+            ->setColSetting('title')
+            ->setColSetting('code')
+            ->setColSetting('is_consent_required', ['header' => 'consent required', 'render' => 'boolean'])
+            ->setColSetting('is_locked', ['header' => 'locked', 'render' => 'boolean'])
+            ->setColSetting('is_public', ['header' => 'public', 'render' => 'boolean'])
+            ->setColSetting('subscribers', ['header' => 'number of subscribers', 'render' => 'number', 'orderable' => false])
+            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
+            ->setRowLink($this->link('Edit', 'RowId'))
+            ->setRowAction('edit', $this->link('Edit', 'RowId'),'palette-Cyan zmdi-edit');
+
+        return $dataTable;
+    }
+
     public function renderDefaultJsonData()
     {
         $request = $this->request->getParameters();
@@ -48,13 +67,13 @@ final class ListPresenter extends BasePresenter
         foreach ($lists as $list) {
             $result['data'][] = [
                 'RowId' => $list->id,
-                $list->name,
+                $list->sorting,
+                $list->title,
                 $list->code,
-                $list->is_consent_required,
-                $list->is_locked,
+                $list->auto_subscribe,
+                $list->locked,
                 $list->is_public,
-                $list->is_consent_required == 1 ? $list->consents : $totalUsers - $list->consents,
-                $list->created_at,
+                $list->is_public == 1 ? $list->consents : $totalUsers - $list->consents,
             ];
         }
         $this->presenter->sendJson($result);

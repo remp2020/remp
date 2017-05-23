@@ -7,25 +7,28 @@ use Remp\MailerModule\Repository;
 
 class ListsRepository extends Repository
 {
-    protected $tableName = 'lists';
+    protected $tableName = 'mail_types';
 
-    protected $dataTableSearchable = ['code', 'name', 'description'];
+    protected $dataTableSearchable = ['code', 'title', 'description'];
 
     public function all()
     {
-        return $this->getTable()->order('name ASC');
+        return $this->getTable()->order('sorting ASC');
     }
 
-    public function add($code, $name, $description, $isConsentRequired, $isLocked, $isPublic)
+    public function add($code, $name, $description, $order, $isConsentRequired, $isLocked, $isPublic)
     {
+        $this->updateOrder(null, $order);
+
         $result = $this->insert([
             'code' => $code,
-            'name' => $name,
+            'title' => $name,
             'description' => $description,
-            'is_consent_required' => (bool)$isConsentRequired,
-            'is_locked' => (bool)$isLocked,
+            'sorting' => $order,
+            'auto_subscribe' => !(bool)$isConsentRequired,
+            'locked' => (bool)$isLocked,
             'is_public' => (bool)$isPublic,
-            'created_at' => new \DateTime(),
+            // 'created_at' => new \DateTime(),
         ]);
 
         if (is_numeric($result)) {
@@ -37,16 +40,31 @@ class ListsRepository extends Repository
 
     public function update(IRow &$row, $data)
     {
+        $this->updateOrder($row->sorting, $data['order']);
+
         $params['updated_at'] = new \DateTime();
         return parent::update($row, $data);
+    }
+
+    public function updateOrder($oldOrder, $newOrder)
+    {
+        if ($oldOrder == $newOrder) {
+            return;
+        }
+
+        if ($oldOrder !== null) {
+            $this->getTable()->where('sorting > ?', $oldOrder)->update(['errors_count-=' => 1]);
+        }
+
+        $this->getTable()->where('sorting > ?', $newOrder)->update(['errors_count+=' => 1]);
     }
 
     public function tableFilter($query, $order, $orderDirection)
     {
         $selection = $this->getTable()
-            ->select('lists.*, count(:list_user_consents.id) AS consents')
+            ->select('mail_types.*, count(:mail_user_preferences.id) AS consents')
             ->order($order . ' ' . strtoupper($orderDirection))
-            ->group('lists.id');
+            ->group('mail_types.id');
 
         if (!empty($query)) {
             $where = [];
@@ -58,11 +76,5 @@ class ListsRepository extends Repository
         }
 
         return $selection->fetchAll();
-    }
-
-    public function isUserSubscribed($user_id, $list)
-    {
-        /** @TODO implement check */
-        return true;
     }
 }
