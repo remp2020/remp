@@ -19,7 +19,6 @@ class UtmReplace implements ReplaceInterface
 
     public function replace($content)
     {
-        // specialny if kvoli ceskej urlke v 1 emaile ktora nefungovala s utm parametrami
         if (strpos($content, 'ihned.cz') !== false) {
             return $content;
         }
@@ -27,10 +26,6 @@ class UtmReplace implements ReplaceInterface
         $urlString = $this->formatUrlString();
         $content = preg_replace('/<a(.*)href="([^"#?]*)([^"]*)"(.*)>/i', '<a$1href="$2?' . $urlString . '$3"$4>', $content);
 
-        // kedze nechceem mat 2x ? v urlke
-        // tak treba ten druhy zrusit
-        // v tom prvom regexpe som to nevedel tak napisat aby to tam dalo nedalo podla toho ci tam uz je
-        // tak robim este jeden so strasnou magiou
         preg_match_all('/href="([^"]*)"/iU', $content, $matches);
 
         foreach ($matches[0] as $match) {

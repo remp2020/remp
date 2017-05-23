@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Repository;
 
 use Nette\Database\Context;
+use Nette\Database\IRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
@@ -45,7 +46,7 @@ class LogsRepository extends Repository
                 $ids[] = $templateId;
             }
         }
-        if (is_a($mailTemplates, 'Nette\Database\IRow')) {
+        if (is_a($mailTemplates, IRow::class)) {
             $ids[] = $mailTemplates->id;
         }
 
@@ -80,7 +81,7 @@ class LogsRepository extends Repository
                 $ids[] = $templateId;
             }
         }
-        if (is_a($mailTemplates, 'Nette\Database\IRow')) {
+        if (is_a($mailTemplates, IRow::class)) {
             $ids[] = $mailTemplates->id;
         }
 
