@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca6a2b22a1fac7e93321fd1c0b78ba73",
+    "content-hash": "9248b5dd64f0e4f15832a26d7c48ded0",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -2300,16 +2300,16 @@
         },
         {
             "name": "rigor789/airbrake-laravel",
-            "version": "1.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rigor789/airbrake-laravel.git",
-                "reference": "cbad0355c91d26ed874ae1e85e80070cfd9d0a66"
+                "reference": "e6d4ee5dc6c024c546bf1f38a9f015e99b87899c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rigor789/airbrake-laravel/zipball/cbad0355c91d26ed874ae1e85e80070cfd9d0a66",
-                "reference": "cbad0355c91d26ed874ae1e85e80070cfd9d0a66",
+                "url": "https://api.github.com/repos/rigor789/airbrake-laravel/zipball/e6d4ee5dc6c024c546bf1f38a9f015e99b87899c",
+                "reference": "e6d4ee5dc6c024c546bf1f38a9f015e99b87899c",
                 "shasum": ""
             },
             "require": {
@@ -2344,7 +2344,7 @@
                 "laravel",
                 "monitor"
             ],
-            "time": "2015-10-23T15:16:22+00:00"
+            "time": "2017-02-16T13:43:33+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -4937,7 +4937,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "rigor789/airbrake-laravel": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

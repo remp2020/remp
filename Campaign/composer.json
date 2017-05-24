@@ -30,7 +30,7 @@
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.4",
         "yajra/laravel-datatables-oracle": "^7.2",
-        "rigor789/airbrake-laravel": "^1.2"
+        "rigor789/airbrake-laravel": "dev-master"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^2.3",
@@ -70,12 +70,12 @@
     },
     "config": {
         "preferred-install": "dist",
-        "sort-packages": true
-    },
-    "extra": {
-        "asset-installer-paths": {
-            "npm-asset-library": "public/assets/vendor",
-            "bower-asset-library": "public/assets/vendor"
+        "sort-packages": true,
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "public/assets/vendor",
+                "bower-asset-library": "public/assets/vendor"
+            }
         }
     }
 }
