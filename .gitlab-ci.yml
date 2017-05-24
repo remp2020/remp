@@ -8,14 +8,14 @@ deploy:production:
     - cd Mailer && php ~/composer.phar install && cd ..
     - cd Beam && php ~/composer.phar install && cd ..
 
-    - cp -fr ./* /data/web/remp2020.com/app
+    - rsync --progress -r -u ./* /data/web/remp2020.com/app
     - cd /data/web/remp2020.com
 
     - cp .env.mailer app/Mailer/.env
     - cp .env.campaign app/Campaign/.env
     - cp .env.beam app/Beam/.env
 
-    - cd Campaign && php artisan migrate && cd ..
+    - cd app/Campaign && php artisan migrate && cd ../../
 
   environment:
     name: production/remp2020
