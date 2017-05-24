@@ -1,6 +1,3 @@
-@component('banners._vue_preview')
-@endcomponent
-
 <style type="text/css">
     .preview-image {
         opacity: 0.3;

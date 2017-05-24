@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('head')
+<link href="/assets/css/banner.css" rel="stylesheet">
+@endpush
+
 @section('title', 'Add account')
 
 @section('content')

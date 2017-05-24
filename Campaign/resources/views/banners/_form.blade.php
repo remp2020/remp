@@ -32,7 +32,7 @@
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
 
-//    Campaign.banner.bindPreview(banner);
+    Campaign.banner.bindPreview(banner);
     Campaign.banner.bindForm(banner);
 
 </script>
