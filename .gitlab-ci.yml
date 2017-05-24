@@ -15,7 +15,7 @@ deploy:production:
     - cp .env.campaign app/Campaign/.env
     - cp .env.beam app/Beam/.env
 
-    - cd app/Campaign && php artisan migrate && cd ../../
+    - cd app/Campaign && php artisan migrate --force && cd ../../
 
   environment:
     name: production/remp2020
