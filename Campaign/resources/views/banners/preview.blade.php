@@ -66,7 +66,12 @@ var run = function() {
     });
     setTimeout(function() {
         banner.show = true;
-    }, 2000);
+        if (banner.closeTimeout) {
+            setTimeout(function() {
+                banner.show = false;
+            }, banner.closeTimeout);
+        }
+    }, banner.displayDelay);
 };
 
 for (var i=0; i<scripts.length; i++) {

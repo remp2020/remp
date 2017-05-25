@@ -2,6 +2,10 @@
 
 /* transitions */
 
+#preview-close.hidden {
+    display: none;
+}
+
 .fade-enter-active, .fade-leave-active {
     transition: opacity .5s
 }

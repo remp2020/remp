@@ -19,21 +19,28 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
                 textColor: model['text_color'] || null,
                 backgroundColor: model['background_color'] || null,
                 position: model['position'] || null,
-                transition: model['transition'] || null
+                transition: model['transition'] || null,
+                closeable: model['closeable'] || null,
+                displayDelay: model['display_delay'] || null,
+                closeTimeout: model['close_timeout'] || null
             }
         },
 
         bindPreview: function(banner, boxStyles) {
             return Vue.component('banner-preview', {
                 template: '' +
-'<a v-bind:href="targetUrl" v-if="show" v-bind:style="linkStyles">' +
+'<a v-bind:href="targetUrl" v-if="show" v-bind:style="[' +
+            'linkStyles,' +
+            'positionOptions[position].style,' +
+            'dimensionOptions[dimensions]' +
+        ']">' +
     '<transition appear v-bind:name="transition">' +
         '<div class="preview-box" v-bind:style="[' +
-            'positionOptions[position].style,' +
-            'dimensionOptions[dimensions],' +
             'boxStyles,' +
+            'dimensionOptions[dimensions],' +
             'customBoxStyles' +
         ']">'+
+            '<a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="show = false" v-bind:style="closeStyles">&#x2716;</a>' +
             '<p class="preview-text" v-bind:style="[' +
                 'alignmentOptions[textAlign].style,' +
                 'textStyles' +
@@ -47,7 +54,8 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
                 computed: {
                     linkStyles: function() {
                         return {
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            position: 'absolute'
                         }
                     },
                     textStyles: function() {
@@ -68,6 +76,17 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
                             whiteSpace: 'pre-line',
                             display: 'table',
                             overflow: 'hidden',
+                            position: 'relative'
+                        }
+                    },
+                    closeStyles: function() {
+                        return {
+                            color: banner.textColor,
+                            position: 'absolute',
+                            top: '5px',
+                            right: '10px',
+                            fontSize: '15px',
+                            padding: '5px'
                         }
                     },
                     customBoxStyles: function() {

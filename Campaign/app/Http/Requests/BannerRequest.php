@@ -33,6 +33,18 @@ class BannerRequest extends FormRequest
             'font_size' => 'required',
             'dimensions' => 'required|in:landscape,medium_rectangle',
             'position' => 'required|in:top_left,top_right,bottom_left,bottom_right,middle_left,middle_right',
+            'display_delay' => 'integer|required',
+            'close_timeout' => 'nullable|integer',
+            'closeable' => 'boolean|required'
         ];
+    }
+
+    public function all()
+    {
+        $result = parent::all();
+        if (!isset($result['closeable'])) {
+            $result['closeable'] = false;
+        }
+        return $result;
     }
 }
