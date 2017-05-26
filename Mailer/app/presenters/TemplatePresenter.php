@@ -98,9 +98,10 @@ final class TemplatePresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('logJsonData'))
+            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
             ->setColSetting('email', ['orderable' => false])
             ->setColSetting('subject', ['orderable' => false])
-            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
+            ->setColSetting('events', ['render' => 'badge', 'orderable' => false])
             ->setTableSetting('remove-search')
             ->setTableSetting('order', Json::encode([[2, 'DESC']]))
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]));
@@ -124,10 +125,17 @@ final class TemplatePresenter extends BasePresenter
         foreach ($logs as $log) {
             $result['data'][] = [
                 'RowId' => $log->id,
+                $log->created_at,
                 $log->email,
                 $log->subject,
-                $log->created_at,
-
+                [
+                    isset($log->delivered_at) ? ['text' => 'Delivered', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->dropped_at) ? ['text' => 'Dropped', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->spam_complained_at) ? ['text' => 'Span', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->hard_bounced_at) ? ['text' => 'Hard Bounce', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->clicked_at) ? ['text' => 'Clicked', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->opened_at) ? ['text' => 'Opened', 'class' => 'palette-Cyan-700 bg'] : '',
+                ],
             ];
         }
         $this->presenter->sendJson($result);

@@ -23,7 +23,7 @@ final class LogPresenter extends BasePresenter
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('created_at', ['render' => 'date'])
+            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
             ->setColSetting('email')
             ->setColSetting('subject')
             ->setColSetting('mail_template_id', ['header' => 'template code', 'render' => 'link', 'orderable' => false])
