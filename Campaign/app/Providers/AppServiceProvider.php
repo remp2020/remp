@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton('App\Models\Alignment\Map', function ($app) {
             return new \App\Models\Alignment\Map(config('banners.alignments'));
+        });
+
+        Blade::directive('yesno', function ($expression) {
+            return "{$expression} ? 'Yes' : 'No'";
         });
     }
 
