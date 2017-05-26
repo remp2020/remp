@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Banners')
+@section('title', 'Campaigns')
 
 @section('sidebar')
     @parent
@@ -11,19 +11,19 @@
 @section('content')
 
     <div class="c-header">
-        <h2>Banners</h2>
+        <h2>Campaigns</h2>
     </div>
     <div class="card">
         <div class="card-header">
             <h2>Lorem ipsum <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
             <div class="actions">
-                <a href="{{ route('banners.create') }}" class="btn palette-Cyan bg waves-effect">Add new banner</a>
+                <a href="{{ route('campaigns.create') }}" class="btn palette-Cyan bg waves-effect">Add new campaign</a>
             </div>
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'dimensions', 'position'],
-            'dataSource' => route('banners.json'),
+            'colSettings' => ['name', 'segment_id'],
+            'dataSource' => route('campaigns.json'),
             'rowActions' => [
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],

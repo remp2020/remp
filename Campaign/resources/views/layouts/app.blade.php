@@ -144,6 +144,9 @@ function route_active($routeName, $classes = '', $activeClasses = '')
             <li {!! route_active('banners') !!}>
                 <a href="{{ route('banners.index') }}" ><i class="zmdi zmdi-view-quilt"></i> Banners</a>
             </li>
+            <li {!! route_active('campaigns') !!}>
+                <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-view-quilt"></i> Campaigns</a>
+            </li>
         </ul>
     </aside>
 
