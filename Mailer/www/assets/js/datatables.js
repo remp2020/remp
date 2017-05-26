@@ -75,9 +75,40 @@ $.fn.dataTables = {
         },
         boolean: function () {
             return function(data) {
-                return data == 1 ? 'Yes' : 'No';
+                return data === 1 ? 'Yes' : 'No';
             }
 
+        },
+        link: function () {
+            return function(data) {
+                return '<a href="' + data.url + '">' + data.text + '</a>';
+            }
+
+        },
+        bytes: function () {
+            return function (data) {
+                if (data === null) {
+                    return '';
+                }
+
+                var k = 1024;
+                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                var i = Math.floor(Math.log(data) / Math.log(k));
+
+                return parseFloat((data / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            };
+        },
+        badge: function () {
+            return function(data) {
+                var string = '';
+                $.each(data, function (index, badge) {
+                    if (badge !== '') {
+                        string += '<div class="badge m-r-5 ' + badge.class + '">' + badge.text + '</div>';
+                    }
+                });
+
+                return string;
+            }
         },
         actions: function (actionSettings) {
             return function(data, type, row) {

@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Presenters;
 
+use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Repository\LogsRepository;
 
@@ -22,10 +23,13 @@ final class LogPresenter extends BasePresenter
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('created_at')
+            ->setColSetting('created_at', ['render' => 'date'])
             ->setColSetting('email')
-            ->setColSetting('mail_template_id')
-            ->setColSetting('events');
+            ->setColSetting('subject')
+            ->setColSetting('mail_template_id', ['header' => 'template code', 'render' => 'link', 'orderable' => false])
+            ->setColSetting('attachment_size', ['header' => 'attachment', 'render' => 'bytes', 'class' => 'text-right'])
+            ->setColSetting('events', ['render' => 'badge', 'orderable' => false])
+            ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
     }
@@ -34,26 +38,34 @@ final class LogPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $lists = $this->listsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
+        $logs = $this->logsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
         $result = [
-            'recordsTotal' => $this->listsRepository->totalCount(),
-            'recordsFiltered' => count($lists),
+            'recordsTotal' => $this->logsRepository->totalCount(),
+            'recordsFiltered' => count($logs),
             'data' => []
         ];
 
-        $lists = array_slice($lists, $request['start'], $request['length']);
-        $totalUsers = $this->usersRepository->totalCount();
+        $logs = array_slice($logs, $request['start'], $request['length']);
 
-        foreach ($lists as $list) {
+        foreach ($logs as $log) {
             $result['data'][] = [
-                'RowId' => $list->id,
-                $list->sorting,
-                $list->title,
-                $list->code,
-                $list->auto_subscribe,
-                $list->locked,
-                $list->is_public,
-                $list->is_public == 1 ? $list->consents : $totalUsers - $list->consents,
+                'RowId' => $log->id,
+                $log->created_at,
+                $log->email,
+                $log->subject,
+                [
+                    'url' => $this->link('Template:Show',
+                        ['id' => $log->mail_template_id]), 'text' => $log->mail_template->code
+                ],
+                $log->attachment_size,
+                [
+                    isset($log->delivered_at) ? ['text' => 'Delivered', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->dropped_at) ? ['text' => 'Dropped', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->spam_complained_at) ? ['text' => 'Span', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->hard_bounced_at) ? ['text' => 'Hard Bounce', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->clicked_at) ? ['text' => 'Clicked', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->opened_at) ? ['text' => 'Opened', 'class' => 'palette-Cyan-700 bg'] : '',
+                ],
             ];
         }
         $this->presenter->sendJson($result);
