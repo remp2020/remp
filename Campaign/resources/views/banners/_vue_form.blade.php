@@ -152,6 +152,31 @@
                 </div>
             </div>
 
+            <div class="input-group fg-float m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
+                <div class="fg-line">
+                    <label for="Display delay" class="fg-label">Display delay (milliseconds)</label>
+                    <input v-model="displayDelay" class="form-control fg-input" name="display_delay" type="number">
+                </div>
+            </div>
+
+            <div class="input-group fg-float m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
+                <div class="fg-line">
+                    <label for="Automatic close" class="fg-label">Automatic close after (milliseconds)</label>
+                    <input v-model="closeTimeout" class="form-control fg-input" name="close_timeout" type="number">
+                </div>
+            </div>
+
+            <div class="input-group fg-float m-t-30 checkbox">
+                <label class="m-l-15">
+                    Ability to close banner manually
+                    <input v-model="closeable" value="1" id="banner-closable-elemenet" name="closeable" type="checkbox">
+                    <i class="input-helper"></i>
+                </label>
+            </div>
+
+
             <div class="input-group m-t-20">
                 <div class="fg-line">
                     <button class="btn btn-info waves-effect" type="submit"><i class="zmdi zmdi-mail-send"></i> Save</button>
@@ -165,7 +190,7 @@
                 <span class="btn btn-default m-l-20" v-on:click="show = !show">Toggle banner</span>
             </h4>
 
-            <div class="row p-relative">
+            <div class="row p-relative" style="width: 560px; height: 700px">
                 <img src="http://rempcampaign.local/assets/img/website_mockup.png" class="preview-image" alt="Mockup" height="700px">
                 <div id="banner-preview">
                     <banner-preview></banner-preview>
