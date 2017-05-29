@@ -29,4 +29,13 @@ class CampaignRequest extends FormRequest
             'banner_id' => 'integer|required',
         ];
     }
+
+    public function all()
+    {
+        $result = parent::all();
+        if (!isset($result['active'])) {
+            $result['active'] = false;
+        }
+        return $result;
+    }
 }

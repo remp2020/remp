@@ -129,18 +129,20 @@ class CampaignController extends Controller
     }
 
     /**
-     * @param string $uuid
      * @param DimensionMap $dm
      * @param PositionMap $pm
      * @param AlignmentMap $am
      * @return \Illuminate\Http\Response
      */
-    public function showtime($uuid, DimensionMap $dm, PositionMap $pm, AlignmentMap $am)
+    public function showtime(DimensionMap $dm, PositionMap $pm, AlignmentMap $am)
     {
-        $campaign = Campaign::whereUuid($uuid)->first();
+        $campaign = Campaign::whereActive(true)->first();
+        if (!$campaign) {
+            return response()->json();
+        }
         $banner = $campaign->banner;
         if (!$banner) {
-            throw new ResourceNotFoundException("no banner for campaign [{$uuid}] was found");
+            return response()->json();
         }
         $positions = $pm->positions();
         $dimensions = $dm->dimensions();

@@ -1,37 +1,13 @@
 {{--<script type="text/javascript">--}}
 
-function loadScript (src, callback) {
-    var s = document.createElement('script');
-    s.src = src;
-    s.async = true;
-    s.onreadystatechange = s.onload = function() {
-        if (typeof callback !== 'undefined' && !callback.done && (!s.readyState || /loaded|complete/.test(s.readyState))) {
-            callback.done = true;
-            callback();
-        }
-    };
-    document.querySelector('head').appendChild(s);
-}
-
-function loadStyle (src, callback) {
-    var l = document.createElement('link');
-    l.href = src;
-    l.rel = "stylesheet";
-    l.onreadystatechange = l.onload = function() {
-        if (typeof callback !== 'undefined' && !callback.done && (!l.readyState || /loaded|complete/.test(l.readyState))) {
-            callback.done = true;
-            callback();
-        }
-    };
-    document.querySelector('head').appendChild(l);
-}
-
 var bannerId = 'b-{{ $banner->uuid }}';
 var scripts = [];
 if (typeof window.Vue === 'undefined') {
     scripts.push('https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.2/vue.js');
 }
-scripts.push('{{ asset('/assets/js/banner.js') }}');
+if (typeof window.Campaign.banner === 'undefined') {
+    scripts.push('{{ asset('/assets/js/banner.js') }}');
+}
 
 var styles = [
     '{{ asset('assets/css/banner.css') }}'
@@ -77,13 +53,13 @@ var run = function() {
 };
 
 for (var i=0; i<scripts.length; i++) {
-    loadScript(scripts[i], function() {
+    Campaign.lib.loadScript(scripts[i], function() {
         waiting -= 1;
         run();
     });
 }
 for (i=0; i<styles.length; i++) {
-    loadStyle(styles[i], function() {
+    Campaign.lib.loadStyle(styles[i], function() {
         waiting -= 1;
         run();
     });

@@ -35,19 +35,24 @@
                 <div class="row">
                     <div class="col-md-12">
                         @php
-                            $url = route('campaigns.showtime', $campaign->uuid);
-                            $snippet = <<<JS
+                            $libUrl = asset("assets/js/lib.js");
+                            $baseUrl = url('/');
+                            $snippet = <<<HTML
 <script type="text/javascript">
+    var rempCampaign = {
+        "server": "{$baseUrl}",
+        "userId": "92363"
+    };
     (function () {
         var s = document.createElement('script');
         s.type = 'text/javascript';
         s.async = true;
-        s.src = '{$url}';
+        s.src = '{$libUrl}';
         var p = document.getElementsByTagName('script')[0];
         p.parentNode.insertBefore(s, p);
     })();
 </script>
-JS;
+HTML;
                         @endphp
                         <pre><code class="html">{{ $snippet }}</code></pre>
                     </div>
@@ -76,8 +81,4 @@ JS;
             </div>
         </div>
     </div>
-
-
-
-
 @endsection

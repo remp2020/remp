@@ -1,7 +1,4 @@
 @push('head')
-<link href="/assets/css/prism/prism-vs.css" rel="stylesheet">
-<script src="/assets/vendor/prism/prism.js"></script>
-
 <link href="/assets/vendor/farbtastic/farbtastic.css" rel="stylesheet">
 <script src="/assets/js/banner.js"></script>
 
