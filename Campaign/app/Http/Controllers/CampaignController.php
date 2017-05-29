@@ -8,7 +8,11 @@ use App\Contracts\SegmentContract;
 use App\Http\Requests\CampaignRequest;
 use Illuminate\Http\Request;
 use Psy\Util\Json;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
+use App\Models\Dimension\Map as DimensionMap;
+use App\Models\Position\Map as PositionMap;
+use App\Models\Alignment\Map as AlignmentMap;
 
 class CampaignController extends Controller
 {
@@ -67,7 +71,12 @@ class CampaignController extends Controller
      */
     public function store(CampaignRequest $request)
     {
-        //
+        $campaign = new Campaign();
+        $campaign->fill($request->all());
+
+        $campaign->save();
+
+        return redirect(route('campaigns.index'))->with('success', 'Campaign created');
     }
 
     /**
@@ -78,18 +87,30 @@ class CampaignController extends Controller
      */
     public function show(Campaign $campaign)
     {
-        //
+        return view('campaigns.show', [
+            'campaign' => $campaign,
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Campaign  $campaign
+     * @param  \App\Campaign $campaign
+     * @param SegmentContract $segmentContract
      * @return \Illuminate\Http\Response
      */
-    public function edit(Campaign $campaign)
+    public function edit(Campaign $campaign, SegmentContract $segmentContract)
     {
-        //
+        $campaign->fill(old());
+
+        $banners = Banner::all();
+        $segments = $segmentContract->list();
+
+        return view('campaigns.edit', [
+            'campaign' => $campaign,
+            'banners' => $banners,
+            'segments' => $segments,
+        ]);
     }
 
     /**
@@ -101,7 +122,38 @@ class CampaignController extends Controller
      */
     public function update(CampaignRequest $request, Campaign $campaign)
     {
-        //
+        $campaign->fill($request->all());
+        $campaign->save();
+
+        return redirect(route('campaigns.index'))->with('success', 'Campaign updated');
+    }
+
+    /**
+     * @param string $uuid
+     * @param DimensionMap $dm
+     * @param PositionMap $pm
+     * @param AlignmentMap $am
+     * @return \Illuminate\Http\Response
+     */
+    public function showtime($uuid, DimensionMap $dm, PositionMap $pm, AlignmentMap $am)
+    {
+        $campaign = Campaign::whereUuid($uuid)->first();
+        $banner = $campaign->banner;
+        if (!$banner) {
+            throw new ResourceNotFoundException("no banner for campaign [{$uuid}] was found");
+        }
+        $positions = $pm->positions();
+        $dimensions = $dm->dimensions();
+        $alignments = $am->alignments();
+
+        return response()
+            ->view('banners.preview', [
+                'banner' => $banner,
+                'positions' => [$banner->position => $positions[$banner->position]],
+                'dimensions' => [$banner->dimensions => $dimensions[$banner->dimensions]],
+                'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
+            ])
+            ->header('Content-Type', 'application/x-javascript');
     }
 
     /**

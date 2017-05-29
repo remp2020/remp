@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "93e1fa1008a3ceca804643d89d44d8dc",
+    "content-hash": "8c25d1b38e280d1d2bb198025069ad23",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -320,80 +320,92 @@
             ]
         },
         {
-            "name": "bower-asset/datatables",
+            "name": "bower-asset/datatables.net",
             "version": "1.10.15",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DataTables/DataTables.git",
-                "reference": "7494262db18b1cbc69dcc1d64a5a8d0cd757d58c"
+                "url": "https://github.com/DataTables/Dist-DataTables.git",
+                "reference": "d3251ca51f55e44f8ca43bdec6f713c971339a60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/7494262db18b1cbc69dcc1d64a5a8d0cd757d58c",
-                "reference": "7494262db18b1cbc69dcc1d64a5a8d0cd757d58c",
+                "url": "https://api.github.com/repos/DataTables/Dist-DataTables/zipball/d3251ca51f55e44f8ca43bdec6f713c971339a60",
+                "reference": "d3251ca51f55e44f8ca43bdec6f713c971339a60",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/jquery": ">=1.7.0"
+                "bower-asset/jquery": ">=1.7"
             },
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": [
-                    "media/js/jquery.dataTables.js",
-                    "media/css/jquery.dataTables.css",
-                    "media/images/sort_asc.png",
-                    "media/images/sort_asc_disabled.png",
-                    "media/images/sort_both.png",
-                    "media/images/sort_desc.png",
-                    "media/images/sort_desc_disabled.png"
+                    "js/jquery.dataTables.js"
                 ],
                 "bower-asset-ignore": [
-                    "/.*",
-                    "examples",
-                    "media/unit_testing",
                     "composer.json",
-                    "dataTables.jquery.json",
+                    "datatables.json",
                     "package.json"
                 ]
             },
             "license": [
                 "MIT"
             ],
+            "description": "DataTables for jQuery ",
             "keywords": [
-                "datatables",
-                "javascript",
-                "jquery",
-                "library",
+                "DataTables",
+                "DataTables",
+                "filter",
+                "jQuery",
+                "sort",
                 "table"
             ]
         },
         {
-            "name": "bower-asset/dropzone",
-            "version": "v4.3.0",
+            "name": "bower-asset/datatables.net-dt",
+            "version": "1.10.15",
             "source": {
                 "type": "git",
-                "url": "https://github.com/enyo/dropzone.git",
-                "reference": "d8ef7a82e6ab5447c1f2d9512c8e1bfd4de5ac9e"
+                "url": "https://github.com/DataTables/Dist-DataTables-DataTables.git",
+                "reference": "c686baf6585e580bf5a77c529550d691f0baa77a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/enyo/dropzone/zipball/d8ef7a82e6ab5447c1f2d9512c8e1bfd4de5ac9e",
-                "reference": "d8ef7a82e6ab5447c1f2d9512c8e1bfd4de5ac9e",
+                "url": "https://api.github.com/repos/DataTables/Dist-DataTables-DataTables/zipball/c686baf6585e580bf5a77c529550d691f0baa77a",
+                "reference": "c686baf6585e580bf5a77c529550d691f0baa77a",
                 "shasum": ""
+            },
+            "require": {
+                "bower-asset/datatables.net": ">=1.10.9",
+                "bower-asset/jquery": ">=1.7"
             },
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": [
-                    "dist/min/dropzone.min.css",
-                    "dist/min/dropzone.min.js"
+                    "css/jquery.dataTables.css",
+                    "images/sort_asc.png",
+                    "images/sort_asc_disabled.png",
+                    "images/sort_both.png",
+                    "images/sort_desc.png",
+                    "images/sort_desc_disabled.png"
                 ],
                 "bower-asset-ignore": [
-                    "*",
-                    "!dist",
-                    "!dist/**/*"
+                    "composer.json",
+                    "datatables.json",
+                    "package.json"
                 ]
             },
-            "description": "Dropzone is an easy to use drag'n'drop library. It supports image previews and shows nice progress bars."
+            "license": [
+                "MIT"
+            ],
+            "description": "DataTables for jQuery ",
+            "keywords": [
+                "DataTables",
+                "DataTables",
+                "filter",
+                "jQuery",
+                "sort",
+                "table"
+            ]
         },
         {
             "name": "bower-asset/farbtastic",
@@ -706,47 +718,6 @@
             ]
         },
         {
-            "name": "bower-asset/prism",
-            "version": "v1.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PrismJS/prism.git",
-                "reference": "22df673c472d52fbd1f9ab2656c7186fcbc47c0b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PrismJS/prism/zipball/22df673c472d52fbd1f9ab2656c7186fcbc47c0b",
-                "reference": "22df673c472d52fbd1f9ab2656c7186fcbc47c0b",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "prism.js",
-                    "themes/prism.css"
-                ],
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "img",
-                    "templates",
-                    "tests",
-                    "CNAME",
-                    "*.html",
-                    "style.css",
-                    "favicon.png",
-                    "logo.svg",
-                    "download.js",
-                    "prefixfree.min.js",
-                    "utopia.js",
-                    "code.js"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Lightweight, robust, elegant syntax highlighting. A spin-off project from Dabblet."
-        },
-        {
             "name": "bower-asset/sugar",
             "version": "1.5.1",
             "source": {
@@ -788,6 +759,22 @@
                 "util",
                 "utility"
             ]
+        },
+        {
+            "name": "bower-asset/vue",
+            "version": "v2.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vuejs/vue.git",
+                "reference": "8d56a498f3d95660e2cafff4ed3c1e1da23494d1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vuejs/vue/zipball/8d56a498f3d95660e2cafff4ed3c1e1da23494d1",
+                "reference": "8d56a498f3d95660e2cafff4ed3c1e1da23494d1",
+                "shasum": ""
+            },
+            "type": "bower-asset-library"
         },
         {
             "name": "bower-asset/waves",

@@ -27,10 +27,12 @@ function loadStyle (src, callback) {
 }
 
 var bannerId = 'b-{{ $banner->uuid }}';
-var scripts = [
-    'https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.2/vue.js',
-    '{{ asset('/assets/js/banner.js') }}'
-];
+var scripts = [];
+if (typeof window.Vue === 'undefined') {
+    scripts.push('https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.2/vue.js');
+}
+scripts.push('{{ asset('/assets/js/banner.js') }}');
+
 var styles = [
     '{{ asset('assets/css/banner.css') }}'
 ];

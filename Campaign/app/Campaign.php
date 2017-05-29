@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Ramsey\Uuid\Uuid;
 
 /**
  * App\Campaign
@@ -27,8 +28,32 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Campaign extends Model
 {
+    protected $fillable = [
+        'name',
+        'banner_id',
+        'segment_id',
+        'active',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'active' => false,
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function(Campaign $campaign) {
+            $campaign->uuid = Uuid::uuid4()->toString();
+        });
+    }
+
     public function banner()
     {
-        return $this->hasOne(Banner::class);
+        return $this->belongsTo(Banner::class);
     }
 }
