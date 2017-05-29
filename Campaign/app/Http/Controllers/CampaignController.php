@@ -8,7 +8,6 @@ use App\Contracts\SegmentContract;
 use App\Http\Requests\CampaignRequest;
 use Illuminate\Http\Request;
 use Psy\Util\Json;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
@@ -129,17 +128,35 @@ class CampaignController extends Controller
     }
 
     /**
+     * @param Request $r
      * @param DimensionMap $dm
      * @param PositionMap $pm
      * @param AlignmentMap $am
+     * @param SegmentContract $sc
      * @return \Illuminate\Http\Response
      */
-    public function showtime(DimensionMap $dm, PositionMap $pm, AlignmentMap $am)
-    {
+    public function showtime(
+        Request $r,
+        DimensionMap $dm,
+        PositionMap $pm,
+        AlignmentMap $am,
+        SegmentContract $sc
+    ) {
         $campaign = Campaign::whereActive(true)->first();
         if (!$campaign) {
             return response()->json();
         }
+
+        if ($campaign->segment_id) {
+            if (!$r->has('userId')) {
+                return response()->json();
+            }
+            $userId = $r->get('userId');
+            if (!$sc->check($campaign->segment_id, $userId)) {
+                return response()->json();
+            }
+        }
+
         $banner = $campaign->banner;
         if (!$banner) {
             return response()->json();

@@ -10,6 +10,8 @@ class Segment implements SegmentContract
 {
     const ENDPOINT_LIST = 'user-segments/list';
 
+    const ENDPOINT_CHECK = 'user-segments/check';
+
     private $client;
 
     public function __construct(Client $client)
@@ -23,5 +25,18 @@ class Segment implements SegmentContract
         $list = json_decode($response->getBody());
         $collection = collect($list->segments);
         return $collection;
+    }
+
+    public function check($segmentId, $userId): bool
+    {
+        $response = $this->client->get(self::ENDPOINT_CHECK, [
+            'query' => [
+                'resolver_type' => 'email',
+                'resolver_value' => $userId,
+                'code' => $segmentId,
+            ],
+        ]);
+        $result = json_decode($response->getBody());
+        return $result->check;
     }
 }

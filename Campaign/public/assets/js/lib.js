@@ -19,7 +19,7 @@ Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
         },
 
         run: function() {
-            this.loadScript("http://rempcampaign.local/campaigns/showtime")
+            this.loadScript("http://rempcampaign.local/campaigns/showtime?userId=" + this.userId)
         },
 
         loadScript: function (src, callback) {
