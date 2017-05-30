@@ -17,14 +17,18 @@ class CacheSegmentJob implements ShouldQueue
 
     private $segmentId;
 
+    private $force;
+
     /**
      * Create a new job instance.
      *
      * @param string $segmentId
+     * @param bool $force
      */
-    public function __construct(string $segmentId)
+    public function __construct(string $segmentId, $force = false)
     {
         $this->segmentId = $segmentId;
+        $this->force = $force;
     }
 
     /**
@@ -35,14 +39,19 @@ class CacheSegmentJob implements ShouldQueue
     public function handle(SegmentContract $segmentContract)
     {
         $segmentId = $this->segmentId;
-        $users = $segmentContract->users($this->segmentId);
+        if (!$this->force && Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($segmentId)) {
+            return;
+        }
 
-        $bloomFilter = new Bloom();
+
+        $users = $segmentContract->users($segmentId);
         $userIds = $users->map(function($item) {
             return $item->id;
         })->toArray();
+
+        $bloomFilter = new Bloom();
         $bloomFilter->set($userIds);
 
-        Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($segmentId, serialize($bloomFilter), 60);
+        Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($segmentId, serialize($bloomFilter), 65);
     }
 }
