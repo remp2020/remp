@@ -19,6 +19,9 @@ class Tracker implements TrackerContract
     public function event(
         string $category,
         string $action,
+``        string $url,
+        string $ipAddress,
+        string $userAgent,
         string $userId,
         array $fields
     ):void {
@@ -31,9 +34,9 @@ class Tracker implements TrackerContract
                     "user_id" => $userId,
                     "time" => (new \DateTime())->format(\DateTime::RFC3339),
                     "api_key" => "xApiKey",
-                    "url" => "http://www.example.com",
-                    "user_agent" => "xUserAgent",
-                    "ip_address" => "127.0.0.1"
+                    "url" => $url,
+                    "user_agent" => $userAgent,
+                    "ip_address" => $ipAddress,
                 ],
                 "value" => 1,
             ],

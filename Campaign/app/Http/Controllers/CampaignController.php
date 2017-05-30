@@ -180,7 +180,10 @@ class CampaignController extends Controller
         $expiresAt = Carbon::now()->addMinutes(10);
         Cache::put('key', 'value', $expiresAt);
 
-        $tc->event("campaign", "display", $userId, [
+        $referer = $r->headers->get('referer');
+        $userAgent = $r->headers->get('user-agent');
+        $ip = $r->ip();
+        $tc->event("campaign", "display", $referer, $ip, $userAgent, $userId, [
             "campaign_id" => $campaign->id,
             "banner_id" => $banner->id,
         ]);
