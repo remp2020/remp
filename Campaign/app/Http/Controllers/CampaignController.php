@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Banner;
 use App\Campaign;
 use App\Contracts\SegmentContract;
+use App\Contracts\TrackerContract;
 use App\Http\Requests\CampaignRequest;
+use App\Jobs\CacheSegmentJob;
+use Cache;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Psy\Util\Json;
 use Yajra\Datatables\Datatables;
@@ -122,7 +126,12 @@ class CampaignController extends Controller
     public function update(CampaignRequest $request, Campaign $campaign)
     {
         $campaign->fill($request->all());
+        $shouldCache = $campaign->isDirty('active');
         $campaign->save();
+
+        if ($campaign->active && $shouldCache) {
+            dispatch(new CacheSegmentJob($campaign->segment_id));
+        }
 
         return redirect(route('campaigns.index'))->with('success', 'Campaign updated');
     }
@@ -133,6 +142,7 @@ class CampaignController extends Controller
      * @param PositionMap $pm
      * @param AlignmentMap $am
      * @param SegmentContract $sc
+     * @param TrackerContract $tc
      * @return \Illuminate\Http\Response
      */
     public function showtime(
@@ -140,13 +150,15 @@ class CampaignController extends Controller
         DimensionMap $dm,
         PositionMap $pm,
         AlignmentMap $am,
-        SegmentContract $sc
+        SegmentContract $sc,
+        TrackerContract $tc
     ) {
         $campaign = Campaign::whereActive(true)->first();
         if (!$campaign) {
             return response()->json();
         }
 
+        $userId = null;
         if ($campaign->segment_id) {
             if (!$r->has('userId')) {
                 return response()->json();
@@ -164,6 +176,14 @@ class CampaignController extends Controller
         $positions = $pm->positions();
         $dimensions = $dm->dimensions();
         $alignments = $am->alignments();
+
+        $expiresAt = Carbon::now()->addMinutes(10);
+        Cache::put('key', 'value', $expiresAt);
+
+        $tc->event("campaign", "display", $userId, [
+            "campaign_id" => $campaign->id,
+            "banner_id" => $banner->id,
+        ]);
 
         return response()
             ->view('banners.preview', [

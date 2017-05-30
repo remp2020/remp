@@ -31,7 +31,9 @@
         "laravelcollective/html": "^5.4",
         "yajra/laravel-datatables-oracle": "^7.2",
         "rigor789/airbrake-laravel": "dev-master",
-        "guzzlehttp/guzzle": "^6.2"
+        "guzzlehttp/guzzle": "^6.2",
+        "predis/predis": " ~1.0",
+        "razorpay/php-bloom-filter": "^0.8"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^2.3",
