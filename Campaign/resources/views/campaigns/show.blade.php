@@ -35,22 +35,47 @@
                 <div class="row">
                     <div class="col-md-12">
                         @php
-                            $libUrl = asset("assets/js/lib.js");
+                            $libUrl = asset("assets/js/remplib.js");
                             $baseUrl = url('/');
                             $snippet = <<<HTML
 <script type="text/javascript">
-    var rempCampaign = {
-        "server": "{$baseUrl}",
-        "userId": "92363"
-    };
-    (function () {
-        var s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.async = true;
-        s.src = '{$libUrl}';
-        var p = document.getElementsByTagName('script')[0];
-        p.parentNode.insertBefore(s, p);
-    })();
+    (function(win, doc) {
+        function e(e) {
+            return function() {
+                var args = arguments;
+                if ("initialize" === e && args && args[0].modify && args[0].modify.overlay && "loading" === doc.readyState) {
+                    var a = "__inf__overlay__";
+                    doc.write('<div id="' + a + '" style="position:absolute;background:#fff;left:0;top:0;width:100%;height:100%;z-index:1010101"></div>');
+                    setTimeout(function() {
+                        var e = doc.getElementById(a);
+                        e && doc.body.removeChild(e);
+                    }, args[0].modify.delay || 500)
+                }
+                this._.push([e, args])
+            }
+        }
+        if (!win.remp) {
+            var fn, i, funcs = "init identify".split(" "),
+                script = doc.createElement("script"),
+                d = "https:" === doc.location.protocol ? "https:" : "http:",
+                win.remp = {_: []};
+
+            for (i = 0; i < funcs.length; i++) {
+                fn = funcs[i];
+                win.remp[fn] = e(fn);
+            }
+
+            script.type = "text/javascript";
+            script.async = true;
+            script.src = d + "//rempcampaign.local/assets/js/remplib.js";
+            doc.getElementsByTagName("head")[0].appendChild(script);
+        }
+    })(window, document);
+
+    remp.init({
+        "token": "your-API-token"
+    });
+    remp.identify("user-identifier"); // optional
 </script>
 HTML;
                         @endphp

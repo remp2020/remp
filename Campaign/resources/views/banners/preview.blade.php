@@ -5,7 +5,7 @@ var scripts = [];
 if (typeof window.Vue === 'undefined') {
     scripts.push('https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.2/vue.js');
 }
-if (typeof window.Campaign.banner === 'undefined') {
+if (typeof window.remplib.banner === 'undefined') {
     scripts.push('{{ asset('/assets/js/banner.js') }}');
 }
 
@@ -21,7 +21,7 @@ var run = function() {
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
-    var banner = Campaign.banner.fromModel({!! $banner->toJson() !!});
+    var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
 
     banner.show = false;
     banner.alignmentOptions = alignments;
@@ -35,17 +35,21 @@ var run = function() {
     var b = document.getElementsByTagName('body')[0];
     b.appendChild(d);
 
-    Campaign.banner.bindPreview(banner, {
+    remplib.banner.bindPreview(banner, {
         zIndex: 99, //TODO: remove when REMP template is fixed,
         position: 'fixed'
     });
     new Vue({
         el: '#' + bannerId
     });
+
+    // TODO: track explicit click and close
     setTimeout(function() {
+        // TODO: track show
         banner.show = true;
         if (banner.closeTimeout) {
             setTimeout(function() {
+                // TODO: track close
                 banner.show = false;
             }, banner.closeTimeout);
         }
@@ -53,13 +57,13 @@ var run = function() {
 };
 
 for (var i=0; i<scripts.length; i++) {
-    Campaign.lib.loadScript(scripts[i], function() {
+    remplib.loadScript(scripts[i], function() {
         waiting -= 1;
         run();
     });
 }
 for (i=0; i<styles.length; i++) {
-    Campaign.lib.loadStyle(styles[i], function() {
+    remplib.loadStyle(styles[i], function() {
         waiting -= 1;
         run();
     });

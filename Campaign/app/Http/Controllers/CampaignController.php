@@ -12,6 +12,7 @@ use Cache;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Psy\Util\Json;
+use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
@@ -143,7 +144,7 @@ class CampaignController extends Controller
      * @param AlignmentMap $am
      * @param SegmentContract $sc
      * @param TrackerContract $tc
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function showtime(
         Request $r,
@@ -158,12 +159,13 @@ class CampaignController extends Controller
             return response()->json();
         }
 
-        $userId = null;
+        $data = \GuzzleHttp\json_decode($r->get('data'));
+        $userId = isset($data->userId) ? $data->userId : null;
+
         if ($campaign->segment_id) {
-            if (!$r->has('userId')) {
+            if (!$userId) {
                 return response()->json();
             }
-            $userId = $r->get('userId');
             if (!$sc->check($campaign->segment_id, $userId)) {
                 return response()->json();
             }
@@ -180,8 +182,9 @@ class CampaignController extends Controller
         $expiresAt = Carbon::now()->addMinutes(10);
         Cache::put('key', 'value', $expiresAt);
 
-        $referer = $r->headers->get('referer');
-        $userAgent = $r->headers->get('user-agent');
+        // following tracking is temporary and will be done from FE javascript directly to the Beam Tracker API.
+        $referer = $r->headers->get("referer", "http://www.example.com");
+        $userAgent = $r->headers->get("user-agent");
         $ip = $r->ip();
         $tc->event("campaign", "display", $referer, $ip, $userAgent, $userId, [
             "campaign_id" => $campaign->id,
@@ -189,13 +192,18 @@ class CampaignController extends Controller
         ]);
 
         return response()
-            ->view('banners.preview', [
-                'banner' => $banner,
-                'positions' => [$banner->position => $positions[$banner->position]],
-                'dimensions' => [$banner->dimensions => $dimensions[$banner->dimensions]],
-                'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
-            ])
-            ->header('Content-Type', 'application/x-javascript');
+            ->jsonp($r->get('callback'), [
+                'success' => true,
+                'errors' => [],
+                'data' => [
+                    View::make('banners.preview', [
+                        'banner' => $banner,
+                        'positions' => [$banner->position => $positions[$banner->position]],
+                        'dimensions' => [$banner->dimensions => $dimensions[$banner->dimensions]],
+                        'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
+                    ])->render(),
+                ],
+            ]);
     }
 
     /**
