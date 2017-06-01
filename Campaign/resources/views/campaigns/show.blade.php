@@ -54,15 +54,15 @@
                 this._.push([e, args])
             }
         }
-        if (!win.remp) {
+        if (!win.remplib) {
             var fn, i, funcs = "init identify".split(" "),
                 script = doc.createElement("script"),
-                d = "https:" === doc.location.protocol ? "https:" : "http:",
-                win.remp = {_: []};
+                d = "https:" === doc.location.protocol ? "https:" : "http:";
+            win.remplib = {_: []};
 
             for (i = 0; i < funcs.length; i++) {
                 fn = funcs[i];
-                win.remp[fn] = e(fn);
+                win.remplib[fn] = e(fn);
             }
 
             script.type = "text/javascript";
@@ -72,10 +72,10 @@
         }
     })(window, document);
 
-    remp.init({
+    remplib.init({
         "token": "your-API-token"
     });
-    remp.identify("user-identifier"); // optional
+    remplib.identify("user-identifier"); // optional
 </script>
 HTML;
                         @endphp
