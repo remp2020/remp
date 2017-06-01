@@ -17,6 +17,7 @@ class Tracker implements TrackerContract
     }
 
     public function event(
+        string $beamToken,
         string $category,
         string $action,
         string $url,
@@ -33,7 +34,7 @@ class Tracker implements TrackerContract
                 "system" => [
                     "user_id" => $userId,
                     "time" => (new \DateTime())->format(\DateTime::RFC3339),
-                    "api_key" => "xApiKey",
+                    "token" => $beamToken,
                     "url" => $url,
                     "user_agent" => $userAgent,
                     "ip_address" => $ipAddress,

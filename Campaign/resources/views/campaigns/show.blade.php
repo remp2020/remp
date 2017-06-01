@@ -73,7 +73,7 @@
     })(window, document);
 
     remplib.init({
-        "token": "your-API-token"
+        "token": "beam-property-token"
     });
     remplib.identify("user-identifier"); // optional
 </script>

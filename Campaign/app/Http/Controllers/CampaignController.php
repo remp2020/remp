@@ -156,37 +156,67 @@ class CampaignController extends Controller
     ) {
         $campaign = Campaign::whereActive(true)->first();
         if (!$campaign) {
-            return response()->json();
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => true,
+                    'data' => [],
+                ]);
         }
 
         $data = \GuzzleHttp\json_decode($r->get('data'));
-        $userId = isset($data->userId) ? $data->userId : null;
+        $beamToken = $data->beamToken ?? null;
+        if (!$beamToken) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => ['beamToken is required and missing'],
+                ]);
+        }
+        $url = $data->url ?? null;
+        if (!$url) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => ['url is required and missing'],
+                ]);
+        }
 
+        $userId = $data->userId ?? null;
         if ($campaign->segment_id) {
             if (!$userId) {
-                return response()->json();
+                return response()
+                    ->jsonp($r->get('callback'), [
+                        'success' => false,
+                        'errors' => [],
+                    ])
+                    ->setStatusCode(400);
             }
             if (!$sc->check($campaign->segment_id, $userId)) {
-                return response()->json();
+                return response()
+                    ->jsonp($r->get('callback'), [
+                        'success' => true,
+                        'data' => [],
+                    ]);
             }
         }
 
         $banner = $campaign->banner;
         if (!$banner) {
-            return response()->json();
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
+                ]);
         }
+
         $positions = $pm->positions();
         $dimensions = $dm->dimensions();
         $alignments = $am->alignments();
 
-        $expiresAt = Carbon::now()->addMinutes(10);
-        Cache::put('key', 'value', $expiresAt);
-
         // following tracking is temporary and will be done from FE javascript directly to the Beam Tracker API.
-        $referer = $r->headers->get("referer", "http://www.example.com");
         $userAgent = $r->headers->get("user-agent");
         $ip = $r->ip();
-        $tc->event("campaign", "display", $referer, $ip, $userAgent, $userId, [
+        $tc->event($beamToken, "campaign", "display", $url, $ip, $userAgent, $userId, [
             "campaign_id" => $campaign->id,
             "banner_id" => $banner->id,
         ]);

@@ -98,6 +98,7 @@ func (c *TrackController) pushEvent(system *app.TrackSystem, name string, tags m
 	values["ip"] = system.IPAddress
 	values["url"] = system.URL
 	values["user_agent"] = system.UserAgent
+	values["token"] = system.Token
 	if system.UserID != nil {
 		values["user_id"] = *system.UserID
 	}
@@ -108,7 +109,7 @@ func (c *TrackController) pushEvent(system *app.TrackSystem, name string, tags m
 	}
 	c.EventProducer.Input() <- &sarama.ProducerMessage{
 		Topic: "beam_events",
-		Key:   sarama.StringEncoder(system.APIKey),
+		Key:   sarama.StringEncoder(system.Token),
 		Value: sarama.StringEncoder(p.String()),
 	}
 	return nil

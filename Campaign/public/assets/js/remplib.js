@@ -10,7 +10,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             _: [],
 
-            token: null,
+            beamToken: null,
 
             userId: null,
 
@@ -46,7 +46,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 jsonpParameter: "data",
                 prepareData: function() {
                     return {
-                        "userId": remplib.userId
+                        "beamToken": remplib.beamToken,
+                        "userId": remplib.userId,
+                        "url": window.location.href
                     }
                 },
                 processResponse: function(result) {
@@ -66,7 +68,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             /* JSONP END */
 
-            init: function() {
+            bootstrap: function() {
                 var self = this;
                 for (var i=0; i < this._.length; i++) {
                     var cb = this._[i];
@@ -82,6 +84,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         }
                     })(), 0);
                 }
+            },
+
+            init: function(config) {
+                this.beamToken = config.token
             },
 
             run: function() {
@@ -152,6 +158,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
     prodlib._ = mocklib._;
     remplib = prodlib.extend(mocklib, prodlib);
-    remplib.init();
+    remplib.bootstrap();
 
 })(remplib);
