@@ -7,7 +7,7 @@ use Nette\Application\UI\Presenter;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class PreviewPresenter extends Presenter
+final class PreviewPresenter extends Presenter
 {
     /** @var TemplatesRepository @inject */
     public $templatesRepository;

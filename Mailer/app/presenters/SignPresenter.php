@@ -5,7 +5,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\UI\Presenter;
 use Remp\MailerModule\Forms\SignInFormFactory;
 
-class SignPresenter extends Presenter
+final class SignPresenter extends Presenter
 {
     /** @var SignInFormFactory */
     private  $signInFormFactory;
