@@ -4,7 +4,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Remp\MailerModule\Forms\ConfigFormFactory;
 
-final class ConfigPresenter extends BasePresenter
+final class SettingsPresenter extends BasePresenter
 {
     public function renderDefault()
     {
@@ -17,7 +17,7 @@ final class ConfigPresenter extends BasePresenter
 
         $configFormFactory->onSuccess = function () {
             $this->flashMessage('Config was updated.');
-            $this->redirect('Config:default');
+            $this->redirect('Settings:default');
         };
         return $form;
     }

@@ -14,6 +14,26 @@ class ConfigsRepository extends Repository
         return $this->getTable()->where('config_category_id', 4)->order('sorting ASC');
     }
 
+    public function add($name, $display_name, $value, $description, $type)
+    {
+        $result = $this->insert([
+            'name' => $name,
+            'display_name' => $display_name,
+            'value' => $value,
+            'description' => $description,
+            'type' => $type,
+            'config_category_id' => 4,
+            'created_at' => new \DateTime(),
+            'updated_at' => new \DateTime(),
+        ]);
+
+        if (is_numeric($result)) {
+            return $this->getTable()->where('id', $result)->fetch();
+        }
+
+        return $result;
+    }
+
     public function loadAllAutoload()
     {
         return $this->getTable()->where('autoload', true)->order('sorting');

@@ -31,7 +31,7 @@ class MailerFactory
      */
     public function getMailer()
     {
-        return $this->availableMailers[$this->config->get('default.mailer')];
+        return $this->availableMailers[$this->config->get('default_mailer')];
     }
 
     /**

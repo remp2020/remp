@@ -32,20 +32,19 @@ class ConfigFormFactory extends Object
         $form->addProtection();
 
         $configs = $this->configsRepository->all();
-        $container = $form->addContainer('config');
-
-        $mailers = [];
-        $mailersConfigs = [];
-        array_walk($this->mailerFactory->getAvailableMailers(), function ($mailer, $name) use (&$mailers, &$mailersConfigs) {
-            $mailers[$name] = $name;
-            $mailersConfigs[$name] = $mailer->getConfig();
-        });
-
-        $container->addSelect('default_mailer', 'Default Mailer', $mailers);
+        $container = $form->addContainer('settings');
 
         foreach ($configs as $config) {
             $item = null;
-            if ($config->type == Config::TYPE_STRING) {
+            if ($config->name == 'default_mailer') {
+                $mailers = [];
+                $availableMailers =  $this->mailerFactory->getAvailableMailers();
+                array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
+                    $mailers[$name] = $name;
+                });
+
+                $item = $container->addSelect('default_mailer', 'Default Mailer', $mailers);
+            } elseif ($config->type == Config::TYPE_STRING) {
                 $item = $container->addText($config->name, $config->display_name ? $config->display_name : $config->name);
             } elseif ($config->type == Config::TYPE_PASSWORD) {
                 $item = $container->addPassword($config->name, $config->display_name ? $config->display_name : $config->name);
@@ -74,7 +73,7 @@ class ConfigFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
-        foreach ($values as $name => $value) {
+        foreach ($values['settings'] as $name => $value) {
             $config = $this->configsRepository->loadByName($name);
             if ($config->value != $value) {
                 $this->configsRepository->update($config, ['value' => $value]);

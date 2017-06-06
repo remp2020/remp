@@ -5,36 +5,25 @@ namespace Remp\MailerModule\Mailer;
 use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 use Remp\MailerModule\Config\Config;
+use Remp\MailerModule\Repository\ConfigsRepository;
 
-class SmtpMailer implements IMailer
+class SmtpMailer extends Mailer implements IMailer
 {
     private $mailer;
 
-    private $config;
+    protected $options = [ 'host', 'port', 'username', 'password', 'secure' ];
 
-    public function __construct(Config $config)
+    public function __construct(
+        Config $config,
+        ConfigsRepository $configsRepository
+    )
     {
-        $this->config = [
-            'host' => $config->get('smtp_host'),
-            'port' => $config->get('smtp_port'),
-            'username' => $config->get('smtp_username'),
-            'password' => $config->get('smtp_password'),
-            'secure' => $config->get('smtp_secure'),
-        ];
-
-        $this->mailer = new \Nette\Mail\SmtpMailer($this->config);
+        parent::__construct($config, $configsRepository);
+        $this->mailer = new \Nette\Mail\SmtpMailer($this->options);
     }
 
     public function send(Message $mail)
     {
         $this->mailer->send($mail);
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfig()
-    {
-        return $this->config;
     }
 }

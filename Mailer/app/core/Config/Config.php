@@ -57,8 +57,7 @@ class Config
             return $this->formatValue($value, $item->type);
         }
 
-        // tu mozno bude treba hodit excepnut
-        return null;
+        throw new ConfigNotExistsException("Setting {$name} does not exists.");
     }
 
     private function initAutoload()

@@ -3,7 +3,7 @@
         {$error}<br>
     </div>
 
-    <div n:foreach="$form['config']->controls as $input" class="form-group fg-float m-b-30">
+    <div n:foreach="$form['settings']->controls as $input" class="form-group fg-float m-b-30">
         <div n:if="$input instanceof Nette\Forms\Controls\TextInput" class="fg-line">
             {input $input, class => 'form-control fg-input'}
             {label $input, class => 'fg-label' /}
