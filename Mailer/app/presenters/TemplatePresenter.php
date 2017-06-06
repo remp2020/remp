@@ -61,14 +61,19 @@ final class TemplatePresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $templates = $this->templatesRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
+        $templatesCount = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+            ->count('*');
+
+        $templates = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->fetchAll();
+
         $result = [
             'recordsTotal' => $this->templatesRepository->totalCount(),
-            'recordsFiltered' => count($templates),
+            'recordsFiltered' => $templatesCount,
             'data' => []
         ];
-
-        $templates = array_slice($templates, $request['start'], $request['length']);
 
         foreach ($templates as $template) {
             $result['data'][] = [
@@ -113,14 +118,19 @@ final class TemplatePresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $logs = $this->logsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['templateId']);
+        $logsCount = $this->logsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, $request['templateId'])
+            ->count('*');
+
+        $logs = $this->logsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'], $request['templateId'])
+            ->fetchAll();
+
         $result = [
             'recordsTotal' => $this->logsRepository->totalCount(),
-            'recordsFiltered' => count($logs),
+            'recordsFiltered' => $logsCount,
             'data' => []
         ];
-
-        $logs = array_slice($logs, $request['start'], $request['length']);
 
         foreach ($logs as $log) {
             $result['data'][] = [

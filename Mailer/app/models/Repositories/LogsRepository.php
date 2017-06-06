@@ -6,6 +6,7 @@ use Nette\Database\Context;
 use Nette\Database\IRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
+use Remp\MailerModule\Selection;
 
 class LogsRepository extends Repository
 {
@@ -130,7 +131,16 @@ class LogsRepository extends Repository
         ];
     }
 
-    public function tableFilter($query, $order, $orderDirection, $templateId = null)
+    /**
+     * @param $query
+     * @param $order
+     * @param $orderDirection
+     * @param null $limit
+     * @param null $offset
+     * @param null $templateId
+     * @return Selection
+     */
+    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null, $templateId = null)
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -148,6 +158,10 @@ class LogsRepository extends Repository
             $selection->whereOr($where);
         }
 
-        return $selection->fetchAll();
+        if ($limit !== null) {
+            $selection->limit($limit, $offset);
+        }
+
+        return $selection;
     }
 }

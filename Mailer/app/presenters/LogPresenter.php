@@ -38,14 +38,19 @@ final class LogPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $logs = $this->logsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
+        $logsCount = $this->logsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+            ->count('*');
+
+        $logs = $this->logsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->fetchAll();
+
         $result = [
             'recordsTotal' => $this->logsRepository->totalCount(),
-            'recordsFiltered' => count($logs),
+            'recordsFiltered' => $logsCount,
             'data' => []
         ];
-
-        $logs = array_slice($logs, $request['start'], $request['length']);
 
         foreach ($logs as $log) {
             $result['data'][] = [
