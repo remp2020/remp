@@ -5,7 +5,7 @@ START_TIMEOUT=600
 start_timeout_exceeded=false
 count=0
 step=10
-while netstat -lnt | awk '$4 ~ /:'$KAFKA_ADVERTISED_PORT'$/ {exit 1}'; do
+while netstat -lnt | awk '$4 ~ /:'$ADVERTISED_PORT'$/ {exit 1}'; do
     echo "waiting for kafka to be ready"
     sleep $step;
     count=$(expr $count + $step)
@@ -20,8 +20,8 @@ if $start_timeout_exceeded; then
     exit 1
 fi
 
-if [[ -n $KAFKA_CREATE_TOPICS ]]; then
-    IFS=','; for topicToCreate in $KAFKA_CREATE_TOPICS; do
+if [[ -n $CREATE_TOPICS ]]; then
+    IFS=','; for topicToCreate in $CREATE_TOPICS; do
         echo "creating topics: $topicToCreate"
         IFS=':' read -a topicConfig <<< "$topicToCreate"
         if [ ${topicConfig[3]} ]; then

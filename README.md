@@ -13,8 +13,8 @@ Restarting Telegraf after topic is ready (it's created automatically) helps.
 are able to work with shared volumes properly.
 
     ```
-    VBoxManage.exe sharedfolder add default --automount --name "d/gospace" --hostpath "\\?\d:\gospace"
-    VBoxManage.exe sharedfolder add default --automount --name "cygdrive/d/gospace" --hostpath "\\?\d:\gospace"
+    VBoxManage.exe sharedfolder add default --automount --name 'd/gospace' --hostpath '\\?\d:\gospace'
+    VBoxManage.exe sharedfolder add default --automount --name 'cygdrive/d/gospace' --hostpath '\\?\d:\gospace'
     ```
 
     The first command has to be run always. The second needs to be used only when you want to use CygWin instead of default MinGW.
