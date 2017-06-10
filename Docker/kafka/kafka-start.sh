@@ -1,5 +1,5 @@
 #!/bin/bash
 
 echo "Starting kafka"
-create-topics.sh &
-/start.sh
+./create-topics.sh &
+supervisord -n
