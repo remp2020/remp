@@ -61,14 +61,19 @@ final class TemplatePresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $templates = $this->templatesRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
+        $templatesCount = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+            ->count('*');
+
+        $templates = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->fetchAll();
+
         $result = [
             'recordsTotal' => $this->templatesRepository->totalCount(),
-            'recordsFiltered' => count($templates),
+            'recordsFiltered' => $templatesCount,
             'data' => []
         ];
-
-        $templates = array_slice($templates, $request['start'], $request['length']);
 
         foreach ($templates as $template) {
             $result['data'][] = [
@@ -98,9 +103,10 @@ final class TemplatePresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('logJsonData'))
+            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
             ->setColSetting('email', ['orderable' => false])
             ->setColSetting('subject', ['orderable' => false])
-            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
+            ->setColSetting('events', ['render' => 'badge', 'orderable' => false])
             ->setTableSetting('remove-search')
             ->setTableSetting('order', Json::encode([[2, 'DESC']]))
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]));
@@ -112,22 +118,34 @@ final class TemplatePresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $logs = $this->logsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['templateId']);
+        $logsCount = $this->logsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, $request['templateId'])
+            ->count('*');
+
+        $logs = $this->logsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'], $request['templateId'])
+            ->fetchAll();
+
         $result = [
             'recordsTotal' => $this->logsRepository->totalCount(),
-            'recordsFiltered' => count($logs),
+            'recordsFiltered' => $logsCount,
             'data' => []
         ];
-
-        $logs = array_slice($logs, $request['start'], $request['length']);
 
         foreach ($logs as $log) {
             $result['data'][] = [
                 'RowId' => $log->id,
+                $log->created_at,
                 $log->email,
                 $log->subject,
-                $log->created_at,
-
+                [
+                    isset($log->delivered_at) ? ['text' => 'Delivered', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->dropped_at) ? ['text' => 'Dropped', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->spam_complained_at) ? ['text' => 'Span', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->hard_bounced_at) ? ['text' => 'Hard Bounce', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->clicked_at) ? ['text' => 'Clicked', 'class' => 'palette-Cyan-700 bg'] : '',
+                    isset($log->opened_at) ? ['text' => 'Opened', 'class' => 'palette-Cyan-700 bg'] : '',
+                ],
             ];
         }
         $this->presenter->sendJson($result);

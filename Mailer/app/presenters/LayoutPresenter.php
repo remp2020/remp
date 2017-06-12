@@ -41,14 +41,19 @@ final class LayoutPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $layouts = $this->layoutsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
+        $layoutsCount = $this->layoutsRepository
+                ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+                ->count('*');
+
+        $layouts = $this->layoutsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->fetchAll();
+
         $result = [
             'recordsTotal' => $this->layoutsRepository->totalCount(),
-            'recordsFiltered' => count($layouts),
+            'recordsFiltered' => $layoutsCount,
             'data' => []
         ];
-
-        $layouts = array_slice($layouts, $request['start'], $request['length']);
 
         foreach ($layouts as $layout) {
             $result['data'][] = [

@@ -54,14 +54,20 @@ final class ListPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $lists = $this->listsRepository->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir']);
+        $listsCount = $this->listsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+            ->count('*');
+
+        $lists = $this->listsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->fetchAll();
+
         $result = [
             'recordsTotal' => $this->listsRepository->totalCount(),
-            'recordsFiltered' => count($lists),
+            'recordsFiltered' => $listsCount,
             'data' => []
         ];
 
-        $lists = array_slice($lists, $request['start'], $request['length']);
         $totalUsers = $this->usersRepository->totalCount();
 
         foreach ($lists as $list) {
