@@ -18,10 +18,12 @@ services:
   mailhog:
    image: "mailhog/mailhog:v1.0.0"
 
-  # adminer:
-  #  build: "./Docker/php"
-  #  volumes:
-  #    - ".:/var/www/html:rw"
+  adminer:
+    build: "./Docker/php"
+    volumes:
+      - ".:/var/www/html:rw"
+    depends_on:
+      - "nginx"
 
   # campaign
 
@@ -122,7 +124,7 @@ services:
      BEAM_TRACKER_ADDR: ":8081"
    ports:
      - "8081:8081"
-#    restart: "unless-stopped"
+   restart: "unless-stopped"
 
 volumes:
   influxdb-data:
