@@ -38,7 +38,8 @@
         "bower-asset/bootstrap-select": "^1.12",
         "bower-asset/jquery.easy-pie-chart": "^2.1",
         "kdyby/autowired": "^1.4",
-        "twig/twig": "^1.33"
+        "twig/twig": "^1.33",
+        "mailgun/mailgun-php": "^2.3"
     },
     "require-dev": {
         "nette/tester": "^1.6"
