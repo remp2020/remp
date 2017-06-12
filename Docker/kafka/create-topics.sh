@@ -25,9 +25,10 @@ if [[ -n $CREATE_TOPICS ]]; then
         echo "creating topics: $topicToCreate"
         IFS=':' read -a topicConfig <<< "$topicToCreate"
         if [ ${topicConfig[3]} ]; then
-          JMX_PORT='' /opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh --create --zookeeper $ZOOKEEPER_CONNECTION_STRING --replication-factor ${topicConfig[2]} --partition ${topicConfig[1]} --topic "${topicConfig[0]}" --config cleanup.policy="${topicConfig[3]}"
+          JMX_PORT='' /opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh --create --zookeeper kafka:2181 --replication-factor ${topicConfig[2]} --partition ${topicConfig[1]} --topic "${topicConfig[0]}" --config cleanup.policy="${topicConfig[3]}"
         else
-          JMX_PORT='' /opt/kafka_2.11-0.10.1.0/bin//kafka-topics.sh --create --zookeeper $ZOOKEEPER_CONNECTION_STRING --replication-factor ${topicConfig[2]} --partition ${topicConfig[1]} --topic "${topicConfig[0]}"
+          JMX_PORT='' /opt/kafka_2.11-0.10.1.0/bin//kafka-topics.sh --create --zookeeper kafka:2181 --replication-factor ${topicConfig[2]} --partition ${topicConfig[1]} --topic "${topicConfig[0]}"
         fi
+        echo "$topicToCreate created"
     done
 fi

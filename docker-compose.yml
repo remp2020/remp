@@ -11,12 +11,17 @@ services:
     restart: "unless-stopped"
 
   redis:
-    image: "redis:3.2"
-    volumes:
-      - "redis-data:/data"
+   image: "redis:3.2"
+   volumes:
+     - "redis-data:/data"
 
   mailhog:
-    image: "mailhog/mailhog:v1.0.0"
+   image: "mailhog/mailhog:v1.0.0"
+
+  # adminer:
+  #  build: "./Docker/php"
+  #  volumes:
+  #    - ".:/var/www/html:rw"
 
   # campaign
 
@@ -26,6 +31,7 @@ services:
       - ".:/var/www/html:rw"
     depends_on:
       - "campaign_mysql"
+      - "nginx"
     env_file: "./Campaign/.env.example"
     restart: "unless-stopped"
 
@@ -48,72 +54,75 @@ services:
   # mailer
 
   mailer:
-    build: "./Docker/php"
-    volumes:
-      - ".:/var/www/html:rw"
-    depends_on:
-      - "mailer_mysql"
-    env_file: "./Mailer/.env.example"
-    restart: "unless-stopped"
+   build: "./Docker/php"
+   volumes:
+     - ".:/var/www/html:rw"
+   depends_on:
+     - "mailer_mysql"
+     - "nginx"
+     - "redis"
+     - "mailhog"
+   env_file: "./Mailer/.env.example"
+   restart: "unless-stopped"
 
   mailer_mysql:
-    image: "mysql:8.0"
-    volumes:
-      - "mysql-data-mailer:/var/lib/mysql"
-    ports:
-      - "3312:3306"
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_ci"
-      - "--skip-character-set-client-handshake"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
-      MYSQL_ROOT_PASSWORD: "secret"
-      MYSQL_DATABASE: "remp_mailer"
-    restart: "unless-stopped"
+   image: "mysql:8.0"
+   volumes:
+     - "mysql-data-mailer:/var/lib/mysql"
+   ports:
+     - "3312:3306"
+   command:
+     - "--character-set-server=utf8mb4"
+     - "--collation-server=utf8mb4_unicode_ci"
+     - "--skip-character-set-client-handshake"
+   environment:
+     MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+     MYSQL_ROOT_PASSWORD: "secret"
+     MYSQL_DATABASE: "remp_mailer"
+   restart: "unless-stopped"
 
   # beam
 
   kafka:
-    build: "./Docker/kafka"
-    environment:
-      ADVERTISED_HOST: "kafka"
-      ADVERTISED_PORT: "9092"
-      CREATE_TOPICS: "beam_events:1:1"
-    ports:
-      - "9092"
-      - "2181"
-    volumes:
-      - "kafka-data:/data"
+   build: "./Docker/kafka"
+   environment:
+     ADVERTISED_HOST: "kafka"
+     ADVERTISED_PORT: "9092"
+     CREATE_TOPICS: "beam_events:1:1"
+   ports:
+     - "9092"
+     - "2181"
+   volumes:
+     - "kafka-data:/data"
 
   influxdb:
-    image: "influxdb:1.2"
-    volumes:
-      - "influxdb-data:/var/lib/influxdb"
-    ports:
-      - "8083:8083"
-      - "8086:8086"
-    restart: "unless-stopped"
+   image: "influxdb:1.2"
+   volumes:
+     - "influxdb-data:/var/lib/influxdb"
+   ports:
+     - "8083:8083"
+     - "8086:8086"
+   restart: "unless-stopped"
 
   telegraf:
-    build: "./Docker/telegraf"
-    volumes:
-      - "./Docker/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
-    depends_on:
-      - "influxdb"
-      - "kafka"
-    restart: "unless-stopped"
+   build: "./Docker/telegraf"
+   volumes:
+     - "./Docker/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
+   depends_on:
+     - "influxdb"
+     - "kafka"
+   restart: "unless-stopped"
 
   beam_tracker:
-    build: "./Beam/go/cmd/tracker"
-    depends_on:
-      - "kafka"
-    environment:
-      BEAM_BROKER_ADDR: "kafka:9092"
-      BEAM_TRACKER_ADDR: ":8081"
-    ports:
-      - "8081:8081"
-    restart: "unless-stopped"
+   build: "./Beam/go/cmd/tracker"
+   depends_on:
+     - "kafka"
+   environment:
+     BEAM_BROKER_ADDR: "kafka:9092"
+     BEAM_TRACKER_ADDR: ":8081"
+   ports:
+     - "8081:8081"
+#    restart: "unless-stopped"
 
 volumes:
   influxdb-data:
