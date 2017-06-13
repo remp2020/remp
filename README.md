@@ -3,9 +3,9 @@
 ## Apps
 
 See separate documentations of each app:
-* [Beam](Beam).
-* [Campaign](Campaign).
-* [Mailer](Mailer).
+* [Beam](Beam)
+* [Campaign](Campaign)
+* [Mailer](Mailer)
 
 ## Running
 
@@ -25,6 +25,9 @@ Couple of neat commands:
 Docker compose and custom images are ready for PHPStorm debugger. All you need to do is set folder for each debuggable host.
 
 ## Known issues
+
+- Windows is pushing scripts to Docker with CRLF new lines which is causing issues described [in this blog](http://willi.am/blog/2016/08/11/docker-for-windows-dealing-with-windows-line-endings).
+Clone your repository with extra ` --config core.autocrlf=input` parameter and set your IDE to save files with `LF` line endings.
 
 - Telegraf gets stuck if requested topic doesn't exist yet. This has been reported and "hacked" with dockerize, custom topic creation and waits.
 
