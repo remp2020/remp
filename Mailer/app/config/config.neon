@@ -1,5 +1,5 @@
 parameters:
-    sso_host: http://crm.localhost.sk/
+    sso_host: @environmentConfig::get('SSO_BASE_URL')
 
 application:
 	errorPresenter: Error

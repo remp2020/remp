@@ -26,7 +26,7 @@
         </ul>
     </div>
 
-    <table id="{$tableId}" class="table table-striped table-bordered table-hover" aria-busy="false">
+    <table id="{$tableId}" class="table table-striped table-bordered {isset($rowLink) ? 'table-hover'}" aria-busy="false">
         <thead>
         <tr>
             <th n:foreach="$colSettings as $colName => $colSetting">
@@ -47,6 +47,9 @@
                 {foreach $colSettings as $colName => $colSetting}
                 {
                     name: {$colName},
+                    {ifset $colSetting['class']}
+                    className: {$colSetting['class']},
+                    {/ifset}
                     {ifset $colSetting['orderable']}
                     orderable: {$colSetting['orderable']},
                     {/ifset}

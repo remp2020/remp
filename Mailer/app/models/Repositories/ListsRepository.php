@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Repository;
 
 use Nette\Database\Table\IRow;
 use Remp\MailerModule\Repository;
+use Remp\MailerModule\Selection;
 
 class ListsRepository extends Repository
 {
@@ -59,7 +60,15 @@ class ListsRepository extends Repository
         $this->getTable()->where('sorting > ?', $newOrder)->update(['errors_count+=' => 1]);
     }
 
-    public function tableFilter($query, $order, $orderDirection)
+    /**
+     * @param $query
+     * @param $order
+     * @param $orderDirection
+     * @param null $limit
+     * @param null $offset
+     * @return Selection
+     */
+    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null)
     {
         $selection = $this->getTable()
             ->select('mail_types.*, count(:mail_user_preferences.id) AS consents')
@@ -75,6 +84,10 @@ class ListsRepository extends Repository
             $selection->whereOr($where);
         }
 
-        return $selection->fetchAll();
+        if ($limit !== null) {
+            $selection->limit($limit, $offset);
+        }
+
+        return $selection;
     }
 }
