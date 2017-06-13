@@ -17,6 +17,8 @@ services:
 
   mailhog:
    image: "mailhog/mailhog:v1.0.0"
+   environment:
+     MH_HOSTNAME: "mailhog.remp.app"
 
   adminer:
     build: "./Docker/php"
@@ -56,6 +58,8 @@ services:
   # mailer
 
   mailer:
+   extra_hosts:
+     - "crm.app:192.168.10.10"
    build: "./Docker/php"
    volumes:
      - ".:/var/www/html:rw"
