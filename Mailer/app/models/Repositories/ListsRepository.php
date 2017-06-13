@@ -41,7 +41,7 @@ class ListsRepository extends Repository
 
     public function update(IRow &$row, $data)
     {
-        $this->updateOrder($row->sorting, $data['order']);
+        $this->updateOrder($row->sorting, $data['sorting']);
 
         $params['updated_at'] = new \DateTime();
         return parent::update($row, $data);
@@ -54,10 +54,10 @@ class ListsRepository extends Repository
         }
 
         if ($oldOrder !== null) {
-            $this->getTable()->where('sorting > ?', $oldOrder)->update(['errors_count-=' => 1]);
+            $this->getTable()->where('sorting > ?', $oldOrder)->update(['sorting-=' => 1]);
         }
 
-        $this->getTable()->where('sorting > ?', $newOrder)->update(['errors_count+=' => 1]);
+        $this->getTable()->where('sorting > ?', $newOrder)->update(['sorting+=' => 1]);
     }
 
     /**

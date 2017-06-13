@@ -39,16 +39,20 @@
         "bower-asset/jquery.easy-pie-chart": "^2.1",
         "kdyby/autowired": "^1.4",
         "twig/twig": "^1.33",
-        "mailgun/mailgun-php": "^2.3"
+        "mailgun/mailgun-php": "^2.3",
+        "php-http/curl-client": "^1.7",
+        "guzzlehttp/psr7": "^1.4"
     },
     "require-dev": {
         "nette/tester": "^1.6"
     },
     "minimum-stability": "stable",
-    "extra": {
-        "asset-installer-paths": {
-            "npm-asset-library": "www/assets/vendor",
-            "bower-asset-library": "www/assets/vendor"
+    "config": {
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "www/assets/vendor",
+                "bower-asset-library": "www/assets/vendor"
+            }
         }
     }
 }

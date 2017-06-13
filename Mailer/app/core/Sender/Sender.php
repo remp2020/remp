@@ -42,6 +42,8 @@ class Sender
     public function addAttachment($name, $content = null)
     {
         $this->attachments[$name] = $content;
+
+        return $this;
     }
 
     public function setTemplate(IRow $template)

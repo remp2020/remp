@@ -1,6 +1,9 @@
 parameters:
     sso_host: @environmentConfig::get('SSO_BASE_URL')
 
+extensions:
+    local_configs: Remp\MailerModule\Config\ConfigExtension
+
 application:
 	errorPresenter: Error
 	mapping:
@@ -40,7 +43,6 @@ services:
 	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
 
 	- Remp\MailerModule\Config\Config
-	- Remp\MailerModule\Config\LocalConfig
 
 	# Repositories
 	- Remp\MailerModule\Repository\ConfigsRepository

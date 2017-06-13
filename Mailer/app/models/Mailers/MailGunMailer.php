@@ -20,26 +20,27 @@ class MailGunMailer extends Mailer implements IMailer
     )
     {
         parent::__construct($config, $configsRepository);
-        $this->mailer = new Mailgun($this->options['api_key']);
+        $this->mailer = Mailgun::create($this->options['api_key']);
     }
 
-    public function send(Message $mail)
+    public function send(Message $message)
     {
         $from = null;
-        foreach ($mail->getFrom() as $email => $name) {
-            $from = "$name <$email>";
+        foreach ($message->getFrom() as $email => $name) {
+            $from = "$email";
         }
 
         $to = null;
-        foreach ($mail->getHeader('To') as $email => $name) {
+        foreach ($message->getHeader('To') as $email => $name) {
             $to = $email;
         }
 
         $attachments = [];
-        foreach ($mail->getAttachments() as $attachment) {
+        foreach ($message->getAttachments() as $attachment) {
+            preg_match('/(?<filename>\w+\.\w+)/', $attachment->getHeader('Content-Disposition'), $attachmentName);
             $attachments[] = [
                 'fileContent' => $attachment->getBody(),
-                'filename' => 'attachment' . microtime(),
+                'filename' => $attachmentName['filename'],
             ];
         }
 
@@ -47,9 +48,9 @@ class MailGunMailer extends Mailer implements IMailer
         $data = [
             'from' => $from,
             'to' => $to,
-            'subject' => $mail->getSubject(),
-            'text' => $mail->getBody(),
-            'html' => $mail->getHtmlBody(),
+            'subject' => $message->getSubject(),
+            'text' => $message->getBody(),
+            'html' => $message->getHtmlBody(),
             'attachment' => $attachments
         ];
 
