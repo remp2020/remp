@@ -1,0 +1,20 @@
+{form configForm}
+    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
+        {$error}<br>
+    </div>
+
+    <div n:foreach="$form['settings']->controls as $input" class="form-group fg-float m-b-30">
+        <div n:if="$input instanceof Nette\Forms\Controls\TextInput" class="fg-line">
+            {input $input, class => 'form-control fg-input'}
+            {label $input, class => 'fg-label' /}
+        </div>
+        <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
+            <div class="col-sm-12">
+                {label $input /}
+                {input $input, class => 'selectpicker'}
+            </div>
+        </div>
+    </div>
+
+    {input save, class => 'btn btn-info waves-effect'}
+{/form}

@@ -1,10 +1,10 @@
-Campaign = typeof(Campaign) === 'undefined' ? {} : Campaign;
+remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
-(function(){
+(function() {
 
     'use strict';
 
-    Campaign.banner = {
+    remplib.banner = {
 
         bannerForm: null,
 

@@ -1,6 +1,9 @@
 parameters:
     sso_host: @environmentConfig::get('SSO_BASE_URL')
 
+extensions:
+    local_configs: Remp\MailerModule\Config\ConfigExtension
+
 application:
 	errorPresenter: Error
 	mapping:
@@ -27,10 +30,22 @@ services:
 	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
 	        - setCatchExceptions(true)
 
+	- Remp\MailerModule\Sender
+
+	mailFactory:
+	    class: Remp\MailerModule\Sender\MailerFactory
+	    setup:
+	        # Register all Mailers (Nette\Mail\IMailer)
+	        - addMailer(Remp\MailerModule\Mailer\SmtpMailer())
+	        - addMailer(Remp\MailerModule\Mailer\MailgunMailer())
+
 	- Remp\MailerModule\Auth\Authenticator
 	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
 
+	- Remp\MailerModule\Config\Config
+
 	# Repositories
+	- Remp\MailerModule\Repository\ConfigsRepository
 	- Remp\MailerModule\Repository\UsersRepository
 	- Remp\MailerModule\Repository\LogsRepository('2000-01-01 00:00:00')
 	- Remp\MailerModule\Repository\LayoutsRepository
@@ -43,6 +58,7 @@ services:
 
 	# Forms
 	- Remp\MailerModule\Forms\SignInFormFactory
+	- Remp\MailerModule\Forms\ConfigFormFactory
 	- Remp\MailerModule\Forms\LayoutFormFactory
 	- Remp\MailerModule\Forms\ListFormFactory
 	- Remp\MailerModule\Forms\TemplateFormFactory

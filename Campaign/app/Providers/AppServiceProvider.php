@@ -14,13 +14,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->singleton('App\Models\Dimension\Map', function ($app) {
+        $this->app->bind('App\Models\Dimension\Map', function ($app) {
             return new \App\Models\Dimension\Map(config('banners.dimensions'));
         });
-        $this->app->singleton('App\Models\Position\Map', function ($app) {
+        $this->app->bind('App\Models\Position\Map', function ($app) {
             return new \App\Models\Position\Map(config('banners.positions'));
         });
-        $this->app->singleton('App\Models\Alignment\Map', function ($app) {
+        $this->app->bind('App\Models\Alignment\Map', function ($app) {
             return new \App\Models\Alignment\Map(config('banners.alignments'));
         });
 

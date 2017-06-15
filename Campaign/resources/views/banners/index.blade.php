@@ -11,7 +11,7 @@
 @section('content')
 
     <div class="c-header">
-        <h2>Accounts</h2>
+        <h2>Banners</h2>
     </div>
     <div class="card">
         <div class="card-header">

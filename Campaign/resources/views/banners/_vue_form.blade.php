@@ -171,7 +171,7 @@
             <div class="input-group fg-float m-t-30 checkbox">
                 <label class="m-l-15">
                     Ability to close banner manually
-                    <input v-model="closeable" value="1" id="banner-closable-elemenet" name="closeable" type="checkbox">
+                    <input v-model="closeable" value="1" name="closeable" type="checkbox">
                     <i class="input-helper"></i>
                 </label>
             </div>
