@@ -28,12 +28,12 @@ class ListFormFactory extends Object
             $defaults = $newsletter->toArray();
 
             if ($defaults['sorting'] == 1) {
-                $defaults['order'] = 'begin';
+                $defaults['sorting'] = 'begin';
             } elseif ($defaults['sorting'] == $this->listsRepository->totalCount()) {
-                $defaults['order'] = 'end';
+                $defaults['sorting'] = 'end';
             } else {
-                $defaults['order'] = 'after';
-                $defaults['order_after'] = --$defaults['sorting'];
+                $defaults['sorting_after'] = --$defaults['sorting'];
+                $defaults['sorting'] = 'after';
             }
         }
 
@@ -52,10 +52,10 @@ class ListFormFactory extends Object
             ->setAttribute('rows', 3);
 
         $order = ['begin' => 'At the beginning', 'end' => 'At the end', 'after' => 'After'];
-        $form->addRadioList('order', 'Order', $order);
+        $form->addRadioList('sorting', 'Order', $order);
 
         $orderPairs = $this->listsRepository->all()->fetchPairs('sorting', 'title');
-        $form->addSelect('order_after', NULL, $orderPairs);
+        $form->addSelect('sorting_after', NULL, $orderPairs);
 
         $form->addCheckbox('auto_subscribe', 'Required user consent');
         $form->addCheckbox('locked', 'Locked');
@@ -74,23 +74,25 @@ class ListFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
-        switch ($values['order']) {
+        switch ($values['sorting']) {
             case 'begin':
-                $values['order'] = 1;
+                $values['sorting'] = 1;
                 break;
 
             case 'after':
-                $values['order'] = $values['order_after'];
+                $values['sorting'] = $values['sorting_after'] + 1;
                 break;
 
             default:
             case 'end':
-                $values['order'] = $this->listsRepository->totalCount();
+                $values['sorting'] = $this->listsRepository->totalCount();
                 break;
         }
 
         if (!empty($values['id'])) {
             $row = $this->listsRepository->find($values['id']);
+
+            unset($values['sorting_after']);
             $this->listsRepository->update($row, $values);
             ($this->onUpdate)($row);
         } else {
@@ -98,7 +100,7 @@ class ListFormFactory extends Object
                 $values['code'],
                 $values['title'],
                 $values['description'],
-                $values['order'],
+                $values['sorting'],
                 $values['auto_subscribe'],
                 $values['locked'],
                 $values['is_public']

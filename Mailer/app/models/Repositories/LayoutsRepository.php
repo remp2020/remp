@@ -22,6 +22,7 @@ class LayoutsRepository extends Repository
         $result = $this->insert([
             'name' => $name,
             'created_at' => new \DateTime(),
+            'updated_at' => new \DateTime(),
             'layout_html' => $layoutHtml,
             'layout_text' => $layoutText,
         ]);

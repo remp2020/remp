@@ -27,12 +27,12 @@
 
     <div class="form-group m-b-30">
         Order
-        <div n:foreach="$form['order']->getItems() as $key => $label" class="radio m-b-15">
-            {label order:$key}
-                {input order:$key}
+        <div n:foreach="$form['sorting']->getItems() as $key => $label" class="radio m-b-15">
+            {label sorting:$key}
+                {input sorting:$key}
                 <i class="input-helper"></i> {$label}
                 {if $key == 'after'}
-                    {input order_after, class => 'selectpicker order_after m-t-10'}
+                    {input sorting_after, class => 'selectpicker sorting_after m-t-10'}
                 {/if}
             {/label}
         </div>
