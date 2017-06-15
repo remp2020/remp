@@ -8,7 +8,7 @@ use Nette\Mail\Message;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Repository\ConfigsRepository;
 
-class MailGunMailer extends Mailer implements IMailer
+class MailgunMailer extends Mailer implements IMailer
 {
     private $mailer;
 
@@ -17,8 +17,7 @@ class MailGunMailer extends Mailer implements IMailer
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository
-    )
-    {
+    ) {
         parent::__construct($config, $configsRepository);
         $this->mailer = Mailgun::create($this->options['api_key']);
     }

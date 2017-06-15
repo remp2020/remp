@@ -37,7 +37,7 @@ services:
 	    setup:
 	        # Register all Mailers (Nette\Mail\IMailer)
 	        - addMailer(Remp\MailerModule\Mailer\SmtpMailer())
-	        - addMailer(Remp\MailerModule\Mailer\MailGunMailer())
+	        - addMailer(Remp\MailerModule\Mailer\MailgunMailer())
 
 	- Remp\MailerModule\Auth\Authenticator
 	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
