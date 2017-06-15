@@ -4,7 +4,7 @@ import . "github.com/goadesign/goa/design"
 import . "github.com/goadesign/goa/design/apidsl"
 
 var TrackSystem = Type("TrackSystem", func() {
-	Attribute("api_key", String, "Public API token")
+	Attribute("token", String, "Property token")
 	Attribute("time", DateTime, "Time of occurrence")
 	Attribute("url", String, "URL", func() {
 		Format("uri")
@@ -14,7 +14,7 @@ var TrackSystem = Type("TrackSystem", func() {
 		Format("ip")
 	})
 	Attribute("user_id", String, "ID of reader")
-	Required("api_key", "time", "url", "user_agent", "ip_address")
+	Required("token", "time", "url", "user_agent", "ip_address")
 })
 
 var TrackPageview = Type("TrackPageview", func() {

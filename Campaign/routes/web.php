@@ -16,7 +16,10 @@ Route::get('/', function () {
 });
 
 Route::get('banners/json', 'BannerController@json')->name('banners.json');
+Route::get('campaigns/json', 'CampaignController@json')->name('campaigns.json');
 Route::get('banners/preview/{uuid}', 'BannerController@preview')->name('banners.preview');
+Route::get('campaigns/showtime', 'CampaignController@showtime')->name('campaigns.showtime');
 Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
 Route::resource('banners', 'BannerController');
+Route::resource('campaigns', 'CampaignController');

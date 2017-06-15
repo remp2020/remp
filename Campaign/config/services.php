@@ -35,4 +35,12 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'segment' => [
+        'base_url' => env('SEGMENT_API_BASE_URL'),
+        'token' => env('SEGMENT_API_TOKEN'),
+    ],
+
+    'tracker' => [
+        'base_url' => env('TRACKER_API_BASE_URL'),
+    ]
 ];

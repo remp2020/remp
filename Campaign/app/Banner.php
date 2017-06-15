@@ -82,4 +82,9 @@ class Banner extends Model
             $banner->uuid = Uuid::uuid4()->toString();
         });
     }
+
+    public function campaigns()
+    {
+        return $this->hasMany(Campaign::class);
+    }
 }

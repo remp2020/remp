@@ -8,7 +8,6 @@
     .cp-value {
         cursor: pointer;
     }
-
 </style>
 
 <template id="banner-form-template">
@@ -28,8 +27,8 @@
                 <div class="input-group fg-float m-t-30">
                     <span class="input-group-addon"><i class="zmdi zmdi-format-color-text"></i></span>
                     <div class="fg-line dropdown">
-                        <label for="Text Color" class="fg-label">Text Color</label>
-                        <input v-model="textColor" class="form-control cp-value" data-toggle="dropdown" name="text_color" type="text">
+                        <label for="banner-text-color" class="fg-label">Text Color</label>
+                        <input v-model="textColor" id="banner-text-color" class="form-control cp-value" data-toggle="dropdown" name="text_color" type="text">
 
                         <div class="dropdown-menu">
                             <div class="color-picker" data-cp-default="#03A9F4"></div>
@@ -43,8 +42,8 @@
                 <div class="input-group fg-float m-t-30">
                     <span class="input-group-addon"><i class="zmdi zmdi-format-color-fill"></i></span>
                     <div class="fg-line dropdown">
-                        <label for="Background color" class="fg-label">Background Color</label>
-                        <input v-model="backgroundColor" class="form-control cp-value" data-toggle="dropdown" name="background_color" type="text">
+                        <label for="banner-bg-color" class="fg-label">Background Color</label>
+                        <input v-model="backgroundColor" id="banner-bg-color" class="form-control cp-value" data-toggle="dropdown" name="background_color" type="text">
 
                         <div class="dropdown-menu">
                             <div class="color-picker"></div>
@@ -57,16 +56,16 @@
             <div class="input-group fg-float m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
                 <div class="fg-line">
-                    <label for="HTML text" class="fg-label">HTML Text</label>
-                    <textarea v-model="text" class="form-control fg-input" rows="3" name="text" cols="50"></textarea>
+                    <label for="banner-html-text" class="fg-label">HTML Text</label>
+                    <textarea v-model="text" id="banner-html-text" class="form-control fg-input" rows="3" name="text" cols="50"></textarea>
                 </div>
             </div>
 
             <div class="input-group fg-float m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-format-size"></i></span>
                 <div class="fg-line">
-                    <label for="Font size" class="fg-label">Font Size</label>
-                    <input v-model="fontSize" class="form-control fg-input" name="font_size" type="number">
+                    <label for="banner-font-size" class="fg-label">Font Size</label>
+                    <input v-model="fontSize" id="banner-font-size" class="form-control fg-input" name="font_size" type="number">
                 </div>
             </div>
 
@@ -75,10 +74,10 @@
                 <div>
                     <div class="row">
                         <div class="col-md-12">
-                            <label for="Text alignment" class="fg-label">Transition</label>
+                            <label for="banner-transition" class="fg-label">Transition</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model="transition" class="selectpicker" name="transition">
+                            <select v-model="transition" id="banner-transition" class="selectpicker" name="transition">
                                 <option value="none">None</option>
                                 <option value="fade">Fade</option>
                                 <option value="bounce">Bounce</option>
@@ -95,12 +94,12 @@
                 <div>
                     <div class="row">
                         <div class="col-md-12">
-                            <label for="Text alignment" class="fg-label">Text Alignment</label>
+                            <label for="banner-text-align" class="fg-label">Text Alignment</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model="textAlign" class="selectpicker" name="text_align">
+                            <select v-model="textAlign" id="banner-text-align" class="selectpicker" name="text_align">
                                 <option v-for="option in alignmentOptions" v-bind:value="option.key">
-                                    @{{ option.name }}
+                                    {{ option.name }}
                                 </option>
                             </select>
                         </div>
@@ -113,12 +112,12 @@
                 <div>
                     <div class="row">
                         <div class="col-md-12">
-                            <label for="Dimensions" class="fg-label">Dimensions</label>
+                            <label for="banner-dimensions" class="fg-label">Dimensions</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model.lazy="dimensions" class="selectpicker" name="dimensions">
+                            <select v-model.lazy="dimensions" id="banner-dimensions" class="selectpicker" name="dimensions">
                                 <option v-for="option in dimensionOptions" v-bind:value="option.key">
-                                    @{{ option.name }}
+                                    {{ option.name }}
                                 </option>
                             </select>
                         </div>
@@ -131,12 +130,12 @@
                 <div>
                     <div class="row">
                         <div class="col-md-12">
-                            <label for="Position" class="fg-label">Position</label>
+                            <label for="banner-position" class="fg-label">Position</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model.lazy="position" class="selectpicker" name="position">
+                            <select v-model.lazy="position" id="banner-position" class="selectpicker" name="position">
                                 <option v-for="option in positionOptions" v-bind:value="option.key">
-                                    @{{ option.name }}
+                                    {{ option.name }}
                                 </option>
                             </select>
                         </div>
@@ -147,24 +146,24 @@
             <div class="input-group fg-float m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
                 <div class="fg-line">
-                    <label for="Target URL" class="fg-label">Target URL</label>
-                    <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text">
+                    <label for="banner-target-url" class="fg-label">Target URL</label>
+                    <input v-model="targetUrl" id="banner-target-url" class="form-control fg-input" name="target_url" type="text">
                 </div>
             </div>
 
             <div class="input-group fg-float m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
                 <div class="fg-line">
-                    <label for="Display delay" class="fg-label">Display delay (milliseconds)</label>
-                    <input v-model="displayDelay" class="form-control fg-input" name="display_delay" type="number">
+                    <label for="banner-display-delay" class="fg-label">Display delay (milliseconds)</label>
+                    <input v-model="displayDelay" id="banner-display-delay" class="form-control fg-input" name="display_delay" type="number">
                 </div>
             </div>
 
             <div class="input-group fg-float m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                 <div class="fg-line">
-                    <label for="Automatic close" class="fg-label">Automatic close after (milliseconds)</label>
-                    <input v-model="closeTimeout" class="form-control fg-input" name="close_timeout" type="number">
+                    <label for="banner-auto-close" class="fg-label">Automatic close after (milliseconds)</label>
+                    <input v-model="closeTimeout" id="banner-auto-close" class="form-control fg-input" name="close_timeout" type="number">
                 </div>
             </div>
 
@@ -191,7 +190,7 @@
             </h4>
 
             <div class="row p-relative" style="width: 560px; height: 700px">
-                <img src="http://rempcampaign.local/assets/img/website_mockup.png" class="preview-image" alt="Mockup" height="700px">
+                <img src="{{ mockup_background }}" class="preview-image" alt="Mockup" height="700px">
                 <div id="banner-preview">
                     <banner-preview></banner-preview>
                 </div>

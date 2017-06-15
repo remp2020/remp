@@ -4,7 +4,7 @@
 <link href="/assets/css/banner.css" rel="stylesheet">
 @endpush
 
-@section('title', 'Add account')
+@section('title', 'Add banner')
 
 @section('content')
 
@@ -19,7 +19,7 @@
             @component('banners._vue_form')
             @endcomponent
 
-            {!! Form::model($banner, ['route' => 'banners.store', 'files' => true, 'id' => 'banner-form']) !!}
+            {!! Form::model($banner, ['route' => 'banners.store', 'id' => 'banner-form']) !!}
             @include('banners._form')
             {!! Form::close() !!}
         </div>

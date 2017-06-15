@@ -15,8 +15,6 @@ use Yajra\Datatables\Datatables;
 
 class BannerController extends Controller
 {
-    const BUCKET = 'banners';
-
     protected $dimensionMap;
     protected $positionMap;
     protected $alignmentMap;
@@ -32,7 +30,6 @@ class BannerController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-     * @internal param Dimensioner $dimensions
      */
     public function index()
     {
@@ -87,7 +84,7 @@ class BannerController extends Controller
 
         $banner->save();
 
-        return redirect(route('banners.index'))->with('success', 'Account created');
+        return redirect(route('banners.index'))->with('success', 'Banner created');
     }
 
     /**
