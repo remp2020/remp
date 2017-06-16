@@ -34,6 +34,7 @@ class Segment implements SegmentContract
 
     public function check($segmentId, $userId): bool
     {
+        return true;
         $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($segmentId);
         if (!$bloomFilter) {
             dispatch(new CacheSegmentJob($segmentId));

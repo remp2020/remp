@@ -26,7 +26,7 @@
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
 
-    var banner = Campaign.banner.fromModel({!! $banner->toJson() !!});
+    var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
     banner.show = true;
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;

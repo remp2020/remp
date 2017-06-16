@@ -37,6 +37,8 @@ services:
       - "campaign_mysql"
       - "nginx"
     env_file: "./Campaign/.env.example"
+    extra_hosts:
+      - "crm.app:192.168.99.100"
     restart: "unless-stopped"
 
   campaign_mysql:
@@ -129,6 +131,16 @@ services:
    ports:
      - "8081:8081"
    restart: "unless-stopped"
+
+  beam_journal:
+     build: "./Beam/go/cmd/journal"
+     depends_on:
+       - "influxdb"
+     environment:
+       BEAM_JOURNAL_ADDR: ":8082"
+     ports:
+       - "8082:8082"
+     restart: "unless-stopped"
 
 volumes:
   influxdb-data:

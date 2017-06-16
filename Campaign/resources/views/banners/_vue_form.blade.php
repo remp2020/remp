@@ -191,7 +191,7 @@
             </h4>
 
             <div class="row p-relative" style="width: 560px; height: 700px">
-                <img src="http://rempcampaign.local/assets/img/website_mockup.png" class="preview-image" alt="Mockup" height="700px">
+                <img src="/assets/img/website_mockup.png" class="preview-image" alt="Mockup" height="700px">
                 <div id="banner-preview">
                     <banner-preview></banner-preview>
                 </div>
