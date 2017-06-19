@@ -184,6 +184,7 @@ return [
         Arrilot\Widgets\ServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
+        Laracasts\Flash\FlashServiceProvider::class,
     ],
 
     /*

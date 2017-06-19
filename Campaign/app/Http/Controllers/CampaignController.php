@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Banner;
 use App\Campaign;
 use App\Contracts\SegmentContract;
+use App\Contracts\SegmentException;
 use App\Contracts\TrackerContract;
 use App\Http\Requests\CampaignRequest;
 use App\Jobs\CacheSegmentJob;
-use Cache;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Psy\Util\Json;
 use View;
 use Yajra\Datatables\Datatables;
@@ -108,7 +108,13 @@ class CampaignController extends Controller
         $campaign->fill(old());
 
         $banners = Banner::all();
-        $segments = $segmentContract->list();
+        try {
+            $segments = $segmentContract->list();
+        } catch (SegmentException $e) {
+            $segments = new Collection();
+            flash('Unable to fetch list of segments, please check the application configuration.')->error();
+            \Log::error($e->getMessage());
+        }
 
         return view('campaigns.edit', [
             'campaign' => $campaign,
