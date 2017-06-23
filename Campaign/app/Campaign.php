@@ -25,6 +25,8 @@ use Ramsey\Uuid\Uuid;
  * @method static \Illuminate\Database\Query\Builder|\App\Campaign whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Campaign whereUuid($value)
  * @mixin \Eloquent
+ * @property-read \App\Banner $banner
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\CampaignRule[] $rules
  */
 class Campaign extends Model
 {
@@ -55,5 +57,10 @@ class Campaign extends Model
     public function banner()
     {
         return $this->belongsTo(Banner::class);
+    }
+
+    public function rules()
+    {
+        return $this->hasMany(CampaignRule::class);
     }
 }

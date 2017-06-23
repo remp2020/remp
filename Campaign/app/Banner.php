@@ -45,6 +45,7 @@ use Ramsey\Uuid\Uuid;
  * @method static \Illuminate\Database\Query\Builder|\App\Banner whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Banner whereUuid($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Campaign[] $campaigns
  */
 class Banner extends Model
 {

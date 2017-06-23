@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Banner;
 use App\Campaign;
+use App\CampaignRule;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
 use App\Contracts\TrackerContract;
@@ -135,6 +136,18 @@ class CampaignController extends Controller
         $campaign->fill($request->all());
         $shouldCache = $campaign->isDirty('active');
         $campaign->save();
+
+        foreach ($request->get('rules') as $r) {
+            /** @var CampaignRule $rule */
+            $rule = CampaignRule::findOrNew($r['id']);
+            $rule->timespan = $r['timespan'];
+            $rule->count = $r['count'];
+            $rule->event = $r['event'];
+            $rule->campaign_id = $campaign->id;
+            $rule->save();
+        }
+
+        CampaignRule::destroy($request->get('removedRules'));
 
         if ($campaign->active && $shouldCache) {
             dispatch(new CacheSegmentJob($campaign->segment_id));
