@@ -1,9 +1,7 @@
 package meta_test
 
 import (
-	"encoding/json"
 	"io/ioutil"
-	"net"
 	"os"
 	"path"
 	"reflect"
@@ -598,15 +596,15 @@ func TestMetaClient_CreateUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if exp, got := "fred", u.Name; exp != got {
+	if exp, got := "fred", u.ID(); exp != got {
 		t.Fatalf("unexpected user name: exp: %s got: %s", exp, got)
 	}
-	if !u.Admin {
+	if !u.IsAdmin() {
 		t.Fatalf("expected user to be admin")
 	}
 
 	u, err = c.Authenticate("fred", "supersecure")
-	if u == nil || err != nil || u.Name != "fred" {
+	if u == nil || err != nil || u.ID() != "fred" {
 		t.Fatalf("failed to authenticate")
 	}
 
@@ -635,7 +633,7 @@ func TestMetaClient_CreateUser(t *testing.T) {
 
 	// Auth for new password should succeed.
 	u, err = c.Authenticate("fred", "moresupersecure")
-	if u == nil || err != nil || u.Name != "fred" {
+	if u == nil || err != nil || u.ID() != "fred" {
 		t.Fatalf("failed to authenticate")
 	}
 
@@ -649,10 +647,10 @@ func TestMetaClient_CreateUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if exp, got := "wilma", u.Name; exp != got {
+	if exp, got := "wilma", u.ID(); exp != got {
 		t.Fatalf("unexpected user name: exp: %s got: %s", exp, got)
 	}
-	if u.Admin {
+	if u.IsAdmin() {
 		t.Fatalf("expected user not to be an admin")
 	}
 
@@ -669,10 +667,10 @@ func TestMetaClient_CreateUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if exp, got := "wilma", u.Name; exp != got {
+	if exp, got := "wilma", u.ID(); exp != got {
 		t.Fatalf("unexpected user name: exp: %s got: %s", exp, got)
 	}
-	if !u.Admin {
+	if !u.IsAdmin() {
 		t.Fatalf("expected user to be an admin")
 	}
 
@@ -685,10 +683,10 @@ func TestMetaClient_CreateUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if exp, got := "wilma", u.Name; exp != got {
+	if exp, got := "wilma", u.ID(); exp != got {
 		t.Fatalf("unexpected user name: exp: %s got: %s", exp, got)
 	}
-	if u.Admin {
+	if u.IsAdmin() {
 		t.Fatalf("expected user not to be an admin")
 	}
 
@@ -1165,34 +1163,4 @@ func testTempDir(skip int) string {
 		panic(err)
 	}
 	return dir
-}
-
-func mustParseStatement(s string) influxql.Statement {
-	stmt, err := influxql.ParseStatement(s)
-	if err != nil {
-		panic(err)
-	}
-	return stmt
-}
-
-func mustMarshalJSON(v interface{}) string {
-	b, e := json.Marshal(v)
-	if e != nil {
-		panic(e)
-	}
-	return string(b)
-}
-
-func freePort() string {
-	l, _ := net.Listen("tcp", "127.0.0.1:0")
-	defer l.Close()
-	return l.Addr().String()
-}
-
-func freePorts(i int) []string {
-	var ports []string
-	for j := 0; j < i; j++ {
-		ports = append(ports, freePort())
-	}
-	return ports
 }

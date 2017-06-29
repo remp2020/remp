@@ -1,11 +1,12 @@
-package middleware
+package middleware_test
 
 import (
 	"net/http"
 	"net/url"
 
+	"context"
+
 	"github.com/goadesign/goa"
-	"golang.org/x/net/context"
 )
 
 // Helper that sets up a "working" service

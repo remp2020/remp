@@ -1,4 +1,4 @@
-package version
+package version_test
 
 import (
 	"strconv"
@@ -31,7 +31,7 @@ var _ = Describe("version", func() {
 		})
 
 		It("returns the default version", func() {
-			Ω(ver).Should(HaveSuffix(".0-dirty"))
+			Ω(ver).Should(HaveSuffix(".0"))
 		})
 	})
 

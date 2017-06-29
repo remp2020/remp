@@ -79,6 +79,9 @@ class Banner extends Model
     {
         parent::boot();
 
+
+
+
         static::creating(function(Banner $banner) {
             $banner->uuid = Uuid::uuid4()->toString();
         });

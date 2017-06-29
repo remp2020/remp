@@ -1,13 +1,17 @@
 package xray
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 
+	"github.com/goadesign/goa"
 	"github.com/pkg/errors"
 )
 
@@ -79,16 +83,17 @@ type (
 
 	// Request describes a HTTP request.
 	Request struct {
-		Method    string `json:"method,omitempty"`
-		URL       string `json:"url,omitempty"`
-		UserAgent string `json:"user_agent,omitempty"`
-		ClientIP  string `json:"client_ip,omitempty"`
+		Method        string `json:"method,omitempty"`
+		URL           string `json:"url,omitempty"`
+		UserAgent     string `json:"user_agent,omitempty"`
+		ClientIP      string `json:"client_ip,omitempty"`
+		ContentLength int64  `json:"content_length"`
 	}
 
 	// Response describes a HTTP response.
 	Response struct {
-		Status        int `json:"status"`
-		ContentLength int `json:"content_length"`
+		Status        int   `json:"status"`
+		ContentLength int64 `json:"content_length"`
 	}
 
 	// Cause list errors that happens during the request.
@@ -157,6 +162,57 @@ func NewSegment(name, traceID, spanID string, conn net.Conn) *Segment {
 	}
 }
 
+// RecordRequest traces a request.
+//
+// It sets Http.Request & Namespace (ex: "remote")
+func (s *Segment) RecordRequest(req *http.Request, namespace string) {
+	s.Lock()
+	defer s.Unlock()
+
+	if s.HTTP == nil {
+		s.HTTP = &HTTP{}
+	}
+
+	s.Namespace = namespace
+	s.HTTP.Request = requestData(req)
+}
+
+// RecordResponse traces a response.
+//
+// It sets Throttle, Fault, Error and HTTP.Response
+func (s *Segment) RecordResponse(resp *http.Response) {
+	s.Lock()
+	defer s.Unlock()
+
+	if s.HTTP == nil {
+		s.HTTP = &HTTP{}
+	}
+
+	s.recordStatusCode(resp.StatusCode)
+
+	s.HTTP.Response = responseData(resp)
+}
+
+// RecordContextResponse traces a context response if present in the context
+//
+// It sets Throttle, Fault, Error and HTTP.Response
+func (s *Segment) RecordContextResponse(ctx context.Context) {
+	resp := goa.ContextResponse(ctx)
+	if resp == nil {
+		return
+	}
+
+	s.Lock()
+	defer s.Unlock()
+
+	if s.HTTP == nil {
+		s.HTTP = &HTTP{}
+	}
+
+	s.recordStatusCode(resp.Status)
+	s.HTTP.Response = &Response{resp.Status, int64(resp.Length)}
+}
+
 // RecordError traces an error. The client may also want to initialize the
 // fault field of s.
 //
@@ -164,33 +220,11 @@ func NewSegment(name, traceID, spanID string, conn net.Conn) *Segment {
 // was created using one of the New, Errorf, Wrap or Wrapf functions of the
 // github.com/pkg/errors package. Otherwise the Stack and Cause fields are empty.
 func (s *Segment) RecordError(e error) {
-	var xerr *Exception
-	if c, ok := e.(causer); ok {
-		xerr = &Exception{Message: c.Cause().Error()}
-	} else {
-		xerr = &Exception{Message: e.Error()}
-	}
-	if s, ok := e.(stackTracer); ok {
-		st := s.StackTrace()
-		ln := len(st)
-		if ln > maxStackDepth {
-			ln = maxStackDepth
-		}
-		frames := make([]*StackEntry, ln)
-		for i := 0; i < ln; i++ {
-			f := st[i]
-			line, _ := strconv.Atoi(fmt.Sprintf("%d", f))
-			frames[i] = &StackEntry{
-				Path:  fmt.Sprintf("%s", f),
-				Line:  line,
-				Label: fmt.Sprintf("%n", f),
-			}
-		}
-		xerr.Stack = frames
-	}
+	xerr := exceptionData(e)
 
 	s.Lock()
 	defer s.Unlock()
+
 	if s.Cause == nil {
 		wd, _ := os.Getwd()
 		s.Cause = &Cause{WorkingDirectory: wd}
@@ -209,6 +243,7 @@ func (s *Segment) RecordError(e error) {
 func (s *Segment) NewSubsegment(name string) *Segment {
 	s.Lock()
 	defer s.Unlock()
+
 	sub := &Segment{
 		Mutex:      &sync.Mutex{},
 		ID:         NewID(),
@@ -260,6 +295,7 @@ func (s *Segment) AddBoolAnnotation(key string, value bool) {
 func (s *Segment) addAnnotation(key string, value interface{}) {
 	s.Lock()
 	defer s.Unlock()
+
 	if s.Annotations == nil {
 		s.Annotations = make(map[string]interface{})
 	}
@@ -287,6 +323,7 @@ func (s *Segment) AddBoolMetadata(key string, value bool) {
 func (s *Segment) addMetadata(key string, value interface{}) {
 	s.Lock()
 	defer s.Unlock()
+
 	if s.Metadata == nil {
 		s.Metadata = make(map[string]map[string]interface{})
 		s.Metadata["default"] = make(map[string]interface{})
@@ -298,6 +335,7 @@ func (s *Segment) addMetadata(key string, value interface{}) {
 func (s *Segment) Close() {
 	s.Lock()
 	defer s.Unlock()
+
 	s.EndTime = now()
 	s.InProgress = false
 	if s.Parent != nil {
@@ -315,13 +353,108 @@ func (s *Segment) flush() {
 	s.conn.Write(append([]byte(udpHeader), b...))
 }
 
+// recordStatusCode sets Throttle, Fault, Error
+//
+// It is expected that the mutex has already been locked when calling this method.
+func (s *Segment) recordStatusCode(statusCode int) {
+	switch {
+	case statusCode == http.StatusTooManyRequests:
+		s.Throttle = true
+	case statusCode >= 400 && statusCode < 500:
+		s.Fault = true
+	case statusCode >= 500:
+		s.Error = true
+	}
+}
+
 // decrementCounter decrements the segment counter and flushes it if it's 0.
 func (s *Segment) decrementCounter() {
 	s.Lock()
 	defer s.Unlock()
+
 	s.counter--
 	if s.counter <= 0 && s.EndTime != 0 {
 		// Segment is closed and last subsegment closed, flush it
 		s.flush()
 	}
+}
+
+// exceptionData creates an Exception from an error.
+func exceptionData(e error) *Exception {
+	var xerr *Exception
+	if c, ok := e.(causer); ok {
+		xerr = &Exception{Message: c.Cause().Error()}
+	} else {
+		xerr = &Exception{Message: e.Error()}
+	}
+	if s, ok := e.(stackTracer); ok {
+		st := s.StackTrace()
+		ln := len(st)
+		if ln > maxStackDepth {
+			ln = maxStackDepth
+		}
+		frames := make([]*StackEntry, ln)
+		for i := 0; i < ln; i++ {
+			f := st[i]
+			line, _ := strconv.Atoi(fmt.Sprintf("%d", f))
+			frames[i] = &StackEntry{
+				Path:  fmt.Sprintf("%s", f),
+				Line:  line,
+				Label: fmt.Sprintf("%n", f),
+			}
+		}
+		xerr.Stack = frames
+	}
+
+	return xerr
+}
+
+// requestData creates a Request from a http.Request.
+func requestData(req *http.Request) *Request {
+	var (
+		scheme = "http"
+		host   = req.Host
+	)
+	if len(req.URL.Scheme) > 0 {
+		scheme = req.URL.Scheme
+	}
+	if len(req.URL.Host) > 0 {
+		host = req.URL.Host
+	}
+
+	return &Request{
+		Method:        req.Method,
+		URL:           fmt.Sprintf("%s://%s%s", scheme, host, req.URL.Path),
+		ClientIP:      getIP(req),
+		UserAgent:     req.UserAgent(),
+		ContentLength: req.ContentLength,
+	}
+}
+
+// responseData creates a Response from a http.Response.
+func responseData(resp *http.Response) *Response {
+	return &Response{
+		Status:        resp.StatusCode,
+		ContentLength: resp.ContentLength,
+	}
+}
+
+// getIP implements a heuristic that returns an origin IP address for a request.
+func getIP(req *http.Request) string {
+	for _, h := range []string{"X-Forwarded-For", "X-Real-Ip"} {
+		for _, ip := range strings.Split(req.Header.Get(h), ",") {
+			if len(ip) == 0 {
+				continue
+			}
+			realIP := net.ParseIP(strings.Replace(ip, " ", "", -1))
+			return realIP.String()
+		}
+	}
+
+	// not found in header
+	host, _, err := net.SplitHostPort(req.RemoteAddr)
+	if err != nil {
+		return req.RemoteAddr
+	}
+	return host
 }

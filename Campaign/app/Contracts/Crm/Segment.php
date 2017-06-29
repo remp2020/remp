@@ -2,6 +2,7 @@
 
 namespace App\Contracts\Crm;
 
+use App\CampaignSegment;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
 use App\Jobs\CacheSegmentJob;
@@ -13,6 +14,8 @@ use Razorpay\BloomFilter\Bloom;
 
 class Segment implements SegmentContract
 {
+    const ALIAS = 'crm_segment';
+
     const ENDPOINT_LIST = 'user-segments/list';
 
     const ENDPOINT_CHECK = 'user-segments/check';
@@ -39,7 +42,16 @@ class Segment implements SegmentContract
         }
 
         $list = json_decode($response->getBody());
-        $collection = collect($list->segments);
+        $campaignSegments = [];
+        foreach ($list->segments as $item) {
+            $cs = new CampaignSegment();
+            $cs->name = $item->name;
+            $cs->provider = self::ALIAS;
+            $cs->code = $item->code;
+            $cs->group = $item->group;
+            $campaignSegments[] = $cs;
+        }
+        $collection = collect($campaignSegments);
         return $collection;
     }
 

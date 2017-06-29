@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-cp -a /src/build/. /go/src/gitlab.com/remp/remp/Beam/go 1>&2
-cd cmd/journal && make build-static 1>&2
-tar -cf - journal swagger

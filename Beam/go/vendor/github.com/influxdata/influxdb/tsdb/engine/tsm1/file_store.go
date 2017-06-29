@@ -1,8 +1,8 @@
 package tsm1
 
 import (
+	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"math"
 	"os"
@@ -107,13 +107,6 @@ type TSMFile interface {
 	// BlockIterator returns an iterator pointing to the first block in the file and
 	// allows sequential iteration to each and every block.
 	BlockIterator() *BlockIterator
-
-	// Removes mmap references held by another object.
-	deref(dereferencer)
-}
-
-type dereferencer interface {
-	Dereference([]byte)
 }
 
 // Statistics gathered by the FileStore.
@@ -137,15 +130,12 @@ type FileStore struct {
 
 	logger       zap.Logger // Logger to be used for important messages
 	traceLogger  zap.Logger // Logger to be used when trace-logging is on.
-	logOutput    io.Writer  // Writer to be logger and traceLogger if active.
 	traceLogging bool
 
 	stats  *FileStoreStatistics
 	purger *purger
 
 	currentTempDirID int
-
-	dereferencer dereferencer
 }
 
 // FileStat holds information about a TSM file on disk.
@@ -256,61 +246,38 @@ func (f *FileStore) NextGeneration() int {
 	return f.currentGeneration
 }
 
-// Add adds the given files to the file store's list of files.
-func (f *FileStore) Add(files ...TSMFile) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	for _, file := range files {
-		atomic.AddInt64(&f.stats.DiskBytes, int64(file.Size()))
-	}
-	f.lastFileStats = nil
-	f.files = append(f.files, files...)
-	sort.Sort(tsmReaders(f.files))
-	atomic.StoreInt64(&f.stats.FileCount, int64(len(f.files)))
-}
-
-// Remove removes the files with matching paths from the set of active files.  It does
-// not remove the paths from disk.
-func (f *FileStore) Remove(paths ...string) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	var active []TSMFile
-	for _, file := range f.files {
-		keep := true
-		for _, remove := range paths {
-			if remove == file.Path() {
-				keep = false
-				break
-			}
-		}
-
-		if keep {
-			active = append(active, file)
-		} else {
-			// Removing the file, remove the file size from the total file store bytes
-			atomic.AddInt64(&f.stats.DiskBytes, -int64(file.Size()))
-		}
-	}
-	f.lastFileStats = nil
-	f.files = active
-	sort.Sort(tsmReaders(f.files))
-	atomic.StoreInt64(&f.stats.FileCount, int64(len(f.files)))
-}
-
 // WalkKeys calls fn for every key in every TSM file known to the FileStore.  If the key
 // exists in multiple files, it will be invoked for each file.
 func (f *FileStore) WalkKeys(fn func(key []byte, typ byte) error) error {
 	f.mu.RLock()
-	defer f.mu.RUnlock()
+	if len(f.files) == 0 {
+		f.mu.RUnlock()
+		return nil
+	}
 
+	readers := make([]chan seriesKey, 0, len(f.files))
 	for _, f := range f.files {
-		for i := 0; i < f.KeyCount(); i++ {
-			key, typ := f.KeyAt(i)
-			if err := fn(key, typ); err != nil {
-				return err
+		ch := make(chan seriesKey, 1)
+		readers = append(readers, ch)
+
+		go func(c chan seriesKey, r TSMFile) {
+			n := r.KeyCount()
+			for i := 0; i < n; i++ {
+				key, typ := r.KeyAt(i)
+				c <- seriesKey{key, typ}
 			}
+			close(ch)
+		}(ch, f)
+	}
+	f.mu.RUnlock()
+
+	merged := merge(readers...)
+	for v := range merged {
+		if err := fn(v.key, v.typ); err != nil {
+			return err
 		}
 	}
+
 	return nil
 }
 
@@ -320,11 +287,11 @@ func (f *FileStore) Keys() map[string]byte {
 	defer f.mu.RUnlock()
 
 	uniqueKeys := map[string]byte{}
-	for _, f := range f.files {
-		for i := 0; i < f.KeyCount(); i++ {
-			key, typ := f.KeyAt(i)
-			uniqueKeys[string(key)] = typ
-		}
+	if err := f.WalkKeys(func(key []byte, typ byte) error {
+		uniqueKeys[string(key)] = typ
+		return nil
+	}); err != nil {
+		return nil
 	}
 
 	return uniqueKeys
@@ -350,13 +317,17 @@ func (f *FileStore) Delete(keys []string) error {
 
 // DeleteRange removes the values for keys between timestamps min and max.
 func (f *FileStore) DeleteRange(keys []string, min, max int64) error {
+	if err := f.walkFiles(func(tsm TSMFile) error {
+		return tsm.DeleteRange(keys, min, max)
+	}); err != nil {
+		return err
+	}
+
 	f.mu.Lock()
 	f.lastModified = time.Now().UTC()
+	f.lastFileStats = nil
 	f.mu.Unlock()
-
-	return f.walkFiles(func(tsm TSMFile) error {
-		return tsm.DeleteRange(keys, min, max)
-	})
+	return nil
 }
 
 // Open loads all the TSM files in the configured directory.
@@ -415,15 +386,6 @@ func (f *FileStore) Open() error {
 			return fmt.Errorf("error opening file %s: %v", fn, err)
 		}
 
-		// Accumulate file store size stat
-		fi, err := file.Stat()
-		if err == nil {
-			atomic.AddInt64(&f.stats.DiskBytes, fi.Size())
-			if fi.ModTime().UTC().After(f.lastModified) {
-				f.lastModified = fi.ModTime().UTC()
-			}
-		}
-
 		go func(idx int, file *os.File) {
 			start := time.Now()
 			df, err := NewTSMReader(file)
@@ -437,6 +399,7 @@ func (f *FileStore) Open() error {
 		}(i, file)
 	}
 
+	var lm int64
 	for range files {
 		res := <-readerC
 		if res.err != nil {
@@ -444,7 +407,19 @@ func (f *FileStore) Open() error {
 			return res.err
 		}
 		f.files = append(f.files, res.r)
+		// Accumulate file store size stats
+		atomic.AddInt64(&f.stats.DiskBytes, int64(res.r.Size()))
+		for _, ts := range res.r.TombstoneFiles() {
+			atomic.AddInt64(&f.stats.DiskBytes, int64(ts.Size))
+		}
+
+		// Re-initialize the lastModified time for the file store
+		if res.r.LastModified() > lm {
+			lm = res.r.LastModified()
+		}
+
 	}
+	f.lastModified = time.Unix(0, lm)
 	close(readerC)
 
 	sort.Sort(tsmReaders(f.files))
@@ -458,9 +433,6 @@ func (f *FileStore) Close() error {
 	defer f.mu.Unlock()
 
 	for _, file := range f.files {
-		if f.dereferencer != nil {
-			file.deref(f.dereferencer)
-		}
 		file.Close()
 	}
 
@@ -468,6 +440,10 @@ func (f *FileStore) Close() error {
 	f.files = nil
 	atomic.StoreInt64(&f.stats.FileCount, 0)
 	return nil
+}
+
+func (f *FileStore) DiskSizeBytes() int64 {
+	return atomic.LoadInt64(&f.stats.DiskBytes)
 }
 
 // Read returns the slice of values for the given key and the given timestamp,
@@ -534,17 +510,11 @@ func (f *FileStore) Replace(oldFiles, newFiles []string) error {
 		return nil
 	}
 
-	f.mu.Lock()
-	defer f.mu.Unlock()
-
+	f.mu.RLock()
 	maxTime := f.lastModified
+	f.mu.RUnlock()
 
-	// Copy the current set of active files while we rename
-	// and load the new files.  We copy the pointers here to minimize
-	// the time that locks are held as well as to ensure that the replacement
-	// is atomic.©
-	updated := make([]TSMFile, len(f.files))
-	copy(updated, f.files)
+	updated := make([]TSMFile, 0, len(newFiles))
 
 	// Rename all the new files to make them live on restart
 	for _, file := range newFiles {
@@ -575,6 +545,16 @@ func (f *FileStore) Replace(oldFiles, newFiles []string) error {
 		}
 		updated = append(updated, tsm)
 	}
+
+	f.mu.Lock()
+	defer f.mu.Unlock()
+
+	// Copy the current set of active files while we rename
+	// and load the new files.  We copy the pointers here to minimize
+	// the time that locks are held as well as to ensure that the replacement
+	// is atomic.©
+
+	updated = append(updated, f.files...)
 
 	// We need to prune our set of active files now
 	var active, inuse []TSMFile
@@ -612,11 +592,6 @@ func (f *FileStore) Replace(oldFiles, newFiles []string) error {
 
 					inuse = append(inuse, file)
 					continue
-				}
-
-				// Remove any mmap references held by the index.
-				if f.dereferencer != nil {
-					file.deref(f.dereferencer)
 				}
 
 				if err := file.Close(); err != nil {
@@ -660,6 +635,10 @@ func (f *FileStore) Replace(oldFiles, newFiles []string) error {
 	var totalSize int64
 	for _, file := range f.files {
 		totalSize += int64(file.Size())
+		for _, ts := range file.TombstoneFiles() {
+			totalSize += int64(ts.Size)
+		}
+
 	}
 	atomic.StoreInt64(&f.stats.DiskBytes, totalSize)
 
@@ -695,7 +674,7 @@ func (f *FileStore) BlockCount(path string, idx int) int {
 					return 0
 				}
 			}
-			_, _, _, _, block, _ := iter.Read()
+			_, _, _, _, _, block, _ := iter.Read()
 			return BlockCount(block)
 		}
 	}
@@ -1203,11 +1182,6 @@ func (p *purger) purge() {
 			p.mu.Lock()
 			for k, v := range p.files {
 				if !v.InUse() {
-					// Remove any mmap references held by the index.
-					if p.fileStore.dereferencer != nil {
-						v.deref(p.fileStore.dereferencer)
-					}
-
 					if err := v.Close(); err != nil {
 						p.logger.Info(fmt.Sprintf("purge: close file: %v", err))
 						continue
@@ -1238,3 +1212,103 @@ type tsmReaders []TSMFile
 func (a tsmReaders) Len() int           { return len(a) }
 func (a tsmReaders) Less(i, j int) bool { return a[i].Path() < a[j].Path() }
 func (a tsmReaders) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type stream struct {
+	c chan seriesKey
+	v seriesKey
+}
+
+type seriesKey struct {
+	key []byte
+	typ byte
+}
+
+// merge merges multiple channels in parallel by recursively splitting the channels
+// until a simple two-way merge can be performed.
+func merge(c ...chan seriesKey) chan seriesKey {
+	if len(c) == 0 {
+		m := make(chan seriesKey)
+		close(m)
+		return m
+	}
+
+	// Just one, drain it
+	if len(c) == 1 {
+		m := make(chan seriesKey)
+		go func() {
+			if c[0] != nil {
+				for v := range c[0] {
+					m <- v
+				}
+			}
+			close(m)
+		}()
+		return m
+	}
+
+	// More than two, split them up recursively
+	if len(c) > 2 {
+		a := merge(c[:len(c)/2]...)
+		b := merge(c[len(c)/2:]...)
+		return merge(a, b)
+	}
+
+	// Merge the two streams and drop duplicates between then
+	m := make(chan seriesKey, 1)
+	a, b := c[0], c[1]
+	go func() {
+		// buffer a and b values
+		var av, bv seriesKey
+		if a != nil {
+			av = <-a
+		}
+		if b != nil {
+			bv = <-b
+		}
+		for {
+			if len(av.key) == 0 && len(bv.key) == 0 {
+				break
+			}
+
+			if len(av.key) == 0 {
+				m <- bv
+				break
+			}
+
+			if len(bv.key) == 0 {
+				m <- av
+				break
+			}
+
+			cmp := bytes.Compare(av.key, bv.key)
+			if cmp < 0 {
+				// Send a's value, and re-prime a buffer
+				m <- av
+				av = <-a
+			} else if cmp == 0 {
+				// Send a's value, and re-prime a and b buffers
+				m <- av
+				av = <-a
+				bv = <-b
+			} else {
+				// Send b's value, and re-prime b buffer
+				m <- bv
+				bv = <-b
+			}
+		}
+
+		if a != nil {
+			for av := range a {
+				m <- av
+			}
+		}
+
+		if b != nil {
+			for bv := range b {
+				m <- bv
+			}
+		}
+		close(m)
+	}()
+	return m
+}

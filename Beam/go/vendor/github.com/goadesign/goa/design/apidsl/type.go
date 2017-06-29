@@ -14,17 +14,11 @@ import (
 // structure of a request payload. They can also be used by media type definitions as reference, see
 // Reference. Here is an example:
 //
-//	var UpdatePayload = Type("UpdatePayload", func() {
-//		Description("UpdatePayload describes the update action request bodies")
-//		Attribute("origin", Origin, "Details on wine origin")  // See Origin definition below
-//	})
-//
-//	Type("CreatePayload", func() {
-//              Reference(UpdatePayload)
-//		Description("CreatePayload describes the create action request bodies")
+//	Type("createPayload", func() {
+//		Description("Type of create and upload action payloads")
 //		Attribute("name", String, "name of bottle")
-//		Attribute("origin") // Inherits description, type from UpdatePayload
-//		Required("name", "origin")
+//		Attribute("origin", Origin, "Details on wine origin")  // See Origin definition below
+//		Required("name")
 //	})
 //
 //	var Origin = Type("origin", func() {
@@ -128,8 +122,37 @@ func ArrayOf(v interface{}, dsl ...func()) *design.Array {
 //			Member("ratings", HashOf(String, Integer))  // Artificial examples...
 //			Member("bottles", RatedBottles)
 //	})
-func HashOf(k, v design.DataType) *design.Hash {
+//
+// HashOf accepts optional DSLs as third and fourth argument which allows providing validations for
+// the keys and values of the hash respectively:
+//
+//	var RatedBottles = HashOf(String, Bottle, func() {
+//          Pattern("[a-zA-Z]+") // Validate bottle names
+//      })
+//
+//      func ValidateKey() {
+//          Pattern("^foo")
+//      }
+//
+//      func TypeValue() {
+//          Metadata("struct:field:type", "json.RawMessage", "encoding/json")
+//      }
+//
+//	var Mappings = HashOf(String, String, ValidateKey, TypeValue)
+//
+func HashOf(k, v design.DataType, dsls ...func()) *design.Hash {
 	kat := design.AttributeDefinition{Type: k}
 	vat := design.AttributeDefinition{Type: v}
+	if len(dsls) > 2 {
+		// never return nil to avoid panics, errors are reported after DSL execution
+		dslengine.ReportError("HashOf: too many arguments")
+		return &design.Hash{KeyType: &kat, ElemType: &vat}
+	}
+	if len(dsls) >= 1 {
+		dslengine.Execute(dsls[0], &kat)
+		if len(dsls) == 2 {
+			dslengine.Execute(dsls[1], &vat)
+		}
+	}
 	return &design.Hash{KeyType: &kat, ElemType: &vat}
 }

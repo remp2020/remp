@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Banner;
 use App\Campaign;
-use App\CampaignRule;
+use App\CampaignSegment;
+use App\Contracts\JournalContract;
+use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
 use App\Contracts\TrackerContract;
@@ -34,7 +36,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::query();
-        return $dataTables->of($campaigns)
+        return $dataTables->of($campaigns->with('segments'))
             ->addColumn('actions', function(Campaign $campaign) {
                 return Json::encode([
                     '_id' => $campaign->id,
@@ -101,16 +103,16 @@ class CampaignController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Campaign $campaign
-     * @param SegmentContract $segmentContract
+     * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function edit(Campaign $campaign, SegmentContract $segmentContract)
-    {
+    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator ) {
         $campaign->fill(old());
 
         $banners = Banner::all();
+
         try {
-            $segments = $segmentContract->list();
+            $segments = $segmentAggregator->list();
         } catch (SegmentException $e) {
             $segments = new Collection();
             flash('Unable to fetch list of segments, please check the application configuration.')->error();
@@ -137,17 +139,16 @@ class CampaignController extends Controller
         $shouldCache = $campaign->isDirty('active');
         $campaign->save();
 
-        foreach ($request->get('rules') as $r) {
-            /** @var CampaignRule $rule */
-            $rule = CampaignRule::findOrNew($r['id']);
-            $rule->timespan = $r['timespan'];
-            $rule->count = $r['count'];
-            $rule->event = $r['event'];
+        foreach ($request->get('segments') as $r) {
+            /** @var CampaignSegment $rule */
+            $rule = CampaignSegment::findOrNew($r['id']);
+            $rule->code = $r['code'];
+            $rule->provider = $r['provider'];
             $rule->campaign_id = $campaign->id;
             $rule->save();
         }
 
-        CampaignRule::destroy($request->get('removedRules'));
+        CampaignSegment::destroy($request->get('removedSegments'));
 
         if ($campaign->active && $shouldCache) {
             dispatch(new CacheSegmentJob($campaign->segment_id));
@@ -163,6 +164,7 @@ class CampaignController extends Controller
      * @param AlignmentMap $am
      * @param SegmentContract $sc
      * @param TrackerContract $tc
+     * @param JournalContract $jc
      * @return \Illuminate\Http\JsonResponse
      */
     public function showtime(
@@ -171,8 +173,12 @@ class CampaignController extends Controller
         PositionMap $pm,
         AlignmentMap $am,
         SegmentContract $sc,
-        TrackerContract $tc
+        TrackerContract $tc,
+        JournalContract $jc
     ) {
+        // validation
+
+        /** @var Campaign $campaign */
         $campaign = Campaign::whereActive(true)->first();
         if (!$campaign) {
             return response()
@@ -200,6 +206,8 @@ class CampaignController extends Controller
                 ]);
         }
 
+        // segment
+
         $userId = $data->userId ?? null;
         if ($campaign->segment_id) {
             if (!$userId) {
@@ -211,6 +219,31 @@ class CampaignController extends Controller
                     ->setStatusCode(400);
             }
             if (!$sc->check($campaign->segment_id, $userId)) {
+                return response()
+                    ->jsonp($r->get('callback'), [
+                        'success' => true,
+                        'data' => [],
+                    ]);
+            }
+        }
+
+        // rules
+
+        foreach ($campaign->rules as $rule) {
+            [$category, $action] = explode('|', $rule->event);
+            $timeAfter = null;
+            if ($rule->timespan) {
+                $timeAfter = new \DateTime();
+                $timeAfter = $timeAfter->add(new \DateInterval("PT{$rule->timespan}S"));
+            }
+            $eventCount = $jc->count(
+                $category,
+                $action,
+                $timeAfter,
+                new \DateTime()
+            );
+
+            if ($eventCount >= $rule->count) {
                 return response()
                     ->jsonp($r->get('callback'), [
                         'success' => true,

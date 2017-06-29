@@ -177,7 +177,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\CrmSegmentServiceProvider::class,
+        App\Providers\RempSegmentServiceProvider::class,
         App\Providers\RempTrackerServiceProvider::class,
+        App\Providers\RempJournalServiceProvider::class,
 
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,

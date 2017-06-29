@@ -1,4 +1,4 @@
-package codegen
+package codegen_test
 
 import (
 	"fmt"

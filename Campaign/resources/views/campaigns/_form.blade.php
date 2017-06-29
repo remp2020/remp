@@ -9,10 +9,14 @@ $banners = $banners->map(function(\App\Banner $banner) {
 });
 
 $segments = $segments->mapToGroups(function ($item) {
-    return [$item->group->name => [$item->code => $item->name]];
+    return [$item->group->name => [$item->code => $item]];
 })->mapWithKeys(function($item, $key) {
     return [$key => $item->collapse()];
 });
+
+$segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
+    return [$item->code => $item->name];
+})
 
 @endphp
 
@@ -51,14 +55,15 @@ $segments = $segments->mapToGroups(function ($item) {
         data: function() {
             return {
                 "name": '{!! $campaign->name !!}' || null,
-                "segmentId": '{!! $campaign->segment_id !!}' || null,
+                "segments": {!! $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
                 "bannerId": {!! $campaign->banner_id !!} || null,
                 "active": {!! $campaign->active !!} || null,
-                "rules": {!! $campaign->rules->toJson() !!},
-                "removedRules": [],
 
                 "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
-                "segments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},
+                "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},
+                "addedSegment": null,
+                "removedSegments": [],
+                "segmentMap": {!! $segmentMap->toJson(JSON_UNESCAPED_UNICODE) !!},
                 "eventTypes": [
                     {
                         "category": "banner",
@@ -76,17 +81,13 @@ $segments = $segments->mapToGroups(function ($item) {
             }
         },
         methods: {
-            addRule: function () {
-                this.rules.push({
-                    id: null,
-                    count: null,
-                    timespan: null,
-                    event: null
-                });
+            'selectSegment': function() {
+                this.segments.push(this.addedSegment);
             },
-            removeRule: function (index) {
-                this.removedRules.push(this.rules[index].id);
-                this.rules.splice(index, 1)
+            'removeSegment': function(index) {
+                var toRemove = this.segments[index];
+                this.segments.splice(index, 1);
+                this.removedSegments.push(toRemove.id);
             }
         }
     });

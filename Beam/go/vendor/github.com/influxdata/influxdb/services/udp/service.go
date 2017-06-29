@@ -19,8 +19,8 @@ const (
 	// Arbitrary, testing indicated that this doesn't typically get over 10
 	parserChanLen = 1000
 
-	// MAX_UDP_PAYLOAD is largest payload size the UDP service will accept.
-	MAX_UDP_PAYLOAD = 64 * 1024
+	// MaxUDPPayload is largest payload size the UDP service will accept.
+	MaxUDPPayload = 64 * 1024
 )
 
 // statistics gathered by the UDP package.
@@ -49,7 +49,7 @@ type Service struct {
 	config     Config
 
 	PointsWriter interface {
-		WritePoints(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, points []models.Point) error
+		WritePointsPrivileged(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, points []models.Point) error
 	}
 
 	MetaClient interface {
@@ -162,7 +162,7 @@ func (s *Service) writer() {
 				continue
 			}
 
-			if err := s.PointsWriter.WritePoints(s.config.Database, s.config.RetentionPolicy, models.ConsistencyLevelAny, batch); err == nil {
+			if err := s.PointsWriter.WritePointsPrivileged(s.config.Database, s.config.RetentionPolicy, models.ConsistencyLevelAny, batch); err == nil {
 				atomic.AddInt64(&s.stats.BatchesTransmitted, 1)
 				atomic.AddInt64(&s.stats.PointsTransmitted, int64(len(batch)))
 			} else {
@@ -179,7 +179,7 @@ func (s *Service) writer() {
 func (s *Service) serve() {
 	defer s.wg.Done()
 
-	buf := make([]byte, MAX_UDP_PAYLOAD)
+	buf := make([]byte, MaxUDPPayload)
 	s.batcher.Start()
 	for {
 		select {

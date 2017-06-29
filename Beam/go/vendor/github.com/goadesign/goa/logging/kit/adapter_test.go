@@ -1,4 +1,4 @@
-package goakit
+package goakit_test
 
 import (
 	"bytes"

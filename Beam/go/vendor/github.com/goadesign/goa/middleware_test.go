@@ -1,10 +1,10 @@
-package goa
+package goa_test
 
 import (
 	"fmt"
 	"net/http"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"

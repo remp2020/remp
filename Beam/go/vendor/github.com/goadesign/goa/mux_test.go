@@ -1,4 +1,4 @@
-package goa
+package goa_test
 
 import (
 	"bytes"

@@ -1,4 +1,4 @@
-package jwt
+package jwt_test
 
 import (
 	. "github.com/onsi/ginkgo"

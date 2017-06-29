@@ -4,7 +4,7 @@
 
 // +build ignore
 
-package h2demo
+package main
 
 import (
 	"bufio"

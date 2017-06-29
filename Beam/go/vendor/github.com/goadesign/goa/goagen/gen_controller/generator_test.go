@@ -1,4 +1,4 @@
-package gencontroller
+package gencontroller_test
 
 import (
 	"io/ioutil"

@@ -3,6 +3,7 @@ package tsm1
 import (
 	"bufio"
 	"encoding/binary"
+	"io"
 	"io/ioutil"
 	"math"
 	"os"
@@ -66,6 +67,12 @@ func (t *Tombstoner) AddRange(keys []string, min, max int64) error {
 	tombstones, err := t.readTombstone()
 	if err != nil {
 		return nil
+	}
+
+	if cap(tombstones) < len(tombstones)+len(keys) {
+		ts := make([]Tombstone, len(tombstones), len(tombstones)+len(keys))
+		copy(ts, tombstones)
+		tombstones = ts
 	}
 
 	for _, k := range keys {
@@ -153,7 +160,7 @@ func (t *Tombstoner) Walk(fn func(t Tombstone) error) error {
 		return t.readTombstoneV1(f, fn)
 	}
 
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
 
@@ -172,28 +179,34 @@ func (t *Tombstoner) writeTombstone(tombstones []Tombstone) error {
 
 	var b [8]byte
 
+	bw := bufio.NewWriterSize(tmp, 1024*1024)
+
 	binary.BigEndian.PutUint32(b[:4], v2header)
-	if _, err := tmp.Write(b[:4]); err != nil {
+	if _, err := bw.Write(b[:4]); err != nil {
 		return err
 	}
 
 	for _, t := range tombstones {
 		binary.BigEndian.PutUint32(b[:4], uint32(len(t.Key)))
-		if _, err := tmp.Write(b[:4]); err != nil {
+		if _, err := bw.Write(b[:4]); err != nil {
 			return err
 		}
-		if _, err := tmp.Write([]byte(t.Key)); err != nil {
+		if _, err := bw.WriteString(t.Key); err != nil {
 			return err
 		}
 		binary.BigEndian.PutUint64(b[:], uint64(t.Min))
-		if _, err := tmp.Write(b[:]); err != nil {
+		if _, err := bw.Write(b[:]); err != nil {
 			return err
 		}
 
 		binary.BigEndian.PutUint64(b[:], uint64(t.Max))
-		if _, err := tmp.Write(b[:]); err != nil {
+		if _, err := bw.Write(b[:]); err != nil {
 			return err
 		}
+	}
+
+	if err := bw.Flush(); err != nil {
+		return err
 	}
 
 	// fsync the file to flush the write
@@ -250,7 +263,7 @@ func (t *Tombstoner) readTombstoneV1(f *os.File, fn func(t Tombstone) error) err
 // format is binary.
 func (t *Tombstoner) readTombstoneV2(f *os.File, fn func(t Tombstone) error) error {
 	// Skip header, already checked earlier
-	if _, err := f.Seek(v2headerSize, os.SEEK_SET); err != nil {
+	if _, err := f.Seek(v2headerSize, io.SeekStart); err != nil {
 		return err
 	}
 	n := int64(4)

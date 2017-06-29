@@ -22,7 +22,18 @@
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'segment_id', 'active'],
+            'colSettings' => [
+                'name',
+                'segments' => [
+                    'header' => 'Segments',
+                    'render' => 'array',
+                    'renderParams' => ['column' => 'code']
+                ],
+                'active' => [
+                    'header' => 'Is active',
+                    'render' => 'boolean'
+                ]
+            ],
             'dataSource' => route('campaigns.json'),
             'rowActions' => [
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],

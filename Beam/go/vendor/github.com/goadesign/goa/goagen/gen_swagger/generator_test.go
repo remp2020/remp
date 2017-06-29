@@ -1,4 +1,4 @@
-package genswagger
+package genswagger_test
 
 import (
 	"github.com/goadesign/goa/design"

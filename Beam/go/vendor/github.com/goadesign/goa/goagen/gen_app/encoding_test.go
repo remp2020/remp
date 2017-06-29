@@ -1,4 +1,4 @@
-package genapp
+package genapp_test
 
 import (
 	"github.com/goadesign/goa/design"

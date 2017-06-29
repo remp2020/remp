@@ -1,4 +1,4 @@
-package goalogrus
+package goalogrus_test
 
 import (
 	. "github.com/onsi/ginkgo"

@@ -42,7 +42,7 @@ import (
 //			Headers("X-Shared-Secret")           // One or more authorized headers, use "*" to authorize all
 //			Methods("GET", "POST")               // One or more authorized HTTP methods
 //			Expose("X-Time")                     // One or more headers exposed to clients
-//			MaxAge(600)                          // How long to cache a preflight request response
+//			MaxAge(600)                          // How long to cache a prefligh request response
 //			Credentials()                        // Sets Access-Control-Allow-Credentials header
 //		})
 //		Consumes("application/xml") // Built-in encoders and decoders
@@ -157,7 +157,7 @@ func BasePath(val string) {
 //                Headers("X-Shared-Secret")           // One or more authorized headers, use "*" to authorize all
 //                Methods("GET", "POST")               // One or more authorized HTTP methods
 //                Expose("X-Time")                     // One or more headers exposed to clients
-//                MaxAge(600)                          // How long to cache a preflight request response
+//                MaxAge(600)                          // How long to cache a prefligh request response
 //                Credentials()                        // Sets Access-Control-Allow-Credentials header
 //        })
 //
@@ -553,7 +553,7 @@ func Trait(name string, val ...func()) {
 }
 
 // UseTrait executes the API trait with the given name. UseTrait can be used inside a Resource,
-// Action, Type, MediaType or Attribute DSL. UseTrait takes a variable number
+// Action, Type, MediaType or Attribute DSL.  UseTrait takes a variable number
 // of trait names.
 func UseTrait(names ...string) {
 	var def dslengine.Definition

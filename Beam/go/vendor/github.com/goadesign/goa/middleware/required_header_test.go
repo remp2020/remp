@@ -1,11 +1,11 @@
-package middleware
+package middleware_test
 
 import (
 	"net/http"
 	"regexp"
 	"strings"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"

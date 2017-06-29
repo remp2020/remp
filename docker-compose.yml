@@ -36,7 +36,7 @@ services:
     depends_on:
       - "campaign_mysql"
       - "nginx"
-    env_file: "./Campaign/.env.example"
+    env_file: "./Campaign/.env"
     extra_hosts:
       - "crm.app:192.168.99.100"
     restart: "unless-stopped"
@@ -70,7 +70,7 @@ services:
      - "nginx"
      - "redis"
      - "mailhog"
-   env_file: "./Mailer/.env.example"
+   env_file: "./Mailer/.env"
    restart: "unless-stopped"
 
   mailer_mysql:
@@ -90,6 +90,35 @@ services:
    restart: "unless-stopped"
 
   # beam
+
+  beam:
+    build: "./Docker/php"
+    volumes:
+      - ".:/var/www/html:rw"
+    depends_on:
+      - "beam_mysql"
+      - "nginx"
+    environment:
+      DB_DATABASE: "remp_beam"
+      DB_USERNAME: "root"
+      DB_PASSWORD: "secret"
+    restart: "unless-stopped"
+
+  beam_mysql:
+    image: "mysql:8.0"
+    volumes:
+      - "mysql-data-beam:/var/lib/mysql"
+    ports:
+      - "3313:3306"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+      - "--skip-character-set-client-handshake"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+      MYSQL_ROOT_PASSWORD: "secret"
+      MYSQL_DATABASE: "remp_beam"
+    restart: "unless-stopped"
 
   kafka:
    build: "./Docker/kafka"
@@ -132,12 +161,12 @@ services:
      - "8081:8081"
    restart: "unless-stopped"
 
-  beam_journal:
-     build: "./Beam/go/cmd/journal"
+  beam_segments:
+     build: "./Beam/go/cmd/segments"
      depends_on:
        - "influxdb"
      environment:
-       BEAM_JOURNAL_ADDR: ":8082"
+       BEAM_SEGMENTS_ADDR: ":8082"
      ports:
        - "8082:8082"
      restart: "unless-stopped"
@@ -150,6 +179,8 @@ volumes:
   mysql-data-campaign:
     driver: "local"
   mysql-data-mailer:
+    driver: "local"
+  mysql-data-beam:
     driver: "local"
   redis-data:
     driver: "local"
