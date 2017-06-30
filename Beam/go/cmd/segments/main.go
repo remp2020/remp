@@ -1,4 +1,4 @@
-//go:generate goagen bootstrap -d gitlab.com/remp/remp/Beam/go/cmd/tracker/design
+//go:generate goagen -d gitlab.com/remp/remp/Beam/go/cmd/segments/design
 
 package main
 
@@ -44,11 +44,12 @@ func main() {
 	// DB init
 
 	mysqlDBConfig := mysql.Config{
-		Net:    c.MysqlNet,
-		Addr:   c.MysqlAddr,
-		User:   c.MysqlUser,
-		Passwd: c.MysqlPasswd,
-		DBName: c.MysqlDBName,
+		Net:       c.MysqlNet,
+		Addr:      c.MysqlAddr,
+		User:      c.MysqlUser,
+		Passwd:    c.MysqlPasswd,
+		DBName:    c.MysqlDBName,
+		ParseTime: true,
 	}
 	mysqlDB, err := sqlx.Connect("mysql", mysqlDBConfig.FormatDSN())
 	if err != nil {
@@ -63,11 +64,11 @@ func main() {
 	if err != nil {
 		log.Fatalln(errors.Wrap(err, "unable to initialize influx http client"))
 	}
-	iqb := influxquery.New()
 	influxDB := &model.InfluxDB{
 		DBName:       c.InfluxDBName,
 		Client:       ic,
-		QueryBuilder: iqb,
+		QueryBuilder: influxquery.NewInfluxBuilder(),
+		Debug:        true,
 	}
 
 	eventDB := &model.EventDB{

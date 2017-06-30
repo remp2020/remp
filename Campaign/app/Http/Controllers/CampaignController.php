@@ -162,7 +162,7 @@ class CampaignController extends Controller
      * @param DimensionMap $dm
      * @param PositionMap $pm
      * @param AlignmentMap $am
-     * @param SegmentContract $sc
+     * @param SegmentAggregator $sa
      * @param TrackerContract $tc
      * @param JournalContract $jc
      * @return \Illuminate\Http\JsonResponse
@@ -172,7 +172,7 @@ class CampaignController extends Controller
         DimensionMap $dm,
         PositionMap $pm,
         AlignmentMap $am,
-        SegmentContract $sc,
+        SegmentAggregator $sa,
         TrackerContract $tc,
         JournalContract $jc
     ) {
@@ -209,41 +209,16 @@ class CampaignController extends Controller
         // segment
 
         $userId = $data->userId ?? null;
-        if ($campaign->segment_id) {
-            if (!$userId) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => false,
-                        'errors' => [],
-                    ])
-                    ->setStatusCode(400);
-            }
-            if (!$sc->check($campaign->segment_id, $userId)) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => true,
-                        'data' => [],
-                    ]);
-            }
+        if (!$userId) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => [],
+                ])
+                ->setStatusCode(400);
         }
-
-        // rules
-
-        foreach ($campaign->rules as $rule) {
-            [$category, $action] = explode('|', $rule->event);
-            $timeAfter = null;
-            if ($rule->timespan) {
-                $timeAfter = new \DateTime();
-                $timeAfter = $timeAfter->add(new \DateInterval("PT{$rule->timespan}S"));
-            }
-            $eventCount = $jc->count(
-                $category,
-                $action,
-                $timeAfter,
-                new \DateTime()
-            );
-
-            if ($eventCount >= $rule->count) {
+        foreach ($campaign->segments as $campaignSegment) {
+            if (!$sa->check($campaignSegment, $userId)) {
                 return response()
                     ->jsonp($r->get('callback'), [
                         'success' => true,

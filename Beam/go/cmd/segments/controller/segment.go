@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/goadesign/goa"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/model"
@@ -31,7 +33,20 @@ func (c *SegmentController) List(ctx *app.ListSegmentsContext) error {
 
 // Check runs the check action.
 func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
-	return ctx.OK(&app.SegmentCheck{})
+	s, ok, err := c.SegmentStorage.Get(ctx.SegmentCode)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+	ok, err = c.SegmentStorage.Check(s, ctx.UserID, time.Now())
+	if err != nil {
+		return err
+	}
+	return ctx.OK(&app.SegmentCheck{
+		Check: ok,
+	})
 }
 
 // Users runs the users action.

@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->bindBladeDirectives();
 
         $this->app->bind(SegmentAggregator::class, function (Application $app) {
-            return new SegmentAggregator($app->tagged('segments'));
+            return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
         });
     }
 

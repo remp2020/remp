@@ -1,12 +1,10 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
-	"github.com/pkg/errors"
 )
 
 // Options represent filter options for event-related calls.
@@ -63,13 +61,5 @@ func (eDB *EventDB) Count(o EventOptions) (int, error) {
 	}
 
 	// process response
-	jsonCount, ok := response.Results[0].Series[0].Values[0][1].(json.Number)
-	if !ok {
-		return 0, errors.New("influx result is not string, cannot proceed")
-	}
-	count, err := jsonCount.Int64()
-	if err != nil {
-		return 0, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%s]", count))
-	}
-	return int(count), nil
+	return eDB.DB.ResponseCount(response)
 }

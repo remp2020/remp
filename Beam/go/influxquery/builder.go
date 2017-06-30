@@ -1,6 +1,8 @@
 package influxquery
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Builder interface {
 	Select(s string) Builder
@@ -9,7 +11,7 @@ type Builder interface {
 	Build() string
 }
 
-func New() Builder {
+func NewInfluxBuilder() *influxBuilder {
 	return &influxBuilder{
 		selectStr: "*",
 	}
@@ -22,7 +24,7 @@ type influxBuilder struct {
 	whereArr  []string
 }
 
-func (b *influxBuilder) Build() string {
+func (b influxBuilder) Build() string {
 	cmd := fmt.Sprintf("SELECT %s FROM %s", b.selectStr, b.fromStr)
 	for i, cond := range b.whereArr {
 		if i == 0 {
@@ -34,17 +36,17 @@ func (b *influxBuilder) Build() string {
 	return cmd
 }
 
-func (b *influxBuilder) Select(s string) Builder {
+func (b influxBuilder) Select(s string) Builder {
 	b.selectStr = s
 	return b
 }
 
-func (b *influxBuilder) From(f string) Builder {
+func (b influxBuilder) From(f string) Builder {
 	b.fromStr = f
 	return b
 }
 
-func (b *influxBuilder) Where(cond string) Builder {
+func (b influxBuilder) Where(cond string) Builder {
 	b.whereArr = append(b.whereArr, cond)
 	return b
 }

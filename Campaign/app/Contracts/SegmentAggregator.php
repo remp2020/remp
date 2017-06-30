@@ -2,16 +2,27 @@
 
 namespace App\Contracts;
 
+use App\CampaignSegment;
 use Illuminate\Support\Collection;
 
 class SegmentAggregator implements SegmentContract
 {
+    const TAG = 'segments';
+
     /** @var SegmentContract[] */
     private $contracts;
 
     public function __construct($segmentContracts)
     {
-        $this->contracts = $segmentContracts;
+        /** @var SegmentContract $contract */
+        foreach ($segmentContracts as $contract) {
+            $this->contracts[$contract->provider()] = $contract;
+        }
+    }
+
+    public function provider(): string
+    {
+        throw new SegmentException("Aggregator cannot return provider value");
     }
 
     public function list(): Collection
@@ -24,9 +35,10 @@ class SegmentAggregator implements SegmentContract
         return $collection;
     }
 
-    public function check($segmentId, $userId): bool
+    public function check(CampaignSegment $campaignSegment, $userId): bool
     {
-        return true;
+        return $this->contracts[$campaignSegment->provider]
+            ->check($campaignSegment, $userId);
     }
 
     public function users($segmentId): Collection

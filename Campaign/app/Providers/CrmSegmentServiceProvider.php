@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Contracts\Crm\Segment;
+use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use GuzzleHttp\Client;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class CrmSegmentServiceProvider extends ServiceProvider
@@ -26,7 +28,7 @@ class CrmSegmentServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Segment::class, function($app){
+        $this->app->bind(Segment::class, function(Application $app){
             $client = new Client([
                 'base_uri' => $app['config']->get('services.crm_segment.base_url'),
                 'headers' => [
@@ -35,8 +37,7 @@ class CrmSegmentServiceProvider extends ServiceProvider
             ]);
             return new Segment($client);
         });
-        $this->app->alias(Segment::class, Segment::ALIAS);
-        $this->app->tag(Segment::class, 'segments');
+        $this->app->tag(Segment::class, SegmentAggregator::TAG);
     }
 
     public function provides()

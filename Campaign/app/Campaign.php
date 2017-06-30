@@ -13,7 +13,6 @@ use Ramsey\Uuid\Uuid;
  * @property string $name
  * @property bool $active
  * @property int $banner_id
- * @property string $segment_id
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \App\Banner $banner
@@ -33,7 +32,6 @@ class Campaign extends Model
     protected $fillable = [
         'name',
         'banner_id',
-        'segment_id',
         'active',
     ];
 

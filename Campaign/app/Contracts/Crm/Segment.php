@@ -14,7 +14,7 @@ use Razorpay\BloomFilter\Bloom;
 
 class Segment implements SegmentContract
 {
-    const ALIAS = 'crm_segment';
+    const PROVIDER_ALIAS = 'crm_segment';
 
     const ENDPOINT_LIST = 'user-segments/list';
 
@@ -27,6 +27,11 @@ class Segment implements SegmentContract
     public function __construct(Client $client)
     {
         $this->client = $client;
+    }
+
+    public function provider(): string
+    {
+        return self::PROVIDER_ALIAS;
     }
 
     /**
@@ -46,7 +51,7 @@ class Segment implements SegmentContract
         foreach ($list->segments as $item) {
             $cs = new CampaignSegment();
             $cs->name = $item->name;
-            $cs->provider = self::ALIAS;
+            $cs->provider = self::PROVIDER_ALIAS;
             $cs->code = $item->code;
             $cs->group = $item->group;
             $campaignSegments[] = $cs;
@@ -56,23 +61,23 @@ class Segment implements SegmentContract
     }
 
     /**
-     * @param $segmentId
+     * @param CampaignSegment $campaignSegment
      * @param $userId
      * @return bool
      * @throws SegmentException
      */
-    public function check($segmentId, $userId): bool
+    public function check(CampaignSegment $campaignSegment, $userId): bool
     {
-        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($segmentId);
+        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($campaignSegment->code);
         if (!$bloomFilter) {
-            dispatch(new CacheSegmentJob($segmentId));
+            dispatch(new CacheSegmentJob($campaignSegment->code));
 
             try {
                 $response = $this->client->get(self::ENDPOINT_CHECK, [
                     'query' => [
                         'resolver_type' => 'email',
                         'resolver_value' => $userId,
-                        'code' => $segmentId,
+                        'code' => $campaignSegment->code,
                     ],
                 ]);
             } catch (ConnectException $e) {

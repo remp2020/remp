@@ -12,10 +12,55 @@ var _ = Resource("swagger", func() {
 	Files("/swagger.json", "swagger/swagger.json")
 })
 
-var _ = Resource("events", func() {
+var _ = Resource("segments", func() {
+	Description("Segment operations")
+	BasePath("/segments")
+	NoSecurity()
 
+	Action("list", func() {
+		Description("List all segments.")
+		Routing(GET("/"))
+		Response(NotFound)
+		Response(OK, func() {
+			Media(CollectionOf(Segment, func() {
+				View("default")
+			}))
+		})
+	})
+	Action("check", func() {
+		Description("Retrieve segment with given ID.")
+		Routing(GET("/:segment_code/check/:user_id"))
+		Params(func() {
+			Param("segment_code", String, "Segment code")
+			Param("user_id", String, "User ID")
+		})
+		Response(NotFound)
+		Response(OK, func() {
+			Media(SegmentCheck)
+		})
+	})
+	Action("users", func() {
+		Description("Change segment.")
+		Routing(
+			GET("/:segment_code/users"),
+		)
+		Params(func() {
+			Param("segment_code", UUID, "Segment code")
+		})
+		Payload(SegmentPayload)
+		Response(NotFound)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(CollectionOf(User, func() {
+				View("default")
+			}))
+		})
+	})
+})
+
+var _ = Resource("events", func() {
 	Description("Events journal")
-	BasePath("/events")
+	BasePath("/journal/events")
 	NoSecurity()
 
 	Action("count", func() {

@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Contracts\Remp\Segment;
+use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use GuzzleHttp\Client;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class RempSegmentServiceProvider extends ServiceProvider
@@ -26,14 +28,13 @@ class RempSegmentServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Segment::class, function($app){
+        $this->app->bind(Segment::class, function(Application $app){
             $client = new Client([
                 'base_uri' => $app['config']->get('services.remp_segment.base_url'),
             ]);
             return new Segment($client);
         });
-        $this->app->alias(Segment::class, Segment::ALIAS);
-        $this->app->tag(Segment::class, 'segments');
+        $this->app->tag(Segment::class, SegmentAggregator::TAG);
     }
 
     public function provides()

@@ -14,11 +14,11 @@ use Razorpay\BloomFilter\Bloom;
 
 class Segment implements SegmentContract
 {
-    const ALIAS = 'remp_segment';
+    const PROVIDER_ALIAS = 'remp_segment';
 
     const ENDPOINT_LIST = 'segments/list';
 
-    const ENDPOINT_CHECK = 'segments/check/%s/user/%s';
+    const ENDPOINT_CHECK = 'segments/%s/check/%s';
 
     const ENDPOINT_USERS = 'segments/%s/users';
 
@@ -27,6 +27,11 @@ class Segment implements SegmentContract
     public function __construct(Client $client)
     {
         $this->client = $client;
+    }
+
+    public function provider(): string
+    {
+        return self::PROVIDER_ALIAS;
     }
 
     /**
@@ -46,7 +51,7 @@ class Segment implements SegmentContract
         foreach ($list as $item) {
             $cs = new CampaignSegment();
             $cs->name = $item->name;
-            $cs->provider = self::ALIAS;
+            $cs->provider = self::PROVIDER_ALIAS;
             $cs->code = $item->code;
             $cs->group = $item->group;
             $campaignSegments[] = $cs;
@@ -56,37 +61,29 @@ class Segment implements SegmentContract
     }
 
     /**
-     * @param $segmentId
+     * @param CampaignSegment $campaignSegment
      * @param $userId
      * @return bool
      * @throws SegmentException
      */
-    public function check($segmentId, $userId): bool
+    public function check(CampaignSegment $campaignSegment, $userId): bool
     {
-        return true;
-        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($segmentId);
-        if (!$bloomFilter) {
-            dispatch(new CacheSegmentJob($segmentId));
+//        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($segmentId);
+//        if ($bloomFilter) {
+//            /** @var Bloom $bloomFilter */
+//            $bloomFilter = unserialize($bloomFilter);
+//            return $bloomFilter->has($userId);
+//        }
+//        dispatch(new CacheSegmentJob($segmentId));
 
-            try {
-                $response = $this->client->get(self::ENDPOINT_CHECK, [
-                    'query' => [
-                        'resolver_type' => 'email',
-                        'resolver_value' => $userId,
-                        'code' => $segmentId,
-                    ],
-                ]);
-            } catch (ConnectException $e) {
-                throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
-            }
-
-            $result = json_decode($response->getBody());
-            return $result->check;
+        try {
+            $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId));
+        } catch (ConnectException $e) {
+            throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
         }
 
-        /** @var Bloom $bloomFilter */
-        $bloomFilter = unserialize($bloomFilter);
-        return $bloomFilter->has($userId);
+        $result = json_decode($response->getBody());
+        return $result->check;
     }
 
     /**
