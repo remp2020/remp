@@ -51,5 +51,13 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 
 // Users runs the users action.
 func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
-	return ctx.OK(app.UserCollection{})
+	s, ok, err := c.SegmentStorage.Get(ctx.SegmentCode)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+	uc, err := c.SegmentStorage.Users(s, time.Now())
+	return ctx.OK((UserCollection)(uc).ToMediaType())
 }

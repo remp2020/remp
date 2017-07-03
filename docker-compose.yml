@@ -139,6 +139,8 @@ services:
    ports:
      - "8083:8083"
      - "8086:8086"
+   environment:
+     INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0 # unlimited due to user_id being a tag (for grouping by)
    restart: "unless-stopped"
 
   telegraf:

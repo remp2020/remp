@@ -20,7 +20,7 @@ type SegmentStorage interface {
 	// Check verifies presence of user within provided segment.
 	Check(segment *Segment, userID string, now time.Time) (bool, error)
 	// Users return list of all users within segment.
-	Users(code string) (UserCollection, error)
+	Users(segment *Segment, now time.Time) (UserCollection, error)
 }
 
 // Segment structure.
@@ -89,6 +89,12 @@ type User struct {
 // UserCollection is list of Users.
 type UserCollection []*User
 
+// UserMap is map of Users keyed by userID.
+type UserMap map[string]*User
+
+// Intersector responds to ability to intersect provided userID with some other collection structure.
+type Intersector func(userID string) bool
+
 // SegmentDB represents Segment's storage MySQL/InfluxDB implementation.
 type SegmentDB struct {
 	MySQL    *sqlx.DB
@@ -143,11 +149,11 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time) (boo
 // checkRule verifies defined rule against current state within InfluxDB.
 func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (bool, error) {
 	subquery := sDB.InfluxDB.QueryBuilder.
-		Select("COUNT(user_id)").
+		Select(`COUNT("value")`).
 		From("events").
-		Where(fmt.Sprintf("\"user_id\" = '%s'", userID))
+		Where(fmt.Sprintf(`"user_id" = '%s'`, userID))
 	for _, cond := range sr.conditions(now) {
-		subquery.Where(cond)
+		subquery = subquery.Where(cond)
 	}
 	sq := subquery.Build()
 
@@ -157,7 +163,7 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 	query := sDB.InfluxDB.QueryBuilder.
 		Select("*").
 		From(fmt.Sprintf("(%s)", sq)).
-		Where(fmt.Sprintf("\"count\" >= %d", sr.Count))
+		Where(fmt.Sprintf(`"count" >= %d`, sr.Count))
 
 	response, err := sDB.InfluxDB.Exec(query.Build())
 	if err != nil {
@@ -178,20 +184,71 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 }
 
 // Users return list of all users within segment.
-func (sDB *SegmentDB) Users(code string) (UserCollection, error) {
-	sc := UserCollection{}
+func (sDB *SegmentDB) Users(segment *Segment, now time.Time) (UserCollection, error) {
+	um := make(UserMap)
 
-	return sc, nil
+	for i, sr := range segment.Rules {
+		filteredUm, err := sDB.ruleUsers(sr, now, func(userID string) bool {
+			_, ok := um[userID]
+			return i == 0 || ok
+		})
+		if err != nil {
+			return nil, err
+		}
+		um = filteredUm
+	}
+
+	uc := UserCollection{}
+	for _, u := range um {
+		uc = append(uc, u)
+	}
+
+	return uc, nil
 }
 
+// ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
+func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Intersector) (UserMap, error) {
+	// TODO: change user_id to tag and update config based on https://docs.influxdata.com/influxdb/v1.2/administration/config/#max-values-per-tag-100000
+
+	query := sDB.InfluxDB.QueryBuilder.
+		Select(`COUNT("value")`).
+		From("events").
+		GroupBy(`"user_id"`)
+	for _, cond := range sr.conditions(now) {
+		query = query.Where(cond)
+	}
+
+	response, err := sDB.InfluxDB.Exec(query.Build())
+	if err != nil {
+		return nil, err
+	}
+	if err := response.Error(); err != nil {
+		return nil, err
+	}
+
+	um := make(UserMap)
+	for _, serie := range response.Results[0].Series {
+		userID := serie.Tags["user_id"]
+		if intersect(userID) {
+			um[userID] = &User{
+				ID: userID,
+			}
+		}
+
+	}
+
+	return um, nil
+}
+
+// conditions returns list of influx conditions for current SegmentRule.
 func (sr *SegmentRule) conditions(now time.Time) []string {
 	conds := []string{
-		fmt.Sprintf("\"category\" = '%s'", sr.EventCategory),
-		fmt.Sprintf("\"name\" = '%s'", sr.EventName),
+		fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
+		fmt.Sprintf(`"name" = '%s'`, sr.EventName),
 	}
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
-		conds = append(conds, fmt.Sprintf("\"time\" >= '%s'", t.Format(time.RFC3339Nano)))
+		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
 	}
 	return conds
 }
