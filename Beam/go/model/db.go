@@ -34,7 +34,7 @@ func (iDB *InfluxDB) ResponseCount(response *client.Response) (int, error) {
 	}
 	jsonCount, ok := response.Results[0].Series[0].Values[0][1].(json.Number)
 	if !ok {
-		return 0, errors.New("influx result is not string, cannot proceed")
+		return 0, errors.New("influx result is not json.Number, cannot proceed")
 	}
 	count, err := jsonCount.Int64()
 	if err != nil {

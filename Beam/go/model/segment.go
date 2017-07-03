@@ -210,13 +210,18 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time) (UserCollection, er
 func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Intersector) (UserMap, error) {
 	// TODO: change user_id to tag and update config based on https://docs.influxdata.com/influxdb/v1.2/administration/config/#max-values-per-tag-100000
 
-	query := sDB.InfluxDB.QueryBuilder.
+	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("value")`).
 		From("events").
 		GroupBy(`"user_id"`)
 	for _, cond := range sr.conditions(now) {
-		query = query.Where(cond)
+		subquery = subquery.Where(cond)
 	}
+
+	query := sDB.InfluxDB.QueryBuilder.
+		Select(`"count", "user_id"`).
+		From(fmt.Sprintf("(%s)", subquery.Build())).
+		Where(fmt.Sprintf(`"count" < %d`, sr.Count))
 
 	response, err := sDB.InfluxDB.Exec(query.Build())
 	if err != nil {
@@ -228,13 +233,24 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 
 	um := make(UserMap)
 	for _, serie := range response.Results[0].Series {
-		userID := serie.Tags["user_id"]
-		if intersect(userID) {
-			um[userID] = &User{
-				ID: userID,
+		var index int
+		for i, col := range serie.Columns {
+			if col == "user_id" {
+				index = i
+				break
 			}
 		}
-
+		for _, val := range serie.Values {
+			userID, ok := val[index].(string)
+			if !ok {
+				return nil, errors.New("influx result is not string, cannot proceed")
+			}
+			if intersect(userID) {
+				um[userID] = &User{
+					ID: userID,
+				}
+			}
+		}
 	}
 
 	return um, nil
@@ -244,7 +260,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 func (sr *SegmentRule) conditions(now time.Time) []string {
 	conds := []string{
 		fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
-		fmt.Sprintf(`"name" = '%s'`, sr.EventName),
+		fmt.Sprintf(`"action" = '%s'`, sr.EventName),
 	}
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))

@@ -59,5 +59,8 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 		return ctx.NotFound()
 	}
 	uc, err := c.SegmentStorage.Users(s, time.Now())
+	if err != nil {
+		return err
+	}
 	return ctx.OK((UserCollection)(uc).ToMediaType())
 }

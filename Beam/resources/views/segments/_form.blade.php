@@ -37,9 +37,9 @@
                 "active": {!! @json($segment->active) !!} || null,
                 "rules": {!! $segment->rules->toJson() !!},
                 "removedRules": [],
-                "categories": ["banner"],
+                "categories": ["campaign"],
                 "events": {
-                    "banner": ["show", "click"]
+                    "campaign": ["display", "click", "close"]
                 }
             }
         },
