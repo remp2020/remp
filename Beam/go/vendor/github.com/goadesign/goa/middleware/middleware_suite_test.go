@@ -1,4 +1,4 @@
-package middleware
+package middleware_test
 
 import (
 	. "github.com/onsi/ginkgo"

@@ -36,6 +36,9 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 
     <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
     <script src="/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.js" integrity="sha256-sawP1sLkcaA4YQJQWAtjahamgG6brGmaIJWRhYwDfno=" crossorigin="anonymous"></script>
+
+    @stack('head')
 </head>
 
 <body data-ma-header="cyan-600">
@@ -146,6 +149,9 @@ function route_active($routeName, $classes = '', $activeClasses = '')
                     <li><a href="{{ route("accounts.properties.index", $account->id) }}">{{ $account->name }}</a></li>
                     @endforeach
                 </ul>
+            </li>
+            <li {!! route_active('segments') !!}>
+                <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-view-quilt"></i> Segments</a>
             </li>
         </ul>
     </aside>
@@ -259,6 +265,8 @@ function route_active($routeName, $classes = '', $activeClasses = '')
         @endforeach
     });
 </script>
+
+@stack('scripts')
 
 </body>
 </html>

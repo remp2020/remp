@@ -18,7 +18,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             initIterator: 0,
 
-            target: "http://rempcampaign.local",
+            target: "http://campaign.remp.app",
 
             extend: function() {
                 var a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;

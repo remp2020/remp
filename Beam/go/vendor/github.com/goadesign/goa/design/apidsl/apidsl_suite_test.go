@@ -1,4 +1,4 @@
-package apidsl
+package apidsl_test
 
 import (
 	. "github.com/onsi/ginkgo"

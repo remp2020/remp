@@ -1,9 +1,9 @@
-package goalogrus
+package goalogrus_test
 
 import (
 	"bytes"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/goadesign/goa"

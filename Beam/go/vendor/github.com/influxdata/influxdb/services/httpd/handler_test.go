@@ -10,10 +10,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/influxdata/influxdb/internal"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/influxdata/influxdb/influxql"
@@ -89,18 +90,9 @@ func TestHandler_Query_Auth(t *testing.T) {
 	h := NewHandler(true)
 
 	// Set mock meta client functions for the handler to use.
-	h.MetaClient.UsersFn = func() []meta.UserInfo {
-		return []meta.UserInfo{
-			{
-				Name:       "user1",
-				Hash:       "abcd",
-				Admin:      true,
-				Privileges: make(map[string]influxql.Privilege),
-			},
-		}
-	}
+	h.MetaClient.AdminUserExistsFn = func() bool { return true }
 
-	h.MetaClient.UserFn = func(username string) (*meta.UserInfo, error) {
+	h.MetaClient.UserFn = func(username string) (meta.User, error) {
 		if username != "user1" {
 			return nil, meta.ErrUserNotFound
 		}
@@ -111,7 +103,7 @@ func TestHandler_Query_Auth(t *testing.T) {
 		}, nil
 	}
 
-	h.MetaClient.AuthenticateFn = func(u, p string) (*meta.UserInfo, error) {
+	h.MetaClient.AuthenticateFn = func(u, p string) (meta.User, error) {
 		if u != "user1" {
 			return nil, fmt.Errorf("unexpected user: exp: user1, got: %s", u)
 		} else if p != "abcd" {
@@ -121,7 +113,7 @@ func TestHandler_Query_Auth(t *testing.T) {
 	}
 
 	// Set mock query authorizer for handler to use.
-	h.QueryAuthorizer.AuthorizeQueryFn = func(u *meta.UserInfo, query *influxql.Query, database string) error {
+	h.QueryAuthorizer.AuthorizeQueryFn = func(u meta.User, query *influxql.Query, database string) error {
 		return nil
 	}
 
@@ -140,6 +132,17 @@ func TestHandler_Query_Auth(t *testing.T) {
 	// Test the handler with valid user and password in the URL parameters.
 	w := httptest.NewRecorder()
 	h.ServeHTTP(w, MustNewJSONRequest("GET", "/query?u=user1&p=abcd&db=foo&q=SELECT+*+FROM+bar", nil))
+	if w.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d: %s", w.Code, w.Body.String())
+	} else if body := strings.TrimSpace(w.Body.String()); body != `{"results":[{"statement_id":1,"series":[{"name":"series0"}]},{"statement_id":2,"series":[{"name":"series1"}]}]}` {
+		t.Fatalf("unexpected body: %s", body)
+	}
+
+	// Test the handler with valid user and password using basic auth.
+	w = httptest.NewRecorder()
+	r := MustNewJSONRequest("GET", "/query?db=foo&q=SELECT+*+FROM+bar", nil)
+	r.SetBasicAuth("user1", "abcd")
+	h.ServeHTTP(w, r)
 	if w.Code != http.StatusOK {
 		t.Fatalf("unexpected status: %d: %s", w.Code, w.Body.String())
 	} else if body := strings.TrimSpace(w.Body.String()); body != `{"results":[{"statement_id":1,"series":[{"name":"series0"}]},{"statement_id":2,"series":[{"name":"series1"}]}]}` {
@@ -211,6 +214,18 @@ func TestHandler_Query_Auth(t *testing.T) {
 	if w.Code != http.StatusUnauthorized {
 		t.Fatalf("unexpected status: %d: %s", w.Code, w.Body.String())
 	} else if body := strings.TrimSpace(w.Body.String()); body != `{"error":"token expiration required"}` {
+		t.Fatalf("unexpected body: %s", body)
+	}
+
+	// Test the handler with valid user and password in the url and invalid in
+	// basic auth (prioritize url).
+	w = httptest.NewRecorder()
+	r = MustNewJSONRequest("GET", "/query?u=user1&p=abcd&db=foo&q=SELECT+*+FROM+bar", nil)
+	r.SetBasicAuth("user1", "efgh")
+	h.ServeHTTP(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d: %s", w.Code, w.Body.String())
+	} else if body := strings.TrimSpace(w.Body.String()); body != `{"results":[{"statement_id":1,"series":[{"name":"series0"}]},{"statement_id":2,"series":[{"name":"series1"}]}]}` {
 		t.Fatalf("unexpected body: %s", body)
 	}
 }
@@ -353,11 +368,13 @@ func TestHandler_Query_ErrInvalidQuery(t *testing.T) {
 // Ensure the handler returns an appropriate 401 or 403 status when authentication or authorization fails.
 func TestHandler_Query_ErrAuthorize(t *testing.T) {
 	h := NewHandler(true)
-	h.QueryAuthorizer.AuthorizeQueryFn = func(u *meta.UserInfo, q *influxql.Query, db string) error {
+	h.QueryAuthorizer.AuthorizeQueryFn = func(u meta.User, q *influxql.Query, db string) error {
 		return errors.New("marker")
 	}
-	h.MetaClient.UsersFn = func() []meta.UserInfo {
-		return []meta.UserInfo{
+	h.MetaClient.AdminUserExistsFn = func() bool { return true }
+	h.MetaClient.AuthenticateFn = func(u, p string) (meta.User, error) {
+
+		users := []meta.UserInfo{
 			{
 				Name:  "admin",
 				Hash:  "admin",
@@ -371,9 +388,8 @@ func TestHandler_Query_ErrAuthorize(t *testing.T) {
 				},
 			},
 		}
-	}
-	h.MetaClient.AuthenticateFn = func(u, p string) (*meta.UserInfo, error) {
-		for _, user := range h.MetaClient.Users() {
+
+		for _, user := range users {
 			if u == user.Name {
 				if p == user.Hash {
 					return &user, nil
@@ -611,14 +627,10 @@ func TestHandler_XForwardedFor(t *testing.T) {
 	}
 }
 
-type invalidJSON struct{}
-
-func (*invalidJSON) MarshalJSON() ([]byte, error) { return nil, errors.New("marker") }
-
 // NewHandler represents a test wrapper for httpd.Handler.
 type Handler struct {
 	*httpd.Handler
-	MetaClient        HandlerMetaStore
+	MetaClient        *internal.MetaClientMock
 	StatementExecutor HandlerStatementExecutor
 	QueryAuthorizer   HandlerQueryAuthorizer
 }
@@ -632,45 +644,15 @@ func NewHandler(requireAuthentication bool) *Handler {
 	h := &Handler{
 		Handler: httpd.NewHandler(config),
 	}
-	h.Handler.MetaClient = &h.MetaClient
+
+	h.MetaClient = &internal.MetaClientMock{}
+
+	h.Handler.MetaClient = h.MetaClient
 	h.Handler.QueryExecutor = influxql.NewQueryExecutor()
 	h.Handler.QueryExecutor.StatementExecutor = &h.StatementExecutor
 	h.Handler.QueryAuthorizer = &h.QueryAuthorizer
 	h.Handler.Version = "0.0.0"
 	return h
-}
-
-// HandlerMetaStore is a mock implementation of Handler.MetaClient.
-type HandlerMetaStore struct {
-	PingFn         func(d time.Duration) error
-	DatabaseFn     func(name string) *meta.DatabaseInfo
-	AuthenticateFn func(username, password string) (ui *meta.UserInfo, err error)
-	UsersFn        func() []meta.UserInfo
-	UserFn         func(username string) (*meta.UserInfo, error)
-}
-
-func (s *HandlerMetaStore) Ping(b bool) error {
-	if s.PingFn == nil {
-		// Default behaviour is to assume there is a leader.
-		return nil
-	}
-	return s.Ping(b)
-}
-
-func (s *HandlerMetaStore) Database(name string) *meta.DatabaseInfo {
-	return s.DatabaseFn(name)
-}
-
-func (s *HandlerMetaStore) Authenticate(username, password string) (ui *meta.UserInfo, err error) {
-	return s.AuthenticateFn(username, password)
-}
-
-func (s *HandlerMetaStore) Users() []meta.UserInfo {
-	return s.UsersFn()
-}
-
-func (s *HandlerMetaStore) User(username string) (*meta.UserInfo, error) {
-	return s.UserFn(username)
 }
 
 // HandlerStatementExecutor is a mock implementation of Handler.StatementExecutor.
@@ -684,10 +666,10 @@ func (e *HandlerStatementExecutor) ExecuteStatement(stmt influxql.Statement, ctx
 
 // HandlerQueryAuthorizer is a mock implementation of Handler.QueryAuthorizer.
 type HandlerQueryAuthorizer struct {
-	AuthorizeQueryFn func(u *meta.UserInfo, query *influxql.Query, database string) error
+	AuthorizeQueryFn func(u meta.User, query *influxql.Query, database string) error
 }
 
-func (a *HandlerQueryAuthorizer) AuthorizeQuery(u *meta.UserInfo, query *influxql.Query, database string) error {
+func (a *HandlerQueryAuthorizer) AuthorizeQuery(u meta.User, query *influxql.Query, database string) error {
 	return a.AuthorizeQueryFn(u, query, database)
 }
 
@@ -705,21 +687,6 @@ func MustNewJSONRequest(method, urlStr string, body io.Reader) *http.Request {
 	r := MustNewRequest(method, urlStr, body)
 	r.Header.Set("Accept", "application/json")
 	return r
-}
-
-// matchRegex returns true if a s matches pattern.
-func matchRegex(pattern, s string) bool {
-	return regexp.MustCompile(pattern).MatchString(s)
-}
-
-// NewResultChan returns a channel that sends all results and then closes.
-func NewResultChan(results ...*influxql.Result) <-chan *influxql.Result {
-	ch := make(chan *influxql.Result, len(results))
-	for _, r := range results {
-		ch <- r
-	}
-	close(ch)
-	return ch
 }
 
 // MustJWTToken returns a new JWT token and signed string or panics trying.

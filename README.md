@@ -9,7 +9,40 @@ See separate documentations of each app:
 
 ## Running
 
-We've prepared `docker-compose.yml` in a way it's ready for development. You can run all or just selected services by calling `docker-compose up`.
+We've prepared `docker-compose.yml` in a way it's ready for development.
+ 
+There's a need for pre-building binaries of Go apps before you can run Docker compose. You don't need Go environment to have
+set up, but you need Docker to build docker-ready tarballs properly.
+
+```bash
+cd Beam
+make docker-build
+```
+
+After that you can run all or just selected services by calling `docker-compose up`.
+
+Application exposes all services via Nginx container.
+
+Following is list of available hosts. We advise you to add them to your `/etc/hosts`:
+
+```bash
+# CAMPAIGN
+campaign.remp.app # web administration
+
+# MAILER
+mailer.remp.app # web administration
+
+# BEAM
+beam.remp.app # web administration
+tracker.beam.remp.app # event tracker API; swagger @ http://tracker.beam.remp.app/swagger.json
+segments.beam.remp.app # segments API; swagger @ http://segments.beam.remp.app/swagger.json
+
+# SERVICE APPS
+adminer.remp.app # adminer for manipulating with DB
+mailhog.remp.app # mailhog for catching and debugging sent emails
+```
+
+### Docker Compose
 
 If you're unfamiliar with `docker-compose`, try running `docker-compose --help` as a starter. Each of the subcommands of Docker also supports its own `--help` switch. Feel free to explore it.
 
@@ -22,7 +55,8 @@ Couple of neat commands:
 
 ## PHP Debugging
 
-Docker compose and custom images are ready for PHPStorm debugger. All you need to do is set folder for each debuggable host.
+Docker compose and custom images are ready for PHPStorm debugger. All you need to do is set folder mapping within your IDE
+for each debuggable host.
 
 ## Known issues
 

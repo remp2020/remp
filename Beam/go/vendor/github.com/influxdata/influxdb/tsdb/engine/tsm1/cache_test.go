@@ -448,7 +448,7 @@ func TestCache_Snapshot_Stats(t *testing.T) {
 	}
 
 	// Store size should have been reset.
-	if got, exp := c.Size(), uint64(0); got != exp {
+	if got, exp := c.Size(), uint64(16); got != exp {
 		t.Fatalf("got %v, expected %v", got, exp)
 	}
 
@@ -519,6 +519,10 @@ func TestCache_CacheWriteMemoryExceeded(t *testing.T) {
 }
 
 func TestCache_Deduplicate_Concurrent(t *testing.T) {
+	if testing.Short() || os.Getenv("GORACE") != "" || os.Getenv("APPVEYOR") != "" {
+		t.Skip("Skipping test in short, race, appveyor mode.")
+	}
+
 	values := make(map[string][]Value)
 
 	for i := 0; i < 1000; i++ {
@@ -573,6 +577,10 @@ func TestCacheLoader_LoadSingle(t *testing.T) {
 
 	if err := w.Write(mustMarshalEntry(entry)); err != nil {
 		t.Fatal("write points", err)
+	}
+
+	if err := w.Flush(); err != nil {
+		t.Fatalf("flush error: %v", err)
 	}
 
 	// Load the cache using the segment.
@@ -639,6 +647,9 @@ func TestCacheLoader_LoadDouble(t *testing.T) {
 		if err := w1.Write(mustMarshalEntry(entry)); err != nil {
 			t.Fatal("write points", err)
 		}
+		if err := w1.Flush(); err != nil {
+			t.Fatalf("flush error: %v", err)
+		}
 	}
 
 	values := map[string][]Value{
@@ -703,6 +714,10 @@ func TestCacheLoader_LoadDeleted(t *testing.T) {
 		t.Fatal("write points", err)
 	}
 
+	if err := w.Flush(); err != nil {
+		t.Fatalf("flush error: %v", err)
+	}
+
 	dentry := &DeleteRangeWALEntry{
 		Keys: []string{"foo"},
 		Min:  2,
@@ -711,6 +726,10 @@ func TestCacheLoader_LoadDeleted(t *testing.T) {
 
 	if err := w.Write(mustMarshalEntry(dentry)); err != nil {
 		t.Fatal("write points", err)
+	}
+
+	if err := w.Flush(); err != nil {
+		t.Fatalf("flush error: %v", err)
 	}
 
 	// Load the cache using the segment.

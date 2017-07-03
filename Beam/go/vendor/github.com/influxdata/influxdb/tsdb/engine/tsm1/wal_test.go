@@ -2,6 +2,7 @@ package tsm1_test
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"testing"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/golang/snappy"
 )
 
-func TestWALWriter_WritePoints_Single(t *testing.T) {
+func TestWALWriter_WriteMulti_Single(t *testing.T) {
 	dir := MustTempDir()
 	defer os.RemoveAll(dir)
 	f := MustTempFile(dir)
@@ -36,7 +37,11 @@ func TestWALWriter_WritePoints_Single(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		fatal(t, "seek", err)
 	}
 
@@ -69,7 +74,7 @@ func TestWALWriter_WritePoints_Single(t *testing.T) {
 	}
 }
 
-func TestWALWriter_WritePoints_LargeBatch(t *testing.T) {
+func TestWALWriter_WriteMulti_LargeBatch(t *testing.T) {
 	dir := MustTempDir()
 	defer os.RemoveAll(dir)
 	f := MustTempFile(dir)
@@ -93,7 +98,11 @@ func TestWALWriter_WritePoints_LargeBatch(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		fatal(t, "seek", err)
 	}
 
@@ -125,7 +134,7 @@ func TestWALWriter_WritePoints_LargeBatch(t *testing.T) {
 		t.Fatalf("wrong count of bytes read, got %d, exp %d", n, MustReadFileSize(f))
 	}
 }
-func TestWALWriter_WritePoints_Multiple(t *testing.T) {
+func TestWALWriter_WriteMulti_Multiple(t *testing.T) {
 	dir := MustTempDir()
 	defer os.RemoveAll(dir)
 	f := MustTempFile(dir)
@@ -150,10 +159,13 @@ func TestWALWriter_WritePoints_Multiple(t *testing.T) {
 		if err := w.Write(mustMarshalEntry(entry)); err != nil {
 			fatal(t, "write points", err)
 		}
+		if err := w.Flush(); err != nil {
+			fatal(t, "flush", err)
+		}
 	}
 
 	// Seek back to the beinning of the file for reading
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		fatal(t, "seek", err)
 	}
 
@@ -210,7 +222,11 @@ func TestWALWriter_WriteDelete_Single(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		fatal(t, "seek", err)
 	}
 
@@ -239,7 +255,7 @@ func TestWALWriter_WriteDelete_Single(t *testing.T) {
 	}
 }
 
-func TestWALWriter_WritePointsDelete_Multiple(t *testing.T) {
+func TestWALWriter_WriteMultiDelete_Multiple(t *testing.T) {
 	dir := MustTempDir()
 	defer os.RemoveAll(dir)
 	f := MustTempFile(dir)
@@ -258,6 +274,10 @@ func TestWALWriter_WritePointsDelete_Multiple(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
 	// Write the delete entry
 	deleteEntry := &tsm1.DeleteWALEntry{
 		Keys: []string{"cpu,host=A#!~value"},
@@ -267,8 +287,12 @@ func TestWALWriter_WritePointsDelete_Multiple(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
 	// Seek back to the beinning of the file for reading
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		fatal(t, "seek", err)
 	}
 
@@ -325,7 +349,7 @@ func TestWALWriter_WritePointsDelete_Multiple(t *testing.T) {
 	}
 }
 
-func TestWALWriter_WritePointsDeleteRange_Multiple(t *testing.T) {
+func TestWALWriter_WriteMultiDeleteRange_Multiple(t *testing.T) {
 	dir := MustTempDir()
 	defer os.RemoveAll(dir)
 	f := MustTempFile(dir)
@@ -347,6 +371,10 @@ func TestWALWriter_WritePointsDeleteRange_Multiple(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
 	// Write the delete entry
 	deleteEntry := &tsm1.DeleteRangeWALEntry{
 		Keys: []string{"cpu,host=A#!~value"},
@@ -358,8 +386,12 @@ func TestWALWriter_WritePointsDeleteRange_Multiple(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
 	// Seek back to the beinning of the file for reading
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		fatal(t, "seek", err)
 	}
 
@@ -443,7 +475,7 @@ func TestWAL_ClosedSegments(t *testing.T) {
 		t.Fatalf("close segment length mismatch: got %v, exp %v", got, exp)
 	}
 
-	if _, err := w.WritePoints(map[string][]tsm1.Value{
+	if _, err := w.WriteMulti(map[string][]tsm1.Value{
 		"cpu,host=A#!~#value": []tsm1.Value{
 			tsm1.NewValue(1, 1.1),
 		},
@@ -532,13 +564,17 @@ func TestWALWriter_Corrupt(t *testing.T) {
 		fatal(t, "write points", err)
 	}
 
+	if err := w.Flush(); err != nil {
+		fatal(t, "flush", err)
+	}
+
 	// Write some random bytes to the file to simulate corruption.
 	if _, err := f.Write(corruption); err != nil {
 		fatal(t, "corrupt WAL segment", err)
 	}
 
 	// Create the WAL segment reader.
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		fatal(t, "seek", err)
 	}
 	r := tsm1.NewWALSegmentReader(f)
@@ -699,7 +735,7 @@ func BenchmarkWALSegmentReader(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		f.Seek(0, os.SEEK_SET)
+		f.Seek(0, io.SeekStart)
 		b.StartTimer()
 
 		for r.Next() {

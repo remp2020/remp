@@ -1,4 +1,4 @@
-package gzip
+package gzip_test
 
 import (
 	. "github.com/onsi/ginkgo"

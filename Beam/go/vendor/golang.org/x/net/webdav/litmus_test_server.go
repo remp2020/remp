@@ -15,7 +15,7 @@ and separately, from the downloaded litmus-xxx directory:
 
 make URL=http://localhost:9999/ check
 */
-package webdav
+package main
 
 import (
 	"flag"

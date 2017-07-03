@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // This example demonstrates parsing HTML data and walking the resulting tree.
-package html
+package html_test
 
 import (
 	"fmt"

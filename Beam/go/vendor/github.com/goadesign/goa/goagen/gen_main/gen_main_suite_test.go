@@ -1,4 +1,4 @@
-package genmain
+package genmain_test
 
 import (
 	. "github.com/onsi/ginkgo"

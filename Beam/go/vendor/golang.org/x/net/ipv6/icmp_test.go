@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ipv6
+package ipv6_test
 
 import (
 	"net"

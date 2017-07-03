@@ -53,16 +53,11 @@ type PointsWriter struct {
 		Database(name string) (di *meta.DatabaseInfo)
 		RetentionPolicy(database, policy string) (*meta.RetentionPolicyInfo, error)
 		CreateShardGroup(database, policy string, timestamp time.Time) (*meta.ShardGroupInfo, error)
-		ShardOwner(shardID uint64) (string, string, *meta.ShardGroupInfo)
 	}
 
 	TSDBStore interface {
 		CreateShard(database, retentionPolicy string, shardID uint64, enabled bool) error
 		WriteToShard(shardID uint64, points []models.Point) error
-	}
-
-	ShardWriter interface {
-		WriteShard(shardID, ownerID uint64, points []models.Point) error
 	}
 
 	Subscriber interface {
@@ -103,13 +98,16 @@ func NewPointsWriter() *PointsWriter {
 
 // ShardMapping contains a mapping of shards to points.
 type ShardMapping struct {
-	Points map[uint64][]models.Point  // The points associated with a shard ID
-	Shards map[uint64]*meta.ShardInfo // The shards that have been mapped, keyed by shard ID
+	n       int
+	Points  map[uint64][]models.Point  // The points associated with a shard ID
+	Shards  map[uint64]*meta.ShardInfo // The shards that have been mapped, keyed by shard ID
+	Dropped []models.Point             // Points that were dropped
 }
 
 // NewShardMapping creates an empty ShardMapping.
-func NewShardMapping() *ShardMapping {
+func NewShardMapping(n int) *ShardMapping {
 	return &ShardMapping{
+		n:      n,
 		Points: map[uint64][]models.Point{},
 		Shards: map[uint64]*meta.ShardInfo{},
 	}
@@ -117,6 +115,9 @@ func NewShardMapping() *ShardMapping {
 
 // MapPoint adds the point to the ShardMapping, associated with the given shardInfo.
 func (s *ShardMapping) MapPoint(shardInfo *meta.ShardInfo, p models.Point) {
+	if cap(s.Points[shardInfo.ID]) < s.n {
+		s.Points[shardInfo.ID] = make([]models.Point, 0, s.n)
+	}
 	s.Points[shardInfo.ID] = append(s.Points[shardInfo.ID], p)
 	s.Shards[shardInfo.ID] = shardInfo
 }
@@ -223,12 +224,13 @@ func (w *PointsWriter) MapShards(wp *WritePointsRequest) (*ShardMapping, error) 
 		list = list.Append(*sg)
 	}
 
-	mapping := NewShardMapping()
+	mapping := NewShardMapping(len(wp.Points))
 	for _, p := range wp.Points {
 		sg := list.ShardGroupAt(p.Time())
 		if sg == nil {
 			// We didn't create a shard group because the point was outside the
 			// scope of the RP.
+			mapping.Dropped = append(mapping.Dropped, p)
 			atomic.AddInt64(&w.stats.WriteDropped, 1)
 			continue
 		}
@@ -279,11 +281,16 @@ func (l sgList) Append(sgi meta.ShardGroupInfo) sgList {
 // WritePointsInto is a copy of WritePoints that uses a tsdb structure instead of
 // a cluster structure for information. This is to avoid a circular dependency.
 func (w *PointsWriter) WritePointsInto(p *IntoWriteRequest) error {
-	return w.WritePoints(p.Database, p.RetentionPolicy, models.ConsistencyLevelOne, p.Points)
+	return w.WritePointsPrivileged(p.Database, p.RetentionPolicy, models.ConsistencyLevelOne, p.Points)
 }
 
-// WritePoints writes across multiple local and remote data nodes according the consistency level.
-func (w *PointsWriter) WritePoints(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, points []models.Point) error {
+// WritePoints writes the data to the underlying storage. consitencyLevel and user are only used for clustered scenarios
+func (w *PointsWriter) WritePoints(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, user meta.User, points []models.Point) error {
+	return w.WritePointsPrivileged(database, retentionPolicy, consistencyLevel, points)
+}
+
+// WritePointsPrivileged writes the data to the underlying storage, consitencyLevel is only used for clustered scenarios
+func (w *PointsWriter) WritePointsPrivileged(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, points []models.Point) error {
 	atomic.AddInt64(&w.stats.WriteReq, 1)
 	atomic.AddInt64(&w.stats.PointWriteReq, int64(len(points)))
 
@@ -324,6 +331,10 @@ func (w *PointsWriter) WritePoints(database, retentionPolicy string, consistency
 		atomic.AddInt64(&w.stats.SubWriteDrop, 1)
 	}
 
+	if err == nil && len(shardMappings.Dropped) > 0 {
+		err = tsdb.PartialWriteError{Reason: "points beyond retention policy", Dropped: len(shardMappings.Dropped)}
+
+	}
 	timeout := time.NewTimer(w.WriteTimeout)
 	defer timeout.Stop()
 	for range shardMappings.Points {
@@ -340,7 +351,7 @@ func (w *PointsWriter) WritePoints(database, retentionPolicy string, consistency
 			}
 		}
 	}
-	return nil
+	return err
 }
 
 // writeToShards writes points to a shard.

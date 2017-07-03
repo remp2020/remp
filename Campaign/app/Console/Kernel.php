@@ -6,6 +6,7 @@ use App\Campaign;
 use App\Jobs\CacheSegmentJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Schema;
 
 class Kernel extends ConsoleKernel
 {
@@ -26,6 +27,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        if (!Schema::hasTable("migrations")) {
+            return;
+        }
+
         // invalidate segments cache
         foreach (Campaign::whereActive(true)->cursor() as $campaign) {
             $schedule->job(new CacheSegmentJob($campaign->segment_id, true))

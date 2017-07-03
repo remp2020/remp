@@ -1,4 +1,4 @@
-package goakit
+package goakit_test
 
 import (
 	. "github.com/onsi/ginkgo"

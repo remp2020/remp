@@ -4,7 +4,7 @@
 
 // +build ignore
 
-package publicsuffix
+package main
 
 // This program generates table.go and table_test.go based on the authoritative
 // public suffix list at https://publicsuffix.org/list/effective_tld_names.dat

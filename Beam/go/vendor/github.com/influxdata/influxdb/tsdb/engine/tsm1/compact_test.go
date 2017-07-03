@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/influxdata/influxdb/models"
+	"github.com/influxdata/influxdb/tsdb"
 	"github.com/influxdata/influxdb/tsdb/engine/tsm1"
 )
 
@@ -1091,8 +1091,8 @@ func TestCacheKeyIterator_Chunked(t *testing.T) {
 }
 
 func TestDefaultPlanner_Plan_Min(t *testing.T) {
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return []tsm1.FileStat{
 					tsm1.FileStat{
@@ -1109,8 +1109,8 @@ func TestDefaultPlanner_Plan_Min(t *testing.T) {
 					},
 				}
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	tsm := cp.Plan(time.Now())
 	if exp, got := 0, len(tsm); got != exp {
@@ -1152,13 +1152,13 @@ func TestDefaultPlanner_Plan_CombineSequence(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{data[0], data[1], data[2], data[3]}
 	tsm := cp.Plan(time.Now())
@@ -1214,13 +1214,11 @@ func TestDefaultPlanner_Plan_MultipleGroups(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
-			PathsFn: func() []tsm1.FileStat {
-				return data
-			},
+	cp := tsm1.NewDefaultPlanner(&fakeFileStore{
+		PathsFn: func() []tsm1.FileStat {
+			return data
 		},
-	}
+	}, tsdb.DefaultCompactFullWriteColdDuration)
 
 	expFiles := []tsm1.FileStat{data[0], data[1], data[2], data[3],
 		data[4], data[5], data[6], data[7]}
@@ -1281,13 +1279,13 @@ func TestDefaultPlanner_PlanLevel_SmallestCompactionStep(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{data[4], data[5]}
 	tsm := cp.PlanLevel(1)
@@ -1313,11 +1311,11 @@ func TestDefaultPlanner_PlanLevel_SplitFile(t *testing.T) {
 			Size: 1 * 1024 * 1024,
 		},
 		tsm1.FileStat{
-			Path: "03-03.tsm1",
+			Path: "03-02.tsm1",
 			Size: 2 * 1024 * 1024 * 1024,
 		},
 		tsm1.FileStat{
-			Path: "03-04.tsm1",
+			Path: "03-03.tsm1",
 			Size: 10 * 1024 * 1024,
 		},
 		tsm1.FileStat{
@@ -1334,13 +1332,13 @@ func TestDefaultPlanner_PlanLevel_SplitFile(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{data[0], data[1], data[2], data[3], data[4]}
 	tsm := cp.PlanLevel(3)
@@ -1383,13 +1381,13 @@ func TestDefaultPlanner_PlanLevel_IsolatedLowLevel(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{data[2], data[3]}
 	tsm := cp.PlanLevel(1)
@@ -1436,13 +1434,13 @@ func TestDefaultPlanner_PlanLevel_IsolatedHighLevel(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{}
 	tsm := cp.PlanLevel(3)
@@ -1479,13 +1477,13 @@ func TestDefaultPlanner_PlanLevel3_MinFiles(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{}
 	tsm := cp.PlanLevel(3)
@@ -1511,13 +1509,13 @@ func TestDefaultPlanner_PlanLevel2_MinFiles(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{}
 	tsm := cp.PlanLevel(2)
@@ -1555,13 +1553,13 @@ func TestDefaultPlanner_PlanLevel_Tombstone(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{data[0], data[1]}
 	tsm := cp.PlanLevel(3)
@@ -1604,13 +1602,13 @@ func TestDefaultPlanner_PlanLevel_Multiple(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles1 := []tsm1.FileStat{data[0], data[1], data[2], data[3]}
 	expFiles2 := []tsm1.FileStat{data[4], data[5]}
@@ -1653,13 +1651,13 @@ func TestDefaultPlanner_PlanOptimize_NoLevel4(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{}
 	tsm := cp.PlanOptimize()
@@ -1696,13 +1694,13 @@ func TestDefaultPlanner_PlanOptimize_Level4(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles1 := []tsm1.FileStat{data[0], data[1], data[2], data[3]}
 	tsm := cp.PlanOptimize()
@@ -1761,13 +1759,13 @@ func TestDefaultPlanner_PlanOptimize_Multiple(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles1 := []tsm1.FileStat{data[0], data[1], data[2], data[3]}
 	expFiles2 := []tsm1.FileStat{data[5], data[6], data[7], data[8]}
@@ -1814,13 +1812,13 @@ func TestDefaultPlanner_PlanOptimize_Optimized(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{}
 	tsm := cp.PlanOptimize()
@@ -1846,13 +1844,13 @@ func TestDefaultPlanner_PlanOptimize_Tombstones(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{data[0], data[1], data[2]}
 	tsm := cp.PlanOptimize()
@@ -1898,14 +1896,14 @@ func TestDefaultPlanner_Plan_FullOnCold(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
 		},
-		CompactFullWriteColdDuration: time.Nanosecond,
-	}
+		time.Nanosecond,
+	)
 
 	tsm := cp.Plan(time.Now().Add(-time.Second))
 	if exp, got := len(data), len(tsm[0]); got != exp {
@@ -1933,13 +1931,13 @@ func TestDefaultPlanner_Plan_SkipMaxSizeFiles(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	tsm := cp.Plan(time.Now())
 	if exp, got := 0, len(tsm); got != exp {
@@ -1976,15 +1974,13 @@ func TestDefaultPlanner_Plan_SkipPlanningAfterFull(t *testing.T) {
 		blockCount: 1000,
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore:                    fs,
-		CompactFullWriteColdDuration: time.Nanosecond,
-	}
-
+	cp := tsm1.NewDefaultPlanner(fs, time.Nanosecond)
+	plan := cp.Plan(time.Now().Add(-time.Second))
 	// first verify that our test set would return files
-	if exp, got := 4, len(cp.Plan(time.Now().Add(-time.Second))[0]); got != exp {
+	if exp, got := 4, len(plan[0]); got != exp {
 		t.Fatalf("tsm file length mismatch: got %v, exp %v", got, exp)
 	}
+	cp.Release(plan)
 
 	// skip planning if all files are over the limit
 	over := []tsm1.FileStat{
@@ -2018,14 +2014,18 @@ func TestDefaultPlanner_Plan_SkipPlanningAfterFull(t *testing.T) {
 	}
 
 	cp.FileStore = overFs
-	if exp, got := 0, len(cp.Plan(time.Now().Add(-time.Second))); got != exp {
+	plan = cp.Plan(time.Now().Add(-time.Second))
+	if exp, got := 0, len(plan); got != exp {
 		t.Fatalf("tsm file length mismatch: got %v, exp %v", got, exp)
 	}
+	cp.Release(plan)
 
+	plan = cp.PlanOptimize()
 	// ensure the optimize planner would pick this up
-	if exp, got := 1, len(cp.PlanOptimize()); got != exp {
+	if exp, got := 1, len(plan); got != exp {
 		t.Fatalf("tsm file length mismatch: got %v, exp %v", got, exp)
 	}
+	cp.Release(plan)
 
 	cp.FileStore = fs
 	// ensure that it will plan if last modified has changed
@@ -2083,15 +2083,14 @@ func TestDefaultPlanner_Plan_TwoGenLevel3(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			blockCount: 1000,
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
 		},
-		CompactFullWriteColdDuration: time.Hour,
-	}
+		time.Hour)
 
 	tsm := cp.Plan(time.Now().Add(-24 * time.Hour))
 	if exp, got := 1, len(tsm); got != exp {
@@ -2128,15 +2127,17 @@ func TestDefaultPlanner_Plan_NotFullOverMaxsize(t *testing.T) {
 		blockCount: 100,
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore:                    fs,
-		CompactFullWriteColdDuration: time.Nanosecond,
-	}
+	cp := tsm1.NewDefaultPlanner(
+		fs,
+		time.Nanosecond,
+	)
 
+	plan := cp.Plan(time.Now().Add(-time.Second))
 	// first verify that our test set would return files
-	if exp, got := 4, len(cp.Plan(time.Now().Add(-time.Second))[0]); got != exp {
+	if exp, got := 4, len(plan[0]); got != exp {
 		t.Fatalf("tsm file length mismatch: got %v, exp %v", got, exp)
 	}
+	cp.Release(plan)
 
 	// skip planning if all files are over the limit
 	over := []tsm1.FileStat{
@@ -2189,13 +2190,13 @@ func TestDefaultPlanner_Plan_CompactsMiddleSteps(t *testing.T) {
 		},
 	}
 
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return data
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	expFiles := []tsm1.FileStat{data[0], data[1], data[2], data[3]}
 	tsm := cp.Plan(time.Now())
@@ -2211,8 +2212,8 @@ func TestDefaultPlanner_Plan_CompactsMiddleSteps(t *testing.T) {
 }
 
 func TestDefaultPlanner_Plan_LargeSets(t *testing.T) {
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return []tsm1.FileStat{
 					tsm1.FileStat{
@@ -2237,8 +2238,8 @@ func TestDefaultPlanner_Plan_LargeSets(t *testing.T) {
 					},
 				}
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	tsm := cp.Plan(time.Now())
 	if exp, got := 0, len(tsm); got != exp {
@@ -2247,8 +2248,8 @@ func TestDefaultPlanner_Plan_LargeSets(t *testing.T) {
 }
 
 func TestDefaultPlanner_Plan_LargeGeneration(t *testing.T) {
-	cp := &tsm1.DefaultPlanner{
-		FileStore: &fakeFileStore{
+	cp := tsm1.NewDefaultPlanner(
+		&fakeFileStore{
 			PathsFn: func() []tsm1.FileStat {
 				return []tsm1.FileStat{
 					tsm1.FileStat{
@@ -2273,8 +2274,8 @@ func TestDefaultPlanner_Plan_LargeGeneration(t *testing.T) {
 					},
 				}
 			},
-		},
-	}
+		}, tsdb.DefaultCompactFullWriteColdDuration,
+	)
 
 	tsm := cp.Plan(time.Now())
 	if exp, got := 0, len(tsm); got != exp {
@@ -2289,36 +2290,6 @@ func assertValueEqual(t *testing.T, a, b tsm1.Value) {
 	if got, exp := a.Value(), b.Value(); got != exp {
 		t.Fatalf("value mismatch: got %v, exp %v", got, exp)
 	}
-}
-
-func assertEqual(t *testing.T, a tsm1.Value, b models.Point, field string) {
-	if got, exp := a.UnixNano(), b.UnixNano(); got != exp {
-		t.Fatalf("time mismatch: got %v, exp %v", got, exp)
-	}
-	fields, err := b.Fields()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got, exp := a.Value(), fields[field]; got != exp {
-		t.Fatalf("value mismatch: got %v, exp %v", got, exp)
-	}
-}
-
-func MustWALSegment(dir string, entries []tsm1.WALEntry) *tsm1.WALSegmentReader {
-	f := MustTempFile(dir)
-	w := tsm1.NewWALSegmentWriter(f)
-
-	for _, e := range entries {
-		if err := w.Write(mustMarshalEntry(e)); err != nil {
-			panic(fmt.Sprintf("write WAL entry: %v", err))
-		}
-	}
-
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
-		panic(fmt.Sprintf("seek WAL: %v", err))
-	}
-
-	return tsm1.NewWALSegmentReader(f)
 }
 
 func MustTSMWriter(dir string, gen int) (tsm1.TSMWriter, string) {
@@ -2385,14 +2356,6 @@ func MustOpenTSMReader(name string) *tsm1.TSMReader {
 		panic(fmt.Sprintf("new reader: %v", err))
 	}
 	return r
-}
-
-type fakeWAL struct {
-	ClosedSegmentsFn func() ([]string, error)
-}
-
-func (w *fakeWAL) ClosedSegments() ([]string, error) {
-	return w.ClosedSegmentsFn()
 }
 
 type fakeFileStore struct {

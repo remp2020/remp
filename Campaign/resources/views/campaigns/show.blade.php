@@ -67,7 +67,7 @@
 
             script.type = "text/javascript";
             script.async = true;
-            script.src = d + "//rempcampaign.local/assets/js/remplib.js";
+            script.src = d + "//campaign.remp.app/assets/js/remplib.js";
             doc.getElementsByTagName("head")[0].appendChild(script);
         }
     })(window, document);

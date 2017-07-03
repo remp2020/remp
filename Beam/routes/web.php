@@ -17,7 +17,9 @@ Route::get('/', function () {
 
 Route::get('accounts/json', 'AccountController@json');
 Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');
+Route::get('segments/json', 'SegmentController@json')->name('segments.json');
 Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
 Route::resource('accounts', 'AccountController');
 Route::resource('accounts.properties', 'PropertyController');
+Route::resource('segments', 'SegmentController');

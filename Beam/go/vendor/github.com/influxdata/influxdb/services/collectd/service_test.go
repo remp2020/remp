@@ -365,26 +365,8 @@ func NewTestService(batchSize int, batchDuration time.Duration) *TestService {
 	return s
 }
 
-func (w *TestService) WritePoints(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, points []models.Point) error {
+func (w *TestService) WritePointsPrivileged(database, retentionPolicy string, consistencyLevel models.ConsistencyLevel, points []models.Point) error {
 	return w.WritePointsFn(database, retentionPolicy, consistencyLevel, points)
-}
-
-func wait(c chan struct{}, d time.Duration) (err error) {
-	select {
-	case <-c:
-	case <-time.After(d):
-		err = errors.New("timed out")
-	}
-	return
-}
-
-func waitInt(c chan int, d time.Duration) (i int, err error) {
-	select {
-	case i = <-c:
-	case <-time.After(d):
-		err = errors.New("timed out")
-	}
-	return
 }
 
 func check(err error) {

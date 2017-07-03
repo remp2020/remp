@@ -3,6 +3,7 @@ package tsm1_test
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -86,7 +87,7 @@ func TestTSMWriter_Write_Single(t *testing.T) {
 		t.Fatalf("magic number mismatch: got %v, exp %v", got, tsm1.MagicNumber)
 	}
 
-	if _, err := fd.Seek(0, os.SEEK_SET); err != nil {
+	if _, err := fd.Seek(0, io.SeekStart); err != nil {
 		t.Fatalf("unexpected error seeking: %v", err)
 	}
 
@@ -546,7 +547,7 @@ func TestTSMWriter_WriteBlock_Multiple(t *testing.T) {
 		t.Fatalf("magic number mismatch: got %v, exp %v", got, tsm1.MagicNumber)
 	}
 
-	if _, err := fd.Seek(0, os.SEEK_SET); err != nil {
+	if _, err := fd.Seek(0, io.SeekStart); err != nil {
 		t.Fatalf("error seeking: %v", err)
 	}
 
@@ -564,7 +565,7 @@ func TestTSMWriter_WriteBlock_Multiple(t *testing.T) {
 
 	iter := r.BlockIterator()
 	for iter.Next() {
-		key, minTime, maxTime, _, b, err := iter.Read()
+		key, minTime, maxTime, _, _, b, err := iter.Read()
 		if err != nil {
 			t.Fatalf("unexpected error reading block: %v", err)
 		}
@@ -608,6 +609,26 @@ func TestTSMWriter_WriteBlock_Multiple(t *testing.T) {
 				t.Fatalf("read value mismatch(%d): got %v, exp %d", i, readValues[i].Value(), v.Value())
 			}
 		}
+	}
+}
+
+func TestTSMWriter_WriteBlock_MaxKey(t *testing.T) {
+	dir := MustTempDir()
+	defer os.RemoveAll(dir)
+	f := MustTempFile(dir)
+
+	w, err := tsm1.NewTSMWriter(f)
+	if err != nil {
+		t.Fatalf("unexpected error creating writer: %v", err)
+	}
+
+	var key string
+	for i := 0; i < 100000; i++ {
+		key += "a"
+	}
+
+	if err := w.WriteBlock(key, 0, 0, nil); err != tsm1.ErrMaxKeyLengthExceeded {
+		t.Fatalf("expected max key length error writing key: %v", err)
 	}
 }
 

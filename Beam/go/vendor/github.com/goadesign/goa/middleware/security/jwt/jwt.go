@@ -8,9 +8,10 @@ import (
 	"sort"
 	"strings"
 
+	"context"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
-	"golang.org/x/net/context"
 )
 
 // New returns a middleware to be used with the JWTSecurity DSL definitions of goa.  It supports the
@@ -27,14 +28,15 @@ import (
 //
 // validationKeys can be one of these:
 //
-//     * []byte
-//     * string
-//     * an *rsa.PublicKey
-//     * an *ecdsa.PublicKey
+//     * a string (for HMAC)
+//     * a []byte (for HMAC)
+//     * an rsa.PublicKey
+//     * an ecdsa.PublicKey
 //     * a slice of any of the above
 //
-// Keys of type string or []byte are interpreted according to the signing method defined in the JWT
-// token's `typ` header element: `HS`, `RS`, `ES`, etc.
+// The type of the keys determine the algorithm that will be used to do the check.  The goal of
+// having lists of keys is to allow for key rotation, still check the previous keys until rotation
+// has been completed.
 //
 // You can define an optional function to do additional validations on the token once the signature
 // and the claims requirements are proven to be valid.  Example:
@@ -49,10 +51,14 @@ import (
 // Mount the middleware with the generated UseXX function where XX is the name of the scheme as
 // defined in the design, e.g.:
 //
-//    jwtResolver, _ := jwt.NewSimpleResolver("secret")
-//    app.UseJWT(jwt.New(jwtResolver, validationHandler, app.NewJWTSecurity()))
+//    app.UseJWT(jwt.New("secret", validationHandler, app.NewJWTSecurity()))
 //
-func New(resolver KeyResolver, validationFunc goa.Middleware, scheme *goa.JWTSecurity) goa.Middleware {
+func New(validationKeys interface{}, validationFunc goa.Middleware, scheme *goa.JWTSecurity) goa.Middleware {
+	var rsaKeys []*rsa.PublicKey
+	var hmacKeys [][]byte
+
+	rsaKeys, ecdsaKeys, hmacKeys := partitionKeys(validationKeys)
+
 	return func(nextHandler goa.Handler) goa.Handler {
 		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 			// TODO: implement the QUERY string handler too
@@ -65,12 +71,10 @@ func New(resolver KeyResolver, validationFunc goa.Middleware, scheme *goa.JWTSec
 			}
 
 			if !strings.HasPrefix(strings.ToLower(val), "bearer ") {
-				return ErrJWTError(fmt.Sprintf("invalid or malformed %q header, expected 'Bearer JWT-token...'", val))
+				return ErrJWTError(fmt.Sprintf("invalid or malformed %q header, expected 'Authorization: Bearer JWT-token...'", val))
 			}
 
 			incomingToken := strings.Split(val, " ")[1]
-
-			rsaKeys, ecdsaKeys, hmacKeys := partitionKeys(resolver.SelectKeys(req))
 
 			var (
 				token     *jwt.Token
@@ -80,27 +84,21 @@ func New(resolver KeyResolver, validationFunc goa.Middleware, scheme *goa.JWTSec
 
 			if len(rsaKeys) > 0 {
 				token, err = validateRSAKeys(rsaKeys, "RS", incomingToken)
-				if err == nil {
-					validated = true
-				}
+				validated = err == nil
 			}
 
 			if !validated && len(ecdsaKeys) > 0 {
 				token, err = validateECDSAKeys(ecdsaKeys, "ES", incomingToken)
-				if err == nil {
-					validated = true
-				}
+				validated = err == nil
 			}
 
 			if !validated && len(hmacKeys) > 0 {
 				token, err = validateHMACKeys(hmacKeys, "HS", incomingToken)
-				if err == nil {
-					validated = true
-				}
+				//validated = err == nil
 			}
 
-			if !validated {
-				return ErrJWTError("JWT validation failed")
+			if err != nil {
+				return ErrJWTError(fmt.Sprintf("JWT validation failed: %s", err))
 			}
 
 			scopesInClaim, scopesInClaimList, err := parseClaimScopes(token)
@@ -127,30 +125,6 @@ func New(resolver KeyResolver, validationFunc goa.Middleware, scheme *goa.JWTSec
 	}
 }
 
-// partitionKeys sorts keys by their type.
-func partitionKeys(keys []Key) ([]*rsa.PublicKey, []*ecdsa.PublicKey, [][]byte) {
-	var (
-		rsaKeys   []*rsa.PublicKey
-		ecdsaKeys []*ecdsa.PublicKey
-		hmacKeys  [][]byte
-	)
-
-	for _, key := range keys {
-		switch k := key.(type) {
-		case *rsa.PublicKey:
-			rsaKeys = append(rsaKeys, k)
-		case *ecdsa.PublicKey:
-			ecdsaKeys = append(ecdsaKeys, k)
-		case []byte:
-			hmacKeys = append(hmacKeys, k)
-		case string:
-			hmacKeys = append(hmacKeys, []byte(k))
-		}
-	}
-
-	return rsaKeys, ecdsaKeys, hmacKeys
-}
-
 // parseClaimScopes parses the "scopes" parameter in the Claims. It supports two formats:
 //
 // * a list of string
@@ -161,7 +135,7 @@ func parseClaimScopes(token *jwt.Token) (map[string]bool, []string, error) {
 	var scopesInClaimList []string
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, nil, fmt.Errorf("unsupported claims shape")
+		return nil, nil, fmt.Errorf("unsupport claims shape")
 	}
 	if claims["scopes"] != nil {
 		switch scopes := claims["scopes"].(type) {
@@ -183,6 +157,48 @@ func parseClaimScopes(token *jwt.Token) (map[string]bool, []string, error) {
 	}
 	sort.Strings(scopesInClaimList)
 	return scopesInClaim, scopesInClaimList, nil
+}
+
+// ErrJWTError is the error returned by this middleware when any sort of validation or assertion
+// fails during processing.
+var ErrJWTError = goa.NewErrorClass("jwt_security_error", 401)
+
+type contextKey int
+
+const (
+	jwtKey contextKey = iota + 1
+)
+
+// partitionKeys sorts keys by their type.
+func partitionKeys(k interface{}) ([]*rsa.PublicKey, []*ecdsa.PublicKey, [][]byte) {
+	var (
+		rsaKeys   []*rsa.PublicKey
+		ecdsaKeys []*ecdsa.PublicKey
+		hmacKeys  [][]byte
+	)
+
+	switch typed := k.(type) {
+	case []byte:
+		hmacKeys = append(hmacKeys, typed)
+	case [][]byte:
+		hmacKeys = typed
+	case string:
+		hmacKeys = append(hmacKeys, []byte(typed))
+	case []string:
+		for _, s := range typed {
+			hmacKeys = append(hmacKeys, []byte(s))
+		}
+	case *rsa.PublicKey:
+		rsaKeys = append(rsaKeys, typed)
+	case []*rsa.PublicKey:
+		rsaKeys = typed
+	case *ecdsa.PublicKey:
+		ecdsaKeys = append(ecdsaKeys, typed)
+	case []*ecdsa.PublicKey:
+		ecdsaKeys = typed
+	}
+
+	return rsaKeys, ecdsaKeys, hmacKeys
 }
 
 func validateRSAKeys(rsaKeys []*rsa.PublicKey, algo, incomingToken string) (token *jwt.Token, err error) {

@@ -4,7 +4,7 @@
 
 // +build ignore
 
-package atom
+package main
 
 // This program generates table.go and table_test.go.
 // Invoke as

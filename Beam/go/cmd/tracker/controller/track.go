@@ -63,11 +63,14 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 		"category": ctx.Payload.Category,
 		"action":   ctx.Payload.Action,
 	}
-	values := map[string]interface{}{}
+	fields := map[string]interface{}{}
 	if ctx.Payload.Value != nil {
-		values["value"] = *ctx.Payload.Value
+		fields["value"] = *ctx.Payload.Value
 	}
-	if err := c.pushEvent(ctx.Payload.System, "events", tags, values); err != nil {
+	for key, val := range ctx.Payload.Fields {
+		fields[key] = val
+	}
+	if err := c.pushEvent(ctx.Payload.System, "events", tags, fields); err != nil {
 		return err
 	}
 	return ctx.Accepted()
@@ -94,16 +97,17 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	return ctx.Accepted()
 }
 
-func (c *TrackController) pushEvent(system *app.TrackSystem, name string, tags map[string]string, values map[string]interface{}) error {
-	values["ip"] = system.IPAddress
-	values["url"] = system.URL
-	values["user_agent"] = system.UserAgent
-	values["token"] = system.Token
+// pushEvent pushes new event to the InfluxDB.
+func (c *TrackController) pushEvent(system *app.TrackSystem, name string, tags map[string]string, fields map[string]interface{}) error {
+	fields["ip"] = system.IPAddress
+	fields["url"] = system.URL
+	fields["user_agent"] = system.UserAgent
+	fields["token"] = system.Token
 	if system.UserID != nil {
-		values["user_id"] = *system.UserID
+		tags["user_id"] = *system.UserID
 	}
 
-	p, err := influxClient.NewPoint(name, tags, values, system.Time)
+	p, err := influxClient.NewPoint(name, tags, fields, system.Time)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-package json
+package json_test
 
 import (
 	. "github.com/onsi/ginkgo"

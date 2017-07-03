@@ -1,0 +1,93 @@
+<template id="campaign-form-template">
+    <div class="row">
+        <div class="col-md-4">
+            <h4>Settings</h4>
+
+            <div class="input-group fg-float m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+                <div class="fg-line">
+                    <label for="name" class="fg-label">Name</label>
+                    <input v-model="name" class="form-control fg-input" name="name" id="name" type="text">
+                </div>
+            </div>
+
+            <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
+                <div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="banner_id" class="fg-label">Banner</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select v-model="bannerId" class="selectpicker" data-live-search="true" name="banner_id">
+                                <option v-for="banner in banners" v-bind:value="banner.id">
+                                    @{{ banner.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group fg-float m-t-30 checkbox">
+                <label class="m-l-15">
+                    Activate
+                    <input v-model="active" value="1" name="active" type="checkbox">
+                    <i class="input-helper"></i>
+                </label>
+            </div>
+
+
+            <div class="input-group m-t-20">
+                <div class="fg-line">
+                    <button class="btn btn-info waves-effect" type="submit"><i class="zmdi zmdi-mail-send"></i> Save</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-8">
+            <h4>Segments</h4>
+
+            <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
+                <div class="row">
+                    <div class="col-md-12">
+                        <select v-model="addedSegment" v-on:change="selectSegment" class="selectpicker col-md-8" data-live-search="true">
+                            <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
+                                <option v-for="(obj,code) in list" v-bind:value="obj">
+                                    @{{ obj.name }}
+                                </option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div v-for="(segment,i) in segments">
+                <input type="hidden" v-bind:name="'segments['+i+'][id]'" v-model="segment.id" />
+                <input type="hidden" v-bind:name="'segments['+i+'][code]'" v-model="segment.code" />
+                <input type="hidden" v-bind:name="'segments['+i+'][provider]'" v-model="segment.provider" />
+            </div>
+            <div v-for="(id,i) in removedSegments">
+                <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
+            </div>
+
+            <div class="row m-t-20">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr v-for="(segment,i) in segments">
+                                    <td>@{{ segmentMap[segment.code] }}</td>
+                                    <td class="text-right"><span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect"><i class="zmdi zmdi-minus-square"></i> Delete</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+</template>

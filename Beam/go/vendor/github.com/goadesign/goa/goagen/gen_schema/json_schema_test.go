@@ -1,4 +1,4 @@
-package genschema
+package genschema_test
 
 import (
 	"github.com/goadesign/goa/design"
