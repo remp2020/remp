@@ -3,9 +3,8 @@ package design
 import . "github.com/goadesign/goa/design"
 import . "github.com/goadesign/goa/design/apidsl"
 
-var TrackSystem = Type("TrackSystem", func() {
-	Attribute("token", String, "Property token")
-	Attribute("time", DateTime, "Time of occurrence")
+var User = Type("User", func() {
+	Attribute("property_token", String, "Property token")
 	Attribute("url", String, "URL", func() {
 		Format("uri")
 	})
@@ -14,26 +13,29 @@ var TrackSystem = Type("TrackSystem", func() {
 		Format("ip")
 	})
 	Attribute("user_id", String, "ID of reader")
-	Required("token", "time", "url", "user_agent", "ip_address")
+	Required("property_token", "url", "user_agent", "ip_address")
 })
 
-var TrackPageview = Type("TrackPageview", func() {
-	Description("TrackPageview is the payload for tracking pageview event")
-
-	Attribute("system", TrackSystem)
-	Attribute("article_id", String, "ID of article")
-	Attribute("category", String, "Page category (homepage, world news...")
-	Attribute("tags", ArrayOf(String), "List of tags (breaking news, trump...")
-	Attribute("author_id", String, "ID of author")
-	Attribute("campaign_id", String, "ID of campaign")
-
-	Required("system", "article_id")
+var System = Type("System", func() {
+	Attribute("time", DateTime, "Time of occurrence")
+	Required("time")
 })
 
-var TrackCommerce = Type("TrackCommerce", func() {
-	Description("TrackCommerce is the payload for tracking commerce event")
+var Pageview = Type("Pageview", func() {
+	Description("Pageview is the payload for tracking pageview event")
 
-	Attribute("system", TrackSystem)
+	Attribute("system", System)
+	Attribute("user", User)
+	Attribute("article", PageviewArticle)
+
+	Required("system", "user", "article")
+})
+
+var Commerce = Type("Commerce", func() {
+	Description("Commerce is the payload for tracking commerce event")
+
+	Attribute("system", System)
+	Attribute("user", User)
 	Attribute("type", String, func() {
 		Enum("checkout", "payment", "purchase", "refund")
 	})
@@ -42,19 +44,33 @@ var TrackCommerce = Type("TrackCommerce", func() {
 	Attribute("purchase", CommercePayment, "Used when payment processor confirms the payment")
 	Attribute("refund", CommercePayment, "Used when refund is issued. Revenue should contain refunded amount of money.")
 
-	Required("system", "type")
+	Required("system", "user", "type")
 })
 
-var TrackEvent = Type("TrackEvent", func() {
+var Event = Type("Event", func() {
 	Description("TrackEvent is the payload for tracking generic event")
 
-	Attribute("system", TrackSystem)
+	Attribute("system", System)
+	Attribute("user", User)
+
 	Attribute("category", String, "Category of event (time, video, comment)")
 	Attribute("action", String, "Specific action (read, pause, reply)")
 	Attribute("value", Number, "Numeric value of event (read 60 seconds, paused after 200 seconds, 3rd comment")
 	Attribute("fields", HashOf(String, Any), "Custom filtering fields")
 
 	Required("system", "category", "action")
+})
+
+var PageviewArticle = Type("PageviewArticle", func() {
+	Description("PageviewArticle is the payload for tracking article-related data during pageview")
+
+	Attribute("id", String, "ID of article")
+	Attribute("category", String, "Page category (homepage, world news...")
+	Attribute("tags", ArrayOf(String), "List of tags (breaking news, trump...")
+	Attribute("author_id", String, "ID of author")
+	Attribute("campaign_id", String, "ID of campaign")
+
+	Required("id")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {

@@ -51,7 +51,7 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 		return fmt.Errorf("unhandled commerce type: %s", ctx.Payload.Type)
 	}
 
-	if err := c.pushEvent(ctx.Payload.System, "commerce", tags, values); err != nil {
+	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "commerce", tags, values); err != nil {
 		return err
 	}
 	return ctx.Accepted()
@@ -70,7 +70,7 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	for key, val := range ctx.Payload.Fields {
 		fields[key] = val
 	}
-	if err := c.pushEvent(ctx.Payload.System, "events", tags, fields); err != nil {
+	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "events", tags, fields); err != nil {
 		return err
 	}
 	return ctx.Accepted()
@@ -80,31 +80,35 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	tags := map[string]string{}
 	values := map[string]interface{}{
-		"article_id": ctx.Payload.ArticleID,
+		"article_id": ctx.Payload.Article.ID,
 	}
-	if ctx.Payload.AuthorID != nil {
-		values["author_id"] = *ctx.Payload.AuthorID
+
+	if ctx.Payload.Article.AuthorID != nil {
+		values["author_id"] = *ctx.Payload.Article.AuthorID
 	}
-	if ctx.Payload.CampaignID != nil {
-		values["campaign_id"] = *ctx.Payload.CampaignID
+	if ctx.Payload.Article.CampaignID != nil {
+		values["campaign_id"] = *ctx.Payload.Article.CampaignID
 	}
-	if ctx.Payload.Category != nil {
-		values["category"] = *ctx.Payload.Category
+	if ctx.Payload.Article.Category != nil {
+		values["category"] = *ctx.Payload.Article.Category
 	}
-	if err := c.pushEvent(ctx.Payload.System, "pageviews", tags, values); err != nil {
+	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "pageviews", tags, values); err != nil {
 		return err
 	}
 	return ctx.Accepted()
 }
 
 // pushEvent pushes new event to the InfluxDB.
-func (c *TrackController) pushEvent(system *app.TrackSystem, name string, tags map[string]string, fields map[string]interface{}) error {
-	fields["ip"] = system.IPAddress
-	fields["url"] = system.URL
-	fields["user_agent"] = system.UserAgent
-	fields["token"] = system.Token
-	if system.UserID != nil {
-		tags["user_id"] = *system.UserID
+func (c *TrackController) pushEvent(system *app.System, user *app.User,
+	name string, tags map[string]string, fields map[string]interface{}) error {
+	if user != nil {
+		fields["ip"] = user.IPAddress
+		fields["url"] = user.URL
+		fields["user_agent"] = user.UserAgent
+		fields["token"] = user.PropertyToken
+		if user.UserID != nil {
+			tags["user_id"] = *user.UserID
+		}
 	}
 
 	p, err := influxClient.NewPoint(name, tags, fields, system.Time)
@@ -113,7 +117,6 @@ func (c *TrackController) pushEvent(system *app.TrackSystem, name string, tags m
 	}
 	c.EventProducer.Input() <- &sarama.ProducerMessage{
 		Topic: "beam_events",
-		Key:   sarama.StringEncoder(system.Token),
 		Value: sarama.StringEncoder(p.String()),
 	}
 	return nil
