@@ -1,7 +1,7 @@
 package main
 
 type Config struct {
-	SegmentsAddr string `envconfig:"segments_addr";required:"true"`
+	SegmentsAddr string `envconfig:"addr";required:"true"`
 
 	MysqlNet    string `envconfig:"mysql_net";required:"true"`
 	MysqlAddr   string `envconfig:"mysql_addr";required:"true"`

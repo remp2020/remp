@@ -24,11 +24,11 @@ func main() {
 		errors.Wrap(err, "unable to load .env file")
 	}
 	var c Config
-	if err := envconfig.Process("beam", &c); err != nil {
+	if err := envconfig.Process("tracker", &c); err != nil {
 		errors.Wrap(err, "unable to process envconfig")
 	}
 
-	service := goa.New("beam")
+	service := goa.New("tracker")
 
 	service.Use(middleware.RequestID())
 	service.Use(middleware.LogRequest(true))

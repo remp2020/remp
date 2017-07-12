@@ -20,20 +20,23 @@ var _ = Resource("track", func() {
 
 	Action("pageview", func() {
 		Description("Track new pageview")
-		Payload(TrackPageview)
+		Payload(Pageview)
 		Routing(POST("/pageview"))
+		Response(BadRequest)
 		Response(Accepted)
 	})
 	Action("commerce", func() {
 		Description("Track new pageview")
-		Payload(TrackCommerce)
+		Payload(Commerce)
 		Routing(POST("/commerce"))
+		Response(BadRequest)
 		Response(Accepted)
 	})
 	Action("event", func() {
 		Description("Track generic event")
-		Payload(TrackEvent)
+		Payload(Event)
 		Routing(POST("/event"))
+		Response(BadRequest)
 		Response(Accepted)
 	})
 })
