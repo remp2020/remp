@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Contracts\SegmentAggregator;
 use Blade;
-use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
@@ -48,8 +47,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if ($this->app->environment() == 'local') {
-            $this->app->register('Barryvdh\Debugbar\ServiceProvider');
-        }
     }
 }

@@ -44,6 +44,10 @@ return [
         'base_url' => env('REMP_SEGMENT_API_ADDR')
     ],
 
+    'remp_sso' => [
+        'base_url' => env('REMP_SSO_ADDR'),
+    ],
+
     'tracker' => [
         'base_url' => env('TRACKER_API_BASE_URL'),
     ]

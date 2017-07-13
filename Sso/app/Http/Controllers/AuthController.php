@@ -58,6 +58,7 @@ class AuthController extends Controller
         $payload = JWTAuth::getPayload();
 
         return response()->json([
+            'id' => $payload['id'],
             'name' => $payload->get('name'),
             'email' => $payload->get('email'),
             'scopes' => $payload->get('scopes'),

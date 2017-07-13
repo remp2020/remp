@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Providers;
+namespace Remp\LaravelSso\Providers;
 
-use App\Contracts\JournalContract;
-use App\Contracts\Remp\Journal;
-use App\Contracts\TrackerContract;
+use Remp\LaravelSso\Contracts\SsoContract;
+use Remp\LaravelSso\Contracts\Remp\Sso;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
-class RempJournalServiceProvider extends ServiceProvider
+class SsoServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -27,16 +26,16 @@ class RempJournalServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(JournalContract::class, function($app){
+        $this->app->bind(SsoContract::class, function($app){
             $client = new Client([
-                'base_uri' => $app['config']->get('services.journal.base_url'),
+                'base_uri' => $app['config']->get('services.remp_sso.base_url'),
             ]);
-            return new Journal($client);
+            return new Sso($client);
         });
     }
 
     public function provides()
     {
-        return [JournalContract::class];
+        return [Sso::class];
     }
 }

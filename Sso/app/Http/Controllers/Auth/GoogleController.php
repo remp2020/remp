@@ -85,6 +85,7 @@ class GoogleController extends Controller
 
         $token = JWTAuth::fromUser($user, [
             'provider' => self::PROVIDER,
+            'id' => $user->id,
             'name' => $factoryUser->getName(),
             'email' => $factoryUser->getEmail(),
             'scopes' => [],
