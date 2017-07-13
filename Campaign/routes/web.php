@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 Route::get('/error', function() {
     return 'error during login: ' . $_GET['error'];
-})->name('jwt.error');
+})->name('sso.error');
 
 Route::get('banners/preview/{uuid}', 'BannerController@preview')->name('banners.preview');
 Route::get('campaigns/showtime', 'CampaignController@showtime')->name('campaigns.showtime');

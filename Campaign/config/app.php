@@ -173,7 +173,6 @@ return [
         Remp\LaravelSso\Providers\SsoServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         App\Providers\AppServiceProvider::class,
-        Remp\LaravelSso\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
