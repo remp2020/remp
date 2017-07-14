@@ -1,0 +1,154 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Jobs</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2>Show Job <span class="text-muted">#{$job->id}</span><small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+        <ul class="actions">
+            <li class="dropdown action-show">
+                <a href="" data-toggle="dropdown">
+                    <i class="zmdi zmdi-more-vert"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right dm-icon">
+                    <li>
+                        <a href="#new-batch-form" data-toggle="collapse"><i class="zmdi zmdi-plus"></i> Add batch</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body card-padding">
+    </div>
+</div>
+
+<div class="card collapse" id="new-batch-form">
+    <div class="card-header">
+        <h2>Add Batch</h2>
+        <ul class="actions">
+            <li>
+                <a href="#new-batch-form" data-toggle="collapse"><i class="zmdi zmdi-close"></i></a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body card-padding">
+        {include '@form_new_batch.latte'}
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h2>Settings</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Segment:</strong> {$job->segment->name}</li>
+                    <li class="list-group-item"><strong>Created:</strong> {$job->created_at}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            {control jobStats jobId => $job->id}
+        </div>
+    </div>
+</div>
+
+{foreach $job->related('mail_job_batch') as $batch}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h2>
+                    Batch #{$batch->id}
+                    <div class="toggle-switch m-l-10">
+                        <input n:if="in_array($batch->status, ['created', 'updated', 'done'])" data-url="{link SetBatchReady! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
+                        <input n:if="in_array($batch->status, ['worker_stopped', 'user_stopped'])" data-url="{link SetBatchSend! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
+                        <input n:if="in_array($batch->status, ['preparing', 'processing', 'sending'])" data-url="{link SetBatchUserStop! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
+                        <input n:if="in_array($batch->status, ['ready'])" data-url="{link SetBatchCreated! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
+                        <label for="change-status-batch-{$batch->id}" class="ts-helper"></label>
+                    </div>
+                </h2>
+                <ul class="actions">
+                    <li class="dropdown action-show">
+                        <a href="#" data-toggle="dropdown">
+                            <i class="zmdi zmdi-more-vert"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right dm-icon">
+                            <li>
+                                <a href="#new-template-form-batch-{$batch->id}" data-toggle="collapse"><i class="zmdi zmdi-plus"></i> Add email</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Status:</strong> {$batch->status}</li>
+                    <li class="list-group-item"><strong>Method:</strong> {$batch->method}</li>
+                    <li class="list-group-item"><strong>Start at:</strong> {$batch->start_at}</li>
+                    <li class="list-group-item"><strong>Number of mails:</strong> {$batch->max_emails}</li>
+                    <li class="list-group-item"><strong>Number of sent mails:</strong> {$batch->sent_emails}</li>
+                    <li class="list-group-item"><strong>Number of errors:</strong> {$batch->errors_count}</li>
+                    <li class="list-group-item"><strong>Started:</strong> {$batch->first_email_sent_at}</li>
+                    <li class="list-group-item"><strong>Ended:</strong> {$batch->last_email_sent_at}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card collapse" id="new-template-form-batch-{$batch->id}">
+            <div class="card-header">
+                <h2>Add Email</h2>
+                <ul class="actions">
+                    <li>
+                        <a href="#new-template-form-batch-{$batch->id}" data-toggle="collapse"><i class="zmdi zmdi-close"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body card-padding">
+                {include '@form_new_template.latte', batchId => $batch->id}
+            </div>
+        </div>
+        <div n:foreach="$batch->related('mail_job_batch_templates') as $email" class="card">
+            <div class="card-header">
+                <h2>{$email->mail_template->name} <span class="text-muted">{$email->mail_template->code}</span> <small>{$email->mail_template->subject}</small></h2>
+                <ul class="actions">
+                    <li class="dropdown action-show">
+                        <a href="" data-toggle="dropdown">
+                            <i class="zmdi zmdi-more-vert"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right dm-icon">
+                            <li>
+                                <a n:href="RemoveTemplate! $email->id"><i class="zmdi zmdi-edit"></i> Remove email</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                {var $id = $email->mail_template->id}
+                {control templateStats-$id}
+            </div>
+        </div>
+
+    </div>
+</div>
+{/foreach}
+
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Log</h2>
+        </div>
+        <div class="card-body">
+        </div>
+    </div>
+

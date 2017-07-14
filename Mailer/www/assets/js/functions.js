@@ -682,6 +682,13 @@ $(document).ready(function(){
 
     $('select.order_after').on('change', function () {
         $('input[type="radio"][name="order"][value="after"]').trigger('click');
-    })
+    });
 
+    $('input[id^=change-status-batch]').change(function () {
+        var url = $(this).data('url');
+        var label = $('label[for="' + $(this).attr('id') + '"]');
+
+        $(this).prop('disabled', true)
+        window.location.href = url;
+    })
 });

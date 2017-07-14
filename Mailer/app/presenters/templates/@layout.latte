@@ -12,6 +12,7 @@
     <link href="/assets/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
     <link href="/assets/vendor/google-material-color/dist/palette.css" rel="stylesheet">
     <link href="/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <link href="/assets/vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/github-gist.min.css" rel="stylesheet">
 
     <!-- CSS -->
@@ -44,40 +45,15 @@
             </a>
             <ul class="dropdown-menu pull-right">
                 <li>
-                    <a href="">
-                        <i class="palette-Red-400 bg zmdi zmdi-calendar"></i>
-                        <small>Calendar</small>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="">
-                        <i class="palette-Green-400 bg zmdi zmdi-file-text"></i>
-                        <small>Files</small>
+                    <a href="http://campaign.remp.app">
+                        <i class="palette-Orange-400 bg zmdi zmdi-blur"></i>
+                        <small>Campaign</small>
                     </a>
                 </li>
                 <li>
-                    <a href="">
-                        <i class="palette-Light-Blue bg zmdi zmdi-email"></i>
+                    <a n:href="Dashboard:default">
+                        <i class="palette-Cyan-400 bg zmdi zmdi-email"></i>
                         <small>Mail</small>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="palette-Orange-400 bg zmdi zmdi-trending-up"></i>
-                        <small>Analytics</small>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="palette-Purple-300 bg zmdi zmdi-view-headline"></i>
-                        <small>News</small>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="palette-Blue-Grey bg zmdi zmdi-image"></i>
-                        <small>Gallery</small>
                     </a>
                 </li>
             </ul>
@@ -92,7 +68,7 @@
 
             <ul class="dropdown-menu pull-right dm-icon">
                 <li>
-                    <a href=""><i class="zmdi zmdi-account"></i> View Profile</a>
+                    <a href="#"><i class="zmdi zmdi-account"></i> View Profile</a>
                 </li>
                 <li>
                     <a n:href="Settings:default"><i class="zmdi zmdi-settings"></i> Settings</a>
@@ -152,7 +128,8 @@
             <li n:class="$presenter->isLinkCurrent('Layout:*') ? active"><a n:href="Layout:default"><i class="zmdi zmdi-widgets"></i> Layouts</a></li>
             <li n:class="$presenter->isLinkCurrent('Template:*') ? active"><a n:href="Template:default"><i class="zmdi zmdi-view-quilt"></i> Emails</a></li>
             <li class="m-b-15"></li>
-            <li n:class="$presenter->isLinkCurrent('Log:*') ? active"><a n:href="Log:default"><i class="zmdi zmdi-view-list-alt"></i> Logs</a></li>
+            <li n:class="$presenter->isLinkCurrent('Job:*') ? active"><a n:href="Job:default"><i class="zmdi zmdi-refresh"></i> Jobs</a></li>
+            <li n:class="$presenter->isLinkCurrent('Log:*') ? active"><a n:href="Log:default"><i class="zmdi zmdi-view-list-alt"></i> Log</a></li>
         </ul>
     </aside>
 
@@ -166,15 +143,6 @@
         Copyright &copy; 2017 REMP
     </footer>
 </section>
-
-<!-- Page Loader -->
-<div class="page-loader palette-Cyan-600 bg">
-    <div class="preloader pl-xl pls-white">
-        <svg class="pl-circular" viewBox="25 25 50 50">
-            <circle class="plc-path" cx="50" cy="50" r="20"/>
-        </svg>
-    </div>
-</div>
 
 <!-- Older IE warning message -->
 <!--[if lt IE 9]>
@@ -220,6 +188,7 @@
 <![endif]-->
 
 <!-- Javascript Libraries -->
+<script src="/assets/vendor/moment/min/moment.min.js"></script>
 <script src="/assets/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
 <script src="/assets/vendor/waves/dist/waves.min.js"></script>
 <script src="/assets/vendor/jquery-bootstrap-purr/jquery-bootstrap-purr.min.js"></script>
@@ -228,6 +197,7 @@
 <script src="/assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
 <script src="/assets/vendor/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js"></script>
+<script src="/assets/vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
@@ -242,8 +212,9 @@
 
 <script type="application/javascript">
     $(document).ready(function() {
-        var index = 1000;
+        var index = 0;
         {foreach $flashes as $flash}
+        index += 250;
         window.setTimeout(function() {
             $.bootstrapPurr({$flash->message}, {
                 type: {$flash->type},
@@ -255,7 +226,6 @@
                 }
             });
         }, index);
-        index += 250;
         {/foreach}
     });
 </script>

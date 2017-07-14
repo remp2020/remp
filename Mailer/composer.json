@@ -41,7 +41,8 @@
         "twig/twig": "^1.33",
         "mailgun/mailgun-php": "^2.3",
         "php-http/curl-client": "^1.7",
-        "guzzlehttp/psr7": "^1.4"
+        "guzzlehttp/psr7": "^1.4",
+        "bower-asset/eonasdan-bootstrap-datetimepicker": "^4.17"
     },
     "require-dev": {
         "nette/tester": "^1.6"

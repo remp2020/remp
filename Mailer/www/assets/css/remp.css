@@ -28,6 +28,13 @@
     background-color: rgba(0, 0, 0, 0.01);
 }
 
+/*******************/
+/* DATETIME PICKER */
+/*******************/
+.bootstrap-datetimepicker-widget {
+    z-index: 10000;
+}
+
 /***************/
 /* DATA TABLES */
 /***************/

@@ -1,0 +1,14 @@
+{form newTemplateForm-$batchId}
+    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
+        {$error}<br>
+    </div>
+
+    <div class="form-group fg-float m-b-30">
+        {label template_id /}
+        {input template_id, class => 'selectpicker'}
+    </div>
+
+    {input batch_id}
+
+    {input save, class => 'btn btn-info waves-effect'}
+{/form}
