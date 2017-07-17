@@ -65,7 +65,7 @@ class VerifyJwtToken
             $redirectUrl = Http::createFromString($e->redirect);
             $query = Query::createFromPairs([
                 'successUrl' => $request->fullUrl(),
-                'errorUrl' => config('services.remp_sso.error_url', route('sso.error')),
+                'errorUrl' => config('services.remp_sso.error_url') ?: route('sso.error'),
             ])->getContent() ?: '';
             return redirect($redirectUrl->withQuery($query)->__toString());
         }

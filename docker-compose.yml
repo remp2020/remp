@@ -33,6 +33,7 @@ services:
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
+      - "composer-data:/composer/cache:rw"
     depends_on:
       - "campaign_mysql"
       - "nginx"
@@ -66,12 +67,12 @@ services:
    build: "./Docker/php"
    volumes:
      - ".:/var/www/html:rw"
+     - "composer-data:/composer/cache:rw"
    depends_on:
      - "mailer_mysql"
      - "nginx"
      - "redis"
      - "mailhog"
-   env_file: "./Mailer/.env"
    restart: "unless-stopped"
 
   mailer_mysql:
@@ -96,6 +97,7 @@ services:
    build: "./Docker/php"
    volumes:
      - ".:/var/www/html:rw"
+     - "composer-data:/composer/cache:rw"
    depends_on:
      - "nginx"
      - "sso_mysql"
@@ -125,6 +127,7 @@ services:
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
+      - "composer-data:/composer/cache:rw"
     depends_on:
       - "beam_mysql"
       - "nginx"
@@ -217,4 +220,6 @@ volumes:
   mysql-data-sso:
     driver: "local"
   redis-data:
+    driver: "local"
+  composer-data:
     driver: "local"

@@ -27,7 +27,6 @@ Include the service providers within your `config/app.php`:
 'providers' => [
     // ...
     Remp\LaravelSso\Providers\SsoServiceProvider::class,
-    Remp\LaravelSso\Providers\AuthServiceProvider::class,
     // ...
 ];
 ```
@@ -84,7 +83,7 @@ Auth::check() // checks if user is logged in
 
 ## Configuration
 
-You can configure the connecter either via Laravel config or environment variables. Following is the list
+You can configure the connector either via Laravel config or environment variables. Following is the list
 of all available configuration options:
 
 | Config | Environment | Default
