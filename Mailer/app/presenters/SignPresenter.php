@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Presenter;
+use Nette\Security\IAuthenticator;
 use Remp\MailerModule\Forms\SignInFormFactory;
 
 final class SignPresenter extends Presenter
@@ -12,12 +13,16 @@ final class SignPresenter extends Presenter
 
     public function __construct(SignInFormFactory $signInFormFactory)
     {
+        parent::__construct();
         $this->signInFormFactory = $signInFormFactory;
     }
 
     public function renderIn()
     {
-        if ($this->getUser()->isLoggedIn()) {
+        $identity = $this->getUser()->authenticator->authenticate([]);
+        if ($identity) {
+            $this->getUser()->getStorage()->setIdentity($identity);
+            $this->getUser()->getStorage()->setAuthenticated(true);
             $this->redirect('Dashboard:Default');
         }
     }

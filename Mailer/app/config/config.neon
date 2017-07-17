@@ -1,5 +1,6 @@
 parameters:
     sso_host: @environmentConfig::get('SSO_BASE_URL')
+    sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
 
 extensions:
     local_configs: Remp\MailerModule\Config\ConfigExtension
@@ -39,8 +40,12 @@ services:
 	        - addMailer(Remp\MailerModule\Mailer\SmtpMailer())
 	        - addMailer(Remp\MailerModule\Mailer\MailgunMailer())
 
-	- Remp\MailerModule\Auth\Authenticator
-	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
+#	- Remp\MailerModule\Auth\Authenticator
+#	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
+	- Remp\NetteSso\Security\Client(%sso_host%)
+	- Remp\NetteSso\Security\Authenticator(%sso_error_url%)
+	security.userStorage:
+	    class: Remp\NetteSso\Security\UserStorage
 
 	- Remp\MailerModule\Config\Config
 

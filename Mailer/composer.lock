@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9c1696aef01144a30b48716d9b757193",
+    "content-hash": "1f78176d362b172268dc8e97daedc9be",
     "packages": [
         {
             "name": "bower-asset/animate.css",
@@ -34,16 +34,16 @@
         },
         {
             "name": "bower-asset/autosize",
-            "version": "3.0.20",
+            "version": "3.0.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jackmoore/autosize.git",
-                "reference": "6c198a8e95c576dd9d5b8b9a1f996963ae1ea15c"
+                "reference": "5284a460d160bd11fda219941b20eb2a82155294"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/6c198a8e95c576dd9d5b8b9a1f996963ae1ea15c",
-                "reference": "6c198a8e95c576dd9d5b8b9a1f996963ae1ea15c",
+                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/5284a460d160bd11fda219941b20eb2a82155294",
+                "reference": "5284a460d160bd11fda219941b20eb2a82155294",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -112,16 +112,16 @@
         },
         {
             "name": "bower-asset/bootstrap-select",
-            "version": "v1.12.2",
+            "version": "v1.12.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silviomoreto/bootstrap-select.git",
-                "reference": "4eb040b7097fd8eab8184e54efe973ce8468e9b2"
+                "reference": "b58fe717acbbc10aa7da1b66df988dab9a248279"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silviomoreto/bootstrap-select/zipball/4eb040b7097fd8eab8184e54efe973ce8468e9b2",
-                "reference": "4eb040b7097fd8eab8184e54efe973ce8468e9b2",
+                "url": "https://api.github.com/repos/silviomoreto/bootstrap-select/zipball/b58fe717acbbc10aa7da1b66df988dab9a248279",
+                "reference": "b58fe717acbbc10aa7da1b66df988dab9a248279",
                 "shasum": ""
             },
             "require": {
@@ -141,7 +141,8 @@
                     "README.md",
                     "composer.json",
                     "package.json",
-                    "test.html"
+                    "test.html",
+                    "docs"
                 ]
             },
             "license": [
@@ -236,16 +237,16 @@
         },
         {
             "name": "bower-asset/jquery",
-            "version": "3.1.1",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jquery/jquery-dist.git",
-                "reference": "1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3"
+                "reference": "77d2a51d0520d2ee44173afdf4e40a9201f5964e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3",
-                "reference": "1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3",
+                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/77d2a51d0520d2ee44173afdf4e40a9201f5964e",
+                "reference": "77d2a51d0520d2ee44173afdf4e40a9201f5964e",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -373,21 +374,20 @@
         },
         {
             "name": "bower-asset/jquery.easy-pie-chart",
-            "version": "2.1.6",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rendro/easy-pie-chart.git",
-                "reference": "29636bc1cc0ecbd8de9490525724a12dbf723888"
+                "reference": "97b5824bf423410c3c6a1e971860159f17ee6ee6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rendro/easy-pie-chart/zipball/29636bc1cc0ecbd8de9490525724a12dbf723888",
-                "reference": "29636bc1cc0ecbd8de9490525724a12dbf723888",
+                "url": "https://api.github.com/repos/rendro/easy-pie-chart/zipball/97b5824bf423410c3c6a1e971860159f17ee6ee6",
+                "reference": "97b5824bf423410c3c6a1e971860159f17ee6ee6",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/jquery": ">=1.9.0",
-                "bower-asset/requirejs": "~2.1.10"
+                "bower-asset/jquery": ">=1.9.0"
             },
             "require-dev": {
                 "bower-asset/angular": "~1.2.9",
@@ -401,8 +401,12 @@
                 "bower-asset-ignore": [
                     "demo",
                     ".editorconfig"
-                ]
-            }
+                ],
+                "branch-alias": {
+                    "dev-master": "2.1.7-dev"
+                }
+            },
+            "time": "2015-07-15 19:49:22"
         },
         {
             "name": "bower-asset/malihu-custom-scrollbar-plugin",
@@ -484,34 +488,6 @@
                 "font",
                 "icons",
                 "material"
-            ]
-        },
-        {
-            "name": "bower-asset/requirejs",
-            "version": "2.1.22",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/requirejs/requirejs-bower.git",
-                "reference": "b295d2bb6d397cc34eea2bc38dbea5b519614035"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/requirejs/requirejs-bower/zipball/b295d2bb6d397cc34eea2bc38dbea5b519614035",
-                "reference": "b295d2bb6d397cc34eea2bc38dbea5b519614035",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "require.js",
-                "bower-asset-ignore": []
-            },
-            "license": [
-                "BSD-3-Clause",
-                "MIT"
-            ],
-            "description": "A file and module loader for JavaScript",
-            "keywords": [
-                "AMD"
             ]
         },
         {
@@ -602,16 +578,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.2.3",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "8d6c6cc55186db87b7dc5009827429ba4e9dc006"
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/8d6c6cc55186db87b7dc5009827429ba4e9dc006",
-                "reference": "8d6c6cc55186db87b7dc5009827429ba4e9dc006",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f4db5a78a5ea468d4831de7f0bf9d9415e348699",
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699",
                 "shasum": ""
             },
             "require": {
@@ -621,8 +597,11 @@
             },
             "require-dev": {
                 "ext-curl": "*",
-                "phpunit/phpunit": "^4.0",
+                "phpunit/phpunit": "^4.0 || ^5.0",
                 "psr/log": "^1.0"
+            },
+            "suggest": {
+                "psr/log": "Required for using the Log middleware"
             },
             "type": "library",
             "extra": {
@@ -660,7 +639,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-02-28T22:50:30+00:00"
+            "time": "2017-06-22T18:50:49+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -779,6 +758,68 @@
             "time": "2017-03-20T17:10:46+00:00"
         },
         {
+            "name": "jeremykendall/php-domain-parser",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeremykendall/php-domain-parser.git",
+                "reference": "896e7e70f02bd4fd77190052799bc61e4d779672"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeremykendall/php-domain-parser/zipball/896e7e70f02bd4fd77190052799bc61e4d779672",
+                "reference": "896e7e70f02bd4fd77190052799bc61e4d779672",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "jeremykendall/debug-die": "0.0.1.*",
+                "mikey179/vfsstream": "~1.4",
+                "phpunit/phpunit": "~4.4"
+            },
+            "bin": [
+                "bin/parse",
+                "bin/update-psl"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Pdp\\": "src/"
+                },
+                "files": [
+                    "src/pdp-parse-url.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Kendall",
+                    "homepage": "http://about.me/jeremykendall",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/jeremykendall/php-domain-parser/graphs/contributors"
+                }
+            ],
+            "description": "Public Suffix List based URL parsing implemented in PHP.",
+            "homepage": "https://github.com/jeremykendall/php-domain-parser",
+            "keywords": [
+                "Public Suffix List",
+                "domain parsing",
+                "url parsing"
+            ],
+            "time": "2015-03-30T12:49:45+00:00"
+        },
+        {
             "name": "kdyby/autowired",
             "version": "v1.4.0",
             "source": {
@@ -861,16 +902,16 @@
         },
         {
             "name": "latte/latte",
-            "version": "v2.4.3",
+            "version": "v2.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/latte.git",
-                "reference": "b62ee346467e1e2402a43c499cf6047fddc5d321"
+                "reference": "8c14fa21390fd2c119924c88bb196dd705dc680f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/latte/zipball/b62ee346467e1e2402a43c499cf6047fddc5d321",
-                "reference": "b62ee346467e1e2402a43c499cf6047fddc5d321",
+                "url": "https://api.github.com/repos/nette/latte/zipball/8c14fa21390fd2c119924c88bb196dd705dc680f",
+                "reference": "8c14fa21390fd2c119924c88bb196dd705dc680f",
                 "shasum": ""
             },
             "require": {
@@ -887,8 +928,7 @@
             },
             "suggest": {
                 "ext-fileinfo": "to use filter |datastream",
-                "ext-mbstring": "to use filters like lower, upper, capitalize, ...",
-                "ext-xml": "to use filters like length, substring, ..."
+                "ext-mbstring": "to use filters like lower, upper, capitalize, ..."
             },
             "type": "library",
             "extra": {
@@ -917,26 +957,407 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "Latte: the amazing template engine for PHP",
+            "description": "☕ Latte: the intuitive and fast template engine for those who want the most secure PHP sites. Introduces context-sensitive escaping.",
             "homepage": "https://latte.nette.org",
             "keywords": [
-                "templating",
+                "context-sensitive",
+                "engine",
+                "escaping",
+                "html",
+                "nette",
+                "security",
+                "template",
                 "twig"
             ],
-            "time": "2017-01-19T11:06:59+00:00"
+            "time": "2017-07-14T06:41:29+00:00"
         },
         {
-            "name": "mailgun/mailgun-php",
-            "version": "v2.3.3",
+            "name": "league/uri",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mailgun/mailgun-php.git",
-                "reference": "dd591edb3c18b10c6c6af75b432af296c4086fd0"
+                "url": "https://github.com/thephpleague/uri.git",
+                "reference": "ef6f413061bd4a9926c4c4394a5f5d384bfd8487"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/dd591edb3c18b10c6c6af75b432af296c4086fd0",
-                "reference": "dd591edb3c18b10c6c6af75b432af296c4086fd0",
+                "url": "https://api.github.com/repos/thephpleague/uri/zipball/ef6f413061bd4a9926c4c4394a5f5d384bfd8487",
+                "reference": "ef6f413061bd4a9926c4c4394a5f5d384bfd8487",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "league/uri-manipulations": "^1.0",
+                "league/uri-schemes": "^1.0",
+                "php": ">=7.0"
+            },
+            "type": "metapackage",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "URI manipulation library",
+            "homepage": "http://uri.thephpleague.com",
+            "keywords": [
+                "data-uri",
+                "file-uri",
+                "ftp",
+                "http",
+                "https",
+                "middleware",
+                "parse_url",
+                "psr-7",
+                "rfc3986",
+                "rfc3987",
+                "uri",
+                "url",
+                "ws"
+            ],
+            "time": "2017-02-06T08:50:02+00:00"
+        },
+        {
+            "name": "league/uri-components",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri-components.git",
+                "reference": "e0ed0842b97bbcd3aef700967e0c29cf5bbc9881"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri-components/zipball/e0ed0842b97bbcd3aef700967e0c29cf5bbc9881",
+                "reference": "e0ed0842b97bbcd3aef700967e0c29cf5bbc9881",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "jeremykendall/php-domain-parser": "^3.0",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.3",
+                "phpunit/phpunit": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\Components\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "URI components manipulation library",
+            "homepage": "http://uri.thephpleague.com",
+            "keywords": [
+                "authority",
+                "components",
+                "fragment",
+                "host",
+                "path",
+                "port",
+                "query",
+                "rfc3986",
+                "scheme",
+                "uri",
+                "url",
+                "userinfo"
+            ],
+            "time": "2017-04-27T08:42:28+00:00"
+        },
+        {
+            "name": "league/uri-interfaces",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri-interfaces.git",
+                "reference": "dcc0be58e8b35a726274249e5eee053be1a56b66"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/dcc0be58e8b35a726274249e5eee053be1a56b66",
+                "reference": "dcc0be58e8b35a726274249e5eee053be1a56b66",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\Interfaces\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "Common interface for URI representation",
+            "homepage": "http://github.com/thephpleague/uri-interfaces",
+            "keywords": [
+                "rfc3986",
+                "rfc3987",
+                "uri",
+                "url"
+            ],
+            "time": "2017-01-04T08:02:42+00:00"
+        },
+        {
+            "name": "league/uri-manipulations",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri-manipulations.git",
+                "reference": "3db42474cb68546ec9180d76dbf9807a8e1bcf98"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri-manipulations/zipball/3db42474cb68546ec9180d76dbf9807a8e1bcf98",
+                "reference": "3db42474cb68546ec9180d76dbf9807a8e1bcf98",
+                "shasum": ""
+            },
+            "require": {
+                "league/uri-components": "^1.0",
+                "league/uri-interfaces": "^1.0",
+                "php": ">=7.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.9",
+                "guzzlehttp/psr7": "^1.2",
+                "league/uri-schemes": "^1.0",
+                "phpunit/phpunit": "^6.0"
+            },
+            "suggest": {
+                "league/uri-schemes": "Allow manipulating URI objects"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\Modifiers\\": "src"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "URI manipulation library",
+            "homepage": "http://url.thephpleague.com",
+            "keywords": [
+                "formatter",
+                "manipulation",
+                "manipulations",
+                "middlewares",
+                "modifiers",
+                "psr-7",
+                "references",
+                "rfc3986",
+                "rfc3987",
+                "uri",
+                "url"
+            ],
+            "time": "2017-02-06T07:57:03+00:00"
+        },
+        {
+            "name": "league/uri-parser",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri-parser.git",
+                "reference": "2b756258c42f489eec5b89bf4030065070ee685b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri-parser/zipball/2b756258c42f489eec5b89bf4030065070ee685b",
+                "reference": "2b756258c42f489eec5b89bf4030065070ee685b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.9",
+                "phpbench/phpbench": "^0.12.2",
+                "phpunit/phpunit": "^6.0"
+            },
+            "suggest": {
+                "league/uri-schemes": "Allow validating and normalizing URI parsing results"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "userland URI parser RFC 3986 compliant",
+            "homepage": "https://github.com/thephpleague/uri-parser",
+            "keywords": [
+                "parse_url",
+                "parser",
+                "rfc3986",
+                "uri",
+                "url"
+            ],
+            "time": "2017-04-19T07:41:41+00:00"
+        },
+        {
+            "name": "league/uri-schemes",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri-schemes.git",
+                "reference": "964d24dcd9dbd2be0c00004344220cff51948f6d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri-schemes/zipball/964d24dcd9dbd2be0c00004344220cff51948f6d",
+                "reference": "964d24dcd9dbd2be0c00004344220cff51948f6d",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "league/uri-interfaces": "^1.0",
+                "league/uri-parser": "^1.0",
+                "php": ">=7.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.0",
+                "phpunit/phpunit": "^6.0"
+            },
+            "suggest": {
+                "league/uri-manipulations": "Needed to easily manipulate URI objects"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\Schemes\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "URI manipulation library",
+            "homepage": "http://uri.thephpleague.com",
+            "keywords": [
+                "data-uri",
+                "file",
+                "ftp",
+                "http",
+                "https",
+                "parse_url",
+                "psr-7",
+                "rfc3986",
+                "uri",
+                "url",
+                "ws",
+                "wss"
+            ],
+            "time": "2017-06-12T07:03:49+00:00"
+        },
+        {
+            "name": "mailgun/mailgun-php",
+            "version": "2.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mailgun/mailgun-php.git",
+                "reference": "f58c5914aefa16fa6ed2b5cf9ee84d40cbda1b3a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/f58c5914aefa16fa6ed2b5cf9ee84d40cbda1b3a",
+                "reference": "f58c5914aefa16fa6ed2b5cf9ee84d40cbda1b3a",
                 "shasum": ""
             },
             "require": {
@@ -970,20 +1391,20 @@
                 }
             ],
             "description": "The Mailgun SDK provides methods for all API functions.",
-            "time": "2017-06-03T08:39:37+00:00"
+            "time": "2017-06-20T19:56:09+00:00"
         },
         {
             "name": "nette/application",
-            "version": "v2.4.5",
+            "version": "v2.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/application.git",
-                "reference": "cec392dd66d5432d47b856d70ac64a5ce15f2538"
+                "reference": "8f8f1071162c1bef8b0bc53ed7b435d342b81308"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/application/zipball/cec392dd66d5432d47b856d70ac64a5ce15f2538",
-                "reference": "cec392dd66d5432d47b856d70ac64a5ce15f2538",
+                "url": "https://api.github.com/repos/nette/application/zipball/8f8f1071162c1bef8b0bc53ed7b435d342b81308",
+                "reference": "8f8f1071162c1bef8b0bc53ed7b435d342b81308",
                 "shasum": ""
             },
             "require": {
@@ -1045,20 +1466,20 @@
             ],
             "description": "Nette Application MVC Component",
             "homepage": "https://nette.org",
-            "time": "2017-02-02T02:25:28+00:00"
+            "time": "2017-07-16T19:14:17+00:00"
         },
         {
             "name": "nette/bootstrap",
-            "version": "v2.4.3",
+            "version": "v2.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/bootstrap.git",
-                "reference": "2c27747f5aff2e436ebf542e0ea566bea1db2d53"
+                "reference": "1b3ec25e9f9f98fe1051bde7b736509a1755a726"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/bootstrap/zipball/2c27747f5aff2e436ebf542e0ea566bea1db2d53",
-                "reference": "2c27747f5aff2e436ebf542e0ea566bea1db2d53",
+                "url": "https://api.github.com/repos/nette/bootstrap/zipball/1b3ec25e9f9f98fe1051bde7b736509a1755a726",
+                "reference": "1b3ec25e9f9f98fe1051bde7b736509a1755a726",
                 "shasum": ""
             },
             "require": {
@@ -1116,20 +1537,20 @@
             ],
             "description": "Nette Bootstrap",
             "homepage": "https://nette.org",
-            "time": "2017-02-19T22:15:02+00:00"
+            "time": "2017-07-11T11:45:32+00:00"
         },
         {
             "name": "nette/caching",
-            "version": "v2.5.3",
+            "version": "v2.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/caching.git",
-                "reference": "2436e530484a346d0a246733519ceaa40b943bd6"
+                "reference": "6a15f06019c4e6ec97d312d31f8edceb01b85060"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/caching/zipball/2436e530484a346d0a246733519ceaa40b943bd6",
-                "reference": "2436e530484a346d0a246733519ceaa40b943bd6",
+                "url": "https://api.github.com/repos/nette/caching/zipball/6a15f06019c4e6ec97d312d31f8edceb01b85060",
+                "reference": "6a15f06019c4e6ec97d312d31f8edceb01b85060",
                 "shasum": ""
             },
             "require": {
@@ -1178,24 +1599,24 @@
             ],
             "description": "Nette Caching Component",
             "homepage": "https://nette.org",
-            "time": "2017-01-29T20:40:55+00:00"
+            "time": "2017-07-11T16:41:08+00:00"
         },
         {
             "name": "nette/component-model",
-            "version": "v2.3.0",
+            "version": "v2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/component-model.git",
-                "reference": "9b5817b246bf409b8f0f8309c23e599dd8729d28"
+                "reference": "b6197fa6867d816b08457ac73b04ba70f78682e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/component-model/zipball/9b5817b246bf409b8f0f8309c23e599dd8729d28",
-                "reference": "9b5817b246bf409b8f0f8309c23e599dd8729d28",
+                "url": "https://api.github.com/repos/nette/component-model/zipball/b6197fa6867d816b08457ac73b04ba70f78682e3",
+                "reference": "b6197fa6867d816b08457ac73b04ba70f78682e3",
                 "shasum": ""
             },
             "require": {
-                "nette/utils": "^2.4",
+                "nette/utils": "^2.4 || ~3.0.0",
                 "php": ">=5.6.0"
             },
             "conflict": {
@@ -1203,7 +1624,7 @@
                 "nette/nette": "<2.2"
             },
             "require-dev": {
-                "nette/tester": "~2.0",
+                "nette/tester": "^2.0",
                 "tracy/tracy": "^2.3"
             },
             "type": "library",
@@ -1235,20 +1656,20 @@
             ],
             "description": "Nette Component Model",
             "homepage": "https://nette.org",
-            "time": "2016-06-17T17:36:56+00:00"
+            "time": "2017-07-11T08:59:35+00:00"
         },
         {
             "name": "nette/database",
-            "version": "v2.4.2",
+            "version": "v2.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/database.git",
-                "reference": "debc7db9f4d7ffff71e2c3a81f841fbcbab4610d"
+                "reference": "f7c6533e8640aa77ef8fcf68744c3f758afa0568"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/database/zipball/debc7db9f4d7ffff71e2c3a81f841fbcbab4610d",
-                "reference": "debc7db9f4d7ffff71e2c3a81f841fbcbab4610d",
+                "url": "https://api.github.com/repos/nette/database/zipball/f7c6533e8640aa77ef8fcf68744c3f758afa0568",
+                "reference": "f7c6533e8640aa77ef8fcf68744c3f758afa0568",
                 "shasum": ""
             },
             "require": {
@@ -1295,26 +1716,26 @@
             ],
             "description": "Nette Database Component",
             "homepage": "https://nette.org",
-            "time": "2017-02-02T02:49:31+00:00"
+            "time": "2017-07-12T17:48:16+00:00"
         },
         {
             "name": "nette/di",
-            "version": "v2.4.7",
+            "version": "v2.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/di.git",
-                "reference": "f2e8ced089549eda2288c780893bf4b4065449ee"
+                "reference": "25437788ff126d0ae6b1f2f684ecdd823812abba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/di/zipball/f2e8ced089549eda2288c780893bf4b4065449ee",
-                "reference": "f2e8ced089549eda2288c780893bf4b4065449ee",
+                "url": "https://api.github.com/repos/nette/di/zipball/25437788ff126d0ae6b1f2f684ecdd823812abba",
+                "reference": "25437788ff126d0ae6b1f2f684ecdd823812abba",
                 "shasum": ""
             },
             "require": {
                 "ext-tokenizer": "*",
                 "nette/neon": "^2.3.3 || ~3.0.0",
-                "nette/php-generator": "^2.5 || ~3.0.0",
+                "nette/php-generator": "^2.6.1 || ~3.0.0",
                 "nette/utils": "^2.4.3 || ~3.0.0",
                 "php": ">=5.6.0"
             },
@@ -1355,31 +1776,31 @@
             ],
             "description": "Nette Dependency Injection Component",
             "homepage": "https://nette.org",
-            "time": "2017-02-04T14:40:36+00:00"
+            "time": "2017-07-11T17:55:11+00:00"
         },
         {
             "name": "nette/finder",
-            "version": "v2.4.0",
+            "version": "v2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/finder.git",
-                "reference": "5cabd5fe89f9903715359a403b820c7f94f9bb5e"
+                "reference": "4d43a66d072c57d585bf08a3ef68d3587f7e9547"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/finder/zipball/5cabd5fe89f9903715359a403b820c7f94f9bb5e",
-                "reference": "5cabd5fe89f9903715359a403b820c7f94f9bb5e",
+                "url": "https://api.github.com/repos/nette/finder/zipball/4d43a66d072c57d585bf08a3ef68d3587f7e9547",
+                "reference": "4d43a66d072c57d585bf08a3ef68d3587f7e9547",
                 "shasum": ""
             },
             "require": {
-                "nette/utils": "~2.4",
+                "nette/utils": "^2.4 || ~3.0.0",
                 "php": ">=5.6.0"
             },
             "conflict": {
                 "nette/nette": "<2.2"
             },
             "require-dev": {
-                "nette/tester": "~2.0",
+                "nette/tester": "^2.0",
                 "tracy/tracy": "^2.3"
             },
             "type": "library",
@@ -1411,26 +1832,26 @@
             ],
             "description": "Nette Finder: Files Searching",
             "homepage": "https://nette.org",
-            "time": "2016-05-17T15:49:06+00:00"
+            "time": "2017-07-10T23:47:08+00:00"
         },
         {
             "name": "nette/forms",
-            "version": "v2.4.3",
+            "version": "v2.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/forms.git",
-                "reference": "c2618a144a7cd0a1f41143e18387d9c48cef91cb"
+                "reference": "85eedf22e1a6ae58fb79b6fc0119d22035163386"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/forms/zipball/c2618a144a7cd0a1f41143e18387d9c48cef91cb",
-                "reference": "c2618a144a7cd0a1f41143e18387d9c48cef91cb",
+                "url": "https://api.github.com/repos/nette/forms/zipball/85eedf22e1a6ae58fb79b6fc0119d22035163386",
+                "reference": "85eedf22e1a6ae58fb79b6fc0119d22035163386",
                 "shasum": ""
             },
             "require": {
                 "nette/component-model": "~2.3",
-                "nette/http": "~2.2",
-                "nette/utils": "~2.4",
+                "nette/http": "^2.3.8",
+                "nette/utils": "^2.4.6",
                 "php": ">=5.6.0"
             },
             "conflict": {
@@ -1471,36 +1892,37 @@
             ],
             "description": "Nette Forms: greatly facilitates web forms",
             "homepage": "https://nette.org",
-            "time": "2016-12-20T23:49:37+00:00"
+            "time": "2017-07-13T16:49:47+00:00"
         },
         {
             "name": "nette/http",
-            "version": "v2.4.4",
+            "version": "v2.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/http.git",
-                "reference": "7727507129934e18c59bdc4060fd32730b0d9e87"
+                "reference": "920984c48f59a91415dab9d231eb264cb42ec00e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/http/zipball/7727507129934e18c59bdc4060fd32730b0d9e87",
-                "reference": "7727507129934e18c59bdc4060fd32730b0d9e87",
+                "url": "https://api.github.com/repos/nette/http/zipball/920984c48f59a91415dab9d231eb264cb42ec00e",
+                "reference": "920984c48f59a91415dab9d231eb264cb42ec00e",
                 "shasum": ""
             },
             "require": {
-                "nette/utils": "^2.4",
+                "nette/utils": "^2.4 || ~3.0.0",
                 "php": ">=5.6.0"
             },
             "conflict": {
                 "nette/nette": "<2.2"
             },
             "require-dev": {
-                "nette/di": "^2.4.6",
-                "nette/tester": "~2.0",
+                "nette/di": "^2.4.6 || ~3.0.0",
+                "nette/tester": "^2.0",
                 "tracy/tracy": "^2.4"
             },
             "suggest": {
-                "ext-fileinfo": "to detect type of uploaded files"
+                "ext-fileinfo": "to detect type of uploaded files",
+                "nette/security": "allows use Nette\\Http\\UserStorage"
             },
             "type": "library",
             "extra": {
@@ -1531,20 +1953,20 @@
             ],
             "description": "Nette HTTP Component",
             "homepage": "https://nette.org",
-            "time": "2017-01-18T03:03:04+00:00"
+            "time": "2017-07-11T11:48:05+00:00"
         },
         {
             "name": "nette/mail",
-            "version": "v2.4.2",
+            "version": "v2.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/mail.git",
-                "reference": "2bb0333200dbec22b0c1868d907e3e451b555665"
+                "reference": "2511b0cfa7c181c5fe333838152e308605594c53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/mail/zipball/2bb0333200dbec22b0c1868d907e3e451b555665",
-                "reference": "2bb0333200dbec22b0c1868d907e3e451b555665",
+                "url": "https://api.github.com/repos/nette/mail/zipball/2511b0cfa7c181c5fe333838152e308605594c53",
+                "reference": "2511b0cfa7c181c5fe333838152e308605594c53",
                 "shasum": ""
             },
             "require": {
@@ -1592,20 +2014,20 @@
             ],
             "description": "Nette Mail: Sending E-mails",
             "homepage": "https://nette.org",
-            "time": "2017-01-27T12:43:33+00:00"
+            "time": "2017-07-13T16:51:28+00:00"
         },
         {
             "name": "nette/neon",
-            "version": "v2.4.1",
+            "version": "v2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/neon.git",
-                "reference": "1a78ff64b1e161ebccc03bdf9366450a69365f5b"
+                "reference": "9eacd50553b26b53a3977bfb2fea2166d4331622"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/neon/zipball/1a78ff64b1e161ebccc03bdf9366450a69365f5b",
-                "reference": "1a78ff64b1e161ebccc03bdf9366450a69365f5b",
+                "url": "https://api.github.com/repos/nette/neon/zipball/9eacd50553b26b53a3977bfb2fea2166d4331622",
+                "reference": "9eacd50553b26b53a3977bfb2fea2166d4331622",
                 "shasum": ""
             },
             "require": {
@@ -1646,25 +2068,25 @@
             ],
             "description": "Nette NEON: parser & generator for Nette Object Notation",
             "homepage": "http://ne-on.org",
-            "time": "2017-01-13T08:00:19+00:00"
+            "time": "2017-07-11T18:29:08+00:00"
         },
         {
             "name": "nette/php-generator",
-            "version": "v2.6.1",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/php-generator.git",
-                "reference": "361f671c269e389c078da9cd2cd6a80164d9813d"
+                "reference": "eb2dbc9c3409e9db40568109ca4994d51373b60c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/php-generator/zipball/361f671c269e389c078da9cd2cd6a80164d9813d",
-                "reference": "361f671c269e389c078da9cd2cd6a80164d9813d",
+                "url": "https://api.github.com/repos/nette/php-generator/zipball/eb2dbc9c3409e9db40568109ca4994d51373b60c",
+                "reference": "eb2dbc9c3409e9db40568109ca4994d51373b60c",
                 "shasum": ""
             },
             "require": {
                 "nette/utils": "^2.4.2 || ~3.0.0",
-                "php": ">=5.6.0"
+                "php": ">=7.0"
             },
             "conflict": {
                 "nette/nette": "<2.2"
@@ -1676,7 +2098,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.6-dev"
+                    "dev-master": "3.0-dev"
                 }
             },
             "autoload": {
@@ -1700,22 +2122,28 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "Nette PHP Generator",
+            "description": "🐘 Nette PHP Generator: generates neat PHP code for you. Supports new PHP 7.1 features.",
             "homepage": "https://nette.org",
-            "time": "2017-03-14T15:50:04+00:00"
+            "keywords": [
+                "code",
+                "nette",
+                "php",
+                "scaffolding"
+            ],
+            "time": "2017-07-11T19:07:13+00:00"
         },
         {
             "name": "nette/reflection",
-            "version": "v2.4.1",
+            "version": "v2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/reflection.git",
-                "reference": "ca6bafe1f73c19719238b58f91e6a399f281069b"
+                "reference": "b12327e98ead74e87a1315e0d48182a702adf901"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/reflection/zipball/ca6bafe1f73c19719238b58f91e6a399f281069b",
-                "reference": "ca6bafe1f73c19719238b58f91e6a399f281069b",
+                "url": "https://api.github.com/repos/nette/reflection/zipball/b12327e98ead74e87a1315e0d48182a702adf901",
+                "reference": "b12327e98ead74e87a1315e0d48182a702adf901",
                 "shasum": ""
             },
             "require": {
@@ -1759,22 +2187,27 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "Nette PHP Reflection Component",
+            "description": "Nette Reflection: docblock annotations parser and common reflection classes",
             "homepage": "https://nette.org",
-            "time": "2017-01-10T16:10:27+00:00"
+            "keywords": [
+                "annotation",
+                "nette",
+                "reflection"
+            ],
+            "time": "2017-07-11T19:28:57+00:00"
         },
         {
             "name": "nette/robot-loader",
-            "version": "v2.4.2",
+            "version": "v2.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/robot-loader.git",
-                "reference": "f23f8885624b249d5ec7bb525b9d6b007ab00293"
+                "reference": "73149b9724ca24c1215b5d53860b77f113bcf063"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/robot-loader/zipball/f23f8885624b249d5ec7bb525b9d6b007ab00293",
-                "reference": "f23f8885624b249d5ec7bb525b9d6b007ab00293",
+                "url": "https://api.github.com/repos/nette/robot-loader/zipball/73149b9724ca24c1215b5d53860b77f113bcf063",
+                "reference": "73149b9724ca24c1215b5d53860b77f113bcf063",
                 "shasum": ""
             },
             "require": {
@@ -1820,20 +2253,20 @@
             ],
             "description": "Nette RobotLoader: comfortable autoloading",
             "homepage": "https://nette.org",
-            "time": "2017-01-02T17:15:22+00:00"
+            "time": "2017-07-11T00:21:10+00:00"
         },
         {
             "name": "nette/security",
-            "version": "v2.4.1",
+            "version": "v2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/security.git",
-                "reference": "e547c81b36bae6cb5a6ba0c498314940f5d428ed"
+                "reference": "8a3051f9b16d4d7bfa18b6b0ff6f9f6f418f9801"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/security/zipball/e547c81b36bae6cb5a6ba0c498314940f5d428ed",
-                "reference": "e547c81b36bae6cb5a6ba0c498314940f5d428ed",
+                "url": "https://api.github.com/repos/nette/security/zipball/8a3051f9b16d4d7bfa18b6b0ff6f9f6f418f9801",
+                "reference": "8a3051f9b16d4d7bfa18b6b0ff6f9f6f418f9801",
                 "shasum": ""
             },
             "require": {
@@ -1878,20 +2311,20 @@
             ],
             "description": "Nette Security: Access Control Component",
             "homepage": "https://nette.org",
-            "time": "2016-12-19T10:53:40+00:00"
+            "time": "2017-07-11T09:41:59+00:00"
         },
         {
             "name": "nette/utils",
-            "version": "v2.4.4",
+            "version": "v2.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "714afb64d0da07d0da7178cbf5680008e4b0180b"
+                "reference": "2750d3948e255f59715a5e01c7453a1fec610996"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/714afb64d0da07d0da7178cbf5680008e4b0180b",
-                "reference": "714afb64d0da07d0da7178cbf5680008e4b0180b",
+                "url": "https://api.github.com/repos/nette/utils/zipball/2750d3948e255f59715a5e01c7453a1fec610996",
+                "reference": "2750d3948e255f59715a5e01c7453a1fec610996",
                 "shasum": ""
             },
             "require": {
@@ -1941,7 +2374,7 @@
             ],
             "description": "Nette Utility Classes",
             "homepage": "https://nette.org",
-            "time": "2017-01-16T12:30:14+00:00"
+            "time": "2017-07-11T19:25:29+00:00"
         },
         {
             "name": "php-http/client-common",
@@ -2180,16 +2613,16 @@
         },
         {
             "name": "php-http/message",
-            "version": "1.5.0",
+            "version": "1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/message.git",
-                "reference": "13df8c48f40ca7925303aa336f19be4b80984f01"
+                "reference": "2edd63bae5f52f79363c5f18904b05ce3a4b7253"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/message/zipball/13df8c48f40ca7925303aa336f19be4b80984f01",
-                "reference": "13df8c48f40ca7925303aa336f19be4b80984f01",
+                "url": "https://api.github.com/repos/php-http/message/zipball/2edd63bae5f52f79363c5f18904b05ce3a4b7253",
+                "reference": "2edd63bae5f52f79363c5f18904b05ce3a4b7253",
                 "shasum": ""
             },
             "require": {
@@ -2197,6 +2630,9 @@
                 "php": ">=5.4",
                 "php-http/message-factory": "^1.0.2",
                 "psr/http-message": "^1.0"
+            },
+            "provide": {
+                "php-http/message-factory-implementation": "1.0"
             },
             "require-dev": {
                 "akeneo/phpspec-skip-example-extension": "^1.0",
@@ -2245,7 +2681,7 @@
                 "message",
                 "psr-7"
             ],
-            "time": "2017-02-14T08:58:37+00:00"
+            "time": "2017-07-05T06:40:53+00:00"
         },
         {
             "name": "php-http/message-factory",
@@ -2552,17 +2988,58 @@
             "time": "2016-10-10T12:19:37+00:00"
         },
         {
+            "name": "remp/nette-sso",
+            "version": "dev-21-put-all-apps-under-sso",
+            "dist": {
+                "type": "path",
+                "url": "../Composer/nette-sso",
+                "reference": "8eefac6414caf10168a8622bba160b7286efba18",
+                "shasum": null
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2",
+                "league/uri": "^5.0",
+                "nette/http": "^2.4",
+                "nette/security": "^2.4",
+                "php": ">=7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Remp\\NetteSso\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": []
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "rootpd",
+                    "email": "dulacka@gmail.com"
+                }
+            ],
+            "description": "A Nette Package to integrate REMP SSO",
+            "keywords": [
+                "nette",
+                "remp",
+                "sso"
+            ]
+        },
+        {
             "name": "robmorgan/phinx",
-            "version": "v0.8.0",
+            "version": "v0.8.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/robmorgan/phinx.git",
-                "reference": "15e43d10dd99ac818c8d65735c50191bcbeafdbc"
+                "url": "https://github.com/cakephp/phinx.git",
+                "reference": "7a19de5bebc59321edd9613bc2a667e7f96224ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/robmorgan/phinx/zipball/15e43d10dd99ac818c8d65735c50191bcbeafdbc",
-                "reference": "15e43d10dd99ac818c8d65735c50191bcbeafdbc",
+                "url": "https://api.github.com/repos/cakephp/phinx/zipball/7a19de5bebc59321edd9613bc2a667e7f96224ec",
+                "reference": "7a19de5bebc59321edd9613bc2a667e7f96224ec",
                 "shasum": ""
             },
             "require": {
@@ -2615,27 +3092,33 @@
                 "migrations",
                 "phinx"
             ],
-            "time": "2017-02-28T18:34:31+00:00"
+            "time": "2017-06-05T13:30:19+00:00"
         },
         {
             "name": "symfony/config",
-            "version": "v3.2.6",
+            "version": "v3.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "741d6d4cd1414d67d48eb71aba6072b46ba740c2"
+                "reference": "a094618deb9a3fe1c3cf500a796e167d0495a274"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/741d6d4cd1414d67d48eb71aba6072b46ba740c2",
-                "reference": "741d6d4cd1414d67d48eb71aba6072b46ba740c2",
+                "url": "https://api.github.com/repos/symfony/config/zipball/a094618deb9a3fe1c3cf500a796e167d0495a274",
+                "reference": "a094618deb9a3fe1c3cf500a796e167d0495a274",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5.9",
                 "symfony/filesystem": "~2.8|~3.0"
             },
+            "conflict": {
+                "symfony/dependency-injection": "<3.3",
+                "symfony/finder": "<3.3"
+            },
             "require-dev": {
+                "symfony/dependency-injection": "~3.3",
+                "symfony/finder": "~3.3",
                 "symfony/yaml": "~3.0"
             },
             "suggest": {
@@ -2644,7 +3127,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -2671,20 +3154,20 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-01T18:18:25+00:00"
+            "time": "2017-06-16T12:40:34+00:00"
         },
         {
             "name": "symfony/console",
-            "version": "v3.2.6",
+            "version": "v3.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "28fb243a2b5727774ca309ec2d92da240f1af0dd"
+                "reference": "a97e45d98c59510f085fa05225a1acb74dfe0546"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/28fb243a2b5727774ca309ec2d92da240f1af0dd",
-                "reference": "28fb243a2b5727774ca309ec2d92da240f1af0dd",
+                "url": "https://api.github.com/repos/symfony/console/zipball/a97e45d98c59510f085fa05225a1acb74dfe0546",
+                "reference": "a97e45d98c59510f085fa05225a1acb74dfe0546",
                 "shasum": ""
             },
             "require": {
@@ -2692,10 +3175,16 @@
                 "symfony/debug": "~2.8|~3.0",
                 "symfony/polyfill-mbstring": "~1.0"
             },
+            "conflict": {
+                "symfony/dependency-injection": "<3.3"
+            },
             "require-dev": {
                 "psr/log": "~1.0",
+                "symfony/config": "~3.3",
+                "symfony/dependency-injection": "~3.3",
                 "symfony/event-dispatcher": "~2.8|~3.0",
                 "symfony/filesystem": "~2.8|~3.0",
+                "symfony/http-kernel": "~2.8|~3.0",
                 "symfony/process": "~2.8|~3.0"
             },
             "suggest": {
@@ -2707,7 +3196,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -2734,20 +3223,20 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-06T19:30:27+00:00"
+            "time": "2017-07-03T13:19:36+00:00"
         },
         {
             "name": "symfony/debug",
-            "version": "v3.2.6",
+            "version": "v3.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
-                "reference": "b90c9f91ad8ac37d9f114e369042d3226b34dc1a"
+                "reference": "63b85a968486d95ff9542228dc2e4247f16f9743"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/debug/zipball/b90c9f91ad8ac37d9f114e369042d3226b34dc1a",
-                "reference": "b90c9f91ad8ac37d9f114e369042d3226b34dc1a",
+                "url": "https://api.github.com/repos/symfony/debug/zipball/63b85a968486d95ff9542228dc2e4247f16f9743",
+                "reference": "63b85a968486d95ff9542228dc2e4247f16f9743",
                 "shasum": ""
             },
             "require": {
@@ -2758,13 +3247,12 @@
                 "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
             },
             "require-dev": {
-                "symfony/class-loader": "~2.8|~3.0",
                 "symfony/http-kernel": "~2.8|~3.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -2791,20 +3279,20 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-18T17:28:00+00:00"
+            "time": "2017-07-05T13:02:37+00:00"
         },
         {
             "name": "symfony/filesystem",
-            "version": "v3.2.6",
+            "version": "v3.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "bc0f17bed914df2cceb989972c3b996043c4da4a"
+                "reference": "311fa718389efbd8b627c272b9324a62437018cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/bc0f17bed914df2cceb989972c3b996043c4da4a",
-                "reference": "bc0f17bed914df2cceb989972c3b996043c4da4a",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/311fa718389efbd8b627c272b9324a62437018cc",
+                "reference": "311fa718389efbd8b627c272b9324a62437018cc",
                 "shasum": ""
             },
             "require": {
@@ -2813,7 +3301,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -2840,11 +3328,11 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-06T19:30:27+00:00"
+            "time": "2017-06-24T09:29:48+00:00"
         },
         {
             "name": "symfony/options-resolver",
-            "version": "v3.3.2",
+            "version": "v3.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/options-resolver.git",
@@ -2898,16 +3386,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4"
+                "reference": "f29dca382a6485c3cbe6379f0c61230167681937"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/e79d363049d1c2128f133a2667e4f4190904f7f4",
-                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/f29dca382a6485c3cbe6379f0c61230167681937",
+                "reference": "f29dca382a6485c3cbe6379f0c61230167681937",
                 "shasum": ""
             },
             "require": {
@@ -2919,7 +3407,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3-dev"
+                    "dev-master": "1.4-dev"
                 }
             },
             "autoload": {
@@ -2953,20 +3441,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14T01:06:16+00:00"
+            "time": "2017-06-09T14:24:12+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.6",
+            "version": "v3.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a"
+                "reference": "1f93a8d19b8241617f5074a123e282575b821df8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/093e416ad096355149e265ea2e4cc1f9ee40ab1a",
-                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/1f93a8d19b8241617f5074a123e282575b821df8",
+                "reference": "1f93a8d19b8241617f5074a123e282575b821df8",
                 "shasum": ""
             },
             "require": {
@@ -2981,7 +3469,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -3008,20 +3496,20 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-07T16:47:02+00:00"
+            "time": "2017-06-15T12:58:50+00:00"
         },
         {
             "name": "tracy/tracy",
-            "version": "v2.4.6",
+            "version": "v2.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/tracy.git",
-                "reference": "c9fbca15b0a11d904c7783b7aad114182618d8d4"
+                "reference": "4538cbe7f11d03d78afd34a168ca1c966792a3d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/tracy/zipball/c9fbca15b0a11d904c7783b7aad114182618d8d4",
-                "reference": "c9fbca15b0a11d904c7783b7aad114182618d8d4",
+                "url": "https://api.github.com/repos/nette/tracy/zipball/4538cbe7f11d03d78afd34a168ca1c966792a3d6",
+                "reference": "4538cbe7f11d03d78afd34a168ca1c966792a3d6",
                 "shasum": ""
             },
             "require": {
@@ -3032,6 +3520,9 @@
             "require-dev": {
                 "nette/di": "~2.3",
                 "nette/tester": "~2.0"
+            },
+            "suggest": {
+                "https://nette.org/donate": "Please support Tracy via a donation"
             },
             "type": "library",
             "extra": {
@@ -3063,31 +3554,33 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "Tracy: useful PHP debugger",
+            "description": "😎 Tracy: the addictive tool to ease debugging PHP code for cool developers. Friendly design, logging, profiler, advanced features like debugging AJAX calls or CLI support. You will love it.",
             "homepage": "https://tracy.nette.org",
             "keywords": [
+                "Xdebug",
                 "debug",
                 "debugger",
-                "nette"
+                "nette",
+                "profiler"
             ],
-            "time": "2017-01-29T19:39:20+00:00"
+            "time": "2017-07-14T06:38:56+00:00"
         },
         {
             "name": "twig/twig",
-            "version": "v1.33.2",
+            "version": "v1.34.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "dd6ca96227917e1e85b41c7c3cc6507b411e0927"
+                "reference": "f878bab48edb66ad9c6ed626bf817f60c6c096ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/dd6ca96227917e1e85b41c7c3cc6507b411e0927",
-                "reference": "dd6ca96227917e1e85b41c7c3cc6507b411e0927",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/f878bab48edb66ad9c6ed626bf817f60c6c096ee",
+                "reference": "f878bab48edb66ad9c6ed626bf817f60c6c096ee",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.7"
+                "php": ">=5.3.3"
             },
             "require-dev": {
                 "psr/container": "^1.0",
@@ -3097,12 +3590,15 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.33-dev"
+                    "dev-master": "1.34-dev"
                 }
             },
             "autoload": {
                 "psr-0": {
                     "Twig_": "lib/"
+                },
+                "psr-4": {
+                    "Twig\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3132,7 +3628,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2017-04-20T17:39:48+00:00"
+            "time": "2017-07-04T13:19:31+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -3291,1027 +3787,12 @@
                 "unit"
             ],
             "time": "2016-03-19T14:34:02+00:00"
-        },
-        {
-            "name": "npm-asset/highlight.js",
-            "version": "9.11.0",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/highlight.js/-/highlight.js-9.11.0.tgz",
-                "reference": null,
-                "shasum": "47f98c7399918700db2caf230ded12cec41a84ae"
-            },
-            "require-dev": {
-                "npm-asset/bluebird": ">=3.0.1,<4.0.0",
-                "npm-asset/commander": ">=2.3.0,<3.0.0",
-                "npm-asset/del": ">=2.0.2,<3.0.0",
-                "npm-asset/gear": ">=0.9.4,<0.10.0",
-                "npm-asset/gear-lib": ">=0.9.2,<0.10.0",
-                "npm-asset/glob": ">=7.0.3,<8.0.0",
-                "npm-asset/js-beautify": ">=1.5.10,<2.0.0",
-                "npm-asset/jsdom": ">=9.2.1,<10.0.0",
-                "npm-asset/lodash": ">=4.0.0,<5.0.0",
-                "npm-asset/mocha": ">=2.0.1,<3.0.0",
-                "npm-asset/should": ">=9.0.2,<10.0.0",
-                "npm-asset/tiny-worker": ">=1.1.1,<2.0.0"
-            },
-            "type": "npm-asset-library",
-            "extra": {
-                "npm-asset-bugs": {
-                    "url": "https://github.com/isagalaev/highlight.js/issues"
-                },
-                "npm-asset-main": "./lib/index.js",
-                "npm-asset-directories": [],
-                "npm-asset-repository": {
-                    "type": "git",
-                    "url": "git://github.com/isagalaev/highlight.js.git"
-                },
-                "npm-asset-scripts": {
-                    "test": "mocha test/",
-                    "test-browser": "mocha test/browser/"
-                },
-                "npm-asset-engines": {
-                    "node": "*"
-                }
-            },
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Ivan Sagalaev",
-                    "email": "maniac@softwaremaniacs.org"
-                },
-                {
-                    "name": "Ivan Sagalaev",
-                    "email": "maniac@softwaremaniacs.org",
-                    "url": "original author"
-                },
-                {
-                    "name": "Jeremy Hull",
-                    "email": "sourdrums@gmail.com"
-                },
-                {
-                    "name": "Oleg Efimov",
-                    "email": "efimovov@gmail.com"
-                },
-                {
-                    "name": "Peter Leonov",
-                    "email": "gojpeg@gmail.com"
-                },
-                {
-                    "name": "Victor Karamzin",
-                    "email": "Victor.Karamzin@enterra-inc.com"
-                },
-                {
-                    "name": "Vsevolod Solovyov",
-                    "email": "vsevolod.solovyov@gmail.com"
-                },
-                {
-                    "name": "Anton Kovalyov",
-                    "email": "anton@kovalyov.net"
-                },
-                {
-                    "name": "Nikita Ledyaev",
-                    "email": "lenikita@yandex.ru"
-                },
-                {
-                    "name": "Konstantin Evdokimenko",
-                    "email": "qewerty@gmail.com"
-                },
-                {
-                    "name": "Dmitri Roudakov",
-                    "email": "dmitri@roudakov.ru"
-                },
-                {
-                    "name": "Yuri Ivanov",
-                    "email": "ivanov@supersoft.ru"
-                },
-                {
-                    "name": "Vladimir Ermakov",
-                    "email": "vooon341@mail.ru"
-                },
-                {
-                    "name": "Vladimir Gubarkov",
-                    "email": "xonixx@gmail.com"
-                },
-                {
-                    "name": "Brian Beck",
-                    "email": "exogen@gmail.com"
-                },
-                {
-                    "name": "MajestiC",
-                    "email": "majestic2k@gmail.com"
-                },
-                {
-                    "name": "Vasily Polovnyov",
-                    "email": "vast@whiteants.net"
-                },
-                {
-                    "name": "Vladimir Epifanov",
-                    "email": "voldmar@voldmar.ru"
-                },
-                {
-                    "name": "Alexander Makarov",
-                    "email": "sam@rmcreative.ru"
-                },
-                {
-                    "name": "Vah",
-                    "email": "vahtenberg@gmail.com"
-                },
-                {
-                    "name": "Shuen-Huei Guan",
-                    "email": "drake.guan@gmail.com"
-                },
-                {
-                    "name": "Jason Diamond",
-                    "email": "jason@diamond.name"
-                },
-                {
-                    "name": "Michal Gabrukiewicz",
-                    "email": "mgabru@gmail.com"
-                },
-                {
-                    "name": "Ruslan Keba",
-                    "email": "rukeba@gmail.com"
-                },
-                {
-                    "name": "Sergey Baranov",
-                    "email": "segyrn@yandex.ru"
-                },
-                {
-                    "name": "Zaripov Yura",
-                    "email": "yur4ik7@ukr.net"
-                },
-                {
-                    "name": "Oleg Volchkov",
-                    "email": "oleg@volchkov.net"
-                },
-                {
-                    "name": "Vasily Mikhailitchenko",
-                    "email": "vaskas@programica.ru"
-                },
-                {
-                    "name": "Jan Berkel",
-                    "email": "jan.berkel@gmail.com"
-                },
-                {
-                    "name": "Vladimir Moskva",
-                    "email": "vladmos@gmail.com"
-                },
-                {
-                    "name": "Loren Segal",
-                    "email": "lsegal@soen.ca"
-                },
-                {
-                    "name": "Andrew Fedorov",
-                    "email": "dmmdrs@mail.ru"
-                },
-                {
-                    "name": "Igor Kalnitsky",
-                    "email": "igor@kalnitsky.org"
-                },
-                {
-                    "name": "Valerii Hiora",
-                    "email": "valerii.hiora@gmail.com"
-                },
-                {
-                    "name": "Nikolay Zakharov",
-                    "email": "nikolay.desh@gmail.com"
-                },
-                {
-                    "name": "Dmitry Kovega",
-                    "email": "arhibot@gmail.com"
-                },
-                {
-                    "name": "Sergey Ignatov",
-                    "email": "sergey@ignatov.spb.su"
-                },
-                {
-                    "name": "Antono Vasiljev",
-                    "email": "self@antono.info"
-                },
-                {
-                    "name": "Stephan Kountso",
-                    "email": "steplg@gmail.com"
-                },
-                {
-                    "name": "pumbur",
-                    "email": "pumbur@pumbur.net"
-                },
-                {
-                    "name": "John Crepezzi",
-                    "email": "john.crepezzi@gmail.com"
-                },
-                {
-                    "name": "Andrey Vlasovskikh",
-                    "email": "andrey.vlasovskikh@gmail.com"
-                },
-                {
-                    "name": "Alexander Myadzel",
-                    "email": "myadzel@gmail.com"
-                },
-                {
-                    "name": "Evgeny Stepanischev",
-                    "email": "imbolk@gmail.com"
-                },
-                {
-                    "name": "Dmytrii Nagirniak",
-                    "email": "dnagir@gmail.com"
-                },
-                {
-                    "name": "Luigi Maselli",
-                    "email": "grigio.org@gmail.com"
-                },
-                {
-                    "name": "Denis Bardadym",
-                    "email": "bardadymchik@gmail.com"
-                },
-                {
-                    "name": "Aahan Krish",
-                    "email": "geekpanth3r@gmail.com"
-                },
-                {
-                    "name": "Ilya Baryshev",
-                    "email": "baryshev@gmail.com"
-                },
-                {
-                    "name": "Aleksandar Ruzicic",
-                    "email": "aleksandar@ruzicic.info"
-                },
-                {
-                    "name": "Joe Cheng",
-                    "email": "joe@rstudio.org"
-                },
-                {
-                    "name": "Angel G. Olloqui",
-                    "email": "angelgarcia.mail@gmail.com"
-                },
-                {
-                    "name": "Jason Tate",
-                    "email": "adminz@web-cms-designs.com"
-                },
-                {
-                    "name": "Sergey Tikhomirov",
-                    "email": "sergey@tikhomirov.io"
-                },
-                {
-                    "name": "Marc Fornos",
-                    "email": "marc.fornos@gmail.com"
-                },
-                {
-                    "name": "Yoshihide Jimbo",
-                    "email": "yjimbo@gmail.com"
-                },
-                {
-                    "name": "Casey Duncan",
-                    "email": "casey.duncan@gmail.com"
-                },
-                {
-                    "name": "Eugene Nizhibitsky",
-                    "email": "nizhibitsky@gmail.com"
-                },
-                {
-                    "name": "Alberto Gimeno",
-                    "email": "gimenete@gmail.com"
-                },
-                {
-                    "name": "Kirk Kimmel",
-                    "email": "kimmel.k.programmer@gmail.com"
-                },
-                {
-                    "name": "Nathan Grigg",
-                    "email": "nathan@nathanamy.org"
-                },
-                {
-                    "name": "Dr. Drang",
-                    "email": "drdrang@gmail.com"
-                },
-                {
-                    "name": "Robin Ward",
-                    "email": "robin.ward@gmail.com"
-                },
-                {
-                    "name": "Dmitry Medvinsky",
-                    "email": "me@dmedvinsky.name"
-                },
-                {
-                    "name": "Jason Jacobson",
-                    "email": "jason.a.jacobson@gmail.com"
-                },
-                {
-                    "name": "Jonas Follesø",
-                    "email": "jonas@follesoe.no"
-                },
-                {
-                    "name": "Dan Allen",
-                    "email": "dan.j.allen@gmail.com"
-                },
-                {
-                    "name": "noformnocontent",
-                    "email": "i@noformnocontent.com"
-                },
-                {
-                    "name": "Damien White",
-                    "email": "damien.white@visoftinc.com"
-                },
-                {
-                    "name": "Alexander Marenin",
-                    "email": "great_muchacho@mail.ru"
-                },
-                {
-                    "name": "Cédric Néhémie",
-                    "email": "cedric.nehemie@gmail.com"
-                },
-                {
-                    "name": "Simon Madine",
-                    "email": "simon@angryrobotzombie.com"
-                },
-                {
-                    "name": "Benjamin Pannell",
-                    "email": "contact@sierrasoftworks.com"
-                },
-                {
-                    "name": "Eric Knibbe",
-                    "email": "eric@lassosoft.com"
-                },
-                {
-                    "name": "Poren Chiang",
-                    "email": "ren.chiang@gmail.com"
-                },
-                {
-                    "name": "Kelley van Evert",
-                    "email": "kelleyvanevert@gmail.com"
-                },
-                {
-                    "name": "Kurt Emch",
-                    "email": "kurt@kurtemch.com"
-                },
-                {
-                    "name": "Mehdi Dogguy",
-                    "email": "mehdi@dogguy.org"
-                },
-                {
-                    "name": "Nicolas Braud-Santoni",
-                    "email": "nicolas.braud-santoni@ens-cachan.fr"
-                },
-                {
-                    "name": "Ralf Bitter",
-                    "email": "rabit@revigniter.com"
-                },
-                {
-                    "name": "Sylvestre Ledru",
-                    "email": "sylvestre.ledru@scilab-enterprises.com"
-                },
-                {
-                    "name": "Troy Kershaw",
-                    "email": "hello@troykershaw.com"
-                },
-                {
-                    "name": "Zena Treep",
-                    "email": "zena.treep@gmail.com"
-                },
-                {
-                    "name": "Daniel Kvasnicka",
-                    "email": "dkvasnicka@vendavo.com"
-                },
-                {
-                    "name": "Carlo Kok",
-                    "email": "ck@remobjects.com"
-                },
-                {
-                    "name": "Bram de Haan",
-                    "email": "info@atelierbramdehaan.nl"
-                },
-                {
-                    "name": "Seongwon Lee",
-                    "email": "dlimpid@gmail.com"
-                },
-                {
-                    "name": "Zaven Muradyan",
-                    "email": "megalivoithos@gmail.com"
-                },
-                {
-                    "name": "Jan T. Sott",
-                    "email": "git@idleberg.com"
-                },
-                {
-                    "name": "Brent Bradbury",
-                    "email": "brent@brentium.com"
-                },
-                {
-                    "name": "Martin Dilling-Hansen",
-                    "email": "martindlling@gmail.com"
-                },
-                {
-                    "name": "Ilya Vassilevsky",
-                    "email": "vassilevsky@gmail.com"
-                },
-                {
-                    "name": "Josh Adams",
-                    "email": "josh@isotope11.com"
-                },
-                {
-                    "name": "Dan Tao",
-                    "email": "daniel.tao@gmail.com"
-                },
-                {
-                    "name": "Jeff Escalante",
-                    "email": "hello@jenius.me"
-                },
-                {
-                    "name": "Jun Yang",
-                    "email": "yangjvn@126.com"
-                },
-                {
-                    "name": "Nikolay Lisienko",
-                    "email": "info@neor.ru"
-                },
-                {
-                    "name": "Heiko August",
-                    "email": "post@auge8472.de"
-                },
-                {
-                    "name": "Domen Kožar",
-                    "email": "domen@dev.si"
-                },
-                {
-                    "name": "Travis Odom",
-                    "email": "travis.a.odom@gmail.com"
-                },
-                {
-                    "name": "innocenat",
-                    "email": "innocenat@gmail.com"
-                },
-                {
-                    "name": "Arthur Bikmullin",
-                    "email": "devolonter@gmail.com"
-                },
-                {
-                    "name": "Pascal Hurni",
-                    "email": "phi@ruby-reactive.org"
-                },
-                {
-                    "name": "Roman Shmatov",
-                    "email": "romanshmatov@gmail.com"
-                },
-                {
-                    "name": "Nic West",
-                    "email": "nic@letolab.com"
-                },
-                {
-                    "name": "Panu Horsmalahti",
-                    "email": "panu.horsmalahti@iki.fi"
-                },
-                {
-                    "name": "Flaviu Tamas",
-                    "email": "tamas.flaviu@gmail.com"
-                },
-                {
-                    "name": "Damian Mee",
-                    "email": "mee.damian@gmail.com"
-                },
-                {
-                    "name": "Christopher Kaster",
-                    "email": "ikasoki@gmail.com"
-                },
-                {
-                    "name": "Chris Eidhof",
-                    "email": "chris@eidhof.nl"
-                },
-                {
-                    "name": "Nate Cook",
-                    "email": "natecook@gmail.com"
-                },
-                {
-                    "name": "Matt Diephouse",
-                    "email": "matt@diephouse.com"
-                },
-                {
-                    "name": "Erik Osheim",
-                    "email": "d_m@plastic-idolatry.com"
-                },
-                {
-                    "name": "Guillaume Laforge",
-                    "email": "glaforge@gmail.com"
-                },
-                {
-                    "name": "Lucas Mazza",
-                    "email": "lucastmazza@gmail.com"
-                },
-                {
-                    "name": "Maxim Dikun",
-                    "email": "dikmax@gmail.com"
-                },
-                {
-                    "name": "Henrik Feldt",
-                    "email": "henrik@haf.se"
-                },
-                {
-                    "name": "Anton Kochkov",
-                    "email": "anton.kochkov@gmail.com"
-                },
-                {
-                    "name": "Michael Allen",
-                    "email": "Michael.Allen@benefitfocus.com"
-                },
-                {
-                    "name": "JP Verkamp",
-                    "email": "me@jverkamp.com"
-                },
-                {
-                    "name": "Adam Joseph Cook",
-                    "email": "adam.joseph.cook@gmail.com"
-                },
-                {
-                    "name": "Sergey Vidyuk",
-                    "email": "svidyuk@gmail.com"
-                },
-                {
-                    "name": "Radek Liska",
-                    "email": "radekliska@gmail.com"
-                },
-                {
-                    "name": "Jose Molina Colmenero",
-                    "email": "gaudy41@gmail.com"
-                },
-                {
-                    "name": "Max Mikhailov",
-                    "email": "seven.phases.max@gmail.com"
-                },
-                {
-                    "name": "Bryant Williams",
-                    "email": "b.n.williams@gmail.com"
-                },
-                {
-                    "name": "Erik Paluka",
-                    "email": "erik.paluka@gmail.com"
-                },
-                {
-                    "name": "Luke Holder",
-                    "email": "lukemh@gmail.com"
-                },
-                {
-                    "name": "David Mohundro",
-                    "email": "david@mohundro.com"
-                },
-                {
-                    "name": "Nicholas Blumhardt",
-                    "email": "nblumhardt@nblumhardt.com"
-                },
-                {
-                    "name": "Christophe de Dinechin",
-                    "email": "christophe@taodyne.com"
-                },
-                {
-                    "name": "Taneli Vatanen",
-                    "email": "taneli.vatanen@gmail.com"
-                },
-                {
-                    "name": "Jen Evers-Corvina",
-                    "email": "jen@sevvie.net"
-                },
-                {
-                    "name": "Kassio Borges",
-                    "email": "kassioborgesm@gmail.com"
-                },
-                {
-                    "name": "Cedric Sohrauer",
-                    "email": "sohrauer@googlemail.com"
-                },
-                {
-                    "name": "Mickaël Delahaye",
-                    "email": "mickael.delahaye@gmail.com"
-                },
-                {
-                    "name": "Hakan Özler",
-                    "email": "ozler.hakan@gmail.com"
-                },
-                {
-                    "name": "Trey Shugart",
-                    "email": "treshugart@gmail.com"
-                },
-                {
-                    "name": "Vincent Zurczak",
-                    "email": "vzurczak@linagora.com"
-                },
-                {
-                    "name": "Adam Joseph Cook",
-                    "email": "adam.joseph.cook@gmail.com"
-                },
-                {
-                    "name": "Edwin Dalorzo",
-                    "email": "edwin@dalorzo.org"
-                },
-                {
-                    "name": "mucaho",
-                    "email": "mkucko@gmail.com"
-                },
-                {
-                    "name": "Dennis Titze",
-                    "email": "dennis.titze@gmail.com"
-                },
-                {
-                    "name": "Jon Evans",
-                    "email": "jon@craftyjon.com"
-                },
-                {
-                    "name": "Brian Quistorff",
-                    "email": "bquistorff@gmail.com"
-                },
-                {
-                    "name": "Jonathan Suever",
-                    "email": "suever@gmail.com"
-                },
-                {
-                    "name": "Alexis Hénaut",
-                    "email": "alexis@henaut.net"
-                },
-                {
-                    "name": "Chris Kiehl",
-                    "email": "audionautic@gmail.com"
-                },
-                {
-                    "name": "Peter Piwowarski",
-                    "email": "oldlaptop654@aol.com"
-                },
-                {
-                    "name": "Kenta Sato",
-                    "email": "bicycle1885@gmail.com"
-                },
-                {
-                    "name": "Anthony Scemama",
-                    "email": "scemama@irsamc.ups-tlse.fr"
-                },
-                {
-                    "name": "Taufik Nurrohman",
-                    "email": "latitudu.latitudu@gmail.com"
-                },
-                {
-                    "name": "Pedro Oliveira",
-                    "email": "kanytu@gmail.com"
-                },
-                {
-                    "name": "Gu Yiling",
-                    "email": "justice360@gmail.com"
-                },
-                {
-                    "name": "Thomas Applencourt",
-                    "email": "thomas.applencourt@irsamc.ups-tlse.fr"
-                },
-                {
-                    "name": "Andrew Farmer",
-                    "email": "ahfarmer@gmail.com"
-                },
-                {
-                    "name": "Sergey Mashkov",
-                    "email": "cy6erGn0m@gmail.com"
-                },
-                {
-                    "name": "Raivo Laanemets",
-                    "email": "raivo@infdot.com"
-                },
-                {
-                    "name": "Kenneth Fuglsang",
-                    "email": "kfuglsang@gmail.com"
-                },
-                {
-                    "name": "David Anson",
-                    "email": "david@dlaa.me"
-                },
-                {
-                    "name": "Louis Barranqueiro",
-                    "email": "louis.barranqueiro@gmail.com"
-                },
-                {
-                    "name": "Tim Schumacher",
-                    "email": "tim@datenknoten.me"
-                },
-                {
-                    "name": "Lucas Werkmeister",
-                    "email": "mail@lucaswerkmeister.de"
-                },
-                {
-                    "name": "Dan Panzarella",
-                    "email": "alsoelp@gmail.com"
-                },
-                {
-                    "name": "Bruno Dias",
-                    "email": "bruno.r.dias@gmail.com"
-                },
-                {
-                    "name": "Jay Strybis",
-                    "email": "jay.strybis@gmail.com"
-                },
-                {
-                    "name": "Guillaume Gomez",
-                    "email": "guillaume1.gomez@gmail.com"
-                },
-                {
-                    "name": "Janis Voigtländer",
-                    "email": "janis.voigtlaender@gmail.com"
-                },
-                {
-                    "name": "Dirk Kirsten",
-                    "email": "dk@basex.org"
-                },
-                {
-                    "name": "MY Sun",
-                    "email": "simonmysun@gmail.com"
-                },
-                {
-                    "name": "Vadimtro",
-                    "email": "vadimtro@yahoo.com"
-                },
-                {
-                    "name": "Benjamin Auder",
-                    "email": "benjamin.auder@gmail.com"
-                },
-                {
-                    "name": "Dotan Dimet",
-                    "email": "dotan@corky.net"
-                },
-                {
-                    "name": "Manh Tuan",
-                    "email": "junookyo@gmail.com"
-                },
-                {
-                    "name": "Philippe Charrière",
-                    "email": "ph.charriere@gmail.com"
-                },
-                {
-                    "name": "Stefan Bechert",
-                    "email": "stefan.bechert@gmx.net"
-                },
-                {
-                    "name": "Samuel Reed",
-                    "email": "sam@bitmex.com"
-                },
-                {
-                    "name": "Yury Selivanov",
-                    "email": "yselivanov@gmail.com"
-                },
-                {
-                    "name": "Tsuyusato Kitsune",
-                    "email": "make.just.on@gmail.com"
-                },
-                {
-                    "name": "Mick MacCallum",
-                    "email": "micksmaccallum@gmail.com"
-                },
-                {
-                    "name": "Kristoffer Gronlund",
-                    "email": "kgronlund@suse.com"
-                },
-                {
-                    "name": "Søren Enevoldsen",
-                    "email": "senevoldsen90@gmail.com"
-                },
-                {
-                    "name": "Daniel Rosenwasser",
-                    "email": "DanielRosenwasser@users.noreply.github.com"
-                },
-                {
-                    "name": "Ladislav Prskavec",
-                    "email": "ladislav@prskavec.net"
-                },
-                {
-                    "name": "Jan Kühle",
-                    "email": "jkuehle90@gmail.com"
-                },
-                {
-                    "name": "Stefan Wienert",
-                    "email": "stwienert@gmail.com"
-                },
-                {
-                    "name": "Nikita Savchenko",
-                    "email": "zitros.lab@gmail.com"
-                },
-                {
-                    "name": "Stefania Mellai",
-                    "email": "s.mellai@arduino.cc"
-                },
-                {
-                    "name": "Nebuleon Fumika",
-                    "email": "nebuleon.fumika@gmail.com"
-                },
-                {
-                    "name": "prince",
-                    "email": "MC.prince.0203@gmail.com"
-                },
-                {
-                    "name": "Brendan Rocks",
-                    "email": "rocks.brendan@gmail.com"
-                },
-                {
-                    "name": "Raphaël Assénat",
-                    "email": "raph@raphnet.net"
-                },
-                {
-                    "name": "Matt Evans",
-                    "email": "matt@aptech.com"
-                },
-                {
-                    "name": "Martin Braun",
-                    "email": "martin.braun@ettus.com"
-                },
-                {
-                    "name": "Boris Cherny",
-                    "email": "boris@performancejs.com"
-                },
-                {
-                    "name": "John Foster",
-                    "email": "jfoster@esri.com"
-                },
-                {
-                    "name": "Robert Dodier",
-                    "email": "robert.dodier@gmail.com"
-                },
-                {
-                    "name": "Anthony Dugois",
-                    "email": "dev.anthonydugois@gmail.com"
-                },
-                {
-                    "name": "Qeole",
-                    "email": "qeole@outlook.com"
-                },
-                {
-                    "name": "Denis Ciccale",
-                    "email": "dciccale@gmail.com"
-                },
-                {
-                    "name": "Michael Johnston",
-                    "email": "lastobelus@gmail.com"
-                },
-                {
-                    "name": "Taras",
-                    "email": "oxdef@oxdef.info"
-                },
-                {
-                    "name": "Philipp Wolfer",
-                    "email": "ph.wolfer@gmail.com"
-                },
-                {
-                    "name": "Mikko Kouhia",
-                    "email": "mikko.kouhia@iki.fi"
-                },
-                {
-                    "name": "Billy Quith",
-                    "email": "chinbillybilbo@gmail.com"
-                },
-                {
-                    "name": "Herbert Shin",
-                    "email": "initbar@protonmail.ch"
-                },
-                {
-                    "name": "Tristano Ajmone",
-                    "email": "tajmone@gmail.com"
-                },
-                {
-                    "name": "Taisuke Fujimoto",
-                    "email": "temp-impl@users.noreply.github.com"
-                },
-                {
-                    "name": "Boone Severson",
-                    "email": "boone.severson@gmail.com"
-                },
-                {
-                    "name": "Victor Zhou",
-                    "email": "OiCMudkips@users.noreply.github.com"
-                },
-                {
-                    "name": "Lars Schulna",
-                    "email": "kartoffelbrei.mit.muskatnuss@gmail.org"
-                },
-                {
-                    "name": "Jacob Childress",
-                    "email": "jacobc@gmail.com"
-                },
-                {
-                    "name": "Gavin Siu",
-                    "email": "gavsiu@gmail.com"
-                },
-                {
-                    "name": "Builder's Brewery",
-                    "email": "buildersbrewery@gmail.com"
-                },
-                {
-                    "name": "Sergey Bronnikov",
-                    "email": "sergeyb@bronevichok.ru"
-                },
-                {
-                    "name": "Joe Eli McIlvain",
-                    "email": "joe.eli.mac@gmail.org"
-                },
-                {
-                    "name": "Stephan Boyer",
-                    "email": "stephan@stephanboyer.com"
-                },
-                {
-                    "name": "Alex McKibben",
-                    "email": "alex@nullscope.net"
-                },
-                {
-                    "name": "Daniel Gamage",
-                    "email": "hellodanielgamage@gmail.com"
-                },
-                {
-                    "name": "Matthew Daly",
-                    "email": "matthewbdaly@gmail.com"
-                },
-                {
-                    "name": "Magnus Madsen",
-                    "email": "mmadsen@uwaterloo.ca"
-                },
-                {
-                    "name": "Camil Staps",
-                    "email": "info@camilstaps.nl"
-                },
-                {
-                    "name": "Alexander Lichter",
-                    "email": "manniL@gmx.net"
-                },
-                {
-                    "name": "Nicolas Le Gall",
-                    "email": "contact@nlegall.fr"
-                },
-                {
-                    "name": "Kenton Hamaluik",
-                    "email": "kentonh@gmail.com"
-                },
-                {
-                    "name": "Marvin Saignat",
-                    "email": "contact@zgmrvn.com"
-                },
-                {
-                    "name": "Michael Rodler",
-                    "email": "contact@f0rki.at"
-                },
-                {
-                    "name": "Sergey Sobko",
-                    "email": "s.sobko@profitware.ru"
-                },
-                {
-                    "name": "Hale Chan",
-                    "email": "halechan@qq.com"
-                },
-                {
-                    "name": "Matt Evans",
-                    "email": "syrius3@gmail.com"
-                },
-                {
-                    "name": "Kasper Andersen",
-                    "email": "kma_untrusted@protonmail.com"
-                },
-                {
-                    "name": "Philipp A.",
-                    "email": "flying-sheep@web.de"
-                },
-                {
-                    "name": "Guannan Wei",
-                    "email": "guannanwei@outlook.com"
-                },
-                {
-                    "name": "Sam Wu",
-                    "email": "samsam2310@gmail.com"
-                },
-                {
-                    "name": "Ike Ku",
-                    "email": "dempfi@yahoo.com"
-                },
-                {
-                    "name": "Andres Täht",
-                    "email": "andres.taht@gmail.com"
-                },
-                {
-                    "name": "Rene Saarsoo",
-                    "email": "nene@triin.net"
-                },
-                {
-                    "name": "Jordi Petit",
-                    "email": "jordi.petit@gmail.com"
-                },
-                {
-                    "name": "Raphaël Parrëe",
-                    "email": "rparree@edc4it.com"
-                },
-                {
-                    "name": "Joël Porquet",
-                    "email": "joel@porquet.org"
-                }
-            ],
-            "description": "Syntax highlighting with language autodetection.",
-            "homepage": "https://highlightjs.org/",
-            "keywords": [
-                "highlight",
-                "syntax"
-            ]
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": [],
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">= 5.6"
