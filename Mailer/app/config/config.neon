@@ -39,8 +39,10 @@ services:
 	        - addMailer(Remp\MailerModule\Mailer\SmtpMailer())
 	        - addMailer(Remp\MailerModule\Mailer\MailgunMailer())
 
+	# Internal CRM system. For more details contact Tomas Bella.
 	- Remp\MailerModule\Auth\Authenticator
 	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
+	# authenticator: Remp\SSOModule\User
 
 	- Remp\MailerModule\Config\Config
 

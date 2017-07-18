@@ -2,6 +2,8 @@
 
 namespace Remp\MailerModule\Auth;
 
+use Nette\Application\LinkGenerator;
+use Nette\Http\IResponse;
 use Nette\Security\AuthenticationException;
 use Nette\Security\IAuthenticator;
 use Nette\Security\Identity;
@@ -11,13 +13,30 @@ class Authenticator implements IAuthenticator
     /** @var RemoteUser */
     private $remoteUser;
 
-    public function __construct(RemoteUser $remoteUser)
-    {
+    /** @var IResponse */
+    private $response;
+
+    /** @var LinkGenerator */
+    private $linkGenerator;
+
+    public function __construct(
+        RemoteUser $remoteUser,
+        IResponse $response,
+        LinkGenerator $linkGenerator
+    ) {
         $this->remoteUser = $remoteUser;
+        $this->response = $response;
+        $this->linkGenerator = $linkGenerator;
     }
 
     public function authenticate(array $credentials)
     {
+        if (empty($credentials)) {
+            $link = $this->linkGenerator->link('Mailer:Sign:In');
+            $this->response->redirect($link);
+            exit();
+        }
+
         list($email, $password) = $credentials;
 
         $result = $this->remoteUser->remoteLogin($email, $password);

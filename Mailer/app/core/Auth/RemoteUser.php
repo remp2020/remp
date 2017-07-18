@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 
@@ -37,7 +38,6 @@ class RemoteUser
             ]);
 
             $responseData = Json::decode($response->getBody(), Json::FORCE_ARRAY);
-
         } catch (ClientException $clientException) {
             $data = json_decode($clientException->getResponse()->getBody());
             return ['status' => 'error', 'error' => $data->error, 'message' => $data->message];
