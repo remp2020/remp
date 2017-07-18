@@ -16,6 +16,8 @@ import (
 
 	"github.com/influxdata/influxdb/influxql"
 	"github.com/influxdata/influxdb/models"
+	"github.com/influxdata/influxdb/pkg/bytesutil"
+	"github.com/influxdata/influxdb/pkg/estimator"
 	"github.com/influxdata/influxdb/pkg/limiter"
 	"github.com/uber-go/zap"
 )
@@ -27,19 +29,30 @@ var (
 	ErrStoreClosed = fmt.Errorf("store is closed")
 )
 
+// Statistics gathered by the store.
+const (
+	statDatabaseSeries       = "numSeries"       // number of series in a database
+	statDatabaseMeasurements = "numMeasurements" // number of measurements in a database
+)
+
 // Store manages shards and indexes for databases.
 type Store struct {
-	mu   sync.RWMutex
+	mu sync.RWMutex
+	// databases keeps track of the number of databases being managed by the store.
+	databases map[string]struct{}
+
 	path string
 
-	databaseIndexes map[string]*DatabaseIndex
+	// shared per-database indexes, only if using "inmem".
+	indexes map[string]interface{}
 
 	// shards is a map of shard IDs to the associated Shard.
 	shards map[uint64]*Shard
 
 	EngineOptions EngineOptions
-	baseLogger    zap.Logger
-	Logger        zap.Logger
+
+	baseLogger zap.Logger
+	Logger     zap.Logger
 
 	closing chan struct{}
 	wg      sync.WaitGroup
@@ -49,12 +62,12 @@ type Store struct {
 // NewStore returns a new store with the given path and a default configuration.
 // The returned store must be initialized by calling Open before using it.
 func NewStore(path string) *Store {
-	opts := NewEngineOptions()
-
 	logger := zap.New(zap.NullEncoder())
 	return &Store{
+		databases:     make(map[string]struct{}),
 		path:          path,
-		EngineOptions: opts,
+		indexes:       make(map[string]interface{}),
+		EngineOptions: NewEngineOptions(),
 		Logger:        logger,
 		baseLogger:    logger,
 	}
@@ -71,21 +84,40 @@ func (s *Store) WithLogger(log zap.Logger) {
 
 // Statistics returns statistics for period monitoring.
 func (s *Store) Statistics(tags map[string]string) []models.Statistic {
-	var statistics []models.Statistic
-
 	s.mu.RLock()
-	indexes := make([]models.Statistic, 0, len(s.databaseIndexes))
-	for _, dbi := range s.databaseIndexes {
-		indexes = append(indexes, dbi.Statistics(tags)...)
-	}
 	shards := s.shardsSlice()
 	s.mu.RUnlock()
 
+	// Add all the series and measurements cardinality estimations.
+	databases := s.Databases()
+	statistics := make([]models.Statistic, 0, len(databases))
+	for _, database := range databases {
+		sc, err := s.SeriesCardinality(database)
+		if err != nil {
+			s.Logger.Error("cannot retrieve series cardinality", zap.Error(err))
+			continue
+		}
+
+		mc, err := s.MeasurementsCardinality(database)
+		if err != nil {
+			s.Logger.Error("cannot retrieve measurement cardinality", zap.Error(err))
+			continue
+		}
+
+		statistics = append(statistics, models.Statistic{
+			Name: "database",
+			Tags: models.StatisticTags{"database": database}.Merge(tags),
+			Values: map[string]interface{}{
+				statDatabaseSeries:       sc,
+				statDatabaseMeasurements: mc,
+			},
+		})
+	}
+
+	// Gather all statistics for all shards.
 	for _, shard := range shards {
 		statistics = append(statistics, shard.Statistics(tags)...)
 	}
-
-	statistics = append(statistics, indexes...)
 	return statistics
 }
 
@@ -93,15 +125,13 @@ func (s *Store) Statistics(tags map[string]string) []models.Statistic {
 func (s *Store) Path() string { return s.path }
 
 // Open initializes the store, creating all necessary directories, loading all
-// shards and indexes and initializing periodic maintenance of all shards.
+// shards as well as initializing periodic maintenance of them.
 func (s *Store) Open() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.closing = make(chan struct{})
-
 	s.shards = map[uint64]*Shard{}
-	s.databaseIndexes = map[string]*DatabaseIndex{}
 
 	s.Logger.Info(fmt.Sprintf("Using data dir: %v", s.Path()))
 
@@ -110,37 +140,19 @@ func (s *Store) Open() error {
 		return err
 	}
 
-	// TODO: Start AE for Node
-	if err := s.loadIndexes(); err != nil {
-		return err
-	}
-
 	if err := s.loadShards(); err != nil {
 		return err
 	}
 
 	s.opened = true
+	s.wg.Add(1)
+	go s.monitorShards()
 
-	return nil
-}
-
-func (s *Store) loadIndexes() error {
-	dbs, err := ioutil.ReadDir(s.path)
-	if err != nil {
-		return err
-	}
-	for _, db := range dbs {
-		if !db.IsDir() {
-			s.Logger.Info(fmt.Sprintf("Skipping database dir: %s. Not a directory", db.Name()))
-			continue
-		}
-		s.databaseIndexes[db.Name()] = NewDatabaseIndex(db.Name())
-	}
 	return nil
 }
 
 func (s *Store) loadShards() error {
-	// struct to hold the result of opening each reader in a goroutine
+	// res holds the result from opening each shard in a goroutine
 	type res struct {
 		s   *Shard
 		err error
@@ -148,30 +160,54 @@ func (s *Store) loadShards() error {
 
 	t := limiter.NewFixed(runtime.GOMAXPROCS(0))
 
+	// Setup a shared limiter for compactions
+	lim := s.EngineOptions.Config.MaxConcurrentCompactions
+	if lim == 0 {
+		lim = runtime.GOMAXPROCS(0)
+	}
+	s.EngineOptions.CompactionLimiter = limiter.NewFixed(lim)
+
 	resC := make(chan *res)
 	var n int
 
-	// loop through the current database indexes
-	for db := range s.databaseIndexes {
-		rps, err := ioutil.ReadDir(filepath.Join(s.path, db))
+	// Determine how many shards we need to open by checking the store path.
+	dbDirs, err := ioutil.ReadDir(s.path)
+	if err != nil {
+		return err
+	}
+
+	for _, db := range dbDirs {
+		if !db.IsDir() {
+			s.Logger.Info("Not loading. Not a database directory.", zap.String("name", db.Name()))
+			continue
+		}
+
+		// Retrieve database index.
+		idx, err := s.createIndexIfNotExists(db.Name())
 		if err != nil {
 			return err
 		}
 
-		for _, rp := range rps {
-			// retention policies should be directories.  Skip anything that is not a dir.
+		// Load each retention policy within the database directory.
+		rpDirs, err := ioutil.ReadDir(filepath.Join(s.path, db.Name()))
+		if err != nil {
+			return err
+		}
+
+		for _, rp := range rpDirs {
 			if !rp.IsDir() {
 				s.Logger.Info(fmt.Sprintf("Skipping retention policy dir: %s. Not a directory", rp.Name()))
 				continue
 			}
 
-			shards, err := ioutil.ReadDir(filepath.Join(s.path, db, rp.Name()))
+			shardDirs, err := ioutil.ReadDir(filepath.Join(s.path, db.Name(), rp.Name()))
 			if err != nil {
 				return err
 			}
-			for _, sh := range shards {
+
+			for _, sh := range shardDirs {
 				n++
-				go func(index *DatabaseIndex, db, rp, sh string) {
+				go func(db, rp, sh string) {
 					t.Take()
 					defer t.Release()
 
@@ -186,7 +222,20 @@ func (s *Store) loadShards() error {
 						return
 					}
 
-					shard := NewShard(shardID, s.databaseIndexes[db], path, walPath, s.EngineOptions)
+					// Copy options and assign shared index.
+					opt := s.EngineOptions
+					opt.InmemIndex = idx
+
+					// Existing shards should continue to use inmem index.
+					if _, err := os.Stat(filepath.Join(path, "index")); os.IsNotExist(err) {
+						opt.IndexVersion = "inmem"
+					}
+
+					// Open engine.
+					shard := NewShard(shardID, path, walPath, opt)
+
+					// Disable compactions, writes and queries until all shards are loaded
+					shard.EnableOnOpen = false
 					shard.WithLogger(s.baseLogger)
 
 					err = shard.Open()
@@ -197,11 +246,13 @@ func (s *Store) loadShards() error {
 
 					resC <- &res{s: shard}
 					s.Logger.Info(fmt.Sprintf("%s opened in %s", path, time.Since(start)))
-				}(s.databaseIndexes[db], db, rp.Name(), sh.Name())
+				}(db.Name(), rp.Name(), sh.Name())
 			}
 		}
 	}
 
+	// Gather results of opening shards concurrently, keeping track of how
+	// many databases we are managing.
 	for i := 0; i < n; i++ {
 		res := <-resC
 		if res.err != nil {
@@ -209,8 +260,18 @@ func (s *Store) loadShards() error {
 			continue
 		}
 		s.shards[res.s.id] = res.s
+		s.databases[res.s.database] = struct{}{}
 	}
 	close(resC)
+
+	// Enable all shards
+	for _, sh := range s.shards {
+		sh.SetEnabled(true)
+		if sh.IsIdle() {
+			sh.SetCompactionsEnabled(false)
+		}
+	}
+
 	return nil
 }
 
@@ -227,23 +288,32 @@ func (s *Store) Close() error {
 
 	// Close all the shards in parallel.
 	if err := s.walkShards(s.shardsSlice(), func(sh *Shard) error {
-		return sh.Close()
+		return sh.CloseFast()
 	}); err != nil {
 		return err
 	}
 
 	s.opened = false
 	s.shards = nil
-	s.databaseIndexes = nil
 
 	return nil
 }
 
-// DatabaseIndexN returns the number of databases indices in the store.
-func (s *Store) DatabaseIndexN() int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return len(s.databaseIndexes)
+// createIndexIfNotExists returns a shared index for a database, if the inmem
+// index is being used. If the TSI index is being used, then this method is
+// basically a no-op.
+func (s *Store) createIndexIfNotExists(name string) (interface{}, error) {
+	if idx := s.indexes[name]; idx != nil {
+		return idx, nil
+	}
+
+	idx, err := NewInmemIndex(name)
+	if err != nil {
+		return nil, err
+	}
+
+	s.indexes[name] = idx
+	return idx, nil
 }
 
 // Shard returns a shard by id.
@@ -295,31 +365,34 @@ func (s *Store) CreateShard(database, retentionPolicy string, shardID uint64, en
 	default:
 	}
 
-	// shard already exists
+	// Shard already exists.
 	if _, ok := s.shards[shardID]; ok {
 		return nil
 	}
 
-	// created the db and retention policy dirs if they don't exist
+	// Create the db and retention policy directories if they don't exist.
 	if err := os.MkdirAll(filepath.Join(s.path, database, retentionPolicy), 0700); err != nil {
 		return err
 	}
 
-	// create the WAL directory
+	// Create the WAL directory.
 	walPath := filepath.Join(s.EngineOptions.Config.WALDir, database, retentionPolicy, fmt.Sprintf("%d", shardID))
 	if err := os.MkdirAll(walPath, 0700); err != nil {
 		return err
 	}
 
-	// create the database index if it does not exist
-	db, ok := s.databaseIndexes[database]
-	if !ok {
-		db = NewDatabaseIndex(database)
-		s.databaseIndexes[database] = db
+	// Retrieve shared index, if needed.
+	idx, err := s.createIndexIfNotExists(database)
+	if err != nil {
+		return err
 	}
 
+	// Copy index options and pass in shared index.
+	opt := s.EngineOptions
+	opt.InmemIndex = idx
+
 	path := filepath.Join(s.path, database, retentionPolicy, strconv.FormatUint(shardID, 10))
-	shard := NewShard(shardID, db, path, walPath, s.EngineOptions)
+	shard := NewShard(shardID, path, walPath, opt)
 	shard.WithLogger(s.baseLogger)
 	shard.EnableOnOpen = enabled
 
@@ -328,6 +401,7 @@ func (s *Store) CreateShard(database, retentionPolicy string, shardID uint64, en
 	}
 
 	s.shards[shardID] = shard
+	s.databases[database] = struct{}{} // Ensure we are tracking any new db.
 
 	return nil
 }
@@ -387,7 +461,7 @@ func (s *Store) DeleteShard(shardID uint64) error {
 // DeleteDatabase will close all shards associated with a database and remove the directory and files from disk.
 func (s *Store) DeleteDatabase(name string) error {
 	s.mu.RLock()
-	if s.databaseIndexes[name] == nil {
+	if _, ok := s.databases[name]; !ok {
 		s.mu.RUnlock()
 		// no files locally, so nothing to do
 		return nil
@@ -402,7 +476,7 @@ func (s *Store) DeleteDatabase(name string) error {
 			return nil
 		}
 
-		return sh.Close()
+		return sh.CloseFast()
 	}); err != nil {
 		return err
 	}
@@ -426,7 +500,12 @@ func (s *Store) DeleteDatabase(name string) error {
 	for _, sh := range shards {
 		delete(s.shards, sh.id)
 	}
-	delete(s.databaseIndexes, name)
+
+	// Remove database from store list of databases
+	delete(s.databases, name)
+
+	// Remove shared index for database if using inmem index.
+	delete(s.indexes, name)
 	s.mu.Unlock()
 
 	return nil
@@ -437,7 +516,7 @@ func (s *Store) DeleteDatabase(name string) error {
 // both the DB and WAL, and remove all shard files from disk.
 func (s *Store) DeleteRetentionPolicy(database, name string) error {
 	s.mu.RLock()
-	if s.databaseIndexes[database] == nil {
+	if _, ok := s.databases[database]; !ok {
 		s.mu.RUnlock()
 		// unknown database, nothing to do
 		return nil
@@ -459,6 +538,7 @@ func (s *Store) DeleteRetentionPolicy(database, name string) error {
 		return err
 	}
 
+	// Remove the retention policy folder.
 	rpPath := filepath.Clean(filepath.Join(s.path, database, name))
 
 	// ensure Store's path is the grandparent of the retention policy
@@ -466,7 +546,7 @@ func (s *Store) DeleteRetentionPolicy(database, name string) error {
 		return fmt.Errorf("invalid path for database '%s', retention policy '%s': %s", database, name, rpPath)
 	}
 
-	// Remove the rentention policy folder.
+	// Remove the retention policy folder.
 	if err := os.RemoveAll(filepath.Join(s.path, database, name)); err != nil {
 		return err
 	}
@@ -486,53 +566,43 @@ func (s *Store) DeleteRetentionPolicy(database, name string) error {
 
 // DeleteMeasurement removes a measurement and all associated series from a database.
 func (s *Store) DeleteMeasurement(database, name string) error {
-	// Find the database.
 	s.mu.RLock()
-	db := s.databaseIndexes[database]
-	s.mu.RUnlock()
-	if db == nil {
-		return nil
-	}
-
-	// Find the measurement.
-	m := db.Measurement(name)
-	if m == nil {
-		return influxql.ErrMeasurementNotFound(name)
-	}
-
-	seriesKeys := m.SeriesKeys()
-
-	s.mu.RLock()
-	shards := s.filterShards(func(sh *Shard) bool {
-		return sh.database == database
-	})
+	shards := s.filterShards(byDatabase(database))
 	s.mu.RUnlock()
 
-	if err := s.walkShards(shards, func(sh *Shard) error {
-		if err := sh.DeleteMeasurement(m.Name, seriesKeys); err != nil {
+	return s.walkShards(shards, func(sh *Shard) error {
+		if err := sh.DeleteMeasurement([]byte(name)); err != nil {
 			return err
 		}
 		return nil
-	}); err != nil {
-		return err
-	}
-
-	// Remove measurement from index.
-	db.DropMeasurement(m.Name)
-
-	return nil
+	})
 }
 
 // filterShards returns a slice of shards where fn returns true
-// for the shard.
+// for the shard. If the provided predicate is nil then all shards are returned.
 func (s *Store) filterShards(fn func(sh *Shard) bool) []*Shard {
-	shards := make([]*Shard, 0, len(s.shards))
+	var shards []*Shard
+	if fn == nil {
+		shards = make([]*Shard, 0, len(s.shards))
+		fn = func(*Shard) bool { return true }
+	} else {
+		shards = make([]*Shard, 0)
+	}
+
 	for _, sh := range s.shards {
 		if fn(sh) {
 			shards = append(shards, sh)
 		}
 	}
 	return shards
+}
+
+// byDatabase provides a predicate for filterShards that matches on the name of
+// the database passed in.
+func byDatabase(name string) func(sh *Shard) bool {
+	return func(sh *Shard) bool {
+		return sh.database == name
+	}
 }
 
 // walkShards apply a function to each shard in parallel.  If any of the
@@ -570,7 +640,7 @@ func (s *Store) walkShards(shards []*Shard, fn func(sh *Shard) error) error {
 	return err
 }
 
-// ShardIDs returns a slice of all ShardIDs under management, in arbitrary order.
+// ShardIDs returns a slice of all ShardIDs under management.
 func (s *Store) ShardIDs() []uint64 {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -595,43 +665,29 @@ func (s *Store) shardsSlice() []*Shard {
 	return a
 }
 
-// DatabaseIndex returns the index for a database by its name.
-func (s *Store) DatabaseIndex(name string) *DatabaseIndex {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.databaseIndexes[name]
-}
-
-// Databases returns all the databases in the indexes.
+// Databases returns the names of all databases managed by the store.
 func (s *Store) Databases() []string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	databases := make([]string, 0, len(s.databaseIndexes))
-	for db := range s.databaseIndexes {
-		databases = append(databases, db)
+
+	databases := make([]string, 0, len(s.databases))
+	for k, _ := range s.databases {
+		databases = append(databases, k)
 	}
 	return databases
 }
 
-// Measurement returns a measurement by name from the given database.
-func (s *Store) Measurement(database, name string) *Measurement {
-	s.mu.RLock()
-	db := s.databaseIndexes[database]
-	s.mu.RUnlock()
-	if db == nil {
-		return nil
-	}
-	return db.Measurement(name)
-}
-
-// DiskSize returns the size of all the shard files in bytes.  This size does not include the WAL size.
+// DiskSize returns the size of all the shard files in bytes.
+// This size does not include the WAL size.
 func (s *Store) DiskSize() (int64, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
 	var size int64
-	for _, shardID := range s.ShardIDs() {
-		shard := s.Shard(shardID)
-		sz, err := shard.DiskSize()
+
+	s.mu.RLock()
+	allShards := s.filterShards(nil)
+	s.mu.RUnlock()
+
+	for _, sh := range allShards {
+		sz, err := sh.DiskSize()
 		if err != nil {
 			return 0, err
 		}
@@ -640,7 +696,61 @@ func (s *Store) DiskSize() (int64, error) {
 	return size, nil
 }
 
-// BackupShard will get the shard and have the engine backup since the passed in time to the writer.
+func (s *Store) estimateCardinality(dbName string, getSketches func(*Shard) (estimator.Sketch, estimator.Sketch, error)) (int64, error) {
+	var (
+		ss estimator.Sketch // Sketch estimating number of items.
+		ts estimator.Sketch // Sketch estimating number of tombstoned items.
+	)
+
+	s.mu.RLock()
+	shards := s.filterShards(byDatabase(dbName))
+	s.mu.RUnlock()
+
+	// Iterate over all shards for the database and combine all of the sketches.
+	for _, shard := range shards {
+		s, t, err := getSketches(shard)
+		if err != nil {
+			return 0, err
+		}
+
+		if ss == nil {
+			ss, ts = s, t
+		} else if err = ss.Merge(s); err != nil {
+			return 0, err
+		} else if err = ts.Merge(t); err != nil {
+			return 0, err
+		}
+	}
+
+	if ss != nil {
+		return int64(ss.Count() - ts.Count()), nil
+	}
+	return 0, nil
+}
+
+// SeriesCardinality returns the series cardinality for the provided database.
+func (s *Store) SeriesCardinality(database string) (int64, error) {
+	return s.estimateCardinality(database, func(sh *Shard) (estimator.Sketch, estimator.Sketch, error) {
+		if sh == nil {
+			return nil, nil, errors.New("shard nil, can't get cardinality")
+		}
+		return sh.SeriesSketches()
+	})
+}
+
+// MeasurementsCardinality returns the measurement cardinality for the provided
+// database.
+func (s *Store) MeasurementsCardinality(database string) (int64, error) {
+	return s.estimateCardinality(database, func(sh *Shard) (estimator.Sketch, estimator.Sketch, error) {
+		if sh == nil {
+			return nil, nil, errors.New("shard nil, can't get cardinality")
+		}
+		return sh.MeasurementsSketches()
+	})
+}
+
+// BackupShard will get the shard and have the engine backup since the passed in
+// time to the writer.
 func (s *Store) BackupShard(id uint64, since time.Time, w io.Writer) error {
 	shard := s.Shard(id)
 	if shard == nil {
@@ -671,7 +781,26 @@ func (s *Store) RestoreShard(id uint64, r io.Reader) error {
 	return shard.Restore(r, path)
 }
 
-// ShardRelativePath will return the relative path to the shard. i.e. <database>/<retention>/<id>.
+// ImportShard imports the contents of r to a given shard.
+// All files in the backup are added as new files which may
+// cause duplicated data to occur requiring more expensive
+// compactions.
+func (s *Store) ImportShard(id uint64, r io.Reader) error {
+	shard := s.Shard(id)
+	if shard == nil {
+		return fmt.Errorf("shard %d doesn't exist on this server", id)
+	}
+
+	path, err := relativePath(s.path, shard.path)
+	if err != nil {
+		return err
+	}
+
+	return shard.Import(r, path)
+}
+
+// ShardRelativePath will return the relative path to the shard, i.e.,
+// <database>/<retention>/<id>.
 func (s *Store) ShardRelativePath(id uint64) (string, error) {
 	shard := s.Shard(id)
 	if shard == nil {
@@ -680,7 +809,8 @@ func (s *Store) ShardRelativePath(id uint64) (string, error) {
 	return relativePath(s.path, shard.path)
 }
 
-// DeleteSeries loops through the local shards and deletes the series data and metadata for the passed in series keys.
+// DeleteSeries loops through the local shards and deletes the series data for
+// the passed in series keys.
 func (s *Store) DeleteSeries(database string, sources []influxql.Source, condition influxql.Expr) error {
 	// Expand regex expressions in the FROM clause.
 	a, err := s.ExpandSources(sources)
@@ -698,88 +828,47 @@ func (s *Store) DeleteSeries(database string, sources []influxql.Source, conditi
 	}
 
 	s.mu.RLock()
+	shards := s.filterShards(byDatabase(database))
+	s.mu.RUnlock()
+
+	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	// Find the database.
-	db := s.DatabaseIndex(database)
-	if db == nil {
-		return nil
-	}
+	return s.walkShards(shards, func(sh *Shard) error {
+		// Determine list of measurements from sources.
+		// Use all measurements if no FROM clause was provided.
+		var names []string
+		if len(sources) > 0 {
+			for _, source := range sources {
+				names = append(names, source.(*influxql.Measurement).Name)
+			}
+		} else {
+			if err := sh.engine.ForEachMeasurementName(func(name []byte) error {
+				names = append(names, string(name))
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		sort.Strings(names)
 
-	measurements, err := measurementsFromSourcesOrDB(db, sources...)
-	if err != nil {
-		return err
-	}
-
-	var seriesKeys []string
-	for _, m := range measurements {
-		var ids SeriesIDs
-		var filters FilterExprs
-		if condition != nil {
-			// Get series IDs that match the WHERE clause.
-			ids, filters, err = m.walkWhereForSeriesIds(condition)
+		// Find matching series keys for each measurement.
+		var keys [][]byte
+		for _, name := range names {
+			a, err := sh.engine.MeasurementSeriesKeysByExpr([]byte(name), condition)
 			if err != nil {
 				return err
 			}
-
-			// Delete boolean literal true filter expressions.
-			// These are returned for `WHERE tagKey = 'tagVal'` type expressions and are okay.
-			filters.DeleteBoolLiteralTrues()
-
-			// Check for unsupported field filters.
-			// Any remaining filters means there were fields (e.g., `WHERE value = 1.2`).
-			if filters.Len() > 0 {
-				return errors.New("fields not supported in WHERE clause during deletion")
-			}
-		} else {
-			// No WHERE clause so get all series IDs for this measurement.
-			ids = m.seriesIDs
+			keys = append(keys, a...)
 		}
 
-		for _, id := range ids {
-			seriesKeys = append(seriesKeys, m.seriesByID[id].Key)
+		if !bytesutil.IsSorted(keys) {
+			bytesutil.Sort(keys)
 		}
-	}
 
-	// delete the raw series data
-	if err := s.deleteSeries(database, seriesKeys, min, max); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Store) deleteSeries(database string, seriesKeys []string, min, max int64) error {
-	db := s.databaseIndexes[database]
-	if db == nil {
-		return influxql.ErrDatabaseNotFound(database)
-	}
-
-	s.mu.RLock()
-	shards := s.filterShards(func(sh *Shard) bool {
-		return sh.database == database
-	})
-	s.mu.RUnlock()
-
-	return s.walkShards(shards, func(sh *Shard) error {
-		if sh.database != database {
-			return nil
-		}
-		if err := sh.DeleteSeriesRange(seriesKeys, min, max); err != nil {
+		// Delete all matching keys.
+		if err := sh.DeleteSeriesRange(keys, min, max); err != nil {
 			return err
-		}
-
-		// The keys we passed in may be fully deleted from the shard, if so,
-		// we need to remove the shard from all the meta data indexes
-		existing, err := sh.ContainsSeries(seriesKeys)
-		if err != nil {
-			return err
-		}
-
-		for k, exists := range existing {
-			if !exists {
-				db.UnassignShard(k, sh.id)
-			}
 		}
 		return nil
 	})
@@ -816,52 +905,59 @@ func (s *Store) WriteToShard(shardID uint64, points []models.Point) error {
 	return sh.WritePoints(points)
 }
 
-// Measurements returns a slice of sorted measurement names in the given database,
-// matching the given condition.
-func (s *Store) Measurements(database string, cond influxql.Expr) ([]string, error) {
-	dbi := s.DatabaseIndex(database)
-	if dbi == nil {
-		return nil, nil
-	}
+// MeasurementNames returns a slice of all measurements. Measurements accepts an
+// optional condition expression. If cond is nil, then all measurements for the
+// database will be returned.
+func (s *Store) MeasurementNames(database string, cond influxql.Expr) ([][]byte, error) {
+	s.mu.RLock()
+	shards := s.filterShards(byDatabase(database))
+	s.mu.RUnlock()
 
-	// Retrieve measurements from database index. Filter if condition specified.
-	var mms Measurements
-	if cond == nil {
-		mms = dbi.Measurements()
-	} else {
-		var err error
-		mms, _, err = dbi.MeasurementsByExpr(cond)
+	// Map to deduplicate measurement names across all shards.  This is kind of naive
+	// and could be improved using a sorted merge of the already sorted measurements in
+	// each shard.
+	set := make(map[string]struct{})
+	var names [][]byte
+	for _, sh := range shards {
+		a, err := sh.MeasurementNamesByExpr(cond)
 		if err != nil {
 			return nil, err
 		}
+
+		for _, m := range a {
+			if _, ok := set[string(m)]; !ok {
+				set[string(m)] = struct{}{}
+				names = append(names, m)
+			}
+		}
 	}
+	bytesutil.Sort(names)
 
-	// Sort measurements by name.
-	sort.Sort(mms)
-
-	measurements := make([]string, len(mms))
-	for i, m := range mms {
-		measurements[i] = m.Name
-	}
-
-	return measurements, nil
+	return names, nil
 }
 
-// TagValues represents the tag keys and values in a measurement.
+// MeasurementSeriesCounts returns the number of measurements and series in all
+// the shards' indices.
+func (s *Store) MeasurementSeriesCounts(database string) (measuments int, series int) {
+	// TODO: implement me
+	return 0, 0
+}
+
 type TagValues struct {
 	Measurement string
 	Values      []KeyValue
 }
 
+type TagValuesSlice []TagValues
+
+func (a TagValuesSlice) Len() int           { return len(a) }
+func (a TagValuesSlice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a TagValuesSlice) Less(i, j int) bool { return a[i].Measurement < a[j].Measurement }
+
 // TagValues returns the tag keys and values in the given database, matching the condition.
 func (s *Store) TagValues(database string, cond influxql.Expr) ([]TagValues, error) {
 	if cond == nil {
 		return nil, errors.New("a condition is required")
-	}
-
-	dbi := s.DatabaseIndex(database)
-	if dbi == nil {
-		return nil, nil
 	}
 
 	measurementExpr := influxql.CloneExpr(cond)
@@ -879,19 +975,6 @@ func (s *Store) TagValues(database string, cond influxql.Expr) ([]TagValues, err
 		return e
 	}), nil)
 
-	mms, ok, err := dbi.MeasurementsByExpr(measurementExpr)
-	if err != nil {
-		return nil, err
-	} else if !ok {
-		mms = dbi.Measurements()
-		sort.Sort(mms)
-	}
-
-	// If there are no measurements, return immediately.
-	if len(mms) == 0 {
-		return nil, nil
-	}
-
 	filterExpr := influxql.CloneExpr(cond)
 	filterExpr = influxql.Reduce(influxql.RewriteExpr(filterExpr, func(e influxql.Expr) influxql.Expr {
 		switch e := e.(type) {
@@ -907,50 +990,129 @@ func (s *Store) TagValues(database string, cond influxql.Expr) ([]TagValues, err
 		return e
 	}), nil)
 
-	tagValues := make([]TagValues, len(mms))
-	for i, mm := range mms {
-		tagValues[i].Measurement = mm.Name
+	// Get all measurements for the shards we're interested in.
+	s.mu.RLock()
+	shards := s.filterShards(byDatabase(database))
+	s.mu.RUnlock()
 
-		ids, err := mm.SeriesIDsAllOrByExpr(filterExpr)
-		if err != nil {
-			return nil, err
-		}
-		ss := mm.SeriesByIDSlice(ids)
-
-		// Determine a list of keys from condition.
-		keySet, ok, err := mm.TagKeysByExpr(cond)
+	m := make(map[string]map[KeyValue]struct{})
+	for _, sh := range shards {
+		names, err := sh.MeasurementNamesByExpr(measurementExpr)
 		if err != nil {
 			return nil, err
 		}
 
-		// Loop over all keys for each series.
-		m := make(map[KeyValue]struct{}, len(ss))
-		for _, series := range ss {
-			series.ForEachTag(func(t models.Tag) {
-				if !ok {
-					// nop
-				} else if _, exists := keySet[string(t.Key)]; !exists {
-					return
+		for _, name := range names {
+			// Determine a list of keys from condition.
+			keySet, err := sh.engine.MeasurementTagKeysByExpr(name, cond)
+			if err != nil {
+				return nil, err
+			}
+
+			// Loop over all keys for each series.
+			if err := sh.engine.ForEachMeasurementSeriesByExpr(name, filterExpr, func(tags models.Tags) error {
+				for _, t := range tags {
+					if _, ok := keySet[string(t.Key)]; ok {
+						if m[string(name)] == nil {
+							m[string(name)] = make(map[KeyValue]struct{})
+						}
+						m[string(name)][KeyValue{string(t.Key), string(t.Value)}] = struct{}{}
+					}
 				}
-				m[KeyValue{string(t.Key), string(t.Value)}] = struct{}{}
-			})
+				return nil
+			}); err != nil {
+				return nil, err
+			}
 		}
+	}
 
-		// Return an empty slice if there are no key/value matches.
-		if len(m) == 0 {
-			continue
-		}
-
-		// Sort key/value set.
-		a := make([]KeyValue, 0, len(m))
-		for kv := range m {
+	// Sort key/value set.
+	var tagValues []TagValues
+	for name, kvs := range m {
+		a := make([]KeyValue, 0, len(kvs))
+		for kv := range kvs {
 			a = append(a, kv)
 		}
 		sort.Sort(KeyValues(a))
-		tagValues[i].Values = a
-	}
 
+		tagValues = append(tagValues, TagValues{
+			Measurement: name,
+			Values:      a,
+		})
+	}
+	sort.Sort(TagValuesSlice(tagValues))
 	return tagValues, nil
+}
+
+func (s *Store) monitorShards() {
+	defer s.wg.Done()
+	t := time.NewTicker(10 * time.Second)
+	defer t.Stop()
+	t2 := time.NewTicker(time.Minute)
+	defer t2.Stop()
+	for {
+		select {
+		case <-s.closing:
+			return
+		case <-t.C:
+			s.mu.RLock()
+			for _, sh := range s.shards {
+				if sh.IsIdle() {
+					sh.SetCompactionsEnabled(false)
+				} else {
+					sh.SetCompactionsEnabled(true)
+				}
+			}
+			s.mu.RUnlock()
+		case <-t2.C:
+			if s.EngineOptions.Config.MaxValuesPerTag == 0 {
+				continue
+			}
+
+			s.mu.RLock()
+			shards := s.filterShards(func(sh *Shard) bool {
+				return sh.IndexType() == "inmem"
+			})
+			s.mu.RUnlock()
+
+			// No inmem shards...
+			if len(shards) == 0 {
+				continue
+			}
+
+			// inmem shards share the same index instance so just use the first one to avoid
+			// allocating the same measurements repeatedly
+			first := shards[0]
+			names, err := first.MeasurementNamesByExpr(nil)
+			if err != nil {
+				s.Logger.Warn("cannot retrieve measurement names", zap.Error(err))
+				continue
+			}
+
+			s.walkShards(shards, func(sh *Shard) error {
+				db := sh.database
+				id := sh.id
+
+				for _, name := range names {
+					sh.ForEachMeasurementTagKey(name, func(k []byte) error {
+						n := sh.TagKeyCardinality(name, k)
+						perc := int(float64(n) / float64(s.EngineOptions.Config.MaxValuesPerTag) * 100)
+						if perc > 100 {
+							perc = 100
+						}
+
+						// Log at 80, 85, 90-100% levels
+						if perc == 80 || perc == 85 || perc >= 90 {
+							s.Logger.Info(fmt.Sprintf("WARN: %d%% of max-values-per-tag limit exceeded: (%d/%d), db=%s shard=%d measurement=%s tag=%s",
+								perc, n, s.EngineOptions.Config.MaxValuesPerTag, db, id, name, k))
+						}
+						return nil
+					})
+				}
+				return nil
+			})
+		}
+	}
 }
 
 // KeyValue holds a string key and a string value.
@@ -1005,9 +1167,9 @@ func (e *Store) filterShowSeriesResult(limit, offset int, rows models.Rows) mode
 	return filteredSeries
 }
 
-// DecodeStorePath extracts the database and retention policy names
+// decodeStorePath extracts the database and retention policy names
 // from a given shard or WAL path.
-func DecodeStorePath(shardOrWALPath string) (database, retentionPolicy string) {
+func decodeStorePath(shardOrWALPath string) (database, retentionPolicy string) {
 	// shardOrWALPath format: /maybe/absolute/base/then/:database/:retentionPolicy/:nameOfShardOrWAL
 
 	// Discard the last part of the path (the shard name or the wal name).
@@ -1038,35 +1200,4 @@ func relativePath(storePath, shardPath string) (string, error) {
 	}
 
 	return name, nil
-}
-
-// measurementsFromSourcesOrDB returns a list of measurements from the
-// sources passed in or, if sources is empty, a list of all
-// measurement names from the database passed in.
-func measurementsFromSourcesOrDB(db *DatabaseIndex, sources ...influxql.Source) (Measurements, error) {
-	var measurements Measurements
-	if len(sources) > 0 {
-		for _, source := range sources {
-			if m, ok := source.(*influxql.Measurement); ok {
-				measurement := db.measurements[m.Name]
-				if measurement == nil {
-					continue
-				}
-
-				measurements = append(measurements, measurement)
-			} else {
-				return nil, errors.New("identifiers in FROM clause must be measurement names")
-			}
-		}
-	} else {
-		// No measurements specified in FROM clause so get all measurements that have series.
-		for _, m := range db.Measurements() {
-			if m.HasSeries() {
-				measurements = append(measurements, m)
-			}
-		}
-	}
-	sort.Sort(measurements)
-
-	return measurements, nil
 }

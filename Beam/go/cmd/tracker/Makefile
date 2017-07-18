@@ -23,6 +23,7 @@ gen:
 	$(GOAGEN_DIR)/goagen app -d $(DESIGN_PKG)
 	$(GOAGEN_DIR)/goagen swagger -d $(DESIGN_PKG)
 	rm $(GOAGEN_DIR)/goagen
+	rm -fr goagen*
 
 build: gen
 	go build -o tracker

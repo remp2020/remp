@@ -46,7 +46,7 @@ const (
 // Point defines the values that will be written to the database.
 type Point interface {
 	// Name return the measurement name for the point.
-	Name() string
+	Name() []byte
 
 	// SetName updates the measurement name for the point.
 	SetName(string)
@@ -59,6 +59,9 @@ type Point interface {
 
 	// SetTags replaces the tags for the point.
 	SetTags(tags Tags)
+
+	// HasTag returns true if the tag exists for the point.
+	HasTag(tag []byte) bool
 
 	// Fields returns the fields for the point.
 	Fields() (Fields, error)
@@ -159,9 +162,6 @@ type FieldIterator interface {
 	// FloatValue returns the float value of the current field.
 	FloatValue() (float64, error)
 
-	// Delete deletes the current field.
-	Delete()
-
 	// Reset resets the iterator to its initial state.
 	Reset()
 }
@@ -237,7 +237,7 @@ func ParsePointsString(buf string) ([]Point, error) {
 //
 // NOTE: to minimize heap allocations, the returned Tags will refer to subslices of buf.
 // This can have the unintended effect preventing buf from being garbage collected.
-func ParseKey(buf []byte) (string, Tags, error) {
+func ParseKey(buf []byte) (string, Tags) {
 	// Ignore the error because scanMeasurement returns "missing fields" which we ignore
 	// when just parsing a key
 	state, i, _ := scanMeasurement(buf, 0)
@@ -246,9 +246,23 @@ func ParseKey(buf []byte) (string, Tags, error) {
 	if state == tagKeyState {
 		tags = parseTags(buf)
 		// scanMeasurement returns the location of the comma if there are tags, strip that off
-		return string(buf[:i-1]), tags, nil
+		return string(buf[:i-1]), tags
 	}
-	return string(buf[:i]), tags, nil
+	return string(buf[:i]), tags
+}
+
+func ParseTags(buf []byte) (Tags, error) {
+	return parseTags(buf), nil
+}
+
+func ParseName(buf []byte) ([]byte, error) {
+	// Ignore the error because scanMeasurement returns "missing fields" which we ignore
+	// when just parsing a key
+	state, i, _ := scanMeasurement(buf, 0)
+	if state == tagKeyState {
+		return buf[:i-1], nil
+	}
+	return buf[:i], nil
 }
 
 // ParsePointsWithPrecision is similar to ParsePoints, but allows the
@@ -328,6 +342,19 @@ func parsePoint(buf []byte, defaultTime time.Time, precision string) (Point, err
 	// at least one field is required
 	if len(fields) == 0 {
 		return nil, fmt.Errorf("missing fields")
+	}
+
+	var maxKeyErr error
+	walkFields(fields, func(k, v []byte) bool {
+		if sz := seriesKeySize(key, k); sz > MaxKeyLength {
+			maxKeyErr = fmt.Errorf("max key length exceeded: %v > %v", sz, MaxKeyLength)
+			return false
+		}
+		return true
+	})
+
+	if maxKeyErr != nil {
+		return nil, maxKeyErr
 	}
 
 	// scan the last block which is an optional integer timestamp
@@ -1245,11 +1272,20 @@ func pointKey(measurement string, tags Tags, fields Fields, t time.Time) ([]byte
 	}
 
 	key := MakeKey([]byte(measurement), tags)
-	if len(key) > MaxKeyLength {
-		return nil, fmt.Errorf("max key length exceeded: %v > %v", len(key), MaxKeyLength)
+	for field := range fields {
+		sz := seriesKeySize(key, []byte(field))
+		if sz > MaxKeyLength {
+			return nil, fmt.Errorf("max key length exceeded: %v > %v", sz, MaxKeyLength)
+		}
 	}
 
 	return key, nil
+}
+
+func seriesKeySize(key, field []byte) int {
+	// 4 is the length of the tsm1.fieldKeySeparator constant.  It's inlined here to avoid a circular
+	// dependency.
+	return len(key) + 4 + len(field)
 }
 
 // NewPointFromBytes returns a new Point from a marshalled Point.
@@ -1258,13 +1294,41 @@ func NewPointFromBytes(b []byte) (Point, error) {
 	if err := p.UnmarshalBinary(b); err != nil {
 		return nil, err
 	}
-	fields, err := p.Fields()
-	if err != nil {
-		return nil, err
+
+	// This does some basic validation to ensure there are fields and they
+	// can be unmarshalled as well.
+	iter := p.FieldIterator()
+	var hasField bool
+	for iter.Next() {
+		if len(iter.FieldKey()) == 0 {
+			continue
+		}
+		hasField = true
+		switch iter.Type() {
+		case Float:
+			_, err := iter.FloatValue()
+			if err != nil {
+				return nil, fmt.Errorf("unable to unmarshal field %s: %s", string(iter.FieldKey()), err)
+			}
+		case Integer:
+			_, err := iter.IntegerValue()
+			if err != nil {
+				return nil, fmt.Errorf("unable to unmarshal field %s: %s", string(iter.FieldKey()), err)
+			}
+		case String:
+			// Skip since this won't return an error
+		case Boolean:
+			_, err := iter.BooleanValue()
+			if err != nil {
+				return nil, fmt.Errorf("unable to unmarshal field %s: %s", string(iter.FieldKey()), err)
+			}
+		}
 	}
-	if len(fields) == 0 {
+
+	if !hasField {
 		return nil, ErrPointMustHaveAField
 	}
+
 	return p, nil
 }
 
@@ -1288,13 +1352,8 @@ func (p *point) name() []byte {
 	return name
 }
 
-// Name return the measurement name for the point.
-func (p *point) Name() string {
-	if p.cachedName != "" {
-		return p.cachedName
-	}
-	p.cachedName = string(escape.Unescape(p.name()))
-	return p.cachedName
+func (p *point) Name() []byte {
+	return escape.Unescape(p.name())
 }
 
 // SetName updates the measurement name for the point.
@@ -1327,21 +1386,36 @@ func (p *point) Tags() Tags {
 	return p.cachedTags
 }
 
-func parseTags(buf []byte) Tags {
+func (p *point) HasTag(tag []byte) bool {
+	if len(p.key) == 0 {
+		return false
+	}
+
+	var exists bool
+	walkTags(p.key, func(key, value []byte) bool {
+		if bytes.Equal(tag, key) {
+			exists = true
+			return false
+		}
+		return true
+	})
+
+	return exists
+}
+
+func walkTags(buf []byte, fn func(key, value []byte) bool) {
 	if len(buf) == 0 {
-		return nil
+		return
 	}
 
 	pos, name := scanTo(buf, 0, ',')
 
 	// it's an empty key, so there are no tags
 	if len(name) == 0 {
-		return nil
+		return
 	}
 
-	tags := make(Tags, 0, bytes.Count(buf, []byte(",")))
 	hasEscape := bytes.IndexByte(buf, '\\') != -1
-
 	i := pos + 1
 	var key, value []byte
 	for {
@@ -1356,14 +1430,50 @@ func parseTags(buf []byte) Tags {
 		}
 
 		if hasEscape {
-			tags = append(tags, Tag{Key: unescapeTag(key), Value: unescapeTag(value)})
+			if !fn(unescapeTag(key), unescapeTag(value)) {
+				return
+			}
 		} else {
-			tags = append(tags, Tag{Key: key, Value: value})
+			if !fn(key, value) {
+				return
+			}
 		}
 
 		i++
 	}
+}
 
+// walkFields walks each field key and value via fn.  If fn returns false, the iteration
+// is stopped.  The values are the raw byte slices and not the converted types.
+func walkFields(buf []byte, fn func(key, value []byte) bool) {
+	var i int
+	var key, val []byte
+	for len(buf) > 0 {
+		i, key = scanTo(buf, 0, '=')
+		buf = buf[i+1:]
+		i, val = scanFieldValue(buf, 0)
+		buf = buf[i:]
+		if !fn(key, val) {
+			break
+		}
+
+		// slice off comma
+		if len(buf) > 0 {
+			buf = buf[1:]
+		}
+	}
+}
+
+func parseTags(buf []byte) Tags {
+	if len(buf) == 0 {
+		return nil
+	}
+
+	tags := make(Tags, 0, bytes.Count(buf, []byte(",")))
+	walkTags(buf, func(key, value []byte) bool {
+		tags = append(tags, NewTag(key, value))
+		return true
+	})
 	return tags
 }
 
@@ -1376,7 +1486,7 @@ func MakeKey(name []byte, tags Tags) []byte {
 
 // SetTags replaces the tags for the point.
 func (p *point) SetTags(tags Tags) {
-	p.key = MakeKey([]byte(p.Name()), tags)
+	p.key = MakeKey(p.Name(), tags)
 	p.cachedTags = tags
 }
 
@@ -1386,7 +1496,7 @@ func (p *point) AddTag(key, value string) {
 	tags = append(tags, Tag{Key: []byte(key), Value: []byte(value)})
 	sort.Sort(tags)
 	p.cachedTags = tags
-	p.key = MakeKey([]byte(p.Name()), tags)
+	p.key = MakeKey(p.Name(), tags)
 }
 
 // Fields returns the fields for the point.
@@ -1639,6 +1749,17 @@ type Tag struct {
 	Value []byte
 }
 
+// NewTag returns a new Tag.
+func NewTag(key, value []byte) Tag {
+	return Tag{
+		Key:   key,
+		Value: value,
+	}
+}
+
+// Size returns the size of the key and value.
+func (t Tag) Size() int { return len(t.Key) + len(t.Value) }
+
 // Clone returns a shallow copy of Tag.
 //
 // Tags associated with a Point created by ParsePointsWithPrecision will hold references to the byte slice that was parsed.
@@ -1655,6 +1776,17 @@ func (t Tag) Clone() Tag {
 	return other
 }
 
+// String returns the string reprsentation of the tag.
+func (t *Tag) String() string {
+	var buf bytes.Buffer
+	buf.WriteByte('{')
+	buf.WriteString(string(t.Key))
+	buf.WriteByte(' ')
+	buf.WriteString(string(t.Value))
+	buf.WriteByte('}')
+	return buf.String()
+}
+
 // Tags represents a sorted list of tags.
 type Tags []Tag
 
@@ -1665,10 +1797,35 @@ func NewTags(m map[string]string) Tags {
 	}
 	a := make(Tags, 0, len(m))
 	for k, v := range m {
-		a = append(a, Tag{Key: []byte(k), Value: []byte(v)})
+		a = append(a, NewTag([]byte(k), []byte(v)))
 	}
 	sort.Sort(a)
 	return a
+}
+
+// String returns the string representation of the tags.
+func (a Tags) String() string {
+	var buf bytes.Buffer
+	buf.WriteByte('[')
+	for i := range a {
+		buf.WriteString(a[i].String())
+		if i < len(a)-1 {
+			buf.WriteByte(' ')
+		}
+	}
+	buf.WriteByte(']')
+	return buf.String()
+}
+
+// Size returns the number of bytes needed to store all tags. Note, this is
+// the number of bytes needed to store all keys and values and does not account
+// for data structures or delimiters for example.
+func (a Tags) Size() int {
+	var total int
+	for _, t := range a {
+		total += t.Size()
+	}
+	return total
 }
 
 // Clone returns a copy of the slice where the elements are a result of calling `Clone` on the original elements
@@ -1688,14 +1845,45 @@ func (a Tags) Clone() Tags {
 	return others
 }
 
-// Len implements sort.Interface.
-func (a Tags) Len() int { return len(a) }
-
-// Less implements sort.Interface.
+func (a Tags) Len() int           { return len(a) }
 func (a Tags) Less(i, j int) bool { return bytes.Compare(a[i].Key, a[j].Key) == -1 }
+func (a Tags) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-// Swap implements sort.Interface.
-func (a Tags) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+// Equal returns true if a equals other.
+func (a Tags) Equal(other Tags) bool {
+	if len(a) != len(other) {
+		return false
+	}
+	for i := range a {
+		if !bytes.Equal(a[i].Key, other[i].Key) || !bytes.Equal(a[i].Value, other[i].Value) {
+			return false
+		}
+	}
+	return true
+}
+
+// CompareTags returns -1 if a < b, 1 if a > b, and 0 if a == b.
+func CompareTags(a, b Tags) int {
+	// Compare each key & value until a mismatch.
+	for i := 0; i < len(a) && i < len(b); i++ {
+		if cmp := bytes.Compare(a[i].Key, b[i].Key); cmp != 0 {
+			return cmp
+		}
+		if cmp := bytes.Compare(a[i].Value, b[i].Value); cmp != 0 {
+			return cmp
+		}
+	}
+
+	// If all tags are equal up to this point then return shorter tagset.
+	if len(a) < len(b) {
+		return -1
+	} else if len(a) > len(b) {
+		return 1
+	}
+
+	// All tags are equal.
+	return 0
+}
 
 // Get returns the value for a key.
 func (a Tags) Get(key []byte) []byte {
@@ -1716,9 +1904,9 @@ func (a Tags) GetString(key string) string {
 
 // Set sets the value for a key.
 func (a *Tags) Set(key, value []byte) {
-	for _, t := range *a {
+	for i, t := range *a {
 		if bytes.Equal(t.Key, key) {
-			t.Value = value
+			(*a)[i].Value = value
 			return
 		}
 	}
@@ -1773,64 +1961,73 @@ func (a Tags) HashKey() []byte {
 		return nil
 	}
 
+	// Type invariant: Tags are sorted
+
 	escaped := make(Tags, 0, len(a))
+	sz := 0
 	for _, t := range a {
 		ek := escapeTag(t.Key)
 		ev := escapeTag(t.Value)
 
 		if len(ev) > 0 {
 			escaped = append(escaped, Tag{Key: ek, Value: ev})
+			sz += len(ek) + len(ev)
 		}
 	}
 
-	// Extract keys and determine final size.
-	sz := len(escaped) + (len(escaped) * 2) // separators
-	keys := make([][]byte, len(escaped)+1)
-	for i, t := range escaped {
-		keys[i] = t.Key
-		sz += len(t.Key) + len(t.Value)
-	}
-	keys = keys[:len(escaped)]
-	sort.Sort(byteSlices(keys))
+	sz += len(escaped) + (len(escaped) * 2) // separators
 
 	// Generate marshaled bytes.
 	b := make([]byte, sz)
 	buf := b
 	idx := 0
-	for i, k := range keys {
+	for _, k := range escaped {
 		buf[idx] = ','
 		idx++
-		copy(buf[idx:idx+len(k)], k)
-		idx += len(k)
+		copy(buf[idx:idx+len(k.Key)], k.Key)
+		idx += len(k.Key)
 		buf[idx] = '='
 		idx++
-		v := escaped[i].Value
-		copy(buf[idx:idx+len(v)], v)
-		idx += len(v)
+		copy(buf[idx:idx+len(k.Value)], k.Value)
+		idx += len(k.Value)
 	}
 	return b[:idx]
+}
+
+// CopyTags returns a shallow copy of tags.
+func CopyTags(a Tags) Tags {
+	other := make(Tags, len(a))
+	copy(other, a)
+	return other
+}
+
+// DeepCopyTags returns a deep copy of tags.
+func DeepCopyTags(a Tags) Tags {
+	// Calculate size of keys/values in bytes.
+	var n int
+	for _, t := range a {
+		n += len(t.Key) + len(t.Value)
+	}
+
+	// Build single allocation for all key/values.
+	buf := make([]byte, n)
+
+	// Copy tags to new set.
+	other := make(Tags, len(a))
+	for i, t := range a {
+		copy(buf, t.Key)
+		other[i].Key, buf = buf[:len(t.Key)], buf[len(t.Key):]
+
+		copy(buf, t.Value)
+		other[i].Value, buf = buf[:len(t.Value)], buf[len(t.Value):]
+	}
+
+	return other
 }
 
 // Fields represents a mapping between a Point's field names and their
 // values.
 type Fields map[string]interface{}
-
-func parseNumber(val []byte) (interface{}, error) {
-	if val[len(val)-1] == 'i' {
-		val = val[:len(val)-1]
-		return parseIntBytes(val, 10, 64)
-	}
-	for i := 0; i < len(val); i++ {
-		// If there is a decimal or an N (NaN), I (Inf), parse as float
-		if val[i] == '.' || val[i] == 'N' || val[i] == 'n' || val[i] == 'I' || val[i] == 'i' || val[i] == 'e' {
-			return parseFloatBytes(val, 64)
-		}
-		if val[i] < '0' && val[i] > '9' {
-			return string(val), nil
-		}
-	}
-	return parseFloatBytes(val, 64)
-}
 
 // FieldIterator retuns a FieldIterator that can be used to traverse the
 // fields of a point without constructing the in-memory map.
@@ -1929,24 +2126,6 @@ func (p *point) FloatValue() (float64, error) {
 		return 0, fmt.Errorf("unable to parse floating point value %q: %v", p.it.valueBuf, err)
 	}
 	return f, nil
-}
-
-// Delete deletes the current field.
-func (p *point) Delete() {
-	switch {
-	case p.it.end == p.it.start:
-	case p.it.end >= len(p.fields):
-		p.fields = p.fields[:p.it.start]
-	case p.it.start == 0:
-		p.fields = p.fields[p.it.end:]
-	default:
-		p.fields = append(p.fields[:p.it.start], p.fields[p.it.end:]...)
-	}
-
-	p.it.end = p.it.start
-	p.it.key = nil
-	p.it.valueBuf = nil
-	p.it.fieldType = Empty
 }
 
 // Reset resets the iterator to its initial state.

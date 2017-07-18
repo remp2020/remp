@@ -1,4 +1,4 @@
-package doc
+package doc_test
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-func ExampleCommand_GenManTree() {
+func ExampleGenManTree() {
 	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "my test program",
@@ -20,7 +20,7 @@ func ExampleCommand_GenManTree() {
 	doc.GenManTree(cmd, header, "/tmp")
 }
 
-func ExampleCommand_GenMan() {
+func ExampleGenMan() {
 	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "my test program",

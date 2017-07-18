@@ -1,4 +1,4 @@
-package json
+package json_test
 
 import (
 	"bytes"

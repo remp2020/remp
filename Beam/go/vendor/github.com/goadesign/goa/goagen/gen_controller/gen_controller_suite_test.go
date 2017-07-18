@@ -1,4 +1,4 @@
-package gencontroller
+package gencontroller_test
 
 import (
 	. "github.com/onsi/ginkgo"

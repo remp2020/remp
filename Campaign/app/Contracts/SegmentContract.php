@@ -2,6 +2,7 @@
 
 namespace App\Contracts;
 
+use App\CampaignSegment;
 use Illuminate\Support\Collection;
 
 interface SegmentContract
@@ -10,7 +11,9 @@ interface SegmentContract
 
     public function list(): Collection;
 
-    public function check($segmentId, $userId): bool;
+    public function check(CampaignSegment $campaignSegment, $userId): bool;
 
     public function users($segmentId): Collection;
+
+    public function provider(): string;
 }

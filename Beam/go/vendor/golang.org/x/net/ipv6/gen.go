@@ -9,7 +9,7 @@
 // This program generates system adaptation constants and types,
 // internet protocol constants and tables by reading template files
 // and IANA protocol registries.
-package ipv6
+package main
 
 import (
 	"bytes"

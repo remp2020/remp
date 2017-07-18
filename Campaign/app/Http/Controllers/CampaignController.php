@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Banner;
 use App\Campaign;
+use App\CampaignSegment;
+use App\Contracts\JournalContract;
+use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
+use App\Contracts\SegmentException;
 use App\Contracts\TrackerContract;
 use App\Http\Requests\CampaignRequest;
 use App\Jobs\CacheSegmentJob;
-use Cache;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Psy\Util\Json;
 use View;
 use Yajra\Datatables\Datatables;
@@ -33,7 +36,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::query();
-        return $dataTables->of($campaigns)
+        return $dataTables->of($campaigns->with('segments'))
             ->addColumn('actions', function(Campaign $campaign) {
                 return Json::encode([
                     '_id' => $campaign->id,
@@ -100,15 +103,21 @@ class CampaignController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Campaign $campaign
-     * @param SegmentContract $segmentContract
+     * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function edit(Campaign $campaign, SegmentContract $segmentContract)
-    {
+    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator ) {
         $campaign->fill(old());
 
         $banners = Banner::all();
-        $segments = $segmentContract->list();
+
+        try {
+            $segments = $segmentAggregator->list();
+        } catch (SegmentException $e) {
+            $segments = new Collection();
+            flash('Unable to fetch list of segments, please check the application configuration.')->error();
+            \Log::error($e->getMessage());
+        }
 
         return view('campaigns.edit', [
             'campaign' => $campaign,
@@ -130,6 +139,17 @@ class CampaignController extends Controller
         $shouldCache = $campaign->isDirty('active');
         $campaign->save();
 
+        foreach ($request->get('segments') as $r) {
+            /** @var CampaignSegment $rule */
+            $rule = CampaignSegment::findOrNew($r['id']);
+            $rule->code = $r['code'];
+            $rule->provider = $r['provider'];
+            $rule->campaign_id = $campaign->id;
+            $rule->save();
+        }
+
+        CampaignSegment::destroy($request->get('removedSegments'));
+
         if ($campaign->active && $shouldCache) {
             dispatch(new CacheSegmentJob($campaign->segment_id));
         }
@@ -142,8 +162,9 @@ class CampaignController extends Controller
      * @param DimensionMap $dm
      * @param PositionMap $pm
      * @param AlignmentMap $am
-     * @param SegmentContract $sc
+     * @param SegmentAggregator $sa
      * @param TrackerContract $tc
+     * @param JournalContract $jc
      * @return \Illuminate\Http\JsonResponse
      */
     public function showtime(
@@ -151,9 +172,13 @@ class CampaignController extends Controller
         DimensionMap $dm,
         PositionMap $pm,
         AlignmentMap $am,
-        SegmentContract $sc,
-        TrackerContract $tc
+        SegmentAggregator $sa,
+        TrackerContract $tc,
+        JournalContract $jc
     ) {
+        // validation
+
+        /** @var Campaign $campaign */
         $campaign = Campaign::whereActive(true)->first();
         if (!$campaign) {
             return response()
@@ -181,17 +206,19 @@ class CampaignController extends Controller
                 ]);
         }
 
+        // segment
+
         $userId = $data->userId ?? null;
-        if ($campaign->segment_id) {
-            if (!$userId) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => false,
-                        'errors' => [],
-                    ])
-                    ->setStatusCode(400);
-            }
-            if (!$sc->check($campaign->segment_id, $userId)) {
+        if (!$userId) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => [],
+                ])
+                ->setStatusCode(400);
+        }
+        foreach ($campaign->segments as $campaignSegment) {
+            if (!$sa->check($campaignSegment, $userId)) {
                 return response()
                     ->jsonp($r->get('callback'), [
                         'success' => true,

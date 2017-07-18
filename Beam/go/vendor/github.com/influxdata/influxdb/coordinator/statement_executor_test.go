@@ -193,6 +193,69 @@ func TestStatementExecutor_NormalizeDeleteSeries(t *testing.T) {
 	}
 }
 
+type mockAuthorizer struct {
+	AuthorizeDatabaseFn func(influxql.Privilege, string) bool
+}
+
+func (a *mockAuthorizer) AuthorizeDatabase(p influxql.Privilege, name string) bool {
+	return a.AuthorizeDatabaseFn(p, name)
+}
+
+func (m *mockAuthorizer) AuthorizeQuery(database string, query *influxql.Query) error {
+	panic("fail")
+}
+
+func (m *mockAuthorizer) AuthorizeSeriesRead(database string, measurement []byte, tags models.Tags) bool {
+	panic("fail")
+}
+
+func (m *mockAuthorizer) AuthorizeSeriesWrite(database string, measurement []byte, tags models.Tags) bool {
+	panic("fail")
+}
+
+func TestQueryExecutor_ExecuteQuery_ShowDatabases(t *testing.T) {
+	qe := influxql.NewQueryExecutor()
+	qe.StatementExecutor = &coordinator.StatementExecutor{
+		MetaClient: &internal.MetaClientMock{
+			DatabasesFn: func() []meta.DatabaseInfo {
+				return []meta.DatabaseInfo{
+					{Name: "db1"}, {Name: "db2"}, {Name: "db3"}, {Name: "db4"},
+				}
+			},
+		},
+	}
+
+	opt := influxql.ExecutionOptions{
+		Authorizer: &mockAuthorizer{
+			AuthorizeDatabaseFn: func(p influxql.Privilege, name string) bool {
+				return name == "db2" || name == "db4"
+			},
+		},
+	}
+
+	q, err := influxql.ParseQuery("SHOW DATABASES")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	results := ReadAllResults(qe.ExecuteQuery(q, opt, make(chan struct{})))
+	exp := []*influxql.Result{
+		{
+			StatementID: 0,
+			Series: []*models.Row{{
+				Name:    "databases",
+				Columns: []string{"name"},
+				Values: [][]interface{}{
+					{"db2"}, {"db4"},
+				},
+			}},
+		},
+	}
+	if !reflect.DeepEqual(results, exp) {
+		t.Fatalf("unexpected results: exp %s, got %s", spew.Sdump(exp), spew.Sdump(results))
+	}
+}
+
 // QueryExecutor is a test wrapper for coordinator.QueryExecutor.
 type QueryExecutor struct {
 	*influxql.QueryExecutor
@@ -259,7 +322,6 @@ type TSDBStore struct {
 	DeleteRetentionPolicyFn func(database, name string) error
 	DeleteShardFn           func(id uint64) error
 	DeleteSeriesFn          func(database string, sources []influxql.Source, condition influxql.Expr) error
-	DatabaseIndexFn         func(name string) *tsdb.DatabaseIndex
 	ShardGroupFn            func(ids []uint64) tsdb.ShardGroup
 }
 
@@ -306,11 +368,11 @@ func (s *TSDBStore) ShardGroup(ids []uint64) tsdb.ShardGroup {
 	return s.ShardGroupFn(ids)
 }
 
-func (s *TSDBStore) DatabaseIndex(name string) *tsdb.DatabaseIndex {
-	return s.DatabaseIndexFn(name)
+func (s *TSDBStore) Measurements(database string, cond influxql.Expr) ([]string, error) {
+	return nil, nil
 }
 
-func (s *TSDBStore) Measurements(database string, cond influxql.Expr) ([]string, error) {
+func (s *TSDBStore) MeasurementNames(database string, cond influxql.Expr) ([][]byte, error) {
 	return nil, nil
 }
 

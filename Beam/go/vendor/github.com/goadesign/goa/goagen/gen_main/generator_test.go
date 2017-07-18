@@ -1,4 +1,4 @@
-package genmain
+package genmain_test
 
 import (
 	"io/ioutil"

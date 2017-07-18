@@ -43,6 +43,29 @@ func TestParser_ParseQuery_Empty(t *testing.T) {
 	}
 }
 
+// Ensure the parser will skip comments.
+func TestParser_ParseQuery_SkipComments(t *testing.T) {
+	q, err := influxql.ParseQuery(`SELECT * FROM cpu; -- read from cpu database
+
+/* create continuous query */
+CREATE CONTINUOUS QUERY cq0 ON db0 BEGIN
+	SELECT mean(*) INTO db1..:MEASUREMENT FROM cpu GROUP BY time(5m)
+END;
+
+/* just a multline comment
+what is this doing here?
+**/
+
+-- should ignore the trailing multiline comment /*
+SELECT mean(value) FROM gpu;
+-- trailing comment at the end`)
+	if err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	} else if len(q.Statements) != 3 {
+		t.Fatalf("unexpected statement count: %d", len(q.Statements))
+	}
+}
+
 // Ensure the parser can return an error from an malformed statement.
 func TestParser_ParseQuery_ParseError(t *testing.T) {
 	_, err := influxql.NewParser(strings.NewReader(`SELECT`)).ParseQuery()
@@ -261,6 +284,56 @@ func TestParser_ParseStatement(t *testing.T) {
 					{
 						Expr: &influxql.Call{
 							Name: "difference",
+							Args: []influxql.Expr{
+								&influxql.Call{
+									Name: "max",
+									Args: []influxql.Expr{
+										&influxql.VarRef{Val: "field1"},
+									},
+								},
+							},
+						},
+					},
+				},
+				Sources: []influxql.Source{&influxql.Measurement{Name: "myseries"}},
+				Dimensions: []*influxql.Dimension{
+					{
+						Expr: &influxql.Call{
+							Name: "time",
+							Args: []influxql.Expr{
+								&influxql.DurationLiteral{Val: time.Minute},
+							},
+						},
+					},
+				},
+				Condition: &influxql.BinaryExpr{
+					Op:  influxql.GT,
+					LHS: &influxql.VarRef{Val: "time"},
+					RHS: &influxql.StringLiteral{Val: now.UTC().Format(time.RFC3339Nano)},
+				},
+			},
+		},
+
+		// non_negative_difference
+		{
+			s: `SELECT non_negative_difference(field1) FROM myseries;`,
+			stmt: &influxql.SelectStatement{
+				IsRawQuery: false,
+				Fields: []*influxql.Field{
+					{Expr: &influxql.Call{Name: "non_negative_difference", Args: []influxql.Expr{&influxql.VarRef{Val: "field1"}}}},
+				},
+				Sources: []influxql.Source{&influxql.Measurement{Name: "myseries"}},
+			},
+		},
+
+		{
+			s: fmt.Sprintf(`SELECT non_negative_difference(max(field1)) FROM myseries WHERE time > '%s' GROUP BY time(1m)`, now.UTC().Format(time.RFC3339Nano)),
+			stmt: &influxql.SelectStatement{
+				IsRawQuery: false,
+				Fields: []*influxql.Field{
+					{
+						Expr: &influxql.Call{
+							Name: "non_negative_difference",
 							Args: []influxql.Expr{
 								&influxql.Call{
 									Name: "max",
@@ -1300,6 +1373,67 @@ func TestParser_ParseStatement(t *testing.T) {
 						RHS: &influxql.DurationLiteral{Val: 24 * time.Hour},
 					},
 				},
+			},
+		},
+
+		// select statements with intertwined comments
+		{
+			s: `SELECT "user" /*, system, idle */ FROM cpu`,
+			stmt: &influxql.SelectStatement{
+				IsRawQuery: true,
+				Fields: []*influxql.Field{
+					{Expr: &influxql.VarRef{Val: "user"}},
+				},
+				Sources: []influxql.Source{&influxql.Measurement{Name: "cpu"}},
+			},
+		},
+
+		{
+			s: `SELECT /foo\/*bar/ FROM /foo\/*bar*/ WHERE x = 1`,
+			stmt: &influxql.SelectStatement{
+				IsRawQuery: true,
+				Fields: []*influxql.Field{
+					{Expr: &influxql.RegexLiteral{Val: regexp.MustCompile(`foo/*bar`)}},
+				},
+				Sources: []influxql.Source{
+					&influxql.Measurement{
+						Regex: &influxql.RegexLiteral{Val: regexp.MustCompile(`foo/*bar*`)},
+					},
+				},
+				Condition: &influxql.BinaryExpr{
+					Op:  influxql.EQ,
+					LHS: &influxql.VarRef{Val: "x"},
+					RHS: &influxql.IntegerLiteral{Val: 1},
+				},
+			},
+		},
+
+		// SELECT statement with a time zone
+		{
+			s: `SELECT mean(value) FROM cpu WHERE time >= now() - 7d GROUP BY time(1d) TZ('America/Los_Angeles')`,
+			stmt: &influxql.SelectStatement{
+				Fields: []*influxql.Field{{
+					Expr: &influxql.Call{
+						Name: "mean",
+						Args: []influxql.Expr{
+							&influxql.VarRef{Val: "value"}},
+					}}},
+				Sources: []influxql.Source{&influxql.Measurement{Name: "cpu"}},
+				Condition: &influxql.BinaryExpr{
+					Op:  influxql.GTE,
+					LHS: &influxql.VarRef{Val: "time"},
+					RHS: &influxql.BinaryExpr{
+						Op:  influxql.SUB,
+						LHS: &influxql.Call{Name: "now"},
+						RHS: &influxql.DurationLiteral{Val: 7 * 24 * time.Hour},
+					},
+				},
+				Dimensions: []*influxql.Dimension{{
+					Expr: &influxql.Call{
+						Name: "time",
+						Args: []influxql.Expr{
+							&influxql.DurationLiteral{Val: 24 * time.Hour}}}}},
+				Location: LosAngeles,
 			},
 		},
 
@@ -2456,6 +2590,8 @@ func TestParser_ParseStatement(t *testing.T) {
 		{s: `SELECT field1 FROM myseries ORDER BY time, field1`, err: `only ORDER BY time supported at this time`},
 		{s: `SELECT field1 AS`, err: `found EOF, expected identifier at line 1, char 18`},
 		{s: `SELECT field1 FROM foo group by time(1s)`, err: `GROUP BY requires at least one aggregate function`},
+		{s: `SELECT field1 FROM foo fill(none)`, err: `fill(none) must be used with a function`},
+		{s: `SELECT field1 FROM foo fill(linear)`, err: `fill(linear) must be used with a function`},
 		{s: `SELECT count(value), value FROM foo`, err: `mixing aggregate and non-aggregate queries is not supported`},
 		{s: `SELECT count(value)/10, value FROM foo`, err: `mixing aggregate and non-aggregate queries is not supported`},
 		{s: `SELECT count(value) FROM foo group by time(1s)`, err: `aggregate functions with GROUP BY time require a WHERE time clause`},
@@ -2470,12 +2606,12 @@ func TestParser_ParseStatement(t *testing.T) {
 		{s: `SELECT field1 FROM 12`, err: `found 12, expected identifier at line 1, char 20`},
 		{s: `SELECT 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 FROM myseries`, err: `unable to parse integer at line 1, char 8`},
 		{s: `SELECT 10.5h FROM myseries`, err: `found h, expected FROM at line 1, char 12`},
-		{s: `SELECT distinct(field1), sum(field1) FROM myseries`, err: `aggregate function distinct() can not be combined with other functions or fields`},
-		{s: `SELECT distinct(field1), field2 FROM myseries`, err: `aggregate function distinct() can not be combined with other functions or fields`},
+		{s: `SELECT distinct(field1), sum(field1) FROM myseries`, err: `aggregate function distinct() cannot be combined with other functions or fields`},
+		{s: `SELECT distinct(field1), field2 FROM myseries`, err: `aggregate function distinct() cannot be combined with other functions or fields`},
 		{s: `SELECT distinct(field1, field2) FROM myseries`, err: `distinct function can only have one argument`},
 		{s: `SELECT distinct() FROM myseries`, err: `distinct function requires at least one argument`},
 		{s: `SELECT distinct FROM myseries`, err: `found FROM, expected identifier at line 1, char 17`},
-		{s: `SELECT distinct field1, field2 FROM myseries`, err: `aggregate function distinct() can not be combined with other functions or fields`},
+		{s: `SELECT distinct field1, field2 FROM myseries`, err: `aggregate function distinct() cannot be combined with other functions or fields`},
 		{s: `SELECT count(distinct) FROM myseries`, err: `found ), expected (, identifier at line 1, char 22`},
 		{s: `SELECT count(distinct field1, field2) FROM myseries`, err: `count(distinct <field>) can only have one argument`},
 		{s: `select count(distinct(too, many, arguments)) from myseries`, err: `count(distinct <field>) can only have one argument`},
@@ -2544,6 +2680,8 @@ func TestParser_ParseStatement(t *testing.T) {
 		{s: `SELECT sum(value) + count(foo + sum(bar)) FROM cpu`, err: `binary expressions cannot mix aggregates and raw fields`},
 		{s: `SELECT mean(value) FROM cpu FILL + value`, err: `fill must be a function call`},
 		{s: `SELECT sum(mean) FROM (SELECT mean(value) FROM cpu GROUP BY time(1h))`, err: `aggregate functions with GROUP BY time require a WHERE time clause`},
+		{s: `SELECT top(value, 2), max(value) FROM cpu`, err: `selector function top() cannot be combined with other functions`},
+		{s: `SELECT bottom(value, 2), max(value) FROM cpu`, err: `selector function bottom() cannot be combined with other functions`},
 		// See issues https://github.com/influxdata/influxdb/issues/1647
 		// and https://github.com/influxdata/influxdb/issues/4404
 		//{s: `DELETE`, err: `found EOF, expected FROM at line 1, char 8`},
@@ -2772,6 +2910,15 @@ func TestParser_ParseExpr(t *testing.T) {
 		// Primitives
 		{s: `100.0`, expr: &influxql.NumberLiteral{Val: 100}},
 		{s: `100`, expr: &influxql.IntegerLiteral{Val: 100}},
+		{s: `-100.0`, expr: &influxql.NumberLiteral{Val: -100}},
+		{s: `-100`, expr: &influxql.IntegerLiteral{Val: -100}},
+		{s: `100.`, expr: &influxql.NumberLiteral{Val: 100}},
+		{s: `-100.`, expr: &influxql.NumberLiteral{Val: -100}},
+		{s: `.23`, expr: &influxql.NumberLiteral{Val: 0.23}},
+		{s: `-.23`, expr: &influxql.NumberLiteral{Val: -0.23}},
+		{s: `1s`, expr: &influxql.DurationLiteral{Val: time.Second}},
+		{s: `-1s`, expr: &influxql.DurationLiteral{Val: -time.Second}},
+		{s: `-+1`, err: `found +, expected identifier, number, duration, ( at line 1, char 2`},
 		{s: `'foo bar'`, expr: &influxql.StringLiteral{Val: "foo bar"}},
 		{s: `true`, expr: &influxql.BooleanLiteral{Val: true}},
 		{s: `false`, expr: &influxql.BooleanLiteral{Val: false}},
@@ -2817,6 +2964,62 @@ func TestParser_ParseExpr(t *testing.T) {
 			},
 		},
 
+		// Binary expression with LHS precedence
+		{
+			s: `1 / 2 + 3`,
+			expr: &influxql.BinaryExpr{
+				Op: influxql.ADD,
+				LHS: &influxql.BinaryExpr{
+					Op:  influxql.DIV,
+					LHS: &influxql.IntegerLiteral{Val: 1},
+					RHS: &influxql.IntegerLiteral{Val: 2},
+				},
+				RHS: &influxql.IntegerLiteral{Val: 3},
+			},
+		},
+
+		// Binary expression with RHS precedence
+		{
+			s: `1 + 2 / 3`,
+			expr: &influxql.BinaryExpr{
+				Op:  influxql.ADD,
+				LHS: &influxql.IntegerLiteral{Val: 1},
+				RHS: &influxql.BinaryExpr{
+					Op:  influxql.DIV,
+					LHS: &influxql.IntegerLiteral{Val: 2},
+					RHS: &influxql.IntegerLiteral{Val: 3},
+				},
+			},
+		},
+
+		// Binary expression with LHS precedence
+		{
+			s: `1 % 2 + 3`,
+			expr: &influxql.BinaryExpr{
+				Op: influxql.ADD,
+				LHS: &influxql.BinaryExpr{
+					Op:  influxql.MOD,
+					LHS: &influxql.IntegerLiteral{Val: 1},
+					RHS: &influxql.IntegerLiteral{Val: 2},
+				},
+				RHS: &influxql.IntegerLiteral{Val: 3},
+			},
+		},
+
+		// Binary expression with RHS precedence
+		{
+			s: `1 + 2 % 3`,
+			expr: &influxql.BinaryExpr{
+				Op:  influxql.ADD,
+				LHS: &influxql.IntegerLiteral{Val: 1},
+				RHS: &influxql.BinaryExpr{
+					Op:  influxql.MOD,
+					LHS: &influxql.IntegerLiteral{Val: 2},
+					RHS: &influxql.IntegerLiteral{Val: 3},
+				},
+			},
+		},
+
 		// Binary expression with LHS paren group.
 		{
 			s: `(1 + 2) * 3`,
@@ -2843,6 +3046,78 @@ func TestParser_ParseExpr(t *testing.T) {
 					LHS: &influxql.IntegerLiteral{Val: 1},
 					RHS: &influxql.IntegerLiteral{Val: 2},
 				},
+				RHS: &influxql.IntegerLiteral{Val: 3},
+			},
+		},
+
+		// Addition and subtraction without whitespace.
+		{
+			s: `1+2-3`,
+			expr: &influxql.BinaryExpr{
+				Op: influxql.SUB,
+				LHS: &influxql.BinaryExpr{
+					Op:  influxql.ADD,
+					LHS: &influxql.IntegerLiteral{Val: 1},
+					RHS: &influxql.IntegerLiteral{Val: 2},
+				},
+				RHS: &influxql.IntegerLiteral{Val: 3},
+			},
+		},
+
+		{
+			s: `time>now()-5m`,
+			expr: &influxql.BinaryExpr{
+				Op:  influxql.GT,
+				LHS: &influxql.VarRef{Val: "time"},
+				RHS: &influxql.BinaryExpr{
+					Op:  influxql.SUB,
+					LHS: &influxql.Call{Name: "now"},
+					RHS: &influxql.DurationLiteral{Val: 5 * time.Minute},
+				},
+			},
+		},
+
+		// Simple unary expression.
+		{
+			s: `-value`,
+			expr: &influxql.BinaryExpr{
+				Op:  influxql.MUL,
+				LHS: &influxql.IntegerLiteral{Val: -1},
+				RHS: &influxql.VarRef{Val: "value"},
+			},
+		},
+
+		{
+			s: `-mean(value)`,
+			expr: &influxql.BinaryExpr{
+				Op:  influxql.MUL,
+				LHS: &influxql.IntegerLiteral{Val: -1},
+				RHS: &influxql.Call{
+					Name: "mean",
+					Args: []influxql.Expr{
+						&influxql.VarRef{Val: "value"}},
+				},
+			},
+		},
+
+		// Unary expressions with parenthesis.
+		{
+			s: `-(-4)`,
+			expr: &influxql.BinaryExpr{
+				Op:  influxql.MUL,
+				LHS: &influxql.IntegerLiteral{Val: -1},
+				RHS: &influxql.ParenExpr{
+					Expr: &influxql.IntegerLiteral{Val: -4},
+				},
+			},
+		},
+
+		// Multiplication with leading subtraction.
+		{
+			s: `-2 * 3`,
+			expr: &influxql.BinaryExpr{
+				Op:  influxql.MUL,
+				LHS: &influxql.IntegerLiteral{Val: -2},
 				RHS: &influxql.IntegerLiteral{Val: 3},
 			},
 		},
@@ -2919,6 +3194,12 @@ func TestParser_ParseExpr(t *testing.T) {
 			},
 		},
 
+		// Duration math with an invalid literal.
+		{
+			s:   `time > now() - 1y`,
+			err: `invalid duration`,
+		},
+
 		// Function call (empty)
 		{
 			s: `my_func()`,
@@ -2950,6 +3231,16 @@ func TestParser_ParseExpr(t *testing.T) {
 			t.Errorf("%d. %q: error mismatch:\n  exp=%s\n  got=%s\n\n", i, tt.s, tt.err, err)
 		} else if tt.err == "" && !reflect.DeepEqual(tt.expr, expr) {
 			t.Errorf("%d. %q\n\nexpr mismatch:\n\nexp=%#v\n\ngot=%#v\n\n", i, tt.s, tt.expr, expr)
+		} else if err == nil {
+			// Attempt to reparse the expr as a string and confirm it parses the same.
+			expr2, err := influxql.ParseExpr(expr.String())
+			if err != nil {
+				t.Errorf("%d. %q: unable to parse expr string: %s", i, expr.String(), err)
+			} else if !reflect.DeepEqual(tt.expr, expr2) {
+				t.Logf("\n# %s\nexp=%s\ngot=%s\n", tt.s, mustMarshalJSON(tt.expr), mustMarshalJSON(expr2))
+				t.Logf("\nSQL exp=%s\nSQL got=%s\n", tt.expr.String(), expr2.String())
+				t.Errorf("%d. %q\n\nexpr reparse mismatch:\n\nexp=%#v\n\ngot=%#v\n\n", i, tt.s, tt.expr, expr2)
+			}
 		}
 	}
 }
@@ -2961,6 +3252,7 @@ func TestParseDuration(t *testing.T) {
 		d   time.Duration
 		err string
 	}{
+		{s: `10ns`, d: 10},
 		{s: `10u`, d: 10 * time.Microsecond},
 		{s: `10µ`, d: 10 * time.Microsecond},
 		{s: `15ms`, d: 15 * time.Millisecond},
@@ -2981,6 +3273,7 @@ func TestParseDuration(t *testing.T) {
 		{s: `ms`, err: "invalid duration"},
 		{s: `1.2w`, err: "invalid duration"},
 		{s: `10x`, err: "invalid duration"},
+		{s: `10n`, err: "invalid duration"},
 	}
 
 	for i, tt := range tests {
@@ -3239,6 +3532,16 @@ func mustParseDuration(s string) time.Duration {
 	}
 	return d
 }
+
+func mustLoadLocation(s string) *time.Location {
+	l, err := time.LoadLocation(s)
+	if err != nil {
+		panic(err)
+	}
+	return l
+}
+
+var LosAngeles = mustLoadLocation("America/Los_Angeles")
 
 func duration(v time.Duration) *time.Duration {
 	return &v

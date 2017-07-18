@@ -1,15 +1,9 @@
 package jwt
 
 import (
-	"golang.org/x/net/context"
+	"context"
 
 	jwt "github.com/dgrijalva/jwt-go"
-)
-
-type contextKey int
-
-const (
-	jwtKey contextKey = iota + 1
 )
 
 // WithJWT creates a child context containing the given JWT.

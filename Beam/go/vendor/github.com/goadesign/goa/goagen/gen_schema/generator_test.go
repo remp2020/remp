@@ -1,4 +1,4 @@
-package genschema
+package genschema_test
 
 import (
 	"encoding/json"

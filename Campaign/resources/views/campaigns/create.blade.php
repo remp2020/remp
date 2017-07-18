@@ -12,6 +12,9 @@
             <h2>Add new campaign</h2>
         </div>
         <div class="card-body card-padding">
+            @component('campaigns._vue_form')
+            @endcomponent
+
             {!! Form::model($campaign, ['route' => 'campaigns.store', 'id' => 'campaign-form']) !!}
             @include('campaigns._form')
             {!! Form::close() !!}

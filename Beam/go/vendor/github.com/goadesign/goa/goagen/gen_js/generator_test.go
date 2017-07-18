@@ -1,4 +1,4 @@
-package genjs
+package genjs_test
 
 import (
 	"io/ioutil"

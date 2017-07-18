@@ -58,7 +58,7 @@
                         orderable: false,
                     @endif
                     @if (isset($col['render']))
-                    render: $.fn.dataTables.render['{!! $col['render'] !!}']()
+                    render: $.fn.dataTables.render['{!! $col['render'] !!}']({!! isset($col['renderParams']) ? json_encode($col['renderParams']) : '' !!})
                     @endif
                 },
                 @endforeach

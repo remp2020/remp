@@ -35,9 +35,13 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
-    'segment' => [
-        'base_url' => env('SEGMENT_API_BASE_URL'),
-        'token' => env('SEGMENT_API_TOKEN'),
+    'crm_segment' => [
+        'base_url' => env('CRM_SEGMENT_API_ADDR'),
+        'token' => env('CRM_SEGMENT_API_TOKEN'),
+    ],
+
+    'remp_segment' => [
+        'base_url' => env('REMP_SEGMENT_API_ADDR')
     ],
 
     'tracker' => [

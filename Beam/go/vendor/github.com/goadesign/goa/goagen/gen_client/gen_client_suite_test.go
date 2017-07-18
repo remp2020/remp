@@ -1,4 +1,4 @@
-package genclient
+package genclient_test
 
 import (
 	. "github.com/onsi/ginkgo"

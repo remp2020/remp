@@ -1,4 +1,4 @@
-package goalog15
+package goalog15_test
 
 import (
 	. "github.com/onsi/ginkgo"

@@ -1,4 +1,4 @@
-package meta
+package meta_test
 
 import (
 	"bytes"

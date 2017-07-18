@@ -133,13 +133,6 @@ func (c *Client) AcquireLease(name string) (*Lease, error) {
 	return &l, nil
 }
 
-func (c *Client) data() *Data {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	data := c.cacheData.Clone()
-	return data
-}
-
 // ClusterID returns the ID of the cluster it's connected to.
 func (c *Client) ClusterID() uint64 {
 	c.mu.RLock()
@@ -377,7 +370,7 @@ func (c *Client) Users() []UserInfo {
 }
 
 // User returns the user with the given name, or ErrUserNotFound.
-func (c *Client) User(name string) (*UserInfo, error) {
+func (c *Client) User(name string) (User, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -413,14 +406,14 @@ func (c *Client) saltedHash(password string) (salt, hash []byte, err error) {
 }
 
 // CreateUser adds a user with the given name and password and admin status.
-func (c *Client) CreateUser(name, password string, admin bool) (*UserInfo, error) {
+func (c *Client) CreateUser(name, password string, admin bool) (User, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	data := c.cacheData.Clone()
 
 	// See if the user already exists.
-	if u := data.User(name); u != nil {
+	if u := data.user(name); u != nil {
 		if err := bcrypt.CompareHashAndPassword([]byte(u.Hash), []byte(password)); err != nil || u.Admin != admin {
 			return nil, ErrUserExists
 		}
@@ -437,7 +430,7 @@ func (c *Client) CreateUser(name, password string, admin bool) (*UserInfo, error
 		return nil, err
 	}
 
-	u := data.User(name)
+	u := data.user(name)
 
 	if err := c.commit(data); err != nil {
 		return nil, err
@@ -554,20 +547,14 @@ func (c *Client) UserPrivilege(username, database string) (*influxql.Privilege, 
 func (c *Client) AdminUserExists() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-
-	for _, u := range c.cacheData.Users {
-		if u.Admin {
-			return true
-		}
-	}
-	return false
+	return c.cacheData.AdminUserExists()
 }
 
 // Authenticate returns a UserInfo if the username and password match an existing entry.
-func (c *Client) Authenticate(username, password string) (*UserInfo, error) {
+func (c *Client) Authenticate(username, password string) (User, error) {
 	// Find user.
 	c.mu.RLock()
-	userInfo := c.cacheData.User(username)
+	userInfo := c.cacheData.user(username)
 	c.mu.RUnlock()
 	if userInfo == nil {
 		return nil, ErrUserNotFound
@@ -996,21 +983,6 @@ func (c *Client) WithLogger(log zap.Logger) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.logger = log.With(zap.String("service", "metaclient"))
-}
-
-func (c *Client) updateAuthCache() {
-	// copy cached user info for still-present users
-	newCache := make(map[string]authUser, len(c.authCache))
-
-	for _, userInfo := range c.cacheData.Users {
-		if cached, ok := c.authCache[userInfo.Name]; ok {
-			if cached.bhash == userInfo.Hash {
-				newCache[userInfo.Name] = cached
-			}
-		}
-	}
-
-	c.authCache = newCache
 }
 
 // snapshot saves the current meta data to disk.

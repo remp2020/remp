@@ -1,4 +1,4 @@
-package goa
+package goa_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/goadesign/goa"
 	. "github.com/onsi/ginkgo"

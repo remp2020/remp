@@ -79,6 +79,16 @@ $.fn.dataTables = {
             }
 
         },
+        array: function (config) {
+            var column = config["column"];
+            return function(data) {
+                var result = '';
+                for (var i=0; i<data.length; i++) {
+                    result += data[i][column] + '<br/>';
+                }
+                return result;
+            }
+        },
         actions: function (actionSettings, tableId) {
             return function(data) {
                 var actions = '';
