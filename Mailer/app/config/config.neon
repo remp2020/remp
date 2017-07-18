@@ -1,5 +1,6 @@
 parameters:
     sso_host: @environmentConfig::get('SSO_BASE_URL')
+    sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
 
 extensions:
     local_configs: Remp\MailerModule\Config\ConfigExtension
@@ -42,7 +43,10 @@ services:
 	# Internal CRM system. For more details contact Tomas Bella.
 	- Remp\MailerModule\Auth\Authenticator
 	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
-	# authenticator: Remp\SSOModule\User
+#	- Remp\NetteSso\Security\Client(%sso_host%)
+#	- Remp\NetteSso\Security\Authenticator(%sso_error_url%)
+#	security.userStorage:
+#	    class: Remp\NetteSso\Security\UserStorage
 
 	- Remp\MailerModule\Config\Config
 

@@ -15,11 +15,17 @@ Route::get('/', function () {
     return redirect(route('dashboard'));
 });
 
-Route::get('accounts/json', 'AccountController@json');
-Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');
-Route::get('segments/json', 'SegmentController@json')->name('segments.json');
-Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+Route::get('/error', function() {
+    return 'error during login: ' . $_GET['error'];
+})->name('sso.error');
 
-Route::resource('accounts', 'AccountController');
-Route::resource('accounts.properties', 'PropertyController');
-Route::resource('segments', 'SegmentController');
+Route::middleware('auth.jwt')->group(function () {
+    Route::get('accounts/json', 'AccountController@json');
+    Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');
+    Route::get('segments/json', 'SegmentController@json')->name('segments.json');
+    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+
+    Route::resource('accounts', 'AccountController');
+    Route::resource('accounts.properties', 'PropertyController');
+    Route::resource('segments', 'SegmentController');
+});

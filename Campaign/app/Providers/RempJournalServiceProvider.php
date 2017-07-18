@@ -37,6 +37,6 @@ class RempJournalServiceProvider extends ServiceProvider
 
     public function provides()
     {
-        return [TrackerContract::class];
+        return [JournalContract::class];
     }
 }

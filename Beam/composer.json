@@ -4,6 +4,14 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Composer/laravel-sso"
+        }
+    ],
     "require": {
         "php": ">=5.6.4",
         "arrilot/laravel-widgets": "^3.7",
@@ -24,10 +32,11 @@
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.4",
-        "yajra/laravel-datatables-oracle": "^7.2"
+        "yajra/laravel-datatables-oracle": "^7.2",
+        "remp/laravel-sso": "*",
+        "recca0120/laravel-tracy": "^1.8"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^2.3",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~5.7"
@@ -63,12 +72,12 @@
     },
     "config": {
         "preferred-install": "dist",
-        "sort-packages": true
-    },
-    "extra": {
-        "asset-installer-paths": {
-            "npm-asset-library": "public/assets/vendor",
-            "bower-asset-library": "public/assets/vendor"
+        "sort-packages": true,
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "public/assets/vendor",
+                "bower-asset-library": "public/assets/vendor"
+            }
         }
     }
 }

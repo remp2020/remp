@@ -3,6 +3,14 @@
     "description": "Nette: Standard Web Project",
     "type": "project",
     "license": ["MIT", "BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Composer/nette-sso"
+        }
+    ],
     "require": {
         "php": ">= 5.6",
         "nette/application": "^2.4",
@@ -42,12 +50,12 @@
         "mailgun/mailgun-php": "^2.3",
         "php-http/curl-client": "^1.7",
         "guzzlehttp/psr7": "^1.4",
-        "bower-asset/eonasdan-bootstrap-datetimepicker": "^4.17"
+        "remp/nette-sso": "*"
+
     },
     "require-dev": {
         "nette/tester": "^1.6"
     },
-    "minimum-stability": "stable",
     "config": {
         "fxp-asset": {
             "installer-paths": {
