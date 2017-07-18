@@ -33,12 +33,13 @@ services:
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
+      - "composer-data:/composer/cache:rw"
     depends_on:
       - "campaign_mysql"
       - "nginx"
-    env_file: "./Campaign/.env"
     extra_hosts:
       - "crm.app:192.168.99.100"
+      - "sso.remp.app:192.168.99.100"
     restart: "unless-stopped"
 
   campaign_mysql:
@@ -62,15 +63,16 @@ services:
   mailer:
    extra_hosts:
      - "crm.app:192.168.10.10"
+     - "sso.remp.app:192.168.99.100"
    build: "./Docker/php"
    volumes:
      - ".:/var/www/html:rw"
+     - "composer-data:/composer/cache:rw"
    depends_on:
      - "mailer_mysql"
      - "nginx"
      - "redis"
      - "mailhog"
-   env_file: "./Mailer/.env"
    restart: "unless-stopped"
 
   mailer_mysql:
@@ -95,6 +97,7 @@ services:
    build: "./Docker/php"
    volumes:
      - ".:/var/www/html:rw"
+     - "composer-data:/composer/cache:rw"
    depends_on:
      - "nginx"
      - "sso_mysql"
@@ -119,9 +122,12 @@ services:
   # beam
 
   beam:
+    extra_hosts:
+     - "sso.remp.app:192.168.99.100"
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
+      - "composer-data:/composer/cache:rw"
     depends_on:
       - "beam_mysql"
       - "nginx"
@@ -214,4 +220,6 @@ volumes:
   mysql-data-sso:
     driver: "local"
   redis-data:
+    driver: "local"
+  composer-data:
     driver: "local"

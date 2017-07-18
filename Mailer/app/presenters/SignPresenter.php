@@ -12,6 +12,7 @@ final class SignPresenter extends Presenter
 
     public function __construct(SignInFormFactory $signInFormFactory)
     {
+        parent::__construct();
         $this->signInFormFactory = $signInFormFactory;
     }
 

@@ -48,7 +48,6 @@ class VerifyUserToken
         if (!$user) {
             return $this->respond('user_not_found', 'user extracted from token was not found', 404);
         }
-        dump($user);die;
 
         return $next($request);
     }
@@ -58,7 +57,7 @@ class VerifyUserToken
         return $this->response->json([
             'code' => $code,
             'detail' => $detail,
-            'redirect' => route('auth/login'),
+            'redirect' => route('auth.login'),
         ], $status);
     }
 }

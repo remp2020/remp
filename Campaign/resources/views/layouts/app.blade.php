@@ -84,7 +84,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
         </li>
         <li class="dropdown hm-profile">
             <a data-toggle="dropdown" href="">
-                <img src="https://www.gravatar.com/avatar/{{ md5('dulacka@gmail.com') }}" alt="">
+                <img src="https://www.gravatar.com/avatar/{{ md5(Auth::user()->email) }}" alt="">
             </a>
 
             <ul class="dropdown-menu pull-right dm-icon">

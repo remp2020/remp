@@ -171,13 +171,14 @@ return [
         /*
          * Application Service Providers...
          */
+        Remp\LaravelSso\Providers\SsoServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
 
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class

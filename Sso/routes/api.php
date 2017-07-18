@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::middleware('jwt.auth')->group(function() {
     Route::get('auth/introspect', 'AuthController@introspect')->name('auth.introspect');
 });

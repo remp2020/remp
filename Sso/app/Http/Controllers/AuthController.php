@@ -43,13 +43,13 @@ class AuthController extends Controller
                 'code' => 'token_expired',
                 'detail' => 'token is expired: refresh timeout hit',
                 'redirect' => route('auth.login'),
-            ]);
+            ])->setStatusCode(401);
         } catch (JWTException $e) {
             return response()->json([
                 'code' => 'token_invalid',
                 'detail' => 'provided token is invalid',
                 'redirect' => route('auth.login'),
-            ]);
+            ])->setStatusCode(400);
         }
     }
 
@@ -58,6 +58,7 @@ class AuthController extends Controller
         $payload = JWTAuth::getPayload();
 
         return response()->json([
+            'id' => $payload['id'],
             'name' => $payload->get('name'),
             'email' => $payload->get('email'),
             'scopes' => $payload->get('scopes'),

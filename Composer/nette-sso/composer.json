@@ -1,0 +1,34 @@
+{
+  "name": "remp/nette-sso",
+  "description": "A Nette Package to integrate REMP SSO",
+  "keywords": ["nette", "remp", "sso"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "rootpd",
+      "email": "dulacka@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "guzzlehttp/guzzle": "^6.2",
+    "nette/security": "^2.4",
+    "nette/http": "^2.4"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Remp\\NetteSso\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+    }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}
