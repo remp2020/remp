@@ -1,5 +1,6 @@
 .idea
 .env
+.vscode
 
 Mailer/vendor/
 Mailer/.idea/

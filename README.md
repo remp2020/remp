@@ -37,6 +37,9 @@ beam.remp.app # web administration
 tracker.beam.remp.app # event tracker API; swagger @ http://tracker.beam.remp.app/swagger.json
 segments.beam.remp.app # segments API; swagger @ http://segments.beam.remp.app/swagger.json
 
+# SSO
+sso.remp.app # web administration and API
+
 # SERVICE APPS
 adminer.remp.app # adminer for manipulating with DB
 mailhog.remp.app # mailhog for catching and debugging sent emails

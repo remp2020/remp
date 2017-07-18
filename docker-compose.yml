@@ -89,6 +89,33 @@ services:
      MYSQL_DATABASE: "remp_mailer"
    restart: "unless-stopped"
 
+  # sso
+
+  sso:
+   build: "./Docker/php"
+   volumes:
+     - ".:/var/www/html:rw"
+   depends_on:
+     - "nginx"
+     - "sso_mysql"
+   restart: "unless-stopped"
+
+  sso_mysql:
+   image: "mysql:8.0"
+   volumes:
+     - "mysql-data-sso:/var/lib/mysql"
+   ports:
+     - "3314:3306"
+   command:
+     - "--character-set-server=utf8mb4"
+     - "--collation-server=utf8mb4_unicode_ci"
+     - "--skip-character-set-client-handshake"
+   environment:
+     MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+     MYSQL_ROOT_PASSWORD: "secret"
+     MYSQL_DATABASE: "remp_sso"
+   restart: "unless-stopped"
+
   # beam
 
   beam:
@@ -157,8 +184,8 @@ services:
    depends_on:
      - "kafka"
    environment:
-     BEAM_BROKER_ADDR: "kafka:9092"
-     BEAM_TRACKER_ADDR: ":8081"
+     TRACKER_BROKER_ADDR: "kafka:9092"
+     TRACKER_ADDR: ":8081"
    ports:
      - "8081:8081"
    restart: "unless-stopped"
@@ -183,6 +210,8 @@ volumes:
   mysql-data-mailer:
     driver: "local"
   mysql-data-beam:
+    driver: "local"
+  mysql-data-sso:
     driver: "local"
   redis-data:
     driver: "local"
