@@ -31,7 +31,7 @@ class Client
      * @param $token
      * @return array
      * @throws SsoExpiredException
-     * @throws SsoException
+     * @throws \Nette\Security\AuthenticationException
      */
     public function introspect($token)
     {
@@ -52,7 +52,7 @@ class Client
                     $e->redirect = $body->redirect;
                     throw $e;
                 default:
-                    throw new Nette\Security\AuthenticationException($contents);
+                    throw new \Nette\Security\AuthenticationException($contents);
             }
         }
 
@@ -79,7 +79,7 @@ class Client
                     $e->redirect = $body->redirect;
                     throw $e;
                 default:
-                    throw new Nette\Security\AuthenticationException($contents);
+                    throw new \Nette\Security\AuthenticationException($contents);
             }
         }
 
