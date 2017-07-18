@@ -39,7 +39,11 @@
     "require-dev": {
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "~5.7"
+        "phpunit/phpunit": "~5.7",
+        "squizlabs/php_codesniffer": "~2.2",
+        "deployer/deployer": "^5.0",
+        "deployphp/recipes": "dev-master",
+        "friendsofphp/php-cs-fixer": "*"
     },
     "autoload": {
         "classmap": [

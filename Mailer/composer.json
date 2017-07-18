@@ -54,7 +54,11 @@
 
     },
     "require-dev": {
-        "nette/tester": "^1.6"
+        "nette/tester": "^1.6",
+        "squizlabs/php_codesniffer": "~2.2",
+        "deployer/deployer": "^5.0",
+        "deployphp/recipes": "dev-master",
+        "friendsofphp/php-cs-fixer": "*"
     },
     "config": {
         "fxp-asset": {
