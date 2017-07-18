@@ -13,6 +13,8 @@ class Guard implements AuthGuard
 {
     const JWT_USER_SESSION = 'jwt.user';
 
+    const JWT_TOKEN_SESSION = 'jwt.token';
+
     private $ssoContract;
 
     private $session;
@@ -98,6 +100,26 @@ class Guard implements AuthGuard
     {
         $sessionUser = serialize($user);
         $this->session->put(self::JWT_USER_SESSION, $sessionUser);
+    }
+
+    /**
+     * setToken stores JWT token to session.
+     *
+     * @param $token
+     */
+    public function setToken($token)
+    {
+        $this->session->put(self::JWT_TOKEN_SESSION, $token);
+    }
+
+    /**
+     * getToken retrieves stored token from session.
+     *
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->session->get(self::JWT_TOKEN_SESSION);
     }
 
     public function getName()

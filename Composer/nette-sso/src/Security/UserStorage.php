@@ -27,11 +27,22 @@ class UserStorage extends \Nette\Http\UserStorage
         }
 
         $token = $this->getIdentity()->token;
+        if (!$token) {
+            return false;
+        }
+
         try {
             $this->ssoClient->introspect($token);
-        } catch (SsoExpiredException $e) {
-            self::$cached = false;
-            return false;
+        } catch (SsoExpiredException $tokenExpired) {
+            if (isset($token)) {
+                try {
+                    $tokenResponse = $this->ssoClient->refresh($token);
+                    $this->getIdentity()->token = $tokenResponse['token'];
+                } catch (SsoExpiredException $refreshExpired) {
+                    self::$cached = false;
+                    return false;
+                }
+            }
         }
         self::$cached = true;
         return true;

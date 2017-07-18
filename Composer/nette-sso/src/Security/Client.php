@@ -5,10 +5,13 @@ namespace Remp\NetteSso\Security;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
 use Nette\Http\IRequest;
+use Nette\Utils\Json;
 
 class Client
 {
     const ENDPOINT_INTROSPECT = 'api/auth/introspect';
+
+    const ENDPOINT_REFRESH = 'api/auth/refresh';
 
     private $request;
 
@@ -41,7 +44,7 @@ class Client
         } catch (ClientException $e) {
             $response = $e->getResponse();
             $contents = $response->getBody()->getContents();
-            $body = \GuzzleHttp\json_decode($contents);
+            $body = Json::decode($contents);
             switch ($response->getStatusCode()) {
                 case 400:
                 case 401:
@@ -53,7 +56,34 @@ class Client
             }
         }
 
-        $user = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        $user = Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
         return $user;
+    }
+
+    public function refresh($token)
+    {
+        try {
+            $response = $this->client->request('POST', self::ENDPOINT_REFRESH, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$token,
+                ]
+            ]);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+            $contents = $response->getBody()->getContents();
+            $body = Json::decode($contents);
+            switch ($response->getStatusCode()) {
+                case 400:
+                case 401:
+                    $e = new SsoExpiredException();
+                    $e->redirect = $body->redirect;
+                    throw $e;
+                default:
+                    throw new Nette\Security\AuthenticationException($contents);
+            }
+        }
+
+        $tokenResponse = Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
+        return $tokenResponse;
     }
 }
