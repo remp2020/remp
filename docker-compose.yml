@@ -62,7 +62,7 @@ services:
 
   mailer:
    extra_hosts:
-     - "crm.app:192.168.10.10"
+     - "crm.app:192.168.99.100"
      - "sso.remp.app:192.168.99.100"
    build: "./Docker/php"
    volumes:
