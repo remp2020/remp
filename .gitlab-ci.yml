@@ -1,27 +1,27 @@
 stages:
+  - test
   - deploy
 
-deploy:production:
-  stage: deploy
-  script:
-    - cd Campaign && php ~/composer.phar install && cd ..
-    - cd Mailer && php ~/composer.phar install && cd ..
-    - cd Beam && php ~/composer.phar install && cd ..
-
-    - rsync --progress -r -u ./* /data/web/remp2020.com/app
-    - cd /data/web/remp2020.com
-
-    - cp .env.mailer app/Mailer/.env
-    - cp .env.campaign app/Campaign/.env
-    - cp .env.beam app/Beam/.env
-
-    - cd app/Campaign && php artisan migrate --force && cd ../../
-
-  environment:
-    name: production/remp2020
-    url: https://www.remp2020.com
+syntax:7.0:
+  stage: test
+  image: php:7.0-cli
   tags:
-    - deploy
-    - remp2020
-  only:
-    - master
+    - docker
+  script:
+    - find app bin bootstrap config database -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
+
+syntax:7.1:
+  stage: test
+  image: php:7.1-cli
+  tags:
+    - docker
+  script:
+    - find app bin bootstrap config database -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
+
+sniffer:
+  stage: test
+  image: php:7.0-cli
+  tags:
+    - docker
+  script:
+    - make sniff

@@ -85,7 +85,7 @@ class DataTable extends Control
      * @param $actionClass
      * @return $this
      */
-    public function setRowAction($actionName,$actionLink, $actionClass)
+    public function setRowAction($actionName, $actionLink, $actionClass)
     {
         $this->rowActions[$actionName] = [
             'link' => $actionLink,

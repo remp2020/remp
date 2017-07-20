@@ -55,7 +55,7 @@ class ListFormFactory extends Object
         $form->addRadioList('sorting', 'Order', $order);
 
         $orderPairs = $this->listsRepository->all()->fetchPairs('sorting', 'title');
-        $form->addSelect('sorting_after', NULL, $orderPairs);
+        $form->addSelect('sorting_after', null, $orderPairs);
 
         $form->addCheckbox('auto_subscribe', 'Required user consent');
         $form->addCheckbox('locked', 'Locked');

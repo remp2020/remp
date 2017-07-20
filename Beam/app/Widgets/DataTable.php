@@ -27,7 +27,7 @@ class DataTable extends AbstractWidget
     public function run()
     {
         $cols = [];
-        array_walk($this->config['colSettings'], function($item, $key) use (&$cols) {
+        array_walk($this->config['colSettings'], function ($item, $key) use (&$cols) {
             if (!is_array($item)) {
                 $cols[] = [
                     'name' => $item,

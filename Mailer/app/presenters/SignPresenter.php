@@ -8,7 +8,7 @@ use Remp\MailerModule\Forms\SignInFormFactory;
 final class SignPresenter extends Presenter
 {
     /** @var SignInFormFactory */
-    private  $signInFormFactory;
+    private $signInFormFactory;
 
     public function __construct(SignInFormFactory $signInFormFactory)
     {

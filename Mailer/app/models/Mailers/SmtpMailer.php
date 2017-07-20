@@ -16,8 +16,8 @@ class SmtpMailer extends Mailer implements IMailer
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository
-    )
-    {
+    ) {
+    
         parent::__construct($config, $configsRepository);
         $this->mailer = new \Nette\Mail\SmtpMailer($this->options);
     }

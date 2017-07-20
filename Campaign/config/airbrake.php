@@ -5,7 +5,7 @@ return [
   /**
    * Should we send errors to Airbrake
    */
-  'enabled'             => env('AIRBRAKE_ENABLED', 'false'),
+  'enabled'             => env('AIRBRAKE_ENABLED', false),
 
   /**
    * Airbrake API key

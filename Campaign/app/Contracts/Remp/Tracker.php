@@ -43,5 +43,4 @@ class Tracker implements TrackerContract
             ],
         ]);
     }
-
 }

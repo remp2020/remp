@@ -96,5 +96,4 @@ class GoogleController extends Controller
         ]);
         return redirect($redirectUrl);
     }
-
 }

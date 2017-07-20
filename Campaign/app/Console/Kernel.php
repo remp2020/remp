@@ -40,7 +40,6 @@ class Kernel extends ConsoleKernel
                 ->hourly()
                 ->withoutOverlapping();
         }
-
     }
 
     /**

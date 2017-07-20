@@ -98,6 +98,9 @@ services:
    volumes:
      - ".:/var/www/html:rw"
      - "composer-data:/composer/cache:rw"
+     - $SSH_AUTH_SOCK:/tmp/ssh-agent
+   environment:
+     SSH_AUTH_SOCK: /tmp/ssh-agent
    depends_on:
      - "nginx"
      - "sso_mysql"

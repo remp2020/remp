@@ -27,7 +27,7 @@ class RempJournalServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(JournalContract::class, function($app){
+        $this->app->bind(JournalContract::class, function ($app) {
             $client = new Client([
                 'base_uri' => $app['config']->get('services.journal.base_url'),
             ]);

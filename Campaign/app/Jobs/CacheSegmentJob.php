@@ -45,7 +45,7 @@ class CacheSegmentJob implements ShouldQueue
 
 
         $users = $segmentContract->users($segmentId);
-        $userIds = $users->map(function($item) {
+        $userIds = $users->map(function ($item) {
             return $item->id;
         })->toArray();
 

@@ -82,7 +82,7 @@ class Banner extends Model
 
 
 
-        static::creating(function(Banner $banner) {
+        static::creating(function (Banner $banner) {
             $banner->uuid = Uuid::uuid4()->toString();
         });
     }
