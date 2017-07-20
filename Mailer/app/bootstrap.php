@@ -6,8 +6,13 @@ $env = new Dotenv\Dotenv(__DIR__ . '/../');
 $env->load();
 
 $configurator = new Nette\Configurator;
+$environment = getenv('ENV');
 
-$configurator->setDebugMode(true); // enable for your remote IP
+if ($environment == 'local') {
+    $configurator->setDebugMode(true);
+} else {
+    $configurator->setDebugMode(false);
+}
 $configurator->enableTracy(__DIR__ . '/../log');
 
 $configurator->setTimeZone('Europe/Bratislava');
