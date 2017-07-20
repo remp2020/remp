@@ -37,12 +37,65 @@ deploy:production:mailer:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Mailer/
     - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
-  variables:
-    # GIT_STRATEGY: none
   environment:
     name: production/remp2020/mailer
     url: https://mailer.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+
+deploy:production:campaign:
+  stage: deploy
+  script:
+    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - cd Campaign/
+    - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
+  environment:
+    name: production/remp2020/campaign
+    url: https://campaign.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+
+deploy:production:beam:
+  stage: deploy
+  script:
+    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - cd Beam/
+    - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
+  environment:
+    name: production/remp2020/beam
+    url: https://beam.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+
+deploy:production:sso:
+  stage: deploy
+  script:
+    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - cd Sso/
+    - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - vendor/bin/dep deploy sso --revision=$CI_COMMIT_SHA -vvv
+  environment:
+    name: production/remp2020/sso
+    url: https://sso.remp2020.com
   when: manual
   tags:
     - remp2020
