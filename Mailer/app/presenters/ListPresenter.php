@@ -8,7 +8,6 @@ use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\UsersRepository;
 
-
 final class ListPresenter extends BasePresenter
 {
     /** @var ListsRepository */
@@ -24,8 +23,8 @@ final class ListPresenter extends BasePresenter
         ListsRepository $listsRepository,
         UsersRepository $usersRepository,
         ListFormFactory $listFormFactory
-    )
-    {
+    ) {
+    
         parent::__construct();
         $this->listsRepository = $listsRepository;
         $this->usersRepository = $usersRepository;
@@ -45,7 +44,7 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('subscribers', ['header' => 'number of subscribers', 'render' => 'number', 'orderable' => false])
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setRowLink($this->link('Edit', 'RowId'))
-            ->setRowAction('edit', $this->link('Edit', 'RowId'),'palette-Cyan zmdi-edit');
+            ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit');
 
         return $dataTable;
     }

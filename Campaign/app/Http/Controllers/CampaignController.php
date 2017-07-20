@@ -37,7 +37,7 @@ class CampaignController extends Controller
     {
         $campaigns = Campaign::query();
         return $dataTables->of($campaigns->with('segments'))
-            ->addColumn('actions', function(Campaign $campaign) {
+            ->addColumn('actions', function (Campaign $campaign) {
                 return Json::encode([
                     '_id' => $campaign->id,
                     'show' => route('campaigns.show', $campaign),
@@ -106,7 +106,8 @@ class CampaignController extends Controller
      * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator ) {
+    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
+    {
         $campaign->fill(old());
 
         $banners = Banner::all();
