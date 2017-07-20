@@ -22,4 +22,7 @@ $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
 $container = $configurator->createContainer();
 
+$errbitConfig = $container->parameters['errbit'];
+Tomaj\Errbit\ErrbitLogger::register($errbitConfig);
+
 return $container;
