@@ -50,7 +50,8 @@
         "mailgun/mailgun-php": "^2.3",
         "php-http/curl-client": "^1.7",
         "guzzlehttp/psr7": "^1.4",
-        "remp/nette-sso": "*"
+        "remp/nette-sso": "*",
+        "tomaj/nette-errbit": "~3.0"
 
     },
     "require-dev": {

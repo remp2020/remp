@@ -9,7 +9,7 @@ require dirname(__FILE__) . '/vendor/deployphp/recipes/recipe/rabbit.php';
 
 set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);
-set('shared_dirs', ['log']);
+set('shared_dirs', ['log', 'app/config/config.local.neon']);
 set('shared_files', ['.env']);
 
 localhost('remp2020')

@@ -178,6 +178,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
+        rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
 
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,

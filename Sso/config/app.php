@@ -185,6 +185,7 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
+        rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
 
     ],
 

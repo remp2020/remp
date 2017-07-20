@@ -34,7 +34,8 @@
         "laravelcollective/html": "^5.4",
         "yajra/laravel-datatables-oracle": "^7.2",
         "remp/laravel-sso": "*",
-        "recca0120/laravel-tracy": "^1.8"
+        "recca0120/laravel-tracy": "^1.8",
+        "rigor789/airbrake-laravel": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

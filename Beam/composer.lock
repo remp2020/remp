@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "57e421dbaf5f6c38cbaa4b540fd564d2",
+    "content-hash": "3a3bd83c29e2d58bf568f899a6dfbec1",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -295,16 +295,16 @@
         },
         {
             "name": "bower-asset/bootstrap-select",
-            "version": "v1.12.3",
+            "version": "v1.12.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silviomoreto/bootstrap-select.git",
-                "reference": "b58fe717acbbc10aa7da1b66df988dab9a248279"
+                "reference": "e1a7743e82eb16bce825ec58a8c95b2aceae6942"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silviomoreto/bootstrap-select/zipball/b58fe717acbbc10aa7da1b66df988dab9a248279",
-                "reference": "b58fe717acbbc10aa7da1b66df988dab9a248279",
+                "url": "https://api.github.com/repos/silviomoreto/bootstrap-select/zipball/e1a7743e82eb16bce825ec58a8c95b2aceae6942",
+                "reference": "e1a7743e82eb16bce825ec58a8c95b2aceae6942",
                 "shasum": ""
             },
             "require": {
@@ -673,6 +673,53 @@
                 "click",
                 "material-design"
             ]
+        },
+        {
+            "name": "dbtlr/php-airbrake",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dbtlr/php-airbrake.git",
+                "reference": "69fd4782219ba22fcfe4c278de1eebbbe38f0950"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dbtlr/php-airbrake/zipball/69fd4782219ba22fcfe4c278de1eebbbe38f0950",
+                "reference": "69fd4782219ba22fcfe4c278de1eebbbe38f0950",
+                "shasum": ""
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "php": ">=5.3.3",
+                "phpunit/phpunit": "*",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Airbrake\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Drew Butler",
+                    "email": "hi@dbtlr.com",
+                    "homepage": "http://dbtlr.com"
+                }
+            ],
+            "description": "A PHP 5.3 library for sending errors to the Airbrake.io service.",
+            "homepage": "https://github.com/dbtlr/php-airbrake",
+            "keywords": [
+                "airbrake",
+                "errors",
+                "exceptions",
+                "logging"
+            ],
+            "time": "2015-08-25T15:01:23+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1551,16 +1598,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.4.28",
+            "version": "v5.4.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "442511fc62121085d184355e4f964c88942bbecb"
+                "reference": "b9a64955f4278f45ac348a6e000b5ecc85da167a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/442511fc62121085d184355e4f964c88942bbecb",
-                "reference": "442511fc62121085d184355e4f964c88942bbecb",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/b9a64955f4278f45ac348a6e000b5ecc85da167a",
+                "reference": "b9a64955f4278f45ac348a6e000b5ecc85da167a",
                 "shasum": ""
             },
             "require": {
@@ -1676,20 +1723,20 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-06-30T13:43:07+00:00"
+            "time": "2017-07-19T19:26:19+00:00"
         },
         {
             "name": "laravel/tinker",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/tinker.git",
-                "reference": "7eb2e281395131897407285672ef5532e87e17f9"
+                "reference": "203978fd67f118902acff95925847e70b72e3daf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/tinker/zipball/7eb2e281395131897407285672ef5532e87e17f9",
-                "reference": "7eb2e281395131897407285672ef5532e87e17f9",
+                "url": "https://api.github.com/repos/laravel/tinker/zipball/203978fd67f118902acff95925847e70b72e3daf",
+                "reference": "203978fd67f118902acff95925847e70b72e3daf",
                 "shasum": ""
             },
             "require": {
@@ -1739,7 +1786,7 @@
                 "laravel",
                 "psysh"
             ],
-            "time": "2017-06-01T16:31:26+00:00"
+            "time": "2017-07-13T13:11:05+00:00"
         },
         {
             "name": "laravelcollective/html",
@@ -2781,16 +2828,16 @@
         },
         {
             "name": "recca0120/laravel-tracy",
-            "version": "v1.8.9",
+            "version": "v1.8.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/recca0120/laravel-tracy.git",
-                "reference": "4fc0eb8dc7774fe4d616e6402937fa6596dc4cd0"
+                "reference": "bf7be8ec1845c337f32f1c2a72376a1154d34830"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/recca0120/laravel-tracy/zipball/4fc0eb8dc7774fe4d616e6402937fa6596dc4cd0",
-                "reference": "4fc0eb8dc7774fe4d616e6402937fa6596dc4cd0",
+                "url": "https://api.github.com/repos/recca0120/laravel-tracy/zipball/bf7be8ec1845c337f32f1c2a72376a1154d34830",
+                "reference": "bf7be8ec1845c337f32f1c2a72376a1154d34830",
                 "shasum": ""
             },
             "require": {
@@ -2840,7 +2887,7 @@
                 "tracy",
                 "webprofiler"
             ],
-            "time": "2017-06-19T18:05:09+00:00"
+            "time": "2017-07-19T07:23:21+00:00"
         },
         {
             "name": "recca0120/terminal",
@@ -2904,11 +2951,11 @@
         },
         {
             "name": "remp/laravel-sso",
-            "version": "dev-21-put-all-apps-under-sso",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-sso",
-                "reference": "0a7123d9280036b84f3e25ab11d9d4ae28c64669",
+                "reference": "156cc55f49bea7ea2d0829ff5798ce2f7f3de54b",
                 "shasum": null
             },
             "require": {
@@ -2945,6 +2992,54 @@
                 "remp",
                 "sso"
             ]
+        },
+        {
+            "name": "rigor789/airbrake-laravel",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rigor789/airbrake-laravel.git",
+                "reference": "e6d4ee5dc6c024c546bf1f38a9f015e99b87899c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rigor789/airbrake-laravel/zipball/e6d4ee5dc6c024c546bf1f38a9f015e99b87899c",
+                "reference": "e6d4ee5dc6c024c546bf1f38a9f015e99b87899c",
+                "shasum": ""
+            },
+            "require": {
+                "dbtlr/php-airbrake": "~1.1",
+                "illuminate/contracts": "5.*",
+                "illuminate/support": "5.*",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "rigor789\\AirbrakeLaravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Igor",
+                    "email": "rigor789@gmail.com"
+                }
+            ],
+            "description": "Laravel package for the Airbrake API, which supports Errbit",
+            "keywords": [
+                "airbrake",
+                "bug",
+                "catch",
+                "errbit",
+                "error",
+                "laravel",
+                "monitor"
+            ],
+            "time": "2017-02-16T13:43:33+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -5922,84 +6017,6 @@
             "time": "2016-10-03T07:35:21+00:00"
         },
         {
-            "name": "squizlabs/php_codesniffer",
-            "version": "2.9.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "dcbed1074f8244661eecddfc2a675430d8d33f62"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/dcbed1074f8244661eecddfc2a675430d8d33f62",
-                "reference": "dcbed1074f8244661eecddfc2a675430d8d33f62",
-                "shasum": ""
-            },
-            "require": {
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": ">=5.1.2"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "bin": [
-                "scripts/phpcs",
-                "scripts/phpcbf"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "CodeSniffer.php",
-                    "CodeSniffer/CLI.php",
-                    "CodeSniffer/Exception.php",
-                    "CodeSniffer/File.php",
-                    "CodeSniffer/Fixer.php",
-                    "CodeSniffer/Report.php",
-                    "CodeSniffer/Reporting.php",
-                    "CodeSniffer/Sniff.php",
-                    "CodeSniffer/Tokens.php",
-                    "CodeSniffer/Reports/",
-                    "CodeSniffer/Tokenizers/",
-                    "CodeSniffer/DocGenerators/",
-                    "CodeSniffer/Standards/AbstractPatternSniff.php",
-                    "CodeSniffer/Standards/AbstractScopeSniff.php",
-                    "CodeSniffer/Standards/AbstractVariableSniff.php",
-                    "CodeSniffer/Standards/IncorrectPatternException.php",
-                    "CodeSniffer/Standards/Generic/Sniffs/",
-                    "CodeSniffer/Standards/MySource/Sniffs/",
-                    "CodeSniffer/Standards/PEAR/Sniffs/",
-                    "CodeSniffer/Standards/PSR1/Sniffs/",
-                    "CodeSniffer/Standards/PSR2/Sniffs/",
-                    "CodeSniffer/Standards/Squiz/Sniffs/",
-                    "CodeSniffer/Standards/Zend/Sniffs/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Sherwood",
-                    "role": "lead"
-                }
-            ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "http://www.squizlabs.com/php-codesniffer",
-            "keywords": [
-                "phpcs",
-                "standards"
-            ],
-            "time": "2017-05-22T02:43:20+00:00"
-        },
-        {
             "name": "symfony/filesystem",
             "version": "v3.3.5",
             "source": {
@@ -6324,6 +6341,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "rigor789/airbrake-laravel": 20,
         "deployphp/recipes": 20
     },
     "prefer-stable": true,
