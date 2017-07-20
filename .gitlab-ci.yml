@@ -5,6 +5,7 @@ stages:
 cache:
   paths:
     - bin/
+    - vendor/bin/dep
 
 syntax:7.0:
   stage: test
@@ -34,9 +35,9 @@ deploy:production:mailer:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
-    - bin/composer global require deployer/deployer:^5.0 --verbose --prefer-dist --no-progress --no-interaction
     - cd Mailer/
-    - ~/.composer/vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
+    - if [ ! -f vendor/bin/dep ]; then composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
   variables:
     # GIT_STRATEGY: none
   environment:
