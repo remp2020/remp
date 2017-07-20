@@ -30,6 +30,11 @@ task('deploy:extract_project', function() {
     run("sed -i -e 's/\.\.\/Composer/.\/Composer/g' {{release_path}}/composer.lock");
 })->desc('Monorepo custom release, will migrate to subrepos');
 
+task('deploy:tmplink', function() {
+    run("rm -fr {{release_path}}/temp");
+    run("ln -s /tmp/remp_mailer {{release_path}}/temp");
+})->desc('Temp symlink');
+
 task('deploy:migration', function() {
     run("cd {{release_path}}; php bin/command.php migrate:migrate");
 })->desc('Migrate database');
@@ -39,6 +44,7 @@ task('deploy', [
     'deploy:release',
     'deploy:extract_project',
     'deploy:shared',
+    'deploy:tmplink',
 //    'deploy:migration', // migrations not enabled until running from shared CRM database
     'deploy:symlink',
     'cleanup',

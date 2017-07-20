@@ -12,7 +12,7 @@ require dirname(__FILE__) . '/vendor/deployphp/recipes/recipe/rabbit.php';
 
 set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);
-set('shared_dirs', ['storage']);
+set('shared_dirs', ['storage/app', 'storage/logs']);
 set('shared_files', ['.env']);
 
 localhost('remp2020')
@@ -37,11 +37,17 @@ task('deploy:migration', function() {
     run("cd {{release_path}}; php artisan migrate");
 })->desc('Migrate database');
 
+task('deploy:tmplink', function() {
+    run("rm -fr {{release_path}}/temp");
+    run("ln -s /tmp/remp_campaign {{release_path}}/storage/framework");
+})->desc('Temp symlink');
+
 task('deploy', [
     'deploy:prepare',
     'deploy:release',
     'deploy:extract_project',
     'deploy:shared',
+    'deploy:tmplink',
     'deploy:migration',
     'deploy:symlink',
     'cleanup',
