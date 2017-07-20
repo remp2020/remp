@@ -22,3 +22,9 @@ fixcs:
 	cd $(SUB_CAMPAIGN) && make fixcs
 	cd $(SUB_MAILER) && make fixcs
 	cd $(SUB_SSO) && make fixcs
+
+syntax:
+	cd $(SUB_BEAM) && make syntax
+	cd $(SUB_CAMPAIGN) && make syntax
+	cd $(SUB_MAILER) && make syntax
+	cd $(SUB_SSO) && make syntax

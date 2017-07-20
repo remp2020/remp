@@ -8,7 +8,7 @@ syntax:7.0:
   tags:
     - docker
   script:
-    - find app bin bootstrap config database -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
+    - make syntax
 
 syntax:7.1:
   stage: test
@@ -16,7 +16,7 @@ syntax:7.1:
   tags:
     - docker
   script:
-    - find app bin bootstrap config database -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
+    - make syntax
 
 sniffer:
   stage: test
