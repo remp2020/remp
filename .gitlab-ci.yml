@@ -25,3 +25,20 @@ sniffer:
     - docker
   script:
     - make sniff
+
+deploy:production:mailer:
+  stage: deploy
+  script:
+    - cd Mailer/
+    - php vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
+  variables:
+    # GIT_STRATEGY: none
+  environment:
+    name: production/remp2020/mailer
+    url: https://mailer.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
