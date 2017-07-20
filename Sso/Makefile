@@ -2,10 +2,10 @@
 
 PHP_FOLDERS=app bootstrap config
 
-sniff: vendor/autoload.php
+sniff:
 	../phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
 
-sniff_fix: vendor/autoload.php
+sniff_fix:
 	../phpcbf --standard=PSR2 ${PHP_FOLDERS} -n
 
 fixcs:

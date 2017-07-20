@@ -45,10 +45,10 @@ docker-compose: docker-build
 	docker-compose down --rmi local; \
 	docker-compose build --pull
 
-sniff: vendor/autoload.php
+sniff:
 	../phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
 
-sniff_fix: vendor/autoload.php
+sniff_fix:
 	../phpcbf --standard=PSR2 ${PHP_FOLDERS} -n
 
 fixcs:
