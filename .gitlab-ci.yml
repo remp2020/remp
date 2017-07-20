@@ -29,8 +29,10 @@ sniffer:
 deploy:production:mailer:
   stage: deploy
   script:
+    - if [ ! -f bin/composer ]; then mkdir bin/ && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - bin/composer global require deployer/deployer:^5.0
     - cd Mailer/
-    - php vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
+    - dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
   variables:
     # GIT_STRATEGY: none
   environment:
