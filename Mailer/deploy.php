@@ -28,13 +28,8 @@ task('deploy:vendors', function() {
 });
 
 task('deploy:extract_project', function() use ($app, $whitelist) {
-    $grep = '';
-    foreach ($whitelist as $name) {
-        $grep .= " | grep -v \"{$name}$\"";
-    }
-    run("find {{release_path}} -mindepth 1 -maxdepth 1 {$grep} | xargs rm -fr");
-    run("find {{release_path}}/{$app} -mindepth 1 -maxdepth 1 -exec mv -t {{release_path}} -- {} +");
-    run("rmdir {{release_path}}/{$app}");
+    run("cp -fr . {{release_path}}");
+    run("cp -fr ../Composer {{release_path}}");
     run("sed -i -e 's/\.\.\/Composer/.\/Composer/g' {{release_path}}/composer.lock");
 })->desc('Monorepo necessary hacks to deploy single project');
 
@@ -45,10 +40,7 @@ task('deploy:migration', function() {
 task('deploy', [
     'deploy:prepare',
     'deploy:release',
-    'deploy:update_code',
-    'deploy:copy_dirs',
     'deploy:extract_project',
-    'deploy:vendors',
     'deploy:shared',
     'deploy:migration',
     'deploy:symlink',
