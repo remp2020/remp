@@ -1,8 +1,5 @@
 <?php
 
-$app = 'Mailer';
-$whitelist = [$app, 'Composer'];
-
 use function Deployer\{has, host, task, run, set, get, add, before, after, localhost, input};
 
 require dirname(__FILE__) . '/vendor/autoload.php';
@@ -12,8 +9,8 @@ require dirname(__FILE__) . '/vendor/deployphp/recipes/recipe/rabbit.php';
 
 set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);
-set('shared_dirs', ['storage']);
-set('shared_files', ['.env', 'app/config/config.local.neon']);
+set('shared_dirs', ['log']);
+set('shared_files', ['.env']);
 
 localhost('remp2020')
     ->set('deploy_path', '/data/web/remp2020.com/app/Mailer')
@@ -27,11 +24,11 @@ task('deploy:vendors', function() {
     run('cd {{release_path}} && {{env_vars}} {{bin/composer}} {{composer_options}}');
 });
 
-task('deploy:extract_project', function() use ($app, $whitelist) {
+task('deploy:extract_project', function() {
     run("cp -fr . {{release_path}}");
     run("cp -fr ../Composer {{release_path}}");
     run("sed -i -e 's/\.\.\/Composer/.\/Composer/g' {{release_path}}/composer.lock");
-})->desc('Monorepo necessary hacks to deploy single project');
+})->desc('Monorepo custom release, will migrate to subrepos');
 
 task('deploy:migration', function() {
     run("cd {{release_path}}; php bin/command.php migrate:migrate");
@@ -42,7 +39,7 @@ task('deploy', [
     'deploy:release',
     'deploy:extract_project',
     'deploy:shared',
-    'deploy:migration',
+//    'deploy:migration', // migrations not enabled until running from shared CRM database
     'deploy:symlink',
     'cleanup',
 ])->desc('Deploy your project');
