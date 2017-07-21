@@ -38,8 +38,8 @@ task('deploy:migration', function() {
 })->desc('Migrate database');
 
 task('deploy:tmplink', function() {
-    run("rm -fr {{release_path}}/temp");
-    run("ln -s /tmp/remp_campaign {{release_path}}/storage/framework");
+    run("rm -fr {{release_path}}/storage/framework");
+    run("ln -s /tmp/remp_beam {{release_path}}/storage/framework");
 })->desc('Temp symlink');
 
 task('deploy', [
