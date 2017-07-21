@@ -38,17 +38,8 @@ task('deploy:migration', function() {
 })->desc('Migrate database');
 
 task('deploy:tmplink', function() {
-    run("rm -fr {{release_path}}/storage/framework/cache");
-    run("ln -s /tmp/remp_sso_cache {{release_path}}/storage/framework/cache");
-
-    run("rm -fr {{release_path}}/storage/framework/sessions");
-    run("ln -s /tmp/remp_sso_sessions {{release_path}}/storage/framework/sessions");
-
-    run("rm -fr {{release_path}}/storage/framework/testing");
-    run("ln -s /tmp/remp_sso_testing {{release_path}}/storage/framework/testing");
-
-    run("rm -fr {{release_path}}/storage/framework/views");
-    run("ln -s /tmp/remp_sso_views {{release_path}}/storage/framework/views");
+    run("rm -fr {{release_path}}/storage/framework");
+    run("ln -s /tmp/remp_sso {{release_path}}/storage/framework");
 })->desc('Temp symlink');
 
 task('deploy', [
