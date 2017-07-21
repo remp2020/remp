@@ -8,7 +8,10 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../Composer/nette-sso"
+            "url": "../Composer/nette-sso",
+            "options": {
+                "symlink": false
+            }
         }
     ],
     "require": {

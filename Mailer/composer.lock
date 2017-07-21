@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5133dd8e26a0fb4b295112d20dd53742",
+    "content-hash": "cfdf555c07e7650b572e8e9a72e9bb74",
     "packages": [
         {
             "name": "bower-asset/animate.css",
@@ -2556,7 +2556,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Composer/nette-sso",
-                "reference": "af49e3d611f17a157080ee1fa449ba8025e66561",
+                "reference": "84ccf8ed2b49777d64399671de325c6263904bc5",
                 "shasum": null
             },
             "require": {
@@ -2588,7 +2588,10 @@
                 "nette",
                 "remp",
                 "sso"
-            ]
+            ],
+            "transport-options": {
+                "symlink": false
+            }
         },
         {
             "name": "robmorgan/phinx",
@@ -3458,12 +3461,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/recipes.git",
-                "reference": "15d28973b35d8a1f92e466791cd111bdce058a88"
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/recipes/zipball/15d28973b35d8a1f92e466791cd111bdce058a88",
-                "reference": "15d28973b35d8a1f92e466791cd111bdce058a88",
+                "url": "https://api.github.com/repos/deployphp/recipes/zipball/305e02f36ec3fa909053ecef4d28be08896652ce",
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce",
                 "shasum": ""
             },
             "replace": {
@@ -3501,7 +3504,7 @@
                 "slack",
                 "yarn"
             ],
-            "time": "2017-06-02 05:40:19"
+            "time": "2017-07-16T14:31:48+00:00"
         },
         {
             "name": "doctrine/annotations",

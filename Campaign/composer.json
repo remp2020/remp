@@ -9,7 +9,10 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../Composer/laravel-sso"
+            "url": "../Composer/laravel-sso",
+            "options": {
+                "symlink": false
+            }
         }
     ],
     "require": {

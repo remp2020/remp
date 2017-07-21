@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a3bd83c29e2d58bf568f899a6dfbec1",
+    "content-hash": "2519bb55d86ced0c168044212c9ccc3b",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -2955,7 +2955,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-sso",
-                "reference": "156cc55f49bea7ea2d0829ff5798ce2f7f3de54b",
+                "reference": "1c84953fc337b047b67c7a194ffcde8183a2e14d",
                 "shasum": null
             },
             "require": {
@@ -2991,7 +2991,10 @@
                 "laravel",
                 "remp",
                 "sso"
-            ]
+            ],
+            "transport-options": {
+                "symlink": false
+            }
         },
         {
             "name": "rigor789/airbrake-laravel",
@@ -4208,16 +4211,16 @@
         },
         {
             "name": "yajra/laravel-datatables-oracle",
-            "version": "v7.9.3",
+            "version": "v7.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yajra/laravel-datatables.git",
-                "reference": "97168bfeb4a3317bc27e61a579302d6a26380d5d"
+                "reference": "1d26b26863495b389808c21d178bbe6ad680ea7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/97168bfeb4a3317bc27e61a579302d6a26380d5d",
-                "reference": "97168bfeb4a3317bc27e61a579302d6a26380d5d",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/1d26b26863495b389808c21d178bbe6ad680ea7d",
+                "reference": "1d26b26863495b389808c21d178bbe6ad680ea7d",
                 "shasum": ""
             },
             "require": {
@@ -4265,7 +4268,7 @@
                 "jquery",
                 "laravel"
             ],
-            "time": "2017-07-12T02:33:08+00:00"
+            "time": "2017-07-21T00:47:56+00:00"
         }
     ],
     "packages-dev": [
@@ -4384,12 +4387,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/recipes.git",
-                "reference": "15d28973b35d8a1f92e466791cd111bdce058a88"
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/recipes/zipball/15d28973b35d8a1f92e466791cd111bdce058a88",
-                "reference": "15d28973b35d8a1f92e466791cd111bdce058a88",
+                "url": "https://api.github.com/repos/deployphp/recipes/zipball/305e02f36ec3fa909053ecef4d28be08896652ce",
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce",
                 "shasum": ""
             },
             "replace": {
@@ -4427,7 +4430,7 @@
                 "slack",
                 "yarn"
             ],
-            "time": "2017-06-02T05:40:19+00:00"
+            "time": "2017-07-16T14:31:48+00:00"
         },
         {
             "name": "doctrine/instantiator",
