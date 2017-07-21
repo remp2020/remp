@@ -37,6 +37,10 @@ task('deploy:migration', function() {
 task('deploy:tmplink', function() {
     run("rm -fr {{release_path}}/storage/framework");
     run("ln -s /tmp/remp_campaign {{release_path}}/storage/framework");
+    run('ls -l {{release_path}}/storage');
+    run('ls -l {{release_path}}/storage/framework');
+    run('ls -l {{release_path}}/storage/framework/cache');
+    run('whoami');
 })->desc('Temp symlink');
 
 task('deploy', [
