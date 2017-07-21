@@ -44,7 +44,6 @@ class Kernel extends ConsoleKernel
         } catch (\PDOException $e) {
             // no action, the tables are not ready yet
         }
-
     }
 
     /**
