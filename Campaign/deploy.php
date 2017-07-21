@@ -35,13 +35,8 @@ task('deploy:migration', function() {
 })->desc('Migrate database');
 
 task('deploy:tmplink', function() {
-    run('whoami');
     run("rm -fr {{release_path}}/storage/framework");
     run("ln -s /tmp/remp_campaign {{release_path}}/storage/framework");
-    run('ls -l {{release_path}}/storage');
-    run('ls -l {{release_path}}/storage/framework');
-    run('ls -l /tmp/remp_campaign');
-    run('ls -l {{release_path}}/storage/framework/cache');
 })->desc('Temp symlink');
 
 task('deploy', [
