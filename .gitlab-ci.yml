@@ -31,12 +31,13 @@ sniffer:
   script:
     - make sniff
 
-deploy:production:mailer:
+production:mailer:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Mailer/
-    - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - ln -s ~/.env.mailer .env
+    - ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
   environment:
@@ -49,12 +50,13 @@ deploy:production:mailer:
   only:
     - master
 
-deploy:production:campaign:
+production:campaign:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Campaign/
-    - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - ln -s ~/.env.campaign .env
+    - ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
   environment:
@@ -67,12 +69,13 @@ deploy:production:campaign:
   only:
     - master
 
-deploy:production:beam:
+production:beam:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Beam/
-    - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - ln -s ~/.env.beam .env
+    - then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
   environment:
@@ -85,12 +88,13 @@ deploy:production:beam:
   only:
     - master
 
-deploy:production:sso:
+production:sso:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Sso/
-    - if [ ! -f vendor/bin/dep ]; then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction ; fi
+    - ln -s ~/.env.sso .env
+    - then ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy sso --revision=$CI_COMMIT_SHA -vvv
   environment:
