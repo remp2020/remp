@@ -58,6 +58,8 @@ production:campaign:
     - ln -s ~/.env.campaign .env
     - ../bin/composer install --verbose --prefer-dist --no-progress --no-interaction
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - whoami
+    - pwd
     - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/campaign
