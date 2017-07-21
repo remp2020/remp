@@ -12,7 +12,7 @@ require dirname(__FILE__) . '/vendor/deployphp/recipes/recipe/rabbit.php';
 
 set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);
-set('shared_dirs', ['storage']);
+set('shared_dirs', ['storage/app', 'storage/logs']);
 set('shared_files', ['.env']);
 
 localhost('remp2020')
