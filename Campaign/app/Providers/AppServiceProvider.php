@@ -6,6 +6,7 @@ use App\Contracts\SegmentAggregator;
 use Blade;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Schema::defaultStringLength(191);
+
         $this->app->bind(\App\Models\Dimension\Map::class, function ($app) {
             return new \App\Models\Dimension\Map(config('banners.dimensions'));
         });
