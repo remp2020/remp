@@ -9,7 +9,7 @@ require dirname(__FILE__) . '/vendor/deployphp/recipes/recipe/rabbit.php';
 
 set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);
-set('shared_dirs', ['storage/app', 'storage/logs']);
+set('shared_dirs', ['storage']);
 set('shared_files', ['.env']);
 
 localhost('remp2020')
@@ -31,7 +31,7 @@ task('deploy:extract_project', function() {
 })->desc('Monorepo custom release, will migrate to subrepos');
 
 task('deploy:migration', function() {
-    run("cd {{release_path}}; php artisan migrate");
+    run("cd {{release_path}}; php artisan migrate --force");
 })->desc('Migrate database');
 
 task('deploy:tmplink', function() {
