@@ -7,7 +7,7 @@ class Request extends \Illuminate\Http\Request
     public function isSecure()
     {
         $isSecure = parent::isSecure();
-        if($isSecure) {
+        if ($isSecure) {
             return true;
         }
 
