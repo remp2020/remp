@@ -1,6 +1,6 @@
 <?php
 
-namespace app;
+namespace App\Http;
 
 class Request extends \Illuminate\Http\Request
 {
