@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "60ef2a268a4caa4e69adbaa80b78001f",
+    "content-hash": "f4c052457aa2cd44b7cd7f086d25c5ca",
     "packages": [
         {
             "name": "bower-asset/animate.css",
@@ -684,6 +684,57 @@
                 "update"
             ],
             "time": "2017-07-03T06:55:29+00:00"
+        },
+        {
+            "name": "deployphp/recipes",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/deployphp/recipes.git",
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/deployphp/recipes/zipball/305e02f36ec3fa909053ecef4d28be08896652ce",
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce",
+                "shasum": ""
+            },
+            "replace": {
+                "deployer/recipes": "self.version"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "autoload.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anton Medvedev",
+                    "email": "anton@medv.io"
+                }
+            ],
+            "description": "3rd party deployer recipes",
+            "homepage": "https://github.com/deployphp/recipes",
+            "keywords": [
+                "cachetool",
+                "cloudflare",
+                "deploy",
+                "deployer",
+                "deployment",
+                "hipchat",
+                "newrelic",
+                "rabbit",
+                "recipes",
+                "sentry",
+                "slack",
+                "yarn"
+            ],
+            "time": "2017-07-16 14:31:48"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -3652,57 +3703,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "deployphp/recipes",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/deployphp/recipes.git",
-                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/recipes/zipball/305e02f36ec3fa909053ecef4d28be08896652ce",
-                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce",
-                "shasum": ""
-            },
-            "replace": {
-                "deployer/recipes": "self.version"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "autoload.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Anton Medvedev",
-                    "email": "anton@medv.io"
-                }
-            ],
-            "description": "3rd party deployer recipes",
-            "homepage": "https://github.com/deployphp/recipes",
-            "keywords": [
-                "cachetool",
-                "cloudflare",
-                "deploy",
-                "deployer",
-                "deployment",
-                "hipchat",
-                "newrelic",
-                "rabbit",
-                "recipes",
-                "sentry",
-                "slack",
-                "yarn"
-            ],
-            "time": "2017-07-16 14:31:48"
-        },
         {
             "name": "doctrine/annotations",
             "version": "v1.4.0",

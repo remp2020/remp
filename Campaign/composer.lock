@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "67d05e3b70fafe6fd47422a0a7b83642",
+    "content-hash": "93130c3fb6dbef76c833409569f9d82d",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -1015,6 +1015,57 @@
                 "update"
             ],
             "time": "2017-07-03T06:55:29+00:00"
+        },
+        {
+            "name": "deployphp/recipes",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/deployphp/recipes.git",
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/deployphp/recipes/zipball/305e02f36ec3fa909053ecef4d28be08896652ce",
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce",
+                "shasum": ""
+            },
+            "replace": {
+                "deployer/recipes": "self.version"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "autoload.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anton Medvedev",
+                    "email": "anton@medv.io"
+                }
+            ],
+            "description": "3rd party deployer recipes",
+            "homepage": "https://github.com/deployphp/recipes",
+            "keywords": [
+                "cachetool",
+                "cloudflare",
+                "deploy",
+                "deployer",
+                "deployment",
+                "hipchat",
+                "newrelic",
+                "rabbit",
+                "recipes",
+                "sentry",
+                "slack",
+                "yarn"
+            ],
+            "time": "2017-07-16T14:31:48+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -4869,57 +4920,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "deployphp/recipes",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/deployphp/recipes.git",
-                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/recipes/zipball/305e02f36ec3fa909053ecef4d28be08896652ce",
-                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce",
-                "shasum": ""
-            },
-            "replace": {
-                "deployer/recipes": "self.version"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "autoload.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Anton Medvedev",
-                    "email": "anton@medv.io"
-                }
-            ],
-            "description": "3rd party deployer recipes",
-            "homepage": "https://github.com/deployphp/recipes",
-            "keywords": [
-                "cachetool",
-                "cloudflare",
-                "deploy",
-                "deployer",
-                "deployment",
-                "hipchat",
-                "newrelic",
-                "rabbit",
-                "recipes",
-                "sentry",
-                "slack",
-                "yarn"
-            ],
-            "time": "2017-07-16T14:31:48+00:00"
-        },
         {
             "name": "doctrine/instantiator",
             "version": "1.0.5",

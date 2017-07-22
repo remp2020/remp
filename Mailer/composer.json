@@ -55,12 +55,12 @@
         "guzzlehttp/psr7": "^1.4",
         "remp/nette-sso": "*",
         "deployer/deployer": "^5.0",
+        "deployphp/recipes": "dev-master",
         "tomaj/nette-errbit": "~3.0"
 
     },
     "require-dev": {
         "nette/tester": "^1.6",
-        "deployphp/recipes": "dev-master",
         "friendsofphp/php-cs-fixer": "*"
     },
     "config": {
