@@ -54,12 +54,12 @@
         "php-http/curl-client": "^1.7",
         "guzzlehttp/psr7": "^1.4",
         "remp/nette-sso": "*",
+        "deployer/deployer": "^5.0",
         "tomaj/nette-errbit": "~3.0"
 
     },
     "require-dev": {
         "nette/tester": "^1.6",
-        "deployer/deployer": "^5.0",
         "deployphp/recipes": "dev-master",
         "friendsofphp/php-cs-fixer": "*"
     },

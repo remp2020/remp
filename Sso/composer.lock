@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2bee2796fa42b3f36fefbad8664c9f4a",
+    "content-hash": "74d876dd0569aa8a118afc93d1d47db5",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -769,6 +769,115 @@
             "time": "2015-08-25T15:01:23+00:00"
         },
         {
+            "name": "deployer/deployer",
+            "version": "v5.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/deployphp/deployer.git",
+                "reference": "ade4ac09803f0738f1a357c573a60b2820213d11"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/deployphp/deployer/zipball/ade4ac09803f0738f1a357c573a60b2820213d11",
+                "reference": "ade4ac09803f0738f1a357c573a60b2820213d11",
+                "shasum": ""
+            },
+            "require": {
+                "deployer/phar-update": "~2.0",
+                "php": "~7.0",
+                "pimple/pimple": "~3.0",
+                "symfony/console": "~2.7|~3.0",
+                "symfony/finder": "~2.7|~3.0",
+                "symfony/process": "~2.7|~3.0",
+                "symfony/yaml": "~2.7|~3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~6.0"
+            },
+            "bin": [
+                "bin/dep"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Deployer\\": "src/"
+                },
+                "files": [
+                    "src/Support/helpers.php",
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anton Medvedev",
+                    "email": "anton@medv.io"
+                }
+            ],
+            "description": "Deployment Tool",
+            "homepage": "https://deployer.org",
+            "time": "2017-07-03T07:01:32+00:00"
+        },
+        {
+            "name": "deployer/phar-update",
+            "version": "v2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/deployphp/phar-update.git",
+                "reference": "9533a3145ae2eee879eefeb84b9bf29a12813f01"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/deployphp/phar-update/zipball/9533a3145ae2eee879eefeb84b9bf29a12813f01",
+                "reference": "9533a3145ae2eee879eefeb84b9bf29a12813f01",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "symfony/console": "^2.1|^3.0"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "1.1.0",
+                "phpunit/phpunit": "3.7.*",
+                "symfony/process": "~2.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Deployer\\Component\\PharUpdate\\": "src/",
+                    "Deployer\\Component\\PHPUnit\\": "src/PHPUnit/",
+                    "Deployer\\Component\\Version\\": "src/Version/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Herrera",
+                    "email": "kevin@herrera.io",
+                    "homepage": "http://kevin.herrera.io"
+                },
+                {
+                    "name": "Anton Medvedev",
+                    "email": "anton@medv.io",
+                    "homepage": "http://medv.io"
+                }
+            ],
+            "description": "Integrates Phar Update to Symfony Console.",
+            "homepage": "https://github.com/deployphp/phar-update",
+            "keywords": [
+                "console",
+                "phar",
+                "update"
+            ],
+            "time": "2017-07-03T06:55:29+00:00"
+        },
+        {
             "name": "dnoegel/php-xdg-base-dir",
             "version": "0.1",
             "source": {
@@ -1008,16 +1117,16 @@
         },
         {
             "name": "doctrine/common",
-            "version": "v2.7.2",
+            "version": "v2.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/common.git",
-                "reference": "930297026c8009a567ac051fd545bf6124150347"
+                "reference": "4acb8f89626baafede6ee5475bc5844096eba8a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/common/zipball/930297026c8009a567ac051fd545bf6124150347",
-                "reference": "930297026c8009a567ac051fd545bf6124150347",
+                "url": "https://api.github.com/repos/doctrine/common/zipball/4acb8f89626baafede6ee5475bc5844096eba8a9",
+                "reference": "4acb8f89626baafede6ee5475bc5844096eba8a9",
                 "shasum": ""
             },
             "require": {
@@ -1077,7 +1186,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2017-01-13T14:02:13+00:00"
+            "time": "2017-07-22T08:35:12+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -2856,6 +2965,155 @@
             "time": "2017-03-13T16:27:32+00:00"
         },
         {
+            "name": "pimple/pimple",
+            "version": "v3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silexphp/Pimple.git",
+                "reference": "729436408ef52f9845f9b60d60b2563f314bf1a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/729436408ef52f9845f9b60d60b2563f314bf1a9",
+                "reference": "729436408ef52f9845f9b60d60b2563f314bf1a9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "psr/container": "^1.0"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^3.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Pimple": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Pimple, a simple Dependency Injection Container",
+            "homepage": "http://pimple.sensiolabs.org",
+            "keywords": [
+                "container",
+                "dependency injection"
+            ],
+            "time": "2017-07-17T17:05:21+00:00"
+        },
+        {
+            "name": "predis/predis",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nrk/predis.git",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8"
+            },
+            "suggest": {
+                "ext-curl": "Allows access to Webdis when paired with phpiredis",
+                "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Predis\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniele Alessandri",
+                    "email": "suppakilla@gmail.com",
+                    "homepage": "http://clorophilla.net"
+                }
+            ],
+            "description": "Flexible and feature-complete Redis client for PHP and HHVM",
+            "homepage": "http://github.com/nrk/predis",
+            "keywords": [
+                "nosql",
+                "predis",
+                "redis"
+            ],
+            "time": "2016-06-16T16:22:20+00:00"
+        },
+        {
+            "name": "psr/container",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/container.git",
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common Container Interface (PHP FIG PSR-11)",
+            "homepage": "https://github.com/php-fig/container",
+            "keywords": [
+                "PSR-11",
+                "container",
+                "container-interface",
+                "container-interop",
+                "psr"
+            ],
+            "time": "2017-02-14T16:28:37+00:00"
+        },
+        {
             "name": "psr/http-message",
             "version": "1.0.1",
             "source": {
@@ -4245,6 +4503,61 @@
             "time": "2017-07-10T14:18:27+00:00"
         },
         {
+            "name": "symfony/yaml",
+            "version": "v3.3.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "1f93a8d19b8241617f5074a123e282575b821df8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/1f93a8d19b8241617f5074a123e282575b821df8",
+                "reference": "1f93a8d19b8241617f5074a123e282575b821df8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "symfony/console": "~2.8|~3.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "time": "2017-06-15T12:58:50+00:00"
+        },
+        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "2.2.0",
             "source": {
@@ -4616,16 +4929,16 @@
         },
         {
             "name": "yajra/laravel-datatables-oracle",
-            "version": "v7.9.3",
+            "version": "v7.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yajra/laravel-datatables.git",
-                "reference": "97168bfeb4a3317bc27e61a579302d6a26380d5d"
+                "reference": "1d26b26863495b389808c21d178bbe6ad680ea7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/97168bfeb4a3317bc27e61a579302d6a26380d5d",
-                "reference": "97168bfeb4a3317bc27e61a579302d6a26380d5d",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/1d26b26863495b389808c21d178bbe6ad680ea7d",
+                "reference": "1d26b26863495b389808c21d178bbe6ad680ea7d",
                 "shasum": ""
             },
             "require": {
@@ -4673,131 +4986,22 @@
                 "jquery",
                 "laravel"
             ],
-            "time": "2017-07-12T02:33:08+00:00"
+            "time": "2017-07-21T00:47:56+00:00"
         }
     ],
     "packages-dev": [
-        {
-            "name": "deployer/deployer",
-            "version": "v5.1.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/deployphp/deployer.git",
-                "reference": "ade4ac09803f0738f1a357c573a60b2820213d11"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/deployer/zipball/ade4ac09803f0738f1a357c573a60b2820213d11",
-                "reference": "ade4ac09803f0738f1a357c573a60b2820213d11",
-                "shasum": ""
-            },
-            "require": {
-                "deployer/phar-update": "~2.0",
-                "php": "~7.0",
-                "pimple/pimple": "~3.0",
-                "symfony/console": "~2.7|~3.0",
-                "symfony/finder": "~2.7|~3.0",
-                "symfony/process": "~2.7|~3.0",
-                "symfony/yaml": "~2.7|~3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~6.0"
-            },
-            "bin": [
-                "bin/dep"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Deployer\\": "src/"
-                },
-                "files": [
-                    "src/Support/helpers.php",
-                    "src/functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Anton Medvedev",
-                    "email": "anton@medv.io"
-                }
-            ],
-            "description": "Deployment Tool",
-            "homepage": "https://deployer.org",
-            "time": "2017-07-03T07:01:32+00:00"
-        },
-        {
-            "name": "deployer/phar-update",
-            "version": "v2.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/deployphp/phar-update.git",
-                "reference": "9533a3145ae2eee879eefeb84b9bf29a12813f01"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/phar-update/zipball/9533a3145ae2eee879eefeb84b9bf29a12813f01",
-                "reference": "9533a3145ae2eee879eefeb84b9bf29a12813f01",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "symfony/console": "^2.1|^3.0"
-            },
-            "require-dev": {
-                "mikey179/vfsstream": "1.1.0",
-                "phpunit/phpunit": "3.7.*",
-                "symfony/process": "~2.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Deployer\\Component\\PharUpdate\\": "src/",
-                    "Deployer\\Component\\PHPUnit\\": "src/PHPUnit/",
-                    "Deployer\\Component\\Version\\": "src/Version/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kevin Herrera",
-                    "email": "kevin@herrera.io",
-                    "homepage": "http://kevin.herrera.io"
-                },
-                {
-                    "name": "Anton Medvedev",
-                    "email": "anton@medv.io",
-                    "homepage": "http://medv.io"
-                }
-            ],
-            "description": "Integrates Phar Update to Symfony Console.",
-            "homepage": "https://github.com/deployphp/phar-update",
-            "keywords": [
-                "console",
-                "phar",
-                "update"
-            ],
-            "time": "2017-07-03T06:55:29+00:00"
-        },
         {
             "name": "deployphp/recipes",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/recipes.git",
-                "reference": "15d28973b35d8a1f92e466791cd111bdce058a88"
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/recipes/zipball/15d28973b35d8a1f92e466791cd111bdce058a88",
-                "reference": "15d28973b35d8a1f92e466791cd111bdce058a88",
+                "url": "https://api.github.com/repos/deployphp/recipes/zipball/305e02f36ec3fa909053ecef4d28be08896652ce",
+                "reference": "305e02f36ec3fa909053ecef4d28be08896652ce",
                 "shasum": ""
             },
             "replace": {
@@ -4835,7 +5039,7 @@
                 "slack",
                 "yarn"
             ],
-            "time": "2017-06-02T05:40:19+00:00"
+            "time": "2017-07-16T14:31:48+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -5813,105 +6017,6 @@
             "time": "2017-06-30T09:13:00+00:00"
         },
         {
-            "name": "pimple/pimple",
-            "version": "v3.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/silexphp/Pimple.git",
-                "reference": "729436408ef52f9845f9b60d60b2563f314bf1a9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/729436408ef52f9845f9b60d60b2563f314bf1a9",
-                "reference": "729436408ef52f9845f9b60d60b2563f314bf1a9",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "psr/container": "^1.0"
-            },
-            "require-dev": {
-                "symfony/phpunit-bridge": "^3.2"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Pimple": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                }
-            ],
-            "description": "Pimple, a simple Dependency Injection Container",
-            "homepage": "http://pimple.sensiolabs.org",
-            "keywords": [
-                "container",
-                "dependency injection"
-            ],
-            "time": "2017-07-17T17:05:21+00:00"
-        },
-        {
-            "name": "psr/container",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/container.git",
-                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/container/zipball/b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
-                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Container\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common Container Interface (PHP FIG PSR-11)",
-            "homepage": "https://github.com/php-fig/container",
-            "keywords": [
-                "PSR-11",
-                "container",
-                "container-interface",
-                "container-interop",
-                "psr"
-            ],
-            "time": "2017-02-14T16:28:37+00:00"
-        },
-        {
             "name": "sebastian/code-unit-reverse-lookup",
             "version": "1.0.1",
             "source": {
@@ -6689,61 +6794,6 @@
             "description": "Symfony Stopwatch Component",
             "homepage": "https://symfony.com",
             "time": "2017-04-12T14:14:56+00:00"
-        },
-        {
-            "name": "symfony/yaml",
-            "version": "v3.3.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "1f93a8d19b8241617f5074a123e282575b821df8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/1f93a8d19b8241617f5074a123e282575b821df8",
-                "reference": "1f93a8d19b8241617f5074a123e282575b821df8",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5.9"
-            },
-            "require-dev": {
-                "symfony/console": "~2.8|~3.0"
-            },
-            "suggest": {
-                "symfony/console": "For validating YAML files using the lint command"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Yaml Component",
-            "homepage": "https://symfony.com",
-            "time": "2017-06-15T12:58:50+00:00"
         }
     ],
     "aliases": [],

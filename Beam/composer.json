@@ -38,13 +38,13 @@
         "yajra/laravel-datatables-oracle": "^7.2",
         "remp/laravel-sso": "*",
         "recca0120/laravel-tracy": "^1.8",
+        "deployer/deployer": "^5.0",
         "rigor789/airbrake-laravel": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~5.7",
-        "deployer/deployer": "^5.0",
         "deployphp/recipes": "dev-master",
         "friendsofphp/php-cs-fixer": "*"
     },
