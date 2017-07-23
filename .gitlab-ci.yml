@@ -1,5 +1,6 @@
 stages:
   - test
+  - build
   - deploy
 
 cache:
@@ -7,7 +8,7 @@ cache:
     - bin/
     - vendor/bin/dep
 
-syntax:7.0:
+test:syntax:7.0:
   stage: test
   image: php:7.0-cli
   tags:
@@ -15,7 +16,7 @@ syntax:7.0:
   script:
     - make syntax
 
-syntax:7.1:
+test:syntax:7.1:
   stage: test
   image: php:7.1-cli
   tags:
@@ -23,7 +24,7 @@ syntax:7.1:
   script:
     - make syntax
 
-sniffer:
+test:sniffer:
   stage: test
   image: php:7.0-cli
   tags:
@@ -31,7 +32,37 @@ sniffer:
   script:
     - make sniff
 
-production:mailer:
+build:beam:tracker:
+  stage: build
+  script:
+    - cd Beam/go/cmd/tracker
+    - make docker-build
+    - mv tracker.tar ../../../../
+  artifacts:
+    paths:
+      - tracker.tar
+    expire_in: 1 month
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+
+build:beam:segments:
+  stage: build
+  script:
+    - cd Beam/go/cmd/segments
+    - make docker-build
+    - mv segments.tar ../../../../
+  artifacts:
+    paths:
+      - segments.tar
+    expire_in: 1 month
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+
+deploy:mailer:admin:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
@@ -49,8 +80,9 @@ production:mailer:
     - deploy
   only:
     - master
+  dependencies: []
 
-production:campaign:
+deploy:campaign:admin:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
@@ -70,8 +102,9 @@ production:campaign:
     - deploy
   only:
     - master
+  dependencies: []
 
-production:beam:
+deploy:beam:admin:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
@@ -89,8 +122,9 @@ production:beam:
     - deploy
   only:
     - master
+  dependencies: []
 
-production:sso:
+deploy:sso:admin:
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
@@ -102,6 +136,25 @@ production:sso:
   environment:
     name: production/remp2020/sso
     url: https://sso.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+  dependencies: []
+
+deploy:beam:tracker:
+  dependencies:
+    - build:beam:tracker
+  stage: deploy
+  script:
+    - cd Beam/go/cmd/tracker/
+    - make docker-build
+    - scp tracker.tar deploy-remp@
+  environment:
+    name: production/remp2020/beam
+    url: https://tracker.beam.remp2020.com
   when: manual
   tags:
     - remp2020
