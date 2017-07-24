@@ -6,16 +6,16 @@ use Remp\MailerModule\Repository;
 
 class BatchesRepository extends Repository
 {
-    const STATE_CREATED = 'created';            // prva faza ked sa vytvori v admine
-    const STATE_UPDATED = 'updated';            // ked sa v admine batch upravi a je nutne ho znovu nastartovat
-    const STATE_READY = 'ready';                // ked sa v admine povie ze sa to moze odosielat, tento stav sa autoamticky zachyti a zacne sa generovat queue
-    const STATE_PREPARING = 'preparing';        // ked je v tomto stave tak sa generuje queueu, po skonceni sa prepne na processing
-    const STATE_PROCESSING = 'processing';      // ked je v totom stave tak sa zacne posielat jobom
-    const STATE_PROCESSED = 'processed';        // job queues naplnene a caka na posielanie
-    const STATE_SENDING = 'sending';            // posiela sa
-    const STATE_DONE = 'done';                  // doposielane
-    const STATE_USER_STOP = 'user_stopped';     // zastavene userom
-    const STATE_WORKER_STOP = 'worker_stopped'; // v pripade chyby s komunikacie s SMTP je posielanie zastavene
+    const STATE_CREATED = 'created';
+    const STATE_UPDATED = 'updated';
+    const STATE_READY = 'ready';
+    const STATE_PREPARING = 'preparing';
+    const STATE_PROCESSING = 'processing';
+    const STATE_PROCESSED = 'processed';
+    const STATE_SENDING = 'sending';
+    const STATE_DONE = 'done';
+    const STATE_USER_STOP = 'user_stopped';
+    const STATE_WORKER_STOP = 'worker_stopped';
 
     protected $tableName = 'mail_job_batch';
 

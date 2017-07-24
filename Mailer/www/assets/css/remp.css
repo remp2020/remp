@@ -28,11 +28,13 @@
     background-color: rgba(0, 0, 0, 0.01);
 }
 
-/*******************/
-/* DATETIME PICKER */
-/*******************/
-.bootstrap-datetimepicker-widget {
-    z-index: 10000;
+/***************/
+/* Z-INDEX FIX */
+/***************/
+.bootstrap-datetimepicker-widget,
+.bootstrap-select .dropdown-menu.open
+{
+    z-index: 3000;
 }
 
 /***************/
