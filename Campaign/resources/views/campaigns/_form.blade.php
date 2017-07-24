@@ -56,8 +56,8 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
             return {
                 "name": '{!! $campaign->name !!}' || null,
                 "segments": {!! $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
-                "bannerId": {!! $campaign->banner_id !!} || null,
-                "active": {!! $campaign->active !!} || null,
+                "bannerId": {!! @json($campaign->banner_id) !!} || null,
+                "active": {!! @json($campaign->active) !!} || null,
 
                 "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
                 "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

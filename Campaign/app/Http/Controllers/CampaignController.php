@@ -52,16 +52,22 @@ class CampaignController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param SegmentContract $segmentContract
+     * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function create(SegmentContract $segmentContract)
+    public function create(SegmentAggregator $segmentAggregator)
     {
         $campaign = new Campaign();
         $campaign->fill(old());
 
         $banners = Banner::all();
-        $segments = $segmentContract->list();
+        try {
+            $segments = $segmentAggregator->list();
+        } catch (SegmentException $e) {
+            $segments = new Collection();
+            flash('Unable to fetch list of segments, please check the application configuration.')->error();
+            \Log::error($e->getMessage());
+        }
 
         return view('campaigns.create', [
             'campaign' => $campaign,

@@ -49,7 +49,13 @@
         <div class="col-md-8">
             <h4>Segments</h4>
 
-            <div class="input-group m-t-30">
+            <div class="row">
+                <div class="col-md-12">
+                    <p>User needs to be member of all selected segments for campaign to be shown.</p>
+                </div>
+            </div>
+
+            <div class="input-group">
                 <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
                 <div class="row">
                     <div class="col-md-12">

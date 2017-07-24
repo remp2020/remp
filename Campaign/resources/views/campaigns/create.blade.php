@@ -12,6 +12,8 @@
             <h2>Add new campaign</h2>
         </div>
         <div class="card-body card-padding">
+            @include('flash::message')
+
             @component('campaigns._vue_form')
             @endcomponent
 

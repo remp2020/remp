@@ -5,18 +5,15 @@ namespace App\Contracts\Remp;
 use App\CampaignSegment;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
-use App\Jobs\CacheSegmentJob;
-use Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
-use Razorpay\BloomFilter\Bloom;
 
 class Segment implements SegmentContract
 {
     const PROVIDER_ALIAS = 'remp_segment';
 
-    const ENDPOINT_LIST = 'segments/list';
+    const ENDPOINT_LIST = 'segments';
 
     const ENDPOINT_CHECK = 'segments/%s/check/%s';
 
