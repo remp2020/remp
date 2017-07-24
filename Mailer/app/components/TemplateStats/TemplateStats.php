@@ -54,7 +54,7 @@ class TemplateStats extends Control
                 $this->templates[] = $this->templatesRepository->find($id);
             }
         }
-        
+
         $this->template->delivered_stat = $this->logsRepository->getStatsRate($this->templates, 'delivered_at', $startTime, $endTime);
         $this->template->opened_stat = $this->logsRepository->getStatsRate($this->templates, 'opened_at', $startTime, $endTime);
         $this->template->clicked_stat = $this->logsRepository->getStatsRate($this->templates, 'clicked_at', $startTime, $endTime);

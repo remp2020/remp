@@ -52,11 +52,9 @@ class JobFormFactory extends Object
 
         $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'));
 
-        $form->addText('email_count', 'Number of emails')
-            ->setRequired('Required');
+        $form->addText('email_count', 'Max number of sent emails');
 
-        $form->addText('start_at', 'Start date')
-            ->setRequired('Required');
+        $form->addText('start_at', 'Start date');
 
         $form->addSubmit('save', 'Save')
             ->getControlPrototype()
@@ -73,8 +71,8 @@ class JobFormFactory extends Object
 
         $batch = $this->batchesRepository->add(
             $job->id,
-            $values['email_count'],
-            $values['start_at']
+            !empty($values['email_count']) ? $values['email_count'] : null,
+            !empty($values['start_at']) ? $values['start_at'] : null
         );
 
         $batchTemplate = $this->batchTemplatesRepository->add(

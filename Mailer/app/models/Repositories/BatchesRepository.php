@@ -19,7 +19,7 @@ class BatchesRepository extends Repository
 
     protected $tableName = 'mail_job_batch';
 
-    public function add($jobId, $email_count, $startAt = null, $method = 'random')
+    public function add($jobId, $email_count = null, $startAt = null, $method = 'random')
     {
         $result = $this->insert([
             'mail_job_id' => $jobId,
