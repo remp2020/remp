@@ -68,15 +68,17 @@
             <div class="card-header">
                 <h2>
                     Batch #{$batch->id}
-                    {if $batch->related('mail_job_batch_templates')->count('*') > 0 && in_array($batch->status, ['created', 'updated', 'done', 'worker_stopped', 'user_stopped', 'preparing', 'processing', 'sending', 'ready'])}
                         <div class="toggle-switch m-l-10">
-                            <input n:if="in_array($batch->status, ['created', 'updated', 'done'])" data-url="{link SetBatchReady! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
-                            <input n:if="in_array($batch->status, ['worker_stopped', 'user_stopped'])" data-url="{link SetBatchSend! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
-                            <input n:if="in_array($batch->status, ['preparing', 'processing', 'sending'])" data-url="{link SetBatchUserStop! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
-                            <input n:if="in_array($batch->status, ['ready'])" data-url="{link SetBatchCreated! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
+                            {if $batch->related('mail_job_batch_templates')->count('*') > 0}
+                                <input n:if="in_array($batch->status, ['created', 'updated', 'done'])" data-url="{link SetBatchReady! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
+                                <input n:if="in_array($batch->status, ['worker_stopped', 'user_stopped'])" data-url="{link SetBatchSend! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
+                                <input n:if="in_array($batch->status, ['preparing', 'processing', 'processed', 'sending'])" data-url="{link SetBatchUserStop! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
+                                <input n:if="in_array($batch->status, ['ready'])" data-url="{link SetBatchCreated! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
+                            {else}
+                                <input id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" disabled />
+                            {/if}
                             <label for="change-status-batch-{$batch->id}" class="ts-helper"></label>
                         </div>
-                    {/if}
                 </h2>
                 <ul class="actions">
                     <li class="dropdown action-show">

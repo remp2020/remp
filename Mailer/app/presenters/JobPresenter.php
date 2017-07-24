@@ -68,7 +68,8 @@ final class JobPresenter extends BasePresenter
             ->setColSetting('status', [])
             ->setColSetting('emails_sent_count', ['header' => 'sent emails', 'orderable' => false])
             ->setRowLink($this->link('Show', 'RowId'))
-            ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]));
+            ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
+            ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
     }
