@@ -126,7 +126,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchReady($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->update($batch, ['status' => 'ready']);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_READY]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -135,6 +135,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchSend($id)
     {
         $batch = $this->batchesRepository->find($id);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -143,6 +144,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchUserStop($id)
     {
         $batch = $this->batchesRepository->find($id);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_USER_STOP]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -151,8 +153,20 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchCreated($id)
     {
         $batch = $this->batchesRepository->find($id);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_CREATED]);
 
         $this->flashMessage('Status of batch was changed.');
+        $this->redirect('Show', $batch->job_id);
+    }
+
+    public function handleRemoveBatch($id)
+    {
+        $batch = $this->batchesRepository->find($id);
+
+        $this->batchTemplatesRepository->deleteByBatchId($batch->id);
+        $this->batchesRepository->delete($batch);
+
+        $this->flashMessage('Batch was removed.');
         $this->redirect('Show', $batch->job_id);
     }
 

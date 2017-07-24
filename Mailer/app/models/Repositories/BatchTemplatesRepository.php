@@ -31,4 +31,14 @@ class BatchTemplatesRepository extends Repository
     {
         return $this->getTable()->where(['mail_job_id' => $jobId]);
     }
+
+    public function findByBatchId($batchId)
+    {
+        return $this->getTable()->where(['mail_job_batch_id' => $batchId]);
+    }
+
+    public function deleteByBatchId($batchId)
+    {
+        $this->findByBatchId($batchId)->delete();
+    }
 }

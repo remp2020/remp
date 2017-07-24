@@ -51,7 +51,8 @@
         "mailgun/mailgun-php": "^2.3",
         "php-http/curl-client": "^1.7",
         "guzzlehttp/psr7": "^1.4",
-        "remp/nette-sso": "*"
+        "remp/nette-sso": "*",
+        "bower-asset/datatables.net-rowgroup": "^1.0"
 
     },
     "require-dev": {

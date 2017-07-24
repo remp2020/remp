@@ -68,13 +68,15 @@
             <div class="card-header">
                 <h2>
                     Batch #{$batch->id}
-                    <div class="toggle-switch m-l-10">
-                        <input n:if="in_array($batch->status, ['created', 'updated', 'done'])" data-url="{link SetBatchReady! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
-                        <input n:if="in_array($batch->status, ['worker_stopped', 'user_stopped'])" data-url="{link SetBatchSend! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
-                        <input n:if="in_array($batch->status, ['preparing', 'processing', 'sending'])" data-url="{link SetBatchUserStop! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
-                        <input n:if="in_array($batch->status, ['ready'])" data-url="{link SetBatchCreated! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
-                        <label for="change-status-batch-{$batch->id}" class="ts-helper"></label>
-                    </div>
+                    {if $batch->related('mail_job_batch_templates')->count('*') > 0 && in_array($batch->status, ['created', 'updated', 'done', 'worker_stopped', 'user_stopped', 'preparing', 'processing', 'sending', 'ready'])}
+                        <div class="toggle-switch m-l-10">
+                            <input n:if="in_array($batch->status, ['created', 'updated', 'done'])" data-url="{link SetBatchReady! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
+                            <input n:if="in_array($batch->status, ['worker_stopped', 'user_stopped'])" data-url="{link SetBatchSend! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" />
+                            <input n:if="in_array($batch->status, ['preparing', 'processing', 'sending'])" data-url="{link SetBatchUserStop! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
+                            <input n:if="in_array($batch->status, ['ready'])" data-url="{link SetBatchCreated! $batch->id}" id="change-status-batch-{$batch->id}" type="checkbox" hidden="hidden" checked />
+                            <label for="change-status-batch-{$batch->id}" class="ts-helper"></label>
+                        </div>
+                    {/if}
                 </h2>
                 <ul class="actions">
                     <li class="dropdown action-show">
@@ -82,6 +84,9 @@
                             <i class="zmdi zmdi-more-vert"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-right dm-icon">
+                                <li n:if="$batch->sent_emails == 0">
+                                    <a n:href="RemoveBatch! $batch->id"><i class="zmdi zmdi-close"></i> Remove Batch</a>
+                                </li>
                             <li>
                                 <a href="#new-template-form-batch-{$batch->id}" data-toggle="collapse"><i class="zmdi zmdi-plus"></i> Add email</a>
                             </li>
@@ -94,7 +99,6 @@
                     <li class="list-group-item"><strong>Status:</strong> {$batch->status}</li>
                     <li class="list-group-item"><strong>Method:</strong> {$batch->method}</li>
                     <li class="list-group-item"><strong>Start at:</strong> {$batch->start_at}</li>
-                    <li class="list-group-item"><strong>Number of mails:</strong> {$batch->max_emails}</li>
                     <li class="list-group-item"><strong>Number of sent mails:</strong> {$batch->sent_emails}</li>
                     <li class="list-group-item"><strong>Number of errors:</strong> {$batch->errors_count}</li>
                     <li class="list-group-item"><strong>Started:</strong> {$batch->first_email_sent_at}</li>
@@ -142,13 +146,3 @@
     </div>
 </div>
 {/foreach}
-
-
-    <div class="card">
-        <div class="card-header">
-            <h2>Log</h2>
-        </div>
-        <div class="card-body">
-        </div>
-    </div>
-
