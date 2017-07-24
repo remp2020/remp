@@ -59,6 +59,7 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
         $campaign->fill(old());
+        $selectedSegments = collect(old('segments'));
 
         $banners = Banner::all();
         try {
@@ -73,6 +74,7 @@ class CampaignController extends Controller
             'campaign' => $campaign,
             'banners' => $banners,
             'segments' => $segments,
+            'selectedSegments' => $selectedSegments,
         ]);
     }
 
@@ -86,8 +88,16 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
         $campaign->fill($request->all());
-
         $campaign->save();
+
+        foreach ($request->get('segments') as $r) {
+            /** @var CampaignSegment $rule */
+            $rule = new CampaignSegment();
+            $rule->code = $r['code'];
+            $rule->provider = $r['provider'];
+            $rule->campaign_id = $campaign->id;
+            $rule->save();
+        }
 
         return redirect(route('campaigns.index'))->with('success', 'Campaign created');
     }
@@ -115,7 +125,6 @@ class CampaignController extends Controller
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
         $campaign->fill(old());
-
         $banners = Banner::all();
 
         try {

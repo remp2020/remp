@@ -19,7 +19,7 @@
                             <label for="banner_id" class="fg-label">Banner</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model="bannerId" class="selectpicker" data-live-search="true" name="banner_id">
+                            <select v-model="bannerId" title="Banner to display" class="selectpicker" data-live-search="true" name="banner_id">
                                 <option v-for="banner in banners" v-bind:value="banner.id">
                                     @{{ banner.name }}
                                 </option>
@@ -59,7 +59,7 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
                 <div class="row">
                     <div class="col-md-12">
-                        <select v-model="addedSegment" v-on:change="selectSegment" class="selectpicker col-md-8" data-live-search="true">
+                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker col-md-8" data-live-search="true">
                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
                                 <option v-for="(obj,code) in list" v-bind:value="obj">
                                     @{{ obj.name }}
