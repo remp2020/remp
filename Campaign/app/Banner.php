@@ -72,15 +72,12 @@ class Banner extends Model
     ];
 
     protected $attributes = [
-        'closeable' => false
+        'closeable' => false,
     ];
 
     protected static function boot()
     {
         parent::boot();
-
-
-
 
         static::creating(function (Banner $banner) {
             $banner->uuid = Uuid::uuid4()->toString();

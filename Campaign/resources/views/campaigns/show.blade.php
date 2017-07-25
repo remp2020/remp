@@ -1,6 +1,5 @@
 @push('head')
-<link href="/assets/css/prism/prism-vs.css" rel="stylesheet">
-<script src="/assets/vendor/prism/prism.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
 
 <style type="text/css">
@@ -35,23 +34,14 @@
                 <div class="row">
                     <div class="col-md-12">
                         @php
-                            $libUrl = asset("assets/js/remplib.js");
-                            $baseUrl = url('/');
+                            $libUrl = Request::getHost() . "/assets/js/remplib.js";
+                            $targetUrl = Request::getHost();
                             $snippet = <<<HTML
 <script type="text/javascript">
     (function(win, doc) {
-        function e(e) {
+        function mock(fn) {
             return function() {
-                var args = arguments;
-                if ("initialize" === e && args && args[0].modify && args[0].modify.overlay && "loading" === doc.readyState) {
-                    var a = "__inf__overlay__";
-                    doc.write('<div id="' + a + '" style="position:absolute;background:#fff;left:0;top:0;width:100%;height:100%;z-index:1010101"></div>');
-                    setTimeout(function() {
-                        var e = doc.getElementById(a);
-                        e && doc.body.removeChild(e);
-                    }, args[0].modify.delay || 500)
-                }
-                this._.push([e, args])
+                this._.push([fn, arguments])
             }
         }
         if (!win.remplib) {
@@ -62,17 +52,18 @@
 
             for (i = 0; i < funcs.length; i++) {
                 fn = funcs[i];
-                win.remplib[fn] = e(fn);
+                win.remplib[fn] = mock(fn);
             }
 
             script.type = "text/javascript";
             script.async = true;
-            script.src = d + "//campaign.remp.app/assets/js/remplib.js";
+            script.src = d + "//{$libUrl}";
             doc.getElementsByTagName("head")[0].appendChild(script);
         }
     })(window, document);
 
     remplib.init({
+        "target": "//{$targetUrl}",
         "token": "beam-property-token"
     });
     remplib.identify("user-identifier"); // optional

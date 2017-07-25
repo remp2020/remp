@@ -97,6 +97,10 @@ class CampaignController extends Controller
             $rule->provider = $r['provider'];
             $rule->campaign_id = $campaign->id;
             $rule->save();
+
+            if ($campaign->active) {
+                dispatch(new CacheSegmentJob($r['id']));
+            }
         }
 
         return redirect(route('campaigns.index'))->with('success', 'Campaign created');
@@ -162,14 +166,13 @@ class CampaignController extends Controller
             $rule->provider = $r['provider'];
             $rule->campaign_id = $campaign->id;
             $rule->save();
+
+            if ($campaign->active && $shouldCache) {
+                dispatch(new CacheSegmentJob($r['id']));
+            }
         }
 
         CampaignSegment::destroy($request->get('removedSegments'));
-
-        if ($campaign->active && $shouldCache) {
-            dispatch(new CacheSegmentJob($campaign->segment_id));
-        }
-
         return redirect(route('campaigns.index'))->with('success', 'Campaign updated');
     }
 

@@ -18,7 +18,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             initIterator: 0,
 
-            target: "http://campaign.remp.app",
+            target: null,
 
             extend: function() {
                 var a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;
@@ -87,7 +87,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             },
 
             init: function(config) {
-                this.beamToken = config.token
+                if (typeof config.target !== 'string') {
+                    throw "remplib: configuration target invalid or missing: "+config.target
+                }
+                if (typeof config.token !== 'string') {
+                    throw "remplib: configuration token invalid or missing: "+config.token
+                }
+                this.target = config.target;
+                this.beamToken = config.token;
             },
 
             run: function() {

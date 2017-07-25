@@ -19,7 +19,7 @@
                             <label for="banner_id" class="fg-label">Banner</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model="bannerId" title="Banner to display" class="selectpicker" data-live-search="true" name="banner_id">
+                            <select v-model="bannerId" class="selectpicker" data-live-search="true" name="banner_id">
                                 <option v-for="banner in banners" v-bind:value="banner.id">
                                     @{{ banner.name }}
                                 </option>
@@ -80,7 +80,7 @@
             </div>
 
             <div class="row m-t-20">
-                <div class="col-md-12">
+                <div class="col-md-8">
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <tbody>

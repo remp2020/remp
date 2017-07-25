@@ -14,14 +14,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 dimensions: model['dimensions'] || null,
                 text: model['text'] || null,
                 textAlign: model['text_align'] || null,
-                fontSize: model['font_size'] || null,
+                fontSize: model['font_size'] || 18,
                 targetUrl: model['target_url'] || null,
                 textColor: model['text_color'] || null,
                 backgroundColor: model['background_color'] || null,
                 position: model['position'] || null,
                 transition: model['transition'] || null,
                 closeable: model['closeable'] || null,
-                displayDelay: model['display_delay'] || null,
+                displayDelay: model['display_delay'] || 0,
                 closeTimeout: model['close_timeout'] || null
             }
         },

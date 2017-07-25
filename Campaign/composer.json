@@ -30,7 +30,6 @@
         "bower-asset/jquery": "^3.1",
         "bower-asset/jquery-bootstrap-purr": "^1.1",
         "bower-asset/jquery-placeholder": "^2.3",
-        "bower-asset/knockout": "^3.4",
         "bower-asset/malihu-custom-scrollbar-plugin": "^3.1",
         "bower-asset/material-design-iconic-font": "^2.2",
         "bower-asset/sugar": "^1.4",
