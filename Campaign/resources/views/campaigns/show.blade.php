@@ -34,8 +34,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         @php
-                            $libUrl = Request::getHost() . "/assets/js/remplib.js";
-                            $targetUrl = Request::getHost();
+                            $libUrl = asset("/assets/js/remplib.js");
+                            $targetUrl = url('/');
                             $snippet = <<<HTML
 <script type="text/javascript">
     (function(win, doc) {
