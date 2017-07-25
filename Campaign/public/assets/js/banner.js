@@ -41,10 +41,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             'customBoxStyles' +
         ']">'+
             '<a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="show = false" v-bind:style="closeStyles">&#x2716;</a>' +
-            '<p class="preview-text" v-bind:style="[' +
+            '<p v-html="text" class="preview-text" v-bind:style="[' +
                 'alignmentOptions[textAlign].style,' +
                 'textStyles' +
-            ']">{{ text }}</p>' +
+            ']"></p>' +
         '</div>' +
     '</transition>'+
 '</a>',
@@ -55,7 +55,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     linkStyles: function() {
                         return {
                             textDecoration: 'none',
-                            position: 'absolute'
+                            position: 'absolute',
+                            overflow: 'hidden',
+                            zIndex: 0
                         }
                     },
                     textStyles: function() {
