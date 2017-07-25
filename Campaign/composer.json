@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
+        "php": "^7.0.0",
         "arrilot/laravel-widgets": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.3",
         "bower-asset/animate.css": "^3.5",

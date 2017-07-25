@@ -1,4 +1,4 @@
-FROM php:7.1-fpm
+FROM php:7.0-fpm
 
 RUN apt-get update && apt-get install -y git libzip-dev zlib1g-dev libicu-dev g++ \
     && docker-php-ext-configure intl \
