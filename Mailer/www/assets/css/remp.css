@@ -29,8 +29,33 @@
 }
 
 /***************/
+/* Z-INDEX FIX */
+/***************/
+.bootstrap-datetimepicker-widget,
+.bootstrap-select .dropdown-menu.open
+{
+    z-index: 3000;
+}
+
+/***************/
 /* DATA TABLES */
 /***************/
+.dataTables_wrapper .dataTables_processing {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 250px;
+    height: 55px;
+    margin-left: -250px;
+    margin-top: -25px;
+    padding-top: 20px;
+    text-align: center;
+    background: rgba(0, 188, 212, .65);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12);
+    z-index: 3000;
+}
+
 .table-hover tbody tr {
     cursor: pointer;
 }

@@ -46,11 +46,11 @@ class TemplateTestFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
-        $row = $this->templateRepository->find($values['id']);
-        $this->sender->setTemplate($row)
+        $template = $this->templateRepository->find($values['id']);
+        $this->sender->setTemplate($template)
             ->setRecipient($values['email'])
             ->send();
 
-        ($this->onSuccess)($row);
+        ($this->onSuccess)($template);
     }
 }

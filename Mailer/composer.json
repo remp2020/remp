@@ -48,6 +48,7 @@
         "bower-asset/datatables.net": "^2.1",
         "bower-asset/bootstrap-select": "^1.12",
         "bower-asset/jquery.easy-pie-chart": "^2.1",
+        "bower-asset/eonasdan-bootstrap-datetimepicker": "^4.17",
         "kdyby/autowired": "^1.4",
         "twig/twig": "^1.33",
         "mailgun/mailgun-php": "^2.3",
