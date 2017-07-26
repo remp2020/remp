@@ -51,8 +51,7 @@ final class JobPresenter extends BasePresenter
         JobFormFactory $jobFormFactory,
         NewBatchFormFactory $newBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory
-    )
-    {
+    ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
         $this->batchesRepository = $batchesRepository;
@@ -230,21 +229,20 @@ final class JobPresenter extends BasePresenter
             $templateStats->showConversions();
 
             return $templateStats;
-
         });
     }
 
     protected function createComponentJobStats(ITemplateStatsFactory $factory)
     {
-            $templateStats = $factory->create();
+        $templateStats = $factory->create();
 
-            $batches = $this->batchTemplatesRepository->findByJobId($this->params['id']);
-            foreach ($batches as $batch) {
-                $template = $this->templatesRepository->find($batch->mail_template_id);
-                $templateStats->setTemplate($template);
-            }
-            $templateStats->showConversions();
+        $batches = $this->batchTemplatesRepository->findByJobId($this->params['id']);
+        foreach ($batches as $batch) {
+            $template = $this->templatesRepository->find($batch->mail_template_id);
+            $templateStats->setTemplate($template);
+        }
+        $templateStats->showConversions();
 
-            return $templateStats;
+        return $templateStats;
     }
 }

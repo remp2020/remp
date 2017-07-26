@@ -52,9 +52,9 @@ final class TemplatePresenter extends BasePresenter
             ->setColSetting('clicked')
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setRowLink($this->link('Show', 'RowId'))
-            ->setRowAction('show', $this->link('Show', 'RowId'),'palette-Cyan zmdi-eye')
-            ->setRowAction('edit', $this->link('Edit', 'RowId'),'palette-Cyan zmdi-edit')
-            ->setRowAction('duplicate', $this->link('Duplicate!', 'RowId'),'palette-Cyan zmdi-copy')
+            ->setRowAction('show', $this->link('Show', 'RowId'), 'palette-Cyan zmdi-eye')
+            ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit')
+            ->setRowAction('duplicate', $this->link('Duplicate!', 'RowId'), 'palette-Cyan zmdi-copy')
             ->setTableSetting('order', Json::encode([[6, 'DESC']]));
 
         return $dataTable;
