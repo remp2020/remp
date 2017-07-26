@@ -33,7 +33,7 @@ class TemplateStats extends Control
 
     public function setTemplate(IRow $mailTemplate)
     {
-        $this->templates = (array)$mailTemplate;
+        $this->templates[] = $mailTemplate;
         return $this;
     }
 
@@ -49,14 +49,7 @@ class TemplateStats extends Control
 
     public function render($templatesIds = null, $startTime = null, $endTime = null)
     {
-        $templatesIds = explode(',', $templatesIds);
-
-        if (!is_array($templatesIds) && is_numeric($templatesIds)) {
-            $templatesIds = (array)$templatesIds;
-        }
-
         if (is_array($templatesIds)) {
-            $this->templates = [];
             foreach ($templatesIds as $id) {
                 $this->templates[] = $this->templatesRepository->find($id);
             }

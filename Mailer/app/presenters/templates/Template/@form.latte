@@ -4,74 +4,78 @@
         {$error}<br>
     </div>
 
-    <div class="form-group fg-float m-b-30">
-        <div class="fg-line">
-            {input name, class => 'form-control fg-input'}
-            {label name, class => 'fg-label' /}
-        </div>
-    </div>
-
-    <div class="form-group fg-float m-b-30">
-        <div class="fg-line">
-            {input code, class => 'form-control fg-input'}
-            {label code, class => 'fg-label' /}
-        </div>
-    </div>
-
-    <div class="form-group fg-float m-b-30">
-        <div class="fg-line">
-            {input description, class => 'form-control fg-input'}
-            {label description, class => 'fg-label' /}
-        </div>
-    </div>
-
-    <div class="row m-b-30">
+    <div class="row">
         <div class="col-sm-6">
-            {label mail_layout_id /}
-            {input mail_layout_id, class => 'selectpicker'}
-        </div>
-        <div class="col-sm-6">
-            {label mail_type_id /}
-            {input mail_type_id, class => 'selectpicker'}
-        </div>
-    </div>
-
-    <div class="form-group m-b-30">
-        <div class="toggle-switch" data-ts-color="cyan">
-            {label autologin:, class => 'ts-label'}
-            {input autologin:, hidden => 'hidden'}
-            <label for="frm-templateForm-autologin" class="ts-helper"></label>
-        </div>
-    </div>
-
-    <div class="clearfix m-b-30"></div>
-
-    <div class="row m-b-30">
-        <div class="col-sm-6 form-group fg-float">
-            <div class="fg-line">
-                {input from, class => 'form-control fg-input'}
-                {label from, class => 'fg-label' /}
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input name, class => 'form-control fg-input'}
+                    {label name, class => 'fg-label' /}
+                </div>
             </div>
-        </div>
-        <div class="col-sm-6 form-group fg-float">
-            <div class="fg-line">
-                {input subject, class => 'form-control fg-input'}
-                {label subject, class => 'fg-label' /}
+
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input code, class => 'form-control fg-input'}
+                    {label code, class => 'fg-label' /}
+                </div>
             </div>
+
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input description, class => 'form-control fg-input'}
+                    {label description, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="row m-b-30">
+                <div class="col-sm-6">
+                    {label mail_layout_id /}
+                    {input mail_layout_id, class => 'selectpicker',  data-live-search => 'true'}
+                </div>
+                <div class="col-sm-6">
+                    {label mail_type_id /}
+                    {input mail_type_id, class => 'selectpicker',  data-live-search => 'true'}
+                </div>
+            </div>
+
+            <div class="form-group m-b-30">
+                <div class="toggle-switch" data-ts-color="cyan">
+                    {label autologin:, class => 'ts-label'}
+                    {input autologin:, hidden => 'hidden'}
+                    <label for="frm-templateForm-autologin" class="ts-helper"></label>
+                </div>
+            </div>
+
+            <div class="clearfix m-b-30"></div>
+
+            <div class="row m-b-30">
+                <div class="col-sm-6 form-group fg-float">
+                    <div class="fg-line">
+                        {input from, class => 'form-control fg-input'}
+                        {label from, class => 'fg-label' /}
+                    </div>
+                </div>
+                <div class="col-sm-6 form-group fg-float">
+                    <div class="fg-line">
+                        {input subject, class => 'form-control fg-input'}
+                        {label subject, class => 'fg-label' /}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input mail_body_text, class => 'form-control fg-input auto-size'}
+                    {label mail_body_text, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="form-group m-b-30">
+                {label mail_body_html /}
+                {input mail_body_html, class => 'form-control html-editor'}
+            </div>
+
+            {input save, class => 'btn btn-info waves-effect'}
         </div>
     </div>
-
-    <div class="form-group fg-float m-b-30">
-        <div class="fg-line">
-            {input mail_body_text, class => 'form-control fg-input auto-size'}
-            {label mail_body_text, class => 'fg-label' /}
-        </div>
-    </div>
-
-    <div class="form-group m-b-30">
-        {label mail_body_html /}
-        {input mail_body_html, class => 'form-control html-editor'}
-    </div>
-
-    {input save, class => 'btn btn-info waves-effect'}
 {/form}

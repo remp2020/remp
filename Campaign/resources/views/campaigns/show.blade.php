@@ -57,13 +57,13 @@
 
             script.type = "text/javascript";
             script.async = true;
-            script.src = d + "//{$libUrl}";
+            script.src = d + "{$libUrl}";
             doc.getElementsByTagName("head")[0].appendChild(script);
         }
     })(window, document);
 
     remplib.init({
-        "target": "//{$targetUrl}",
+        "target": "{$targetUrl}",
         "token": "beam-property-token"
     });
     remplib.identify("user-identifier"); // optional

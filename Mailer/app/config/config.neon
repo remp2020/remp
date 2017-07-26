@@ -42,6 +42,7 @@ services:
 	        - addMailer(Remp\MailerModule\Mailer\SmtpMailer())
 	        - addMailer(Remp\MailerModule\Mailer\MailgunMailer())
 
+	# Internal CRM system. For more details contact Tomas Bella.
 	- Remp\MailerModule\Auth\Authenticator
 	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
 #	- Remp\NetteSso\Security\Client(%sso_host%)
@@ -58,6 +59,10 @@ services:
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
 	- Remp\MailerModule\Repository\TemplatesRepository
+	- Remp\MailerModule\Repository\JobsRepository
+	- Remp\MailerModule\Repository\SegmentsRepository
+	- Remp\MailerModule\Repository\BatchesRepository
+	- Remp\MailerModule\Repository\BatchTemplatesRepository
 
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory
@@ -70,6 +75,9 @@ services:
 	- Remp\MailerModule\Forms\ListFormFactory
 	- Remp\MailerModule\Forms\TemplateFormFactory
 	- Remp\MailerModule\Forms\TemplateTestFormFactory
+	- Remp\MailerModule\Forms\JobFormFactory
+	- Remp\MailerModule\Forms\NewBatchFormFactory
+	- Remp\MailerModule\Forms\NewTemplateFormFactory
 
 	# Commands
 	- Remp\MailerModule\Commands\HelloWorldCommand

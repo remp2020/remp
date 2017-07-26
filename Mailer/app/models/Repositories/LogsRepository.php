@@ -39,6 +39,16 @@ class LogsRepository extends Repository
         ]);
     }
 
+    public function getEmailLogs($email)
+    {
+        return $this->getTable()->where('email', $email)->order('created_at DESC');
+    }
+
+    public function getJobLogs($jobId)
+    {
+        return $this->getTable()->where('mail_job_id', $jobId)->order('created_at DESC');
+    }
+
     public function getStatsRate($mailTemplates, $field, $startTime = null, $endTime = null)
     {
         $ids = [];
