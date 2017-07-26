@@ -49,11 +49,17 @@
         <div class="col-md-8">
             <h4>Segments</h4>
 
-            <div class="input-group m-t-30">
+            <div class="row">
+                <div class="col-md-12">
+                    <p>User needs to be member of all selected segments for campaign to be shown.</p>
+                </div>
+            </div>
+
+            <div class="input-group">
                 <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
                 <div class="row">
                     <div class="col-md-12">
-                        <select v-model="addedSegment" v-on:change="selectSegment" class="selectpicker col-md-8" data-live-search="true">
+                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker col-md-8" data-live-search="true">
                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
                                 <option v-for="(obj,code) in list" v-bind:value="obj">
                                     @{{ obj.name }}
@@ -74,7 +80,7 @@
             </div>
 
             <div class="row m-t-20">
-                <div class="col-md-12">
+                <div class="col-md-8">
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <tbody>

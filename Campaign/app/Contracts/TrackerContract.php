@@ -13,5 +13,5 @@ interface TrackerContract
         string $userAgent,
         string $userId,
         array $fields
-    ): void;
+    );
 }

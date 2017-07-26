@@ -40,7 +40,7 @@ class BannerController extends Controller
     {
         $banners = Banner::query();
         return $dataTables->of($banners)
-            ->addColumn('actions', function(Banner $banner) {
+            ->addColumn('actions', function (Banner $banner) {
                 return Json::encode([
                     '_id' => $banner->id,
                     'show' => route('banners.show', $banner),

@@ -1,27 +1,163 @@
 stages:
+  - test
+  - build
   - deploy
 
-deploy:production:
+cache:
+  paths:
+    - bin/
+    - vendor/bin/dep
+
+test:syntax:7.0:
+  stage: test
+  image: php:7.0-cli
+  tags:
+    - docker
+  script:
+    - make syntax
+
+test:syntax:7.1:
+  stage: test
+  image: php:7.1-cli
+  tags:
+    - docker
+  script:
+    - make syntax
+
+test:sniffer:
+  stage: test
+  image: php:7.0-cli
+  tags:
+    - docker
+  script:
+    - make sniff
+
+build:beam:tracker:
+  stage: build
+  script:
+    - cd Beam/go/cmd/tracker
+    - make docker-build
+    - mv tracker.tar ../../../../
+  artifacts:
+    paths:
+      - tracker.tar
+    expire_in: 1 month
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+
+build:beam:segments:
+  stage: build
+  script:
+    - cd Beam/go/cmd/segments
+    - make docker-build
+    - mv segments.tar ../../../../
+  artifacts:
+    paths:
+      - segments.tar
+    expire_in: 1 month
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+
+deploy:mailer:admin:
   stage: deploy
   script:
-    - cd Campaign && php ~/composer.phar install && cd ..
-    - cd Mailer && php ~/composer.phar install && cd ..
-    - cd Beam && php ~/composer.phar install && cd ..
-
-    - rsync --progress -r -u ./* /data/web/remp2020.com/app
-    - cd /data/web/remp2020.com
-
-    - cp .env.mailer app/Mailer/.env
-    - cp .env.campaign app/Campaign/.env
-    - cp .env.beam app/Beam/.env
-
-    - cd app/Campaign && php artisan migrate --force && cd ../../
-
+    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - cd Mailer/
+    - ln -s ~/.env.mailer .env
+    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
   environment:
-    name: production/remp2020
-    url: https://www.remp2020.com
+    name: production/remp2020/mailer
+    url: https://mailer.remp2020.com
+  when: manual
   tags:
-    - deploy
     - remp2020
+    - deploy
+  only:
+    - master
+  dependencies: []
+
+deploy:campaign:admin:
+  stage: deploy
+  script:
+    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - cd Campaign/
+    - ln -s ~/.env.campaign .env
+    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - whoami
+    - pwd
+    - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
+  environment:
+    name: production/remp2020/campaign
+    url: https://campaign.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+  dependencies: []
+
+deploy:beam:admin:
+  stage: deploy
+  script:
+    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - cd Beam/
+    - ln -s ~/.env.beam .env
+    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
+  environment:
+    name: production/remp2020/beam
+    url: https://beam.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+  dependencies: []
+
+deploy:sso:admin:
+  stage: deploy
+  script:
+    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
+    - cd Sso/
+    - ln -s ~/.env.sso .env
+    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
+    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
+    - vendor/bin/dep deploy sso --revision=$CI_COMMIT_SHA -vvv
+  environment:
+    name: production/remp2020/sso
+    url: https://sso.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+  dependencies: []
+
+deploy:beam:tracker:
+  dependencies:
+    - build:beam:tracker
+  stage: deploy
+  script:
+    - cd Beam/go/cmd/tracker/
+    - make docker-build
+    - scp tracker.tar deploy-remp@
+  environment:
+    name: production/remp2020/beam
+    url: https://tracker.beam.remp2020.com
+  when: manual
+  tags:
+    - remp2020
+    - deploy
   only:
     - master

@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\CampaignSegment;
+use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use Cache;
 use Illuminate\Bus\Queueable;
@@ -15,43 +17,51 @@ class CacheSegmentJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $segmentId;
+    private $campaignSegment;
 
     private $force;
 
     /**
      * Create a new job instance.
      *
-     * @param string $segmentId
+     * @param CampaignSegment $campaignSegment
      * @param bool $force
      */
-    public function __construct(string $segmentId, $force = false)
+    public function __construct(CampaignSegment $campaignSegment, $force = false)
     {
-        $this->segmentId = $segmentId;
+        $this->campaignSegment = $campaignSegment;
         $this->force = $force;
     }
 
     /**
      * Execute the job.
      *
-     * @param SegmentContract $segmentContract
+     * @param SegmentAggregator $segmentAggregator
      */
-    public function handle(SegmentContract $segmentContract)
+    public function handle(SegmentAggregator $segmentAggregator)
     {
-        $segmentId = $this->segmentId;
-        if (!$this->force && Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($segmentId)) {
+        if (!$this->force && Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($this->key())) {
             return;
         }
 
-
-        $users = $segmentContract->users($segmentId);
-        $userIds = $users->map(function($item) {
+        $users = $segmentAggregator->users($this->campaignSegment);
+        $userIds = $users->map(function ($item) {
             return $item->id;
         })->toArray();
 
         $bloomFilter = new Bloom();
         $bloomFilter->set($userIds);
 
-        Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($segmentId, serialize($bloomFilter), 65);
+        Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($this->key(), serialize($bloomFilter), 65);
+    }
+
+    /**
+     * Key returns unique key under which the data for given campaignSegment are cached.
+     *
+     * @return string
+     */
+    public function key(): string
+    {
+        return "{$this->campaignSegment->provider}|{$this->campaignSegment->code}";
     }
 }

@@ -6,7 +6,6 @@ use Nette;
 use Nette\Application\Routers\RouteList;
 use Nette\Application\Routers\Route;
 
-
 class RouterFactory
 {
     use Nette\StaticClass;
@@ -21,9 +20,8 @@ class RouterFactory
             'module' => 'Mailer',
             'presenter' => 'Dashboard',
             'action' => 'default',
-            'id' => NULL,
+            'id' => null,
         ]);
         return $router;
     }
-
 }

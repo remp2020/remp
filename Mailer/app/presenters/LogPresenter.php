@@ -13,8 +13,8 @@ final class LogPresenter extends BasePresenter
 
     public function __construct(
         LogsRepository $logsRepository
-    )
-    {
+    ) {
+    
         parent::__construct();
         $this->logsRepository = $logsRepository;
     }
@@ -59,8 +59,10 @@ final class LogPresenter extends BasePresenter
                 $log->email,
                 $log->subject,
                 [
-                    'url' => $this->link('Template:Show',
-                        ['id' => $log->mail_template_id]), 'text' => $log->mail_template->code
+                    'url' => $this->link(
+                        'Template:Show',
+                        ['id' => $log->mail_template_id]
+                    ), 'text' => $log->mail_template->code
                 ],
                 $log->attachment_size,
                 [

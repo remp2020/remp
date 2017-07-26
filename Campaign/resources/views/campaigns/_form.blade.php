@@ -31,9 +31,9 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
 
 <script type="text/javascript">
     Vue.component('v-select', {
-        props : ['options', 'value', 'multiple', 'livesearch'],
+        props : ['options', 'opLabel', 'opValue', 'value', 'multiple', 'livesearch'],
         template : "<select :multiple='multiple' class='selectpicker' :data-live-search='livesearch'>"+
-                        "<option :value='option.value' v-for='option in options'>@{{ option.label }}</option>"+
+                        "<option :value='option[opValue]' v-for='option in options'>@{{ option[opLabel] }}</option>"+
                     "</select>",
         mounted : function () {
             var vm = this;
@@ -55,9 +55,9 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         data: function() {
             return {
                 "name": '{!! $campaign->name !!}' || null,
-                "segments": {!! $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
-                "bannerId": {!! $campaign->banner_id !!} || null,
-                "active": {!! $campaign->active !!} || null,
+                "segments": {!! isset($selectedSegments) ? $selectedSegments->toJson(JSON_UNESCAPED_UNICODE) : $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
+                "bannerId": {!! @json($campaign->banner_id) !!} || null,
+                "active": {!! @json($campaign->active) !!} || null,
 
                 "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
                 "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

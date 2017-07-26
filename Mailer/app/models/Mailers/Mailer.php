@@ -20,8 +20,8 @@ abstract class Mailer
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository
-    )
-    {
+    ) {
+    
         $this->configsRepository = $configsRepository;
         $this->config = $config;
 

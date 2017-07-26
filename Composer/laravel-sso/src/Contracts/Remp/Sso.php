@@ -71,7 +71,7 @@ class Sso implements SsoContract
             }
         }
 
-        $tokenResponse = \GuzzleHttp\json_decode::decode($response->getBody()->getContents(), true);
+        $tokenResponse = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
         return $tokenResponse;
     }
 }

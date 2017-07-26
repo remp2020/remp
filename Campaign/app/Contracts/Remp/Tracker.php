@@ -25,7 +25,7 @@ class Tracker implements TrackerContract
         string $userAgent,
         string $userId,
         array $fields
-    ):void {
+    ) {
         $this->client->post(self::ENDPOINT_TRACK_EVENT, [
             'json' => [
                 "category" => $category,
@@ -43,5 +43,4 @@ class Tracker implements TrackerContract
             ],
         ]);
     }
-
 }

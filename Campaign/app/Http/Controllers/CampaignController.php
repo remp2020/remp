@@ -37,7 +37,7 @@ class CampaignController extends Controller
     {
         $campaigns = Campaign::query();
         return $dataTables->of($campaigns->with('segments'))
-            ->addColumn('actions', function(Campaign $campaign) {
+            ->addColumn('actions', function (Campaign $campaign) {
                 return Json::encode([
                     '_id' => $campaign->id,
                     'show' => route('campaigns.show', $campaign),
@@ -52,21 +52,29 @@ class CampaignController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param SegmentContract $segmentContract
+     * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function create(SegmentContract $segmentContract)
+    public function create(SegmentAggregator $segmentAggregator)
     {
         $campaign = new Campaign();
         $campaign->fill(old());
+        $selectedSegments = collect(old('segments'));
 
         $banners = Banner::all();
-        $segments = $segmentContract->list();
+        try {
+            $segments = $segmentAggregator->list();
+        } catch (SegmentException $e) {
+            $segments = new Collection();
+            flash('Unable to fetch list of segments, please check the application configuration.')->error();
+            \Log::error($e->getMessage());
+        }
 
         return view('campaigns.create', [
             'campaign' => $campaign,
             'banners' => $banners,
             'segments' => $segments,
+            'selectedSegments' => $selectedSegments,
         ]);
     }
 
@@ -80,8 +88,20 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
         $campaign->fill($request->all());
-
         $campaign->save();
+
+        foreach ($request->get('segments') as $r) {
+            /** @var CampaignSegment $campaignSegment */
+            $campaignSegment = new CampaignSegment();
+            $campaignSegment->code = $r['code'];
+            $campaignSegment->provider = $r['provider'];
+            $campaignSegment->campaign_id = $campaign->id;
+            $campaignSegment->save();
+
+            if ($campaign->active) {
+                dispatch(new CacheSegmentJob($campaignSegment));
+            }
+        }
 
         return redirect(route('campaigns.index'))->with('success', 'Campaign created');
     }
@@ -106,9 +126,9 @@ class CampaignController extends Controller
      * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator ) {
+    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
+    {
         $campaign->fill(old());
-
         $banners = Banner::all();
 
         try {
@@ -140,20 +160,19 @@ class CampaignController extends Controller
         $campaign->save();
 
         foreach ($request->get('segments') as $r) {
-            /** @var CampaignSegment $rule */
-            $rule = CampaignSegment::findOrNew($r['id']);
-            $rule->code = $r['code'];
-            $rule->provider = $r['provider'];
-            $rule->campaign_id = $campaign->id;
-            $rule->save();
+            /** @var CampaignSegment $campaignSegment */
+            $campaignSegment = CampaignSegment::findOrNew($r['id']);
+            $campaignSegment->code = $r['code'];
+            $campaignSegment->provider = $r['provider'];
+            $campaignSegment->campaign_id = $campaign->id;
+            $campaignSegment->save();
+
+            if ($campaign->active && $shouldCache) {
+                dispatch(new CacheSegmentJob($campaignSegment));
+            }
         }
 
         CampaignSegment::destroy($request->get('removedSegments'));
-
-        if ($campaign->active && $shouldCache) {
-            dispatch(new CacheSegmentJob($campaign->segment_id));
-        }
-
         return redirect(route('campaigns.index'))->with('success', 'Campaign updated');
     }
 

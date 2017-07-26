@@ -31,8 +31,8 @@ final class TemplatePresenter extends BasePresenter
         LogsRepository $logsRepository,
         TemplateFormFactory $templateFormFactory,
         TemplateTestFormFactory $templateTestFormFactory
-    )
-    {
+    ) {
+    
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
         $this->logsRepository = $logsRepository;

@@ -65,7 +65,7 @@ class MaterialRenderer extends DefaultFormRenderer
     {
         foreach ($form->getControls() as $control) {
             if ($control instanceof  Controls\Button) {
-                if (strpos($control->getControlPrototype()->getClass(), 'btn') === FALSE) {
+                if (strpos($control->getControlPrototype()->getClass(), 'btn') === false) {
                     $control->getControlPrototype()->addClass(empty($usedPrimary) ? 'btn btn-primary' : 'btn btn-default');
                     $usedPrimary = true;
                 }

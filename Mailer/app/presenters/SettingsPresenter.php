@@ -8,7 +8,6 @@ final class SettingsPresenter extends BasePresenter
 {
     public function renderDefault()
     {
-
     }
 
     public function createComponentConfigForm(ConfigFormFactory $configFormFactory)

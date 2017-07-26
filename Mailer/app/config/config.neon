@@ -1,12 +1,14 @@
 parameters:
     sso_host: @environmentConfig::get('SSO_BASE_URL')
     sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
+    errbit:
+        send_errors: false
 
 extensions:
     local_configs: Remp\MailerModule\Config\ConfigExtension
 
 application:
-	errorPresenter: Error
+	errorPresenter: Mailer:Error
 	mapping:
 		*: Remp\*Module\Presenters\*Presenter
 

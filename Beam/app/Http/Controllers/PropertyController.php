@@ -29,7 +29,7 @@ class PropertyController extends Controller
     {
         $properties = $account->properties()->getQuery();
         return $datatables->of($properties)
-            ->addColumn('actions', function(Property $property) use ($account) {
+            ->addColumn('actions', function (Property $property) use ($account) {
                 return Json::encode([
                     'edit' => route('accounts.properties.edit', [$account, $property]),
                 ]);

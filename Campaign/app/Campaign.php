@@ -47,7 +47,7 @@ class Campaign extends Model
     {
         parent::boot();
 
-        static::creating(function(Campaign $campaign) {
+        static::creating(function (Campaign $campaign) {
             $campaign->uuid = Uuid::uuid4()->toString();
         });
     }

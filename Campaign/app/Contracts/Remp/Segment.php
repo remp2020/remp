@@ -16,7 +16,7 @@ class Segment implements SegmentContract
 {
     const PROVIDER_ALIAS = 'remp_segment';
 
-    const ENDPOINT_LIST = 'segments/list';
+    const ENDPOINT_LIST = 'segments';
 
     const ENDPOINT_CHECK = 'segments/%s/check/%s';
 
@@ -68,14 +68,17 @@ class Segment implements SegmentContract
      */
     public function check(CampaignSegment $campaignSegment, $userId): bool
     {
-//        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($segmentId);
-//        if ($bloomFilter) {
-//            /** @var Bloom $bloomFilter */
-//            $bloomFilter = unserialize($bloomFilter);
-//            return $bloomFilter->has($userId);
-//        }
-//        dispatch(new CacheSegmentJob($segmentId));
+        $cacheJob = new CacheSegmentJob($campaignSegment);
+        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
+        if ($bloomFilter) {
+            /** @var Bloom $bloomFilter */
+            $bloomFilter = unserialize($bloomFilter);
+            return $bloomFilter->has($userId);
+        }
 
+        dispatch($cacheJob);
+
+        // until the cache is filled, let's check directly
         try {
             $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId));
         } catch (ConnectException $e) {
@@ -87,24 +90,20 @@ class Segment implements SegmentContract
     }
 
     /**
-     * @param $segmentId
+     * @param CampaignSegment $campaignSegment
      * @return Collection
      * @throws SegmentException
      */
-    public function users($segmentId): Collection
+    public function users(CampaignSegment $campaignSegment): Collection
     {
         try {
-            $response = $this->client->get(self::ENDPOINT_USERS, [
-                'query' => [
-                    'code' => $segmentId,
-                ],
-            ]);
+            $response = $this->client->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code));
         } catch (ConnectException $e) {
             throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
         }
 
         $list = json_decode($response->getBody());
-        $collection = collect($list->users);
+        $collection = collect($list);
         return $collection;
     }
 }

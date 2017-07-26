@@ -32,15 +32,18 @@ class Kernel extends ConsoleKernel
         }
 
         // invalidate segments cache
-        foreach (Campaign::whereActive(true)->cursor() as $campaign) {
-            if (!$campaign->segment_id) {
-                continue;
+        try {
+            /** @var Campaign $campaign */
+            foreach (Campaign::whereActive(true)->cursor() as $campaign) {
+                foreach ($campaign->segments as $campaignSegment) {
+                    $schedule->job(new CacheSegmentJob($campaignSegment, true))
+                        ->hourly()
+                        ->withoutOverlapping();
+                }
             }
-            $schedule->job(new CacheSegmentJob($campaign->segment_id, true))
-                ->hourly()
-                ->withoutOverlapping();
+        } catch (\PDOException $e) {
+            // no action, the tables are not ready yet
         }
-
     }
 
     /**

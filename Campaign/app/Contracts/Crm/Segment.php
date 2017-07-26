@@ -70,7 +70,7 @@ class Segment implements SegmentContract
     {
         $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($campaignSegment->code);
         if (!$bloomFilter) {
-            dispatch(new CacheSegmentJob($campaignSegment->code));
+            dispatch(new CacheSegmentJob($campaignSegment));
 
             try {
                 $response = $this->client->get(self::ENDPOINT_CHECK, [
@@ -94,16 +94,16 @@ class Segment implements SegmentContract
     }
 
     /**
-     * @param $segmentId
+     * @param CampaignSegment $campaignSegment
      * @return Collection
      * @throws SegmentException
      */
-    public function users($segmentId): Collection
+    public function users(CampaignSegment $campaignSegment): Collection
     {
         try {
             $response = $this->client->get(self::ENDPOINT_USERS, [
                 'query' => [
-                    'code' => $segmentId,
+                    'code' => $campaignSegment->code,
                 ],
             ]);
         } catch (ConnectException $e) {

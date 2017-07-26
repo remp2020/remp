@@ -28,7 +28,7 @@ class CrmSegmentServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Segment::class, function(Application $app){
+        $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
                 'base_uri' => $app['config']->get('services.crm_segment.base_url'),
                 'headers' => [

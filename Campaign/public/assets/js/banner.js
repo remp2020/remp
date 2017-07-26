@@ -14,14 +14,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 dimensions: model['dimensions'] || null,
                 text: model['text'] || null,
                 textAlign: model['text_align'] || null,
-                fontSize: model['font_size'] || null,
+                fontSize: model['font_size'] || 18,
                 targetUrl: model['target_url'] || null,
                 textColor: model['text_color'] || null,
                 backgroundColor: model['background_color'] || null,
                 position: model['position'] || null,
                 transition: model['transition'] || null,
                 closeable: model['closeable'] || null,
-                displayDelay: model['display_delay'] || null,
+                displayDelay: model['display_delay'] || 0,
                 closeTimeout: model['close_timeout'] || null
             }
         },
@@ -41,10 +41,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             'customBoxStyles' +
         ']">'+
             '<a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="show = false" v-bind:style="closeStyles">&#x2716;</a>' +
-            '<p class="preview-text" v-bind:style="[' +
+            '<p v-html="text" class="preview-text" v-bind:style="[' +
                 'alignmentOptions[textAlign].style,' +
                 'textStyles' +
-            ']">{{ text }}</p>' +
+            ']"></p>' +
         '</div>' +
     '</transition>'+
 '</a>',
@@ -55,7 +55,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     linkStyles: function() {
                         return {
                             textDecoration: 'none',
-                            position: 'absolute'
+                            position: 'absolute',
+                            overflow: 'hidden',
+                            zIndex: 0
                         }
                     },
                     textStyles: function() {

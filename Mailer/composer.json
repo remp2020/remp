@@ -8,7 +8,10 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../Composer/nette-sso"
+            "url": "../Composer/nette-sso",
+            "options": {
+                "symlink": false
+            }
         }
     ],
     "require": {
@@ -52,14 +55,13 @@
         "php-http/curl-client": "^1.7",
         "guzzlehttp/psr7": "^1.4",
         "remp/nette-sso": "*",
-        "bower-asset/datatables.net-rowgroup": "^1.0"
+        "deployer/deployer": "^5.0",
+        "deployphp/recipes": "dev-master",
+        "tomaj/nette-errbit": "~3.0"
 
     },
     "require-dev": {
         "nette/tester": "^1.6",
-        "squizlabs/php_codesniffer": "~2.2",
-        "deployer/deployer": "^5.0",
-        "deployphp/recipes": "dev-master",
         "friendsofphp/php-cs-fixer": "*"
     },
     "config": {

@@ -45,6 +45,6 @@ return [
     ],
 
     'tracker' => [
-        'base_url' => env('TRACKER_API_BASE_URL'),
+        'base_url' => env('REMP_TRACKER_API_ADDR'),
     ]
 ];

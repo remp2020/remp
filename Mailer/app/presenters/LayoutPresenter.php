@@ -18,8 +18,8 @@ final class LayoutPresenter extends BasePresenter
     public function __construct(
         LayoutsRepository $layoutsRepository,
         LayoutFormFactory $layoutFormFactory
-    )
-    {
+    ) {
+    
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->layoutFormFactory = $layoutFormFactory;
@@ -32,7 +32,7 @@ final class LayoutPresenter extends BasePresenter
             ->setColSetting('name')
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setRowLink($this->link('Edit', 'RowId'))
-            ->setRowAction('edit', $this->link('Edit', 'RowId'),'palette-Cyan zmdi-edit');
+            ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit');
 
         return $dataTable;
     }
