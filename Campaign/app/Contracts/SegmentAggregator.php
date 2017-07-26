@@ -41,8 +41,9 @@ class SegmentAggregator implements SegmentContract
             ->check($campaignSegment, $userId);
     }
 
-    public function users($segmentId): Collection
+    public function users(CampaignSegment $campaignSegment): Collection
     {
-        return collect([]);
+        return $this->contracts[$campaignSegment->provider]
+            ->users($campaignSegment);
     }
 }

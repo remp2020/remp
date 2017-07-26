@@ -31,15 +31,15 @@ class Kernel extends ConsoleKernel
             return;
         }
 
+        // invalidate segments cache
         try {
-            // invalidate segments cache
+            /** @var Campaign $campaign */
             foreach (Campaign::whereActive(true)->cursor() as $campaign) {
-                if (!$campaign->segment_id) {
-                    continue;
+                foreach ($campaign->segments as $campaignSegment) {
+                    $schedule->job(new CacheSegmentJob($campaignSegment, true))
+                        ->hourly()
+                        ->withoutOverlapping();
                 }
-                $schedule->job(new CacheSegmentJob($campaign->segment_id, true))
-                    ->hourly()
-                    ->withoutOverlapping();
             }
         } catch (\PDOException $e) {
             // no action, the tables are not ready yet

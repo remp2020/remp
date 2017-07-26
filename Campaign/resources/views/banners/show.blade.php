@@ -24,14 +24,14 @@
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
-    var banner = Campaign.banner.fromModel({!! $banner->toJson() !!});
+    var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
 
     banner.show = true;
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
 
-    Campaign.banner.bindPreview(banner);
+    remplib.banner.bindPreview(banner);
     new Vue({
         el: '#banner-preview'
     });
@@ -91,37 +91,28 @@
             </div>
             <div class="row m-t-10">
                 <div class="col-md-2"><strong>Close timeout</strong></div>
-                <div class="col-md-10">{{ $banner->close_timeout }} ms</div>
+                <div class="col-md-10">
+                    @if($banner->close_timeout)
+                        {{ $banner->close_timeout }} ms
+                    @else
+                        -
+                    @endif
+                </div>
             </div>
             <div class="row m-t-10">
                 <div class="col-md-2"><strong>Closeable</strong></div>
                 <div class="col-md-10">{{ @yesno($banner->closeable) }}</div>
             </div>
-            <div class="row m-t-10">
-                <div class="col-md-2"><strong>JS snippet</strong></div>
-                <div class="col-md-10">
-                    @php
-                    $url = route('banners.preview', $banner->uuid);
-                    $snippet = <<<JS
-<script type="text/javascript">
-    (function () {
-        var s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.async = true;
-        s.src = '{$url}';
-        var p = document.getElementsByTagName('script')[0];
-        p.parentNode.insertBefore(s, p);
-    })();
-</script>
+        </div>
+    </div>
 
-JS;
-                    @endphp
-                    <pre class="language-html"><code class="language-html">{{ $snippet }}</code></pre>
-                </div>
-            </div>
-            <div class="row m-t-10" style="min-height: 250px;">
-                <div class="col-md-2"><strong>Preview</strong></div>
-                <div class="col-md-10">
+    <div class="card">
+        <div class="card-header">
+            <h2>Preview</h2>
+        </div>
+        <div class="card-body card-padding">
+            <div class="row cp-container" style="min-height: {{ $dimensions[$banner->dimensions]->height }};">
+                <div class="col-md-12">
                     <div id="banner-preview">
                         <banner-preview></banner-preview>
                     </div>

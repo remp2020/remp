@@ -84,11 +84,15 @@ HTML;
             <div class="card-body card-padding">
                 <div class="row m-t-10 cp-container">
                     <div class="col-md-4"><strong>Banner</strong></div>
-                    <div class="col-md-8">{{ $campaign->banner->name }}</div>
+                    <div class="col-md-8">{{ link_to_route('banners.show', $campaign->banner->name, $campaign->banner) }}</div>
                 </div>
                 <div class="row m-t-10 cp-container">
-                    <div class="col-md-4"><strong>Segment</strong></div>
-                    <div class="col-md-8">{{ $campaign->segment_id }}</div>
+                    <div class="col-md-4"><strong>Segments</strong></div>
+                    <div class="col-md-8">
+                        @foreach($campaign->segments as $segment)
+                             {{ $segment->code }}<br/>
+                        @endforeach
+                    </div>
                 </div>
                 <div class="row m-t-10 cp-container">
                     <div class="col-md-4"><strong>Active</strong></div>

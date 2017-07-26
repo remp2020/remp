@@ -22,6 +22,6 @@ return [
         'request' => true,
         'auth' => true,
         'html-validator' => true,
-        'terminal' => true,
+        'terminal' => env('APP_DEBUG_TERMINAL', false), // it's initializing whole console kernel for each request
     ],
 ];

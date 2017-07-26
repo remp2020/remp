@@ -13,7 +13,7 @@ interface SegmentContract
 
     public function check(CampaignSegment $campaignSegment, $userId): bool;
 
-    public function users($segmentId): Collection;
+    public function users(CampaignSegment $campaignSegment): Collection;
 
     public function provider(): string;
 }

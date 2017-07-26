@@ -91,15 +91,15 @@ class CampaignController extends Controller
         $campaign->save();
 
         foreach ($request->get('segments') as $r) {
-            /** @var CampaignSegment $rule */
-            $rule = new CampaignSegment();
-            $rule->code = $r['code'];
-            $rule->provider = $r['provider'];
-            $rule->campaign_id = $campaign->id;
-            $rule->save();
+            /** @var CampaignSegment $campaignSegment */
+            $campaignSegment = new CampaignSegment();
+            $campaignSegment->code = $r['code'];
+            $campaignSegment->provider = $r['provider'];
+            $campaignSegment->campaign_id = $campaign->id;
+            $campaignSegment->save();
 
             if ($campaign->active) {
-                dispatch(new CacheSegmentJob($r['id']));
+                dispatch(new CacheSegmentJob($campaignSegment));
             }
         }
 
@@ -160,15 +160,15 @@ class CampaignController extends Controller
         $campaign->save();
 
         foreach ($request->get('segments') as $r) {
-            /** @var CampaignSegment $rule */
-            $rule = CampaignSegment::findOrNew($r['id']);
-            $rule->code = $r['code'];
-            $rule->provider = $r['provider'];
-            $rule->campaign_id = $campaign->id;
-            $rule->save();
+            /** @var CampaignSegment $campaignSegment */
+            $campaignSegment = CampaignSegment::findOrNew($r['id']);
+            $campaignSegment->code = $r['code'];
+            $campaignSegment->provider = $r['provider'];
+            $campaignSegment->campaign_id = $campaign->id;
+            $campaignSegment->save();
 
             if ($campaign->active && $shouldCache) {
-                dispatch(new CacheSegmentJob($r['id']));
+                dispatch(new CacheSegmentJob($campaignSegment));
             }
         }
 
