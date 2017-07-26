@@ -12,6 +12,7 @@ use Remp\MailerModule\Forms\NewTemplateFormFactory;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
+use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
 final class JobPresenter extends BasePresenter
@@ -25,8 +26,11 @@ final class JobPresenter extends BasePresenter
     /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
 
-    /** @var  TemplatesRepository */
+    /** @var TemplatesRepository */
     private $templatesRepository;
+
+    /** @var LogsRepository */
+    private $logsRepository;
 
     /** @var JobFormFactory */
     private $jobFormFactory;
@@ -43,6 +47,7 @@ final class JobPresenter extends BasePresenter
         BatchesRepository $batchesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         TemplatesRepository $templatesRepository,
+        LogsRepository $logsRepository,
         JobFormFactory $jobFormFactory,
         NewBatchFormFactory $newBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory
@@ -53,6 +58,7 @@ final class JobPresenter extends BasePresenter
         $this->batchesRepository = $batchesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->templatesRepository = $templatesRepository;
+        $this->logsRepository = $logsRepository;
         $this->jobFormFactory = $jobFormFactory;
         $this->newBatchFormFactory = $newBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
@@ -107,9 +113,10 @@ final class JobPresenter extends BasePresenter
     public function renderShow($id)
     {
         $job = $this->jobsRepository->find($id);
-        $this->template->job = $job;
-    }
 
+        $this->template->job = $job;
+        $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
+    }
 
     public function renderEdit($id)
     {
@@ -220,7 +227,7 @@ final class JobPresenter extends BasePresenter
 
             $template = $this->templatesRepository->find($templateId);
             $templateStats->setTemplate($template);
-            $templateStats->showTotal();
+            $templateStats->showConversions();
 
             return $templateStats;
 
@@ -236,7 +243,7 @@ final class JobPresenter extends BasePresenter
                 $template = $this->templatesRepository->find($batch->mail_template_id);
                 $templateStats->setTemplate($template);
             }
-            $templateStats->showTotal();
+            $templateStats->showConversions();
 
             return $templateStats;
     }
