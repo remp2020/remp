@@ -7,21 +7,17 @@
     <title>{ifset title}{include title|stripHtml} | {/ifset} REMP</title>
 
     <!-- Vendor CSS -->
-    <link href="/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
-    <link href="/assets/vendor/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
-    <link href="/assets/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
-    <link href="/assets/vendor/google-material-color/dist/palette.css" rel="stylesheet">
-    <link href="/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
-    <link href="/assets/vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link href="/assets/vendor/css/vendor.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/github-gist.min.css" rel="stylesheet">
 
     <!-- CSS -->
-    <link href="/assets/css/app.min.1.css" rel="stylesheet">
-    <link href="/assets/css/app.min.2.css" rel="stylesheet">
-    <link href="/assets/css/remp.css" rel="stylesheet">
+    <link href="/assets/vendor/css/app.css" rel="stylesheet">
 
-    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <script src="/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- SCRIPT -->
+    <script src="/assets/vendor/js/manifest.js"></script>
+    <script src="/assets/vendor/js/init.js"></script>
+    <script src="/assets/vendor/js/vendor.js"></script>
+    <script src="/assets/vendor/js/app.js"></script>
 </head>
 
 <body data-ma-header="cyan-600">
@@ -188,28 +184,8 @@
 <![endif]-->
 
 <!-- Javascript Libraries -->
-<script src="/assets/vendor/moment/min/moment.min.js"></script>
-<script src="/assets/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
-<script src="/assets/vendor/waves/dist/waves.min.js"></script>
-<script src="/assets/vendor/jquery-bootstrap-purr/jquery-bootstrap-purr.min.js"></script>
-<script src="/assets/js/ckeditor/ckeditor.js"></script>
-<script src="/assets/vendor/autosize/dist/autosize.min.js"></script>
-<script src="/assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="/assets/vendor/datatables.net-rowgroup/js/dataTables.rowGroup.min.js"></script>
-<script src="/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
-<script src="/assets/vendor/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js"></script>
-<script src="/assets/vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
-
-<!-- Placeholder for IE9 -->
-<!--[if IE 9 ]>
-<script src="/assets/vendor/jquery-placeholder/jquery.placeholder.min.js"></script>
-<![endif]-->
-
-<script src="/assets/js/functions.js"></script>
-<script src="/assets/js/actions.js"></script>
-<script src="/assets/js/datatables.js"></script>
 
 <script type="application/javascript">
     $(document).ready(function() {
