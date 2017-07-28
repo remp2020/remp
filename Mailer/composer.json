@@ -57,7 +57,8 @@
         "remp/nette-sso": "*",
         "deployer/deployer": "^5.0",
         "deployphp/recipes": "dev-master",
-        "tomaj/nette-errbit": "~3.0"
+        "tomaj/nette-errbit": "~3.0",
+        "bower-asset/datatables.net-rowgroup": "^1.0"
 
     },
     "require-dev": {

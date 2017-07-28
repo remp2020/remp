@@ -27,6 +27,16 @@ services:
 	router: Remp\RouterFactory::createRouter
 	environmentConfig: Remp\MailerModule\EnvironmentConfig
 
+	# Latte filters
+	filterLoader:
+	    class: Remp\MailerModule\Filters\FilterLoader
+	    setup:
+	        - register('YesNo', [Remp\MailerModule\Filters\YesNoFilter(), process])
+
+	nette.latteFactory:
+	    setup:
+	        - addFilter(null, [@filterLoader, 'load'])
+
 	console:
 	    class: Symfony\Component\Console\Application
 	    setup:
@@ -72,7 +82,6 @@ services:
 	- Remp\MailerModule\Forms\SignInFormFactory
 	- Remp\MailerModule\Forms\ConfigFormFactory
 	- Remp\MailerModule\Forms\LayoutFormFactory
-	- Remp\MailerModule\Forms\ListFormFactory
 	- Remp\MailerModule\Forms\TemplateFormFactory
 	- Remp\MailerModule\Forms\TemplateTestFormFactory
 	- Remp\MailerModule\Forms\JobFormFactory

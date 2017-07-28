@@ -4,7 +4,6 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
 use Remp\MailerModule\Components\IDataTableFactory;
-use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\UsersRepository;
 
@@ -16,35 +15,33 @@ final class ListPresenter extends BasePresenter
     /** @var UsersRepository */
     private $usersRepository;
 
-    /** @var ListFormFactory */
-    private $listFormFactory;
-
     public function __construct(
         ListsRepository $listsRepository,
-        UsersRepository $usersRepository,
-        ListFormFactory $listFormFactory
+        UsersRepository $usersRepository
     ) {
     
         parent::__construct();
         $this->listsRepository = $listsRepository;
         $this->usersRepository = $usersRepository;
-        $this->listFormFactory = $listFormFactory;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('sorting', ['visible' => false])
+            ->setColSetting('category', ['visible' => false])
             ->setColSetting('title')
             ->setColSetting('code')
-            ->setColSetting('is_consent_required', ['header' => 'consent required', 'render' => 'boolean'])
-            ->setColSetting('is_locked', ['header' => 'locked', 'render' => 'boolean'])
+            ->setColSetting('subscribed', ['render' => 'number'])
+            ->setColSetting('auto_subscribe', ['header' => 'auto subscribe', 'render' => 'boolean'])
+            ->setColSetting('locked', ['render' => 'boolean'])
             ->setColSetting('is_public', ['header' => 'public', 'render' => 'boolean'])
-            ->setColSetting('subscribers', ['header' => 'number of subscribers', 'render' => 'number', 'orderable' => false])
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setRowLink($this->link('Edit', 'RowId'))
-            ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit');
+            ->setAllColSetting('orderable', false)
+            ->setRowLink($this->link('Show', 'RowId'))
+            ->setRowAction('show', $this->link('Show', 'RowId'), 'palette-Cyan zmdi-eye')
+            ->setTableSetting('displayNavigation', false)
+            ->setTableSetting('rowGroup', 0)
+            ->setTableSetting('length', -1);
 
         return $dataTable;
     }
@@ -67,24 +64,22 @@ final class ListPresenter extends BasePresenter
             'data' => []
         ];
 
-        $totalUsers = $this->usersRepository->totalCount();
-
         foreach ($lists as $list) {
             $result['data'][] = [
                 'RowId' => $list->id,
-                $list->sorting,
+                $list->type_category->title,
                 $list->title,
                 $list->code,
+                $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
                 $list->auto_subscribe,
                 $list->locked,
                 $list->is_public,
-                $list->is_public == 1 ? $list->consents : $totalUsers - $list->consents,
             ];
         }
         $this->presenter->sendJson($result);
     }
 
-    public function renderEdit($id)
+    public function renderShow($id)
     {
         $list = $this->listsRepository->find($id);
         if (!$list) {
@@ -92,6 +87,11 @@ final class ListPresenter extends BasePresenter
         }
 
         $this->template->list = $list;
+        $this->template->variants = $list->related('mail_type_variants')->order('sorting');
+        $this->template->stats = [
+            'subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
+            'un-subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => false])->count('*'),
+        ];
     }
 
     public function createComponentListForm()

@@ -1,0 +1,103 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Newsletter lists</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2>Show newsletter lists <span class="text-muted">{$list->title}</span> <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+        <ul class="actions">
+            <li class="dropdown action-show">
+                <a href="" data-toggle="dropdown">
+                    <i class="zmdi zmdi-more-vert"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right dm-icon">
+                    <li>
+                        <a href="{$list->preview_url}"><i class="zmdi zmdi-search"></i> Preview</a>
+                    </li>
+                    <li>
+                        <a href="{$list->image_url}"><i class="zmdi zmdi-image-o"></i> List image</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+    <div class="card-body card-padding">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h2>Settings</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Category:</strong> {$list->type_category->title}</li>
+                    <li class="list-group-item"><strong>Priority:</strong> {$list->priority}</li>
+                    <li class="list-group-item"><strong>Code:</strong> {$list->code}</li>
+                    <li class="list-group-item"><strong>Description:</strong> {$list->description}</li>
+                    <li class="list-group-item"><strong>Auto subscribe:</strong> {$list->auto_subscribe|YesNo}</li>
+                    <li class="list-group-item"><strong>Locked:</strong> {$list->locked|YesNo}</li>
+                    <li class="list-group-item"><strong>Public:</strong> {$list->is_public|YesNo}</li>
+                    <li class="list-group-item"><strong>Number of subscribed:</strong> {$stats['subscribed']|number}</li>
+                    <li class="list-group-item"><strong>Number of un-subscribed:</strong> {$stats['un-subscribed']|number}</li>
+                </ul>
+            </div>
+        </div>
+        {if $variants->count('*')}
+            <div class="card">
+                <div class="card-header">
+                    <h2>Variants</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-responsive table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Code</th>
+                            <th>Subscribed</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr n:foreach="$variants as $variant">
+                            <td>{$variant->title}</td>
+                            <td>{$variant->code}</td>
+                            <td>{$variant->related('mail_user_subscriptions')->count('*')|number}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {/if}
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2>Subscribed users</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="chart-edge">
+                    <div id="chart-subscribed-users" class="flot-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Unsubscribed users</h2>
+            </div>
+
+            <div class="card-body">
+                <div class="chart-edge">
+                    <div id="chart-unsubscribed-users" class="flot-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -41,13 +41,30 @@ class DataTable extends Control
      */
     public function setColSetting($colName, $colSetting = null)
     {
-        if ($colSetting == null) {
+        if ($colSetting === null) {
             $colSetting = [
                 'header' => $colName,
             ];
         }
 
         $this->colSettings[$colName] = $colSetting;
+
+        return $this;
+    }
+
+    /**
+     * @param $colSettingName
+     * @param null $colSettingValue
+     * @return $this
+     */
+    public function setAllColSetting($colSettingName, $colSettingValue = null)
+    {
+        if ($colSettingValue === null) {
+            $colSettingValue = true;
+        }
+
+        foreach ($this->colSettings as $colName => $colSetting)
+        $this->colSettings[$colName][$colSettingName] = $colSettingValue;
 
         return $this;
     }
