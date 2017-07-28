@@ -4,7 +4,6 @@ import . "github.com/goadesign/goa/design"
 import . "github.com/goadesign/goa/design/apidsl"
 
 var User = Type("User", func() {
-	Attribute("property_token", String, "Property token")
 	Attribute("url", String, "URL", func() {
 		Format("uri")
 	})
@@ -13,12 +12,13 @@ var User = Type("User", func() {
 		Format("ip")
 	})
 	Attribute("user_id", String, "ID of reader")
-	Required("property_token", "url", "user_agent", "ip_address")
+	Required("url", "user_agent", "ip_address")
 })
 
 var System = Type("System", func() {
+	Attribute("property_token", UUID, "Property token")
 	Attribute("time", DateTime, "Time of occurrence")
-	Required("time")
+	Required("property_token", "time")
 })
 
 var Pageview = Type("Pageview", func() {
