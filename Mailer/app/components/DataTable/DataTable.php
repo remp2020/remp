@@ -36,7 +36,7 @@ class DataTable extends Control
 
     /**
      * @param $colName
-     * @param null $colSetting
+     * @param $colSetting
      * @return $this
      */
     public function setColSetting($colName, $colSetting = null)
@@ -54,17 +54,14 @@ class DataTable extends Control
 
     /**
      * @param $colSettingName
-     * @param null $colSettingValue
+     * @param $colSettingValue
      * @return $this
      */
-    public function setAllColSetting($colSettingName, $colSettingValue = null)
+    public function setAllColSetting($colSettingName, $colSettingValue = true)
     {
-        if ($colSettingValue === null) {
-            $colSettingValue = true;
+        foreach ($this->colSettings as $colName => $colSetting) {
+            $this->colSettings[$colName][$colSettingName] = $colSettingValue;
         }
-
-        foreach ($this->colSettings as $colName => $colSetting)
-        $this->colSettings[$colName][$colSettingName] = $colSettingValue;
 
         return $this;
     }
@@ -74,12 +71,8 @@ class DataTable extends Control
      * @param $tableSetting
      * @return $this
      */
-    public function setTableSetting($tableSettingName, $tableSetting = null)
+    public function setTableSetting($tableSettingName, $tableSetting = true)
     {
-        if ($tableSetting === null) {
-            $tableSetting = true;
-        }
-
         $this->tableSettings[$tableSettingName] = $tableSetting;
 
         return $this;

@@ -2,7 +2,6 @@
 
 namespace Remp\MailerModule\Filters;
 
-
 class YesNoFilter
 {
     public function process($string)
