@@ -15,7 +15,7 @@ $.fn.dataTables = {
         }
 
         $('.ah-page .dropdown-menu').empty();
-        for (page = 0; page <= count / length; page++) {
+        for (page = 0; page < count / length; page++) {
             $('.ah-page .dropdown-menu').append('<li data-value="' + page + '"><a class="dropdown-item dropdown-item-button">Page ' + (page+1) + '</a></li>');
             if (start == page * length) {
                 $('.ah-page button').html('Page ' + (page+1));
@@ -75,17 +75,48 @@ $.fn.dataTables = {
         },
         boolean: function () {
             return function(data) {
-                return data == 1 ? 'Yes' : 'No';
+                return data === 1 ? 'Yes' : 'No';
             }
 
         },
-        actions: function (actionSettings) {
+        link: function () {
             return function(data) {
-                var actions = '';
-                data = $.parseJSON(data);
-                $.each(actionSettings, function(i, action) {
-                    actions += '<a href="' + data[action['name']] + '"><i class="btn btn-xs palette-Cyan bg waves-effect zmdi ' + action['class'] + '"></i></a>\n';
+                return '<a href="' + data.url + '">' + data.text + '</a>';
+            }
+
+        },
+        bytes: function () {
+            return function (data) {
+                if (data === null) {
+                    return '';
+                }
+
+                var k = 1024;
+                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                var i = Math.floor(Math.log(data) / Math.log(k));
+
+                return parseFloat((data / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            };
+        },
+        badge: function () {
+            return function(data) {
+                var string = '';
+                $.each(data, function (index, badge) {
+                    if (badge !== '') {
+                        string += '<div class="badge m-r-5 ' + badge.class + '">' + badge.text + '</div>';
+                    }
                 });
+
+                return string;
+            }
+        },
+        actions: function (actionSettings) {
+            return function(data, type, row) {
+                var actions = '';
+                $.each(actionSettings, function (key, action) {
+                    actions += '<a href="' + action.link.replace('RowId', row.RowId) + '" title="' + key + '"><i class="btn btn-xs bg waves-effect zmdi ' + action.class + '"></i></a>\n';
+                });
+
                 return actions;
             }
         }
