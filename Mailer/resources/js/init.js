@@ -1,1 +1,0 @@
-window.CKEDITOR_BASEPATH = "/assets/vendor/js/ckeditor/";
