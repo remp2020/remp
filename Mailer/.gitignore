@@ -1,2 +1,7 @@
 app/config/config.local.neon
 .env
+vendor/
+www/assets/vendor/
+node_modules
+yarn-error.log
+mix-manifest.json
