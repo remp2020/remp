@@ -18,7 +18,7 @@ mix.options({
         "resources/js/actions.js",
         "resources/js/datatables.js",
         "resources/js/charts.js"
-    ], 'js')
+    ], 'js/app.js')
     .js("resources/js/init.js", "js/init.js")
     .sass("resources/sass/vendor.scss", "css/vendor.css")
     .sass("resources/sass/app.scss", "css/app.css")
