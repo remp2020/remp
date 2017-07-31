@@ -1,5 +1,5 @@
-var mix = require("laravel-mix");
-var publicPath = "www/assets/vendor/";
+let mix = require("laravel-mix");
+let publicPath = "www/assets/vendor/";
 
 mix.options({
         publicPath: publicPath,
@@ -20,8 +20,8 @@ mix.options({
         "resources/js/charts.js"
     ], 'js')
     .js("resources/js/init.js", "js/init.js")
-    .sass("resources/scss/vendor.scss", "css/vendor.css")
-    .sass("resources/scss/app.scss", "css/app.css")
+    .sass("resources/sass/vendor.scss", "css/vendor.css")
+    .sass("resources/sass/app.scss", "css/app.css")
     .extract([
         "animate.css",
         "autosize",
@@ -41,6 +41,6 @@ mix.options({
     .autoload({
         "jquery": ['$', 'jQuery', "window.jQuery"],
         "node-waves": ["Waves", "window.Waves"],
-        "autosize": ["autosize"]
+        "autosize": ["autosize", "window.autosize"]
     })
     .version();
