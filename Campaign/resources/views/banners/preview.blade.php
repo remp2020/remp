@@ -3,7 +3,7 @@
 var bannerId = 'b-{{ $banner->uuid }}';
 var scripts = [];
 if (typeof window.Vue === 'undefined') {
-    scripts.push('https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.2/vue.js');
+    scripts.push('https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.js');
 }
 if (typeof window.remplib.banner === 'undefined') {
     scripts.push('{{ asset('/assets/js/banner.js') }}');

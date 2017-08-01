@@ -18,8 +18,22 @@ Beam Admin serves as a tool for configuration of sites and properties. It's the 
 and manage metadata about your websites. When the backend is ready, don't forget to install dependencies and run 
 DB migrations:
 
-    composer install
-    php artisan migrate
+```bash
+# 1. Download PHP dependencies
+composer install
+
+# 2. Download JS/HTML dependencies
+yarn install
+
+# !. use extra switch if your system doesn't support symlinks (Windows; can be enabled)
+yarn install --no-bin-links
+
+# 3. Generate assets
+yarn run dev // or any other alternative defined within package.json
+
+# 4. Run migrations
+php artisan migrate
+```
 
 ### Dependencies
 

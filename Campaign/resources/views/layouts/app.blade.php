@@ -24,25 +24,14 @@ function route_active($routeName, $classes = '', $activeClasses = '')
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title> @yield('title') </title>
 
-    <!-- Vendor CSS -->
-    <link href="/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
-    <link href="/assets/vendor/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
-    <link href="/assets/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
-    <link href="/assets/vendor/google-material-color/dist/palette.css" rel="stylesheet">
-    <link href="/assets/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="{{ asset(mix('/css/vendor.css', '/assets/vendor')) }}" rel="stylesheet">
+    <link href="{{ asset(mix('/css/app.css', '/assets/vendor')) }}" rel="stylesheet">
 
-    <!-- CSS -->
-    <link href="/assets/css/app.min.1.css" rel="stylesheet">
-    <link href="/assets/css/app.min.2.css" rel="stylesheet">
-
-    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <script src="/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.js" integrity="sha256-sawP1sLkcaA4YQJQWAtjahamgG6brGmaIJWRhYwDfno=" crossorigin="anonymous"></script>
-    <script src="/assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="{{ asset(mix('/js/manifest.js', '/assets/vendor')) }}"></script>
+    <script src="{{ asset(mix('/js/vendor.js', '/assets/vendor')) }}"></script>
+    <script src="{{ asset(mix('/js/app.js', '/assets/vendor')) }}"></script>
 
     @stack('head')
-
-    <link href="/assets/css/remp.css" rel="stylesheet">
 </head>
 
 <body data-ma-header="cyan-600">
@@ -224,22 +213,6 @@ function route_active($routeName, $classes = '', $activeClasses = '')
     <p>Sorry for the inconvenience!</p>
 </div>
 <![endif]-->
-
-<!-- Javascript Libraries -->
-<script src="/assets/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
-<script src="/assets/vendor/waves/dist/waves.min.js"></script>
-<script src="/assets/vendor/jquery-bootstrap-purr/jquery-bootstrap-purr.min.js"></script>
-<script src="/assets/vendor/autosize/dist/autosize.min.js"></script>
-<script src="/assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
-
-<!-- Placeholder for IE9 -->
-<!--[if IE 9 ]>
-<script src="/assets/vendor/jquery-placeholder/jquery.placeholder.min.js"></script>
-<![endif]-->
-
-<script src="/assets/js/functions.js"></script>
-<script src="/assets/js/actions.js"></script>
-<script src="/assets/js/datatables.js"></script>
 
 <script type="application/javascript">
     $(document).ready(function() {

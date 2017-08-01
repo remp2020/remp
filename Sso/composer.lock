@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f8bc36b92c934568809d2faf2f1fe8c7",
+    "content-hash": "eb8cd73067632fcb33f214c653727afb",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -69,16 +69,16 @@
         },
         {
             "name": "barryvdh/laravel-ide-helper",
-            "version": "v2.4.0",
+            "version": "v2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-ide-helper.git",
-                "reference": "87a02ff574f722c685e011f76692ab869ab64f6c"
+                "reference": "2b1273c45e2f8df7a625563e2283a17c14f02ae8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/87a02ff574f722c685e011f76692ab869ab64f6c",
-                "reference": "87a02ff574f722c685e011f76692ab869ab64f6c",
+                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/2b1273c45e2f8df7a625563e2283a17c14f02ae8",
+                "reference": "2b1273c45e2f8df7a625563e2283a17c14f02ae8",
                 "shasum": ""
             },
             "require": {
@@ -138,7 +138,7 @@
                 "phpstorm",
                 "sublime"
             ],
-            "time": "2017-06-16T14:08:59+00:00"
+            "time": "2017-07-16T00:24:12+00:00"
         },
         {
             "name": "barryvdh/reflection-docblock",
@@ -188,538 +188,6 @@
                 }
             ],
             "time": "2016-06-13T19:28:20+00:00"
-        },
-        {
-            "name": "bower-asset/animate.css",
-            "version": "3.5.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/daneden/animate.css.git",
-                "reference": "dac3dab7b59cb6072b5d0fe23eae3805e370a58c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/daneden/animate.css/zipball/dac3dab7b59cb6072b5d0fe23eae3805e370a58c",
-                "reference": "dac3dab7b59cb6072b5d0fe23eae3805e370a58c",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "./animate.css",
-                "bower-asset-ignore": [
-                    ".*",
-                    "*.yml",
-                    "Gemfile",
-                    "Gemfile.lock",
-                    "*.md"
-                ]
-            }
-        },
-        {
-            "name": "bower-asset/autosize",
-            "version": "3.0.21",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jackmoore/autosize.git",
-                "reference": "5284a460d160bd11fda219941b20eb2a82155294"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/5284a460d160bd11fda219941b20eb2a82155294",
-                "reference": "5284a460d160bd11fda219941b20eb2a82155294",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "dist/autosize.js",
-                "bower-asset-ignore": []
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Autosize is a small, stand-alone script to automatically adjust textarea height to fit text.",
-            "keywords": [
-                "form",
-                "textarea",
-                "ui"
-            ]
-        },
-        {
-            "name": "bower-asset/bootstrap",
-            "version": "v3.3.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/0b9c4a4007c44201dce9a6cc1a38407005c26c86",
-                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.9.1,<4.0"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "less/bootstrap.less",
-                    "dist/js/bootstrap.js"
-                ],
-                "bower-asset-ignore": [
-                    "/.*",
-                    "_config.yml",
-                    "CNAME",
-                    "composer.json",
-                    "CONTRIBUTING.md",
-                    "docs",
-                    "js/tests",
-                    "test-infra"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
-            "keywords": [
-                "css",
-                "framework",
-                "front-end",
-                "js",
-                "less",
-                "mobile-first",
-                "responsive",
-                "web"
-            ]
-        },
-        {
-            "name": "bower-asset/bootstrap-select",
-            "version": "v1.12.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/silviomoreto/bootstrap-select.git",
-                "reference": "e1a7743e82eb16bce825ec58a8c95b2aceae6942"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/silviomoreto/bootstrap-select/zipball/e1a7743e82eb16bce825ec58a8c95b2aceae6942",
-                "reference": "e1a7743e82eb16bce825ec58a8c95b2aceae6942",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.8"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "less/bootstrap-select.less",
-                    "dist/css/bootstrap-select.css",
-                    "dist/js/bootstrap-select.js"
-                ],
-                "bower-asset-ignore": [
-                    ".gitignore",
-                    "CONTRIBUTING.md",
-                    "Gruntfile.js",
-                    "README.md",
-                    "composer.json",
-                    "package.json",
-                    "test.html",
-                    "docs"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "keywords": [
-                "bootstrap",
-                "form",
-                "replacement",
-                "select"
-            ]
-        },
-        {
-            "name": "bower-asset/datatables.net",
-            "version": "1.10.15",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DataTables/Dist-DataTables.git",
-                "reference": "d3251ca51f55e44f8ca43bdec6f713c971339a60"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DataTables/Dist-DataTables/zipball/d3251ca51f55e44f8ca43bdec6f713c971339a60",
-                "reference": "d3251ca51f55e44f8ca43bdec6f713c971339a60",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.7"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "js/jquery.dataTables.js"
-                ],
-                "bower-asset-ignore": [
-                    "composer.json",
-                    "datatables.json",
-                    "package.json"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "DataTables for jQuery ",
-            "keywords": [
-                "DataTables",
-                "DataTables",
-                "filter",
-                "jQuery",
-                "sort",
-                "table"
-            ]
-        },
-        {
-            "name": "bower-asset/datatables.net-dt",
-            "version": "1.10.15",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DataTables/Dist-DataTables-DataTables.git",
-                "reference": "c686baf6585e580bf5a77c529550d691f0baa77a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DataTables/Dist-DataTables-DataTables/zipball/c686baf6585e580bf5a77c529550d691f0baa77a",
-                "reference": "c686baf6585e580bf5a77c529550d691f0baa77a",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/datatables.net": ">=1.10.9",
-                "bower-asset/jquery": ">=1.7"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "css/jquery.dataTables.css",
-                    "images/sort_asc.png",
-                    "images/sort_asc_disabled.png",
-                    "images/sort_both.png",
-                    "images/sort_desc.png",
-                    "images/sort_desc_disabled.png"
-                ],
-                "bower-asset-ignore": [
-                    "composer.json",
-                    "datatables.json",
-                    "package.json"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "DataTables for jQuery ",
-            "keywords": [
-                "DataTables",
-                "DataTables",
-                "filter",
-                "jQuery",
-                "sort",
-                "table"
-            ]
-        },
-        {
-            "name": "bower-asset/google-material-color",
-            "version": "v1.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/danlevan/google-material-color.git",
-                "reference": "e51e91128085a71d8c81ae13ffd5fa3e6fdbbdc1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/danlevan/google-material-color/zipball/e51e91128085a71d8c81ae13ffd5fa3e6fdbbdc1",
-                "reference": "e51e91128085a71d8c81ae13ffd5fa3e6fdbbdc1",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "dist",
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "node_modules",
-                    "bower_components",
-                    "test",
-                    "tests"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Google material color (http://www.google.com/design/spec/style/color.html) implementation for Sass, Less, Stylus, CSS and JS.",
-            "keywords": [
-                "color",
-                "css",
-                "google",
-                "less",
-                "material",
-                "sass",
-                "stylus"
-            ]
-        },
-        {
-            "name": "bower-asset/jquery",
-            "version": "3.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
-                "reference": "77d2a51d0520d2ee44173afdf4e40a9201f5964e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/77d2a51d0520d2ee44173afdf4e40a9201f5964e",
-                "reference": "77d2a51d0520d2ee44173afdf4e40a9201f5964e",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "dist/jquery.js",
-                "bower-asset-ignore": [
-                    "package.json"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "keywords": [
-                "browser",
-                "javascript",
-                "jquery",
-                "library"
-            ]
-        },
-        {
-            "name": "bower-asset/jquery-bootstrap-purr",
-            "version": "v1.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/softwarespot/jquery-bootstrap-purr.git",
-                "reference": "3ed513e628a6d9183f7c8516db3cec7ca0382db5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/softwarespot/jquery-bootstrap-purr/zipball/3ed513e628a6d9183f7c8516db3cec7ca0382db5",
-                "reference": "3ed513e628a6d9183f7c8516db3cec7ca0382db5",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/bootstrap": ">=3.0.0",
-                "bower-asset/jquery": ">=1.7.0"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "jquery-bootstrap-purr.js",
-                "bower-asset-ignore": []
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "A jQuery plugin for displaying Bootstrap Alerts dynamically on your website",
-            "keywords": [
-                "alerts",
-                "bootstrap",
-                "bootstrap-purr",
-                "notifications"
-            ]
-        },
-        {
-            "name": "bower-asset/jquery-mousewheel",
-            "version": "3.1.13",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jquery/jquery-mousewheel.git",
-                "reference": "67289b6b2aa0066d7d78a5807f520387135ffb22"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jquery/jquery-mousewheel/zipball/67289b6b2aa0066d7d78a5807f520387135ffb22",
-                "reference": "67289b6b2aa0066d7d78a5807f520387135ffb22",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.2.2"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "./jquery.mousewheel.js",
-                "bower-asset-ignore": [
-                    "*.json",
-                    "*.markdown",
-                    "*.txt",
-                    ".*",
-                    "!LICENSE.txt",
-                    "Gruntfile.js",
-                    "test"
-                ]
-            }
-        },
-        {
-            "name": "bower-asset/jquery-placeholder",
-            "version": "v2.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mathiasbynens/jquery-placeholder.git",
-                "reference": "bd18712c2f6cc6be2dfd7310a89044b09610057e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mathiasbynens/jquery-placeholder/zipball/bd18712c2f6cc6be2dfd7310a89044b09610057e",
-                "reference": "bd18712c2f6cc6be2dfd7310a89044b09610057e",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.6"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "jquery.placeholder.js"
-                ],
-                "bower-asset-ignore": [
-                    "*",
-                    "!/bower.json",
-                    "!/jquery.placeholder.js",
-                    "!/jquery.placeholder.min.js",
-                    "!/jquery.placeholder.min.js.map"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "A jQuery plugin that enables HTML5 placeholder behavior for browsers that aren’t trying hard enough yet",
-            "keywords": [
-                "form",
-                "jQuery",
-                "jquery-plugin",
-                "placeholder"
-            ]
-        },
-        {
-            "name": "bower-asset/malihu-custom-scrollbar-plugin",
-            "version": "3.1.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/malihu/malihu-custom-scrollbar-plugin.git",
-                "reference": "eac2b0af71a7ca06cc19e28d15ba60f6db2dfd29"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/malihu/malihu-custom-scrollbar-plugin/zipball/eac2b0af71a7ca06cc19e28d15ba60f6db2dfd29",
-                "reference": "eac2b0af71a7ca06cc19e28d15ba60f6db2dfd29",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.6",
-                "bower-asset/jquery-mousewheel": ">=3.0.6"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "./jquery.mCustomScrollbar.js",
-                    "./jquery.mCustomScrollbar.css",
-                    "./mCSB_buttons.png"
-                ],
-                "bower-asset-ignore": [
-                    "*.md",
-                    ".*",
-                    "*.txt",
-                    "*.json",
-                    "*.html",
-                    "/examples",
-                    "/source-files",
-                    "/js"
-                ]
-            },
-            "description": "Highly customizable custom scrollbar jQuery plugin, featuring vertical/horizontal scrollbars, scrolling momentum, mouse-wheel, keyboard and touch support, user defined callbacks etc.",
-            "keywords": [
-                "custom-scrollbar",
-                "jquery",
-                "scrollbar"
-            ]
-        },
-        {
-            "name": "bower-asset/material-design-iconic-font",
-            "version": "2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zavoloklom/material-design-iconic-font.git",
-                "reference": "a1cdb51dc417163d0f262806ffe290751b0e63d3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zavoloklom/material-design-iconic-font/zipball/a1cdb51dc417163d0f262806ffe290751b0e63d3",
-                "reference": "a1cdb51dc417163d0f262806ffe290751b0e63d3",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "./dist/css/material-design-iconic-font.min.css",
-                    "./dist/fonts/*"
-                ],
-                "bower-asset-ignore": [
-                    "*/.*",
-                    "node_modules/*",
-                    "*.json",
-                    "*.md"
-                ]
-            },
-            "license": [
-                "OFL-1.1",
-                "MIT"
-            ],
-            "description": "Material Design Iconic Font",
-            "keywords": [
-                "design",
-                "font",
-                "icons",
-                "material"
-            ]
-        },
-        {
-            "name": "bower-asset/waves",
-            "version": "v0.7.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fians/Waves.git",
-                "reference": "5ce37da75c9e1c41b0344afd4a8dd6eea92424e7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fians/Waves/zipball/5ce37da75c9e1c41b0344afd4a8dd6eea92424e7",
-                "reference": "5ce37da75c9e1c41b0344afd4a8dd6eea92424e7",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "dist/waves.min.js",
-                    "dist/waves.min.css"
-                ],
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "node_modules",
-                    "bower_components",
-                    "test",
-                    "tests"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Click effect inspired by Google's Material Design",
-            "keywords": [
-                "click",
-                "material-design"
-            ]
         },
         {
             "name": "dbtlr/php-airbrake",
@@ -1031,16 +499,16 @@
         },
         {
             "name": "doctrine/cache",
-            "version": "v1.6.1",
+            "version": "v1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3"
+                "reference": "eb152c5100571c7a45470ff2a35095ab3f3b900b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/b6f544a20f4807e81f7044d31e679ccbb1866dc3",
-                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/eb152c5100571c7a45470ff2a35095ab3f3b900b",
+                "reference": "eb152c5100571c7a45470ff2a35095ab3f3b900b",
                 "shasum": ""
             },
             "require": {
@@ -1097,7 +565,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2016-10-29T11:16:17+00:00"
+            "time": "2017-07-22T12:49:21+00:00"
         },
         {
             "name": "doctrine/collections",
@@ -1241,16 +709,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.5.12",
+            "version": "v2.5.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "7b9e911f9d8b30d43b96853dab26898c710d8f44"
+                "reference": "729340d8d1eec8f01bff708e12e449a3415af873"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/7b9e911f9d8b30d43b96853dab26898c710d8f44",
-                "reference": "7b9e911f9d8b30d43b96853dab26898c710d8f44",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/729340d8d1eec8f01bff708e12e449a3415af873",
+                "reference": "729340d8d1eec8f01bff708e12e449a3415af873",
                 "shasum": ""
             },
             "require": {
@@ -1308,37 +776,37 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2017-02-08T12:53:47+00:00"
+            "time": "2017-07-22T20:44:48+00:00"
         },
         {
             "name": "doctrine/inflector",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/inflector.git",
-                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae"
+                "reference": "e11d84c6e018beedd929cff5220969a3c6d1d462"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/inflector/zipball/90b2128806bfde671b6952ab8bea493942c1fdae",
-                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae",
+                "url": "https://api.github.com/repos/doctrine/inflector/zipball/e11d84c6e018beedd929cff5220969a3c6d1d462",
+                "reference": "e11d84c6e018beedd929cff5220969a3c6d1d462",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2"
+                "php": "^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.*"
+                "phpunit/phpunit": "^6.2"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "1.2.x-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Doctrine\\Common\\Inflector\\": "lib/"
+                "psr-4": {
+                    "Doctrine\\Common\\Inflector\\": "lib/Doctrine/Common/Inflector"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1375,7 +843,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06T14:35:42+00:00"
+            "time": "2017-07-22T12:18:28+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -1988,16 +1456,16 @@
         },
         {
             "name": "laravel/socialite",
-            "version": "v3.0.6",
+            "version": "v3.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/socialite.git",
-                "reference": "bca777a8526983e0ebdf3350f1b6e031923a473b"
+                "reference": "d79174513dbf14359b53e44394cf71373ae03433"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/socialite/zipball/bca777a8526983e0ebdf3350f1b6e031923a473b",
-                "reference": "bca777a8526983e0ebdf3350f1b6e031923a473b",
+                "url": "https://api.github.com/repos/laravel/socialite/zipball/d79174513dbf14359b53e44394cf71373ae03433",
+                "reference": "d79174513dbf14359b53e44394cf71373ae03433",
                 "shasum": ""
             },
             "require": {
@@ -2016,6 +1484,14 @@
             "extra": {
                 "branch-alias": {
                     "dev-master": "3.0-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Socialite\\SocialiteServiceProvider"
+                    ],
+                    "aliases": {
+                        "Socialite": "Laravel\\Socialite\\Facades\\Socialite"
+                    }
                 }
             },
             "autoload": {
@@ -2038,7 +1514,7 @@
                 "laravel",
                 "oauth"
             ],
-            "time": "2017-05-05T14:17:11+00:00"
+            "time": "2017-07-22T14:44:37+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -2918,16 +2394,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v3.0.6",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "0808939f81c1347a3c8a82a5925385a08074b0f1"
+                "reference": "4d4896e553f2094e657fe493506dc37c509d4e2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/0808939f81c1347a3c8a82a5925385a08074b0f1",
-                "reference": "0808939f81c1347a3c8a82a5925385a08074b0f1",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/4d4896e553f2094e657fe493506dc37c509d4e2b",
+                "reference": "4d4896e553f2094e657fe493506dc37c509d4e2b",
                 "shasum": ""
             },
             "require": {
@@ -2965,7 +2441,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2017-06-28T20:53:48+00:00"
+            "time": "2017-07-28T14:45:09+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -3017,16 +2493,16 @@
         },
         {
             "name": "pimple/pimple",
-            "version": "v3.2.0",
+            "version": "v3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silexphp/Pimple.git",
-                "reference": "729436408ef52f9845f9b60d60b2563f314bf1a9"
+                "reference": "4d45fb62d96418396ec58ba76e6f065bca16e10a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/729436408ef52f9845f9b60d60b2563f314bf1a9",
-                "reference": "729436408ef52f9845f9b60d60b2563f314bf1a9",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/4d45fb62d96418396ec58ba76e6f065bca16e10a",
+                "reference": "4d45fb62d96418396ec58ba76e6f065bca16e10a",
                 "shasum": ""
             },
             "require": {
@@ -3063,7 +2539,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2017-07-17T17:05:21+00:00"
+            "time": "2017-07-23T07:32:15+00:00"
         },
         {
             "name": "predis/predis",
@@ -3263,16 +2739,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.8.9",
+            "version": "v0.8.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "58a31cc4404c8f632d8c557bc72056af2d3a83db"
+                "reference": "b193cd020e8c6b66cea6457826ae005e94e6d2c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/58a31cc4404c8f632d8c557bc72056af2d3a83db",
-                "reference": "58a31cc4404c8f632d8c557bc72056af2d3a83db",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/b193cd020e8c6b66cea6457826ae005e94e6d2c0",
+                "reference": "b193cd020e8c6b66cea6457826ae005e94e6d2c0",
                 "shasum": ""
             },
             "require": {
@@ -3332,7 +2808,7 @@
                 "interactive",
                 "shell"
             ],
-            "time": "2017-07-06T14:53:52+00:00"
+            "time": "2017-07-29T19:30:02+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -4980,16 +4456,16 @@
         },
         {
             "name": "yajra/laravel-datatables-oracle",
-            "version": "v7.9.5",
+            "version": "v7.9.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yajra/laravel-datatables.git",
-                "reference": "1d26b26863495b389808c21d178bbe6ad680ea7d"
+                "reference": "0d39f3d1b87dd4d5e53c07033cb1d916aff8c659"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/1d26b26863495b389808c21d178bbe6ad680ea7d",
-                "reference": "1d26b26863495b389808c21d178bbe6ad680ea7d",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/0d39f3d1b87dd4d5e53c07033cb1d916aff8c659",
+                "reference": "0d39f3d1b87dd4d5e53c07033cb1d916aff8c659",
                 "shasum": ""
             },
             "require": {
@@ -5037,7 +4513,7 @@
                 "jquery",
                 "laravel"
             ],
-            "time": "2017-07-21T00:47:56+00:00"
+            "time": "2017-07-29T15:28:46+00:00"
         }
     ],
     "packages-dev": [
@@ -6805,7 +6281,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.6.4"
+        "php": "^7.0.0"
     },
     "platform-dev": []
 }

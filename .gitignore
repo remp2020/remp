@@ -1,7 +1,3 @@
 .idea
-.env
 .vscode
-
-Mailer/vendor/
-Mailer/.idea/
-Mailer/www/assets/vendor/
+.env

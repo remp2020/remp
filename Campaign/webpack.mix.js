@@ -1,17 +1,43 @@
-const { mix } = require('laravel-mix');
+let mix = require('laravel-mix');
+let publicPath = "public/assets/vendor/";
 
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for the application as well as bundling up all the JS files.
- |
- */
-
-mix.js('resources/assets/js/app.js', 'public/js')
-    .js('resources/assets/js/lib.js', 'public/js')
-    .sass('resources/assets/sass/app.scss', 'public/css')
-    .extract(['vue', 'jquery', 'bootstrap-sass', 'axios', 'lodash']);
+mix.options({
+    publicPath: publicPath,
+    resourceRoot: "/assets/vendor/"
+})
+    .js([
+        "resources/assets/js/functions.js",
+        "resources/assets/js/actions.js",
+        "resources/assets/js/datatables.js",
+        "resources/assets/js/remplib.js",
+        "resources/assets/js/banner.js"
+    ], "js/app.js")
+    .js("resources/assets/js/banner.js", "js/banner.js")
+    .js("resources/assets/js/remplib.js", "js/remplib.js")
+    .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
+    .sass("resources/assets/sass/app.scss", "css/app.css")
+    .sass("resources/assets/sass/banner.scss", "css/banner.css")
+    .extract([
+        "./resources/assets/js/bootstrap.js",
+        "jquery",
+        "jquery-placeholder",
+        "bootstrap",
+        "bootstrap-select",
+        "vue",
+        "animate.css",
+        "autosize",
+        "datatables.net",
+        "datatables.net-rowgroup",
+        "google-material-color",
+        "malihu-custom-scrollbar-plugin",
+        "node-waves",
+        "bootstrap-notify",
+        "./resources/assets/js/farbtastic.js",
+    ])
+    .autoload({
+        "jquery": ['$', 'jQuery', "window.jQuery"],
+        "node-waves": ["Waves", "window.Waves"],
+        "autosize": ["autosize", "window.autosize"],
+        "vue": ["vue", "window.vue"]
+    })
+    .version();

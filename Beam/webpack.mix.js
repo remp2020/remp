@@ -1,15 +1,41 @@
-const { mix } = require('laravel-mix');
+let mix = require('laravel-mix');
+let publicPath = "public/assets/vendor/";
 
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for the application as well as bundling up all the JS files.
- |
- */
-
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css');
+mix.options({
+    publicPath: publicPath,
+    resourceRoot: "/assets/vendor/"
+})
+    .js([
+        "resources/assets/js/functions.js",
+        "resources/assets/js/actions.js",
+        "resources/assets/js/datatables.js",
+        "resources/assets/js/charts.js"
+    ], "js/app.js")
+    .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
+    .sass("resources/assets/sass/app.scss", "css/app.css")
+    .extract([
+        "./resources/assets/js/bootstrap.js",
+        "animate.css",
+        "autosize",
+        "bootstrap",
+        "bootstrap-select",
+        "ckeditor",
+        "datatables.net",
+        "datatables.net-rowgroup",
+        "google-material-color",
+        "jquery",
+        "jquery-placeholder",
+        "malihu-custom-scrollbar-plugin",
+        "node-waves",
+        "easy-pie-chart/dist/jquery.easypiechart.js",
+        "bootstrap-notify",
+        "eonasdan-bootstrap-datetimepicker",
+        "vue"
+    ])
+    .autoload({
+        "jquery": ['$', 'jQuery', "window.jQuery"],
+        "node-waves": ["Waves", "window.Waves"],
+        "autosize": ["autosize", "window.autosize"],
+        "vue": ["vue", "window.vue"]
+    })
+    .version();

@@ -1,8 +1,12 @@
 FROM php:7.0-fpm
 
-RUN apt-get update && apt-get install -y git libzip-dev zlib1g-dev libicu-dev g++ \
+# INIT
+
+RUN apt-get update && apt-get install -y git libzip-dev zlib1g-dev libicu-dev g++ build-essential \
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl
+
+# PHP
 
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
@@ -12,6 +16,8 @@ RUN cat /tmp/xdebug.ini >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 ADD log.conf /usr/local/etc/php-fpm.d/zz-log.conf
 
+# COMPOSER
+
 ENV COMPOSER_HOME /composer
 
 ENV PATH /composer/vendor/bin:$PATH
@@ -20,7 +26,19 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN composer global require "fxp/composer-asset-plugin:^1.3"
+# NODEJS + YARN
+
+ENV PATH=$HOME/.yarn/bin:$PATH
+
+ENV YARN_CACHE_FOLDER /yarn
+
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+
+RUN apt-get install -y nodejs
+
+RUN curl -sL https://yarnpkg.com/install.sh | bash -
+
+# VOLUME
 
 VOLUME /var/www/html
 
