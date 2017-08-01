@@ -9,23 +9,26 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/controller"
+	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		errors.Wrap(err, "unable to load .env file")
+		log.Fatalln(errors.Wrap(err, "unable to load .env file"))
 	}
 	var c Config
 	if err := envconfig.Process("tracker", &c); err != nil {
-		errors.Wrap(err, "unable to process envconfig")
+		log.Fatalln(errors.Wrap(err, "unable to process envconfig"))
 	}
 
 	service := goa.New("tracker")
@@ -35,6 +38,8 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
+	// kafka init
+
 	log.Println("connecting to broker:", c.BrokerAddr)
 	eventProducer, err := newProducer([]string{c.BrokerAddr})
 	if err != nil {
@@ -42,10 +47,30 @@ func main() {
 	}
 	defer eventProducer.Close()
 
+	// DB init
+
+	mysqlDBConfig := mysql.Config{
+		Net:       c.MysqlNet,
+		Addr:      c.MysqlAddr,
+		User:      c.MysqlUser,
+		Passwd:    c.MysqlPasswd,
+		DBName:    c.MysqlDBName,
+		ParseTime: true,
+	}
+	mysqlDB, err := sqlx.Connect("mysql", mysqlDBConfig.FormatDSN())
+	if err != nil {
+		log.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
+	}
+
+	propertyDB := &model.PropertyDB{
+		MySQL: mysqlDB,
+	}
+
 	app.MountSwaggerController(service, service.NewController("swagger"))
 	app.MountTrackController(service, controller.NewTrackController(
 		service,
 		eventProducer,
+		propertyDB,
 	))
 
 	log.Println("starting server:", c.TrackerAddr)

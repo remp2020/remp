@@ -8,12 +8,14 @@ import (
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
+	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 // TrackController implements the track resource.
 type TrackController struct {
 	*goa.Controller
-	EventProducer sarama.AsyncProducer
+	EventProducer   sarama.AsyncProducer
+	PropertyStorage model.PropertyStorage
 }
 
 // Event represents Influx event structure
@@ -25,10 +27,11 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer) *TrackController {
+func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage) *TrackController {
 	return &TrackController{
-		Controller:    service.NewController("TrackController"),
-		EventProducer: ep,
+		Controller:      service.NewController("TrackController"),
+		EventProducer:   ep,
+		PropertyStorage: ps,
 	}
 }
 
@@ -59,6 +62,14 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 
 // Event runs the event action.
 func (c *TrackController) Event(ctx *app.EventTrackContext) error {
+	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+
 	tags := map[string]string{
 		"category": ctx.Payload.Category,
 		"action":   ctx.Payload.Action,
@@ -101,11 +112,11 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 // pushEvent pushes new event to the InfluxDB.
 func (c *TrackController) pushEvent(system *app.System, user *app.User,
 	name string, tags map[string]string, fields map[string]interface{}) error {
+	fields["token"] = system.PropertyToken
 	if user != nil {
 		fields["ip"] = user.IPAddress
 		fields["url"] = user.URL
 		fields["user_agent"] = user.UserAgent
-		fields["token"] = user.PropertyToken
 		if user.UserID != nil {
 			tags["user_id"] = *user.UserID
 		}
