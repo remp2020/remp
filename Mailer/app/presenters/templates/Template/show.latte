@@ -40,7 +40,7 @@
                     <li class="list-group-item"><strong>From:</strong> {$mailTemplate->from}</li>
                     <li class="list-group-item"><strong>Subject:</strong> {$mailTemplate->subject}</li>
                     <li class="list-group-item"><strong>Layout:</strong> <a n:href="Layout:Edit $mailTemplate->mail_layout_id">{$mailTemplate->mail_layout->name}</a></li>
-                    <li class="list-group-item"><strong>List:</strong> <a n:href="List:Edit $mailTemplate->mail_type_id">{$mailTemplate->mail_type->title}</a></li>
+                    <li class="list-group-item"><strong>List:</strong> <a n:href="List:Show $mailTemplate->mail_type_id">{$mailTemplate->mail_type->title}</a></li>
                     <li class="list-group-item"><strong>Created:</strong> {$mailTemplate->created_at}</li>
                     <li class="list-group-item"><strong>Updated:</strong> {$mailTemplate->updated_at}</li>
                     <li class="list-group-item" n:if="$mailTemplate->autologin"><strong>Auto Login</strong></li>

@@ -44,18 +44,17 @@ final class TemplatePresenter extends BasePresenter
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('name')
+            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setColSetting('code')
             ->setColSetting('subject')
             ->setColSetting('type', ['orderable' => false, 'filter' => true])
             ->setColSetting('opened')
             ->setColSetting('clicked')
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setRowLink($this->link('Show', 'RowId'))
             ->setRowAction('show', $this->link('Show', 'RowId'), 'palette-Cyan zmdi-eye')
             ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit')
             ->setRowAction('duplicate', $this->link('Duplicate!', 'RowId'), 'palette-Cyan zmdi-copy')
-            ->setTableSetting('order', Json::encode([[6, 'DESC']]));
+            ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
     }
@@ -81,13 +80,12 @@ final class TemplatePresenter extends BasePresenter
         foreach ($templates as $template) {
             $result['data'][] = [
                 'RowId' => $template->id,
-                $template->name,
+                $template->created_at,
                 $template->code,
                 $template->subject,
                 $template->type->title,
                 $template->opened,
                 $template->clicked,
-                $template->created_at,
             ];
         }
         $this->presenter->sendJson($result);

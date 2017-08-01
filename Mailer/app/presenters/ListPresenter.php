@@ -3,26 +3,27 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Repository\ListsRepository;
-use Remp\MailerModule\Repository\UsersRepository;
+use Remp\MailerModule\Repository\TemplatesRepository;
 
 final class ListPresenter extends BasePresenter
 {
     /** @var ListsRepository */
     private $listsRepository;
 
-    /** @var UsersRepository */
-    private $usersRepository;
+    /** @var TemplatesRepository */
+    private $templatesRepository;
 
     public function __construct(
         ListsRepository $listsRepository,
-        UsersRepository $usersRepository
+        TemplatesRepository $templatesRepository
     ) {
     
         parent::__construct();
         $this->listsRepository = $listsRepository;
-        $this->usersRepository = $usersRepository;
+        $this->templatesRepository = $templatesRepository;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -94,25 +95,49 @@ final class ListPresenter extends BasePresenter
         ];
     }
 
-    public function createComponentListForm()
+    public function createComponentDataTableTemplates(IDataTableFactory $dataTableFactory)
     {
-        $id = null;
-        if (isset($this->params['id'])) {
-            $id = (int)$this->params['id'];
+        $dataTable = $dataTableFactory->create();
+        $dataTable
+            ->setSourceUrl($this->link('templateJsonData'))
+            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
+            ->setColSetting('subject')
+            ->setColSetting('opened')
+            ->setColSetting('clicked')
+            ->setRowLink($this->link('Template:Show', 'RowId'))
+            ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
+            ->setTableSetting('order', Json::encode([[0, 'DESC']]));
+
+        return $dataTable;
+    }
+
+    public function renderTemplateJsonData()
+    {
+        $request = $this->request->getParameters();
+
+        $templatesCount = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, $request['listId'])
+            ->count('*');
+
+        $templates = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'], $request['listId'])
+            ->fetchAll();
+
+        $result = [
+            'recordsTotal' => $this->templatesRepository->totalCount(),
+            'recordsFiltered' => $templatesCount,
+            'data' => []
+        ];
+
+        foreach ($templates as $template) {
+            $result['data'][] = [
+                'RowId' => $template->id,
+                $template->created_at,
+                $template->subject,
+                $template->opened,
+                $template->clicked,
+            ];
         }
-
-        $form = $this->listFormFactory->create($id);
-
-        $presenter = $this;
-        $this->listFormFactory->onCreate = function ($list) use ($presenter) {
-            $presenter->flashMessage('Newsletter list was created');
-            $presenter->redirect('Edit', $list->id);
-        };
-        $this->listFormFactory->onUpdate = function ($list) use ($presenter) {
-            $presenter->flashMessage('Newsletter list was updated');
-            $presenter->redirect('Edit', $list->id);
-        };
-
-        return $form;
+        $this->presenter->sendJson($result);
     }
 }
