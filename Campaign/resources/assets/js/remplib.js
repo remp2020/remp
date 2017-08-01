@@ -76,7 +76,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         var cbf = cb[0];
                         var cbargs = cb[1];
                         return function() {
-                            self[cbf].apply(self, cbargs);
+                            if (cbf !== "run") {
+                                self[cbf].apply(self, cbargs);
+                            }
                             self.initIterator++;
                             if (self.initIterator === self._.length) {
                                 self.run();
@@ -163,7 +165,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         };
     }());
 
-    prodlib._ = mocklib._;
+    if (typeof mocklib._ !== 'undefined') {
+        prodlib._ = mocklib._;
+    }
     remplib = prodlib.extend(mocklib, prodlib);
     remplib.bootstrap();
 

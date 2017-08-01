@@ -3885,6 +3885,7 @@ tbody.collapse.in {
   text-decoration: none;
   color: #333333;
   background-color: rgba(0, 0, 0, 0.075);
+  background-image: none;
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
@@ -3893,6 +3894,7 @@ tbody.collapse.in {
   text-decoration: none;
   outline: 0;
   background-color: rgba(0, 0, 0, 0.075);
+  background-image: none;
 }
 .dropdown-menu > .disabled > a,
 .dropdown-menu > .disabled > a:hover,

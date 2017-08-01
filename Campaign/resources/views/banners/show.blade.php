@@ -1,6 +1,4 @@
 @push('head')
-<link href="/assets/vendor/farbtastic/farbtastic.css" rel="stylesheet">
-<script src="/assets/js/banner.js"></script>
 
 <style>
     #preview-box {

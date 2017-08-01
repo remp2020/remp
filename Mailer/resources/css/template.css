@@ -3885,6 +3885,7 @@ tbody.collapse.in {
   text-decoration: none;
   color: #333333;
   background-color: rgba(0, 0, 0, 0.075);
+  background-image: none;
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
@@ -3893,6 +3894,7 @@ tbody.collapse.in {
   text-decoration: none;
   outline: 0;
   background-color: rgba(0, 0, 0, 0.075);
+  background-image: none;
 }
 .dropdown-menu > .disabled > a,
 .dropdown-menu > .disabled > a:hover,
@@ -7176,7 +7178,7 @@ button.close {
 /*
  * Scale 3d
  */
-/* 
+/*
  * Load Font
  */
 /*
@@ -7461,11 +7463,11 @@ button.close {
 }
 /*!
  * Waves v0.7.4
- * http://fian.my.id/Waves 
- * 
- * Copyright 2014 Alfiana E. Sibuea and other contributors 
- * Released under the MIT license 
- * https://github.com/fians/Waves/blob/master/LICENSE 
+ * http://fian.my.id/Waves
+ *
+ * Copyright 2014 Alfiana E. Sibuea and other contributors
+ * Released under the MIT license
+ * https://github.com/fians/Waves/blob/master/LICENSE
  */
 .waves-effect {
   position: relative;
@@ -7603,8 +7605,8 @@ a.waves-effect .waves-ripple {
  * google-material-color v1.2.6
  * https://github.com/danlevan/google-material-color
  */
-/* 
- * Load Website related LESS files 
+/*
+ * Load Website related LESS files
  */
 /*
  * Generate Margin Class
@@ -7917,7 +7919,7 @@ a.waves-effect .waves-ripple {
 .di-block {
   display: inline-block !important;
 }
-/* 
+/*
  * Material Background Colors
  */
 .bgm-white {
@@ -8068,7 +8070,7 @@ a.waves-effect .waves-ripple {
   width: 100% !important;
 }
 /*
- * Border Radius 
+ * Border Radius
  */
 .brd-2 {
   border-radius: 2px;
@@ -8635,7 +8637,7 @@ pre {
   background: rgba(255, 255, 255, 0.5);
   z-index: 100;
 }
-/*---------------------------------- 
+/*----------------------------------
     User Alerts
 -----------------------------------*/
 .smm-alerts {
@@ -10465,7 +10467,7 @@ html:not(.ie9) .select.fg-line:before {
   color: #fff !important;
 }
 /*
- * Lightbox  
+ * Lightbox
  */
 .lightbox .lightbox-item > img {
   width: 100%;

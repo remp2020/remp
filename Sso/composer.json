@@ -5,7 +5,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^7.0",
+        "php": "^7.0.0",
         "arrilot/laravel-widgets": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.3",
         "doctrine/dbal": "~2.3",

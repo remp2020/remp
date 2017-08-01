@@ -6,17 +6,6 @@
 
 @endphp
 
-@push('head')
-<link href="/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
-<script src="/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
-
-<link href="/assets/vendor/farbtastic/farbtastic.css" rel="stylesheet">
-<script src="/assets/vendor/farbtastic/farbtastic.js"></script>
-
-<script src="/assets/js/banner.js"></script>
-
-@endpush
-
 <banner-form></banner-form>
 
 @push('scripts')
