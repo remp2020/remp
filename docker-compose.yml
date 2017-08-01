@@ -1,5 +1,6 @@
 version: "3"
 
+# see .env file for docker-compose ENV variables required for proper run
 
 services:
   nginx:
@@ -10,6 +11,20 @@ services:
     ports:
       - "80:80"
     restart: "unless-stopped"
+    networks:
+      default:
+        aliases:
+          - "campaign.remp.app"
+          - "mailer.remp.app"
+          - "sso.remp.app"
+          - "beam.remp.app"
+          - "tracker.beam.remp.app"
+          - "segments.beam.remp.app"
+    depends_on:
+      - "campaign"
+      - "mailer"
+      - "sso"
+      - "beam"
 
   redis:
     image: "redis:3.2"
@@ -19,29 +34,27 @@ services:
   mailhog:
     image: "mailhog/mailhog:v1.0.0"
     environment:
-      MH_HOSTNAME: "mailhog.remp.app"
+      MH_domainname: "mailhog.remp.app"
 
   adminer:
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
-    depends_on:
-      - "nginx"
 
   # campaign
 
   campaign:
     build: "./Docker/php"
+    domainname: "campaign.remp.app"
+    hostname: "campaign"
     volumes:
       - ".:/var/www/html:rw"
       - "composer-data:/composer:rw"
       - "yarn-data:/yarn:rw"
     depends_on:
       - "campaign_mysql"
-      - "nginx"
     extra_hosts:
-      - "crm.app:192.168.99.100"
-      - "sso.remp.app:192.168.99.100"
+      - "crm.app:${REMP_EXTRA_HOSTS_IP}"
     restart: "unless-stopped"
 
   campaign_mysql:
@@ -64,8 +77,9 @@ services:
 
   mailer:
    extra_hosts:
-     - "crm.app:192.168.99.100"
-     - "sso.remp.app:192.168.99.100"
+     - "crm.app:${REMP_EXTRA_HOSTS_IP}"
+   domainname: "mailer.remp.app"
+   hostname: "mailer"
    build: "./Docker/php"
    volumes:
      - ".:/var/www/html:rw"
@@ -73,7 +87,6 @@ services:
      - "yarn-data:/yarn:rw"
    depends_on:
      - "mailer_mysql"
-     - "nginx"
      - "redis"
      - "mailhog"
    restart: "unless-stopped"
@@ -98,12 +111,13 @@ services:
 
   sso:
     build: "./Docker/php"
+    domainname: "sso.remp.app"
+    hostname: "sso"
     volumes:
       - ".:/var/www/html:rw"
       - "composer-data:/composer:rw"
       - "yarn-data:/yarn:rw"
     depends_on:
-      - "nginx"
       - "sso_mysql"
     restart: "unless-stopped"
 
@@ -126,8 +140,8 @@ services:
   # beam
 
   beam:
-    extra_hosts:
-      - "sso.remp.app:192.168.99.100"
+    domainname: "beam.remp.app"
+    hostname: "beam"
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
@@ -135,11 +149,6 @@ services:
       - "yarn-data:/yarn:rw"
     depends_on:
       - "beam_mysql"
-      - "nginx"
-    environment:
-      DB_DATABASE: "remp_beam"
-      DB_USERNAME: "root"
-      DB_PASSWORD: "secret"
     restart: "unless-stopped"
 
   beam_mysql:
@@ -226,3 +235,6 @@ volumes:
     driver: "local"
   yarn-data:
     driver: "local"
+
+networks:
+  default:
