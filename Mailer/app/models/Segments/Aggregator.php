@@ -1,7 +1,6 @@
 <?php
 namespace Remp\MailerModule\Segment;
 
-
 class Aggregator implements ISegment
 {
     /** @var ISegment[] */

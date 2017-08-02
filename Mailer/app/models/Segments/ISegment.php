@@ -1,7 +1,6 @@
 <?php
 namespace Remp\MailerModule\Segment;
 
-
 interface ISegment
 {
     public function provider();
