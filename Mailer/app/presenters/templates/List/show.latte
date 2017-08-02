@@ -15,10 +15,10 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right dm-icon">
                     <li>
-                        <a href="{$list->preview_url}"><i class="zmdi zmdi-search"></i> Preview</a>
+                        <a n:ifset="$list->preview_url" href="{$list->preview_url}"><i class="zmdi zmdi-search"></i> Preview</a>
                     </li>
                     <li>
-                        <a href="{$list->image_url}"><i class="zmdi zmdi-image-o"></i> List image</a>
+                        <a n:ifset="$list->image_url" href="{$list->image_url}"><i class="zmdi zmdi-image-o"></i> List image</a>
                     </li>
                 </ul>
             </li>
@@ -40,7 +40,7 @@
                     <li class="list-group-item"><strong>Category:</strong> {$list->type_category->title}</li>
                     <li class="list-group-item"><strong>Priority:</strong> {$list->priority}</li>
                     <li class="list-group-item"><strong>Code:</strong> {$list->code}</li>
-                    <li class="list-group-item"><strong>Description:</strong> {$list->description}</li>
+                    <li class="list-group-item"><strong>Description:</strong> {$list->description|noescape}</li>
                     <li class="list-group-item"><strong>Auto subscribe:</strong> {$list->auto_subscribe|YesNo}</li>
                     <li class="list-group-item"><strong>Locked:</strong> {$list->locked|YesNo}</li>
                     <li class="list-group-item"><strong>Public:</strong> {$list->is_public|YesNo}</li>
