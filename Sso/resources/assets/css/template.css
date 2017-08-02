@@ -5380,6 +5380,8 @@ a.thumbnail.active {
   background-color: #4caf50;
   border-color: transparent;
   color: #ffffff;
+  background-image: none;
+  box-shadow: none;
 }
 .alert-success hr {
   border-top-color: rgba(0, 0, 0, 0);
@@ -5391,6 +5393,8 @@ a.thumbnail.active {
   background-color: #2196f3;
   border-color: transparent;
   color: #ffffff;
+  background-image: none;
+  box-shadow: none;
 }
 .alert-info hr {
   border-top-color: rgba(0, 0, 0, 0);
@@ -5402,6 +5406,8 @@ a.thumbnail.active {
   background-color: #ffc107;
   border-color: transparent;
   color: #ffffff;
+  background-image: none;
+  box-shadow: none;
 }
 .alert-warning hr {
   border-top-color: rgba(0, 0, 0, 0);
@@ -5413,6 +5419,8 @@ a.thumbnail.active {
   background-color: #f44336;
   border-color: transparent;
   color: #ffffff;
+  background-image: none;
+  box-shadow: none;
 }
 .alert-danger hr {
   border-top-color: rgba(0, 0, 0, 0);

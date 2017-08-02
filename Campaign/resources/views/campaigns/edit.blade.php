@@ -10,15 +10,19 @@
     <div class="card">
         <div class="card-header">
             <h2>Edit campaign <small>{{ $campaign->name }}</small></h2>
-            @include('flash::message')
+
         </div>
 
-        @component('campaigns._vue_form')
-        @endcomponent
+        <div class="card-body card-padding">
+            @include('flash::message')
 
-        {!! Form::model($campaign, ['route' => ['campaigns.update', $campaign], 'method' => 'PATCH', 'id' => 'campaign-form']) !!}
-        @include('campaigns._form')
-        {!! Form::close() !!}
+            @component('campaigns._vue_form')
+            @endcomponent
+
+            {!! Form::model($campaign, ['route' => ['campaigns.update', $campaign], 'method' => 'PATCH', 'id' => 'campaign-form']) !!}
+            @include('campaigns._form')
+            {!! Form::close() !!}
+        </div>
     </div>
 
 @endsection

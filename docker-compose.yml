@@ -20,6 +20,7 @@ services:
           - "beam.remp.app"
           - "tracker.beam.remp.app"
           - "segments.beam.remp.app"
+          - "grafana.beam.remp.app"
     depends_on:
       - "campaign"
       - "mailer"
@@ -157,6 +158,8 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "no"
       MYSQL_ROOT_PASSWORD: "secret"
       MYSQL_DATABASE: "remp_beam"
+    ports:
+      - "3313:3306"
     restart: "unless-stopped"
 
   kafka:
@@ -165,6 +168,8 @@ services:
       ADVERTISED_HOST: "kafka"
       ADVERTISED_PORT: "9092"
       CREATE_TOPICS: "beam_events:1:1"
+    ports:
+      - "9002:9092"
     volumes:
       - "kafka-data:/data"
 
@@ -183,6 +188,12 @@ services:
     depends_on:
       - "influxdb"
       - "kafka"
+    restart: "unless-stopped"
+
+  grafana:
+    image: "grafana/grafana"
+    volumes:
+      - "grafana-data:/var/lib/grafana"
     restart: "unless-stopped"
 
   beam_tracker:
@@ -211,6 +222,8 @@ volumes:
   mysql-data-sso:
     driver: "local"
   redis-data:
+    driver: "local"
+  grafana-data:
     driver: "local"
 
   composer-data:
