@@ -13,10 +13,11 @@ class JobsRepository extends Repository
 
     protected $dataTableSearchable = [];
 
-    public function add($segment_id)
+    public function add($segment_code, $segment_provider)
     {
         $result = $this->insert([
-            'segment_id' => $segment_id,
+            'segment_code' => $segment_code,
+            'segment_provider' => $segment_provider,
             'status' => static::STATUS_NEW,
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),

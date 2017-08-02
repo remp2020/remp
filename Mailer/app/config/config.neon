@@ -1,6 +1,9 @@
 parameters:
     sso_host: @environmentConfig::get('SSO_BASE_URL')
     sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
+    crm_api_base_url: @environmentConfig::get('CRM_API_BASE_URL')
+    crm_api_token: @environmentConfig::get('CRM_API_TOKEN')
+    tracker_api_base_url: @environmentConfig::get('TRACKER_API_BASE_URL')
     errbit:
         send_errors: false
 
@@ -44,6 +47,12 @@ services:
 	        - setCatchExceptions(true)
 
 	- Remp\MailerModule\Sender
+
+	segmentAgreggator:
+	    class: Remp\MailerModule\Segment\Aggregator
+	    setup:
+	        - register(Remp\MailerModule\Segment\Crm(%crm_api_base_url%, %crm_api_token%))
+	        # - register(Remp\MailerModule\Segment\Remp(tracker_api_base_url%))
 
 	mailFactory:
 	    class: Remp\MailerModule\Sender\MailerFactory
