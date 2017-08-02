@@ -29,7 +29,6 @@ class ListsRepository extends Repository
             'auto_subscribe' => !(bool)$isConsentRequired,
             'locked' => (bool)$isLocked,
             'is_public' => (bool)$isPublic,
-            // 'created_at' => new \DateTime(),
         ]);
 
         if (is_numeric($result)) {
@@ -61,32 +60,13 @@ class ListsRepository extends Repository
     }
 
     /**
-     * @param $query
-     * @param $order
-     * @param $orderDirection
-     * @param null $limit
-     * @param null $offset
      * @return Selection
      */
-    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null)
+    public function tableFilter()
     {
         $selection = $this->getTable()
-            ->select('mail_types.*, count(:mail_user_preferences.id) AS consents')
-            ->order($order . ' ' . strtoupper($orderDirection))
+            ->order('mail_type_category.sorting')
             ->group('mail_types.id');
-
-        if (!empty($query)) {
-            $where = [];
-            foreach ($this->dataTableSearchable as $col) {
-                $where[$col . ' LIKE ?'] = '%' . $query . '%';
-            }
-
-            $selection->whereOr($where);
-        }
-
-        if ($limit !== null) {
-            $selection->limit($limit, $offset);
-        }
 
         return $selection;
     }

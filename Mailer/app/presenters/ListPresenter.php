@@ -3,48 +3,46 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
-use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Repository\ListsRepository;
-use Remp\MailerModule\Repository\UsersRepository;
+use Remp\MailerModule\Repository\TemplatesRepository;
 
 final class ListPresenter extends BasePresenter
 {
     /** @var ListsRepository */
     private $listsRepository;
 
-    /** @var UsersRepository */
-    private $usersRepository;
-
-    /** @var ListFormFactory */
-    private $listFormFactory;
+    /** @var TemplatesRepository */
+    private $templatesRepository;
 
     public function __construct(
         ListsRepository $listsRepository,
-        UsersRepository $usersRepository,
-        ListFormFactory $listFormFactory
+        TemplatesRepository $templatesRepository
     ) {
     
         parent::__construct();
         $this->listsRepository = $listsRepository;
-        $this->usersRepository = $usersRepository;
-        $this->listFormFactory = $listFormFactory;
+        $this->templatesRepository = $templatesRepository;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('sorting', ['visible' => false])
+            ->setColSetting('category', ['visible' => false])
             ->setColSetting('title')
             ->setColSetting('code')
-            ->setColSetting('is_consent_required', ['header' => 'consent required', 'render' => 'boolean'])
-            ->setColSetting('is_locked', ['header' => 'locked', 'render' => 'boolean'])
+            ->setColSetting('subscribed', ['render' => 'number'])
+            ->setColSetting('auto_subscribe', ['header' => 'auto subscribe', 'render' => 'boolean'])
+            ->setColSetting('locked', ['render' => 'boolean'])
             ->setColSetting('is_public', ['header' => 'public', 'render' => 'boolean'])
-            ->setColSetting('subscribers', ['header' => 'number of subscribers', 'render' => 'number', 'orderable' => false])
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setRowLink($this->link('Edit', 'RowId'))
-            ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit');
+            ->setAllColSetting('orderable', false)
+            ->setRowLink($this->link('Show', 'RowId'))
+            ->setRowAction('show', $this->link('Show', 'RowId'), 'palette-Cyan zmdi-eye')
+            ->setTableSetting('displayNavigation', false)
+            ->setTableSetting('rowGroup', 0)
+            ->setTableSetting('length', -1);
 
         return $dataTable;
     }
@@ -67,24 +65,22 @@ final class ListPresenter extends BasePresenter
             'data' => []
         ];
 
-        $totalUsers = $this->usersRepository->totalCount();
-
         foreach ($lists as $list) {
             $result['data'][] = [
                 'RowId' => $list->id,
-                $list->sorting,
+                $list->type_category->title,
                 $list->title,
                 $list->code,
+                $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
                 $list->auto_subscribe,
                 $list->locked,
                 $list->is_public,
-                $list->is_public == 1 ? $list->consents : $totalUsers - $list->consents,
             ];
         }
         $this->presenter->sendJson($result);
     }
 
-    public function renderEdit($id)
+    public function renderShow($id)
     {
         $list = $this->listsRepository->find($id);
         if (!$list) {
@@ -92,27 +88,56 @@ final class ListPresenter extends BasePresenter
         }
 
         $this->template->list = $list;
+        $this->template->variants = $list->related('mail_type_variants')->order('sorting');
+        $this->template->stats = [
+            'subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
+            'un-subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => false])->count('*'),
+        ];
     }
 
-    public function createComponentListForm()
+    public function createComponentDataTableTemplates(IDataTableFactory $dataTableFactory)
     {
-        $id = null;
-        if (isset($this->params['id'])) {
-            $id = (int)$this->params['id'];
+        $dataTable = $dataTableFactory->create();
+        $dataTable
+            ->setSourceUrl($this->link('templateJsonData'))
+            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
+            ->setColSetting('subject')
+            ->setColSetting('opened')
+            ->setColSetting('clicked')
+            ->setRowLink($this->link('Template:Show', 'RowId'))
+            ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
+            ->setTableSetting('order', Json::encode([[0, 'DESC']]));
+
+        return $dataTable;
+    }
+
+    public function renderTemplateJsonData()
+    {
+        $request = $this->request->getParameters();
+
+        $templatesCount = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, $request['listId'])
+            ->count('*');
+
+        $templates = $this->templatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'], $request['listId'])
+            ->fetchAll();
+
+        $result = [
+            'recordsTotal' => $this->templatesRepository->totalCount(),
+            'recordsFiltered' => $templatesCount,
+            'data' => []
+        ];
+
+        foreach ($templates as $template) {
+            $result['data'][] = [
+                'RowId' => $template->id,
+                $template->created_at,
+                $template->subject,
+                $template->opened,
+                $template->clicked,
+            ];
         }
-
-        $form = $this->listFormFactory->create($id);
-
-        $presenter = $this;
-        $this->listFormFactory->onCreate = function ($list) use ($presenter) {
-            $presenter->flashMessage('Newsletter list was created');
-            $presenter->redirect('Edit', $list->id);
-        };
-        $this->listFormFactory->onUpdate = function ($list) use ($presenter) {
-            $presenter->flashMessage('Newsletter list was updated');
-            $presenter->redirect('Edit', $list->id);
-        };
-
-        return $form;
+        $this->presenter->sendJson($result);
     }
 }

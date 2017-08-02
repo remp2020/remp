@@ -36,12 +36,12 @@ class DataTable extends Control
 
     /**
      * @param $colName
-     * @param null $colSetting
+     * @param $colSetting
      * @return $this
      */
     public function setColSetting($colName, $colSetting = null)
     {
-        if ($colSetting == null) {
+        if ($colSetting === null) {
             $colSetting = [
                 'header' => $colName,
             ];
@@ -53,16 +53,26 @@ class DataTable extends Control
     }
 
     /**
+     * @param $colSettingName
+     * @param $colSettingValue
+     * @return $this
+     */
+    public function setAllColSetting($colSettingName, $colSettingValue = true)
+    {
+        foreach ($this->colSettings as $colName => $colSetting) {
+            $this->colSettings[$colName][$colSettingName] = $colSettingValue;
+        }
+
+        return $this;
+    }
+
+    /**
      * @param $tableSettingName
      * @param $tableSetting
      * @return $this
      */
-    public function setTableSetting($tableSettingName, $tableSetting = null)
+    public function setTableSetting($tableSettingName, $tableSetting = true)
     {
-        if ($tableSetting === null) {
-            $tableSetting = true;
-        }
-
         $this->tableSettings[$tableSettingName] = $tableSetting;
 
         return $this;

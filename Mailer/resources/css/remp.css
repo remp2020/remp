@@ -56,8 +56,22 @@
     z-index: 3000;
 }
 
-.table-hover tbody tr {
+.dataTables_wrapper .dataTable tbody tr {
     cursor: pointer;
+}
+
+.dataTables_wrapper .dataTable .group {
+    cursor: default;
+    font-weight: 700;
+    background: rgba(0, 188, 212, .10);
+}
+
+.dataTables_wrapper .dataTable tbody tr.odd {
+    background-color: #fff;
+}
+
+.dataTables_wrapper .dataTable tbody tr.even {
+    background-color: #f4f4f4;
 }
 
 tr th.sorting:hover,

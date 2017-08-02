@@ -44,11 +44,11 @@ class LayoutsRepository extends Repository
      * @param $query
      * @param $order
      * @param $orderDirection
-     * @param null $limit
+     * @param int $limit
      * @param null $offset
      * @return Selection
      */
-    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null)
+    public function tableFilter($query, $order, $orderDirection, $limit = -1, $offset = null)
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -63,7 +63,7 @@ class LayoutsRepository extends Repository
         }
 
 
-        if ($limit !== null) {
+        if ($limit != -1) {
             $selection->limit($limit, $offset);
         }
 
