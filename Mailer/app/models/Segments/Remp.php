@@ -60,7 +60,7 @@ class Remp implements ISegment
             ]);
 
             return Json::decode($response->getBody(), Json::FORCE_ARRAY);
-        }  catch (ConnectException $connectException) {
+        } catch (ConnectException $connectException) {
             throw new SegmentException("Could not connect to Segment:{$url} endpoint: {$connectException->getMessage()}");
         }
     }
