@@ -46,9 +46,12 @@
     $(document).ready(function() {
         $.fn.dataTable.ext.errMode = 'none';
         var dataTable = $('#{$tableId|noescape}').on('error.dt', function(e, settings, techNote, message) {
-            // @TODO use bootstrap notification - flash message
-            alert(settings.jqXHR.responseJSON.error);
-            console.log(settings.jqXHR.responseJSON.error);
+            $.notify({
+                message: settings.jqXHR.responseJSON.error
+            }, {
+                allow_dismiss: false,
+                type: 'danger'
+            });
         }).DataTable({
             'columns': [
                 {foreach $colSettings as $colName => $colSetting}

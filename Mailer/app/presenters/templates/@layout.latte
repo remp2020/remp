@@ -192,14 +192,11 @@
         {foreach $flashes as $flash}
         index += 250;
         window.setTimeout(function() {
-            $.bootstrapPurr({$flash->message}, {
-                type: {$flash->type},
-                align: 'left',
-                allowDismiss: false,
-                width: 270,
-                offset: {
-                    from: 'bottom'
-                }
+            $.notify({
+                message: {$flash->message}
+            }, {
+                allow_dismiss: false,
+                type: {$flash->type}
             });
         }, index);
         {/foreach}

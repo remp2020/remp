@@ -135,12 +135,11 @@ final class JobPresenter extends BasePresenter
             $segmentList = $this->segmentAggregator->list();
             array_walk($segmentList, function ($segment) use (&$job) {
                 if ($segment['code'] == $job->segment_code) {
-                    $this->template->segment = $segment['provider'] . ':' . $segment['name'];
+                    $this->template->segment = $segment;
                 }
             });
         } catch (SegmentException $e) {
-            $this->flashMessage('Unable to fetch list of segments, please check the application configuration.', 'error');
-            $this->template->segment = 'Missing segment';
+            $this->flashMessage('Unable to fetch list of segments, please check the application configuration.', 'danger');
         }
 
         $this->template->job = $job;
@@ -205,14 +204,9 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentJobForm()
     {
-        $presenter = $this;
-
-        $this->jobFormFactory->onFlash = function ($message) use ($presenter) {
-            return $presenter->flashMessage($message);
-        };
-
         $form = $this->jobFormFactory->create();
 
+        $presenter = $this;
         $this->jobFormFactory->onSuccess = function ($job) use ($presenter) {
             $presenter->flashMessage('Job was created');
             $presenter->redirect('Show', $job->id);

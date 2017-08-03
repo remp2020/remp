@@ -30,8 +30,6 @@ class JobFormFactory extends Object
 
     public $onSuccess;
 
-    public $onFlash;
-
     public function __construct(
         JobsRepository $jobsRepository,
         TemplatesRepository $templatesRepository,
@@ -55,10 +53,10 @@ class JobFormFactory extends Object
         try {
             $segmentList = $this->segmentAggregator->list();
             array_walk($segmentList, function ($segment) use (&$segments) {
-                $segments[$segment['provider']][$segment['code']] = $segment['name'];
+                $segments[$segment['provider']][$segment['provider'] . '::' . $segment['code']] = $segment['name'];
             });
         } catch (SegmentException $e) {
-            ($this->onFlash)('Unable to fetch list of segments, please check the application configuration.');
+            $form->addError('Unable to fetch list of segments, please check the application configuration.');
         }
 
         $form->addSelect('segment_code', 'Segment', $segments);
@@ -80,13 +78,9 @@ class JobFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
-        $segments = [];
-        $segmentList = $this->segmentAggregator->list();
-        array_walk($segmentList, function ($segment) use (&$segments) {
-            $segments[$segment['code']] = $segment['provider'];
-        });
+        $segment = explode('::', $values['segment_code']);
 
-        $job = $this->jobsRepository->add($values['segment_code'], $segments[$values['segment_code']]);
+        $job = $this->jobsRepository->add($segment[1], $segment[0]);
 
         $batch = $this->batchesRepository->add(
             $job->id,
