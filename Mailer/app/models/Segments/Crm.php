@@ -68,13 +68,8 @@ class Crm implements ISegment
             ]);
 
             return Json::decode($response->getBody(), Json::FORCE_ARRAY);
-        } catch (ClientException $clientException) {
-            $data = json_decode($clientException->getResponse()->getBody());
-            return ['status' => 'error', 'error' => $data->error, 'message' => $data->message];
-        } catch (ConnectException $connectException) {
-            return ['status' => 'error', 'error' => 'unavailable server', 'message' => 'Cannot connect to auth server'];
-        } catch (JsonException $jsonException) {
-            return ['status' => 'error', 'error' => 'wrong response', 'message' => $jsonException->getMessage()];
+        }  catch (ConnectException $connectException) {
+            throw new SegmentException("Could not connect to Segment:{$url} endpoint: {$connectException->getMessage()}");
         }
     }
 }

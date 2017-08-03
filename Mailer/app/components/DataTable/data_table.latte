@@ -44,7 +44,12 @@
 
 <script>
     $(document).ready(function() {
-        var dataTable = $('#{$tableId|noescape}').DataTable({
+        $.fn.dataTable.ext.errMode = 'none';
+        var dataTable = $('#{$tableId|noescape}').on('error.dt', function(e, settings, techNote, message) {
+            // @TODO use bootstrap notification - flash message
+            alert(settings.jqXHR.responseJSON.error);
+            console.log(settings.jqXHR.responseJSON.error);
+        }).DataTable({
             'columns': [
                 {foreach $colSettings as $colName => $colSetting}
                 {

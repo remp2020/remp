@@ -16,6 +16,7 @@ use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Segment\Aggregator;
+use Remp\MailerModule\Segment\SegmentException;
 
 final class JobPresenter extends BasePresenter
 {
@@ -89,12 +90,6 @@ final class JobPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $segments = [];
-        $segmentList = $this->segmentAggregator->list();
-        array_walk($segmentList, function ($segment) use (&$segments) {
-            $segments[$segment['code']] = $segment['provider'] . ':' . $segment['name'];
-        });
-
         $jobsCount = $this->jobsRepository
             ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, $request['templateId'])
             ->count('*');
@@ -109,11 +104,22 @@ final class JobPresenter extends BasePresenter
             'data' => []
         ];
 
+        $segments = [];
+        try {
+            $segmentList = $this->segmentAggregator->list();
+            array_walk($segmentList, function ($segment) use (&$segments) {
+                $segments[$segment['code']] = $segment['provider'] . ':' . $segment['name'];
+            });
+        } catch (SegmentException $e) {
+            $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
+        }
+
+
         foreach ($jobs as $job) {
             $result['data'][] = [
                 'RowId' => $job->id,
                 $job->created_at,
-                $segments[$job->segment_code],
+                (isset($segments[$job->segment_code]) ? $segments[$job->segment_code] : 'Missing segment'),
                 $job->status,
                 $job->emails_sent_count,
             ];
@@ -125,12 +131,17 @@ final class JobPresenter extends BasePresenter
     {
         $job = $this->jobsRepository->find($id);
 
-        $segmentList = $this->segmentAggregator->list();
-        array_walk($segmentList, function ($segment) use (&$job) {
-            if ($segment['code'] == $job->segment_code) {
-                $this->template->segment = $segment;
-            }
-        });
+        try {
+            $segmentList = $this->segmentAggregator->list();
+            array_walk($segmentList, function ($segment) use (&$job) {
+                if ($segment['code'] == $job->segment_code) {
+                    $this->template->segment = $segment['provider'] . ':' . $segment['name'];
+                }
+            });
+        } catch (SegmentException $e) {
+            $this->flashMessage('Unable to fetch list of segments, please check the application configuration.', 'error');
+            $this->template->segment = 'Missing segment';
+        }
 
         $this->template->job = $job;
         $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
@@ -194,9 +205,14 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentJobForm()
     {
+        $presenter = $this;
+
+        $this->jobFormFactory->onFlash = function ($message) use ($presenter) {
+            return $presenter->flashMessage($message);
+        };
+
         $form = $this->jobFormFactory->create();
 
-        $presenter = $this;
         $this->jobFormFactory->onSuccess = function ($job) use ($presenter) {
             $presenter->flashMessage('Job was created');
             $presenter->redirect('Show', $job->id);

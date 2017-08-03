@@ -2,10 +2,8 @@
 namespace Remp\MailerModule\Segment;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Nette\Utils\Json;
-use Nette\Utils\JsonException;
 
 class Remp implements ISegment
 {
@@ -32,7 +30,7 @@ class Remp implements ISegment
         $response = $this->request(static::ENDPOINT_LIST);
         $segments = [];
 
-        foreach ($response['segments'] as $segment) {
+        foreach ($response as $segment) {
             $segments[] = [
                 'name' => $segment['name'],
                 'provider' => static::PROVIDER_ALIAS,
@@ -47,7 +45,7 @@ class Remp implements ISegment
     public function users($segment)
     {
         $response = $this->request(sprintf(static::ENDPOINT_USERS, $segment['code']));
-        return $response['users'];
+        return $response;
     }
 
     private function request($url, $query = [])
@@ -62,13 +60,8 @@ class Remp implements ISegment
             ]);
 
             return Json::decode($response->getBody(), Json::FORCE_ARRAY);
-        } catch (ClientException $clientException) {
-            $data = json_decode($clientException->getResponse()->getBody());
-            return ['status' => 'error', 'error' => $data->error, 'message' => $data->message];
-        } catch (ConnectException $connectException) {
-            return ['status' => 'error', 'error' => 'unavailable server', 'message' => 'Cannot connect to auth server'];
-        } catch (JsonException $jsonException) {
-            return ['status' => 'error', 'error' => 'wrong response', 'message' => $jsonException->getMessage()];
+        }  catch (ConnectException $connectException) {
+            throw new SegmentException("Could not connect to Segment:{$url} endpoint: {$connectException->getMessage()}");
         }
     }
 }

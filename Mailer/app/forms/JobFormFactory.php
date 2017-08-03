@@ -9,6 +9,7 @@ use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Segment\Aggregator;
+use Remp\MailerModule\Segment\SegmentException;
 
 class JobFormFactory extends Object
 {
@@ -28,6 +29,8 @@ class JobFormFactory extends Object
     private $segmentAggregator;
 
     public $onSuccess;
+
+    public $onFlash;
 
     public function __construct(
         JobsRepository $jobsRepository,
@@ -49,10 +52,14 @@ class JobFormFactory extends Object
         $form->addProtection();
 
         $segments = [];
-        $segmentList = $this->segmentAggregator->list();
-        array_walk($segmentList, function ($segment) use (&$segments) {
-            $segments[$segment['provider']][$segment['code']] = $segment['name'];
-        });
+        try {
+            $segmentList = $this->segmentAggregator->list();
+            array_walk($segmentList, function ($segment) use (&$segments) {
+                $segments[$segment['provider']][$segment['code']] = $segment['name'];
+            });
+        } catch (SegmentException $e) {
+            ($this->onFlash)('Unable to fetch list of segments, please check the application configuration.');
+        }
 
         $form->addSelect('segment_code', 'Segment', $segments);
 
