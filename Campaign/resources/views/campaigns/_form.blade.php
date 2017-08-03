@@ -20,11 +20,6 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
 
 @endphp
 
-@push('head')
-<link href="/assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
-<script src="/assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
-@endpush
-
 <campaign-form></campaign-form>
 
 @push('scripts')

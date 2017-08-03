@@ -12,8 +12,8 @@ mix.options({
         "resources/assets/js/remplib.js",
         "resources/assets/js/banner.js"
     ], "js/app.js")
-    .js("resources/assets/js/banner.js", "js/banner.js")
-    .js("resources/assets/js/remplib.js", "js/remplib.js")
+    .copy("resources/assets/js/banner.js", publicPath + "js/banner.js")
+    .copy("resources/assets/js/remplib.js", publicPath + "js/remplib.js")
     .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
     .sass("resources/assets/sass/app.scss", "css/app.css")
     .sass("resources/assets/sass/banner.scss", "css/banner.css")

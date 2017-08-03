@@ -7,9 +7,9 @@ use App\Campaign;
 use App\CampaignSegment;
 use App\Contracts\JournalContract;
 use App\Contracts\SegmentAggregator;
-use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
 use App\Contracts\TrackerContract;
+use App\Contracts\TrackerException;
 use App\Http\Requests\CampaignRequest;
 use App\Jobs\CacheSegmentJob;
 use Illuminate\Http\Request;
@@ -159,7 +159,7 @@ class CampaignController extends Controller
         $shouldCache = $campaign->isDirty('active');
         $campaign->save();
 
-        foreach ($request->get('segments') as $r) {
+        foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
             $campaignSegment = CampaignSegment::findOrNew($r['id']);
             $campaignSegment->code = $r['code'];
@@ -262,10 +262,20 @@ class CampaignController extends Controller
         // following tracking is temporary and will be done from FE javascript directly to the Beam Tracker API.
         $userAgent = $r->headers->get("user-agent");
         $ip = $r->ip();
-        $tc->event($beamToken, "campaign", "display", $url, $ip, $userAgent, $userId, [
-            "campaign_id" => $campaign->id,
-            "banner_id" => $banner->id,
-        ]);
+
+        try {
+            $tc->event($beamToken, "campaign", "display", $url, $ip, $userAgent, $userId, [
+                "campaign_id" => $campaign->id,
+                "banner_id" => $banner->id,
+            ]);
+        } catch (TrackerException $e) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => ['unable to track event in tracker'],
+                ])
+                ->setStatusCode(400);
+        }
 
         return response()
             ->jsonp($r->get('callback'), [

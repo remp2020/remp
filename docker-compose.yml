@@ -20,6 +20,7 @@ services:
           - "beam.remp.app"
           - "tracker.beam.remp.app"
           - "segments.beam.remp.app"
+          - "grafana.beam.remp.app"
     depends_on:
       - "campaign"
       - "mailer"
@@ -61,8 +62,6 @@ services:
     image: "mysql:8.0"
     volumes:
       - "mysql-data-campaign:/var/lib/mysql"
-    ports:
-      - "3311:3306"
     command:
       - "--character-set-server=utf8mb4"
       - "--collation-server=utf8mb4_unicode_ci"
@@ -95,8 +94,6 @@ services:
     image: "mysql:8.0"
     volumes:
       - "mysql-data-mailer:/var/lib/mysql"
-    ports:
-      - "3312:3306"
     command:
       - "--character-set-server=utf8mb4"
       - "--collation-server=utf8mb4_unicode_ci"
@@ -125,8 +122,6 @@ services:
     image: "mysql:8.0"
     volumes:
       - "mysql-data-sso:/var/lib/mysql"
-    ports:
-      - "3314:3306"
     command:
       - "--character-set-server=utf8mb4"
       - "--collation-server=utf8mb4_unicode_ci"
@@ -155,8 +150,6 @@ services:
     image: "mysql:8.0"
     volumes:
       - "mysql-data-beam:/var/lib/mysql"
-    ports:
-      - "3313:3306"
     command:
       - "--character-set-server=utf8mb4"
       - "--collation-server=utf8mb4_unicode_ci"
@@ -165,6 +158,8 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "no"
       MYSQL_ROOT_PASSWORD: "secret"
       MYSQL_DATABASE: "remp_beam"
+    ports:
+      - "3313:3306"
     restart: "unless-stopped"
 
   kafka:
@@ -174,8 +169,7 @@ services:
       ADVERTISED_PORT: "9092"
       CREATE_TOPICS: "beam_events:1:1"
     ports:
-      - "9092"
-      - "2181"
+      - "9002:9092"
     volumes:
       - "kafka-data:/data"
 
@@ -183,9 +177,6 @@ services:
     image: "influxdb:1.2"
     volumes:
       - "influxdb-data:/var/lib/influxdb"
-    ports:
-      - "8083:8083"
-      - "8086:8086"
     environment:
       INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0 # unlimited due to user_id being a tag (for grouping by)
     restart: "unless-stopped"
@@ -199,20 +190,22 @@ services:
       - "kafka"
     restart: "unless-stopped"
 
+  grafana:
+    image: "grafana/grafana"
+    volumes:
+      - "grafana-data:/var/lib/grafana"
+    restart: "unless-stopped"
+
   beam_tracker:
     build: "./Beam/go/cmd/tracker"
     depends_on:
       - "kafka"
-    ports:
-      - "8081:8081"
     restart: "unless-stopped"
 
   beam_segments:
     build: "./Beam/go/cmd/segments"
     depends_on:
       - "influxdb"
-    ports:
-      - "8082:8082"
     restart: "unless-stopped"
 
 volumes:
@@ -229,6 +222,8 @@ volumes:
   mysql-data-sso:
     driver: "local"
   redis-data:
+    driver: "local"
+  grafana-data:
     driver: "local"
 
   composer-data:

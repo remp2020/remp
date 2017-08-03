@@ -31,10 +31,12 @@ class PropertyController extends Controller
         return $datatables->of($properties)
             ->addColumn('actions', function (Property $property) use ($account) {
                 return Json::encode([
+                    '_id' => $property->id,
                     'edit' => route('accounts.properties.edit', [$account, $property]),
                 ]);
             })
             ->rawColumns(['actions'])
+            ->setRowId('id')
             ->make(true);
     }
 

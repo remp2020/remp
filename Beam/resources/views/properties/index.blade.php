@@ -22,7 +22,7 @@
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'created_at' => ['header' => 'created at', 'render' => 'date']],
+            'colSettings' => ['name', 'uuid' => ['header' => 'token'], 'created_at' => ['header' => 'created at', 'render' => 'date']],
             'dataSource' => route('accounts.properties.json', $account),
             'rowActions' => [
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
