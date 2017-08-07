@@ -2,16 +2,11 @@
 
 var bannerId = 'b-{{ $banner->uuid }}';
 var scripts = [];
-if (typeof window.Vue === 'undefined') {
-    scripts.push('https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.js');
-}
 if (typeof window.remplib.banner === 'undefined') {
-    scripts.push('{{ asset('/assets/vendor/js/banner.js') }}');
+    scripts.push('{{ asset(mix('/js/banner.js', '/assets/showtime')) }}');
 }
 
-var styles = [
-    '{{ asset('assets/vendor/css/banner.css') }}'
-];
+var styles = [];
 
 var waiting = scripts.length + styles.length;
 var run = function() {
@@ -35,12 +30,9 @@ var run = function() {
     var b = document.getElementsByTagName('body')[0];
     b.appendChild(d);
 
-    remplib.banner.bindPreview(banner, {
+    remplib.banner.bindPreview('#' + bannerId, banner, {
         zIndex: 99, //TODO: remove when REMP template is fixed,
         position: 'fixed'
-    });
-    new Vue({
-        el: '#' + bannerId
     });
 
     // TODO: track explicit click and close
