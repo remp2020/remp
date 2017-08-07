@@ -14,9 +14,6 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            @component('campaigns._vue_form')
-            @endcomponent
-
             {!! Form::model($campaign, ['route' => 'campaigns.store', 'id' => 'campaign-form']) !!}
             @include('campaigns._form')
             {!! Form::close() !!}
