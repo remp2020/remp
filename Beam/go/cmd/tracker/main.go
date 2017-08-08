@@ -92,6 +92,7 @@ func main() {
 func newProducer(brokerList []string) (sarama.AsyncProducer, error) {
 
 	config := sarama.NewConfig()
+	config.ClientID = "beam-tracker"
 	config.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
 	config.Producer.Compression = sarama.CompressionSnappy   // Compress messages
 	config.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms

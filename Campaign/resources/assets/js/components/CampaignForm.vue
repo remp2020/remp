@@ -1,4 +1,4 @@
-<template id="campaign-form-template">
+<template>
     <div class="row">
         <div class="col-md-4">
             <h4>Settings</h4>
@@ -19,9 +19,9 @@
                             <label for="banner_id" class="fg-label">Banner</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model="bannerId" class="selectpicker" data-live-search="true" name="banner_id">
+                            <select v-model="bannerId" class="selectpicker" data-live-search="true" name="banner_id" id="banner_id">
                                 <option v-for="banner in banners" v-bind:value="banner.id">
-                                    @{{ banner.name }}
+                                    {{ banner.name }}
                                 </option>
                             </select>
                         </div>
@@ -62,7 +62,7 @@
                         <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker col-md-8" data-live-search="true">
                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
                                 <option v-for="(obj,code) in list" v-bind:value="obj">
-                                    @{{ obj.name }}
+                                    {{ obj.name }}
                                 </option>
                             </optgroup>
                         </select>
@@ -84,10 +84,10 @@
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <tbody>
-                                <tr v-for="(segment,i) in segments">
-                                    <td>@{{ segmentMap[segment.code] }}</td>
-                                    <td class="text-right"><span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect"><i class="zmdi zmdi-minus-square"></i> Delete</span></td>
-                                </tr>
+                            <tr v-for="(segment,i) in segments">
+                                <td>{{ segmentMap[segment.code] }}</td>
+                                <td class="text-right"><span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect"><i class="zmdi zmdi-minus-square"></i> Delete</span></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -95,5 +95,62 @@
             </div>
         </div>
 
-        </div>
+    </div>
 </template>
+
+<script type="text/javascript">
+    let props = [
+        "_name",
+        "_segments",
+        "_bannerId",
+        "_active",
+        "_banners",
+        "_availableSegments",
+        "_addedSegment",
+        "_removedSegments",
+        "_segmentMap",
+        "_eventTypes",
+    ];
+    export default {
+        mounted: function(){
+            let self = this;
+            props.forEach((prop) => {
+                this[prop.slice(1)] = this[prop];
+            });
+        },
+        props: props,
+        data: function() {
+            return {
+                "name": null,
+                "segments": [],
+                "bannerId": null,
+                "active": null,
+
+                "banners": null,
+                "availableSegments": null,
+                "addedSegment": null,
+                "removedSegments": [],
+                "segmentMap": null,
+                "eventTypes": null
+            }
+        },
+        methods: {
+            'selectSegment': function() {
+                if (typeof this.addedSegment === 'undefined') {
+                    return;
+                }
+                for (let i in this.segments) {
+                    if (this.segments[i].id === this.addedSegment.id) {
+                        return;
+                    }
+                }
+                this.segments.push(this.addedSegment);
+            },
+            'removeSegment': function(index) {
+                let toRemove = this.segments[index];
+                this.segments.splice(index, 1);
+                this.removedSegments.push(toRemove.id);
+            }
+        }
+    }
+</script>

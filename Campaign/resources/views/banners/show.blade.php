@@ -25,14 +25,12 @@
     var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
 
     banner.show = true;
+    banner.closeable = false;
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
 
-    remplib.banner.bindPreview(banner);
-    new Vue({
-        el: '#banner-preview'
-    });
+    remplib.banner.bindPreview('#banner-preview', banner);
 </script>
 
 @endpush
@@ -120,16 +118,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h2>Navigate</h2>
-            </div>
-            <div class="card-body card-padding">
             </div>
         </div>
     </div>

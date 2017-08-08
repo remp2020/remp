@@ -1,11 +1,21 @@
 {
   "private": true,
   "scripts": {
-    "dev": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch-poll": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "hot": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "dev": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=web NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=web NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch-poll": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=web NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "hot": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=web NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "production": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=web NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-dev": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-watch": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-watch-poll": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-hot": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-production": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "all-dev": "node_modules/npm-run-all/bin/npm-run-all/index.js dev lib-dev",
+    "all-watch": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch",
+    "all-watch-poll": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch-poll lib-watch-poll",
+    "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch",
+    "all-production": "node_modules/npm-run-all/bin/npm-run-all/index.js production lib-production"
   },
   "dependencies": {
     "animate.css": "^3.5.2",
@@ -29,6 +39,7 @@
     "cross-env": "^5.0.1",
     "laravel-mix": "^1.4.2",
     "node-sass": "^4.5.3",
+    "npm-run-all": "^4.0.2",
     "optipng-bin": "^4.0.0",
     "vue": "^2.4.2"
   }

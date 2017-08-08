@@ -169,7 +169,7 @@ services:
       ADVERTISED_PORT: "9092"
       CREATE_TOPICS: "beam_events:1:1"
     ports:
-      - "9002:9092"
+      - "9092:9092"
     volumes:
       - "kafka-data:/data"
 
