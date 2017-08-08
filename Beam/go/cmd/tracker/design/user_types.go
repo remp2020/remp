@@ -4,7 +4,7 @@ import . "github.com/goadesign/goa/design"
 import . "github.com/goadesign/goa/design/apidsl"
 
 var User = Type("User", func() {
-	Attribute("url", String, "URL", func() {
+	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
 	})
 	Attribute("user_agent", String, "User agent of client")
@@ -26,7 +26,7 @@ var Pageview = Type("Pageview", func() {
 
 	Attribute("system", System)
 	Attribute("user", User)
-	Attribute("article", PageviewArticle)
+	Attribute("article", Article)
 
 	Required("system", "user", "article")
 })
@@ -36,15 +36,16 @@ var Commerce = Type("Commerce", func() {
 
 	Attribute("system", System)
 	Attribute("user", User)
-	Attribute("type", String, func() {
+	Attribute("article", Article)
+	Attribute("step", String, func() {
 		Enum("checkout", "payment", "purchase", "refund")
 	})
-	Attribute("checkout", CommerceCheckout)
+	Attribute("checkout", CommerceCheckout, "Used when user enters the checkout process (reviews the cart)")
 	Attribute("payment", CommercePayment, "Used when user confirmed checkout and was redirected to the payment processor")
 	Attribute("purchase", CommercePayment, "Used when payment processor confirms the payment")
 	Attribute("refund", CommercePayment, "Used when refund is issued. Revenue should contain refunded amount of money.")
 
-	Required("system", "user", "type")
+	Required("system", "user", "step")
 })
 
 var Event = Type("Event", func() {
@@ -61,8 +62,8 @@ var Event = Type("Event", func() {
 	Required("system", "category", "action")
 })
 
-var PageviewArticle = Type("PageviewArticle", func() {
-	Description("PageviewArticle is the payload for tracking article-related data during pageview")
+var Article = Type("Article", func() {
+	Description("Article is the payload for tracking article-related data")
 
 	Attribute("id", String, "ID of article")
 	Attribute("category", String, "Page category (homepage, world news...")

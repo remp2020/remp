@@ -38,11 +38,21 @@ func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.
 // Commerce runs the commerce action.
 func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 	tags := map[string]string{
-		"step": ctx.Payload.Type,
+		"step": ctx.Payload.Step,
 	}
 	values := map[string]interface{}{}
 
-	switch ctx.Payload.Type {
+	if ctx.Payload.Article != nil {
+		at, av := articleValues(ctx.Payload.Article)
+		for key, tag := range at {
+			tags[key] = tag
+		}
+		for key, val := range av {
+			values[key] = val
+		}
+	}
+
+	switch ctx.Payload.Step {
 	case "checkout":
 		values["funnel_id"] = ctx.Payload.Checkout.FunnelID
 	case "payment", "purchase", "refund":
@@ -51,7 +61,7 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 		values["transaction_id"] = ctx.Payload.Payment.TransactionID
 		tags["currency"] = ctx.Payload.Payment.Revenue.Currency
 	default:
-		return fmt.Errorf("unhandled commerce type: %s", ctx.Payload.Type)
+		return fmt.Errorf("unhandled commerce step: %s", ctx.Payload.Step)
 	}
 
 	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "commerce", tags, values); err != nil {
@@ -90,23 +100,42 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 // Pageview runs the pageview action.
 func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	tags := map[string]string{}
-	values := map[string]interface{}{
-		"article_id": ctx.Payload.Article.ID,
+	values := map[string]interface{}{}
+
+	if ctx.Payload.Article != nil {
+		at, av := articleValues(ctx.Payload.Article)
+		for key, tag := range at {
+			tags[key] = tag
+		}
+		for key, val := range av {
+			values[key] = val
+		}
 	}
 
-	if ctx.Payload.Article.AuthorID != nil {
-		values["author_id"] = *ctx.Payload.Article.AuthorID
-	}
-	if ctx.Payload.Article.CampaignID != nil {
-		values["campaign_id"] = *ctx.Payload.Article.CampaignID
-	}
-	if ctx.Payload.Article.Category != nil {
-		values["category"] = *ctx.Payload.Article.Category
-	}
 	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "pageviews", tags, values); err != nil {
 		return err
 	}
 	return ctx.Accepted()
+}
+
+func articleValues(article *app.Article) (map[string]string, map[string]interface{}) {
+	tags := map[string]string{
+		"article_id": article.ID,
+	}
+	values := map[string]interface{}{}
+	if article.AuthorID != nil {
+		tags["author_id"] = *article.AuthorID
+	}
+	if article.CampaignID != nil {
+		tags["campaign_id"] = *article.CampaignID
+	}
+	if article.Category != nil {
+		tags["category"] = *article.Category
+	}
+	if article.Tags != nil {
+		values["tags"] = strings.Join(article.Tags, ",")
+	}
+	return tags, values
 }
 
 // pushEvent pushes new event to the InfluxDB.
