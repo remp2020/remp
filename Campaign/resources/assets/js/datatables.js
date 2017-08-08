@@ -1,4 +1,4 @@
-$.fn.dataTables = {
+window.$.fn.dataTables = {
     pagination: function (settings) {
         var start = settings._iDisplayStart;
         var length = settings._iDisplayLength;

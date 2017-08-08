@@ -2,6 +2,7 @@
 /public/storage
 /public/hot
 /public/assets/vendor
+/public/assets/showtime
 /storage/*.key
 /vendor
 /.idea
@@ -12,3 +13,5 @@ Homestead.yaml
 _ide_helper.php
 _ide_helper_models.php
 adminer*
+yarn-error.log
+npm-error.log

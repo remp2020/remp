@@ -1,5 +1,7 @@
-// Vue.component('banner-form', require('./components/BannerForm.vue'));
-//
-// const app = new Vue({
-//     el: '#app'
-// });
+import "./functions.js";
+import "./actions.js";
+import "./datatables.js";
+import "./remplib.js";
+import "./banner.js";
+import "./forms/bannerForm.js";
+import "./forms/campaignForm.js";

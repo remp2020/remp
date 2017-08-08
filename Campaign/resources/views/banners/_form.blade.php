@@ -6,7 +6,9 @@
 
 @endphp
 
-<banner-form></banner-form>
+<div id="banner-form">
+    <banner-form></banner-form>
+</div>
 
 @push('scripts')
 
@@ -21,8 +23,7 @@
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
 
-    remplib.banner.bindPreview(banner);
-    remplib.banner.bindForm(banner);
+    remplib.bannerForm.bind("#banner-form", banner);
 
 </script>
 
