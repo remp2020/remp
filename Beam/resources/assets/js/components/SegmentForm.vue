@@ -146,6 +146,8 @@
 </template>
 
 <script>
+    import vSelect from "./vSelect.vue";
+
     const props = [
         "_name",
         "_code",
@@ -157,6 +159,7 @@
 
     export default {
         name: 'segment-form',
+        components: { vSelect },
         props: props,
         mounted: function(){
             let self = this;
@@ -179,8 +182,8 @@
                     id: null,
                     count: null,
                     timespan: null,
-                    event: null,
-                    category: null,
+                    event_name: null,
+                    event_category: null,
                     fields: [{
                         key: null,
                         value: null
