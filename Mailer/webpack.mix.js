@@ -1,7 +1,13 @@
 let mix = require("laravel-mix");
 let publicPath = "www/assets/vendor/";
 
-mix.options({
+mix
+    .webpackConfig({
+        watchOptions: {
+            ignored: /node_modules/,
+        }
+    })
+    .options({
         publicPath: publicPath,
         resourceRoot: "/assets/vendor/"
     })
