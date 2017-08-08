@@ -1,5 +1,4 @@
-Vue.component('example', require('./components/Example.vue'));
-
-const app = new Vue({
-    el: '#app'
-});
+import "./functions.js"
+import "./actions.js"
+import "./datatables.js"
+import "./forms/segmentForm.js"

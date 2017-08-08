@@ -11,12 +11,7 @@ mix
         publicPath: publicPath,
         resourceRoot: "/assets/vendor/"
     })
-    .js([
-        "resources/assets/js/functions.js",
-        "resources/assets/js/actions.js",
-        "resources/assets/js/datatables.js",
-        "resources/assets/js/charts.js"
-    ], "js/app.js")
+    .js("resources/assets/js/app.js", "js/app.js")
     .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
     .sass("resources/assets/sass/app.scss", "css/app.css")
     .extract([
@@ -25,7 +20,6 @@ mix
         "autosize",
         "bootstrap",
         "bootstrap-select",
-        "ckeditor",
         "datatables.net",
         "datatables.net-rowgroup",
         "google-material-color",
