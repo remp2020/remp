@@ -1,6 +1,6 @@
 <?php
 
-namespace Remp\MailerModile\Api\v1\Handlers\Users;
+namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
 use Remp\MailerModule\Repository\LogEventsRepository;
 use Nette\Utils\DateTime;
@@ -13,7 +13,7 @@ use Tomaj\NetteApi\Response\JsonApiResponse;
 class MailgunHandler extends BaseHandler
 {
     private $apiKey;
-    
+
     /** @var LogsRepository */
     private $logsRepository;
 
