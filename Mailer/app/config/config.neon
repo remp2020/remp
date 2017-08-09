@@ -18,7 +18,8 @@ extensions:
 application:
 	errorPresenter: Mailer:Error
 	mapping:
-		*: Remp\*Module\Presenters\*Presenter
+	    Api: Tomaj\NetteApi\Presenters\*Presenter
+	    *: Remp\*Module\Presenters\*Presenter
 
 session:
 	expiration: 14 days
@@ -78,12 +79,24 @@ services:
 
 	- Remp\MailerModule\Config\Config
 
+
 	- Remp\MailerModule\Job\BatchEmailGenerator
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
+
+	# API
+	- Tomaj\NetteApi\Link\ApiLink
+	- Tomaj\NetteApi\Misc\IpDetector
+	apiDecider:
+	    class: Tomaj\NetteApi\ApiDecider
+	    setup:
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \App\MyApi\v1\Handlers\Users\SubscribeHandler())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \App\MyApi\v1\Handlers\Users\UnSubscribeHandler())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \App\MyApi\v1\Handlers\Mailers\MailgunHandler())
 
 	# Repositories
 	- Remp\MailerModule\Repository\ConfigsRepository
 	- Remp\MailerModule\Repository\UsersRepository
+	- Remp\MailerModule\Repository\UserSubscriptionsRepository
 	- Remp\MailerModule\Repository\LogsRepository('2000-01-01 00:00:00')
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
