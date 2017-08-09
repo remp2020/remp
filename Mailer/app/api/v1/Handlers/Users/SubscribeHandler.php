@@ -1,6 +1,6 @@
 <?php
 
-namespace Remp\MailerModile\Api\v1\Handlers\Users;
+namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
@@ -9,7 +9,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class UnSubscribeHandler extends BaseHandler
+class SubscribeHandler extends BaseHandler
 {
     /** @var UserSubscriptionsRepository */
     private $userSubscriptionsRepository;
