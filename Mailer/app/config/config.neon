@@ -91,7 +91,7 @@ services:
 	    setup:
 	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 
 	# Repositories
 	- Remp\MailerModule\Repository\ConfigsRepository
