@@ -60,7 +60,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         @php
-                            $libUrl = asset("/assets/js/remplib.js");
+                            $libUrl = asset("/assets/vendor/js/remplib.js");
                             $targetUrl = url('/');
                             $snippet = <<<HTML
 <script type="text/javascript">
