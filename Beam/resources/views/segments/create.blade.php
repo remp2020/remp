@@ -12,7 +12,7 @@
             <h2>Add new segment</h2>
         </div>
         <div class="card-body card-padding">
-            {!! Form::model($segment, ['route' => 'segments.store', 'id' => 'segment-form']) !!}
+            {!! Form::model($segment, ['route' => 'segments.store']) !!}
             @include('segments._form')
             {!! Form::close() !!}
         </div>

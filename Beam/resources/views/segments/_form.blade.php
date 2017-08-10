@@ -1,4 +1,4 @@
-<div id="segments-form">
+<div id="segment-form">
     <segment-form></segment-form>
 </div>
 

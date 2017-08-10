@@ -64,14 +64,12 @@ class SegmentController extends Controller
         $segment->save();
 
         foreach ($request->get('rules') as $r) {
-            list($category, $event) = explode('|', $r['event']);
-
             /** @var SegmentRule $rule */
             $rule = SegmentRule::findOrNew($r['id']);
             $rule->timespan = $r['timespan'];
             $rule->count = $r['count'];
-            $rule->event_category = $category;
-            $rule->event_name = $event;
+            $rule->event_category = $r['event_category'];
+            $rule->event_name = $r['event_name'];
             $rule->segment_id = $segment->id;
             $rule->fields = $r['fields'];
             $rule->save();
