@@ -72,8 +72,7 @@
         }
         if (!win.remplib) {
             var fn, i, funcs = "init identify".split(" "),
-                script = doc.createElement("script"),
-                d = "https:" === doc.location.protocol ? "https:" : "http:";
+                script = doc.createElement("script");
             win.remplib = {_: []};
 
             for (i = 0; i < funcs.length; i++) {
@@ -83,7 +82,7 @@
 
             script.type = "text/javascript";
             script.async = true;
-            script.src = d + "{$libUrl}";
+            script.src = "{$libUrl}";
             doc.getElementsByTagName("head")[0].appendChild(script);
         }
     })(window, document);

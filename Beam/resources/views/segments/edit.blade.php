@@ -12,7 +12,7 @@
             <h2>Edit segment / <small>{{ $segment->name }}</small></h2>
         </div>
         <div class="card-body card-padding">
-            {!! Form::model($segment, ['route' => ['segments.update', $segment], 'method' => 'PATCH', 'id' => 'segment-form']) !!}
+            {!! Form::model($segment, ['route' => ['segments.update', $segment], 'method' => 'PATCH']) !!}
             @include('segments._form')
             {!! Form::close() !!}
         </div>
