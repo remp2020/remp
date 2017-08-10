@@ -14,4 +14,9 @@ class UserSubscriptionsRepository extends Repository
         $params['updated_at'] = new \DateTime();
         return parent::update($row, $data);
     }
+
+    public function findByEmailList($email, $listId)
+    {
+        return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $listId])->fetch();
+    }
 }
