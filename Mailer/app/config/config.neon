@@ -91,6 +91,7 @@ services:
 	- Remp\MailerModule\Repository\LogEventsRepository
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
+	- Remp\MailerModule\Repository\ListVariantsRepository
 	- Remp\MailerModule\Repository\TemplatesRepository
 	- Remp\MailerModule\Repository\JobsRepository
 	- Remp\MailerModule\Repository\SegmentsRepository
