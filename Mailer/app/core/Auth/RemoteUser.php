@@ -5,7 +5,6 @@ namespace Remp\MailerModule\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\ServerException;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 

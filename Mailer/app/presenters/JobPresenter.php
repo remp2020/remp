@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Multiplier;
 use Nette\Utils\Json;
+use Nette\Utils\Strings;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ITemplateStatsFactory;
 use Remp\MailerModule\Forms\JobFormFactory;
@@ -14,6 +15,8 @@ use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Remp\MailerModule\Segment\Aggregator;
+use Remp\MailerModule\Segment\SegmentException;
 
 final class JobPresenter extends BasePresenter
 {
@@ -41,6 +44,8 @@ final class JobPresenter extends BasePresenter
     /** @var NewTemplateFormFactory */
     private $newTemplateFormFactory;
 
+    /** @var  Aggregator */
+    private $segmentAggregator;
 
     public function __construct(
         JobsRepository $jobsRepository,
@@ -50,7 +55,8 @@ final class JobPresenter extends BasePresenter
         LogsRepository $logsRepository,
         JobFormFactory $jobFormFactory,
         NewBatchFormFactory $newBatchFormFactory,
-        NewTemplateFormFactory $newTemplateFormFactory
+        NewTemplateFormFactory $newTemplateFormFactory,
+        Aggregator $segmentAggregator
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -61,6 +67,7 @@ final class JobPresenter extends BasePresenter
         $this->jobFormFactory = $jobFormFactory;
         $this->newBatchFormFactory = $newBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
+        $this->segmentAggregator = $segmentAggregator;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -97,11 +104,22 @@ final class JobPresenter extends BasePresenter
             'data' => []
         ];
 
+        $segments = [];
+        try {
+            $segmentList = $this->segmentAggregator->list();
+            array_walk($segmentList, function ($segment) use (&$segments) {
+                $segments[$segment['code']] = $segment['provider'] . ':' . $segment['name'];
+            });
+        } catch (SegmentException $e) {
+            $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
+        }
+
+
         foreach ($jobs as $job) {
             $result['data'][] = [
                 'RowId' => $job->id,
                 $job->created_at,
-                $job->segment->name,
+                (isset($segments[$job->segment_code]) ? $segments[$job->segment_code] : 'Missing segment'),
                 $job->status,
                 $job->emails_sent_count,
             ];
@@ -113,12 +131,19 @@ final class JobPresenter extends BasePresenter
     {
         $job = $this->jobsRepository->find($id);
 
+        try {
+            $segmentList = $this->segmentAggregator->list();
+            array_walk($segmentList, function ($segment) use (&$job) {
+                if ($segment['code'] == $job->segment_code) {
+                    $this->template->segment = $segment;
+                }
+            });
+        } catch (SegmentException $e) {
+            $this->flashMessage('Unable to fetch list of segments, please check the application configuration.', 'danger');
+        }
+
         $this->template->job = $job;
         $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
-    }
-
-    public function renderEdit($id)
-    {
     }
 
     public function handleRemoveTemplate($id)

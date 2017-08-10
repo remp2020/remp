@@ -7,8 +7,9 @@ use Nette\Object;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
-use Remp\MailerModule\Repository\SegmentsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Remp\MailerModule\Segment\Aggregator;
+use Remp\MailerModule\Segment\SegmentException;
 
 class JobFormFactory extends Object
 {
@@ -18,29 +19,29 @@ class JobFormFactory extends Object
     /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var SegmentsRepository */
-    private $segmentRepository;
-
     /** @var BatchesRepository */
     private $batchesRepository;
 
     /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
 
+    /** @var Aggregator */
+    private $segmentAggregator;
+
     public $onSuccess;
 
     public function __construct(
         JobsRepository $jobsRepository,
         TemplatesRepository $templatesRepository,
-        SegmentsRepository $segmentRepository,
         BatchesRepository $batchesRepository,
-        BatchTemplatesRepository $batchTemplatesRepository
+        BatchTemplatesRepository $batchTemplatesRepository,
+        Aggregator $segmentAggregator
     ) {
         $this->jobsRepository = $jobsRepository;
         $this->templatesRepository = $templatesRepository;
-        $this->segmentRepository = $segmentRepository;
         $this->batchesRepository = $batchesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
+        $this->segmentAggregator = $segmentAggregator;
     }
 
     public function create()
@@ -48,7 +49,17 @@ class JobFormFactory extends Object
         $form = new Form;
         $form->addProtection();
 
-        $form->addSelect('segment_id', 'Segment', $this->segmentRepository->all()->fetchPairs('id', 'name'));
+        $segments = [];
+        try {
+            $segmentList = $this->segmentAggregator->list();
+            array_walk($segmentList, function ($segment) use (&$segments) {
+                $segments[$segment['provider']][$segment['provider'] . '::' . $segment['code']] = $segment['name'];
+            });
+        } catch (SegmentException $e) {
+            $form->addError('Unable to fetch list of segments, please check the application configuration.');
+        }
+
+        $form->addSelect('segment_code', 'Segment', $segments);
 
         $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'));
 
@@ -67,7 +78,9 @@ class JobFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
-        $job = $this->jobsRepository->add($values['segment_id']);
+        $segment = explode('::', $values['segment_code']);
+
+        $job = $this->jobsRepository->add($segment[1], $segment[0]);
 
         $batch = $this->batchesRepository->add(
             $job->id,
