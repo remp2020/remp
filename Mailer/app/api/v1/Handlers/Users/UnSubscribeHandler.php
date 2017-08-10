@@ -34,14 +34,20 @@ class UnSubscribeHandler extends BaseHandler
         } catch (JsonException $e) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Wrong format.']);
         }
-        $data['subscribed'] = 0;
 
-        $userSubscription = $this->userSubscriptionsRepository->findBy('user_email', $data['email']);
-        if ($userSubscription === false) {
-            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Email not found.']);
+        if (!isset($data['email']) || !isset($data['list_id'])) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing parameters.']);
         }
 
-        $this->userSubscriptionsRepository->update($userSubscription, $data);
+        $userSubscription = $this->userSubscriptionsRepository->findByEmailList($data['email'], $data['list_id']);
+        if ($userSubscription === false) {
+            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Data not found.']);
+        }
+
+        $this->userSubscriptionsRepository->update($userSubscription, [
+            'subscribed' => 0,
+            'mail_type_variant_id' => null,
+        ]);
 
         return new JsonApiResponse(200, ['status' => 'ok']);
     }

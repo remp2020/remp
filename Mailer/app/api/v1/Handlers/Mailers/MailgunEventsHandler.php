@@ -10,7 +10,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class MailgunHandler extends BaseHandler
+class MailgunEventsHandler extends BaseHandler
 {
     private $apiKey;
 

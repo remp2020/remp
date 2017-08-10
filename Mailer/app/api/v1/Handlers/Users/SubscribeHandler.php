@@ -4,6 +4,8 @@ namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\ListVariantsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
@@ -14,10 +16,22 @@ class SubscribeHandler extends BaseHandler
     /** @var UserSubscriptionsRepository */
     private $userSubscriptionsRepository;
 
-    public function __construct(UserSubscriptionsRepository $userSubscriptionsRepository)
-    {
+    /** @var ListsRepository */
+    private $listsRepository;
+
+    /** @var ListVariantsRepository */
+    private $listVariantsRepository;
+
+    public function __construct(
+        UserSubscriptionsRepository $userSubscriptionsRepository,
+        ListsRepository $listsRepository,
+        ListVariantsRepository $listVariantsRepository
+    ) {
         parent::__construct();
+
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
+        $this->listsRepository = $listsRepository;
+        $this->listVariantsRepository = $listVariantsRepository;
     }
 
     public function params()
@@ -34,14 +48,34 @@ class SubscribeHandler extends BaseHandler
         } catch (JsonException $e) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Wrong format.']);
         }
-        $data['subscribed'] = 1;
 
-        $userSubscription = $this->userSubscriptionsRepository->findBy('user_email', $data['email']);
-        if ($userSubscription === false) {
-            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Email not found.']);
+        if (!isset($data['email']) || !isset($data['list_id'])) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing parameters.']);
         }
 
-        $this->userSubscriptionsRepository->update($userSubscription, $data);
+        if (isset($data['variant_id'])) {
+            $variant = $this->listVariantsRepository->find($data['variant_id']);
+            if ($variant === false || $variant->mail_type_id != $data['list_id']) {
+                return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Wrong parameter.']);
+            }
+            $variantId = $variant->id;
+        } else {
+            $list = $this->listsRepository->find($data['list_id']);
+            if ($list === false) {
+                return new JsonApiResponse(404, ['status' => 'error', 'message' => 'List not found.']);
+            }
+            $variantId = $list->default_variant_id;
+        }
+
+        $userSubscription = $this->userSubscriptionsRepository->findByEmailList($data['email'], $data['list_id']);
+        if ($userSubscription === false) {
+            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Data not found.']);
+        }
+
+        $this->userSubscriptionsRepository->update($userSubscription, [
+            'subscribed' => 1,
+            'mail_type_variant_id' => $variantId,
+        ]);
 
         return new JsonApiResponse(200, ['status' => 'ok']);
     }
