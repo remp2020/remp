@@ -80,7 +80,7 @@
                 dimensionOptions[dimensions],
                 customBoxStyles
             ]">
-                <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="show = false" v-bind:style="closeStyles">&#x274C;</a>
+                <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="show = false" v-bind:style="closeStyles">&#x1f5d9;</a>
                 <p v-html="text" class="preview-text" v-bind:style="[
             _textAlign,
             textStyles
