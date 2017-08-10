@@ -14,7 +14,8 @@ extensions:
 application:
 	errorPresenter: Mailer:Error
 	mapping:
-		*: Remp\*Module\Presenters\*Presenter
+	    Api: Tomaj\NetteApi\Presenters\*Presenter
+	    *: Remp\*Module\Presenters\*Presenter
 
 session:
 	expiration: 14 days
@@ -72,10 +73,22 @@ services:
 
 	- Remp\MailerModule\Config\Config
 
+	# API
+	- Tomaj\NetteApi\Link\ApiLink
+	- Tomaj\NetteApi\Misc\IpDetector
+	apiDecider:
+	    class: Tomaj\NetteApi\ApiDecider
+	    setup:
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+
 	# Repositories
 	- Remp\MailerModule\Repository\ConfigsRepository
 	- Remp\MailerModule\Repository\UsersRepository
+	- Remp\MailerModule\Repository\UserSubscriptionsRepository
 	- Remp\MailerModule\Repository\LogsRepository('2000-01-01 00:00:00')
+	- Remp\MailerModule\Repository\LogEventsRepository
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
 	- Remp\MailerModule\Repository\TemplatesRepository

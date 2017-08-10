@@ -49,6 +49,11 @@ class LogsRepository extends Repository
         return $this->getTable()->where('mail_job_id', $jobId)->order('created_at DESC');
     }
 
+    public function findBySenderId($sender_id)
+    {
+        return $this->getTable()->where('mail_sender_id', $sender_id)->limit(1)->fetch();
+    }
+
     public function getStatsRate($mailTemplates, $field, $startTime = null, $endTime = null)
     {
         $ids = [];

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "162f4bb69fd1e99505e68b532fd9a1ed",
+    "content-hash": "a5741add510ec7da14d925c28b19276e",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -547,6 +547,69 @@
                 "twig"
             ],
             "time": "2017-07-14T06:41:29+00:00"
+        },
+        {
+            "name": "league/fractal",
+            "version": "0.14.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/fractal.git",
+                "reference": "56ad8933fbb40328ca3321c84143b2c16186eebf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/fractal/zipball/56ad8933fbb40328ca3321c84143b2c16186eebf",
+                "reference": "56ad8933fbb40328ca3321c84143b2c16186eebf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "illuminate/contracts": "~5.0",
+                "mockery/mockery": "~0.9",
+                "pagerfanta/pagerfanta": "~1.0.0",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~1.5",
+                "zendframework/zend-paginator": "~2.3"
+            },
+            "suggest": {
+                "illuminate/pagination": "The Illuminate Pagination component.",
+                "pagerfanta/pagerfanta": "Pagerfanta Paginator",
+                "zendframework/zend-paginator": "Zend Framework Paginator"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.13-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Fractal\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Phil Sturgeon",
+                    "email": "me@philsturgeon.uk",
+                    "homepage": "http://philsturgeon.uk/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Handle the output of complex data structures ready for API output.",
+            "homepage": "http://fractal.thephpleague.com/",
+            "keywords": [
+                "api",
+                "json",
+                "league",
+                "rest"
+            ],
+            "time": "2016-07-21T09:56:14+00:00"
         },
         {
             "name": "mailgun/mailgun-php",
@@ -2910,6 +2973,102 @@
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
             "time": "2017-06-15T12:58:50+00:00"
+        },
+        {
+            "name": "tomaj/nette-api",
+            "version": "1.11.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tomaj/nette-api.git",
+                "reference": "9af1fbe51bc901916237821865cce9dc226ea7a3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tomaj/nette-api/zipball/9af1fbe51bc901916237821865cce9dc226ea7a3",
+                "reference": "9af1fbe51bc901916237821865cce9dc226ea7a3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "league/fractal": "^0.14.0",
+                "nette/application": "^2.3.12",
+                "nette/http": "^2.0",
+                "php": ">= 5.6.0",
+                "tomaj/nette-bootstrap-form": "^1.1",
+                "tracy/tracy": "^2.0"
+            },
+            "require-dev": {
+                "nette/di": "^2.0",
+                "phpunit/phpunit": "^5.3",
+                "squizlabs/php_codesniffer": "^2.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Tomaj\\NetteApi\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tomas Majer",
+                    "email": "tomasmajer@gmail.com",
+                    "homepage": "http://www.tomaj.sk/"
+                }
+            ],
+            "description": "Nette api",
+            "keywords": [
+                "api",
+                "nette"
+            ],
+            "time": "2017-05-12T06:35:39+00:00"
+        },
+        {
+            "name": "tomaj/nette-bootstrap-form",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tomaj/nette-bootstrap-form.git",
+                "reference": "3d9c337757fa1a8ff978cca9b1a7017ea2153df9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tomaj/nette-bootstrap-form/zipball/3d9c337757fa1a8ff978cca9b1a7017ea2153df9",
+                "reference": "3d9c337757fa1a8ff978cca9b1a7017ea2153df9",
+                "shasum": ""
+            },
+            "require": {
+                "nette/forms": "~2.3",
+                "php": ">= 5.3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Tomas Majer",
+                    "email": "tomasmajer@gmail.com",
+                    "homepage": "http://www.tomaj.sk/"
+                }
+            ],
+            "description": "Nette bootstrap form renderer",
+            "keywords": [
+                "bootstrap",
+                "form",
+                "nette",
+                "renderer"
+            ],
+            "time": "2016-02-07T16:39:43+00:00"
         },
         {
             "name": "tomaj/nette-errbit",
