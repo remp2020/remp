@@ -13,18 +13,6 @@ $.fn.dataTables = {
         if (start + length >= count) {
             $('.ah-next button').attr('disabled', 'disabled');
         }
-
-        $('.ah-page .dropdown-menu').empty();
-        for (page = 0; page < count / length; page++) {
-            $('.ah-page .dropdown-menu').append('<li data-value="' + page + '"><a class="dropdown-item dropdown-item-button">Page ' + (page+1) + '</a></li>');
-            if (start == page * length) {
-                $('.ah-page button').html('Page ' + (page+1));
-                $('.ah-page li:last').addClass('active')
-            }
-        }
-        if (page <= 1) {
-            $('.ah-page button').attr('disabled', 'disabled');
-        }
     },
 
     navigation: function (dataTable) {
@@ -48,16 +36,6 @@ $.fn.dataTables = {
 
         $('.ah-next').on('click', function () {
             dataTable.page('next').draw('page');
-        });
-
-        $('.ah-page').on('click', 'li', function () {
-            var value = $(this).data('value');
-
-            $('.ah-page li').removeClass('active');
-            $(this).addClass('active');
-            $('.ah-page button').html($(this).find('a').text());
-
-            dataTable.page(value).draw('page');
         });
     },
 
