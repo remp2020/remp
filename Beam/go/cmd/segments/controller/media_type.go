@@ -8,14 +8,20 @@ import (
 // Segment represents segment information stored in storage.
 type Segment model.Segment
 
-// SegmentCollection is the collection of Segment.
+// SegmentCollection is the collection of Segments.
 type SegmentCollection model.SegmentCollection
 
 // User represent user information stored in events.
 type User model.User
 
-// UserCollection is the collection of User.
+// UserCollection is the collection of Users.
 type UserCollection model.UserCollection
+
+// Event represent tracked generic events data.
+type Event model.Event
+
+// EventCollection is the collection of Events.
+type EventCollection model.EventCollection
 
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() *app.Segment {
@@ -50,6 +56,30 @@ func (uc UserCollection) ToMediaType() app.UserCollection {
 	mt := app.UserCollection{}
 	for _, u := range uc {
 		mt = append(mt, (*User)(u).ToMediaType())
+	}
+	return mt
+}
+
+// ToMediaType converts internal Event representation to application one.
+func (e *Event) ToMediaType() *app.Event {
+	return &app.Event{
+		Category:  e.Category,
+		Action:    e.Action,
+		Time:      e.Time,
+		Host:      e.Host,
+		IP:        e.IP,
+		Token:     e.Token,
+		UserID:    e.UserID,
+		URL:       e.URL,
+		UserAgent: e.UserAgent,
+	}
+}
+
+// ToMediaType converts internal EventCollection representation to application one.
+func (ec EventCollection) ToMediaType() app.EventCollection {
+	mt := app.EventCollection{}
+	for _, e := range ec {
+		mt = append(mt, (*Event)(e).ToMediaType())
 	}
 	return mt
 }
