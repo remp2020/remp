@@ -179,6 +179,8 @@ services:
       - "influxdb-data:/var/lib/influxdb"
     environment:
       INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0 # unlimited due to user_id being a tag (for grouping by)
+    ports:
+      - "8098:8086"
     restart: "unless-stopped"
 
   telegraf:
@@ -200,12 +202,16 @@ services:
     build: "./Beam/go/cmd/tracker"
     depends_on:
       - "kafka"
+    ports:
+      - "8091:8081"
     restart: "unless-stopped"
 
   beam_segments:
     build: "./Beam/go/cmd/segments"
     depends_on:
       - "influxdb"
+    ports:
+      - "8092:8082"
     restart: "unless-stopped"
 
 volumes:

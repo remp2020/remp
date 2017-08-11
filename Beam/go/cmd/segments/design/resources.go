@@ -82,11 +82,11 @@ var _ = Resource("events", func() {
 			Param("user_id", String, "Identification of user")
 			Param("action", String, "Event action")
 			Param("category", String, "Event category")
-			Param("time_after", DateTime, "Include all events that happened after specified time")
-			Param("time_before", DateTime, "Include all events that happened before specified time")
+			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
+			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
 		})
 		Response(OK, func() {
-			Media(EventCount)
+			Media(Count)
 		})
 	})
 	Action("list", func() {
@@ -96,11 +96,77 @@ var _ = Resource("events", func() {
 			Param("user_id", String, "Identification of user")
 			Param("action", String, "Event action")
 			Param("category", String, "Event category")
-			Param("time_after", DateTime, "Include all events that happened after specified time")
-			Param("time_before", DateTime, "Include all events that happened before specified time")
+			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
+			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
 		})
 		Response(OK, func() {
-			Media(EventList)
+			Media(CollectionOf(Event, func() {
+				View("default")
+			}))
+		})
+	})
+})
+
+var _ = Resource("commerce", func() {
+	Description("Commerce journal")
+	BasePath("/journal/commerce")
+	NoSecurity()
+
+	Action("count", func() {
+		Description("Returns counts of events")
+		Routing(GET("/:step/count"))
+		Params(func() {
+			Param("filter_by", String, "Selection of data filtering type", func() {
+				Enum("users", "articles", "authors")
+			})
+			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
+			Param("group", Boolean, "Whether to group results by filter values (used only when _filter_by_ is set)")
+			Param("step", String, "Identification of commerce step", func() {
+				Enum("checkout", "payment", "purchase", "refund")
+			})
+			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
+			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
+		})
+		Response(OK, func() {
+			Media(GrouppedCounts)
+		})
+	})
+	Action("sum", func() {
+		Description("Returns sum of amounts within events")
+		Routing(GET("/:step/sum"))
+		Params(func() {
+			Param("filter_by", String, "Selection of data filtering type", func() {
+				Enum("users", "articles", "authors")
+			})
+			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
+			Param("group", Boolean, "Whether to group results by filter values (used only when _filter_by_ is set)")
+			Param("step", String, "Identification of commerce step", func() {
+				Enum("checkout", "payment", "purchase", "refund")
+			})
+			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
+			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
+		})
+		Response(OK, func() {
+			Media(GrouppedSums)
+		})
+	})
+	Action("list", func() {
+		Description("Returns full list of events")
+		Routing(GET("/list"))
+		Params(func() {
+			Param("filter_by", String, "Selection of data filtering type", func() {
+				Enum("users", "articles", "authors")
+			})
+			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
+			Param("group", Boolean, "Whether to group results by filter values (used only when _filter_by_ is set)")
+			Param("step", String, "Identification of commerce step", func() {
+				Enum("checkout", "payment", "purchase", "refund")
+			})
+			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
+			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
+		})
+		Response(OK, func() {
+			Media(CommerceList)
 		})
 	})
 })

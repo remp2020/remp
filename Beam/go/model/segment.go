@@ -157,7 +157,7 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 	}
 	sq := subquery.Build()
 
-	// If user didn't generate any event so far, ResponseCount will return always zero.
+	// If user didn't generate any event so far, Count will return always zero.
 	// We're aiming for query always returning zero for users eligible for segment rule hit.
 
 	query := sDB.InfluxDB.QueryBuilder.
@@ -173,7 +173,7 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 		return false, err
 	}
 
-	count, err := sDB.InfluxDB.ResponseCount(response)
+	count, err := sDB.InfluxDB.Count(response)
 	if err != nil {
 		return false, err
 	}

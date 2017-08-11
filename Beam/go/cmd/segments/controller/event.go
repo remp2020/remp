@@ -44,12 +44,33 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 		return err
 	}
 
-	return ctx.OK(&app.EventCount{
+	return ctx.OK(&app.Count{
 		Count: ec,
 	})
 }
 
 // List runs the list action.
 func (c *EventController) List(ctx *app.ListEventsContext) error {
-	return ctx.OK(&app.EventList{})
+	o := model.EventOptions{}
+	if ctx.Action != nil {
+		o.Action = *ctx.Action
+	}
+	if ctx.Category != nil {
+		o.Category = *ctx.Category
+	}
+	if ctx.TimeAfter != nil {
+		o.TimeAfter = *ctx.TimeAfter
+	}
+	if ctx.TimeBefore != nil {
+		o.TimeBefore = *ctx.TimeBefore
+	}
+	if ctx.UserID != nil {
+		o.UserID = *ctx.UserID
+	}
+
+	ec, err := c.EventStorage.List(o)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(EventCollection(ec).ToMediaType())
 }
