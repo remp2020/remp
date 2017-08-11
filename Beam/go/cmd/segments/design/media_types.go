@@ -5,8 +5,8 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var EventCount = MediaType("application/vnd.event.count+json", func() {
-	Description("EventCount")
+var Count = MediaType("application/vnd.count+json", func() {
+	Description("Count")
 	Attributes(func() {
 		Attribute("count", Integer)
 	})
@@ -16,8 +16,30 @@ var EventCount = MediaType("application/vnd.event.count+json", func() {
 	Required("count")
 })
 
-var EventList = MediaType("application/vnd.event.list+json", func() {
-	Description("EventList")
+var GrouppedCounts = MediaType("application/vnd.groupped.counts+json", func() {
+	Description("Groupped counts")
+	Attributes(func() {
+		Attribute("counts", HashOf(String, Integer))
+	})
+	View("default", func() {
+		Attribute("counts")
+	})
+	Required("counts")
+})
+
+var GrouppedSums = MediaType("application/vnd.groupped.sums+json", func() {
+	Description("Groupped sums")
+	Attributes(func() {
+		Attribute("sums", HashOf(String, Number))
+	})
+	View("default", func() {
+		Attribute("sums")
+	})
+	Required("sums")
+})
+
+var CommerceList = MediaType("application/vnd.commerce.list+json", func() {
+	Description("CommerceList")
 	Attributes(func() {
 		Attribute("dummy")
 	})
@@ -78,4 +100,31 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("email")
 	})
 	Required("id")
+})
+
+var Event = MediaType("application/vnd.event+json", func() {
+	Description("Generic event")
+	Attributes(func() {
+		Attribute("category", String)
+		Attribute("action", String)
+		Attribute("time", DateTime)
+		Attribute("host", String)
+		Attribute("ip", String)
+		Attribute("token", String)
+		Attribute("user_id", String)
+		Attribute("url", String)
+		Attribute("user_agent", String)
+	})
+	View("default", func() {
+		Attribute("category")
+		Attribute("action")
+		Attribute("time")
+		Attribute("host")
+		Attribute("ip")
+		Attribute("token")
+		Attribute("user_id")
+		Attribute("url")
+		Attribute("user_agent")
+	})
+	Required("category", "action", "time", "host", "ip", "token", "user_id", "url", "user_agent")
 })
