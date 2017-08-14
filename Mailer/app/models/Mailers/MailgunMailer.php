@@ -27,12 +27,12 @@ class MailgunMailer extends Mailer implements IMailer
     {
         $from = null;
         foreach ($message->getFrom() as $email => $name) {
-            $from = "$email";
+            $from = "$name <$email>";
         }
 
         $to = null;
         foreach ($message->getHeader('To') as $email => $name) {
-            $to = $email;
+            $to = "$name <$email>";
         }
 
         $attachments = [];
