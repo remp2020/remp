@@ -111,7 +111,8 @@ class WorkerCommand extends Command
                 $output->writeln(" * sending from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
 
                 try {
-                    $result = $this->applicationMailer->setTemplate($job->template)
+                    $template = $this->mailTemplateRepository->getByCode($job->templateCode);
+                    $result = $this->applicationMailer->setTemplate($template)
                         ->setRecipient($job->email)
                         ->setParams([])
                         ->send();

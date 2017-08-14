@@ -21,6 +21,7 @@ services:
           - "tracker.beam.remp.app"
           - "segments.beam.remp.app"
           - "grafana.beam.remp.app"
+          - "mailhog.remp.app"
     depends_on:
       - "campaign"
       - "mailer"
