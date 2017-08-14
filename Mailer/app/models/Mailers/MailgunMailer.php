@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Mailer;
 use Mailgun\Mailgun;
 use Nette\Mail\IMailer;
 use Nette\Mail\Message;
+use Nette\Utils\Json;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Repository\ConfigsRepository;
 
@@ -43,6 +44,7 @@ class MailgunMailer extends Mailer implements IMailer
             ];
         }
 
+        $mailVariables = Json::decode($message->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
 
         $data = [
             'from' => $from,
@@ -50,7 +52,9 @@ class MailgunMailer extends Mailer implements IMailer
             'subject' => $message->getSubject(),
             'text' => $message->getBody(),
             'html' => $message->getHtmlBody(),
-            'attachment' => $attachments
+            'attachment' => $attachments,
+            'tag' => $mailVariables['tag'],
+            'v:my-vars' => $message->getHeader('X-Mailer-Variables'),
         ];
 
         $this->mailer->messages()->send($this->options['domain'], $data);
