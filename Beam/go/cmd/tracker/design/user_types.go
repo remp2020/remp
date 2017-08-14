@@ -4,6 +4,7 @@ import . "github.com/goadesign/goa/design"
 import . "github.com/goadesign/goa/design/apidsl"
 
 var User = Type("User", func() {
+	Attribute("id", String, "ID of reader")
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
 	})
@@ -11,8 +12,6 @@ var User = Type("User", func() {
 	Attribute("ip_address", String, "IP address of client", func() {
 		Format("ip")
 	})
-	Attribute("user_id", String, "ID of reader")
-	Required("url", "user_agent", "ip_address")
 })
 
 var System = Type("System", func() {

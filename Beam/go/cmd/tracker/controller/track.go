@@ -55,11 +55,21 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 	switch ctx.Payload.Step {
 	case "checkout":
 		values["funnel_id"] = ctx.Payload.Checkout.FunnelID
-	case "payment", "purchase", "refund":
+	case "payment":
 		values["product_ids"] = strings.Join(ctx.Payload.Payment.ProductIds, ",")
 		values["revenue"] = ctx.Payload.Payment.Revenue.Amount
 		values["transaction_id"] = ctx.Payload.Payment.TransactionID
 		tags["currency"] = ctx.Payload.Payment.Revenue.Currency
+	case "purchase":
+		values["product_ids"] = strings.Join(ctx.Payload.Purchase.ProductIds, ",")
+		values["revenue"] = ctx.Payload.Purchase.Revenue.Amount
+		values["transaction_id"] = ctx.Payload.Purchase.TransactionID
+		tags["currency"] = ctx.Payload.Purchase.Revenue.Currency
+	case "refund":
+		values["product_ids"] = strings.Join(ctx.Payload.Refund.ProductIds, ",")
+		values["revenue"] = ctx.Payload.Refund.Revenue.Amount
+		values["transaction_id"] = ctx.Payload.Refund.TransactionID
+		tags["currency"] = ctx.Payload.Refund.Revenue.Currency
 	default:
 		return fmt.Errorf("unhandled commerce step: %s", ctx.Payload.Step)
 	}
@@ -143,11 +153,17 @@ func (c *TrackController) pushEvent(system *app.System, user *app.User,
 	name string, tags map[string]string, fields map[string]interface{}) error {
 	fields["token"] = system.PropertyToken
 	if user != nil {
-		fields["ip"] = user.IPAddress
-		fields["url"] = user.URL
-		fields["user_agent"] = user.UserAgent
-		if user.UserID != nil {
-			tags["user_id"] = *user.UserID
+		if user.IPAddress != nil {
+			fields["ip"] = *user.IPAddress
+		}
+		if user.URL != nil {
+			fields["url"] = *user.URL
+		}
+		if user.UserAgent != nil {
+			fields["user_agent"] = *user.UserAgent
+		}
+		if user.ID != nil {
+			tags["user_id"] = *user.ID
 		}
 	}
 
