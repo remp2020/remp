@@ -174,4 +174,20 @@ class LogsRepository extends Repository
 
         return $selection;
     }
+
+    public function alreadySentForJob($email, $jobId)
+    {
+        return $this->getTable()->where([
+                'mail_logs.mail_job_id' => $jobId,
+                'mail_logs.email' => $email
+            ])->count('*') > 0;
+    }
+
+    public function alreadySentForEmail($mailTemplateCode, $email)
+    {
+        return $this->getTable()->where([
+                'mail_logs.email' => $email,
+                'mail_template.code' => $mailTemplateCode
+            ])->count('*') > 0;
+    }
 }

@@ -81,5 +81,6 @@ class Sender
         }
 
         $this->mailerFactory->getMailer()->send($message);
+        return true;
     }
 }

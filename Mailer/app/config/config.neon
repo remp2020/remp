@@ -5,6 +5,10 @@ parameters:
     crm_api_token: @environmentConfig::get('CRM_API_TOKEN')
     tracker_api_base_url: @environmentConfig::get('TRACKER_API_BASE_URL')
     segments_api_base_url: @environmentConfig::get('SEGMENTS_API_BASE_URL')
+    redis:
+        host: @environmentConfig::get('REDIS_HOST')
+        port: @environmentConfig::get('REDIS_PORT')
+        db: @environmentConfig::get('REDIS_DB')
     errbit:
         send_errors: false
 
@@ -45,6 +49,8 @@ services:
 	    class: Symfony\Component\Console\Application
 	    setup:
 	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
+	        - add(Remp\MailerModule\Commands\ProcessJobCommand())
+	        - add(Remp\MailerModule\Commands\WorkerCommand())
 	        - setCatchExceptions(true)
 
 	- Remp\MailerModule\Sender
@@ -72,6 +78,9 @@ services:
 
 	- Remp\MailerModule\Config\Config
 
+	- Remp\MailerModule\Job\BatchEmailGenerator
+	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
+
 	# Repositories
 	- Remp\MailerModule\Repository\ConfigsRepository
 	- Remp\MailerModule\Repository\UsersRepository
@@ -80,9 +89,12 @@ services:
 	- Remp\MailerModule\Repository\ListsRepository
 	- Remp\MailerModule\Repository\TemplatesRepository
 	- Remp\MailerModule\Repository\JobsRepository
+	- Remp\MailerModule\Repository\JobQueueRepository
 	- Remp\MailerModule\Repository\SegmentsRepository
 	- Remp\MailerModule\Repository\BatchesRepository
 	- Remp\MailerModule\Repository\BatchTemplatesRepository
+
+
 
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory
