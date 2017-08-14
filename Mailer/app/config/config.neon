@@ -91,6 +91,7 @@ services:
 	- Remp\MailerModule\Repository\LogEventsRepository
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
+	- Remp\MailerModule\Repository\ListCategoriesRepository
 	- Remp\MailerModule\Repository\ListVariantsRepository
 	- Remp\MailerModule\Repository\TemplatesRepository
 	- Remp\MailerModule\Repository\JobsRepository
@@ -105,6 +106,7 @@ services:
 	# Forms
 	- Remp\MailerModule\Forms\SignInFormFactory
 	- Remp\MailerModule\Forms\ConfigFormFactory
+	- Remp\MailerModule\Forms\ListFormFactory
 	- Remp\MailerModule\Forms\LayoutFormFactory
 	- Remp\MailerModule\Forms\TemplateFormFactory
 	- Remp\MailerModule\Forms\TemplateTestFormFactory
