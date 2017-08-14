@@ -18,6 +18,9 @@ class Sender
     /** @var IRow */
     private $template;
 
+    /** @var int|null */
+    private $jobId = null;
+
     /** @var  array */
     private $params = [];
 
@@ -67,6 +70,13 @@ class Sender
         return $this;
     }
 
+    public function setJobId($jobId)
+    {
+        $this->jobId = $jobId;
+
+        return $this;
+    }
+
     public function setParams($params)
     {
         $this->params = $params;
@@ -74,9 +84,9 @@ class Sender
         return $this;
     }
 
-    public function send($checkUserSubscribed = true)
+    public function send($checkEmailSubscribed = true)
     {
-        if ($checkUserSubscribed && $this->userSubscriptionsRepository->isEmailUnSubscribed($this->recipient['email'], $this->template->mail_type->id)) {
+        if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($this->recipient['email'], $this->template->mail_type->id)) {
             return false;
         }
 
@@ -103,11 +113,11 @@ class Sender
         $senderId = md5($this->recipient['email'] . microtime(true));
 
         $message->setHeader('X-Mailer-Variables', Json::encode([
-            'tag' => $this->template->code,
+            'template' => $this->template->code,
             'sender_id' => $senderId,
         ]));
 
-        $this->logsRepository->add($this->recipient['email'], $this->template->subject, $this->template->id, $senderId, $attachmentSize);
+        $this->logsRepository->add($this->recipient['email'], $this->template->subject, $this->template->id, $this->jobId, $senderId, $attachmentSize);
 
         $this->mailerFactory->getMailer()->send($message);
         $this->reset();
@@ -119,6 +129,7 @@ class Sender
     {
         $this->recipient = null;
         $this->template = null;
+        $this->jobId = null;
         $this->params = [];
         $this->attachments = [];
     }

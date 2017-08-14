@@ -53,7 +53,7 @@ class MailgunMailer extends Mailer implements IMailer
             'text' => $message->getBody(),
             'html' => $message->getHtmlBody(),
             'attachment' => $attachments,
-            'tag' => $mailVariables['tag'],
+            'tag' => $mailVariables['template'],
             'v:my-vars' => $message->getHeader('X-Mailer-Variables'),
         ];
 

@@ -24,7 +24,7 @@ class LogsRepository extends Repository
         $this->startStatsDate = $startStatsDate;
     }
 
-    public function add($email, $subject, $templateId, $mailSenderId = null, $attachmentSize = null)
+    public function add($email, $subject, $templateId, $jobId = null, $mailSenderId = null, $attachmentSize = null)
     {
         return $this->insert([
             'email' => $email,
@@ -32,6 +32,7 @@ class LogsRepository extends Repository
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
             'mail_template_id' => $templateId,
+            'mail_job_id' => $jobId,
             'mail_sender_id' => $mailSenderId,
             'attachment_size' => $attachmentSize,
         ]);
