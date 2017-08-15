@@ -117,10 +117,10 @@ func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions)
 		builder.Where(fmt.Sprintf("action = '%s'", o.Action))
 	}
 	if !o.TimeAfter.IsZero() {
-		builder.Where(fmt.Sprintf("time <= %d", o.TimeAfter.UnixNano()))
+		builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
 	}
 	if !o.TimeBefore.IsZero() {
-		builder.Where(fmt.Sprintf("time <= %d", o.TimeBefore.UnixNano()))
+		builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
 	}
 	return builder
 }
