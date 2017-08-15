@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
 class BatchesRepository extends Repository
@@ -35,5 +36,20 @@ class BatchesRepository extends Repository
         }
 
         return $result;
+    }
+
+    public function getBatchReady()
+    {
+        return $this->getTable()->select('*')->where([
+            'status' => BatchesRepository::STATE_READY,
+            'start_at <= ? OR start_at IS NULL' => new DateTime(),
+        ])->limit(1)->fetch();
+    }
+
+    public function getBatchToSend()
+    {
+        return $this->getTable()->select('*')->where([
+            'status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
+        ])->limit(1)->fetch();
     }
 }
