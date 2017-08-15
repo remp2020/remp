@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Presenters;
 
+use Mailgun\Mailgun;
 use Nette\Application\UI\Multiplier;
 use Nette\Utils\Json;
 use Nette\Utils\Strings;
@@ -10,6 +11,7 @@ use Remp\MailerModule\Components\ITemplateStatsFactory;
 use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
+use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
@@ -47,6 +49,9 @@ final class JobPresenter extends BasePresenter
     /** @var  Aggregator */
     private $segmentAggregator;
 
+    /** @var MailCache */
+    private $mailCache;
+
     public function __construct(
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository,
@@ -56,7 +61,8 @@ final class JobPresenter extends BasePresenter
         JobFormFactory $jobFormFactory,
         NewBatchFormFactory $newBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory,
-        Aggregator $segmentAggregator
+        Aggregator $segmentAggregator,
+        MailCache $mailCache
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -68,6 +74,7 @@ final class JobPresenter extends BasePresenter
         $this->newBatchFormFactory = $newBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
         $this->segmentAggregator = $segmentAggregator;
+        $this->mailCache = $mailCache;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -176,6 +183,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchUserStop($id)
     {
         $batch = $this->batchesRepository->find($id);
+        $this->mailCache->pauseQueue($batch->id);
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_USER_STOP]);
 
         $this->flashMessage('Status of batch was changed.');
