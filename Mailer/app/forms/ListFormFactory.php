@@ -33,7 +33,7 @@ class ListFormFactory extends Object
         $categoryPairs = $this->listCategoriesRepository->all()->fetchPairs('id', 'title');
         $form->addSelect('mail_type_category_id', 'Category', $categoryPairs);
 
-        $form->addSelect('priority', 'Priority', [10 => 'High', '100' => 'Normal', 1000 => 'Low']);
+        $form->addSelect('priority', 'Priority', [10 => 'High', 100 => 'Normal', 1000 => 'Low']);
 
         $form->addText('code', 'Code')
             ->setRequired('Required');
@@ -54,7 +54,7 @@ class ListFormFactory extends Object
         $orderPairs = $this->listsRepository->findByCategory(key($categoryPairs))->fetchPairs('sorting', 'title');
         $form->addSelect('sorting_after', null, $orderPairs);
 
-        $form->addCheckbox('auto_subscribe', 'Required user consent');
+        $form->addCheckbox('auto_subscribe', 'Auto subscribe');
         $form->addCheckbox('locked', 'Locked');
         $form->addCheckbox('is_public', 'Public');
 
