@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Repository;
 
 use Nette\Database\Table\IRow;
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 use Remp\MailerModule\Selection;
 
@@ -17,18 +18,24 @@ class ListsRepository extends Repository
         return $this->getTable()->order('sorting ASC');
     }
 
-    public function add($code, $name, $description, $order, $isConsentRequired, $isLocked, $isPublic)
+    public function add($categoryId, $priority, $code, $name, $order, $isAutoSubscribe, $isLocked, $isPublic, $description = null, $previewUrl = null, $imageUrl = null)
     {
-        $this->updateOrder(null, $order);
+        $this->updateOrder($categoryId, $order);
 
         $result = $this->insert([
+            'mail_type_category_id' => $categoryId,
+            'priority' => $priority,
             'code' => $code,
             'title' => $name,
             'description' => $description,
             'sorting' => $order,
-            'auto_subscribe' => !(bool)$isConsentRequired,
+            'auto_subscribe' => (bool)$isAutoSubscribe,
             'locked' => (bool)$isLocked,
             'is_public' => (bool)$isPublic,
+            'image_url' => $imageUrl,
+            'preview_url' => $previewUrl,
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime()
         ]);
 
         if (is_numeric($result)) {
@@ -38,35 +45,26 @@ class ListsRepository extends Repository
         return $result;
     }
 
-    public function update(IRow &$row, $data)
+    public function updateOrder($categoryId, $order)
     {
-        $this->updateOrder($row->sorting, $data['sorting']);
-
-        $params['updated_at'] = new \DateTime();
-        return parent::update($row, $data);
+        $this->getTable()
+            ->where(['mail_type_category_id' => $categoryId])
+            ->where('sorting > ?', $order)
+            ->update(['sorting+=' => 1]);
     }
 
-    public function updateOrder($oldOrder, $newOrder)
+    public function findByCategory($categoryId)
     {
-        if ($oldOrder == $newOrder) {
-            return;
-        }
-
-        if ($oldOrder !== null) {
-            $this->getTable()->where('sorting > ?', $oldOrder)->update(['sorting-=' => 1]);
-        }
-
-        $this->getTable()->where('sorting > ?', $newOrder)->update(['sorting+=' => 1]);
+        return $this->getTable()->where(['mail_type_category_id' => $categoryId]);
     }
+
 
     /**
      * @return Selection
      */
     public function tableFilter()
     {
-        $selection = $this->getTable()
-            ->order('mail_type_category.sorting')
-            ->group('mail_types.id');
+        $selection = $this->getTable()->order('mail_type_category.sorting, mail_types.sorting');
 
         return $selection;
     }

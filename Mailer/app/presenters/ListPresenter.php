@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\BadRequestException;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
+use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
@@ -16,14 +17,19 @@ final class ListPresenter extends BasePresenter
     /** @var TemplatesRepository */
     private $templatesRepository;
 
+    /** @var ListFormFactory */
+    private $listFormFactory;
+
     public function __construct(
         ListsRepository $listsRepository,
-        TemplatesRepository $templatesRepository
+        TemplatesRepository $templatesRepository,
+        ListFormFactory $listFormFactory
     ) {
     
         parent::__construct();
         $this->listsRepository = $listsRepository;
         $this->templatesRepository = $templatesRepository;
+        $this->listFormFactory = $listFormFactory;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -41,26 +47,18 @@ final class ListPresenter extends BasePresenter
             ->setRowLink($this->link('Show', 'RowId'))
             ->setRowAction('show', $this->link('Show', 'RowId'), 'palette-Cyan zmdi-eye')
             ->setTableSetting('displayNavigation', false)
-            ->setTableSetting('rowGroup', 0)
-            ->setTableSetting('length', -1);
+            ->setTableSetting('rowGroup', 0);
 
         return $dataTable;
     }
 
     public function renderDefaultJsonData()
     {
-        $request = $this->request->getParameters();
-
-        $listsCount = $this->listsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
-            ->count('*');
-
-        $lists = $this->listsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
-            ->fetchAll();
+        $lists = $this->listsRepository->tableFilter();
+        $listsCount = $lists->count('*');
 
         $result = [
-            'recordsTotal' => $this->listsRepository->totalCount(),
+            'recordsTotal' => $listsCount,
             'recordsFiltered' => $listsCount,
             'data' => []
         ];
@@ -139,5 +137,27 @@ final class ListPresenter extends BasePresenter
             ];
         }
         $this->presenter->sendJson($result);
+    }
+
+    public function createComponentListForm()
+    {
+        $form = $this->listFormFactory->create();
+
+        $presenter = $this;
+        $this->listFormFactory->onSuccess = function ($list) use ($presenter) {
+            $presenter->flashMessage('Newsletter list was created');
+            $presenter->redirect('Show', $list->id);
+        };
+
+        return $form;
+    }
+
+    public function handleListCategoryChange($categoryId)
+    {
+        $lists = $this->listsRepository->findByCategory($categoryId)->fetchPairs('sorting', 'title');
+        $this['listForm']['sorting_after']->setItems($lists);
+
+        $this->redrawControl('wrapper');
+        $this->redrawControl('sortingAfterSnippet');
     }
 }
