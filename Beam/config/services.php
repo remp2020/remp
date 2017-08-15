@@ -35,4 +35,8 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'remp_segments' => [
+        'base_url' => env('REMP_SEGMENTS_API_ADDR'),
+    ]
+
 ];
