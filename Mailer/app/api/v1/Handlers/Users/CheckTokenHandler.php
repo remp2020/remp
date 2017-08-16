@@ -37,7 +37,7 @@ class CheckTokenHandler extends BaseHandler
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Wrong format.']);
         }
 
-        if (!isset($data['email']) || !isset($data['token'])) {
+        if (!isset($data['token'])) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing parameters.']);
         }
 
@@ -47,12 +47,12 @@ class CheckTokenHandler extends BaseHandler
         }
 
         $now = new DateTime();
-        if ($now  < $token->valid_from || $now > $token->valid_to || $token->used_count >= $token->max_count || $token->email != $data['email']) {
+        if ($now < $token->valid_from || $now > $token->valid_to || $token->used_count >= $token->max_count) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Token not valid.']);
         }
 
         $this->autoLogin->useToken($token);
 
-        return new JsonApiResponse(200, ['status' => 'ok']);
+        return new JsonApiResponse(200, ['status' => 'ok', 'email' => $token->user->email]);
     }
 }
