@@ -47,7 +47,7 @@ class CheckTokenHandler extends BaseHandler
         }
 
         $now = new DateTime();
-        if ($now  < $token->validFrom || $now > $token->validTo || $token->used_count >= $token->max_count || $token->email != $data['email']) {
+        if ($now  < $token->valid_from || $now > $token->valid_to || $token->used_count >= $token->max_count || $token->email != $data['email']) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Token not valid.']);
         }
 

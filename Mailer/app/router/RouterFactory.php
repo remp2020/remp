@@ -22,7 +22,8 @@ class RouterFactory
             'action' => 'default',
             'id' => null,
         ]);
-        $router[] = new Route('/api/v<version>/<package>[/<apiAction>][/<params>]', 'Mailer:Api:default');
+
+        $router[] = new Route('/api/v<version>/<package>[/<apiAction>][/<params>]', 'Api:Api:default');
         return $router;
     }
 }
