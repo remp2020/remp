@@ -42,6 +42,8 @@ type EventStorage interface {
 	Categories() ([]string, error)
 	// Actions lists all tracked actions under the given category.
 	Actions(category string) ([]string, error)
+	// Users lists all tracked users.
+	Users() ([]string, error)
 }
 
 type EventDB struct {
@@ -168,6 +170,34 @@ func (eDB *EventDB) Actions(category string) ([]string, error) {
 		actions = append(actions, strVal)
 	}
 	return actions, nil
+}
+
+func (eDB *EventDB) Users() ([]string, error) {
+	q := client.Query{
+		Command:  `SHOW TAG VALUES WITH KEY = "user_id"`,
+		Database: eDB.DB.DBName,
+	}
+
+	response, err := eDB.DB.Client.Query(q)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error() != nil {
+		return nil, response.Error()
+	}
+
+	users := []string{}
+	if len(response.Results[0].Series) == 0 {
+		return users, nil
+	}
+	for _, val := range response.Results[0].Series[0].Values {
+		strVal, ok := val[1].(string)
+		if !ok {
+			return nil, errors.New("unable to convert influx result value to string")
+		}
+		users = append(users, strVal)
+	}
+	return users, nil
 }
 
 func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions) influxquery.Builder {

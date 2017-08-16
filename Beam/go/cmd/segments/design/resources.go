@@ -114,6 +114,11 @@ var _ = Resource("events", func() {
 		})
 		Response(OK, ArrayOf(String))
 	})
+	Action("users", func() {
+		Description("List of all tracked users")
+		Routing(GET("/users"))
+		Response(OK, ArrayOf(String))
+	})
 })
 
 var _ = Resource("commerce", func() {

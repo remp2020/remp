@@ -96,3 +96,12 @@ func (c *EventController) Actions(ctx *app.ActionsEventsContext) error {
 	}
 	return ctx.OK(actions)
 }
+
+// Users runs the users action.
+func (c *EventController) Users(ctx *app.UsersEventsContext) error {
+	users, err := c.EventStorage.Users()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(users)
+}
