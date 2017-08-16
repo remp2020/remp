@@ -24,7 +24,7 @@ class LogsRepository extends Repository
         $this->startStatsDate = $startStatsDate;
     }
 
-    public function addLog($email, $subject, $templateId, $subscriptionId = null, $mailSenderId = null, $mailJobId = null, $attachmentSize = null)
+    public function add($email, $subject, $templateId, $jobId = null, $mailSenderId = null, $attachmentSize = null)
     {
         return $this->insert([
             'email' => $email,
@@ -32,9 +32,8 @@ class LogsRepository extends Repository
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
             'mail_template_id' => $templateId,
-            'subscription_id' => $subscriptionId,
+            'mail_job_id' => $jobId,
             'mail_sender_id' => $mailSenderId,
-            'mail_job_id' => $mailJobId,
             'attachment_size' => $attachmentSize,
         ]);
     }
@@ -178,5 +177,21 @@ class LogsRepository extends Repository
         }
 
         return $selection;
+    }
+
+    public function alreadySentForJob($email, $jobId)
+    {
+        return $this->getTable()->where([
+                'mail_logs.mail_job_id' => $jobId,
+                'mail_logs.email' => $email
+            ])->count('*') > 0;
+    }
+
+    public function alreadySentForEmail($mailTemplateCode, $email)
+    {
+        return $this->getTable()->where([
+                'mail_logs.email' => $email,
+                'mail_template.code' => $mailTemplateCode
+            ])->count('*') > 0;
     }
 }
