@@ -29,7 +29,7 @@ class TemplateTestFormFactory extends Object
         $form->addProtection();
 
         $form->addText('email', 'Email')
-            ->addRule($form::EMAIL)
+            ->addRule(Form::EMAIL)
             ->setRequired('Required');
 
         $form->addSubmit('save', 'Send')

@@ -3,7 +3,10 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Rule;
+use Nette\Forms\Rules;
 use Nette\Object;
+use Remp\MailerModule\Forms\Rules\FormRules;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
@@ -58,14 +61,14 @@ class TemplateFormFactory extends Object
                 ->setRequired('Required');
         }
 
-        $form->addText('description', 'Description')
-            ->setRequired('Required');
+        $form->addText('description', 'Description');
 
         $form->addSelect('mail_layout_id', 'Layout', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
         $form->addSelect('mail_type_id', 'Newsletter list', $this->listsRepository->all()->fetchPairs('id', 'title'));
 
         $form->addText('from', 'From')
+            ->addRule(FormRules::ADVANCED_EMAIL,'Enter correct email')
             ->setRequired('Required');
 
         $form->addText('subject', 'Subject')
