@@ -98,7 +98,7 @@ class Sender
 
         if ($this->template->autologin) {
             $token = $this->autoLogin->createToken($this->recipient['email']);
-            $this->params['autologin'] = "?token={$token->token}&email={$token->email}";
+            $this->params['autologin'] = "?token={$token->token}";
         }
 
         $message = new Message();
