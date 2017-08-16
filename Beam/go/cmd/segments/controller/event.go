@@ -72,5 +72,27 @@ func (c *EventController) List(ctx *app.ListEventsContext) error {
 	if err != nil {
 		return err
 	}
-	return ctx.OK(EventCollection(ec).ToMediaType())
+	mt, err := EventCollection(ec).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(mt)
+}
+
+// Categories runs the categories action.
+func (c *EventController) Categories(ctx *app.CategoriesEventsContext) error {
+	categories, err := c.EventStorage.Categories()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(categories)
+}
+
+// Actions runs the action action. :)
+func (c *EventController) Actions(ctx *app.ActionsEventsContext) error {
+	actions, err := c.EventStorage.Actions(ctx.Category)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(actions)
 }
