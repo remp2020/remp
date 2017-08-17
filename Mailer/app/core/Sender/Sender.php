@@ -5,6 +5,7 @@ namespace Remp\MailerModule;
 use Nette\Database\IRow;
 use Nette\Mail\Message;
 use Nette\Utils\Json;
+use Remp\MailerModule\Auth\AutoLogin;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Sender\ContentGenerator;
@@ -30,6 +31,9 @@ class Sender
     /** @var MailerFactory */
     private $mailerFactory;
 
+    /** @var AutoLogin */
+    private $autoLogin;
+
     /** @var UserSubscriptionsRepository */
     private $userSubscriptionsRepository;
 
@@ -38,10 +42,12 @@ class Sender
 
     public function __construct(
         MailerFactory $mailerFactory,
+        AutoLogin $autoLogin,
         UserSubscriptionsRepository $userSubscriptionsRepository,
         LogsRepository $logsRepository
     ) {
         $this->mailerFactory = $mailerFactory;
+        $this->autoLogin = $autoLogin;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
         $this->logsRepository = $logsRepository;
     }
@@ -88,6 +94,11 @@ class Sender
     {
         if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($this->recipient['email'], $this->template->mail_type->id)) {
             return false;
+        }
+
+        if ($this->template->autologin) {
+            $token = $this->autoLogin->createToken($this->recipient['email']);
+            $this->params['autologin'] = "?token={$token->token}";
         }
 
         $message = new Message();

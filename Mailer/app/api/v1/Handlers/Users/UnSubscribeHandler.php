@@ -45,7 +45,7 @@ class UnSubscribeHandler extends BaseHandler
         }
 
         $this->userSubscriptionsRepository->update($userSubscription, [
-            'subscribed' => 0,
+            'subscribed' => false,
             'mail_type_variant_id' => null,
         ]);
 

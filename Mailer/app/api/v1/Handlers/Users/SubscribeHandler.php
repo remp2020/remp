@@ -73,7 +73,7 @@ class SubscribeHandler extends BaseHandler
         }
 
         $this->userSubscriptionsRepository->update($userSubscription, [
-            'subscribed' => 1,
+            'subscribed' => true,
             'mail_type_variant_id' => $variantId,
         ]);
 

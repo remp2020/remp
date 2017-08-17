@@ -54,8 +54,6 @@ services:
 	        - add(Remp\MailerModule\Commands\WorkerCommand())
 	        - setCatchExceptions(true)
 
-	- Remp\MailerModule\Sender
-
 	segmentAgreggator:
 	    class: Remp\MailerModule\Segment\Aggregator
 	    setup:
@@ -78,10 +76,10 @@ services:
 #	    class: Remp\NetteSso\Security\UserStorage
 
 	- Remp\MailerModule\Config\Config
-
-
+	- Remp\MailerModule\Sender
 	- Remp\MailerModule\Job\BatchEmailGenerator
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Auth\AutoLogin
 
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
@@ -90,10 +88,12 @@ services:
 	    class: Tomaj\NetteApi\ApiDecider
 	    setup:
 	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 
 	# Repositories
+	- Remp\MailerModule\Repository\AuditLogRepository
 	- Remp\MailerModule\Repository\ConfigsRepository
 	- Remp\MailerModule\Repository\UsersRepository
 	- Remp\MailerModule\Repository\UserSubscriptionsRepository
@@ -109,6 +109,7 @@ services:
 	- Remp\MailerModule\Repository\SegmentsRepository
 	- Remp\MailerModule\Repository\BatchesRepository
 	- Remp\MailerModule\Repository\BatchTemplatesRepository
+	- Remp\MailerModule\Repository\AutoLoginTokensRepository
 
 
 
