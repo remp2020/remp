@@ -9,6 +9,8 @@ parameters:
         host: @environmentConfig::get('REDIS_HOST')
         port: @environmentConfig::get('REDIS_PORT')
         db: @environmentConfig::get('REDIS_DB')
+    kafka:
+        broker: @environmentConfig::get('KAFKA_BROKER')
     errbit:
         send_errors: false
 
@@ -53,6 +55,7 @@ services:
 	        - add(Remp\MailerModule\Commands\ProcessJobCommand())
 	        - add(Remp\MailerModule\Commands\WorkerCommand())
 	        - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
+	        - add(Remp\MailerModule\Commands\SubscriberCommand())
 	        - setCatchExceptions(true)
 
 	- Remp\MailerModule\Sender
@@ -81,7 +84,7 @@ services:
 #	    class: Remp\NetteSso\Security\UserStorage
 
 	- Remp\MailerModule\Config\Config
-
+	- Remp\MailerModule\Broker\ConsumerFactory(%kafka.broker%)
 
 	- Remp\MailerModule\Job\BatchEmailGenerator
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
@@ -112,8 +115,6 @@ services:
 	- Remp\MailerModule\Repository\SegmentsRepository
 	- Remp\MailerModule\Repository\BatchesRepository
 	- Remp\MailerModule\Repository\BatchTemplatesRepository
-
-
 
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory

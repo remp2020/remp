@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/Shopify/sarama"
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -74,9 +76,17 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 		return fmt.Errorf("unhandled commerce step: %s", ctx.Payload.Step)
 	}
 
-	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "commerce", tags, values); err != nil {
+	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, "commerce", tags, values); err != nil {
 		return err
 	}
+
+	topic := fmt.Sprintf("%s_%s", "commerce", ctx.Payload.Step)
+	value, err := json.Marshal(ctx.Payload)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal payload for kafka")
+	}
+	c.pushPublic(topic, value)
+
 	return ctx.Accepted()
 }
 
@@ -101,9 +111,17 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	for key, val := range ctx.Payload.Fields {
 		fields[key] = val
 	}
-	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "events", tags, fields); err != nil {
+	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, "events", tags, fields); err != nil {
 		return err
 	}
+
+	topic := fmt.Sprintf("%s_%s", ctx.Payload.Category, ctx.Payload.Action)
+	value, err := json.Marshal(ctx.Payload)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal payload for kafka")
+	}
+	c.pushPublic(topic, value)
+
 	return ctx.Accepted()
 }
 
@@ -122,7 +140,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		}
 	}
 
-	if err := c.pushEvent(ctx.Payload.System, ctx.Payload.User, "pageviews", tags, values); err != nil {
+	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, "pageviews", tags, values); err != nil {
 		return err
 	}
 	return ctx.Accepted()
@@ -148,8 +166,8 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	return tags, values
 }
 
-// pushEvent pushes new event to the InfluxDB.
-func (c *TrackController) pushEvent(system *app.System, user *app.User,
+// pushInternal pushes new event to the InfluxDB.
+func (c *TrackController) pushInternal(system *app.System, user *app.User,
 	name string, tags map[string]string, fields map[string]interface{}) error {
 	fields["token"] = system.PropertyToken
 	if user != nil {
@@ -176,4 +194,11 @@ func (c *TrackController) pushEvent(system *app.System, user *app.User,
 		Value: sarama.StringEncoder(p.String()),
 	}
 	return nil
+}
+
+func (c *TrackController) pushPublic(topic string, value []byte) {
+	c.EventProducer.Input() <- &sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.ByteEncoder(value),
+	}
 }
