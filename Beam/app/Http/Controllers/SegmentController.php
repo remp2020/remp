@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\JournalContract;
 use App\Http\Requests\SegmentRequest;
 use App\Segment;
 use App\SegmentRule;
@@ -39,15 +40,19 @@ class SegmentController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param JournalContract $journalContract
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(JournalContract $journalContract)
     {
         $segment = new Segment();
         $segment->fill(old());
 
+        $categories = $journalContract->categories();
+
         return view('segments.create', [
             'segment' => $segment,
+            'categories' => $categories,
         ]);
     }
 
@@ -144,5 +149,10 @@ class SegmentController extends Controller
     {
         $segment->delete();
         return redirect(route('segments.index', $segment))->with('success', 'Segment removed');
+    }
+
+    public function actions(JournalContract $journalContract, $category)
+    {
+        return response()->json($journalContract->actions($category));
     }
 }

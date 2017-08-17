@@ -33,15 +33,21 @@ type Event struct {
 type EventCollection []*Event
 
 type EventStorage interface {
+	// Count returns number of events matching the filter defined by EventOptions.
 	Count(o EventOptions) (int, error)
-
+	// List returns list of all events based on given EventOptions.
 	List(o EventOptions) (EventCollection, error)
+	// Categories lists all tracked categories.
+	Categories() ([]string, error)
+	// Actions lists all tracked actions under the given category.
+	Actions(category string) ([]string, error)
 }
 
 type EventDB struct {
 	DB *InfluxDB
 }
 
+// Count returns number of events matching the filter defined by EventOptions.
 func (eDB *EventDB) Count(o EventOptions) (int, error) {
 	builder := eDB.DB.QueryBuilder.Select("count(value)").From("events")
 	builder = eDB.addQueryFilters(builder, o)
@@ -68,6 +74,7 @@ func (eDB *EventDB) Count(o EventOptions) (int, error) {
 	return eDB.DB.Count(response)
 }
 
+// List returns list of all events based on given EventOptions.
 func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
 	builder := eDB.DB.QueryBuilder.Select("*").From("events")
 	builder = eDB.addQueryFilters(builder, o)
@@ -104,6 +111,62 @@ func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
 	}
 
 	return ec, nil
+}
+
+func (eDB *EventDB) Categories() ([]string, error) {
+	q := client.Query{
+		Command:  `SHOW TAG VALUES WITH KEY = "category"`,
+		Database: eDB.DB.DBName,
+	}
+
+	response, err := eDB.DB.Client.Query(q)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error() != nil {
+		return nil, response.Error()
+	}
+
+	categories := []string{}
+	if len(response.Results[0].Series) == 0 {
+		return categories, nil
+	}
+	for _, val := range response.Results[0].Series[0].Values {
+		strVal, ok := val[1].(string)
+		if !ok {
+			return nil, errors.New("unable to convert influx result value to string")
+		}
+		categories = append(categories, strVal)
+	}
+	return categories, nil
+}
+
+func (eDB *EventDB) Actions(category string) ([]string, error) {
+	q := client.Query{
+		Command:  fmt.Sprintf(`SHOW TAG VALUES WITH KEY = "action" WHERE category =~ /%s/`, category),
+		Database: eDB.DB.DBName,
+	}
+
+	response, err := eDB.DB.Client.Query(q)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error() != nil {
+		return nil, response.Error()
+	}
+
+	actions := []string{}
+	if len(response.Results[0].Series) == 0 {
+		return actions, nil
+	}
+	for _, val := range response.Results[0].Series[0].Values {
+		strVal, ok := val[1].(string)
+		if !ok {
+			return nil, errors.New("unable to convert influx result value to string")
+		}
+		actions = append(actions, strVal)
+	}
+	return actions, nil
 }
 
 func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions) influxquery.Builder {

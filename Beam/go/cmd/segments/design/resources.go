@@ -105,6 +105,19 @@ var _ = Resource("events", func() {
 			}))
 		})
 	})
+	Action("categories", func() {
+		Description("List of all tracked categories")
+		Routing(GET("/categories"))
+		Response(OK, ArrayOf(String))
+	})
+	Action("actions", func() {
+		Description("List of all tracked actions for given category")
+		Routing(GET("/categories/:category/actions"))
+		Params(func() {
+			Param("category", String, "Category under which the actions were tracked")
+		})
+		Response(OK, ArrayOf(String))
+	})
 })
 
 var _ = Resource("commerce", func() {

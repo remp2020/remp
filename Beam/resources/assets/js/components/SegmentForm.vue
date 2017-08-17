@@ -66,24 +66,34 @@
                                                   v-bind:name="'rules['+i+'][event_category]'"
                                                   v-bind:value="rule.event_category"
                                                   class="col-md-12 p-l-0 p-r-0"
-                                                  v-bind:options="eventCategories"
+                                                  v-bind:options.sync="eventCategories"
+                                                  v-bind:dataType="'category'"
                                         ></v-select>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="input-group m-t-10">
-                                <span class="input-group-addon"><i class="zmdi zmdi-badge-check"></i></span>
+                                <span class="input-group-addon">
+                                    <span class="preloader pl-xs" v-if="showEventsLoader">
+                                        <svg class="pl-circular" viewBox="25 25 50 50">
+                                            <circle class="plc-path" cx="50" cy="50" r="20" />
+                                        </svg>
+                                    </span>
+                                    <i class="zmdi zmdi-badge-check" v-if="showEventsInput"></i>
+                                </span>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label class="fg-label">Event name</label>
+                                        <label class="fg-label">Event action</label>
                                     </div>
                                     <div class="col-md-12">
                                         <v-select v-model="rule.event_name"
                                                   v-bind:name="'rules['+i+'][event_name]'"
                                                   v-bind:value="rule.event_name"
                                                   class="col-md-12 p-l-0 p-r-0"
-                                                  v-bind:options="eventNames[rule.event_category]"
+                                                  v-bind:options.sync="eventNames"
+                                                  v-bind:dataType="'event'"
+                                                  v-bind:disabled="!showEventsInput"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -161,6 +171,14 @@
         name: 'segment-form',
         components: { vSelect },
         props: props,
+        created: function() {
+            this.$on('select-changed', function(data){
+                if (data.type !== 'category') {
+                    return;
+                }
+                this.fetchActions(data.value);
+            });
+        },
         mounted: function(){
             let self = this;
             props.forEach((prop) => {
@@ -175,9 +193,11 @@
             "removedRules": [],
             "eventCategories": [],
             "eventNames": null,
+            "showEventsLoader": false,
+            "showEventsInput": false,
         }),
         methods: {
-            addRule: function () {
+            addRule: function() {
                 this.rules.push({
                     id: null,
                     count: null,
@@ -190,22 +210,32 @@
                     }]
                 });
             },
-            addField: function (ruleIndex) {
+            addField: function(ruleIndex) {
                 this.rules[ruleIndex].fields.push({
                     key: null,
                     value: null
                 })
             },
-            removeRule: function (index) {
+            removeRule: function(index) {
                 this.removedRules.push(this.rules[index].id);
                 this.rules.splice(index, 1)
             },
-            removeField: function (ruleIndex, fieldIndex) {
+            removeField: function(ruleIndex, fieldIndex) {
                 let fields = this.rules[ruleIndex].fields;
                 fields.splice(fieldIndex, 1);
                 if (fields.length === 0) {
                     this.addField(ruleIndex);
                 }
+            },
+            fetchActions: function(category) {
+                let self = this;
+                self.showEventsLoader = true;
+                self.showEventsInput = false;
+                $.get('/api/journal/' + category + '/actions', ( data ) => {
+                    self.eventNames = data;
+                    self.showEventsLoader = false;
+                    self.showEventsInput = true;
+                })
             }
         },
     }
