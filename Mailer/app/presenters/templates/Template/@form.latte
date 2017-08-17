@@ -1,4 +1,5 @@
 {form templateForm}
+    {include jsCallback, form => $form}
     {input id}
     <div class="row">
         <div class="col-sm-6">
@@ -74,14 +75,18 @@
             {input save, class => 'btn btn-info waves-effect'}
         </div>
     </div>
+{/form}
 
+{define jsCallback}
     <script type="application/javascript">
-        console.log(Nette);
-        /*
-        Nette.validators.RempMailerModuleFormsRulesFormRules_validateAdvancedEmail = function (e, arg, value) {
-            return false;
-        };
-        */
+         Nette.validators.RempMailerModuleFormsRulesFormRules_validateAdvancedEmail = function (element, args, value) {
+             var regexp = /^(.+) +<(.*)>$/i;
+             var email = value.match(regexp);
+             if (email !== null) {
+                 value = email[2];
+             }
+             return Nette.validateRule(element, ':email', args, { 'value': value });
+         };
     </script>
     <script n:if="$form->getErrors()" type="application/javascript">
         $(document).ready(function() {
@@ -99,4 +104,4 @@
             {/foreach}
         });
     </script>
-{/form}
+{/define}

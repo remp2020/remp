@@ -23,8 +23,7 @@ mix
         "resources/js/functions.js",
         "resources/js/actions.js",
         "resources/js/datatables.js",
-        "resources/js/charts.js",
-        "resources/js/nette.ajax.js"
+        "resources/js/charts.js"
     ], 'js/app.js')
     .sass("resources/sass/vendor.scss", "css/vendor.css")
     .sass("resources/sass/app.scss", "css/app.css")
@@ -33,6 +32,7 @@ mix
         "jquery",
         "bootstrap",
         "nette-forms",
+        "nette.ajax.js",
         "animate.css",
         "autosize",
         "bootstrap-select",

@@ -3892,6 +3892,10 @@ nette-forms@^2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/nette-forms/-/nette-forms-2.4.2.tgz#32fc70996d14fc39e155ec2b5f438646ff1ff9ca"
 
+nette.ajax.js@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/nette.ajax.js/-/nette.ajax.js-2.3.0.tgz#426752cb2a00988570ed70aa2bdc58d072cc0354"
+
 no-case@^2.2.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/no-case/-/no-case-2.3.1.tgz#7aeba1c73a52184265554b7dc03baf720df80081"
