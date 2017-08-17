@@ -11,7 +11,8 @@ class SyncUserSubscriptionsCommand extends Command
 {
     private $userProvider;
 
-    public function __construct(IUser $userProvider) {
+    public function __construct(IUser $userProvider)
+    {
         parent::__construct();
         $this->userProvider = $userProvider;
     }
@@ -30,7 +31,6 @@ class SyncUserSubscriptionsCommand extends Command
         $page = 1;
 
         while ($users = $this->userProvider->list([], $page)) {
-            dump($users);die;
             // TODO: subscribe users
 
             $page++;
