@@ -11,10 +11,8 @@
         "active": {!! @json($segment->active) !!} || null,
         "rules": {!! $segment->rules->toJson() !!},
         "removedRules": [],
-        "eventCategories": ["campaign"],
-        "eventNames": {
-            "campaign": ["display", "click", "close"]
-        }
+        "eventCategories": {!! $categories->toJson() !!},
+        "eventNames": [],
     }
     remplib.segmentForm.bind("#segment-form", segment);
 </script>

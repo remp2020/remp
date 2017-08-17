@@ -105,3 +105,21 @@ func (c *EventController) Users(ctx *app.UsersEventsContext) error {
 	}
 	return ctx.OK(users)
 }
+
+// Categories runs the categories action.
+func (c *EventController) Categories(ctx *app.CategoriesEventsContext) error {
+	categories, err := c.EventStorage.Categories()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(categories)
+}
+
+// Actions runs the action action. :)
+func (c *EventController) Actions(ctx *app.ActionsEventsContext) error {
+	actions, err := c.EventStorage.Actions(ctx.Category)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(actions)
+}
