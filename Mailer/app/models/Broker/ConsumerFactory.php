@@ -2,13 +2,10 @@
 
 namespace Remp\MailerModule\Broker;
 
-use Kafka\ConsumerConfig;
-
 class ConsumerFactory
 {
     const CONSUMER_GROUP = 'remp_mailer';
 
-    /** @var ConsumerConfig */
     private $config;
 
     public function __construct($kafkaBroker)
