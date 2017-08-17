@@ -68,7 +68,7 @@ class TemplateFormFactory extends Object
         $form->addSelect('mail_type_id', 'Newsletter list', $this->listsRepository->all()->fetchPairs('id', 'title'));
 
         $form->addText('from', 'From')
-            ->addRule(FormRules::ADVANCED_EMAIL,'Enter correct email')
+            ->addRule(FormRules::ADVANCED_EMAIL, 'Enter correct email')
             ->setRequired('Required');
 
         $form->addText('subject', 'Subject')
