@@ -1,9 +1,6 @@
 {form templateForm}
+    {include jsCallback, form => $form}
     {input id}
-    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
-        {$error}<br>
-    </div>
-
     <div class="row">
         <div class="col-sm-6">
             <div class="form-group fg-float m-b-30">
@@ -79,3 +76,32 @@
         </div>
     </div>
 {/form}
+
+{define jsCallback}
+    <script type="application/javascript">
+         Nette.validators.RempMailerModuleFormsRulesFormRules_validateAdvancedEmail = function (element, args, value) {
+             var regexp = /^(.+) +<(.*)>$/i;
+             var email = value.match(regexp);
+             if (email !== null) {
+                 value = email[2];
+             }
+             return Nette.validateRule(element, ':email', args, { 'value': value });
+         };
+    </script>
+    <script n:if="$form->getErrors()" type="application/javascript">
+        $(document).ready(function() {
+            var index = 0;
+            {foreach $form->getErrors() as $error}
+            index += 250;
+            window.setTimeout(function() {
+                $.notify({
+                    message: {$error}
+                }, {
+                    allow_dismiss: false,
+                    type: 'danger'
+                });
+            }, index);
+            {/foreach}
+        });
+    </script>
+{/define}
