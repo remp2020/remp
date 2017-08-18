@@ -61,10 +61,8 @@ class SubscriberCommand extends Command
                 case RD_KAFKA_RESP_ERR_NO_ERROR:
                     break;
                 case RD_KAFKA_RESP_ERR__PARTITION_EOF:
-//                    echo "No more messages; will wait for more\n";
                     continue 2;
                 case RD_KAFKA_RESP_ERR__TIMED_OUT:
-//                    echo "Timed out\n";
                     continue 2;
                 default:
                     throw new \Exception($message->errstr(), $message->err);
