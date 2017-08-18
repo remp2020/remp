@@ -80,7 +80,7 @@ class SubscriberCommand extends Command
             }
             $userInfo = $userList[$userId];
 
-            $lists = $this->listsRepository->getTable()->fetchAll();
+            $lists = $this->listsRepository->all();
 
             /** @var ActiveRow $list */
             foreach ($lists as $list) {

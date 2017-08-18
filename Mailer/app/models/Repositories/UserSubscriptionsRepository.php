@@ -44,22 +44,15 @@ class UserSubscriptionsRepository extends Repository
         if ($userSubscription) {
             return $userSubscription;
         }
-
-        $variants = $mailType->related('mail_type_variants')->fetchAll();
-        if ($mailType->auto_subscribe && count($variants) > 1) {
-            throw new \Exception("unable to auto-subscribe user, don't know which variant to choose");
-        }
         $data = [
             'subscribed' => $mailType->auto_subscribe,
             'user_id' => $userId,
             'mail_type_id' => $mailType->id,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
-            'user_email' => $email, // TODO: do we need this here? it's required...
+            'user_email' => $email,
+            'mail_type_variant_id' => $mailType->default_variant_id,
         ];
-        if (count($variants) == 1) {
-            $data['mail_type_variant_id'] = $variants[0]->id;
-        }
         return $this->insert($data);
     }
 }
