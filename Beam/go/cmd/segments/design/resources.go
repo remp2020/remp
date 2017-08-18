@@ -62,11 +62,7 @@ var _ = Resource("segments", func() {
 		})
 		Response(NotFound)
 		Response(BadRequest)
-		Response(OK, func() {
-			Media(CollectionOf(User, func() {
-				View("default")
-			}))
-		})
+		Response(OK, ArrayOf(String))
 	})
 })
 
@@ -116,6 +112,11 @@ var _ = Resource("events", func() {
 		Params(func() {
 			Param("category", String, "Category under which the actions were tracked")
 		})
+		Response(OK, ArrayOf(String))
+	})
+	Action("users", func() {
+		Description("List of all tracked users")
+		Routing(GET("/users"))
 		Response(OK, ArrayOf(String))
 	})
 })

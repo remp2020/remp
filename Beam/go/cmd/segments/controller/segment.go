@@ -62,5 +62,5 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 	if err != nil {
 		return err
 	}
-	return ctx.OK((UserCollection)(uc).ToMediaType())
+	return ctx.OK(uc)
 }

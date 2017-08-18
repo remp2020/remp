@@ -52,6 +52,7 @@ services:
 	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
 	        - add(Remp\MailerModule\Commands\ProcessJobCommand())
 	        - add(Remp\MailerModule\Commands\WorkerCommand())
+	        - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
 	        - setCatchExceptions(true)
 
 	segmentAgreggator:
@@ -59,6 +60,8 @@ services:
 	    setup:
 	        - register(Remp\MailerModule\Segment\Crm(%crm_api_base_url%, %crm_api_token%))
 	        - register(Remp\MailerModule\Segment\Remp(%segments_api_base_url%))
+
+	- Remp\MailerModule\User\Crm(%crm_api_base_url%, %crm_api_token%)
 
 	mailFactory:
 	    class: Remp\MailerModule\Sender\MailerFactory
@@ -127,6 +130,3 @@ services:
 	- Remp\MailerModule\Forms\JobFormFactory
 	- Remp\MailerModule\Forms\NewBatchFormFactory
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
-
-	# Commands
-	- Remp\MailerModule\Commands\HelloWorldCommand

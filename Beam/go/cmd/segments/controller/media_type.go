@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"github.com/pkg/errors"
+	"github.com/satori/go.uuid"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -10,12 +12,6 @@ type Segment model.Segment
 
 // SegmentCollection is the collection of Segments.
 type SegmentCollection model.SegmentCollection
-
-// User represent user information stored in events.
-type User model.User
-
-// UserCollection is the collection of Users.
-type UserCollection model.UserCollection
 
 // Event represent tracked generic events data.
 type Event model.Event
@@ -44,42 +40,45 @@ func (sc SegmentCollection) ToMediaType() app.SegmentCollection {
 	return mt
 }
 
-// ToMediaType converts internal User representation to application one.
-func (u *User) ToMediaType() *app.User {
-	return &app.User{
-		ID: u.ID,
-	}
-}
-
-// ToMediaType converts internal UserCollection representation to application one.
-func (uc UserCollection) ToMediaType() app.UserCollection {
-	mt := app.UserCollection{}
-	for _, u := range uc {
-		mt = append(mt, (*User)(u).ToMediaType())
-	}
-	return mt
-}
-
 // ToMediaType converts internal Event representation to application one.
-func (e *Event) ToMediaType() *app.Event {
-	return &app.Event{
-		Category:  e.Category,
-		Action:    e.Action,
-		Time:      e.Time,
-		Host:      e.Host,
-		IP:        e.IP,
-		Token:     e.Token,
-		UserID:    e.UserID,
-		URL:       e.URL,
-		UserAgent: e.UserAgent,
+func (e *Event) ToMediaType() (*app.Event, error) {
+	token, err := uuid.FromString(e.Token)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to parse property token as UUID")
 	}
+	event := &app.Event{
+		Category: e.Category,
+		Action:   e.Action,
+		System: &app.System{
+			Time:          e.Time,
+			PropertyToken: token,
+		},
+		User: &app.User{},
+	}
+	if e.IP != "" {
+		event.User.IPAddress = &e.IP
+	}
+	if e.UserID != "" {
+		event.User.ID = &e.UserID
+	}
+	if e.URL != "" {
+		event.User.URL = &e.URL
+	}
+	if e.UserAgent != "" {
+		event.User.UserAgent = &e.UserAgent
+	}
+	return event, nil
 }
 
 // ToMediaType converts internal EventCollection representation to application one.
-func (ec EventCollection) ToMediaType() app.EventCollection {
+func (ec EventCollection) ToMediaType() (app.EventCollection, error) {
 	mt := app.EventCollection{}
 	for _, e := range ec {
-		mt = append(mt, (*Event)(e).ToMediaType())
+		event, err := (*Event)(e).ToMediaType()
+		if err != nil {
+			return nil, err
+		}
+		mt = append(mt, event)
 	}
-	return mt
+	return mt, nil
 }

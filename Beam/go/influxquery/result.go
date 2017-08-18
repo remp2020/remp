@@ -30,7 +30,10 @@ func (ir *Result) StringValue(col string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	val := ir.series.Values[ir.rowIdx][colIdx].(string)
+	val, ok := ir.series.Values[ir.rowIdx][colIdx].(string)
+	if !ok {
+		return "", false
+	}
 	return val, true
 }
 
