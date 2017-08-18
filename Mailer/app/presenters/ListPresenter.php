@@ -3,11 +3,14 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
+use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Tomaj\Hermes\Emitter;
 
 final class ListPresenter extends BasePresenter
 {
@@ -20,16 +23,21 @@ final class ListPresenter extends BasePresenter
     /** @var ListFormFactory */
     private $listFormFactory;
 
+    /** @var Emitter */
+    private $emitter;
+
     public function __construct(
         ListsRepository $listsRepository,
         TemplatesRepository $templatesRepository,
-        ListFormFactory $listFormFactory
+        ListFormFactory $listFormFactory,
+        Emitter $emitter
     ) {
 
         parent::__construct();
         $this->listsRepository = $listsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->listFormFactory = $listFormFactory;
+        $this->emitter = $emitter;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -63,6 +71,7 @@ final class ListPresenter extends BasePresenter
             'data' => []
         ];
 
+        /** @var ActiveRow $list */
         foreach ($lists as $list) {
             $result['data'][] = [
                 'RowId' => $list->id,
@@ -127,6 +136,7 @@ final class ListPresenter extends BasePresenter
             'data' => []
         ];
 
+        /** @var ActiveRow $template */
         foreach ($templates as $template) {
             $result['data'][] = [
                 'RowId' => $template->id,
@@ -145,6 +155,10 @@ final class ListPresenter extends BasePresenter
 
         $presenter = $this;
         $this->listFormFactory->onSuccess = function ($list) use ($presenter) {
+            $this->emitter->emit(new HermesMessage('list-created', [
+                'list_id' => $list->id,
+            ]));
+
             $presenter->flashMessage('Newsletter list was created');
             $presenter->redirect('Show', $list->id);
         };

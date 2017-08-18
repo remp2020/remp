@@ -39,6 +39,10 @@ task('deploy:migration', function() {
     run("cd {{release_path}}; php bin/command.php migrate:migrate");
 })->desc('Migrate database');
 
+task('deploy:restart_hermes', function() {
+    run("touch {{deploy_path}}/shared/system/hermes_restart");
+});
+
 task('deploy', [
     'deploy:prepare',
     'deploy:release',
@@ -47,5 +51,6 @@ task('deploy', [
     'deploy:tmplink',
 //    'deploy:migration', // migrations not enabled until running from shared CRM database
     'deploy:symlink',
+    'deploy:restart_hermes',
     'cleanup',
 ])->desc('Deploy your project');

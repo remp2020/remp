@@ -11,6 +11,8 @@ parameters:
         db: @environmentConfig::get('REDIS_DB')
     kafka:
         broker: @environmentConfig::get('KAFKA_BROKER')
+    hermes:
+        restart_file_path: @environmentConfig::get('HERMES_RESTART_FILE_PATH')
     errbit:
         send_errors: false
 
@@ -53,10 +55,24 @@ services:
 	    setup:
 	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
 	        - add(Remp\MailerModule\Commands\ProcessJobCommand())
-	        - add(Remp\MailerModule\Commands\WorkerCommand())
+	        - add(Remp\MailerModule\Commands\MailWorkerCommand())
 	        - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
 	        - add(Remp\MailerModule\Commands\SubscriberCommand())
+	        - add(Remp\MailerModule\Commands\HermesWorkerCommand())
 	        - setCatchExceptions(true)
+
+	hermesLogger:
+		class: Monolog\Logger('hermes-logger')
+		setup:
+			- pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/hermes-log.txt"))
+			- pushHandler(Monolog\Handler\ErrorLogHandler())
+	hermesRestart: Tomaj\Hermes\Restart\SharedFileRestart(%hermes.restart_file_path%)
+	hermesDispatcher:
+		class: Tomaj\Hermes\Dispatcher(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger, @hermesRestart)
+	hermesEmitter:
+		class: Tomaj\Hermes\Emitter(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger)
+	- Remp\MailerModule\Hermes\HermesTasksQueue(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Repository\HermesTasksRepository
 
 	segmentAgreggator:
 	    class: Remp\MailerModule\Segment\Aggregator
@@ -132,3 +148,6 @@ services:
 	- Remp\MailerModule\Forms\JobFormFactory
 	- Remp\MailerModule\Forms\NewBatchFormFactory
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
+
+	# Hermes handlers
+	- Remp\MailerModule\Hermes\ListCreatedHandler
