@@ -72,13 +72,14 @@ class SubscriberCommand extends Command
 
             $message = Json::decode($message->payload, Json::FORCE_ARRAY);
             $userId = $message['user']['id'];
-            $output->write("Subscribing user: " . $userId . " ... ");
 
             $userList = $this->userProvider->list([$userId], 1);
             if (count($userList) == 0) {
                 throw new \Exception('invalid user_id provided by event: ' . $userId);
             }
             $userInfo = $userList[$userId];
+
+            $output->write(sprintf("Subscribing user: %s (%s) ... ",  $userInfo['email'], $userId));
 
             $lists = $this->listsRepository->all();
 
