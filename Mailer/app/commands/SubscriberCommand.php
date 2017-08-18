@@ -79,7 +79,7 @@ class SubscriberCommand extends Command
             }
             $userInfo = $userList[$userId];
 
-            $output->write(sprintf("Subscribing user: %s (%s) ... ",  $userInfo['email'], $userId));
+            $output->write(sprintf("Subscribing user: %s (%s) ... ", $userInfo['email'], $userId));
 
             $lists = $this->listsRepository->all();
 

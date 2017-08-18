@@ -48,8 +48,8 @@ class SyncUserSubscriptionsCommand extends Command
 
         while ($users = $this->userProvider->list([], $page)) {
             foreach ($users as $user) {
-                $output->write("Subscribing user: " . $user['id'] . " ... ");
-                $lists = $this->listsRepository->getTable()->fetchAll();
+                $output->write(sprintf("Subscribing user: %s (%s) ... ", $user['email'], $user['id']));
+                $lists = $this->listsRepository->all();
 
                 /** @var ActiveRow $list */
                 foreach ($lists as $list) {
