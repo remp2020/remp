@@ -20,7 +20,7 @@ type SegmentStorage interface {
 	// Check verifies presence of user within provided segment.
 	Check(segment *Segment, userID string, now time.Time) (bool, error)
 	// Users return list of all users within segment.
-	Users(segment *Segment, now time.Time) (UserCollection, error)
+	Users(segment *Segment, now time.Time) ([]string, error)
 }
 
 // Segment structure.
@@ -89,8 +89,8 @@ type User struct {
 // UserCollection is list of Users.
 type UserCollection []*User
 
-// UserMap is map of Users keyed by userID.
-type UserMap map[string]*User
+// UserSet is set of Users keyed by userID.
+type UserSet map[string]bool
 
 // Intersector responds to ability to intersect provided userID with some other collection structure.
 type Intersector func(userID string) bool
@@ -184,8 +184,8 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 }
 
 // Users return list of all users within segment.
-func (sDB *SegmentDB) Users(segment *Segment, now time.Time) (UserCollection, error) {
-	um := make(UserMap)
+func (sDB *SegmentDB) Users(segment *Segment, now time.Time) ([]string, error) {
+	um := make(UserSet)
 
 	for i, sr := range segment.Rules {
 		filteredUm, err := sDB.ruleUsers(sr, now, func(userID string) bool {
@@ -198,16 +198,16 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time) (UserCollection, er
 		um = filteredUm
 	}
 
-	uc := UserCollection{}
-	for _, u := range um {
-		uc = append(uc, u)
+	var uc []string
+	for userID := range um {
+		uc = append(uc, userID)
 	}
 
 	return uc, nil
 }
 
 // ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
-func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Intersector) (UserMap, error) {
+func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Intersector) (UserSet, error) {
 	// TODO: change user_id to tag and update config based on https://docs.influxdata.com/influxdb/v1.2/administration/config/#max-values-per-tag-100000
 
 	subquery := sDB.InfluxDB.QueryBuilder.
@@ -231,7 +231,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 		return nil, err
 	}
 
-	um := make(UserMap)
+	um := make(UserSet)
 	for _, serie := range response.Results[0].Series {
 		var index int
 		for i, col := range serie.Columns {
@@ -246,9 +246,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 				return nil, errors.New("influx result is not string, cannot proceed")
 			}
 			if intersect(userID) {
-				um[userID] = &User{
-					ID: userID,
-				}
+				um[userID] = true
 			}
 		}
 	}

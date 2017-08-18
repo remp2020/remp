@@ -9,6 +9,8 @@ parameters:
         host: @environmentConfig::get('REDIS_HOST')
         port: @environmentConfig::get('REDIS_PORT')
         db: @environmentConfig::get('REDIS_DB')
+    kafka:
+        broker: @environmentConfig::get('KAFKA_BROKER')
     errbit:
         send_errors: false
 
@@ -52,15 +54,17 @@ services:
 	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
 	        - add(Remp\MailerModule\Commands\ProcessJobCommand())
 	        - add(Remp\MailerModule\Commands\WorkerCommand())
+	        - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
+	        - add(Remp\MailerModule\Commands\SubscriberCommand())
 	        - setCatchExceptions(true)
-
-	- Remp\MailerModule\Sender
 
 	segmentAgreggator:
 	    class: Remp\MailerModule\Segment\Aggregator
 	    setup:
 	        - register(Remp\MailerModule\Segment\Crm(%crm_api_base_url%, %crm_api_token%))
 	        - register(Remp\MailerModule\Segment\Remp(%segments_api_base_url%))
+
+	- Remp\MailerModule\User\Crm(%crm_api_base_url%, %crm_api_token%)
 
 	mailFactory:
 	    class: Remp\MailerModule\Sender\MailerFactory
@@ -78,10 +82,11 @@ services:
 #	    class: Remp\NetteSso\Security\UserStorage
 
 	- Remp\MailerModule\Config\Config
-
-
+	- Remp\MailerModule\Sender
+	- Remp\MailerModule\Broker\ConsumerFactory(%kafka.broker%)
 	- Remp\MailerModule\Job\BatchEmailGenerator
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Auth\AutoLogin
 
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
@@ -90,10 +95,12 @@ services:
 	    class: Tomaj\NetteApi\ApiDecider
 	    setup:
 	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 	        - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 
 	# Repositories
+	- Remp\MailerModule\Repository\AuditLogRepository
 	- Remp\MailerModule\Repository\ConfigsRepository
 	- Remp\MailerModule\Repository\UsersRepository
 	- Remp\MailerModule\Repository\UserSubscriptionsRepository
@@ -109,8 +116,7 @@ services:
 	- Remp\MailerModule\Repository\SegmentsRepository
 	- Remp\MailerModule\Repository\BatchesRepository
 	- Remp\MailerModule\Repository\BatchTemplatesRepository
-
-
+	- Remp\MailerModule\Repository\AutoLoginTokensRepository
 
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory
@@ -126,6 +132,3 @@ services:
 	- Remp\MailerModule\Forms\JobFormFactory
 	- Remp\MailerModule\Forms\NewBatchFormFactory
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
-
-	# Commands
-	- Remp\MailerModule\Commands\HelloWorldCommand

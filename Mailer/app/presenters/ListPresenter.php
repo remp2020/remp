@@ -25,7 +25,7 @@ final class ListPresenter extends BasePresenter
         TemplatesRepository $templatesRepository,
         ListFormFactory $listFormFactory
     ) {
-    
+
         parent::__construct();
         $this->listsRepository = $listsRepository;
         $this->templatesRepository = $templatesRepository;
