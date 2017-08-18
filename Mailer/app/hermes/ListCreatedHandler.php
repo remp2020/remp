@@ -24,8 +24,7 @@ class ListCreatedHandler implements HandlerInterface
         ListsRepository $listsRepository,
         IUser $userProvider,
         UserSubscriptionsRepository $userSubscriptionsRepository
-    )
-    {
+    ) {
         $this->listsRepository = $listsRepository;
         $this->userProvider = $userProvider;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
