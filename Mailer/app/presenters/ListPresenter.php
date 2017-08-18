@@ -8,7 +8,6 @@ use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
-use Remp\MailerModule\User\IUser;
 
 final class ListPresenter extends BasePresenter
 {
@@ -21,20 +20,16 @@ final class ListPresenter extends BasePresenter
     /** @var ListFormFactory */
     private $listFormFactory;
 
-    private $userProvider;
-
     public function __construct(
         ListsRepository $listsRepository,
         TemplatesRepository $templatesRepository,
-        ListFormFactory $listFormFactory,
-        IUser $userProvider
+        ListFormFactory $listFormFactory
     ) {
-    
+
         parent::__construct();
         $this->listsRepository = $listsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->listFormFactory = $listFormFactory;
-        $this->userProvider = $userProvider;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
