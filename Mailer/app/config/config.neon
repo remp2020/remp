@@ -58,7 +58,7 @@ services:
 	        - add(Remp\MailerModule\Commands\MailWorkerCommand())
 	        - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
 	        - add(Remp\MailerModule\Commands\SubscriberCommand())
-	        - add(Remp\MailerModule\Commands\HermesWorkerCommand())
+	        - add(@hermesWorker())
 	        - setCatchExceptions(true)
 
 	hermesLogger:
@@ -73,6 +73,10 @@ services:
 		class: Tomaj\Hermes\Emitter(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger)
 	- Remp\MailerModule\Hermes\HermesTasksQueue(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Repository\HermesTasksRepository
+	hermesWorker:
+	    class: Remp\MailerModule\Commands\HermesWorkerCommand
+	    setup:
+	        - add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
 
 	segmentAgreggator:
 	    class: Remp\MailerModule\Segment\Aggregator
@@ -148,6 +152,3 @@ services:
 	- Remp\MailerModule\Forms\JobFormFactory
 	- Remp\MailerModule\Forms\NewBatchFormFactory
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
-
-	# Hermes handlers
-	- Remp\MailerModule\Hermes\ListCreatedHandler
