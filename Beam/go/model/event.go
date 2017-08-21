@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -21,13 +22,13 @@ type EventOptions struct {
 type Event struct {
 	Category  string
 	Action    string
+	Token     string
+	Time      time.Time
 	Host      string
 	IP        string
-	Token     string
 	UserID    string
 	URL       string
 	UserAgent string
-	Time      time.Time
 }
 
 type EventCollection []*Event
@@ -41,6 +42,8 @@ type EventStorage interface {
 	Categories() ([]string, error)
 	// Actions lists all tracked actions under the given category.
 	Actions(category string) ([]string, error)
+	// Users lists all tracked users.
+	Users() ([]string, error)
 }
 
 type EventDB struct {
@@ -169,6 +172,34 @@ func (eDB *EventDB) Actions(category string) ([]string, error) {
 	return actions, nil
 }
 
+func (eDB *EventDB) Users() ([]string, error) {
+	q := client.Query{
+		Command:  `SHOW TAG VALUES WITH KEY = "user_id"`,
+		Database: eDB.DB.DBName,
+	}
+
+	response, err := eDB.DB.Client.Query(q)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error() != nil {
+		return nil, response.Error()
+	}
+
+	users := []string{}
+	if len(response.Results[0].Series) == 0 {
+		return users, nil
+	}
+	for _, val := range response.Results[0].Series[0].Values {
+		strVal, ok := val[1].(string)
+		if !ok {
+			return nil, errors.New("unable to convert influx result value to string")
+		}
+		users = append(users, strVal)
+	}
+	return users, nil
+}
+
 func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions) influxquery.Builder {
 	if o.UserID != "" {
 		builder.Where(fmt.Sprintf("user_id = '%s'", o.UserID))
@@ -189,6 +220,7 @@ func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions)
 }
 
 func eventFromInfluxResult(ir *influxquery.Result) (*Event, error) {
+	log.Printf("DEBUG: %#v\n", ir)
 	category, ok := ir.StringValue("category")
 	if !ok {
 		return nil, errors.New("unable to map Category to influx result column")
@@ -197,29 +229,9 @@ func eventFromInfluxResult(ir *influxquery.Result) (*Event, error) {
 	if !ok {
 		return nil, errors.New("unable to map Action to influx result column")
 	}
-	host, ok := ir.StringValue("host")
-	if !ok {
-		return nil, errors.New("unable to map Host to influx result column")
-	}
-	ip, ok := ir.StringValue("ip")
-	if !ok {
-		return nil, errors.New("unable to map IP to influx result column")
-	}
 	token, ok := ir.StringValue("token")
 	if !ok {
 		return nil, errors.New("unable to map Token to influx result column")
-	}
-	userID, ok := ir.StringValue("user_id")
-	if !ok {
-		return nil, errors.New("unable to map UserID to influx result column")
-	}
-	url, ok := ir.StringValue("url")
-	if !ok {
-		return nil, errors.New("unable to map URL to influx result column")
-	}
-	userAgent, ok := ir.StringValue("user_agent")
-	if !ok {
-		return nil, errors.New("unable to map UserAgent to influx result column")
 	}
 	t, ok, err := ir.TimeValue("time")
 	if err != nil {
@@ -228,16 +240,33 @@ func eventFromInfluxResult(ir *influxquery.Result) (*Event, error) {
 	if !ok {
 		return nil, errors.New("unable to map Time to influx result column")
 	}
+	event := &Event{
+		Category: category,
+		Action:   action,
+		Token:    token,
+		Time:     t,
+	}
 
-	return &Event{
-		Category:  category,
-		Action:    action,
-		Host:      host,
-		IP:        ip,
-		Token:     token,
-		UserID:    userID,
-		URL:       url,
-		UserAgent: userAgent,
-		Time:      t,
-	}, nil
+	host, ok := ir.StringValue("host")
+	if ok {
+		event.Host = host
+	}
+	ip, ok := ir.StringValue("ip")
+	if ok {
+		event.IP = ip
+	}
+	userID, ok := ir.StringValue("user_id")
+	if ok {
+		event.UserID = userID
+	}
+	url, ok := ir.StringValue("url")
+	if ok {
+		event.URL = url
+	}
+	userAgent, ok := ir.StringValue("user_agent")
+	if ok {
+		event.UserAgent = userAgent
+	}
+
+	return event, nil
 }

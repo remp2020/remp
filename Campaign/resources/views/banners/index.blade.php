@@ -15,7 +15,7 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Lorem ipsum <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+            <h2>List of banners <small></small></h2>
             <div class="actions">
                 <a href="{{ route('banners.create') }}" class="btn palette-Cyan bg waves-effect">Add new banner</a>
             </div>

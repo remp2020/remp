@@ -1,14 +1,34 @@
 FROM php:7.0-fpm
 
-# INIT
+ENV LIBRDKAFKA_VERSION v0.9.5
 
-RUN apt-get update && apt-get install -y git libzip-dev zlib1g-dev libicu-dev g++ build-essential \
+ENV BUILD_DEPS git libzip-dev zlib1g-dev g++ build-essential libsasl2-dev libssl-dev python-minimal
+
+ENV RUN_DEPS libicu-dev
+
+# INIT (single command so the intermediates are not stored)
+# librdkafka is built manually because packages contain only v0.8.5
+
+RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
+    && cd /tmp \
+    && git clone \
+        --branch ${LIBRDKAFKA_VERSION} \
+        --depth 1 \
+        https://github.com/edenhill/librdkafka.git \
+    && cd librdkafka \
+    && ./configure \
+    && make \
+    && make install \
+    && pecl install rdkafka && docker-php-ext-enable rdkafka && rm -rf /tmp/librdkafka && cd /var/www/html \
+    && pecl install xdebug && docker-php-ext-enable xdebug \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl
+    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl \
+    && apt-get purge \
+        -y --auto-remove \
+        -o APT::AutoRemove::RecommendsImportant=false \
+        ${BUILD_DEPS}
 
 # PHP
-
-RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 ADD xdebug.ini /tmp/xdebug.ini
 

@@ -9,7 +9,7 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Add new account <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+            <h2>Add new account <small></small></h2>
         </div>
         <div class="card-body card-padding">
             {!! Form::model($account, ['route' => 'accounts.store']) !!}

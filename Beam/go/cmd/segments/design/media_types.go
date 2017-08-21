@@ -89,42 +89,36 @@ var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
 	Required("id", "name", "sorting")
 })
 
-var User = MediaType("application/vnd.user+json", func() {
-	Description("User")
-	Attributes(func() {
-		Attribute("id", String, "Identificator of user")
-		Attribute("email", String, "E-mail of user")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("email")
-	})
-	Required("id")
-})
-
 var Event = MediaType("application/vnd.event+json", func() {
 	Description("Generic event")
 	Attributes(func() {
 		Attribute("category", String)
 		Attribute("action", String)
-		Attribute("time", DateTime)
-		Attribute("host", String)
-		Attribute("ip", String)
-		Attribute("token", String)
-		Attribute("user_id", String)
-		Attribute("url", String)
-		Attribute("user_agent", String)
+		Attribute("system", System)
+		Attribute("user", User)
 	})
 	View("default", func() {
 		Attribute("category")
 		Attribute("action")
-		Attribute("time")
-		Attribute("host")
-		Attribute("ip")
-		Attribute("token")
-		Attribute("user_id")
-		Attribute("url")
-		Attribute("user_agent")
+		Attribute("system")
+		Attribute("user")
 	})
-	Required("category", "action", "time", "host", "ip", "token", "user_id", "url", "user_agent")
+	Required("system", "category", "action")
+})
+
+var User = Type("User", func() {
+	Attribute("id", String, "ID of reader")
+	Attribute("url", String, "URL of the content/conversion point", func() {
+		Format("uri")
+	})
+	Attribute("user_agent", String, "User agent of client")
+	Attribute("ip_address", String, "IP address of client", func() {
+		Format("ip")
+	})
+})
+
+var System = Type("System", func() {
+	Attribute("property_token", UUID, "Property token")
+	Attribute("time", DateTime, "Time of occurrence")
+	Required("property_token", "time")
 })

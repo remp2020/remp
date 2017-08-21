@@ -15,7 +15,7 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Lorem ipsum <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+            <h2>List of segments <small></small></h2>
             <div class="actions">
                 <a href="{{ route('segments.create') }}" class="btn palette-Cyan bg waves-effect">Add new segment</a>
             </div>

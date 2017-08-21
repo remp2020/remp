@@ -15,7 +15,7 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Lorem ipsum <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
+            <h2>All accounts <small></small></h2>
             <div class="actions">
                 <a href="{{ route('accounts.create') }}" class="btn palette-Cyan bg waves-effect">Add new account</a>
             </div>

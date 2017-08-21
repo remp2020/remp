@@ -72,7 +72,11 @@ func (c *EventController) List(ctx *app.ListEventsContext) error {
 	if err != nil {
 		return err
 	}
-	return ctx.OK(EventCollection(ec).ToMediaType())
+	mt, err := EventCollection(ec).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(mt)
 }
 
 // Categories runs the categories action.
@@ -91,4 +95,13 @@ func (c *EventController) Actions(ctx *app.ActionsEventsContext) error {
 		return err
 	}
 	return ctx.OK(actions)
+}
+
+// Users runs the users action.
+func (c *EventController) Users(ctx *app.UsersEventsContext) error {
+	users, err := c.EventStorage.Users()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(users)
 }

@@ -44,10 +44,13 @@
         "deployer/deployer": "^5.0",
         "deployphp/recipes": "dev-master",
         "tomaj/nette-errbit": "~3.0",
-        "tomaj/nette-api": "^1.11"
+        "tomaj/nette-api": "^1.11",
+        "tomaj/hermes": "^1.3",
+        "monolog/monolog": "^1.13"
     },
     "require-dev": {
         "nette/tester": "^1.6",
-        "friendsofphp/php-cs-fixer": "*"
+        "friendsofphp/php-cs-fixer": "*",
+        "kwn/php-rdkafka-stubs": "^1.0"
     }
 }

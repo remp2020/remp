@@ -15,7 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class WorkerCommand extends Command
+class MailWorkerCommand extends Command
 {
     private $applicationMailer;
 
