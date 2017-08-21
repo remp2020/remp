@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EmailChangedWorkerCommand extends Command
 {
-    const TOPICS = ["email_changed"];
+    const TOPICS = ['email_changed'];
 
     private $consumerFactory;
 
@@ -38,7 +38,7 @@ class EmailChangedWorkerCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('worker:subscribe')
+        $this->setName('worker:change-email')
             ->setDescription('Start worker changing users email');
     }
 

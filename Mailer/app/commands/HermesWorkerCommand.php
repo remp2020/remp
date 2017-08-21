@@ -28,8 +28,8 @@ class HermesWorkerCommand extends Command
 
     protected function configure()
     {
-        $this->setName('hermes:worker')
-            ->setDescription('Hermes offline worker');
+        $this->setName('worker:hermes')
+            ->setDescription('Start hermes offline worker');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
