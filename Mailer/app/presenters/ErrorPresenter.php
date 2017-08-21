@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette;
 use Nette\Application\Responses;
+use Tracy\Debugger;
 use Tracy\ILogger;
 
 class ErrorPresenter implements Nette\Application\IPresenter
@@ -29,7 +30,7 @@ class ErrorPresenter implements Nette\Application\IPresenter
             return new Responses\ForwardResponse($request->setPresenterName($module . $sep . 'Error4xx'));
         }
 
-        $this->logger->log($exception, ILogger::EXCEPTION);
+        Debugger::log($exception, Debugger::EXCEPTION);
         return new Responses\CallbackResponse(function () {
             require __DIR__ . '/templates/Error/500.phtml';
         });
