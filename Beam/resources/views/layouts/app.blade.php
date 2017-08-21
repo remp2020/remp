@@ -67,9 +67,6 @@ function route_active($routeName, $classes = '', $activeClasses = '')
                 </li>
             </ul>
         </li>
-        <li class="hm-alerts" data-user-alert="sua-messages" data-ma-action="sidebar-open" data-ma-target="user-alerts">
-            <a href=""><i class="hm-icon zmdi zmdi-notifications"></i></a>
-        </li>
         <li class="dropdown hm-profile">
             <a data-toggle="dropdown" href="">
                 <img src="https://www.gravatar.com/avatar/{{ md5(Auth::user()->email) }}" alt="">
@@ -99,34 +96,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 </header>
 
 <section id="main">
-    <aside id="s-user-alerts" class="sidebar">
-        <div class="card">
-            <div class="card-header ch-img" style="background:white; height: 200px;">
-                <button data-ma-action="sidebar-close" class="btn palette-Red-600 bg btn-float waves-effect waves-circle waves-float"><i class="zmdi zmdi-arrow-left"></i></button>
-            </div>
-            <div class="card-header">
-                <h2>
-                    HELP
-                    <small>Lorem ipsum dolor sit amet</small>
-                </h2>
-            </div>
-            <div class="card-body card-padding">
-                <p>Donec ullamcorper nulla non metus auctor fringilla. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Vestibulum id ligula porta felis euismod semper. Nulla vitae elit libero, a pharetra </p>
-            </div>
-        </div>
-    </aside>
-
     <aside id="s-main-menu" class="sidebar">
-        <div class="smm-header">
-            <i class="zmdi zmdi-long-arrow-left" data-ma-action="sidebar-close"></i>
-        </div>
-
-        <ul class="smm-alerts">
-            <li data-ma-action="sidebar-open" data-ma-target="user-alerts">
-                <i class="zmdi zmdi-help"></i>
-            </li>
-        </ul>
-
         <ul class="main-menu">
             <li {!! route_active('dashboard') !!}>
                 <a href="{{ route('dashboard') }}"><i class="zmdi zmdi-home"></i> Dashboard</a>
