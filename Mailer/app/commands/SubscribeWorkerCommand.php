@@ -12,7 +12,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SubscriberCommand extends Command
+class SubscribeWorkerCommand extends Command
 {
     const TOPICS = ["user_register"];
 
@@ -42,8 +42,8 @@ class SubscriberCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('mail:subscribe-worker')
-            ->setDescription('Worker subscribing new users to emails');
+        $this->setName('worker:subscribe')
+            ->setDescription('Start worker subscribing new users to newsletter groups');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

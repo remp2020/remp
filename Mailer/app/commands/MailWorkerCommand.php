@@ -59,7 +59,7 @@ class MailWorkerCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('mail:worker')
+        $this->setName('worker:mail')
             ->setDescription('Start mail worker')
         ;
     }
