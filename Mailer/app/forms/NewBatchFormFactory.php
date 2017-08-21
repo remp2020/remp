@@ -18,14 +18,24 @@ class NewBatchFormFactory extends Object
     /** @var BatchesRepository */
     private $batchesRepository;
 
+    /** @var TemplatesRepository */
+    private $templatesRepository;
+
+    /** @var BatchTemplatesRepository */
+    private $batchTemplatesRepository;
+
     public $onSuccess;
 
     public function __construct(
         JobsRepository $jobsRepository,
-        BatchesRepository $batchesRepository
+        BatchesRepository $batchesRepository,
+        TemplatesRepository $templatesRepository,
+        BatchTemplatesRepository $batchTemplatesRepository
     ) {
         $this->jobsRepository = $jobsRepository;
         $this->batchesRepository = $batchesRepository;
+        $this->templatesRepository = $templatesRepository;
+        $this->batchTemplatesRepository = $batchTemplatesRepository;
     }
 
     public function create($jobId)
@@ -39,11 +49,16 @@ class NewBatchFormFactory extends Object
         ];
         $form->addSelect('method', 'Method', $methods);
 
-        $form->addText('email_count', 'Number of emails')
-            ->setRequired('Required');
+        $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'))
+            ->setPrompt('Select email')
+            ->setRequired();
 
-        $form->addText('start_at', 'Start date')
-            ->setRequired('Required');
+        $form->addSelect('b_template_id', 'Email B Alternative', $this->templatesRepository->all()->fetchPairs('id', 'name'))
+            ->setPrompt('Select email');
+
+        $form->addText('email_count', 'Number of emails');
+
+        $form->addText('start_at', 'Start date');
 
         $form->addHidden('job_id', $jobId);
 
@@ -60,10 +75,24 @@ class NewBatchFormFactory extends Object
     {
         $batch = $this->batchesRepository->add(
             $values['job_id'],
-            $values['email_count'],
+            !empty($values['email_count']) ? (int)$values['email_count'] : null,
             $values['start_at'],
             $values['method']
         );
+
+        $this->batchTemplatesRepository->add(
+            $values['job_id'],
+            $batch->id,
+            $values['template_id']
+        );
+
+        if ($values['b_template_id'] !== null) {
+            $this->batchTemplatesRepository->add(
+                $values['job_id'],
+                $batch->id,
+                $values['b_template_id']
+            );
+        }
 
         ($this->onSuccess)($batch->job);
     }

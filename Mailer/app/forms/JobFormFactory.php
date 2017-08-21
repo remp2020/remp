@@ -59,9 +59,16 @@ class JobFormFactory extends Object
             $form->addError('Unable to fetch list of segments, please check the application configuration.');
         }
 
-        $form->addSelect('segment_code', 'Segment', $segments);
+        $form->addSelect('segment_code', 'Segment', $segments)
+            ->setPrompt('Select segment')
+            ->setRequired();
 
-        $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'));
+        $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'))
+            ->setPrompt('Select email')
+            ->setRequired();
+
+        $form->addSelect('b_template_id', 'Email B Alternative', $this->templatesRepository->all()->fetchPairs('id', 'name'))
+            ->setPrompt('Select email');
 
         $form->addText('email_count', 'Max number of sent emails');
 
@@ -88,11 +95,19 @@ class JobFormFactory extends Object
             !empty($values['start_at']) ? $values['start_at'] : null
         );
 
-        $batchTemplate = $this->batchTemplatesRepository->add(
+        $this->batchTemplatesRepository->add(
             $job->id,
             $batch->id,
             $values['template_id']
         );
+
+        if ($values['b_template_id'] !== null) {
+            $this->batchTemplatesRepository->add(
+                $job->id,
+                $batch->id,
+                $values['b_template_id']
+            );
+        }
 
         ($this->onSuccess)($job);
     }

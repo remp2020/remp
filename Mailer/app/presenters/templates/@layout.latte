@@ -20,6 +20,11 @@
 </head>
 
 <body data-ma-header="cyan-600">
+<div class="remp-bar btn-group">
+    <a class="btn btn-default waves-effect">REMP</a>
+    <a href="https://mailer.remp2020.com" class="btn btn-icon-text btn-default waves-effect"><i class="zmdi zmdi-email"></i> Mailer</a>
+    <a href="https://campaign.remp2020.com" class="btn btn-icon-text btn-default waves-effect"><i class="zmdi zmdi-star"></i> Campaign</a>
+</div>
 <header id="header" class="media">
     <div class="pull-left h-logo">
         <a n:href="Dashboard:default" class="hidden-xs"></a>
@@ -78,7 +83,6 @@
             <i class="zmdi zmdi-search hs-reset" data-ma-action="search-clear"></i>
         </form>
     </div>
-
 </header>
 
 <section id="main">
@@ -86,9 +90,9 @@
         <ul class="main-menu">
             <li n:class="$presenter->isLinkCurrent('Dashboard:*') ? active"><a n:href="Dashboard:default"><i class="zmdi zmdi-home"></i> Dashboard</a></li>
             <li class="m-b-15"></li>
-            <li n:class="$presenter->isLinkCurrent('List:*') ? active"><a n:href="List:default"><i class="zmdi zmdi-arrow-split"></i> Newsletter lists</a></li>
-            <li n:class="$presenter->isLinkCurrent('Layout:*') ? active"><a n:href="Layout:default"><i class="zmdi zmdi-widgets"></i> Layouts (Templates)</a></li>
             <li n:class="$presenter->isLinkCurrent('Template:*') ? active"><a n:href="Template:default"><i class="zmdi zmdi-view-quilt"></i> Emails</a></li>
+            <li n:class="$presenter->isLinkCurrent('Layout:*') ? active"><a n:href="Layout:default"><i class="zmdi zmdi-widgets"></i> Layouts (Templates)</a></li>
+            <li n:class="$presenter->isLinkCurrent('List:*') ? active"><a n:href="List:default"><i class="zmdi zmdi-arrow-split"></i> Newsletter lists</a></li>
             <li class="m-b-15"></li>
             <li n:class="$presenter->isLinkCurrent('Job:*') ? active"><a n:href="Job:default"><i class="zmdi zmdi-refresh"></i> Jobs</a></li>
             <li n:class="$presenter->isLinkCurrent('Log:*') ? active"><a n:href="Log:default"><i class="zmdi zmdi-view-list-alt"></i> Log</a></li>
