@@ -19,7 +19,7 @@ class NewBatchFormFactory extends Object
     private $batchesRepository;
 
     /** @var TemplatesRepository */
-    private  $templatesRepository;
+    private $templatesRepository;
 
     /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;

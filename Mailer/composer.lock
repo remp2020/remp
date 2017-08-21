@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc89911712e4844a0e25ce7ccf375268",
+    "content-hash": "a009078167f168dc9c8e58fee9e0a534",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -2580,7 +2580,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Composer/nette-sso",
-                "reference": "84ccf8ed2b49777d64399671de325c6263904bc5",
+                "reference": "9f49932e2dd48d7508f20ff2a73b8bebece27b39",
                 "shasum": null
             },
             "require": {
