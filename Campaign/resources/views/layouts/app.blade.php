@@ -97,8 +97,6 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 </header>
 
 <section id="main">
-    <aside id="s-user-alerts" class="sidebar">
-
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
             <li {!! route_active('dashboard') !!}>
