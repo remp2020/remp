@@ -4,6 +4,7 @@ parameters:
     crm_api_base_url: @environmentConfig::get('CRM_API_BASE_URL')
     crm_api_token: @environmentConfig::get('CRM_API_TOKEN')
     tracker_api_base_url: @environmentConfig::get('TRACKER_API_BASE_URL')
+    tracker_api_property_token: @environmentConfig::get('TRACKER_API_PROPERTY_TOKEN')
     segments_api_base_url: @environmentConfig::get('SEGMENTS_API_BASE_URL')
     redis:
         host: @environmentConfig::get('REDIS_HOST')
@@ -78,6 +79,7 @@ services:
 	    class: Remp\MailerModule\Commands\HermesWorkerCommand
 	    setup:
 	        - add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
+	        - add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
 
 	segmentAgreggator:
 	    class: Remp\MailerModule\Segment\Aggregator
@@ -86,6 +88,7 @@ services:
 	        - register(Remp\MailerModule\Segment\Remp(%segments_api_base_url%))
 
 	- Remp\MailerModule\User\Crm(%crm_api_base_url%, %crm_api_token%)
+	- Remp\MailerModule\Tracker\Remp(%tracker_api_base_url%, %tracker_api_property_token%)
 
 	mailFactory:
 	    class: Remp\MailerModule\Sender\MailerFactory

@@ -50,7 +50,11 @@ class Crm implements ISegment
     public function users($segment)
     {
         $response = $this->request(static::ENDPOINT_USERS, ['code' => $segment['code']]);
-        return $response['users'];
+        $userIds = [];
+        foreach ($response['users'] as $user) {
+            $userIds[] = $user['id'];
+        }
+        return $userIds;
     }
 
     private function request($url, $query = [])
