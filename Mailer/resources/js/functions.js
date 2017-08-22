@@ -350,7 +350,15 @@ $(document).ready(function(){
      * HTML Editor
      */
     if ($('.html-editor')[0]) {
-        // TODO: implement summernote
+        $('.html-editor').each(function () {
+            var id = $(this).attr('id');
+            var editor = CodeMirror.fromTextArea(document.getElementById(id), {
+                mode: 'htmlmixed',
+                styleActiveLine: true,
+                lineNumbers: true,
+                lineWrapping: false
+            });
+        });
     }
 
     /*

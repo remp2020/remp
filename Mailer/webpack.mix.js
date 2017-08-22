@@ -37,7 +37,8 @@ mix
         "easy-pie-chart/dist/jquery.easypiechart.js",
         "bootstrap-notify",
         "eonasdan-bootstrap-datetimepicker",
-        "summernote"
+        "codemirror",
+        "codemirror/mode/htmlmixed/htmlmixed.js"
     ])
     .autoload({
         "jquery": ['$', 'jQuery', "window.jQuery"],
