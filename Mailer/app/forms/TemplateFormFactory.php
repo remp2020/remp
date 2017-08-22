@@ -38,9 +38,12 @@ class TemplateFormFactory extends Object
 
     public function create($id)
     {
+        $count = 0;
         $defaults = [];
+
         if (isset($id)) {
             $template = $this->templatesRepository->find($id);
+            $count = $template->related('mail_logs')->count('*');
             $defaults = $template->toArray();
         }
 
@@ -52,7 +55,7 @@ class TemplateFormFactory extends Object
         $form->addText('name', 'Name')
             ->setRequired('Required');
 
-        if (isset($id)) {
+        if (isset($id) && $count > 0) {
             $form->addText('code', 'Code')
                 ->setRequired('Required')
                 ->setDisabled();
@@ -103,6 +106,7 @@ class TemplateFormFactory extends Object
                 $values['name'],
                 $values['code'],
                 $values['description'],
+                $values['autologin'],
                 $values['from'],
                 $values['subject'],
                 $values['mail_body_text'],

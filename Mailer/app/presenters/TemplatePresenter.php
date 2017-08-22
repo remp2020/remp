@@ -184,7 +184,7 @@ final class TemplatePresenter extends BasePresenter
         $template = $this->templatesRepository->find($id);
         $newTemplate = $this->templatesRepository->duplicate($template);
         $this->flashMessage('Email was duplicated.');
-        $this->redirect('show', $newTemplate->id);
+        $this->redirect('edit', $newTemplate->id);
     }
 
     public function createComponentTemplateForm()
