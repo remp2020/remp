@@ -63,3 +63,9 @@ RUN curl -sL https://yarnpkg.com/install.sh | bash -
 VOLUME /var/www/html
 
 RUN chmod 777 /var/www/html
+
+ADD remp.sh /root/remp.sh
+
+RUN chmod +x /root/remp.sh
+
+CMD "/root/remp.sh"
