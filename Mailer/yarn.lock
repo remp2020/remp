@@ -3195,10 +3195,6 @@ jquery@3.2.1, jquery@>=1.7, jquery@>=1.8, "jquery@^1.8.3 || ^2.0 || ^3.0":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
 
-jquery@^2.2.4:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-2.2.4.tgz#2c89d6889b5eac522a7eea32c14521559c6cbf02"
-
 js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.1.9"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.1.9.tgz#f0e80ae039a4bd654b5f281fc93f04a914a7fcce"
@@ -5552,13 +5548,6 @@ sum-up@^1.0.1:
   resolved "https://registry.yarnpkg.com/sum-up/-/sum-up-1.0.3.tgz#1c661f667057f63bcb7875aa1438bc162525156e"
   dependencies:
     chalk "^1.0.0"
-
-summernote@^0.8.7:
-  version "0.8.7"
-  resolved "https://registry.yarnpkg.com/summernote/-/summernote-0.8.7.tgz#20178dcd918593a02840262590f3cbd3e4801467"
-  dependencies:
-    bootstrap "^3.3.7"
-    jquery "^2.2.4"
 
 supports-color@^2.0.0:
   version "2.0.0"
