@@ -15,7 +15,8 @@ class MailSentHandler implements HandlerInterface
 
     private $tracker;
 
-    public function __construct(ITracker $tracker) {
+    public function __construct(ITracker $tracker)
+    {
         $this->tracker = $tracker;
     }
 
