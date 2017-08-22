@@ -350,14 +350,7 @@ $(document).ready(function(){
      * HTML Editor
      */
     if ($('.html-editor')[0]) {
-        CKEDITOR.replaceAll(function (textarea, config) {
-            if (textarea.className.indexOf('html-editor') === -1) {
-                return false;
-            }
-
-            config.customConfig = '/assets/js/config.js';
-            return true;
-        });
+        // TODO: implement summernote
     }
 
     /*

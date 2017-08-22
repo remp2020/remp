@@ -11,14 +11,6 @@ mix
         publicPath: publicPath,
         resourceRoot: "/assets/vendor/"
     })
-    .copy("node_modules/ckeditor/adapters", publicPath + "js/ckeditor/adapters")
-    .copy("node_modules/ckeditor/lang", publicPath + "js/ckeditor/lang")
-    .copy("node_modules/ckeditor/plugins", publicPath + "js/ckeditor/plugins")
-    .copy("node_modules/ckeditor/skins", publicPath + "js/ckeditor/skins")
-    .copy([
-        "node_modules/ckeditor/styles.js",
-        "node_modules/ckeditor/contents.css"
-    ], publicPath + "js/ckeditor")
     .js([
         "resources/js/functions.js",
         "resources/js/actions.js",
@@ -36,7 +28,6 @@ mix
         "animate.css",
         "autosize",
         "bootstrap-select",
-        "ckeditor",
         "datatables.net",
         "datatables.net-rowgroup",
         "google-material-color",
@@ -45,7 +36,8 @@ mix
         "node-waves",
         "easy-pie-chart/dist/jquery.easypiechart.js",
         "bootstrap-notify",
-        "eonasdan-bootstrap-datetimepicker"
+        "eonasdan-bootstrap-datetimepicker",
+        "summernote"
     ])
     .autoload({
         "jquery": ['$', 'jQuery', "window.jQuery"],
