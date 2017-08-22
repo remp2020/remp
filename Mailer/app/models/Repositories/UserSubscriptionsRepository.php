@@ -17,6 +17,11 @@ class UserSubscriptionsRepository extends Repository
         return parent::update($row, $data);
     }
 
+    public function findByEmail($email)
+    {
+        return $this->getTable()->where(['user_email' => $email])->fetchAll();
+    }
+
     public function findByEmailList($email, $listId)
     {
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $listId])->fetch();
