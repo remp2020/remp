@@ -79,7 +79,7 @@ services:
     domainname: "mailer.remp.app"
     hostname: "mailer"
     environment:
-      APP_NAME: "Sso"
+      APP_NAME: "Mailer"
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
