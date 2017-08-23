@@ -6,6 +6,13 @@ then
     composer install
     yarn install
     yarn run dev
+
+    if [ -f "artisan" ]
+    then
+        php artisan db:seed
+    elif [ -f "bin/command.php" ]
+        php bin/command.php application:seed
+    fi
 fi
 php-fpm
 
