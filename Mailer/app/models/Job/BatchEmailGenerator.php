@@ -2,10 +2,11 @@
 
 namespace Remp\MailerModule\Job;
 
-use Nette\Database\Table\IRow;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository\JobQueueRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Segment\Aggregator;
+use Remp\MailerModule\User\IUser;
 
 class BatchEmailGenerator
 {
@@ -15,6 +16,8 @@ class BatchEmailGenerator
 
     private $segmentAggregator;
 
+    private $userProvider;
+
     private $mailCache;
 
     private $templates = [];
@@ -23,15 +26,17 @@ class BatchEmailGenerator
         JobsRepository $mailJobsRepository,
         JobQueueRepository $mailJobQueueRepository,
         Aggregator $segmentAggregator,
+        IUser $userProvider,
         MailCache $mailCache
     ) {
         $this->mailJobsRepository = $mailJobsRepository;
         $this->mailJobQueueRepository = $mailJobQueueRepository;
         $this->segmentAggregator = $segmentAggregator;
+        $this->userProvider = $userProvider;
         $this->mailCache = $mailCache;
     }
 
-    public function generate(IRow $batch)
+    public function generate(ActiveRow $batch)
     {
         $this->mailJobQueueRepository->clearBatch($batch);
 
@@ -41,23 +46,29 @@ class BatchEmailGenerator
 
         $job = $batch->job;
 
-        $users = $this->segmentAggregator->users(['provider' => $batch->mail_job->segment_provider, 'code' => $batch->mail_job->segment_code]);
+        $userIds = $this->segmentAggregator->users(['provider' => $batch->mail_job->segment_provider, 'code' => $batch->mail_job->segment_code]);
 
-        foreach ($users as $user) {
-            $templateId = $this->getTemplate($batch);
+        $userMap = [];
+        $page = 1;
+        while ($users = $this->userProvider->list($userIds, $page)) {
+            foreach ($users as $user) {
+                $userMap[$user['email']] = $user['id'];
+                $templateId = $this->getTemplate($batch);
 
-            $insert[] = [
-                'batch' => $batch,
-                'templateId' => $templateId,
-                'email' => $user['email'],
-                'sorting' => rand(),
-            ];
-            ++$processed;
-            if ($processed == $batchInsert) {
-                $processed = 0;
-                $this->mailJobQueueRepository->multiInsert($insert);
-                $insert = [];
+                $insert[] = [
+                    'batch' => $batch,
+                    'templateId' => $templateId,
+                    'email' => $user['email'],
+                    'sorting' => rand(),
+                ];
+                ++$processed;
+                if ($processed == $batchInsert) {
+                    $processed = 0;
+                    $this->mailJobQueueRepository->multiInsert($insert);
+                    $insert = [];
+                }
             }
+            $page++;
         }
 
         if ($processed) {
@@ -74,14 +85,17 @@ class BatchEmailGenerator
 
         $queueJobs = $this->mailJobQueueRepository->getBatchEmails($batch, 0, null);
         $this->mailCache->pauseQueue($batch->id);
+
+        /** @var ActiveRow $job */
         foreach ($queueJobs as $job) {
+            /** @var ActiveRow $template */
             $template = $job->ref('mail_templates', 'mail_template_id');
-            $this->mailCache->addJob($job->email, $template->code, $job->mail_batch_id);
+            $this->mailCache->addJob($userMap[$job->email], $job->email, $template->code, $job->mail_batch_id);
         }
         $this->mailCache->restartQueue($batch->id);
     }
 
-    private function getTemplate(IRow $batch)
+    private function getTemplate(ActiveRow $batch)
     {
         if (isset($this->templates[$batch->id])) {
             return $this->templates[$batch->id][ array_rand($this->templates[$batch->id]) ];
@@ -90,6 +104,7 @@ class BatchEmailGenerator
         $this->templates[$batch->id] = [];
 
         $templates = $batch->related('mail_job_batch_templates');
+        /** @var ActiveRow $template */
         foreach ($templates as $template) {
             $this->templates[$batch->id] = array_merge($this->templates[$batch->id], array_fill(0, $template->weight, $template->mail_template_id));
         }
