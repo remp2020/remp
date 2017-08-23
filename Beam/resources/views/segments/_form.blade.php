@@ -12,7 +12,7 @@
         "rules": {!! $segment->rules->toJson() !!},
         "removedRules": [],
         "eventCategories": {!! $categories->toJson() !!},
-        "eventNames": [],
+        "eventActions": [],
     }
     remplib.segmentForm.bind("#segment-form", segment);
 </script>

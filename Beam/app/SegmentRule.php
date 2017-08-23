@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $segment_id
  * @property int $parent_id
  * @property string $event_category
- * @property string $event_name
+ * @property string $event_action
  * @property int $timespan
  * @property int $count
  * @property \Carbon\Carbon $created_at
@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereCount($value)
  * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereEventCategory($value)
- * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereEventName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereEventAction($value)
  * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereParentId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\SegmentRule whereSegmentId($value)

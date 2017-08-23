@@ -74,7 +74,7 @@ class SegmentController extends Controller
             $rule->timespan = $r['timespan'];
             $rule->count = $r['count'];
             $rule->event_category = $r['event_category'];
-            $rule->event_name = $r['event_name'];
+            $rule->event_action = $r['event_action'];
             $rule->segment_id = $segment->id;
             $rule->fields = $r['fields'];
             $rule->save();
@@ -97,13 +97,17 @@ class SegmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Segment  $segment
+     * @param  \App\Segment $segment
+     * @param JournalContract $journalContract
      * @return \Illuminate\Http\Response
      */
-    public function edit(Segment $segment)
+    public function edit(Segment $segment, JournalContract $journalContract)
     {
+        $categories = $journalContract->categories();
+
         return view('segments.edit', [
             'segment' => $segment,
+            'categories' => $categories,
         ]);
     }
 
@@ -129,7 +133,7 @@ class SegmentController extends Controller
             $rule->timespan = $r['timespan'];
             $rule->count = $r['count'];
             $rule->event_category = $r['event_category'];
-            $rule->event_name = $r['event_name'];
+            $rule->event_action = $r['event_action'];
             $rule->segment_id = $segment->id;
             $rule->fields = $r['fields'];
             $rule->save();

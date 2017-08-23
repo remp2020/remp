@@ -47,6 +47,8 @@ services:
 
   campaign:
     build: "./Docker/php"
+    environment:
+      APP_NAME: "Campaign"
     domainname: "campaign.remp.app"
     hostname: "campaign"
     volumes:
@@ -55,8 +57,8 @@ services:
       - "yarn-data:/yarn:rw"
     depends_on:
       - "campaign_mysql"
-    extra_hosts:
-      - "crm.app:${REMP_EXTRA_HOSTS_IP}"
+#    extra_hosts:
+#      - "crm.app:${REMP_EXTRA_HOSTS_IP}"
     restart: "unless-stopped"
 
   campaign_mysql:
@@ -109,6 +111,8 @@ services:
 
   sso:
     build: "./Docker/php"
+    environment:
+      APP_NAME: "Sso"
     domainname: "sso.remp.app"
     hostname: "sso"
     volumes:
@@ -139,6 +143,8 @@ services:
     domainname: "beam.remp.app"
     hostname: "beam"
     build: "./Docker/php"
+    environment:
+      APP_NAME: "Beam"
     volumes:
       - ".:/var/www/html:rw"
       - "composer-data:/composer:rw"
