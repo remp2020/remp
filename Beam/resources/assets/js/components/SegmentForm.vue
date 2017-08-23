@@ -87,11 +87,11 @@
                                         <label class="fg-label">Event action</label>
                                     </div>
                                     <div class="col-md-12">
-                                        <v-select v-model="rule.event_name"
-                                                  v-bind:name="'rules['+i+'][event_name]'"
-                                                  v-bind:value="rule.event_name"
+                                        <v-select v-model="rule.event_action"
+                                                  v-bind:name="'rules['+i+'][event_action]'"
+                                                  v-bind:value="rule.event_action"
                                                   class="col-md-12 p-l-0 p-r-0"
-                                                  v-bind:options.sync="eventNames"
+                                                  v-bind:options.sync="eventActions[rule.event_category]"
                                                   v-bind:dataType="'event'"
                                                   v-bind:disabled="!showEventsInput"
                                         ></v-select>
@@ -164,7 +164,7 @@
         "_active",
         "_rules",
         "_eventCategories",
-        "_eventNames",
+        "_eventActions",
     ];
 
     export default {
@@ -184,6 +184,14 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
+
+            let categories = [];
+            for (let i=0; i < this.rules.length; i++) {
+                if (this.rules[i].event_category !== null) {
+                    categories.push(self.rules[i].event_category);
+                }
+            }
+            this.loadActions(categories);
         },
         data: () => ({
             "name": null,
@@ -192,7 +200,8 @@
             "rules": [],
             "removedRules": [],
             "eventCategories": [],
-            "eventNames": null,
+            "loadingActions": {},
+            "eventActions": null,
             "showEventsLoader": false,
             "showEventsInput": false,
         }),
@@ -202,7 +211,7 @@
                     id: null,
                     count: null,
                     timespan: null,
-                    event_name: null,
+                    event_action: null,
                     event_category: null,
                     fields: [{
                         key: null,
@@ -227,14 +236,33 @@
                     this.addField(ruleIndex);
                 }
             },
-            fetchActions: function(category) {
+            loadActions: function(categories) {
+                let vm = this;
+                let ready = [];
+                categories.forEach((category) => {
+                    vm.fetchActions(category, function(data) {
+                        vm.loadingActions[category] = data;
+                        ready.push(category);
+                        if (ready.length === categories.length) {
+                            vm.eventActions = vm.loadingActions;
+                            vm.showEventsLoader = false;
+                            vm.showEventsInput = true;
+                        }
+                    })
+                });
+            },
+            fetchActions: function(category, cb) {
                 let self = this;
                 self.showEventsLoader = true;
                 self.showEventsInput = false;
                 $.get('/api/journal/' + category + '/actions', ( data ) => {
-                    self.eventNames = data;
-                    self.showEventsLoader = false;
-                    self.showEventsInput = true;
+                    if (typeof cb !== 'undefined') {
+                        cb(data);
+                    } else {
+                        self.eventActions[category] = data;
+                        self.showEventsLoader = false;
+                        self.showEventsInput = true;
+                    }
                 })
             }
         },
