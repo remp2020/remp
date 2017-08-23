@@ -69,8 +69,17 @@ class DatabaseSeedCommand extends Command
         /** @var ActiveRow $list */
         $list = $this->listsRepository->findBy('code', 'demo-weekly-newsletter');
         if (!$list) {
-            $list = $this->listsRepository->add($category->id, 100, 'demo-weekly-newsletter', 'DEMO Weekly newsletter',
-                100, false, false, true, 'Example mail list');
+            $list = $this->listsRepository->add(
+                $category->id,
+                100,
+                'demo-weekly-newsletter',
+                'DEMO Weekly newsletter',
+                100,
+                false,
+                false,
+                true,
+                'Example mail list'
+            );
         }
         $output->writeln('<info>OK!</info>');
 
