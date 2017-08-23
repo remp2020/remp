@@ -36,7 +36,7 @@
         "vlucas/phpdotenv": "^2.4",
         "guzzlehttp/guzzle": "^6.2",
         "kdyby/autowired": "^1.4",
-        "twig/twig": "^1.33",
+        "twig/twig": "^2.4",
         "mailgun/mailgun-php": "^2.3",
         "php-http/curl-client": "^1.7",
         "guzzlehttp/psr7": "^1.4",

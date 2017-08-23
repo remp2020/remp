@@ -59,6 +59,7 @@ services:
 	        - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
 	        - add(Remp\MailerModule\Commands\SubscribeWorkerCommand())
 	        - add(Remp\MailerModule\Commands\EmailChangedWorkerCommand())
+	        - add(Remp\MailerModule\Commands\DatabaseSeedCommand())
 	        - add(@hermesWorker())
 	        - setCatchExceptions(true)
 
