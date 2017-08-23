@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Hermes;
 
+use Nette\Utils\DateTime;
 use Psr\Log\LoggerAwareTrait;
 use Remp\MailerModule\Tracker\EventOptions;
 use Remp\MailerModule\Tracker\ITracker;
@@ -35,6 +36,9 @@ class MailSentHandler implements HandlerInterface
         if (!isset($payload['mail_job_batch_id'])) {
             throw new HermesException('unable to handle event: mail_job_batch_id is missing');
         }
+        if (!isset($payload['time'])) {
+            throw new HermesException('unable to handle event: time is missing');
+        }
 
         $options = new EventOptions();
         $options->setUser(new User([
@@ -46,7 +50,7 @@ class MailSentHandler implements HandlerInterface
             'mail_job_batch_id' => $payload['mail_job_batch_id'],
         ]);
         $this->tracker->trackEvent(
-            new \DateTime(),
+            DateTime::from($payload['time']),
             'mail',
             'sent',
             $options

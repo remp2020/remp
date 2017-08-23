@@ -132,6 +132,7 @@ class MailWorkerCommand extends Command
                                 'email' => $job->email,
                                 'template_code' => $job->templateCode,
                                 'mail_job_batch_id' => $batch->id,
+                                'time' => time(),
                             ]
                         ));
                     } else {
