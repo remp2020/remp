@@ -44,11 +44,12 @@ $factory->define(\App\SegmentRule::class, function (Faker\Generator $faker) {
     return [
         'event_category' => 'demo',
         'event_action' => 'action',
-        'timespan' => 1440 * $faker->numberBetween(1,7),
+        'timespan' => 1440 * $faker->numberBetween(1, 7),
         'fields' => \Psy\Util\Json::encode([
             'myfield' => 'myvalue',
         ]),
         'created_at' => $faker->date(),
         'updated_at' => $faker->date(),
+        'count' => $faker->numberBetween(1, 5),
     ];
 });
