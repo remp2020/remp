@@ -44,10 +44,8 @@ class ConfigFormFactory extends Object
                 });
 
                 $item = $container->addSelect('default_mailer', 'Default Mailer', $mailers);
-            } elseif ($config->type == Config::TYPE_STRING) {
+            } elseif (in_array($config->type, [Config::TYPE_STRING, Config::TYPE_PASSWORD])) {
                 $item = $container->addText($config->name, $config->display_name ? $config->display_name : $config->name);
-            } elseif ($config->type == Config::TYPE_PASSWORD) {
-                $item = $container->addPassword($config->name, $config->display_name ? $config->display_name : $config->name);
             } elseif ($config->type == Config::TYPE_TEXT) {
                 $item = $container->addTextArea($config->name, $config->display_name ? $config->display_name : $config->name)
                     ->getControlPrototype()->addAttributes(['class' => 'auto-size']);
