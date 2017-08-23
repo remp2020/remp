@@ -48,7 +48,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # NODEJS + YARN
 
-ENV PATH=$HOME/.yarn/bin:$PATH
+ENV PATH /root/.yarn/bin:$PATH
 
 ENV YARN_CACHE_FOLDER /yarn
 
@@ -68,4 +68,4 @@ ADD remp.sh /root/remp.sh
 
 RUN chmod +x /root/remp.sh
 
-CMD "/root/remp.sh"
+CMD /root/remp.sh
