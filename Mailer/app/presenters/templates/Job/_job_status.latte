@@ -1,0 +1,5 @@
+{foreach $job->related('mail_job_batch') as $batch}
+    {foreach $batch->related('mail_job_batch_templates')->order('mail_job_batch_templates.weight') as $mailJobTemplate}
+        <p>{$batch->status|jobLabel} {$mailJobTemplate->template->name}</p>
+    {/foreach}
+{/foreach}

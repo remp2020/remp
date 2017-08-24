@@ -4,9 +4,9 @@ namespace Remp\MailerModule\Repository;
 
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
+use Nette\Database\Table\Selection;
 use Remp\MailerModule\Repository;
 use Remp\MailerModule\Segment\Crm;
-use Remp\MailerModule\Selection;
 
 class JobsRepository extends Repository
 {

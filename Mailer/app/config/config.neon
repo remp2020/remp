@@ -45,7 +45,8 @@ services:
 	filterLoader:
 	    class: Remp\MailerModule\Filters\FilterLoader
 	    setup:
-	        - register('YesNo', [Remp\MailerModule\Filters\YesNoFilter(), process])
+	        - register('yesNo', [Remp\MailerModule\Filters\YesNoFilter(), process])
+	        - register('jobLabel', [Remp\MailerModule\Filters\JobLabelFilter(), process])
 
 	nette.latteFactory:
 	    setup:

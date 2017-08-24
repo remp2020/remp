@@ -2,10 +2,10 @@
 
 namespace Remp\MailerModule\Presenters;
 
-use Mailgun\Mailgun;
 use Nette\Application\UI\Multiplier;
+use Nette\Bridges\ApplicationLatte\ILatteFactory;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
-use Nette\Utils\Strings;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ITemplateStatsFactory;
 use Remp\MailerModule\Forms\JobFormFactory;
@@ -52,6 +52,9 @@ final class JobPresenter extends BasePresenter
     /** @var MailCache */
     private $mailCache;
 
+    /** @var ILatteFactory  */
+    private $latteFactory;
+
     public function __construct(
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository,
@@ -62,7 +65,8 @@ final class JobPresenter extends BasePresenter
         NewBatchFormFactory $newBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory,
         Aggregator $segmentAggregator,
-        MailCache $mailCache
+        MailCache $mailCache,
+        ILatteFactory $latteFactory
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -75,6 +79,7 @@ final class JobPresenter extends BasePresenter
         $this->newTemplateFormFactory = $newTemplateFormFactory;
         $this->segmentAggregator = $segmentAggregator;
         $this->mailCache = $mailCache;
+        $this->latteFactory = $latteFactory;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -98,11 +103,11 @@ final class JobPresenter extends BasePresenter
         $request = $this->request->getParameters();
 
         $jobsCount = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, $request['templateId'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null)
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'], $request['templateId'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
             ->fetchAll();
 
         $result = [
@@ -121,14 +126,19 @@ final class JobPresenter extends BasePresenter
             $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
         }
 
-
+        /** @var ActiveRow $job */
         foreach ($jobs as $job) {
+            $emails_sent_count = $job->related('mail_job_batch')->sum('sent_emails');
+
+            $latte = $this->latteFactory->create();
+            $status = $latte->renderToString(__DIR__  . '/templates/Job/_job_status.latte', ['job' => $job]);
+
             $result['data'][] = [
                 'RowId' => $job->id,
                 $job->created_at,
                 (isset($segments[$job->segment_code]) ? $segments[$job->segment_code] : 'Missing segment'),
-                $job->status,
-                $job->emails_sent_count,
+                $status,
+                $emails_sent_count,
             ];
         }
         $this->presenter->sendJson($result);
