@@ -89,7 +89,7 @@ final class JobPresenter extends BasePresenter
             ->setSourceUrl($this->link('defaultJsonData'))
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setColSetting('segment', ['orderable' => false])
-            ->setColSetting('status', [])
+            ->setColSetting('batches', ['orderable' => false])
             ->setColSetting('emails_sent_count', ['header' => 'sent emails', 'orderable' => false])
             ->setRowLink($this->link('Show', 'RowId'))
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
