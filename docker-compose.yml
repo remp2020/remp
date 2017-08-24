@@ -57,8 +57,6 @@ services:
       - "yarn-data:/yarn:rw"
     depends_on:
       - "campaign_mysql"
-#    extra_hosts:
-#      - "crm.app:${REMP_EXTRA_HOSTS_IP}"
     restart: "unless-stopped"
 
   campaign_mysql:
@@ -78,20 +76,20 @@ services:
   # mailer
 
   mailer:
-   extra_hosts:
-     - "crm.app:${REMP_EXTRA_HOSTS_IP}"
-   domainname: "mailer.remp.app"
-   hostname: "mailer"
-   build: "./Docker/php"
-   volumes:
-     - ".:/var/www/html:rw"
-     - "composer-data:/composer:rw"
-     - "yarn-data:/yarn:rw"
-   depends_on:
-     - "mailer_mysql"
-     - "redis"
-     - "mailhog"
-   restart: "unless-stopped"
+    domainname: "mailer.remp.app"
+    hostname: "mailer"
+    environment:
+      APP_NAME: "Mailer"
+    build: "./Docker/php"
+    volumes:
+      - ".:/var/www/html:rw"
+      - "composer-data:/composer:rw"
+      - "yarn-data:/yarn:rw"
+    depends_on:
+      - "mailer_mysql"
+      - "redis"
+      - "mailhog"
+    restart: "unless-stopped"
 
   mailer_mysql:
     image: "mysql:8.0"

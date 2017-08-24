@@ -12,13 +12,44 @@
 */
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(App\User::class, function (Faker\Generator $faker) {
-    static $password;
-
+$factory->define(\App\Property::class, function (Faker\Generator $faker) {
     return [
-        'name' => $faker->name,
-        'email' => $faker->unique()->safeEmail,
-        'password' => $password ?: $password = bcrypt('secret'),
-        'remember_token' => str_random(10),
+        'name' => 'DEMO property',
+        'uuid' => $faker->uuid,
+        'created_at' => $faker->date(),
+        'updated_at' => $faker->date(),
+    ];
+});
+
+$factory->define(\App\Account::class, function (Faker\Generator $faker) {
+    return [
+        'name' => 'DEMO account',
+        'uuid' => $faker->uuid,
+        'created_at' => $faker->date(),
+        'updated_at' => $faker->date(),
+    ];
+});
+
+$factory->define(\App\Segment::class, function (Faker\Generator $faker) {
+    return [
+        'name' => 'DEMO segment',
+        'code' => 'demo-segment',
+        'active' => true,
+        'created_at' => $faker->date(),
+        'updated_at' => $faker->date(),
+    ];
+});
+
+$factory->define(\App\SegmentRule::class, function (Faker\Generator $faker) {
+    return [
+        'event_category' => 'demo',
+        'event_action' => 'action',
+        'timespan' => 1440 * $faker->numberBetween(1, 7),
+        'fields' => \Psy\Util\Json::encode([
+            'myfield' => 'myvalue',
+        ]),
+        'created_at' => $faker->date(),
+        'updated_at' => $faker->date(),
+        'count' => $faker->numberBetween(1, 5),
     ];
 });

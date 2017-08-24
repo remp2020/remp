@@ -16,6 +16,8 @@ class ContentGenerator
 
     private $links;
 
+    private $time;
+
     private $utmReplace;
 
     public function __construct(IRow $mailTemplate, IRow $mailLayout, array $links = [])
@@ -23,6 +25,7 @@ class ContentGenerator
         $this->mailTemplate = $mailTemplate;
         $this->mailLayout = $mailLayout;
         $this->links = $links;
+        $this->time = new \DateTime();
 
         $this->utmReplace = new UtmReplace($mailTemplate->mail_type->code, 'email', $mailTemplate->code);
     }
@@ -50,6 +53,7 @@ class ContentGenerator
         ]);
         $twig = new Twig_Environment($loader);
         $params['links'] = $this->links;
+        $params['time'] = $this->time;
         $bodyTemplate = $twig->render('my_template', $params);
         return $bodyTemplate;
     }
@@ -68,6 +72,7 @@ class ContentGenerator
             'title' => $template->subject,
             'content' => $renderedTemplateContent,
             'links' => $this->links,
+            'time' => $this->time,
         ];
         $params = array_merge($layoutParams, $params);
         $content = $twig->render('my_template', $params);

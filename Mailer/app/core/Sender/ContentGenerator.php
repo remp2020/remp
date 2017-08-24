@@ -17,10 +17,13 @@ class ContentGenerator
 
     private $utmReplace;
 
+    private $time;
+
     public function __construct(IRow $template, IRow $layout)
     {
         $this->template = $template;
         $this->layout = $layout;
+        $this->time = new \DateTime;
 
         $this->utmReplace = new UtmReplace($template->mail_type->code, 'email', $template->code);
     }
@@ -47,6 +50,7 @@ class ContentGenerator
             'my_template' => $bodyTemplate,
         ]);
         $twig = new Twig_Environment($loader);
+        $params['time'] = $this->time;
         $bodyTemplate = $twig->render('my_template', $params);
         return $bodyTemplate;
     }
@@ -64,6 +68,7 @@ class ContentGenerator
         $layoutParams = [
             'title' => $subject,
             'content' => $renderedTemplateContent,
+            'time' => $this->time,
         ];
         $params = array_merge($layoutParams, $params);
         $content = $twig->render('my_template', $params);
