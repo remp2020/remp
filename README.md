@@ -52,6 +52,22 @@ Following is list of available hosts. We advise you to add them to your
 127.0.0.1 mailhog.remp.app # mailhog for catching and debugging sent emails
 ```
 
+**3. generate key for Sso**
+
+Since we made it only based on one Docker Image you have to run the following command 
+```bash
+docker-compose exec sso bash
+cd Sso; php artisan key:generate
+exit
+```
+
+**4. Adding your allowed email for google SSO**
+
+Edit `Sso/.env` and add your email in
+```bash
+JWT_EMAIL_PATTERN_WHITELIST=@remp2020.com,@example.com
+```
+
 ### Docker Compose
 
 If you're unfamiliar with `docker-compose`, try running `docker-compose --help` as a starter. Each of the subcommands of Docker also supports its own `--help` switch. Feel free to explore it.
