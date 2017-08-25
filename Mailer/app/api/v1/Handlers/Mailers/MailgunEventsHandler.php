@@ -34,7 +34,7 @@ class MailgunEventsHandler extends BaseHandler
     public function params()
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'sender_id', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'mail_sender_id', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'timestamp', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'token', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'signature', InputParam::REQUIRED),

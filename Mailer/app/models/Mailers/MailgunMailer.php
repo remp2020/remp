@@ -54,8 +54,10 @@ class MailgunMailer extends Mailer implements IMailer
             'html' => $message->getHtmlBody(),
             'attachment' => $attachments,
             'tag' => $mailVariables['template'],
-            'v:my-vars' => $message->getHeader('X-Mailer-Variables'),
         ];
+        foreach ($mailVariables as $key => $val) {
+            $data["v:".$key] = $val;
+        }
 
         $this->mailer->messages()->send($this->options['domain'], $data);
     }
