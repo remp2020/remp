@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "874d28d15280104bc76b938c97e6fc34",
+    "content-hash": "28caba82534ec2e337168a2206046349",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -60,16 +60,16 @@
         },
         {
             "name": "deployer/deployer",
-            "version": "v5.1.3",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/deployer.git",
-                "reference": "ade4ac09803f0738f1a357c573a60b2820213d11"
+                "reference": "f6c4bd7c92ee2ec0a9d69402b67e7fed5b49548b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/deployer/zipball/ade4ac09803f0738f1a357c573a60b2820213d11",
-                "reference": "ade4ac09803f0738f1a357c573a60b2820213d11",
+                "url": "https://api.github.com/repos/deployphp/deployer/zipball/f6c4bd7c92ee2ec0a9d69402b67e7fed5b49548b",
+                "reference": "f6c4bd7c92ee2ec0a9d69402b67e7fed5b49548b",
                 "shasum": ""
             },
             "require": {
@@ -109,7 +109,7 @@
             ],
             "description": "Deployment Tool",
             "homepage": "https://deployer.org",
-            "time": "2017-07-03T07:01:32+00:00"
+            "time": "2017-08-22T15:51:36+00:00"
         },
         {
             "name": "deployer/phar-update",
@@ -168,17 +168,17 @@
             "time": "2017-07-03T06:55:29+00:00"
         },
         {
-            "name": "deployphp/recipes",
-            "version": "dev-master",
+            "name": "deployer/recipes",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/recipes.git",
-                "reference": "0e9dcba1c991b9bbd8aeaae24ce09bb2efc41df8"
+                "reference": "5f462100d2c9a109e119ea390091c1e66d961f74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/recipes/zipball/0e9dcba1c991b9bbd8aeaae24ce09bb2efc41df8",
-                "reference": "0e9dcba1c991b9bbd8aeaae24ce09bb2efc41df8",
+                "url": "https://api.github.com/repos/deployphp/recipes/zipball/5f462100d2c9a109e119ea390091c1e66d961f74",
+                "reference": "5f462100d2c9a109e119ea390091c1e66d961f74",
                 "shasum": ""
             },
             "replace": {
@@ -216,7 +216,7 @@
                 "slack",
                 "yarn"
             ],
-            "time": "2017-08-18T13:38:18+00:00"
+            "time": "2017-08-24T13:39:08+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -4246,9 +4246,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "deployphp/recipes": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

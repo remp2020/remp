@@ -31,8 +31,8 @@
         "laracasts/flash": "^3.0",
         "league/uri": "^5.0",
         "remp/laravel-sso": "*",
-        "deployer/deployer": "^5.0",
-        "deployphp/recipes": "dev-master",
+        "deployer/deployer": "^6.0",
+        "deployer/recipes": "^6.0",
         "recca0120/laravel-tracy": "^1.8"
     },
     "require-dev": {

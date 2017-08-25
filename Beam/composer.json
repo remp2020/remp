@@ -26,8 +26,8 @@
         "yajra/laravel-datatables-oracle": "^7.2",
         "remp/laravel-sso": "*",
         "recca0120/laravel-tracy": "^1.8",
-        "deployer/deployer": "^5.0",
-        "deployphp/recipes": "dev-master",
+        "deployer/deployer": "^6.0",
+        "deployer/recipes": "^6.0",
         "predis/predis": " ~1.0",
         "rigor789/airbrake-laravel": "dev-master"
     },
