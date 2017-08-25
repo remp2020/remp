@@ -56,7 +56,6 @@ class RemoteUser
             return ['status' => 'error', 'error' => 'not admin', 'message' => 'Your are not authorized for this app'];
         }
 
-
         return $data;
     }
 
