@@ -35,11 +35,12 @@
             });
         },
         updated : function () {
+            $(this.$el).val(this.value);
             $(this.$el).selectpicker('refresh');
             this.$emit('updated')
         },
         destroyed : function () {
             $(this.$el).selectpicker('destroy');
-        }
+        },
     }
 </script>

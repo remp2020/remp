@@ -41,9 +41,9 @@
                     <li class="list-group-item"><strong>Priority:</strong> {$list->priority}</li>
                     <li class="list-group-item"><strong>Code:</strong> {$list->code}</li>
                     <li class="list-group-item"><strong>Description:</strong> {$list->description|noescape}</li>
-                    <li class="list-group-item"><strong>Auto subscribe:</strong> {$list->auto_subscribe|YesNo}</li>
-                    <li class="list-group-item"><strong>Locked:</strong> {$list->locked|YesNo}</li>
-                    <li class="list-group-item"><strong>Public:</strong> {$list->is_public|YesNo}</li>
+                    <li class="list-group-item"><strong>Auto subscribe:</strong> {$list->auto_subscribe|yesNo}</li>
+                    <li class="list-group-item"><strong>Locked:</strong> {$list->locked|yesNo}</li>
+                    <li class="list-group-item"><strong>Public:</strong> {$list->is_public|yesNo}</li>
                     <li class="list-group-item"><strong>Number of subscribed:</strong> {$stats['subscribed']|number}</li>
                     <li class="list-group-item"><strong>Number of un-subscribed:</strong> {$stats['un-subscribed']|number}</li>
                 </ul>

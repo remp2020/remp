@@ -2,9 +2,9 @@ FROM php:7.0-fpm
 
 ENV LIBRDKAFKA_VERSION v0.9.5
 
-ENV BUILD_DEPS git libzip-dev zlib1g-dev g++ build-essential libsasl2-dev libssl-dev python-minimal
+ENV BUILD_DEPS libzip-dev zlib1g-dev g++ build-essential libsasl2-dev libssl-dev python-minimal
 
-ENV RUN_DEPS libicu-dev
+ENV RUN_DEPS libicu-dev git
 
 # INIT (single command so the intermediates are not stored)
 # librdkafka is built manually because packages contain only v0.8.5
@@ -48,7 +48,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # NODEJS + YARN
 
-ENV PATH=$HOME/.yarn/bin:$PATH
+ENV PATH /root/.yarn/bin:$PATH
 
 ENV YARN_CACHE_FOLDER /yarn
 
@@ -63,3 +63,9 @@ RUN curl -sL https://yarnpkg.com/install.sh | bash -
 VOLUME /var/www/html
 
 RUN chmod 777 /var/www/html
+
+ADD remp.sh /root/remp.sh
+
+RUN chmod +x /root/remp.sh
+
+CMD /root/remp.sh

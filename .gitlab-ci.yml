@@ -6,7 +6,6 @@ stages:
 cache:
   paths:
     - bin/
-    - vendor/bin/dep
 
 test:syntax:7.0:
   stage: test

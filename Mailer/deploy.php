@@ -4,8 +4,8 @@ use function Deployer\{has, host, task, run, set, get, add, before, after, local
 
 require dirname(__FILE__) . '/vendor/autoload.php';
 require dirname(__FILE__) . '/vendor/deployer/deployer/recipe/common.php';
-require dirname(__FILE__) . '/vendor/deployphp/recipes/recipe/slack.php';
-require dirname(__FILE__) . '/vendor/deployphp/recipes/recipe/rabbit.php';
+require dirname(__FILE__) . '/vendor/deployer/recipes/recipe/slack.php';
+require dirname(__FILE__) . '/vendor/deployer/recipes/recipe/rabbit.php';
 
 set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);

@@ -7,42 +7,65 @@ See separate documentations of each app:
 * [Campaign](Campaign)
 * [Mailer](Mailer)
 
-## Running
+## Install
 
-We've prepared `docker-compose.yml` in a way it's ready for development.
  
+**1. Pre-building binaries of Go apps**
+
 There's a need for pre-building binaries of Go apps before you can run Docker compose. You don't need Go environment to have
 set up, but you need Docker to build docker-ready tarballs properly.
 
 ```bash
 cd Beam
 make docker-build
+cd ..
 ```
 
-After that you can run all or just selected services by calling `docker-compose up`.
+**2. Docker-compose**
+
+We've prepared `docker-compose.yml` in a way it's ready for development.
+```bash
+docker-compose up
+```
 
 Application exposes all services via Nginx container.
-
-Following is list of available hosts. We advise you to add them to your `/etc/hosts`:
+Following is list of available hosts. We advise you to add them to your
+`/etc/hosts`:
 
 ```bash
 # CAMPAIGN
-campaign.remp.app # web administration
+127.0.0.1 campaign.remp.app # web administration
 
 # MAILER
-mailer.remp.app # web administration
+127.0.0.1 mailer.remp.app # web administration
 
 # BEAM
-beam.remp.app # web administration
-tracker.beam.remp.app # event tracker API; swagger @ http://tracker.beam.remp.app/swagger.json
-segments.beam.remp.app # segments API; swagger @ http://segments.beam.remp.app/swagger.json
+127.0.0.1 beam.remp.app # web administration
+127.0.0.1 tracker.beam.remp.app # event tracker API; swagger @ http://tracker.beam.remp.app/swagger.json
+127.0.0.1 segments.beam.remp.app # segments API; swagger @ http://segments.beam.remp.app/swagger.json
 
 # SSO
-sso.remp.app # web administration and API
+127.0.0.1 sso.remp.app # web administration and API
 
 # SERVICE APPS
-adminer.remp.app # adminer for manipulating with DB
-mailhog.remp.app # mailhog for catching and debugging sent emails
+127.0.0.1 adminer.remp.app # adminer for manipulating with DB
+127.0.0.1 mailhog.remp.app # mailhog for catching and debugging sent emails
+```
+
+**3. generate key for Sso**
+
+Since we made it only based on one Docker Image you have to run the following command 
+```bash
+docker-compose exec sso bash
+cd Sso; php artisan key:generate
+exit
+```
+
+**4. Adding your allowed email for google SSO**
+
+Edit `Sso/.env` and add your email in
+```bash
+JWT_EMAIL_PATTERN_WHITELIST=@remp2020.com,@example.com
 ```
 
 ### Docker Compose

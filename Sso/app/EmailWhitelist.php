@@ -21,6 +21,9 @@ class EmailWhitelist
 
     public function validate($email)
     {
+        if ($this->disabled) {
+            return true;
+        }
         foreach ($this->patterns as $pattern) {
             if (strpos($email, $pattern) !== false) {
                 return true;

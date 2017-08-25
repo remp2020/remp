@@ -14,6 +14,8 @@ use Remp\MailerModule\Sender;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tomaj\Hermes\Emitter;
+use Tomaj\Hermes\Message;
 
 class MailWorkerCommand extends Command
 {
@@ -31,6 +33,8 @@ class MailWorkerCommand extends Command
 
     private $mailCache;
 
+    private $hermesEmitter;
+
     private $isFirstLine = true;
 
     private $smtpErrors = 0;
@@ -42,7 +46,8 @@ class MailWorkerCommand extends Command
         JobQueueRepository $mailJobQueueRepository,
         LogsRepository $mailLogRepository,
         TemplatesRepository $mailTemplatesRepository,
-        MailCache $redis
+        MailCache $redis,
+        Emitter $hermesEmitter
     ) {
         parent::__construct();
         $this->applicationMailer = $applicationMailer;
@@ -52,6 +57,7 @@ class MailWorkerCommand extends Command
         $this->mailLogRepository = $mailLogRepository;
         $this->mailTemplateRepository = $mailTemplatesRepository;
         $this->mailCache = $redis;
+        $this->hermesEmitter = $hermesEmitter;
     }
 
     /**
@@ -119,6 +125,16 @@ class MailWorkerCommand extends Command
 
                     if ($result) {
                         $this->mailJobQueueRepository->delete($queueJob);
+                        $this->hermesEmitter->emit(new Message(
+                            'mail-sent',
+                            [
+                                'user_id' => $job->userId,
+                                'email' => $job->email,
+                                'template_code' => $job->templateCode,
+                                'mail_job_batch_id' => $batch->id,
+                                'time' => time(),
+                            ]
+                        ));
                     } else {
                         $this->mailJobBatchRepository->update($batch, ['errors_count+=' => 1]);
                         $this->mailJobQueueRepository->update($queueJob, ['status' => JobQueueRepository::STATUS_ERROR]);
@@ -127,7 +143,7 @@ class MailWorkerCommand extends Command
                 } catch (SmtpException $smtpException) {
                     $this->smtpErrors++;
                     $output->writeln("<error>SMTP Error {$smtpException->getMessage()}</error>");
-                    $this->mailCache->addJob($job->email, $job->templateCode, $batch->id);
+                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
 
                     if ($this->smtpErrors >= 10) {
                         $this->mailCache->pauseQueue($batch->id);

@@ -14,7 +14,7 @@ class TemplatesRepository extends Repository
 
     public function all()
     {
-        return $this->getTable()->order('name ASC');
+        return $this->getTable()->order('created_at DESC');
     }
 
     public function add($name, $code, $description, $autoLogin, $from, $subject, $templateText, $templateHtml, $layoutId, $typeId)
