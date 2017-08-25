@@ -125,7 +125,7 @@ class Sender
 
         $message->setHeader('X-Mailer-Variables', Json::encode([
             'template' => $this->template->code,
-            'sender_id' => $senderId,
+            'mail_sender_id' => $senderId,
         ]));
 
         $this->logsRepository->add($this->recipient['email'], $this->template->subject, $this->template->id, $this->jobId, $senderId, $attachmentSize);
