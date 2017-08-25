@@ -9,6 +9,7 @@ use Remp\MailerModule\Components\ITemplateStatsFactory;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\TemplateFormFactory;
 use Remp\MailerModule\Forms\TemplateTestFormFactory;
+use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
@@ -26,11 +27,15 @@ final class TemplatePresenter extends BasePresenter
     /** @var TemplateTestFormFactory */
     private $templateTestFormFactory;
 
+    /** @var LayoutsRepository */
+    private $layoutsRepository;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
         TemplateFormFactory $templateFormFactory,
-        TemplateTestFormFactory $templateTestFormFactory
+        TemplateTestFormFactory $templateTestFormFactory,
+        LayoutsRepository $layoutsRepository
     ) {
     
         parent::__construct();
@@ -38,6 +43,7 @@ final class TemplatePresenter extends BasePresenter
         $this->logsRepository = $logsRepository;
         $this->templateFormFactory = $templateFormFactory;
         $this->templateTestFormFactory = $templateTestFormFactory;
+        $this->layoutsRepository = $layoutsRepository;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -154,14 +160,22 @@ final class TemplatePresenter extends BasePresenter
         $this->presenter->sendJson($result);
     }
 
+    public function renderNew()
+    {
+        $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
+        $this->template->layouts = $layouts;
+    }
+
     public function renderEdit($id)
     {
         $template = $this->templatesRepository->find($id);
         if (!$template) {
             throw new BadRequestException();
         }
+        $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
 
         $this->template->mailTemplate = $template;
+        $this->template->layouts = $layouts;
     }
 
     public function renderPreview($id, $type = 'html')

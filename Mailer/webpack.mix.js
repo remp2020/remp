@@ -11,12 +11,7 @@ mix
         publicPath: publicPath,
         resourceRoot: "/assets/vendor/"
     })
-    .js([
-        "resources/js/functions.js",
-        "resources/js/actions.js",
-        "resources/js/datatables.js",
-        "resources/js/charts.js"
-    ], 'js/app.js')
+    .js("resources/js/app.js", "js/app.js")
     .sass("resources/sass/vendor.scss", "css/vendor.css")
     .sass("resources/sass/app.scss", "css/app.css")
     .extract([
@@ -38,11 +33,13 @@ mix
         "bootstrap-notify",
         "eonasdan-bootstrap-datetimepicker",
         "codemirror",
-        "codemirror/mode/htmlmixed/htmlmixed.js"
+        "codemirror/mode/htmlmixed/htmlmixed.js",
+        "vue",
     ])
     .autoload({
         "jquery": ['$', 'jQuery', "window.jQuery"],
         "node-waves": ["Waves", "window.Waves"],
-        "autosize": ["autosize", "window.autosize"]
+        "autosize": ["autosize", "window.autosize"],
+        "vue": ["Vue", "window.vue"],
     })
     .version();

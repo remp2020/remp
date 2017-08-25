@@ -356,7 +356,7 @@ $(document).ready(function(){
                 mode: 'htmlmixed',
                 styleActiveLine: true,
                 lineNumbers: true,
-                lineWrapping: false
+                lineWrapping: true,
             });
         });
     }
