@@ -350,13 +350,14 @@ $(document).ready(function(){
      * HTML Editor
      */
     if ($('.html-editor')[0]) {
-        CKEDITOR.replaceAll(function (textarea, config) {
-            if (textarea.className.indexOf('html-editor') === -1) {
-                return false;
-            }
-
-            config.customConfig = '/assets/js/config.js';
-            return true;
+        $('.html-editor').each(function () {
+            var id = $(this).attr('id');
+            var editor = CodeMirror.fromTextArea(document.getElementById(id), {
+                mode: 'htmlmixed',
+                styleActiveLine: true,
+                lineNumbers: true,
+                lineWrapping: true,
+            });
         });
     }
 

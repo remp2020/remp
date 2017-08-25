@@ -2,7 +2,7 @@
     {include jsCallback, form => $form}
     {input id}
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-lg-6">
             <div class="form-group fg-float m-b-30">
                 <div class="fg-line">
                     {input name, class => 'form-control fg-input'}
@@ -25,11 +25,11 @@
             </div>
 
             <div class="row m-b-30">
-                <div class="col-sm-6">
+                <div class="col-lg-6">
                     {label mail_layout_id /}
                     {input mail_layout_id, class => 'selectpicker',  data-live-search => 'true'}
                 </div>
-                <div class="col-sm-6">
+                <div class="col-lg-6">
                     {label mail_type_id /}
                     {input mail_type_id, class => 'selectpicker',  data-live-search => 'true'}
                 </div>
@@ -48,13 +48,13 @@ If turned off, they might have trouble unsubscribing from your emails and mark i
             <div class="clearfix m-b-30"></div>
 
             <div class="row m-b-30">
-                <div class="col-sm-6 form-group fg-float">
+                <div class="col-lg-6 form-group fg-float">
                     <div class="fg-line">
                         {input from, class => 'form-control fg-input'}
                         {label from, class => 'fg-label' /}
                     </div>
                 </div>
-                <div class="col-sm-6 form-group fg-float">
+                <div class="col-lg-6 form-group fg-float">
                     <div class="fg-line">
                         {input subject, class => 'form-control fg-input'}
                         {label subject, class => 'fg-label' /}
@@ -74,9 +74,38 @@ If turned off, they might have trouble unsubscribing from your emails and mark i
                 {input mail_body_html, class => 'form-control html-editor'}
             </div>
 
-            {input save, class => 'btn btn-info waves-effect'}
+            <div class="row">
+                <div class="col-lg-6">
+                    {input save, class => 'btn btn-info waves-effect'}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-lg-offset-1">
+            <div id="mail-preview">
+                <mail-preview></mail-preview>
+            </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        let layouts = {json_encode($layouts)|noescape};
+        $(function() {
+            let cm = $('.CodeMirror')[0].CodeMirror;
+            let vm = remplib.templateForm.bind(
+                '#mail-preview',
+                cm.getValue(),
+                layouts[{$form[mail_layout_id]->value}]
+            );
+            cm.on('change', function() {
+                vm.htmlContent = cm.getValue();
+            });
+            $('#'+{$form[mail_layout_id]->htmlId}).on('change', function() {
+                vm.htmlLayout = layouts[$(this).val()]
+            })
+        });
+
+    </script>
 {/form}
 
 {define jsCallback}

@@ -26,7 +26,8 @@
     "jquery-placeholder": "^2.3.1",
     "malihu-custom-scrollbar-plugin": "^3.1.5",
     "material-design-iconic-font": "^2.2.0",
-    "node-waves": "^0.7.5"
+    "node-waves": "^0.7.5",
+    "vue": "^2.4.2"
   },
   "devDependencies": {
     "axios": "^0.16.2",
@@ -34,7 +35,6 @@
     "cross-env": "^5.0.1",
     "laravel-mix": "^1.4.2",
     "node-sass": "^4.5.3",
-    "optipng-bin": "^4.0.0",
-    "vue": "^2.4.2"
+    "optipng-bin": "^4.0.0"
   }
 }
