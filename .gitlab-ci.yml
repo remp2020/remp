@@ -68,7 +68,7 @@ deploy:mailer:admin:
     - cd Mailer/
     - ln -s ~/.env.mailer .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run dev ; rm -fr ./node_modules
+    - yarn install && yarn run production ; rm -fr ./node_modules
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
   environment:
@@ -112,7 +112,7 @@ deploy:beam:admin:
     - cd Beam/
     - ln -s ~/.env.beam .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run dev ; rm -fr ./node_modules
+    - yarn install && yarn run production ; rm -fr ./node_modules
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
   environment:
@@ -133,7 +133,7 @@ deploy:sso:admin:
     - cd Sso/
     - ln -s ~/.env.sso .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run dev ; rm -fr ./node_modules
+    - yarn install && yarn run production ; rm -fr ./node_modules
     - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy sso --revision=$CI_COMMIT_SHA -vvv
   environment:
