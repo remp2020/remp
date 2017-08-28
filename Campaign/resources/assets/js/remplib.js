@@ -22,7 +22,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             tracking: null,
 
-            method: 'get',
+            method: 'POST',
 
             extend: function() {
                 var a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;
@@ -103,12 +103,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     throw "remplib: configuration token invalid or missing: "+config.token
                 }
 
-                if (typeof config.method == 'string') {
-                    this.method = config.method
-                }
                 this.tracking = config.tracking;
                 this.target = config.target;
                 this.beamToken = config.token;
+                if (typeof config.method === 'string') {
+                    this.method = config.method
+                }
             },
 
             run: function() {
@@ -148,48 +148,37 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.loadScript(url + query + "callback=" + cb)
             },
 
-            track: function (params) {
-                params = this.addParams(params);
-                if (this.method == 'post') {
-                    this.post(this.tracking + "/track/event", params, 'post')
+            trackEvent: function (category, action, fields, value) {
+                let params = {
+                    "category": category,
+                    "action": action,
+                    "fields": fields,
+                    "value": value
+                };
+                if (this.method === 'POST') {
+                    this.post(this.tracking + "/track/event", params)
                 } else {
-                    var query = "?";
-
-                    for (var item in params)
-                        params.hasOwnProperty(item) && (query += encodeURIComponent(item) + "=" + encodeURIComponent(params[item]) + "&");
-                    this.loadScript(remplib.tracking + '/track/event' + query)
+                    // var query = "?";
+                    //
+                    // for (var item in params)
+                    //     params.hasOwnProperty(item) && (query += encodeURIComponent(item) + "=" + encodeURIComponent(params[item]) + "&");
+                    // this.loadScript(remplib.tracking + '/track/event' + query)
                 }
             },
 
 
-            post: function (path, params, method) {
-                method = method || "post"; // Set method to post by default if not specified.
-
-                // The rest of this code assumes you are not using a library.
-                // It can be made less wordy if you use one.
-                var form = document.createElement("form");
-                form.setAttribute("method", method);
-                form.setAttribute("action", path);
-
-                for(var key in params) {
-                    if(params.hasOwnProperty(key)) {
-                        var hiddenField = document.createElement("input");
-                        hiddenField.setAttribute("type", "hidden");
-                        hiddenField.setAttribute("name", key);
-                        hiddenField.setAttribute("value", params[key]);
-
-                        form.appendChild(hiddenField);
-                    }
-                }
-
-                document.body.appendChild(form);
-                form.submit();
+            post: function (path, params) {
+                params = this.addParams(params);
+                let xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+                xmlhttp.open("POST", path);
+                xmlhttp.setRequestHeader("Content-Type", "application/json");
+                xmlhttp.send(JSON.stringify(params));
             },
 
             addParams: function(params) {
                 var d = new Date();
-                params["system"] = {"property_tokem": this.beamToken, "time": d.toISOString()}
-                params["user"] = {"id": this.userId, "url":  window.location.href, "user_agent": navigator.userAgent}
+                params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
+                params["user"] = {"id": this.userId, "url":  window.location.href, "user_agent": navigator.userAgent};
                 return params
             },
 
