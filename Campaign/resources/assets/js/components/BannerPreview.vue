@@ -3,7 +3,7 @@
 
     /* transitions */
 
-    #preview-close.hidden {
+    .preview-close.hidden {
         display: none;
     }
 
@@ -69,7 +69,7 @@
 </style>
 
 <template>
-    <a v-bind:href="targetUrl" v-if="show" v-bind:style="[
+    <a v-bind:href="targetUrl" v-if="isVisible" v-bind:style="[
         linkStyles,
         _position,
         dimensionOptions[dimensions]
@@ -80,7 +80,7 @@
                 dimensionOptions[dimensions],
                 customBoxStyles
             ]">
-                <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="show = false" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="visible = false" v-bind:style="closeStyles">&#x1f5d9;</a>
                 <p v-html="text" class="preview-text" v-bind:style="[
             _textAlign,
             textStyles
@@ -108,18 +108,43 @@
             "targetUrl",
             "closeable",
             "text",
+            "displayType",
+            "forcedPosition",
         ],
+        data: function() {
+            return {
+                visible: true,
+            }
+        },
+        methods: {
+            customPositioned: function() {
+                if (this.displayType === 'overlay') {
+                    return true;
+                }
+                if (this.forcedPosition !== undefined && this.forcedPosition === 'absolute') {
+                    return true;
+                }
+                return false;
+            }
+        },
         computed: {
             _textAlign: function() {
                   return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
             },
             _position: function() {
+                if (!this.customPositioned()) {
+                    return {};
+                }
                 return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
             },
             linkStyles: function() {
+                let position = this.displayType === 'overlay' ? 'absolute' : 'relative';
+                if (typeof this.forcedPosition !== 'undefined') {
+                    position = this.forcedPosition;
+                }
                 return {
                     textDecoration: 'none',
-                    position: 'absolute',
+                    position: position,
                     overflow: 'hidden',
                     zIndex: 0,
                 }},
@@ -139,7 +164,7 @@
                     fontFamily: 'Noto Sans, sans-serif',
                     color: 'white',
                     whiteSpace: 'pre-line',
-                    display: 'table',
+                    display: 'inline-block',
                     overflow: 'hidden',
                     position: 'relative'
                 }},
@@ -156,6 +181,9 @@
             customBoxStyles: function() {
                 return {}
             },
+            isVisible: function() {
+                return this.show && this.visible;
+            }
         },
     }
 </script>

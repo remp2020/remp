@@ -236,6 +236,8 @@
                                 v-bind:targetUrl="targetUrl"
                                 v-bind:closeable="closeable"
                                 v-bind:text="text"
+                                v-bind:displayType="displayType"
+                                v-bind:forcedPosition="'absolute'"
                         ></banner-preview>
                     </div>
                 </div>

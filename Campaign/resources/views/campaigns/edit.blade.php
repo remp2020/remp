@@ -15,7 +15,7 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($campaign, ['route' => ['campaigns.update', $campaign], 'method' => 'PATCH', 'id' => 'campaign-form']) !!}
+            {!! Form::model($campaign, ['route' => ['campaigns.update', $campaign], 'method' => 'PATCH']) !!}
             @include('campaigns._form')
             {!! Form::close() !!}
         </div>
