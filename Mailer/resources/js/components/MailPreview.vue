@@ -1,5 +1,5 @@
 <template>
-    <div class="row" v-html="htmlContent"></div>
+    <div class="row" v-html="htmlContent" style="overflow-x: scroll"></div>
 </template>
 
 <script>

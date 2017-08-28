@@ -23,6 +23,10 @@
     background-color: rgba(0, 0, 0, 0.01);
 }
 
+.form-control:not(.fc-alt).auto-size {
+    max-height: 600px;
+}
+
 /***************/
 /* Z-INDEX FIX */
 /***************/

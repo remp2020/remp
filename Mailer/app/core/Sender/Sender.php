@@ -6,9 +6,9 @@ use Nette\Database\IRow;
 use Nette\Mail\Message;
 use Nette\Utils\Json;
 use Remp\MailerModule\Auth\AutoLogin;
+use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
-use Remp\MailerModule\Sender\ContentGenerator;
 use Remp\MailerModule\Sender\MailerFactory;
 
 class Sender
@@ -16,7 +16,7 @@ class Sender
     /** @var array */
     private $recipient;
 
-    /** @var IRow */
+    /** @var \Nette\Database\Table\ActiveRow */
     private $template;
 
     /** @var int|null */
