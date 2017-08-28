@@ -33,9 +33,11 @@ class BannerRequest extends FormRequest
             'font_size' => 'required',
             'dimensions' => 'required|in:landscape,medium_rectangle',
             'position' => 'required|in:top_left,top_right,bottom_left,bottom_right,middle_left,middle_right',
-            'display_delay' => 'integer|required',
-            'close_timeout' => 'nullable|integer',
-            'closeable' => 'boolean|required'
+            'display_type' => 'string|required|in:overlay,inline',
+            'display_delay' => 'nullable|integer|required|required_if:display_type,overlay',
+            'close_timeout' => 'nullable|integer|required_if:display_type,overlay',
+            'closeable' => 'nullable|boolean|required_if:display_type,overlay',
+            'target_selector' => 'nullable|string|required_if:display_type,inline',
         ];
     }
 
