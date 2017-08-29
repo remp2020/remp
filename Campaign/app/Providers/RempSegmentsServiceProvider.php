@@ -9,7 +9,7 @@ use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
-class RempSegmentServiceProvider extends ServiceProvider
+class RempSegmentsServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -30,7 +30,7 @@ class RempSegmentServiceProvider extends ServiceProvider
     {
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.remp_segment.base_url'),
+                'base_uri' => $app['config']->get('services.remp_beam.segments_base_url'),
             ]);
             return new Segment($client);
         });

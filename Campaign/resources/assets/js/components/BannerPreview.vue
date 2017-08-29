@@ -69,7 +69,7 @@
 </style>
 
 <template>
-    <a v-bind:href="targetUrl" v-if="show" v-bind:style="[
+    <a v-bind:href="targetUrl" v-on:click="clicked" v-if="show" v-bind:style="[
         linkStyles,
         _position,
         dimensionOptions[dimensions]
@@ -80,7 +80,7 @@
                 dimensionOptions[dimensions],
                 customBoxStyles
             ]">
-                <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="show = false" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
                 <p v-html="text" class="preview-text" v-bind:style="[
             _textAlign,
             textStyles
@@ -108,7 +108,15 @@
             "targetUrl",
             "closeable",
             "text",
+            "uuid",
+            "campaignUuid"
         ],
+        data: function() {
+            return {
+                closeTracked: false,
+                clickTracked: false,
+            }
+        },
         computed: {
             _textAlign: function() {
                   return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
@@ -157,5 +165,29 @@
                 return {}
             },
         },
+        methods: {
+            closed: function() {
+                if (this.closeTracked) {
+                    return true;
+                }
+                remplib.trackEvent("banner", "close", {
+                    "banner_id": this.uuid,
+                    "campaign_id": this.campaignUuid,
+                });
+                this.closeTracked = true;
+                this.show = false;
+            },
+            clicked: function() {
+                if (this.clickTracked) {
+                    return true;
+                }
+                remplib.trackEvent("banner", "click", {
+                    "banner_id": this.uuid,
+                    "campaign_id": this.campaignUuid,
+                });
+                this.clickTracked = true;
+                return true;
+            }
+        }
     }
 </script>

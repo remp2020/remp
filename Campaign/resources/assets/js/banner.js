@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import BannerPreview from './components/BannerPreview.vue';
 
-remplib = typeof(remplib) === 'undefined' ? {} : remplib;
+window.remplib = window.remplib || {};
 
 (function() {
 
@@ -23,7 +23,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 transition: model['transition'] || null,
                 closeable: model['closeable'] || null,
                 displayDelay: model['display_delay'] || 0,
-                closeTimeout: model['close_timeout'] || null
+                closeTimeout: model['close_timeout'] || null,
             }
         },
 

@@ -8,21 +8,102 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         return {
 
-            _: [],
-
             beamToken: null,
 
             userId: null,
 
-            callbackIterator: 0,
+            campaign: {
 
-            initIterator: 0,
+                _: [],
 
-            target: null,
+                callbackIterator: 0,
 
-            tracking: null,
+                initIterator: 0,
 
-            method: 'POST',
+                url: null,
+
+                /* JSONP START */
+
+                showtime: {
+                    name: "campaigns/showtime",
+                    jsonpParameter: "data",
+                    prepareData: function() {
+                        return {
+                            "beamToken": remplib.beamToken,
+                            "userId": remplib.userId,
+                            "url": window.location.href
+                        }
+                    },
+                    processResponse: function(result) {
+                        if (!result["success"]) {
+                            return;
+                        }
+                        for (var exec = result.data, c = 0; c < result.data.length; c++) {
+                            try {
+                                var fn = new Function(exec[c]);
+                                setTimeout(fn(), 0);
+                            } catch (u) {
+                                console.error("campaign showtime error:", u)
+                            }
+                        }
+                    }
+                },
+
+                /* JSONP END */
+
+                init: function(config) {
+                    if (typeof config.token !== 'string') {
+                        throw "remplib: configuration token invalid or missing: "+config.token
+                    }
+                    if (typeof config.campaign !== 'object') {
+                        throw "remplib: configuration campaign invalid or missing: "+config.campaign
+                    }
+                    if (typeof config.campaign.url !== 'string') {
+                        throw "remplib: configuration campaign.url invalid or missing: "+config.campaign.url
+                    }
+
+                    this.url = config.campaign.url;
+
+                    // global
+                    remplib.beamToken = config.token;
+                    if (typeof config.userId !== 'undefined' && config.userId !== null) {
+                        remplib.userId = config.userId;
+                    }
+                },
+
+                run: function() {
+                    this.request(this.showtime);
+                },
+
+                request: function(def) {
+                    var params = {};
+                    params[def.jsonpParameter] = JSON.stringify(def.prepareData());
+
+                    this.get(this.url + "/" + def.name, params, function (data) {
+                        def.processResponse && def.processResponse(data);
+                    }, function() {
+                        def.processError && def.processError();
+                    });
+                },
+
+                get: function(url, params, success, error) {
+                    var query = "?";
+                    var cb = "rempcampaign_callback_json" + this.callbackIterator++;
+
+                    for (var item in params)
+                        params.hasOwnProperty(item) && (query += encodeURIComponent(item) + "=" + encodeURIComponent(params[item]) + "&");
+
+                    window[cb] = function(data) {
+                        success(data);
+                        try {
+                            delete window[cb]
+                        } catch (_) {}
+                        window[cb] = null
+                    };
+
+                    remplib.loadScript(url + query + "callback=" + cb)
+                },
+            },
 
             extend: function() {
                 var a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;
@@ -43,39 +124,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 return g
             },
 
-            /* JSONP START */
-
-            showtime: {
-                name: "campaigns/showtime",
-                jsonpParameter: "data",
-                prepareData: function() {
-                    return {
-                        "beamToken": remplib.beamToken,
-                        "userId": remplib.userId,
-                        "url": window.location.href
-                    }
-                },
-                processResponse: function(result) {
-                    if (!result["success"]) {
-                        return;
-                    }
-                    for (var exec = result.data, c = 0; c < result.data.length; c++) {
-                        try {
-                            var fn = new Function(exec[c]);
-                            setTimeout(fn(), 0);
-                        } catch (u) {
-                            console.error("campaign showtime error:", u)
-                        }
-                    }
-                }
-            },
-
-            /* JSONP END */
-
-            bootstrap: function() {
-                var self = this;
-                for (var i=0; i < this._.length; i++) {
-                    var cb = this._[i];
+            bootstrap: function(self) {
+                for (var i=0; i < self._.length; i++) {
+                    var cb = self._[i];
                     setTimeout((function() {
                         var cbf = cb[0];
                         var cbargs = cb[1];
@@ -90,96 +141,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         }
                     })(), 0);
                 }
-            },
-
-            init: function(config) {
-                if (typeof config.target !== 'string') {
-                    throw "remplib: configuration target invalid or missing: "+config.target
-                }
-                if (typeof config.tracking !== 'string') {
-                    throw "remplib: configuration tracking invalid or missing: "+config.tracking
-                }
-                if (typeof config.token !== 'string') {
-                    throw "remplib: configuration token invalid or missing: "+config.token
-                }
-
-                this.tracking = config.tracking;
-                this.target = config.target;
-                this.beamToken = config.token;
-                if (typeof config.method === 'string') {
-                    this.method = config.method
-                }
-            },
-
-            run: function() {
-                remplib.request(remplib.showtime);
-            },
-
-            identify: function(userId) {
-                this.userId = userId;
-            },
-
-            request: function(def) {
-                var params = {};
-                params[def.jsonpParameter] = JSON.stringify(def.prepareData());
-
-                this.get(this.target + "/" + def.name, params, function (data) {
-                    def.processResponse && def.processResponse(data);
-                }, function() {
-                    def.processError && def.processError();
-                });
-            },
-
-            get: function(url, params, success, error) {
-                var query = "?";
-                var cb = "rempcampaign_callback_json" + this.callbackIterator++;
-
-                for (var item in params)
-                    params.hasOwnProperty(item) && (query += encodeURIComponent(item) + "=" + encodeURIComponent(params[item]) + "&");
-
-                window[cb] = function(data) {
-                    success(data);
-                    try {
-                        delete window[cb]
-                    } catch (_) {}
-                    window[cb] = null
-                };
-
-                this.loadScript(url + query + "callback=" + cb)
-            },
-
-            trackEvent: function (category, action, fields, value) {
-                let params = {
-                    "category": category,
-                    "action": action,
-                    "fields": fields,
-                    "value": value
-                };
-                if (this.method === 'POST') {
-                    this.post(this.tracking + "/track/event", params)
-                } else {
-                    // var query = "?";
-                    //
-                    // for (var item in params)
-                    //     params.hasOwnProperty(item) && (query += encodeURIComponent(item) + "=" + encodeURIComponent(params[item]) + "&");
-                    // this.loadScript(remplib.tracking + '/track/event' + query)
-                }
-            },
-
-
-            post: function (path, params) {
-                params = this.addParams(params);
-                let xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-                xmlhttp.open("POST", path);
-                xmlhttp.setRequestHeader("Content-Type", "application/json");
-                xmlhttp.send(JSON.stringify(params));
-            },
-
-            addParams: function(params) {
-                var d = new Date();
-                params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
-                params["user"] = {"id": this.userId, "url":  window.location.href, "user_agent": navigator.userAgent};
-                return params
             },
 
             loadScript: function (src, callback) {
@@ -207,14 +168,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 };
                 document.getElementsByTagName('head')[0].appendChild(l);
             }
-
         };
     }());
 
-    if (typeof mocklib._ !== 'undefined') {
-        prodlib._ = mocklib._;
-    }
+    prodlib.campaign._ = mocklib.campaign._ || [];
     remplib = prodlib.extend(mocklib, prodlib);
-    remplib.bootstrap();
+    remplib.bootstrap(remplib.campaign);
 
 })(remplib);

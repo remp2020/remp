@@ -1,9 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-</head>
-<body>
+@php
+    $campaignUrl = url('/');
+    $campaignLibUrl = asset("/assets/vendor/js/remplib.js");
+
+    $beamWebUrl = config('services.remp_beam.web_base_url');
+    if ($beamWebUrl !== null) {
+        $trackerUrl = url($beamWebUrl);
+        $trackerLibUrl = $trackerUrl . "/assets/vendor/js/remplib.js";
+    }
+@endphp
 
 <script type="text/javascript">
     (function(win, doc) {
@@ -36,27 +40,33 @@
                 win.remplib.tracker[fn] = mock(fn);
             }
         }
-        load("http://beam.remp.app/assets/vendor/js/remplib.js");
-        load("http://campaign.remp.app/assets/vendor/js/remplib.js");
+@isset($trackerUrl)
+        load("{{ $trackerLibUrl }}");
+@endisset
+        load("{{ $campaignLibUrl }}");
     })(window, document);
 
     var rempConfig = {
-        token: "9f87abd6-4316-4fb1-b07c-b0c47c641d99",
-        userId: "peter.dulacka@projektn.sk",
+        // required if you're using REMP segments
+        token: "UUIDv4",
+        // optional
+        userId: "any-string",
+@isset($trackerUrl)
+        // required if you want to automatically track banner events to BEAM Tracker
         tracker: {
-            url: "http://localhost:8081",
+            url: "{{ $trackerUrl }}",
             article: {
                 id: "13579"
             }
         },
+@endisset
+        // required
         campaign: {
-            url: "http://campaign.remp.app",
+            url: "{{ $campaignUrl }}",
         }
-    };
-    remplib.campaign.init(rempConfig);
-    remplib.tracker.init(rempConfig);
+};
+@isset($trackerUrl)
+remplib.campaign.init(rempConfig);
+@endisset
+remplib.tracker.init(rempConfig);
 </script>
-
-</body>
-
-</html>

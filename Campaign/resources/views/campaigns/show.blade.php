@@ -1,20 +1,3 @@
-@push('head')
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
-
-<style type="text/css">
-    pre {
-        padding: 0;
-    }
-</style>
-@endpush
-
-@push('scripts')
-<script type="text/javascript">
-    hljs.initHighlightingOnLoad();
-</script>
-@endpush
-
 @extends('layouts.app')
 
 @section('title', 'Show campaign')

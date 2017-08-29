@@ -40,11 +40,9 @@ return [
         'token' => env('CRM_SEGMENT_API_TOKEN'),
     ],
 
-    'remp_segment' => [
-        'base_url' => env('REMP_SEGMENT_API_ADDR')
+    'remp_beam' => [
+        'tracker_base_url' => env('REMP_TRACKER_API_ADDR'),
+        'segments_base_url' => env('REMP_SEGMENTS_API_ADDR'),
+        'web_base_url' => env('REMP_BEAM_ADDR'),
     ],
-
-    'tracker' => [
-        'base_url' => env('REMP_TRACKER_API_ADDR'),
-    ]
 ];

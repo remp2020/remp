@@ -46,7 +46,7 @@
 
         </div>
 
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h4>Segments</h4>
 
             <div class="row">
@@ -81,20 +81,17 @@
 
             <div class="row m-t-20">
                 <div class="col-md-8">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <tbody>
-                            <tr v-for="(segment,i) in segments">
-                                <td>{{ segmentMap[segment.code] }}</td>
-                                <td class="text-right"><span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect"><i class="zmdi zmdi-minus-square"></i> Delete</span></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                    <div class="row m-b-10" v-for="(segment,i) in segments" style="line-height: 25px">
+                        <div class="col-md-12 text-right">
+                            {{ segmentMap[segment.code] }}
+                            <div class="pull-right m-l-20">
+                                <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect"><i class="zmdi zmdi-minus-square"></i> Delete</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -140,7 +137,7 @@
                     return;
                 }
                 for (let i in this.segments) {
-                    if (this.segments[i].id === this.addedSegment.id) {
+                    if (this.segments[i].code === this.addedSegment.code) {
                         return;
                     }
                 }

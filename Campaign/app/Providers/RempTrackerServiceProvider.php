@@ -28,7 +28,7 @@ class RempTrackerServiceProvider extends ServiceProvider
     {
         $this->app->bind(TrackerContract::class, function ($app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.tracker.base_url'),
+                'base_uri' => $app['config']->get('services.remp_beam.tracker_base_url'),
             ]);
             return new Tracker($client);
         });
