@@ -12,9 +12,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             userId: null,
 
+
             tracker: {
 
                 url: null,
+
+                social: null,
+
+                campaign_id: null,
 
                 _: [],
 
@@ -24,11 +29,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                 article: {
                     id: null,
-                    campaign_id: null,
                     author_id: null,
                     category: null,
                     tags: [],
                 },
+
+                uriParams: {},
 
                 init: function(config) {
                     if (typeof config.token !== 'string') {
@@ -47,29 +53,32 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         this.userId = config.userId;
                     }
 
-                    if (typeof config.article === 'object') {
-                        if (typeof config.article.id === 'undefined' || config.article.id === null) {
-                            throw "remplib: configuration tracker.article.id invalid or missing: "+config.article.id
+                    if (typeof config.tracker.article === 'object') {
+                        if (typeof config.tracker.article.id === 'undefined' || config.tracker.article.id === null) {
+                            throw "remplib: configuration tracker.article.id invalid or missing: "+config.tracker.article.id
                         }
-                        this.article.id = config.article.id;
-                        if (typeof config.article.campaign_id !== 'undefined') {
-                            this.article.campaign_id = config.article.campaign_id;
+                        this.article.id = config.tracker.article.id;
+                        if (typeof config.tracker.article.campaign_id !== 'undefined') {
+                            this.article.campaign_id = config.tracker.article.campaign_id;
                         }
-                        if (typeof config.article.author_id !== 'undefined') {
-                            this.article.author_id = config.article.author_id;
+                        if (typeof config.tracker.article.author_id !== 'undefined') {
+                            this.article.author_id = config.tracker.article.author_id;
                         }
-                        if (typeof config.article.category !== 'undefined') {
-                            this.article.category = config.article.category;
+                        if (typeof config.tracker.article.category !== 'undefined') {
+                            this.article.category = config.tracker.article.category;
                         }
-                        if (config.article.tags instanceof Array) {
-                            this.article.tags = config.article.tags;
+                        if (config.tracker.article.tags instanceof Array) {
+                            this.article.tags = config.tracker.article.tags;
                         }
                     }
+
+                    this.parseUriParams();
                 },
 
                 run: function() {
+                    console.log(this.article.id);
                     if (this.article.id !== null) {
-                        remplib.trackPageview();
+                        this.trackPageview();
                     }
                 },
 
@@ -106,10 +115,32 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     var d = new Date();
                     params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
                     params["user"] = {"id": this.userId, "url":  window.location.href, "user_agent": navigator.userAgent};
+
+                    if (document.referrer == "https://www.facebook.com") {
+                        params["social"] = "fb";
+                    } else
+                        if (document.referrer == "https://twitter.com") {
+                        params["social"] = "tw";
+                    }
+
+                    if (typeof this.uriParams["rc_id"] !== 'undefined') {
+                        params["rc_id"] = this.uriParams["rc_id"];
+                        params["rc_source"] = this.uriParams["rc_source"];
+                    }
+
                     return params
                 },
 
+                parseUriParams: function(){
+                    var query = window.location.search.substring(1);
+                    var vars = query.split('&');
+                    for (var i = 0; i < vars.length; i++) {
+                        var pair = vars[i].split('=');
+                        this.uriParams[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+                    }
+                },
             },
+
 
             extend: function() {
                 var a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;
@@ -133,6 +164,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             bootstrap: function(self) {
                 for (var i=0; i < self._.length; i++) {
                     var cb = self._[i];
+                    console.log(cb);
                     setTimeout((function() {
                         var cbf = cb[0];
                         var cbargs = cb[1];
@@ -141,6 +173,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                                 self[cbf].apply(self, cbargs);
                             }
                             self.initIterator++;
+                            console.log(self.initIterator, self._.length);
                             if (self.initIterator === self._.length) {
                                 self.run();
                             }
