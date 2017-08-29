@@ -21,8 +21,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\CampaignSegment whereProvider($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\CampaignSegment whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property-read mixed $group
- * @property-read mixed $name
  */
 class CampaignSegment extends Model
 {

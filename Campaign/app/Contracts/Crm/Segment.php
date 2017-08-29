@@ -50,8 +50,10 @@ class Segment implements SegmentContract
         $campaignSegments = [];
         foreach ($list->segments as $item) {
             $cs = new CampaignSegment();
+            $cs->name = $item->name;
             $cs->provider = self::PROVIDER_ALIAS;
             $cs->code = $item->code;
+            $cs->group = $item->group;
             $campaignSegments[] = $cs;
         }
         $collection = collect($campaignSegments);
