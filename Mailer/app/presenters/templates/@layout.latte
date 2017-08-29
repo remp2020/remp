@@ -161,9 +161,9 @@
 
 <script type="application/javascript">
     $(document).ready(function() {
-        var index = 0;
+        var delay = 0;
         {foreach $flashes as $flash}
-        index += 250;
+        delay += 250;
         window.setTimeout(function() {
             $.notify({
                 message: {$flash->message}
@@ -171,7 +171,7 @@
                 allow_dismiss: false,
                 type: {$flash->type}
             });
-        }, index);
+        }, delay);
         {/foreach}
     });
 </script>

@@ -67,7 +67,7 @@
                     </div>
 
                     <div class="input-group m-t-30">
-                        <span class="input-group-addon"><i class="zmdi zmdi-swap"></i></span>
+                        <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
                         <div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -122,24 +122,6 @@
                         </div>
                     </div>
 
-                    <div class="input-group m-t-30">
-                        <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
-                        <div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <label for="position" class="fg-label">Position</label>
-                                </div>
-                                <div class="col-md-12">
-                                    <select v-model.lazy="position" class="selectpicker" name="position" id="position">
-                                        <option v-for="option in positionOptions" v-bind:value="option.key">
-                                            {{ option.name }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="input-group fg-float m-t-30">
                         <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
                         <div class="fg-line">
@@ -147,37 +129,84 @@
                             <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="input-group fg-float m-t-30">
-                        <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
-                        <div class="fg-line">
-                            <label for="display_delay" class="fg-label">Display delay (milliseconds)</label>
-                            <input v-model="displayDelay" class="form-control fg-input" name="display_delay" type="number" id="display_delay">
+            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
+                <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType == 'overlay'}">
+                    <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
+                </li>
+                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType == 'inline'}">
+                    <a href="#inline-banner" role="tab" data-toggle="tab" aria-expanded="false">Inline Banner</a>
+                </li>
+            </ul>
+
+            <div class="card m-t-15">
+                <div class="tab-content p-0">
+                    <div role="tabpanel" v-bind:class="[{active: displayType == 'overlay'}, 'tab-pane']" id="overlay-banner">
+                        <div class="card-body card-padding p-l-15">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
+                                <div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="position" class="fg-label">Position</label>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <select v-model.lazy="position" class="selectpicker" name="position" id="position">
+                                                <option v-for="option in positionOptions" v-bind:value="option.key">
+                                                    {{ option.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
+                                <div class="fg-line">
+                                    <label for="display_delay" class="fg-label">Display delay (milliseconds)</label>
+                                    <input v-model="displayDelay" class="form-control fg-input" name="display_delay" type="number" id="display_delay">
+                                </div>
+                            </div>
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
+                                <div class="fg-line">
+                                    <label for="automatic_close" class="fg-label">Automatic close after (milliseconds)</label>
+                                    <input v-model="closeTimeout" class="form-control fg-input" name="close_timeout" type="number" id="automatic_close">
+                                </div>
+                            </div>
+
+                            <div class="input-group fg-float m-t-30 checkbox">
+                                <label class="m-l-15">
+                                    Ability to close banner manually
+                                    <input v-model="closeable" value="1" name="closeable" type="checkbox">
+                                    <i class="input-helper"></i>
+                                </label>
+                            </div>
+
                         </div>
                     </div>
 
-                    <div class="input-group fg-float m-t-30">
-                        <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
-                        <div class="fg-line">
-                            <label for="automatic_close" class="fg-label">Automatic close after (milliseconds)</label>
-                            <input v-model="closeTimeout" class="form-control fg-input" name="close_timeout" type="number" id="automatic_close">
+                    <div role="tabpanel" v-bind:class="[{active: displayType == 'inline'}, 'tab-pane']" id="inline-banner">
+                        <div class="card-body card-padding p-l-15">
+                            <div class="input-group fg-float m-t-10">
+                                <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
+                                <div class="fg-line">
+                                    <label for="target_selector" class="fg-label">Target element selector</label>
+                                    <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="input-group fg-float m-t-30 checkbox">
-                        <label class="m-l-15">
-                            Ability to close banner manually
-                            <input v-model="closeable" value="1" name="closeable" type="checkbox">
-                            <i class="input-helper"></i>
-                        </label>
-                    </div>
-
-
-                    <div class="input-group m-t-20">
-                        <div class="fg-line">
-                            <button class="btn btn-info waves-effect" type="submit"><i class="zmdi zmdi-mail-send"></i> Save</button>
-                        </div>
-                    </div>
+            <div class="input-group m-t-20">
+                <div class="fg-line">
+                    <button class="btn btn-info waves-effect" type="submit"><i class="zmdi zmdi-mail-send"></i> Save</button>
                 </div>
             </div>
         </div>
@@ -207,11 +236,15 @@
                                 v-bind:targetUrl="targetUrl"
                                 v-bind:closeable="closeable"
                                 v-bind:text="text"
+                                v-bind:displayType="displayType"
+                                v-bind:forcedPosition="'absolute'"
                         ></banner-preview>
                     </div>
                 </div>
             </div>
         </div>
+
+        <input type="hidden" name="display_type" v-bind:value="displayType" />
     </div>
 </template>
 
@@ -233,6 +266,8 @@
         "_closeable",
         "_displayDelay",
         "_closeTimeout",
+        "_targetSelector",
+        "_displayType",
 
         "_alignmentOptions",
         "_dimensionOptions",
@@ -250,31 +285,33 @@
             });
         },
         data: () => ({
-                name: null,
-                dimensions: null,
-                text: null,
-                textAlign: null,
-                fontSize: null,
-                targetUrl: null,
-                textColor: null,
-                backgroundColor: null,
-                position: null,
-                transition: null,
-                closeable: null,
-                displayDelay: null,
-                closeTimeout: null,
+            name: null,
+            dimensions: null,
+            text: null,
+            textAlign: null,
+            fontSize: null,
+            targetUrl: null,
+            textColor: null,
+            backgroundColor: null,
+            position: null,
+            transition: null,
+            closeable: null,
+            displayDelay: null,
+            closeTimeout: null,
+            targetSelector: null,
+            displayType: null,
 
-                alignmentOptions: [],
-                dimensionOptions: [],
-                positionOptions: [],
+            alignmentOptions: [],
+            dimensionOptions: [],
+            positionOptions: [],
 
-                previewShow: true,
+            previewShow: true,
         }),
         watch: {
             'transition': function () {
-                var self = this;
-                setTimeout(function() { self.previewShow = false }, 100);
-                setTimeout(function() { self.previewShow = true }, 800);
+                let vm = this;
+                setTimeout(function() { vm.previewShow = false }, 100);
+                setTimeout(function() { vm.previewShow = true }, 800);
             }
         },
     }

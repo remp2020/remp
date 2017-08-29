@@ -30,8 +30,18 @@ var run = function() {
     d.id = bannerId;
     var bp = document.createElement('banner-preview');
     d.appendChild(bp);
-    var b = document.getElementsByTagName('body')[0];
-    b.appendChild(d);
+
+    let target = null;
+    if (banner.displayType == 'inline') {
+        target = document.querySelector(banner.targetSelector);
+        if (target === null) {
+            console.warn("REMP: unable to display banner, selector not matched: " + banner.targetSelector);
+            return;
+        }
+    } else {
+        target = document.getElementsByTagName('body')[0];
+    }
+    target.appendChild(d);
 
     remplib.banner.bindPreview('#' + bannerId, banner, {
         zIndex: 99, //TODO: remove when REMP template is fixed,
