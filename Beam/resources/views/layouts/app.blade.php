@@ -193,21 +193,19 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 
 <script type="application/javascript">
     $(document).ready(function() {
-        var index = 1000;
+        let delay = 250;
         @foreach ($errors->all() as $error)
-        window.setTimeout(function() {
-            $.bootstrapPurr( '{!! $error !!}' , {
-                type: 'danger',
-                align: 'left',
-                allowDismiss: false,
-                width: 270,
-                offset: {
-                    from: 'bottom'
-                },
-                delay: 10000
-            });
-        }, index);
-        index += 250;
+        (function(delay) {
+            window.setTimeout(function() {
+                $.notify({
+                    message: '{{ $error }}'
+                }, {
+                    allow_dismiss: false,
+                    type: 'danger'
+                });
+            }, delay);
+        })(delay);
+        delay += 250;
         @endforeach
     });
 </script>
