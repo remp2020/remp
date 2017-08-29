@@ -52,16 +52,16 @@ services:
 	        - addFilter(null, [@filterLoader, 'load'])
 
 	console:
-	    class: Symfony\Component\Console\Application
+	    class: Remp\MailerModule\Console\Application
 	    setup:
-	        - add(Remp\MailerModule\Commands\HelloWorldCommand())
-	        - add(Remp\MailerModule\Commands\ProcessJobCommand())
-	        - add(Remp\MailerModule\Commands\MailWorkerCommand())
-	        - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
-	        - add(Remp\MailerModule\Commands\SubscribeWorkerCommand())
-	        - add(Remp\MailerModule\Commands\EmailChangedWorkerCommand())
-	        - add(Remp\MailerModule\Commands\DatabaseSeedCommand())
-	        - add(@hermesWorker())
+	        - announce(Remp\MailerModule\Commands\HelloWorldCommand)
+	        - announce(Remp\MailerModule\Commands\ProcessJobCommand)
+	        - announce(Remp\MailerModule\Commands\MailWorkerCommand)
+	        - announce(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand)
+	        - announce(Remp\MailerModule\Commands\SubscribeWorkerCommand)
+	        - announce(Remp\MailerModule\Commands\EmailChangedWorkerCommand)
+	        - announce(Remp\MailerModule\Commands\DatabaseSeedCommand)
+	        - announce(@hermesWorker())
 	        - setCatchExceptions(true)
 
 	hermesLogger:
@@ -157,3 +157,12 @@ services:
 	- Remp\MailerModule\Forms\JobFormFactory
 	- Remp\MailerModule\Forms\NewBatchFormFactory
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
+
+	# Commands
+	- Remp\MailerModule\Commands\HelloWorldCommand
+	- Remp\MailerModule\Commands\ProcessJobCommand
+	- Remp\MailerModule\Commands\MailWorkerCommand
+	- Remp\MailerModule\Commands\SyncUserSubscriptionsCommand
+	- Remp\MailerModule\Commands\SubscribeWorkerCommand
+	- Remp\MailerModule\Commands\EmailChangedWorkerCommand
+	- Remp\MailerModule\Commands\DatabaseSeedCommand

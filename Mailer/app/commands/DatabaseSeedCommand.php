@@ -134,6 +134,7 @@ HTML;
                 'DEMO email',
                 'demo-email',
                 'Demonstration-purpose email',
+                true,
                 'REMP <info@remp2020.com>',
                 'REMP - DEMO',
                 $text,
