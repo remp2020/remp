@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Sender;
 
 use Nette\Mail\IMailer;
 use Remp\MailerModule\Config\Config;
+use Remp\MailerModule\Mailer\Mailer;
 
 class MailerFactory
 {
@@ -27,7 +28,7 @@ class MailerFactory
     }
 
     /**
-     * @return IMailer
+     * @return IMailer|Mailer
      */
     public function getMailer()
     {

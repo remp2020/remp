@@ -28,6 +28,11 @@ abstract class Mailer
         $this->buildConfig();
     }
 
+    public function getConfig()
+    {
+        return $this->options;
+    }
+
     protected function buildConfig()
     {
         foreach ($this->options as $configName) {

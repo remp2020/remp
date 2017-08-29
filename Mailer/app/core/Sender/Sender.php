@@ -136,6 +136,11 @@ class Sender
         return true;
     }
 
+    public function getMailerConfig()
+    {
+        return $this->mailerFactory->getMailer()->getConfig();
+    }
+
     private function reset()
     {
         $this->recipient = null;
