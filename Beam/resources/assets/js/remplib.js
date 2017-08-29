@@ -76,7 +76,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 },
 
                 run: function() {
-                    console.log(this.article.id);
                     if (this.article.id !== null) {
                         this.trackPageview();
                     }
@@ -164,7 +163,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             bootstrap: function(self) {
                 for (var i=0; i < self._.length; i++) {
                     var cb = self._[i];
-                    console.log(cb);
                     setTimeout((function() {
                         var cbf = cb[0];
                         var cbargs = cb[1];
@@ -173,7 +171,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                                 self[cbf].apply(self, cbargs);
                             }
                             self.initIterator++;
-                            console.log(self.initIterator, self._.length);
                             if (self.initIterator === self._.length) {
                                 self.run();
                             }
