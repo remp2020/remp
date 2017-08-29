@@ -69,7 +69,7 @@
 </style>
 
 <template>
-    <a v-bind:href="targetUrl" v-on:click="clicked" v-if="isVisible" v-bind:style="[
+    <a v-bind:href="url" v-on:click="clicked" v-if="isVisible" v-bind:style="[
         linkStyles,
         _position,
         dimensionOptions[dimensions]
@@ -129,7 +129,29 @@
                     return true;
                 }
                 return false;
-            }
+            },
+            closed: function() {
+                if (this.closeTracked) {
+                    return true;
+                }
+                remplib.tracker.trackEvent("banner", "close", {
+                    "banner_id": this.uuid,
+                    "campaign_id": this.campaignUuid,
+                });
+                this.closeTracked = true;
+                this.visible = false;
+            },
+            clicked: function() {
+                if (this.clickTracked) {
+                    return true;
+                }
+                remplib.tracker.trackEvent("banner", "click", {
+                    "banner_id": this.uuid,
+                    "campaign_id": this.campaignUuid,
+                });
+                this.clickTracked = true;
+                return true;
+            },
         },
         computed: {
             _textAlign: function() {
@@ -187,31 +209,19 @@
             },
             isVisible: function() {
                 return this.show && this.visible;
-            }
-        },
-        methods: {
-            closed: function() {
-                if (this.closeTracked) {
-                    return true;
-                }
-                remplib.trackEvent("banner", "close", {
-                    "banner_id": this.uuid,
-                    "campaign_id": this.campaignUuid,
-                });
-                this.closeTracked = true;
-                this.visible = false;
             },
-            clicked: function() {
-                if (this.clickTracked) {
-                    return true;
+            url: function() {
+                let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
+                let url =  this.targetUrl + separator + "utm_source=remp_campaign" +
+                    "&utm_medium=" + encodeURIComponent(this.displayType);
+                if (this.campaignUuid) {
+                    url += "&utm_campaign=" + encodeURIComponent(this.campaignUuid);
                 }
-                remplib.trackEvent("banner", "click", {
-                    "banner_id": this.uuid,
-                    "campaign_id": this.campaignUuid,
-                });
-                this.clickTracked = true;
-                return true;
-            }
-        }
+                if (this.uuid) {
+                    url += "&utm_content=" + encodeURIComponent(this.uuid);
+                }
+                return url;
+            },
+        },
     }
 </script>
