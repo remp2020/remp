@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Console;
 
 use Nette\DI\Container;
+use Symfony\Component\Console\Command\Command;
 
 class Application extends \Symfony\Component\Console\Application
 {
@@ -24,6 +25,7 @@ class Application extends \Symfony\Component\Console\Application
     public function registerAnnounced()
     {
         foreach ($this->announced as $type) {
+            /** @var Command $instance */
             $instance = $this->container->getByType($type);
             $this->add($instance);
         }
