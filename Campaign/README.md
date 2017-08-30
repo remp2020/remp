@@ -1,47 +1,63 @@
 # Beam
 
-## Running
-
-Suite can be run via Docker and Docker Compose. The appliance was tested with Docker CE 2017.03.
- 
-    make docker-compose
-    docker-compose up
-
-You can run `docker-compose ps` to see exposed ports of the appliance:
-
-- Admin: `:8080`
-- Tracker `:8081`, and you can visit `:8081/swagger.json` for the full API specs
-
 ## Admin (Laravel)
 
-Beam Admin serves as a tool for configuration of sites and properties. It's the place to generate tracking snippets
-and manage metadata about your websites. When the backend is ready, don't forget to install dependencies and run 
-DB migrations:
+Campaign Admin serves as a tool for configuration of banners and campaigns. It's the place for UI generation of banners
+and definition of how and to whom display Campaigns. 
 
-    composer install
-    php artisan migrate
+When the backend is ready, don't forget to install dependencies and run DB migrations:
+
+```bash
+# 1. Download PHP dependencies
+composer install
+
+# 2. Download JS/HTML dependencies
+yarn install
+
+# !. use extra switch if your system doesn't support symlinks (Windows; can be enabled)
+yarn install --no-bin-links
+
+# 3. Generate assets
+yarn run dev // or any other alternative defined within package.json
+
+# 4. Run migrations
+php artisan migrate
+```
 
 ### Dependencies
 
 - PHP 7.1
 - MySQL 5.7
+- Redis ^3.2
 
-## Tracker (Go)
+### Schedule
 
-Beam Tracker serves as a tool for tracking events via API. Endpoints can be discovered via generated swagger.json.
+For application to function properly you need to add Laravel's schedule running into your crontab:
 
-To build it, you need to have Go 1.8 installed and any kind of GNU make support (Unix-based or 
-CygWin on Windows). After that, execute:
+```
+* * * * * php artisan schedule:run >> storage/logs/schedule.log 2>&1
+```
 
-    make build
-    
-If you don't want to install Go, you can fully use Docker to run all tools together in the root of the project. 
-Feel free to alter `docker-compose.yml` based on your needs.
+Laravel's scheduler currently includes:
 
-### Dependencies
+*CacheSegmentJob*:
 
-- Go 1.8
-- InfluxDB 1.2
-- Telegraf 1.2
-- Kafka 0.10
-- Zookeeper 3.4
+- Triggered hourly and forced to refresh.
+
+### Queue
+
+For application to function properly, you also need to have Laravel's queue worker running as a daemon. Please follow the
+official documentation's [guidelines](https://laravel.com/docs/5.4/queues#running-the-queue-worker).
+
+```bash
+php artisan queue:work
+```
+
+Laravel's queue currently includes
+
+*CacheSegmentJob*: 
+
+- Triggered when campaign is activated. 
+- Trigerred when cached data got invalidated and need to be fetched again.
+
+If the data are still valid, job doesn't refresh them.

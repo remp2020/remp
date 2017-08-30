@@ -1,6 +1,6 @@
 # REMP Segments
 
-This is and API to acquire information about segments defined via web administration interface.
+Segments is read-only API to acquire information about segments defined via web administration interface.
 
 It provides:
 

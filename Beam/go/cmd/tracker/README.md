@@ -1,7 +1,7 @@
 # REMP Tracker
 
 This is a gateway for storing both user and system events. Tracker validates the request and posts InfluxDB-formatted
-set of data to Kafka.
+set of data to Kafka. For generic events, it also creates a Kafka topic based on provided `$category_$action`.
 
 ## Building
 
