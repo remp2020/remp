@@ -99,15 +99,18 @@ services:
 	        - addMailer(Remp\MailerModule\Mailer\SmtpMailer())
 	        - addMailer(Remp\MailerModule\Mailer\MailgunMailer())
 
-	# Internal CRM system. For more details contact Tomas Bella.
-#	- Remp\MailerModule\Auth\Authenticator
-#	- Remp\MailerModule\Auth\RemoteUser(%sso_host%)
+#	# Internal CRM system. For more details contact Tomas Bella.
+#	authenticator:
+#		class: Remp\MailerModule\Auth\Authenticator
+#	authStorage:
+#		class: Remp\MailerModule\Auth\RemoteUser(%sso_host%)
 
 	# SSO authentication
 	- Remp\NetteSso\Security\Client(%sso_host%)
-	- Remp\NetteSso\Security\Authenticator(%sso_error_url%)
+	authenticator:
+		class: Remp\NetteSso\Security\Authenticator(%sso_error_url%)
 	security.userStorage:
-	    class: Remp\NetteSso\Security\UserStorage
+		class: Remp\NetteSso\Security\UserStorage
 
 	- Remp\MailerModule\Config\Config
 	- Remp\MailerModule\Sender

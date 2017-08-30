@@ -32,7 +32,8 @@ parameters:
 services:
     # ...
     - Remp\NetteSso\Security\Client(%sso_host%)
-    - Remp\NetteSso\Security\Authenticator(%sso_error_url%)
+    authenticator:
+        class: Remp\NetteSso\Security\Authenticator(%sso_error_url%)
     security.userStorage:
         class: Remp\NetteSso\Security\UserStorage
     # ...
