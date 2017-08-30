@@ -6,13 +6,14 @@ use Remp\MailerModule\Repository\LogEventsRepository;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Repository\LogsRepository;
+use Remp\MailerModule\Sender;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class MailgunEventsHandler extends BaseHandler
 {
-    private $apiKey;
+    private $sender;
 
     /** @var LogsRepository */
     private $logsRepository;
@@ -23,10 +24,11 @@ class MailgunEventsHandler extends BaseHandler
     public function __construct(
         Config $config,
         logsRepository $logsRepository,
-        LogEventsRepository $logEventsRepository
+        LogEventsRepository $logEventsRepository,
+        Sender $sender
     ) {
         parent::__construct();
-        $this->apiKey = $config->get('mailgun_api_key');
+        $this->sender = $sender;
         $this->logsRepository = $logsRepository;
         $this->logEventsRepository = $logEventsRepository;
     }
@@ -45,7 +47,9 @@ class MailgunEventsHandler extends BaseHandler
 
     public function handle($params)
     {
-        if (hash_hmac('sha256', $params['timestamp'] . $params['token'], $this->mailgunApiKey) !== $params['signature']) {
+        $mailerConfig = $this->sender->getMailerConfig('remp-mailgun');
+
+        if (hash_hmac('sha256', $params['timestamp'] . $params['token'], $mailerConfig['api_key']) !== $params['signature']) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Wrong signature.']);
         }
 

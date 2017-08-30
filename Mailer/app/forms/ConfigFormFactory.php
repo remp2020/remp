@@ -40,7 +40,7 @@ class ConfigFormFactory extends Object
                 $mailers = [];
                 $availableMailers =  $this->mailerFactory->getAvailableMailers();
                 array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
-                    $mailers[$name] = $name;
+                    $mailers[$name] = get_class($mailer);
                 });
 
                 $item = $container->addSelect('default_mailer', 'Default Mailer', $mailers);

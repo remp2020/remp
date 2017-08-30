@@ -11,7 +11,7 @@ class ConfigsRepository extends Repository
 
     public function all()
     {
-        return $this->getTable()->where('config_category_id', 4)->order('sorting ASC');
+        return $this->getTable()->order('sorting ASC');
     }
 
     public function add($name, $display_name, $value, $description, $type)
@@ -22,7 +22,6 @@ class ConfigsRepository extends Repository
             'value' => $value,
             'description' => $description,
             'type' => $type,
-            'config_category_id' => 4,
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),
         ]);

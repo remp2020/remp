@@ -13,6 +13,8 @@ class MailgunMailer extends Mailer implements IMailer
 {
     private $mailer;
 
+    protected $alias = 'remp-mailgun';
+
     protected $options = [ 'api_key', 'domain' ];
 
     public function __construct(
