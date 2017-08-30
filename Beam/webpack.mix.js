@@ -12,6 +12,7 @@ mix
         resourceRoot: "/assets/vendor/"
     })
     .js("resources/assets/js/app.js", "js/app.js")
+    .copy("resources/assets/js/remplib.js", publicPath + "js/remplib.js")
     .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
     .sass("resources/assets/sass/app.scss", "css/app.css")
     .extract([

@@ -23,6 +23,9 @@ var run = function() {
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
 
+    banner.uuid = "{{ $banner->uuid }}";
+    banner.campaignUuid = "{{ $campaign->uuid }}";
+
     var d = document.createElement('div');
     d.id = bannerId;
     var bp = document.createElement('banner-preview');
@@ -47,11 +50,13 @@ var run = function() {
 
     // TODO: track explicit click and close
     setTimeout(function() {
-        // TODO: track show
+        remplib.tracker.trackEvent("banner", "show", {
+            "banner_id": banner.uuid,
+            "campaign_id": banner.campaign_uuid
+        })
         banner.show = true;
         if (banner.closeTimeout) {
             setTimeout(function() {
-                // TODO: track close
                 banner.show = false;
             }, banner.closeTimeout);
         }

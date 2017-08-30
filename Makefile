@@ -11,11 +11,11 @@ sniff:
 	cd $(SUB_MAILER) && make sniff
 	cd $(SUB_SSO) && make sniff
 
-sniff_fix:
-	cd $(SUB_BEAM) && make sniff_fix
-	cd $(SUB_CAMPAIGN) && make sniff_fix
-	cd $(SUB_MAILER) && make sniff_fix
-	cd $(SUB_SSO) && make sniff_fix
+sniff-fix:
+	cd $(SUB_BEAM) && make sniff-fix
+	cd $(SUB_CAMPAIGN) && make sniff-fix
+	cd $(SUB_MAILER) && make sniff-fix
+	cd $(SUB_SSO) && make sniff-fix
 
 fixcs:
 	cd $(SUB_BEAM) && make fixcs
@@ -28,3 +28,6 @@ syntax:
 	cd $(SUB_CAMPAIGN) && make syntax
 	cd $(SUB_MAILER) && make syntax
 	cd $(SUB_SSO) && make syntax
+
+docker-build:
+	cd $(SUB_BEAM) && make docker-build

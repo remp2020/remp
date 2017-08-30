@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import BannerPreview from './components/BannerPreview.vue';
 
-remplib = typeof(remplib) === 'undefined' ? {} : remplib;
+window.remplib = window.remplib || {};
 
 (function() {
 

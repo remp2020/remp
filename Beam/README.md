@@ -1,22 +1,11 @@
 # Beam
 
-## Running
-
-Suite can be run via Docker and Docker Compose. The appliance was tested with Docker CE 2017.03.
- 
-    make docker-compose
-    docker-compose up
-
-You can run `docker-compose ps` to see exposed ports of the appliance:
-
-- Admin: `:8080`
-- Tracker `:8081`, and you can visit `:8081/swagger.json` for the full API specs
-
 ## Admin (Laravel)
 
-Beam Admin serves as a tool for configuration of sites and properties. It's the place to generate tracking snippets
-and manage metadata about your websites. When the backend is ready, don't forget to install dependencies and run 
-DB migrations:
+Beam Admin serves as a tool for configuration of sites, properties and segments. It's the place to get tracking snippets
+and manage metadata about your websites.
+
+When the backend is ready, don't forget to install dependencies and run DB migrations:
 
 ```bash
 # 1. Download PHP dependencies
@@ -35,27 +24,54 @@ yarn run dev // or any other alternative defined within package.json
 php artisan migrate
 ```
 
-### Dependencies
+#### Dependencies
 
-- PHP 7.1
-- MySQL 5.7
+- PHP ^7.0
+- MySQL ^5.7
+- Redis ^3.2
 
-## Tracker (Go)
+## [Tracker](go/cmd/tracker) (Go)
 
-Beam Tracker serves as a tool for tracking events via API. Endpoints can be discovered via generated swagger.json.
+Beam Tracker serves as a tool for tracking events via API. Endpoints can be discovered via generated `/swagger.json`.
 
-To build it, you need to have Go 1.8 installed and any kind of GNU make support (Unix-based or 
-CygWin on Windows). After that, execute:
+Tracker pushes events to Kafka in Influx format into `beam_events` topic. For all `/track/event` calls, Tracker also
+pushes raw JSON event to its own topic based on the event *category* and *action*.
 
-    make build
+For example for payload
+
+```json
+{
+  "category": "foo",
+  "action": "bar"
+  // ...
+}
+```
+
+the event would be stored within `foo_bar` topic so everyone can subscribe to it.
+
+#### Dependencies
+
+- Go ^1.8
+- Kafka ^0.10
+- Zookeeper ^3.4
+- MySQL ^5.7
     
-If you don't want to install Go, you can fully use Docker to run all tools together in the root of the project. 
-Feel free to alter `docker-compose.yml` based on your needs.
+## [Segments](go/cmd/segments) (Go)
 
-### Dependencies
+Beam Segments serves as a read-only API for getting information about segments and users of these segments.
+Endpoints can be discovered via generated `/swagger.json`.
 
-- Go 1.8
-- InfluxDB 1.2
-- Telegraf 1.2
-- Kafka 0.10
-- Zookeeper 3.4
+#### Dependencies
+
+- Go ^1.8
+- InfluxDB ^1.2
+- MySQL ^5.7
+
+## [Telegraf](../Docker/telegraf)
+
+Influx Telegraf is a backend service for moving data out of Kafka to InfluxDB. It needs to be ready as Segments are
+dependent on Influx-based data pushed by Telegraf.
+
+## [Kafka](../Docker/kafka)
+
+All tracked events are also pushed to Kafka 

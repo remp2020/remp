@@ -5,11 +5,8 @@ namespace App\Http\Controllers;
 use App\Banner;
 use App\Campaign;
 use App\CampaignSegment;
-use App\Contracts\JournalContract;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
-use App\Contracts\TrackerContract;
-use App\Contracts\TrackerException;
 use App\Http\Requests\CampaignRequest;
 use App\Jobs\CacheSegmentJob;
 use Illuminate\Http\Request;
@@ -30,7 +27,9 @@ class CampaignController extends Controller
      */
     public function index()
     {
-        return view('campaigns.index');
+        return view('campaigns.index', [
+            'snippet' => view('campaigns._snippet'),
+        ]);
     }
 
     public function json(Datatables $dataTables)
@@ -40,7 +39,6 @@ class CampaignController extends Controller
             ->addColumn('actions', function (Campaign $campaign) {
                 return Json::encode([
                     '_id' => $campaign->id,
-                    'show' => route('campaigns.show', $campaign),
                     'edit' => route('campaigns.edit', $campaign) ,
                 ]);
             })
@@ -182,8 +180,6 @@ class CampaignController extends Controller
      * @param PositionMap $pm
      * @param AlignmentMap $am
      * @param SegmentAggregator $sa
-     * @param TrackerContract $tc
-     * @param JournalContract $jc
      * @return \Illuminate\Http\JsonResponse
      */
     public function showtime(
@@ -191,9 +187,7 @@ class CampaignController extends Controller
         DimensionMap $dm,
         PositionMap $pm,
         AlignmentMap $am,
-        SegmentAggregator $sa,
-        TrackerContract $tc,
-        JournalContract $jc
+        SegmentAggregator $sa
     ) {
         // validation
 
@@ -209,13 +203,6 @@ class CampaignController extends Controller
 
         $data = \GuzzleHttp\json_decode($r->get('data'));
         $beamToken = $data->beamToken ?? null;
-        if (!$beamToken) {
-            return response()
-                ->jsonp($r->get('callback'), [
-                    'success' => false,
-                    'errors' => ['beamToken is required and missing'],
-                ]);
-        }
         $url = $data->url ?? null;
         if (!$url) {
             return response()
@@ -259,24 +246,6 @@ class CampaignController extends Controller
         $dimensions = $dm->dimensions();
         $alignments = $am->alignments();
 
-        // following tracking is temporary and will be done from FE javascript directly to the Beam Tracker API.
-        $userAgent = $r->headers->get("user-agent");
-        $ip = $r->ip();
-
-        try {
-            $tc->event($beamToken, "campaign", "display", $url, $ip, $userAgent, $userId, [
-                "campaign_id" => $campaign->id,
-                "banner_id" => $banner->id,
-            ]);
-        } catch (TrackerException $e) {
-            return response()
-                ->jsonp($r->get('callback'), [
-                    'success' => false,
-                    'errors' => ['unable to track event in tracker'],
-                ])
-                ->setStatusCode(400);
-        }
-
         return response()
             ->jsonp($r->get('callback'), [
                 'success' => true,
@@ -284,6 +253,7 @@ class CampaignController extends Controller
                 'data' => [
                     View::make('banners.preview', [
                         'banner' => $banner,
+                        'campaign' => $campaign,
                         'positions' => [$banner->position => $positions[$banner->position]],
                         'dimensions' => [$banner->dimensions => $dimensions[$banner->dimensions]],
                         'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
