@@ -115,16 +115,19 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
                     params["user"] = {"id": this.userId, "url":  window.location.href, "user_agent": navigator.userAgent};
 
-                    if (document.referrer == "https://www.facebook.com") {
-                        params["social"] = "fb";
-                    } else
-                        if (document.referrer == "https://twitter.com") {
-                        params["social"] = "tw";
+                    if (document.referrer.match(/^https?:\/\/([^\/]+\.)?facebook\.com(\/|$)/i)) {
+                        params["social"] = "facebook";
+                    } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?twitter\.com(\/|$)/i)) {
+                        params["social"] = "twitter";
+                    } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?reddit\.com(\/|$)/i)) {
+                        params["social"] = "reddit";
                     }
 
-                    if (typeof this.uriParams["rc_id"] !== 'undefined') {
-                        params["rc_id"] = this.uriParams["rc_id"];
-                        params["rc_source"] = this.uriParams["rc_source"];
+                    if (typeof this.uriParams["utm_source"] !== 'undefined') {
+                        params["utm_source"] = this.uriParams["utm_source"];
+                        params["utm_medium"] = this.uriParams["utm_medium"];
+                        params["utm_campaign"] = this.uriParams["utm_campaign"];
+                        params["utm_content"] = this.uriParams["utm_content"];
                     }
 
                     return params
