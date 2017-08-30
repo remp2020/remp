@@ -35,8 +35,33 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
-    'remp_segments' => [
-        'base_url' => env('REMP_SEGMENTS_API_ADDR'),
-    ]
+    'remp' => [
+        'beam' => [
+            'web_addr' => env('REMP_BEAM_ADDR'),
+            'tracker_addr' => env('REMP_TRACKER_ADDR'),
+            'tracker_property_token' => env('REMP_TRACKER_ADDR'),
+            'segments_addr' => env('REMP_SEGMENTS_ADDR'),
+        ],
+        'campaign' => [
+            'web_addr' => env('REMP_CAMPAIGN_ADDR'),
+        ],
+        'sso' => [
+            'web_addr' => env('REMP_SSO_ADDR'),
+        ],
+        'linked' => [
+            'beam' => [
+                'url' => '/',
+                'icon' => 'album',
+            ],
+            'campaign' => [
+                'url' => env('REMP_CAMPAIGN_ADDR'),
+                'icon' => 'trending-up',
+            ],
+            'mailer' => [
+                'url' => env('REMP_MAILER_ADDR'),
+                'icon' => 'email',
+            ],
+        ],
+    ],
 
 ];

@@ -5,11 +5,20 @@ namespace Remp\MailerModule\Presenters;
 use Kdyby\Autowired\AutowireComponentFactories;
 use Kdyby\Autowired\AutowireProperties;
 use Nette\Application\UI\Presenter;
+use Remp\MailerModule\EnvironmentConfig;
 
 abstract class BasePresenter extends Presenter
 {
     use AutowireProperties;
     use AutowireComponentFactories;
+
+    /** @var EnvironmentConfig @inject */
+    public $environmentConfig;
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     public function startup()
     {
@@ -20,5 +29,6 @@ abstract class BasePresenter extends Presenter
         }
 
         $this->template->currentUser = $this->getUser();
+        $this->template->linkedServices = $this->environmentConfig->getLinkedServices();
     }
 }
