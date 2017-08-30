@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{ifset title}{include title|stripHtml} | {/ifset} REMP</title>
 
+    <link rel="apple-touch-icon" sizes="57x57" href="/assets/img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/assets/img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/assets/img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon/ms-icon-144x144.png">
+
     <!-- Vendor CSS -->
     <link href="/assets/vendor/css/vendor.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/github-gist.min.css" rel="stylesheet">
@@ -20,13 +37,43 @@
 </head>
 
 <body data-ma-header="cyan-600">
-<div class="remp-bar btn-group">
-    <a href="https://remp2020.com" class="btn btn-default waves-effect">REMP</a>
-    <a href="https://beam.remp2020.com" class="btn btn-icon-text btn-default waves-effect"><i class="zmdi zmdi-star"></i> Beam</a>
-    <a href="https://campaign.remp2020.com" class="btn btn-icon-text btn-default waves-effect"><i class="zmdi zmdi-trending-up"></i> Campaign</a>
-    <a href="https://mailer.remp2020.com" class="btn btn-icon-text btn-default waves-effect"><i class="zmdi zmdi-email"></i> Mailer</a>
-    <a href="https://predplatne.dennikn.sk/admin/" class="btn btn-icon-text btn-default waves-effect"><i class="zmdi zmdi-bike"></i> CRM</a>
+
+<div class="remp-menu">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">
+                    <div class="svg-logo"></div>
+                </a>
+            </div>
+            <ul class="nav navbar-nav navbar-remp">
+                <li><a href="https://beam.remp2020.com"><i class="zmdi zmdi-album zmdi-hc-fw"></i> Beam</a></li>
+                <li><a href="https://campaign.remp2020.com"><i class="zmdi zmdi-trending-up zmdi-hc-fw"></i> Campaign</a></li>
+                <li><a href="https://mailer.remp2020.com"><i class="zmdi zmdi-email zmdi-hc-fw"></i> Mailer</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown hm-profile">
+                    <a data-toggle="dropdown" href="">
+                        <img src="https://www.gravatar.com/avatar/{md5(strtolower($currentUser->getIdentity()->data['email']))}?s=45&d=mm" alt="">
+                    </a>
+
+                    <ul class="dropdown-menu pull-right dm-icon">
+                        {*<li>*}
+                        {*<a href="#"><i class="zmdi zmdi-account"></i> View Profile</a>*}
+                        {*</li>*}
+                        <li>
+                            <a n:href="Settings:default"><i class="zmdi zmdi-settings"></i> Settings</a>
+                        </li>
+                        {*<li>*}
+                        {*<a n:href="Sign:Out"><i class="zmdi zmdi-time-restore"></i> Logout</a>*}
+                        {*</li>*}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
 </div>
+
 <header id="header" class="media">
     <div class="pull-left h-logo">
         <a n:href="Dashboard:default" class="hidden-xs"></a>
@@ -40,45 +87,6 @@
         </div>
     </div>
 
-    <ul class="pull-right h-menu">
-        <li class="dropdown hidden-xs hidden-sm h-apps">
-            <a data-toggle="dropdown" href="">
-                <i class="hm-icon zmdi zmdi-apps"></i>
-            </a>
-            <ul class="dropdown-menu pull-right">
-                <li>
-                    <a href="http://campaign.remp.app">
-                        <i class="palette-Orange-400 bg zmdi zmdi-blur"></i>
-                        <small>Campaign</small>
-                    </a>
-                </li>
-                <li>
-                    <a n:href="Dashboard:default">
-                        <i class="palette-Cyan-400 bg zmdi zmdi-email"></i>
-                        <small>Mail</small>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="dropdown hm-profile">
-            <a data-toggle="dropdown" href="">
-                <img src="https://www.gravatar.com/avatar/{md5(strtolower($currentUser->getIdentity()->data['email']))}?s=45&d=mm" alt="">
-            </a>
-
-            <ul class="dropdown-menu pull-right dm-icon">
-                <li>
-                    <a href="#"><i class="zmdi zmdi-account"></i> View Profile</a>
-                </li>
-                <li>
-                    <a n:href="Settings:default"><i class="zmdi zmdi-settings"></i> Settings</a>
-                </li>
-                <li>
-                    <a n:href="Sign:Out"><i class="zmdi zmdi-time-restore"></i> Logout</a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-
     <div class="media-body h-search">
         <form class="p-relative">
             <input type="text" class="hs-input" placeholder="Search for people, files & reports">
@@ -90,8 +98,6 @@
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
-            <li n:class="$presenter->isLinkCurrent('Dashboard:*') ? active"><a n:href="Dashboard:default"><i class="zmdi zmdi-home"></i> Dashboard</a></li>
-            <li class="m-b-15"></li>
             <li n:class="$presenter->isLinkCurrent('Template:*') ? active"><a n:href="Template:default"><i class="zmdi zmdi-view-quilt"></i> Emails</a></li>
             <li n:class="$presenter->isLinkCurrent('Layout:*') ? active"><a n:href="Layout:default"><i class="zmdi zmdi-widgets"></i> Layouts (Templates)</a></li>
             <li n:class="$presenter->isLinkCurrent('List:*') ? active"><a n:href="List:default"><i class="zmdi zmdi-arrow-split"></i> Newsletter lists</a></li>

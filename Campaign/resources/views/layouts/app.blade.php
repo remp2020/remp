@@ -24,6 +24,23 @@ function route_active($routeName, $classes = '', $activeClasses = '')
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title> @yield('title') </title>
 
+    <link rel="apple-touch-icon" sizes="57x57" href="/assets/img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/assets/img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/assets/img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon/ms-icon-144x144.png">
+
     <link href="{{ asset(mix('/css/vendor.css', '/assets/vendor')) }}" rel="stylesheet">
     <link href="{{ asset(mix('/css/app.css', '/assets/vendor')) }}" rel="stylesheet">
 
@@ -35,6 +52,43 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 </head>
 
 <body data-ma-header="cyan-600">
+
+<div class="remp-menu">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">
+                    <div class="svg-logo"></div>
+                </a>
+            </div>
+            <ul class="nav navbar-nav navbar-remp">
+                <li><a href="https://beam.remp2020.com"><i class="zmdi zmdi-album zmdi-hc-fw"></i> Beam</a></li>
+                <li><a href="https://campaign.remp2020.com"><i class="zmdi zmdi-trending-up zmdi-hc-fw"></i> Campaign</a></li>
+                <li><a href="https://mailer.remp2020.com"><i class="zmdi zmdi-email zmdi-hc-fw"></i> Mailer</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown hm-profile">
+                    <a data-toggle="dropdown" href="">
+                        <img src="https://www.gravatar.com/avatar/{{ md5(Auth::user()->email) }}" alt="">
+                    </a>
+
+                    {{--<ul class="dropdown-menu pull-right dm-icon">--}}
+                    {{--<li>--}}
+                    {{--<a href="#"><i class="zmdi zmdi-account"></i> View Profile</a>--}}
+                    {{--</li>--}}
+                    {{--<li>--}}
+                    {{--<a href="#"><i class="zmdi zmdi-settings"></i> Settings</a>--}}
+                    {{--</li>--}}
+                    {{--<li>--}}
+                    {{--<a href="#"><i class="zmdi zmdi-time-restore"></i> Logout</a>*}--}}
+                    {{--</li>--}}
+                    {{--</ul>--}}
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
 <header id="header" class="media">
     <div class="pull-left h-logo">
         <a href="/" class="hidden-xs"></a>
@@ -48,45 +102,6 @@ function route_active($routeName, $classes = '', $activeClasses = '')
         </div>
     </div>
 
-    <ul class="pull-right h-menu">
-        <li class="dropdown hidden-xs hidden-sm h-apps">
-            <a data-toggle="dropdown" href="">
-                <i class="hm-icon zmdi zmdi-apps"></i>
-            </a>
-            <ul class="dropdown-menu pull-right">
-                <li>
-                    <a href="">
-                        <i class="palette-Green-400 bg zmdi zmdi-file-text"></i>
-                        <small>Beam</small>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class="palette-Light-Blue bg zmdi zmdi-email"></i>
-                        <small>Mailer</small>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="dropdown hm-profile">
-            <a data-toggle="dropdown" href="">
-                <img src="https://www.gravatar.com/avatar/{{ md5(Auth::user()->email) }}" alt="">
-            </a>
-
-            <ul class="dropdown-menu pull-right dm-icon">
-                <li>
-                    <a href=""><i class="zmdi zmdi-account"></i> View Profile</a>
-                </li>
-                <li>
-                    <a href=""><i class="zmdi zmdi-settings"></i> Settings</a>
-                </li>
-                <li>
-                    <a href=""><i class="zmdi zmdi-time-restore"></i> Logout</a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-
     <div class="media-body h-search">
         <form class="p-relative">
             <input type="text" class="hs-input" placeholder="Search for banners and campaigns">
@@ -99,14 +114,11 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
-            <li {!! route_active('dashboard') !!}>
-                <a href="{{ route('dashboard') }}"><i class="zmdi zmdi-home"></i> Dashboard</a>
-            </li>
             <li {!! route_active('banners') !!}>
-                <a href="{{ route('banners.index') }}" ><i class="zmdi zmdi-view-quilt"></i> Banners</a>
+                <a href="{{ route('banners.index') }}" ><i class="zmdi zmdi-collection-folder-image"></i> Banners</a>
             </li>
             <li {!! route_active('campaigns') !!}>
-                <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-view-quilt"></i> Campaigns</a>
+                <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-ticket-star"></i> Campaigns</a>
             </li>
         </ul>
     </aside>
@@ -131,15 +143,6 @@ function route_active($routeName, $classes = '', $activeClasses = '')
         Copyright &copy; 2017 REMP
     </footer>
 </section>
-
-<!-- Page Loader -->
-<div class="page-loader palette-Cyan-600 bg">
-    <div class="preloader pl-xl pls-white">
-        <svg class="pl-circular" viewBox="25 25 50 50">
-            <circle class="plc-path" cx="50" cy="50" r="20"/>
-        </svg>
-    </div>
-</div>
 
 <!-- Older IE warning message -->
 <!--[if lt IE 9]>
@@ -201,7 +204,6 @@ function route_active($routeName, $classes = '', $activeClasses = '')
         delay += 250;
         @endforeach
     });
-
 </script>
 
 @stack('scripts')

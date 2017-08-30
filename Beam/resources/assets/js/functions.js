@@ -2,7 +2,7 @@
  * Detact Mobile Browser
  */
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-   $('html').addClass('ismobile');
+    $('html').addClass('ismobile');
 }
 
 $(window).on('load', function () {
@@ -47,19 +47,19 @@ $(document).ready(function(){
     /* --------------------------------------------------------
         Top Search
     ----------------------------------------------------------*/
-    
+
     /* Bring search reset icon when focused */
     $('body').on('focus', '.hs-input', function(){
         $('.h-search').addClass('focused');
     });
-    
+
     /* Take off reset icon if input length is 0, when blurred */
     $('body').on('blur', '.hs-input', function(){
         var x = $(this).val();
-        
+
         if (!x.length > 0) {
             $('.h-search').removeClass('focused');
-        } 
+        }
     });
 
 
@@ -68,10 +68,10 @@ $(document).ready(function(){
     ----------------------------------------------------------*/
     $('body').on('click', '[data-user-alert]', function(e) {
         e.preventDefault();
-        
+
         var u = $(this).data('user-alert');
         $('.'+u).tab('show');
-        
+
     });
 
 
@@ -89,12 +89,12 @@ $(document).ready(function(){
 
         //On check
         $('body').on('click', '#todo-lists .acc-check', function () {
-           if($(this).is(':checked')) {
-               $(this).closest('.list-group-item').addClass('checked');
-           }
+            if($(this).is(':checked')) {
+                $(this).closest('.list-group-item').addClass('checked');
+            }
             else {
-               $(this).closest('.list-group-item').removeClass('checked');
-           }
+                $(this).closest('.list-group-item').removeClass('checked');
+            }
         });
     }
 
@@ -102,13 +102,13 @@ $(document).ready(function(){
      * Calendar Widget
      */
     if($('#calendar-widget')[0]) {
-        
-        
-        
+
+
+
         (function(){
             $('#cw-body').fullCalendar({
-		        contentHeight: 'auto',
-		        theme: true,
+                contentHeight: 'auto',
+                theme: true,
                 header: {
                     right: 'next',
                     center: 'title, ',
@@ -165,7 +165,7 @@ $(document).ready(function(){
                 ]
             });
         })();
-        
+
         //Display Current Date as Calendar widget header
         var mYear = moment().format('YYYY');
         var mDay = moment().format('dddd, MMM D');
@@ -184,36 +184,36 @@ $(document).ready(function(){
             unit: 'f',
             success: function(weather) {
                 var html = '<div class="cw-current media">' +
-                                '<div class="pull-left cwc-icon cwci-'+weather.code+'"></div>' +
-                                '<div class="cwc-info media-body">' +
-                                    '<div class="cwci-temp">'+weather.temp+'&deg;'+weather.units.temp+'</div>' +
-                                    '<ul class="cwci-info">' +
-                                        '<li>'+weather.city+', '+weather.region+'</li>' +
-                                        '<li>'+weather.currently+'</li>' +
-                                    '</ul>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="cw-upcoming"></div>';
+                    '<div class="pull-left cwc-icon cwci-'+weather.code+'"></div>' +
+                    '<div class="cwc-info media-body">' +
+                    '<div class="cwci-temp">'+weather.temp+'&deg;'+weather.units.temp+'</div>' +
+                    '<ul class="cwci-info">' +
+                    '<li>'+weather.city+', '+weather.region+'</li>' +
+                    '<li>'+weather.currently+'</li>' +
+                    '</ul>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="cw-upcoming"></div>';
 
                 $("#c-weather").html(html);
-                
+
                 setTimeout(function() {
-                    
-                    
+
+
                     for(i = 0; i < 5; i++) {
                         var l = '<ul class="clearfix">' +
-                                    '<li class="m-r-15">' +
-                                        '<i class="cwc-icon cwci-sm cwci-'+weather.forecast[i].code+'"></i>' +
-                                    '</li>' +
-                                    '<li class="cwu-forecast">'+weather.forecast[i].high+'/'+weather.forecast[i].low+'</li>' +
-                                    '<li>'+weather.forecast[i].text+'</li>' +
-                                '</ul>';
-                        
+                            '<li class="m-r-15">' +
+                            '<i class="cwc-icon cwci-sm cwci-'+weather.forecast[i].code+'"></i>' +
+                            '</li>' +
+                            '<li class="cwu-forecast">'+weather.forecast[i].high+'/'+weather.forecast[i].low+'</li>' +
+                            '<li>'+weather.forecast[i].text+'</li>' +
+                            '</ul>';
+
                         $('.cw-upcoming').append(l);
                     }
                 });
             },
-            error: function(error) { 
+            error: function(error) {
                 $("#c-weather").html('<p>'+error+'</p>');
             }
         });
@@ -223,7 +223,7 @@ $(document).ready(function(){
      * Auto Hight Textarea
      */
     if ($('.auto-size')[0]) {
-	   autosize($('.auto-size'));
+        autosize($('.auto-size'));
     }
 
     /*
@@ -232,7 +232,7 @@ $(document).ready(function(){
     $('body').on('click', '.profile-menu > a', function(e){
         e.preventDefault();
         $(this).parent().toggleClass('toggled');
-	    $(this).next().slideToggle(200);
+        $(this).next().slideToggle(200);
     });
 
     /*
@@ -302,30 +302,30 @@ $(document).ready(function(){
 
     //Range slider
     if($('.input-slider-range')[0]) {
-	$('.input-slider-range').noUiSlider({
-	    start: [30, 60],
-	    range: {
-		    'min': 0,
-		    'max': 100
-	    },
-	    connect: true
-	});
+        $('.input-slider-range').noUiSlider({
+            start: [30, 60],
+            range: {
+                'min': 0,
+                'max': 100
+            },
+            connect: true
+        });
     }
 
     //Range slider with value
     if($('.input-slider-values')[0]) {
-	$('.input-slider-values').noUiSlider({
-	    start: [ 45, 80 ],
-	    connect: true,
-	    direction: 'rtl',
-	    behaviour: 'tap-drag',
-	    range: {
-		    'min': 0,
-		    'max': 100
-	    }
-	});
+        $('.input-slider-values').noUiSlider({
+            start: [ 45, 80 ],
+            connect: true,
+            direction: 'rtl',
+            behaviour: 'tap-drag',
+            range: {
+                'min': 0,
+                'max': 100
+            }
+        });
 
-	$('.input-slider-values').Link('lower').to($('#value-lower'));
+        $('.input-slider-values').Link('lower').to($('#value-lower'));
         $('.input-slider-values').Link('upper').to($('#value-upper'), 'html');
     }
 
@@ -340,7 +340,7 @@ $(document).ready(function(){
      * Color Picker
      */
     if ($('.color-picker')[0]) {
-	    $('.color-picker').each(function(){
+        $('.color-picker').each(function(){
             var colorOutput = $(this).closest('.cp-container').find('.cp-value');
             $(this).farbtastic(colorOutput);
         });
@@ -350,13 +350,14 @@ $(document).ready(function(){
      * HTML Editor
      */
     if ($('.html-editor')[0]) {
-        CKEDITOR.replaceAll(function (textarea, config) {
-            if (textarea.className.indexOf('html-editor') === -1) {
-                return false;
-            }
-
-            config.customConfig = '/assets/js/config.js';
-            return true;
+        $('.html-editor').each(function () {
+            var id = $(this).attr('id');
+            var editor = CodeMirror.fromTextArea(document.getElementById(id), {
+                mode: 'htmlmixed',
+                styleActiveLine: true,
+                lineNumbers: true,
+                lineWrapping: true,
+            });
         });
     }
 
@@ -366,21 +367,21 @@ $(document).ready(function(){
 
     //Date Time Picker
     if ($('.date-time-picker')[0]) {
-	   $('.date-time-picker').datetimepicker();
+        $('.date-time-picker').datetimepicker();
     }
 
     //Time
     if ($('.time-picker')[0]) {
-    	$('.time-picker').datetimepicker({
-    	    format: 'LT'
-    	});
+        $('.time-picker').datetimepicker({
+            format: 'LT'
+        });
     }
 
     //Date
     if ($('.date-picker')[0]) {
-    	$('.date-picker').datetimepicker({
-    	    format: 'DD/MM/YYYY'
-    	});
+        $('.date-picker').datetimepicker({
+            format: 'DD/MM/YYYY'
+        });
     }
 
     /*
@@ -388,11 +389,11 @@ $(document).ready(function(){
      */
 
     if ($('.form-wizard-basic')[0]) {
-    	$('.form-wizard-basic').bootstrapWizard({
-    	    tabClass: 'fw-nav',
+        $('.form-wizard-basic').bootstrapWizard({
+            tabClass: 'fw-nav',
             'nextSelector': '.next',
             'previousSelector': '.previous'
-    	});
+        });
     }
 
     /*
@@ -412,8 +413,8 @@ $(document).ready(function(){
             },
             delay: 2500,
             animate: {
-                    enter: 'animated bounceIn',
-                    exit: 'animated bounceOut'
+                enter: 'animated bounceIn',
+                exit: 'animated bounceOut'
             },
             offset: {
                 x: 20,
@@ -426,8 +427,8 @@ $(document).ready(function(){
      * Waves Animation
      */
     (function(){
-         Waves.attach('.btn:not(.btn-icon):not(.btn-float)');
-         Waves.attach('.btn-icon, .btn-float', ['waves-circle', 'waves-float']);
+        Waves.attach('.btn:not(.btn-icon):not(.btn-float)');
+        Waves.attach('.btn-icon, .btn-float', ['waves-circle', 'waves-float']);
         Waves.init();
     })();
 
@@ -533,39 +534,39 @@ $(document).ready(function(){
      * Fullscreen Browsing
      */
     if ($('[data-action="fullscreen"]')[0]) {
-	var fs = $("[data-action='fullscreen']");
-	fs.on('click', function(e) {
-	    e.preventDefault();
+        var fs = $("[data-action='fullscreen']");
+        fs.on('click', function(e) {
+            e.preventDefault();
 
-	    //Launch
-	    function launchIntoFullscreen(element) {
+            //Launch
+            function launchIntoFullscreen(element) {
 
-		if(element.requestFullscreen) {
-		    element.requestFullscreen();
-		} else if(element.mozRequestFullScreen) {
-		    element.mozRequestFullScreen();
-		} else if(element.webkitRequestFullscreen) {
-		    element.webkitRequestFullscreen();
-		} else if(element.msRequestFullscreen) {
-		    element.msRequestFullscreen();
-		}
-	    }
+                if(element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if(element.mozRequestFullScreen) {
+                    element.mozRequestFullScreen();
+                } else if(element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                } else if(element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+            }
 
-	    //Exit
-	    function exitFullscreen() {
+            //Exit
+            function exitFullscreen() {
 
-		if(document.exitFullscreen) {
-		    document.exitFullscreen();
-		} else if(document.mozCancelFullScreen) {
-		    document.mozCancelFullScreen();
-		} else if(document.webkitExitFullscreen) {
-		    document.webkitExitFullscreen();
-		}
-	    }
+                if(document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if(document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if(document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
 
-	    launchIntoFullscreen(document.documentElement);
-	    fs.closest('.dropdown').removeClass('open');
-	});
+            launchIntoFullscreen(document.documentElement);
+            fs.closest('.dropdown').removeClass('open');
+        });
     }
 
 
@@ -612,9 +613,9 @@ $(document).ready(function(){
     /*
      * Typeahead Auto Complete
      */
-     if($('.typeahead')[0]) {
+    if($('.typeahead')[0]) {
 
-          var statesArray = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
+        var statesArray = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
             'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
             'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
             'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
@@ -623,7 +624,7 @@ $(document).ready(function(){
             'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
             'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
             'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
-          ];
+        ];
         var states = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -631,14 +632,14 @@ $(document).ready(function(){
         });
 
         $('.typeahead').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-          name: 'states',
-          source: states
-        });
+                hint: true,
+                highlight: true,
+                minLength: 1
+            },
+            {
+                name: 'states',
+                source: states
+            });
     }
 
 
@@ -647,12 +648,12 @@ $(document).ready(function(){
      */
     if ($('.wcc-toggle')[0]) {
         var z = '<div class="wcc-inner">' +
-                    '<textarea class="wcci-text auto-size" placeholder="Write Something..."></textarea>' +
-                '</div>' +
-                '<div class="m-t-15">' +
-                    '<button class="btn btn-sm btn-primary">Post</button>' +
-                    '<button class="btn btn-sm btn-link wcc-cencel">Cancel</button>' +
-                '</div>'
+            '<textarea class="wcci-text auto-size" placeholder="Write Something..."></textarea>' +
+            '</div>' +
+            '<div class="m-t-15">' +
+            '<button class="btn btn-sm btn-primary">Post</button>' +
+            '<button class="btn btn-sm btn-link wcc-cencel">Cancel</button>' +
+            '</div>'
 
 
         $('body').on('click', '.wcc-toggle', function() {
@@ -690,5 +691,16 @@ $(document).ready(function(){
 
         $(this).prop('disabled', true)
         window.location.href = url;
-    })
+    });
+
+    $.extend( $.fn.dataTable.defaults, {
+        language: {
+            "processing": '<div class="preloader pl-lg pls-teal">' +
+            '<svg class="pl-circular" viewBox="25 25 50 50">' +
+            '<circle class="plc-path" cx="50" cy="50" r="20"></circle>' +
+            '</svg>' +
+            '</div>'
+        },
+
+    });
 });

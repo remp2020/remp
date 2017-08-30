@@ -1,5 +1,57 @@
+#header {
+    padding: 20px 45px 0;
+}
+
+.remp-menu .svg-logo {
+    background: url("../img/logo_dark.svg") no-repeat;
+    background-size: 90px;
+    height: 40px;
+    width: 230px;
+}
+
+.navbar-brand {
+    padding: 14px 0 5px 30px;
+}
+
+.nav.navbar-remp {
+    padding-top: 9px;
+    text-transform: lowercase;
+}
+
+.nav > li {
+    font-size: 15px;
+}
+
+.navbar-nav > li > a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #4c4c4c;
+}
+
 #s-user-alerts {
     background: #f0f0f0;
+}
+
+@media (min-width: 1280px) {
+    #s-main-menu {
+        top: 120px;
+    }
+}
+
+.h-search {
+    padding: 5px 0 15px;
+}
+
+.hm-profile > a img {
+    border-color: #00acc1;
+}
+
+.nav .zmdi {
+    font-size: 20px;
+    vertical-align: sub;
 }
 
 .label-muted {
@@ -41,17 +93,8 @@
 /***************/
 .dataTables_wrapper .dataTables_processing {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 250px;
-    height: 55px;
-    margin-left: -250px;
-    margin-top: -25px;
-    padding-top: 20px;
-    text-align: center;
-    background: rgba(0, 188, 212, .65);
-    color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12);
+    top: 85px;
+    left: 42%;
     z-index: 3000;
 }
 

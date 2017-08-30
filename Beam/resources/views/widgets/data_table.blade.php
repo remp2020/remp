@@ -71,7 +71,7 @@
                 }
             ],
             'autoWidth': false,
-            'sDom': 't',
+            'sDom': 'tr',
             'processing': true,
             'serverSide': true,
             'ajax': '{{ $dataSource }}',

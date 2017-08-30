@@ -30,7 +30,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h2>Campaign list <small></small></h2>
@@ -61,10 +61,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h2>JS snippet <small></small></h2>
+                    <h2>Campaign display JS snippet <small></small></h2>
                 </div>
 
                 <div class="card-body card-padding">
