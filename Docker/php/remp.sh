@@ -17,9 +17,9 @@ then
         php artisan key:generate
     elif [ -f "bin/command.php" ]
     then
-#        php bin/command.php db:migrate
-#        php bin/command.php db:seed
-        echo "mailer skipped"
+        php bin/command.php db:migrate
+        php bin/command.php db:seed
+        php bin/command.php demo:seed
     fi
 fi
 php-fpm
