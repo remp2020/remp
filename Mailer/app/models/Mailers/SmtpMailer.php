@@ -11,6 +11,8 @@ class SmtpMailer extends Mailer implements IMailer
 {
     private $mailer;
 
+    protected $alias = 'remp-smtp';
+
     protected $options = [ 'host', 'port', 'username', 'password', 'secure' ];
 
     public function __construct(

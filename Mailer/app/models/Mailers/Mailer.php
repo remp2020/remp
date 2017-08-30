@@ -15,6 +15,8 @@ abstract class Mailer
     /** @var Config */
     protected $config;
 
+    protected $alias;
+
     protected $options = [];
 
     public function __construct(
@@ -26,6 +28,11 @@ abstract class Mailer
         $this->config = $config;
 
         $this->buildConfig();
+    }
+
+    public function getAlias()
+    {
+        return $this->alias;
     }
 
     public function getConfig()

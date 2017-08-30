@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Sender;
 
 use Nette\Mail\IMailer;
 use Remp\MailerModule\Config\Config;
+use Remp\MailerModule\Config\MailerNotExistsException;
 use Remp\MailerModule\Mailer\Mailer;
 
 class MailerFactory
@@ -24,15 +25,25 @@ class MailerFactory
      */
     public function addMailer(IMailer $mailer)
     {
-        $this->availableMailers[get_class($mailer)] = $mailer;
+        $this->availableMailers[$mailer->getAlias()] = $mailer;
     }
 
     /**
+     * @param null|string $alias
      * @return IMailer|Mailer
+     * @throws MailerNotExistsException
      */
-    public function getMailer()
+    public function getMailer($alias = null)
     {
-        return $this->availableMailers[$this->config->get('default_mailer')];
+        if ($alias === null) {
+            $alias = $this->config->get('default_mailer');
+        }
+
+        if (!isset($this->availableMailers[$alias])) {
+            throw new MailerNotExistsException("Mailer {$alias} not exists");
+        }
+
+        return $this->availableMailers[$alias];
     }
 
     /**

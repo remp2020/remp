@@ -136,9 +136,9 @@ class Sender
         return true;
     }
 
-    public function getMailerConfig()
+    public function getMailerConfig($alias = null)
     {
-        return $this->mailerFactory->getMailer()->getConfig();
+        return $this->mailerFactory->getMailer($alias)->getConfig();
     }
 
     private function reset()
