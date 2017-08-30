@@ -29,7 +29,7 @@ class RempJournalServiceProvider extends ServiceProvider
     {
         $this->app->bind(JournalContract::class, function ($app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.remp_beam.segment_base_url'),
+                'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
             ]);
             return new Journal($client);
         });

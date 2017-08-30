@@ -40,9 +40,32 @@ return [
         'token' => env('CRM_SEGMENT_API_TOKEN'),
     ],
 
-    'remp_beam' => [
-        'tracker_base_url' => env('REMP_TRACKER_API_ADDR'),
-        'segments_base_url' => env('REMP_SEGMENTS_API_ADDR'),
-        'web_base_url' => env('REMP_BEAM_ADDR'),
+    'remp' => [
+        'beam' => [
+            'web_addr' => env('REMP_BEAM_ADDR'),
+            'tracker_addr' => env('REMP_TRACKER_ADDR'),
+            'tracker_property_token' => env('REMP_TRACKER_ADDR'),
+            'segments_addr' => env('REMP_SEGMENTS_ADDR'),
+        ],
+        'mailer' => [
+            'web_addr' => env('REMP_MAILER_ADDR'),
+        ],
+        'sso' => [
+            'web_addr' => env('REMP_SSO_ADDR'),
+        ],
+        'linked' => [
+            'beam' => [
+                'url' => env('REMP_BEAM_ADDR'),
+                'icon' => 'album',
+            ],
+            'campaign' => [
+                'url' => '/',
+                'icon' => 'trending-up',
+            ],
+            'mailer' => [
+                'url' => env('REMP_MAILER_ADDR'),
+                'icon' => 'email',
+            ],
+        ],
     ],
 ];

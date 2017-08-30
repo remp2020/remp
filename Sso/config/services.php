@@ -41,4 +41,29 @@ return [
         'redirect' => env('GOOGLE_CALLBACK_URL', 'http://your-callback-url'),
     ],
 
+    'remp' => [
+        'beam' => [
+            'web_addr' => env('REMP_BEAM_ADDR'),
+        ],
+        'mailer' => [
+            'web_addr' => env('REMP_MAILER_ADDR'),
+        ],
+        'sso' => [
+            'web_addr' => env('REMP_SSO_ADDR'),
+        ],
+        'linked' => [
+            'beam' => [
+                'url' => env('REMP_BEAM_ADDR'),
+                'icon' => 'album',
+            ],
+            'campaign' => [
+                'url' => env('REMP_CAMPAIGN_ADDR'),
+                'icon' => 'trending-up',
+            ],
+            'mailer' => [
+                'url' => env('REMP_MAILER_ADDR'),
+                'icon' => 'email',
+            ],
+        ],
+    ],
 ];
