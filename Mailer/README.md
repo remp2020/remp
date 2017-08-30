@@ -34,6 +34,17 @@ You can override any default config from
 - MySQL ^5.7
 - Redis ^3.2
 
+### Integration with user base
+
+Mailer is dependent on external user base provider. After the installation the application will trigger the error
+saying that `Service of type Remp\MailerModule\User\IUser needed by ...`.
+
+To integrate with your user base, you need to implement `Remp\MailerModule\User\IUser` interface and register it
+as an service within [`config.neon`](./app/config/config.neon) or your `config.local.neon`.
+
+You can check reference implementation against our user base in
+[`Remp\MailerModule\User\Crm`](./app/models/Users/Crm.php). 
+
 ### Mailers
 
 By default application includes implementation of:
