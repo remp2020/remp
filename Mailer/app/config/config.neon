@@ -61,7 +61,8 @@ services:
 	        - announce(Remp\MailerModule\Commands\SubscribeWorkerCommand)
 	        - announce(Remp\MailerModule\Commands\EmailChangedWorkerCommand)
 	        - announce(Remp\MailerModule\Commands\DatabaseSeedCommand)
-	        - announce(@hermesWorker())
+	        - announce(Remp\MailerModule\Commands\DemoSeedCommand)
+	        - add(@hermesWorker())
 	        - setCatchExceptions(true)
 
 	hermesLogger:
@@ -166,3 +167,4 @@ services:
 	- Remp\MailerModule\Commands\SubscribeWorkerCommand
 	- Remp\MailerModule\Commands\EmailChangedWorkerCommand
 	- Remp\MailerModule\Commands\DatabaseSeedCommand
+	- Remp\MailerModule\Commands\DemoSeedCommand
