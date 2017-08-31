@@ -36,7 +36,7 @@ class SsoServiceProvider extends ServiceProvider
     {
         $this->app->bind(SsoContract::class, function($app){
             $client = new Client([
-                'base_uri' => $app['config']->get('services.remp_sso.addr'),
+                'base_uri' => $app['config']->get('services.remp.sso.web_addr'),
             ]);
             return new Sso($client);
         });

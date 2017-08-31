@@ -25,7 +25,7 @@ abstract class BasePresenter extends Presenter
         parent::startup();
 
         if (!$this->getUser()->isLoggedIn()) {
-            $this->getUser()->authenticator->authenticate([]);
+            $this->getUser()->login();
         }
 
         $this->template->currentUser = $this->getUser();
