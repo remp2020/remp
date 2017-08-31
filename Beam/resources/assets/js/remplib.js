@@ -84,7 +84,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     var params = {
                         "category": category,
                         "action": action,
-                        "fields": fields,
+                        "fields": fields || {},
                         "value": value
                     };
                     this.post(this.url + "/track/event", params)
@@ -92,7 +92,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                 trackPageview: function() {
                     var params = {
-                        "article": this.article
+                        "article": this.article,
+                        "fields": {}
                     };
                     this.post(this.url + "/track/pageview", params)
                 },
@@ -113,23 +114,80 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     var d = new Date();
                     params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
                     params["user"] = {"id": this.userId, "url":  window.location.href, "user_agent": navigator.userAgent};
+                    params["fields"]["social"] = this.getSocialSource();
+                    params["fields"]["utm_source"] = this.getParam("utm_source");
+                    params["fields"]["utm_medium"] = this.getParam("utm_medium");
+                    params["fields"]["utm_campaign"] = this.getParam("utm_campaign");
+                    params["fields"]["utm_content"] = this.getParam("utm_content");
 
-                    if (document.referrer.match(/^https?:\/\/([^\/]+\.)?facebook\.com(\/|$)/i)) {
-                        params["social"] = "facebook";
-                    } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?twitter\.com(\/|$)/i)) {
-                        params["social"] = "twitter";
-                    } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?reddit\.com(\/|$)/i)) {
-                        params["social"] = "reddit";
-                    }
-
-                    if (typeof this.uriParams["utm_source"] !== 'undefined') {
-                        params["utm_source"] = this.uriParams["utm_source"];
-                        params["utm_medium"] = this.uriParams["utm_medium"];
-                        params["utm_campaign"] = this.uriParams["utm_campaign"];
-                        params["utm_content"] = this.uriParams["utm_content"];
-                    }
-
+                    var cleanup = function(obj) {
+                        Object.keys(obj).forEach(function(key) {
+                            if (obj[key] && typeof obj[key] === 'object') cleanup(obj[key])
+                            else if (obj[key] === null) delete obj[key]
+                        });    
+                    };
+                    cleanup(params);
                     return params
+                },
+
+                getSocialSource: function() {
+                    var source = null;
+                    if (document.referrer.match(/^https?:\/\/([^\/]+\.)?facebook\.com(\/|$)/i)) {
+                        source = "facebook";
+                    } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?twitter\.com(\/|$)/i)) {
+                        source = "twitter";
+                    } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?reddit\.com(\/|$)/i)) {
+                        source = "reddit";
+                    }
+
+                    if (source === null) {
+                        return this.getFromStorage("social_source");
+                    }
+
+                    var now = new Date();
+                    var item = {
+                        "version": 1,
+                        "value": source,
+                        "createdAt": now.getTime(),
+                        "updatedAt": now.getTime(),
+                    };
+                    localStorage.setItem("social_source", JSON.stringify(item));
+                    return item.value;
+                },
+
+                getParam: function(key) {
+                    if (typeof this.uriParams[key] === 'undefined') {
+                        return this.getFromStorage(key);
+                    }
+
+                    var now = new Date();
+                    var item = {
+                        "version": 1,
+                        "value": this.uriParams[key],
+                        "createdAt": now.getTime(),
+                        "updatedAt": now.getTime(),
+                    };
+                    localStorage.setItem(key, JSON.stringify(item));
+                    return item.value;
+                },
+
+                getFromStorage: function(key) {
+                    var now = new Date();
+                    var data = localStorage.getItem(key);
+                    if (data === null) {
+                        return null;
+                    }
+
+                    var item = JSON.parse(data);
+                    var threshold = new Date(now.getTime() - 30 * 60000);
+                    if ((new Date(item.updatedAt)).getTime() < threshold.getTime()) {
+                        localStorage.removeItem(key);
+                        return null;
+                    }
+
+                    item.updatedAt = now;
+                    localStorage.setItem(key, JSON.stringify(item));
+                    return item.value;
                 },
 
                 parseUriParams: function(){
