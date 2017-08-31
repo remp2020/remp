@@ -12,6 +12,7 @@ var User = Type("User", func() {
 	Attribute("ip_address", String, "IP address of client", func() {
 		Format("ip")
 	})
+	Attribute("source", Source)
 })
 
 var System = Type("System", func() {
@@ -68,9 +69,18 @@ var Article = Type("Article", func() {
 	Attribute("category", String, "Page category (homepage, world news...")
 	Attribute("tags", ArrayOf(String), "List of tags (breaking news, trump...")
 	Attribute("author_id", String, "ID of author")
-	Attribute("campaign_id", String, "ID of campaign")
 
 	Required("id")
+})
+
+var Source = Type("source", func() {
+	Description("User-source related data")
+
+	Attribute("utm_source", String, "Origin of user (e.g. remp_campaign)")
+	Attribute("utm_medium", String, "Medium through which the came (e.g. overlay, inline)")
+	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
+	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
+	Attribute("social", String, "Social source if available")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {

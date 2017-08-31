@@ -115,6 +115,8 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 		return err
 	}
 
+	// push public
+
 	topic := fmt.Sprintf("%s_%s", ctx.Payload.Category, ctx.Payload.Action)
 	value, err := json.Marshal(ctx.Payload)
 	if err != nil {
@@ -154,9 +156,6 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	if article.AuthorID != nil {
 		tags["author_id"] = *article.AuthorID
 	}
-	if article.CampaignID != nil {
-		tags["campaign_id"] = *article.CampaignID
-	}
 	if article.Category != nil {
 		tags["category"] = *article.Category
 	}
@@ -170,6 +169,7 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 func (c *TrackController) pushInternal(system *app.System, user *app.User,
 	name string, tags map[string]string, fields map[string]interface{}) error {
 	fields["token"] = system.PropertyToken
+
 	if user != nil {
 		if user.IPAddress != nil {
 			fields["ip"] = *user.IPAddress
@@ -182,6 +182,24 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID
+		}
+
+		if user.Source != nil {
+			if user.Source.Social != nil {
+				tags["social"] = *user.Source.Social
+			}
+			if user.Source.UtmSource != nil {
+				tags["utm_source"] = *user.Source.UtmSource
+			}
+			if user.Source.UtmMedium != nil {
+				tags["utm_medium"] = *user.Source.UtmMedium
+			}
+			if user.Source.UtmCampaign != nil {
+				tags["utm_campaign"] = *user.Source.UtmCampaign
+			}
+			if user.Source.UtmContent != nil {
+				tags["utm_content"] = *user.Source.UtmContent
+			}
 		}
 	}
 
