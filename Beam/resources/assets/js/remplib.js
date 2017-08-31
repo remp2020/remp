@@ -12,7 +12,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             userId: null,
 
-
             tracker: {
 
                 url: null,
@@ -31,7 +30,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     id: null,
                     author_id: null,
                     category: null,
-                    tags: [],
+                    tags: []
                 },
 
                 uriParams: {},
@@ -93,7 +92,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                 trackPageview: function() {
                     var params = {
-                        "article": this.article,
+                        "article": this.article
                     };
                     this.post(this.url + "/track/pageview", params)
                 },
@@ -104,7 +103,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                 post: function (path, params) {
                     params = this.addParams(params);
-                    let xmlhttp = new XMLHttpRequest();
+                    var xmlhttp = new XMLHttpRequest();
                     xmlhttp.open("POST", path);
                     xmlhttp.setRequestHeader("Content-Type", "application/json");
                     xmlhttp.send(JSON.stringify(params));
@@ -140,7 +139,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         var pair = vars[i].split('=');
                         this.uriParams[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
                     }
-                },
+                }
             },
 
 
@@ -180,7 +179,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         }
                     })(), 0);
                 }
-            },
+            }
         };
     }());
 
