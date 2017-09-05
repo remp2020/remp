@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'lifetime' => 120,
+    'lifetime' => env('APP_SESSION_EXPIRATION', 120),
 
     'expire_on_close' => false,
 
