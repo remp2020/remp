@@ -32,6 +32,7 @@ class PropertyController extends Controller
             ->addColumn('actions', function (Property $property) use ($account) {
                 return Json::encode([
                     '_id' => $property->id,
+                    'show' => route('accounts.properties.show', [$account, $property]),
                     'edit' => route('accounts.properties.edit', [$account, $property]),
                 ]);
             })
@@ -83,9 +84,14 @@ class PropertyController extends Controller
      * @param  \App\Property  $property
      * @return \Illuminate\Http\Response
      */
-    public function show(Property $property)
+    public function show(Account $account, Property $property)
     {
-        //
+        return view('properties.show', [
+            'property' => $property,
+            'snippet' => view('properties._snippet', [
+                'property' => $property,
+            ]),
+        ]);
     }
 
     /**
