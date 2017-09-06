@@ -219,8 +219,8 @@
                     </h2>
                 </div>
                 <div class="card-body card-padding" id="banner-preview">
-                    <div class="row p-relative" style="width: 560px; height: 700px">
-                        <img src="../../img/website_mockup.png" class="preview-image" alt="Mockup" height="700px">
+                    <div class="row p-relative" style="text-align: center">
+                        <img src="../../img/website_mockup.png" class="preview-image" alt="Mockup" height="100%">
                         <banner-preview
                                 v-bind:alignmentOptions="alignmentOptions"
                                 v-bind:dimensionOptions="dimensionOptions"

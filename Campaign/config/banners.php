@@ -11,7 +11,22 @@ return [
             'name' => 'Medium rectangle (300x250)',
             'width' => '300px',
             'height' => '250px',
-        ]
+        ],
+        'bar' => [
+            'name' => 'Bar (728x50)',
+            'width' => '728px',
+            'height' => '50px',
+        ],
+        'notification' => [
+            'name' => 'Notification (300x50)',
+            'width' => '300px',
+            'height' => '50px',
+        ],
+        'square' => [
+            'name' => 'Square (300x300)',
+            'width' => '300px',
+            'height' => '300px',
+        ],
     ],
     'positions' => [
         'top_left' => [

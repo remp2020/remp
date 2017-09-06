@@ -49,6 +49,9 @@
         <div class="card">
             <div class="card-header">
                 <h2>Show banner <small>{{ $banner->name }}</small></h2>
+                <div class="actions">
+                    <a href="{{ route('banners.edit', $banner) }}" class="btn palette-Cyan bg waves-effect">Edit banner</a>
+                </div>
             </div>
             <div class="card-body card-padding">
             </div>
