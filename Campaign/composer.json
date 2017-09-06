@@ -47,7 +47,10 @@
         ],
         "psr-4": {
             "App\\": "app/"
-        }
+        },
+        "files": [
+            "../Composer/laravel_helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

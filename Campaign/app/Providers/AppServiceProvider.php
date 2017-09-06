@@ -45,6 +45,10 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('json', function ($expression) {
             return "\Psy\Util\Json::encode({$expression})";
         });
+
+        Blade::directive('class', function ($expression) {
+            return "<?php echo blade_class({$expression}); ?>";
+        });
     }
 
     /**
