@@ -339,12 +339,36 @@ $(document).ready(function(){
     /*
      * Color Picker
      */
-    if ($('.color-picker')[0]) {
-        $('.color-picker').each(function(){
-            var colorOutput = $(this).closest('.cp-container').find('.cp-value');
-            $(this).farbtastic(colorOutput);
+    $('.color-picker').each(function(){
+        var colorOutput = $(this).closest('.cp-container').find('.cp-value');
+        $(this).farbtastic(function() {
+            colorOutput.bind('keyup', this.updateValue);
+
+            // Set background/foreground color
+            $(colorOutput).css({
+                backgroundColor: this.color,
+                color: this.hsl[2] > 0.5 ? '#000' : '#fff'
+            });
+
+            // Change linked value
+            var self = this;
+            $(colorOutput).each(function() {
+                if (this.value !== self.color) {
+                    this.value = self.color;
+
+                    var e = document.createEvent('HTMLEvents');
+                    e.initEvent('input', true, true);
+                    this.dispatchEvent(e);
+                }
+            });
+
+            colorOutput.trigger("farbtastic.change");
         });
-    }
+    });
+    $(document).on('click', '.cp-container .dropdown', function (e) {
+        // don't close colorpicker when clicked inside
+        e.stopPropagation();
+    });
 
     /*
      * HTML Editor
@@ -683,14 +707,6 @@ $(document).ready(function(){
 
     $('select.order_after').on('change', function () {
         $('input[type="radio"][name="order"][value="after"]').trigger('click');
-    });
-
-    $('input[id^=change-status-batch]').change(function () {
-        var url = $(this).data('url');
-        var label = $('label[for="' + $(this).attr('id') + '"]');
-
-        $(this).prop('disabled', true)
-        window.location.href = url;
     });
 
     $.extend( $.fn.dataTable.defaults, {

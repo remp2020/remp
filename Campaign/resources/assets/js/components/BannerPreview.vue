@@ -211,6 +211,9 @@
                 return this.show && this.visible;
             },
             url: function() {
+                if (this.targetUrl === null) {
+                    return null;
+                }
                 let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
                 let url =  this.targetUrl + separator + "utm_source=remp_campaign" +
                     "&utm_medium=" + encodeURIComponent(this.displayType);
