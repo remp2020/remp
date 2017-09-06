@@ -126,7 +126,7 @@
         </div>
         <div n:foreach="$batch->related('mail_job_batch_templates') as $email" class="card">
             <div class="card-header">
-                <h2>Summary <small><span class="text-muted">{$email->mail_template->name}</span> {$email->mail_template->code}</small></h2>
+                <h2>Summary <small><span class="text-muted">{$email->mail_template->name}: {$email->mail_template->subject}</span> {$email->mail_template->code}</small></h2>
                 <ul class="actions">
                     <li class="dropdown action-show">
                         <a href="" data-toggle="dropdown">
