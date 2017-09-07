@@ -31,8 +31,8 @@ final class LayoutPresenter extends BasePresenter
         $dataTable
             ->setColSetting('name')
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setRowLink($this->link('Edit', 'RowId'))
-            ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit');
+            ->setRowLinkAction('edit')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit');
 
         return $dataTable;
     }
@@ -57,7 +57,9 @@ final class LayoutPresenter extends BasePresenter
 
         foreach ($layouts as $layout) {
             $result['data'][] = [
-                'RowId' => $layout->id,
+                'actions' => [
+                    'edit' => $this->link('Edit', $layout->id),
+                ],
                 $layout->name,
                 $layout->created_at,
             ];

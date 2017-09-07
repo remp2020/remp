@@ -70,7 +70,12 @@
                 {
                     name: 'actions',
                     orderable: false,
-                    render: $.fn.dataTables.render.actions({json_encode($rowActions)|noescape})
+                    render: $.fn.dataTables.render.actions({json_encode($rowActions)|noescape}, {
+                        {ifset $rowLinkAction}
+                        "rowLinkAction": {$rowLinkAction},
+                        {/ifset}
+                        "tableId": {$tableId},
+                    })
                 }
                 {/if}
             ],
@@ -102,10 +107,10 @@
 
         $.fn.dataTables.navigation(dataTable);
 
-        {ifset $rowLink}
+        {ifset $rowLinkAction}
         $('#{$tableId|noescape} tbody').on('click', 'tr', function () {
             var data = dataTable.row(this).data();
-            window.location.href = {$rowLink}.replace('RowId', data.RowId);
+            window.location.href = data.actions[{$rowLinkAction}];
         });
         {/ifset}
     });

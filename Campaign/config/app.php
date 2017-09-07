@@ -171,6 +171,7 @@ return [
          * Application Service Providers...
          */
         Remp\LaravelSso\Providers\SsoServiceProvider::class,
+        Remp\Widgets\Providers\WidgetServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,

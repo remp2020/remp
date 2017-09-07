@@ -30,6 +30,7 @@
                     ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
                     ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                 ],
+                'rowActionLink' => 'show',
             ]) !!}
         </div>
     </div>

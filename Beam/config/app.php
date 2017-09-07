@@ -172,6 +172,7 @@ return [
          * Application Service Providers...
          */
         Remp\LaravelSso\Providers\SsoServiceProvider::class,
+        Remp\Widgets\Providers\WidgetServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Widgets;
+namespace Remp\Widgets;
 
 use Arrilot\Widgets\AbstractWidget;
-use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 
 class DataTable extends AbstractWidget
@@ -18,6 +17,7 @@ class DataTable extends AbstractWidget
         'colSettings' => [],
         'tableId' => '',
         'rowActions' => [],
+        'rowActionLink' => null,
     ];
 
     /**
@@ -38,11 +38,12 @@ class DataTable extends AbstractWidget
             }
         });
 
-        return view("widgets.data_table", [
+        return view("widgets::data_table", [
             'dataSource' => $this->config['dataSource'],
             'cols' => $cols,
             'tableId' => Uuid::getFactory()->uuid4(),
-            'rowActions' => json_encode($this->config['rowActions'])
+            'rowActions' => $this->config['rowActions'],
+            'rowActionLink' => $this->config['rowActionLink'],
         ]);
     }
 }

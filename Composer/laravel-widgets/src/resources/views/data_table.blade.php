@@ -30,13 +30,13 @@
         <thead>
         <tr>
             @foreach ($cols as $col)
-            <th>
-                @if (isset($col['header']))
-                    {{ $col['header'] }}
-                @else
-                    {{ $col['name'] }}
-                @endif
-            </th>
+                <th>
+                    @if (isset($col['header']))
+                        {{ $col['header'] }}
+                    @else
+                        {{ $col['name'] }}
+                    @endif
+                </th>
             @endforeach
             <th>actions</th>
         </tr>
@@ -50,25 +50,27 @@
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
             'columns': [
-                @foreach ($cols as $col)
+                    @foreach ($cols as $col)
                 {
                     data: '{{ $col['name'] }}',
                     name: '{{ $col['name'] }}',
                     @if (isset($col['orderable']))
-                        orderable: false,
+                    orderable: false,
                     @endif
-                    @if (isset($col['render']))
+                            @if (isset($col['render']))
                     render: $.fn.dataTables.render['{!! $col['render'] !!}']({!! isset($col['renderParams']) ? json_encode($col['renderParams']) : '' !!})
                     @endif
                 },
-                @endforeach
+                    @endforeach
+                    @if (!empty($rowActions))
                 {
                     data: 'actions',
                     name: 'actions',
                     orderable: false,
                     searchable: false,
-                    render: $.fn.dataTables.render.actions({!! $rowActions !!}, '{{ $tableId }}')
-                }
+                    render: $.fn.dataTables.render.actions({!! @json($rowActions) !!})
+                },
+                @endif
             ],
             'autoWidth': false,
             'sDom': 'tr',
@@ -81,5 +83,12 @@
         });
 
         $.fn.dataTables.navigation(dataTable);
+
+        @if(isset($rowActionLink))
+        $('#{{ $tableId }} tbody').on('click', 'tr', function () {
+            var data = dataTable.row(this).data();
+            window.location.href = data.actions['{{ $rowActionLink }}'];
+        });
+        @endif
     });
 </script>
