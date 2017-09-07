@@ -1,6 +1,6 @@
-import "./functions.js";
-import "./actions.js";
-import "./datatables.js";
-import "./banner.js";
-import "./forms/bannerForm.js";
-import "./forms/campaignForm.js";
+require("remp/js/functions.js");
+require("remp/js/actions.js");
+require("remp/js/datatables.js");
+require("./banner.js");
+require("./forms/bannerForm.js");
+require("./forms/campaignForm.js");
