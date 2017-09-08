@@ -85,6 +85,14 @@ Couple of neat commands:
 Docker compose and custom images are ready for PHPStorm debugger. All you need to do is set folder mapping within
 your IDE for each debuggable host.
 
+## Error tracking
+
+All PHP applications are preconfigured to use [Airbrake](https://airbrake.io/) error tracking - see `.env.example`
+for configuration options.
+
+We recommend to use self-hosted [Errbit](https://github.com/errbit/errbit) instance
+as it's compatible with Airbrake APIs and completely open-source.
+
 ## Known issues
 
 - Windows is pushing scripts to Docker with CRLF new lines which is causing issues described 
