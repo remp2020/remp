@@ -29,9 +29,9 @@ class SegmentController extends Controller
 
         return $datatables->of($segments)
             ->addColumn('actions', function (Segment $segment) {
-                return Json::encode([
+                return [
                     'edit' => route('segments.edit', $segment),
-                ]);
+                ];
             })
             ->rawColumns(['actions'])
             ->make(true);

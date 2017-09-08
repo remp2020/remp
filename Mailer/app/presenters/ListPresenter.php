@@ -52,8 +52,8 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('locked', ['render' => 'boolean'])
             ->setColSetting('is_public', ['header' => 'public', 'render' => 'boolean'])
             ->setAllColSetting('orderable', false)
-            ->setRowLink($this->link('Show', 'RowId'))
-            ->setRowAction('show', $this->link('Show', 'RowId'), 'palette-Cyan zmdi-eye')
+            ->setRowLinkAction('show')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('displayNavigation', false)
             ->setTableSetting('rowGroup', 0);
 
@@ -74,7 +74,9 @@ final class ListPresenter extends BasePresenter
         /** @var ActiveRow $list */
         foreach ($lists as $list) {
             $result['data'][] = [
-                'RowId' => $list->id,
+                'actions' => [
+                    'show' => $this->link('Show', $list->id),
+                ],
                 $list->type_category->title,
                 $list->title,
                 $list->code,
@@ -111,7 +113,7 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('subject')
             ->setColSetting('opened')
             ->setColSetting('clicked')
-            ->setRowLink($this->link('Template:Show', 'RowId'))
+            ->setRowLinkAction('show')
             ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
@@ -139,7 +141,9 @@ final class ListPresenter extends BasePresenter
         /** @var ActiveRow $template */
         foreach ($templates as $template) {
             $result['data'][] = [
-                'RowId' => $template->id,
+                'actions' => [
+                    'show' => $this->link('Template:Show', $template->id),
+                ],
                 $template->created_at,
                 $template->subject,
                 $template->opened,

@@ -41,11 +41,10 @@ class BannerController extends Controller
         $banners = Banner::query();
         return $dataTables->of($banners)
             ->addColumn('actions', function (Banner $banner) {
-                return Json::encode([
-                    '_id' => $banner->id,
+                return [
                     'show' => route('banners.show', $banner),
                     'edit' => route('banners.edit', $banner) ,
-                ]);
+                ];
             })
             ->rawColumns(['actions'])
             ->setRowId('id')
