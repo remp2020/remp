@@ -63,7 +63,9 @@ function route_active($routeName, $classes = '', $activeClasses = '')
             <ul class="nav navbar-nav navbar-remp">
                 @foreach(config('services.remp.linked') as $key => $service)
                     @isset($service['url'])
-                        <li><a href="{{ $service['url'] }}"><i class="zmdi zmdi-{{ $service['icon'] }} zmdi-hc-fw"></i> {{ $key }}</a></li>
+                        <li @class(['active' => $service['url'] === '/'])>
+                            <a href="{{ $service['url'] }}"><i class="zmdi zmdi-{{ $service['icon'] }} zmdi-hc-fw"></i> {{ $key }}</a>
+                        </li>
                     @endisset
                 @endforeach
             </ul>
