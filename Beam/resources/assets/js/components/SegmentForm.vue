@@ -28,6 +28,7 @@
             <div class="input-group fg-float m-t-30 checkbox">
                 <label class="m-l-15">
                     Active
+                    <input type="hidden" name="active" value="0" />
                     <input v-model="active" value="1" name="active" type="checkbox">
                     <i class="input-helper"></i>
                 </label>

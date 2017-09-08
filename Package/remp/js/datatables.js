@@ -53,9 +53,15 @@ $.fn.dataTables = {
         },
         boolean: function () {
             return function(data) {
-                return data === 1 ? 'Yes' : 'No';
+                if (data === 1 || data === true) {
+                    return 'Yes';
+                }
+                if (data === 0 || data === false) {
+                    return 'No';
+                }
+                console.warn("remp datatables: invalid value passed to boolean renderer: " + data);
+                return '';
             }
-
         },
         link: function () {
             return function(data) {

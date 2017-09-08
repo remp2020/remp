@@ -22,7 +22,7 @@
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'code', 'active'],
+            'colSettings' => ['name', 'code', 'active' => ['render' => 'boolean', 'header' => 'Is active']],
             'dataSource' => route('segments.json'),
             'rowActions' => [
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],

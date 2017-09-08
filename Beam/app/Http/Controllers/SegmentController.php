@@ -33,7 +33,7 @@ class SegmentController extends Controller
                     'edit' => route('segments.edit', $segment),
                 ];
             })
-            ->rawColumns(['actions'])
+            ->rawColumns(['active', 'actions'])
             ->make(true);
     }
 
@@ -68,7 +68,7 @@ class SegmentController extends Controller
         $segment->fill($request->all());
         $segment->save();
 
-        foreach ($request->get('rules') as $r) {
+        foreach ($request->get('rules', []) as $r) {
             /** @var SegmentRule $rule */
             $rule = SegmentRule::findOrNew($r['id']);
             $rule->timespan = $r['timespan'];
@@ -127,7 +127,7 @@ class SegmentController extends Controller
         $segment->fill($request->all());
         $segment->save();
 
-        foreach ($request->get('rules') as $r) {
+        foreach ($request->get('rules', []) as $r) {
             /** @var SegmentRule $rule */
             $rule = SegmentRule::findOrNew($r['id']);
             $rule->timespan = $r['timespan'];
