@@ -37,10 +37,9 @@ class CampaignController extends Controller
         $campaigns = Campaign::query();
         return $dataTables->of($campaigns->with('segments'))
             ->addColumn('actions', function (Campaign $campaign) {
-                return Json::encode([
-                    '_id' => $campaign->id,
+                return[
                     'edit' => route('campaigns.edit', $campaign) ,
-                ]);
+                ];
             })
             ->rawColumns(['actions'])
             ->setRowId('id')

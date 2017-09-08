@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ITemplateStatsFactory;
@@ -56,10 +57,10 @@ final class TemplatePresenter extends BasePresenter
             ->setColSetting('type', ['orderable' => false, 'filter' => true])
             ->setColSetting('opened')
             ->setColSetting('clicked')
-            ->setRowLink($this->link('Show', 'RowId'))
-            ->setRowAction('show', $this->link('Show', 'RowId'), 'palette-Cyan zmdi-eye')
-            ->setRowAction('edit', $this->link('Edit', 'RowId'), 'palette-Cyan zmdi-edit')
-            ->setRowAction('duplicate', $this->link('Duplicate!', 'RowId'), 'palette-Cyan zmdi-copy')
+            ->setRowLinkAction('show')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit')
+            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
@@ -83,9 +84,14 @@ final class TemplatePresenter extends BasePresenter
             'data' => []
         ];
 
+        /** @var ActiveRow $template */
         foreach ($templates as $template) {
             $result['data'][] = [
-                'RowId' => $template->id,
+                'actions' => [
+                    'show' => $this->link('Show', $template->id),
+                    'edit' => $this->link('Edit', $template->id),
+                    'duplicate' => $this->link('Duplicate!', $template->id),
+                ],
                 $template->created_at,
                 $template->code,
                 $template->subject,

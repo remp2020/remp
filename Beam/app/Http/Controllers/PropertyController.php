@@ -30,11 +30,10 @@ class PropertyController extends Controller
         $properties = $account->properties()->getQuery();
         return $datatables->of($properties)
             ->addColumn('actions', function (Property $property) use ($account) {
-                return Json::encode([
-                    '_id' => $property->id,
+                return [
                     'show' => route('accounts.properties.show', [$account, $property]),
                     'edit' => route('accounts.properties.edit', [$account, $property]),
-                ]);
+                ];
             })
             ->rawColumns(['actions'])
             ->setRowId('id')

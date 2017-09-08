@@ -10,7 +10,7 @@ class DataTable extends Control
     private $sourceUrl;
     private $colSettings = [];
     private $tableSettings = [];
-    private $rowLink;
+    private $rowLinkAction;
     private $rowActions = [];
 
     /**
@@ -79,26 +79,25 @@ class DataTable extends Control
     }
 
     /**
-     * @param $rowLink
+     * @param $rowLinkAction
      * @return $this
      */
-    public function setRowLink($rowLink)
+    public function setRowLinkAction($rowLinkAction)
     {
-        $this->rowLink = $rowLink;
+        $this->rowLinkAction = $rowLinkAction;
 
         return $this;
     }
 
     /**
      * @param $actionName
-     * @param $actionLink
      * @param $actionClass
      * @return $this
      */
-    public function setRowAction($actionName, $actionLink, $actionClass)
+    public function setRowAction($actionName, $actionClass)
     {
-        $this->rowActions[$actionName] = [
-            'link' => $actionLink,
+        $this->rowActions[] = [
+            'name' => $actionName,
             'class' => $actionClass,
         ];
 
@@ -110,7 +109,7 @@ class DataTable extends Control
         $this->template->sourceUrl = $this->getSourceUrl();
         $this->template->colSettings = $this->colSettings;
         $this->template->tableSettings = $this->tableSettings;
-        $this->template->rowLink = $this->rowLink;
+        $this->template->rowLinkAction = $this->rowLinkAction;
         $this->template->rowActions = $this->rowActions;
 
         $this->template->tableId = 'dt-' . Random::generate(6);

@@ -13,6 +13,13 @@
             "options": {
                 "symlink": false
             }
+        },
+        {
+            "type": "path",
+            "url": "../Composer/laravel-widgets",
+            "options": {
+                "symlink": false
+            }
         }
     ],
     "require": {
@@ -25,6 +32,7 @@
         "laravelcollective/html": "^5.4",
         "yajra/laravel-datatables-oracle": "^7.2",
         "remp/laravel-sso": "*",
+        "remp/laravel-widgets": "*",
         "recca0120/laravel-tracy": "^1.8",
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",

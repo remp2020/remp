@@ -28,9 +28,9 @@ class AccountController extends Controller
 
         return $datatables->of($accounts)
             ->addColumn('actions', function (Account $account) {
-                return Json::encode([
+                return [
                     'edit' => route('accounts.edit', $account),
-                ]);
+                ];
             })
             ->rawColumns(['actions'])
             ->make(true);

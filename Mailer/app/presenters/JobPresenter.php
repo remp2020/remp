@@ -91,7 +91,7 @@ final class JobPresenter extends BasePresenter
             ->setColSetting('segment', ['orderable' => false])
             ->setColSetting('batches', ['orderable' => false])
             ->setColSetting('emails_sent_count', ['header' => 'sent emails', 'orderable' => false])
-            ->setRowLink($this->link('Show', 'RowId'))
+            ->setRowLinkAction('show')
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
@@ -134,7 +134,9 @@ final class JobPresenter extends BasePresenter
             $status = $latte->renderToString(__DIR__  . '/templates/Job/_job_status.latte', ['job' => $job]);
 
             $result['data'][] = [
-                'RowId' => $job->id,
+                'actions' => [
+                    'show' => $this->link('Show', $job->id),
+                ],
                 $job->created_at,
                 (isset($segments[$job->segment_code]) ? $segments[$job->segment_code] : 'Missing segment'),
                 $status,
