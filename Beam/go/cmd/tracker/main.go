@@ -6,6 +6,10 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -31,6 +35,9 @@ func main() {
 		log.Fatalln(errors.Wrap(err, "unable to process envconfig"))
 	}
 
+	stop := make(chan os.Signal, 3)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
 	service := goa.New("tracker")
 
 	service.Use(middleware.RequestID())
@@ -40,7 +47,7 @@ func main() {
 
 	// kafka init
 
-	log.Println("connecting to broker:", c.BrokerAddr)
+	service.LogInfo("connecting to broker", "bind", c.BrokerAddr)
 	eventProducer, err := newProducer([]string{c.BrokerAddr})
 	if err != nil {
 		log.Fatalln(err)
@@ -66,6 +73,38 @@ func main() {
 		MySQL: mysqlDB,
 	}
 
+	// server cancellation
+
+	var wg sync.WaitGroup
+	ctx, cancelCtx := context.WithCancel(context.Background())
+
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	cacheProperties := func() {
+		if err := propertyDB.Cache(); err != nil {
+			service.LogError("unable to cache properties", "err", err)
+		}
+	}
+
+	wg.Add(1)
+	cacheProperties()
+	go func() {
+		defer wg.Done()
+		service.LogInfo("starting property caching")
+		for {
+			select {
+			case <-ticker.C:
+				cacheProperties()
+			case <-ctx.Done():
+				service.LogInfo("property caching stopped")
+				return
+			}
+		}
+	}()
+
+	// controllers init
+
 	app.MountSwaggerController(service, service.NewController("swagger"))
 	app.MountTrackController(service, controller.NewTrackController(
 		service,
@@ -73,20 +112,31 @@ func main() {
 		propertyDB,
 	))
 
-	log.Println("starting server:", c.TrackerAddr)
+	// server init
+
+	service.LogInfo("starting server", "bind", c.TrackerAddr)
 	srv := &http.Server{
 		Addr:    c.TrackerAddr,
 		Handler: service.Mux,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		service.LogError("startup", "err", err)
-	}
+	wg.Add(1)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			if err != http.ErrServerClosed {
+				service.LogError("startup", "err", err)
+				stop <- syscall.SIGQUIT
+			}
+			wg.Done()
+		}
+	}()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	s := <-stop
+	service.LogInfo("shutting down", "signal", s)
 	srv.Shutdown(ctx)
-
+	cancelCtx()
+	wg.Wait()
+	service.LogInfo("bye bye")
 }
 
 func newProducer(brokerList []string) (sarama.AsyncProducer, error) {

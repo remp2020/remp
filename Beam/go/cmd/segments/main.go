@@ -6,7 +6,10 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"time"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
@@ -31,6 +34,9 @@ func main() {
 	if err := envconfig.Process("segments", &c); err != nil {
 		log.Fatalln(errors.Wrap(err, "unable to process envconfig"))
 	}
+
+	stop := make(chan os.Signal, 3)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	service := goa.New("segments")
 
@@ -82,6 +88,11 @@ func main() {
 		InfluxDB: influxDB,
 	}
 
+	// server cancellation
+
+	var wg sync.WaitGroup
+	ctx, cancelCtx := context.WithCancel(context.Background())
+
 	// controllers init
 
 	app.MountEventsController(service, controller.NewEventController(service, eventDB))
@@ -90,18 +101,27 @@ func main() {
 
 	// server init
 
-	log.Println("starting server:", c.SegmentsAddr)
+	service.LogInfo("starting server", "bind", c.SegmentsAddr)
 	srv := &http.Server{
 		Addr:    c.SegmentsAddr,
 		Handler: service.Mux,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		service.LogError("startup", "err", err)
-	}
+	wg.Add(1)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			if err != http.ErrServerClosed {
+				service.LogError("startup", "err", err)
+				stop <- syscall.SIGQUIT
+			}
+			wg.Done()
+		}
+	}()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	s := <-stop
+	service.LogInfo("shutting down", "signal", s)
 	srv.Shutdown(ctx)
-
+	cancelCtx()
+	wg.Wait()
+	service.LogInfo("bye bye")
 }

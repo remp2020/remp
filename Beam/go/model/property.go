@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -29,12 +30,18 @@ type PropertyCollection []*Property
 
 // PropertyDB represents Property's storage MySQL implementation.
 type PropertyDB struct {
-	MySQL *sqlx.DB
+	MySQL      *sqlx.DB
+	Properties map[string]*Property
 }
 
 // Get returns instance of Property based on the given UUID.
 func (pDB *PropertyDB) Get(UUID string) (*Property, bool, error) {
-	p := &Property{}
+	p, ok := pDB.Properties[UUID]
+	if ok {
+		return p, true, nil
+	}
+
+	p = &Property{}
 	err := pDB.MySQL.Get(p, "SELECT * FROM properties WHERE uuid = ?", UUID)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -43,4 +50,25 @@ func (pDB *PropertyDB) Get(UUID string) (*Property, bool, error) {
 		return nil, false, errors.Wrap(err, "unable to get property from MySQL")
 	}
 	return p, true, nil
+}
+
+func (pDB *PropertyDB) Cache() error {
+	pm := make(map[string]*Property)
+	pc := PropertyCollection{}
+
+	err := pDB.MySQL.Select(&pc, "SELECT * FROM properties")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+		return errors.Wrap(err, "unable to cache properties from MySQL")
+	}
+	for _, p := range pc {
+		pm[p.UUID] = p
+	}
+	if len(pDB.Properties) != len(pm) {
+		log.Println("property cache reloaded")
+	}
+	pDB.Properties = pm
+	return nil
 }
