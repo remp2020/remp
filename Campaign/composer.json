@@ -20,6 +20,13 @@
             "options": {
                 "symlink": false
             }
+        },
+        {
+            "type": "path",
+            "url": "../Composer/laravel-helpers",
+            "options": {
+                "symlink": false
+            }
         }
     ],
     "require": {
@@ -37,6 +44,7 @@
         "league/uri": "^5.0",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
+        "remp/laravel-helpers": "*",
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "recca0120/laravel-tracy": "^1.8"
@@ -54,10 +62,7 @@
         ],
         "psr-4": {
             "App\\": "app/"
-        },
-        "files": [
-            "../Composer/laravel_helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

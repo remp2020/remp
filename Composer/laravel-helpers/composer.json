@@ -1,0 +1,27 @@
+{
+  "name": "remp/laravel-helpers",
+  "description": "Laravel Helpers",
+  "keywords": ["laravel", "remp", "helpers"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "rootpd",
+      "email": "dulacka@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "files": [
+      "src/laravel_helpers.php"
+    ]
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}

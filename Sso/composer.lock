@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "44447b3af6cdb8441b4c9747daba7732",
+    "content-hash": "01cf3afdd2d5a55f1b3ba8da80627d46",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -3030,6 +3030,86 @@
             "time": "2017-08-18T01:23:24+00:00"
         },
         {
+            "name": "remp/laravel-helpers",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../Composer/laravel-helpers",
+                "reference": "1a6e85b6d97506bc1aa434959fe2d50f806a3083",
+                "shasum": null
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/laravel_helpers.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "rootpd",
+                    "email": "dulacka@gmail.com"
+                }
+            ],
+            "description": "Laravel Helpers",
+            "keywords": [
+                "helpers",
+                "laravel",
+                "remp"
+            ],
+            "transport-options": {
+                "symlink": false
+            }
+        },
+        {
+            "name": "remp/laravel-widgets",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../Composer/laravel-widgets",
+                "reference": "0abe924246bba8c5b757d1eaf0624755b337658b",
+                "shasum": null
+            },
+            "require": {
+                "arrilot/laravel-widgets": "^3.7",
+                "illuminate/support": "^5.4",
+                "php": ">=7.0",
+                "ramsey/uuid": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Remp\\Widgets\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": []
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "rootpd",
+                    "email": "dulacka@gmail.com"
+                }
+            ],
+            "description": "Laravel Widgets",
+            "keywords": [
+                "laravel",
+                "remp",
+                "widgets"
+            ],
+            "transport-options": {
+                "symlink": false
+            }
+        },
+        {
             "name": "rigor789/airbrake-laravel",
             "version": "dev-master",
             "source": {
@@ -4979,16 +5059,16 @@
         },
         {
             "name": "phpdocumentor/reflection-common",
-            "version": "1.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionCommon.git",
-                "reference": "144c307535e82c8fdcaacbcfc1d6d8eeb896687c"
+                "reference": "21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/144c307535e82c8fdcaacbcfc1d6d8eeb896687c",
-                "reference": "144c307535e82c8fdcaacbcfc1d6d8eeb896687c",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6",
+                "reference": "21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6",
                 "shasum": ""
             },
             "require": {
@@ -5029,7 +5109,7 @@
                 "reflection",
                 "static analysis"
             ],
-            "time": "2015-12-27T11:43:31+00:00"
+            "time": "2017-09-11T18:02:19+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -6357,11 +6437,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "rigor789/airbrake-laravel": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.0.0"

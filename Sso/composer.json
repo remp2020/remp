@@ -4,6 +4,24 @@
     "keywords": ["remp", "sso"],
     "license": "MIT",
     "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Composer/laravel-widgets",
+            "options": {
+                "symlink": false
+            }
+        },
+        {
+            "type": "path",
+            "url": "../Composer/laravel-helpers",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
     "require": {
         "php": "^7.0.0",
         "arrilot/laravel-widgets": "^3.7",
@@ -20,6 +38,8 @@
         "league/uri": "^5.0",
         "recca0120/laravel-tracy": "^1.8",
         "predis/predis": " ~1.0",
+        "remp/laravel-widgets": "*",
+        "remp/laravel-helpers": "*",
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0"
     },
@@ -35,10 +55,7 @@
         ],
         "psr-4": {
             "App\\": "app/"
-        },
-        "files": [
-            "../Composer/laravel_helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
