@@ -74,6 +74,7 @@ func main() {
 	}
 
 	// server cancellation
+
 	var wg sync.WaitGroup
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
@@ -102,12 +103,16 @@ func main() {
 		}
 	}()
 
+	// controllers init
+
 	app.MountSwaggerController(service, service.NewController("swagger"))
 	app.MountTrackController(service, controller.NewTrackController(
 		service,
 		eventProducer,
 		propertyDB,
 	))
+
+	// server init
 
 	service.LogInfo("starting server", "bind", c.TrackerAddr)
 	srv := &http.Server{
