@@ -28,7 +28,7 @@ var Pageview = Type("Pageview", func() {
 	Attribute("user", User)
 	Attribute("article", Article)
 
-	Required("system", "user", "article")
+	Required("system", "user")
 })
 
 var Commerce = Type("Commerce", func() {

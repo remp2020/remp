@@ -77,9 +77,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 },
 
                 run: function() {
-                    if (this.article.id !== null) {
-                        this.trackPageview();
-                    }
+                    this.trackPageview();
                 },
 
                 trackEvent: function(category, action, fields, value) {
