@@ -39,6 +39,14 @@ func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.
 
 // Commerce runs the commerce action.
 func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
+	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+
 	tags := map[string]string{
 		"step": ctx.Payload.Step,
 	}
@@ -129,6 +137,14 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 
 // Pageview runs the pageview action.
 func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
+	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+
 	tags := map[string]string{}
 	values := map[string]interface{}{}
 
