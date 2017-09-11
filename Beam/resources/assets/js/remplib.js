@@ -71,6 +71,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         if (config.tracker.article.tags instanceof Array) {
                             this.article.tags = config.tracker.article.tags;
                         }
+                    } else {
+                        this.article = null;
                     }
 
                     this.parseUriParams();
