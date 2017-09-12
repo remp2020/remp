@@ -26,6 +26,7 @@
 
     banner.show = true;
     banner.closeable = false;
+    banner.forcedPosition = 'relative';
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
