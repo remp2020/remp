@@ -41,12 +41,12 @@
         mounted: function () {
             let vm = this;
             let $select = $(this.$el).find('select');
+            $select.selectpicker();
             if (this.value !== null) {
                 $select.selectpicker('val', this.value !== null ? this.value : null);
                 this.customValue = this.value;
             }
-
-            $select.on('changed.bs.select', function () {
+            $(this.$el).find('select').on('changed.bs.select', function () {
                 let val = $(this).val();
                 vm.$parent.$emit("select-changed", {
                     type: vm.dataType,
