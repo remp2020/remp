@@ -1,5 +1,5 @@
 @php
-    $beamUrl = url('/');
+    $beamUrl = config('services.remp.beam.tracker_addr');
     $beamLibUrl = asset("/assets/vendor/js/remplib.js");
 @endphp
 

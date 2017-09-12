@@ -66,10 +66,13 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h2>Campaign display JS snippet <small></small></h2>
+                    <h2>
+                        Campaign display JS snippet
+                        <a href="#snippet" class="btn palette-Cyan bg waves-effect" data-toggle="collapse" aria-controls="snippet">Toggle</a>
+                    </h2>
                 </div>
 
-                <div class="card-body card-padding">
+                <div class="card-body card-padding collapse" id="snippet">
                     <pre><code class="html">{{ $snippet }}</code></pre>
                 </div>
             </div>
