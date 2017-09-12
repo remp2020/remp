@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
+        if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
+            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        }
+
         $this->app->bind(\App\Models\Dimension\Map::class, function ($app) {
             return new \App\Models\Dimension\Map(config('banners.dimensions'));
         });

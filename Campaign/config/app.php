@@ -182,7 +182,6 @@ return [
         App\Providers\RempTrackerServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
 
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,

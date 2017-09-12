@@ -17,6 +17,15 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
+        if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
+            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        }
+
+        $this->bindBladeDirectives();
+    }
+
+    public function bindBladeDirectives()
+    {
         Blade::directive('yesno', function ($expression) {
             return "{$expression} ? 'Yes' : 'No'";
         });
