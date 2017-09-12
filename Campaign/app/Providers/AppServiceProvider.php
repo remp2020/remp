@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->bindBladeDirectives();
+        $this->bindObservers();
 
         $this->app->bind(SegmentAggregator::class, function (Application $app) {
             return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
@@ -49,6 +50,12 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('class', function ($expression) {
             return "<?php echo blade_class({$expression}); ?>";
         });
+    }
+
+    public function bindObservers()
+    {
+        \App\Banner::observe(\App\Observers\Banner::class);
+        \App\Campaign::observe(\App\Observers\Campaign::class);
     }
 
     /**

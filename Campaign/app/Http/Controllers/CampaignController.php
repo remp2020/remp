@@ -9,9 +9,9 @@ use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
 use App\Http\Requests\CampaignRequest;
 use App\Jobs\CacheSegmentJob;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Psy\Util\Json;
 use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
@@ -41,7 +41,7 @@ class CampaignController extends Controller
                     'edit' => route('campaigns.edit', $campaign) ,
                 ];
             })
-            ->rawColumns(['actions'])
+            ->rawColumns(['actions', 'active'])
             ->setRowId('id')
             ->make(true);
     }
@@ -190,18 +190,7 @@ class CampaignController extends Controller
     ) {
         // validation
 
-        /** @var Campaign $campaign */
-        $campaign = Campaign::whereActive(true)->first();
-        if (!$campaign) {
-            return response()
-                ->jsonp($r->get('callback'), [
-                    'success' => true,
-                    'data' => [],
-                ]);
-        }
-
         $data = \GuzzleHttp\json_decode($r->get('data'));
-        $beamToken = $data->beamToken ?? null;
         $url = $data->url ?? null;
         if (!$url) {
             return response()
@@ -210,8 +199,6 @@ class CampaignController extends Controller
                     'errors' => ['url is required and missing'],
                 ]);
         }
-
-        // segment
 
         $userId = $data->userId ?? null;
         if (!$userId) {
@@ -222,6 +209,28 @@ class CampaignController extends Controller
                 ])
                 ->setStatusCode(400);
         }
+
+        $campaignIds = Cache::get(Campaign::ACTIVE_CAMPAIGN_IDS, []);
+        if (count($campaignIds) == 0) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => true,
+                    'data' => [],
+                ]);
+        }
+        /** @var Campaign $campaign */
+        $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignIds[0]);
+        $banner = $campaign->banner;
+        if (!$banner) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
+                ]);
+        }
+
+        // segment
+
         foreach ($campaign->segments as $campaignSegment) {
             if (!$sa->check($campaignSegment, $userId)) {
                 return response()
@@ -230,15 +239,6 @@ class CampaignController extends Controller
                         'data' => [],
                     ]);
             }
-        }
-
-        $banner = $campaign->banner;
-        if (!$banner) {
-            return response()
-                ->jsonp($r->get('callback'), [
-                    'success' => false,
-                    'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
-                ]);
         }
 
         $positions = $pm->positions();

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Cache;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
 
@@ -29,6 +30,9 @@ use Ramsey\Uuid\Uuid;
  */
 class Campaign extends Model
 {
+    const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
+    const CAMPAIGN_TAG = 'campaign';
+
     protected $fillable = [
         'name',
         'banner_id',
@@ -60,5 +64,13 @@ class Campaign extends Model
     public function segments()
     {
         return $this->hasMany(CampaignSegment::class);
+    }
+
+    public function cache()
+    {
+        $activeCampaignIds = self::whereActive(true)->pluck('id')->toArray();
+        $this->load(['segments', 'banner']);
+        Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
+        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $this);
     }
 }
