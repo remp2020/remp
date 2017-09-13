@@ -69,6 +69,7 @@
                                                   class="col-md-12 p-l-0 p-r-0"
                                                   v-bind:options.sync="eventCategories"
                                                   v-bind:dataType="'category'"
+                                                  v-bind:allowCustomValue="true"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -95,6 +96,7 @@
                                                   v-bind:options.sync="eventActions[rule.event_category]"
                                                   v-bind:dataType="'event'"
                                                   v-bind:disabled="!showEventsInput"
+                                                  v-bind:allowCustomValue="true"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -173,7 +175,7 @@
         components: { vSelect },
         props: props,
         created: function() {
-            this.$on('select-changed', function(data){
+            this.$on('value-changed', function(data){
                 if (data.type !== 'category') {
                     return;
                 }
