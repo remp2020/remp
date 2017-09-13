@@ -2,6 +2,10 @@
     padding: 20px 45px 0;
 }
 
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: inherit;
+}
+
 .remp-menu .svg-logo {
     background: url("../img/logo_dark.svg") no-repeat;
     background-size: 90px;
@@ -109,7 +113,7 @@
     position: absolute;
     top: 85px;
     left: 42%;
-    z-index: 3000;
+    z-index: 200;
 }
 
 .dataTables_wrapper .dataTable tbody tr {
