@@ -55,6 +55,9 @@ class Banner extends Model
 {
     use Notifiable;
 
+    const TEMPLATE_HTML = 'html';
+    const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
+
     protected $fillable = [
         'name',
         'dimensions',

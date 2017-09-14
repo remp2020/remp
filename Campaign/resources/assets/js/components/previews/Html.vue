@@ -78,11 +78,11 @@
             <div class="preview-box" v-bind:style="[
                 boxStyles,
                 dimensionOptions[dimensions],
+                _textAlign,
                 customBoxStyles
             ]">
                 <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
                 <p v-html="text" class="preview-text" v-bind:style="[
-            _textAlign,
             textStyles
         ]"></p>
             </div>
@@ -92,7 +92,7 @@
 
 <script>
     export default {
-        name: 'banner-preview',
+        name: 'html-template-preview',
         props: [
             "positionOptions",
             "dimensionOptions",
@@ -155,7 +155,7 @@
         },
         computed: {
             _textAlign: function() {
-                  return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
+                return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
             },
             _position: function() {
                 if (!this.customPositioned()) {
@@ -178,7 +178,7 @@
                 return {
                     color: this.textColor,
                     fontSize: this.fontSize + "px",
-                    display: 'table-cell',
+                    display: 'inline-block',
                     wordBreak: 'break-all',
                     verticalAlign: 'middle',
                     padding: '5px 10px'

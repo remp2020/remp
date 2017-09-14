@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import BannerPreview from './components/BannerPreview.vue';
+import HtmlPreview from './components/previews/Html.vue';
 
 window.remplib = window.remplib || {};
 
@@ -35,7 +35,7 @@ window.remplib = window.remplib || {};
             return new Vue({
                 el: el,
                 data: banner,
-                render: h => h(BannerPreview, {
+                render: h => h(HtmlPreview, {
                     props: banner
                 }),
             })

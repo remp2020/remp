@@ -97,6 +97,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     max-height: 600px;
 }
 
+.tab-nav li button {
+    margin-top: 15px;
+    margin-left: 10px;
+}
+
 /***************/
 /* Z-INDEX FIX */
 /***************/

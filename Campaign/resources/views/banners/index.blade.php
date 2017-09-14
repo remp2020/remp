@@ -36,25 +36,29 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card">
-                                <div class="card-header">
-                                    <h4 class="text-center">Custom HTML</h4>
-                                </div>
-                                <div class="card-body card-padding">
-                                    <div class="preview" style="margin-top: 55px;">
-                                        <i class="zmdi zmdi-language-html5 zmdi-hc-5x"></i>
+                                <a href="{{ route('banners.create', ['template' => 'html']) }}">
+                                    <div class="card-header">
+                                        <h4 class="text-center">Custom HTML</h4>
                                     </div>
-                                </div>
+                                    <div class="card-body">
+                                        <div class="preview" style="margin-top: 55px;">
+                                            <i class="zmdi zmdi-language-html5 zmdi-hc-5x"></i>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <div class="card">
-                                <div class="card-header">
-                                    <h4 class="text-center">Medium rectangle</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="preview medium-rectangle"></div>
-                                </div>
+                                <a href="{{ route('banners.create', ['template' => 'medium_rectangle']) }}">
+                                    <div class="card-header">
+                                        <h4 class="text-center">Medium rectangle</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="preview medium-rectangle"></div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </div>

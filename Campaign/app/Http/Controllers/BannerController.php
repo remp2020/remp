@@ -54,15 +54,17 @@ class BannerController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $banner = new Banner;
         $banner->fill(old());
 
         return view('banners.create', [
             'banner' => $banner,
+            'template' => $request->get('template'),
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
