@@ -1,4 +1,4 @@
-FROM telegraf:1.3
+FROM telegraf:1.4
 
 ADD dockerize-alpine-linux-amd64-v0.4.0.tar.gz .
 
