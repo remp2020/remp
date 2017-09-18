@@ -7,16 +7,23 @@
 <template>
     <div class="row">
         <div class="col-md-4">
-            <html-template
-                    v-bind:_backgroundColor="backgroundColor"
-                    v-bind:_text="text"
-                    v-bind:_textColor="textColor"
-                    v-bind:_fontSize="fontSize"
-                    v-bind:_textAlign="textAlign"
-                    v-bind:_dimensions="dimensions"
-                    v-bind:alignmentOptions="alignmentOptions"
-                    v-bind:dimensionOptions="dimensionOptions"
+            <html-template v-if="template == 'html'"
+                v-bind:_backgroundColor="backgroundColor"
+                v-bind:_text="text"
+                v-bind:_textColor="textColor"
+                v-bind:_fontSize="fontSize"
+                v-bind:_textAlign="textAlign"
+                v-bind:_dimensions="dimensions"
+                v-bind:alignmentOptions="alignmentOptions"
+                v-bind:dimensionOptions="dimensionOptions"
             ></html-template>
+
+            <medium-rectangle-template v-if="template == 'medium_rectangle'"
+               v-bind:_headerText="mediumRectangleTemplate.headerText"
+               v-bind:_mainText="mediumRectangleTemplate.mainText"
+               v-bind:_buttonText="mediumRectangleTemplate.buttonText"
+               v-bind:_backgroundColor="mediumRectangleTemplate.backgroundColor"
+            ></medium-rectangle-template>
 
             <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
                 <li class="active">
@@ -36,7 +43,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group m-t-30">
+                            <div class="input-group">
                                 <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
                                 <div>
                                     <div class="row">
@@ -56,7 +63,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group fg-float m-t-30">
+                            <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
                                 <div class="fg-line">
                                     <label for="target_url" class="fg-label">Target URL</label>
@@ -99,7 +106,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group fg-float m-t-30">
+                            <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
                                 <div class="fg-line">
                                     <label for="display_delay" class="fg-label">Display delay (milliseconds)</label>
@@ -107,7 +114,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group fg-float m-t-30">
+                            <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                                 <div class="fg-line">
                                     <label for="automatic_close" class="fg-label">Automatic close after (milliseconds)</label>
@@ -115,7 +122,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group fg-float m-t-30 checkbox">
+                            <div class="input-group fg-float checkbox">
                                 <label class="m-l-15">
                                     Ability to close banner manually
                                     <input v-model="closeable" value="1" name="closeable" type="checkbox">
@@ -163,24 +170,44 @@
                         <div class="card-body card-padding" id="banner-preview">
                             <div class="row p-relative" style="text-align: center">
                                 <img src="../../img/website_mockup.png" class="preview-image" alt="Mockup" height="100%">
-                                <html-template-preview
+                                <html-template-preview v-if="template == 'html'"
                                         v-bind:alignmentOptions="alignmentOptions"
                                         v-bind:dimensionOptions="dimensionOptions"
                                         v-bind:positionOptions="positionOptions"
+
                                         v-bind:textAlign="textAlign"
-                                        v-bind:transition="transition"
-                                        v-bind:position="position"
                                         v-bind:dimensions="dimensions"
                                         v-bind:show="previewShow"
                                         v-bind:textColor="textColor"
                                         v-bind:fontSize="fontSize"
                                         v-bind:backgroundColor="backgroundColor"
+                                        v-bind:text="text"
+
+                                        v-bind:position="position"
                                         v-bind:targetUrl="targetUrl"
                                         v-bind:closeable="closeable"
-                                        v-bind:text="text"
+                                        v-bind:transition="transition"
                                         v-bind:displayType="displayType"
                                         v-bind:forcedPosition="'absolute'"
                                 ></html-template-preview>
+
+                                <medium-rectangle-template-preview v-if="template == 'medium_rectangle'"
+                                        v-bind:alignmentOptions="alignmentOptions"
+                                        v-bind:positionOptions="positionOptions"
+                                        v-bind:show="previewShow"
+
+                                        v-bind:headerText="mediumRectangleTemplate.headerText"
+                                        v-bind:mainText="mediumRectangleTemplate.mainText"
+                                        v-bind:buttonText="mediumRectangleTemplate.buttonText"
+                                        v-bind:backgroundColor="mediumRectangleTemplate.backgroundColor"
+
+                                        v-bind:position="position"
+                                        v-bind:targetUrl="targetUrl"
+                                        v-bind:closeable="closeable"
+                                        v-bind:transition="transition"
+                                        v-bind:displayType="displayType"
+                                        v-bind:forcedPosition="'absolute'"
+                                ></medium-rectangle-template-preview>
                             </div>
                         </div>
                     </div>
@@ -196,6 +223,8 @@
 <script>
     import HtmlTemplate from "./templates/Html.vue"
     import HtmlTemplatePreview from "./previews/Html.vue";
+    import MediumRectangleTemplate from "./templates/MediumRectangle.vue";
+    import MediumRectangleTemplatePreview from "./previews/MediumRectangle.vue";
 
     const props = [
         "_name",
@@ -213,6 +242,12 @@
         "_closeTimeout",
         "_targetSelector",
         "_displayType",
+        "_template",
+
+        "_mediumRectangleheaderText",
+        "_mediumRectangleMainText",
+        "_mediumRectangleButtonText",
+        "_mediumRectangleBackgroundColor",
 
         "_alignmentOptions",
         "_dimensionOptions",
@@ -220,7 +255,7 @@
     ];
 
     export default {
-        components: { HtmlTemplatePreview, HtmlTemplate },
+        components: { HtmlTemplate, HtmlTemplatePreview, MediumRectangleTemplate, MediumRectangleTemplatePreview },
         name: 'banner-form',
         props: props,
         created: function() {
@@ -234,6 +269,13 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
+
+            this.mediumRectangleTemplate = {
+                headerText: this._mediumRectangleheaderText,
+                mainText: this._mediumRectangleMainText,
+                buttonText: this._mediumRectangleButtonText,
+                backgroundColor: this._mediumRectangleBackgroundColor,
+            };
         },
         data: () => ({
             name: null,
@@ -251,6 +293,14 @@
             closeTimeout: null,
             targetSelector: null,
             displayType: null,
+            template: null,
+
+            mediumRectangleTemplate: {
+                headerText: null,
+                mainText: null,
+                buttonText: null,
+                backgroundColor: null,
+            },
 
             alignmentOptions: [],
             dimensionOptions: [],

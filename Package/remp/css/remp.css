@@ -102,6 +102,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin-left: 10px;
 }
 
+.card-body .input-group:not(:first-child) {
+    margin-top: 30px;
+}
+
 /***************/
 /* Z-INDEX FIX */
 /***************/

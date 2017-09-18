@@ -21,6 +21,12 @@ window.remplib = window.remplib || {};
                 backgroundColor: model['background_color'] || null,
                 transition: model['transition'] || null,
                 displayType: model['display_type'] || 'overlay',
+
+                mediumRectangleHeaderText: model['header_text'] || "",
+                mediumRectangleMainText: model['main_text'] || "",
+                mediumRectangleButtonText: model['button_text'] || "",
+                mediumRectangleBackgroundColor: model['background_color'] || null,
+
                 // overlay
                 position: model['position'] || null,
                 closeable: model['closeable'] || null,
