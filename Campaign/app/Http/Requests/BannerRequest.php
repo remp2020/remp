@@ -8,11 +8,6 @@ use Validator;
 
 class BannerRequest extends FormRequest
 {
-    public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
-    {
-        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
-    }
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -45,7 +40,7 @@ class BannerRequest extends FormRequest
 
     public function withValidator(\Illuminate\Validation\Validator $validator)
     {
-        $validator->after(function ($validator) {
+        $validator->after(function (\Illuminate\Validation\Validator $validator) {
             $templateType = $this->get('template');
             switch ($templateType) {
                 case Banner::TEMPLATE_HTML:

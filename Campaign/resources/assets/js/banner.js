@@ -15,6 +15,7 @@ window.remplib = window.remplib || {};
                 targetUrl: model['target_url'] || null,
                 transition: model['transition'] || null,
                 displayType: model['display_type'] || 'overlay',
+                template: model['template'] || null,
                 // overlay
                 position: model['position'] || null,
                 closeable: model['closeable'] || null,

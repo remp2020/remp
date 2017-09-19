@@ -280,22 +280,16 @@
 
             this.htmlTemplate = {
                 textAlign: this._htmlTextAlign,
-                dimensions: this._dimensions,
-                textColor: this._textColor,
-                fontSize: this._fontSize,
-                backgroundColor: this._backgroundColor,
-                text: this._text,
+                dimensions: this._htmlDimensions,
+                textColor: this._htmlTextColor,
+                fontSize: this._htmlFontSize,
+                backgroundColor: this._htmlBackgroundColor,
+                text: this._htmlText,
             };
         },
         data: () => ({
             name: null,
-            dimensions: null,
-            text: null,
-            textAlign: null,
-            fontSize: null,
             targetUrl: null,
-            textColor: null,
-            backgroundColor: null,
             position: null,
             transition: null,
             closeable: null,
@@ -323,7 +317,6 @@
             alignmentOptions: [],
             dimensionOptions: [],
             positionOptions: [],
-
             previewShow: true,
         }),
         watch: {

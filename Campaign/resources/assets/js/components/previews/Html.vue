@@ -132,7 +132,7 @@
                 if (this.closeTracked) {
                     return true;
                 }
-                remplib.tracker.trackEvent("banner", "close", {
+                this.trackEvent("banner", "close", {
                     "banner_id": this.uuid,
                     "campaign_id": this.campaignUuid,
                 });
@@ -143,13 +143,19 @@
                 if (this.clickTracked) {
                     return true;
                 }
-                remplib.tracker.trackEvent("banner", "click", {
+                this.trackEvent("banner", "click", {
                     "banner_id": this.uuid,
                     "campaign_id": this.campaignUuid,
                 });
                 this.clickTracked = true;
                 return true;
             },
+            trackEvent: function(category, action, fields) {
+                if (typeof remplib.tracker === 'undefined') {
+                    return;
+                }
+                remplib.tracker.trackEvent(category, action, fields);
+            }
         },
         computed: {
             _textAlign: function() {

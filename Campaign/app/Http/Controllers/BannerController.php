@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Banner;
+use App\HtmlTemplate;
 use App\Http\Requests\BannerRequest;
+use App\MediumRectangleTemplate;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
@@ -61,10 +63,12 @@ class BannerController extends Controller
     {
         $banner = new Banner;
         $banner->fill(old());
+        $banner->template = $request->get('template');
+        $banner->setRelation('htmlTemplate', new HtmlTemplate(old()));
+        $banner->setRelation('mediumRectangleTemplate', new MediumRectangleTemplate(old()));
 
         return view('banners.create', [
             'banner' => $banner,
-            'template' => $request->get('template'),
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
@@ -122,9 +126,15 @@ class BannerController extends Controller
      */
     public function edit(Banner $banner)
     {
+        if ($banner->htmlTemplate) {
+            $banner->htmlTemplate->fill(old());
+        }
+        if ($banner->mediumRectangleTemplate) {
+            $banner->mediumRectangleTemplate->fill(old());
+        }
+
         return view('banners.edit', [
             'banner' => $banner,
-            'template' => $banner->template,
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),

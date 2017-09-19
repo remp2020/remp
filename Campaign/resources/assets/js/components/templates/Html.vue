@@ -18,11 +18,12 @@
                                         <label for="dimensions" class="fg-label">Dimensions</label>
                                     </div>
                                     <div class="col-md-12">
-                                        <select v-model.lazy="dimensions" class="selectpicker" name="dimensions" id="dimensions" title="Select dimensions">
-                                            <option v-for="option in dimensionOptions" v-bind:value="option.key">
-                                                {{ option.name }}
-                                            </option>
-                                        </select>
+                                        <v-select v-model="dimensions"
+                                                  name="dimensions"
+                                                  id="dimensions"
+                                                  v-bind:value="dimensions"
+                                                  v-bind:options.sync="mappedDimensionOptions"
+                                        ></v-select>
                                     </div>
                                 </div>
                             </div>
@@ -101,6 +102,8 @@
 </template>
 
 <script type="text/javascript">
+    let vSelect = require("remp/js/components/vSelect.vue");
+
     let props = [
         "_backgroundColor",
         "_text",
@@ -114,11 +117,13 @@
     ];
     export default {
         name: "html-template",
+        components: { vSelect },
         props: props,
-        mounted: function(){
+        created: function(){
             props.forEach((prop) => {
-                this[prop.slice(1)] = this[prop];
+                this[prop.slice(1)] = this[prop] || this[prop.slice(1)];
             });
+            this.emitValuesChanged();
         },
         data: () => ({
             backgroundColor: null,
@@ -143,6 +148,18 @@
                         dimensions: this.dimensions,
                     }},
                 ]);
+            }
+        },
+        computed: {
+            mappedDimensionOptions: function() {
+                let opts = [];
+                for (let i in this.dimensionOptions) {
+                    opts.push({
+                        label: this.dimensionOptions[i].name,
+                        value: this.dimensionOptions[i].key,
+                    });
+                }
+                return opts;
             }
         }
     }

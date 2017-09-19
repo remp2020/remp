@@ -19,7 +19,7 @@
 
     var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
     banner.show = true;
-    banner.template = '{{ $template }}';
+    banner.closeable = false;
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
