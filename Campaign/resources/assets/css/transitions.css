@@ -1,0 +1,52 @@
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+    opacity: 0
+}
+
+.bounce-enter-active {
+    animation: bounce linear 0.5s;
+    animation-iteration-count: 1;
+    transform-origin: 50% 50%;
+}
+@keyframes bounce{
+    0% { transform: translate(0px,0px) }
+    15% { transform: translate(0px,-25px) }
+    30% { transform: translate(0px,0px) }
+    45% { transform: translate(0px,-15px) }
+    60% { transform: translate(0px,0px) }
+    75% {  transform: translate(0px,-5px) }
+    100% { transform: translate(0px,0px)  }
+}
+
+.shake-enter-active{
+    animation: shake linear 0.5s;
+    animation-iteration-count: 1;
+    transform-origin: 50% 50%;
+}
+@keyframes shake{
+    0% { transform: translate(0px,0px) }
+    10% { transform: translate(-10px,0px) }
+    20% { transform: translate(10px,0px) }
+    30% { transform: translate(-10px,0px) }
+    40% { transform: translate(10px,0px) }
+    50% { transform: translate(-10px,0px) }
+    60% { transform: translate(10px,0px) }
+    70% { transform: translate(-10px,0px) }
+    80% { transform: translate(10px,0px) }
+    90% { transform: translate(-10px,0px) }
+    100% { transform: translate(0px,0px) }
+}
+
+.fade-in-down-enter-active {
+    animation: fadeInDown ease 0.5s;
+    animation-iteration-count: 1;
+    transform-origin: 50% 50%;
+    animation-fill-mode:forwards; /*when the spec is finished*/
+}
+
+@keyframes fadeInDown{
+    0% { opacity: 0;  transform: translate(0px,-25px) }
+    100% { opacity: 1; transform: translate(0px,0px) }
+}
