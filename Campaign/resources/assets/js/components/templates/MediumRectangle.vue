@@ -56,6 +56,8 @@
                 </div>
             </div>
         </div>
+
+        <input type="hidden" name="template" value="medium_rectangle" />
     </div>
 </template>
 
@@ -79,9 +81,9 @@
             this.emitValuesChanged();
         },
         data: () => ({
-            headerText: "",
-            mainText: "",
-            buttonText: "",
+            headerText: "REMP2020.com",
+            mainText: "Limited time offer<br/>30% discount",
+            buttonText: "Visit offer",
             backgroundColor: '#009688',
 
             backgroundColorOptions: [

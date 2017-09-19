@@ -16,7 +16,7 @@
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'dimensions', 'position'],
+            'colSettings' => ['name', 'template', 'display_type', 'position'],
             'dataSource' => route('banners.json'),
             'rowActions' => [
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
@@ -26,45 +26,5 @@
         ]) !!}
     </div>
 
-    <div class="modal" id="modal-template-select" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Select template</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <a href="{{ route('banners.create', ['template' => 'html']) }}">
-                                    <div class="card-header">
-                                        <h4 class="text-center">Custom HTML</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="preview" style="margin-top: 55px;">
-                                            <i class="zmdi zmdi-language-html5 zmdi-hc-5x"></i>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="card">
-                                <a href="{{ route('banners.create', ['template' => 'medium_rectangle']) }}">
-                                    <div class="card-header">
-                                        <h4 class="text-center">Medium rectangle</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="preview medium-rectangle"></div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    @include('banners._template_modal')
 @endsection

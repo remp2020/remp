@@ -1,12 +1,14 @@
 .preview {
     background-size: contain;
     background-repeat: no-repeat;
-    height: 220px;
+    height: 200px;
     text-align: center;
 }
 
 .preview.medium-rectangle {
     background-image: url('../img/medium_rectangle.png');
+    background-size: contain;
+    background-position: center;
 }
 
 .modal .card-header {

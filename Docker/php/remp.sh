@@ -15,6 +15,7 @@ then
         php artisan migrate
         php artisan db:seed
         php artisan key:generate
+        php artisan ide-helper:models
     elif [ -f "bin/command.php" ]
     then
         php bin/command.php db:migrate

@@ -8,12 +8,12 @@
     <div class="row">
         <div class="col-md-4">
             <html-template v-if="template == 'html'"
-                v-bind:_backgroundColor="backgroundColor"
-                v-bind:_text="text"
-                v-bind:_textColor="textColor"
-                v-bind:_fontSize="fontSize"
-                v-bind:_textAlign="textAlign"
-                v-bind:_dimensions="dimensions"
+                v-bind:_backgroundColor="htmlTemplate.backgroundColor"
+                v-bind:_text="htmlTemplate.text"
+                v-bind:_textColor="htmlTemplate.textColor"
+                v-bind:_fontSize="htmlTemplate.fontSize"
+                v-bind:_textAlign="htmlTemplate.textAlign"
+                v-bind:_dimensions="htmlTemplate.dimensions"
                 v-bind:alignmentOptions="alignmentOptions"
                 v-bind:dimensionOptions="dimensionOptions"
             ></html-template>
@@ -174,14 +174,14 @@
                                         v-bind:alignmentOptions="alignmentOptions"
                                         v-bind:dimensionOptions="dimensionOptions"
                                         v-bind:positionOptions="positionOptions"
-
-                                        v-bind:textAlign="textAlign"
-                                        v-bind:dimensions="dimensions"
                                         v-bind:show="previewShow"
-                                        v-bind:textColor="textColor"
-                                        v-bind:fontSize="fontSize"
-                                        v-bind:backgroundColor="backgroundColor"
-                                        v-bind:text="text"
+
+                                        v-bind:textAlign="htmlTemplate.textAlign"
+                                        v-bind:dimensions="htmlTemplate.dimensions"
+                                        v-bind:textColor="htmlTemplate.textColor"
+                                        v-bind:fontSize="htmlTemplate.fontSize"
+                                        v-bind:backgroundColor="htmlTemplate.backgroundColor"
+                                        v-bind:text="htmlTemplate.text"
 
                                         v-bind:position="position"
                                         v-bind:targetUrl="targetUrl"
@@ -228,13 +228,7 @@
 
     const props = [
         "_name",
-        "_dimensions",
-        "_text",
-        "_textAlign",
-        "_fontSize",
         "_targetUrl",
-        "_textColor",
-        "_backgroundColor",
         "_position",
         "_transition",
         "_closeable",
@@ -244,10 +238,17 @@
         "_displayType",
         "_template",
 
-        "_mediumRectangleheaderText",
+        "_mediumRectangleHeaderText",
         "_mediumRectangleMainText",
         "_mediumRectangleButtonText",
         "_mediumRectangleBackgroundColor",
+
+        "_htmlTextAlign",
+        "_htmlDimensions",
+        "_htmlTextColor",
+        "_htmlFontSize",
+        "_htmlBackgroundColor",
+        "_htmlText",
 
         "_alignmentOptions",
         "_dimensionOptions",
@@ -271,10 +272,19 @@
             });
 
             this.mediumRectangleTemplate = {
-                headerText: this._mediumRectangleheaderText,
+                headerText: this._mediumRectangleHeaderText,
                 mainText: this._mediumRectangleMainText,
                 buttonText: this._mediumRectangleButtonText,
                 backgroundColor: this._mediumRectangleBackgroundColor,
+            };
+
+            this.htmlTemplate = {
+                textAlign: this._htmlTextAlign,
+                dimensions: this._dimensions,
+                textColor: this._textColor,
+                fontSize: this._fontSize,
+                backgroundColor: this._backgroundColor,
+                text: this._text,
             };
         },
         data: () => ({
@@ -300,6 +310,14 @@
                 mainText: null,
                 buttonText: null,
                 backgroundColor: null,
+            },
+            htmlTemplate: {
+                textAlign: null,
+                dimensions: null,
+                textColor: null,
+                fontSize: null,
+                backgroundColor: null,
+                text: null,
             },
 
             alignmentOptions: [],

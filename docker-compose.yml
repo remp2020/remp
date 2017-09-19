@@ -49,6 +49,7 @@ services:
     build: "./Docker/php"
     environment:
       APP_NAME: "Campaign"
+      PHP_IDE_CONFIG: "serverName=campaign.remp.app"
     domainname: "campaign.remp.app"
     hostname: "campaign"
     volumes:
@@ -80,6 +81,7 @@ services:
     hostname: "mailer"
     environment:
       APP_NAME: "Mailer"
+      PHP_IDE_CONFIG: "serverName=mailer.remp.app"
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
@@ -111,6 +113,7 @@ services:
     build: "./Docker/php"
     environment:
       APP_NAME: "Sso"
+      PHP_IDE_CONFIG: "serverName=sso.remp.app"
     domainname: "sso.remp.app"
     hostname: "sso"
     volumes:
@@ -143,6 +146,7 @@ services:
     build: "./Docker/php"
     environment:
       APP_NAME: "Beam"
+      PHP_IDE_CONFIG: "serverName=beam.remp.app"
     volumes:
       - ".:/var/www/html:rw"
       - "composer-data:/composer:rw"

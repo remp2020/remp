@@ -82,9 +82,7 @@
                 customBoxStyles
             ]">
                 <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
-                <p v-html="text" class="preview-text" v-bind:style="[
-            textStyles
-        ]"></p>
+                <p v-html="text" class="preview-text" v-bind:style="[_textAlign, textStyles]"></p>
             </div>
         </transition>
     </a>
@@ -178,10 +176,12 @@
                 return {
                     color: this.textColor,
                     fontSize: this.fontSize + "px",
-                    display: 'inline-block',
                     wordBreak: 'break-all',
                     verticalAlign: 'middle',
-                    padding: '5px 10px'
+                    padding: '5px 10px',
+                    display: 'flex',
+                    height: '100%',
+                    alignItems: 'center',
                 }
             },
             boxStyles: function() {

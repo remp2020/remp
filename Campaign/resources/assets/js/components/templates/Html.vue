@@ -95,6 +95,8 @@
                 </div>
             </div>
         </div>
+
+        <input type="hidden" name="template" value="html" />
     </div>
 </template>
 
@@ -126,15 +128,22 @@
             textAlign: null,
             dimensions: null,
         }),
-        updated: function(a,b,c) {
-            this.$parent.$emit("values-changed", [
-                {key: "backgroundColor", val: this.backgroundColor},
-                {key: "text", val: this.text},
-                {key: "textColor", val: this.textColor},
-                {key: "fontSize", val: this.fontSize},
-                {key: "textAlign", val: this.textAlign},
-                {key: "dimensions", val: this.dimensions},
-            ]);
+        updated: function() {
+            this.emitValuesChanged();
+        },
+        methods: {
+            emitValuesChanged: function() {
+                this.$parent.$emit("values-changed", [
+                    {key: "htmlTemplate", val: {
+                        backgroundColor: this.backgroundColor,
+                        text: this.text,
+                        textColor: this.textColor,
+                        fontSize: this.fontSize,
+                        textAlign: this.textAlign,
+                        dimensions: this.dimensions,
+                    }},
+                ]);
+            }
         }
     }
 </script>

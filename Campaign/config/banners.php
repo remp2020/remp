@@ -62,19 +62,22 @@ return [
         'left' => [
             'name' => 'Left',
             'style' => [
-                'text-align' => 'left'
+                'text-align' => 'left',
+                'justify-content' => 'flex-start',
             ],
         ],
         'center' => [
             'name' => 'Center',
             'style' => [
-                'text-align' => 'center'
+                'text-align' => 'center',
+                'justify-content' => 'center',
             ],
         ],
         'right' => [
             'name' => 'Right',
             'style' => [
-                'text-align' => 'right'
+                'text-align' => 'right',
+                'justify-content' => 'flex-end',
             ],
         ],
     ]

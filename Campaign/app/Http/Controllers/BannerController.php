@@ -9,7 +9,7 @@ use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Psy\Util\Json;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
 
@@ -82,8 +82,18 @@ class BannerController extends Controller
     {
         $banner = new Banner();
         $banner->fill($request->all());
-
         $banner->save();
+
+        switch ($banner->template) {
+            case Banner::TEMPLATE_HTML:
+                $banner->htmlTemplate()->create($request->all());
+                break;
+            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
+                $banner->mediumRectangleTemplate()->create($request->all());
+                break;
+            default:
+                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
+        }
 
         return redirect(route('banners.index'))->with('success', 'Banner created');
     }
@@ -114,6 +124,7 @@ class BannerController extends Controller
     {
         return view('banners.edit', [
             'banner' => $banner,
+            'template' => $banner->template,
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
@@ -129,8 +140,18 @@ class BannerController extends Controller
      */
     public function update(BannerRequest $request, Banner $banner)
     {
-        $banner->fill($request->all());
-        $banner->save();
+        $banner->update($request->all());
+
+        switch ($banner->template) {
+            case Banner::TEMPLATE_HTML:
+                $banner->htmlTemplate->update($request->all());
+                break;
+            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
+                $banner->mediumRectangleTemplate->update($request->all());
+                break;
+            default:
+                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
+        }
 
         return redirect(route('banners.index'))->with('success', 'Banner updated');
     }

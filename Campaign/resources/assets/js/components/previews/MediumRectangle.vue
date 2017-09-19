@@ -107,9 +107,10 @@
         left: 15%;
         width: 70%;
         border-radius: 15px;
-        padding: 7px;
+        padding: 2px;
         color: white;
         word-wrap: break-word;
+        font-size: 16px;
     }
 </style>
 
