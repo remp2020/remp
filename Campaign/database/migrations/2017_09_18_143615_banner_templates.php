@@ -49,6 +49,7 @@ class BannerTemplates extends Migration
             $htmlTemplate->text_color = $banner->text_color;
             $htmlTemplate->font_size = $banner->font_size;
             $htmlTemplate->background_color = $banner->background_color;
+            $htmlTemplate->text = $banner->text;
             $htmlTemplate->save();
         }
 
