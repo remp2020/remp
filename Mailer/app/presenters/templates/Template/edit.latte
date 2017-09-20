@@ -8,18 +8,11 @@
 <div class="card">
     <div class="card-header">
         <h2>Edit email <span class="text-muted">{$mailTemplate->name}</span> <small></small></h2>
-        <ul class="actions">
-            <li class="dropdown action-show">
-                <a href="" data-toggle="dropdown">
-                    <i class="zmdi zmdi-more-vert"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-right dm-icon">
-                    <li>
-                        <a n:href="Show $mailTemplate->id"><i class="zmdi zmdi-edit"></i> Show Email</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <div class="actions">
+            <a n:href="Show $mailTemplate->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> View</button>
+            </a>
+        </div>
     </div>
     <div class="card-body card-padding">
         {include '@form.latte'}

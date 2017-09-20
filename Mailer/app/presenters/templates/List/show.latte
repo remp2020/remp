@@ -8,22 +8,14 @@
 <div class="card">
     <div class="card-header">
         <h2>Show newsletter lists <span class="text-muted">{$list->title}</span> <small></small></h2>
-        <ul class="actions">
-            <li class="dropdown action-show">
-                <a href="" data-toggle="dropdown">
-                    <i class="zmdi zmdi-more-vert"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-right dm-icon">
-                    <li>
-                        <a n:ifset="$list->preview_url" href="{$list->preview_url}"><i class="zmdi zmdi-search"></i> Preview</a>
-                    </li>
-                    <li>
-                        <a n:ifset="$list->image_url" href="{$list->image_url}"><i class="zmdi zmdi-image-o"></i> List image</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-
+        <div class="actions">
+            <a n:ifset="$list->preview_url" href="{$list->preview_url}">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> Preview</button>
+            </a>
+            <a n:ifset="$list->image_url" href="{$list->image_url}">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-image-o"></i> List image</button>
+            </a>
+        </div>
     </div>
     <div class="card-body card-padding">
     </div>
