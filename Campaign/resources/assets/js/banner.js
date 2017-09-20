@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import BannerPreview from './components/BannerPreview.vue';
+import HtmlPreview from './components/previews/Html.vue';
 
 window.remplib = window.remplib || {};
 
@@ -10,17 +10,12 @@ window.remplib = window.remplib || {};
     remplib.banner = {
 
         fromModel: (model) => {
-            return {
+            let banner = {
                 name: model['name'] || null,
-                dimensions: model['dimensions'] || null,
-                text: model['text'] || null,
-                textAlign: model['text_align'] || null,
-                fontSize: model['font_size'] || 18,
                 targetUrl: model['target_url'] || null,
-                textColor: model['text_color'] || null,
-                backgroundColor: model['background_color'] || null,
                 transition: model['transition'] || null,
                 displayType: model['display_type'] || 'overlay',
+                template: model['template'] || null,
                 // overlay
                 position: model['position'] || null,
                 closeable: model['closeable'] || null,
@@ -28,14 +23,32 @@ window.remplib = window.remplib || {};
                 closeTimeout: model['close_timeout'] || null,
                 // inline
                 targetSelector: model['target_selector'] || null
+            };
+
+            if (banner.template === 'medium_rectangle') {
+                banner.mediumRectangleHeaderText = model['medium_rectangle_template']['header_text'] || "";
+                banner.mediumRectangleMainText = model['medium_rectangle_template']['main_text'] || "";
+                banner.mediumRectangleButtonText = model['medium_rectangle_template']['button_text'] || "";
+                banner.mediumRectangleBackgroundColor = model['medium_rectangle_template']['background_color'] || null;
             }
+
+            if (banner.template === 'html') {
+                banner.htmlBackgroundColor = model['html_template']['background_color'] || null;
+                banner.htmlTextColor = model['html_template']['text_color'] || null;
+                banner.htmlFontSize = model['html_template']['font_size'] || null;
+                banner.htmlTextAlign = model['html_template']['text_align'] || null;
+                banner.htmlText = model['html_template']['text'] || null;
+                banner.htmlDimensions = model['html_template']['dimensions'] || null;
+            }
+
+            return banner;
         },
 
         bindPreview: function(el, banner, boxStyles) {
             return new Vue({
                 el: el,
                 data: banner,
-                render: h => h(BannerPreview, {
+                render: h => h(HtmlPreview, {
                     props: banner
                 }),
             })

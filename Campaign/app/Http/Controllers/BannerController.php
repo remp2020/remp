@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Banner;
+use App\HtmlTemplate;
 use App\Http\Requests\BannerRequest;
+use App\MediumRectangleTemplate;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Psy\Util\Json;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
 
@@ -54,12 +56,16 @@ class BannerController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $banner = new Banner;
         $banner->fill(old());
+        $banner->template = $request->get('template');
+        $banner->setRelation('htmlTemplate', new HtmlTemplate(old()));
+        $banner->setRelation('mediumRectangleTemplate', new MediumRectangleTemplate(old()));
 
         return view('banners.create', [
             'banner' => $banner,
@@ -80,8 +86,18 @@ class BannerController extends Controller
     {
         $banner = new Banner();
         $banner->fill($request->all());
-
         $banner->save();
+
+        switch ($banner->template) {
+            case Banner::TEMPLATE_HTML:
+                $banner->htmlTemplate()->create($request->all());
+                break;
+            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
+                $banner->mediumRectangleTemplate()->create($request->all());
+                break;
+            default:
+                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
+        }
 
         return redirect(route('banners.index'))->with('success', 'Banner created');
     }
@@ -110,6 +126,13 @@ class BannerController extends Controller
      */
     public function edit(Banner $banner)
     {
+        if ($banner->htmlTemplate) {
+            $banner->htmlTemplate->fill(old());
+        }
+        if ($banner->mediumRectangleTemplate) {
+            $banner->mediumRectangleTemplate->fill(old());
+        }
+
         return view('banners.edit', [
             'banner' => $banner,
             'positions' => $this->positionMap->positions(),
@@ -127,8 +150,18 @@ class BannerController extends Controller
      */
     public function update(BannerRequest $request, Banner $banner)
     {
-        $banner->fill($request->all());
-        $banner->save();
+        $banner->update($request->all());
+
+        switch ($banner->template) {
+            case Banner::TEMPLATE_HTML:
+                $banner->htmlTemplate->update($request->all());
+                break;
+            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
+                $banner->mediumRectangleTemplate->update($request->all());
+                break;
+            default:
+                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
+        }
 
         return redirect(route('banners.index'))->with('success', 'Banner updated');
     }

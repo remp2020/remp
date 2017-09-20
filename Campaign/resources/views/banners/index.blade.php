@@ -11,12 +11,12 @@
         <div class="card-header">
             <h2>List of banners <small></small></h2>
             <div class="actions">
-                <a href="{{ route('banners.create') }}" class="btn palette-Cyan bg waves-effect">Add new banner</a>
+                <a href="#modal-template-select" data-toggle="modal" class="btn palette-Cyan bg waves-effect">Add new banner</a>
             </div>
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'dimensions', 'position'],
+            'colSettings' => ['name', 'template', 'display_type', 'position'],
             'dataSource' => route('banners.json'),
             'rowActions' => [
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
@@ -26,4 +26,5 @@
         ]) !!}
     </div>
 
+    @include('banners._template_modal')
 @endsection

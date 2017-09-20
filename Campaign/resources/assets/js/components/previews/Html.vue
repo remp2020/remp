@@ -1,65 +1,10 @@
 <style type="text/css">
     @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
-
-    /* transitions */
+    @import url('../../../css/transitions.css');
 
     .preview-close.hidden {
         display: none;
     }
-
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .5s
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-        opacity: 0
-    }
-
-    .bounce-enter-active {
-        animation: bounce linear 0.5s;
-        animation-iteration-count: 1;
-        transform-origin: 50% 50%;
-    }
-    @keyframes bounce{
-        0% { transform: translate(0px,0px) }
-        15% { transform: translate(0px,-25px) }
-        30% { transform: translate(0px,0px) }
-        45% { transform: translate(0px,-15px) }
-        60% { transform: translate(0px,0px) }
-        75% {  transform: translate(0px,-5px) }
-        100% { transform: translate(0px,0px)  }
-    }
-
-    .shake-enter-active{
-        animation: shake linear 0.5s;
-        animation-iteration-count: 1;
-        transform-origin: 50% 50%;
-    }
-    @keyframes shake{
-        0% { transform: translate(0px,0px) }
-        10% { transform: translate(-10px,0px) }
-        20% { transform: translate(10px,0px) }
-        30% { transform: translate(-10px,0px) }
-        40% { transform: translate(10px,0px) }
-        50% { transform: translate(-10px,0px) }
-        60% { transform: translate(10px,0px) }
-        70% { transform: translate(-10px,0px) }
-        80% { transform: translate(10px,0px) }
-        90% { transform: translate(-10px,0px) }
-        100% { transform: translate(0px,0px) }
-    }
-
-    .fade-in-down-enter-active {
-        animation: fadeInDown ease 0.5s;
-        animation-iteration-count: 1;
-        transform-origin: 50% 50%;
-        animation-fill-mode:forwards; /*when the spec is finished*/
-    }
-
-    @keyframes fadeInDown{
-        0% { opacity: 0;  transform: translate(0px,-25px) }
-        100% { opacity: 1; transform: translate(0px,0px) }
-    }
-
     .preview-image {
         opacity: 0.3;
     }
@@ -78,13 +23,11 @@
             <div class="preview-box" v-bind:style="[
                 boxStyles,
                 dimensionOptions[dimensions],
+                _textAlign,
                 customBoxStyles
             ]">
                 <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
-                <p v-html="text" class="preview-text" v-bind:style="[
-            _textAlign,
-            textStyles
-        ]"></p>
+                <p v-html="text" class="preview-text" v-bind:style="[_textAlign, textStyles]"></p>
             </div>
         </transition>
     </a>
@@ -92,7 +35,7 @@
 
 <script>
     export default {
-        name: 'banner-preview',
+        name: 'html-template-preview',
         props: [
             "positionOptions",
             "dimensionOptions",
@@ -134,7 +77,7 @@
                 if (this.closeTracked) {
                     return true;
                 }
-                remplib.tracker.trackEvent("banner", "close", {
+                this.trackEvent("banner", "close", {
                     "banner_id": this.uuid,
                     "campaign_id": this.campaignUuid,
                 });
@@ -145,17 +88,23 @@
                 if (this.clickTracked) {
                     return true;
                 }
-                remplib.tracker.trackEvent("banner", "click", {
+                this.trackEvent("banner", "click", {
                     "banner_id": this.uuid,
                     "campaign_id": this.campaignUuid,
                 });
                 this.clickTracked = true;
                 return true;
             },
+            trackEvent: function(category, action, fields) {
+                if (typeof remplib.tracker === 'undefined') {
+                    return;
+                }
+                remplib.tracker.trackEvent(category, action, fields);
+            },
         },
         computed: {
             _textAlign: function() {
-                  return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
+                return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
             },
             _position: function() {
                 if (!this.customPositioned()) {
@@ -178,10 +127,12 @@
                 return {
                     color: this.textColor,
                     fontSize: this.fontSize + "px",
-                    display: 'table-cell',
                     wordBreak: 'break-all',
                     verticalAlign: 'middle',
-                    padding: '5px 10px'
+                    padding: '5px 10px',
+                    display: 'flex',
+                    height: '100%',
+                    alignItems: 'center',
                 }
             },
             boxStyles: function() {

@@ -132,7 +132,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
             @yield('content')
 
             @if (count($errors) > 0)
-                <div class="alert alert-danger">
+                <div class="alert alert-danger m-t-30">
                     <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>

@@ -1,0 +1,35 @@
+.preview {
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 200px;
+    text-align: center;
+}
+
+.preview.medium-rectangle {
+    background-image: url('../img/medium_rectangle.png');
+    background-size: contain;
+    background-position: center;
+}
+
+.modal .card-header {
+    padding: 10px 20px;
+}
+
+.modal .modal-header {
+    background-color: #00acc1;
+    color: white;
+}
+
+.modal .modal-body {
+    background-color: #edecec;
+    padding-top: 15px;
+}
+
+#modal-template-select .card {
+    max-height: 274px;
+    height: 274px;
+}
+
+.card a {
+    color: inherit;
+}
