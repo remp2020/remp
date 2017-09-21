@@ -45,7 +45,7 @@ class SegmentController extends Controller
      */
     public function create(JournalContract $journalContract)
     {
-        $old = old();;
+        $old = old();
         $segment = new Segment();
         $segment->fill($old);
 
