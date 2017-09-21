@@ -45,8 +45,17 @@ class SegmentController extends Controller
      */
     public function create(JournalContract $journalContract)
     {
+        $old = old();;
         $segment = new Segment();
-        $segment->fill(old());
+        $segment->fill($old);
+
+        if (isset($old['rules'])) {
+            $rules = [];
+            foreach ($old['rules'] as $rule) {
+                $rules[] = $segment->rules()->make($rule);
+            }
+            $segment->setRelation('rules', collect($rules));
+        }
 
         $categories = $journalContract->categories();
 
@@ -69,15 +78,7 @@ class SegmentController extends Controller
         $segment->save();
 
         foreach ($request->get('rules', []) as $r) {
-            /** @var SegmentRule $rule */
-            $rule = SegmentRule::findOrNew($r['id']);
-            $rule->timespan = $r['timespan'];
-            $rule->count = $r['count'];
-            $rule->event_category = $r['event_category'];
-            $rule->event_action = $r['event_action'];
-            $rule->segment_id = $segment->id;
-            $rule->fields = $r['fields'];
-            $rule->save();
+            $segment->rules()->create($r);
         }
 
         return redirect(route('segments.index'))->with('success', 'Segment created');
@@ -103,6 +104,7 @@ class SegmentController extends Controller
      */
     public function edit(Segment $segment, JournalContract $journalContract)
     {
+        $segment->fill(old());
         $categories = $journalContract->categories();
 
         return view('segments.edit', [
@@ -114,28 +116,19 @@ class SegmentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Segment  $segment
+     * @param SegmentRequest|Request $request
+     * @param  \App\Segment $segment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Segment $segment)
+    public function update(SegmentRequest $request, Segment $segment)
     {
-        $this->validate($request, [
-            'name' => 'bail|required|unique:accounts|max:255',
-        ]);
-
         $segment->fill($request->all());
         $segment->save();
 
         foreach ($request->get('rules', []) as $r) {
             /** @var SegmentRule $rule */
-            $rule = SegmentRule::findOrNew($r['id']);
-            $rule->timespan = $r['timespan'];
-            $rule->count = $r['count'];
-            $rule->event_category = $r['event_category'];
-            $rule->event_action = $r['event_action'];
-            $rule->segment_id = $segment->id;
-            $rule->fields = $r['fields'];
+            $rule = $segment->rules()->findOrNew($r['id']);
+            $rule->fill($r);
             $rule->save();
         }
         SegmentRule::destroy($request->get('removedRules'));
