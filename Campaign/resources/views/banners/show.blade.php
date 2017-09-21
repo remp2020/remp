@@ -60,6 +60,72 @@
     </div>
 
     <div class="col-md-4">
+        @if(isset($banner->htmlTemplate))
+        <div class="card">
+            <div class="card-header">
+                <h2>HTML Template</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <strong>Text color: </strong>{{ $banner->htmlTemplate->text_color }}
+                        <i class="color" style="background-color: {{ $banner->htmlTemplate->text_color }}"></i>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Font size: </strong>{{ $banner->htmlTemplate->font_size }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Background color: </strong>{{ $banner->htmlTemplate->background_color }}
+                        <i class="color" style="background-color: {{ $banner->htmlTemplate->background_color }}"></i>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Dimensions: </strong>{{ $dimensions[$banner->htmlTemplate->dimensions]->name }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Alignment: </strong>{{ $alignments[$banner->htmlTemplate->text_align]->name }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        @endif
+
+        @if(isset($banner->mediumRectangleTemplate))
+            <div class="card">
+                <div class="card-header">
+                    <h2>Medium Rectangle Template</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <strong>Header text: </strong>{{ $banner->mediumRectangleTemplate->header_text }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Main text: </strong>{{ $banner->mediumRectangleTemplate->main_text }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Button text: </strong>{{ $banner->mediumRectangleTemplate->button_text }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Text color: </strong>{{ $banner->mediumRectangleTemplate->text_color }}
+                            <i class="color" style="background-color: {{ $banner->mediumRectangleTemplate->text_color }}"></i>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Background color: </strong>{{ $banner->mediumRectangleTemplate->background_color }}
+                            <i class="color" style="background-color: {{ $banner->mediumRectangleTemplate->background_color }}"></i>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Button text color: </strong>{{ $banner->mediumRectangleTemplate->button_text_color }}
+                            <i class="color" style="background-color: {{ $banner->mediumRectangleTemplate->button_text_color }}"></i>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Button background color: </strong>{{ $banner->mediumRectangleTemplate->button_background_color }}
+                            <i class="color" style="background-color: {{ $banner->mediumRectangleTemplate->button_background_color }}"></i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        @endif
+
         <div class="card">
             <div class="card-header">
                 <h2>Settings</h2>
@@ -67,22 +133,7 @@
             <div class="card-body">
                 <ul class="list-group">
                     <li class="list-group-item">
-                        <strong>Text color: </strong>{{ $banner->text_color }} <i class="color" style="background-color: {{ $banner->text_color }}"></i>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Font size: </strong>{{ $banner->font_size }}
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Background color: </strong>{{ $banner->background_color }} <i class="color" style="background-color: {{ $banner->background_color }}"></i>
-                    </li>
-                    <li class="list-group-item">
                         <strong>Position: </strong>{{ $positions[$banner->position]->name }}
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Dimensions: </strong>{{ $dimensions[$banner->dimensions]->name }}
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Alignment: </strong>{{ $alignments[$banner->text_align]->name }}
                     </li>
                     <li class="list-group-item">
                         <strong>Transition: </strong>{{ $banner->transition }}
@@ -115,10 +166,10 @@
                 <h2>Preview</h2>
             </div>
             <div class="card-body card-padding">
-                <div class="row cp-container" style="min-height: {{ $dimensions[$banner->dimensions]->height }};">
+                <div class="row cp-container" style="min-height: 300px">
                     <div class="col-md-12">
                         <div id="banner-preview">
-                            <banner-preview></banner-preview>
+                            <medium-rectangle-template-preview></medium-rectangle-template-preview>
                         </div>
                     </div>
                 </div>

@@ -23,6 +23,9 @@
                v-bind:_mainText="mediumRectangleTemplate.mainText"
                v-bind:_buttonText="mediumRectangleTemplate.buttonText"
                v-bind:_backgroundColor="mediumRectangleTemplate.backgroundColor"
+               v-bind:_textColor="mediumRectangleTemplate.textColor"
+               v-bind:_buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="mediumRectangleTemplate.buttonTextColor"
             ></medium-rectangle-template>
 
             <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
@@ -200,6 +203,9 @@
                                         v-bind:mainText="mediumRectangleTemplate.mainText"
                                         v-bind:buttonText="mediumRectangleTemplate.buttonText"
                                         v-bind:backgroundColor="mediumRectangleTemplate.backgroundColor"
+                                        v-bind:textColor="mediumRectangleTemplate.textColor"
+                                        v-bind:buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
+                                        v-bind:buttonTextColor="mediumRectangleTemplate.buttonTextColor"
 
                                         v-bind:position="position"
                                         v-bind:targetUrl="targetUrl"
@@ -238,17 +244,22 @@
         "_displayType",
         "_template",
 
-        "_mediumRectangleHeaderText",
-        "_mediumRectangleMainText",
-        "_mediumRectangleButtonText",
-        "_mediumRectangleBackgroundColor",
+        // medium rectangle template
+        "_headerText",
+        "_mainText",
+        "_buttonText",
+        "_backgroundColor",
+        "_textColor",
+        "_backgroundColor",
+        "_buttonTextColor",
 
-        "_htmlTextAlign",
-        "_htmlDimensions",
-        "_htmlTextColor",
-        "_htmlFontSize",
-        "_htmlBackgroundColor",
-        "_htmlText",
+        // html template
+        "_textAlign",
+        "_dimensions",
+        "_textColor",
+        "_fontSize",
+        "_backgroundColor",
+        "_text",
 
         "_alignmentOptions",
         "_dimensionOptions",
@@ -272,19 +283,22 @@
             });
 
             this.mediumRectangleTemplate = {
-                headerText: this._mediumRectangleHeaderText,
-                mainText: this._mediumRectangleMainText,
-                buttonText: this._mediumRectangleButtonText,
-                backgroundColor: this._mediumRectangleBackgroundColor,
+                headerText: this._headerText,
+                mainText: this._mainText,
+                buttonText: this._buttonText,
+                backgroundColor: this._backgroundColor,
+                textColor: this._textColor,
+                buttonBackgroundColor: this._buttonBackgroundColor,
+                buttonTextColor: this._buttonTextColor,
             };
 
             this.htmlTemplate = {
-                textAlign: this._htmlTextAlign,
-                dimensions: this._htmlDimensions,
-                textColor: this._htmlTextColor,
-                fontSize: this._htmlFontSize,
-                backgroundColor: this._htmlBackgroundColor,
-                text: this._htmlText,
+                textAlign: this._textAlign,
+                dimensions: this._dimensions,
+                textColor: this._textColor,
+                fontSize: this._fontSize,
+                backgroundColor: this._backgroundColor,
+                text: this._text,
             };
         },
         data: () => ({

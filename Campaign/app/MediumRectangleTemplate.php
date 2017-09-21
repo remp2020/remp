@@ -11,6 +11,9 @@ class MediumRectangleTemplate extends Model
         'main_text',
         'button_text',
         'background_color',
+        'text_color',
+        'button_background_color',
+        'button_text_color',
     ];
 
     public function banner()

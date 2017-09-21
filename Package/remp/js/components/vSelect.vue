@@ -17,7 +17,7 @@
         </div>
         <div v-else>
             <select :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="livesearch" title="Please select">
-                <option :value="option.value || option" v-for="option in options">
+                <option v-bind:style="[option.style]" v-bind:data-subtext="option.sublabel" :value="option.value || option" v-for="option in options">
                     {{ option.label || option.value || option }}
                 </option>
             </select>
@@ -62,6 +62,9 @@
                         this.customInput = true;
                     }
                 }
+            }
+            if (this.allowCustomValue && this.options.length === 0) {
+                this.customInput = true;
             }
         },
         updated: function () {
