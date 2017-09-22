@@ -28,6 +28,15 @@
                v-bind:_buttonTextColor="mediumRectangleTemplate.buttonTextColor"
             ></medium-rectangle-template>
 
+            <bar-template v-if="template == 'bar'"
+               v-bind:_mainText="barTemplate.mainText"
+               v-bind:_buttonText="barTemplate.buttonText"
+               v-bind:_backgroundColor="barTemplate.backgroundColor"
+               v-bind:_textColor="barTemplate.textColor"
+               v-bind:_buttonBackgroundColor="barTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="barTemplate.buttonTextColor"
+            ></bar-template>
+
             <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
                 <li class="active">
                     <a href="#settings" role="tab" data-toggle="tab" aria-expanded="true">Settings</a>
@@ -170,50 +179,26 @@
             <div class="card m-t-15">
                 <div class="tab-content p-0">
                     <div role="tabpanel" class="active tab-pane" id="preview">
-                        <div class="card-body card-padding" id="banner-preview">
-                            <div class="row p-relative" style="text-align: center">
-                                <img src="../../img/website_mockup.png" class="preview-image" alt="Mockup" height="100%">
-                                <html-template-preview v-if="template == 'html'"
-                                        v-bind:alignmentOptions="alignmentOptions"
-                                        v-bind:dimensionOptions="dimensionOptions"
-                                        v-bind:positionOptions="positionOptions"
-                                        v-bind:show="previewShow"
+                        <div class="card-body" id="banner-preview">
+                            <div class="p-relative" style="height: 800px">
+                                <banner-preview
+                                        :alignmentOptions="alignmentOptions"
+                                        :dimensionOptions="dimensionOptions"
+                                        :positionOptions="positionOptions"
+                                        :show="previewShow"
+                                        :template="template"
 
-                                        v-bind:textAlign="htmlTemplate.textAlign"
-                                        v-bind:dimensions="htmlTemplate.dimensions"
-                                        v-bind:textColor="htmlTemplate.textColor"
-                                        v-bind:fontSize="htmlTemplate.fontSize"
-                                        v-bind:backgroundColor="htmlTemplate.backgroundColor"
-                                        v-bind:text="htmlTemplate.text"
+                                        :mediumRectangleTemplate="mediumRectangleTemplate"
+                                        :barTemplate="barTemplate"
+                                        :htmlTemplate="htmlTemplate"
 
-                                        v-bind:position="position"
-                                        v-bind:targetUrl="targetUrl"
-                                        v-bind:closeable="closeable"
-                                        v-bind:transition="transition"
-                                        v-bind:displayType="displayType"
-                                        v-bind:forcedPosition="'absolute'"
-                                ></html-template-preview>
-
-                                <medium-rectangle-template-preview v-if="template == 'medium_rectangle'"
-                                        v-bind:alignmentOptions="alignmentOptions"
-                                        v-bind:positionOptions="positionOptions"
-                                        v-bind:show="previewShow"
-
-                                        v-bind:headerText="mediumRectangleTemplate.headerText"
-                                        v-bind:mainText="mediumRectangleTemplate.mainText"
-                                        v-bind:buttonText="mediumRectangleTemplate.buttonText"
-                                        v-bind:backgroundColor="mediumRectangleTemplate.backgroundColor"
-                                        v-bind:textColor="mediumRectangleTemplate.textColor"
-                                        v-bind:buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
-                                        v-bind:buttonTextColor="mediumRectangleTemplate.buttonTextColor"
-
-                                        v-bind:position="position"
-                                        v-bind:targetUrl="targetUrl"
-                                        v-bind:closeable="closeable"
-                                        v-bind:transition="transition"
-                                        v-bind:displayType="displayType"
-                                        v-bind:forcedPosition="'absolute'"
-                                ></medium-rectangle-template-preview>
+                                        :position="position"
+                                        :targetUrl="targetUrl"
+                                        :closeable="closeable"
+                                        :transition="transition"
+                                        :displayType="displayType"
+                                        :forcedPosition="'absolute'"
+                                ></banner-preview>
                             </div>
                         </div>
                     </div>
@@ -228,9 +213,9 @@
 
 <script>
     import HtmlTemplate from "./templates/Html.vue"
-    import HtmlTemplatePreview from "./previews/Html.vue";
     import MediumRectangleTemplate from "./templates/MediumRectangle.vue";
-    import MediumRectangleTemplatePreview from "./previews/MediumRectangle.vue";
+    import BarTemplate from "./templates/Bar.vue";
+    import BannerPreview from "./BannerPreview.vue";
 
     const props = [
         "_name",
@@ -267,7 +252,12 @@
     ];
 
     export default {
-        components: { HtmlTemplate, HtmlTemplatePreview, MediumRectangleTemplate, MediumRectangleTemplatePreview },
+        components: {
+            HtmlTemplate,
+            MediumRectangleTemplate,
+            BarTemplate,
+            BannerPreview,
+        },
         name: 'banner-form',
         props: props,
         created: function() {
@@ -284,6 +274,15 @@
 
             this.mediumRectangleTemplate = {
                 headerText: this._headerText,
+                mainText: this._mainText,
+                buttonText: this._buttonText,
+                backgroundColor: this._backgroundColor,
+                textColor: this._textColor,
+                buttonBackgroundColor: this._buttonBackgroundColor,
+                buttonTextColor: this._buttonTextColor,
+            };
+
+            this.barTemplate = {
                 mainText: this._mainText,
                 buttonText: this._buttonText,
                 backgroundColor: this._backgroundColor,
@@ -313,20 +312,9 @@
             displayType: null,
             template: null,
 
-            mediumRectangleTemplate: {
-                headerText: null,
-                mainText: null,
-                buttonText: null,
-                backgroundColor: null,
-            },
-            htmlTemplate: {
-                textAlign: null,
-                dimensions: null,
-                textColor: null,
-                fontSize: null,
-                backgroundColor: null,
-                text: null,
-            },
+            mediumRectangleTemplate: null,
+            barTemplate: null,
+            htmlTemplate: null,
 
             alignmentOptions: [],
             dimensionOptions: [],

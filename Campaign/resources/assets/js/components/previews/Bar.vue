@@ -2,7 +2,7 @@
     @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
     @import url('../../../css/transitions.css');
 
-    .medium-rectangle-preview-close {
+    .bar-preview-close {
         position: absolute;
         top: 5px;
         right: 10px;
@@ -11,65 +11,53 @@
         text-decoration: none;
     }
 
-    .medium-rectangle-preview-close.hidden {
+    .bar-preview-close.hidden {
         display: none;
     }
 
-    .medium-rectangle-preview-link {
+    .bar-preview-link {
         text-decoration: none;
         overflow: hidden;
         z-index: 0;
+        width: 100%;
     }
 
-    .medium-rectangle-preview-box {
+    .bar-preview-box {
         font-family: Noto Sans, sans-serif;
         white-space: pre-line;
-        display: inline-block;
+        display: flex;
         overflow: hidden;
         position: relative;
-        padding: 0 20px;
-        min-width: 100px;
-        max-width: 370px;
-        min-height: 250px;
-        max-height: 370px;
-        text-align: center;
+        padding: 0 40px;
+        width: 100%;
+        height: 68px;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    .medium-rectangle-header {
-        margin-top: 35px;
-        margin-bottom:-20px;
+    .bar-main {
+        font-size: 17px;
         word-wrap: break-word;
     }
 
-    .medium-rectangle-main {
-        font-size: 26px;
-        margin-top: 45px;
-        word-wrap: break-word;
-    }
-
-    .medium-rectangle-button {
-        position: absolute;
-        bottom: 20px;
-        left: 15%;
-        width: 70%;
+    .bar-button {
         border-radius: 15px;
-        padding: 2px;
+        padding: 7px 30px;
         word-wrap: break-word;
-        font-size: 16px;
+        font-size: 14px;
     }
 </style>
 
 <template>
-    <a v-bind:href="url" v-on:click="clicked" v-if="isVisible" class="medium-rectangle-preview-link" v-bind:style="[
+    <a v-bind:href="url" v-on:click="clicked" v-if="isVisible" class="bar-preview-link" v-bind:style="[
         linkStyles,
         _position
     ]">
         <transition appear v-bind:name="transition">
-            <div class="medium-rectangle-preview-box" v-bind:style="[boxStyles]">
-                <a class="medium-rectangle-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
-                <div class="medium-rectangle-header" v-html="headerText"></div>
-                <div class="medium-rectangle-main" v-html="mainText"></div>
-                <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-html="buttonText" v-bind:style="[buttonStyles]"></div>
+            <div class="bar-preview-box" v-bind:style="[boxStyles]">
+                <a class="bar-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <div class="bar-main" v-html="mainText"></div>
+                <div class="bar-button" v-if="buttonText.length > 0" v-html="buttonText" v-bind:style="[buttonStyles]"></div>
             </div>
         </transition>
     </a>
@@ -77,7 +65,7 @@
 
 <script>
     export default {
-        name: 'medium-rectangle-preview',
+        name: 'bar-preview',
         props: [
             "positionOptions",
             "alignmentOptions",
@@ -151,7 +139,18 @@
                 if (!this.customPositioned()) {
                     return {};
                 }
-                return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
+                if (!this.positionOptions[this.position]) {
+                    return {};
+                }
+                let styles = this.positionOptions[this.position].style;
+                // if there's custom offset set, we want to remove it for bar so it's either on the top or bottom of page without any paddings
+                for (let style in styles) {
+                    if (!styles.hasOwnProperty(style)) {
+                        continue;
+                    }
+                    styles[style] = 0;
+                }
+                return styles;
             },
             linkStyles: function() {
                 let position = this.displayType === 'overlay' ? 'absolute' : 'relative';
@@ -174,7 +173,8 @@
             },
             closeStyles: function() {
                 return {
-                    color: this.textColor,
+                    color: 'white',
+
                 }},
             isVisible: function() {
                 return this.show && this.visible;
