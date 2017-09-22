@@ -27,6 +27,13 @@ class SegmentRequest extends FormRequest
             'name' => 'required|string|max:255',
             'code' => 'required|string',
             'active' => 'required|boolean',
+
+            'rules.*.timespan' => 'required|integer',
+            'rules.*.count' => 'required|integer',
+            'rules.*.event_category' => 'required|string',
+            'rules.*.event_action' => 'required|string',
+            'rules.*.operator' => 'required|string',
+            'rules.*.fields' => 'array',
         ];
     }
 }

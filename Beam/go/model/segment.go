@@ -45,8 +45,9 @@ type SegmentRule struct {
 	ParentID      sql.NullInt64 `db:"parent_id"`
 	SegmentID     int           `db:"segment_id"`
 	EventCategory string        `db:"event_category"`
-	EventName     string        `db:"event_name"`
+	EventAction   string        `db:"event_action"`
 	Timespan      sql.NullInt64
+	Operator      string
 	Count         int
 	CreatedAt     time.Time `db:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at"`
@@ -149,7 +150,7 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time) (boo
 // checkRule verifies defined rule against current state within InfluxDB.
 func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (bool, error) {
 	subquery := sDB.InfluxDB.QueryBuilder.
-		Select(`COUNT("value")`).
+		Select(`COUNT("token")`).
 		From("events").
 		Where(fmt.Sprintf(`"user_id" = '%s'`, userID))
 	for _, cond := range sr.conditions(now) {
@@ -158,12 +159,12 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 	sq := subquery.Build()
 
 	// If user didn't generate any event so far, Count will return always zero.
-	// We're aiming for query always returning zero for users eligible for segment rule hit.
+	// We're aiming for query always returning zero for users eligible for segment rule hit if it matches condition.
 
 	query := sDB.InfluxDB.QueryBuilder.
 		Select("*").
 		From(fmt.Sprintf("(%s)", sq)).
-		Where(fmt.Sprintf(`"count" >= %d`, sr.Count))
+		Where(fmt.Sprintf(`"count" %s %d`, sr.Operator, sr.Count))
 
 	response, err := sDB.InfluxDB.Exec(query.Build())
 	if err != nil {
@@ -211,7 +212,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 	// TODO: change user_id to tag and update config based on https://docs.influxdata.com/influxdb/v1.2/administration/config/#max-values-per-tag-100000
 
 	subquery := sDB.InfluxDB.QueryBuilder.
-		Select(`COUNT("value")`).
+		Select(`COUNT("token")`).
 		From("events").
 		GroupBy(`"user_id"`)
 	for _, cond := range sr.conditions(now) {
@@ -258,7 +259,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 func (sr *SegmentRule) conditions(now time.Time) []string {
 	conds := []string{
 		fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
-		fmt.Sprintf(`"action" = '%s'`, sr.EventName),
+		fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
 	}
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
