@@ -20,7 +20,6 @@
 
     .medium-rectangle-preview-box {
         font-family: Noto Sans, sans-serif;
-        color: white;
         white-space: pre-line;
         display: inline-block;
         overflow: hidden;
@@ -30,17 +29,16 @@
         max-width: 370px;
         min-height: 250px;
         max-height: 370px;
+        text-align: center;
     }
 
     .medium-rectangle-header {
         margin-top: 35px;
         margin-bottom:-20px;
-        color: white;
         word-wrap: break-word;
     }
 
     .medium-rectangle-main {
-        color: white;
         font-size: 26px;
         margin-top: 45px;
         word-wrap: break-word;
@@ -54,7 +52,6 @@
         width: 70%;
         border-radius: 15px;
         padding: 2px;
-        color: white;
         word-wrap: break-word;
         font-size: 16px;
     }
@@ -69,7 +66,7 @@
             <div class="medium-rectangle-preview-box" v-bind:style="[boxStyles]">
                 <div class="medium-rectangle-header" v-html="headerText"></div>
                 <div class="medium-rectangle-main" v-html="mainText"></div>
-                <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-html="buttonText"></div>
+                <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-html="buttonText" v-bind:style="[buttonStyles]"></div>
             </div>
         </transition>
     </a>
@@ -83,6 +80,9 @@
             "alignmentOptions",
 
             "backgroundColor",
+            "buttonBackgroundColor",
+            "textColor",
+            "buttonTextColor",
             "headerText",
             "mainText",
             "buttonText",
@@ -161,8 +161,14 @@
             boxStyles: function() {
                 return {
                     backgroundColor: this.backgroundColor,
-
+                    color: this.textColor,
                 }},
+            buttonStyles: function() {
+                return {
+                    color: this.buttonTextColor,
+                    backgroundColor: this.buttonBackgroundColor,
+                }
+            },
             closeStyles: function() {
                 return {
                     color: 'white',

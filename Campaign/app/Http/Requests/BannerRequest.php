@@ -56,6 +56,9 @@ class BannerRequest extends FormRequest
                 case Banner::TEMPLATE_MEDIUM_RECTANGLE:
                     $templateValidator = Validator::make($this->all(), [
                         'background_color' => 'string|required',
+                        'text_color' => 'string|required',
+                        'button_background_color' => 'string|required',
+                        'button_text_color' => 'string|required',
                         'header_text' => 'string|required',
                         'main_text' => 'string|required',
                         'button_text' => 'string|required',
