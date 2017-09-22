@@ -8,21 +8,14 @@
 <div class="card">
     <div class="card-header">
         <h2>Show email <span class="text-muted">{$mailTemplate->name}</span> <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit</small></h2>
-        <ul class="actions">
-            <li class="dropdown action-show">
-                <a href="" data-toggle="dropdown">
-                    <i class="zmdi zmdi-more-vert"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-right dm-icon">
-                    <li>
-                        <a n:href="Edit $mailTemplate->id"><i class="zmdi zmdi-edit"></i> Edit Email</a>
-                    </li>
-                    <li>
-                        <a n:href="Duplicate! $mailTemplate->id"><i class="zmdi zmdi-copy"></i> Duplicate Email</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <div class="actions">
+            <a n:href="Edit $mailTemplate->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Edit</button>
+            </a>
+            <a n:href="Duplicate! $mailTemplate->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-copy"></i> Duplicate</button>
+            </a>
+        </div>
     </div>
     <div class="card-body card-padding">
     </div>
@@ -63,24 +56,17 @@
         <div class="card">
             <div class="card-header">
                 <h2>Source</h2>
-                <ul class="actions">
-                    <li class="dropdown action-show">
-                        <a href="" data-toggle="dropdown">
-                            <i class="zmdi zmdi-more-vert"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-right dm-icon">
-                            <li>
-                                <a n:href="Preview $mailTemplate->id, type => 'html'" target="_blank"><i class="zmdi zmdi-search"></i> Preview HTML Version</a>
-                            </li>
-                            <li>
-                                <a n:href="Preview $mailTemplate->id, type => 'plain'" target="_blank"><i class="zmdi zmdi-search"></i> Preview Text Version</a>
-                            </li>
-                            <li>
-                                <a n:if="$mailTemplate->mail_type->is_public" n:href="Preview:Preview $mailTemplate->code" target="_blank"><i class="zmdi zmdi-search"></i> Preview Public Version</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                <div class="actions">
+                    <a n:href="Preview $mailTemplate->id, type => 'html'" target="_blank">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> HTML Version</button>
+                    </a>
+                    <a n:href="Preview $mailTemplate->id, type => 'plain'" target="_blank">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> Text Version</button>
+                    </a>
+                    <a n:if="$mailTemplate->mail_type->is_public" n:href="Preview:Preview $mailTemplate->code" target="_blank">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> Public Version</button>
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <ul class="tab-nav tn-justified tn-icon" role="tablist">

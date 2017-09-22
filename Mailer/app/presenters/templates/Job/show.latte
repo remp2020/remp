@@ -8,18 +8,11 @@
 <div class="card">
     <div class="card-header">
         <h2>Show Job <span class="text-muted">#{$job->id}</span><small></small></h2>
-        <ul class="actions">
-            <li class="dropdown action-show">
-                <a href="" data-toggle="dropdown">
-                    <i class="zmdi zmdi-more-vert"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-right dm-icon">
-                    <li>
-                        <a href="#new-batch-form" data-toggle="collapse"><i class="zmdi zmdi-plus"></i> Add batch</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <div class="actions">
+            <a href="#new-batch-form" data-toggle="collapse">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-plus-circle"></i> Add batch</button>
+            </a>
+        </div>
     </div>
     <div class="card-body card-padding">
     </div>
@@ -73,21 +66,14 @@
         <div class="card">
             <div class="card-header">
                 <h2>Batch #{$batch->id}</h2>
-                <ul class="actions">
-                    <li class="dropdown action-show">
-                        <a href="#" data-toggle="dropdown">
-                            <i class="zmdi zmdi-more-vert"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-right dm-icon">
-                            <li n:if="$batch->sent_emails == 0">
-                                <a n:href="RemoveBatch! $batch->id"><i class="zmdi zmdi-close"></i> Remove Batch</a>
-                            </li>
-                            <li>
-                                <a href="#new-template-form-batch-{$batch->id}" data-toggle="collapse"><i class="zmdi zmdi-plus"></i> Add email</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                <div class="actions">
+                    <a n:if="$batch->sent_emails == 0" n:href="RemoveBatch! $batch->id">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-close"></i> Remove Batch</button>
+                    </a>
+                    <a href="#new-template-form-batch-{$batch->id}" data-toggle="collapse">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-plus-circle"></i> Add email</button>
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 {if $batch->related('mail_job_batch_templates')->count('*') > 0}
@@ -126,22 +112,15 @@
         </div>
         <div n:foreach="$batch->related('mail_job_batch_templates') as $email" class="card">
             <div class="card-header">
-                <h2>Summary <small><span class="text-muted">{$email->mail_template->name}: {$email->mail_template->subject}</span> {$email->mail_template->code}</small></h2>
-                <ul class="actions">
-                    <li class="dropdown action-show">
-                        <a href="" data-toggle="dropdown">
-                            <i class="zmdi zmdi-more-vert"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-right dm-icon">
-                            <li>
-                                <a n:href="Template:Preview $email->mail_template->id, type => 'html'" target="_blank"><i class="zmdi zmdi-search"></i> Preview email</a>
-                            </li>
-                            <li>
-                                <a n:href="RemoveTemplate! $email->id"><i class="zmdi zmdi-edit"></i> Remove email</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                <h2>Summary <small class="m-t-20"><span class="text-muted">{$email->mail_template->name}: {$email->mail_template->subject}</span> {$email->mail_template->code}</small></h2>
+                <div class="actions">
+                    <a n:href="Template:Preview $email->mail_template->id, type => 'html'" target="_blank">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> Preview emai</button>
+                    </a>
+                    <a n:href="RemoveTemplate! $email->id">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Remove email</button>
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 {var $id = $email->mail_template->id}
