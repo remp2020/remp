@@ -102,11 +102,30 @@
                                 </div>
                             </div>
 
-                            <div class="input-group m-t-20">
-                                <span class="input-group-addon"><i class="zmdi zmdi-refresh"></i></span>
-                                <div class="fg-line">
-                                    <label class="fg-label">Count</label>
-                                    <input v-model="rule.count" :name="'rules['+i+'][count]'" placeholder="e.g. 5" class="form-control fg-input" title="count" type="text" required />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group m-t-20">
+                                        <span class="input-group-addon"><i class="zmdi zmdi-swap-vertical-circle"></i></span>
+                                        <div class="fg-line">
+                                            <label class="fg-label">Operator</label>
+                                            <v-select v-model="rule.operator"
+                                                      v-bind:name="'rules['+i+'][operator]'"
+                                                      v-bind:value="rule.operator"
+                                                      class="col-md-12 p-l-0 p-r-0"
+                                                      v-bind:options.sync="operators"
+                                                      v-bind:required="true"
+                                            ></v-select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group m-t-20">
+                                        <span class="input-group-addon"><i class="zmdi zmdi-n-1-square"></i></span>
+                                        <div class="fg-line">
+                                            <label class="fg-label">Count</label>
+                                            <input v-model="rule.count" :name="'rules['+i+'][count]'" placeholder="e.g. 5" class="form-control fg-input" title="count" type="number" required />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -114,7 +133,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                                 <div class="fg-line">
                                     <label class="fg-label">Timespan</label>
-                                    <input v-model="rule.timespan" :name="'rules['+i+'][timespan]'" placeholder="e.g. 1440 (minutes)" class="form-control fg-input"title="timespan" type="number">
+                                    <input v-model="rule.timespan" :name="'rules['+i+'][timespan]'" placeholder="e.g. 1440 (minutes)" class="form-control fg-input" title="timespan" type="number" required>
                                 </div>
                             </div>
 
@@ -159,7 +178,7 @@
 </template>
 
 <script>
-    import vSelect from "./vSelect.vue";
+    let vSelect = require("remp/js/components/vSelect.vue");
 
     const props = [
         "_name",
@@ -207,6 +226,13 @@
             "eventActions": null,
             "showEventsLoader": false,
             "showEventsInput": false,
+            "operators": [
+                {"value": "<", "sublabel": "<", "label": "At most"},
+                {"value": "<=", "sublabel": "<=", "label": "At most or exactly"},
+                {"value": "=", "sublabel": "=", "label": "Exactly"},
+                {"value": ">", "sublabel": ">", "label": "At least"},
+                {"value": ">=", "sublabel": ">=", "label": "At least or exactly"},
+            ]
         }),
         methods: {
             addRule: function() {
@@ -216,6 +242,7 @@
                     timespan: null,
                     event_action: null,
                     event_category: null,
+                    operator: null,
                     fields: [{
                         key: null,
                         value: null

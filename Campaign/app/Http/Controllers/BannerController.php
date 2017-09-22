@@ -90,10 +90,10 @@ class BannerController extends Controller
 
         switch ($banner->template) {
             case Banner::TEMPLATE_HTML:
-                $banner->htmlTemplate()->create($request->all());
+                $banner->htmlTemplate()->make($request->all());
                 break;
             case Banner::TEMPLATE_MEDIUM_RECTANGLE:
-                $banner->mediumRectangleTemplate()->create($request->all());
+                $banner->mediumRectangleTemplate()->make($request->all());
                 break;
             default:
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
@@ -126,6 +126,7 @@ class BannerController extends Controller
      */
     public function edit(Banner $banner)
     {
+        $banner->fill(old());
         if ($banner->htmlTemplate) {
             $banner->htmlTemplate->fill(old());
         }
