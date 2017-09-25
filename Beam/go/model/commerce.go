@@ -10,6 +10,9 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
+const CategoryCommerce = "commerce"
+const TableCommerce = "commerce"
+
 // Options represent filter options for commerce-related calls.
 type CommerceOptions struct {
 	IDs        []string
@@ -147,13 +150,13 @@ func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
 
 func (eDB *CommerceDB) Categories() ([]string, error) {
 	return []string{
-		"commerce",
+		CategoryCommerce,
 	}, nil
 }
 
 func (eDB *CommerceDB) Actions(category string) ([]string, error) {
 	switch category {
-	case "commerce":
+	case CategoryCommerce:
 		return []string{
 			"checkout",
 			"payment",

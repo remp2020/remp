@@ -9,6 +9,10 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
+const CategoryPageview = "pageview"
+const ActionPageviewLoad = "load"
+const TablePageviews = "pageviews"
+
 // PageviewOptions represent filter options for pageview-related calls.
 type PageviewOptions struct {
 	UserID     string
@@ -120,15 +124,15 @@ func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
 
 func (eDB *PageviewDB) Categories() ([]string, error) {
 	return []string{
-		"pageview",
+		CategoryPageview,
 	}, nil
 }
 
 func (eDB *PageviewDB) Actions(category string) ([]string, error) {
 	switch category {
-	case "pageview":
+	case CategoryPageview:
 		return []string{
-			"load",
+			ActionPageviewLoad,
 		}, nil
 	}
 	return nil, fmt.Errorf("unknown commerce category: %s", category)

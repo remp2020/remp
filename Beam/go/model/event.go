@@ -9,6 +9,8 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
+const TableEvents = "events"
+
 // Options represent filter options for event-related calls.
 type EventOptions struct {
 	UserID     string

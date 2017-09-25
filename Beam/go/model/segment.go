@@ -151,7 +151,7 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time) (boo
 func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (bool, error) {
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
-		From("events").
+		From(sr.tableName()).
 		Where(fmt.Sprintf(`"user_id" = '%s'`, userID))
 	for _, cond := range sr.conditions(now) {
 		subquery = subquery.Where(cond)
@@ -218,7 +218,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
-		From("events").
+		From(sr.tableName()).
 		GroupBy(`"user_id"`)
 	for _, cond := range sr.conditions(now) {
 		subquery = subquery.Where(cond)
@@ -262,13 +262,37 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 
 // conditions returns list of influx conditions for current SegmentRule.
 func (sr *SegmentRule) conditions(now time.Time) []string {
-	conds := []string{
-		fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
-		fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
+	var conds []string
+	switch sr.EventCategory {
+	case CategoryPageview:
+		// no condition needed yet, pageview-load event is implicit
+	case CategoryCommerce:
+		conds = append(
+			conds,
+			fmt.Sprintf(`"step" = '%s'`, sr.EventAction),
+		)
+	default:
+		conds = append(
+			conds,
+			fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
+			fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
+		)
 	}
+
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
 		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
 	}
 	return conds
+}
+
+func (sr *SegmentRule) tableName() string {
+	switch sr.EventCategory {
+	case CategoryPageview:
+		return TablePageviews
+	case CategoryCommerce:
+		return TableCommerce
+	default:
+		return TableEvents
+	}
 }
