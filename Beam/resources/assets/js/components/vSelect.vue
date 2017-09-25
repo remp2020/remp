@@ -1,41 +1,51 @@
 <template>
     <div>
-        <div v-if="allowCustomValue" class="row">
-            <div class="col-xs-10">
-                <select :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="livesearch" :disabled="disabled" title="Please select">
-                    <option :value="option.value || option" v-for="option in options">
+        <div class="row">
+            <div :class="allowCustomValue ? 'col-xs-10' : 'col-xs-12'">
+                <select v-if="typeof options === 'object' && options.length === undefined" title="Please select" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
+                    <optgroup v-for="(group, label) in options" :label="label">
+                        <option v-for="option in group" :data-subtext="option.sublabel" :value="option.value || option" >
+                            {{ option.label || option.value || option }}
+                        </option>
+                    </optgroup>
+                </select>
+                <select v-else title="Please select" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
+                    <option v-for="option in options" :data-subtext="option.sublabel" :value="option.value || option" >
                         {{ option.label || option.value || option }}
                     </option>
                 </select>
-                <input v-on:blur="customValueUpdated" v-show="customInput" v-model="customValue" :disabled="!this.customInput" :name="name" placeholder="e.g. my-event" title="Custom value" type="text" required="required" class="form-control fg-input">
+                <input v-if="allowCustomValue" v-on:blur="customValueUpdated" v-show="customInput" v-model="customValue" :disabled="!this.customInput" :name="name" placeholder="e.g. my-event" title="Custom value" type="text" required="required" class="form-control fg-input">
             </div>
-            <div class="col-xs-2">
+            <div v-if="allowCustomValue" class="col-xs-2">
                 <button type="button" :disabled="this.optionsEmpty()" v-on:click="customInput = !customInput" :class="[{'palette-Blue-Grey bg': customInput}, {'btn-default': !customInput}, 'btn', 'waves-effect']">
                     <i class="zmdi zmdi-hc-lg zmdi-edit"></i>
                 </button>
             </div>
         </div>
-        <div v-else>
-            <select :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="livesearch" title="Please select">
-                <option v-bind:data-subtext="option.sublabel" :value="option.value || option" v-for="option in options">
-                    {{ option.label || option.value || option }}
-                </option>
-            </select>
-        </div>
     </div>
 </template>
 
 <script>
-    let props = [
-        'name',
-        'options',
-        'value',
-        'multiple',
-        'livesearch',
-        'dataType',
-        'disabled',
-        'allowCustomValue',
-    ];
+    let props = {
+        'name': String,
+        'options': [Array, Object],
+        'value': [String, Number],
+        'multiple': Boolean,
+        'liveSearch': {
+            'type': Boolean,
+            'default': true,
+        },
+        'dataType': String,
+        'disabled': Boolean,
+        'allowCustomValue': {
+            'type': Boolean,
+            'default': false,
+        },
+        'required': {
+            'type': Boolean,
+            'default': false,
+        }
+    };
 
     export default {
         name: "v-select",
@@ -52,7 +62,9 @@
             $select.selectpicker();
             $(this.$el).find('select').on('changed.bs.select', function () {
                 let val = $(this).val();
-                vm.emitValueChanged(val);
+                // noinspection JSPotentiallyInvalidUsageOfThis
+                let group = this.options[this.selectedIndex].parentNode.label;
+                vm.emitValueChanged(val, group);
             });
             if (this.value !== null) {
                 $select.selectpicker('val', this.value !== null ? this.value : null);
@@ -63,7 +75,7 @@
                     }
                 }
             }
-            if (this.options.length === 0) {
+            if (this.allowCustomValue && this.options instanceof Array && this.options.length === 0) {
                 this.customInput = true;
             }
         },
@@ -127,9 +139,10 @@
             customValueUpdated: function() {
                 this.emitValueChanged(this.customValue);
             },
-            emitValueChanged: function(value) {
-                this.$parent.$emit("value-changed", {
+            emitValueChanged: function(value, group) {
+                this.$parent.$emit("vselect-changed", {
                     type: this.dataType,
+                    group: group,
                     value: value,
                 });
                 this.$emit('input', value);

@@ -158,8 +158,8 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 	}
 	sq := subquery.Build()
 
-	// If user didn't generate any event so far, Count will return always zero.
-	// We're aiming for query always returning zero for users eligible for segment rule hit if it matches condition.
+	// If user didn't generate any event so far, sr.Count will return always zero.
+	// We're aiming for query matching also users with no event which could still match the condition.
 
 	query := sDB.InfluxDB.QueryBuilder.
 		Select("*").
@@ -186,21 +186,26 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 
 // Users return list of all users within segment.
 func (sDB *SegmentDB) Users(segment *Segment, now time.Time) ([]string, error) {
-	um := make(UserSet)
+	users := make(UserSet)
 
 	for i, sr := range segment.Rules {
-		filteredUm, err := sDB.ruleUsers(sr, now, func(userID string) bool {
-			_, ok := um[userID]
-			return i == 0 || ok
+		filteredUsers, err := sDB.ruleUsers(sr, now, func(userID string) bool {
+			// on first iteration everyone is eligible to be in "users"
+			if i == 0 {
+				return true
+			}
+			// on further iterations user needs to be present in "users" (effectivelly all previous iterations)
+			_, ok := users[userID]
+			return ok
 		})
 		if err != nil {
 			return nil, err
 		}
-		um = filteredUm
+		users = filteredUsers
 	}
 
 	var uc []string
-	for userID := range um {
+	for userID := range users {
 		uc = append(uc, userID)
 	}
 

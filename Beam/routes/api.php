@@ -17,6 +17,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/journal/{category}/actions', function(\App\Contracts\JournalContract $journalContract, $category) {
-    return $journalContract->actions($category);
+Route::get('/journal/{group}/categories/{category}/actions', function(\App\Contracts\JournalContract $journalContract, $group, $category) {
+    return $journalContract->actions($group, $category);
 });

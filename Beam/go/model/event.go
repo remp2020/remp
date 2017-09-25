@@ -3,7 +3,6 @@ package model
 import (
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -118,7 +117,7 @@ func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
 
 func (eDB *EventDB) Categories() ([]string, error) {
 	q := client.Query{
-		Command:  `SHOW TAG VALUES WITH KEY = "category"`,
+		Command:  `SHOW TAG VALUES FROM "events" WITH KEY = "category"`,
 		Database: eDB.DB.DBName,
 	}
 
@@ -146,7 +145,7 @@ func (eDB *EventDB) Categories() ([]string, error) {
 
 func (eDB *EventDB) Actions(category string) ([]string, error) {
 	q := client.Query{
-		Command:  fmt.Sprintf(`SHOW TAG VALUES WITH KEY = "action" WHERE category =~ /%s/`, category),
+		Command:  fmt.Sprintf(`SHOW TAG VALUES FROM "events" WITH KEY = "action" WHERE category =~ /%s/`, category),
 		Database: eDB.DB.DBName,
 	}
 
@@ -174,7 +173,7 @@ func (eDB *EventDB) Actions(category string) ([]string, error) {
 
 func (eDB *EventDB) Users() ([]string, error) {
 	q := client.Query{
-		Command:  `SHOW TAG VALUES WITH KEY = "user_id"`,
+		Command:  `SHOW TAG VALUES FROM "events" WITH KEY = "user_id"`,
 		Database: eDB.DB.DBName,
 	}
 
@@ -220,7 +219,6 @@ func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions)
 }
 
 func eventFromInfluxResult(ir *influxquery.Result) (*Event, error) {
-	log.Printf("DEBUG: %#v\n", ir)
 	category, ok := ir.StringValue("category")
 	if !ok {
 		return nil, errors.New("unable to map Category to influx result column")
