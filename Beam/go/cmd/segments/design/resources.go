@@ -174,7 +174,6 @@ var _ = Resource("commerce", func() {
 				Enum("users", "articles", "authors")
 			})
 			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
-			Param("group", Boolean, "Whether to group results by filter values (used only when _filter_by_ is set)")
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
 			})

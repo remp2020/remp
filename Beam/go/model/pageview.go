@@ -58,7 +58,7 @@ type PageviewDB struct {
 
 // Count returns number of pageviews matching the filter defined by PageviewOptions.
 func (eDB *PageviewDB) Count(o PageviewOptions) (int, error) {
-	builder := eDB.DB.QueryBuilder.Select("count(token)").From("pageviews")
+	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TablePageviews + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
 	q := client.Query{
@@ -85,7 +85,7 @@ func (eDB *PageviewDB) Count(o PageviewOptions) (int, error) {
 
 // List returns list of all pageviews based on given PageviewOptions.
 func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
-	builder := eDB.DB.QueryBuilder.Select("*").From("pageviews")
+	builder := eDB.DB.QueryBuilder.Select("*").From(`"` + TablePageviews + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
 	q := client.Query{
@@ -140,7 +140,7 @@ func (eDB *PageviewDB) Actions(category string) ([]string, error) {
 
 func (eDB *PageviewDB) Users() ([]string, error) {
 	q := client.Query{
-		Command:  `SHOW TAG VALUES FROM "pageviews" WITH KEY = "user_id"`,
+		Command:  `SHOW TAG VALUES FROM "` + TablePageviews + `" WITH KEY = "user_id"`,
 		Database: eDB.DB.DBName,
 	}
 

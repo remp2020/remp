@@ -54,7 +54,7 @@ type CommerceDB struct {
 }
 
 func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, error) {
-	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"commerce"`)
+	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
 
 	log.Println("query:", builder.Build())
@@ -83,7 +83,7 @@ func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, error) {
 
 // List returns list of all events based on given CommerceOptions.
 func (cDB *CommerceDB) List(o CommerceOptions) (CommerceCollection, error) {
-	builder := cDB.DB.QueryBuilder.Select("*").From("commerce")
+	builder := cDB.DB.QueryBuilder.Select("*").From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
 
 	q := client.Query{
@@ -121,7 +121,7 @@ func (cDB *CommerceDB) List(o CommerceOptions) (CommerceCollection, error) {
 }
 
 func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
-	builder := cDB.DB.QueryBuilder.Select(`sum("revenue")`).From(`"commerce"`)
+	builder := cDB.DB.QueryBuilder.Select(`sum("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
 
 	log.Println("query:", builder.Build())

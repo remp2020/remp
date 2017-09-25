@@ -63,10 +63,6 @@ func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
 			return err
 		}
 		o.FilterBy = ft
-
-		if ctx.Group != nil && *ctx.Group {
-			o.Group = true
-		}
 		o.IDs = ctx.Ids
 	}
 	if ctx.Step != nil {

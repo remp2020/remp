@@ -53,7 +53,7 @@ type EventDB struct {
 
 // Count returns number of events matching the filter defined by EventOptions.
 func (eDB *EventDB) Count(o EventOptions) (int, error) {
-	builder := eDB.DB.QueryBuilder.Select("count(value)").From("events")
+	builder := eDB.DB.QueryBuilder.Select("count(value)").From(`"` + TableEvents + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
 	q := client.Query{
@@ -80,7 +80,7 @@ func (eDB *EventDB) Count(o EventOptions) (int, error) {
 
 // List returns list of all events based on given EventOptions.
 func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
-	builder := eDB.DB.QueryBuilder.Select("*").From("events")
+	builder := eDB.DB.QueryBuilder.Select("*").From(`"` + TableEvents + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
 	q := client.Query{
@@ -119,7 +119,7 @@ func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
 
 func (eDB *EventDB) Categories() ([]string, error) {
 	q := client.Query{
-		Command:  `SHOW TAG VALUES FROM "events" WITH KEY = "category"`,
+		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "category"`,
 		Database: eDB.DB.DBName,
 	}
 
@@ -147,7 +147,7 @@ func (eDB *EventDB) Categories() ([]string, error) {
 
 func (eDB *EventDB) Actions(category string) ([]string, error) {
 	q := client.Query{
-		Command:  fmt.Sprintf(`SHOW TAG VALUES FROM "events" WITH KEY = "action" WHERE category =~ /%s/`, category),
+		Command:  fmt.Sprintf(`SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "action" WHERE category =~ /%s/`, category),
 		Database: eDB.DB.DBName,
 	}
 
@@ -175,7 +175,7 @@ func (eDB *EventDB) Actions(category string) ([]string, error) {
 
 func (eDB *EventDB) Users() ([]string, error) {
 	q := client.Query{
-		Command:  `SHOW TAG VALUES FROM "events" WITH KEY = "user_id"`,
+		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "user_id"`,
 		Database: eDB.DB.DBName,
 	}
 
