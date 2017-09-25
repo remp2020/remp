@@ -2,14 +2,32 @@
     @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
     @import url('../../../css/transitions.css');
 
-    .preview-close.hidden {
+    .html-preview-close.hidden {
         display: none;
     }
-    .preview-image {
-        opacity: 0.3;
+    .html-preview-box {
+        font-family: Noto Sans, sans-serif;
+        color: white;
+        white-space: pre-line;
+        display: inline-block;
+        overflow: hidden;
+        position: relative
     }
-    .preview-box {
+    .html-preview-text {
+        word-break: break-all;
+        vertical-align: middle;
+        padding: 5px 10px;
+        display: flex;
+        height: 100%;
+        align-items: center;
+    }
+    .html-preview-close {
         position: absolute;
+        top: 5px;
+        right: 10px;
+        font-size: 15px;
+        padding: 5px;
+        text-decoration: none;
     }
 </style>
 
@@ -20,14 +38,14 @@
         dimensionOptions[dimensions]
     ]">
         <transition appear v-bind:name="transition">
-            <div class="preview-box" v-bind:style="[
+            <div class="html-preview-box" v-bind:style="[
                 boxStyles,
                 dimensionOptions[dimensions],
                 _textAlign,
                 customBoxStyles
             ]">
-                <a class="preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
-                <p v-html="text" class="preview-text" v-bind:style="[_textAlign, textStyles]"></p>
+                <a class="html-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <p v-html="text" class="html-preview-text" v-bind:style="[_textAlign, textStyles]"></p>
             </div>
         </transition>
     </a>
@@ -35,7 +53,7 @@
 
 <script>
     export default {
-        name: 'html-template-preview',
+        name: 'html-preview',
         props: [
             "positionOptions",
             "dimensionOptions",
@@ -127,33 +145,15 @@
                 return {
                     color: this.textColor,
                     fontSize: this.fontSize + "px",
-                    wordBreak: 'break-all',
-                    verticalAlign: 'middle',
-                    padding: '5px 10px',
-                    display: 'flex',
-                    height: '100%',
-                    alignItems: 'center',
                 }
             },
             boxStyles: function() {
                 return {
                     backgroundColor: this.backgroundColor,
-                    fontFamily: 'Noto Sans, sans-serif',
-                    color: 'white',
-                    whiteSpace: 'pre-line',
-                    display: 'inline-block',
-                    overflow: 'hidden',
-                    position: 'relative'
                 }},
             closeStyles: function() {
                 return {
                     color: this.textColor,
-                    position: 'absolute',
-                    top: '5px',
-                    right: '10px',
-                    fontSize: '15px',
-                    padding: '5px',
-                    textDecoration: 'none',
                 }},
             customBoxStyles: function() {
                 return {}

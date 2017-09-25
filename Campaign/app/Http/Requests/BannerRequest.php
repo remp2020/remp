@@ -50,7 +50,7 @@ class BannerRequest extends FormRequest
                         'text_color' => 'required',
                         'background_color' => 'required',
                         'font_size' => 'required',
-                        'dimensions' => 'required|in:landscape,medium_rectangle',
+                        'dimensions' => 'required|in:landscape,medium_rectangle,bar',
                     ]);
                     break;
                 case Banner::TEMPLATE_MEDIUM_RECTANGLE:
@@ -60,6 +60,16 @@ class BannerRequest extends FormRequest
                         'button_background_color' => 'string|required',
                         'button_text_color' => 'string|required',
                         'header_text' => 'string|required',
+                        'main_text' => 'string|required',
+                        'button_text' => 'string|required',
+                    ]);
+                    break;
+                case Banner::TEMPLATE_BAR:
+                    $templateValidator = Validator::make($this->all(), [
+                        'background_color' => 'string|required',
+                        'text_color' => 'string|required',
+                        'button_background_color' => 'string|required',
+                        'button_text_color' => 'string|required',
                         'main_text' => 'string|required',
                         'button_text' => 'string|required',
                     ]);

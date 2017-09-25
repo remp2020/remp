@@ -62,10 +62,8 @@ class BannerController extends Controller
     public function create(Request $request)
     {
         $banner = new Banner;
-        $banner->fill(old());
         $banner->template = $request->get('template');
-        $banner->setRelation('htmlTemplate', new HtmlTemplate(old()));
-        $banner->setRelation('mediumRectangleTemplate', new MediumRectangleTemplate(old()));
+        $banner->fill(old());
 
         return view('banners.create', [
             'banner' => $banner,
@@ -90,10 +88,13 @@ class BannerController extends Controller
 
         switch ($banner->template) {
             case Banner::TEMPLATE_HTML:
-                $banner->htmlTemplate()->make($request->all());
+                $banner->htmlTemplate()->create($request->all());
                 break;
             case Banner::TEMPLATE_MEDIUM_RECTANGLE:
-                $banner->mediumRectangleTemplate()->make($request->all());
+                $banner->mediumRectangleTemplate()->create($request->all());
+                break;
+            case Banner::TEMPLATE_BAR:
+                $banner->barTemplate()->create($request->all());
                 break;
             default:
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
@@ -127,12 +128,6 @@ class BannerController extends Controller
     public function edit(Banner $banner)
     {
         $banner->fill(old());
-        if ($banner->htmlTemplate) {
-            $banner->htmlTemplate->fill(old());
-        }
-        if ($banner->mediumRectangleTemplate) {
-            $banner->mediumRectangleTemplate->fill(old());
-        }
 
         return view('banners.edit', [
             'banner' => $banner,
@@ -159,6 +154,9 @@ class BannerController extends Controller
                 break;
             case Banner::TEMPLATE_MEDIUM_RECTANGLE:
                 $banner->mediumRectangleTemplate->update($request->all());
+                break;
+            case Banner::TEMPLATE_BAR:
+                $banner->barTemplate->update($request->all());
                 break;
             default:
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);

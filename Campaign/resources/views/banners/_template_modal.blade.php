@@ -33,6 +33,20 @@
                             </a>
                         </div>
                     </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <a href="{{ route('banners.create', ['template' => 'bar']) }}">
+                                <div class="card-header">
+                                    <h4 class="text-center">Bar</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="preview bar"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

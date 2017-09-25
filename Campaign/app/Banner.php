@@ -12,6 +12,7 @@ class Banner extends Model
 
     const TEMPLATE_HTML = 'html';
     const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
+    const TEMPLATE_BAR = 'bar';
 
     protected $fillable = [
         'name',
@@ -29,6 +30,7 @@ class Banner extends Model
     protected $with = [
         'htmlTemplate',
         'mediumRectangleTemplate',
+        'barTemplate',
     ];
 
     protected $casts = [
@@ -48,6 +50,29 @@ class Banner extends Model
         });
     }
 
+    public function fill(array $attributes)
+    {
+        parent::fill($attributes);
+        switch ($this->template) {
+            case self::TEMPLATE_HTML:
+                $this->htmlTemplate ?
+                    $this->htmlTemplate->fill($attributes) :
+                    $this->setRelation('htmlTemplate', $this->htmlTemplate()->make($attributes));
+                break;
+            case self::TEMPLATE_MEDIUM_RECTANGLE:
+                $this->mediumRectangleTemplate ?
+                    $this->mediumRectangleTemplate->fill($attributes) :
+                    $this->setRelation('mediumRectangleTemplate', $this->mediumRectangleTemplate()->make($attributes));
+                break;
+            case self::TEMPLATE_BAR:
+                $this->barTemplate ?
+                    $this->barTemplate->fill($attributes) :
+                    $this->setRelation('barTemplate', $this->barTemplate()->make($attributes));
+                break;
+        }
+        return $this;
+    }
+
     public function campaigns()
     {
         return $this->hasMany(Campaign::class);
@@ -61,5 +86,10 @@ class Banner extends Model
     public function mediumRectangleTemplate()
     {
         return $this->hasOne(MediumRectangleTemplate::class);
+    }
+
+    public function barTemplate()
+    {
+        return $this->hasOne(BarTemplate::class);
     }
 }
