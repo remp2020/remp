@@ -97,7 +97,7 @@ var CommercePayment = Type("CommercePayment", func() {
 	Attribute("product_ids", ArrayOf(String), "Public IDs of selected products")
 	Attribute("revenue", Revenue, "Amount of money for given payment")
 
-	Required("funnel_id", "revenue", "transaction_id", "product_ids")
+	Required("revenue", "transaction_id", "product_ids")
 })
 
 var Revenue = Type("Revenue", func() {
