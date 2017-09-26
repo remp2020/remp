@@ -84,7 +84,7 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 		return fmt.Errorf("unhandled commerce step: %s", ctx.Payload.Step)
 	}
 
-	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, "commerce", tags, values); err != nil {
+	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, model.TableCommerce, tags, values); err != nil {
 		return err
 	}
 
@@ -119,7 +119,7 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	for key, val := range ctx.Payload.Fields {
 		fields[key] = val
 	}
-	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, "events", tags, fields); err != nil {
+	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, model.TableEvents, tags, fields); err != nil {
 		return err
 	}
 
@@ -145,7 +145,10 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		return ctx.NotFound()
 	}
 
-	tags := map[string]string{}
+	tags := map[string]string{
+		"category": model.CategoryPageview,
+		"action":   model.ActionPageviewLoad,
+	}
 	values := map[string]interface{}{}
 
 	if ctx.Payload.Article != nil {
@@ -158,7 +161,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		}
 	}
 
-	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, "pageviews", tags, values); err != nil {
+	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, model.TablePageviews, tags, values); err != nil {
 		return err
 	}
 	return ctx.Accepted()

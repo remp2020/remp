@@ -3,12 +3,13 @@ package model
 import (
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
+
+const TableEvents = "events"
 
 // Options represent filter options for event-related calls.
 type EventOptions struct {
@@ -52,7 +53,7 @@ type EventDB struct {
 
 // Count returns number of events matching the filter defined by EventOptions.
 func (eDB *EventDB) Count(o EventOptions) (int, error) {
-	builder := eDB.DB.QueryBuilder.Select("count(value)").From("events")
+	builder := eDB.DB.QueryBuilder.Select("count(value)").From(`"` + TableEvents + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
 	q := client.Query{
@@ -79,7 +80,7 @@ func (eDB *EventDB) Count(o EventOptions) (int, error) {
 
 // List returns list of all events based on given EventOptions.
 func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
-	builder := eDB.DB.QueryBuilder.Select("*").From("events")
+	builder := eDB.DB.QueryBuilder.Select("*").From(`"` + TableEvents + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
 	q := client.Query{
@@ -118,7 +119,7 @@ func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
 
 func (eDB *EventDB) Categories() ([]string, error) {
 	q := client.Query{
-		Command:  `SHOW TAG VALUES WITH KEY = "category"`,
+		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "category"`,
 		Database: eDB.DB.DBName,
 	}
 
@@ -146,7 +147,7 @@ func (eDB *EventDB) Categories() ([]string, error) {
 
 func (eDB *EventDB) Actions(category string) ([]string, error) {
 	q := client.Query{
-		Command:  fmt.Sprintf(`SHOW TAG VALUES WITH KEY = "action" WHERE category =~ /%s/`, category),
+		Command:  fmt.Sprintf(`SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "action" WHERE category =~ /%s/`, category),
 		Database: eDB.DB.DBName,
 	}
 
@@ -174,7 +175,7 @@ func (eDB *EventDB) Actions(category string) ([]string, error) {
 
 func (eDB *EventDB) Users() ([]string, error) {
 	q := client.Query{
-		Command:  `SHOW TAG VALUES WITH KEY = "user_id"`,
+		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "user_id"`,
 		Database: eDB.DB.DBName,
 	}
 
@@ -220,7 +221,6 @@ func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions)
 }
 
 func eventFromInfluxResult(ir *influxquery.Result) (*Event, error) {
-	log.Printf("DEBUG: %#v\n", ir)
 	category, ok := ir.StringValue("category")
 	if !ok {
 		return nil, errors.New("unable to map Category to influx result column")

@@ -70,6 +70,7 @@
                                                   v-bind:options.sync="eventCategories"
                                                   v-bind:dataType="'category'"
                                                   v-bind:allowCustomValue="true"
+                                                  v-bind:liveSearch="true"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -97,6 +98,7 @@
                                                   v-bind:dataType="'event'"
                                                   v-bind:disabled="!showEventsInput"
                                                   v-bind:allowCustomValue="true"
+                                                  v-bind:liveSearch="true"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -178,7 +180,7 @@
 </template>
 
 <script>
-    let vSelect = require("remp/js/components/vSelect.vue");
+    let vSelect = require("./vSelect.vue");
 
     const props = [
         "_name",
@@ -194,11 +196,11 @@
         components: { vSelect },
         props: props,
         created: function() {
-            this.$on('value-changed', function(data){
+            this.$on('vselect-changed', function(data){
                 if (data.type !== 'category') {
                     return;
                 }
-                this.fetchActions(data.value);
+                this.fetchActions(data.group, data.value);
             });
         },
         mounted: function(){
@@ -213,7 +215,6 @@
                     categories.push(self.rules[i].event_category);
                 }
             }
-            this.loadActions(categories);
         },
         data: () => ({
             "name": null,
@@ -222,7 +223,6 @@
             "rules": [],
             "removedRules": [],
             "eventCategories": [],
-            "loadingActions": {},
             "eventActions": null,
             "showEventsLoader": false,
             "showEventsInput": false,
@@ -266,33 +266,14 @@
                     this.addField(ruleIndex);
                 }
             },
-            loadActions: function(categories) {
-                let vm = this;
-                let ready = [];
-                categories.forEach((category) => {
-                    vm.fetchActions(category, function(data) {
-                        vm.loadingActions[category] = data;
-                        ready.push(category);
-                        if (ready.length === categories.length) {
-                            vm.eventActions = vm.loadingActions;
-                            vm.showEventsLoader = false;
-                            vm.showEventsInput = true;
-                        }
-                    })
-                });
-            },
-            fetchActions: function(category, cb) {
+            fetchActions: function(group, category) {
                 let self = this;
                 self.showEventsLoader = true;
                 self.showEventsInput = false;
-                $.get('/api/journal/' + category + '/actions', ( data ) => {
-                    if (typeof cb !== 'undefined') {
-                        cb(data);
-                    } else {
-                        self.eventActions[category] = data;
-                        self.showEventsLoader = false;
-                        self.showEventsInput = true;
-                    }
+                $.get('/api/journal/' + group + '/categories/' + category + '/actions', ( data ) => {
+                    self.eventActions[category] = data;
+                    self.showEventsLoader = false;
+                    self.showEventsInput = true;
                 })
             }
         },

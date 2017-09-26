@@ -83,6 +83,9 @@ func main() {
 	commerceDB := &model.CommerceDB{
 		DB: influxDB,
 	}
+	pageviewDB := &model.PageviewDB{
+		DB: influxDB,
+	}
 	segmentDB := &model.SegmentDB{
 		MySQL:    mysqlDB,
 		InfluxDB: influxDB,
@@ -97,6 +100,7 @@ func main() {
 
 	app.MountEventsController(service, controller.NewEventController(service, eventDB))
 	app.MountCommerceController(service, controller.NewCommerceController(service, commerceDB))
+	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewDB))
 	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentDB))
 
 	// server init

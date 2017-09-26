@@ -1,7 +1,9 @@
 package design
 
-import . "github.com/goadesign/goa/design"
-import . "github.com/goadesign/goa/design/apidsl"
+import (
+	. "github.com/goadesign/goa/design"
+	. "github.com/goadesign/goa/design/apidsl"
+)
 
 var User = Type("User", func() {
 	Attribute("id", String, "ID of reader")
@@ -12,7 +14,7 @@ var User = Type("User", func() {
 	Attribute("ip_address", String, "IP address of client", func() {
 		Format("ip")
 	})
-	Attribute("source", Source)
+	Attribute("source", Source, "UTM and social source metadata")
 })
 
 var System = Type("System", func() {
@@ -84,17 +86,18 @@ var Source = Type("source", func() {
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {
-	Attribute("funnel_id", String)
+	Attribute("funnel_id", String, "ID of funnel user is being routed trough")
 
 	Required("funnel_id")
 })
 
 var CommercePayment = Type("CommercePayment", func() {
+	Attribute("funnel_id", String, "ID of funnel user is being routed trough")
 	Attribute("transaction_id", String, "Public ID of transaction (variable symbol)")
 	Attribute("product_ids", ArrayOf(String), "Public IDs of selected products")
 	Attribute("revenue", Revenue, "Amount of money for given payment")
 
-	Required("revenue", "transaction_id", "product_ids")
+	Required("funnel_id", "revenue", "transaction_id", "product_ids")
 })
 
 var Revenue = Type("Revenue", func() {

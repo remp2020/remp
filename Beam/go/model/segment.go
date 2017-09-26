@@ -151,15 +151,15 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time) (boo
 func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (bool, error) {
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
-		From("events").
+		From(sr.tableName()).
 		Where(fmt.Sprintf(`"user_id" = '%s'`, userID))
 	for _, cond := range sr.conditions(now) {
 		subquery = subquery.Where(cond)
 	}
 	sq := subquery.Build()
 
-	// If user didn't generate any event so far, Count will return always zero.
-	// We're aiming for query always returning zero for users eligible for segment rule hit if it matches condition.
+	// If user didn't generate any event so far, sr.Count will return always zero.
+	// We're aiming for query matching also users with no event which could still match the condition.
 
 	query := sDB.InfluxDB.QueryBuilder.
 		Select("*").
@@ -186,21 +186,26 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 
 // Users return list of all users within segment.
 func (sDB *SegmentDB) Users(segment *Segment, now time.Time) ([]string, error) {
-	um := make(UserSet)
+	users := make(UserSet)
 
 	for i, sr := range segment.Rules {
-		filteredUm, err := sDB.ruleUsers(sr, now, func(userID string) bool {
-			_, ok := um[userID]
-			return i == 0 || ok
+		filteredUsers, err := sDB.ruleUsers(sr, now, func(userID string) bool {
+			// on first iteration everyone is eligible to be in "users"
+			if i == 0 {
+				return true
+			}
+			// on further iterations user needs to be present in "users" (effectivelly all previous iterations)
+			_, ok := users[userID]
+			return ok
 		})
 		if err != nil {
 			return nil, err
 		}
-		um = filteredUm
+		users = filteredUsers
 	}
 
 	var uc []string
-	for userID := range um {
+	for userID := range users {
 		uc = append(uc, userID)
 	}
 
@@ -213,7 +218,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
-		From("events").
+		From(sr.tableName()).
 		GroupBy(`"user_id"`)
 	for _, cond := range sr.conditions(now) {
 		subquery = subquery.Where(cond)
@@ -257,13 +262,37 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 
 // conditions returns list of influx conditions for current SegmentRule.
 func (sr *SegmentRule) conditions(now time.Time) []string {
-	conds := []string{
-		fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
-		fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
+	var conds []string
+	switch sr.EventCategory {
+	case CategoryPageview:
+		// no condition needed yet, pageview-load event is implicit
+	case CategoryCommerce:
+		conds = append(
+			conds,
+			fmt.Sprintf(`"step" = '%s'`, sr.EventAction),
+		)
+	default:
+		conds = append(
+			conds,
+			fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
+			fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
+		)
 	}
+
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
 		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
 	}
 	return conds
+}
+
+func (sr *SegmentRule) tableName() string {
+	switch sr.EventCategory {
+	case CategoryPageview:
+		return TablePageviews
+	case CategoryCommerce:
+		return TableCommerce
+	default:
+		return TableEvents
+	}
 }

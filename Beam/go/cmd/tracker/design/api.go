@@ -1,7 +1,9 @@
 package design
 
-import . "github.com/goadesign/goa/design"
-import . "github.com/goadesign/goa/design/apidsl"
+import (
+	. "github.com/goadesign/goa/design"
+	. "github.com/goadesign/goa/design/apidsl"
+)
 
 var _ = API("beam", func() {
 	Title("Beam tracker")
