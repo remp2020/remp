@@ -66,16 +66,19 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 	case "checkout":
 		values["funnel_id"] = ctx.Payload.Checkout.FunnelID
 	case "payment":
+		values["funnel_id"] = ctx.Payload.Payment.FunnelID
 		values["product_ids"] = strings.Join(ctx.Payload.Payment.ProductIds, ",")
 		values["revenue"] = ctx.Payload.Payment.Revenue.Amount
 		values["transaction_id"] = ctx.Payload.Payment.TransactionID
 		tags["currency"] = ctx.Payload.Payment.Revenue.Currency
 	case "purchase":
+		values["funnel_id"] = ctx.Payload.Purchase.FunnelID
 		values["product_ids"] = strings.Join(ctx.Payload.Purchase.ProductIds, ",")
 		values["revenue"] = ctx.Payload.Purchase.Revenue.Amount
 		values["transaction_id"] = ctx.Payload.Purchase.TransactionID
 		tags["currency"] = ctx.Payload.Purchase.Revenue.Currency
 	case "refund":
+		values["funnel_id"] = ctx.Payload.Refund.FunnelID
 		values["product_ids"] = strings.Join(ctx.Payload.Refund.ProductIds, ",")
 		values["revenue"] = ctx.Payload.Refund.Revenue.Amount
 		values["transaction_id"] = ctx.Payload.Refund.TransactionID
