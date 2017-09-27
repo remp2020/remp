@@ -114,6 +114,23 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     padding: 5px 16px 0px;
 }
 
+.table  > tbody > tr > td, .table > tbody > tr > th {
+    vertical-align: middle;
+}
+
+.table  > tbody > tr > td > .btn, .table > tbody > tr > th > .btn {
+    text-transform: capitalize;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    padding: 12px;
+}
+
 /***************/
 /* Z-INDEX FIX */
 /***************/
