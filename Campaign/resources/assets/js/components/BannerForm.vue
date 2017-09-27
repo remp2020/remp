@@ -18,10 +18,12 @@
                 v-bind:dimensionOptions="dimensionOptions"
             ></html-template>
 
-            <medium-rectangle-template v-if="template == 'medium_rectangle'"
+            <medium-rectangle-template v-if="template == 'medium_rectangle'" v-bind:_template="mediumRectangleTemplate"
                v-bind:_headerText="mediumRectangleTemplate.headerText"
                v-bind:_mainText="mediumRectangleTemplate.mainText"
                v-bind:_buttonText="mediumRectangleTemplate.buttonText"
+               v-bind:_width="mediumRectangleTemplate.height"
+               v-bind:_height="mediumRectangleTemplate.width"
                v-bind:_backgroundColor="mediumRectangleTemplate.backgroundColor"
                v-bind:_textColor="mediumRectangleTemplate.textColor"
                v-bind:_buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
@@ -51,7 +53,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                                 <div class="fg-line">
                                     <label for="name" class="fg-label">Name</label>
-                                    <input v-model="name" class="form-control fg-input" name="name" id="name" type="text">
+                                    <input v-model="name" class="form-control fg-input" name="name" id="name" type="text" required>
                                 </div>
                             </div>
 
@@ -60,16 +62,16 @@
                                 <div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <label for="transition" class="fg-label">Transition</label>
+                                            <label class="fg-label">Transition</label>
                                         </div>
                                         <div class="col-md-12">
-                                            <select v-model="transition" class="selectpicker" name="transition" id="transition">
-                                                <option value="none">None</option>
-                                                <option value="fade">Fade</option>
-                                                <option value="bounce">Bounce</option>
-                                                <option value="shake">Shake</option>
-                                                <option value="fade-in-down">Fade in down</option>
-                                            </select>
+                                            <v-select v-model="transition"
+                                                    id="transition"
+                                                    :name="'transition'"
+                                                    :value="transition"
+                                                    :options.sync="transitionOptions"
+                                                    :required="'required'"
+                                            ></v-select>
                                         </div>
                                     </div>
                                 </div>
@@ -79,7 +81,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
                                 <div class="fg-line">
                                     <label for="target_url" class="fg-label">Target URL</label>
-                                    <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
+                                    <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url" required>
                                 </div>
                             </div>
                         </div>
@@ -216,6 +218,7 @@
     import MediumRectangleTemplate from "./templates/MediumRectangle.vue";
     import BarTemplate from "./templates/Bar.vue";
     import BannerPreview from "./BannerPreview.vue";
+    import vSelect from "remp/js/components/vSelect.vue";
 
     const props = [
         "_name",
@@ -233,9 +236,11 @@
         "_headerText",
         "_mainText",
         "_buttonText",
+        "_width",
+        "_height",
         "_backgroundColor",
         "_textColor",
-        "_backgroundColor",
+        "_buttonBackgroundColor",
         "_buttonTextColor",
 
         // html template
@@ -257,17 +262,11 @@
             MediumRectangleTemplate,
             BarTemplate,
             BannerPreview,
+            vSelect,
         },
         name: 'banner-form',
         props: props,
-        created: function() {
-            this.$on('values-changed', function(data) {
-                for (let item of data) {
-                    this[item.key] = item.val;
-                }
-            });
-        },
-        mounted: function(){
+        created: function(){
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
@@ -276,6 +275,8 @@
                 headerText: this._headerText,
                 mainText: this._mainText,
                 buttonText: this._buttonText,
+                width: this._width,
+                height: this._height,
                 backgroundColor: this._backgroundColor,
                 textColor: this._textColor,
                 buttonBackgroundColor: this._buttonBackgroundColor,
@@ -300,6 +301,13 @@
                 text: this._text,
             };
         },
+        mounted: function() {
+            this.$on('values-changed', function(data) {
+                for (let item of data) {
+                    this[item.key] = item.val;
+                }
+            });
+        },
         data: () => ({
             name: null,
             targetUrl: null,
@@ -320,6 +328,14 @@
             dimensionOptions: [],
             positionOptions: [],
             previewShow: true,
+
+            transitionOptions: [
+                {"label": "None", "value": "none"},
+                {"label": "Fade", "value": "fade"},
+                {"label": "Bounce", "value": "bounce"},
+                {"label": "Shake", "value": "shake"},
+                {"label": "Fade in down", "value": "fade-in-down"},
+            ]
         }),
         watch: {
             'transition': function () {

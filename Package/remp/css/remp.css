@@ -105,6 +105,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .card-body .input-group:not(:first-child) {
     margin-top: 30px;
 }
+.card-body .input-group:not(:first-child).v-select {
+    margin-top: 15px;
+}
 
 .dropdown-menu .divider {
     margin: 3px 0;

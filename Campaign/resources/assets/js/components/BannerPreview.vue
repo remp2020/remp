@@ -29,6 +29,8 @@
                 v-bind:headerText="mediumRectangleTemplate.headerText"
                 v-bind:mainText="mediumRectangleTemplate.mainText"
                 v-bind:buttonText="mediumRectangleTemplate.buttonText"
+                v-bind:width="mediumRectangleTemplate.width"
+                v-bind:height="mediumRectangleTemplate.height"
                 v-bind:backgroundColor="mediumRectangleTemplate.backgroundColor"
                 v-bind:textColor="mediumRectangleTemplate.textColor"
                 v-bind:buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
