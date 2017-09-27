@@ -18,7 +18,7 @@
                 v-bind:dimensionOptions="dimensionOptions"
             ></html-template>
 
-            <medium-rectangle-template v-if="template == 'medium_rectangle'" v-bind:_template="mediumRectangleTemplate"
+            <medium-rectangle-template v-if="template == 'medium_rectangle'"
                v-bind:_headerText="mediumRectangleTemplate.headerText"
                v-bind:_mainText="mediumRectangleTemplate.mainText"
                v-bind:_buttonText="mediumRectangleTemplate.buttonText"
