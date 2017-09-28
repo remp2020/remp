@@ -44,9 +44,14 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 		o.TimeBefore = *ctx.TimeBefore
 	}
 
-	cc, err := c.CommerceStorage.Count(o)
+	cc, ok, err := c.CommerceStorage.Count(o)
 	if err != nil {
 		return err
+	}
+	if !ok {
+		cc = map[string]int{
+			"": 0,
+		}
 	}
 
 	return ctx.OK(&app.GroupedCounts{

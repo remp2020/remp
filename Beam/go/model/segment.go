@@ -174,14 +174,14 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 		return false, err
 	}
 
-	count, err := sDB.InfluxDB.Count(response)
+	_, ok, err := sDB.InfluxDB.Count(response)
 	if err != nil {
 		return false, err
 	}
-	if count == 0 {
-		return true, nil
+	if !ok {
+		return false, nil
 	}
-	return false, nil
+	return true, nil
 }
 
 // Users return list of all users within segment.
