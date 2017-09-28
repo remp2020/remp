@@ -279,6 +279,12 @@ func (sr *SegmentRule) conditions(now time.Time) []string {
 		)
 	}
 
+	for _, def := range sr.Fields {
+		conds = append(
+			conds,
+			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
+		)
+	}
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
 		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
