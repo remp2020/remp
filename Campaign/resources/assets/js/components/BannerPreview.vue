@@ -1,65 +1,75 @@
+<style type="text/css">
+    @import '../../css/banner.css';
+</style>
+
 <template>
     <div>
         <html-preview v-if="template == 'html'"
-                v-bind:alignmentOptions="alignmentOptions"
-                v-bind:dimensionOptions="dimensionOptions"
-                v-bind:positionOptions="positionOptions"
-                v-bind:show="previewShow"
+                :alignmentOptions="alignmentOptions"
+                :dimensionOptions="dimensionOptions"
+                :positionOptions="positionOptions"
+                :show="previewShow"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
 
-                v-bind:textAlign="htmlTemplate.textAlign"
-                v-bind:dimensions="htmlTemplate.dimensions"
-                v-bind:textColor="htmlTemplate.textColor"
-                v-bind:fontSize="htmlTemplate.fontSize"
-                v-bind:backgroundColor="htmlTemplate.backgroundColor"
-                v-bind:text="htmlTemplate.text"
+                :textAlign="htmlTemplate.textAlign"
+                :dimensions="htmlTemplate.dimensions"
+                :textColor="htmlTemplate.textColor"
+                :fontSize="htmlTemplate.fontSize"
+                :backgroundColor="htmlTemplate.backgroundColor"
+                :text="htmlTemplate.text"
 
-                v-bind:position="position"
-                v-bind:targetUrl="targetUrl"
-                v-bind:closeable="closeable"
-                v-bind:transition="transition"
-                v-bind:displayType="displayType"
-                v-bind:forcedPosition="'absolute'"
+                :position="position"
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :transition="transition"
+                :displayType="displayType"
+                :forcedPosition="'absolute'"
         ></html-preview>
 
         <medium-rectangle-preview v-if="template == 'medium_rectangle'"
-                v-bind:alignmentOptions="alignmentOptions"
-                v-bind:positionOptions="positionOptions"
-                v-bind:show="previewShow"
+                :alignmentOptions="alignmentOptions"
+                :positionOptions="positionOptions"
+                :show="previewShow"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
 
-                v-bind:headerText="mediumRectangleTemplate.headerText"
-                v-bind:mainText="mediumRectangleTemplate.mainText"
-                v-bind:buttonText="mediumRectangleTemplate.buttonText"
-                v-bind:backgroundColor="mediumRectangleTemplate.backgroundColor"
-                v-bind:textColor="mediumRectangleTemplate.textColor"
-                v-bind:buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
-                v-bind:buttonTextColor="mediumRectangleTemplate.buttonTextColor"
+                :headerText="mediumRectangleTemplate.headerText"
+                :mainText="mediumRectangleTemplate.mainText"
+                :buttonText="mediumRectangleTemplate.buttonText"
+                :backgroundColor="mediumRectangleTemplate.backgroundColor"
+                :textColor="mediumRectangleTemplate.textColor"
+                :buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
+                :buttonTextColor="mediumRectangleTemplate.buttonTextColor"
 
-                v-bind:position="position"
-                v-bind:targetUrl="targetUrl"
-                v-bind:closeable="closeable"
-                v-bind:transition="transition"
-                v-bind:displayType="displayType"
-                v-bind:forcedPosition="'absolute'"
+                :position="position"
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :transition="transition"
+                :displayType="displayType"
+                :forcedPosition="'absolute'"
         ></medium-rectangle-preview>
 
         <bar-preview v-if="template == 'bar'"
-                v-bind:alignmentOptions="alignmentOptions"
-                v-bind:positionOptions="positionOptions"
-                v-bind:show="previewShow"
+                :alignmentOptions="alignmentOptions"
+                :positionOptions="positionOptions"
+                :show="previewShow"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
 
-                v-bind:mainText="barTemplate.mainText"
-                v-bind:buttonText="barTemplate.buttonText"
-                v-bind:backgroundColor="barTemplate.backgroundColor"
-                v-bind:textColor="barTemplate.textColor"
-                v-bind:buttonBackgroundColor="barTemplate.buttonBackgroundColor"
-                v-bind:buttonTextColor="barTemplate.buttonTextColor"
+                :mainText="barTemplate.mainText"
+                :buttonText="barTemplate.buttonText"
+                :backgroundColor="barTemplate.backgroundColor"
+                :textColor="barTemplate.textColor"
+                :buttonBackgroundColor="barTemplate.buttonBackgroundColor"
+                :buttonTextColor="barTemplate.buttonTextColor"
 
-                v-bind:position="position"
-                v-bind:targetUrl="targetUrl"
-                v-bind:closeable="closeable"
-                v-bind:transition="transition"
-                v-bind:displayType="displayType"
-                v-bind:forcedPosition="'absolute'"
+                :position="position"
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :transition="transition"
+                :displayType="displayType"
+                :forcedPosition="'absolute'"
         ></bar-preview>
     </div>
 </template>
@@ -81,6 +91,8 @@
         "targetSelector",
         "displayType",
         "template",
+        "uuid",
+        "campaignUuid",
 
         "mediumRectangleTemplate",
         "barTemplate",

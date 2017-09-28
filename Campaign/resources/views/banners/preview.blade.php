@@ -31,7 +31,7 @@ var run = function() {
     var bp = document.createElement('banner-preview');
     d.appendChild(bp);
 
-    let target = null;
+    var target = null;
     if (banner.displayType == 'inline') {
         target = document.querySelector(banner.targetSelector);
         if (target === null) {
@@ -43,16 +43,13 @@ var run = function() {
     }
     target.appendChild(d);
 
-    remplib.banner.bindPreview('#' + bannerId, banner, {
-        zIndex: 99, //TODO: remove when REMP template is fixed,
-        position: 'fixed'
-    });
+    remplib.banner.bindPreview('#' + bannerId, banner);
 
     // TODO: track explicit click and close
     setTimeout(function() {
         remplib.tracker.trackEvent("banner", "show", {
             "banner_id": banner.uuid,
-            "campaign_id": banner.campaign_uuid
+            "campaign_id": banner.campaignUuid
         })
         banner.show = true;
         if (banner.closeTimeout) {

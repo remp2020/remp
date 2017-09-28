@@ -169,7 +169,7 @@
                 <div class="row cp-container" style="min-height: 300px">
                     <div class="col-md-12">
                         <div id="banner-preview">
-                            <medium-rectangle-template-preview></medium-rectangle-template-preview>
+                            <banner-preview></banner-preview>
                         </div>
                     </div>
                 </div>
