@@ -36,9 +36,12 @@ func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 		o.TimeBefore = *ctx.TimeBefore
 	}
 
-	pc, err := c.PageviewStorage.Count(o)
+	pc, ok, err := c.PageviewStorage.Count(o)
 	if err != nil {
 		return err
+	}
+	if !ok {
+		pc = 0
 	}
 
 	return ctx.OK(&app.Count{

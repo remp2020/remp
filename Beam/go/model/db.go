@@ -48,34 +48,36 @@ func (iDB *InfluxDB) Exec(cmd string) (*client.Response, error) {
 	return iDB.Client.Query(q)
 }
 
-func (iDB *InfluxDB) Count(response *client.Response) (int, error) {
-	counts, err := iDB.GroupedCount(response, FilterType(""))
+func (iDB *InfluxDB) Count(response *client.Response) (int, bool, error) {
+	counts, ok, err := iDB.GroupedCount(response, FilterType(""))
 	if err != nil {
-		return 0, err
+		return 0, false, err
 	}
-	return counts[""], nil
+	if !ok {
+		return 0, false, nil
+	}
+	return counts[""], true, nil
 }
 
-func (iDB *InfluxDB) GroupedCount(response *client.Response, ft FilterType) (map[string]int, error) {
+func (iDB *InfluxDB) GroupedCount(response *client.Response, ft FilterType) (map[string]int, bool, error) {
 	counts := make(map[string]int)
 	if len(response.Results[0].Series) == 0 {
-		counts[""] = 0
-		return counts, nil
+		return nil, false, nil
 	}
 
 	for _, s := range response.Results[0].Series {
 		jsonCount, ok := s.Values[0][1].(json.Number)
 		if !ok {
-			return nil, errors.New("influx result is not json.Number, cannot proceed")
+			return nil, false, errors.New("influx result is not json.Number, cannot proceed")
 		}
 		count, err := jsonCount.Int64()
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%s]", count))
+			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%s]", count))
 		}
 		counts[s.Tags[ft.column()]] = int(count)
 	}
 
-	return counts, nil
+	return counts, true, nil
 }
 
 func (iDB *InfluxDB) GroupedSum(response *client.Response, ft FilterType) (map[string]float64, error) {

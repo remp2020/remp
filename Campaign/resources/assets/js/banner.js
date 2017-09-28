@@ -1,7 +1,5 @@
 import Vue from 'vue';
-import HtmlPreview from './components/previews/Html.vue';
-import MediumRectanglePreview from './components/previews/MediumRectangle.vue';
-import BarPreview from './components/previews/Bar.vue';
+import BannerPreview from './components/BannerPreview.vue';
 
 window.remplib = window.remplib || {};
 
@@ -28,49 +26,50 @@ window.remplib = window.remplib || {};
             };
 
             if (banner.template === 'medium_rectangle') {
-                banner.headerText = model['medium_rectangle_template']['header_text'] || "";
-                banner.mainText = model['medium_rectangle_template']['main_text'] || "";
-                banner.buttonText = model['medium_rectangle_template']['button_text'] || "";
-                banner.width = model['medium_rectangle_template']['width'] || null;
-                banner.height = model['medium_rectangle_template']['height'] || null;
-                banner.backgroundColor = model['medium_rectangle_template']['background_color'] || null;
-                banner.textColor = model['medium_rectangle_template']['text_color'] || null;
-                banner.buttonBackgroundColor = model['medium_rectangle_template']['button_background_color'] || null;
-                banner.buttonTextColor = model['medium_rectangle_template']['button_text_color'] || null;
+                banner.mediumRectangleTemplate = {
+                    headerText: model['medium_rectangle_template']['header_text'] || "",
+                    mainText: model['medium_rectangle_template']['main_text'] || "",
+                    buttonText: model['medium_rectangle_template']['button_text'] || "",
+                    width: model['medium_rectangle_template']['width'] || null,
+                    height: model['medium_rectangle_template']['height'] || null,
+                    backgroundColor: model['medium_rectangle_template']['background_color'] || null,
+                    textColor: model['medium_rectangle_template']['text_color'] || null,
+                    buttonBackgroundColor: model['medium_rectangle_template']['button_background_color'] || null,
+                    buttonTextColor: model['medium_rectangle_template']['button_text_color'] || null,
+                }
             }
 
             if (banner.template === 'bar') {
-                banner.mainText = model['bar_template']['main_text'] || "";
-                banner.buttonText = model['bar_template']['button_text'] || "";
-                banner.backgroundColor = model['bar_template']['background_color'] || null;
-                banner.textColor = model['bar_template']['text_color'] || null;
-                banner.buttonBackgroundColor = model['bar_template']['button_background_color'] || null;
-                banner.buttonTextColor = model['bar_template']['button_text_color'] || null;
+                banner.barTemplate = {
+                    mainText: model['bar_template']['main_text'] || "",
+                    buttonText: model['bar_template']['button_text'] || "",
+                    backgroundColor: model['bar_template']['background_color'] || null,
+                    textColor: model['bar_template']['text_color'] || null,
+                    buttonBackgroundColor: model['bar_template']['button_background_color'] || null,
+                    buttonTextColor: model['bar_template']['button_text_color'] || null
+                }
             }
 
             if (banner.template === 'html') {
-                banner.backgroundColor = model['html_template']['background_color'] || null;
-                banner.textColor = model['html_template']['text_color'] || null;
-                banner.fontSize = model['html_template']['font_size'] || null;
-                banner.textAlign = model['html_template']['text_align'] || null;
-                banner.text = model['html_template']['text'] || null;
-                banner.dimensions = model['html_template']['dimensions'] || null;
+                banner.htmlTemplate = {
+                    backgroundColor: model['html_template']['background_color'] || null,
+                    textColor: model['html_template']['text_color'] || null,
+                    fontSize: model['html_template']['font_size'] || null,
+                    textAlign: model['html_template']['text_align'] || null,
+                    text: model['html_template']['text'] || null,
+                    dimensions: model['html_template']['dimensions'] || null,
+                }
             }
 
             return banner;
         },
 
         bindPreview: function(el, banner) {
-            let preview;
-            switch (banner.template) {
-                case "medium_rectangle": preview = MediumRectanglePreview; break;
-                case "html": preview = HtmlPreview; break;
-                case "bar": preview = BarPreview; break;
-            }
+            console.log(banner);
             return new Vue({
                 el: el,
                 data: banner,
-                render: h => h(preview, {
+                render: h => h(BannerPreview, {
                     props: banner
                 }),
             })

@@ -232,24 +232,9 @@
         "_displayType",
         "_template",
 
-        // medium rectangle template
-        "_headerText",
-        "_mainText",
-        "_buttonText",
-        "_width",
-        "_height",
-        "_backgroundColor",
-        "_textColor",
-        "_buttonBackgroundColor",
-        "_buttonTextColor",
-
-        // html template
-        "_textAlign",
-        "_dimensions",
-        "_textColor",
-        "_fontSize",
-        "_backgroundColor",
-        "_text",
+        "_mediumRectangleTemplate",
+        "_barTemplate",
+        "_htmlTemplate",
 
         "_alignmentOptions",
         "_dimensionOptions",
@@ -270,36 +255,6 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
-
-            this.mediumRectangleTemplate = {
-                headerText: this._headerText,
-                mainText: this._mainText,
-                buttonText: this._buttonText,
-                width: this._width,
-                height: this._height,
-                backgroundColor: this._backgroundColor,
-                textColor: this._textColor,
-                buttonBackgroundColor: this._buttonBackgroundColor,
-                buttonTextColor: this._buttonTextColor,
-            };
-
-            this.barTemplate = {
-                mainText: this._mainText,
-                buttonText: this._buttonText,
-                backgroundColor: this._backgroundColor,
-                textColor: this._textColor,
-                buttonBackgroundColor: this._buttonBackgroundColor,
-                buttonTextColor: this._buttonTextColor,
-            };
-
-            this.htmlTemplate = {
-                textAlign: this._textAlign,
-                dimensions: this._dimensions,
-                textColor: this._textColor,
-                fontSize: this._fontSize,
-                backgroundColor: this._backgroundColor,
-                text: this._text,
-            };
         },
         mounted: function() {
             this.$on('values-changed', function(data) {

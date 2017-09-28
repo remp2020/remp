@@ -39,9 +39,12 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 		o.UserID = *ctx.UserID
 	}
 
-	ec, err := c.EventStorage.Count(o)
+	ec, ok, err := c.EventStorage.Count(o)
 	if err != nil {
 		return err
+	}
+	if !ok {
+		ec = 0
 	}
 
 	return ctx.OK(&app.Count{

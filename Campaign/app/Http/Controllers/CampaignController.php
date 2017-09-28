@@ -253,9 +253,9 @@ class CampaignController extends Controller
                     View::make('banners.preview', [
                         'banner' => $banner,
                         'campaign' => $campaign,
-                        'positions' => [$banner->position => $positions[$banner->position]],
-                        'dimensions' => [$banner->dimensions => $dimensions[$banner->dimensions]],
-                        'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
+                        'positions' => $positions,
+                        'dimensions' => $dimensions,
+                        'alignments' => $alignments,
                     ])->render(),
                 ],
             ]);

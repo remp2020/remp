@@ -43,7 +43,7 @@ type PageviewCollection []*Pageview
 
 type PageviewStorage interface {
 	// Count returns number of pageviews matching the filter defined by PageviewOptions.
-	Count(o PageviewOptions) (int, error)
+	Count(o PageviewOptions) (int, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o PageviewOptions) (PageviewCollection, error)
 	// Categories lists all tracked categories.
@@ -57,7 +57,7 @@ type PageviewDB struct {
 }
 
 // Count returns number of pageviews matching the filter defined by PageviewOptions.
-func (eDB *PageviewDB) Count(o PageviewOptions) (int, error) {
+func (eDB *PageviewDB) Count(o PageviewOptions) (int, bool, error) {
 	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TablePageviews + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
@@ -68,15 +68,10 @@ func (eDB *PageviewDB) Count(o PageviewOptions) (int, error) {
 
 	response, err := eDB.DB.Client.Query(q)
 	if err != nil {
-		return 0, err
+		return 0, false, err
 	}
 	if response.Error() != nil {
-		return 0, response.Error()
-	}
-
-	// no data returned
-	if len(response.Results[0].Series) == 0 {
-		return 0, nil
+		return 0, false, response.Error()
 	}
 
 	// process response

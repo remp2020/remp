@@ -38,7 +38,7 @@ type CommerceCollection []*Commerce
 
 type CommerceStorage interface {
 	// Count returns count of events based on the provided filter options.
-	Count(o CommerceOptions) (map[string]int, error)
+	Count(o CommerceOptions) (map[string]int, bool, error)
 	// Sum returns sum of events based on the provided filter options.
 	Sum(o CommerceOptions) (map[string]float64, error)
 	// List returns list of all events based on given CommerceOptions.
@@ -53,7 +53,7 @@ type CommerceDB struct {
 	DB *InfluxDB
 }
 
-func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, error) {
+func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
 
@@ -66,15 +66,10 @@ func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, error) {
 
 	response, err := cDB.DB.Client.Query(q)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	if response.Error() != nil {
-		return nil, response.Error()
-	}
-
-	// no data returned
-	if len(response.Results[0].Series) == 0 {
-		return nil, nil
+		return nil, false, response.Error()
 	}
 
 	// process response
