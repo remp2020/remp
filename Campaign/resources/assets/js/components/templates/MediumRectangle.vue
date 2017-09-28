@@ -30,8 +30,28 @@
                                     <div class="col-md-12">
                                         <v-select v-model="colorScheme"
                                                   id="color_scheme"
-                                                  v-bind:value="colorScheme"
-                                                  v-bind:options.sync="colorSchemeOptions"
+                                                  :value="colorScheme"
+                                                  :options.sync="colorSchemeOptions"
+                                                  :required="true"
+                                        ></v-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group v-select">
+                            <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="color_scheme" class="fg-label">Dimensions</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <v-select v-model="dimensions"
+                                                id="dimensions"
+                                                :value="dimensions"
+                                                :options.sync="dimensionOptions"
+                                                :required="true"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -42,6 +62,8 @@
                         <input type="hidden" name="text_color" v-bind:value="_textColor" />
                         <input type="hidden" name="button_background_color" v-bind:value="_buttonBackgroundColor" />
                         <input type="hidden" name="button_text_color" v-bind:value="_buttonTextColor" />
+                        <input type="hidden" name="width" v-bind:value="_width" />
+                        <input type="hidden" name="height" v-bind:value="_height" />
 
                         <div class="input-group fg-float m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
@@ -55,7 +77,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="main_text" class="fg-label">Main text</label>
-                                <input v-model="mainText" class="form-control fg-input" name="main_text" id="main_text" type="text">
+                                <input v-model="mainText" class="form-control fg-input" name="main_text" id="main_text" type="text" requried>
                             </div>
                         </div>
 
@@ -63,7 +85,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="button_text" class="fg-label">Button text</label>
-                                <input v-model="buttonText" class="form-control fg-input" name="button_text" id="button_text" type="text">
+                                <input v-model="buttonText" class="form-control fg-input" name="button_text" id="button_text" type="text" requried>
                             </div>
                         </div>
                     </div>
@@ -86,6 +108,8 @@
         "_textColor",
         "_buttonBackgroundColor",
         "_buttonTextColor",
+        "_width",
+        "_height",
     ];
     export default {
         name: "medium-rectangle-template",
@@ -96,14 +120,17 @@
                 this[prop.slice(1)] = this[prop] || this[prop.slice(1)];
             });
             this.colorScheme = this.colorSchemeByBackground(this._backgroundColor) || this.colorScheme;
+            this.dimensions = this.dimensionsByWidthHeight(this._width, this._height) || this.dimensions;
             this.emitValuesChanged();
         },
         data: () => ({
             headerText: "REMP2020.com",
             mainText: "Limited time offer<br/>30% discount",
             buttonText: "Visit offer",
-            colorScheme: "green",
+            width: null,
+            height: null,
 
+            colorScheme: "green",
             colorSchemes: {
                 "grey": {
                     "label": "Grey",
@@ -141,6 +168,20 @@
                     "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
                 },
             },
+
+            dimensions: "dynamic",
+            availableDimensions: {
+                "dynamic": {
+                    "label": "Dynamic",
+                    "width": null,
+                    "height": null,
+                },
+                "300x300": {
+                    "label": "300x300",
+                    "width": "300px",
+                    "height": "300px",
+                },
+            }
         }),
         computed: {
             colorSchemeOptions: function() {
@@ -157,6 +198,19 @@
                 }
                 return options
             },
+            dimensionOptions: function() {
+                let options = [];
+                for (let idx in this.availableDimensions) {
+                    if (!this.availableDimensions.hasOwnProperty(idx)) {
+                        continue;
+                    }
+                    options.push({
+                        "label": this.availableDimensions[idx].label,
+                        "value": idx,
+                    });
+                }
+                return options
+            }
         },
         updated: function() {
            this.emitValuesChanged();
@@ -175,6 +229,11 @@
                     val.buttonBackgroundColor = cs.buttonBackgroundColor;
                     val.buttonTextColor = cs.buttonTextColor;
                 }
+                if (this.availableDimensions[this.dimensions]) {
+                    let d = this.availableDimensions[this.dimensions];
+                    val.width = d.width;
+                    val.height = d.height;
+                }
                 this.$parent.$emit("values-changed", [{
                     key: "mediumRectangleTemplate",
                     val: val,
@@ -190,7 +249,18 @@
                     }
                 }
                 return null;
-            }
+            },
+            dimensionsByWidthHeight: function(width, height) {
+                for (let idx in this.availableDimensions) {
+                    if (!this.availableDimensions.hasOwnProperty(idx)) {
+                        continue;
+                    }
+                    if (this.availableDimensions[idx].width === width && this.availableDimensions[idx].width === height) {
+                        return idx;
+                    }
+                }
+                return null;
+            },
         }
     }
 </script>

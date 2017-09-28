@@ -24,36 +24,29 @@
     .medium-rectangle-preview-box {
         font-family: Noto Sans, sans-serif;
         white-space: pre-line;
-        display: inline-block;
         overflow: hidden;
         position: relative;
         padding: 0 20px;
-        min-width: 100px;
-        max-width: 370px;
-        min-height: 250px;
-        max-height: 370px;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
     }
 
     .medium-rectangle-header {
-        margin-top: 35px;
-        margin-bottom:-20px;
         word-wrap: break-word;
     }
 
     .medium-rectangle-main {
         font-size: 26px;
-        margin-top: 45px;
         word-wrap: break-word;
     }
 
     .medium-rectangle-button {
-        position: absolute;
-        bottom: 20px;
-        left: 15%;
         width: 70%;
         border-radius: 15px;
-        padding: 2px;
+        padding: 5px;
         word-wrap: break-word;
         font-size: 16px;
     }
@@ -67,7 +60,7 @@
         <transition appear v-bind:name="transition">
             <div class="medium-rectangle-preview-box" v-bind:style="[boxStyles]">
                 <a class="medium-rectangle-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="closed" v-bind:style="closeStyles">&#x1f5d9;</a>
-                <div class="medium-rectangle-header" v-html="headerText"></div>
+                <div v-if="headerText.length > 0" class="medium-rectangle-header" v-html="headerText"></div>
                 <div class="medium-rectangle-main" v-html="mainText"></div>
                 <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-html="buttonText" v-bind:style="[buttonStyles]"></div>
             </div>
@@ -89,6 +82,8 @@
             "headerText",
             "mainText",
             "buttonText",
+            "width",
+            "height",
 
             "show",
             "transition",
@@ -165,6 +160,10 @@
                 return {
                     backgroundColor: this.backgroundColor,
                     color: this.textColor,
+                    minWidth: this.width || '100px',
+                    maxWidth: this.width || '370px',
+                    minHeight: this.height || '250px',
+                    maxHeight: this.height || '370px',
                 }},
             buttonStyles: function() {
                 return {
