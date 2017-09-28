@@ -30,6 +30,8 @@ window.remplib = window.remplib || {};
                     headerText: model['medium_rectangle_template']['header_text'] || "",
                     mainText: model['medium_rectangle_template']['main_text'] || "",
                     buttonText: model['medium_rectangle_template']['button_text'] || "",
+                    width: model['medium_rectangle_template']['width'] || null,
+                    height: model['medium_rectangle_template']['height'] || null,
                     backgroundColor: model['medium_rectangle_template']['background_color'] || null,
                     textColor: model['medium_rectangle_template']['text_color'] || null,
                     buttonBackgroundColor: model['medium_rectangle_template']['button_background_color'] || null,
@@ -44,7 +46,7 @@ window.remplib = window.remplib || {};
                     backgroundColor: model['bar_template']['background_color'] || null,
                     textColor: model['bar_template']['text_color'] || null,
                     buttonBackgroundColor: model['bar_template']['button_background_color'] || null,
-                    buttonTextColor: model['bar_template']['button_text_color'] || null 
+                    buttonTextColor: model['bar_template']['button_text_color'] || null
                 }
             }
 

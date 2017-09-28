@@ -4,17 +4,17 @@
             <div :class="allowCustomValue ? 'col-xs-10' : 'col-xs-12'">
                 <select v-if="typeof options === 'object' && options.length === undefined" title="Please select" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
                     <optgroup v-for="(group, label) in options" :label="label">
-                        <option v-for="option in group" :data-subtext="option.sublabel" :value="option.value || option" >
+                        <option v-for="option in group" :data-subtext="option.sublabel || ''" :value="option.value || option" >
                             {{ option.label || option.value || option }}
                         </option>
                     </optgroup>
                 </select>
                 <select v-else title="Please select" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
-                    <option v-for="option in options" :data-subtext="option.sublabel" :value="option.value || option" >
+                    <option v-for="option in options" :data-subtext="option.sublabel || ''" :value="option.value || option" >
                         {{ option.label || option.value || option }}
                     </option>
                 </select>
-                <input v-if="allowCustomValue" v-on:blur="customValueUpdated" v-show="customInput" v-model="customValue" :disabled="!this.customInput" :name="name" placeholder="e.g. my-event" title="Custom value" type="text" required="required" class="form-control fg-input">
+                <input v-if="allowCustomValue" v-on:blur="customValueUpdated" v-show="customInput" v-model="customValue" :disabled="!this.customInput" :name="name" placeholder="e.g. my-event" title="Custom value" type="text" :required="required" class="form-control fg-input">
             </div>
             <div v-if="allowCustomValue" class="col-xs-2">
                 <button type="button" :disabled="this.optionsEmpty()" v-on:click="customInput = !customInput" :class="[{'palette-Blue-Grey bg': customInput}, {'btn-default': !customInput}, 'btn', 'waves-effect']">

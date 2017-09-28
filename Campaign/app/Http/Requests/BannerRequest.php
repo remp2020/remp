@@ -29,6 +29,7 @@ class BannerRequest extends FormRequest
             'name' => 'required|max:255',
             'target_url' => 'required|url',
             'position' => 'required|in:top_left,top_right,bottom_left,bottom_right,middle_left,middle_right',
+            'transition' => 'required|string',
             'display_type' => 'string|required|in:overlay,inline',
             'display_delay' => 'nullable|integer|required|required_if:display_type,overlay',
             'close_timeout' => 'nullable|integer',
@@ -59,9 +60,11 @@ class BannerRequest extends FormRequest
                         'text_color' => 'string|required',
                         'button_background_color' => 'string|required',
                         'button_text_color' => 'string|required',
-                        'header_text' => 'string|required',
+                        'header_text' => 'string',
                         'main_text' => 'string|required',
                         'button_text' => 'string|required',
+                        'width' => 'string',
+                        'height' => 'string',
                     ]);
                     break;
                 case Banner::TEMPLATE_BAR:

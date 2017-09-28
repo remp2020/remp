@@ -37,6 +37,8 @@
                 :headerText="mediumRectangleTemplate.headerText"
                 :mainText="mediumRectangleTemplate.mainText"
                 :buttonText="mediumRectangleTemplate.buttonText"
+                :width="mediumRectangleTemplate.width"
+                :height="mediumRectangleTemplate.height"
                 :backgroundColor="mediumRectangleTemplate.backgroundColor"
                 :textColor="mediumRectangleTemplate.textColor"
                 :buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"

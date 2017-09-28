@@ -10,6 +10,8 @@ class MediumRectangleTemplate extends Model
         'header_text',
         'main_text',
         'button_text',
+        'width',
+        'height',
         'background_color',
         'text_color',
         'button_background_color',
