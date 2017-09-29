@@ -99,6 +99,11 @@ class MailWorkerCommand extends Command
 
             while ($job = json_decode($this->mailCache->getJob($batch->id))) {
                 if (!$this->mailCache->isQueueActive($batch->id)) {
+                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
+                    break;
+                }
+                if (!$this->mailJobBatchRepository->isTopPriority($batch)) {
+                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
 

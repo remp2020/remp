@@ -48,8 +48,26 @@ class BatchesRepository extends Repository
 
     public function getBatchToSend()
     {
-        return $this->getTable()->select('*')->where([
-            'status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
-        ])->limit(1)->fetch();
+        return $this->getTable()
+            ->select('*')
+            ->where([
+                'status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
+            ])
+            ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
+            ->limit(1)
+            ->fetch();
+    }
+
+    public function isTopPriority($batch)
+    {
+        $topPriority = $this->getTable()
+            ->where([
+                'id' => $batch->id,
+            ])
+            ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
+            ->limit(1)
+            ->fetch();
+
+        return $topPriority->id === $batch->id;
     }
 }
