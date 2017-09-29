@@ -63,14 +63,14 @@
                                         <label class="fg-label">Event category</label>
                                     </div>
                                     <div class="col-md-12">
-                                        <v-select v-model="rule.event_category"
-                                                  v-bind:name="'rules['+i+'][event_category]'"
-                                                  v-bind:value="rule.event_category"
-                                                  class="col-md-12 p-l-0 p-r-0"
-                                                  v-bind:options.sync="eventCategories"
-                                                  v-bind:dataType="'category'"
-                                                  v-bind:allowCustomValue="true"
-                                                  v-bind:liveSearch="true"
+                                        <v-select class="col-md-12 p-l-0 p-r-0"
+                                                v-model="rule.event_category"
+                                                :name="'rules['+i+'][event_category]'"
+                                                :value="rule.event_category"
+                                                :options.sync="eventCategories"
+                                                :dataType="'category'"
+                                                :allowCustomValue="true"
+                                                :liveSearch="true"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -90,15 +90,15 @@
                                         <label class="fg-label">Event action</label>
                                     </div>
                                     <div class="col-md-12">
-                                        <v-select v-model="rule.event_action"
-                                                  v-bind:name="'rules['+i+'][event_action]'"
-                                                  v-bind:value="rule.event_action"
-                                                  class="col-md-12 p-l-0 p-r-0"
-                                                  v-bind:options.sync="eventActions[rule.event_category]"
-                                                  v-bind:dataType="'event'"
-                                                  v-bind:disabled="!showEventsInput"
-                                                  v-bind:allowCustomValue="true"
-                                                  v-bind:liveSearch="true"
+                                        <v-select class="col-md-12 p-l-0 p-r-0"
+                                                v-model="rule.event_action"
+                                                :name="'rules['+i+'][event_action]'"
+                                                :value="rule.event_action"
+                                                :options.sync="eventActions[rule.event_category]"
+                                                :dataType="'event'"
+                                                :disabled="!showEventsInput"
+                                                :allowCustomValue="true"
+                                                :liveSearch="true"
                                         ></v-select>
                                     </div>
                                 </div>
@@ -110,12 +110,12 @@
                                         <span class="input-group-addon"><i class="zmdi zmdi-swap-vertical-circle"></i></span>
                                         <div class="fg-line">
                                             <label class="fg-label">Operator</label>
-                                            <v-select v-model="rule.operator"
-                                                      v-bind:name="'rules['+i+'][operator]'"
-                                                      v-bind:value="rule.operator"
-                                                      class="col-md-12 p-l-0 p-r-0"
-                                                      v-bind:options.sync="operators"
-                                                      v-bind:required="true"
+                                            <v-select class="col-md-12 p-l-0 p-r-0"
+                                                    v-model="rule.operator"
+                                                    :name="'rules['+i+'][operator]'"
+                                                    :value="rule.operator"
+                                                    :options.sync="operators"
+                                                    :required="true"
                                             ></v-select>
                                         </div>
                                     </div>
@@ -149,6 +149,23 @@
                                         <label class="fg-label">Field value</label>
                                     </div>
                                 </div>
+                                <div v-for="(flag,j) in eventFlags[eventGroup(rule.event_category)]" class="row">
+                                    <div class="col-md-5">
+                                        <input v-model="rule.flags[flagIdx(rule, flag)].key" disabled="disabled" class="form-control fg-input" title="field key" type="text" style="background-color: transparent"/>
+                                        <input v-model="rule.flags[flagIdx(rule, flag)].key" :name="'rules['+i+'][flags]['+j+'][key]'" type="hidden" />
+                                    </div>
+                                    <div class="col-md-5">
+                                        <v-select class="col-md-12 p-l-0 p-r-0"
+                                                v-model="rule.flags[flagIdx(rule, flag)].value"
+                                                :name="'rules['+i+'][flags]['+j+'][value]'"
+                                                :value="rule.flags[flagIdx(rule, flag)].value"
+                                                :options.sync="flagOptions"
+                                                :liveSearch="false"
+                                                :dataType="'flag'"
+                                                :title="flagOptions[0].label"
+                                        ></v-select>
+                                    </div>
+                                </div>
                                 <div v-for="(field,j) in rule.fields" class="row">
                                     <div class="col-md-5">
                                         <input v-model="field.key" :name="'rules['+i+'][fields]['+j+'][key]'" placeholder="e.g. campaign" class="form-control fg-input" title="field key" type="text" />
@@ -156,7 +173,7 @@
                                     <div class="col-md-5">
                                         <input v-model="field.value" :name="'rules['+i+'][fields]['+j+'][value]'" placeholder="e.g. christmas" class="form-control fg-input" title="field value" type="text" />
                                     </div>
-                                    <div class="col-md-2 p-0" v-if="j > 0 || (field.key || field.value)">
+                                    <div class="col-md-2 p-0" v-if="j > 0 || field.key || field.value">
                                         <span v-on:click="removeField(i,j)" class="btn btn-sm palette-Red bg waves-effect"><i class="zmdi zmdi-minus-square"></i></span>
                                     </div>
                                 </div>
@@ -180,7 +197,7 @@
 </template>
 
 <script>
-    let vSelect = require("./vSelect.vue");
+    let vSelect = require("remp/js/components/vSelect.vue");
 
     const props = [
         "_name",
@@ -196,25 +213,39 @@
         components: { vSelect },
         props: props,
         created: function() {
-            this.$on('vselect-changed', function(data){
-                if (data.type !== 'category') {
-                    return;
-                }
-                this.fetchActions(data.group, data.value);
-            });
-        },
-        mounted: function(){
             let self = this;
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
 
+            this.fetchFlags();
+
+            // init actions dropdown for existing category selections
             let categories = [];
             for (let i=0; i < this.rules.length; i++) {
                 if (this.rules[i].event_category !== null) {
                     categories.push(self.rules[i].event_category);
                 }
             }
+            for (let group in this.eventCategories) {
+                if (!this.eventCategories.hasOwnProperty(group)) {
+                    continue;
+                }
+                for (let category of this.eventCategories[group]) {
+                    if (categories.indexOf(category) !== -1) {
+                        this.fetchActions(group, category);
+                    }
+                }
+            }
+
+        },
+        mounted: function(){
+            this.$on('vselect-changed', function(data){
+                if (data.type === 'category') {
+                    this.fetchActions(data.group, data.value);
+                    this.fetchFlags(data.group);
+                }
+            });
         },
         data: () => ({
             "name": null,
@@ -223,7 +254,8 @@
             "rules": [],
             "removedRules": [],
             "eventCategories": [],
-            "eventActions": null,
+            "eventActions": {},
+            "eventFlags": {},
             "showEventsLoader": false,
             "showEventsInput": false,
             "operators": [
@@ -232,7 +264,12 @@
                 {"value": "=", "sublabel": "=", "label": "Exactly"},
                 {"value": ">", "sublabel": ">", "label": "At least"},
                 {"value": ">=", "sublabel": ">=", "label": "At least or exactly"},
-            ]
+            ],
+            "flagOptions": [
+                {"label": "No filter", "value": ""},
+                {"label": "Yes", "value": "1"},
+                {"label": "No", "value": "0"},
+            ],
         }),
         methods: {
             addRule: function() {
@@ -246,7 +283,11 @@
                     fields: [{
                         key: null,
                         value: null
-                    }]
+                    }],
+                    flags: [{
+                        key: "article",
+                        value: null,
+                    }],
                 });
             },
             addField: function(ruleIndex) {
@@ -266,6 +307,26 @@
                     this.addField(ruleIndex);
                 }
             },
+            flagIdx: function(rule, flagKey) {
+                for (let i=0; i<rule.flags.length; i++) {
+                    if (rule.flags[i].key === flagKey) return i;
+                }
+                rule.flags.push({
+                    key: flagKey,
+                    value: null,
+                });
+                return rule.flags.length - 1;
+            },
+            eventGroup: function(category) {
+                for (let group in this.eventCategories) {
+                    if (!this.eventCategories.hasOwnProperty(group)) {
+                        continue;
+                    }
+                    if (this.eventCategories[group].indexOf(category) !== -1) {
+                        return group;
+                    }
+                }
+            },
             fetchActions: function(group, category) {
                 let self = this;
                 self.showEventsLoader = true;
@@ -275,7 +336,13 @@
                     self.showEventsLoader = false;
                     self.showEventsInput = true;
                 })
-            }
+            },
+            fetchFlags: function() {
+                let self = this;
+                $.get('/api/journal/flags', ( data ) => {
+                    self.eventFlags = data;
+                })
+            },
         },
     }
 </script>

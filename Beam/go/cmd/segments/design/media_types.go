@@ -232,7 +232,7 @@ var CommercePayment = MediaType("application/vnd.commerce.payment+json", func() 
 	Required("funnel_id", "revenue", "transaction_id", "product_ids")
 })
 
-var Revenue = MediaType("Revenue", func() {
+var Revenue = MediaType("application/vnd.revenue+json", func() {
 	Attributes(func() {
 		Attribute("amount", Number, "Numeric amount of money")
 		Attribute("currency", String, "ISO 4217 representation of currency")
@@ -242,4 +242,18 @@ var Revenue = MediaType("Revenue", func() {
 		Attribute("currency")
 	})
 	Required("amount", "currency")
+})
+
+var Flags = MediaType("application/vnd.flags+json", func() {
+	Attributes(func() {
+		Attribute("pageviews", ArrayOf(String), "Pageviews category flags")
+		Attribute("commerce", ArrayOf(String), "Commerce category flags")
+		Attribute("events", ArrayOf(String), "Events category flags")
+	})
+	View("default", func() {
+		Attribute("pageviews")
+		Attribute("commerce")
+		Attribute("events")
+	})
+	Required("pageviews", "commerce", "events")
 })

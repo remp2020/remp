@@ -12,6 +12,7 @@ import (
 const CategoryPageview = "pageview"
 const ActionPageviewLoad = "load"
 const TablePageviews = "pageviews"
+const FlagArticle = "_article"
 
 // PageviewOptions represent filter options for pageview-related calls.
 type PageviewOptions struct {
@@ -47,7 +48,9 @@ type PageviewStorage interface {
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o PageviewOptions) (PageviewCollection, error)
 	// Categories lists all tracked categories.
-	Categories() ([]string, error)
+	Categories() []string
+	// Flags lists all available flags.
+	Flags() []string
 	// Actions lists all tracked actions under the given category.
 	Actions(category string) ([]string, error)
 }
@@ -117,10 +120,16 @@ func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
 	return ec, nil
 }
 
-func (eDB *PageviewDB) Categories() ([]string, error) {
+func (eDB *PageviewDB) Categories() []string {
 	return []string{
 		CategoryPageview,
-	}, nil
+	}
+}
+
+func (eDB *PageviewDB) Flags() []string {
+	return []string{
+		FlagArticle,
+	}
 }
 
 func (eDB *PageviewDB) Actions(category string) ([]string, error) {

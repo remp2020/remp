@@ -127,10 +127,7 @@ func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
 
 // Categories runs the categories action.
 func (c *CommerceController) Categories(ctx *app.CategoriesCommerceContext) error {
-	categories, err := c.CommerceStorage.Categories()
-	if err != nil {
-		return err
-	}
+	categories := c.CommerceStorage.Categories()
 	return ctx.OK(categories)
 }
 

@@ -2,16 +2,16 @@
     <div>
         <div class="row">
             <div :class="allowCustomValue ? 'col-xs-10' : 'col-xs-12'">
-                <select v-if="typeof options === 'object' && options.length === undefined" title="Please select" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
+                <select v-if="typeof options === 'object' && options.length === undefined" :title="title || 'Please select'" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
                     <optgroup v-for="(group, label) in options" :label="label">
-                        <option v-for="option in group" :data-subtext="option.sublabel || ''" :value="option.value || option" >
-                            {{ option.label || option.value || option }}
+                        <option v-for="option in group" :data-subtext="option.sublabel || ''" :value="textValue(option)" >
+                            {{ textLabel(option) }}
                         </option>
                     </optgroup>
                 </select>
-                <select v-else title="Please select" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
-                    <option v-for="option in options" :data-subtext="option.sublabel || ''" :value="option.value || option" >
-                        {{ option.label || option.value || option }}
+                <select v-else :title="title || 'Please select'" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
+                    <option v-for="option in options" :data-subtext="option.sublabel || ''" :value="textValue(option)" >
+                        {{ textLabel(option) }}
                     </option>
                 </select>
                 <input v-if="allowCustomValue" v-on:blur="customValueUpdated" v-show="customInput" v-model="customValue" :disabled="!this.customInput" :name="name" placeholder="e.g. my-event" title="Custom value" type="text" :required="required" class="form-control fg-input">
@@ -31,6 +31,7 @@
         'options': [Array, Object],
         'value': [String, Number],
         'multiple': Boolean,
+        'title': String,
         'liveSearch': {
             'type': Boolean,
             'default': true,
@@ -66,8 +67,10 @@
                 let group = this.options[this.selectedIndex].parentNode.label;
                 vm.emitValueChanged(val, group);
             });
+
+            // init default value
             if (this.value !== null) {
-                $select.selectpicker('val', this.value !== null ? this.value : null);
+                $select.selectpicker('val', this.value);
                 if (this.allowCustomValue) {
                     this.customValue = this.value;
                     if (!this.inOptions(this.value)) {
@@ -109,7 +112,7 @@
                 }
 
                 let $select = $(this.$el).find('.selectpicker');
-                if (this.options.length === 1) {
+                if (this.options.length > 0) {
                     this.customInput = false;
                     $select.selectpicker('val', this.options[0]);
                 }
@@ -129,12 +132,20 @@
                 if (this.optionsEmpty()) {
                     return false;
                 }
-                for (let item of this.options) {
-                    if (item === value) {
-                        return true;
+                if (this.isGroup(this.options)) {
+                    for (let idx in this.options) {
+                        if (!this.options.hasOwnProperty(idx)) {
+                            continue;
+                        }
+                        for (let item of this.options[idx]) if (item === value) return true;
                     }
+                } else {
+                    for (let item of this.options) if (item === value) return true;
                 }
                 return false;
+            },
+            isGroup: function(options) {
+                return typeof options === 'object' && options.length === undefined;
             },
             customValueUpdated: function() {
                 this.emitValueChanged(this.customValue);
@@ -146,6 +157,18 @@
                     value: value,
                 });
                 this.$emit('input', value);
+            },
+            textValue: function(option) {
+                if (option.value !== undefined) {
+                    return option.value;
+                }
+                return option;
+            },
+            textLabel: function(option) {
+                if (option.label !== undefined) {
+                    return option.label;
+                }
+                return this.textValue(option);
             }
         }
     }

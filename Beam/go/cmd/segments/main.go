@@ -98,6 +98,7 @@ func main() {
 
 	// controllers init
 
+	app.MountJournalController(service, controller.NewJournalController(service, eventDB, commerceDB, pageviewDB))
 	app.MountEventsController(service, controller.NewEventController(service, eventDB))
 	app.MountCommerceController(service, controller.NewCommerceController(service, commerceDB))
 	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewDB))
