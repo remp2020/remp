@@ -41,6 +41,8 @@ type EventStorage interface {
 	List(o EventOptions) (EventCollection, error)
 	// Categories lists all tracked categories.
 	Categories() ([]string, error)
+	// Flags lists all available flags.
+	Flags() []string
 	// Actions lists all tracked actions under the given category.
 	Actions(category string) ([]string, error)
 	// Users lists all tracked users.
@@ -138,6 +140,10 @@ func (eDB *EventDB) Categories() ([]string, error) {
 		categories = append(categories, strVal)
 	}
 	return categories, nil
+}
+
+func (eDB *EventDB) Flags() []string {
+	return []string{}
 }
 
 func (eDB *EventDB) Actions(category string) ([]string, error) {

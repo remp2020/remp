@@ -8,10 +8,12 @@ class SegmentRule extends Model
 {
     protected $casts = [
         'fields' => 'array',
+        'flags' => 'array',
     ];
 
     protected $attributes = [
         'fields' => [],
+        'flags' => [],
     ];
 
     protected $fillable = [
@@ -22,6 +24,7 @@ class SegmentRule extends Model
         'segment_id',
         'operator',
         'fields',
+        'flags',
     ];
 
     public function segment()

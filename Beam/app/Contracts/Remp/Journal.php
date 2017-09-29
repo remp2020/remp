@@ -18,6 +18,8 @@ class Journal implements JournalContract
 
     const ENDPOINT_GROUP_CATEGORY_ACTIONS = 'journal/%s/categories/%s/actions';
 
+    const ENDPOINT_GROUP_FLAGS = 'journal/flags';
+
     private $client;
 
     public function __construct(Client $client)
@@ -43,6 +45,17 @@ class Journal implements JournalContract
             'commerce' => $commerceCategories,
             'events' => $eventCategories,
         ]);
+    }
+
+    public function flags(): Collection
+    {
+        try {
+            $response = $this->client->get(self::ENDPOINT_GROUP_FLAGS);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:ListCategories endpoint: {$e->getMessage()}");
+        }
+        $flags = json_decode($response->getBody());
+        return collect($flags);
     }
 
     public function actions($group, $category): Collection

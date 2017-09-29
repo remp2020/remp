@@ -44,7 +44,9 @@ type CommerceStorage interface {
 	// List returns list of all events based on given CommerceOptions.
 	List(o CommerceOptions) (CommerceCollection, error)
 	// Categories lists all available categories.
-	Categories() ([]string, error)
+	Categories() []string
+	// Flags lists all available flags.
+	Flags() []string
 	// Actions lists all available actions under the given category.
 	Actions(category string) ([]string, error)
 }
@@ -143,10 +145,14 @@ func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
 	return cDB.DB.GroupedSum(response, o.FilterBy)
 }
 
-func (eDB *CommerceDB) Categories() ([]string, error) {
+func (eDB *CommerceDB) Categories() []string {
 	return []string{
 		CategoryCommerce,
-	}, nil
+	}
+}
+
+func (eDB *CommerceDB) Flags() []string {
+	return []string{}
 }
 
 func (eDB *CommerceDB) Actions(category string) ([]string, error) {

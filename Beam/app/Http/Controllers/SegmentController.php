@@ -147,9 +147,4 @@ class SegmentController extends Controller
         $segment->delete();
         return redirect(route('segments.index', $segment))->with('success', 'Segment removed');
     }
-
-    public function actions(JournalContract $journalContract, $category)
-    {
-        return response()->json($journalContract->actions($category));
-    }
 }

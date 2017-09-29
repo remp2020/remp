@@ -51,25 +51,26 @@ type SegmentRule struct {
 	Count         int
 	CreatedAt     time.Time `db:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at"`
-	Fields        FieldMap
+	Fields        JsonMap
+	Flags         JsonMap
 
 	Segment *Segment `db:"segment"`
 }
 
-type FieldMap []map[string]string
+type JsonMap []map[string]string
 
-func (fm FieldMap) Value() (driver.Value, error) {
+func (fm JsonMap) Value() (driver.Value, error) {
 	return json.Marshal(fm)
 }
 
-func (fm *FieldMap) Scan(src interface{}) error {
+func (fm *JsonMap) Scan(src interface{}) error {
 	source, ok := src.([]byte)
 	if !ok {
-		return errors.New("unable to scan FieldMap: type assertion .([]byte) failed")
+		return errors.New("unable to scan JsonMap: type assertion .([]byte) failed")
 	}
 	err := json.Unmarshal(source, fm)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal FieldMap")
+		return errors.Wrap(err, "unable to unmarshal JsonMap")
 	}
 	return nil
 }
@@ -214,8 +215,6 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time) ([]string, error) {
 
 // ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
 func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Intersector) (UserSet, error) {
-	// TODO: change user_id to tag and update config based on https://docs.influxdata.com/influxdb/v1.2/administration/config/#max-values-per-tag-100000
-
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
@@ -280,11 +279,25 @@ func (sr *SegmentRule) conditions(now time.Time) []string {
 	}
 
 	for _, def := range sr.Fields {
+		if def["key"] == "" || def["value"] == "" {
+			continue
+		}
 		conds = append(
 			conds,
 			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
 		)
 	}
+
+	for _, def := range sr.Flags {
+		if def["value"] == "" {
+			continue
+		}
+		conds = append(
+			conds,
+			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
+		)
+	}
+
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
 		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))

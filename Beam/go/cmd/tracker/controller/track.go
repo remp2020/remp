@@ -161,6 +161,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	values := map[string]interface{}{}
 
 	if ctx.Payload.Article != nil {
+		tags[model.FlagArticle] = "1"
 		at, av := articleValues(ctx.Payload.Article)
 		for key, tag := range at {
 			tags[key] = tag
@@ -168,6 +169,8 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		for key, val := range av {
 			values[key] = val
 		}
+	} else {
+		tags[model.FlagArticle] = "0"
 	}
 
 	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, model.TablePageviews, tags, values); err != nil {

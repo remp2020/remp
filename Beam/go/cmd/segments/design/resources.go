@@ -68,6 +68,18 @@ var _ = Resource("segments", func() {
 	})
 })
 
+var _ = Resource("journal", func() {
+	Description("Common journal calls")
+	BasePath("/journal")
+	NoSecurity()
+
+	Action("flags", func() {
+		Description("List of all available flags")
+		Routing(GET("/flags"))
+		Response(OK, Flags)
+	})
+})
+
 var _ = Resource("events", func() {
 	Description("Events journal")
 	BasePath("/journal/events")
