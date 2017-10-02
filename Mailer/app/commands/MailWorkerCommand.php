@@ -87,6 +87,11 @@ class MailWorkerCommand extends Command
                 continue;
             }
 
+            if ($this->isFirstLine) {
+                $output->writeln('');
+                $this->isFirstLine = false;
+            }
+
             if (!$this->mailCache->hasJobs($batch->id)) {
                 $this->mailCache->removeQueue($batch->id);
                 $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_DONE]);
@@ -102,7 +107,7 @@ class MailWorkerCommand extends Command
                     $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
-                if (!$this->mailJobBatchRepository->isTopPriority($batch)) {
+                if (!$this->mailJobBatchRepository->isTopPriorityToSend($batch)) {
                     $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
@@ -112,11 +117,6 @@ class MailWorkerCommand extends Command
                 if ($this->isDuplicateJob($job->email, $job->templateCode, $batch->mail_job_id)) {
                     $this->mailJobQueueRepository->delete($queueJob);
                     continue;
-                }
-
-                if ($this->isFirstLine) {
-                    $output->writeln('');
-                    $this->isFirstLine = false;
                 }
 
                 $output->writeln(" * sending from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");

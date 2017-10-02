@@ -49,20 +49,27 @@ class BatchesRepository extends Repository
     public function getBatchToSend()
     {
         return $this->getTable()
-            ->select('*')
+            ->select('mail_job_batch.*')
             ->where([
-                'status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
+                'mail_job_batch.status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
             ])
             ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
             ->limit(1)
             ->fetch();
     }
 
-    public function isTopPriority($batch)
+    /**
+     * isTopPriorityToSend checks whether current batch is still top priority batch. If there are multiple batches with
+     * same priority, it's expected that
+     *
+     * @param $batch
+     * @return bool
+     */
+    public function isTopPriorityToSend($batch)
     {
         $topPriority = $this->getTable()
             ->where([
-                'id' => $batch->id,
+                'mail_job_batch.status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
             ])
             ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
             ->limit(1)
