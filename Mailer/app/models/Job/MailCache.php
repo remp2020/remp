@@ -76,7 +76,7 @@ class MailCache
     public function removeQueue($queueId)
     {
         $res1 = $this->connect()->del([static::REDIS_KEY . $queueId]);
-        $res2 = $this->connect()->zrem(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);;
+        $res2 = $this->connect()->zrem(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
         return $res1 && $res2;
     }
 
