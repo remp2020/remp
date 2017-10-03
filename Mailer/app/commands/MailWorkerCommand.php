@@ -93,6 +93,7 @@ class MailWorkerCommand extends Command
             }
 
             if (!$this->mailCache->hasJobs($batch->id)) {
+                $output->writeln("Queue <info>{$batch->id}</info> has no more jobs, cleaning up...");
                 $this->mailCache->removeQueue($batch->id);
                 $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_DONE]);
                 continue;
@@ -102,12 +103,15 @@ class MailWorkerCommand extends Command
                 $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
             }
 
+            $output->writeln("Sending batch <info>{$batch->id}</info>...");
             while ($job = json_decode($this->mailCache->getJob($batch->id))) {
                 if (!$this->mailCache->isQueueActive($batch->id)) {
+                    $output->writeln("Queue <info>{$batch->id}</info> not active anymore...");
                     $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
-                if (!$this->mailJobBatchRepository->isTopPriorityToSend($batch)) {
+                if (!$this->mailCache->isQueueTopPriority($batch->id)) {
+                    $output->writeln("Batch <info>{$batch->id}</info> no longer top priority, switching...");
                     $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }

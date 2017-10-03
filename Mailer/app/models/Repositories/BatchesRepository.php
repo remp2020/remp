@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
@@ -58,23 +59,8 @@ class BatchesRepository extends Repository
             ->fetch();
     }
 
-    /**
-     * isTopPriorityToSend checks whether current batch is still top priority batch. If there are multiple batches with
-     * same priority, it's expected that
-     *
-     * @param $batch
-     * @return bool
-     */
-    public function isTopPriorityToSend($batch)
+    public function getBatchPriority(ActiveRow $batch)
     {
-        $topPriority = $this->getTable()
-            ->where([
-                'mail_job_batch.status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
-            ])
-            ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
-            ->limit(1)
-            ->fetch();
-
-        return $topPriority->id === $batch->id;
+        return $batch->related('mail_job_batch_templates')->fetch()->mail_template->mail_type->priority;
     }
 }
