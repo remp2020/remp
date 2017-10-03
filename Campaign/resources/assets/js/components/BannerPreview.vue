@@ -24,7 +24,6 @@
                 :closeable="closeable"
                 :transition="transition"
                 :displayType="displayType"
-                :forcedPosition="'absolute'"
         ></html-preview>
 
         <medium-rectangle-preview v-if="template == 'medium_rectangle'"
@@ -49,7 +48,6 @@
                 :closeable="closeable"
                 :transition="transition"
                 :displayType="displayType"
-                :forcedPosition="'absolute'"
         ></medium-rectangle-preview>
 
         <bar-preview v-if="template == 'bar'"
@@ -71,7 +69,6 @@
                 :closeable="closeable"
                 :transition="transition"
                 :displayType="displayType"
-                :forcedPosition="'absolute'"
         ></bar-preview>
     </div>
 </template>
