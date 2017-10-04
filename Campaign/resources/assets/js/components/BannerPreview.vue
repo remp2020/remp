@@ -3,7 +3,7 @@
 </style>
 
 <template>
-    <div>
+    <div class="remp-banner">
         <html-preview v-if="template == 'html'"
                 :alignmentOptions="alignmentOptions"
                 :dimensionOptions="dimensionOptions"

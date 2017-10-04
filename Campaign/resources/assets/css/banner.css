@@ -2,18 +2,19 @@
 
 /* transitions */
 
-#preview-close.hidden {
+.remp-banner #preview-close.hidden {
     display: none;
 }
 
-.fade-enter-active, .fade-leave-active {
+.remp-banner .fade-enter-active, .fade-leave-active {
     transition: opacity .5s
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+.remp-banner .fade-enter,
+.remp-banner .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
     opacity: 0
 }
 
-.bounce-enter-active {
+.remp-banner .bounce-enter-active {
     animation: bounce linear 0.5s;
     animation-iteration-count: 1;
     transform-origin: 50% 50%;
@@ -28,7 +29,7 @@
     100% { transform: translate(0px,0px)  }
 }
 
-.shake-enter-active{
+.remp-banner .shake-enter-active{
     animation: shake linear 0.5s;
     animation-iteration-count: 1;
     transform-origin: 50% 50%;
@@ -47,7 +48,7 @@
     100% { transform: translate(0px,0px) }
 }
 
-.fade-in-down-enter-active {
+.remp-banner .fade-in-down-enter-active {
     animation: fadeInDown ease 0.5s;
     animation-iteration-count: 1;
     transform-origin: 50% 50%;
@@ -59,6 +60,7 @@
     100% { opacity: 1; transform: translate(0px,0px) }
 }
 
-a:before, a:after, div:before, div:after {
+.remp-banner a:before, .remp-banner a:after,
+.remp-banner div:before, .remp-banner div:after {
     content: none;
 }
