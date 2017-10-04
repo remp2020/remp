@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presenters;
+namespace Remp\MailerModule\Presenters;
 
 use Nette;
 
