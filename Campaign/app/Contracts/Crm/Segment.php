@@ -69,10 +69,9 @@ class Segment implements SegmentContract
     public function check(CampaignSegment $campaignSegment, $userId): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
+        /** @var Bloom $bloomFilter */
         $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
         if ($bloomFilter) {
-            /** @var Bloom $bloomFilter */
-            $bloomFilter = unserialize($bloomFilter);
             return $bloomFilter->has($userId);
         }
 

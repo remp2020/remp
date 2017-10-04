@@ -52,7 +52,7 @@ class CacheSegmentJob implements ShouldQueue
         $bloomFilter = new Bloom();
         $bloomFilter->set($userIds);
 
-        Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($this->key(), serialize($bloomFilter), 65);
+        Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($this->key(), $bloomFilter, 65);
     }
 
     /**
