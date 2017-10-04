@@ -153,7 +153,6 @@ class CampaignController extends Controller
     public function update(CampaignRequest $request, Campaign $campaign)
     {
         $campaign->fill($request->all());
-        $shouldCache = $campaign->isDirty('active');
         $campaign->save();
 
         foreach ($request->get('segments', []) as $r) {
@@ -164,7 +163,7 @@ class CampaignController extends Controller
             $campaignSegment->campaign_id = $campaign->id;
             $campaignSegment->save();
 
-            if ($campaign->active && $shouldCache) {
+            if ($campaign->active) {
                 dispatch(new CacheSegmentJob($campaignSegment));
             }
         }

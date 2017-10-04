@@ -68,29 +68,30 @@ class Segment implements SegmentContract
      */
     public function check(CampaignSegment $campaignSegment, $userId): bool
     {
-        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($campaignSegment->code);
-        if (!$bloomFilter) {
-            dispatch(new CacheSegmentJob($campaignSegment));
-
-            try {
-                $response = $this->client->get(self::ENDPOINT_CHECK, [
-                    'query' => [
-                        'resolver_type' => 'id',
-                        'resolver_value' => $userId,
-                        'code' => $campaignSegment->code,
-                    ],
-                ]);
-            } catch (ConnectException $e) {
-                throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
-            }
-
-            $result = json_decode($response->getBody());
-            return $result->check;
+        $cacheJob = new CacheSegmentJob($campaignSegment);
+        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
+        if ($bloomFilter) {
+            /** @var Bloom $bloomFilter */
+            $bloomFilter = unserialize($bloomFilter);
+            return $bloomFilter->has($userId);
         }
 
-        /** @var Bloom $bloomFilter */
-        $bloomFilter = unserialize($bloomFilter);
-        return $bloomFilter->has($userId);
+        dispatch(new CacheSegmentJob($campaignSegment));
+
+        try {
+            $response = $this->client->get(self::ENDPOINT_CHECK, [
+                'query' => [
+                    'resolver_type' => 'id',
+                    'resolver_value' => $userId,
+                    'code' => $campaignSegment->code,
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
+        }
+
+        $result = json_decode($response->getBody());
+        return $result->check;
     }
 
     /**
