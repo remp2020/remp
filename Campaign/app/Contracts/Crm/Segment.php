@@ -75,7 +75,7 @@ class Segment implements SegmentContract
             try {
                 $response = $this->client->get(self::ENDPOINT_CHECK, [
                     'query' => [
-                        'resolver_type' => 'email',
+                        'resolver_type' => 'id',
                         'resolver_value' => $userId,
                         'code' => $campaignSegment->code,
                     ],
