@@ -11,6 +11,15 @@ set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);
 set('shared_dirs', ['log']);
 set('shared_files', ['.env', 'app/config/config.local.neon']);
+set('rabbit', [
+    'host' => getenv('DEPLOY_RABBIT_HOST'),
+    'port' => getenv('DEPLOY_RABBIT_PORT'),
+    'username' => getenv('DEPLOY_RABBIT_USERNAME'),
+    'password' => getenv('DEPLOY_RABBIT_PASSWORD'),
+    'channel' => getenv('DEPLOY_RABBIT_CHANNEL'),
+    'message' => 'remp',
+    'vhost'  => getenv('DEPLOY_RABBIT_VHOST')
+]);
 
 localhost('remp2020')
     ->set('deploy_path', '/data/web/remp2020.com/app/Mailer')
@@ -52,5 +61,6 @@ task('deploy', [
 //    'deploy:migration', // migrations not enabled until running from shared CRM database
     'deploy:symlink',
     'deploy:restart_hermes',
+    'deploy:rabbit',
     'cleanup',
 ])->desc('Deploy your project');

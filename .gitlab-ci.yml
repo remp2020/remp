@@ -146,21 +146,3 @@ deploy:sso:admin:
   only:
     - master
   dependencies: []
-
-deploy:beam:tracker:
-  dependencies:
-    - build:beam:tracker
-  stage: deploy
-  script:
-    - cd Beam/go/cmd/tracker/
-    - make docker-build
-    - scp tracker.tar deploy-remp@
-  environment:
-    name: production/remp2020/beam
-    url: https://tracker.beam.remp2020.com
-  when: manual
-  tags:
-    - remp2020
-    - deploy
-  only:
-    - master
