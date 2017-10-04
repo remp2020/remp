@@ -24,9 +24,12 @@ class Segment implements SegmentContract
 
     private $client;
 
-    public function __construct(Client $client)
+    private $allowCache;
+
+    public function __construct(Client $client, $allowCache)
     {
         $this->client = $client;
+        $this->allowCache = false;
     }
 
     public function provider(): string
@@ -68,15 +71,17 @@ class Segment implements SegmentContract
      */
     public function check(CampaignSegment $campaignSegment, $userId): bool
     {
-        $cacheJob = new CacheSegmentJob($campaignSegment);
-        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
-        if ($bloomFilter) {
-            /** @var Bloom $bloomFilter */
-            $bloomFilter = unserialize($bloomFilter);
-            return $bloomFilter->has($userId);
-        }
+        if ($this->allowCache) {
+            $cacheJob = new CacheSegmentJob($campaignSegment);
+            $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
+            if ($bloomFilter) {
+                /** @var Bloom $bloomFilter */
+                $bloomFilter = unserialize($bloomFilter);
+                return $bloomFilter->has($userId);
+            }
 
-        dispatch($cacheJob);
+            dispatch($cacheJob);
+        }
 
         // until the cache is filled, let's check directly
         try {

@@ -82,10 +82,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     this.trackPageview();
                 },
 
-                trackEvent: function(category, action, fields, value) {
+                trackEvent: function(category, action, tags, fields, value) {
                     var params = {
                         "category": category,
                         "action": action,
+                        "tags": tags || {},
                         "fields": fields || {},
                         "value": value
                     };
@@ -95,7 +96,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 trackPageview: function() {
                     var params = {
                         "article": this.article,
-                        "fields": {}
                     };
                     this.post(this.url + "/track/pageview", params);
                 },

@@ -32,7 +32,7 @@ class RempSegmentsServiceProvider extends ServiceProvider
             $client = new Client([
                 'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
             ]);
-            return new Segment($client);
+            return new Segment($client, false);
         });
         $this->app->tag(Segment::class, SegmentAggregator::TAG);
     }

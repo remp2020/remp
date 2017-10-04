@@ -59,7 +59,8 @@ var Event = Type("Event", func() {
 	Attribute("category", String, "Category of event (time, video, comment)")
 	Attribute("action", String, "Specific action (read, pause, reply)")
 	Attribute("value", Number, "Numeric value of event (read 60 seconds, paused after 200 seconds, 3rd comment")
-	Attribute("fields", HashOf(String, Any), "Custom filtering fields")
+	Attribute("tags", HashOf(String, String), "Custom filtering tags")
+	Attribute("fields", HashOf(String, Any), "Additinal key-value data")
 
 	Required("system", "category", "action")
 })

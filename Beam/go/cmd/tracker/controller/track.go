@@ -125,6 +125,9 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	if ctx.Payload.Value != nil {
 		fields["value"] = *ctx.Payload.Value
 	}
+	for key, val := range ctx.Payload.Tags {
+		tags[key] = val
+	}
 	for key, val := range ctx.Payload.Fields {
 		fields[key] = val
 	}
