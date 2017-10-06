@@ -186,6 +186,8 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchSend($id)
     {
         $batch = $this->batchesRepository->find($id);
+        $priority = $this->batchesRepository->getBatchPriority($batch);
+        $this->mailCache->restartQueue($batch->id, $priority);
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
 
         $this->flashMessage('Status of batch was changed.');
