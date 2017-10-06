@@ -2,8 +2,10 @@
 
 namespace Remp\MailerModule\Commands;
 
+use League\Event\Emitter;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\JobQueueRepository;
@@ -14,8 +16,6 @@ use Remp\MailerModule\Sender;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Tomaj\Hermes\Emitter;
-use Tomaj\Hermes\Message;
 
 class MailWorkerCommand extends Command
 {
@@ -33,7 +33,7 @@ class MailWorkerCommand extends Command
 
     private $mailCache;
 
-    private $hermesEmitter;
+    private $emitter;
 
     private $isFirstLine = true;
 
@@ -47,7 +47,7 @@ class MailWorkerCommand extends Command
         LogsRepository $mailLogRepository,
         TemplatesRepository $mailTemplatesRepository,
         MailCache $redis,
-        Emitter $hermesEmitter
+        Emitter $emitter
     ) {
         parent::__construct();
         $this->applicationMailer = $applicationMailer;
@@ -57,7 +57,7 @@ class MailWorkerCommand extends Command
         $this->mailLogRepository = $mailLogRepository;
         $this->mailTemplateRepository = $mailTemplatesRepository;
         $this->mailCache = $redis;
-        $this->hermesEmitter = $hermesEmitter;
+        $this->emitter = $emitter;
     }
 
     /**
@@ -125,16 +125,7 @@ class MailWorkerCommand extends Command
 
                     if ($result) {
                         $this->mailJobQueueRepository->delete($queueJob);
-                        $this->hermesEmitter->emit(new Message(
-                            'mail-sent',
-                            [
-                                'user_id' => $job->userId,
-                                'email' => $job->email,
-                                'template_code' => $job->templateCode,
-                                'mail_job_batch_id' => $batch->id,
-                                'time' => time(),
-                            ]
-                        ));
+                        $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
                     } else {
                         $this->mailJobBatchRepository->update($batch, ['errors_count+=' => 1]);
                         $this->mailJobQueueRepository->update($queueJob, ['status' => JobQueueRepository::STATUS_ERROR]);
