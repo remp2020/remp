@@ -141,18 +141,11 @@ final class JobPresenter extends BasePresenter
 
         /** @var ActiveRow $job */
         foreach ($jobs as $job) {
-            $sentCount = $job->related('mail_job_batch')->sum('sent_emails');
-            $openedCount = $this->logEventsRepository->getTable()->where([
-                'type' => 'opened',
-                'mail_log.mail_job_id' => $job->id,
-            ])->count('*');
-            $clickedCount = $this->logEventsRepository->getTable()->where([
-                'type' => 'clicked',
-                'mail_log.mail_job_id' => $job->id,
-            ])->count('*');
-
             $latte = $this->latteFactory->create();
             $status = $latte->renderToString(__DIR__  . '/templates/Job/_job_status.latte', ['job' => $job]);
+            $sentCount = $latte->renderToString(__DIR__  . '/templates/Job/_sent_count.latte', ['job' => $job]);
+            $openedCount = $latte->renderToString(__DIR__  . '/templates/Job/_opened_count.latte', ['job' => $job]);
+            $clickedCount = $latte->renderToString(__DIR__  . '/templates/Job/_clicked_count.latte', ['job' => $job]);
 
             $result['data'][] = [
                 'actions' => [

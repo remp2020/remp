@@ -18,13 +18,16 @@ class LogsRepository extends Repository
 
     protected $dataTableSearchable = ['email'];
 
-    public function __construct($startStatsDate, Context $database)
+    private $logEventsRepository;
+
+    public function __construct($startStatsDate, Context $database, LogEventsRepository $logEventsRepository)
     {
         parent::__construct($database);
         $this->startStatsDate = $startStatsDate;
+        $this->logEventsRepository = $logEventsRepository;
     }
 
-    public function add($email, $subject, $templateId, $jobId = null, $mailSenderId = null, $attachmentSize = null)
+    public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null)
     {
         return $this->insert([
             'email' => $email,
@@ -33,6 +36,7 @@ class LogsRepository extends Repository
             'updated_at' => new DateTime(),
             'mail_template_id' => $templateId,
             'mail_job_id' => $jobId,
+            'mail_job_batch_id' => $batchId,
             'mail_sender_id' => $mailSenderId,
             'attachment_size' => $attachmentSize,
         ]);
@@ -51,6 +55,13 @@ class LogsRepository extends Repository
     public function findBySenderId($sender_id)
     {
         return $this->getTable()->where('mail_sender_id', $sender_id)->limit(1)->fetch();
+    }
+
+    public function getBatchStats($batch)
+    {
+        return $this->logEventsRepository->getTable()->where([
+            'mail_log.mail_job_batch_id' => $batch->id,
+        ])->group('type')->select('COUNT(*) AS count, type')->fetchPairs('type', 'count');
     }
 
     public function getStatsRate($mailTemplates, $field, $startTime = null, $endTime = null)
