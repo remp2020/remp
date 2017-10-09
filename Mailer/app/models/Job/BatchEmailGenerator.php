@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Job;
 
 use Remp\MailerModule\ActiveRow;
+use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\JobQueueRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Segment\Aggregator;
@@ -13,6 +14,8 @@ class BatchEmailGenerator
     private $mailJobsRepository;
 
     private $mailJobQueueRepository;
+
+    private $batchesRepository;
 
     private $segmentAggregator;
 
@@ -25,12 +28,14 @@ class BatchEmailGenerator
     public function __construct(
         JobsRepository $mailJobsRepository,
         JobQueueRepository $mailJobQueueRepository,
+        BatchesRepository $batchesRepository,
         Aggregator $segmentAggregator,
         IUser $userProvider,
         MailCache $mailCache
     ) {
         $this->mailJobsRepository = $mailJobsRepository;
         $this->mailJobQueueRepository = $mailJobQueueRepository;
+        $this->batchesRepository = $batchesRepository;
         $this->segmentAggregator = $segmentAggregator;
         $this->userProvider = $userProvider;
         $this->mailCache = $mailCache;
@@ -92,7 +97,8 @@ class BatchEmailGenerator
             $template = $job->ref('mail_templates', 'mail_template_id');
             $this->mailCache->addJob($userMap[$job->email], $job->email, $template->code, $job->mail_batch_id);
         }
-        $this->mailCache->restartQueue($batch->id);
+        $priority = $this->batchesRepository->getBatchPriority($batch);
+        $this->mailCache->restartQueue($batch->id, $priority);
     }
 
     private function getTemplate(ActiveRow $batch)

@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
@@ -48,8 +49,18 @@ class BatchesRepository extends Repository
 
     public function getBatchToSend()
     {
-        return $this->getTable()->select('*')->where([
-            'status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
-        ])->limit(1)->fetch();
+        return $this->getTable()
+            ->select('mail_job_batch.*')
+            ->where([
+                'mail_job_batch.status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
+            ])
+            ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
+            ->limit(1)
+            ->fetch();
+    }
+
+    public function getBatchPriority(ActiveRow $batch)
+    {
+        return $batch->related('mail_job_batch_templates')->fetch()->mail_template->mail_type->priority;
     }
 }
