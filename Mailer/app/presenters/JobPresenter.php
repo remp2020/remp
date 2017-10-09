@@ -105,6 +105,7 @@ final class JobPresenter extends BasePresenter
             ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
 //            ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
             ->setRowLinkAction('show')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
@@ -133,7 +134,7 @@ final class JobPresenter extends BasePresenter
         try {
             $segmentList = $this->segmentAggregator->list();
             array_walk($segmentList, function ($segment) use (&$segments) {
-                $segments[$segment['code']] = $segment['provider'] . ':' . $segment['name'];
+                $segments[$segment['code']] = $segment['name'];
             });
         } catch (SegmentException $e) {
             $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';

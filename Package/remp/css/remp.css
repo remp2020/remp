@@ -120,9 +120,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .table  > tbody > tr > td, .table > tbody > tr > th {
     vertical-align: middle;
 }
-
 .table  > tbody > tr > td > .btn, .table > tbody > tr > th > .btn {
     text-transform: capitalize;
+}
+.table  > tbody > tr > td > span.actions {
+    white-space: nowrap;
 }
 
 .table > thead > tr > th,

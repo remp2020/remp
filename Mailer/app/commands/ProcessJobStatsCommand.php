@@ -52,12 +52,12 @@ class ProcessJobStatsCommand extends Command
             $stats = $this->logsRepository->getBatchStats($batch);
 
             $this->batchesRepository->update($batch, [
-                'delivered' => $stats['delivered'] ?? 0,
-                'opened' => $stats['opened'] ?? 0,
-                'clicked' => $stats['clicked'] ?? 0,
-                'dropped' => $stats['dropped'] ?? 0,
-                'spam_complained' => $stats['complained'] ?? 0,
-                'hard_bounced' => $stats['bounced'] ?? 0,
+                'delivered' => $stats->delivered ?? 0,
+                'opened' => $stats->opened ?? 0,
+                'clicked' => $stats->clicked ?? 0,
+                'dropped' => $stats->dropped ?? 0,
+                'spam_complained' => $stats->spam_complained ?? 0,
+                'hard_bounced' => $stats->hard_bounced ?? 0,
             ]);
             $progressBar->advance();
         }

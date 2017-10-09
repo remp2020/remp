@@ -17,7 +17,23 @@ class MailJobStats extends AbstractMigration
 
         $this->table('mail_logs')
             ->addColumn('mail_job_batch_id', 'integer', ['null' => true, 'after' => 'mail_job_id'])
+            ->save();
+
+        // intentional split to two separate queries to lower the blocking time
+
+        $this->table('mail_logs')
             ->addForeignKey('mail_job_batch_id', 'mail_job_batch', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->save();
+
+        $sql = <<<SQL
+UPDATE mail_logs
+SET mail_job_batch_id = (
+  SELECT id FROM mail_job_batch
+  WHERE mail_job_batch.mail_job_id = mail_logs.mail_job_id
+  ORDER BY mail_job_batch.id DESC LIMIT 1
+)
+SQL;
+
+        $this->execute($sql);
     }
 }

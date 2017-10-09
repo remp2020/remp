@@ -59,9 +59,22 @@ class LogsRepository extends Repository
 
     public function getBatchStats($batch)
     {
-        return $this->logEventsRepository->getTable()->where([
-            'mail_log.mail_job_batch_id' => $batch->id,
-        ])->group('type')->select('COUNT(*) AS count, type')->fetchPairs('type', 'count');
+        $columns = [
+            'mail_job_batch_id',
+            'COUNT(delivered_at) AS delivered',
+            'COUNT(dropped_at) AS dropped',
+            'COUNT(spam_complained_at) AS spam_complained',
+            'COUNT(hard_bounced_at) AS hard_bounced',
+            'COUNT(clicked_at) AS clicked',
+            'COUNT(opened_at) AS opened',
+        ];
+        return $this->getTable()
+            ->select(implode(',', $columns))
+            ->where([
+                'mail_job_batch_id' => $batch->id,
+            ])
+            ->limit(1)
+            ->fetch();
     }
 
     public function getStatsRate($mailTemplates, $field, $startTime = null, $endTime = null)

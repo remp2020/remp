@@ -1,5 +1,8 @@
 {foreach $job->related('mail_job_batch') as $batch}
     {if $batch->related('mail_job_batch_templates')->count('*') > 0}
-    <p>{$batch->clicked}</p>
+    <span class="actions">
+        {var $percent = $batch->sent_emails ? (100 * $batch->clicked / $batch->sent_emails) : 0}
+        {$batch->clicked} ({$percent|number:0}%)
+    </span>
     {/if}
 {/foreach}
