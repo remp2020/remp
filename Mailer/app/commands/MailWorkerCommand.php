@@ -129,6 +129,7 @@ class MailWorkerCommand extends Command
                     $template = $this->mailTemplateRepository->getByCode($job->templateCode);
                     $result = $this->applicationMailer->setTemplate($template)
                         ->setRecipient($job->email)
+                        ->setJobId($job->id)
                         ->setParams([])
                         ->send();
 
