@@ -96,7 +96,7 @@ class CampaignController extends Controller
             $campaignSegment->save();
 
             if ($campaign->active) {
-                dispatch(new CacheSegmentJob($campaignSegment));
+                dispatch(new CacheSegmentJob($campaignSegment, true));
             }
         }
 
@@ -164,7 +164,7 @@ class CampaignController extends Controller
             $campaignSegment->save();
 
             if ($campaign->active) {
-                dispatch(new CacheSegmentJob($campaignSegment));
+                dispatch(new CacheSegmentJob($campaignSegment, true));
             }
         }
 
