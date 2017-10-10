@@ -140,9 +140,9 @@ final class JobPresenter extends BasePresenter
             $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
         }
 
+        $latte = $this->latteFactory->create();
         /** @var ActiveRow $job */
         foreach ($jobs as $job) {
-            $latte = $this->latteFactory->create();
             $status = $latte->renderToString(__DIR__  . '/templates/Job/_job_status.latte', ['job' => $job]);
             $sentCount = $latte->renderToString(__DIR__  . '/templates/Job/_sent_count.latte', ['job' => $job]);
             $openedCount = $latte->renderToString(__DIR__  . '/templates/Job/_opened_count.latte', ['job' => $job]);
