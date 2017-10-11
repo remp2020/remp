@@ -90,7 +90,12 @@ services:
         class: Remp\MailerModule\Commands\HermesWorkerCommand
         setup:
             - add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
-            - add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
+#            - add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
+
+    eventEmitter:
+        class: League\Event\Emitter
+        setup:
+            - addListener(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentHandler())
 
     segmentAgreggator:
         class: Remp\MailerModule\Segment\Aggregator
