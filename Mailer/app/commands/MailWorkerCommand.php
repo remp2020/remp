@@ -107,12 +107,12 @@ class MailWorkerCommand extends Command
             while ($job = json_decode($this->mailCache->getJob($batch->id))) {
                 if (!$this->mailCache->isQueueActive($batch->id)) {
                     $output->writeln("Queue <info>{$batch->id}</info> not active anymore...");
-                    $this->mailCache->addJob($job->id, $job->userId, $job->email, $job->templateCode, $batch->id);
+                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
                 if (!$this->mailCache->isQueueTopPriority($batch->id)) {
                     $output->writeln("Batch <info>{$batch->id}</info> no longer top priority, switching...");
-                    $this->mailCache->addJob($job->id, $job->userId, $job->email, $job->templateCode, $batch->id);
+                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
 
@@ -129,7 +129,7 @@ class MailWorkerCommand extends Command
                     $template = $this->mailTemplateRepository->getByCode($job->templateCode);
                     $result = $this->applicationMailer->setTemplate($template)
                         ->setRecipient($job->email)
-                        ->setJobId($job->id)
+                        ->setJobId($batch->mail_job_id)
                         ->setBatchId($batch->id)
                         ->setParams([])
                         ->send();
@@ -145,7 +145,7 @@ class MailWorkerCommand extends Command
                 } catch (SmtpException $smtpException) {
                     $this->smtpErrors++;
                     $output->writeln("<error>SMTP Error {$smtpException->getMessage()}</error>");
-                    $this->mailCache->addJob($job->id, $job->userId, $job->email, $job->templateCode, $batch->id);
+                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
 
                     if ($this->smtpErrors >= 10) {
                         $this->mailCache->pauseQueue($batch->id);

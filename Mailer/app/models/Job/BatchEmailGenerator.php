@@ -95,7 +95,7 @@ class BatchEmailGenerator
         foreach ($queueJobs as $queueJob) {
             /** @var ActiveRow $template */
             $template = $queueJob->ref('mail_templates', 'mail_template_id');
-            $this->mailCache->addJob($job->id, $userMap[$queueJob->email], $queueJob->email, $template->code, $queueJob->mail_batch_id);
+            $this->mailCache->addJob($userMap[$queueJob->email], $queueJob->email, $template->code, $queueJob->mail_batch_id);
         }
         $priority = $this->batchesRepository->getBatchPriority($batch);
         $this->mailCache->restartQueue($batch->id, $priority);
