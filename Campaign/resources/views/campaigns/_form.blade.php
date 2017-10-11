@@ -27,11 +27,12 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
 @push('scripts')
 
 <script type="text/javascript">
-    let campaign = {
+    var campaign = {
         "name": '{!! $campaign->name !!}' || null,
         "segments": {!! isset($selectedSegments) ? $selectedSegments->toJson(JSON_UNESCAPED_UNICODE) : $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
         "bannerId": {!! @json($campaign->banner_id) !!} || null,
-        "active": {!! @json($campaign->active) !!} || null,
+        "signedIn": {!! @json($campaign->signed_in) !!},
+        "active": {!! @json($campaign->active) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

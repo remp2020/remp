@@ -12,6 +12,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             userId: null,
 
+            signedIn: false,
+
             tracker: {
 
                 url: null,
@@ -49,9 +51,20 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     }
 
                     this.url = config.tracker.url;
+
+                    // global
                     this.beamToken = config.token;
                     if (typeof config.userId !== 'undefined' && config.userId !== null) {
-                        this.userId = config.userId;
+                        remplib.userId = config.userId;
+                    }
+                    if (typeof config.signedIn !== 'undefined') {
+                        if (typeof config.signedIn !== 'boolean') {
+                            throw "remplib: configuration signedIn invalid (boolean required): "+config.signedIn
+                        }
+                        if (config.signedIn && remplib.userId === null) {
+                            throw "remplib: cannot set signedIn flag when no userId was provided"
+                        }
+                        remplib.signedIn = config.signedIn;
                     }
 
                     if (typeof config.tracker.article === 'object') {
@@ -179,7 +192,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     var d = new Date();
                     params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
                     params["user"] = {
-                        "id": this.userId,
+                        "id": remplib.getUserId(),
+                        "is_logged": remplib.isUserLogged(),
+                        "access": remplib.hasAccess(),
                         "url":  window.location.href,
                         "user_agent": navigator.userAgent,
                         "source": {
@@ -210,8 +225,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         source = "reddit";
                     }
 
+                    var storageKey = "social_source";
                     if (source === null) {
-                        return this.getFromStorage("social_source");
+                        return remplib.getFromStorage(storageKey);
                     }
 
                     var now = new Date();
@@ -221,13 +237,13 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "createdAt": now.getTime(),
                         "updatedAt": now.getTime(),
                     };
-                    localStorage.setItem("social_source", JSON.stringify(item));
+                    localStorage.setItem(storageKey, JSON.stringify(item));
                     return item.value;
                 },
 
                 getParam: function(key) {
                     if (typeof this.uriParams[key] === 'undefined') {
-                        return this.getFromStorage(key);
+                        return remplib.getFromStorage(key);
                     }
 
                     var now = new Date();
@@ -237,25 +253,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "createdAt": now.getTime(),
                         "updatedAt": now.getTime(),
                     };
-                    localStorage.setItem(key, JSON.stringify(item));
-                    return item.value;
-                },
-
-                getFromStorage: function(key) {
-                    var now = new Date();
-                    var data = localStorage.getItem(key);
-                    if (data === null) {
-                        return null;
-                    }
-
-                    var item = JSON.parse(data);
-                    var threshold = new Date(now.getTime() - this.cacheThreshold * 60000);
-                    if ((new Date(item.updatedAt)).getTime() < threshold.getTime()) {
-                        localStorage.removeItem(key);
-                        return null;
-                    }
-
-                    item.updatedAt = now;
                     localStorage.setItem(key, JSON.stringify(item));
                     return item.value;
                 },
@@ -270,6 +267,63 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             },
 
+            getUserId: function() {
+                if (this.userId) {
+                    return this.userId;
+                }
+                var storageKey = "anon_id";
+                var anonId = this.getFromStorage(storageKey, true);
+                if (anonId) {
+                    return anonId;
+                }
+                anonId = remplib.uuidv4();
+                var now = new Date();
+                var item = {
+                    "version": 1,
+                    "value": anonId,
+                    "createdAt": now.getTime(),
+                    "updatedAt": now.getTime(),
+                };
+                localStorage.setItem(storageKey, JSON.stringify(item));
+                return anonId;
+            },
+
+            uuidv4: function() {
+                var format = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+                if (!window.crypto) {
+                    return format.replace(/[xy]/g, function(c) {
+                        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                        return v.toString(16);
+                    });
+                }
+
+                var nums = window.crypto.getRandomValues(new Uint8ClampedArray(format.split(/[xy]/).length - 1));
+                var pointer = 0;
+                return format.replace(/[xy]/g, function(c) {
+                    var r = nums[pointer++] % 16,
+                        v = (c === 'x') ? r : (r&0x3|0x8);
+                    return v.toString(16);
+                });
+            },
+
+            getFromStorage: function(key, bypassThreshold) {
+                var now = new Date();
+                var data = localStorage.getItem(key);
+                if (data === null) {
+                    return null;
+                }
+
+                var item = JSON.parse(data);
+                var threshold = new Date(now.getTime() - this.cacheThreshold * 60000);
+                if (!bypassThreshold && (new Date(item.updatedAt)).getTime() < threshold.getTime()) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+
+                item.updatedAt = now;
+                localStorage.setItem(key, JSON.stringify(item));
+                return item.value;
+            },
 
             extend: function() {
                 var a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;

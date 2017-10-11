@@ -27,16 +27,18 @@ class CampaignRequest extends FormRequest
             'name' => 'required|max:255',
             'active' => 'boolean|required',
             'banner_id' => 'integer|required',
+            'signed_in' => 'boolean|nullable',
             'segments' => 'array',
         ];
     }
 
     public function all()
     {
-        $result = parent::all();
-        if (!isset($result['active'])) {
-            $result['active'] = false;
+        $data = parent::all();
+        if (isset($data['signed_in'])) {
+            $data['signed_in'] = $this->getInputSource()->getBoolean('signed_in');
         }
-        return $result;
+        $data['active'] = $this->getInputSource()->getBoolean('active', false);
+        return $data;
     }
 }

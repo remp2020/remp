@@ -51,7 +51,11 @@
                         'active' => [
                             'header' => 'Is active',
                             'render' => 'boolean'
-                        ]
+                        ],
+                        'signed_in' => [
+                            'header' => 'Signed in',
+                            'render' => 'boolean',
+                        ],
                     ],
                     'dataSource' => route('campaigns.json'),
                     'rowActions' => [
