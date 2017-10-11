@@ -130,6 +130,7 @@ class MailWorkerCommand extends Command
                     $result = $this->applicationMailer->setTemplate($template)
                         ->setRecipient($job->email)
                         ->setJobId($job->id)
+                        ->setBatchId($batch->id)
                         ->setParams([])
                         ->send();
 

@@ -22,6 +22,9 @@ class Sender
     /** @var int|null */
     private $jobId = null;
 
+    /** @var int|null */
+    private $batchId = null;
+
     /** @var  array */
     private $params = [];
 
@@ -83,6 +86,13 @@ class Sender
         return $this;
     }
 
+    public function setBatchId($batchId)
+    {
+        $this->batchId = $batchId;
+
+        return $this;
+    }
+
     public function setParams($params)
     {
         $this->params = $params;
@@ -125,10 +135,20 @@ class Sender
 
         $message->setHeader('X-Mailer-Variables', Json::encode([
             'template' => $this->template->code,
+            'job_id' => $this->jobId,
+            'batch_id' => $this->batchId,
             'mail_sender_id' => $senderId,
         ]));
 
-        $this->logsRepository->add($this->recipient['email'], $this->template->subject, $this->template->id, $this->jobId, $senderId, $attachmentSize);
+        $this->logsRepository->add(
+            $this->recipient['email'],
+            $this->template->subject,
+            $this->template->id,
+            $this->jobId,
+            $this->batchId,
+            $senderId,
+            $attachmentSize
+        );
 
         $this->mailerFactory->getMailer()->send($message);
         $this->reset();

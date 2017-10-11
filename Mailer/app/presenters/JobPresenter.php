@@ -15,8 +15,10 @@ use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
+use Remp\MailerModule\Repository\LogEventsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Segment\Aggregator;
 use Remp\MailerModule\Segment\SegmentException;
 
@@ -46,6 +48,10 @@ final class JobPresenter extends BasePresenter
     /** @var NewTemplateFormFactory */
     private $newTemplateFormFactory;
 
+    private $userSubscriptionsRepository;
+
+    private $logEventsRepository;
+
     /** @var  Aggregator */
     private $segmentAggregator;
 
@@ -64,6 +70,8 @@ final class JobPresenter extends BasePresenter
         JobFormFactory $jobFormFactory,
         NewBatchFormFactory $newBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory,
+        UserSubscriptionsRepository $userSubscriptionsRepository,
+        LogEventsRepository $logEventsRepository,
         Aggregator $segmentAggregator,
         MailCache $mailCache,
         ILatteFactory $latteFactory
@@ -77,6 +85,8 @@ final class JobPresenter extends BasePresenter
         $this->jobFormFactory = $jobFormFactory;
         $this->newBatchFormFactory = $newBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
+        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
+        $this->logEventsRepository = $logEventsRepository;
         $this->segmentAggregator = $segmentAggregator;
         $this->mailCache = $mailCache;
         $this->latteFactory = $latteFactory;
@@ -90,8 +100,12 @@ final class JobPresenter extends BasePresenter
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setColSetting('segment', ['orderable' => false])
             ->setColSetting('batches', ['orderable' => false])
-            ->setColSetting('emails_sent_count', ['header' => 'sent emails', 'orderable' => false])
+            ->setColSetting('sent_count', ['header' => 'sent', 'orderable' => false])
+            ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
+            ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
+//            ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
             ->setRowLinkAction('show')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
@@ -120,18 +134,19 @@ final class JobPresenter extends BasePresenter
         try {
             $segmentList = $this->segmentAggregator->list();
             array_walk($segmentList, function ($segment) use (&$segments) {
-                $segments[$segment['code']] = $segment['provider'] . ':' . $segment['name'];
+                $segments[$segment['code']] = $segment['name'];
             });
         } catch (SegmentException $e) {
             $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
         }
 
+        $latte = $this->latteFactory->create();
         /** @var ActiveRow $job */
         foreach ($jobs as $job) {
-            $emails_sent_count = $job->related('mail_job_batch')->sum('sent_emails');
-
-            $latte = $this->latteFactory->create();
             $status = $latte->renderToString(__DIR__  . '/templates/Job/_job_status.latte', ['job' => $job]);
+            $sentCount = $latte->renderToString(__DIR__  . '/templates/Job/_sent_count.latte', ['job' => $job]);
+            $openedCount = $latte->renderToString(__DIR__  . '/templates/Job/_opened_count.latte', ['job' => $job]);
+            $clickedCount = $latte->renderToString(__DIR__  . '/templates/Job/_clicked_count.latte', ['job' => $job]);
 
             $result['data'][] = [
                 'actions' => [
@@ -140,7 +155,10 @@ final class JobPresenter extends BasePresenter
                 $job->created_at,
                 (isset($segments[$job->segment_code]) ? $segments[$job->segment_code] : 'Missing segment'),
                 $status,
-                $emails_sent_count,
+                $sentCount,
+                $openedCount,
+                $clickedCount,
+//                $unsubscribedCount,
             ];
         }
         $this->presenter->sendJson($result);

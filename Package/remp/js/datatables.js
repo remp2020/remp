@@ -106,10 +106,11 @@ $.fn.dataTables = {
         },
         actions: function (actionSettings) {
             return function(data, type, row) {
-                var actions = '';
+                var actions = '<span class="actions">';
                 $.each(actionSettings, function (key, action) {
                     actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" href="' + row.actions[action['name']] + '"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                 });
+                actions += '</span>';
                 return actions;
             }
         }

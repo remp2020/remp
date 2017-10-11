@@ -1,0 +1,5 @@
+{foreach $job->related('mail_job_batch') as $batch}
+    {if $batch->related('mail_job_batch_templates')->count('*') > 0}
+    <div>{$batch->sent_emails}</div>
+    {/if}
+{/foreach}
