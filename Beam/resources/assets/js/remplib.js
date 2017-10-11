@@ -193,8 +193,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
                     params["user"] = {
                         "id": remplib.getUserId(),
-                        "is_logged": remplib.isUserLogged(),
-                        "access": remplib.hasAccess(),
+                        "signed_in": remplib.signedIn,
                         "url":  window.location.href,
                         "user_agent": navigator.userAgent,
                         "source": {
