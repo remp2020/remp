@@ -29,7 +29,7 @@
     let props = {
         'name': String,
         'options': [Array, Object],
-        'value': [String, Number],
+        'value': [String, Number, Boolean],
         'multiple': Boolean,
         'title': String,
         'liveSearch': {
@@ -70,7 +70,7 @@
 
             // init default value
             if (this.value !== null) {
-                $select.selectpicker('val', this.value);
+                $select.selectpicker('val', String(this.value));
                 if (this.allowCustomValue) {
                     this.customValue = this.value;
                     if (!this.inOptions(this.value)) {

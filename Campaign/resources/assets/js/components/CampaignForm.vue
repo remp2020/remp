@@ -160,7 +160,7 @@
 
                 "signedInOptions": [
                     {"label": "Everyone", "value": null},
-                    {"label": "Only logged in", "value": true},
+                    {"label": "Only signed in", "value": true},
                     {"label": "Only anonymous ", "value": false},
                 ]
             }
