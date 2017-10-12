@@ -49,7 +49,10 @@ class CacheSegmentJob implements ShouldQueue
             return $item->id;
         })->toArray();
 
-        $bloomFilter = new Bloom();
+        $bloomFilter = new Bloom([
+            'entries_max' => count($userIds),
+            'error_chance' => 0.001
+        ]);
         $bloomFilter->set($userIds);
 
         Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($this->key(), $bloomFilter, 65);
