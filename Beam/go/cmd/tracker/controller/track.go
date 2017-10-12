@@ -217,6 +217,13 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		if user.ID != nil {
 			tags["user_id"] = *user.ID
 		}
+		if user.SignedIn != nil {
+			if *user.SignedIn {
+				tags["signed_in"] = "1"
+			} else {
+				tags["signed_in"] = "0"
+			}
+		}
 
 		if user.Source != nil {
 			if user.Source.Social != nil {

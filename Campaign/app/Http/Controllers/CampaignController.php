@@ -37,11 +37,11 @@ class CampaignController extends Controller
         $campaigns = Campaign::query();
         return $dataTables->of($campaigns->with('segments'))
             ->addColumn('actions', function (Campaign $campaign) {
-                return[
+                return [
                     'edit' => route('campaigns.edit', $campaign) ,
                 ];
             })
-            ->rawColumns(['actions', 'active'])
+            ->rawColumns(['actions', 'active', 'signed_in'])
             ->setRowId('id')
             ->make(true);
     }
@@ -204,7 +204,7 @@ class CampaignController extends Controller
             return response()
                 ->jsonp($r->get('callback'), [
                     'success' => false,
-                    'errors' => [],
+                    'errors' => ['userId is required and missing'],
                 ])
                 ->setStatusCode(400);
         }
@@ -226,6 +226,23 @@ class CampaignController extends Controller
                     'success' => false,
                     'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
                 ]);
+        }
+
+        if (isset($campaign->signed_in)) {
+            if (!isset($data->signedIn)) {
+                return response()
+                    ->jsonp($r->get('callback'), [
+                        'success' => false,
+                        'errors' => ['current campaign requires "signedIn" param to be provided'],
+                    ]);
+            }
+            if ($campaign->signed_in !== $data->signedIn) {
+                return response()
+                    ->jsonp($r->get('callback'), [
+                        'success' => true,
+                        'data' => [],
+                    ]);
+            }
         }
 
         // segment

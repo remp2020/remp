@@ -12,6 +12,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             userId: null,
 
+            signedIn: false,
+
             campaign: {
 
                 _: [],
@@ -30,7 +32,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     prepareData: function() {
                         return {
                             "beamToken": remplib.beamToken,
-                            "userId": remplib.userId,
+                            "userId": remplib.getUserId(),
+                            "signedIn": remplib.signedIn,
                             "url": window.location.href
                         }
                     },
@@ -69,6 +72,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     if (typeof config.userId !== 'undefined' && config.userId !== null) {
                         remplib.userId = config.userId;
                     }
+                    if (typeof config.signedIn !== 'undefined') {
+                        if (typeof config.signedIn !== 'boolean') {
+                            throw "remplib: configuration signedIn invalid (boolean required): "+config.signedIn
+                        }
+                        remplib.signedIn = config.signedIn;
+                    }
                 },
 
                 run: function() {
@@ -103,6 +112,64 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                     remplib.loadScript(url + query + "callback=" + cb)
                 },
+            },
+
+            getUserId: function() {
+                if (this.userId) {
+                    return this.userId;
+                }
+                var storageKey = "anon_id";
+                var anonId = this.getFromStorage(storageKey, true);
+                if (anonId) {
+                    return anonId;
+                }
+                anonId = remplib.uuidv4();
+                var now = new Date();
+                var item = {
+                    "version": 1,
+                    "value": anonId,
+                    "createdAt": now.getTime(),
+                    "updatedAt": now.getTime(),
+                };
+                localStorage.setItem(storageKey, JSON.stringify(item));
+                return anonId;
+            },
+
+            uuidv4: function() {
+                var format = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+                if (!window.crypto) {
+                    return format.replace(/[xy]/g, function(c) {
+                        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                        return v.toString(16);
+                    });
+                }
+
+                var nums = window.crypto.getRandomValues(new Uint8ClampedArray(format.split(/[xy]/).length - 1));
+                var pointer = 0;
+                return format.replace(/[xy]/g, function(c) {
+                    var r = nums[pointer++] % 16,
+                        v = (c === 'x') ? r : (r&0x3|0x8);
+                    return v.toString(16);
+                });
+            },
+
+            getFromStorage: function(key, bypassThreshold) {
+                var now = new Date();
+                var data = localStorage.getItem(key);
+                if (data === null) {
+                    return null;
+                }
+
+                var item = JSON.parse(data);
+                var threshold = new Date(now.getTime() - this.cacheThreshold * 60000);
+                if (!bypassThreshold && (new Date(item.updatedAt)).getTime() < threshold.getTime()) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+
+                item.updatedAt = now;
+                localStorage.setItem(key, JSON.stringify(item));
+                return item.value;
             },
 
             extend: function() {

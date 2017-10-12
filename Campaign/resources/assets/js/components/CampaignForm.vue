@@ -4,7 +4,7 @@
             <h4>Settings</h4>
 
             <div class="input-group fg-float m-t-30">
-                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+                <span class="input-group-addon"><i class="zmdi zmdi-file-text"></i></span>
                 <div class="fg-line">
                     <label for="name" class="fg-label">Name</label>
                     <input v-model="name" class="form-control fg-input" name="name" id="name" type="text">
@@ -24,6 +24,27 @@
                                     {{ banner.name }}
                                 </option>
                             </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+                <div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="banner_id" class="fg-label">User signed-in state</label>
+                        </div>
+                        <div class="col-md-12">
+                            <v-select v-model="signedIn"
+                                    id="signed_in"
+                                    :name="'signed_in'"
+                                    :value="signedIn"
+                                    :options.sync="signedInOptions"
+                                    :title="'Everyone'"
+                            ></v-select>
+                            <small class="help-block">To use this filter, you have to be setting <code>signedIn: Boolean</code> within your REMP tracking code.</small>
                         </div>
                     </div>
                 </div>
@@ -96,10 +117,13 @@
 </template>
 
 <script type="text/javascript">
+    import vSelect from "remp/js/components/vSelect.vue";
+
     let props = [
         "_name",
         "_segments",
         "_bannerId",
+        "_signedIn",
         "_active",
         "_banners",
         "_availableSegments",
@@ -109,7 +133,10 @@
         "_eventTypes",
     ];
     export default {
-        mounted: function(){
+        components: {
+            vSelect,
+        },
+        created: function(){
             let self = this;
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
@@ -121,6 +148,7 @@
                 "name": null,
                 "segments": [],
                 "bannerId": null,
+                "signedIn": null,
                 "active": null,
 
                 "banners": null,
@@ -128,7 +156,13 @@
                 "addedSegment": null,
                 "removedSegments": [],
                 "segmentMap": null,
-                "eventTypes": null
+                "eventTypes": null,
+
+                "signedInOptions": [
+                    {"label": "Everyone", "value": null},
+                    {"label": "Only logged in", "value": true},
+                    {"label": "Only anonymous ", "value": false},
+                ]
             }
         },
         methods: {

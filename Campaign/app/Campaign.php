@@ -14,11 +14,13 @@ class Campaign extends Model
     protected $fillable = [
         'name',
         'banner_id',
+        'signed_in',
         'active',
     ];
 
     protected $casts = [
         'active' => 'boolean',
+        'signed_in' => 'boolean',
     ];
 
     protected $attributes = [
