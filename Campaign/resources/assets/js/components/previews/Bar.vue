@@ -110,8 +110,10 @@
                     return true;
                 }
                 this.trackEvent("banner", "close", {
-                    "banner_id": this.uuid,
-                    "campaign_id": this.campaignUuid,
+                    "utm_source": "remp_campaign",
+                    "utm_medium": this.displayType,
+                    "utm_campaign": this.campaignUuid,
+                    "utm_content": this.uuid
                 });
                 this.closeTracked = true;
                 this.visible = false;
@@ -121,8 +123,10 @@
                     return true;
                 }
                 this.trackEvent("banner", "click", {
-                    "banner_id": this.uuid,
-                    "campaign_id": this.campaignUuid,
+                    "utm_source": "remp_campaign",
+                    "utm_medium": this.displayType,
+                    "utm_campaign": this.campaignUuid,
+                    "utm_content": this.uuid
                 });
                 this.clickTracked = true;
                 return true;

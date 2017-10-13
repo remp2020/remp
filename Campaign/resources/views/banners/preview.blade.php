@@ -45,11 +45,12 @@ var run = function() {
 
     remplib.banner.bindPreview('#' + bannerId, banner);
 
-    // TODO: track explicit click and close
     setTimeout(function() {
         remplib.tracker.trackEvent("banner", "show", {
-            "banner_id": banner.uuid,
-            "campaign_id": banner.campaignUuid
+            "utm_source": "remp_campaign",
+            "utm_medium": banner.displayType,
+            "utm_campaign": banner.campaignUuid,
+            "utm_content": banner.uuid
         })
         banner.show = true;
         if (banner.closeTimeout) {
