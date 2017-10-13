@@ -6,7 +6,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
     'use strict';
 
-    var prodlib = {
+    let prodlib = Remplib;
+
+    prodlib.tracker = {
 
         url: null,
 
