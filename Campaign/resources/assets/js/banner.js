@@ -65,7 +65,6 @@ window.remplib = window.remplib || {};
         },
 
         bindPreview: function(el, banner) {
-            console.log(banner);
             return new Vue({
                 el: el,
                 data: banner,
