@@ -83,19 +83,22 @@ export default {
         return g
     },
 
-    bootstrap: function(self) {
-        for (var i=0; i < self._.length; i++) {
-            var cb = self._[i];
+    bootstrap: function(app) {
+        if (this.isBot(navigator.userAgent)) {
+            return;
+        }
+        for (var i=0; i < app._.length; i++) {
+            var cb = app._[i];
             setTimeout((function() {
                 var cbf = cb[0];
                 var cbargs = cb[1];
                 return function() {
                     if (cbf !== "run") {
-                        self[cbf].apply(self, cbargs);
+                        app[cbf].apply(app, cbargs);
                     }
-                    self.initIterator++;
-                    if (self.initIterator === self._.length) {
-                        self.run();
+                    app.initIterator++;
+                    if (app.initIterator === app._.length) {
+                        app.run();
                     }
                 }
             })(), 0);
@@ -126,5 +129,9 @@ export default {
             }
         };
         document.getElementsByTagName('head')[0].appendChild(l);
-    }
+    },
+
+    isBot: function(userAgent) {
+        return userAgent.match(/bot|crawl|slurp|spider|mediapartners/i);
+    },
 }

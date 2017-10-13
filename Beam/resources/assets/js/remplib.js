@@ -208,10 +208,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return params
         },
 
-        isBot: function(userAgent) {
-            return navigator.userAgent.match(/bot|crawl|slurp|spider|mediapartners/i);
-        },
-
         getSocialSource: function() {
             var source = null;
             if (document.referrer.match(/^https?:\/\/([^\/]+\.)?facebook\.com(\/|$)/i)) {
