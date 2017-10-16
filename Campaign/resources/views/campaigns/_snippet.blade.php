@@ -1,11 +1,11 @@
 @php
     $campaignUrl = url('/');
-    $campaignLibUrl = asset("/assets/vendor/js/remplib.js");
+    $campaignLibUrl = asset("/assets/vendor/lib/remplib.js");
 
     $beamWebUrl = config('services.remp_beam.web_base_url');
     if ($beamWebUrl !== null) {
         $trackerUrl = url($beamWebUrl);
-        $trackerLibUrl = $trackerUrl . "/assets/vendor/js/remplib.js";
+        $trackerLibUrl = $trackerUrl . "/assets/vendor/lib/remplib.js";
     }
 @endphp
 

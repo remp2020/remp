@@ -24,7 +24,7 @@
 
                 script.type = "text/javascript";
                 script.async = true;
-                script.src = d + "http://campaign.remp.app/assets/js/remplib.js";
+                script.src = d + "http://campaign.remp.app/assets/lib/remplib.js";
                 doc.getElementsByTagName("head")[0].appendChild(script);
             }
         })(window, document);
