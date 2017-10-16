@@ -2,6 +2,11 @@
     @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
     @import url('../../../css/transitions.css');
 
+    .html-preview-link {
+        text-decoration: none;
+        overflow: hidden;
+        z-index: 9999;
+    }
     .html-preview-close.hidden {
         display: none;
     }
@@ -32,7 +37,7 @@
 </style>
 
 <template>
-    <a v-bind:href="url" v-on:click="clicked" v-if="isVisible" v-bind:style="[
+    <a class="html-preview-link" v-bind:href="url" v-on:click="clicked" v-if="isVisible" v-bind:style="[
         linkStyles,
         _position,
         dimensionOptions[dimensions]
@@ -135,7 +140,7 @@
                 return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
             },
             linkStyles: function() {
-                let position = this.displayType === 'overlay' ? 'absolute' : 'relative';
+                let position = this.displayType === 'overlay' ? 'fixed' : 'relative';
                 if (typeof this.forcedPosition !== 'undefined') {
                     position = this.forcedPosition;
                 }

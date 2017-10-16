@@ -18,7 +18,7 @@
     .bar-preview-link {
         text-decoration: none;
         overflow: hidden;
-        z-index: 0;
+        z-index: 9999;
         width: 100%;
     }
 
@@ -30,7 +30,7 @@
         position: relative;
         padding: 0 40px;
         width: 100%;
-        height: 68px;
+        min-height: 68px;
         justify-content: space-between;
         align-items: center;
     }
@@ -38,6 +38,7 @@
     .bar-main {
         font-size: 17px;
         word-wrap: break-word;
+        padding-right: 5px;
     }
 
     .bar-button {
@@ -45,6 +46,13 @@
         padding: 7px 30px;
         word-wrap: break-word;
         font-size: 14px;
+        text-align: center;
+    }
+
+    @media (max-width: 760px) {
+        .bar-button {
+            padding: 5px 15px;
+        }
     }
 </style>
 
@@ -157,7 +165,8 @@
                 return styles;
             },
             linkStyles: function() {
-                let position = this.displayType === 'overlay' ? 'absolute' : 'relative';
+                console.log("forcedPosition: ", this.forcedPosition);
+                let position = this.displayType === 'overlay' ? 'fixed' : 'relative';
                 if (typeof this.forcedPosition !== 'undefined') {
                     position = this.forcedPosition;
                 }

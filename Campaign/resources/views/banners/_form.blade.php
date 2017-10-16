@@ -23,6 +23,7 @@
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
+    banner.forcedPosition = 'absolute';
 
     remplib.bannerForm.bind("#banner-form", banner);
 

@@ -63,8 +63,8 @@ class BannerRequest extends FormRequest
                         'header_text' => 'string',
                         'main_text' => 'string|required',
                         'button_text' => 'string|required',
-                        'width' => 'string',
-                        'height' => 'string',
+                        'width' => 'string|nullable',
+                        'height' => 'string|nullable',
                     ]);
                     break;
                 case Banner::TEMPLATE_BAR:

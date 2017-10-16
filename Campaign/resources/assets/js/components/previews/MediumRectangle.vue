@@ -18,7 +18,7 @@
     .medium-rectangle-preview-link {
         text-decoration: none;
         overflow: hidden;
-        z-index: 0;
+        z-index: 9999;
     }
 
     .medium-rectangle-preview-box {
@@ -153,7 +153,7 @@
                 return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
             },
             linkStyles: function() {
-                let position = this.displayType === 'overlay' ? 'absolute' : 'relative';
+                let position = this.displayType === 'overlay' ? 'fixed' : 'relative';
                 if (typeof this.forcedPosition !== 'undefined') {
                     position = this.forcedPosition;
                 }

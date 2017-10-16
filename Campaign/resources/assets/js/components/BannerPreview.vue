@@ -11,6 +11,7 @@
                 :show="previewShow"
                 :uuid="uuid"
                 :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
 
                 :textAlign="htmlTemplate.textAlign"
                 :dimensions="htmlTemplate.dimensions"
@@ -32,6 +33,7 @@
                 :show="previewShow"
                 :uuid="uuid"
                 :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
 
                 :headerText="mediumRectangleTemplate.headerText"
                 :mainText="mediumRectangleTemplate.mainText"
@@ -56,6 +58,7 @@
                 :show="previewShow"
                 :uuid="uuid"
                 :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
 
                 :mainText="barTemplate.mainText"
                 :buttonText="barTemplate.buttonText"
@@ -92,6 +95,7 @@
         "template",
         "uuid",
         "campaignUuid",
+        "forcedPosition",
 
         "mediumRectangleTemplate",
         "barTemplate",
