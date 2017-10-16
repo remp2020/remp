@@ -3,7 +3,7 @@
 var bannerId = 'b-{{ $banner->uuid }}';
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {
-    scripts.push('{{ asset(mix('/js/banner.js', '/assets/showtime')) }}');
+    scripts.push('{{ asset(mix('/js/banner.js', '/assets/vendor')) }}');
 }
 
 var styles = [];
