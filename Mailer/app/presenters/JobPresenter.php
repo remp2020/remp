@@ -7,7 +7,7 @@ use Nette\Bridges\ApplicationLatte\ILatteFactory;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
-use Remp\MailerModule\Components\ITemplateStatsFactory;
+use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
@@ -283,28 +283,31 @@ final class JobPresenter extends BasePresenter
         });
     }
 
-    protected function createComponentTemplateStats(ITemplateStatsFactory $factory)
+    protected function createComponentTemplateStats(ISendingStatsFactory $factory)
     {
-
         return new Multiplier(function ($templateId) use ($factory) {
             $templateStats = $factory->create();
 
             $template = $this->templatesRepository->find($templateId);
-            $templateStats->setTemplate($template);
+            $templateStats->addTemplate($template);
             $templateStats->showConversions();
 
             return $templateStats;
         });
     }
 
-    protected function createComponentJobStats(ITemplateStatsFactory $factory)
+    protected function createComponentJobStats(ISendingStatsFactory $factory)
     {
         $templateStats = $factory->create();
 
-        $batches = $this->batchTemplatesRepository->findByJobId($this->params['id']);
+        $batches = $this->batchesRepository
+            ->getTable()
+            ->where([
+                'mail_job_id' => $this->params['id'],
+            ]);
+
         foreach ($batches as $batch) {
-            $template = $this->templatesRepository->find($batch->mail_template_id);
-            $templateStats->setTemplate($template);
+            $templateStats->addBatch($batch);
         }
         $templateStats->showConversions();
 

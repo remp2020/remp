@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Commands;
 
 use Nette\Database\Table\ActiveRow;
 use Remp\MailerModule\Repository\BatchesRepository;
+use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -16,11 +17,14 @@ class ProcessJobStatsCommand extends Command
 
     private $batchesRepository;
 
-    public function __construct(LogsRepository $logsRepository, BatchesRepository $batchesRepository)
+    private $batchTemplatesRepository;
+
+    public function __construct(LogsRepository $logsRepository, BatchesRepository $batchesRepository, BatchTemplatesRepository $batchTemplatesRepository)
     {
         parent::__construct();
         $this->logsRepository = $logsRepository;
         $this->batchesRepository = $batchesRepository;
+        $this->batchTemplatesRepository = $batchTemplatesRepository;
     }
 
     protected function configure()
@@ -36,22 +40,22 @@ class ProcessJobStatsCommand extends Command
         $output->writeln('<info>***** UPDATE EMAIL JOB STATS *****</info>');
         $output->writeln('');
 
-        $batches = $this->batchesRepository->getTable()->fetchAll();
+        $batchTemplates = $this->batchTemplatesRepository->getTable()->fetchAll();
 
         ProgressBar::setFormatDefinition(
             'processStats',
             "%processing% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%"
         );
-        $progressBar = new ProgressBar($output, count($batches));
+        $progressBar = new ProgressBar($output, count($batchTemplates));
         $progressBar->setFormat('processStats');
         $progressBar->start();
 
-        /** @var ActiveRow $batch */
-        foreach ($batches as $batch) {
-            $progressBar->setMessage('Processing batch <info>' . $batch->id . '</info>', 'processing');
-            $stats = $this->logsRepository->getBatchStats($batch);
+        /** @var ActiveRow $batchTemplate */
+        foreach ($batchTemplates as $batchTemplate) {
+            $progressBar->setMessage('Processing jobBatchTemplate <info>' . $batchTemplate->id . '</info>', 'processing');
+            $stats = $this->logsRepository->getBatchTemplateStats($batchTemplate);
 
-            $this->batchesRepository->update($batch, [
+            $this->batchTemplatesRepository->update($batchTemplate, [
                 'delivered' => $stats->delivered ?? 0,
                 'opened' => $stats->opened ?? 0,
                 'clicked' => $stats->clicked ?? 0,

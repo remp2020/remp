@@ -163,7 +163,7 @@ services:
 
     # Factories
     - Remp\MailerModule\Components\IDataTableFactory
-    - Remp\MailerModule\Components\ITemplateStatsFactory
+    - Remp\MailerModule\Components\ISendingStatsFactory
 
     # Forms
     - Remp\MailerModule\Forms\SignInFormFactory

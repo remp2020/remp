@@ -8,6 +8,7 @@ use Nette\Utils\DateTime;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
+use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobQueueRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
@@ -31,6 +32,8 @@ class MailWorkerCommand extends Command
 
     private $mailTemplateRepository;
 
+    private $batchTemplatesRepository;
+
     private $mailCache;
 
     private $emitter;
@@ -46,6 +49,7 @@ class MailWorkerCommand extends Command
         JobQueueRepository $mailJobQueueRepository,
         LogsRepository $mailLogRepository,
         TemplatesRepository $mailTemplatesRepository,
+        BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
         Emitter $emitter
     ) {
@@ -56,6 +60,7 @@ class MailWorkerCommand extends Command
         $this->mailJobQueueRepository = $mailJobQueueRepository;
         $this->mailLogRepository = $mailLogRepository;
         $this->mailTemplateRepository = $mailTemplatesRepository;
+        $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailCache = $redis;
         $this->emitter = $emitter;
     }
@@ -124,9 +129,9 @@ class MailWorkerCommand extends Command
                 }
 
                 $output->writeln(" * sending from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
+                $template = $this->mailTemplateRepository->getByCode($job->templateCode);
 
                 try {
-                    $template = $this->mailTemplateRepository->getByCode($job->templateCode);
                     $result = $this->applicationMailer->setTemplate($template)
                         ->setRecipient($job->email)
                         ->setJobId($batch->mail_job_id)
@@ -162,6 +167,14 @@ class MailWorkerCommand extends Command
                     'last_email_sent_at' => $now,
                     'sent_emails+=' => 1,
                     'last_ping' => $now
+                ]);
+
+                $jobBatchTemplate = $this->batchTemplatesRepository->getTable()->where([
+                    'mail_template_id' => $template->id,
+                    'mail_job_batch_id' => $batch->id,
+                ])->fetch();
+                $this->batchTemplatesRepository->update($jobBatchTemplate, [
+                    'sent+=' => 1,
                 ]);
             }
         }

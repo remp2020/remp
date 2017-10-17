@@ -1,5 +1,3 @@
-{foreach $job->related('mail_job_batch') as $batch}
-    {foreach $batch->related('mail_job_batch_templates')->order('mail_job_batch_templates.weight') as $mailJobTemplate}
-        <div><span class="badge m-r-5 palette-Cyan-700 bg">{$batch->status|upper}</span> {$mailJobTemplate->template->name}</div>
-    {/foreach}
+{foreach $job->related('mail_job_batch_templates')->order('mail_job_batch_templates.weight') as $jobBatchTemplate}
+    <div><span class="badge m-r-5 palette-Cyan-700 bg">{$jobBatchTemplate->mail_job_batch->status|upper}</span> {$jobBatchTemplate->template->name}</div>
 {/foreach}
