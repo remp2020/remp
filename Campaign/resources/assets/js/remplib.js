@@ -25,7 +25,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             jsonpParameter: "data",
             prepareData: function() {
                 return {
-                    "beamToken": remplib.beamToken,
                     "userId": remplib.getUserId(),
                     "signedIn": remplib.signedIn,
                     "url": window.location.href
@@ -49,9 +48,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         /* JSONP END */
 
         init: function(config) {
-            if (typeof config.token !== 'string') {
-                throw "remplib: configuration token invalid or missing: "+config.token
-            }
             if (typeof config.campaign !== 'object') {
                 throw "remplib: configuration campaign invalid or missing: "+config.campaign
             }
@@ -62,7 +58,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.url = config.campaign.url;
 
             // global
-            remplib.beamToken = config.token;
             if (typeof config.userId !== 'undefined' && config.userId !== null) {
                 remplib.userId = config.userId;
             }

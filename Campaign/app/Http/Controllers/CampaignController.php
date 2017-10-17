@@ -87,7 +87,7 @@ class CampaignController extends Controller
         $campaign->fill($request->all());
         $campaign->save();
 
-        foreach ($request->get('segments') as $r) {
+        foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
             $campaignSegment = new CampaignSegment();
             $campaignSegment->code = $r['code'];
