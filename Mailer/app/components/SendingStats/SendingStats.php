@@ -28,8 +28,7 @@ class SendingStats extends Control
         LogsRepository $mailLogsRepository,
         TemplatesRepository $templatesRepository,
         BatchesRepository $batchesRepository
-    )
-    {
+    ) {
         parent::__construct();
 
         $this->logsRepository = $mailLogsRepository;
