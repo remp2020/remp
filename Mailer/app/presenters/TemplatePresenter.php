@@ -6,7 +6,7 @@ use Nette\Application\BadRequestException;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
-use Remp\MailerModule\Components\ITemplateStatsFactory;
+use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\TemplateFormFactory;
 use Remp\MailerModule\Forms\TemplateTestFormFactory;
@@ -96,8 +96,8 @@ final class TemplatePresenter extends BasePresenter
                 $template->code,
                 $template->subject,
                 $template->type->title,
-                $template->opened,
-                $template->clicked,
+                $template->related('mail_job_batch_template')->sum('opened'),
+                $template->related('mail_job_batch_template')->sum('clicked'),
             ];
         }
         $this->presenter->sendJson($result);
@@ -242,13 +242,13 @@ final class TemplatePresenter extends BasePresenter
         return $form;
     }
 
-    protected function createComponentTemplateStats(ITemplateStatsFactory $factory)
+    protected function createComponentTemplateStats(ISendingStatsFactory $factory)
     {
         $templateStats = $factory->create();
 
         if (isset($this->params['id'])) {
             $template = $this->templatesRepository->find($this->params['id']);
-            $templateStats->setTemplate($template);
+            $templateStats->addTemplate($template);
             $templateStats->showTotal();
         }
 

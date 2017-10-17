@@ -2,8 +2,8 @@
 
 namespace Remp\MailerModule\Components;
 
-interface ITemplateStatsFactory
+interface ISendingStatsFactory
 {
-    /** @return TemplateStats */
+    /** @return SendingStats */
     public function create();
 }

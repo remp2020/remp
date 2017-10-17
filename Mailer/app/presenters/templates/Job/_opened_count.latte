@@ -1,8 +1,6 @@
-{foreach $job->related('mail_job_batch') as $batch}
-    {if $batch->related('mail_job_batch_templates')->count('*') > 0}
-        <span class="actions">
-            {var $percent = $batch->sent_emails ? (100 * $batch->opened / $batch->sent_emails) : 0}
-            {$batch->opened} ({$percent|number:0}%)
-        </span>
-    {/if}
+{foreach $job->related('mail_job_batch_templates') as $jobBatchTemplate}
+    <span class="actions">
+        {var $percent = $jobBatchTemplate->sent ? (100 * $jobBatchTemplate->opened / $jobBatchTemplate->sent) : 0}
+        {$jobBatchTemplate->opened} ({$percent|number:0}%)
+    </span>
 {/foreach}

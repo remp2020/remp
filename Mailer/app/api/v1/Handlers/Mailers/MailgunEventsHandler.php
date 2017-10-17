@@ -23,7 +23,7 @@ class MailgunEventsHandler extends BaseHandler
 
     public function __construct(
         Config $config,
-        logsRepository $logsRepository,
+        LogsRepository $logsRepository,
         LogEventsRepository $logEventsRepository,
         Sender $sender
     ) {

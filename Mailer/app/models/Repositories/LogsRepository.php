@@ -57,7 +57,7 @@ class LogsRepository extends Repository
         return $this->getTable()->where('mail_sender_id', $sender_id)->limit(1)->fetch();
     }
 
-    public function getBatchStats($batch)
+    public function getBatchTemplateStats($batchTemplate)
     {
         $columns = [
             'mail_job_batch_id',
@@ -71,7 +71,8 @@ class LogsRepository extends Repository
         return $this->getTable()
             ->select(implode(',', $columns))
             ->where([
-                'mail_job_batch_id' => $batch->id,
+                'mail_job_batch_id' => $batchTemplate->mail_job_batch_id,
+                'mail_template_id' => $batchTemplate->mail_template_id,
             ])
             ->limit(1)
             ->fetch();
@@ -132,8 +133,6 @@ class LogsRepository extends Repository
             ];
         }
 
-        $statsKey = implode(',', $ids) . '-' . ($startTime ? $startTime->format('c') : '') . '-' . ($endTime ? $endTime->format('c') : '');
-
         $timeWhere = '';
         if ($startTime) {
             $timeWhere .= " AND mail_logs.created_at >= '{$startTime->format('Y-m-d H:i:s')}' ";
@@ -159,14 +158,7 @@ class LogsRepository extends Repository
             $local = $row->count;
             break;
         }
-
-        $total = $this->statsTotals[$statsKey];
-
-        return [
-            'per' => $total ? 100 * $local / $total : 0,
-            'value' => $local,
-            'total' => $total,
-        ];
+        return $local;
     }
 
     /**
