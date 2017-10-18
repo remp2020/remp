@@ -40,7 +40,10 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 	if !ok {
 		return ctx.NotFound()
 	}
-	ok, err = c.SegmentStorage.Check(s, ctx.UserID, time.Now())
+	ro := model.RuleOverrides{
+		Fields: ctx.Payload.Fields,
+	}
+	ok, err = c.SegmentStorage.Check(s, ctx.UserID, time.Now(), ro)
 	if err != nil {
 		return err
 	}
@@ -58,7 +61,10 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 	if !ok {
 		return ctx.NotFound()
 	}
-	uc, err := c.SegmentStorage.Users(s, time.Now())
+	ro := model.RuleOverrides{
+		Fields: ctx.Payload.Fields,
+	}
+	uc, err := c.SegmentStorage.Users(s, time.Now(), ro)
 	if err != nil {
 		return err
 	}

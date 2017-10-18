@@ -37,7 +37,7 @@ var _ = Resource("segments", func() {
 	})
 	Action("check", func() {
 		Description("Retrieve segment with given ID.")
-		Routing(GET("/:segment_code/check/:user_id"))
+		Routing(POST("/:segment_code/check/:user_id"))
 		Params(func() {
 			Param("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
@@ -46,6 +46,7 @@ var _ = Resource("segments", func() {
 				Pattern(UserPattern)
 			})
 		})
+		Payload(RuleOverrides)
 		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, func() {
@@ -55,13 +56,14 @@ var _ = Resource("segments", func() {
 	Action("users", func() {
 		Description("List users of segment.")
 		Routing(
-			GET("/:segment_code/users"),
+			POST("/:segment_code/users"),
 		)
 		Params(func() {
 			Param("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
 			})
 		})
+		Payload(RuleOverrides)
 		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))

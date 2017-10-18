@@ -18,9 +18,9 @@ type SegmentStorage interface {
 	// List returns all available segments configured via Beam admin.
 	List() (SegmentCollection, error)
 	// Check verifies presence of user within provided segment.
-	Check(segment *Segment, userID string, now time.Time) (bool, error)
+	Check(segment *Segment, userID string, now time.Time, ro RuleOverrides) (bool, error)
 	// Users return list of all users within segment.
-	Users(segment *Segment, now time.Time) ([]string, error)
+	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
 }
 
 // Segment structure.
@@ -34,6 +34,10 @@ type Segment struct {
 
 	Group *SegmentGroup
 	Rules []*SegmentRule `db:"segment_rules"`
+}
+
+type RuleOverrides struct {
+	Fields map[string]string
 }
 
 // SegmentCollection is list of Segments.
@@ -135,9 +139,9 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 }
 
 // Check verifies presence of user within provided segment.
-func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time) (bool, error) {
+func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, ro RuleOverrides) (bool, error) {
 	for _, sr := range segment.Rules {
-		ok, err := sDB.checkRule(sr, userID, now)
+		ok, err := sDB.checkRule(sr, userID, now, ro)
 		if err != nil {
 			return false, errors.Wrap(err, "unable to check SegmentRule")
 		}
@@ -149,23 +153,17 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time) (boo
 }
 
 // checkRule verifies defined rule against current state within InfluxDB.
-func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (bool, error) {
-	subquery := sDB.InfluxDB.QueryBuilder.
+func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, ro RuleOverrides) (bool, error) {
+	query := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
 		Where(fmt.Sprintf(`"user_id" = '%s'`, userID))
-	for _, cond := range sr.conditions(now) {
-		subquery = subquery.Where(cond)
+	for _, cond := range sr.conditions(now, ro) {
+		query = query.Where(cond)
 	}
-	sq := subquery.Build()
 
 	// If user didn't generate any event so far, sr.Count will return always zero.
 	// We're aiming for query matching also users with no event which could still match the condition.
-
-	query := sDB.InfluxDB.QueryBuilder.
-		Select("*").
-		From(fmt.Sprintf("(%s)", sq)).
-		Where(fmt.Sprintf(`"count" %s %d`, sr.Operator, sr.Count))
 
 	response, err := sDB.InfluxDB.Exec(query.Build())
 	if err != nil {
@@ -175,22 +173,36 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time) (
 		return false, err
 	}
 
-	_, ok, err := sDB.InfluxDB.Count(response)
+	count, ok, err := sDB.InfluxDB.Count(response)
 	if err != nil {
 		return false, err
 	}
-	if !ok {
-		return false, nil
+	if !ok { // no response from influx, in-place rule evaluation
+		count = 0
 	}
-	return true, nil
+
+	switch sr.Operator {
+	case "<=":
+		return count >= sr.Count, nil
+	case "<":
+		return count < sr.Count, nil
+	case "=":
+		return count == sr.Count, nil
+	case ">=":
+		return count >= sr.Count, nil
+	case ">":
+		return count > sr.Count, nil
+	default:
+		return false, fmt.Errorf("unhandled operator: %s", sr.Operator)
+	}
 }
 
 // Users return list of all users within segment.
-func (sDB *SegmentDB) Users(segment *Segment, now time.Time) ([]string, error) {
+func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error) {
 	users := make(UserSet)
 
 	for i, sr := range segment.Rules {
-		filteredUsers, err := sDB.ruleUsers(sr, now, func(userID string) bool {
+		filteredUsers, err := sDB.ruleUsers(sr, now, ro, func(userID string) bool {
 			// on first iteration everyone is eligible to be in "users"
 			if i == 0 {
 				return true
@@ -214,12 +226,12 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time) ([]string, error) {
 }
 
 // ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
-func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Intersector) (UserSet, error) {
+func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, o RuleOverrides, intersect Intersector) (UserSet, error) {
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
 		GroupBy(`"user_id"`)
-	for _, cond := range sr.conditions(now) {
+	for _, cond := range sr.conditions(now, o) {
 		subquery = subquery.Where(cond)
 	}
 
@@ -260,7 +272,7 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, intersect Inters
 }
 
 // conditions returns list of influx conditions for current SegmentRule.
-func (sr *SegmentRule) conditions(now time.Time) []string {
+func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
 	var conds []string
 	switch sr.EventCategory {
 	case CategoryPageview:
@@ -279,12 +291,16 @@ func (sr *SegmentRule) conditions(now time.Time) []string {
 	}
 
 	for _, def := range sr.Fields {
-		if def["key"] == "" || def["value"] == "" {
+		value := def["value"]
+		if overriddenVal, ok := o.Fields[def["key"]]; ok {
+			value = overriddenVal
+		}
+		if def["key"] == "" || value == "" {
 			continue
 		}
 		conds = append(
 			conds,
-			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
+			fmt.Sprintf(`"%s" = '%s'`, def["key"], value),
 		)
 	}
 
