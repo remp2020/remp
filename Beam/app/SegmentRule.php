@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class SegmentRule extends Model
 {
     protected $casts = [
-        'fields' => 'array',
-        'flags' => 'array',
+        'fields' => 'json',
+        'flags' => 'json',
     ];
 
     protected $attributes = [
-        'fields' => [],
-        'flags' => [],
+        'fields' => '[]',
+        'flags' => '[]',
     ];
 
     protected $fillable = [

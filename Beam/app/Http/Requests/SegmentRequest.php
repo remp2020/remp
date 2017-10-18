@@ -34,6 +34,7 @@ class SegmentRequest extends FormRequest
             'rules.*.event_action' => 'required|string',
             'rules.*.operator' => 'required|string',
             'rules.*.fields' => 'array',
+            'rules.*.flags' => 'array',
             'rules.*.flags.*.key' => 'string',
             'rules.*.flags.*.value' => 'string|nullable|in:"0","1"',
         ];

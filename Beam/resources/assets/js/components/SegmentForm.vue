@@ -242,6 +242,9 @@
         mounted: function(){
             this.$on('vselect-changed', function(data){
                 if (data.type === 'category') {
+                    if (data.group === undefined) {
+                        data.group = 'events'; // default for custom values
+                    }
                     this.fetchActions(data.group, data.value);
                     this.fetchFlags(data.group);
                 }
