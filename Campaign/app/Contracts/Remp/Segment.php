@@ -10,6 +10,7 @@ use Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
+use Psy\Util\Json;
 use Razorpay\BloomFilter\Bloom;
 
 class Segment implements SegmentContract
@@ -86,9 +87,9 @@ class Segment implements SegmentContract
 
         // until the cache is filled, let's check directly
         try {
-            $response = $this->client->post(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
-                'json' => [
-                    'fields' => $overrides,
+            $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
+                'query' => [
+                    'fields' => Json::encode($overrides)
                 ],
             ]);
         } catch (ConnectException $e) {
@@ -108,8 +109,10 @@ class Segment implements SegmentContract
     public function users(CampaignSegment $campaignSegment, array $overrides): Collection
     {
         try {
-            $response = $this->client->post(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
-                'json' => $overrides,
+            $response = $this->client->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
+                'query' => [
+                    'fields' => Json::encode($overrides)
+                ],
             ]);
         } catch (ConnectException $e) {
             throw new SegmentException("Could not connect to Segment:Users endpoint: {$e->getMessage()}");

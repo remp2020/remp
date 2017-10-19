@@ -154,6 +154,7 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, ro R
 
 // checkRule verifies defined rule against current state within InfluxDB.
 func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, ro RuleOverrides) (bool, error) {
+	// get count of events
 	query := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
@@ -161,9 +162,6 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, r
 	for _, cond := range sr.conditions(now, ro) {
 		query = query.Where(cond)
 	}
-
-	// If user didn't generate any event so far, sr.Count will return always zero.
-	// We're aiming for query matching also users with no event which could still match the condition.
 
 	response, err := sDB.InfluxDB.Exec(query.Build())
 	if err != nil {
@@ -177,13 +175,14 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, r
 	if err != nil {
 		return false, err
 	}
-	if !ok { // no response from influx, in-place rule evaluation
+	if !ok { // no response from influx mean no data tracked
 		count = 0
 	}
 
+	// in-place rule evaluation
 	switch sr.Operator {
 	case "<=":
-		return count >= sr.Count, nil
+		return count <= sr.Count, nil
 	case "<":
 		return count < sr.Count, nil
 	case "=":

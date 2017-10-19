@@ -37,7 +37,7 @@ var _ = Resource("segments", func() {
 	})
 	Action("check", func() {
 		Description("Retrieve segment with given ID.")
-		Routing(POST("/:segment_code/check/:user_id"))
+		Routing(GET("/:segment_code/check/:user_id"))
 		Params(func() {
 			Param("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
@@ -45,8 +45,14 @@ var _ = Resource("segments", func() {
 			Param("user_id", String, "User ID", func() {
 				Pattern(UserPattern)
 			})
+			Param("fields", String, `JSON-encoded object of overriden pairs, e.g.:
+
+	{
+		"utm_campaign": "custom-campaign-id",
+		// ...
+	}
+			`)
 		})
-		Payload(RuleOverrides)
 		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, func() {
@@ -56,12 +62,19 @@ var _ = Resource("segments", func() {
 	Action("users", func() {
 		Description("List users of segment.")
 		Routing(
-			POST("/:segment_code/users"),
+			GET("/:segment_code/users"),
 		)
 		Params(func() {
 			Param("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
 			})
+			Param("fields", String, `JSON-encoded object of overriden pairs, e.g.:
+
+	{
+		"utm_campaign": "custom-campaign-id",
+		// ...
+	}
+			`)
 		})
 		Payload(RuleOverrides)
 		Response(NotFound)
