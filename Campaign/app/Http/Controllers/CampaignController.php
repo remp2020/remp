@@ -246,9 +246,11 @@ class CampaignController extends Controller
         }
 
         // segment
-
+        $overrides = [
+            'utm_campaign' => $campaign->uuid,
+        ];
         foreach ($campaign->segments as $campaignSegment) {
-            if (!$sa->check($campaignSegment, $userId)) {
+            if (!$sa->check($campaignSegment, $userId, $overrides)) {
                 return response()
                     ->jsonp($r->get('callback'), [
                         'success' => true,

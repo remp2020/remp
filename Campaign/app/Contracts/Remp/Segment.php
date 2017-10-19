@@ -66,10 +66,11 @@ class Segment implements SegmentContract
     /**
      * @param CampaignSegment $campaignSegment
      * @param $userId
+     * @param array $overrides
      * @return bool
      * @throws SegmentException
      */
-    public function check(CampaignSegment $campaignSegment, $userId): bool
+    public function check(CampaignSegment $campaignSegment, $userId, array $overrides): bool
     {
         if ($this->allowCache) {
             $cacheJob = new CacheSegmentJob($campaignSegment);
@@ -85,7 +86,11 @@ class Segment implements SegmentContract
 
         // until the cache is filled, let's check directly
         try {
-            $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId));
+            $response = $this->client->post(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
+                'json' => [
+                    'fields' => $overrides,
+                ],
+            ]);
         } catch (ConnectException $e) {
             throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
         }
@@ -96,15 +101,18 @@ class Segment implements SegmentContract
 
     /**
      * @param CampaignSegment $campaignSegment
+     * @param array $overrides
      * @return Collection
      * @throws SegmentException
      */
-    public function users(CampaignSegment $campaignSegment): Collection
+    public function users(CampaignSegment $campaignSegment, array $overrides): Collection
     {
         try {
-            $response = $this->client->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code));
+            $response = $this->client->post(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
+                'json' => $overrides,
+            ]);
         } catch (ConnectException $e) {
-            throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
+            throw new SegmentException("Could not connect to Segment:Users endpoint: {$e->getMessage()}");
         }
 
         $list = json_decode($response->getBody());
