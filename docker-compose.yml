@@ -183,7 +183,7 @@ services:
       - "kafka-data:/data"
 
   influxdb:
-    image: "influxdb:1.2"
+    image: "influxdb:1.3"
     volumes:
       - "influxdb-data:/var/lib/influxdb"
     environment:

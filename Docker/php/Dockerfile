@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:7.1-fpm
 
 ENV LIBRDKAFKA_VERSION v0.9.5
 

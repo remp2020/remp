@@ -30,9 +30,9 @@ You can override any default config from
 
 #### Dependencies
 
-- PHP ^7.0
-- MySQL ^5.7
-- Redis ^3.2
+- PHP 7.1
+- MySQL 5.7
+- Redis 3.2
 
 ### Integration with user base
 
