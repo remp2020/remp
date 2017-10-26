@@ -9,9 +9,12 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
-const TableEvents = "events_v2"
+// Exported constants for services writing to EventStorage indirectly (e.g. Kafka).
+const (
+	TableEvents = "events_v2"
+)
 
-// Options represent filter options for event-related calls.
+// EventOptions represent filter options for event-related calls.
 type EventOptions struct {
 	UserID     string
 	Action     string
@@ -20,6 +23,7 @@ type EventOptions struct {
 	TimeBefore time.Time
 }
 
+// Event represents event data.
 type Event struct {
 	Category  string
 	Action    string
@@ -32,8 +36,10 @@ type Event struct {
 	UserAgent string
 }
 
+// EventCollection is collection of events.
 type EventCollection []*Event
 
+// EventStorage is an interface to get generic event related data.
 type EventStorage interface {
 	// Count returns number of events matching the filter defined by EventOptions.
 	Count(o EventOptions) (int, bool, error)
@@ -49,6 +55,7 @@ type EventStorage interface {
 	Users() ([]string, error)
 }
 
+// EventDB is Influx implementation of EventStorage.
 type EventDB struct {
 	DB *InfluxDB
 }
@@ -114,6 +121,7 @@ func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
 	return ec, nil
 }
 
+// Categories lists all tracked categories.
 func (eDB *EventDB) Categories() ([]string, error) {
 	q := client.Query{
 		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "category"`,
@@ -142,10 +150,12 @@ func (eDB *EventDB) Categories() ([]string, error) {
 	return categories, nil
 }
 
+// Flags lists all available flags.
 func (eDB *EventDB) Flags() []string {
 	return []string{}
 }
 
+// Actions lists all tracked actions under the given category.
 func (eDB *EventDB) Actions(category string) ([]string, error) {
 	q := client.Query{
 		Command:  fmt.Sprintf(`SHOW TAG VALUES FROM "`+TableEvents+`" WITH KEY = "action" WHERE category =~ /%s/`, category),
@@ -174,6 +184,7 @@ func (eDB *EventDB) Actions(category string) ([]string, error) {
 	return actions, nil
 }
 
+// Users lists all tracked users.
 func (eDB *EventDB) Users() ([]string, error) {
 	q := client.Query{
 		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "user_id"`,

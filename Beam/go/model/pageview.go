@@ -9,10 +9,13 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
-const CategoryPageview = "pageview"
-const ActionPageviewLoad = "load"
-const TablePageviews = "pageviews"
-const FlagArticle = "_article"
+// Exported constants for services writing to EventStorage indirectly (e.g. Kafka) and reading from enumerated values.
+const (
+	CategoryPageview   = "pageview"
+	ActionPageviewLoad = "load"
+	TablePageviews     = "pageviews"
+	FlagArticle        = "_article"
+)
 
 // PageviewOptions represent filter options for pageview-related calls.
 type PageviewOptions struct {
@@ -22,6 +25,7 @@ type PageviewOptions struct {
 	TimeBefore time.Time
 }
 
+// Pageview represents pageview data.
 type Pageview struct {
 	ArticleID    string
 	AuthorID     string
@@ -40,8 +44,10 @@ type Pageview struct {
 	UserAgent string
 }
 
+// PageviewCollection is collection of pageviews.
 type PageviewCollection []*Pageview
 
+// PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
 	// Count returns number of pageviews matching the filter defined by PageviewOptions.
 	Count(o PageviewOptions) (int, bool, error)
@@ -55,6 +61,7 @@ type PageviewStorage interface {
 	Actions(category string) ([]string, error)
 }
 
+// PageviewDB is Influx implementation of PageviewStorage.
 type PageviewDB struct {
 	DB *InfluxDB
 }
@@ -120,18 +127,21 @@ func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
 	return ec, nil
 }
 
+// Categories lists all tracked categories.
 func (eDB *PageviewDB) Categories() []string {
 	return []string{
 		CategoryPageview,
 	}
 }
 
+// Flags lists all available flags.
 func (eDB *PageviewDB) Flags() []string {
 	return []string{
 		FlagArticle,
 	}
 }
 
+// Actions lists all tracked actions under the given category.
 func (eDB *PageviewDB) Actions(category string) ([]string, error) {
 	switch category {
 	case CategoryPageview:
@@ -142,6 +152,7 @@ func (eDB *PageviewDB) Actions(category string) ([]string, error) {
 	return nil, fmt.Errorf("unknown commerce category: %s", category)
 }
 
+// Users returns list of all tracked user IDs.
 func (eDB *PageviewDB) Users() ([]string, error) {
 	q := client.Query{
 		Command:  `SHOW TAG VALUES FROM "` + TablePageviews + `" WITH KEY = "user_id"`,

@@ -10,7 +10,7 @@ import (
 	"gitlab.com/remp/remp/Beam/go/model"
 )
 
-// EventController implements the event resource.
+// SegmentController implements the segment resource.
 type SegmentController struct {
 	*goa.Controller
 	SegmentStorage model.SegmentStorage

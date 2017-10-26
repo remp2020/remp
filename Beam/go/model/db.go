@@ -16,8 +16,10 @@ var fts = map[string]string{
 	"users":    "user_id",
 }
 
+// FilterType represents special enum layer for data filtering.
 type FilterType string
 
+// NewFilterType validates support for provided type and returns FilterType instance.
 func NewFilterType(t string) (FilterType, error) {
 	_, ok := fts[t]
 	if !ok {
@@ -30,6 +32,7 @@ func (gt FilterType) column() string {
 	return fts[string(gt)]
 }
 
+// InfluxDB represents data layer based on InfluxDB.
 type InfluxDB struct {
 	DBName       string
 	Client       client.Client
@@ -37,6 +40,7 @@ type InfluxDB struct {
 	Debug        bool
 }
 
+// Exec executes the provided query string and returns response.
 func (iDB *InfluxDB) Exec(cmd string) (*client.Response, error) {
 	if iDB.Debug {
 		log.Println("InfluxDB:", cmd)
@@ -48,6 +52,7 @@ func (iDB *InfluxDB) Exec(cmd string) (*client.Response, error) {
 	return iDB.Client.Query(q)
 }
 
+// Count parses the provided response and extracts count from the query result.
 func (iDB *InfluxDB) Count(response *client.Response) (int, bool, error) {
 	counts, ok, err := iDB.GroupedCount(response, FilterType(""))
 	if err != nil {
@@ -59,6 +64,7 @@ func (iDB *InfluxDB) Count(response *client.Response) (int, bool, error) {
 	return counts[""], true, nil
 }
 
+// GroupedCount parses the provided response and extracts counts based on provided filter type.
 func (iDB *InfluxDB) GroupedCount(response *client.Response, ft FilterType) (map[string]int, bool, error) {
 	counts := make(map[string]int)
 	if len(response.Results[0].Series) == 0 {
@@ -80,6 +86,7 @@ func (iDB *InfluxDB) GroupedCount(response *client.Response, ft FilterType) (map
 	return counts, true, nil
 }
 
+// GroupedSum parses the provided response and extracts sums based on provided filter type.
 func (iDB *InfluxDB) GroupedSum(response *client.Response, ft FilterType) (map[string]float64, error) {
 	sums := make(map[string]float64)
 	if len(response.Results[0].Series) == 0 {

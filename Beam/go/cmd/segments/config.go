@@ -1,5 +1,6 @@
 package main
 
+// Config represents config structure for segments cmd.
 type Config struct {
 	SegmentsAddr string `envconfig:"addr";required:"true"`
 

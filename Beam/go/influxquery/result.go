@@ -7,12 +7,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Result represents structure of InfluxDB query result.
 type Result struct {
 	rowIdx int
 	series models.Row
 	colMap map[string]int
 }
 
+// NewInfluxResult creates Result structure based on provided Row series and index to extract.
 func NewInfluxResult(series models.Row, rowIdx int) *Result {
 	colmap := make(map[string]int)
 	for i, col := range series.Columns {
@@ -25,6 +27,7 @@ func NewInfluxResult(series models.Row, rowIdx int) *Result {
 	}
 }
 
+// StringValue parses string out of Result's column.
 func (ir *Result) StringValue(col string) (string, bool) {
 	colIdx, ok := ir.colMap[col]
 	if !ok {
@@ -37,6 +40,7 @@ func (ir *Result) StringValue(col string) (string, bool) {
 	return val, true
 }
 
+// TimeValue parses string out of Result's column.
 func (ir *Result) TimeValue(col string) (time.Time, bool, error) {
 	colIdx, ok := ir.colMap[col]
 	if !ok {

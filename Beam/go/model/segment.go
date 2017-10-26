@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// SegmentStorage represents segment's storage interface.
+// SegmentStorage represents interface to get segment related data.
 type SegmentStorage interface {
 	// Get returns instance of Segment based on the given code.
 	Get(code string) (*Segment, bool, error)
@@ -36,6 +36,7 @@ type Segment struct {
 	Rules []*SegmentRule `db:"segment_rules"`
 }
 
+// RuleOverrides represent key-value string pairs for overriding stored tags in segment rules.
 type RuleOverrides struct {
 	Fields map[string]string
 }
@@ -55,26 +56,29 @@ type SegmentRule struct {
 	Count         int
 	CreatedAt     time.Time `db:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at"`
-	Fields        JsonMap
-	Flags         JsonMap
+	Fields        JSONMap
+	Flags         JSONMap
 
 	Segment *Segment `db:"segment"`
 }
 
-type JsonMap []map[string]string
+// JSONMap represents key-value string pairs stored as string JSON.
+type JSONMap []map[string]string
 
-func (fm JsonMap) Value() (driver.Value, error) {
-	return json.Marshal(fm)
+// Value returns JSON-encoded value of JSONMap.
+func (jm JSONMap) Value() (driver.Value, error) {
+	return json.Marshal(jm)
 }
 
-func (fm *JsonMap) Scan(src interface{}) error {
+// Scan populates JSONMap based on scanned value.
+func (jm *JSONMap) Scan(src interface{}) error {
 	source, ok := src.([]byte)
 	if !ok {
-		return errors.New("unable to scan JsonMap: type assertion .([]byte) failed")
+		return errors.New("unable to scan JSONMap: type assertion .([]byte) failed")
 	}
-	err := json.Unmarshal(source, fm)
+	err := json.Unmarshal(source, jm)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal JsonMap")
+		return errors.Wrap(err, "unable to unmarshal JSONMap")
 	}
 	return nil
 }
