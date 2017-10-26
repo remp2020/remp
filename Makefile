@@ -17,6 +17,12 @@ sniff-fix:
 	cd $(SUB_MAILER) && make sniff-fix
 	cd $(SUB_SSO) && make sniff-fix
 
+lint:
+	cd $(SUB_BEAM) && make lint
+
+vet:
+	cd $(SUB_BEAM) && make vet
+
 fixcs:
 	cd $(SUB_BEAM) && make fixcs
 	cd $(SUB_CAMPAIGN) && make fixcs
