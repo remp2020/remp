@@ -7,14 +7,6 @@ cache:
   paths:
     - bin/
 
-test:syntax:7.0:
-  stage: test
-  image: php:7.0-cli
-  tags:
-    - docker
-  script:
-    - make syntax
-
 test:syntax:7.1:
   stage: test
   image: php:7.1-cli
@@ -30,16 +22,6 @@ test:sniffer:
     - docker
   script:
     - make sniff
-
-test:linter:
-  stage: test
-  image: golang:1.9
-  tags:
-    - docker
-  script:
-    - go get -u github.com/golang/lint/golint
-    - make lint
-    - make vet
 
 build:beam:tracker:
   stage: build
