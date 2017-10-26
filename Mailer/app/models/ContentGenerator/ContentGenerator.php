@@ -14,20 +14,23 @@ class ContentGenerator
 
     private $mailLayout;
 
+    private $batchId;
+
     private $links;
 
     private $time;
 
     private $utmReplace;
 
-    public function __construct(IRow $mailTemplate, IRow $mailLayout, array $links = [])
+    public function __construct(IRow $mailTemplate, IRow $mailLayout, $batchId, array $links = [])
     {
         $this->mailTemplate = $mailTemplate;
         $this->mailLayout = $mailLayout;
+        $this->batchId = $batchId;
         $this->links = $links;
         $this->time = new \DateTime();
 
-        $this->utmReplace = new UtmReplace($mailTemplate->mail_type->code, 'email', $mailTemplate->code);
+        $this->utmReplace = new UtmReplace($mailTemplate->mail_type->code, 'email', $mailTemplate->code, $batchId);
     }
 
     public function getHtmlBody($params)

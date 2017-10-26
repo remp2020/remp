@@ -81,6 +81,7 @@ class SendingStats extends Control
             'clicked' => ['value' => 0, 'per' => 0],
             'dropped' => ['value' => 0, 'per' => 0],
             'spam_complained' => ['value' => 0, 'per' => 0],
+            'unsubscribed' => ['value' => 0, 'per' => 0],
         ];
         foreach ($this->jobBatchTemplates as $jobBatchTemplate) {
             $total += $jobBatchTemplate->sent;
@@ -89,6 +90,13 @@ class SendingStats extends Control
             $stats['clicked']['value'] += $jobBatchTemplate->clicked;
             $stats['dropped']['value'] += $jobBatchTemplate->dropped;
             $stats['spam_complained']['value'] += $jobBatchTemplate->spam_complained;
+            $stats['unsubscribed']['value'] += $jobBatchTemplate->mail_template->mail_type
+                ->related('mail_user_subscriptions')
+                ->where([
+                    'utm_campaign' => $jobBatchTemplate->mail_template->code,
+                    'utm_content' => $jobBatchTemplate->mail_job_batch_id,
+                ])
+                ->count('*');
         }
         foreach ($stats as $key => $stat) {
             $stats[$key]['per'] = $total ? ($stat['value'] / $total * 100) : 0;
@@ -99,10 +107,8 @@ class SendingStats extends Control
         $this->template->clicked_stat = $stats['clicked'];
         $this->template->dropped_stat = $stats['dropped'];
         $this->template->spam_stat = $stats['spam_complained'];
-
-        if ($this->showTotal) {
-            $this->template->total_stat = $total;
-        }
+        $this->template->unsubscribed_stat = $stats['unsubscribed'];
+        $this->template->total_stat = $total;
 
         if ($this->showConversions) {
             $val = $this->logsRepository->getConversion($this->templateIds);

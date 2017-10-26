@@ -103,7 +103,7 @@ final class JobPresenter extends BasePresenter
             ->setColSetting('sent_count', ['header' => 'sent', 'orderable' => false])
             ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
             ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
-//            ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
+            ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
             ->setRowLinkAction('show')
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
@@ -148,6 +148,8 @@ final class JobPresenter extends BasePresenter
             $openedCount = $latte->renderToString(__DIR__  . '/templates/Job/_opened_count.latte', ['job' => $job]);
             $clickedCount = $latte->renderToString(__DIR__  . '/templates/Job/_clicked_count.latte', ['job' => $job]);
 
+            $unsubscribedCount = $latte->renderToString(__DIR__  . '/templates/Job/_unsubscribed_count.latte', ['job' => $job]);
+
             $result['data'][] = [
                 'actions' => [
                     'show' => $this->link('Show', $job->id),
@@ -158,7 +160,7 @@ final class JobPresenter extends BasePresenter
                 $sentCount,
                 $openedCount,
                 $clickedCount,
-//                $unsubscribedCount,
+                $unsubscribedCount,
             ];
         }
         $this->presenter->sendJson($result);
