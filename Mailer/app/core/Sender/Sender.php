@@ -116,7 +116,7 @@ class Sender
         $message->setFrom($this->template->from);
         $message->setSubject($this->template->subject);
 
-        $generator = new ContentGenerator($this->template, $this->template->layout);
+        $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
         if ($this->template->mail_body_text) {
             $message->setBody($generator->getTextBody($this->params));
         }

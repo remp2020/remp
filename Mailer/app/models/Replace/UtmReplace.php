@@ -4,17 +4,20 @@ namespace Remp\MailerModule\Replace;
 
 class UtmReplace implements ReplaceInterface
 {
-    private $utmSource;
+    private $utmSource; // newsfilter
 
-    private $utmMedium;
+    private $utmMedium; // email
 
-    private $utmCampaign;
+    private $utmCampaign; // campaign/email identifier
 
-    public function __construct($utmSource, $utmMedium, $utmCampaign)
+    private $utmContent; // specific job identifier
+
+    public function __construct($utmSource, $utmMedium, $utmCampaign, $utmContent)
     {
         $this->utmSource = $utmSource;
         $this->utmMedium = $utmMedium;
         $this->utmCampaign = $utmCampaign;
+        $this->utmContent = $utmContent;
     }
 
     public function replace($content)
@@ -38,6 +41,6 @@ class UtmReplace implements ReplaceInterface
 
     private function formatUrlString()
     {
-        return "utm_source={$this->utmSource}&utm_medium={$this->utmMedium}&utm_campaign={$this->utmCampaign}";
+        return "utm_source={$this->utmSource}&utm_medium={$this->utmMedium}&utm_campaign={$this->utmCampaign}&utm_content={$this->utmContent}";
     }
 }
