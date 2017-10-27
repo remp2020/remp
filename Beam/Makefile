@@ -20,7 +20,7 @@ lint: lint-lib
 vet-lib:
 	@go vet $$(go list ./... | grep -vE '(/vendor|/cmd)')
 
-vet: #vet-lib
+vet: vet-lib
 	@cd $(SUB_TRACKER) && make vet
 	@cd $(SUB_SEGMENTS) && make vet
 
@@ -39,11 +39,6 @@ pr: clear build lint vet test-only
 docker-build:
 	@cd $(SUB_TRACKER) && make docker-build
 	@cd $(SUB_SEGMENTS) && make docker-build
-
-docker-compose: docker-build
-	@set -e; \
-	docker-compose down --rmi local; \
-	docker-compose build --pull
 
 sniff:
 	../phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p

@@ -11,9 +11,9 @@ interface SegmentContract
 
     public function list(): Collection;
 
-    public function check(CampaignSegment $campaignSegment, $userId): bool;
+    public function check(CampaignSegment $campaignSegment, $userId, array $overrides): bool;
 
-    public function users(CampaignSegment $campaignSegment): Collection;
+    public function users(CampaignSegment $campaignSegment, array $overrides): Collection;
 
     public function provider(): string;
 }

@@ -12,7 +12,7 @@ type PageviewController struct {
 	PageviewStorage model.PageviewStorage
 }
 
-// NewPageviewsController creates a pageview controller.
+// NewPageviewController creates a pageview controller.
 func NewPageviewController(service *goa.Service, ps model.PageviewStorage) *PageviewController {
 	return &PageviewController{
 		Controller:      service.NewController("PageviewController"),

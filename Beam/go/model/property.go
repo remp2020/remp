@@ -52,6 +52,7 @@ func (pDB *PropertyDB) Get(UUID string) (*Property, bool, error) {
 	return p, true, nil
 }
 
+// Cache stores the properties in memory.
 func (pDB *PropertyDB) Cache() error {
 	pm := make(map[string]*Property)
 	pc := PropertyCollection{}

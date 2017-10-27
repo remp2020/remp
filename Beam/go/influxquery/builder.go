@@ -19,7 +19,7 @@ type Builder interface {
 }
 
 // NewInfluxBuilder returns instance of simple influx builder.
-func NewInfluxBuilder() *influxBuilder {
+func NewInfluxBuilder() Builder {
 	return &influxBuilder{
 		selectStr: "*",
 	}

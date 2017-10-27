@@ -66,7 +66,7 @@ class Segment implements SegmentContract
      * @return bool
      * @throws SegmentException
      */
-    public function check(CampaignSegment $campaignSegment, $userId): bool
+    public function check(CampaignSegment $campaignSegment, $userId, array $overrides): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
         /** @var Bloom $bloomFilter */
@@ -95,10 +95,11 @@ class Segment implements SegmentContract
 
     /**
      * @param CampaignSegment $campaignSegment
+     * @param array $overrides
      * @return Collection
      * @throws SegmentException
      */
-    public function users(CampaignSegment $campaignSegment): Collection
+    public function users(CampaignSegment $campaignSegment, array $overrides): Collection
     {
         try {
             $response = $this->client->get(self::ENDPOINT_USERS, [

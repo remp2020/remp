@@ -35,15 +35,15 @@ class SegmentAggregator implements SegmentContract
         return $collection;
     }
 
-    public function check(CampaignSegment $campaignSegment, $userId): bool
+    public function check(CampaignSegment $campaignSegment, $userId, array $overrides): bool
     {
         return $this->contracts[$campaignSegment->provider]
-            ->check($campaignSegment, $userId);
+            ->check($campaignSegment, $userId, $overrides);
     }
 
-    public function users(CampaignSegment $campaignSegment): Collection
+    public function users(CampaignSegment $campaignSegment, array $overrides): Collection
     {
         return $this->contracts[$campaignSegment->provider]
-            ->users($campaignSegment);
+            ->users($campaignSegment, $overrides);
     }
 }

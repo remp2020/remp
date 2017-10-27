@@ -10,10 +10,13 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
-const CategoryCommerce = "commerce"
-const TableCommerce = "commerce"
+// Exported constants for services writing to EventStorage indirectly (e.g. Kafka).
+const (
+	CategoryCommerce = "commerce"
+	TableCommerce    = "commerce"
+)
 
-// Options represent filter options for commerce-related calls.
+// CommerceOptions represent filter options for commerce-related calls.
 type CommerceOptions struct {
 	IDs        []string
 	FilterBy   FilterType
@@ -23,6 +26,7 @@ type CommerceOptions struct {
 	TimeBefore time.Time
 }
 
+// Commerce represents commerce event data.
 type Commerce struct {
 	Step      string
 	Token     string
@@ -34,8 +38,10 @@ type Commerce struct {
 	UserAgent string
 }
 
+// CommerceCollection is collection of commerce events.
 type CommerceCollection []*Commerce
 
+// CommerceStorage is an interface to get commerce event related data.
 type CommerceStorage interface {
 	// Count returns count of events based on the provided filter options.
 	Count(o CommerceOptions) (map[string]int, bool, error)
@@ -51,10 +57,12 @@ type CommerceStorage interface {
 	Actions(category string) ([]string, error)
 }
 
+// CommerceDB is Influx implementation of CommerceStorage.
 type CommerceDB struct {
 	DB *InfluxDB
 }
 
+// Count returns count of events based on the provided filter options.
 func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
@@ -117,6 +125,7 @@ func (cDB *CommerceDB) List(o CommerceOptions) (CommerceCollection, error) {
 	return cc, nil
 }
 
+// Sum returns sum of events based on the provided filter options.
 func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
 	builder := cDB.DB.QueryBuilder.Select(`sum("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
@@ -145,17 +154,20 @@ func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
 	return cDB.DB.GroupedSum(response, o.FilterBy)
 }
 
-func (eDB *CommerceDB) Categories() []string {
+// Categories lists all available categories.
+func (cDB *CommerceDB) Categories() []string {
 	return []string{
 		CategoryCommerce,
 	}
 }
 
-func (eDB *CommerceDB) Flags() []string {
+// Flags lists all available flags.
+func (cDB *CommerceDB) Flags() []string {
 	return []string{}
 }
 
-func (eDB *CommerceDB) Actions(category string) ([]string, error) {
+// Actions lists all available actions under the given category.
+func (cDB *CommerceDB) Actions(category string) ([]string, error) {
 	switch category {
 	case CategoryCommerce:
 		return []string{

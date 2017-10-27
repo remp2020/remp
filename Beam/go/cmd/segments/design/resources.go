@@ -45,6 +45,13 @@ var _ = Resource("segments", func() {
 			Param("user_id", String, "User ID", func() {
 				Pattern(UserPattern)
 			})
+			Param("fields", String, `JSON-encoded object of overriden pairs, e.g.:
+
+	{
+		"utm_campaign": "custom-campaign-id",
+		// ...
+	}
+			`)
 		})
 		Response(NotFound)
 		Response(BadRequest)
@@ -61,7 +68,15 @@ var _ = Resource("segments", func() {
 			Param("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
 			})
+			Param("fields", String, `JSON-encoded object of overriden pairs, e.g.:
+
+	{
+		"utm_campaign": "custom-campaign-id",
+		// ...
+	}
+			`)
 		})
+		Payload(RuleOverrides)
 		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))

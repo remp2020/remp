@@ -1,14 +1,16 @@
 package controller
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/goadesign/goa"
+	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
 
-// EventController implements the event resource.
+// SegmentController implements the segment resource.
 type SegmentController struct {
 	*goa.Controller
 	SegmentStorage model.SegmentStorage
@@ -40,7 +42,15 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 	if !ok {
 		return ctx.NotFound()
 	}
-	ok, err = c.SegmentStorage.Check(s, ctx.UserID, time.Now())
+	ro := model.RuleOverrides{}
+	if ctx.Fields != nil {
+		overrides := make(map[string]string)
+		if err := json.Unmarshal([]byte(*ctx.Fields), &overrides); err != nil {
+			return errors.Wrap(err, "invalid format of fields JSON string")
+		}
+		ro.Fields = overrides
+	}
+	ok, err = c.SegmentStorage.Check(s, ctx.UserID, time.Now(), ro)
 	if err != nil {
 		return err
 	}
@@ -58,7 +68,15 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 	if !ok {
 		return ctx.NotFound()
 	}
-	uc, err := c.SegmentStorage.Users(s, time.Now())
+	ro := model.RuleOverrides{}
+	if ctx.Fields != nil {
+		overrides := make(map[string]string)
+		if err := json.Unmarshal([]byte(*ctx.Fields), &overrides); err != nil {
+			return errors.Wrap(err, "invalid format of fields JSON string")
+		}
+		ro.Fields = overrides
+	}
+	uc, err := c.SegmentStorage.Users(s, time.Now(), ro)
 	if err != nil {
 		return err
 	}
