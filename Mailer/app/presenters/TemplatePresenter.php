@@ -191,7 +191,7 @@ final class TemplatePresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $mailContentGenerator = new ContentGenerator($template, $template->mail_layout);
+        $mailContentGenerator = new ContentGenerator($template, $template->mail_layout, null);
         if ($type == 'html') {
             $this->template->content = $mailContentGenerator->getHtmlBody([]);
         } else {

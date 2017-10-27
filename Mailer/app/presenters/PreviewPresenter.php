@@ -23,7 +23,7 @@ final class PreviewPresenter extends Presenter
         }
 
         $params = [];
-        $mailContentGenerator = new ContentGenerator($template, $template->layout);
+        $mailContentGenerator = new ContentGenerator($template, $template->layout, null);
         $this->template->content = $mailContentGenerator->getHtmlBody($params);
     }
 }
