@@ -24,28 +24,20 @@ use Remp\MailerModule\Segment\SegmentException;
 
 final class JobPresenter extends BasePresenter
 {
-    /** @var JobsRepository */
     private $jobsRepository;
 
-    /** @var BatchesRepository */
     private $batchesRepository;
 
-    /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
 
-    /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var LogsRepository */
     private $logsRepository;
 
-    /** @var JobFormFactory */
     private $jobFormFactory;
 
-    /** @var NewBatchFormFactory */
     private $newBatchFormFactory;
 
-    /** @var NewTemplateFormFactory */
     private $newTemplateFormFactory;
 
     private $userSubscriptionsRepository;
@@ -295,6 +287,19 @@ final class JobPresenter extends BasePresenter
             $templateStats->showConversions();
 
             return $templateStats;
+        });
+    }
+
+    protected function createComponentJobBatchTemplateStats(ISendingStatsFactory $factory)
+    {
+        return new Multiplier(function ($jobBatchTemplateId) use ($factory) {
+            $stats = $factory->create();
+
+            $jobBatchTemplate = $this->batchTemplatesRepository->find($jobBatchTemplateId);
+            $stats->addJobBatchTemplate($jobBatchTemplate);
+            $stats->showConversions();
+
+            return $stats;
         });
     }
 
