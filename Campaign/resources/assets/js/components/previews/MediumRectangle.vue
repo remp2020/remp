@@ -18,7 +18,6 @@
     .medium-rectangle-preview-link {
         text-decoration: none;
         overflow: hidden;
-        z-index: 9999;
     }
 
     .medium-rectangle-preview-box {
@@ -153,13 +152,21 @@
                 return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
             },
             linkStyles: function() {
-                let position = this.displayType === 'overlay' ? 'fixed' : 'relative';
+                let position, zIndex;
+                if (this.displayType === 'overlay') {
+                    position = 'fixed';
+                    zIndex = 9999;
+                } else {
+                    position = 'relative'
+                }
                 if (typeof this.forcedPosition !== 'undefined') {
                     position = this.forcedPosition;
                 }
                 return {
                     position: position,
-                }},
+                    zIndex: zIndex,
+                }
+            },
             boxStyles: function() {
                 return {
                     backgroundColor: this.backgroundColor,
@@ -168,7 +175,8 @@
                     maxWidth: this.width || '370px',
                     minHeight: this.height || '250px',
                     maxHeight: this.height || '370px',
-                }},
+                }
+            },
             buttonStyles: function() {
                 return {
                     color: this.buttonTextColor,
@@ -178,7 +186,8 @@
             closeStyles: function() {
                 return {
                     color: this.textColor,
-                }},
+                }
+            },
             isVisible: function() {
                 return this.show && this.visible;
             },

@@ -3,6 +3,7 @@
 /public/hot
 /public/assets/vendor
 /public/assets/showtime
+/public/assets/lib
 /storage/*.key
 /vendor
 /.idea

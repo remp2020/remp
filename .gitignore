@@ -2,3 +2,4 @@
 .vscode
 .env
 docker-compose.override.yml
+.yarn-error.log

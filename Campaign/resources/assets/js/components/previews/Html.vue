@@ -5,7 +5,6 @@
     .html-preview-link {
         text-decoration: none;
         overflow: hidden;
-        z-index: 9999;
     }
     .html-preview-close.hidden {
         display: none;
@@ -140,7 +139,13 @@
                 return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
             },
             linkStyles: function() {
-                let position = this.displayType === 'overlay' ? 'fixed' : 'relative';
+                let position, zIndex;
+                if (this.displayType === 'overlay') {
+                    position = 'fixed';
+                    zIndex = 9999;
+                } else {
+                    position = 'relative'
+                }
                 if (typeof this.forcedPosition !== 'undefined') {
                     position = this.forcedPosition;
                 }
@@ -148,8 +153,9 @@
                     textDecoration: 'none',
                     position: position,
                     overflow: 'hidden',
-                    zIndex: 0,
-                }},
+                    zIndex: zIndex,
+                }
+            },
             textStyles: function() {
                 return {
                     color: this.textColor,
@@ -159,11 +165,13 @@
             boxStyles: function() {
                 return {
                     backgroundColor: this.backgroundColor,
-                }},
+                }
+            },
             closeStyles: function() {
                 return {
                     color: this.textColor,
-                }},
+                }
+            },
             customBoxStyles: function() {
                 return {}
             },

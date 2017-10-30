@@ -18,7 +18,6 @@
     .bar-preview-link {
         text-decoration: none;
         overflow: hidden;
-        z-index: 9999;
         width: 100%;
     }
 
@@ -28,7 +27,7 @@
         display: flex;
         overflow: hidden;
         position: relative;
-        padding: 0 40px;
+        padding: 0 18px;
         width: 100%;
         min-height: 68px;
         justify-content: space-between;
@@ -49,7 +48,15 @@
         text-align: center;
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 640px) {
+        .bar-preview-box {
+            flex-direction: column;
+            padding: 9px;
+        }
+        .bar-main {
+            text-align: center;
+            margin-bottom: 9px;
+        }
         .bar-button {
             padding: 5px 15px;
         }
@@ -165,19 +172,27 @@
                 return styles;
             },
             linkStyles: function() {
-                console.log("forcedPosition: ", this.forcedPosition);
-                let position = this.displayType === 'overlay' ? 'fixed' : 'relative';
+                let position, zIndex;
+                if (this.displayType === 'overlay') {
+                    position = 'fixed';
+                    zIndex = 9999;
+                } else {
+                    position = 'relative'
+                }
                 if (typeof this.forcedPosition !== 'undefined') {
                     position = this.forcedPosition;
                 }
                 return {
                     position: position,
-                }},
+                    zIndex: zIndex,
+                }
+            },
             boxStyles: function() {
                 return {
                     backgroundColor: this.backgroundColor,
                     color: this.textColor,
-                }},
+                }
+            },
             buttonStyles: function() {
                 return {
                     color: this.buttonTextColor,
@@ -188,7 +203,8 @@
                 return {
                     color: 'white',
 
-                }},
+                }
+            },
             isVisible: function() {
                 return this.show && this.visible;
             },
