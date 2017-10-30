@@ -22,15 +22,12 @@ class UtmReplace implements ReplaceInterface
 
     public function replace($content)
     {
-        if (strpos($content, 'ihned.cz') !== false) {
-            return $content;
-        }
-
+        // replace params
         $urlString = $this->formatUrlString();
-        $content = preg_replace('/<a(.*)href="([^"#?]*)([^"]*)"(.*)>/i', '<a$1href="$2?' . $urlString . '$3"$4>', $content);
+        $content = preg_replace('/<a(.*?)href="([^"#?]*)([^"]*?)"(.*?)>/i', '<a$1href="$2?' . $urlString . '$3"$4>', $content);
 
+        // make sure we don't have two "?" characters in query string
         preg_match_all('/href="([^"]*)"/iU', $content, $matches);
-
         foreach ($matches[0] as $match) {
             $newHref = substr($match, 0, strpos($match, '?') + 1) . str_replace('?', '&', substr($match, strpos($match, '?') + 1));
             $content = str_replace($match, $newHref, $content);
