@@ -32,7 +32,7 @@ class ScheduleController extends Controller
                     'stop' => $schedule->isRunning() ? route('schedule.stop', $schedule) : null,
                 ];
             })
-            ->addColumn('status', function(Schedule $schedule) {
+            ->addColumn('status', function (Schedule $schedule) {
                 if ($schedule->isRunning()) {
                     return 'Running';
                 }

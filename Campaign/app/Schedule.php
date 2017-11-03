@@ -52,8 +52,7 @@ class Schedule extends Model
         if ($this->status === self::STATUS_RUNNING && $this->end_time > Carbon::now()) {
             return true;
         }
-        if (
-            $this->start_time < Carbon::now() &&
+        if ($this->start_time < Carbon::now() &&
             $this->end_time > Carbon::now() &&
             !in_array($this->status, [self::STATUS_PAUSED, self::STATUS_STOPPED])
         ) {
