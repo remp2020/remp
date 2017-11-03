@@ -17,7 +17,7 @@ test:syntax:7.1:
 
 test:sniffer:
   stage: test
-  image: php:7.0-cli
+  image: php:7.1-cli
   tags:
     - docker
   script:

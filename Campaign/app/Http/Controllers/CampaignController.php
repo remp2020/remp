@@ -217,8 +217,27 @@ class CampaignController extends Controller
                     'data' => [],
                 ]);
         }
+
         /** @var Campaign $campaign */
-        $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignIds[0]);
+        $campaign = null;
+        $running = false;
+        foreach ($campaignIds as $cid) {
+            $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($cid);
+            foreach ($campaign->schedules as $schedule) {
+                if ($schedule->isRunning()) {
+                    $running = true;
+                    break 2;
+                }
+            }
+        }
+        if (!$running) {
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => true,
+                    'data' => [],
+                ]);
+        }
+
         $banner = $campaign->banner;
         if (!$banner) {
             return response()

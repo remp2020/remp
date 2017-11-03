@@ -124,6 +124,9 @@ function route_active($routeName, $classes = '', $activeClasses = '')
             <li {!! route_active('campaigns') !!}>
                 <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-ticket-star"></i> Campaigns</a>
             </li>
+            <li {!! route_active('schedule') !!}>
+                <a href="{{ route('schedule.index') }}" ><i class="zmdi zmdi-calendar-check"></i> Schedule</a>
+            </li>
         </ul>
     </aside>
 
@@ -193,7 +196,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 
 <script type="application/javascript">
     $(document).ready(function() {
-        let delay = 250;
+        var delay = 250;
         @foreach ($errors->all() as $error)
         (function(delay) {
             window.setTimeout(function() {
@@ -205,8 +208,19 @@ function route_active($routeName, $classes = '', $activeClasses = '')
                 });
             }, delay);
         })(delay);
-        delay += 250;
         @endforeach
+        @if (session('success'))
+        $.notify({
+            message: '{{ session('success') }}'
+        }, {
+            allow_dismiss: false,
+            type: 'info',
+            placement: {
+                from: "bottom",
+                align: "left"
+            }
+        });
+        @endif
     });
 </script>
 

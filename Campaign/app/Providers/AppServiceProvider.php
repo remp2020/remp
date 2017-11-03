@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\SegmentAggregator;
 use Blade;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Schema;
@@ -18,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
+        Carbon::setToStringFormat(DATE_RFC3339);
 
         if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
@@ -61,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Banner::observe(\App\Observers\Banner::class);
         \App\Campaign::observe(\App\Observers\Campaign::class);
         \App\CampaignSegment::observe(\App\Observers\CampaignSegment::class);
+        \App\Schedule::observe(\App\Observers\Schedule::class);
     }
 
     /**

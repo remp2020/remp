@@ -34,6 +34,7 @@ if (process.env.REMP_TARGET === 'lib') {
             "autosize",
             "datatables.net",
             "datatables.net-rowgroup",
+            "eonasdan-bootstrap-datetimepicker",
             "google-material-color",
             "malihu-custom-scrollbar-plugin",
             "node-waves",
