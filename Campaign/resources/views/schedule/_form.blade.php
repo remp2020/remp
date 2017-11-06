@@ -11,13 +11,15 @@
                            return [$campaign->id => $campaign->name];
                        })->toArray(),
                        null,
-                       [
+                       array_filter([
                            'class' => 'selectpicker',
                            'data-live-search' => 'true',
-                           'disabled' => $schedule->campaign_id ? 'disabled' : '',
-                       ]
+                           'disabled' => $schedule->id ? 'disabled' : null,
+                       ])
                    ) !!}
+                    @isset($schedule->id)
                     {!! Form::hidden('campaign_id') !!}
+                    @endisset
                 </div>
             </div>
         </div>

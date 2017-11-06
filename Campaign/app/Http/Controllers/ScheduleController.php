@@ -92,7 +92,7 @@ class ScheduleController extends Controller
 
         return redirect(route('schedule.index'))->with('success', sprintf(
             "Campaign %s scheduled from %s to %s",
-            $schedule->campaign,
+            $schedule->campaign->name,
             Carbon::parse($schedule->start_time)->toDayDateTimeString(),
             Carbon::parse($schedule->end_time)->toDayDateTimeString()
         ));

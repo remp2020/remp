@@ -8,11 +8,6 @@ use Tests\TestCase;
 
 class ScheduleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
     public function testWaitingSchedule()
     {
         $schedule = new Schedule([
