@@ -43,6 +43,7 @@
                         ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play'],
                         ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause'],
                         ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
+                        ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
                     ],
                     'rowActionLink' => 'edit',
                 ]) !!}

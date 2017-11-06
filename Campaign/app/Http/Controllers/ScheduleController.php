@@ -18,20 +18,29 @@ class ScheduleController extends Controller
 
     public function json(Datatables $dataTables)
     {
-        $schedule = Schedule::query()
+        $schedule = Schedule::select()
             ->with('campaign')
             ->orderBy('start_time', 'DESC')
-            ->orderBy('end_time', 'DESC');
+            ->orderBy('end_time', 'DESC')
+            ->get();
 
         return $dataTables->of($schedule)
-            ->addColumn('actions', function (Schedule $schedule) {
+            ->addColumn('actions', function (Schedule $s) {
                 return [
-                    'edit' => !$schedule->isStopped() ? route('schedule.edit', $schedule) : null,
-                    'start' => $schedule->isRunnable() ? route('schedule.start', $schedule) : null,
-                    'pause' => $schedule->isRunning() ? route('schedule.pause', $schedule) : null,
-                    'stop' => $schedule->isRunning() ? route('schedule.stop', $schedule) : null,
+                    'edit' => !$s->isStopped() ? route('schedule.edit', $s) : null,
+                    'start' => $s->isRunnable() ? route('schedule.start', $s) : null,
+                    'pause' => $s->isRunning() ? route('schedule.pause', $s) : null,
+                    'stop' => $s->isRunning() ? route('schedule.stop', $s) : null,
+                    'destroy' => $s->isDeletable() ? route('schedule.destroy', $s) : null,
                 ];
             })
+            ->addColumn('action_methods', [
+                'start' => 'POST',
+                'pause' => 'POST',
+                'stop' => 'POST',
+                'destroy' => 'DELETE',
+            ])
+            ->addColumn('_csrf', csrf_token())
             ->addColumn('status', function (Schedule $schedule) {
                 if ($schedule->isRunning()) {
                     return 'Running';
@@ -56,7 +65,7 @@ class ScheduleController extends Controller
             ->editColumn('end_time', function (Schedule $schedule) {
                 return $schedule->end_time;
             })
-            ->rawColumns(['actions', 'status'])
+            ->rawColumns(['actions', 'action_methods', 'status'])
             ->setRowId('id')
             ->make(true);
     }
@@ -116,6 +125,18 @@ class ScheduleController extends Controller
 
         return redirect(route('schedule.index'))->with('success', sprintf(
             "Campaign %s rescheduled from %s to %s",
+            $schedule->campaign->name,
+            Carbon::parse($schedule->start_time)->toDayDateTimeString(),
+            Carbon::parse($schedule->end_time)->toDayDateTimeString()
+        ));
+    }
+
+    public function destroy(Schedule $schedule)
+    {
+        $schedule->delete();
+
+        return redirect(route('schedule.index'))->with('success', sprintf(
+            "Schedule for campaign %s from %s to %s was removed",
             $schedule->campaign->name,
             Carbon::parse($schedule->start_time)->toDayDateTimeString(),
             Carbon::parse($schedule->end_time)->toDayDateTimeString()

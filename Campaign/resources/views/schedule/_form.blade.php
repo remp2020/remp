@@ -15,6 +15,7 @@
                            'class' => 'selectpicker',
                            'data-live-search' => 'true',
                            'disabled' => $schedule->id ? 'disabled' : null,
+                           'placeholder' => 'Please select...'
                        ])
                    ) !!}
                     @isset($schedule->id)

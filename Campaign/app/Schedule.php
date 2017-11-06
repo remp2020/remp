@@ -75,6 +75,14 @@ class Schedule extends Model
         return false;
     }
 
+    public function isDeletable()
+    {
+        if ($this->start_time > Carbon::now() && $this->status === self::STATUS_READY) {
+            return true;
+        }
+        return false;
+    }
+
     public function isStopped()
     {
         return $this->status === self::STATUS_STOPPED;

@@ -17,6 +17,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-01 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertTrue($schedule->isRunnable());
+        $this->assertTrue($schedule->isDeletable());
     }
 
     public function testForcedRunnningBeforeScheduledStarted()
@@ -29,6 +30,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-01 00:00:00'));
         $this->assertTrue($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
+        $this->assertFalse($schedule->isDeletable());
     }
 
     public function testForcedRunnningAfterScheduledEnd()
@@ -41,6 +43,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-03 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
+        $this->assertFalse($schedule->isDeletable());
     }
 
     public function testForcedStoppedBeforeScheduledStarted()
@@ -53,6 +56,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-01 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
+        $this->assertFalse($schedule->isDeletable());
     }
 
     public function testNativeRunning()
@@ -64,6 +68,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-02 00:00:00'));
         $this->assertTrue($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
+        $this->assertFalse($schedule->isDeletable());
     }
 
     public function testNativeFinished()
@@ -75,6 +80,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-03 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
+        $this->assertFalse($schedule->isDeletable());
     }
 
     public function testPausedRunnable()
@@ -87,6 +93,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-02 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertTrue($schedule->isRunnable());
+        $this->assertFalse($schedule->isDeletable());
     }
 
     public function testPausedNotRunnable()
@@ -99,5 +106,6 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-03 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
+        $this->assertFalse($schedule->isDeletable());
     }
 }

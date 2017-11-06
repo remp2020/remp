@@ -40,6 +40,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
     <link rel="manifest" href="/assets/img/favicon/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/assets/img/favicon/ms-icon-144x144.png">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="{{ asset(mix('/css/vendor.css', '/assets/vendor')) }}" rel="stylesheet">
     <link href="{{ asset(mix('/css/app.css', '/assets/vendor')) }}" rel="stylesheet">
