@@ -112,6 +112,15 @@ $.fn.dataTables = {
                         actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" disabled="disabled" href=""><i class="zmdi ' + action['class'] + '"></i></a>\n';
                         return;
                     }
+                    if (row.action_methods && row.action_methods[action['name']]) {
+                        var tokenVal = $('meta[name="csrf-token"]').attr('content');
+                        actions += '<form method="POST" action="' + row.actions[action['name']] + '">';
+                        actions += '<button type="submit" class="btn btn-sm palette-Cyan bg waves-effect"><i class="zmdi ' + action['class'] + '"></i></button>\n';
+                        actions += '<input type="hidden" name="_token" value="' + tokenVal + '" />\n';
+                        actions += '<input type="hidden" name="_method" value="' + row.action_methods[action['name']] + '" />\n';
+                        actions += '</form>';
+                        return;
+                    }
                     actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" href="' + row.actions[action['name']] + '"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                 });
                 actions += '</span>';
