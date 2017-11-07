@@ -32,6 +32,7 @@
                 win.remplib.campaign[fn] = mock(fn);
             }
         }
+@isset($trackerUrl)
         if (!win.remplib.tracker) {
             var fn, i, funcs = "init trackEvent trackPageview trackCommerce".split(" ");
             win.remplib.tracker = {_: []};
@@ -40,7 +41,6 @@
                 win.remplib.tracker[fn] = mock(fn);
             }
         }
-@isset($trackerUrl)
         load("{{ $trackerLibUrl }}");
 @endisset
         load("{{ $campaignLibUrl }}");
@@ -48,25 +48,38 @@
 
     var rempConfig = {
         // required if you're using REMP segments
-        token: "UUIDv4",
+        token: String, // UUIDv4 based REMP Beam token
         // optional
-        userId: "any-string",
+        userId: String,
 @isset($trackerUrl)
         // required if you want to automatically track banner events to BEAM Tracker
         tracker: {
             url: "{{ $trackerUrl }}",
             article: {
-                id: "13579"
+                id: String
             }
         },
 @endisset
         // required
         campaign: {
             url: "{{ $campaignUrl }}",
+            variables: {
+                // variables replace template placeholders in banners,
+                // e.g. @{{ email }} -> foo@example.com
+                //
+                // the callback doesn't pass any parameters, it's required for convenience and just-in-time evaluation
+                //
+                // missing variable is translated to empty string
+                email: {
+                    value: function() {
+                        return "foo@example.com"
+                    }
+                }
+            }
         }
-};
+    };
 @isset($trackerUrl)
-remplib.campaign.init(rempConfig);
+    remplib.tracker.init(rempConfig);
 @endisset
-remplib.tracker.init(rempConfig);
+    remplib.campaign.init(rempConfig);
 </script>

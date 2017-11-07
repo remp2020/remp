@@ -19,11 +19,12 @@
                             <label for="banner_id" class="fg-label">Banner</label>
                         </div>
                         <div class="col-md-12">
-                            <select v-model="bannerId" class="selectpicker" data-live-search="true" name="banner_id" id="banner_id">
-                                <option v-for="banner in banners" v-bind:value="banner.id">
-                                    {{ banner.name }}
-                                </option>
-                            </select>
+                            <v-select v-model="bannerId"
+                                      id="banner_id"
+                                      :name="'banner_id'"
+                                      :value="bannerId"
+                                      :options.sync="bannerOptions"
+                            ></v-select>
                         </div>
                     </div>
                 </div>
@@ -157,12 +158,25 @@
                 "removedSegments": [],
                 "segmentMap": null,
                 "eventTypes": null,
-
-                "signedInOptions": [
+            }
+        },
+        computed: {
+            "bannerOptions": function() {
+                let result = [];
+                for (let banner of this.banners) {
+                    result.push({
+                        "label": banner.name,
+                        "value": banner.id,
+                    })
+                }
+                return result;
+            },
+            "signedInOptions": function() {
+                return [
                     {"label": "Everyone", "value": null},
                     {"label": "Only signed in", "value": true},
                     {"label": "Only anonymous ", "value": false},
-                ]
+                ];
             }
         },
         methods: {

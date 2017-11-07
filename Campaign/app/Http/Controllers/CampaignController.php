@@ -34,8 +34,11 @@ class CampaignController extends Controller
 
     public function json(Datatables $dataTables)
     {
-        $campaigns = Campaign::query();
-        return $dataTables->of($campaigns->with('segments'))
+        $campaigns = Campaign::select()
+            ->with(['banner', 'segments'])
+            ->get();
+
+        return $dataTables->of($campaigns)
             ->addColumn('actions', function (Campaign $campaign) {
                 return [
                     'edit' => route('campaigns.edit', $campaign) ,

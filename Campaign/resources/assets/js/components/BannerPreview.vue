@@ -97,6 +97,8 @@
         "campaignUuid",
         "forcedPosition",
 
+        "variables",
+
         "mediumRectangleTemplate",
         "barTemplate",
         "htmlTemplate",
@@ -121,7 +123,7 @@
                 }
             });
         },
-        mounted: function(){
+        mounted: function() {
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
@@ -130,11 +132,76 @@
             previewShow: true,
         }),
         watch: {
-            'transition': function () {
+            'transition': function() {
                 let vm = this;
                 setTimeout(function() { vm.previewShow = false }, 100);
                 setTimeout(function() { vm.previewShow = true }, 800);
             }
         },
+        computed: {
+            url: function() {
+                if (this.targetUrl === null) {
+                    return null;
+                }
+                let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
+                let url =  this.targetUrl + separator + "utm_source=remp_campaign" +
+                    "&utm_medium=" + encodeURIComponent(this.displayType);
+                if (this.campaignUuid) {
+                    url += "&utm_campaign=" + encodeURIComponent(this.campaignUuid);
+                }
+                if (this.uuid) {
+                    url += "&utm_content=" + encodeURIComponent(this.uuid);
+                }
+                return url;
+            },
+        },
+        methods: {
+            injectVars: function(str) {
+                let re = /\{\{\s?(.*?)\s?\}\}/g;
+                let match;
+
+                while (match = re.exec(str)) {
+                    let replRegex = new RegExp(match[0], "g");
+                    let replVal = '';
+                    if (remplib.campaign.variables.hasOwnProperty(match[1])) {
+                        replVal = remplib.campaign.variables[match[1]].value()
+                    }
+                    str = str.replace(replRegex, replVal);
+                }
+                return str;
+            },
+            closed: function() {
+                if (this.closeTracked) {
+                    return true;
+                }
+                this.trackEvent("banner", "close", {
+                    "utm_source": "remp_campaign",
+                    "utm_medium": this.displayType,
+                    "utm_campaign": this.campaignUuid,
+                    "utm_content": this.uuid
+                });
+                this.closeTracked = true;
+                this.visible = false;
+            },
+            clicked: function() {
+                if (this.clickTracked) {
+                    return true;
+                }
+                this.trackEvent("banner", "click", {
+                    "utm_source": "remp_campaign",
+                    "utm_medium": this.displayType,
+                    "utm_campaign": this.campaignUuid,
+                    "utm_content": this.uuid
+                });
+                this.clickTracked = true;
+                return true;
+            },
+            trackEvent: function(category, action, fields) {
+                if (typeof remplib.tracker === 'undefined') {
+                    return;
+                }
+                remplib.tracker.trackEvent(category, action, fields);
+            },
+        }
     }
 </script>

@@ -43,6 +43,9 @@
                     {!! Widget::run('DataTable', [
                     'colSettings' => [
                         'name',
+                        'banner.name' => [
+                            'header' => 'Banner'
+                        ],
                         'segments' => [
                             'header' => 'Segments',
                             'render' => 'array',
