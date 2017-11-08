@@ -60,7 +60,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (typeof config.campaign.variables !== 'undefined') {
                 if (typeof config.campaign.variables !== 'object') {
-                    throw "remplib: configuration variables invalid (object required, see campaign README): "+config.campaign.variables
+                    throw "remplib: configuration variables invalid (object required): "+config.campaign.variables
                 }
                 this.variables = config.campaign.variables;
             }
