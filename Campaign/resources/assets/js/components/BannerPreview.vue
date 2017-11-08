@@ -157,14 +157,19 @@
         },
         methods: {
             injectVars: function(str) {
+                if (!remplib || !remplib.campaign) {
+                    return str;
+                }
                 let re = /\{\{\s?(.*?)\s?\}\}/g;
                 let match;
 
                 while (match = re.exec(str)) {
                     let replRegex = new RegExp(match[0], "g");
                     let replVal = '';
-                    if (remplib.campaign.variables.hasOwnProperty(match[1])) {
+                    if (remplib.campaign.variables && remplib.campaign.variables.hasOwnProperty(match[1])) {
                         replVal = remplib.campaign.variables[match[1]].value()
+                    } else {
+                        throw EvalError("cannot render banner, variable [" + match[1] + "] is missing");
                     }
                     str = str.replace(replRegex, replVal);
                 }
