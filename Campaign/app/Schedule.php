@@ -90,6 +90,6 @@ class Schedule extends Model
 
     public function endsInFuture()
     {
-    	return !$this->end_time || $this->end_time > Carbon::now();
+        return !$this->end_time || $this->end_time > Carbon::now();
     }
 }
