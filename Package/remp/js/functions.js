@@ -393,7 +393,8 @@ $(document).ready(function(){
     if ($('.date-time-picker')[0]) {
         $('.date-time-picker').datetimepicker({
             focusOnShow: false,
-            extraFormats: [ 'YYYY-MM-DDTHH:mm:ssZ' ]
+            extraFormats: [ 'YYYY-MM-DDTHH:mm:ssZ' ],
+            useCurrent: false
             // format: 'YYYY-MM-DD HH:mm:ss'
         });
     }
