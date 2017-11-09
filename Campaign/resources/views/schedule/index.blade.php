@@ -24,7 +24,7 @@
                         'campaign.name' => [
                             'header' => 'Campaign',
                         ],
-                        'banner.name' => [
+                        'campaign.banner.name' => [
                             'header' => 'Banner',
                         ],
                         'start_time' => [

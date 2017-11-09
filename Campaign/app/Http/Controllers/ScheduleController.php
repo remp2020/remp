@@ -19,7 +19,7 @@ class ScheduleController extends Controller
     public function json(Datatables $dataTables)
     {
         $schedule = Schedule::select()
-            ->with(['campaign.banner'])
+            ->with(['campaign:name,banner_id', 'campaign.banner:name'])
             ->orderBy('start_time', 'DESC')
             ->orderBy('end_time', 'DESC')
             ->get();
