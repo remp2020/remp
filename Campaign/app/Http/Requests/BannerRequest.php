@@ -33,7 +33,7 @@ class BannerRequest extends FormRequest
             'display_type' => 'string|required|in:overlay,inline',
             'display_delay' => 'nullable|integer|required|required_if:display_type,overlay',
             'close_timeout' => 'nullable|integer',
-            'closeable' => 'nullable|boolean|required_if:display_type,overlay',
+            'closeable' => 'boolean',
             'target_selector' => 'nullable|string|required_if:display_type,inline',
             'template' => 'required|string',
         ];

@@ -8,7 +8,7 @@
                 :alignmentOptions="alignmentOptions"
                 :dimensionOptions="dimensionOptions"
                 :positionOptions="positionOptions"
-                :show="previewShow"
+                :show="visible"
                 :uuid="uuid"
                 :campaignUuid="campaignUuid"
                 :forcedPosition="forcedPosition"
@@ -30,7 +30,7 @@
         <medium-rectangle-preview v-if="template == 'medium_rectangle'"
                 :alignmentOptions="alignmentOptions"
                 :positionOptions="positionOptions"
-                :show="previewShow"
+                :show="visible"
                 :uuid="uuid"
                 :campaignUuid="campaignUuid"
                 :forcedPosition="forcedPosition"
@@ -55,7 +55,7 @@
         <bar-preview v-if="template == 'bar'"
                 :alignmentOptions="alignmentOptions"
                 :positionOptions="positionOptions"
-                :show="previewShow"
+                :show="visible"
                 :uuid="uuid"
                 :campaignUuid="campaignUuid"
                 :forcedPosition="forcedPosition"
@@ -96,6 +96,7 @@
         "uuid",
         "campaignUuid",
         "forcedPosition",
+        "show",
 
         "variables",
 
@@ -129,13 +130,16 @@
             });
         },
         data: () => ({
-            previewShow: true,
+            visible: true,
         }),
         watch: {
             'transition': function() {
                 let vm = this;
-                setTimeout(function() { vm.previewShow = false }, 100);
-                setTimeout(function() { vm.previewShow = true }, 800);
+                setTimeout(function() { vm.visible = false }, 100);
+                setTimeout(function() { vm.visible = true }, 800);
+            },
+            'show': function() {
+            	this.visible = this.show;
             }
         },
         computed: {
@@ -176,6 +180,10 @@
                 return str;
             },
             closed: function() {
+				this.visible = false;
+				this.$parent.$emit('values-changed', [
+                    {key: "show", val: false}
+                ]);
                 if (this.closeTracked) {
                     return true;
                 }
@@ -186,7 +194,6 @@
                     "utm_content": this.uuid
                 });
                 this.closeTracked = true;
-                this.visible = false;
             },
             clicked: function() {
                 if (this.clickTracked) {

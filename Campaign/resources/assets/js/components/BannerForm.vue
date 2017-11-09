@@ -16,6 +16,7 @@
                 v-bind:_dimensions="htmlTemplate.dimensions"
                 v-bind:alignmentOptions="alignmentOptions"
                 v-bind:dimensionOptions="dimensionOptions"
+                v-bind:show="show"
             ></html-template>
 
             <medium-rectangle-template v-if="template == 'medium_rectangle'"
@@ -28,6 +29,7 @@
                v-bind:_textColor="mediumRectangleTemplate.textColor"
                v-bind:_buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
                v-bind:_buttonTextColor="mediumRectangleTemplate.buttonTextColor"
+               v-bind:show="show"
             ></medium-rectangle-template>
 
             <bar-template v-if="template == 'bar'"
@@ -37,6 +39,7 @@
                v-bind:_textColor="barTemplate.textColor"
                v-bind:_buttonBackgroundColor="barTemplate.buttonBackgroundColor"
                v-bind:_buttonTextColor="barTemplate.buttonTextColor"
+               v-bind:show="show"
             ></bar-template>
 
             <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
@@ -156,6 +159,14 @@
                                     <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
                                 </div>
                             </div>
+
+                            <div class="input-group fg-float checkbox">
+                                <label class="m-l-15">
+                                    Ability to close banner manually
+                                    <input v-model="closeable" value="1" name="closeable" type="checkbox">
+                                    <i class="input-helper"></i>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -174,7 +185,7 @@
                     <a href="#preview" role="tab" data-toggle="tab" aria-expanded="true">Preview</a>
                 </li>
                 <li class="pull-right">
-                    <button type="button" class="btn btn-default" v-on:click="previewShow = !previewShow">Toggle banner</button>
+                    <button type="button" class="btn btn-default" v-on:click="show = !show">Toggle banner</button>
                 </li>
             </ul>
 
@@ -187,7 +198,7 @@
                                         :alignmentOptions="alignmentOptions"
                                         :dimensionOptions="dimensionOptions"
                                         :positionOptions="positionOptions"
-                                        :show="previewShow"
+                                        :show="show"
                                         :template="template"
 
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
@@ -282,7 +293,7 @@
             alignmentOptions: [],
             dimensionOptions: [],
             positionOptions: [],
-            previewShow: true,
+            show: true,
 
             transitionOptions: [
                 {"label": "None", "value": "none"},
@@ -292,12 +303,5 @@
                 {"label": "Fade in down", "value": "fade-in-down"},
             ]
         }),
-        watch: {
-            'transition': function () {
-                let vm = this;
-                setTimeout(function() { vm.previewShow = false }, 100);
-                setTimeout(function() { vm.previewShow = true }, 800);
-            }
-        },
     }
 </script>
