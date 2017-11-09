@@ -39,11 +39,17 @@ class Schedule extends Model
 
     public function setStartTimeAttribute($value)
     {
+        if (!$value) {
+            return;
+        }
         $this->attributes['start_time'] = new Carbon($value);
     }
 
     public function setEndTimeAttribute($value)
     {
+        if (!$value) {
+            return;
+        }
         $this->attributes['end_time'] = new Carbon($value);
     }
 

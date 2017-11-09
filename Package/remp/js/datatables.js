@@ -42,6 +42,9 @@ $.fn.dataTables = {
     render: {
         date: function () {
             return function(data) {
+                if (data === null) {
+                    return "";
+                }
                 var date = new Date(data);
                 return date.toLocaleString();
             }
@@ -59,7 +62,6 @@ $.fn.dataTables = {
                 if (data === 0 || data === false) {
                     return 'No';
                 }
-                console.warn("remp datatables: invalid value passed to boolean renderer: " + data);
                 return '';
             }
         },

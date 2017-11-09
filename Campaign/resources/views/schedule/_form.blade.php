@@ -67,14 +67,30 @@
         var $startTime = $('input[name="start_time"]');
         var $endTimeFE = $("#end_time_frontend");
         var $endTime = $('input[name="end_time"]');
-        $startTimeFE.on("dp.hide", function (e) {
-            $endTimeFE.data("DateTimePicker").minDate(e.date);
-            $endTimeFE.data("DateTimePicker").defaultDate(e.date);
-            $startTime.val(e.date.toISOString());
+
+		$startTimeFE.data("DateTimePicker").minDate(new Date());
+
+		$startTimeFE.on('dp.change', function() {
+			var st = $(this).data("DateTimePicker").date();
+			var et = $endTimeFE.data("DateTimePicker").date();
+			if (st && et && st.unix() > et.unix()) {
+				$endTimeFE.data("DateTimePicker").date(st);
+			}
         });
-        $endTimeFE.on("dp.hide", function (e) {
-            $startTimeFE.data("DateTimePicker").maxDate(e.date);
-            $endTime.val(e.date.toISOString());
+        $endTimeFE.on("dp.change", function (e) {
+        	var st = $startTimeFE.data("DateTimePicker").date();
+			var et = $(this).data("DateTimePicker").date();
+			if (st && et && et.unix() < st.unix()) {
+				$startTimeFE.data("DateTimePicker").date(et);
+			}
         }).datetimepicker({useCurrent: false});
+
+        $('form').on('submit', function() {
+			var st = $startTimeFE.data("DateTimePicker").date();
+			$startTime.val(st ? st.toISOString() : null);
+			var et = $endTimeFE.data("DateTimePicker").date();
+			$endTime.val(et ? et.toISOString() : null);
+			return true;
+        })
     })
 </script>
