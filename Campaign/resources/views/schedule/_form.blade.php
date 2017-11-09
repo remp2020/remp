@@ -30,9 +30,10 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
                 <div class="dtp-container fg-line">
                     {!! Form::label('start_time_frontend', 'Start time', ['class' => 'fg-label']) !!}
-                    {!! Form::datetime('start_time_frontend', $schedule->start_time, [
-                        'class' => 'form-control date-time-picker'
-                    ]) !!}
+                    {!! Form::datetime('start_time_frontend', $schedule->start_time, array_filter([
+                        'class' => 'form-control date-time-picker',
+                        'disabled' => !$schedule->isEditable() ? 'disabled' : null,
+                    ])) !!}
                 </div>
                 {!! Form::hidden('start_time') !!}
             </div>
@@ -43,9 +44,10 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-timer-off"></i></span>
                 <div class="dtp-container fg-line">
                     {!! Form::label('end_time_frontend', 'End time', ['class' => 'fg-label']) !!}
-                    {!! Form::datetime('end_time_frontend', $schedule->end_time, [
-                        'class' => 'form-control date-time-picker'
-                    ]) !!}
+                    {!! Form::datetime('end_time_frontend', $schedule->end_time, array_filter([
+                        'class' => 'form-control date-time-picker',
+                        'disabled' => !$schedule->isEditable() ? 'disabled' : null,
+                    ])) !!}
                 </div>
                 {!! Form::hidden('end_time') !!}
             </div>

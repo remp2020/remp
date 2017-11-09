@@ -23,7 +23,9 @@
                     'colSettings' => [
                         'campaign.name' => [
                             'header' => 'Campaign',
-                            'renderParams' => ['column' => 'name']
+                        ],
+                        'banner.name' => [
+                            'header' => 'Banner',
                         ],
                         'start_time' => [
                             'header' => 'Scheduled start date',

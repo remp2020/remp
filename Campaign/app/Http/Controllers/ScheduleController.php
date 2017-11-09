@@ -19,7 +19,7 @@ class ScheduleController extends Controller
     public function json(Datatables $dataTables)
     {
         $schedule = Schedule::select()
-            ->with('campaign')
+            ->with(['campaign.banner'])
             ->orderBy('start_time', 'DESC')
             ->orderBy('end_time', 'DESC')
             ->get();
@@ -27,11 +27,11 @@ class ScheduleController extends Controller
         return $dataTables->of($schedule)
             ->addColumn('actions', function (Schedule $s) {
                 return [
-                    'edit' => !$s->isStopped() ? route('schedule.edit', $s) : null,
+                    'edit' => $s->isEditable() ? route('schedule.edit', $s) : null,
                     'start' => $s->isRunnable() ? route('schedule.start', $s) : null,
                     'pause' => $s->isRunning() ? route('schedule.pause', $s) : null,
                     'stop' => $s->isRunning() ? route('schedule.stop', $s) : null,
-                    'destroy' => $s->isDeletable() ? route('schedule.destroy', $s) : null,
+                    'destroy' => $s->isEditable() ? route('schedule.destroy', $s) : null,
                 ];
             })
             ->addColumn('action_methods', [
@@ -124,7 +124,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return redirect(route('schedule.index'))->with('success', sprintf(
-            "Campaign %s rescheduled from %s to %s",
+            "Campaign %s rescheduled starting on %s and ending on %s",
             $schedule->campaign->name,
             Carbon::parse($schedule->start_time)->toDayDateTimeString(),
             Carbon::parse($schedule->end_time)->toDayDateTimeString()
@@ -163,7 +163,7 @@ class ScheduleController extends Controller
      */
     public function start(Schedule $schedule)
     {
-        $schedule->status = Schedule::STATUS_RUNNING;
+        $schedule->status = Schedule::STATUS_EXECUTED;
         $schedule->save();
         return redirect(route('schedule.index'))->with('success', sprintf(
             "Schedule for campaign %s was started manually",

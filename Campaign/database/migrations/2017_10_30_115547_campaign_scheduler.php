@@ -13,7 +13,7 @@ class CampaignScheduler extends Migration
             $table->integer('campaign_id')->unsigned();
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();
-            $table->string('status')->default('ready');
+            $table->enum('status', ['ready', 'executed', 'paused', 'stopped'])->default('ready');
 
             $table->foreign('campaign_id')->references('id')->on('campaigns');
             $table->timestamps();

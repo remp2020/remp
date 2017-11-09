@@ -17,7 +17,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-01 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertTrue($schedule->isRunnable());
-        $this->assertTrue($schedule->isDeletable());
+        $this->assertTrue($schedule->isEditable());
     }
 
     public function testForcedRunnningBeforeScheduledStarted()
@@ -26,11 +26,11 @@ class ScheduleTest extends TestCase
             'start_time' => new Carbon('2017-11-01 01:23:45'),
             'end_time' => new Carbon('2017-11-02 01:23:45'),
         ]);
-        $schedule->status = Schedule::STATUS_RUNNING;
+        $schedule->status = Schedule::STATUS_EXECUTED;
         Carbon::setTestNow(new Carbon('2017-11-01 00:00:00'));
         $this->assertTrue($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
-        $this->assertFalse($schedule->isDeletable());
+        $this->assertFalse($schedule->isEditable());
     }
 
     public function testForcedRunnningAfterScheduledEnd()
@@ -39,11 +39,11 @@ class ScheduleTest extends TestCase
             'start_time' => new Carbon('2017-11-01 01:23:45'),
             'end_time' => new Carbon('2017-11-02 01:23:45'),
         ]);
-        $schedule->status = Schedule::STATUS_RUNNING;
+        $schedule->status = Schedule::STATUS_EXECUTED;
         Carbon::setTestNow(new Carbon('2017-11-03 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
-        $this->assertFalse($schedule->isDeletable());
+        $this->assertFalse($schedule->isEditable());
     }
 
     public function testForcedStoppedBeforeScheduledStarted()
@@ -56,7 +56,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-01 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
-        $this->assertFalse($schedule->isDeletable());
+        $this->assertFalse($schedule->isEditable());
     }
 
     public function testNativeRunning()
@@ -68,7 +68,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-02 00:00:00'));
         $this->assertTrue($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
-        $this->assertFalse($schedule->isDeletable());
+        $this->assertFalse($schedule->isEditable());
     }
 
     public function testNativeFinished()
@@ -80,7 +80,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-03 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
-        $this->assertFalse($schedule->isDeletable());
+        $this->assertFalse($schedule->isEditable());
     }
 
     public function testPausedRunnable()
@@ -93,7 +93,7 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-02 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertTrue($schedule->isRunnable());
-        $this->assertFalse($schedule->isDeletable());
+        $this->assertFalse($schedule->isEditable());
     }
 
     public function testPausedNotRunnable()
@@ -106,6 +106,27 @@ class ScheduleTest extends TestCase
         Carbon::setTestNow(new Carbon('2017-11-03 00:00:00'));
         $this->assertFalse($schedule->isRunning());
         $this->assertFalse($schedule->isRunnable());
-        $this->assertFalse($schedule->isDeletable());
+        $this->assertFalse($schedule->isEditable());
+    }
+
+    public function testNoEndTime()
+    {
+	    $schedule = new Schedule([
+		    'start_time' => new Carbon('2017-11-01 01:23:45'),
+	    ]);
+	    Carbon::setTestNow(new Carbon('2017-11-01 00:00:00'));
+	    $this->assertFalse($schedule->isRunning());
+	    $this->assertTrue($schedule->isRunnable());
+	    $this->assertTrue($schedule->isEditable());
+
+	    Carbon::setTestNow(new Carbon('2017-11-03 00:00:00'));
+	    $this->assertTrue($schedule->isRunning());
+	    $this->assertFalse($schedule->isRunnable());
+	    $this->assertFalse($schedule->isEditable());
+
+	    $schedule->status = Schedule::STATUS_STOPPED;
+	    $this->assertFalse($schedule->isRunning());
+	    $this->assertFalse($schedule->isRunnable());
+	    $this->assertFalse($schedule->isEditable());
     }
 }

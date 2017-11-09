@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Schedule extends Model
 {
     const STATUS_READY = 'ready';
-    const STATUS_RUNNING = 'running';
+    const STATUS_EXECUTED = 'executed';
     const STATUS_PAUSED = 'paused';
     const STATUS_STOPPED = 'stopped';
 
@@ -39,7 +39,7 @@ class Schedule extends Model
 
     public function setStartTimeAttribute($value)
     {
-        $this->attributes['start_time'] = new Carbon($value, $this->timez);
+        $this->attributes['start_time'] = new Carbon($value);
     }
 
     public function setEndTimeAttribute($value)
@@ -49,12 +49,12 @@ class Schedule extends Model
 
     public function isRunning()
     {
-        if ($this->status === self::STATUS_RUNNING && $this->end_time > Carbon::now()) {
+        if ($this->status === self::STATUS_EXECUTED && $this->endsInFuture()) {
             return true;
         }
         if ($this->start_time < Carbon::now() &&
-            $this->end_time > Carbon::now() &&
-            !in_array($this->status, [self::STATUS_PAUSED, self::STATUS_STOPPED])
+            $this->endsInFuture() &&
+            $this->status === self::STATUS_READY
         ) {
             return true;
         }
@@ -63,7 +63,7 @@ class Schedule extends Model
 
     public function isRunnable()
     {
-        if ($this->end_time < Carbon::now()) {
+        if (!$this->endsInFuture()) {
             return false;
         }
         if ($this->status === self::STATUS_READY && $this->start_time > Carbon::now()) {
@@ -75,7 +75,7 @@ class Schedule extends Model
         return false;
     }
 
-    public function isDeletable()
+    public function isEditable()
     {
         if ($this->start_time > Carbon::now() && $this->status === self::STATUS_READY) {
             return true;
@@ -86,5 +86,10 @@ class Schedule extends Model
     public function isStopped()
     {
         return $this->status === self::STATUS_STOPPED;
+    }
+
+    public function endsInFuture()
+    {
+    	return !$this->end_time || $this->end_time > Carbon::now();
     }
 }
