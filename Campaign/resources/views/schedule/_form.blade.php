@@ -32,7 +32,7 @@
                     {!! Form::label('start_time_frontend', 'Start time', ['class' => 'fg-label']) !!}
                     {!! Form::datetime('start_time_frontend', $schedule->start_time, array_filter([
                         'class' => 'form-control date-time-picker',
-                        'disabled' => !$schedule->isEditable() ? 'disabled' : null,
+                        'disabled' => $schedule->id && !$schedule->isEditable() ? 'disabled' : null,
                     ])) !!}
                 </div>
                 {!! Form::hidden('start_time') !!}
@@ -46,7 +46,7 @@
                     {!! Form::label('end_time_frontend', 'End time', ['class' => 'fg-label']) !!}
                     {!! Form::datetime('end_time_frontend', $schedule->end_time, array_filter([
                         'class' => 'form-control date-time-picker',
-                        'disabled' => !$schedule->isEditable() ? 'disabled' : null,
+                        'disabled' => $schedule->id && !$schedule->isEditable() ? 'disabled' : null,
                     ])) !!}
                 </div>
                 {!! Form::hidden('end_time') !!}

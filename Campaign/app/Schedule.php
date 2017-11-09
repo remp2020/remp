@@ -83,9 +83,6 @@ class Schedule extends Model
 
     public function isEditable()
     {
-        if (!$this->id) {
-            return true;
-        }
         if ($this->start_time > Carbon::now() && $this->status === self::STATUS_READY) {
             return true;
         }
