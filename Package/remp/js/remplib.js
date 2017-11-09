@@ -6,6 +6,8 @@ export default {
 
     signedIn: false,
 
+    cacheThreshold: 15 * 60000, // 15 minutes
+
     getUserId: function() {
         if (this.userId) {
             return this.userId;
@@ -20,8 +22,8 @@ export default {
         var item = {
             "version": 1,
             "value": anonId,
-            "createdAt": now.getTime(),
-            "updatedAt": now.getTime(),
+            "createdAt": now,
+            "updatedAt": now,
         };
         localStorage.setItem(storageKey, JSON.stringify(item));
         return anonId;
@@ -53,15 +55,18 @@ export default {
         }
 
         var item = JSON.parse(data);
-        var threshold = new Date(now.getTime() - this.cacheThreshold * 60000);
+        var threshold = new Date(now.getTime() - this.cacheThreshold);
         if (!bypassThreshold && (new Date(item.updatedAt)).getTime() < threshold.getTime()) {
             localStorage.removeItem(key);
             return null;
         }
 
         item.updatedAt = now;
-        localStorage.setItem(key, JSON.stringify(item));
-        return item.value;
+
+        if (item.hasOwnProperty('value')) {
+            return item.value;
+        }
+        return item;
     },
 
     extend: function() {

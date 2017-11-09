@@ -22,8 +22,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         initIterator: 0,
 
-        cacheThreshold: 15, // minutes
-
         article: {
             id: null,
             author_id: null,

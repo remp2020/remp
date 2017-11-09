@@ -28,6 +28,7 @@ class CampaignRequest extends FormRequest
             'active' => 'boolean|required',
             'banner_id' => 'integer|required',
             'signed_in' => 'boolean|nullable',
+            'once_per_session' => 'boolean|required',
             'segments' => 'array',
         ];
     }
@@ -39,6 +40,7 @@ class CampaignRequest extends FormRequest
             $data['signed_in'] = $this->getInputSource()->getBoolean('signed_in');
         }
         $data['active'] = $this->getInputSource()->getBoolean('active', false);
+        $data['once_per_session'] = $this->getInputSource()->getBoolean('once_per_session', false);
         return $data;
     }
 }

@@ -53,6 +53,14 @@
 
             <div class="input-group fg-float m-t-30 checkbox">
                 <label class="m-l-15">
+                    Display once per session
+                    <input v-model="oncePerSession" value="1" name="once_per_session" type="checkbox">
+                    <i class="input-helper"></i>
+                </label>
+            </div>
+
+            <div class="input-group fg-float m-t-30 checkbox">
+                <label class="m-l-15">
                     Activate
                     <input v-model="active" value="1" name="active" type="checkbox">
                     <i class="input-helper"></i>
@@ -125,6 +133,7 @@
         "_segments",
         "_bannerId",
         "_signedIn",
+        "_oncePerSession",
         "_active",
         "_banners",
         "_availableSegments",
@@ -150,6 +159,7 @@
                 "segments": [],
                 "bannerId": null,
                 "signedIn": null,
+                "oncePerSession": null,
                 "active": null,
 
                 "banners": null,
