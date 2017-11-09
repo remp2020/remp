@@ -20,7 +20,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         variables: {},
 
-        campaignsStorageKey: "campaigns",
+        campaignsSessionStorageKey: "campaigns_session",
 
         /* JSONP START */
 
@@ -114,7 +114,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         getCampaignsSeen: function() {
-            var campaigns = remplib.getFromStorage(this.campaignsStorageKey, false);
+            var campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
             if (typeof campaigns !== "undefined" && campaigns !== null && campaigns.seen) {
                 return campaigns.seen;
             }
@@ -124,7 +124,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         // used to store seen campaign from campaign / banner view
         storeCampaign: function(campaignId) {
             var now = new Date();
-            var campaigns = remplib.getFromStorage(this.campaignsStorageKey, false);
+            var campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
 
             if(typeof campaigns === "undefined" || campaigns === null) {
                 campaigns = {
@@ -154,7 +154,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 });
             }
 
-            localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
+            localStorage.setItem(this.campaignsSessionStorageKey, JSON.stringify(campaigns));
         },
     };
 
