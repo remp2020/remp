@@ -126,6 +126,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .table  > tbody > tr > td > span.actions {
     white-space: nowrap;
 }
+.table  > tbody > tr > td > span.actions > form {
+    display: inherit;
+}
 
 .table > thead > tr > th,
 .table > tbody > tr > th,
@@ -134,6 +137,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
     padding: 12px;
+}
+
+.bootstrap-datetimepicker-widget table td.today:before {
+    border: none;
 }
 
 /***************/

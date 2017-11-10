@@ -42,6 +42,9 @@ $.fn.dataTables = {
     render: {
         date: function () {
             return function(data) {
+                if (data === null) {
+                    return "";
+                }
                 var date = new Date(data);
                 return date.toLocaleString();
             }
@@ -59,7 +62,6 @@ $.fn.dataTables = {
                 if (data === 0 || data === false) {
                     return 'No';
                 }
-                console.warn("remp datatables: invalid value passed to boolean renderer: " + data);
                 return '';
             }
         },
@@ -108,6 +110,19 @@ $.fn.dataTables = {
             return function(data, type, row) {
                 var actions = '<span class="actions">';
                 $.each(actionSettings, function (key, action) {
+                    if (row.actions[action['name']] === null) {
+                        actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" disabled="disabled" href=""><i class="zmdi ' + action['class'] + '"></i></a>\n';
+                        return;
+                    }
+                    if (row.action_methods && row.action_methods[action['name']]) {
+                        var tokenVal = $('meta[name="csrf-token"]').attr('content');
+                        actions += '<form method="POST" action="' + row.actions[action['name']] + '">';
+                        actions += '<button type="submit" class="btn btn-sm palette-Cyan bg waves-effect"><i class="zmdi ' + action['class'] + '"></i></button>\n';
+                        actions += '<input type="hidden" name="_token" value="' + tokenVal + '" />\n';
+                        actions += '<input type="hidden" name="_method" value="' + row.action_methods[action['name']] + '" />\n';
+                        actions += '</form>';
+                        return;
+                    }
                     actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" href="' + row.actions[action['name']] + '"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                 });
                 actions += '</span>';

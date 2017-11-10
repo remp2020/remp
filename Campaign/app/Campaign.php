@@ -46,10 +46,15 @@ class Campaign extends Model
         return $this->hasMany(CampaignSegment::class);
     }
 
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
     public function cache()
     {
         $activeCampaignIds = self::whereActive(true)->pluck('id')->toArray();
-        $this->load(['segments', 'banner']);
+        $this->load(['segments', 'banner', 'schedules']);
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
         Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $this);
     }
