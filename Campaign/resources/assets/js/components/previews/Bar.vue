@@ -4,8 +4,8 @@
 
     .bar-preview-close {
         position: absolute;
-        top: 5px;
-        right: 10px;
+        top: -5px;
+        right: 0;
         font-size: 15px;
         padding: 5px;
         text-decoration: none;
@@ -70,7 +70,7 @@
     ]">
         <transition appear v-bind:name="transition">
             <div class="bar-preview-box" v-bind:style="[boxStyles]">
-                <a class="bar-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable || displayType !== 'overlay'}]" v-on:click="$parent.closed" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <a class="bar-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&#10006;</a>
                 <div class="bar-main" v-html="$parent.injectVars(mainText)"></div>
                 <div class="bar-button" v-if="buttonText.length > 0" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
             </div>
@@ -170,8 +170,7 @@
             },
             closeStyles: function() {
                 return {
-                    color: 'white',
-
+					color: this.textColor,
                 }
             },
             isVisible: function() {

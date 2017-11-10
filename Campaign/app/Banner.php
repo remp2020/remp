@@ -37,10 +37,6 @@ class Banner extends Model
         'closeable' => 'boolean',
     ];
 
-    protected $attributes = [
-        'closeable' => false,
-    ];
-
     protected static function boot()
     {
         parent::boot();
