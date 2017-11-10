@@ -30,7 +30,7 @@ class Segment implements SegmentContract
     public function __construct(Client $client, $allowCache)
     {
         $this->client = $client;
-        $this->allowCache = false;
+        $this->allowCache = $allowCache;
     }
 
     public function provider(): string
@@ -67,11 +67,10 @@ class Segment implements SegmentContract
     /**
      * @param CampaignSegment $campaignSegment
      * @param $userId
-     * @param array $overrides
      * @return bool
      * @throws SegmentException
      */
-    public function check(CampaignSegment $campaignSegment, $userId, array $overrides): bool
+    public function check(CampaignSegment $campaignSegment, $userId): bool
     {
         if ($this->allowCache) {
             $cacheJob = new CacheSegmentJob($campaignSegment);
@@ -89,7 +88,7 @@ class Segment implements SegmentContract
         try {
             $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
                 'query' => [
-                    'fields' => Json::encode($overrides)
+                    'fields' => Json::encode($campaignSegment->getOverrides())
                 ],
             ]);
         } catch (ConnectException $e) {
@@ -102,16 +101,15 @@ class Segment implements SegmentContract
 
     /**
      * @param CampaignSegment $campaignSegment
-     * @param array $overrides
      * @return Collection
      * @throws SegmentException
      */
-    public function users(CampaignSegment $campaignSegment, array $overrides): Collection
+    public function users(CampaignSegment $campaignSegment): Collection
     {
         try {
             $response = $this->client->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
                 'query' => [
-                    'fields' => Json::encode($overrides)
+                    'fields' => Json::encode($campaignSegment->getOverrides())
                 ],
             ]);
         } catch (ConnectException $e) {

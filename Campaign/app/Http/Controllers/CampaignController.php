@@ -97,10 +97,6 @@ class CampaignController extends Controller
             $campaignSegment->provider = $r['provider'];
             $campaignSegment->campaign_id = $campaign->id;
             $campaignSegment->save();
-
-            if ($campaign->active) {
-                dispatch(new CacheSegmentJob($campaignSegment, true));
-            }
         }
 
         return redirect(route('campaigns.index'))->with('success', 'Campaign created');
@@ -165,10 +161,6 @@ class CampaignController extends Controller
             $campaignSegment->provider = $r['provider'];
             $campaignSegment->campaign_id = $campaign->id;
             $campaignSegment->save();
-
-            if ($campaign->active) {
-                dispatch(new CacheSegmentJob($campaignSegment, true));
-            }
         }
 
         CampaignSegment::destroy($request->get('removedSegments'));
@@ -268,11 +260,8 @@ class CampaignController extends Controller
         }
 
         // segment
-        $overrides = [
-            'utm_campaign' => $campaign->uuid,
-        ];
         foreach ($campaign->segments as $campaignSegment) {
-            if (!$sa->check($campaignSegment, $userId, $overrides)) {
+            if (!$sa->check($campaignSegment, $userId)) {
                 return response()
                     ->jsonp($r->get('callback'), [
                         'success' => true,
