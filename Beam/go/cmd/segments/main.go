@@ -74,7 +74,7 @@ func main() {
 		DBName:       c.InfluxDBName,
 		Client:       ic,
 		QueryBuilder: influxquery.NewInfluxBuilder(),
-		Debug:        true,
+		Debug:        c.Debug,
 	}
 
 	eventDB := &model.EventDB{
