@@ -5,6 +5,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"log"
+	"reflect"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -109,10 +111,16 @@ type Intersector func(userID string) bool
 type SegmentDB struct {
 	MySQL    *sqlx.DB
 	InfluxDB *InfluxDB
+	Segments map[string]*Segment
 }
 
 // Get returns instance of Segment based on the given code.
 func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
+	p, ok := sDB.Segments[code]
+	if ok {
+		return p, true, nil
+	}
+
 	s := &Segment{}
 	err := sDB.MySQL.Get(s, "SELECT * FROM segments WHERE code = ?", code)
 	if err != nil {
@@ -272,6 +280,34 @@ func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, o RuleOverrides,
 	}
 
 	return um, nil
+}
+
+// Cache stores the segments in memory.
+func (sDB *SegmentDB) Cache() error {
+	sm := make(map[string]*Segment)
+	sc := SegmentCollection{}
+
+	err := sDB.MySQL.Select(&sc, "SELECT * FROM segments")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+		return errors.Wrap(err, "unable to cache segments from MySQL")
+	}
+	var changed bool
+	for _, s := range sc {
+		old, ok := sDB.Segments[s.Code]
+		if !changed && (!ok || !reflect.DeepEqual(old, s)) {
+			changed = true
+		}
+		sm[s.Code] = s
+	}
+	if changed {
+		log.Println("segment cache reloaded")
+	}
+
+	sDB.Segments = sm
+	return nil
 }
 
 // conditions returns list of influx conditions for current SegmentRule.

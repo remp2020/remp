@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
@@ -95,6 +96,31 @@ func main() {
 
 	var wg sync.WaitGroup
 	ctx, cancelCtx := context.WithCancel(context.Background())
+
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	cacheProperties := func() {
+		if err := segmentDB.Cache(); err != nil {
+			service.LogError("unable to cache segments", "err", err)
+		}
+	}
+
+	wg.Add(1)
+	cacheProperties()
+	go func() {
+		defer wg.Done()
+		service.LogInfo("starting property caching")
+		for {
+			select {
+			case <-ticker.C:
+				cacheProperties()
+			case <-ctx.Done():
+				service.LogInfo("property caching stopped")
+				return
+			}
+		}
+	}()
 
 	// controllers init
 
