@@ -16,13 +16,27 @@
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'template', 'display_type', 'position'],
+            'colSettings' => [
+                'name',
+                'template',
+                'display_type',
+                'position',
+                'created_at' => [
+                    'header' => 'Created at',
+                    'render' => 'date',
+                ],
+                'updated_at' => [
+                    'header' => 'Updated at',
+                    'render' => 'date',
+                ],
+            ],
             'dataSource' => route('banners.json'),
             'rowActions' => [
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
             ],
             'rowActionLink' => 'show',
+            'order' => [4, 'desc'],
         ]) !!}
     </div>
 

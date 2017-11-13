@@ -15,6 +15,7 @@ class DataTable extends AbstractWidget
     protected $config = [
         'dataSource' => '',
         'colSettings' => [],
+        'order' => [],
         'tableId' => '',
         'rowActions' => [],
         'rowActionLink' => null,
@@ -44,6 +45,7 @@ class DataTable extends AbstractWidget
             'tableId' => Uuid::getFactory()->uuid4(),
             'rowActions' => $this->config['rowActions'],
             'rowActionLink' => $this->config['rowActionLink'],
+            'order' => $this->config['order'],
         ]);
     }
 }

@@ -59,12 +59,21 @@
                             'header' => 'Signed in',
                             'render' => 'boolean',
                         ],
+                        'created_at' => [
+                            'header' => 'Created at',
+                            'render' => 'date',
+                        ],
+                        'updated_at' => [
+                            'header' => 'Updated at',
+                            'render' => 'date',
+                        ],
                     ],
                     'dataSource' => route('campaigns.json'),
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                     ],
                     'rowActionLink' => 'edit',
+                    'order' => [5, 'desc'],
                 ]) !!}
                 </div>
             </div>

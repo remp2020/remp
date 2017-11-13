@@ -76,6 +76,7 @@
             'sDom': 'tr',
             'processing': true,
             'serverSide': true,
+            'order': {!! @json($order) !!},
             'ajax': '{{ $dataSource }}',
             'drawCallback': function(settings) {
                 $.fn.dataTables.pagination(settings);
