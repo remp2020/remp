@@ -44,7 +44,7 @@ class CampaignController extends Controller
                     'edit' => route('campaigns.edit', $campaign) ,
                 ];
             })
-            ->rawColumns(['actions', 'active', 'signed_in'])
+            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
             ->make(true);
     }
@@ -240,6 +240,21 @@ class CampaignController extends Controller
                     'success' => false,
                     'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
                 ]);
+        }
+
+        // check if campaign is set to be seen only once per session
+        // and check campaign UUID against list of campaigns seen by user
+        $campaignsSeen = $data->campaignsSeen ?? false;
+        if ($campaign->once_per_session && $campaignsSeen) {
+            foreach ($campaignsSeen as $campaignSeen) {
+                if ($campaignSeen->campaignId === $campaign->uuid) {
+                    return response()
+                        ->jsonp($r->get('callback'), [
+                            'success' => true,
+                            'errors' => [],
+                        ]);
+                }
+            }
         }
 
         if (isset($campaign->signed_in)) {

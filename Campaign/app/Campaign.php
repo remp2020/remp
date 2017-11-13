@@ -16,15 +16,18 @@ class Campaign extends Model
         'banner_id',
         'signed_in',
         'active',
+        'once_per_session',
     ];
 
     protected $casts = [
         'active' => 'boolean',
         'signed_in' => 'boolean',
+        'once_per_session' => 'boolean',
     ];
 
     protected $attributes = [
         'active' => false,
+        'once_per_session' => false,
     ];
 
     protected static function boot()
