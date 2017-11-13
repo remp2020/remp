@@ -214,18 +214,82 @@ class CampaignController extends Controller
         }
 
         /** @var Campaign $campaign */
-        $campaign = null;
-        $running = false;
-        foreach ($campaignIds as $cid) {
-            $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($cid);
+        $positions = $pm->positions();
+        $dimensions = $dm->dimensions();
+        $alignments = $am->alignments();
+        $displayedCampaigns = [];
+
+        foreach ($campaignIds as $campaignId) {
+            $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignId);
+            $running = false;
             foreach ($campaign->schedules as $schedule) {
                 if ($schedule->isRunning()) {
                     $running = true;
-                    break 2;
+                    break;
                 }
             }
+            if (!$running) {
+                continue;
+            }
+
+            // banner
+            $banner = $campaign->banner;
+            if (!$banner) {
+                return response()
+                    ->jsonp($r->get('callback'), [
+                        'success' => false,
+                        'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
+                    ]);
+            }
+
+            // check if campaign is set to be seen only once per session
+            // and check campaign UUID against list of campaigns seen by user
+            $campaignsSeen = $data->campaignsSeen ?? false;
+            if ($campaign->once_per_session && $campaignsSeen) {
+                $seen = false;
+                foreach ($campaignsSeen as $campaignSeen) {
+                    if ($campaignSeen->campaignId === $campaign->uuid) {
+                        $seen = true;
+                        break;
+                    }
+                }
+                if ($seen) {
+                    continue;
+                }
+            }
+
+            // signed in state
+            if (isset($campaign->signed_in)) {
+                if (!isset($data->signedIn)) {
+                    return response()
+                        ->jsonp($r->get('callback'), [
+                            'success' => false,
+                            'errors' => ['current campaign requires "signedIn" param to be provided'],
+                        ]);
+                }
+                if ($campaign->signed_in !== $data->signedIn) {
+                    continue;
+                }
+            }
+
+            // segment
+            foreach ($campaign->segments as $campaignSegment) {
+                if (!$sa->check($campaignSegment, $userId)) {
+                    continue;
+                }
+            }
+
+            //render
+            $displayedCampaigns[] = View::make('banners.preview', [
+                'banner' => $banner,
+                'campaign' => $campaign,
+                'positions' => $positions,
+                'dimensions' => $dimensions,
+                'alignments' => $alignments,
+            ])->render();
         }
-        if (!$running) {
+
+        if (empty($displayedCampaigns)) {
             return response()
                 ->jsonp($r->get('callback'), [
                     'success' => true,
@@ -233,75 +297,11 @@ class CampaignController extends Controller
                 ]);
         }
 
-        $banner = $campaign->banner;
-        if (!$banner) {
-            return response()
-                ->jsonp($r->get('callback'), [
-                    'success' => false,
-                    'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
-                ]);
-        }
-
-        // check if campaign is set to be seen only once per session
-        // and check campaign UUID against list of campaigns seen by user
-        $campaignsSeen = $data->campaignsSeen ?? false;
-        if ($campaign->once_per_session && $campaignsSeen) {
-            foreach ($campaignsSeen as $campaignSeen) {
-                if ($campaignSeen->campaignId === $campaign->uuid) {
-                    return response()
-                        ->jsonp($r->get('callback'), [
-                            'success' => true,
-                            'errors' => [],
-                        ]);
-                }
-            }
-        }
-
-        if (isset($campaign->signed_in)) {
-            if (!isset($data->signedIn)) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => false,
-                        'errors' => ['current campaign requires "signedIn" param to be provided'],
-                    ]);
-            }
-            if ($campaign->signed_in !== $data->signedIn) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => true,
-                        'data' => [],
-                    ]);
-            }
-        }
-
-        // segment
-        foreach ($campaign->segments as $campaignSegment) {
-            if (!$sa->check($campaignSegment, $userId)) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => true,
-                        'data' => [],
-                    ]);
-            }
-        }
-
-        $positions = $pm->positions();
-        $dimensions = $dm->dimensions();
-        $alignments = $am->alignments();
-
         return response()
             ->jsonp($r->get('callback'), [
                 'success' => true,
                 'errors' => [],
-                'data' => [
-                    View::make('banners.preview', [
-                        'banner' => $banner,
-                        'campaign' => $campaign,
-                        'positions' => $positions,
-                        'dimensions' => $dimensions,
-                        'alignments' => $alignments,
-                    ])->render(),
-                ],
+                'data' => $displayedCampaigns,
             ]);
     }
 

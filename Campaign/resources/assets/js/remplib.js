@@ -39,9 +39,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (!result["success"]) {
                     return;
                 }
-                for (var exec = result.data || [], c = 0; c < exec.length; c++) {
+                for (let exec = result.data || [], c = 0; c < exec.length; c++) {
                     try {
-                        var fn = new Function(exec[c]);
+                        let fn = new Function(exec[c]);
                         setTimeout(fn(), 0);
                     } catch (u) {
                         console.error("campaign showtime error:", u)
@@ -85,7 +85,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         request: function(def) {
-            var params = {};
+            let params = {};
             params[def.jsonpParameter] = JSON.stringify(def.prepareData());
 
             this.get(this.url + "/" + def.name, params, function (data) {
@@ -96,10 +96,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         get: function(url, params, success, error) {
-            var query = "?";
-            var cb = "rempcampaign_callback_json" + this.callbackIterator++;
+            let query = "?";
+            let cb = "rempcampaign_callback_json" + this.callbackIterator++;
 
-            for (var item in params)
+            for (let item in params)
                 params.hasOwnProperty(item) && (query += encodeURIComponent(item) + "=" + encodeURIComponent(params[item]) + "&");
 
             window[cb] = function(data) {
@@ -114,7 +114,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         getCampaignsSeen: function() {
-            var campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
+            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
             if (typeof campaigns !== "undefined" && campaigns !== null && campaigns.seen) {
                 return campaigns.seen;
             }
@@ -123,8 +123,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         // used to store seen campaign from campaign / banner view
         storeCampaign: function(campaignId) {
-            var now = new Date();
-            var campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
+            let now = new Date();
+            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
 
             if(typeof campaigns === "undefined" || campaigns === null) {
                 campaigns = {
@@ -135,8 +135,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             }
 
-            var flag = false;
-            for (var i = 0, len = campaigns.seen.length; i < len; i++) {
+            let flag = false;
+            for (let i = 0, len = campaigns.seen.length; i < len; i++) {
                 if (campaigns.seen[i].campaignId === campaignId) {
                     campaigns.seen[i].updatedAt = now;
                     campaigns.seen[i].count++;
