@@ -68,6 +68,9 @@
                             'render' => 'date',
                         ],
                     ],
+                    'rowHighlights' => [
+                        'active' => true
+                    ],
                     'dataSource' => route('campaigns.json'),
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],

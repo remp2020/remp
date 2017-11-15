@@ -180,6 +180,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     background-color: #f4f4f4;
 }
 
+.dataTables_wrapper .dataTable tbody tr.highlight {
+    color: #007c91;
+}
+
 tr th.sorting:hover,
 tr th.sorting_asc:hover,
 tr th.sorting_desc:hover {

@@ -78,6 +78,17 @@
             'serverSide': true,
             'order': {!! @json($order) !!},
             'ajax': '{{ $dataSource }}',
+            'createdRow': function (row, data, index) {
+                var highlight = true;
+                @foreach($rowHighlights as $column => $value)
+                if (!data.hasOwnProperty({!! @json($column) !!}) || data['{{ $column }}'] !== {!! @json($value) !!}) {
+                    highlight = false;
+                }
+                @endforeach
+                if (highlight) {
+                    $(row).addClass('highlight');
+                }
+            },
             'drawCallback': function(settings) {
                 $.fn.dataTables.pagination(settings);
             }
