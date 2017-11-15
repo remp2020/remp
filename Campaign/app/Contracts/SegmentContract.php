@@ -16,4 +16,6 @@ interface SegmentContract
     public function users(CampaignSegment $campaignSegment): Collection;
 
     public function provider(): string;
+
+    public function cacheEnabled(CampaignSegment $campaignSegment): bool;
 }

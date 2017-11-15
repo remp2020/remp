@@ -44,6 +44,10 @@ class CacheSegmentJob implements ShouldQueue
             return;
         }
 
+        if (!$segmentAggregator->cacheEnabled($this->campaignSegment)) {
+            return;
+        }
+
         $users = $segmentAggregator->users($this->campaignSegment);
         $userIds = $users->map(function ($item) {
             return $item->id;

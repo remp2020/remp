@@ -46,4 +46,9 @@ class SegmentAggregator implements SegmentContract
         return $this->contracts[$campaignSegment->provider]
             ->users($campaignSegment);
     }
+
+    public function cacheEnabled(CampaignSegment $campaignSegment): bool {
+        return $this->contracts[$campaignSegment->provider]
+            ->cacheEnabled($campaignSegment);
+    }
 }

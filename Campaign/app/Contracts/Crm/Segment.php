@@ -114,4 +114,9 @@ class Segment implements SegmentContract
         $collection = collect($list->users);
         return $collection;
     }
+
+    public function cacheEnabled(CampaignSegment $campaignSegment): bool
+    {
+        return true;
+    }
 }

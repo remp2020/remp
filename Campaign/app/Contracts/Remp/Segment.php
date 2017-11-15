@@ -25,12 +25,12 @@ class Segment implements SegmentContract
 
     private $client;
 
-    private $allowCache;
+    private $cacheEnabled;
 
-    public function __construct(Client $client, $allowCache)
+    public function __construct(Client $client, $cacheEnabled)
     {
         $this->client = $client;
-        $this->allowCache = $allowCache;
+        $this->cacheEnabled = $cacheEnabled;
     }
 
     public function provider(): string
@@ -72,7 +72,7 @@ class Segment implements SegmentContract
      */
     public function check(CampaignSegment $campaignSegment, $userId): bool
     {
-        if ($this->allowCache) {
+        if ($this->cacheEnabled) {
             $cacheJob = new CacheSegmentJob($campaignSegment);
             $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
             if ($bloomFilter) {
@@ -119,5 +119,10 @@ class Segment implements SegmentContract
         $list = json_decode($response->getBody());
         $collection = collect($list);
         return $collection;
+    }
+
+    public function cacheEnabled(CampaignSegment $campaignSegment): bool
+    {
+        return $this->cacheEnabled;
     }
 }
