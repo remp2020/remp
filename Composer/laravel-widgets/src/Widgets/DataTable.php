@@ -19,6 +19,7 @@ class DataTable extends AbstractWidget
         'tableId' => '',
         'rowActions' => [],
         'rowActionLink' => null,
+        'rowHighlights' => [], // column-value conditions that have to be met to highlight the row
     ];
 
     /**
@@ -45,6 +46,7 @@ class DataTable extends AbstractWidget
             'tableId' => Uuid::getFactory()->uuid4(),
             'rowActions' => $this->config['rowActions'],
             'rowActionLink' => $this->config['rowActionLink'],
+            'rowHighlights' => $this->config['rowHighlights'],
             'order' => $this->config['order'],
         ]);
     }
