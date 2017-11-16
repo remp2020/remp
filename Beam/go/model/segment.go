@@ -294,6 +294,16 @@ func (sDB *SegmentDB) Cache() error {
 		}
 		return errors.Wrap(err, "unable to cache segments from MySQL")
 	}
+
+	for _, s := range sc {
+		src := []*SegmentRule{}
+		err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
+		}
+		s.Rules = src
+	}
+
 	var changed bool
 	for _, s := range sc {
 		old, ok := sDB.Segments[s.Code]
