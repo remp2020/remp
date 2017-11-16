@@ -274,6 +274,7 @@ class CampaignController extends Controller
 
             // segment
             foreach ($campaign->segments as $campaignSegment) {
+                $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
                 if (!$sa->check($campaignSegment, $userId)) {
                     continue;
                 }
