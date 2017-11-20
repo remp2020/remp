@@ -14,6 +14,7 @@ class Campaign extends Model
     protected $fillable = [
         'name',
         'banner_id',
+        'alt_banner_id',
         'signed_in',
         'active',
         'once_per_session',
@@ -42,6 +43,11 @@ class Campaign extends Model
     public function banner()
     {
         return $this->belongsTo(Banner::class);
+    }
+
+    public function altBanner()
+    {
+        return $this->belongsTo(Banner::class, 'alt_banner_id');
     }
 
     public function segments()

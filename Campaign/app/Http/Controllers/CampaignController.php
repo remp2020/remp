@@ -35,7 +35,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'segments'])
+            ->with(['banner', 'altBanner', 'segments'])
             ->get();
 
         return $dataTables->of($campaigns)
