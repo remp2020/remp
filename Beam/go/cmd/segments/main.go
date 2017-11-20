@@ -19,6 +19,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/controller"
@@ -78,6 +79,8 @@ func main() {
 		Debug:        c.Debug,
 	}
 
+	countCache := cache.New(5*time.Minute, 10*time.Minute)
+
 	eventDB := &model.EventDB{
 		DB: influxDB,
 	}
@@ -88,8 +91,9 @@ func main() {
 		DB: influxDB,
 	}
 	segmentDB := &model.SegmentDB{
-		MySQL:    mysqlDB,
-		InfluxDB: influxDB,
+		MySQL:          mysqlDB,
+		InfluxDB:       influxDB,
+		RuleCountCache: countCache,
 	}
 
 	// server cancellation

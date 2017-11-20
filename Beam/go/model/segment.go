@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 )
 
@@ -109,9 +110,10 @@ type Intersector func(userID string) bool
 
 // SegmentDB represents Segment's storage MySQL/InfluxDB implementation.
 type SegmentDB struct {
-	MySQL    *sqlx.DB
-	InfluxDB *InfluxDB
-	Segments map[string]*Segment
+	MySQL          *sqlx.DB
+	InfluxDB       *InfluxDB
+	RuleCountCache *cache.Cache
+	Segments       map[string]*Segment
 }
 
 // Get returns instance of Segment based on the given code.
@@ -166,7 +168,15 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, ro R
 
 // checkRule verifies defined rule against current state within InfluxDB.
 func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, ro RuleOverrides) (bool, error) {
-	// get count of events
+	// get count of events from cache if possible
+	cacheKey := sr.CacheKey(userID)
+	if c, ok := sDB.RuleCountCache.Get(cacheKey); ok {
+		if count, ok := c.(int); ok {
+			return sr.Evaluate(count)
+		}
+	}
+
+	// get count of events directly from influx
 	query := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
@@ -191,7 +201,56 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, r
 		count = 0
 	}
 
-	// in-place rule evaluation
+	// cache count if possible for future requests
+	if cd, ok := sr.CacheDuration(count); ok {
+		sDB.RuleCountCache.Set(cacheKey, count, cd)
+	}
+	return sr.Evaluate(count)
+}
+
+func (sr *SegmentRule) CacheKey(userID string) string {
+	key := fmt.Sprintf(
+		"%s,%s/%s,%s%d,%d",
+		userID,
+		sr.EventCategory,
+		sr.EventAction,
+		sr.Operator,
+		sr.Count,
+		sr.Timespan.Int64,
+	)
+	for _, def := range sr.Fields {
+		key = fmt.Sprintf("%s,%s/%s", key, def["key"], def["value"])
+	}
+	return key
+}
+
+// CacheDuration returns duration to cache the item for and whether the item should be cached at all.
+func (sr *SegmentRule) CacheDuration(count int) (time.Duration, bool) {
+	var d time.Duration
+	switch sr.Operator {
+	case "<=", ">=":
+		if count < sr.Count {
+			return d, false
+		}
+		d = cache.DefaultExpiration
+	case "<", ">":
+		if count <= sr.Count {
+			return d, false
+		}
+		d = cache.DefaultExpiration
+	case "=":
+		if count < sr.Count {
+			return d, false
+		}
+		d = 2 * time.Minute
+	default:
+		return 0, false
+	}
+	return d, true
+}
+
+// Evaluate evaluates segment rule condition against provided count.
+func (sr *SegmentRule) Evaluate(count int) (bool, error) {
 	switch sr.Operator {
 	case "<=":
 		return count <= sr.Count, nil
@@ -218,7 +277,7 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) (
 			if i == 0 {
 				return true
 			}
-			// on further iterations user needs to be present in "users" (effectivelly all previous iterations)
+			// on further iterations user needs to be present in "users" (effectively all previous iterations)
 			_, ok := users[userID]
 			return ok
 		})
