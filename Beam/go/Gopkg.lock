@@ -68,12 +68,6 @@
   revision = "553a641470496b2327abcac10b36396bd98e45c9"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/inconshreveable/mousetrap"
-  packages = ["."]
-  revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
-
-[[projects]]
   name = "github.com/influxdata/influxdb"
   packages = ["client/v2","models","pkg/escape"]
   revision = "76124df5c121e411e99807b9473a03eb785cd43b"
@@ -102,6 +96,12 @@
   name = "github.com/manveru/faker"
   packages = ["."]
   revision = "717f7cf83fb78669bfab612749c2e8ff63d5be11"
+
+[[projects]]
+  name = "github.com/patrickmn/go-cache"
+  packages = ["."]
+  revision = "a3647f8e31d79543b2d0f0ae2fe5c379d72cedc0"
+  version = "v2.1.0"
 
 [[projects]]
   name = "github.com/pierrec/lz4"
@@ -135,18 +135,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/spf13/cobra"
-  packages = ["."]
-  revision = "4d647c8944eb42504a714e57e97f244ed6344722"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/spf13/pflag"
-  packages = ["."]
-  revision = "e57e3eeb33f795204c1ca35f56c44f83227c6e66"
-
-[[projects]]
-  branch = "master"
   name = "github.com/zach-klippenstein/goregen"
   packages = ["."]
   revision = "795b5e3961ea1912fde60af417ad85e86acc0d6a"
@@ -154,12 +142,12 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","websocket"]
+  packages = ["websocket"]
   revision = "8663ed5da4fd087c3cfb99a996e628b72e2f0948"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "079c57525c1fa8e130ea377bb2d2fa08c0dd981fd5b008281452cfcb9ae6e795"
+  inputs-digest = "4c0414ca6546e5f264d671817f1c26b160de77ca70677d3766e28fc9d29e12de"
   solver-name = "gps-cdcl"
   solver-version = 1
