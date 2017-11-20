@@ -208,6 +208,7 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, r
 	return sr.Evaluate(count)
 }
 
+// CacheKey generates string cache key for SegmentRule.
 func (sr *SegmentRule) CacheKey(userID string) string {
 	key := fmt.Sprintf(
 		"%s,%s/%s,%s%d,%d",
