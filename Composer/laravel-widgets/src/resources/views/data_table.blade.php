@@ -80,11 +80,13 @@
             'ajax': '{{ $dataSource }}',
             'createdRow': function (row, data, index) {
                 var highlight = true;
-                @foreach($rowHighlights as $column => $value)
+                @forelse($rowHighlights as $column => $value)
                 if (!data.hasOwnProperty({!! @json($column) !!}) || data['{{ $column }}'] !== {!! @json($value) !!}) {
                     highlight = false;
                 }
-                @endforeach
+                @empty
+                    highlight = false;
+                @endforelse
                 if (highlight) {
                     $(row).addClass('highlight');
                 }
