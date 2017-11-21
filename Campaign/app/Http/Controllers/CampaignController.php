@@ -233,13 +233,48 @@ class CampaignController extends Controller
             }
 
             // banner
-            $banner = $campaign->banner;
-            if (!$banner) {
+            $bannerVariantA = $campaign->banner;
+            if (!$bannerVariantA) {
                 return response()
                     ->jsonp($r->get('callback'), [
                         'success' => false,
                         'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
                     ]);
+            }
+
+            $banner = null;
+            $bannerVariantB = $campaign->altBanner;
+            if (!$bannerVariantB) {
+                // only one variant of banner, so set it
+                $banner = $bannerVariantA;
+            } else {
+                // there are two variants
+                // find banner previously displayed to user
+                $bannerId = null;
+                $campaignsBanners = $data->campaignsBanners ?? [];
+                foreach ($campaignsBanners as $campaignBanner) {
+                    if ($campaignBanner->campaignId == $campaign->uuid) {
+                        $bannerId = $campaignBanner->bannerId;
+                        break;
+                    }
+                }
+
+                if ($bannerId !== null) {
+                    // check if displayed banner is one of existing variants
+                    switch ($bannerId) {
+                        case $bannerVariantA->uuid:
+                            $banner = $bannerVariantA;
+                            break;
+                        case $bannerVariantB->uuid:
+                            $banner = $bannerVariantB;
+                            break;
+                    }
+                }
+
+                // banner still not set, choose random variant
+                if ($banner === null) {
+                    $banner = rand(0, 1) ? $bannerVariantA : $bannerVariantB;
+                }
             }
 
             // check if campaign is set to be seen only once per session

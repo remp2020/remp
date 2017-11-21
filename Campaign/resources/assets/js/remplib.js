@@ -20,6 +20,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         variables: {},
 
+        campaignsStorageKey: "campaigns",
         campaignsSessionStorageKey: "campaigns_session",
 
         /* JSONP START */
@@ -32,7 +33,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "userId": remplib.getUserId(),
                     "signedIn": remplib.signedIn,
                     "url": window.location.href,
-                    "campaignsSeen": remplib.campaign.getCampaignsSeen()
+                    "campaignsSeen": remplib.campaign.getCampaignsSeen(),
+                    "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                 }
             },
             processResponse: function(result) {
@@ -121,9 +123,56 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return null;
         },
 
-        // used to store seen campaign from campaign / banner view
-        storeCampaign: function(campaignId) {
-            let now = new Date();
+        getCampaignsBanners: function() {
+            let campaigns = remplib.getFromStorage(this.campaignsStorageKey, true);
+            if (typeof campaigns !== "undefined" && campaigns !== null && campaigns.values) {
+                return campaigns.values;
+            }
+            return null;
+        },
+
+        // used to store campaign details, called from banner view
+        storeCampaignDetails: function(campaignId, bannerId) {
+            this.storeCampaigns(campaignId, bannerId);
+            this.storeCampaignsSession(campaignId);
+        },
+
+
+        // store persistent campaign details
+        storeCampaigns: function(campaignId, bannerId) {
+            const now = new Date();
+            let campaigns = remplib.getFromStorage(this.campaignsStorageKey, true);
+
+            if (typeof campaigns === "undefined" || campaigns === null) {
+                campaigns = {
+                    "version": 1,
+                    "createdAt": now,
+                    "updatedAt": now,
+                    "values": [],
+                }
+            }
+
+            if (!campaigns.hasOwnProperty('values')) {
+                campaigns.values = [];
+            }
+
+            let exists = campaigns.values.find(function(element) {
+                return element.bannerId === bannerId;
+            });
+
+            if(typeof exists === "undefined") {
+                campaigns.values.push({
+                    "campaignId": campaignId,
+                    "bannerId": bannerId,
+                });
+            }
+
+            localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
+        },
+
+        // store session campaign details
+        storeCampaignsSession: function(campaignId) {
+            const now = new Date();
             let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
 
             if(typeof campaigns === "undefined" || campaigns === null) {
