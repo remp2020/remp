@@ -1,57 +1,55 @@
-<div class="card">
-    <div class="pie-grid clearfix text-center">
-        <div class="col-xs-6 p-0">
-            <div class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="100">
-                    <span class="ep-value c-black">100</span>
-                </div>
-                <div class="pgi-title c-black">Sent<br> {$total_stat}</div>
+<div class="pie-grid clearfix text-center">
+    <div class="col-xs-6 p-0">
+        <div class="col-xs-6 col-sm-3 pg-item green">
+            <div class="easy-pie" data-percent="100">
+                <span class="ep-value c-black">100</span>
             </div>
-            <div class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="{$delivered_stat['per']|number:0}">
-                    <span class="ep-value c-black">{$delivered_stat['per']|number:2}</span>
-                </div>
-                <div class="pgi-title c-black">Delivered<br> {$delivered_stat['value']}</div>
-            </div>
-            <div class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="{$opened_stat['per']|number:0}">
-                    <span class="ep-value c-black">{$opened_stat['per']|number:2}</span>
-                </div>
-                <div class="pgi-title c-black">Opened<br> {$opened_stat['value']}</div>
-            </div>
-            <div class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="{$clicked_stat['per']|number:0}">
-                    <span class="ep-value c-black">{$clicked_stat['per']|number:2}</span>
-                </div>
-                <div class="pgi-title c-black">Clicked<br>{$clicked_stat['value']}</div>
-            </div>
+            <div class="pgi-title c-black">Sent<br> {$total_stat}</div>
         </div>
+        <div class="col-xs-6 col-sm-3 pg-item green">
+            <div class="easy-pie" data-percent="{$delivered_stat['per']|number:0}">
+                <span class="ep-value c-black">{$delivered_stat['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Delivered<br> {$delivered_stat['value']}</div>
+        </div>
+        <div class="col-xs-6 col-sm-3 pg-item green">
+            <div class="easy-pie" data-percent="{$opened_stat['per']|number:0}">
+                <span class="ep-value c-black">{$opened_stat['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Opened<br> {$opened_stat['value']}</div>
+        </div>
+        <div class="col-xs-6 col-sm-3 pg-item green">
+            <div class="easy-pie" data-percent="{$clicked_stat['per']|number:0}">
+                <span class="ep-value c-black">{$clicked_stat['per']|number:2}</span>
+            </div>
+            <div class="pgi-title c-black">Clicked<br>{$clicked_stat['value']}</div>
+        </div>
+    </div>
 
-        <div class="col-xs-6 p-0">
-            <div n:ifset="$conversions" class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="{$conversions['per']|number:0}">
-                    <span class="ep-value c-black">{$conversions['per']|number:2}</span>
-                </div>
-                <div class="pgi-title c-black">Conversion<br>{$conversions['value']}</div>
+    <div class="col-xs-6 p-0">
+        <div n:ifset="$conversions" class="col-xs-6 col-sm-3 pg-item green">
+            <div class="easy-pie" data-percent="{$conversions['per']|number:0}">
+                <span class="ep-value c-black">{$conversions['per']|number:2}</span>
             </div>
-            <div class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="{$unsubscribed_stat['per']|number:0}">
-                    <span class="ep-value c-black">{$unsubscribed_stat['per']|number:2}</span>
-                </div>
-                <div class="pgi-title c-black">Unsubscribed<br>{$unsubscribed_stat['value']}</div>
+            <div class="pgi-title c-black">Conversion<br>{$conversions['value']}</div>
+        </div>
+        <div class="col-xs-6 col-sm-3 pg-item red">
+            <div class="easy-pie" data-percent="{$unsubscribed_stat['per']|number:0}">
+                <span class="ep-value c-black">{$unsubscribed_stat['per']|number:2}</span>
             </div>
-            <div class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="{$dropped_stat['per']|number:0}">
-                    <span class="ep-value c-black">{$dropped_stat['per']|number:2}</span>
-                </div>
-                <div class="pgi-title c-black">Dropped<br>{$dropped_stat['value']}</div>
+            <div class="pgi-title c-black">Unsubscribed<br>{$unsubscribed_stat['value']}</div>
+        </div>
+        <div class="col-xs-6 col-sm-3 pg-item red">
+            <div class="easy-pie" data-percent="{$dropped_stat['per']|number:0}">
+                <span class="ep-value c-black">{$dropped_stat['per']|number:2}</span>
             </div>
-            <div class="col-xs-6 col-sm-3 pg-item">
-                <div class="easy-pie" data-percent="{$spam_stat['per']|number:0}">
-                    <span class="ep-value c-black">{$spam_stat['per']|number:2}</span>
-                </div>
-                <div class="pgi-title c-black">Spam<br>{$spam_stat['value']}</div>
+            <div class="pgi-title c-black">Dropped<br>{$dropped_stat['value']}</div>
+        </div>
+        <div class="col-xs-6 col-sm-3 pg-item red">
+            <div class="easy-pie" data-percent="{$spam_stat['per']|number:0}">
+                <span class="ep-value c-black">{$spam_stat['per']|number:2}</span>
             </div>
+            <div class="pgi-title c-black">Spam<br>{$spam_stat['value']}</div>
         </div>
     </div>
 </div>

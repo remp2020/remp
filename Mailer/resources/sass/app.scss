@@ -1,3 +1,18 @@
 @import "~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css";
 @import "~remp/css/template.css";
 @import "~remp/css/remp.css";
+
+.pg-item {
+  &.green:nth-child(odd) {
+    background-color: transparentize(#75a478, .90);
+  }
+  &.green:nth-child(2n) {
+    background-color: transparentize(#75a478, .85);
+  }
+  &.red:nth-child(odd) {
+    background-color: transparentize(#ba6b6c, .90);
+  }
+  &.red:nth-child(2n) {
+    background-color: transparentize(#ba6b6c, .85);
+  }
+}
