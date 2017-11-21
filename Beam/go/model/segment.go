@@ -231,17 +231,17 @@ func (sr *SegmentRule) CacheDuration(count int) (time.Duration, bool) {
 	switch sr.Operator {
 	case "<=", ">=":
 		if count < sr.Count {
-			return d, false
+			return 0, false
 		}
 		d = cache.DefaultExpiration
 	case "<", ">":
 		if count <= sr.Count {
-			return d, false
+			return 0, false
 		}
 		d = cache.DefaultExpiration
 	case "=":
 		if count < sr.Count {
-			return d, false
+			return 0, false
 		}
 		d = 2 * time.Minute
 	default:
