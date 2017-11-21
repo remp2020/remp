@@ -78,7 +78,7 @@ func (iDB *InfluxDB) GroupedCount(response *client.Response, ft FilterType) (map
 		}
 		count, err := jsonCount.Int64()
 		if err != nil {
-			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%s]", count))
+			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%d]", count))
 		}
 		counts[s.Tags[ft.column()]] = int(count)
 	}
@@ -101,7 +101,7 @@ func (iDB *InfluxDB) GroupedSum(response *client.Response, ft FilterType) (map[s
 		}
 		sum, err := jsonCount.Float64()
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%s]", sum))
+			return nil, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%f]", sum))
 		}
 		sums[s.Tags[ft.column()]] = sum
 	}
