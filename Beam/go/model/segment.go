@@ -21,9 +21,18 @@ type SegmentStorage interface {
 	// List returns all available segments configured via Beam admin.
 	List() (SegmentCollection, error)
 	// Check verifies presence of user within provided segment.
-	Check(segment *Segment, userID string, now time.Time, ro RuleOverrides) (bool, error)
+	Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (bool, SegmentCache, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
+}
+
+// SegmentCache represents event count information for SegmentRules indexed by SegmentRule ID.
+type SegmentCache map[int]*SegmentRuleCache
+
+// SegmentRuleCache represents event count information for single SegmentRule.
+type SegmentRuleCache struct {
+	SyncedAt time.Time `json:"s"`
+	Count    int       `json:"c"`
 }
 
 // Segment structure.
@@ -65,7 +74,7 @@ type SegmentRule struct {
 	Segment *Segment `db:"segment"`
 }
 
-// JSONMap represents key-value string pairs stored as string JSON.
+// JSONMap represents key-value string pairs stored as string JSON [{"key": "foo", "value": "bar"}].
 type JSONMap []map[string]string
 
 // Value returns JSON-encoded value of JSONMap.
@@ -153,29 +162,37 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 }
 
 // Check verifies presence of user within provided segment.
-func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, ro RuleOverrides) (bool, error) {
+func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (bool, SegmentCache, error) {
+	c := make(SegmentCache)
+
 	for _, sr := range segment.Rules {
-		ok, err := sDB.checkRule(sr, userID, now, ro)
+		osr := sr.applyOverrides(ro)
+
+		// get count
+		count, err := sDB.getRuleEventCount(osr, userID, now, ro)
 		if err != nil {
-			return false, errors.Wrap(err, "unable to check SegmentRule")
+			return false, nil, errors.Wrap(err, "unable to get SegmentRule event count")
 		}
-		if !ok {
-			return false, nil
+
+		// update cache
+		c[osr.ID] = &SegmentRuleCache{
+			Count:    count,
+			SyncedAt: now,
 		}
+
+		// evaluate
+		ok, err := osr.Evaluate(count)
+		if err != nil {
+			return false, nil, errors.Wrap(err, "unable to evaluate SegmentRule")
+		}
+		return ok, c, nil
 	}
-	return true, nil
+
+	return true, c, nil
 }
 
-// checkRule verifies defined rule against current state within InfluxDB.
-func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, ro RuleOverrides) (bool, error) {
-	// get count of events from cache if possible
-	cacheKey := sr.CacheKey(userID)
-	if c, ok := sDB.RuleCountCache.Get(cacheKey); ok {
-		if count, ok := c.(int); ok {
-			return sr.Evaluate(count)
-		}
-	}
-
+// getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
+func (sDB *SegmentDB) getRuleEventCount(sr SegmentRule, userID string, now time.Time, ro RuleOverrides) (int, error) {
 	// get count of events directly from influx
 	query := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
@@ -187,25 +204,21 @@ func (sDB *SegmentDB) checkRule(sr *SegmentRule, userID string, now time.Time, r
 
 	response, err := sDB.InfluxDB.Exec(query.Build())
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	if err := response.Error(); err != nil {
-		return false, err
+		return 0, err
 	}
 
 	count, ok, err := sDB.InfluxDB.Count(response)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	if !ok { // no response from influx mean no data tracked
 		count = 0
 	}
 
-	// cache count if possible for future requests
-	if cd, ok := sr.CacheDuration(count); ok {
-		sDB.RuleCountCache.Set(cacheKey, count, cd)
-	}
-	return sr.Evaluate(count)
+	return count, nil
 }
 
 // CacheKey generates string cache key for SegmentRule.
@@ -380,6 +393,16 @@ func (sDB *SegmentDB) Cache() error {
 	return nil
 }
 
+// applyOverrides overrides field values based on provided RuleOverrides.
+func (sr SegmentRule) applyOverrides(o RuleOverrides) SegmentRule {
+	for _, def := range sr.Fields {
+		if overriddenVal, ok := o.Fields[def["key"]]; ok {
+			def["value"] = overriddenVal
+		}
+	}
+	return sr
+}
+
 // conditions returns list of influx conditions for current SegmentRule.
 func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
 	var conds []string
@@ -400,16 +423,12 @@ func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
 	}
 
 	for _, def := range sr.Fields {
-		value := def["value"]
-		if overriddenVal, ok := o.Fields[def["key"]]; ok {
-			value = overriddenVal
-		}
-		if def["key"] == "" || value == "" {
+		if def["key"] == "" || def["value"] == "" {
 			continue
 		}
 		conds = append(
 			conds,
-			fmt.Sprintf(`"%s" = '%s'`, def["key"], value),
+			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
 		)
 	}
 

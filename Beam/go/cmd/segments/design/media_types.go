@@ -57,11 +57,13 @@ var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {
 	Description("Segment check")
 	Attributes(func() {
 		Attribute("check", Boolean, "Flag whether user is in the segment or not")
+		Attribute("cache", HashOf(Integer, SegmentRuleCache), "Cache object for third party (remplib.js) to use indexed by SegmentRule ID")
 	})
 	View("default", func() {
 		Attribute("check")
+		Attribute("cache")
 	})
-	Required("check")
+	Required("check", "cache")
 })
 
 var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
