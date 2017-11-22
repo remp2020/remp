@@ -24,7 +24,12 @@ type SegmentStorage interface {
 	Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (bool, SegmentCache, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
+	// EventRules returns map of rules assigned to given "category/event" key
+	EventRules() EventRules
 }
+
+// EventRules represent map of rules with given "category/event" assigned
+type EventRules map[string][]int
 
 // SegmentCache represents event count information for SegmentRules indexed by SegmentRule ID.
 type SegmentCache map[int]*SegmentRuleCache
@@ -393,6 +398,18 @@ func (sDB *SegmentDB) Cache() error {
 	return nil
 }
 
+// EventRules returns map of rules assigned to given "category/event" key
+func (sDB *SegmentDB) EventRules() EventRules {
+	er := make(EventRules)
+	for _, s := range sDB.Segments {
+		for _, sr := range s.Rules {
+			key := fmt.Sprintf("%s/%s", sr.EventCategory, sr.EventAction)
+			er[key] = append(er[key], sr.ID)
+		}
+	}
+	return er
+}
+
 // applyOverrides overrides field values based on provided RuleOverrides.
 func (sr SegmentRule) applyOverrides(o RuleOverrides) SegmentRule {
 	for _, def := range sr.Fields {
@@ -449,6 +466,7 @@ func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
 	return conds
 }
 
+// tableName returns name of table containing data based on SegmentRule internals.
 func (sr *SegmentRule) tableName() string {
 	switch sr.EventCategory {
 	case CategoryPageview:

@@ -71,9 +71,12 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 	if err != nil {
 		return err
 	}
+	er := c.SegmentStorage.EventRules()
+
 	return ctx.OK(&app.SegmentCheck{
-		Check: ok,
-		Cache: (SegmentCache(cache)).ToMediaType(),
+		Check:      ok,
+		Cache:      (SegmentCache(cache)).ToMediaType(),
+		EventRules: er,
 	})
 }
 

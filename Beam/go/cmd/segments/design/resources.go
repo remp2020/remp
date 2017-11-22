@@ -56,12 +56,8 @@ var _ = Resource("segments", func() {
 
 	{
 		10: { // segment rule ID
-			"c": "banner", // category
-			"a": "show", // action
-			"f": { // fields
-				"utm_campaign": "custom-campaign-id" // UUIDv4
-			},
 			"d": "2017-11-07T08:06:26.612Z" // RFC3339 date
+			"c": 11 // number of occurrences
 		}
 	}
 			`)
