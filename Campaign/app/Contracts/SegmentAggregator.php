@@ -62,11 +62,11 @@ class SegmentAggregator implements SegmentContract
         }
     }
 
-    public function getCache()
+    public function getProviderData()
     {
         $cache = new \stdClass;
         foreach ($this->contracts as $provider => $contract) {
-            if ($cc = $contract->getCache()) {
+            if ($cc = $contract->getProviderData()) {
                 $cache->$provider = $cc;
             }
         }

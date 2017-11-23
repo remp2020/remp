@@ -214,7 +214,7 @@ class CampaignController extends Controller
                 ->jsonp($r->get('callback'), [
                     'success' => true,
                     'data' => [],
-                    'cache' => $sa->getCache(),
+                    'providerData' => $sa->getProviderData(),
                 ]);
         }
 
@@ -300,7 +300,7 @@ class CampaignController extends Controller
                 ->jsonp($r->get('callback'), [
                     'success' => true,
                     'data' => [],
-                    'cache' => $sa->getCache(),
+                    'providerData' => $sa->getProviderData(),
                 ]);
         }
 
@@ -309,7 +309,7 @@ class CampaignController extends Controller
                 'success' => true,
                 'errors' => [],
                 'data' => $displayedCampaigns,
-                'cache' => $sa->getCache(),
+                'providerData' => $sa->getProviderData(),
             ]);
     }
 

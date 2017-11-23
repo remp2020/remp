@@ -29,10 +29,14 @@ class Segment implements SegmentContract
 
     private $cache;
 
+    private $eventRules;
+
     public function __construct(Client $client, $cacheEnabled)
     {
         $this->client = $client;
         $this->cacheEnabled = $cacheEnabled;
+        $this->cache = new \stdClass;
+        $this->eventRules = new \stdClass;
     }
 
     public function provider(): string
@@ -90,10 +94,10 @@ class Segment implements SegmentContract
         try {
             $params = [];
             $cso = $campaignSegment->getOverrides();
-            if ($cso !== null) {
+            if ($cso) {
                 $params['fields'] = Json::encode($cso);
             }
-            if ($this->cache !== null) {
+            if ($this->cache) {
                 $params['cache'] = Json::encode($this->cache);
             }
             $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
@@ -104,7 +108,15 @@ class Segment implements SegmentContract
         }
 
         $result = json_decode($response->getBody());
-        $this->cache = $result->cache;
+        if ($result->cache) {
+            foreach (get_object_vars($result->cache) as $ruleId => $ruleCache) {
+                $this->cache->$ruleId = $ruleCache;
+            }
+        }
+        if ($result->event_rules) {
+            $this->eventRules = $result->event_rules;
+        }
+
         return $result->check;
     }
 
@@ -140,8 +152,15 @@ class Segment implements SegmentContract
         $this->cache = $cache;
     }
 
-    public function getCache()
+    public function getProviderData()
     {
-        return $this->cache;
+        $pd = new \stdClass();
+        if ($this->cache) {
+            $pd->cache = $this->cache;
+        }
+        if ($this->eventRules) {
+            $pd->event_rules = $this->eventRules;
+        }
+        return $pd;
     }
 }

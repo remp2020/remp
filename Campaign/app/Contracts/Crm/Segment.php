@@ -29,6 +29,7 @@ class Segment implements SegmentContract
     public function __construct(Client $client)
     {
         $this->client = $client;
+        $this->cache = new \stdClass;
     }
 
     public function provider(): string
@@ -127,7 +128,7 @@ class Segment implements SegmentContract
         $this->cache = $cache;
     }
 
-    public function getCache()
+    public function getProviderData()
     {
         return $this->cache;
     }

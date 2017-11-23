@@ -24,6 +24,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         showtimeCacheStorageKey: "showtime_cache",
 
+        rempEventRulesStorageKey: "remp_event_rules",
+
         /* JSONP START */
 
         showtime: {
@@ -35,7 +37,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "signedIn": remplib.signedIn,
                     "url": window.location.href,
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
-                    "cache": remplib.getFromStorage(remplib.campaign.showtimeCacheStorageKey, true)
+                    "cache": {
+                        "remp_segment": remplib.getFromStorage(remplib.tracker.segmentRulesCacheKey, true)
+                    },
                 }
             },
             processResponse: function(result) {
@@ -50,10 +54,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         console.error("campaign showtime error:", u)
                     }
                 }
-                if (result["cache"]) {
-                    localStorage.setItem(remplib.campaign.showtimeCacheStorageKey, JSON.stringify(result["cache"]));
-                }
-            }
+                let event = new CustomEvent("campaign_showtime", {
+                    detail: result.providerData,
+                });
+                window.dispatchEvent(event);
+            },
         },
 
         /* JSONP END */

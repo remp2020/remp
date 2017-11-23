@@ -29,10 +29,10 @@ interface SegmentContract
     public function setCache($cache): void;
 
     /**
-     * getCache returns internal cache objects for each segment provider to be stored
-     * by third party and provided later via *setCache()* call.
+     * getProviderData returns internal per-provider data objects to be stored
+     * by third party and possibly provided later via *setCache()* call.
      *
      * @return \stdClass
      */
-    public function getCache();
+    public function getProviderData();
 }

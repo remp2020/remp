@@ -31,6 +31,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         uriParams: {},
 
+        segmentRulesCacheKey: "segment_rules_cache",
+
+        eventRulesMapKey: "event_rules_map",
+
         init: function(config) {
             if (typeof config.token !== 'string') {
                 throw "remplib: configuration token invalid or missing: "+config.token
@@ -81,6 +85,58 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             this.parseUriParams();
+
+            window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
+            window.addEventListener("campaign_showtime", this.syncEventRulesMap);
+            window.addEventListener("beam_event", this.incrementSegmentRulesCache);
+        },
+
+        syncSegmentRulesCache: function(e) {
+            if (!e.detail.hasOwnProperty("remp_segment")) {
+                return;
+            }
+            if (!e.detail["remp_segment"].hasOwnProperty("cache")) {
+                return;
+            }
+            localStorage.setItem(remplib.tracker.segmentRulesCacheKey, JSON.stringify(e.detail["remp_segment"]["cache"]));
+        },
+
+        syncEventRulesMap: function(e) {
+            if (!e.detail.hasOwnProperty("remp_segment")) {
+                return;
+            }
+            if (!e.detail["remp_segment"].hasOwnProperty("event_rules")) {
+                return;
+            }
+            localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail["remp_segment"]["event_rules"]));
+        },
+
+        incrementSegmentRulesCache: function(event) {
+            let cache = remplib.getFromStorage(remplib.tracker.segmentRulesCacheKey, true);
+            if (!cache) {
+                return;
+            }
+            let eventRules = remplib.getFromStorage(remplib.tracker.eventRulesMapKey, true);
+            if (!eventRules) {
+                return;
+            }
+
+            // check whether some rule uses triggered event
+            let params = event.detail;
+            let key = params["_category"] + "/" + params["_action"];
+            if (!eventRules.hasOwnProperty(key)) {
+                return;
+            }
+
+            // increment counts where applicable
+            for (let ruleId of eventRules[key]) {
+                if (!cache.hasOwnProperty(ruleId)) {
+                    continue;
+                }
+                cache[ruleId]["c"] += 1;
+            }
+            localStorage.setItem(remplib.tracker.segmentRulesCacheKey, JSON.stringify(cache));
+
         },
 
         run: function() {
@@ -96,6 +152,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "value": value
             };
             this.post(this.url + "/track/event", params);
+            this.dispatchEvent(category, action, params);
         },
 
         trackPageview: function() {
@@ -103,6 +160,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
             };
             this.post(this.url + "/track/pageview", params);
+            this.dispatchEvent("pageview", "show", params);
         },
 
         trackCheckout: function(funnelId) {
@@ -114,6 +172,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "checkout", params);
         },
 
         trackPayment: function(transactionId, amount, currency, productIds) {
@@ -130,6 +189,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "payment", params);
         },
 
         trackPurchase: function(transactionId, amount, currency, productIds) {
@@ -146,6 +206,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "purchase", params);
         },
 
         trackRefund: function(transactionId, amount, currency, productIds) {
@@ -162,6 +223,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "refund", params);
+        },
+
+        dispatchEvent: function(category, action, params) {
+            params["_category"] = category;
+            params["_action"] = action;
+            let event = new CustomEvent("beam_event", {
+                detail: params,
+            });
+            window.dispatchEvent(event);
         },
 
         post: function (path, params) {
