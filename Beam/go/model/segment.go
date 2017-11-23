@@ -174,15 +174,24 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 		osr := sr.applyOverrides(ro)
 
 		// get count
-		count, err := sDB.getRuleEventCount(osr, userID, now, ro)
-		if err != nil {
-			return false, nil, errors.Wrap(err, "unable to get SegmentRule event count")
-		}
-
-		// update cache
-		c[osr.ID] = &SegmentRuleCache{
-			Count:    count,
-			SyncedAt: now,
+		var count int
+		if src, ok := cache[sr.ID]; ok {
+			count = src.Count
+			// update cache
+			c[osr.ID] = &SegmentRuleCache{
+				Count:    count,
+				SyncedAt: cache[sr.ID].SyncedAt,
+			}
+		} else {
+			count, err := sDB.getRuleEventCount(osr, userID, now, ro)
+			if err != nil {
+				return false, nil, errors.Wrap(err, "unable to get SegmentRule event count")
+			}
+			// update cache
+			c[osr.ID] = &SegmentRuleCache{
+				Count:    count,
+				SyncedAt: now,
+			}
 		}
 
 		// evaluate

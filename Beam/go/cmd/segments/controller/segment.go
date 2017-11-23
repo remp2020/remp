@@ -62,7 +62,7 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 
 	// unset invalidated elements
 	for id, c := range cache {
-		if c.SyncedAt.After(now.Add(-1 * time.Hour)) {
+		if c.SyncedAt.Before(now.Add(-1 * time.Hour)) {
 			delete(cache, id)
 		}
 	}
