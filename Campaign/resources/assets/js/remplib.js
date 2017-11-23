@@ -148,23 +148,18 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "version": 1,
                     "createdAt": now,
                     "updatedAt": now,
-                    "values": [],
+                    "values": {},
                 }
             }
 
             if (!campaigns.hasOwnProperty('values')) {
-                campaigns.values = [];
+                campaigns.values = {};
             }
 
-            let exists = campaigns.values.find(function(element) {
-                return element.bannerId === bannerId;
-            });
-
-            if(typeof exists === "undefined") {
-                campaigns.values.push({
-                    "campaignId": campaignId,
+            if (!(campaignId in campaigns.values)) {
+                campaigns.values[campaignId] = {
                     "bannerId": bannerId,
-                });
+                };
             }
 
             localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));

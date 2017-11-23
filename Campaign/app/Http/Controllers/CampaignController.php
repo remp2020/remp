@@ -257,12 +257,9 @@ class CampaignController extends Controller
                 // there are two variants
                 // find banner previously displayed to user
                 $bannerId = null;
-                $campaignsBanners = $data->campaignsBanners ?? [];
-                foreach ($campaignsBanners as $campaignBanner) {
-                    if ($campaignBanner->campaignId == $campaign->uuid) {
-                        $bannerId = $campaignBanner->bannerId;
-                        break;
-                    }
+                $campaignsBanners = $data->campaignsBanners;
+                if ($campaignsBanners && $campaignsBanners->{$campaign->uuid}) {
+                    $bannerId = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
                 }
 
                 if ($bannerId !== null) {
