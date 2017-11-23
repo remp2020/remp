@@ -44,6 +44,12 @@ class CampaignController extends Controller
                     'edit' => route('campaigns.edit', $campaign) ,
                 ];
             })
+            ->addColumn('alt_banner', function (Campaign $campaign) {
+                if (!$campaign->altBanner) {
+                    return [];
+                }
+                return [$campaign->altBanner->name];
+            })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
             ->make(true);
