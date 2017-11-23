@@ -18,4 +18,21 @@ interface SegmentContract
     public function provider(): string;
 
     public function cacheEnabled(CampaignSegment $campaignSegment): bool;
+
+    /**
+     * setCache stores and provides cache object for campaign segment providers.
+     *
+     * @param $cache \stdClass Array of objects keyed by name of the segment provider. Internals
+     *                     of the stored object is defined by contract of provider itself
+     *                     and not subject of validation here.
+     */
+    public function setCache($cache): void;
+
+    /**
+     * getCache returns internal cache objects for each segment provider to be stored
+     * by third party and provided later via *setCache()* call.
+     *
+     * @return \stdClass
+     */
+    public function getCache();
 }

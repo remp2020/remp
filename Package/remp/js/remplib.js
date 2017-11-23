@@ -61,7 +61,9 @@ export default {
             return null;
         }
 
-        item.updatedAt = now;
+        if (item.hasOwnProperty("updatedAt")) {
+            item.updatedAt = now;
+        }
         localStorage.setItem(key, JSON.stringify(item));
 
         if (item.hasOwnProperty('value')) {

@@ -204,12 +204,17 @@ class CampaignController extends Controller
                 ->setStatusCode(400);
         }
 
+        if ($data->cache) {
+            $sa->setCache($data->cache);
+        }
+
         $campaignIds = Cache::get(Campaign::ACTIVE_CAMPAIGN_IDS, []);
         if (count($campaignIds) == 0) {
             return response()
                 ->jsonp($r->get('callback'), [
                     'success' => true,
                     'data' => [],
+                    'cache' => $sa->getCache(),
                 ]);
         }
 
@@ -295,6 +300,7 @@ class CampaignController extends Controller
                 ->jsonp($r->get('callback'), [
                     'success' => true,
                     'data' => [],
+                    'cache' => $sa->getCache(),
                 ]);
         }
 
@@ -303,6 +309,7 @@ class CampaignController extends Controller
                 'success' => true,
                 'errors' => [],
                 'data' => $displayedCampaigns,
+                'cache' => $sa->getCache(),
             ]);
     }
 

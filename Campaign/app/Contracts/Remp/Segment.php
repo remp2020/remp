@@ -27,6 +27,8 @@ class Segment implements SegmentContract
 
     private $cacheEnabled;
 
+    private $cache;
+
     public function __construct(Client $client, $cacheEnabled)
     {
         $this->client = $client;
@@ -35,7 +37,7 @@ class Segment implements SegmentContract
 
     public function provider(): string
     {
-        return self::PROVIDER_ALIAS;
+        return static::PROVIDER_ALIAS;
     }
 
     /**
@@ -86,16 +88,23 @@ class Segment implements SegmentContract
 
         // until the cache is filled, let's check directly
         try {
+            $params = [];
+            $cso = $campaignSegment->getOverrides();
+            if ($cso !== null) {
+                $params['fields'] = Json::encode($cso);
+            }
+            if ($this->cache !== null) {
+                $params['cache'] = Json::encode($this->cache);
+            }
             $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
-                'query' => [
-                    'fields' => Json::encode($campaignSegment->getOverrides())
-                ],
+                'query' => $params,
             ]);
         } catch (ConnectException $e) {
             throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
         }
 
         $result = json_decode($response->getBody());
+        $this->cache = $result->cache;
         return $result->check;
     }
 
@@ -124,5 +133,15 @@ class Segment implements SegmentContract
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
     {
         return $this->cacheEnabled;
+    }
+
+    public function setCache($cache): void
+    {
+        $this->cache = $cache;
+    }
+
+    public function getCache()
+    {
+        return $this->cache;
     }
 }

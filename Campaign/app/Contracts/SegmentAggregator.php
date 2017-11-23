@@ -52,4 +52,24 @@ class SegmentAggregator implements SegmentContract
         return $this->contracts[$campaignSegment->provider]
             ->cacheEnabled($campaignSegment);
     }
+
+    public function setCache($cache): void
+    {
+        foreach ($this->contracts as $provider => $contract) {
+            if ($cache && isset($cache->$provider)) {
+                $contract->setCache($cache->$provider);
+            }
+        }
+    }
+
+    public function getCache()
+    {
+        $cache = new \stdClass;
+        foreach ($this->contracts as $provider => $contract) {
+            if ($cc = $contract->getCache()) {
+                $cache->$provider = $cc;
+            }
+        }
+        return $cache;
+    }
 }

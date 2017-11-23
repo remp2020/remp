@@ -22,6 +22,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsSessionStorageKey: "campaigns_session",
 
+        showtimeCacheStorageKey: "showtime_cache",
+
         /* JSONP START */
 
         showtime: {
@@ -32,7 +34,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "userId": remplib.getUserId(),
                     "signedIn": remplib.signedIn,
                     "url": window.location.href,
-                    "campaignsSeen": remplib.campaign.getCampaignsSeen()
+                    "campaignsSeen": remplib.campaign.getCampaignsSeen(),
+                    "cache": remplib.getFromStorage(remplib.campaign.showtimeCacheStorageKey, true)
                 }
             },
             processResponse: function(result) {
@@ -46,6 +49,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     } catch (u) {
                         console.error("campaign showtime error:", u)
                     }
+                }
+                if (result["cache"]) {
+                    localStorage.setItem(remplib.campaign.showtimeCacheStorageKey, JSON.stringify(result["cache"]));
                 }
             }
         },
