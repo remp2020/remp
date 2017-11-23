@@ -67,7 +67,7 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 		}
 	}
 
-	ok, cache, err = c.SegmentStorage.Check(s, ctx.UserID, now, cache, ro)
+	cache, ok, err = c.SegmentStorage.Check(s, ctx.UserID, now, cache, ro)
 	if err != nil {
 		return err
 	}

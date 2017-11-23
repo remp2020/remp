@@ -21,7 +21,7 @@ type SegmentStorage interface {
 	// List returns all available segments configured via Beam admin.
 	List() (SegmentCollection, error)
 	// Check verifies presence of user within provided segment.
-	Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (bool, SegmentCache, error)
+	Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
 	// EventRules returns map of rules assigned to given "category/event" key
@@ -167,7 +167,7 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 }
 
 // Check verifies presence of user within provided segment.
-func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (bool, SegmentCache, error) {
+func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
 	c := make(SegmentCache)
 
 	for _, sr := range segment.Rules {
@@ -175,6 +175,7 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 
 		// get count
 		var count int
+		var err error
 		if src, ok := cache[sr.ID]; ok {
 			count = src.Count
 			// update cache
@@ -183,9 +184,9 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 				SyncedAt: cache[sr.ID].SyncedAt,
 			}
 		} else {
-			count, err := sDB.getRuleEventCount(osr, userID, now, ro)
+			count, err = sDB.getRuleEventCount(osr, userID, now, ro)
 			if err != nil {
-				return false, nil, errors.Wrap(err, "unable to get SegmentRule event count")
+				return nil, false, errors.Wrap(err, "unable to get SegmentRule event count")
 			}
 			// update cache
 			c[osr.ID] = &SegmentRuleCache{
@@ -197,12 +198,12 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 		// evaluate
 		ok, err := osr.Evaluate(count)
 		if err != nil {
-			return false, nil, errors.Wrap(err, "unable to evaluate SegmentRule")
+			return nil, false, errors.Wrap(err, "unable to evaluate SegmentRule")
 		}
-		return ok, c, nil
+		return c, ok, nil
 	}
 
-	return true, c, nil
+	return c, true, nil
 }
 
 // getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
