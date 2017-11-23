@@ -52,6 +52,15 @@ var _ = Resource("segments", func() {
 		// ...
 	}
 			`)
+			Param("cache", String, `JSON-encoded object of internal cache with count of events provided by third party (mostly Beam's remplib.js), e.g.:
+
+	{
+		10: { // segment rule ID
+			"d": "2017-11-07T08:06:26.612Z" // RFC3339 date
+			"c": 11 // number of occurrences
+		}
+	}
+			`)
 		})
 		Response(NotFound)
 		Response(BadRequest)

@@ -31,6 +31,9 @@ type Pageview model.Pageview
 // PageviewCollection is the collection of Pageview events.
 type PageviewCollection model.PageviewCollection
 
+// SegmentCache represent cache object for count of events of SegmentRules.
+type SegmentCache model.SegmentCache
+
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() *app.Segment {
 	return &app.Segment{
@@ -202,4 +205,16 @@ func (pc PageviewCollection) ToMediaType() (app.PageviewCollection, error) {
 		mt = append(mt, event)
 	}
 	return mt, nil
+}
+
+// ToMediaType converts internal PageviewCollection representation to application one.
+func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
+	mt := make(map[int]*app.SegmentRuleCache)
+	for key, c := range sc {
+		mt[key] = &app.SegmentRuleCache{
+			S: c.SyncedAt,
+			C: c.Count,
+		}
+	}
+	return mt
 }

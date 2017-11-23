@@ -42,7 +42,10 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 	if !ok {
 		return ctx.NotFound()
 	}
-	ro := model.RuleOverrides{}
+	now := time.Now()
+
+	// unmarshal fields and cache
+	var ro model.RuleOverrides
 	if ctx.Fields != nil {
 		overrides := make(map[string]string)
 		if err := json.Unmarshal([]byte(*ctx.Fields), &overrides); err != nil {
@@ -50,12 +53,30 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 		}
 		ro.Fields = overrides
 	}
-	ok, err = c.SegmentStorage.Check(s, ctx.UserID, time.Now(), ro)
+	var cache model.SegmentCache
+	if ctx.Cache != nil {
+		if err := json.Unmarshal([]byte(*ctx.Cache), &cache); err != nil {
+			return errors.Wrap(err, "invalid format of cache JSON string")
+		}
+	}
+
+	// unset invalidated elements
+	for id, c := range cache {
+		if c.SyncedAt.Before(now.Add(-1 * time.Hour)) {
+			delete(cache, id)
+		}
+	}
+
+	cache, ok, err = c.SegmentStorage.Check(s, ctx.UserID, now, cache, ro)
 	if err != nil {
 		return err
 	}
+	er := c.SegmentStorage.EventRules()
+
 	return ctx.OK(&app.SegmentCheck{
-		Check: ok,
+		Check:      ok,
+		Cache:      (SegmentCache(cache)).ToMediaType(),
+		EventRules: er,
 	})
 }
 
