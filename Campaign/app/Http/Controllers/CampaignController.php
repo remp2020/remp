@@ -239,7 +239,7 @@ class CampaignController extends Controller
             }
 
             // banner
-            $bannerVariantA = $campaign->banner;
+            $bannerVariantA = $campaign->banner ?? false;
             if (!$bannerVariantA) {
                 return response()
                     ->jsonp($r->get('callback'), [
@@ -249,7 +249,7 @@ class CampaignController extends Controller
             }
 
             $banner = null;
-            $bannerVariantB = $campaign->altBanner;
+            $bannerVariantB = $campaign->altBanner ?? false;
             if (!$bannerVariantB) {
                 // only one variant of banner, so set it
                 $banner = $bannerVariantA;
@@ -257,7 +257,7 @@ class CampaignController extends Controller
                 // there are two variants
                 // find banner previously displayed to user
                 $bannerId = null;
-                $campaignsBanners = $data->campaignsBanners;
+                $campaignsBanners = $data->campaignsBanners ?? false;
                 if ($campaignsBanners && $campaignsBanners->{$campaign->uuid}) {
                     $bannerId = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
                 }
