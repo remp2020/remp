@@ -31,7 +31,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         uriParams: {},
 
-        segmentRulesCacheKey: "segment_rules_cache",
+        segmentProviderKey: "remp_segment",
 
         eventRulesMapKey: "event_rules_map",
 
@@ -92,27 +92,27 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         syncSegmentRulesCache: function(e) {
-            if (!e.detail.hasOwnProperty("remp_segment")) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProviderKey)) {
                 return;
             }
-            if (!e.detail["remp_segment"].hasOwnProperty("cache")) {
+            if (!e.detail[remplib.tracker.segmentProviderKey].hasOwnProperty("cache")) {
                 return;
             }
-            localStorage.setItem(remplib.tracker.segmentRulesCacheKey, JSON.stringify(e.detail["remp_segment"]["cache"]));
+            localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(e.detail[remplib.tracker.segmentProviderKey]["cache"]));
         },
 
         syncEventRulesMap: function(e) {
-            if (!e.detail.hasOwnProperty("remp_segment")) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProviderKey)) {
                 return;
             }
-            if (!e.detail["remp_segment"].hasOwnProperty("event_rules")) {
+            if (!e.detail[remplib.tracker.segmentProviderKey].hasOwnProperty("event_rules")) {
                 return;
             }
-            localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail["remp_segment"]["event_rules"]));
+            localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail[remplib.tracker.segmentProviderKey]["event_rules"]));
         },
 
         incrementSegmentRulesCache: function(event) {
-            let cache = remplib.getFromStorage(remplib.tracker.segmentRulesCacheKey, true);
+            let cache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
             if (!cache) {
                 return;
             }
@@ -135,7 +135,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
                 cache[ruleId]["c"] += 1;
             }
-            localStorage.setItem(remplib.tracker.segmentRulesCacheKey, JSON.stringify(cache));
+            localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(cache));
 
         },
 

@@ -22,10 +22,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsSessionStorageKey: "campaigns_session",
 
-        showtimeCacheStorageKey: "showtime_cache",
-
-        rempEventRulesStorageKey: "remp_event_rules",
-
         /* JSONP START */
 
         showtime: {
@@ -38,7 +34,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "url": window.location.href,
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "cache": {
-                        "remp_segment": remplib.getFromStorage(remplib.tracker.segmentRulesCacheKey, true)
+                        "remp_segment": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
                     },
                 }
             },

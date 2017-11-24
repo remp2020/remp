@@ -2,6 +2,8 @@ export default {
 
     beamToken: null,
 
+    segmentProviderCacheKey: "segment_provider_cache",
+
     userId: null,
 
     signedIn: false,
