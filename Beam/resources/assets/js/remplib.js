@@ -31,9 +31,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         uriParams: {},
 
-        segmentProviderKey: "remp_segment",
+        segmentProvider: "remp_segment",
 
-        eventRulesMapKey: "event_rules_map",
+        eventRulesMapKey: "beam_event_rules_map",
 
         init: function(config) {
             if (typeof config.token !== 'string') {
@@ -92,28 +92,33 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         syncSegmentRulesCache: function(e) {
-            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProviderKey)) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
                 return;
             }
-            if (!e.detail[remplib.tracker.segmentProviderKey].hasOwnProperty("cache")) {
+            if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("cache")) {
                 return;
             }
-            localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(e.detail[remplib.tracker.segmentProviderKey]["cache"]));
+            let segmentProviderCache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
+            if (!segmentProviderCache) {
+                segmentProviderCache = {};
+            }
+            segmentProviderCache[remplib.tracker.segmentProvider] = e.detail[remplib.tracker.segmentProvider]["cache"]
+            localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(segmentProviderCache));
         },
 
         syncEventRulesMap: function(e) {
-            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProviderKey)) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
                 return;
             }
-            if (!e.detail[remplib.tracker.segmentProviderKey].hasOwnProperty("event_rules")) {
+            if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("event_rules")) {
                 return;
             }
-            localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail[remplib.tracker.segmentProviderKey]["event_rules"]));
+            localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["event_rules"]));
         },
 
         incrementSegmentRulesCache: function(event) {
             let cache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
-            if (!cache) {
+            if (!cache || !cache.hasOwnProperty(this.segmentProvider)) {
                 return;
             }
             let eventRules = remplib.getFromStorage(remplib.tracker.eventRulesMapKey, true);
@@ -133,7 +138,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (!cache.hasOwnProperty(ruleId)) {
                     continue;
                 }
-                cache[ruleId]["c"] += 1;
+                cache[this.segmentProvider][ruleId]["c"] += 1;
             }
             localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(cache));
 

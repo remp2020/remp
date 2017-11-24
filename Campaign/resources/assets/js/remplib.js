@@ -33,9 +33,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "signedIn": remplib.signedIn,
                     "url": window.location.href,
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
-                    "cache": {
-                        "remp_segment": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
-                    },
+                    "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
                 }
             },
             processResponse: function(result) {
