@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EmailChangedWorkerCommand extends Command
 {
-    const TOPICS = ['email_changed'];
+    const TOPICS = ['user_email_changed'];
 
     private $consumerFactory;
 
