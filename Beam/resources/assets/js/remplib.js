@@ -118,7 +118,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         incrementSegmentRulesCache: function(event) {
             let cache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
-            if (!cache || !cache.hasOwnProperty(this.segmentProvider)) {
+            if (!cache || !cache.hasOwnProperty(remplib.tracker.segmentProvider)) {
                 return;
             }
             let eventRules = remplib.getFromStorage(remplib.tracker.eventRulesMapKey, true);
@@ -138,7 +138,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (!cache.hasOwnProperty(ruleId)) {
                     continue;
                 }
-                cache[this.segmentProvider][ruleId]["c"] += 1;
+                cache[remplib.tracker.segmentProvider][ruleId]["c"] += 1;
             }
             localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(cache));
 
