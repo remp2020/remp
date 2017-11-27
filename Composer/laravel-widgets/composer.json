@@ -11,8 +11,8 @@
   ],
   "require": {
     "php": ">=7.0",
-    "arrilot/laravel-widgets": "^3.7",
-    "illuminate/support": "^5.4",
+    "arrilot/laravel-widgets": "^3.9",
+    "illuminate/support": "^5.5",
     "ramsey/uuid": "^3.0"
   },
   "require-dev": {
