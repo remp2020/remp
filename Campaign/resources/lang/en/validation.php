@@ -114,6 +114,9 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'banner_id' => 'banner',
+        'alt_banner_id' => 'banner B alternative',
+    ],
 
 ];

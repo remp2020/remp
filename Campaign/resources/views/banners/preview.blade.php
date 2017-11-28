@@ -25,7 +25,7 @@ var run = function() {
 
     banner.uuid = "{{ $banner->uuid }}";
     banner.campaignUuid = "{{ $campaign->uuid }}";
-    remplib.campaign.storeCampaign('{{ $campaign->uuid }}');
+    remplib.campaign.storeCampaignDetails('{{ $campaign->uuid }}', '{{ $banner->uuid }}');
 
     var d = document.createElement('div');
     d.id = bannerId;

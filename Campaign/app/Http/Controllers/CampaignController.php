@@ -35,7 +35,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'segments'])
+            ->with(['banner', 'altBanner', 'segments'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -43,6 +43,12 @@ class CampaignController extends Controller
                 return [
                     'edit' => route('campaigns.edit', $campaign) ,
                 ];
+            })
+            ->addColumn('alt_banner', function (Campaign $campaign) {
+                if (!$campaign->altBanner) {
+                    return [];
+                }
+                return [$campaign->altBanner->name];
             })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
@@ -233,13 +239,45 @@ class CampaignController extends Controller
             }
 
             // banner
-            $banner = $campaign->banner;
-            if (!$banner) {
+            $bannerVariantA = $campaign->banner ?? false;
+            if (!$bannerVariantA) {
                 return response()
                     ->jsonp($r->get('callback'), [
                         'success' => false,
                         'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
                     ]);
+            }
+
+            $banner = null;
+            $bannerVariantB = $campaign->altBanner ?? false;
+            if (!$bannerVariantB) {
+                // only one variant of banner, so set it
+                $banner = $bannerVariantA;
+            } else {
+                // there are two variants
+                // find banner previously displayed to user
+                $bannerId = null;
+                $campaignsBanners = $data->campaignsBanners ?? false;
+                if ($campaignsBanners && $campaignsBanners->{$campaign->uuid}) {
+                    $bannerId = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
+                }
+
+                if ($bannerId !== null) {
+                    // check if displayed banner is one of existing variants
+                    switch ($bannerId) {
+                        case $bannerVariantA->uuid:
+                            $banner = $bannerVariantA;
+                            break;
+                        case $bannerVariantB->uuid:
+                            $banner = $bannerVariantB;
+                            break;
+                    }
+                }
+
+                // banner still not set, choose random variant
+                if ($banner === null) {
+                    $banner = rand(0, 1) ? $bannerVariantA : $bannerVariantB;
+                }
             }
 
             // check if campaign is set to be seen only once per session

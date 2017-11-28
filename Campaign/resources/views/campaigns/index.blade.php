@@ -46,6 +46,9 @@
                         'banner.name' => [
                             'header' => 'Banner'
                         ],
+                        'alt_banner' => [
+                            'header' => 'Banner B'
+                        ],
                         'segments' => [
                             'header' => 'Segments',
                             'render' => 'array',
