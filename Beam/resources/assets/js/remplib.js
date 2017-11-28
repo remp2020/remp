@@ -135,7 +135,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             // increment counts where applicable
             for (let ruleId of eventRules[key]) {
-                if (!cache.hasOwnProperty(ruleId)) {
+                if (!cache[remplib.tracker.segmentProvider].hasOwnProperty(ruleId)) {
                     continue;
                 }
                 cache[remplib.tracker.segmentProvider][ruleId]["c"] += 1;

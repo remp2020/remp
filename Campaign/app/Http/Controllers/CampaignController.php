@@ -204,7 +204,7 @@ class CampaignController extends Controller
                 ->setStatusCode(400);
         }
 
-        if ($data->cache) {
+        if (isset($data->cache)) {
             $sa->setCache($data->cache);
         }
 
