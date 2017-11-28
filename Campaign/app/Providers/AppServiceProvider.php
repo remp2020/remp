@@ -6,6 +6,8 @@ use App\Contracts\SegmentAggregator;
 use Blade;
 use Carbon\Carbon;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\ServiceProvider;
 use Schema;
 
@@ -73,5 +75,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->call([$this, 'responseMacros']);
+    }
+
+    public function responseMacros(Request $request, ResponseFactory $response)
+    {
+        $response->macro('format', function($formats) use ($request, $response)
+        {
+            if ($request->wantsJson() && array_key_exists('json', $formats)) {
+                return $formats['json'];
+            }
+            return $formats['html'];
+        });
     }
 }

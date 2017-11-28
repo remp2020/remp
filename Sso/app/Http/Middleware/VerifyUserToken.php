@@ -32,13 +32,12 @@ class VerifyUserToken
      */
     public function handle(Request $request, Closure $next)
     {
-        $token = $this->auth->setRequest($request)->getToken();
-        if (!$token) {
+        if (!$this->auth->parser()->setRequest($request)->hasToken()) {
             return $this->respond('token_not_provided', 'no JWT token was provided', 400);
         }
 
         try {
-            $user = $this->auth->authenticate($token);
+            $user = $this->auth->parseToken()->authenticate();
         } catch (TokenExpiredException $e) {
             return $this->respond('token_expired', 'provided token has already expired', 401);
         } catch (JWTException $e) {

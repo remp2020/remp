@@ -57,7 +57,9 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
-        'jwt.auth' => \App\Http\Middleware\VerifyUserToken::class,
-        'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
+        'app.jwt.auth' => \App\Http\Middleware\VerifyUserToken::class,
+        'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
+
+        'auth.jwt' => \Remp\LaravelSso\Http\Middleware\VerifyJwtToken::class,
     ];
 }

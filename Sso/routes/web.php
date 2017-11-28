@@ -15,7 +15,14 @@ Route::get('/', function () {
     return redirect(route('dashboard'));
 });
 
-Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+Route::get('/error', function() {
+    return 'error during login: ' . $_GET['error'];
+})->name('sso.error');
+
+Route::middleware('auth.jwt')->group(function () {
+    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+});
+
 Route::get('auth/login', 'AuthController@login')->name('auth.login');
 Route::get('auth/google', 'Auth\GoogleController@redirect')->name('auth.google');
 Route::get('auth/google/callback', 'Auth\GoogleController@callback');

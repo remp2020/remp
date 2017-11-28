@@ -36,6 +36,7 @@
         "laravelcollective/html": "^5.5",
         "laravel/tinker": "~1.0",
         "yajra/laravel-datatables-oracle": "^8.0",
+        "yajra/laravel-datatables-buttons": "^3.0",
         "rigor789/airbrake-laravel": "dev-master",
         "guzzlehttp/guzzle": "^6.2",
         "predis/predis": " ~1.0",
@@ -55,7 +56,11 @@
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~5.7",
         "friendsofphp/php-cs-fixer": "*",
-        "barryvdh/laravel-ide-helper": "^2.3"
+        "barryvdh/laravel-ide-helper": "^2.3",
+        "infyomlabs/swagger-generator": "dev-master",
+        "jlapp/swaggervel": "dev-master",
+        "infyomlabs/laravel-generator": "^5.5",
+        "infyomlabs/adminlte-templates": "^5.5"
     },
     "autoload": {
         "classmap": [

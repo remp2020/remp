@@ -9,6 +9,13 @@
     "repositories": [
         {
             "type": "path",
+            "url": "../Composer/laravel-sso",
+            "options": {
+                "symlink": false
+            }
+        },
+        {
+            "type": "path",
             "url": "../Composer/laravel-widgets",
             "options": {
                 "symlink": false
@@ -27,17 +34,18 @@
         "arrilot/laravel-widgets": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.3",
         "doctrine/dbal": "~2.3",
-        "laravel/framework": "5.4.*",
+        "laravel/framework": "5.5.*",
+        "laravelcollective/html": "^5.5",
         "laravel/tinker": "~1.0",
-        "laravelcollective/html": "^5.4",
-        "yajra/laravel-datatables-oracle": "^7.2",
+        "yajra/laravel-datatables-oracle": "^8.0",
         "rigor789/airbrake-laravel": "dev-master",
         "laracasts/flash": "^3.0",
         "laravel/socialite": "^3.0",
-        "tymon/jwt-auth": "^0.5",
+        "tymon/jwt-auth": "^1.0",
         "league/uri": "^5.0",
         "recca0120/laravel-tracy": "^1.8",
         "predis/predis": " ~1.0",
+        "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
         "remp/laravel-helpers": "*",
         "deployer/deployer": "^6.0",

@@ -16,3 +16,12 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::apiResource('campaigns', 'CampaignController');
+Route::apiResource('banners', 'CampaignController');
+Route::prefix('schedule')->group(function() {
+    Route::get('schedule', 'ScheduleController@index')->name('schedule.index');
+    Route::post('schedule/{schedule}/start', 'ScheduleController@start')->name('schedule.start');
+    Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
+    Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
+});
