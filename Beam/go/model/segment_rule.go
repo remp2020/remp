@@ -6,10 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"hash/fnv"
+	"sort"
 	"strconv"
 	"time"
-
-	"sort"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"

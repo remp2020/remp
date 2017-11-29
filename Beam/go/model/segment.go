@@ -47,7 +47,7 @@ type Segment struct {
 	UpdatedAt time.Time `db:"updated_at"`
 
 	Group *SegmentGroup
-	Rules []*SegmentRule `db:"segment_rules"`
+	Rules []SegmentRule `db:"segment_rules"`
 }
 
 // SegmentCollection is list of Segments.
@@ -99,7 +99,7 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 		return nil, false, nil
 	}
 
-	src := []*SegmentRule{}
+	src := []SegmentRule{}
 	err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
 	if err != nil {
 		return nil, false, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
@@ -124,7 +124,7 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 	c := make(SegmentCache)
 
 	for _, sr := range segment.Rules {
-		osr := (*sr).applyOverrides(ro)
+		osr := sr.applyOverrides(ro)
 		cacheKey := sr.getCacheKey(ro)
 
 		// get count
@@ -219,7 +219,7 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) (
 }
 
 // ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
-func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, o RuleOverrides, intersect Intersector) (UserSet, error) {
+func (sDB *SegmentDB) ruleUsers(sr SegmentRule, now time.Time, o RuleOverrides, intersect Intersector) (UserSet, error) {
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
@@ -278,7 +278,7 @@ func (sDB *SegmentDB) Cache() error {
 	}
 
 	for _, s := range sc {
-		src := []*SegmentRule{}
+		src := []SegmentRule{}
 		err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
