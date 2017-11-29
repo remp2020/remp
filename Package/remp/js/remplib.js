@@ -2,6 +2,8 @@ export default {
 
     beamToken: null,
 
+    segmentProviderCacheKey: "segment_provider_cache",
+
     userId: null,
 
     signedIn: false,
@@ -61,7 +63,9 @@ export default {
             return null;
         }
 
-        item.updatedAt = now;
+        if (item.hasOwnProperty("updatedAt")) {
+            item.updatedAt = now;
+        }
         localStorage.setItem(key, JSON.stringify(item));
 
         if (item.hasOwnProperty('value')) {
@@ -90,6 +94,7 @@ export default {
     },
 
     bootstrap: function(app) {
+        this.applyPolyfills();
         if (this.isBot(navigator.userAgent)) {
             return;
         }
@@ -109,6 +114,19 @@ export default {
                 }
             })(), 0);
         }
+    },
+
+    applyPolyfills: function() {
+        // CustomEvent constructor for IE
+        if ( typeof window.CustomEvent === "function" ) return false;
+        function CustomEvent ( event, params ) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent( 'CustomEvent' );
+            evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+            return evt;
+        }
+        CustomEvent.prototype = window.Event.prototype;
+        window.CustomEvent = CustomEvent;
     },
 
     loadScript: function (src, callback) {

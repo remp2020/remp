@@ -21,6 +21,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         variables: {},
 
         campaignsStorageKey: "campaigns",
+
         campaignsSessionStorageKey: "campaigns_session",
 
         /* JSONP START */
@@ -35,6 +36,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "url": window.location.href,
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
+                    "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
                 }
             },
             processResponse: function(result) {
@@ -49,7 +51,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         console.error("campaign showtime error:", u)
                     }
                 }
-            }
+                let event = new CustomEvent("campaign_showtime", {
+                    detail: result.providerData,
+                });
+                window.dispatchEvent(event);
+            },
         },
 
         /* JSONP END */

@@ -72,11 +72,13 @@ func (c *SegmentController) Check(ctx *app.CheckSegmentsContext) error {
 		return err
 	}
 	er := c.SegmentStorage.EventRules()
+	of := c.SegmentStorage.OverridableFields()
 
 	return ctx.OK(&app.SegmentCheck{
-		Check:      ok,
-		Cache:      (SegmentCache(cache)).ToMediaType(),
-		EventRules: er,
+		Check:             ok,
+		Cache:             (SegmentCache(cache)).ToMediaType(),
+		EventRules:        er,
+		OverridableFields: of,
 	})
 }
 

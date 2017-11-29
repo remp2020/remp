@@ -2,8 +2,6 @@ package model
 
 import (
 	"database/sql"
-	"database/sql/driver"
-	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
@@ -24,21 +22,20 @@ type SegmentStorage interface {
 	Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
-	// EventRules returns map of rules assigned to given "category/event" key
+	// EventRules returns map of rules assigned to given "category/event" key.
 	EventRules() EventRules
+	// OverridableFields returns array of fields that expect to be overriden when rule is checked.
+	OverridableFields() OverridableFields
 }
 
 // EventRules represent map of rules with given "category/event" assigned
 type EventRules map[string][]int
 
+// OverridableFields represent array of fields (key-value pairs) keyed by Rule ID.
+type OverridableFields map[int][]string
+
 // SegmentCache represents event count information for SegmentRules indexed by SegmentRule ID.
 type SegmentCache map[int]*SegmentRuleCache
-
-// SegmentRuleCache represents event count information for single SegmentRule.
-type SegmentRuleCache struct {
-	SyncedAt time.Time `json:"s"`
-	Count    int       `json:"c"`
-}
 
 // Segment structure.
 type Segment struct {
@@ -50,55 +47,11 @@ type Segment struct {
 	UpdatedAt time.Time `db:"updated_at"`
 
 	Group *SegmentGroup
-	Rules []*SegmentRule `db:"segment_rules"`
-}
-
-// RuleOverrides represent key-value string pairs for overriding stored tags in segment rules.
-type RuleOverrides struct {
-	Fields map[string]string
+	Rules []SegmentRule `db:"segment_rules"`
 }
 
 // SegmentCollection is list of Segments.
 type SegmentCollection []*Segment
-
-// SegmentRule represent single rule of a Segment
-type SegmentRule struct {
-	ID            int
-	ParentID      sql.NullInt64 `db:"parent_id"`
-	SegmentID     int           `db:"segment_id"`
-	EventCategory string        `db:"event_category"`
-	EventAction   string        `db:"event_action"`
-	Timespan      sql.NullInt64
-	Operator      string
-	Count         int
-	CreatedAt     time.Time `db:"created_at"`
-	UpdatedAt     time.Time `db:"updated_at"`
-	Fields        JSONMap
-	Flags         JSONMap
-
-	Segment *Segment `db:"segment"`
-}
-
-// JSONMap represents key-value string pairs stored as string JSON [{"key": "foo", "value": "bar"}].
-type JSONMap []map[string]string
-
-// Value returns JSON-encoded value of JSONMap.
-func (jm JSONMap) Value() (driver.Value, error) {
-	return json.Marshal(jm)
-}
-
-// Scan populates JSONMap based on scanned value.
-func (jm *JSONMap) Scan(src interface{}) error {
-	source, ok := src.([]byte)
-	if !ok {
-		return errors.New("unable to scan JSONMap: type assertion .([]byte) failed")
-	}
-	err := json.Unmarshal(source, jm)
-	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal JSONMap")
-	}
-	return nil
-}
 
 // SegmentGroup represents metadata about group, in which Segments can be placed in.
 type SegmentGroup struct {
@@ -146,7 +99,7 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 		return nil, false, nil
 	}
 
-	src := []*SegmentRule{}
+	src := []SegmentRule{}
 	err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
 	if err != nil {
 		return nil, false, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
@@ -172,24 +125,25 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 
 	for _, sr := range segment.Rules {
 		osr := sr.applyOverrides(ro)
+		cacheKey := sr.getCacheKey(ro)
 
 		// get count
 		var count int
 		var err error
-		if src, ok := cache[sr.ID]; ok {
+		if src, ok := cache[cacheKey]; ok {
 			count = src.Count
 			// update cache
-			c[osr.ID] = &SegmentRuleCache{
+			c[cacheKey] = &SegmentRuleCache{
 				Count:    count,
-				SyncedAt: cache[sr.ID].SyncedAt,
+				SyncedAt: cache[cacheKey].SyncedAt,
 			}
 		} else {
 			count, err = sDB.getRuleEventCount(osr, userID, now, ro)
 			if err != nil {
 				return nil, false, errors.Wrap(err, "unable to get SegmentRule event count")
 			}
-			// update cache
-			c[osr.ID] = &SegmentRuleCache{
+			// set synced cache
+			c[cacheKey] = &SegmentRuleCache{
 				Count:    count,
 				SyncedAt: now,
 			}
@@ -207,7 +161,7 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 }
 
 // getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
-func (sDB *SegmentDB) getRuleEventCount(sr SegmentRule, userID string, now time.Time, ro RuleOverrides) (int, error) {
+func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, userID string, now time.Time, ro RuleOverrides) (int, error) {
 	// get count of events directly from influx
 	query := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
@@ -234,66 +188,6 @@ func (sDB *SegmentDB) getRuleEventCount(sr SegmentRule, userID string, now time.
 	}
 
 	return count, nil
-}
-
-// CacheKey generates string cache key for SegmentRule.
-func (sr *SegmentRule) CacheKey(userID string) string {
-	key := fmt.Sprintf(
-		"%s,%s/%s,%s%d,%d",
-		userID,
-		sr.EventCategory,
-		sr.EventAction,
-		sr.Operator,
-		sr.Count,
-		sr.Timespan.Int64,
-	)
-	for _, def := range sr.Fields {
-		key = fmt.Sprintf("%s,%s/%s", key, def["key"], def["value"])
-	}
-	return key
-}
-
-// CacheDuration returns duration to cache the item for and whether the item should be cached at all.
-func (sr *SegmentRule) CacheDuration(count int) (time.Duration, bool) {
-	var d time.Duration
-	switch sr.Operator {
-	case "<=", ">=":
-		if count < sr.Count {
-			return 0, false
-		}
-		d = cache.DefaultExpiration
-	case "<", ">":
-		if count <= sr.Count {
-			return 0, false
-		}
-		d = cache.DefaultExpiration
-	case "=":
-		if count < sr.Count {
-			return 0, false
-		}
-		d = 2 * time.Minute
-	default:
-		return 0, false
-	}
-	return d, true
-}
-
-// Evaluate evaluates segment rule condition against provided count.
-func (sr *SegmentRule) Evaluate(count int) (bool, error) {
-	switch sr.Operator {
-	case "<=":
-		return count <= sr.Count, nil
-	case "<":
-		return count < sr.Count, nil
-	case "=":
-		return count == sr.Count, nil
-	case ">=":
-		return count >= sr.Count, nil
-	case ">":
-		return count > sr.Count, nil
-	default:
-		return false, fmt.Errorf("unhandled operator: %s", sr.Operator)
-	}
 }
 
 // Users return list of all users within segment.
@@ -325,7 +219,7 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) (
 }
 
 // ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
-func (sDB *SegmentDB) ruleUsers(sr *SegmentRule, now time.Time, o RuleOverrides, intersect Intersector) (UserSet, error) {
+func (sDB *SegmentDB) ruleUsers(sr SegmentRule, now time.Time, o RuleOverrides, intersect Intersector) (UserSet, error) {
 	subquery := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
@@ -384,7 +278,7 @@ func (sDB *SegmentDB) Cache() error {
 	}
 
 	for _, s := range sc {
-		src := []*SegmentRule{}
+		src := []SegmentRule{}
 		err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
@@ -420,70 +314,13 @@ func (sDB *SegmentDB) EventRules() EventRules {
 	return er
 }
 
-// applyOverrides overrides field values based on provided RuleOverrides.
-func (sr SegmentRule) applyOverrides(o RuleOverrides) SegmentRule {
-	for _, def := range sr.Fields {
-		if overriddenVal, ok := o.Fields[def["key"]]; ok {
-			def["value"] = overriddenVal
+// OverridableFields returns array of fields that expect to be overriden when rule is checked.
+func (sDB *SegmentDB) OverridableFields() OverridableFields {
+	of := make(OverridableFields)
+	for _, s := range sDB.Segments {
+		for _, sr := range s.Rules {
+			of[sr.ID] = sr.overridableFields()
 		}
 	}
-	return sr
-}
-
-// conditions returns list of influx conditions for current SegmentRule.
-func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
-	var conds []string
-	switch sr.EventCategory {
-	case CategoryPageview:
-		// no condition needed yet, pageview-load event is implicit
-	case CategoryCommerce:
-		conds = append(
-			conds,
-			fmt.Sprintf(`"step" = '%s'`, sr.EventAction),
-		)
-	default:
-		conds = append(
-			conds,
-			fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
-			fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
-		)
-	}
-
-	for _, def := range sr.Fields {
-		if def["key"] == "" || def["value"] == "" {
-			continue
-		}
-		conds = append(
-			conds,
-			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
-		)
-	}
-
-	for _, def := range sr.Flags {
-		if def["value"] == "" {
-			continue
-		}
-		conds = append(
-			conds,
-			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
-		)
-	}
-
-	if sr.Timespan.Valid {
-		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
-		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
-	}
-	return conds
-}
-
-// tableName returns name of table containing data based on SegmentRule internals.
-func (sr *SegmentRule) tableName() string {
-	switch sr.EventCategory {
-	case CategoryPageview:
-		return TablePageviews
-	case CategoryCommerce:
-		return TableCommerce
-	default:
-		return TableEvents
-	}
+	return of
 }
