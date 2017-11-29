@@ -31,7 +31,8 @@
     "bootstrap-sass": "^3.3.7",
     "cross-env": "^5.0.1",
     "laravel-mix": "^1.4.2",
-    "node-sass": "^4.5.3",
-    "optipng-bin": "^4.0.0"
+    "node-sass": "^4.7.2",
+    "optipng-bin": "^4.0.0",
+    "sass-loader": "^6.0.6"
   }
 }

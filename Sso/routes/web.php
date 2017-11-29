@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return redirect(route('dashboard'));
+    return redirect(route('api-tokens.index'));
 });
 
 Route::get('/error', function() {
@@ -20,7 +20,8 @@ Route::get('/error', function() {
 })->name('sso.error');
 
 Route::middleware('auth.jwt')->group(function () {
-    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+    Route::get('api-tokens/json', 'ApiTokenController@json')->name('api-tokens.json');
+    Route::resource('api-tokens', 'ApiTokenController');
 });
 
 Route::get('auth/login', 'AuthController@login')->name('auth.login');

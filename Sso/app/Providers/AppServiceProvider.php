@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Request;
+use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\ServiceProvider;
 use Blade;
 use Schema;
@@ -45,5 +47,17 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment() !== 'production') {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
+        $this->app->call([$this, 'responseMacros']);
+    }
+
+    public function responseMacros(Request $request, ResponseFactory $response)
+    {
+        $response->macro('format', function($formats) use ($request, $response)
+        {
+            if ($request->wantsJson() && array_key_exists('json', $formats)) {
+                return $formats['json'];
+            }
+            return $formats['html'];
+        });
     }
 }
