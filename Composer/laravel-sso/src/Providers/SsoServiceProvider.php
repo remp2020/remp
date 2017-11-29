@@ -2,7 +2,8 @@
 
 namespace Remp\LaravelSso\Providers;
 
-use Remp\LaravelSso\Contracts\Jwt\Guard;
+use Remp\LaravelSso\Contracts\Jwt\Guard as JWTGuard;
+use Remp\LaravelSso\Contracts\Token\Guard as TokenGuard;
 use Remp\LaravelSso\Contracts\SsoContract;
 use Remp\LaravelSso\Contracts\Remp\Sso;
 use GuzzleHttp\Client;
@@ -23,7 +24,10 @@ class SsoServiceProvider extends ServiceProvider
         $this->app['config']->set('services', array_merge(require $path, $config));
 
         Auth::extend('jwt', function ($app, $name, array $config) {
-            return $app->make(Guard::class);
+            return $app->make(JWTGuard::class);
+        });
+        Auth::extend('token', function($app, $name, array $config) {
+            return $app->make(TokenGuard::class);
         });
     }
 

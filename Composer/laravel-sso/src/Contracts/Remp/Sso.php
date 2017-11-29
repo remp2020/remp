@@ -14,6 +14,8 @@ class Sso implements SsoContract
 
     const ENDPOINT_REFRESH = 'api/auth/refresh';
 
+    const ENDPOINT_CHECK_TOKEN = 'api/auth/api-token';
+
     private $client;
 
     public function __construct(Client $client)
@@ -67,11 +69,28 @@ class Sso implements SsoContract
                     $e->redirect = $body->redirect;
                     throw $e;
                 default:
-                    throw new Nette\Security\AuthenticationException($contents);
+                    throw new SsoException($contents);
             }
         }
 
         $tokenResponse = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
         return $tokenResponse;
+    }
+
+    public function apiToken($token): bool
+    {
+        try {
+            $response = $this->client->request('GET', self::ENDPOINT_CHECK_TOKEN, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$token,
+                ]
+            ]);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+            $contents = $response->getBody()->getContents();
+            throw new SsoException($contents);
+        }
+
+        return $response->getStatusCode() == 200;
     }
 }

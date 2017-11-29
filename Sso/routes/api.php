@@ -18,3 +18,4 @@ Route::middleware('app.jwt.auth')->group(function() {
 });
 
 Route::post('auth/refresh', 'AuthController@refresh')->name('auth.refresh');
+Route::get('auth/api-token', 'AuthController@apiToken')->name('auth.api-token');

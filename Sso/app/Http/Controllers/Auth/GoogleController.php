@@ -32,8 +32,8 @@ class GoogleController extends Controller
      */
     public function redirect(Request $request)
     {
-        Session::put(self::SUCCESS_URL_KEY, $request->input(self::SUCCESS_URL_QUERY_PARAM, route('dashboard')));
-        Session::put(self::ERROR_URL_KEY, $request->input(self::ERROR_URL_QUERY_PARAM, route('dashboard')));
+        Session::put(self::SUCCESS_URL_KEY, $request->input(self::SUCCESS_URL_QUERY_PARAM, '/'));
+        Session::put(self::ERROR_URL_KEY, $request->input(self::ERROR_URL_QUERY_PARAM, '/'));
 
         return Socialite::driver(User::PROVIDER_GOOGLE)->stateless()->redirect();
     }
