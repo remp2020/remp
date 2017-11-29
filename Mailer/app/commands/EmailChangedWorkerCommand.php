@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EmailChangedWorkerCommand extends Command
 {
-    const TOPICS = ['email_changed'];
+    const TOPICS = ['user_email_changed'];
 
     private $consumerFactory;
 
@@ -77,7 +77,7 @@ class EmailChangedWorkerCommand extends Command
             }
 
             foreach ($subscriptions as $subscription) {
-                $this->userSubscriptionsRepository->update($subscription, ['email' => $newEmail]);
+                $this->userSubscriptionsRepository->update($subscription, ['user_email' => $newEmail]);
             }
 
             $output->writeln('<info>OK!</info>');

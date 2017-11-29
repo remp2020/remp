@@ -31,11 +31,31 @@
             </div>
 
             <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
+                <div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="alt_banner_id" class="fg-label">Banner B alternative</label>
+                        </div>
+                        <div class="col-md-12">
+                            <v-select v-model="altBannerId"
+                                      id="alt_banner_id"
+                                      :name="'alt_banner_id'"
+                                      :value="altBannerId"
+                                      :title="'No alternative'"
+                                      :options.sync="altBannerOptions"
+                            ></v-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                 <div>
                     <div class="row">
                         <div class="col-md-12">
-                            <label for="banner_id" class="fg-label">User signed-in state</label>
+                            <label for="signed_in" class="fg-label">User signed-in state</label>
                         </div>
                         <div class="col-md-12">
                             <v-select v-model="signedIn"
@@ -132,6 +152,7 @@
         "_name",
         "_segments",
         "_bannerId",
+        "_altBannerId",
         "_signedIn",
         "_oncePerSession",
         "_active",
@@ -158,6 +179,7 @@
                 "name": null,
                 "segments": [],
                 "bannerId": null,
+                "altBannerId": null,
                 "signedIn": null,
                 "oncePerSession": null,
                 "active": null,
@@ -180,6 +202,15 @@
                     })
                 }
                 return result;
+            },
+            "altBannerOptions": function() {
+                //same as bannerOptions, just add null element (alternative banner is nullable)
+                let result = [];
+                result.push({
+                    "label": "No alternative",
+                    "value": null,
+                })
+                return result.concat(this.bannerOptions);
             },
             "signedInOptions": function() {
                 return [
