@@ -1,4 +1,5 @@
 import Remplib from 'remp/js/remplib'
+import Hash from 'fnv1a'
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
@@ -34,6 +35,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         segmentProvider: "remp_segment",
 
         eventRulesMapKey: "beam_event_rules_map",
+
+        overridableFieldsKey: "overridable_fields",
 
         init: function(config) {
             if (typeof config.token !== 'string') {
@@ -88,6 +91,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
             window.addEventListener("campaign_showtime", this.syncEventRulesMap);
+            window.addEventListener("campaign_showtime", this.syncOverridableFields);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
         },
 
@@ -116,6 +120,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["event_rules"]));
         },
 
+        syncOverridableFields: function(e) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
+                return;
+            }
+            if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("overridable_fields")) {
+                return;
+            }
+            localStorage.setItem(remplib.tracker.overridableFieldsKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["overridable_fields"]));
+        },
+
         incrementSegmentRulesCache: function(event) {
             let cache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
             if (!cache || !cache.hasOwnProperty(remplib.tracker.segmentProvider)) {
@@ -135,13 +149,29 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             // increment counts where applicable
             for (let ruleId of eventRules[key]) {
-                if (!cache[remplib.tracker.segmentProvider].hasOwnProperty(ruleId)) {
+                let of = remplib.getFromStorage(remplib.tracker.overridableFieldsKey, true) || [];
+                if (!of.hasOwnProperty(ruleId)) {
+                    console.warn("remplib: missing overridable fields for rule " + ruleId);
                     continue;
                 }
-                cache[remplib.tracker.segmentProvider][ruleId]["c"] += 1;
+                let cacheKey = remplib.tracker.segmentRuleKey(ruleId, of[ruleId], params);
+                if (!cache[remplib.tracker.segmentProvider].hasOwnProperty(cacheKey)) {
+                    continue;
+                }
+                cache[remplib.tracker.segmentProvider][cacheKey]["c"] += 1;
             }
             localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(cache));
 
+        },
+
+        // this function needs to work the same way as SegmentRule.getCacheKey on the segments backend.
+        segmentRuleKey: function(ruleId, overridableFields, params) {
+            let k = ruleId.toString();
+            overridableFields = overridableFields.sort();
+            for (let f of overridableFields) {
+                k += "_" + (params['tags'][f] || params['fields'][f] || '');
+            }
+            return Hash(k);
         },
 
         run: function() {

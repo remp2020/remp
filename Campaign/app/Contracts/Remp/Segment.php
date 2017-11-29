@@ -31,6 +31,8 @@ class Segment implements SegmentContract
 
     private $eventRules;
 
+    private $overridableFields;
+
     public function __construct(Client $client, $cacheEnabled)
     {
         $this->client = $client;
@@ -113,8 +115,11 @@ class Segment implements SegmentContract
                 $this->cache->$ruleId = $ruleCache;
             }
         }
-        if ($result->event_rules) {
+        if (isset($result->event_rules)) {
             $this->eventRules = $result->event_rules;
+        }
+        if (isset($result->overridable_fields)) {
+            $this->overridableFields = $result->overridable_fields;
         }
 
         return $result->check;
@@ -160,6 +165,9 @@ class Segment implements SegmentContract
         }
         if ($this->eventRules) {
             $pd->event_rules = $this->eventRules;
+        }
+        if ($this->overridableFields) {
+            $pd->overridable_fields = $this->overridableFields;
         }
         return $pd;
     }

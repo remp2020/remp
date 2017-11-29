@@ -35,7 +35,8 @@
     "material-design-iconic-font": "^2.2.0",
     "node-waves": "^0.7.5",
     "remp": "file:../Package/remp",
-    "vue": "^2.4.2"
+    "vue": "^2.4.2",
+    "fnv1a": "^1.0.1"
   },
   "devDependencies": {
     "bootstrap-sass": "^3.3.7",
