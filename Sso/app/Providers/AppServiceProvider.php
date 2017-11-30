@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function responseMacros(Request $request, ResponseFactory $response)
     {
-        $response->macro('format', function($formats) use ($request, $response)
+        $response->macro('format', function ($formats) use ($request, $response)
         {
             if ($request->wantsJson() && array_key_exists('json', $formats)) {
                 return $formats['json'];
