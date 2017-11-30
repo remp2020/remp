@@ -63,8 +63,15 @@ class Campaign extends Model
     public function cache()
     {
         $activeCampaignIds = self::whereActive(true)->pluck('id')->toArray();
-        $this->load(['segments', 'banner', 'schedules']);
+        $campaign = $this->where(['id' => $this->id])->with([
+            'segments',
+            'banner',
+            'banner.htmlTemplate',
+            'banner.mediumRectangleTemplate',
+            'banner.barTemplate',
+            'schedules',
+        ])->first();
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
-        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $this);
+        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
 }
