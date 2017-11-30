@@ -39,7 +39,7 @@ class BannerController extends Controller
     {
         return response()->format([
             'html' => view('banners.index'),
-            'json' => Banner::paginate(),
+            'json' => BannerResource::collection(Banner::paginate()),
         ]);
     }
 
@@ -107,7 +107,7 @@ class BannerController extends Controller
 
         return response()->format([
             'html' => redirect(route('banners.index'))->with('success', 'Banner created'),
-            'json' => new BannerResource([]),
+            'json' => new BannerResource($banner),
         ]);
     }
 

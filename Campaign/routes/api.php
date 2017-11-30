@@ -18,13 +18,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:api')->group(function() {
+    Route::prefix('schedule')->group(function() {
+        Route::post('{schedule}/start', 'ScheduleController@start')->name('schedule.start');
+        Route::post('{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
+        Route::post('{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
+    });
+
     Route::apiResource('campaigns', 'CampaignController');
     Route::apiResource('banners', 'CampaignController');
-    Route::prefix('schedule')->group(function() {
-        Route::get('schedule', 'ScheduleController@index')->name('schedule.index');
-        Route::post('schedule/{schedule}/start', 'ScheduleController@start')->name('schedule.start');
-        Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
-        Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
-    });
+    Route::apiResource('schedule', 'ScheduleController');
 });
 

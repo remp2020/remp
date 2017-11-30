@@ -4,16 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Campaign;
 use App\Http\Requests\ScheduleRequest;
+use App\Http\Resources\ScheduleResource;
 use App\Schedule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Remp\LaravelHelpers\Resources\JsonResource;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Yajra\Datatables\Datatables;
 
 class ScheduleController extends Controller
 {
     public function index()
     {
-        return view('schedule.index');
+        return response()->format([
+            'html' => view('schedule.index'),
+            'json' => Schedule::paginate(),
+        ]);
     }
 
     public function json(Datatables $dataTables)
@@ -102,12 +108,15 @@ class ScheduleController extends Controller
         $schedule->fill($request->all());
         $schedule->save();
 
-        return redirect(route('schedule.index'))->with('success', sprintf(
-            "Campaign %s scheduled from %s to %s",
-            $schedule->campaign->name,
-            Carbon::parse($schedule->start_time)->toDayDateTimeString(),
-            Carbon::parse($schedule->end_time)->toDayDateTimeString()
-        ));
+        return response()->format([
+            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                "Campaign %s scheduled from %s to %s",
+                $schedule->campaign->name,
+                Carbon::parse($schedule->start_time)->toDayDateTimeString(),
+                Carbon::parse($schedule->end_time)->toDayDateTimeString()
+            )),
+            'json' => new ScheduleResource($schedule),
+        ]);
     }
 
     public function edit(Schedule $schedule)
@@ -126,24 +135,30 @@ class ScheduleController extends Controller
         $schedule->fill($request->all());
         $schedule->save();
 
-        return redirect(route('schedule.index'))->with('success', sprintf(
-            "Campaign %s rescheduled starting on %s and ending on %s",
-            $schedule->campaign->name,
-            Carbon::parse($schedule->start_time)->toDayDateTimeString(),
-            Carbon::parse($schedule->end_time)->toDayDateTimeString()
-        ));
+        return response()->format([
+            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                "Campaign %s rescheduled starting on %s and ending on %s",
+                $schedule->campaign->name,
+                Carbon::parse($schedule->start_time)->toDayDateTimeString(),
+                Carbon::parse($schedule->end_time)->toDayDateTimeString()
+            )),
+            'json' => new ScheduleResource($schedule),
+        ]);
     }
 
     public function destroy(Schedule $schedule)
     {
         $schedule->delete();
 
-        return redirect(route('schedule.index'))->with('success', sprintf(
-            "Schedule for campaign %s from %s to %s was removed",
-            $schedule->campaign->name,
-            Carbon::parse($schedule->start_time)->toDayDateTimeString(),
-            Carbon::parse($schedule->end_time)->toDayDateTimeString()
-        ));
+        return response()->format([
+            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                "Schedule for campaign %s from %s to %s was removed",
+                $schedule->campaign->name,
+                Carbon::parse($schedule->start_time)->toDayDateTimeString(),
+                Carbon::parse($schedule->end_time)->toDayDateTimeString()
+            )),
+            'json' => new ScheduleResource([]),
+        ]);
     }
 
     /**
@@ -152,12 +167,26 @@ class ScheduleController extends Controller
      */
     public function pause(Schedule $schedule)
     {
+        if (!$schedule->isRunning()) {
+            return response()->format([
+                'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                    "Schedule for campaign %s was not running, pause request ignored",
+                    $schedule->campaign->name
+                )),
+                'json' => new JsonResource(new BadRequestHttpException('cannot pause schedule: not running')),
+            ]);
+        }
+
         $schedule->status = Schedule::STATUS_PAUSED;
         $schedule->save();
-        return redirect(route('schedule.index'))->with('success', sprintf(
-            "Schedule for campaign %s is now paused",
-            $schedule->campaign->name
-        ));
+
+        return response()->format([
+            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                "Schedule for campaign %s is now paused",
+                $schedule->campaign->name
+            )),
+            'json' => new ScheduleResource([]),
+        ]);
     }
 
     /**
@@ -166,12 +195,26 @@ class ScheduleController extends Controller
      */
     public function start(Schedule $schedule)
     {
+        if (!$schedule->isRunnable()) {
+            return response()->format([
+                'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                    "Schedule for campaign %s was not runnable, satrt request ignored",
+                    $schedule->campaign->name
+                )),
+                'json' => new JsonResource(new BadRequestHttpException('cannot start schedule: not runnable')),
+            ]);
+        }
+
         $schedule->status = Schedule::STATUS_EXECUTED;
         $schedule->save();
-        return redirect(route('schedule.index'))->with('success', sprintf(
-            "Schedule for campaign %s was started manually",
-            $schedule->campaign->name
-        ));
+
+        return response()->format([
+            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                "Schedule for campaign %s was started manually",
+                $schedule->campaign->name
+            )),
+            'json' => new ScheduleResource([]),
+        ]);
     }
 
     /**
@@ -180,11 +223,25 @@ class ScheduleController extends Controller
      */
     public function stop(Schedule $schedule)
     {
+        if (!$schedule->isRunnable()) {
+            return response()->format([
+                'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                    "Schedule for campaign %s was not running, stop request ignored",
+                    $schedule->campaign->name
+                )),
+                'json' => new JsonResource(new BadRequestHttpException('cannot stop schedule: not running')),
+            ]);
+        }
+
         $schedule->status = Schedule::STATUS_STOPPED;
         $schedule->save();
-        return redirect(route('schedule.index'))->with('success', sprintf(
-            "Schedule for campaign %s was stopped",
-            $schedule->campaign->name
-        ));
+
+        return response()->format([
+            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                "Schedule for campaign %s was stopped",
+                $schedule->campaign->name
+            )),
+            'json' => new ScheduleResource([]),
+        ]);
     }
 }

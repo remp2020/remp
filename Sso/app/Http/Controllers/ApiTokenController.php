@@ -13,7 +13,7 @@ class ApiTokenController extends Controller
     {
         return response()->format([
             'html' => view('api_tokens.index'),
-            'json' => ApiToken::paginate(),
+            'json' => ApiTokenResource::collection(ApiToken::paginate()),
         ]);
     }
 

@@ -2,12 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Request;
-use Illuminate\Routing\ResponseFactory;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
-use Blade;
-use Schema;
 
 class AppServiceProvider extends ServiceProvider
 {

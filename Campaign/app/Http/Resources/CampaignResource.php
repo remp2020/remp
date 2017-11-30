@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Remp\LaravelHelpers\Resources\JsonResource;
 
-class CampaignResource extends Resource
+class CampaignResource extends JsonResource
 {
 }

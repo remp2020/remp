@@ -32,7 +32,7 @@ class CampaignController extends Controller
             'html' => view('campaigns.index', [
                 'snippet' => view('campaigns._snippet'),
             ]),
-            'json' => Campaign::paginate(),
+            'json' => CampaignResource::collection(Campaign::paginate()),
         ]);
     }
 
@@ -105,7 +105,7 @@ class CampaignController extends Controller
 
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
-            'json' => new CampaignResource([]),
+            'json' => new CampaignResource($campaign),
         ]);
     }
 
@@ -177,7 +177,7 @@ class CampaignController extends Controller
 
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
-            'json' => new CampaignResource([]),
+            'json' => new CampaignResource($campaign),
         ]);
     }
 

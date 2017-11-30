@@ -2,18 +2,8 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Remp\LaravelHelpers\Resources\JsonResource;
 
-class ApiTokenResource extends Resource
+class ApiTokenResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function toArray($request)
-    {
-        return parent::toArray($request);
-    }
 }

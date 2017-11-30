@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Remp\LaravelHelpers\Resources\JsonResource;
 
-class ScheduleResource extends Resource
+class ScheduleResource extends JsonResource
 {
 }
