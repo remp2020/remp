@@ -111,11 +111,7 @@ class SendingStats extends Control
         $this->template->total_stat = $total;
 
         if ($this->showConversions) {
-            $val = $this->logsRepository->getConversion($this->templateIds);
-            $this->template->conversions = [
-                'value' => $val,
-                'per' => $total ? ($val / $total * 100) : 0,
-            ];
+            $this->template->conversions = $this->logsRepository->getConversion($this->templateIds);
         }
 
         $this->template->setFile(__DIR__ . '/sending_stats.latte');

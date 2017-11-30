@@ -1,4 +1,4 @@
-{form newBatchForm}
+{form editBatchForm}
     <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
         {$error}<br>
     </div>
@@ -9,22 +9,6 @@
                 {label method /}
                 {input method, class => 'selectpicker'}
             </div>
-
-            <div class="row m-b-30">
-                <div class="col-sm-6">
-                    <div class="form-group fg-float m-b-30">
-                        {label template_id /}
-                        {input template_id, class => 'selectpicker',  data-live-search => 'true'}
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group fg-float m-b-30">
-                        {label b_template_id /}
-                        {input b_template_id, class => 'selectpicker',  data-live-search => 'true'}
-                    </div>
-                </div>
-            </div>
-
 
             <div class="form-group fg-float m-b-30">
                 <div class="fg-line">
@@ -40,7 +24,7 @@
                 </div>
             </div>
 
-            {input job_id}
+            {input id}
 
             {input save, class => 'btn btn-info waves-effect'}
         </div>
