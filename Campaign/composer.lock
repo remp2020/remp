@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c5a4c0f7235f703808dd2cd7fc8bfedb",
+    "content-hash": "6828a1dbab98e30b6ba9da098685c091",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -225,16 +225,16 @@
         },
         {
             "name": "deployer/recipes",
-            "version": "6.0.1",
+            "version": "6.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/recipes.git",
-                "reference": "5f462100d2c9a109e119ea390091c1e66d961f74"
+                "reference": "39d4fb3f94272652ac1595f3e83ac5ec4379f6c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/recipes/zipball/5f462100d2c9a109e119ea390091c1e66d961f74",
-                "reference": "5f462100d2c9a109e119ea390091c1e66d961f74",
+                "url": "https://api.github.com/repos/deployphp/recipes/zipball/39d4fb3f94272652ac1595f3e83ac5ec4379f6c1",
+                "reference": "39d4fb3f94272652ac1595f3e83ac5ec4379f6c1",
                 "shasum": ""
             },
             "replace": {
@@ -272,7 +272,7 @@
                 "slack",
                 "yarn"
             ],
-            "time": "2017-08-24T13:39:08+00:00"
+            "time": "2017-11-29T11:03:02+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -6532,7 +6532,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.0.0"
+        "php": "~7.1.0"
     },
     "platform-dev": []
 }

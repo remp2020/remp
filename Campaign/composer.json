@@ -30,10 +30,10 @@
         }
     ],
     "require": {
-        "php": "^7.0.0",
+        "php": "~7.1.0",
         "doctrine/dbal": "~2.3",
-        "laravel/framework": "5.5.*",
-        "laravelcollective/html": "^5.5",
+        "laravel/framework": "~5.5.0",
+        "laravelcollective/html": "~5.5.0",
         "laravel/tinker": "~1.0",
         "yajra/laravel-datatables-oracle": "^8.0",
         "rigor789/airbrake-laravel": "dev-master",
