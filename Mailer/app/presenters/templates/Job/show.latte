@@ -70,7 +70,7 @@
                     <div class="card-header">
                         <h2><i class="zmdi zmdi-collection-item"></i> Batch #{$batch->id}</h2>
                         <div class="actions">
-                            <a n:href="EditBatch $batch->id" n:if="$batch->status == created">
+                            <a n:href="EditBatch $batch->id" n:if="in_array($batch->status, [created, updated, ready])">
                                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Edit</button>
                             </a>
                             <a href="#new-template-form-batch-{$batch->id}" data-toggle="collapse">

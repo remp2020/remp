@@ -26,6 +26,8 @@ class EditBatchFormFactory extends Object
 
     public $onSuccess;
 
+    public $onError;
+
     public function __construct(
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository,
@@ -74,6 +76,12 @@ class EditBatchFormFactory extends Object
     public function formSucceeded($form, $values)
     {
         $batch = $this->batchesRepository->find($values['id']);
+
+        if (!in_array($batch->status, [BatchesRepository::STATE_CREATED, BatchesRepository::STATE_UPDATED, BatchesRepository::STATE_READY])) {
+            $form->addError("Unable to edit batch, already in non-editable status: {$batch->status}");
+            return;
+        }
+
         $this->batchesRepository->update($batch, array_filter([
             'method' => $values['method'],
             'max_emails' => $values['max_emails'],
