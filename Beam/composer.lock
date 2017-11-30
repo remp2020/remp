@@ -2956,21 +2956,27 @@
         },
         {
             "name": "remp/laravel-helpers",
-            "version": "dev-master",
+            "version": "dev-107-campaign-apis",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-helpers",
-                "reference": "c94bdbcef7cf9622733cbfab4f5e47045fbc3582",
+                "reference": "43a702396344d99631e2c89078b7ca6e9aed8253",
                 "shasum": null
             },
             "require": {
-                "php": ">=7.0"
+                "illuminate/http": "^5.5",
+                "illuminate/routing": "^5.5",
+                "illuminate/support": "^5.5",
+                "php": "~7.1"
             },
             "type": "library",
             "autoload": {
                 "files": [
                     "src/laravel_helpers.php"
-                ]
+                ],
+                "psr-4": {
+                    "Remp\\LaravelHelpers\\": "src/"
+                }
             },
             "license": [
                 "MIT"
@@ -2993,7 +2999,7 @@
         },
         {
             "name": "remp/laravel-sso",
-            "version": "dev-master",
+            "version": "dev-107-campaign-apis",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-sso",
@@ -3040,16 +3046,16 @@
         },
         {
             "name": "remp/laravel-widgets",
-            "version": "dev-master",
+            "version": "dev-107-campaign-apis",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-widgets",
-                "reference": "d7d26a2f606d52395ebaa857bb2769de9acdfc6a",
+                "reference": "4bb978908a2a446d8b32d98391cb40613f4c46dc",
                 "shasum": null
             },
             "require": {
-                "arrilot/laravel-widgets": "^3.7",
-                "illuminate/support": "^5.4",
+                "arrilot/laravel-widgets": "^3.9",
+                "illuminate/support": "^5.5",
                 "php": ">=7.0",
                 "ramsey/uuid": "^3.0"
             },
