@@ -24,14 +24,17 @@ class Segment implements SegmentContract
 
     private $client;
 
+    private $cache;
+
     public function __construct(Client $client)
     {
         $this->client = $client;
+        $this->cache = new \stdClass;
     }
 
     public function provider(): string
     {
-        return self::PROVIDER_ALIAS;
+        return static::PROVIDER_ALIAS;
     }
 
     /**
@@ -118,5 +121,15 @@ class Segment implements SegmentContract
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
     {
         return true;
+    }
+
+    public function setCache($cache): void
+    {
+        $this->cache = $cache;
+    }
+
+    public function getProviderData()
+    {
+        return $this->cache;
     }
 }

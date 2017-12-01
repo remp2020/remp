@@ -1,4 +1,5 @@
 import Remplib from 'remp/js/remplib'
+import Hash from 'fnv1a'
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
@@ -30,6 +31,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         uriParams: {},
+
+        segmentProvider: "remp_segment",
+
+        eventRulesMapKey: "beam_event_rules_map",
+
+        overridableFieldsKey: "overridable_fields",
 
         init: function(config) {
             if (typeof config.token !== 'string') {
@@ -81,6 +88,90 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             this.parseUriParams();
+
+            window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
+            window.addEventListener("campaign_showtime", this.syncEventRulesMap);
+            window.addEventListener("campaign_showtime", this.syncOverridableFields);
+            window.addEventListener("beam_event", this.incrementSegmentRulesCache);
+        },
+
+        syncSegmentRulesCache: function(e) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
+                return;
+            }
+            if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("cache")) {
+                return;
+            }
+            let segmentProviderCache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
+            if (!segmentProviderCache) {
+                segmentProviderCache = {};
+            }
+            segmentProviderCache[remplib.tracker.segmentProvider] = e.detail[remplib.tracker.segmentProvider]["cache"]
+            localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(segmentProviderCache));
+        },
+
+        syncEventRulesMap: function(e) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
+                return;
+            }
+            if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("event_rules")) {
+                return;
+            }
+            localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["event_rules"]));
+        },
+
+        syncOverridableFields: function(e) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
+                return;
+            }
+            if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("overridable_fields")) {
+                return;
+            }
+            localStorage.setItem(remplib.tracker.overridableFieldsKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["overridable_fields"]));
+        },
+
+        incrementSegmentRulesCache: function(event) {
+            let cache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
+            if (!cache || !cache.hasOwnProperty(remplib.tracker.segmentProvider)) {
+                return;
+            }
+            let eventRules = remplib.getFromStorage(remplib.tracker.eventRulesMapKey, true);
+            if (!eventRules) {
+                return;
+            }
+
+            // check whether some rule uses triggered event
+            let params = event.detail;
+            let key = params["_category"] + "/" + params["_action"];
+            if (!eventRules.hasOwnProperty(key)) {
+                return;
+            }
+
+            // increment counts where applicable
+            for (let ruleId of eventRules[key]) {
+                let of = remplib.getFromStorage(remplib.tracker.overridableFieldsKey, true) || [];
+                if (!of.hasOwnProperty(ruleId)) {
+                    console.warn("remplib: missing overridable fields for rule " + ruleId);
+                    continue;
+                }
+                let cacheKey = remplib.tracker.segmentRuleKey(ruleId, of[ruleId], params);
+                if (!cache[remplib.tracker.segmentProvider].hasOwnProperty(cacheKey)) {
+                    continue;
+                }
+                cache[remplib.tracker.segmentProvider][cacheKey]["c"] += 1;
+            }
+            localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(cache));
+
+        },
+
+        // this function needs to work the same way as SegmentRule.getCacheKey on the segments backend.
+        segmentRuleKey: function(ruleId, overridableFields, params) {
+            let k = ruleId.toString();
+            overridableFields = overridableFields.sort();
+            for (let f of overridableFields) {
+                k += "_" + (params['tags'][f] || params['fields'][f] || '');
+            }
+            return Hash(k);
         },
 
         run: function() {
@@ -96,6 +187,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "value": value
             };
             this.post(this.url + "/track/event", params);
+            this.dispatchEvent(category, action, params);
         },
 
         trackPageview: function() {
@@ -103,6 +195,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
             };
             this.post(this.url + "/track/pageview", params);
+            this.dispatchEvent("pageview", "show", params);
         },
 
         trackCheckout: function(funnelId) {
@@ -114,6 +207,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "checkout", params);
         },
 
         trackPayment: function(transactionId, amount, currency, productIds) {
@@ -130,6 +224,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "payment", params);
         },
 
         trackPurchase: function(transactionId, amount, currency, productIds) {
@@ -146,6 +241,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "purchase", params);
         },
 
         trackRefund: function(transactionId, amount, currency, productIds) {
@@ -162,6 +258,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "refund", params);
+        },
+
+        dispatchEvent: function(category, action, params) {
+            params["_category"] = category;
+            params["_action"] = action;
+            let event = new CustomEvent("beam_event", {
+                detail: params,
+            });
+            window.dispatchEvent(event);
         },
 
         post: function (path, params) {

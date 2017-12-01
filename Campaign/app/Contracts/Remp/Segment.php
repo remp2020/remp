@@ -27,15 +27,23 @@ class Segment implements SegmentContract
 
     private $cacheEnabled;
 
+    private $cache;
+
+    private $eventRules;
+
+    private $overridableFields;
+
     public function __construct(Client $client, $cacheEnabled)
     {
         $this->client = $client;
         $this->cacheEnabled = $cacheEnabled;
+        $this->cache = new \stdClass;
+        $this->eventRules = new \stdClass;
     }
 
     public function provider(): string
     {
-        return self::PROVIDER_ALIAS;
+        return static::PROVIDER_ALIAS;
     }
 
     /**
@@ -86,16 +94,34 @@ class Segment implements SegmentContract
 
         // until the cache is filled, let's check directly
         try {
+            $params = [];
+            $cso = $campaignSegment->getOverrides();
+            if ($cso) {
+                $params['fields'] = Json::encode($cso);
+            }
+            if ($this->cache) {
+                $params['cache'] = Json::encode($this->cache);
+            }
             $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
-                'query' => [
-                    'fields' => Json::encode($campaignSegment->getOverrides())
-                ],
+                'query' => $params,
             ]);
         } catch (ConnectException $e) {
             throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
         }
 
         $result = json_decode($response->getBody());
+        if ($result->cache) {
+            foreach (get_object_vars($result->cache) as $ruleId => $ruleCache) {
+                $this->cache->$ruleId = $ruleCache;
+            }
+        }
+        if (isset($result->event_rules)) {
+            $this->eventRules = $result->event_rules;
+        }
+        if (isset($result->overridable_fields)) {
+            $this->overridableFields = $result->overridable_fields;
+        }
+
         return $result->check;
     }
 
@@ -124,5 +150,25 @@ class Segment implements SegmentContract
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
     {
         return $this->cacheEnabled;
+    }
+
+    public function setCache($cache): void
+    {
+        $this->cache = $cache;
+    }
+
+    public function getProviderData()
+    {
+        $pd = new \stdClass();
+        if ($this->cache) {
+            $pd->cache = $this->cache;
+        }
+        if ($this->eventRules) {
+            $pd->event_rules = $this->eventRules;
+        }
+        if ($this->overridableFields) {
+            $pd->overridable_fields = $this->overridableFields;
+        }
+        return $pd;
     }
 }

@@ -14,6 +14,7 @@ class Campaign extends Model
     protected $fillable = [
         'name',
         'banner_id',
+        'alt_banner_id',
         'signed_in',
         'active',
         'once_per_session',
@@ -44,6 +45,11 @@ class Campaign extends Model
         return $this->belongsTo(Banner::class);
     }
 
+    public function altBanner()
+    {
+        return $this->belongsTo(Banner::class, 'alt_banner_id');
+    }
+
     public function segments()
     {
         return $this->hasMany(CampaignSegment::class);
@@ -57,8 +63,15 @@ class Campaign extends Model
     public function cache()
     {
         $activeCampaignIds = self::whereActive(true)->pluck('id')->toArray();
-        $this->load(['segments', 'banner', 'schedules']);
+        $campaign = $this->where(['id' => $this->id])->with([
+            'segments',
+            'banner',
+            'banner.htmlTemplate',
+            'banner.mediumRectangleTemplate',
+            'banner.barTemplate',
+            'schedules',
+        ])->first();
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
-        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $this);
+        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
 }
