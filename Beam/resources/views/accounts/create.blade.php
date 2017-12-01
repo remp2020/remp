@@ -12,6 +12,8 @@
             <h2>Add new account <small></small></h2>
         </div>
         <div class="card-body card-padding">
+            @include('flash::message')
+
             {!! Form::model($account, ['route' => 'accounts.store']) !!}
             @include('accounts._form')
             {!! Form::close() !!}

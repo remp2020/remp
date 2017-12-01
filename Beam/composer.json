@@ -32,20 +32,21 @@
     "require": {
         "php": "^7.0.0",
         "arrilot/laravel-widgets": "^3.7",
+        "deployer/deployer": "^6.0",
+        "deployer/recipes": "^6.0",
         "doctrine/dbal": "~2.3",
+        "laracasts/flash": " ^3.0",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.4",
-        "yajra/laravel-datatables-oracle": "^7.2",
+        "php-amqplib/php-amqplib": "^2.7",
+        "predis/predis": " ~1.0",
+        "recca0120/laravel-tracy": "^1.8",
+        "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
-        "remp/laravel-helpers": "*",
-        "recca0120/laravel-tracy": "^1.8",
-        "deployer/deployer": "^6.0",
-        "deployer/recipes": "^6.0",
-        "predis/predis": " ~1.0",
         "rigor789/airbrake-laravel": "dev-master",
-        "php-amqplib/php-amqplib": "^2.7"
+        "yajra/laravel-datatables-oracle": "^7.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
