@@ -181,6 +181,7 @@ return [
         App\Providers\RempJournalServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
+        Laracasts\Flash\FlashServiceProvider::class,
 
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,

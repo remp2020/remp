@@ -12,6 +12,8 @@
             <h2>Add new property <small></small></h2>
         </div>
         <div class="card-body card-padding">
+            @include('flash::message')
+
             {!! Form::model($property, ['route' => ['accounts.properties.store', $account]]) !!}
             @include('properties._form')
             {!! Form::close() !!}

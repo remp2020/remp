@@ -12,6 +12,8 @@
             <h2>Edit account <small>{{ $account->name }}</small></h2>
         </div>
         <div class="card-body card-padding">
+            @include('flash::message')
+
             {!! Form::model($account, ['route' => ['accounts.update', $account], 'method' => 'PATCH']) !!}
             @include('accounts._form')
             {!! Form::close() !!}

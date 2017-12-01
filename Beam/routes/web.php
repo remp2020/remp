@@ -23,6 +23,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('accounts/json', 'AccountController@json');
     Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');
     Route::get('segments/json', 'SegmentController@json')->name('segments.json');
+    Route::get('segments/{sourceSegment}/copy', 'SegmentController@copy')->name('segments.copy');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
     Route::resource('accounts', 'AccountController');

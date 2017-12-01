@@ -24,8 +24,8 @@ class SegmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'code' => 'required|string',
+            'name' => 'required|string|unique:segments|max:255',
+            'code' => 'required|string|unique:segments',
             'active' => 'required|boolean',
 
             'rules.*.timespan' => 'required|integer',
