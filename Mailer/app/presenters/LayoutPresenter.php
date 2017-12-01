@@ -31,7 +31,6 @@ final class LayoutPresenter extends BasePresenter
         $dataTable
             ->setColSetting('name')
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setRowLinkAction('edit')
             ->setRowAction('edit', 'palette-Cyan zmdi-edit');
 
         return $dataTable;
@@ -56,11 +55,12 @@ final class LayoutPresenter extends BasePresenter
         ];
 
         foreach ($layouts as $layout) {
+            $editUrl = $this->link('Edit', $layout->id);
             $result['data'][] = [
                 'actions' => [
-                    'edit' => $this->link('Edit', $layout->id),
+                    'edit' => $editUrl,
                 ],
-                $layout->name,
+                "<a href='{$editUrl}'>{$layout->name}</a>",
                 $layout->created_at,
             ];
         }

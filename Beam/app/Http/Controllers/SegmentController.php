@@ -6,9 +6,9 @@ use App\Contracts\JournalContract;
 use App\Http\Requests\SegmentRequest;
 use App\Segment;
 use App\SegmentRule;
+use HTML;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
-use Psy\Util\Json;
 
 class SegmentController extends Controller
 {
@@ -32,6 +32,9 @@ class SegmentController extends Controller
                 return [
                     'edit' => route('segments.edit', $segment),
                 ];
+            })
+            ->addColumn('name', function (Segment $segment) {
+                return HTML::linkRoute('segments.edit', $segment->name, $segment);
             })
             ->rawColumns(['active', 'actions'])
             ->make(true);

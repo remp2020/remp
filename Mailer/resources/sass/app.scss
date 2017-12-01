@@ -1,6 +1,10 @@
+$primaryColor: #00acc1;
+$primaryColorDark: #007c91;
+$primaryColorLight: #5ddef4;
+
 @import "~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css";
-@import "~remp/css/template.css";
-@import "~remp/css/remp.css";
+@import "~remp/sass/template.scss";
+@import "~remp/sass/remp.scss";
 
 .pg-item {
   &.green:nth-child(odd) {

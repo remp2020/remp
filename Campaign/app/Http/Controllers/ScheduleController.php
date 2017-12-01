@@ -6,6 +6,7 @@ use App\Campaign;
 use App\Http\Requests\ScheduleRequest;
 use App\Schedule;
 use Carbon\Carbon;
+use HTML;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
@@ -37,13 +38,24 @@ class ScheduleController extends Controller
                     'destroy' => $s->isEditable() ? route('schedule.destroy', $s) : null,
                 ];
             })
+            ->addColumn('campaign', function (Schedule $schedule) {
+                return Html::linkRoute('campaigns.edit', $schedule->campaign->name, $schedule->campaign);
+            })
+            ->addColumn('banners', function (Schedule $schedule) {
+                $links = [
+                    Html::linkRoute('banners.edit', $schedule->campaign->banner->name, $schedule->campaign->banner),
+                ];
+                if ($schedule->campaign->altBanner) {
+                    $links[] = Html::linkRoute('banners.edit', $schedule->campaign->altBanner->name, $schedule->campaign->altBanner);
+                }
+                return implode('<br/>', $links);
+            })
             ->addColumn('action_methods', [
                 'start' => 'POST',
                 'pause' => 'POST',
                 'stop' => 'POST',
                 'destroy' => 'DELETE',
             ])
-            ->addColumn('_csrf', csrf_token())
             ->addColumn('status', function (Schedule $schedule) {
                 if ($schedule->isRunning()) {
                     return 'Running';
@@ -68,7 +80,7 @@ class ScheduleController extends Controller
             ->editColumn('end_time', function (Schedule $schedule) {
                 return $schedule->end_time;
             })
-            ->rawColumns(['actions', 'action_methods', 'status'])
+            ->rawColumns(['actions', 'action_methods', 'status', 'banners', 'campaign'])
             ->setRowId('id')
             ->make(true);
     }

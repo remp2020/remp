@@ -10,6 +10,7 @@ use App\Contracts\SegmentException;
 use App\Http\Requests\CampaignRequest;
 use App\Jobs\CacheSegmentJob;
 use Cache;
+use HTML;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use View;
@@ -41,14 +42,20 @@ class CampaignController extends Controller
         return $dataTables->of($campaigns)
             ->addColumn('actions', function (Campaign $campaign) {
                 return [
-                    'edit' => route('campaigns.edit', $campaign) ,
+                    'edit' => route('campaigns.edit', $campaign),
                 ];
+            })
+            ->addColumn('name', function (Campaign $campaign) {
+                return Html::linkRoute('campaigns.edit', $campaign->name, $campaign);
+            })
+            ->addColumn('banner', function (Campaign $campaign) {
+                return Html::linkRoute('banners.edit', $campaign->banner->name, $campaign->banner);
             })
             ->addColumn('alt_banner', function (Campaign $campaign) {
                 if (!$campaign->altBanner) {
-                    return [];
+                    return null;
                 }
-                return [$campaign->altBanner->name];
+                return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
             })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')

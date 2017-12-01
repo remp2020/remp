@@ -43,7 +43,7 @@
                     {!! Widget::run('DataTable', [
                     'colSettings' => [
                         'name',
-                        'banner.name' => [
+                        'banner' => [
                             'header' => 'Banner'
                         ],
                         'alt_banner' => [
@@ -78,7 +78,6 @@
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                     ],
-                    'rowActionLink' => 'edit',
                     'order' => [5, 'desc'],
                 ]) !!}
                 </div>
