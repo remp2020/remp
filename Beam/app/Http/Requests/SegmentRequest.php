@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Segment;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SegmentRequest extends FormRequest
@@ -24,8 +25,8 @@ class SegmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|unique:segments|max:255',
-            'code' => 'required|string|unique:segments',
+            'name' => 'required|string|unique:segments,id,:id|max:255',
+            'code' => 'required|string|unique:segments,id,:id',
             'active' => 'required|boolean',
 
             'rules.*.timespan' => 'required|integer',
