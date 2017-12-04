@@ -44,6 +44,7 @@
     "laravel-mix": "^1.4.3",
     "node-sass": "^4.5.3",
     "npm-run-all": "^4.0.2",
-    "optipng-bin": "^4.0.0"
+    "optipng-bin": "^4.0.0",
+    "sass-loader": "^6.0.6"
   }
 }
