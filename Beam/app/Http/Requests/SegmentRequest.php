@@ -23,9 +23,11 @@ class SegmentRequest extends FormRequest
      */
     public function rules()
     {
+        $id = $this->segment->id ?? '';
+
         return [
-            'name' => 'required|string|max:255',
-            'code' => 'required|string',
+            'name' => "required|string|unique:segments,name,{$id}|max:255",
+            'code' => "required|string|unique:segments,code,{$id}",
             'active' => 'required|boolean',
 
             'rules.*.timespan' => 'required|integer',

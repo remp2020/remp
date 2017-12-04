@@ -31,6 +31,7 @@ class SegmentController extends Controller
             ->addColumn('actions', function (Segment $segment) {
                 return [
                     'edit' => route('segments.edit', $segment),
+                    'copy' => route('segments.copy', $segment),
                 ];
             })
             ->rawColumns(['active', 'actions'])
@@ -58,6 +59,30 @@ class SegmentController extends Controller
         }
 
         $categories = $journalContract->categories();
+
+        return view('segments.create', [
+            'segment' => $segment,
+            'categories' => $categories,
+        ]);
+    }
+
+    public function copy(Segment $sourceSegment, JournalContract $journalContract)
+    {
+        $segment = new Segment();
+        $segment->fill($sourceSegment->toArray());
+        $segment->fill(old());
+
+        // user submitted rules, otherwise use rules from source Segment
+        $sourceRules = old('rules', $sourceSegment->rules->toArray());
+        $rules = [];
+        foreach ($sourceRules as $rule) {
+            // make sure we only set fillable attributes (no IDs)
+            $rules[] = $segment->rules()->make($rule);
+        }
+        $segment->setRelation('rules', collect($rules));
+
+        $categories = $journalContract->categories();
+        flash(sprintf('Form has been pre-filled with data from segment "%s"', $sourceSegment->name))->info();
 
         return view('segments.create', [
             'segment' => $segment,

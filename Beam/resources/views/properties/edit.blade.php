@@ -12,6 +12,8 @@
             <h2>Edit property <small>{{ $property->name }}</small></h2>
         </div>
         <div class="card-body card-padding">
+            @include('flash::message')
+
             {!! Form::model($property, ['route' => ['accounts.properties.update', $account, $property], 'method' => 'PATCH']) !!}
             @include('properties._form')
             {!! Form::close() !!}

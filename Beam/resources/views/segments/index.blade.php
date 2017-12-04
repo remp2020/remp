@@ -26,6 +26,7 @@
             'dataSource' => route('segments.json'),
             'rowActions' => [
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
             ],
             'rowActionLink' => 'edit',
         ]) !!}
