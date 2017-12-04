@@ -7,7 +7,6 @@ use Remp\LaravelSso\Contracts\SsoContract;
 use Remp\LaravelSso\Contracts\SsoException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard as AuthGuard;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 
 class Guard implements AuthGuard
