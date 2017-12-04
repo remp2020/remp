@@ -25,7 +25,7 @@ Route::middleware('auth:api')->group(function() {
     });
 
     Route::apiResource('campaigns', 'CampaignController');
-    Route::apiResource('banners', 'CampaignController');
+    Route::apiResource('banners', 'BannerController');
     Route::apiResource('schedule', 'ScheduleController');
 });
 
