@@ -185,6 +185,7 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         Remp\LaravelSso\Providers\SsoServiceProvider::class,
         Remp\Widgets\Providers\WidgetServiceProvider::class,
+        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
