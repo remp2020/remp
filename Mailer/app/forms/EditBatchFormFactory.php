@@ -3,14 +3,14 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Database\Table\ActiveRow;
 use Nette\Object;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
-use Remp\MailerModule\Repository\SegmentsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class NewBatchFormFactory extends Object
+class EditBatchFormFactory extends Object
 {
     /** @var JobsRepository */
     private $jobsRepository;
@@ -26,6 +26,8 @@ class NewBatchFormFactory extends Object
 
     public $onSuccess;
 
+    public $onError;
+
     public function __construct(
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository,
@@ -38,7 +40,7 @@ class NewBatchFormFactory extends Object
         $this->batchTemplatesRepository = $batchTemplatesRepository;
     }
 
-    public function create($jobId)
+    public function create(ActiveRow $batch)
     {
         $form = new Form;
         $form->addProtection();
@@ -49,23 +51,23 @@ class NewBatchFormFactory extends Object
         ];
         $form->addSelect('method', 'Method', $methods);
 
-        $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'))
-            ->setPrompt('Select email')
-            ->setRequired();
-
-        $form->addSelect('b_template_id', 'Email B Alternative', $this->templatesRepository->all()->fetchPairs('id', 'name'))
-            ->setPrompt('Select email');
-
-        $form->addText('max_emails', 'Number of emails');
+        $form->addText('max_emails', 'Number of emails')->setHtmlType('number');
 
         $form->addText('start_at', 'Start date');
 
-        $form->addHidden('job_id', $jobId);
+        $form->addHidden('id', $batch->id);
 
         $form->addSubmit('save', 'Save')
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
+
+        $form->setDefaults([
+            'method' => $batch->method,
+            'max_emails' => $batch->max_emails,
+            'start_at' => $batch->start_at,
+            'id' => $batch->id,
+        ]);
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
@@ -73,27 +75,19 @@ class NewBatchFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
-        $batch = $this->batchesRepository->add(
-            $values['job_id'],
-            !empty($values['max_emails']) ? (int)$values['max_emails'] : null,
-            $values['start_at'],
-            $values['method']
-        );
+        $batch = $this->batchesRepository->find($values['id']);
 
-        $this->batchTemplatesRepository->add(
-            $values['job_id'],
-            $batch->id,
-            $values['template_id']
-        );
-
-        if ($values['b_template_id'] !== null) {
-            $this->batchTemplatesRepository->add(
-                $values['job_id'],
-                $batch->id,
-                $values['b_template_id']
-            );
+        if (!in_array($batch->status, [BatchesRepository::STATE_CREATED, BatchesRepository::STATE_UPDATED, BatchesRepository::STATE_READY])) {
+            $form->addError("Unable to edit batch, already in non-editable status: {$batch->status}");
+            return;
         }
 
-        ($this->onSuccess)($batch->job);
+        $this->batchesRepository->update($batch, array_filter([
+            'method' => $values['method'],
+            'max_emails' => $values['max_emails'],
+            'start_at' => new \DateTime($values['start_at']),
+        ]));
+
+        ($this->onSuccess)($batch);
     }
 }
