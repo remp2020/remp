@@ -84,6 +84,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.signedIn !== 'boolean') {
                     throw "remplib: configuration signedIn invalid (boolean required): "+config.signedIn
                 }
+                if (config.signedIn && remplib.userId === null) {
+                    throw "remplib: cannot set signedIn flag when no userId was provided"
+                }
                 remplib.signedIn = config.signedIn;
             }
         },
