@@ -28,9 +28,7 @@ class CampaignController extends Controller
      */
     public function index()
     {
-        return view('campaigns.index', [
-            'snippet' => view('campaigns._snippet'),
-        ]);
+        return view('campaigns.index');
     }
 
     public function json(Datatables $dataTables)
