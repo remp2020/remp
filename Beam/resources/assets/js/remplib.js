@@ -38,6 +38,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         overridableFieldsKey: "overridable_fields",
 
+        cookieDomain: null,
+
         init: function(config) {
             if (typeof config.token !== 'string') {
                 throw "remplib: configuration token invalid or missing: "+config.token
@@ -85,6 +87,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             } else {
                 this.article = null;
+            }
+
+            if (typeof config.tracker.cookieDomain === 'string') {
+                this.cookieDomain = config.tracker.cookieDomain;
             }
 
             this.parseUriParams();
@@ -342,14 +348,25 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 return remplib.getFromStorage(key);
             }
 
-            var now = new Date();
-            var item = {
+            const now = new Date();
+            const item = {
                 "version": 1,
                 "value": this.uriParams[key],
                 "createdAt": now.getTime(),
                 "updatedAt": now.getTime(),
             };
             localStorage.setItem(key, JSON.stringify(item));
+
+            // set value to cookie
+            let cookieExp = new Date();
+            cookieExp.setTime(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // expire in 30 days
+            const expires = "; expires=" + cookieExp.toUTCString();
+            let domain = "";
+            if (this.cookieDomain !== null) {
+                domain = "; domain=" + this.cookieDomain;
+            }
+            document.cookie = key + "=" + JSON.stringify(item) + expires + "; path=/"+ domain + ";";
+
             return item.value;
         },
 

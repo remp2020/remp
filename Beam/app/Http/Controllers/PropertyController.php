@@ -87,9 +87,6 @@ class PropertyController extends Controller
     {
         return view('properties.show', [
             'property' => $property,
-            'snippet' => view('properties._snippet', [
-                'property' => $property,
-            ]),
         ]);
     }
 
