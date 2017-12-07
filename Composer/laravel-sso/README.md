@@ -31,6 +31,8 @@ Include the service providers within your `config/app.php`:
 ];
 ```
 
+### Web authentication (JWT)
+
 Add new middleware to `$routeMiddleware` within your `App\Http\Kernel`:
 
 ```php
@@ -71,7 +73,7 @@ Route::middleware('auth.jwt')->group(function () {
 });
 ```
 
-## Accessing user
+#### Accessing user
 
 You can use `Auth` facade to verify user presence and access his data.
 
@@ -80,6 +82,28 @@ Auth::user() // returns instance of Remp\LaravelSso\Contracts\Jwt\User
 Auth::id() // returns current user ID
 Auth::check() // checks if user is logged in
 ```
+
+### API authentication (token)
+
+When registered, `SsoServiceProvider` overrides default `token` auth and uses its own guard
+to authenticate the caller (`Remp\LaravelSso\Contracts\Token\Guard`).
+
+Auth configuration for API should be then set as follows:
+
+```php
+'guards' => [
+    // ...
+    'api' => [
+        'driver' => 'token',
+        'provider' => null,
+    ],
+    // ...
+],
+```
+
+To make a request, you have to provide valid API token (via `Authorization: Bearer $token`)
+generated via REMP SSO web admin. If token is not provided or not valid, middleware will
+throw `AuthenticationException` for application's exception handler to handle.
 
 ## Configuration
 
