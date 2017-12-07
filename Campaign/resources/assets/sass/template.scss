@@ -1,0 +1,45 @@
+.preview {
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 200px;
+    text-align: center;
+
+    &.medium-rectangle {
+        background-image: url('../img/medium_rectangle.png');
+        background-size: contain;
+        background-position: center;
+    }
+
+    &.bar {
+        background-image: url('../img/bar.png');
+        background-size: contain;
+        background-position: center;
+    }
+
+    &.notification {
+        background-image: url('../img/notification.png');
+        background-size: contain;
+        background-position: center;
+    }
+}
+
+.modal {
+    .card-header {
+        padding: 10px 20px;
+    }
+
+    .modal-header {
+        background-color: #00acc1;
+        color: white;
+    }
+
+    .modal-body {
+        background-color: #edecec;
+        padding-top: 15px;
+    }
+}
+
+#modal-template-select .card {
+    max-height: 274px;
+    height: 274px;
+}

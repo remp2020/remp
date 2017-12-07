@@ -2,25 +2,24 @@
     @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
     @import url('../../../sass/transitions.scss');
 
-    .medium-rectangle-preview-close {
+    .short-message-preview-close {
         position: absolute;
-        top: 5px;
-        right: 10px;
-        font-size: 15px;
-        padding: 5px;
+        top: 0px;
+        right: 5px;
+        font-size: 14px;
         text-decoration: none;
     }
 
-    .medium-rectangle-preview-close.hidden {
+    .short-message-preview-close.hidden {
         display: none;
     }
 
-    .medium-rectangle-preview-link {
+    .short-message-preview-link {
         text-decoration: none;
         overflow: hidden;
     }
 
-    .medium-rectangle-preview-box {
+    .short-message-preview-box {
         font-family: Noto Sans, sans-serif;
         white-space: pre-line;
         overflow: hidden;
@@ -33,35 +32,22 @@
         align-items: center;
     }
 
-    .medium-rectangle-header {
-        word-wrap: break-word;
-    }
-
-    .medium-rectangle-main {
-        font-size: 26px;
-        word-wrap: break-word;
-    }
-
-    .medium-rectangle-button {
-        width: 70%;
-        border-radius: 15px;
-        padding: 5px;
-        word-wrap: break-word;
+    .short-message-main {
         font-size: 16px;
+        word-wrap: break-word;
+        padding: 10px;
     }
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on:click="$parent.clicked" v-if="isVisible" class="medium-rectangle-preview-link" v-bind:style="[
+    <a v-bind:href="$parent.url" v-on:click="$parent.clicked" v-if="isVisible" class="short-message-preview-link" v-bind:style="[
         linkStyles,
         _position
     ]">
         <transition appear v-bind:name="transition">
-            <div class="medium-rectangle-preview-box" v-bind:style="[boxStyles]">
-                <a class="medium-rectangle-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&#x1f5d9;</a>
-                <div v-if="headerText.length > 0" class="medium-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
-                <div class="medium-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
-                <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
+            <div class="short-message-preview-box" v-bind:style="[boxStyles]">
+                <a class="short-message-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <div class="short-message-main" v-html="$parent.injectVars(text)"></div>
             </div>
         </transition>
     </a>
@@ -69,20 +55,14 @@
 
 <script>
     export default {
-        name: 'medium-rectangle-preview',
+        name: 'short-message-preview',
         props: [
             "positionOptions",
             "alignmentOptions",
 
             "backgroundColor",
-            "buttonBackgroundColor",
             "textColor",
-            "buttonTextColor",
-            "headerText",
-            "mainText",
-            "buttonText",
-            "width",
-            "height",
+            "text",
 
             "show",
             "transition",
@@ -139,16 +119,8 @@
                 return {
                     backgroundColor: this.backgroundColor,
                     color: this.textColor,
-                    minWidth: this.width || '100px',
-                    maxWidth: this.width || '370px',
-                    minHeight: this.height || '250px',
-                    maxHeight: this.height || '370px',
-                }
-            },
-            buttonStyles: function() {
-                return {
-                    color: this.buttonTextColor,
-                    backgroundColor: this.buttonBackgroundColor,
+                    minWidth: '50px',
+                    minHeight: '25px',
                 }
             },
             closeStyles: function() {

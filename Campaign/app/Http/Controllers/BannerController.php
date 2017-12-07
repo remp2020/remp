@@ -87,7 +87,6 @@ class BannerController extends Controller
      *
      * @param BannerRequest|Request $request
      * @return \Illuminate\Http\Response
-     * @throws ValidationException
      */
     public function store(BannerRequest $request)
     {
@@ -104,6 +103,9 @@ class BannerController extends Controller
                 break;
             case Banner::TEMPLATE_BAR:
                 $banner->barTemplate()->create($request->all());
+                break;
+            case Banner::TEMPLATE_SHORT_MESSAGE:
+                $banner->shortMessageTemplate()->create($request->all());
                 break;
             default:
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
@@ -173,6 +175,9 @@ class BannerController extends Controller
             case Banner::TEMPLATE_BAR:
                 $banner->barTemplate->update($request->all());
                 break;
+            case Banner::TEMPLATE_SHORT_MESSAGE:
+                $banner->shortMessageTemplate->update($request->all());
+                break;
             default:
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
         }
@@ -186,8 +191,9 @@ class BannerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Banner  $banner
+     * @param  \App\Banner $banner
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Banner $banner)
     {

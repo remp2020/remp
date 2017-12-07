@@ -61,6 +61,14 @@ window.remplib = window.remplib || {};
                 }
             }
 
+            if (banner.template === 'short_message') {
+                banner.shortMessageTemplate = {
+                    backgroundColor: model['short_message_template']['background_color'] || null,
+                    textColor: model['short_message_template']['text_color'] || null,
+                    text: model['short_message_template']['text'] || null,
+                }
+            }
+
             return banner;
         },
 

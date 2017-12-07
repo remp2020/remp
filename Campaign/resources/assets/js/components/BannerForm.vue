@@ -7,7 +7,7 @@
 <template>
     <div class="row">
         <div class="col-md-4">
-            <html-template v-if="template == 'html'"
+            <html-template v-if="template === 'html'"
                 v-bind:_backgroundColor="htmlTemplate.backgroundColor"
                 v-bind:_text="htmlTemplate.text"
                 v-bind:_textColor="htmlTemplate.textColor"
@@ -19,7 +19,7 @@
                 v-bind:show="show"
             ></html-template>
 
-            <medium-rectangle-template v-if="template == 'medium_rectangle'"
+            <medium-rectangle-template v-if="template === 'medium_rectangle'"
                v-bind:_headerText="mediumRectangleTemplate.headerText"
                v-bind:_mainText="mediumRectangleTemplate.mainText"
                v-bind:_buttonText="mediumRectangleTemplate.buttonText"
@@ -32,7 +32,7 @@
                v-bind:show="show"
             ></medium-rectangle-template>
 
-            <bar-template v-if="template == 'bar'"
+            <bar-template v-if="template === 'bar'"
                v-bind:_mainText="barTemplate.mainText"
                v-bind:_buttonText="barTemplate.buttonText"
                v-bind:_backgroundColor="barTemplate.backgroundColor"
@@ -41,6 +41,13 @@
                v-bind:_buttonTextColor="barTemplate.buttonTextColor"
                v-bind:show="show"
             ></bar-template>
+
+            <short-message-template v-if="template === 'short_message'"
+              v-bind:_text="shortMessageTemplate.text"
+              v-bind:_backgroundColor="shortMessageTemplate.backgroundColor"
+              v-bind:_textColor="shortMessageTemplate.textColor"
+              v-bind:show="show"
+            ></short-message-template>
 
             <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
                 <li class="active">
@@ -93,17 +100,17 @@
             </div>
 
             <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
-                <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType == 'overlay'}">
+                <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
-                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType == 'inline'}">
+                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}">
                     <a href="#inline-banner" role="tab" data-toggle="tab" aria-expanded="false">Inline Banner</a>
                 </li>
             </ul>
 
             <div class="card m-t-15">
                 <div class="tab-content p-0">
-                    <div role="tabpanel" v-bind:class="[{active: displayType == 'overlay'}, 'tab-pane']" id="overlay-banner">
+                    <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
@@ -150,7 +157,7 @@
                         </div>
                     </div>
 
-                    <div role="tabpanel" v-bind:class="[{active: displayType == 'inline'}, 'tab-pane']" id="inline-banner">
+                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner">
                         <div class="card-body card-padding p-l-15">
                             <div class="input-group fg-float m-t-10">
                                 <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
@@ -204,6 +211,7 @@
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
                                         :barTemplate="barTemplate"
                                         :htmlTemplate="htmlTemplate"
+                                        :shortMessageTemplate="shortMessageTemplate"
 
                                         :position="position"
                                         :targetUrl="targetUrl"
@@ -225,11 +233,12 @@
 
 
 <script>
-    import HtmlTemplate from "./templates/Html.vue"
-    import MediumRectangleTemplate from "./templates/MediumRectangle.vue";
-    import BarTemplate from "./templates/Bar.vue";
-    import BannerPreview from "./BannerPreview.vue";
-    import vSelect from "remp/js/components/vSelect.vue";
+    import HtmlTemplate from "./templates/Html"
+    import MediumRectangleTemplate from "./templates/MediumRectangle";
+    import BarTemplate from "./templates/Bar";
+    import ShortMessageTemplate from "./templates/ShortMessage";
+    import BannerPreview from "./BannerPreview";
+    import vSelect from "remp/js/components/vSelect";
 
     const props = [
         "_name",
@@ -246,6 +255,7 @@
         "_mediumRectangleTemplate",
         "_barTemplate",
         "_htmlTemplate",
+        "_shortMessageTemplate",
 
         "_alignmentOptions",
         "_dimensionOptions",
@@ -257,6 +267,7 @@
             HtmlTemplate,
             MediumRectangleTemplate,
             BarTemplate,
+            ShortMessageTemplate,
             BannerPreview,
             vSelect,
         },
@@ -287,6 +298,7 @@
             mediumRectangleTemplate: null,
             barTemplate: null,
             htmlTemplate: null,
+            shortMessageTemplate: null,
 
             alignmentOptions: [],
             dimensionOptions: [],

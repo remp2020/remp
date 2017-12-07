@@ -77,6 +77,13 @@ class BannerRequest extends FormRequest
                         'button_text' => 'string|required',
                     ]);
                     break;
+                case Banner::TEMPLATE_SHORT_MESSAGE:
+                    $templateValidator = Validator::make($this->all(), [
+                        'background_color' => 'string|required',
+                        'text_color' => 'string|required',
+                        'text' => 'string|required',
+                    ]);
+                    break;
                 default:
                     throw new \Exception('unhandled template type: ' . $templateType);
             }

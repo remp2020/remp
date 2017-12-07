@@ -4,18 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MediumRectangleTemplate extends Model
+class ShortMessageTemplate extends Model
 {
     protected $fillable = [
-        'header_text',
-        'main_text',
-        'button_text',
-        'width',
-        'height',
+        'text',
         'background_color',
         'text_color',
-        'button_background_color',
-        'button_text_color',
     ];
 
     protected $touches = [
