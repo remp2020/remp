@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Account;
 use App\Property;
+use HTML;
 use Illuminate\Http\Request;
-use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
 
@@ -34,6 +34,9 @@ class PropertyController extends Controller
                     'show' => route('accounts.properties.show', [$account, $property]),
                     'edit' => route('accounts.properties.edit', [$account, $property]),
                 ];
+            })
+            ->addColumn('name', function (Property $property) use ($account) {
+                return HTML::linkRoute('accounts.properties.edit', $property->name, [$account, $property]);
             })
             ->rawColumns(['actions'])
             ->setRowId('id')

@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Presenters;
 
+use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\ILatteFactory;
 use Nette\Database\Table\ActiveRow;
@@ -47,6 +48,8 @@ final class JobPresenter extends BasePresenter
 
     private $logEventsRepository;
 
+    private $linkGenerator;
+
     /** @var  Aggregator */
     private $segmentAggregator;
 
@@ -70,7 +73,8 @@ final class JobPresenter extends BasePresenter
         LogEventsRepository $logEventsRepository,
         Aggregator $segmentAggregator,
         MailCache $mailCache,
-        ILatteFactory $latteFactory
+        ILatteFactory $latteFactory,
+        LinkGenerator $linkGenerator
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -87,6 +91,7 @@ final class JobPresenter extends BasePresenter
         $this->segmentAggregator = $segmentAggregator;
         $this->mailCache = $mailCache;
         $this->latteFactory = $latteFactory;
+        $this->linkGenerator = $linkGenerator;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -101,7 +106,6 @@ final class JobPresenter extends BasePresenter
             ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
             ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
             ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
-            ->setRowLinkAction('show')
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
@@ -138,6 +142,10 @@ final class JobPresenter extends BasePresenter
         }
 
         $latte = $this->latteFactory->create();
+        \Latte\Macros\CoreMacros::install($latte->getCompiler());
+        \Nette\Bridges\ApplicationLatte\UIMacros::install($latte->getCompiler());
+        $latte->addProvider('uiControl', $this->linkGenerator);
+
         /** @var ActiveRow $job */
         foreach ($jobs as $job) {
             $status = $latte->renderToString(__DIR__  . '/templates/Job/_job_status.latte', ['job' => $job]);

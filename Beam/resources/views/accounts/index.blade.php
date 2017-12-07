@@ -27,7 +27,6 @@
             'rowActions' => [
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
             ],
-            'rowActionLink' => 'edit',
         ]) !!}
 
     </div>

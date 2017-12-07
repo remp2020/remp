@@ -21,11 +21,11 @@
                 <div class="card-body">
                     {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'campaign.name' => [
+                        'campaign' => [
                             'header' => 'Campaign',
                         ],
-                        'campaign.banner.name' => [
-                            'header' => 'Banner',
+                        'banners' => [
+                            'header' => 'Banners',
                         ],
                         'start_time' => [
                             'header' => 'Scheduled start date',
@@ -47,7 +47,6 @@
                         ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
                         ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
                     ],
-                    'rowActionLink' => 'edit',
                 ]) !!}
                 </div>
             </div>
