@@ -34,9 +34,9 @@ class CampaignRequest extends FormRequest
         ];
     }
 
-    public function all()
+    public function all($keys = null)
     {
-        $data = parent::all();
+        $data = parent::all($keys);
         if (isset($data['signed_in'])) {
             $data['signed_in'] = $this->getInputSource()->getBoolean('signed_in');
         }

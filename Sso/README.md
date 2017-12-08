@@ -96,3 +96,22 @@ is set to `true` (default value), it automatically invalidates the old token.
   "redirect": String // SSO login URL to redirect user to
 }
 ```
+
+### GET /auth/api-token
+
+API endpoint for services to validate provided API token. Endpoint simply returns whether token
+is usable or not and no additional info.
+  
+#### Required headers:
+  
+* `Authorization: Bearer %TOKEN%`
+
+#### Success response:
+
+* `200 OK`
+
+#### Error responses:
+
+HTTP status codes are based on RFC 6750.
+
+* `404 Not Found`

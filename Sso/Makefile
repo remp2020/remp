@@ -1,6 +1,6 @@
 #! /usr/bin/make
 
-PHP_FOLDERS=app bootstrap config
+PHP_FOLDERS=app config
 
 sniff:
 	../phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p

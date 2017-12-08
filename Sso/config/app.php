@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'REMP SSO'),
 
     /*
     |--------------------------------------------------------------------------
@@ -183,7 +183,10 @@ return [
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
-        Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        Remp\LaravelSso\Providers\SsoServiceProvider::class,
+        Remp\Widgets\Providers\WidgetServiceProvider::class,
+        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
 

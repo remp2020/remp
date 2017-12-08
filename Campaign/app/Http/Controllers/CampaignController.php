@@ -8,10 +8,11 @@ use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
 use App\Http\Requests\CampaignRequest;
-use App\Jobs\CacheSegmentJob;
+use App\Http\Resources\CampaignResource;
 use Cache;
 use HTML;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\Collection;
 use View;
 use Yajra\Datatables\Datatables;
@@ -28,7 +29,10 @@ class CampaignController extends Controller
      */
     public function index()
     {
-        return view('campaigns.index');
+        return response()->format([
+            'html' => view('campaigns.index'),
+            'json' => CampaignResource::collection(Campaign::paginate()),
+        ]);
     }
 
     public function json(Datatables $dataTables)
@@ -110,7 +114,10 @@ class CampaignController extends Controller
             $campaignSegment->save();
         }
 
-        return redirect(route('campaigns.index'))->with('success', 'Campaign created');
+        return response()->format([
+            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
+            'json' => new CampaignResource($campaign),
+        ]);
     }
 
     /**
@@ -121,8 +128,11 @@ class CampaignController extends Controller
      */
     public function show(Campaign $campaign)
     {
-        return view('campaigns.show', [
-            'campaign' => $campaign,
+        return response()->format([
+            'html' => view('campaigns.show', [
+                'campaign' => $campaign,
+            ]),
+            'json' => new CampaignResource($campaign),
         ]);
     }
 
@@ -175,7 +185,11 @@ class CampaignController extends Controller
         }
 
         CampaignSegment::destroy($request->get('removedSegments'));
-        return redirect(route('campaigns.index'))->with('success', 'Campaign updated');
+
+        return response()->format([
+            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
+            'json' => new CampaignResource($campaign),
+        ]);
     }
 
     /**

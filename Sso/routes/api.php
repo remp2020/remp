@@ -13,8 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('jwt.auth')->group(function() {
+Route::middleware('app.jwt.auth')->group(function() {
     Route::get('auth/introspect', 'AuthController@introspect')->name('auth.introspect');
 });
 
 Route::post('auth/refresh', 'AuthController@refresh')->name('auth.refresh');
+Route::get('auth/api-token', 'AuthController@apiToken')->name('auth.api-token');

@@ -172,6 +172,7 @@ return [
          */
         Remp\LaravelSso\Providers\SsoServiceProvider::class,
         Remp\Widgets\Providers\WidgetServiceProvider::class,
+        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
@@ -184,7 +185,7 @@ return [
 
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,
-        Yajra\Datatables\DatatablesServiceProvider::class,
+        Yajra\DataTables\DataTablesServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
     ],
@@ -240,5 +241,6 @@ return [
         'HTML' => Collective\Html\HtmlFacade::class,
         'Widget' => Arrilot\Widgets\Facade::class,
         'AsyncWidget' => Arrilot\Widgets\AsyncFacade::class,
+        'DataTables' => Yajra\DataTables\Facades\DataTables::class,
     ],
 ];

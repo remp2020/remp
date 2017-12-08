@@ -84,9 +84,9 @@ class BannerRequest extends FormRequest
         });
     }
 
-    public function all()
+    public function all($keys = null)
     {
-        $result = parent::all();
+        $result = parent::all($keys);
         if (!isset($result['closeable'])) {
             $result['closeable'] = false;
         }

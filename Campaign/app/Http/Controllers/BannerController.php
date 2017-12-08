@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Banner;
 use App\HtmlTemplate;
 use App\Http\Requests\BannerRequest;
+use App\Http\Resources\BannerResource;
 use App\MediumRectangleTemplate;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use HTML;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -36,7 +38,10 @@ class BannerController extends Controller
      */
     public function index()
     {
-        return view('banners.index');
+        return response()->format([
+            'html' => view('banners.index'),
+            'json' => BannerResource::collection(Banner::paginate()),
+        ]);
     }
 
     public function json(Datatables $dataTables)
@@ -104,7 +109,10 @@ class BannerController extends Controller
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
         }
 
-        return redirect(route('banners.index'))->with('success', 'Banner created');
+        return response()->format([
+            'html' => redirect(route('banners.index'))->with('success', 'Banner created'),
+            'json' => new BannerResource($banner),
+        ]);
     }
 
     /**
@@ -115,11 +123,14 @@ class BannerController extends Controller
      */
     public function show(Banner $banner)
     {
-        return view('banners.show', [
-            'banner' => $banner,
-            'positions' => $this->positionMap->positions(),
-            'dimensions' => $this->dimensionMap->dimensions(),
-            'alignments' => $this->alignmentMap->alignments(),
+        return response()->format([
+            'html' => view('banners.show', [
+                'banner' => $banner,
+                'positions' => $this->positionMap->positions(),
+                'dimensions' => $this->dimensionMap->dimensions(),
+                'alignments' => $this->alignmentMap->alignments(),
+            ]),
+            'json' => new BannerResource($banner),
         ]);
     }
 
@@ -166,7 +177,10 @@ class BannerController extends Controller
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
         }
 
-        return redirect(route('banners.index'))->with('success', 'Banner updated');
+        return response()->format([
+            'html' => redirect(route('banners.index'))->with('success', 'Banner updated'),
+            'json' => new BannerResource($banner),
+        ]);
     }
 
     /**
@@ -178,7 +192,11 @@ class BannerController extends Controller
     public function destroy(Banner $banner)
     {
         $banner->delete();
-        return redirect(route('banners.index'))->with('success', 'Banner removed');
+
+        return response()->format([
+            'html' => redirect(route('banners.index'))->with('success', 'Banner removed'),
+            'json' => new BannerResource([]),
+        ]);
     }
 
     public function preview($uuid)

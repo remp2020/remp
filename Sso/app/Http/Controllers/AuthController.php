@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ApiToken;
 use App\UrlHelper;
 use Illuminate\Http\Request;
 use JWTAuth;
@@ -63,5 +64,15 @@ class AuthController extends Controller
             'email' => $payload->get('email'),
             'scopes' => $payload->get('scopes'),
         ]);
+    }
+
+    public function apiToken(\Illuminate\Http\Request $request)
+    {
+        $bearerToken = $request->bearerToken();
+        $token = ApiToken::whereToken($bearerToken)->first();
+        if (!$token) {
+            return response()->json(null, 404);
+        }
+        return response()->json(null, 200);
     }
 }

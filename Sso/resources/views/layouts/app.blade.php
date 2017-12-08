@@ -39,6 +39,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
     <link rel="manifest" href="/assets/img/favicon/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/assets/img/favicon/ms-icon-144x144.png">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="{{ asset(mix('/css/vendor.css', '/assets/vendor')) }}" rel="stylesheet">
     <link href="{{ asset(mix('/css/app.css', '/assets/vendor')) }}" rel="stylesheet">
@@ -113,8 +114,8 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
-            <li {!! route_active('dashboard') !!}>
-                <a href="{{ route('dashboard') }}"><i class="zmdi zmdi-home"></i> Dashboard</a>
+            <li {!! route_active('api-tokens.index') !!}>
+                <a href="{{ route('api-tokens.index') }}"><i class="zmdi zmdi-key"></i> API Tokens</a>
             </li>
         </ul>
     </aside>

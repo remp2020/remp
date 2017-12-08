@@ -3,6 +3,7 @@
 namespace Remp\LaravelSso\Http\Middleware;
 
 use Closure;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\RedirectResponse;
 use League\Uri\Components\Query;
 use League\Uri\Schemes\Http;
@@ -48,6 +49,9 @@ class VerifyJwtToken
             $this->sso->introspect($token);
         } catch (SsoExpiredException $tokenExpired) {
             try {
+                if ($request->wantsJson()) {
+                    throw new AuthenticationException($tokenExpired->getCode());
+                }
                 $tokenResponse = $this->sso->refresh($token);
                 $this->guard->setToken($tokenResponse['token']);
             } catch (SsoExpiredException $refreshExpired) {

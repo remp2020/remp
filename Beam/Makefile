@@ -2,7 +2,7 @@
 
 SUB_TRACKER="go/cmd/tracker"
 SUB_SEGMENTS="go/cmd/segments"
-PHP_FOLDERS=app bootstrap config
+PHP_FOLDERS=app config
 
 clear:
 	@cd $(SUB_TRACKER) && make clear
