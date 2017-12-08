@@ -3,11 +3,11 @@
 namespace Remp\LaravelHelpers\Providers;
 
 use Blade;
+use Request;
+use Response;
 use Schema;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Http\Request;
-use Illuminate\Routing\ResponseFactory;
 
 class HelperServiceProvider extends ServiceProvider
 {
@@ -15,18 +15,15 @@ class HelperServiceProvider extends ServiceProvider
     {
         Carbon::setToStringFormat(DATE_RFC3339);
         Schema::defaultStringLength(191);
+
+        $this->responseMacros();
+        $this->bladeDirectives();
     }
 
-    public function register()
+    public function responseMacros()
     {
-        $this->app->call([$this, 'responseMacros']);
-        $this->app->call([$this, 'bladeDirectives']);
-    }
-
-    public function responseMacros(Request $request, ResponseFactory $response)
-    {
-        $response->macro('format', function ($formats) use ($request, $response) {
-            if ($request->wantsJson() && array_key_exists('json', $formats)) {
+        Response::macro('format', function ($formats) {
+            if (Request::wantsJson() && array_key_exists('json', $formats)) {
                 return $formats['json'];
             }
             return $formats['html'];
