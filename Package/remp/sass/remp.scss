@@ -1,3 +1,14 @@
+$primaryColor: #00acc1 !default;
+$primaryColorDark: #007c91 !default;
+$primaryColorLight: #5ddef4 !default;
+
+a {
+    color: $primaryColorDark;
+    &:hover, &:focus {
+        color: darken($primaryColorDark, 20%);
+    }
+}
+
 #header {
     padding: 20px 45px 0;
 }
@@ -166,26 +177,28 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     z-index: 200;
 }
 
-.dataTables_wrapper .dataTable tbody tr {
-    cursor: pointer;
-}
+.dataTables_wrapper .dataTable {
+    .group {
+        cursor: default;
+        font-weight: 700;
+        background: rgba(0, 188, 212, .10);
+    }
 
-.dataTables_wrapper .dataTable .group {
-    cursor: default;
-    font-weight: 700;
-    background: rgba(0, 188, 212, .10);
-}
+    tbody tr {
+        $rowBackground: #fff;
+        border-left: 12px solid transparent;
 
-.dataTables_wrapper .dataTable tbody tr.odd {
-    background-color: #fff;
-}
+        &.odd {
+            background-color: $rowBackground;
+        }
+        &.even {
+            background-color: darken($rowBackground, 5%);
+        }
 
-.dataTables_wrapper .dataTable tbody tr.even {
-    background-color: #f4f4f4;
-}
-
-.dataTables_wrapper .dataTable tbody tr.highlight {
-    color: #007c91;
+        &.highlight {
+            border-color: $primaryColorDark;
+        }
+    }
 }
 
 tr th.sorting:hover,

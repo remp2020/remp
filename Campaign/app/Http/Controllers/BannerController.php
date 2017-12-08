@@ -10,6 +10,7 @@ use App\MediumRectangleTemplate;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
+use HTML;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Validation\ValidationException;
@@ -53,7 +54,10 @@ class BannerController extends Controller
                     'edit' => route('banners.edit', $banner) ,
                 ];
             })
-            ->rawColumns(['actions'])
+            ->addColumn('name', function (Banner $banner) {
+                return Html::linkRoute('banners.edit', $banner->name, $banner);
+            })
+            ->rawColumns(['actions', 'name'])
             ->setRowId('id')
             ->make(true);
     }

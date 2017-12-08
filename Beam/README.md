@@ -74,4 +74,80 @@ dependent on Influx-based data pushed by Telegraf.
 
 ## [Kafka](../Docker/kafka)
 
-All tracked events are also pushed to Kafka 
+All tracked events are also pushed to Kafka.
+
+## Javascript Snippet
+
+Include following snippet into the page to track events. Update `rempConfig` object as needed.
+
+```javascript
+<script type="text/javascript">
+    (function(win, doc) {
+        function mock(fn) {
+            return function() {
+                this._.push([fn, arguments])
+            }
+        }
+        function load(url) {
+            var script = doc.createElement("script");
+            script.type = "text/javascript";
+            script.async = true;
+            script.src = url;
+            doc.getElementsByTagName("head")[0].appendChild(script);
+        }
+        win.remplib = win.remplib || {};
+        if (!win.remplib.campaign) {
+            var fn, i, funcs = "init".split(" ");
+            win.remplib.campaign = {_: []};
+            for (i = 0; i < funcs.length; i++) {
+                fn = funcs[i];
+                win.remplib.campaign[fn] = mock(fn);
+            }
+        }
+        if (!win.remplib.tracker) {
+            var fn, i, funcs = "init trackEvent trackPageview trackCommerce".split(" ");
+            win.remplib.tracker = {_: []};
+            for (i = 0; i < funcs.length; i++) {
+                fn = funcs[i];
+                win.remplib.tracker[fn] = mock(fn);
+            }
+        }
+        
+        // change URL to location of BEAM remplib.js
+        load("http://beam.remp.app/assets/vendor/js/remplib.js");
+    })(window, document);
+
+    var rempConfig = {
+        // UUIDv4 based REMP BEAM token of appropriate property
+        // (see BEAM Admin -> Properties)
+        token: String,
+        
+        // optional
+        userId: String,
+        
+        // signedIn indicates if user is signed in
+        // userId must be provided if signedIn is set
+        // optional
+        signedIn: Boolean,
+        
+        tracker: {
+            // required URL location of BEAM Tracker
+            url: "http://tracker.beam.remp.app",
+            
+            // optional article details
+            article: {
+                id: String, // optional
+                author_id: String, // optional
+                category: String, // optional
+                tags: [String, String, String] // optional
+            },
+            
+            // optional, controls where are BEAM cookies stored
+            // default value (if not set) is current BEAM domain
+            cookieDomain: ".remp.app"
+        },
+    };
+    remplib.tracker.init(rempConfig);
+</script>
+
+```

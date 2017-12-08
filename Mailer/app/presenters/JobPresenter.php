@@ -2,12 +2,14 @@
 
 namespace Remp\MailerModule\Presenters;
 
+use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\ILatteFactory;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ISendingStatsFactory;
+use Remp\MailerModule\Forms\EditBatchFormFactory;
 use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
@@ -38,11 +40,15 @@ final class JobPresenter extends BasePresenter
 
     private $newBatchFormFactory;
 
+    private $editBatchFormFactory;
+
     private $newTemplateFormFactory;
 
     private $userSubscriptionsRepository;
 
     private $logEventsRepository;
+
+    private $linkGenerator;
 
     /** @var  Aggregator */
     private $segmentAggregator;
@@ -61,12 +67,14 @@ final class JobPresenter extends BasePresenter
         LogsRepository $logsRepository,
         JobFormFactory $jobFormFactory,
         NewBatchFormFactory $newBatchFormFactory,
+        EditBatchFormFactory $editBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory,
         UserSubscriptionsRepository $userSubscriptionsRepository,
         LogEventsRepository $logEventsRepository,
         Aggregator $segmentAggregator,
         MailCache $mailCache,
-        ILatteFactory $latteFactory
+        ILatteFactory $latteFactory,
+        LinkGenerator $linkGenerator
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -76,12 +84,14 @@ final class JobPresenter extends BasePresenter
         $this->logsRepository = $logsRepository;
         $this->jobFormFactory = $jobFormFactory;
         $this->newBatchFormFactory = $newBatchFormFactory;
+        $this->editBatchFormFactory = $editBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
         $this->logEventsRepository = $logEventsRepository;
         $this->segmentAggregator = $segmentAggregator;
         $this->mailCache = $mailCache;
         $this->latteFactory = $latteFactory;
+        $this->linkGenerator = $linkGenerator;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -96,7 +106,6 @@ final class JobPresenter extends BasePresenter
             ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
             ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
             ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
-            ->setRowLinkAction('show')
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
@@ -133,6 +142,10 @@ final class JobPresenter extends BasePresenter
         }
 
         $latte = $this->latteFactory->create();
+        \Latte\Macros\CoreMacros::install($latte->getCompiler());
+        \Nette\Bridges\ApplicationLatte\UIMacros::install($latte->getCompiler());
+        $latte->addProvider('uiControl', $this->linkGenerator);
+
         /** @var ActiveRow $job */
         foreach ($jobs as $job) {
             $status = $latte->renderToString(__DIR__  . '/templates/Job/_job_status.latte', ['job' => $job]);
@@ -175,6 +188,12 @@ final class JobPresenter extends BasePresenter
 
         $this->template->job = $job;
         $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
+    }
+
+    public function renderEditBatch($id)
+    {
+        $batch = $this->batchesRepository->find($id);
+        $this->template->batch = $batch;
     }
 
     public function handleRemoveTemplate($id)
@@ -253,10 +272,22 @@ final class JobPresenter extends BasePresenter
     {
         $form = $this->newBatchFormFactory->create($this->params['id']);
 
-        $presenter = $this;
-        $this->newBatchFormFactory->onSuccess = function ($job) use ($presenter) {
-            $presenter->flashMessage('Batch was added');
-            $presenter->redirect('Show', $job->id);
+        $this->newBatchFormFactory->onSuccess = function ($job) {
+            $this->flashMessage('Batch was added');
+            $this->redirect('Show', $job->id);
+        };
+
+        return $form;
+    }
+
+    public function createComponentEditBatchForm()
+    {
+        $batch = $this->batchesRepository->find($this->getParameter('id'));
+        $form = $this->editBatchFormFactory->create($batch);
+
+        $this->editBatchFormFactory->onSuccess = function ($batch) {
+            $this->flashMessage(sprintf('Batch #%d was updated', $batch->id));
+            $this->redirect('Show', $batch->job->id);
         };
 
         return $form;
@@ -267,10 +298,9 @@ final class JobPresenter extends BasePresenter
         return new Multiplier(function ($batchId) {
             $form = $this->newTemplateFormFactory->create($batchId);
 
-            $presenter = $this;
-            $this->newTemplateFormFactory->onSuccess = function ($job) use ($presenter) {
-                $presenter->flashMessage('Email was added');
-                $presenter->redirect('Show', $job->id);
+            $this->newTemplateFormFactory->onSuccess = function ($job) {
+                $this->flashMessage('Email was added');
+                $this->redirect('Show', $job->id);
             };
 
             return $form;

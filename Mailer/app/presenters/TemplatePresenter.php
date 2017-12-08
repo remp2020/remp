@@ -57,7 +57,6 @@ final class TemplatePresenter extends BasePresenter
             ->setColSetting('type', ['orderable' => false, 'filter' => true])
             ->setColSetting('opened')
             ->setColSetting('clicked')
-            ->setRowLinkAction('show')
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setRowAction('edit', 'palette-Cyan zmdi-edit')
             ->setRowAction('duplicate', 'palette-Cyan zmdi-copy')
@@ -86,6 +85,7 @@ final class TemplatePresenter extends BasePresenter
 
         /** @var ActiveRow $template */
         foreach ($templates as $template) {
+            $editUrl = $this->link('Edit', $template->id);
             $result['data'][] = [
                 'actions' => [
                     'show' => $this->link('Show', $template->id),
@@ -94,7 +94,7 @@ final class TemplatePresenter extends BasePresenter
                 ],
                 $template->created_at,
                 $template->code,
-                $template->subject,
+                "<a href='{$editUrl}'>{$template->subject}</a>",
                 $template->type->title,
                 $template->related('mail_job_batch_template')->sum('opened'),
                 $template->related('mail_job_batch_template')->sum('clicked'),

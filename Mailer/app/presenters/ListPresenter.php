@@ -52,7 +52,6 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('locked', ['render' => 'boolean'])
             ->setColSetting('is_public', ['header' => 'public', 'render' => 'boolean'])
             ->setAllColSetting('orderable', false)
-            ->setRowLinkAction('show')
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('displayNavigation', false)
             ->setTableSetting('rowGroup', 0);
@@ -73,12 +72,13 @@ final class ListPresenter extends BasePresenter
 
         /** @var ActiveRow $list */
         foreach ($lists as $list) {
+            $showUrl = $this->link('Show', $list->id);
             $result['data'][] = [
                 'actions' => [
-                    'show' => $this->link('Show', $list->id),
+                    'show' => $showUrl,
                 ],
                 $list->type_category->title,
-                $list->title,
+                "<a href='{$showUrl}'>{$list->title}</a>",
                 $list->code,
                 $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
                 $list->auto_subscribe,

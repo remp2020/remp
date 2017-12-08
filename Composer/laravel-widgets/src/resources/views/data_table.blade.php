@@ -97,12 +97,5 @@
         });
 
         $.fn.dataTables.navigation(dataTable);
-
-        @if(isset($rowActionLink))
-        $('#{{ $tableId }} tbody').on('click', 'tr', function () {
-            var data = dataTable.row(this).data();
-            window.location.href = data.actions['{{ $rowActionLink }}'];
-        });
-        @endif
     });
 </script>

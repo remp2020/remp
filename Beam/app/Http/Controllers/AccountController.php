@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use HTML;
 use Illuminate\Http\Request;
-use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
-use Yajra\Datatables\Helper;
 
 class AccountController extends Controller
 {
@@ -31,6 +30,9 @@ class AccountController extends Controller
                 return [
                     'edit' => route('accounts.edit', $account),
                 ];
+            })
+            ->addColumn('name', function (Account $account) {
+                return HTML::linkRoute('accounts.edit', $account->name, $account);
             })
             ->rawColumns(['actions'])
             ->make(true);
