@@ -6,7 +6,7 @@
         position: absolute;
         top: 5px;
         right: 10px;
-        font-size: 15px;
+        font-size: 16px;
         padding: 5px;
         text-decoration: none;
     }
@@ -58,7 +58,7 @@
     ]">
         <transition appear v-bind:name="transition">
             <div class="medium-rectangle-preview-box" v-bind:style="[boxStyles]">
-                <a class="medium-rectangle-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <a class="medium-rectangle-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
                 <div v-if="headerText.length > 0" class="medium-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
                 <div class="medium-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
                 <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>

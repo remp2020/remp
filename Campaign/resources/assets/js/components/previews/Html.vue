@@ -48,7 +48,7 @@
                 _textAlign,
                 customBoxStyles
             ]">
-                <a class="html-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&#x1f5d9;</a>
+                <a class="html-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
                 <p v-html="$parent.injectVars(text)" class="html-preview-text" v-bind:style="[_textAlign, textStyles]"></p>
             </div>
         </transition>

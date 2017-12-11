@@ -70,7 +70,7 @@
     ]">
         <transition appear v-bind:name="transition">
             <div class="bar-preview-box" v-bind:style="[boxStyles]">
-                <a class="bar-preview-close" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&#10006;</a>
+                <a class="bar-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
                 <div class="bar-main" v-html="$parent.injectVars(mainText)"></div>
                 <div class="bar-button" v-if="buttonText.length > 0" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
             </div>
