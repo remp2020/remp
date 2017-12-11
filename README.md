@@ -35,23 +35,23 @@ Following is list of available hosts. We advise you to add them to your
 
 ```bash
 # CAMPAIGN
-127.0.0.1 campaign.remp.app # web administration
+127.0.0.1 campaign.remp.press # web administration
 
 # MAILER
-127.0.0.1 mailer.remp.app # web administration
+127.0.0.1 mailer.remp.press # web administration
 
 # BEAM
-127.0.0.1 beam.remp.app # web administration
-127.0.0.1 tracker.beam.remp.app # event tracker API; swagger @ http://tracker.beam.remp.app/swagger.json
-127.0.0.1 segments.beam.remp.app # segments API; swagger @ http://segments.beam.remp.app/swagger.json
+127.0.0.1 beam.remp.press # web administration
+127.0.0.1 tracker.beam.remp.press # event tracker API; swagger @ http://tracker.beam.remp.press/swagger.json
+127.0.0.1 segments.beam.remp.press # segments API; swagger @ http://segments.beam.remp.press/swagger.json
 
 # SSO
-127.0.0.1 sso.remp.app # web administration and API
+127.0.0.1 sso.remp.press # web administration and API
 
 # SERVICE APPS
-127.0.0.1 adminer.remp.app # adminer for manipulating with MySQL
-127.0.0.1 mailhog.remp.app # mailhog for catching and debugging sent emails
-127.0.0.1 grafana.beam.remp.app # grafana for manipulating with InfluxDB and displaying charts
+127.0.0.1 adminer.remp.press # adminer for manipulating with MySQL
+127.0.0.1 mailhog.remp.press # mailhog for catching and debugging sent emails
+127.0.0.1 grafana.beam.remp.press # grafana for manipulating with InfluxDB and displaying charts
 ```
 
 Note: If you use Docker Toolbox, the IP won't be `127.0.0.1`. Use `docker-machine ls` to get IP address of the machine.

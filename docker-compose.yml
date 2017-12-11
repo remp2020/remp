@@ -14,14 +14,14 @@ services:
     networks:
       default:
         aliases:
-          - "campaign.remp.app"
-          - "mailer.remp.app"
-          - "sso.remp.app"
-          - "beam.remp.app"
-          - "tracker.beam.remp.app"
-          - "segments.beam.remp.app"
-          - "grafana.beam.remp.app"
-          - "mailhog.remp.app"
+          - "campaign.remp.press"
+          - "mailer.remp.press"
+          - "sso.remp.press"
+          - "beam.remp.press"
+          - "tracker.beam.remp.press"
+          - "segments.beam.remp.press"
+          - "grafana.beam.remp.press"
+          - "mailhog.remp.press"
     depends_on:
       - "campaign"
       - "mailer"
@@ -36,7 +36,7 @@ services:
   mailhog:
     image: "mailhog/mailhog:v1.0.0"
     environment:
-      MH_domainname: "mailhog.remp.app"
+      MH_domainname: "mailhog.remp.press"
 
   adminer:
     build: "./Docker/php"
@@ -49,8 +49,8 @@ services:
     build: "./Docker/php"
     environment:
       APP_NAME: "Campaign"
-      PHP_IDE_CONFIG: "serverName=campaign.remp.app"
-    domainname: "campaign.remp.app"
+      PHP_IDE_CONFIG: "serverName=campaign.remp.press"
+    domainname: "campaign.remp.press"
     hostname: "campaign"
     volumes:
       - ".:/var/www/html:rw"
@@ -77,11 +77,11 @@ services:
   # mailer
 
   mailer:
-    domainname: "mailer.remp.app"
+    domainname: "mailer.remp.press"
     hostname: "mailer"
     environment:
       APP_NAME: "Mailer"
-      PHP_IDE_CONFIG: "serverName=mailer.remp.app"
+      PHP_IDE_CONFIG: "serverName=mailer.remp.press"
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
@@ -113,8 +113,8 @@ services:
     build: "./Docker/php"
     environment:
       APP_NAME: "Sso"
-      PHP_IDE_CONFIG: "serverName=sso.remp.app"
-    domainname: "sso.remp.app"
+      PHP_IDE_CONFIG: "serverName=sso.remp.press"
+    domainname: "sso.remp.press"
     hostname: "sso"
     volumes:
       - ".:/var/www/html:rw"
@@ -141,12 +141,12 @@ services:
   # beam
 
   beam:
-    domainname: "beam.remp.app"
+    domainname: "beam.remp.press"
     hostname: "beam"
     build: "./Docker/php"
     environment:
       APP_NAME: "Beam"
-      PHP_IDE_CONFIG: "serverName=beam.remp.app"
+      PHP_IDE_CONFIG: "serverName=beam.remp.press"
     volumes:
       - ".:/var/www/html:rw"
       - "composer-data:/composer:rw"

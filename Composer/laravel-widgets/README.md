@@ -88,5 +88,5 @@ of all available configuration options:
 
 | Config | Environment | Default
 | --- | --- | --- |
-| `services.remp_sso.addr` | `REMP_SSO_ADDR` | `http://sso.remp.app` |
+| `services.remp_sso.addr` | `REMP_SSO_ADDR` | `http://sso.remp.press` |
 | `services.remp_sso.error_url` | `REMP_SSO_ERROR_URL` | `route('sso.error')` |
