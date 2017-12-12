@@ -149,7 +149,7 @@ func (eDB *PageviewDB) Actions(category string) ([]string, error) {
 			ActionPageviewLoad,
 		}, nil
 	}
-	return nil, fmt.Errorf("unknown commerce category: %s", category)
+	return nil, fmt.Errorf("unknown pageview category: %s", category)
 }
 
 // Users returns list of all tracked user IDs.

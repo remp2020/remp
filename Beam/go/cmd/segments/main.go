@@ -101,24 +101,37 @@ func main() {
 	var wg sync.WaitGroup
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
-	ticker := time.NewTicker(10 * time.Second)
-	defer ticker.Stop()
+	// caching
 
-	cacheProperties := func() {
+	ticker10s := time.NewTicker(10 * time.Second)
+	defer ticker10s.Stop()
+
+	ticker1h := time.NewTicker(time.Hour)
+	defer ticker1h.Stop()
+
+	cacheSegmentDB := func() {
 		if err := segmentDB.Cache(); err != nil {
 			service.LogError("unable to cache segments", "err", err)
 		}
 	}
+	cacheEventDB := func() {
+		if err := eventDB.Cache(); err != nil {
+			service.LogError("unable to cache events", "err", err)
+		}
+	}
 
 	wg.Add(1)
-	cacheProperties()
+	cacheSegmentDB()
+	cacheEventDB()
 	go func() {
 		defer wg.Done()
 		service.LogInfo("starting property caching")
 		for {
 			select {
-			case <-ticker.C:
-				cacheProperties()
+			case <-ticker10s.C:
+				cacheSegmentDB()
+			case <-ticker1h.C:
+				cacheEventDB()
 			case <-ctx.Done():
 				service.LogInfo("property caching stopped")
 				return
