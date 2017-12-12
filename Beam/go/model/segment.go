@@ -286,19 +286,15 @@ func (sDB *SegmentDB) Cache() error {
 		s.Rules = src
 	}
 
-	var changed bool
+	old := sDB.Segments
 	for _, s := range sc {
-		old, ok := sDB.Segments[s.Code]
-		if !changed && (!ok || !reflect.DeepEqual(old, s)) {
-			changed = true
-		}
 		sm[s.Code] = s
 	}
-	if changed {
+	sDB.Segments = sm
+
+	if !reflect.DeepEqual(old, sm) {
 		log.Println("segment cache reloaded")
 	}
-
-	sDB.Segments = sm
 	return nil
 }
 

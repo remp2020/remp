@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 	"fmt"
+	"log"
+	"reflect"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -228,6 +230,7 @@ func (eDB *EventDB) Users() ([]string, error) {
 // Cache stores event categories and activities in memory.
 func (eDB *EventDB) Cache() error {
 	// cache categories
+	oldc := eDB.categoriesCached
 	eDB.categoriesCached = []string{} // cache niled so Categories() loads categories from DB
 	cl, err := eDB.Categories()
 	if err != nil {
@@ -235,7 +238,12 @@ func (eDB *EventDB) Cache() error {
 	}
 	eDB.categoriesCached = cl
 
+	if !reflect.DeepEqual(oldc, eDB.categoriesCached) {
+		log.Println("event categories cache reloaded")
+	}
+
 	// cache actions for each category
+	olda := eDB.actionsCached
 	eDB.actionsCached = make(map[string][]string) // cache niled so Actions() loads actions from DB
 	for _, c := range cl {
 		cal, err := eDB.Actions(c)
@@ -243,6 +251,10 @@ func (eDB *EventDB) Cache() error {
 			return err
 		}
 		eDB.actionsCached[c] = cal
+	}
+
+	if !reflect.DeepEqual(olda, eDB.actionsCached) {
+		log.Println("event actions cache reloaded")
 	}
 
 	return nil
