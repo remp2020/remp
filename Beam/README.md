@@ -114,7 +114,7 @@ Include following snippet into the page to track events. Update `rempConfig` obj
         }
         
         // change URL to location of BEAM remplib.js
-        load("http://beam.remp.app/assets/vendor/js/remplib.js");
+        load("http://beam.remp.press/assets/vendor/js/remplib.js");
     })(window, document);
 
     var rempConfig = {
@@ -132,7 +132,7 @@ Include following snippet into the page to track events. Update `rempConfig` obj
         
         tracker: {
             // required URL location of BEAM Tracker
-            url: "http://tracker.beam.remp.app",
+            url: "http://tracker.beam.remp.press",
             
             // optional article details
             article: {
@@ -144,13 +144,37 @@ Include following snippet into the page to track events. Update `rempConfig` obj
             
             // optional, controls where are BEAM cookies stored
             // default value (if not set) is current BEAM domain
-            cookieDomain: ".remp.app"
+            cookieDomain: ".remp.press"
         },
+        
+        segments: {
+            // optional URL of BEAM segments API; required if Iota is used
+            url: "http://segments.beam.remp.press"
+        },
+        
+        iota: {
+            // required: selector matching all "article" elements on site you want to be reported
+            articleSelector: String,
+            // required: callback for articleId extraction out of matched element
+            idCallback: Function, // function (matchedElement) {}
+            // optional: callback for selecting element where the stats will be placed as next sibling; if not present, stats are appended as next sibling to matchedElement
+            targetElementCallback: Function, // function (matchedElement) {}
+            // optional: HTTP headers to be used in API calls 
+            httpHeaders: Object
+        }
     };
     remplib.tracker.init(rempConfig);
 </script>
 
 ```
+
+## Iota (on-site reporting)
+
+We've built a tool able to display article-based statistic directly on-site for your editors.
+Currently we support:
+
+- Revenue-based statistics
+- Event-based statistics (primarily for reporting A/B test data)
 
 ## Known issues
 

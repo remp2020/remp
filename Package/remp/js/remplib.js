@@ -118,6 +118,10 @@ export default {
         if (this.isBot(navigator.userAgent)) {
             return;
         }
+        if (typeof app._ === 'undefined' || app._.length === 0) {
+            app.run();
+            return;
+        }
         for (var i=0; i < app._.length; i++) {
             var cb = app._[i];
             setTimeout((function() {
@@ -127,7 +131,7 @@ export default {
                     if (cbf !== "run") {
                         app[cbf].apply(app, cbargs);
                     }
-                    app.initIterator++;
+                    app.initIterator = app.initIterator+1 || 1;
                     if (app.initIterator === app._.length) {
                         app.run();
                     }
