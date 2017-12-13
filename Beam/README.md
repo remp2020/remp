@@ -151,3 +151,25 @@ Include following snippet into the page to track events. Update `rempConfig` obj
 </script>
 
 ```
+
+## Known issues
+
+### Some internal API calls are not going through
+
+#### What probably happened
+
+Event groups, categories and actions can contain words like _pageviews_, _banners_, _track_ blocked by ad / track blockers. And they are loaded for segment's rules via API call. URL can look like this _(group == pageviews; category == pageview)_:
+
+`https://beam.remp.press/api/journal/pageviews/categories/pageview/actions`
+`
+
+#### How to solve
+
+Add filter to your blocker which allows these calls.
+
+_Example of uBlock Origin / AdBlockPlus syntax filter_ if your BEAM domain is `beam.remp.press`:
+
+```
+! REMP - allow BEAM journal API calls with blocked words (eg 'pageviews', 'banners', ...)
+@@||beam.remp.press/api/journal/*$xmlhttprequest,domain=beam.remp.press
+```
