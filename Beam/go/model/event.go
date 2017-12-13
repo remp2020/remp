@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 	"fmt"
+	"log"
+	"reflect"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -57,7 +59,9 @@ type EventStorage interface {
 
 // EventDB is Influx implementation of EventStorage.
 type EventDB struct {
-	DB *InfluxDB
+	DB               *InfluxDB
+	categoriesCached []string
+	actionsCached    map[string][]string
 }
 
 // Count returns number of events matching the filter defined by EventOptions.
@@ -123,6 +127,11 @@ func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
 
 // Categories lists all tracked categories.
 func (eDB *EventDB) Categories() ([]string, error) {
+	// try to load from cache first
+	if ec := eDB.categoriesCached; len(ec) > 0 {
+		return ec, nil
+	}
+
 	q := client.Query{
 		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "category"`,
 		Database: eDB.DB.DBName,
@@ -157,6 +166,11 @@ func (eDB *EventDB) Flags() []string {
 
 // Actions lists all tracked actions under the given category.
 func (eDB *EventDB) Actions(category string) ([]string, error) {
+	// try to load from cache first
+	if ac, ok := eDB.actionsCached[category]; ok {
+		return ac, nil
+	}
+
 	q := client.Query{
 		Command:  fmt.Sprintf(`SHOW TAG VALUES FROM "`+TableEvents+`" WITH KEY = "action" WHERE category =~ /%s/`, category),
 		Database: eDB.DB.DBName,
@@ -211,6 +225,39 @@ func (eDB *EventDB) Users() ([]string, error) {
 		users = append(users, strVal)
 	}
 	return users, nil
+}
+
+// Cache stores event categories and activities in memory.
+func (eDB *EventDB) Cache() error {
+	// cache categories
+	oldc := eDB.categoriesCached
+	eDB.categoriesCached = []string{} // cache niled so Categories() loads categories from DB
+	cl, err := eDB.Categories()
+	if err != nil {
+		return err
+	}
+	eDB.categoriesCached = cl
+
+	if !reflect.DeepEqual(oldc, eDB.categoriesCached) {
+		log.Println("event categories cache reloaded")
+	}
+
+	// cache actions for each category
+	olda := eDB.actionsCached
+	eDB.actionsCached = make(map[string][]string) // cache niled so Actions() loads actions from DB
+	for _, c := range cl {
+		cal, err := eDB.Actions(c)
+		if err != nil {
+			return err
+		}
+		eDB.actionsCached[c] = cal
+	}
+
+	if !reflect.DeepEqual(olda, eDB.actionsCached) {
+		log.Println("event actions cache reloaded")
+	}
+
+	return nil
 }
 
 func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions) influxquery.Builder {

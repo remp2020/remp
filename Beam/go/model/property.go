@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"reflect"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -67,7 +69,7 @@ func (pDB *PropertyDB) Cache() error {
 	for _, p := range pc {
 		pm[p.UUID] = p
 	}
-	if len(pDB.Properties) != len(pm) {
+	if !reflect.DeepEqual(pDB.Properties, pm) {
 		log.Println("property cache reloaded")
 	}
 	pDB.Properties = pm
