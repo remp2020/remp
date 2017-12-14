@@ -183,16 +183,16 @@ func (eDB *PageviewDB) Users() ([]string, error) {
 
 func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOptions) influxquery.Builder {
 	if o.UserID != "" {
-		builder.Where(fmt.Sprintf("user_id = '%s'", o.UserID))
+		builder = builder.Where(fmt.Sprintf("user_id = '%s'", o.UserID))
 	}
 	if o.ArticleID != "" {
-		builder.Where(fmt.Sprintf("article_id = '%s'", o.ArticleID))
+		builder = builder.Where(fmt.Sprintf("article_id = '%s'", o.ArticleID))
 	}
 	if !o.TimeAfter.IsZero() {
-		builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
+		builder = builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
 	}
 	if !o.TimeBefore.IsZero() {
-		builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
+		builder = builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
 	}
 	return builder
 }

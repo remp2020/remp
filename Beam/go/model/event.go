@@ -262,19 +262,19 @@ func (eDB *EventDB) Cache() error {
 
 func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions) influxquery.Builder {
 	if o.UserID != "" {
-		builder.Where(fmt.Sprintf("user_id = '%s'", o.UserID))
+		builder = builder.Where(fmt.Sprintf("user_id = '%s'", o.UserID))
 	}
 	if o.Category != "" {
-		builder.Where(fmt.Sprintf("category = '%s'", o.Category))
+		builder = builder.Where(fmt.Sprintf("category = '%s'", o.Category))
 	}
 	if o.Action != "" {
-		builder.Where(fmt.Sprintf("action = '%s'", o.Action))
+		builder = builder.Where(fmt.Sprintf("action = '%s'", o.Action))
 	}
 	if !o.TimeAfter.IsZero() {
-		builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
+		builder = builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
 	}
 	if !o.TimeBefore.IsZero() {
-		builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
+		builder = builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
 	}
 	return builder
 }
