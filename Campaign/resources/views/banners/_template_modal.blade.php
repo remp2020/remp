@@ -36,10 +36,10 @@
                         <div class="card">
                             <a href="{{ route('banners.create', ['template' => \App\Banner::TEMPLATE_SHORT_MESSAGE]) }}">
                                 <div class="card-header">
-                                    <h4 class="text-center">Notification</h4>
+                                    <h4 class="text-center">Short message</h4>
                                 </div>
                                 <div class="card-body">
-                                    <div class="preview notification"></div>
+                                    <div class="preview short-message"></div>
                                 </div>
                             </a>
                         </div>

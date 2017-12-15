@@ -12,7 +12,7 @@
     <div>
         <ul class="tab-nav" role="tablist" data-tab-color="teal">
             <li class="active">
-                <a href="#html-template" role="tab" data-toggle="tab" aria-expanded="true">Notification template</a>
+                <a href="#html-template" role="tab" data-toggle="tab" aria-expanded="true">Short message template</a>
             </li>
         </ul>
 
@@ -68,7 +68,7 @@
         "_textColor",
     ];
     export default {
-        name: "notification-template",
+        name: "short-message-template",
         components: { vSelect },
         props: props,
         created: function(){
