@@ -11,6 +11,7 @@ set('repository', 'git@gitlab.com:remp/remp.git');
 set('keep_releases', 4);
 set('shared_dirs', ['log']);
 set('shared_files', ['.env', 'app/config/config.local.neon']);
+set('default_timeout', 900);
 set('rabbit', [
     'host' => getenv('DEPLOY_RABBIT_HOST'),
     'port' => getenv('DEPLOY_RABBIT_PORT'),

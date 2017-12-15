@@ -61,7 +61,6 @@ deploy:mailer:admin:
     - ln -s ~/.env.mailer .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
     - yarn install && yarn run production ; rm -fr ./node_modules
-    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/mailer
@@ -82,7 +81,6 @@ deploy:campaign:admin:
     - ln -s ~/.env.campaign .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
     - yarn install && yarn run all-production ; rm -fr ./node_modules
-    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - whoami
     - pwd
     - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
@@ -105,7 +103,6 @@ deploy:beam:admin:
     - ln -s ~/.env.beam .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
     - yarn install && yarn run all-production ; rm -fr ./node_modules
-    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/beam
@@ -126,7 +123,6 @@ deploy:sso:admin:
     - ln -s ~/.env.sso .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
     - yarn install && yarn run production ; rm -fr ./node_modules
-    - sed -i 's/300/900/g' vendor/deployer/deployer/src/Utility/ProcessRunner.php # hack to raise non-configurable process timeout
     - vendor/bin/dep deploy sso --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/sso
