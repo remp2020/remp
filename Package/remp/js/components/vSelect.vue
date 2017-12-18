@@ -112,16 +112,22 @@
                 }
 
                 let $select = $(this.$el).find('.selectpicker');
-                if (this.options.length > 0) {
+                let val = null;
+                if (this.customInput) {
+                    if (this.inOptions(this.customValue)) {
+                        this.customInput = false;
+                    }
+                    val = this.customValue;
+                } else if (this.inOptions(this.value)) {
+                    val = this.value;
+                } else {
                     this.customInput = false;
-                    $select.selectpicker('val', this.options[0]);
+                    val = this.options[0];
                 }
-                if (this.customInput && this.inOptions(this.customValue)) {
-                    this.customInput = false;
-                    $select.selectpicker('val', this.customValue);
-                }
+
+                $select.selectpicker('val', val);
+                this.$emit('input', val);
                 $select.selectpicker('refresh');
-                this.$emit('input', this.options[0]);
             }
         },
         methods: {

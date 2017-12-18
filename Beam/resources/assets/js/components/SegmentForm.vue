@@ -238,8 +238,6 @@
                 }
             }
 
-        },
-        mounted: function(){
             this.$on('vselect-changed', function(data){
                 if (data.type === 'category') {
                     if (data.group === undefined) {
