@@ -13,6 +13,7 @@ class Banner extends Model
     const TEMPLATE_HTML = 'html';
     const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
     const TEMPLATE_BAR = 'bar';
+    const TEMPLATE_SHORT_MESSAGE = 'short_message';
 
     protected $fillable = [
         'name',
@@ -31,6 +32,7 @@ class Banner extends Model
         'htmlTemplate',
         'mediumRectangleTemplate',
         'barTemplate',
+        'shortMessageTemplate',
     ];
 
     protected $casts = [
@@ -65,13 +67,20 @@ class Banner extends Model
                     $this->barTemplate->fill($attributes) :
                     $this->setRelation('barTemplate', $this->barTemplate()->make($attributes));
                 break;
+            case self::TEMPLATE_SHORT_MESSAGE:
+                $this->shortMessageTemplate ?
+                    $this->shortMessageTemplate->fill($attributes) :
+                    $this->setRelation('shortMessageTemplate', $this->shortMessageTemplate()->make($attributes));
+                break;
         }
         return $this;
     }
 
     public function campaigns()
     {
-        return $this->hasMany(Campaign::class);
+        return $this->hasMany(Campaign::class)->orWhere([
+            'alt_banner_id' => $this->id,
+        ]);
     }
 
     public function htmlTemplate()
@@ -87,5 +96,10 @@ class Banner extends Model
     public function barTemplate()
     {
         return $this->hasOne(BarTemplate::class);
+    }
+
+    public function shortMessageTemplate()
+    {
+        return $this->hasOne(ShortMessageTemplate::class);
     }
 }

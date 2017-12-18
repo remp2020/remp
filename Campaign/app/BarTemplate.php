@@ -15,6 +15,10 @@ class BarTemplate extends Model
         'button_text_color',
     ];
 
+    protected $touches = [
+        'banner',
+    ];
+
     public function banner()
     {
         return $this->belongsTo(Banner::class);

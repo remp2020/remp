@@ -1,10 +1,10 @@
 <style type="text/css">
-    @import '../../css/banner.css';
+    @import '../../sass/banner.scss';
 </style>
 
 <template>
     <div class="remp-banner">
-        <html-preview v-if="template == 'html'"
+        <html-preview v-if="template === 'html'"
                 :alignmentOptions="alignmentOptions"
                 :dimensionOptions="dimensionOptions"
                 :positionOptions="positionOptions"
@@ -27,7 +27,7 @@
                 :displayType="displayType"
         ></html-preview>
 
-        <medium-rectangle-preview v-if="template == 'medium_rectangle'"
+        <medium-rectangle-preview v-if="template === 'medium_rectangle'"
                 :alignmentOptions="alignmentOptions"
                 :positionOptions="positionOptions"
                 :show="visible"
@@ -52,7 +52,7 @@
                 :displayType="displayType"
         ></medium-rectangle-preview>
 
-        <bar-preview v-if="template == 'bar'"
+        <bar-preview v-if="template === 'bar'"
                 :alignmentOptions="alignmentOptions"
                 :positionOptions="positionOptions"
                 :show="visible"
@@ -73,14 +73,34 @@
                 :transition="transition"
                 :displayType="displayType"
         ></bar-preview>
+
+        <short-message-preview v-if="template === 'short_message'"
+                 :alignmentOptions="alignmentOptions"
+                 :positionOptions="positionOptions"
+                 :show="visible"
+                 :uuid="uuid"
+                 :campaignUuid="campaignUuid"
+                 :forcedPosition="forcedPosition"
+
+                 :text="shortMessageTemplate.text"
+                 :backgroundColor="shortMessageTemplate.backgroundColor"
+                 :textColor="shortMessageTemplate.textColor"
+
+                 :position="position"
+                 :targetUrl="targetUrl"
+                 :closeable="closeable"
+                 :transition="transition"
+                 :displayType="displayType"
+        ></short-message-preview>
     </div>
 </template>
 
 
 <script>
-    import HtmlPreview from "./previews/Html.vue";
-    import MediumRectanglePreview from "./previews/MediumRectangle.vue";
-    import BarPreview from "./previews/Bar.vue";
+    import HtmlPreview from "./previews/Html";
+    import MediumRectanglePreview from "./previews/MediumRectangle";
+    import BarPreview from "./previews/Bar";
+    import ShortMessagePreview from "./previews/ShortMessage";
 
     const props = [
         "name",
@@ -103,6 +123,7 @@
         "mediumRectangleTemplate",
         "barTemplate",
         "htmlTemplate",
+        "shortMessageTemplate",
 
         "alignmentOptions",
         "dimensionOptions",
@@ -114,6 +135,7 @@
             HtmlPreview,
             MediumRectanglePreview,
             BarPreview,
+            ShortMessagePreview,
         },
         name: 'banner-preview',
         props: props,

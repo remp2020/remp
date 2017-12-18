@@ -69,10 +69,12 @@ class Campaign extends Model
             'banner.htmlTemplate',
             'banner.mediumRectangleTemplate',
             'banner.barTemplate',
+            'banner.shortMessageTemplate',
             'altBanner',
             'altBanner.htmlTemplate',
             'altBanner.mediumRectangleTemplate',
             'altBanner.barTemplate',
+            'altBanner.shortMessageTemplate',
             'schedules',
         ])->first();
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);

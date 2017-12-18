@@ -15,6 +15,10 @@ class HtmlTemplate extends Model
         'background_color',
     ];
 
+    protected $touches = [
+        'banner',
+    ];
+
     public function banner()
     {
         return $this->belongsTo(Banner::class);
