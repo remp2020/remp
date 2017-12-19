@@ -38,6 +38,9 @@
                         'status' => [
                             'header' => 'Status',
                         ],
+                        'updated_at' => [
+                            'header' => 'Status',
+                        ],
                     ],
                     'dataSource' => route('schedule.json'),
                     'rowActions' => [

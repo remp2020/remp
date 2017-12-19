@@ -1,6 +1,11 @@
-window.$ = window.jQuery = require('jquery');
-window.Nette = require('nette-forms');
-window.CodeMirror = require('codemirror');
-window.Vue = require('vue');
+global.$ = global.jQuery = require('jquery');
+
+global.Nette = require('nette-forms');
+
+global.CodeMirror = require('codemirror');
+
+global.Vue = require('vue');
+
+global.moment = require('moment');
 
 Nette.initOnLoad();

@@ -30,5 +30,6 @@ abstract class BasePresenter extends Presenter
 
         $this->template->currentUser = $this->getUser();
         $this->template->linkedServices = $this->environmentConfig->getLinkedServices();
+        $this->template->locale = $this->environmentConfig->getParam('locale');
     }
 }

@@ -37,6 +37,7 @@ if (process.env.REMP_TARGET === 'lib') {
             "eonasdan-bootstrap-datetimepicker",
             "google-material-color",
             "malihu-custom-scrollbar-plugin",
+            "moment",
             "node-waves",
             "bootstrap-notify",
             "./resources/assets/js/farbtastic.js",
@@ -46,5 +47,6 @@ if (process.env.REMP_TARGET === 'lib') {
             "node-waves": ["Waves", "window.Waves"],
             "autosize": ["autosize", "window.autosize"],
             "vue": ["Vue", "window.Vue"],
+            "moment": ["Moment", "window.Moment"],
         });
 }

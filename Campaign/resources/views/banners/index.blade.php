@@ -35,7 +35,7 @@
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
             ],
-            'order' => [4, 'desc'],
+            'order' => [5, 'desc'],
         ]) !!}
     </div>
 

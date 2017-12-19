@@ -1,6 +1,7 @@
 $primaryColor: #00acc1 !default;
 $primaryColorDark: #007c91 !default;
 $primaryColorLight: #5ddef4 !default;
+$highlightColor: #4caf50 !default;
 
 a {
     color: $primaryColorDark;
@@ -196,7 +197,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         }
 
         &.highlight {
-            border-color: $primaryColorDark;
+            border-color: $highlightColor;
         }
     }
 }

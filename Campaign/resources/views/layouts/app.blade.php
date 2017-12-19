@@ -49,6 +49,10 @@ function route_active($routeName, $classes = '', $activeClasses = '')
     <script src="{{ asset(mix('/js/vendor.js', '/assets/vendor')) }}"></script>
     <script src="{{ asset(mix('/js/app.js', '/assets/vendor')) }}"></script>
 
+    <script type="text/javascript">
+        moment.locale('{{ Config::get('app.locale') }}');
+    </script>
+
     @stack('head')
 </head>
 

@@ -1,4 +1,5 @@
 parameters:
+    locale: en
     sso_addr: @environmentConfig::get('SSO_ADDR')
     sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
     redis:
@@ -49,6 +50,7 @@ services:
             - linkService(beam, %remp.beam.web_addr%, album)
             - linkService(campaign, %remp.campaign.web_addr%, trending-up)
             - linkService(mailer, /, email)
+            - setParam(locale, %locale%)
 
     # Latte filters
     filterLoader:

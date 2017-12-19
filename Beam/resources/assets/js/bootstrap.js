@@ -1,3 +1,5 @@
-window.$ = window.jQuery = require('jquery');
+global.$ = global.jQuery = require('jquery');
 
-window.Vue = require('vue');
+global.Vue = require('vue');
+
+global.moment = require('moment');
