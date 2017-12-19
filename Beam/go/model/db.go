@@ -32,6 +32,15 @@ func (gt FilterType) column() string {
 	return fts[string(gt)]
 }
 
+// CountRow represents one row of grouped count.
+type CountRow struct {
+	Tags  map[string]string
+	Count int
+}
+
+// CountRowCollection represents collection of rows of grouped count.
+type CountRowCollection []CountRow
+
 // InfluxDB represents data layer based on InfluxDB.
 type InfluxDB struct {
 	DBName       string
@@ -84,6 +93,31 @@ func (iDB *InfluxDB) GroupedCount(response *client.Response, ft FilterType) (map
 	}
 
 	return counts, true, nil
+}
+
+// MultiGroupedCount parses the provided response and extracts counts based on provided filter column.
+func (iDB *InfluxDB) MultiGroupedCount(response *client.Response, fc string) (CountRowCollection, bool, error) {
+	var results CountRowCollection
+	if len(response.Results[0].Series) == 0 {
+		return nil, false, nil
+	}
+
+	for _, s := range response.Results[0].Series {
+		var row CountRow
+		row.Tags = s.Tags
+		jsonCount, ok := s.Values[0][1].(json.Number)
+		if !ok {
+			return nil, false, errors.New("influx result is not json.Number, cannot proceed")
+		}
+		count, err := jsonCount.Int64()
+		if err != nil {
+			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%d]", count))
+		}
+		row.Count = int(count)
+		results = append(results, row)
+	}
+
+	return results, true, nil
 }
 
 // GroupedSum parses the provided response and extracts sums based on provided filter type.

@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -19,8 +20,10 @@ const (
 
 // PageviewOptions represent filter options for pageview-related calls.
 type PageviewOptions struct {
-	UserID     string
-	ArticleID  string
+	Action     string
+	IDs        []string
+	FilterBy   string
+	GroupBy    []string
 	TimeAfter  time.Time
 	TimeBefore time.Time
 }
@@ -50,7 +53,7 @@ type PageviewCollection []*Pageview
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
 	// Count returns number of pageviews matching the filter defined by PageviewOptions.
-	Count(o PageviewOptions) (int, bool, error)
+	Count(o PageviewOptions) (CountRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o PageviewOptions) (PageviewCollection, error)
 	// Categories lists all tracked categories.
@@ -67,25 +70,28 @@ type PageviewDB struct {
 }
 
 // Count returns number of pageviews matching the filter defined by PageviewOptions.
-func (eDB *PageviewDB) Count(o PageviewOptions) (int, bool, error) {
+func (eDB *PageviewDB) Count(o PageviewOptions) (CountRowCollection, bool, error) {
 	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TablePageviews + `"`)
 	builder = eDB.addQueryFilters(builder, o)
 
+	bb := builder.Build()
+	log.Println("pageview count query:", bb)
+
 	q := client.Query{
-		Command:  builder.Build(),
+		Command:  bb,
 		Database: eDB.DB.DBName,
 	}
 
 	response, err := eDB.DB.Client.Query(q)
 	if err != nil {
-		return 0, false, err
+		return nil, false, err
 	}
 	if response.Error() != nil {
-		return 0, false, response.Error()
+		return nil, false, response.Error()
 	}
 
 	// process response
-	return eDB.DB.Count(response)
+	return eDB.DB.MultiGroupedCount(response, "")
 }
 
 // List returns list of all pageviews based on given PageviewOptions.
@@ -182,12 +188,39 @@ func (eDB *PageviewDB) Users() ([]string, error) {
 }
 
 func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOptions) influxquery.Builder {
-	if o.UserID != "" {
-		builder = builder.Where(fmt.Sprintf("user_id = '%s'", o.UserID))
+	if o.FilterBy != "" {
+		cond := ""
+		for i, val := range o.IDs {
+			if i > 0 {
+				cond += " OR "
+			}
+			//o.FilterBy should be influx table column
+			cond = fmt.Sprintf("%s%s = '%s'", cond, o.FilterBy, val)
+		}
+		if cond != "" {
+			builder = builder.Where(fmt.Sprintf("(%s)", cond))
+		}
 	}
-	if o.ArticleID != "" {
-		builder = builder.Where(fmt.Sprintf("article_id = '%s'", o.ArticleID))
+
+	groupBy := ""
+	for _, val := range o.GroupBy {
+		if val == "" {
+			continue
+		}
+		if groupBy != "" {
+			groupBy = fmt.Sprintf(`%s, "%s"`, groupBy, val)
+		} else {
+			groupBy = fmt.Sprintf(`"%s"`, val)
+		}
 	}
+	if groupBy != "" {
+		builder = builder.GroupBy(groupBy)
+	}
+
+	if o.Action != "" {
+		builder = builder.Where(fmt.Sprintf("action = '%s'", o.Action))
+	}
+
 	if !o.TimeAfter.IsZero() {
 		builder = builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
 	}

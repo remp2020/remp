@@ -27,6 +27,19 @@ var GroupedCounts = MediaType("application/vnd.grouped.counts+json", func() {
 	Required("counts")
 })
 
+var PageviewCount = MediaType("application/vnd.pageview.count+json", func() {
+	Description("Pageview count")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("count", Integer)
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("count")
+	})
+	Required("tags", "count")
+})
+
 var GroupedSums = MediaType("application/vnd.grouped.sums+json", func() {
 	Description("Grouped sums")
 	Attributes(func() {
