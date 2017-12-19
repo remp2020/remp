@@ -121,7 +121,6 @@
                 } else if (this.inOptions(this.value)) {
                     val = this.value;
                 } else {
-                    this.customInput = false;
                     val = this.options[0];
                 }
 

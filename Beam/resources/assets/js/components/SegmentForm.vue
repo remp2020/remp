@@ -232,9 +232,7 @@
                     continue;
                 }
                 for (let category of this.eventCategories[group]) {
-                    if (categories.indexOf(category) !== -1) {
-                        this.fetchActions(group, category);
-                    }
+                    this.fetchActions(group, category);
                 }
             }
 
