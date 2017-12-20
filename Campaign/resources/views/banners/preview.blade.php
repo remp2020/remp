@@ -25,7 +25,6 @@ var run = function() {
 
     banner.uuid = "{{ $banner->uuid }}";
     banner.campaignUuid = "{{ $campaign->uuid }}";
-    remplib.campaign.storeCampaignDetails('{{ $campaign->uuid }}', '{{ $banner->uuid }}');
 
     var d = document.createElement('div');
     d.id = bannerId;
@@ -59,6 +58,7 @@ var run = function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
+        remplib.campaign.storeCampaignDetails('{{ $campaign->uuid }}', '{{ $banner->uuid }}');
     }, banner.displayDelay);
 };
 
