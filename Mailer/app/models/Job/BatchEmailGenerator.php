@@ -54,7 +54,7 @@ class BatchEmailGenerator
         $userMap = [];
         $userIds = $this->segmentAggregator->users(['provider' => $batch->mail_job->segment_provider, 'code' => $batch->mail_job->segment_code]);
 
-        foreach (array_chunk($userIds, 200, true) as $userIdsChunk) {
+        foreach (array_chunk($userIds, 1000, true) as $userIdsChunk) {
             $page = 1;
             while ($users = $this->userProvider->list($userIdsChunk, $page)) {
                 foreach ($users as $user) {
