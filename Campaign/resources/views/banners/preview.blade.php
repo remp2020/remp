@@ -58,7 +58,7 @@ var run = function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
-        remplib.campaign.storeCampaignDetails('{{ $campaign->uuid }}', '{{ $banner->uuid }}');
+        remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid);
     }, banner.displayDelay);
 };
 
