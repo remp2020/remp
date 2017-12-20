@@ -17,7 +17,9 @@ class JobsRepository extends Repository
 
     protected $tableName = 'mail_jobs';
 
-    protected $dataTableSearchable = [];
+    protected $dataTableSearchable = [
+        ':mail_job_batch_templates.mail_template.name',
+    ];
 
     public function __construct(
         Context $database,
