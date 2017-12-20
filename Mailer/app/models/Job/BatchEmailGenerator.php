@@ -51,29 +51,31 @@ class BatchEmailGenerator
 
         $job = $batch->job;
 
+        $userMap = [];
         $userIds = $this->segmentAggregator->users(['provider' => $batch->mail_job->segment_provider, 'code' => $batch->mail_job->segment_code]);
 
-        $userMap = [];
-        $page = 1;
-        while ($users = $this->userProvider->list($userIds, $page)) {
-            foreach ($users as $user) {
-                $userMap[$user['email']] = $user['id'];
-                $templateId = $this->getTemplate($batch);
+        foreach (array_chunk($userIds, 200, true) as $userIdsChunk) {
+            $page = 1;
+            while ($users = $this->userProvider->list($userIdsChunk, $page)) {
+                foreach ($users as $user) {
+                    $userMap[$user['email']] = $user['id'];
+                    $templateId = $this->getTemplate($batch);
 
-                $insert[] = [
-                    'batch' => $batch,
-                    'templateId' => $templateId,
-                    'email' => $user['email'],
-                    'sorting' => rand(),
-                ];
-                ++$processed;
-                if ($processed == $batchInsert) {
-                    $processed = 0;
-                    $this->mailJobQueueRepository->multiInsert($insert);
-                    $insert = [];
+                    $insert[] = [
+                        'batch' => $batch,
+                        'templateId' => $templateId,
+                        'email' => $user['email'],
+                        'sorting' => rand(),
+                    ];
+                    ++$processed;
+                    if ($processed == $batchInsert) {
+                        $processed = 0;
+                        $this->mailJobQueueRepository->multiInsert($insert);
+                        $insert = [];
+                    }
                 }
+                $page++;
             }
-            $page++;
         }
 
         if ($processed) {
