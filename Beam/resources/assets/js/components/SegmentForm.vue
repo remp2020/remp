@@ -232,14 +232,10 @@
                     continue;
                 }
                 for (let category of this.eventCategories[group]) {
-                    if (categories.indexOf(category) !== -1) {
-                        this.fetchActions(group, category);
-                    }
+                    this.fetchActions(group, category);
                 }
             }
 
-        },
-        mounted: function(){
             this.$on('vselect-changed', function(data){
                 if (data.type === 'category') {
                     if (data.group === undefined) {
