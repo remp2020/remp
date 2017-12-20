@@ -1,5 +1,5 @@
 parameters:
-    locale: en
+    locale: @environmentConfig::get('LOCALE')
     sso_addr: @environmentConfig::get('SSO_ADDR')
     sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
     redis:
