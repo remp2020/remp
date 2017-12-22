@@ -36,7 +36,7 @@ services:
   mailhog:
     image: "mailhog/mailhog:v1.0.0"
     environment:
-      MH_domainname: "mailhog.remp.press"
+      MH_HOSTNAME: "mailhog.remp.press"
 
   adminer:
     build: "./Docker/php"
