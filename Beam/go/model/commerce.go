@@ -67,10 +67,11 @@ func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
 
-	log.Println("query:", builder.Build())
+	bb := builder.Build()
+	log.Println("commerce count query:", bb)
 
 	q := client.Query{
-		Command:  builder.Build(),
+		Command:  bb,
 		Database: cDB.DB.DBName,
 	}
 
@@ -130,10 +131,11 @@ func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
 	builder := cDB.DB.QueryBuilder.Select(`sum("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = cDB.addQueryFilters(builder, o)
 
-	log.Println("query:", builder.Build())
+	bb := builder.Build()
+	log.Println("commerce sum query:", bb)
 
 	q := client.Query{
-		Command:  builder.Build(),
+		Command:  bb,
 		Database: cDB.DB.DBName,
 	}
 

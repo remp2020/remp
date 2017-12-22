@@ -34,6 +34,12 @@ type PageviewCollection model.PageviewCollection
 // SegmentCache represent cache object for count of events of SegmentRules.
 type SegmentCache model.SegmentCache
 
+// CountRow represent row with count result.
+type CountRow model.CountRow
+
+// CountRowCollection is the collection of count rows.
+type CountRowCollection model.CountRowCollection
+
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() *app.Segment {
 	return &app.Segment{
@@ -215,6 +221,25 @@ func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 			S: c.SyncedAt,
 			C: c.Count,
 		}
+	}
+	return mt
+}
+
+// ToMediaType converts internal PageviewCountCollection representation to application one.
+func (crc CountRowCollection) ToMediaType() app.PageviewCountCollection {
+	mt := app.PageviewCountCollection{}
+	for _, c := range crc {
+		mtc := (CountRow)(c).ToMediaType()
+		mt = append(mt, mtc)
+	}
+	return mt
+}
+
+// ToMediaType converts internal PageviewCount representation to application one.
+func (cr CountRow) ToMediaType() *app.PageviewCount {
+	mt := &app.PageviewCount{
+		Count: cr.Count,
+		Tags:  cr.Tags,
 	}
 	return mt
 }

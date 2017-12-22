@@ -23,12 +23,12 @@ func NewPageviewController(service *goa.Service, ps model.PageviewStorage) *Page
 // Count runs the count action.
 func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 	var o model.PageviewOptions
-	if ctx.UserID != nil {
-		o.UserID = *ctx.UserID
+	o.Action = ctx.Action
+	if ctx.FilterBy != nil {
+		o.FilterBy = *ctx.FilterBy
+		o.IDs = ctx.Ids
 	}
-	if ctx.ArticleID != nil {
-		o.ArticleID = *ctx.ArticleID
-	}
+	o.GroupBy = ctx.GroupBy
 	if ctx.TimeAfter != nil {
 		o.TimeAfter = *ctx.TimeAfter
 	}
@@ -36,27 +36,33 @@ func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 		o.TimeBefore = *ctx.TimeBefore
 	}
 
-	pc, ok, err := c.PageviewStorage.Count(o)
+	crc, ok, err := c.PageviewStorage.Count(o)
 	if err != nil {
 		return err
 	}
+	ok = false
 	if !ok {
-		pc = 0
+		cr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
+		}
+		crc = model.CountRowCollection{}
+		crc = append(crc, cr)
 	}
 
-	return ctx.OK(&app.Count{
-		Count: pc,
-	})
+	acrc := CountRowCollection(crc).ToMediaType()
+	return ctx.OK(acrc)
 }
 
 // List runs the list action.
 func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 	var o model.PageviewOptions
-	if ctx.UserID != nil {
-		o.UserID = *ctx.UserID
+	if ctx.Action != nil {
+		o.Action = *ctx.Action
 	}
-	if ctx.ArticleID != nil {
-		o.ArticleID = *ctx.ArticleID
+	if ctx.FilterBy != nil {
+		o.FilterBy = *ctx.FilterBy
+		o.IDs = ctx.Ids
 	}
 	if ctx.TimeAfter != nil {
 		o.TimeAfter = *ctx.TimeAfter
