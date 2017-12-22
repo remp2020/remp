@@ -24,6 +24,7 @@ mix
         "datatables.net-rowgroup",
         "google-material-color",
         "malihu-custom-scrollbar-plugin",
+        "moment",
         "node-waves",
         "bootstrap-notify",
     ])
@@ -31,4 +32,5 @@ mix
         "jquery": ['$', 'jQuery', "window.jQuery"],
         "node-waves": ["Waves", "window.Waves"],
         "autosize": ["autosize", "window.autosize"],
+        "moment": ["Moment", "window.Moment"],
     });
