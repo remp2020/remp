@@ -226,9 +226,9 @@ func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 }
 
 // ToMediaType converts internal PageviewCountCollection representation to application one.
-func (grc CountRowCollection) ToMediaType() app.PageviewCountCollection {
+func (crc CountRowCollection) ToMediaType() app.PageviewCountCollection {
 	mt := app.PageviewCountCollection{}
-	for _, c := range grc {
+	for _, c := range crc {
 		mtc := (CountRow)(c).ToMediaType()
 		mt = append(mt, mtc)
 	}
@@ -236,10 +236,10 @@ func (grc CountRowCollection) ToMediaType() app.PageviewCountCollection {
 }
 
 // ToMediaType converts internal PageviewCount representation to application one.
-func (p CountRow) ToMediaType() *app.PageviewCount {
+func (cr CountRow) ToMediaType() *app.PageviewCount {
 	mt := &app.PageviewCount{
-		Count: p.Count,
-		Tags:  p.Tags,
+		Count: cr.Count,
+		Tags:  cr.Tags,
 	}
 	return mt
 }

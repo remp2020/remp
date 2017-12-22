@@ -91,7 +91,7 @@ func (eDB *PageviewDB) Count(o PageviewOptions) (CountRowCollection, bool, error
 	}
 
 	// process response
-	return eDB.DB.MultiGroupedCount(response, "")
+	return eDB.DB.MultiGroupedCount(response)
 }
 
 // List returns list of all pageviews based on given PageviewOptions.

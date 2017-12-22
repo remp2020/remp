@@ -40,12 +40,13 @@ func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 	if err != nil {
 		return err
 	}
+	ok = false
 	if !ok {
 		cr := model.CountRow{
-			Tags:  nil,
+			Tags:  make(map[string]string),
 			Count: 0,
 		}
-		crc := model.CountRowCollection{}
+		crc = model.CountRowCollection{}
 		crc = append(crc, cr)
 	}
 

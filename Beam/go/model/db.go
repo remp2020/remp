@@ -96,7 +96,7 @@ func (iDB *InfluxDB) GroupedCount(response *client.Response, ft FilterType) (map
 }
 
 // MultiGroupedCount parses the provided response and extracts counts based on provided filter column.
-func (iDB *InfluxDB) MultiGroupedCount(response *client.Response, fc string) (CountRowCollection, bool, error) {
+func (iDB *InfluxDB) MultiGroupedCount(response *client.Response) (CountRowCollection, bool, error) {
 	var results CountRowCollection
 	if len(response.Results[0].Series) == 0 {
 		return nil, false, nil
