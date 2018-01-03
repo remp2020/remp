@@ -106,7 +106,11 @@ class SegmentController extends Controller
         $segment->save();
 
         foreach ($request->get('rules', []) as $r) {
-            $segment->rules()->create($r);
+            $rule = $segment->rules()->create($r);
+            $rule->fields = array_filter($rule->fields, function($item) {
+                return !empty($item["key"]);
+            });
+            $rule->save();
         }
 
         return redirect(route('segments.index'))->with('success', 'Segment created');
@@ -157,6 +161,9 @@ class SegmentController extends Controller
             /** @var SegmentRule $rule */
             $rule = $segment->rules()->findOrNew($r['id']);
             $rule->fill($r);
+            $rule->fields = array_filter($rule->fields, function($item) {
+                return !empty($item["key"]);
+            });
             $rule->save();
         }
         SegmentRule::destroy($request->get('removedRules'));

@@ -201,7 +201,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
             };
             this.post(this.url + "/track/pageview", params);
-            this.dispatchEvent("pageview", "show", params);
+            this.dispatchEvent("pageview", "load", params);
         },
 
         trackCheckout: function(funnelId) {
