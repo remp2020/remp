@@ -16,7 +16,7 @@ $.fn.dataTables = {
     },
 
     navigation: function (dataTable) {
-        $('.ah-search input').on('keyup', function () {
+        $('.ah-search input').on('change', function () {
             dataTable.search($(this).val()).draw();
         });
 
@@ -45,8 +45,7 @@ $.fn.dataTables = {
                 if (data === null) {
                     return "";
                 }
-                var date = new Date(data);
-                return date.toLocaleString();
+                return "<span title='" + moment(data).format('LLL') + "'>" + moment(data).locale('en').fromNow() + "</span>";
             }
         },
         number: function () {

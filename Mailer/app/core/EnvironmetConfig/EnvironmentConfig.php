@@ -6,6 +6,8 @@ class EnvironmentConfig
 {
     private $linkedServices = [];
 
+    private $params = [];
+
     public function linkService($code, $url, $icon)
     {
         if (empty($url)) {
@@ -38,5 +40,15 @@ class EnvironmentConfig
             ':host=' . $this->get('DB_HOST') .
             ';dbname=' . $this->get('DB_NAME') .
             ';port=' . $port;
+    }
+
+    public function setParam($key, $value)
+    {
+        $this->params[$key] = $value;
+    }
+
+    public function getParam($key, $default = null)
+    {
+        return $this->params[$key] ?? $default;
     }
 }

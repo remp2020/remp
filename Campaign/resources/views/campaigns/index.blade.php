@@ -57,7 +57,7 @@
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                     ],
-                    'order' => [5, 'desc'],
+                    'order' => [7, 'desc'],
                 ]) !!}
                 </div>
             </div>

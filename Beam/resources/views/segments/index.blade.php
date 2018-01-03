@@ -22,13 +22,20 @@
         </div>
 
         {!! Widget::run('DataTable', [
-            'colSettings' => ['name', 'code', 'active' => ['render' => 'boolean', 'header' => 'Is active']],
+            'colSettings' => [
+                'name',
+                'code',
+                'active' => ['render' => 'boolean', 'header' => 'Is active'],
+                'created_at' => ['render' => 'date', 'header' => 'Created at'],
+                'updated_at' => ['render' => 'date', 'header' => 'Updated at'],
+            ],
             'dataSource' => route('segments.json'),
             'rowActions' => [
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                 ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
             ],
             'rowActionLink' => 'edit',
+            'order' => [4, 'desc'],
         ]) !!}
     </div>
 

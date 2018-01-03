@@ -394,7 +394,8 @@ $(document).ready(function(){
         $('.date-time-picker').datetimepicker({
             focusOnShow: false,
             extraFormats: [ 'YYYY-MM-DDTHH:mm:ssZ' ],
-            useCurrent: false
+            useCurrent: false,
+            locale: moment.locale()
             // format: 'YYYY-MM-DD HH:mm:ss'
         });
     }

@@ -111,7 +111,7 @@ $(document).ready(function () {
             case 'ah-search-close':
                     x.fadeOut(300);
                     setTimeout(function(){
-                        x.find('.ahs-input').val('');
+                        x.find('.ahs-input').val('').trigger('change');
                     }, 350);
 
                 break;

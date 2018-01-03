@@ -24,7 +24,7 @@ class SegmentController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
-        $columns = ['id', 'name', 'active', 'code', 'created_at'];
+        $columns = ['id', 'name', 'active', 'code', 'created_at', 'updated_at'];
         $segments = Segment::select($columns);
 
         return $datatables->of($segments)

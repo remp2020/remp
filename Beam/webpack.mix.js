@@ -35,6 +35,7 @@ if (process.env.REMP_TARGET === 'lib') {
             "jquery",
             "jquery-placeholder",
             "malihu-custom-scrollbar-plugin",
+            "moment",
             "node-waves",
             "easy-pie-chart/dist/jquery.easypiechart.js",
             "bootstrap-notify",
@@ -45,6 +46,7 @@ if (process.env.REMP_TARGET === 'lib') {
             "jquery": ['$', 'jQuery', "window.jQuery"],
             "node-waves": ["Waves", "window.Waves"],
             "autosize": ["autosize", "window.autosize"],
-            "vue": ["vue", "window.vue"]
+            "vue": ["vue", "window.vue"],
+            "moment": ["Moment", "window.Moment"],
         });
 }

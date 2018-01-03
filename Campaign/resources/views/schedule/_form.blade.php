@@ -68,8 +68,6 @@
         var $endTimeFE = $("#end_time_frontend");
         var $endTime = $('input[name="end_time"]');
 
-		$startTimeFE.data("DateTimePicker").minDate(new Date());
-
 		$startTimeFE.on('dp.change', function() {
 			var st = $(this).data("DateTimePicker").date();
 			var et = $endTimeFE.data("DateTimePicker").date();
