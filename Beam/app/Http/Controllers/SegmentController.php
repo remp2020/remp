@@ -107,7 +107,7 @@ class SegmentController extends Controller
 
         foreach ($request->get('rules', []) as $r) {
             $rule = $segment->rules()->create($r);
-            $rule->fields = array_filter($rule->fields, function($item) {
+            $rule->fields = array_filter($rule->fields, function ($item) {
                 return !empty($item["key"]);
             });
             $rule->save();
@@ -161,7 +161,7 @@ class SegmentController extends Controller
             /** @var SegmentRule $rule */
             $rule = $segment->rules()->findOrNew($r['id']);
             $rule->fill($r);
-            $rule->fields = array_filter($rule->fields, function($item) {
+            $rule->fields = array_filter($rule->fields, function ($item) {
                 return !empty($item["key"]);
             });
             $rule->save();
