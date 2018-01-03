@@ -19,3 +19,21 @@ var SegmentRuleCache = Type("SegmentRuleCache", func() {
 
 	Required("s", "c")
 })
+
+var PageviewCountPayload = Type("PageviewCountPayload", func() {
+	Description("Parameters to filter pageview counts")
+
+	Attribute("filter_by", ArrayOf(FilterBy), "Selection of data filtering type (use tag name: user_id, article_id, ...)")
+	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
+	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
+	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+})
+
+var FilterBy = Type("FilterBy", func() {
+	Description("Tags and values used to filter results")
+
+	Attribute("tag", String, "Tag used to filter results")
+	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
+
+	Required("tag", "values")
+})

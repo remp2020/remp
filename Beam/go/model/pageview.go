@@ -28,6 +28,22 @@ type PageviewOptions struct {
 	TimeBefore time.Time
 }
 
+// PageviewCountOptions represent filter options for pageview count call.
+type PageviewCountOptions struct {
+	Action     string
+	IDs        []string
+	FilterBy   []*FilterBy
+	GroupBy    []string
+	TimeAfter  time.Time
+	TimeBefore time.Time
+}
+
+// FilterBy represents tag and values used to filter results of pageview count call.
+type FilterBy struct {
+	Tag    string
+	Values []string
+}
+
 // Pageview represents pageview data.
 type Pageview struct {
 	ArticleID    string
@@ -52,8 +68,8 @@ type PageviewCollection []*Pageview
 
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
-	// Count returns number of pageviews matching the filter defined by PageviewOptions.
-	Count(o PageviewOptions) (CountRowCollection, bool, error)
+	// Count returns number of pageviews matching the filter defined by PageviewCountOptions.
+	Count(o PageviewCountOptions) (CountRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o PageviewOptions) (PageviewCollection, error)
 	// Categories lists all tracked categories.
@@ -70,9 +86,9 @@ type PageviewDB struct {
 }
 
 // Count returns number of pageviews matching the filter defined by PageviewOptions.
-func (eDB *PageviewDB) Count(o PageviewOptions) (CountRowCollection, bool, error) {
+func (eDB *PageviewDB) Count(o PageviewCountOptions) (CountRowCollection, bool, error) {
 	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TablePageviews + `"`)
-	builder = eDB.addQueryFilters(builder, o)
+	builder = eDB.addCountQueryFilters(builder, o)
 
 	bb := builder.Build()
 	log.Println("pageview count query:", bb)
@@ -202,30 +218,82 @@ func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOp
 		}
 	}
 
-	groupBy := ""
-	for _, val := range o.GroupBy {
+	builder = addQueryFilterGroupBy(builder, o.GroupBy)
+	builder = addQueryFilterAction(builder, o.Action)
+	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
+	builder = addQueryFilterTimeBefore(builder, o.TimeBefore)
+
+	return builder
+}
+
+func (eDB *PageviewDB) addCountQueryFilters(builder influxquery.Builder, o PageviewCountOptions) influxquery.Builder {
+	if len(o.FilterBy) > 0 {
+		cond := ""
+		for _, val := range o.FilterBy {
+
+			if cond != "" {
+				cond += ") AND ("
+			}
+
+			// TODO: replace OR with IN when it's implemented into influxDB
+			// https://github.com/influxdata/influxdb/issues/2157
+			for i, v := range val.Values {
+				if i > 0 {
+					cond += " OR "
+				}
+				cond = fmt.Sprintf("%s%s = '%s'", cond, val.Tag, v)
+			}
+		}
+
+		if cond != "" {
+			builder = builder.Where(fmt.Sprintf("(%s)", cond))
+		}
+	}
+
+	builder = addQueryFilterGroupBy(builder, o.GroupBy)
+	builder = addQueryFilterAction(builder, o.Action)
+	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
+	builder = addQueryFilterTimeBefore(builder, o.TimeBefore)
+
+	return builder
+}
+
+func addQueryFilterGroupBy(builder influxquery.Builder, groupBy []string) influxquery.Builder {
+	condGroupBy := ""
+	for _, val := range groupBy {
 		if val == "" {
 			continue
 		}
-		if groupBy != "" {
-			groupBy = fmt.Sprintf(`%s, "%s"`, groupBy, val)
+		if condGroupBy != "" {
+			condGroupBy = fmt.Sprintf(`%s, "%s"`, condGroupBy, val)
 		} else {
-			groupBy = fmt.Sprintf(`"%s"`, val)
+			condGroupBy = fmt.Sprintf(`"%s"`, val)
 		}
 	}
-	if groupBy != "" {
-		builder = builder.GroupBy(groupBy)
+	if condGroupBy != "" {
+		builder = builder.GroupBy(condGroupBy)
 	}
 
-	if o.Action != "" {
-		builder = builder.Where(fmt.Sprintf("action = '%s'", o.Action))
-	}
+	return builder
+}
 
-	if !o.TimeAfter.IsZero() {
-		builder = builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
+func addQueryFilterAction(builder influxquery.Builder, action string) influxquery.Builder {
+	if action != "" {
+		builder = builder.Where(fmt.Sprintf("action = '%s'", action))
 	}
-	if !o.TimeBefore.IsZero() {
-		builder = builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
+	return builder
+}
+
+func addQueryFilterTimeAfter(builder influxquery.Builder, timeAfter time.Time) influxquery.Builder {
+	if !timeAfter.IsZero() {
+		builder = builder.Where(fmt.Sprintf("time >= %d", timeAfter.UnixNano()))
+	}
+	return builder
+}
+
+func addQueryFilterTimeBefore(builder influxquery.Builder, timeBefore time.Time) influxquery.Builder {
+	if !timeBefore.IsZero() {
+		builder = builder.Where(fmt.Sprintf("time < %d", timeBefore.UnixNano()))
 	}
 	return builder
 }

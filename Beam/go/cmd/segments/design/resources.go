@@ -243,19 +243,18 @@ var _ = Resource("pageviews", func() {
 	NoSecurity()
 
 	Action("count", func() {
-		Description("Returns counts of pageviews")
-		Routing(GET("/:action/count"))
+		Description("Returns number of pageviews")
+		Payload(PageviewCountPayload)
+		Routing(POST("/:action/count"))
 		Params(func() {
 			Param("action", String, "Identification of pageview action", func() {
 				Enum("load")
 			})
-			Param("filter_by", String, "Selection of data filtering type (use tag name: user_id, article_id, ...)")
-			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
-			Param("group_by", ArrayOf(String), "Select tags by which should be data grouped")
-			Param("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 		})
-		Response(OK, func() {
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(Accepted, func() {
 			Media(CollectionOf(PageviewCount, func() {
 				View("default")
 			}))
