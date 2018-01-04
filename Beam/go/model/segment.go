@@ -80,9 +80,6 @@ type UserSet map[string]bool
 // Intersector responds to ability to intersect provided userID with some other collection structure.
 type Intersector func(userID string) bool
 
-// FlagResolver returns list of flags for given category
-type FlagResolver func(category string) []string
-
 // SegmentDB represents Segment's storage MySQL/InfluxDB implementation.
 type SegmentDB struct {
 	MySQL          *sqlx.DB
