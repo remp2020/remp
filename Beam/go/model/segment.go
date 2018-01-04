@@ -26,6 +26,8 @@ type SegmentStorage interface {
 	EventRules() EventRules
 	// OverridableFields returns array of fields that expect to be overriden when rule is checked.
 	OverridableFields() OverridableFields
+	// Flags returns array of flags available for rules.
+	Flags() Flags
 }
 
 // EventRules represent map of rules with given "category/event" assigned
@@ -33,6 +35,9 @@ type EventRules map[string][]int
 
 // OverridableFields represent array of fields (key-value pairs) keyed by Rule ID.
 type OverridableFields map[int][]string
+
+// Flags represent array of flags keyed by Rule ID.
+type Flags map[int]map[string]string
 
 // SegmentCache represents event count information for SegmentRules indexed by SegmentRule ID.
 type SegmentCache map[int]*SegmentRuleCache
@@ -269,7 +274,7 @@ func (sDB *SegmentDB) Cache() error {
 	sm := make(map[string]*Segment)
 	sc := SegmentCollection{}
 
-	err := sDB.MySQL.Select(&sc, "SELECT * FROM segments")
+	err := sDB.MySQL.Select(&sc, "SELECT * FROM segments WHERE active = 1")
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -319,4 +324,15 @@ func (sDB *SegmentDB) OverridableFields() OverridableFields {
 		}
 	}
 	return of
+}
+
+// Flags returns array of flags available for rules.
+func (sDB *SegmentDB) Flags() Flags {
+	flags := make(Flags)
+	for _, s := range sDB.Segments {
+		for _, sr := range s.Rules {
+			flags[sr.ID] = sr.flags()
+		}
+	}
+	return flags
 }

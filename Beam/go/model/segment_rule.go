@@ -204,6 +204,18 @@ func (sr *SegmentRule) overridableFields() []string {
 	return fields
 }
 
+// overridableFields returns list of fields that can be overriden via RuleOverrides.
+func (sr *SegmentRule) flags() map[string]string {
+	flags := make(map[string]string)
+	for _, def := range sr.Flags {
+		if def["value"] == "" {
+			continue
+		}
+		flags[def["key"]] = def["value"]
+	}
+	return flags
+}
+
 // getCacheKey generates unique int-based key based on SegmentRule definition.
 func (sr *SegmentRule) getCacheKey(ro RuleOverrides) int {
 	if sr.cacheKey != 0 {

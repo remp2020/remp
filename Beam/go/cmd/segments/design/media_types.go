@@ -73,14 +73,16 @@ var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {
 		Attribute("cache", HashOf(Integer, SegmentRuleCache), "Cache object for third party (remplib.js) to use indexed by SegmentRule-based key")
 		Attribute("event_rules", HashOf(String, ArrayOf(Integer)), "Map of which rules should be incremented for selected events.")
 		Attribute("overridable_fields", HashOf(Integer, ArrayOf(String)), "Array of overridable fields belonging to rules.")
+		Attribute("flags", HashOf(Integer, HashOf(String, String)), "Array of flags belonging to rules.")
 	})
 	View("default", func() {
 		Attribute("check")
 		Attribute("cache")
 		Attribute("event_rules")
 		Attribute("overridable_fields")
+		Attribute("flags")
 	})
-	Required("check", "cache", "event_rules", "overridable_fields")
+	Required("check", "cache", "event_rules", "overridable_fields", "flags")
 })
 
 var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {

@@ -33,6 +33,8 @@ class Segment implements SegmentContract
 
     private $overridableFields;
 
+    private $flags;
+
     public function __construct(Client $client, $cacheEnabled)
     {
         $this->client = $client;
@@ -121,6 +123,9 @@ class Segment implements SegmentContract
         if (isset($result->overridable_fields)) {
             $this->overridableFields = $result->overridable_fields;
         }
+        if (isset($result->flags)) {
+            $this->flags = $result->flags;
+        }
 
         return $result->check;
     }
@@ -168,6 +173,9 @@ class Segment implements SegmentContract
         }
         if ($this->overridableFields) {
             $pd->overridable_fields = $this->overridableFields;
+        }
+        if ($this->flags) {
+            $pd->flags = $this->flags;
         }
         return $pd;
     }
