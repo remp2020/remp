@@ -36,45 +36,64 @@
             this.fetchArticleStats(this.articleIds);
         },
         methods: {
-            fetchArticleStats: function(ids) {
-                let queryIds = '';
-                for (let aid of ids) {
-                    queryIds = queryIds + '&ids=' + aid;
-                }
+            fetchArticleStats: function(articleIds) {
                 for (let range of this.hourRanges) {
-                    this.request(range, queryIds);
+                    this.request(range, articleIds);
                 }
             },
             
-
-            request: function(hourRange, queryIds) {
-                let vm = this
+            request: function(hourRange, articleIds) {
                 let d = new Date();
                 d.setHours(d.getHours() - hourRange);
 
-                Axios.get(this.baseUrl + '/journal/commerce/purchase/sum?time_after=' + d.toISOString() + '&filter_by=articles' + queryIds + '&group=1')
+                const payload = {
+                    "time_after": d.toISOString(),
+                    "filter_by": [
+                        {
+                            "tag": "article_id",
+                            "values": articleIds,
+                        },
+                    ],
+                    "group_by": [
+                        "article_id",
+                    ],
+                }
+
+                Axios.post(this.baseUrl + '/journal/commerce/purchase/sum', payload)
                     .then(function (response) {
-                        EventHub.$emit('content-conversions-revenue-changed', hourRange, response.data.sums)
+                        let sums = {}
+                        for (const group of response.data) {
+                            sums[group["tags"]["article_id"]] = group["count"]
+                        }
+                        EventHub.$emit('content-conversions-revenue-changed', hourRange, sums)
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        console.warn(error);
                     });
 
-                Axios.get(this.baseUrl + '/journal/commerce/purchase/count?time_after=' + d.toISOString() + '&filter_by=articles' + queryIds + '&group=1')
+                Axios.post(this.baseUrl + '/journal/commerce/purchase/count', payload)
                     .then(function (response) {
-                        EventHub.$emit('content-conversions-counts-changed', hourRange, response.data.counts)
+                        let counts = {}
+                        for (const group of response.data) {
+                            counts[group["tags"]["article_id"]] = group["count"]
+                        }
+                        EventHub.$emit('content-conversions-counts-changed', hourRange, counts)
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        console.warn(error);
                     });
 
-//                Axios.get(this.baseUrl + '/journal/pageviews/count?time_after=' + d.toISOString() + '&filter_by=articles' + queryIds + '&group=1')
-//                    .then(function (response) {
-//                        EventHub.$emit('content-pageviews-changed', hourRange, response.data.counts)
-//                    })
-//                    .catch(function (error) {
-//                        console.log(error);
-//                    });
+                Axios.get(this.baseUrl + '/journal/pageviews/load/count', payload)
+                    .then(function (response) {
+                        let counts = {}
+                        for (const group of response.data) {
+                            counts[group["tags"]["article_id"]] = group["count"]
+                        }
+                        EventHub.$emit('content-pageviews-changed', hourRange, counts)
+                    })
+                    .catch(function (error) {
+                        console.warn(error);
+                    });
             },
         },
 
