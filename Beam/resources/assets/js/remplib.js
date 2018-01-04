@@ -38,6 +38,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         overridableFieldsKey: "overridable_fields",
 
+        flagsKey: "flags",
+
         cookieDomain: null,
 
         init: function(config) {
@@ -98,6 +100,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
             window.addEventListener("campaign_showtime", this.syncEventRulesMap);
             window.addEventListener("campaign_showtime", this.syncOverridableFields);
+            window.addEventListener("campaign_showtime", this.syncFlags);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
         },
 
@@ -136,6 +139,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             localStorage.setItem(remplib.tracker.overridableFieldsKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["overridable_fields"]));
         },
 
+        syncFlags: function(e) {
+            if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
+                return;
+            }
+            if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("flags")) {
+                return;
+            }
+            localStorage.setItem(remplib.tracker.flagsKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["flags"]));
+        },
+
         incrementSegmentRulesCache: function(event) {
             let cache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
             if (!cache || !cache.hasOwnProperty(remplib.tracker.segmentProvider)) {
@@ -155,12 +168,18 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             // increment counts where applicable
             for (let ruleId of eventRules[key]) {
-                let of = remplib.getFromStorage(remplib.tracker.overridableFieldsKey, true) || [];
+                const flagsValid = remplib.tracker.validateFlags(ruleId);
+                if (!flagsValid) {
+                    continue;
+                }
+
+                const of = remplib.getFromStorage(remplib.tracker.overridableFieldsKey, true) || [];
                 if (!of.hasOwnProperty(ruleId)) {
                     console.warn("remplib: missing overridable fields for rule " + ruleId);
                     continue;
                 }
-                let cacheKey = remplib.tracker.segmentRuleKey(ruleId, of[ruleId], params);
+
+                const cacheKey = remplib.tracker.segmentRuleKey(ruleId, of[ruleId], params);
                 if (!cache[remplib.tracker.segmentProvider].hasOwnProperty(cacheKey)) {
                     continue;
                 }
@@ -168,6 +187,28 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
             localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(cache));
 
+        },
+
+        // checks if all flags are matched against provided config
+        validateFlags: function(ruleId) {
+            let flags = remplib.getFromStorage(remplib.tracker.flagsKey, true) || [];
+            if (!flags.hasOwnProperty(ruleId)) {
+                console.warn("remplib: missing flags for rule " + ruleId);
+                return false;
+            }
+
+            for (let f of Object.keys(flags[ruleId])) {
+                // duplicating flag handling from track/pageviews API call
+                if (f === '_article') {
+                    if (flags[ruleId][f] === '1' && !remplib.tracker.article) {
+                        return false;
+                    }
+                    if (flags[ruleId][f] === '0' && remplib.tracker.article) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         },
 
         // this function needs to work the same way as SegmentRule.getCacheKey on the segments backend.
