@@ -98,16 +98,18 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 	s := &Segment{}
 	err := sDB.MySQL.Get(s, "SELECT * FROM segments WHERE code = ?", code)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, false, nil
+		}
 		return nil, false, errors.Wrap(err, "unable to get segment from MySQL")
-	}
-	if s.ID == 0 {
-		return nil, false, nil
 	}
 
 	src := []SegmentRule{}
 	err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
 	if err != nil {
-		return nil, false, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
+		if err != sql.ErrNoRows {
+			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
+		}
 	}
 	s.Rules = src
 
