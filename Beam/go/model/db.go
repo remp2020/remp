@@ -41,6 +41,15 @@ type CountRow struct {
 // CountRowCollection represents collection of rows of grouped count.
 type CountRowCollection []CountRow
 
+// SumRow represents one row of grouped sum.
+type SumRow struct {
+	Tags map[string]string
+	Sum  float64
+}
+
+// SumRowCollection represents collection of rows of grouped sum.
+type SumRowCollection []SumRow
+
 // InfluxDB represents data layer based on InfluxDB.
 type InfluxDB struct {
 	DBName       string
@@ -121,24 +130,26 @@ func (iDB *InfluxDB) MultiGroupedCount(response *client.Response) (CountRowColle
 }
 
 // GroupedSum parses the provided response and extracts sums based on provided filter type.
-func (iDB *InfluxDB) GroupedSum(response *client.Response, ft FilterType) (map[string]float64, error) {
-	sums := make(map[string]float64)
+func (iDB *InfluxDB) GroupedSum(response *client.Response) (SumRowCollection, bool, error) {
+	var sums SumRowCollection
 	if len(response.Results[0].Series) == 0 {
-		sums[""] = 0
-		return sums, nil
+		return nil, false, nil
 	}
 
 	for _, s := range response.Results[0].Series {
+		var row SumRow
+		row.Tags = s.Tags
 		jsonCount, ok := s.Values[0][1].(json.Number)
 		if !ok {
-			return nil, errors.New("influx result is not json.Number, cannot proceed")
+			return nil, false, errors.New("influx result is not json.Number, cannot proceed")
 		}
 		sum, err := jsonCount.Float64()
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%f]", sum))
+			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to parse influx count [%f]", sum))
 		}
-		sums[s.Tags[ft.column()]] = sum
+		row.Sum = sum
+		sums = append(sums, row)
 	}
 
-	return sums, nil
+	return sums, true, nil
 }

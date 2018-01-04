@@ -20,16 +20,16 @@ var SegmentRuleCache = Type("SegmentRuleCache", func() {
 	Required("s", "c")
 })
 
-var PageviewCountPayload = Type("PageviewCountPayload", func() {
+var PageviewOptionsPayload = Type("PageviewOptionsPayload", func() {
 	Description("Parameters to filter pageview counts")
 
-	Attribute("filter_by", ArrayOf(PageviewCountFilterBy), "Selection of data filtering type")
+	Attribute("filter_by", ArrayOf(PageviewOptionsFilterBy), "Selection of data filtering type")
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 })
 
-var PageviewCountFilterBy = Type("PageviewCountFilterBy", func() {
+var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
 	Description("Tags and values used to filter results")
 
 	Attribute("tag", String, "Tag used to filter results (use tag name: user_id, article_id, ...)")
@@ -38,16 +38,16 @@ var PageviewCountFilterBy = Type("PageviewCountFilterBy", func() {
 	Required("tag", "values")
 })
 
-var CommerceCountPayload = Type("CommerceCountPayload", func() {
+var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Description("Parameters to filter commerce counts")
 
-	Attribute("filter_by", ArrayOf(CommerceCountFilterBy), "Selection of data filtering type")
+	Attribute("filter_by", ArrayOf(CommerceOptionsFilterBy), "Selection of data filtering type")
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 })
 
-var CommerceCountFilterBy = Type("CommerceCountFilterBy", func() {
+var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
 	Description("Tags and values used to filter results")
 
 	Attribute("tag", String, "Tag used to filter results", func() {

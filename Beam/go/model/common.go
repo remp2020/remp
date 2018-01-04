@@ -38,7 +38,9 @@ func addQueryFilterFilterBy(builder influxquery.Builder, filterBy []*FilterBy) i
 	if len(filterBy) > 0 {
 		cond := ""
 		for _, val := range filterBy {
-
+			if len(val.Values) == 0 {
+				continue
+			}
 			if cond != "" {
 				cond += ") AND ("
 			}

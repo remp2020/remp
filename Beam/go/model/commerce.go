@@ -46,7 +46,7 @@ type CommerceStorage interface {
 	// Count returns count of events based on the provided filter options.
 	Count(o CountOptions) (CountRowCollection, bool, error)
 	// Sum returns sum of events based on the provided filter options.
-	Sum(o CommerceOptions) (map[string]float64, error)
+	Sum(o CountOptions) (SumRowCollection, bool, error)
 	// List returns list of all events based on given CommerceOptions.
 	List(o CommerceOptions) (CommerceCollection, error)
 	// Categories lists all available categories.
@@ -127,9 +127,9 @@ func (cDB *CommerceDB) List(o CommerceOptions) (CommerceCollection, error) {
 }
 
 // Sum returns sum of events based on the provided filter options.
-func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
+func (cDB *CommerceDB) Sum(o CountOptions) (SumRowCollection, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`sum("revenue")`).From(`"` + TableCommerce + `"`)
-	builder = cDB.addQueryFilters(builder, o)
+	builder = addCountQueryFilters(builder, o)
 
 	bb := builder.Build()
 	log.Println("commerce sum query:", bb)
@@ -141,19 +141,14 @@ func (cDB *CommerceDB) Sum(o CommerceOptions) (map[string]float64, error) {
 
 	response, err := cDB.DB.Client.Query(q)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	if response.Error() != nil {
-		return nil, response.Error()
-	}
-
-	// no data returned
-	if len(response.Results[0].Series) == 0 {
-		return nil, nil
+		return nil, false, response.Error()
 	}
 
 	// process response
-	return cDB.DB.GroupedSum(response, o.FilterBy)
+	return cDB.DB.GroupedSum(response)
 }
 
 // Categories lists all available categories.

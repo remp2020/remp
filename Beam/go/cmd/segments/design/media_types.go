@@ -17,7 +17,7 @@ var EventCount = MediaType("application/vnd.event.count+json", func() {
 })
 
 var Count = MediaType("application/vnd.count+json", func() {
-	Description("Pageview count")
+	Description("Count")
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("count", Integer)
@@ -29,15 +29,17 @@ var Count = MediaType("application/vnd.count+json", func() {
 	Required("tags", "count")
 })
 
-var GroupedSums = MediaType("application/vnd.grouped.sums+json", func() {
-	Description("Grouped sums")
+var Sum = MediaType("application/vnd.sum+json", func() {
+	Description("Sum")
 	Attributes(func() {
-		Attribute("sums", HashOf(String, Number))
+		Attribute("tags", HashOf(String, String))
+		Attribute("sum", Number)
 	})
 	View("default", func() {
-		Attribute("sums")
+		Attribute("tags")
+		Attribute("sum")
 	})
-	Required("sums")
+	Required("tags", "sum")
 })
 
 var Segment = MediaType("application/vnd.segment+json", func() {
