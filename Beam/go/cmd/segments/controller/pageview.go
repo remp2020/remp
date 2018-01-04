@@ -22,7 +22,7 @@ func NewPageviewController(service *goa.Service, ps model.PageviewStorage) *Page
 
 // Count runs the count action.
 func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
-	var o model.PageviewCountOptions
+	var o model.CountOptions
 	o.Action = ctx.Action
 
 	for _, val := range ctx.Payload.FilterBy {

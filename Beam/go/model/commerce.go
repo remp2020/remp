@@ -44,7 +44,7 @@ type CommerceCollection []*Commerce
 // CommerceStorage is an interface to get commerce event related data.
 type CommerceStorage interface {
 	// Count returns count of events based on the provided filter options.
-	Count(o CommerceOptions) (map[string]int, bool, error)
+	Count(o CountOptions) (CountRowCollection, bool, error)
 	// Sum returns sum of events based on the provided filter options.
 	Sum(o CommerceOptions) (map[string]float64, error)
 	// List returns list of all events based on given CommerceOptions.
@@ -63,9 +63,9 @@ type CommerceDB struct {
 }
 
 // Count returns count of events based on the provided filter options.
-func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, bool, error) {
+func (cDB *CommerceDB) Count(o CountOptions) (CountRowCollection, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"` + TableCommerce + `"`)
-	builder = cDB.addQueryFilters(builder, o)
+	builder = addCountQueryFilters(builder, o)
 
 	bb := builder.Build()
 	log.Println("commerce count query:", bb)
@@ -84,7 +84,7 @@ func (cDB *CommerceDB) Count(o CommerceOptions) (map[string]int, bool, error) {
 	}
 
 	// process response
-	return cDB.DB.GroupedCount(response, o.FilterBy)
+	return cDB.DB.MultiGroupedCount(response)
 }
 
 // List returns list of all events based on given CommerceOptions.
@@ -199,15 +199,9 @@ func (cDB *CommerceDB) addQueryFilters(builder influxquery.Builder, o CommerceOp
 		}
 	}
 
-	if o.Step != "" {
-		builder = builder.Where(fmt.Sprintf("step = '%s'", o.Step))
-	}
-	if !o.TimeAfter.IsZero() {
-		builder = builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
-	}
-	if !o.TimeBefore.IsZero() {
-		builder = builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
-	}
+	builder = addQueryFilterStep(builder, o.Step)
+	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
+	builder = addQueryFilterTimeBefore(builder, o.TimeBefore)
 
 	return builder
 }

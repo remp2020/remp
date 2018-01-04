@@ -5,7 +5,7 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-var Count = MediaType("application/vnd.count+json", func() {
+var EventCount = MediaType("application/vnd.event.count+json", func() {
 	Description("Count")
 	Attributes(func() {
 		Attribute("count", Integer)
@@ -16,18 +16,7 @@ var Count = MediaType("application/vnd.count+json", func() {
 	Required("count")
 })
 
-var GroupedCounts = MediaType("application/vnd.grouped.counts+json", func() {
-	Description("Grouped counts")
-	Attributes(func() {
-		Attribute("counts", HashOf(String, Integer))
-	})
-	View("default", func() {
-		Attribute("counts")
-	})
-	Required("counts")
-})
-
-var PageviewCount = MediaType("application/vnd.pageview.count+json", func() {
+var Count = MediaType("application/vnd.count+json", func() {
 	Description("Pageview count")
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
