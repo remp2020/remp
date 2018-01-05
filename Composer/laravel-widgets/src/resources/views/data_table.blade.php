@@ -1,7 +1,7 @@
 <div class="table-responsive">
     <div class="action-header m-0 palette-White bg clearfix">
         <div class="ah-search" style="display: none;">
-            <input placeholder="Search" class="ahs-input b-0" type="text">
+            <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{{ $tableId }}">
             <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
         </div>
 
@@ -10,18 +10,15 @@
             <li class="ah-length dropdown">
                 <button class="btn palette-Cyan bg" data-toggle="dropdown">10</button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li class="active" data-value="2"><a class="dropdown-item dropdown-item-button">10</a></li>
+                    <li data-value="10"><a class="dropdown-item dropdown-item-button">10</a></li>
                     <li data-value="25"><a class="dropdown-item dropdown-item-button">25</a></li>
-                    <li data-value="50"><a class="dropdown-item dropdown-item-button">50</a></li>
-                    <li data-value="-1"><a class="dropdown-item dropdown-item-button">All</a></li>
+                    <li data-value="100"><a class="dropdown-item dropdown-item-button">100</a></li>
+                    <li data-value="250"><a class="dropdown-item dropdown-item-button">250</a></li>
                 </ul>
             </li>
+
             <li class="ah-pagination ah-prev"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-left"></i></button></li>
-            <li class="ah-pagination ah-page dropdown">
-                <button class="btn palette-Cyan bg" data-toggle="dropdown">Page 1</button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                </ul>
-            </li>
+            <li class="ah-pagination ah-curr"><button class="btn palette-Cyan bg disabled">1</button></li>
             <li class="ah-pagination ah-next"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-right"></i></button></li>
         </ul>
     </div>

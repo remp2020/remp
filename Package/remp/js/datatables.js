@@ -1,3 +1,34 @@
+$.extend( $.fn.dataTable.defaults, {
+    'language': {
+        "processing": '<div class="preloader pl-lg pls-teal">' +
+        '<svg class="pl-circular" viewBox="25 25 50 50">' +
+        '<circle class="plc-path" cx="50" cy="50" r="20"></circle>' +
+        '</svg>' +
+        '</div>'
+    },
+    'stateSave': true,
+    'stateLoaded': function(settings, data) {
+        // set filter state
+        if (data.search.search) {
+            $('#dt-search-' + settings.sInstance).val(data.search.search);
+            $('[data-ma-action="ah-search-open"]').trigger('click');
+        }
+
+        // set page state
+        var page = (data.start / data.length) + 1;
+        $('.ah-curr button').text(page);
+
+        // set items-per-page state
+        $('.ah-length button').text(data.length);
+        $('.ah-length li').each(function() {
+            $(this).removeClass('active');
+            if ($(this).data('value') === data.length.toString()) {
+                $(this).addClass('active');
+            }
+        })
+    },
+});
+
 $.fn.dataTables = {
     pagination: function (settings) {
         var start = settings._iDisplayStart;
@@ -28,14 +59,23 @@ $.fn.dataTables = {
             $(this).addClass('active');
 
             dataTable.page.len(value).draw();
+            $(this).closest('.ah-actions').find('.ah-curr button').text(dataTable.page.info().page + 1)
         });
 
         $('.ah-prev').on('click', function () {
+            if ($(this).find('button').is(':disabled')) {
+                return;
+            }
             dataTable.page('previous').draw('page');
+            $(this).closest('.ah-actions').find('.ah-curr button').text(dataTable.page.info().page + 1)
         });
 
         $('.ah-next').on('click', function () {
+            if ($(this).find('button').is(':disabled')) {
+                return;
+            }
             dataTable.page('next').draw('page');
+            $(this).closest('.ah-actions').find('.ah-curr button').text(dataTable.page.info().page + 1)
         });
     },
 

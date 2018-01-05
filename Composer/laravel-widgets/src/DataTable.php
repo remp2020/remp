@@ -3,7 +3,7 @@
 namespace Remp\Widgets;
 
 use Arrilot\Widgets\AbstractWidget;
-use Ramsey\Uuid\Uuid;
+use Psy\Util\Json;
 
 class DataTable extends AbstractWidget
 {
@@ -39,10 +39,16 @@ class DataTable extends AbstractWidget
             }
         });
 
+        $tableId = md5(Json::encode([
+            $this->config['dataSource'],
+            $cols,
+            $this->config['rowActions'],
+        ]));
+
         return view("widgets::data_table", [
             'dataSource' => $this->config['dataSource'],
             'cols' => $cols,
-            'tableId' => Uuid::getFactory()->uuid4(),
+            'tableId' => $tableId,
             'rowActions' => $this->config['rowActions'],
             'rowHighlights' => $this->config['rowHighlights'],
             'order' => $this->config['order'],

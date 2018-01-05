@@ -3,7 +3,7 @@
 namespace Remp\MailerModule\Components;
 
 use Nette\Application\UI\Control;
-use Nette\Utils\Random;
+use Nette\Utils\Json;
 
 class DataTable extends Control
 {
@@ -99,7 +99,12 @@ class DataTable extends Control
         $this->template->tableSettings = $this->tableSettings;
         $this->template->rowActions = $this->rowActions;
 
-        $this->template->tableId = 'dt-' . Random::generate(6);
+        $this->template->tableId = 'dt-' . md5(Json::encode([
+            $this->template->sourceUrl,
+            $this->template->colSettings,
+            $this->template->tableSettings,
+            $this->template->rowActions,
+        ]));
 
         $this->template->setFile(__DIR__ . '/data_table.latte');
         $this->template->render();
