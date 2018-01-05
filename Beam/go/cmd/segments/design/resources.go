@@ -111,7 +111,7 @@ var _ = Resource("events", func() {
 
 	Action("count", func() {
 		Description("Returns counts of events")
-		Routing(POST("/:category/:action/count"))
+		Routing(POST("/categories/:category/actions/:action/count"))
 		Payload(EventOptionsPayload)
 		Params(func() {
 			Param("action", String, "Event action")
@@ -170,7 +170,7 @@ var _ = Resource("commerce", func() {
 	Action("count", func() {
 		Description("Returns counts of commerce events")
 		Payload(CommerceOptionsPayload)
-		Routing(POST("/:step/count"))
+		Routing(POST("/steps/:step/count"))
 		Params(func() {
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
@@ -189,7 +189,7 @@ var _ = Resource("commerce", func() {
 	Action("sum", func() {
 		Description("Returns sum of amounts within events")
 		Payload(CommerceOptionsPayload)
-		Routing(POST("/:step/sum"))
+		Routing(POST("/steps/:step/sum"))
 		Params(func() {
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
@@ -247,7 +247,7 @@ var _ = Resource("pageviews", func() {
 	Action("count", func() {
 		Description("Returns counts of pageviews")
 		Payload(PageviewOptionsPayload)
-		Routing(POST("/:action/count"))
+		Routing(POST("/actions/:action/count"))
 		Params(func() {
 			Param("action", String, "Identification of pageview action", func() {
 				Enum("load")
