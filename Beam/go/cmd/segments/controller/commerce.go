@@ -56,7 +56,7 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 	}
 
 	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.Accepted(acrc)
+	return ctx.OK(acrc)
 }
 
 // List runs the list action.
@@ -127,7 +127,7 @@ func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
 	}
 
 	asrc := SumRowCollection(src).ToMediaType()
-	return ctx.Accepted(asrc)
+	return ctx.OK(asrc)
 }
 
 // Categories runs the categories action.

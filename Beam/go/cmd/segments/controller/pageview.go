@@ -56,7 +56,7 @@ func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 	}
 
 	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.Accepted(acrc)
+	return ctx.OK(acrc)
 }
 
 // List runs the list action.

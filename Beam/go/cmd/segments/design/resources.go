@@ -176,7 +176,7 @@ var _ = Resource("commerce", func() {
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
-		Response(Accepted, func() {
+		Response(OK, func() {
 			Media(CollectionOf(Count, func() {
 				View("default")
 			}))
@@ -195,7 +195,7 @@ var _ = Resource("commerce", func() {
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
-		Response(Accepted, func() {
+		Response(OK, func() {
 			Media(CollectionOf(Sum, func() {
 				View("default")
 			}))
@@ -253,7 +253,7 @@ var _ = Resource("pageviews", func() {
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
-		Response(Accepted, func() {
+		Response(OK, func() {
 			Media(CollectionOf(Count, func() {
 				View("default")
 			}))
