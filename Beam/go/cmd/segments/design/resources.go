@@ -120,7 +120,7 @@ var _ = Resource("events", func() {
 			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
 		})
 		Response(OK, func() {
-			Media(Count)
+			Media(EventCount)
 		})
 	})
 	Action("list", func() {
@@ -165,41 +165,40 @@ var _ = Resource("commerce", func() {
 	NoSecurity()
 
 	Action("count", func() {
-		Description("Returns counts of events")
-		Routing(GET("/:step/count"))
+		Description("Returns counts of commerce events")
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/:step/count"))
 		Params(func() {
-			Param("filter_by", String, "Selection of data filtering type", func() {
-				Enum("users", "articles", "authors")
-			})
-			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
-			Param("group", Boolean, "Whether to group results by filter values (used only when _filter_by_ is set)")
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
 			})
-			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
 		})
 		Response(OK, func() {
-			Media(GroupedCounts)
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
 		})
 	})
+
 	Action("sum", func() {
 		Description("Returns sum of amounts within events")
-		Routing(GET("/:step/sum"))
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/:step/sum"))
 		Params(func() {
-			Param("filter_by", String, "Selection of data filtering type", func() {
-				Enum("users", "articles", "authors")
-			})
-			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
-			Param("group", Boolean, "Whether to group results by filter values (used only when _filter_by_ is set)")
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
 			})
-			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
 		})
 		Response(OK, func() {
-			Media(GroupedSums)
+			Media(CollectionOf(Sum, func() {
+				View("default")
+			}))
 		})
 	})
 	Action("list", func() {
@@ -244,19 +243,18 @@ var _ = Resource("pageviews", func() {
 
 	Action("count", func() {
 		Description("Returns counts of pageviews")
-		Routing(GET("/:action/count"))
+		Payload(PageviewOptionsPayload)
+		Routing(POST("/:action/count"))
 		Params(func() {
 			Param("action", String, "Identification of pageview action", func() {
 				Enum("load")
 			})
-			Param("filter_by", String, "Selection of data filtering type (use tag name: user_id, article_id, ...)")
-			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
-			Param("group_by", ArrayOf(String), "Select tags by which should be data grouped")
-			Param("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
 		})
 		Response(OK, func() {
-			Media(CollectionOf(PageviewCount, func() {
+			Media(CollectionOf(Count, func() {
 				View("default")
 			}))
 		})

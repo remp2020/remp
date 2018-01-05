@@ -22,41 +22,41 @@ func NewCommerceController(service *goa.Service, cs model.CommerceStorage) *Comm
 
 // Count runs the count action.
 func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
-	o := model.CommerceOptions{
+	o := model.CountOptions{
 		Step: ctx.Step,
 	}
-	if ctx.FilterBy != nil {
-		ft, err := model.NewFilterType(*ctx.FilterBy)
-		if err != nil {
-			return err
-		}
-		o.FilterBy = ft
 
-		if ctx.Group != nil && *ctx.Group {
-			o.Group = true
+	for _, val := range ctx.Payload.FilterBy {
+		fb := &model.FilterBy{
+			Tag:    val.Tag,
+			Values: val.Values,
 		}
-		o.IDs = ctx.Ids
-	}
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
-	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
+		o.FilterBy = append(o.FilterBy, fb)
 	}
 
-	cc, ok, err := c.CommerceStorage.Count(o)
+	o.GroupBy = ctx.Payload.GroupBy
+	if ctx.Payload.TimeAfter != nil {
+		o.TimeAfter = *ctx.Payload.TimeAfter
+	}
+	if ctx.Payload.TimeBefore != nil {
+		o.TimeBefore = *ctx.Payload.TimeBefore
+	}
+
+	crc, ok, err := c.CommerceStorage.Count(o)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		cc = map[string]int{
-			"": 0,
+		cr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
 		}
+		crc = model.CountRowCollection{}
+		crc = append(crc, cr)
 	}
 
-	return ctx.OK(&app.GroupedCounts{
-		Counts: cc,
-	})
+	acrc := CountRowCollection(crc).ToMediaType()
+	return ctx.OK(acrc)
 }
 
 // List runs the list action.
@@ -93,36 +93,41 @@ func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
 
 // Sum runs the sum action.
 func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
-	o := model.CommerceOptions{
+	o := model.CountOptions{
 		Step: ctx.Step,
 	}
-	if ctx.FilterBy != nil {
-		ft, err := model.NewFilterType(*ctx.FilterBy)
-		if err != nil {
-			return err
-		}
-		o.FilterBy = ft
 
-		if ctx.Group != nil && *ctx.Group {
-			o.Group = true
+	for _, val := range ctx.Payload.FilterBy {
+		fb := &model.FilterBy{
+			Tag:    val.Tag,
+			Values: val.Values,
 		}
-		o.IDs = ctx.Ids
-	}
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
-	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
+		o.FilterBy = append(o.FilterBy, fb)
 	}
 
-	cs, err := c.CommerceStorage.Sum(o)
+	o.GroupBy = ctx.Payload.GroupBy
+	if ctx.Payload.TimeAfter != nil {
+		o.TimeAfter = *ctx.Payload.TimeAfter
+	}
+	if ctx.Payload.TimeBefore != nil {
+		o.TimeBefore = *ctx.Payload.TimeBefore
+	}
+
+	src, ok, err := c.CommerceStorage.Sum(o)
 	if err != nil {
 		return err
 	}
+	if !ok {
+		sr := model.SumRow{
+			Tags: make(map[string]string),
+			Sum:  0,
+		}
+		src = model.SumRowCollection{}
+		src = append(src, sr)
+	}
 
-	return ctx.OK(&app.GroupedSums{
-		Sums: cs,
-	})
+	asrc := SumRowCollection(src).ToMediaType()
+	return ctx.OK(asrc)
 }
 
 // Categories runs the categories action.

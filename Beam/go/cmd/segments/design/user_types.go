@@ -19,3 +19,41 @@ var SegmentRuleCache = Type("SegmentRuleCache", func() {
 
 	Required("s", "c")
 })
+
+var PageviewOptionsPayload = Type("PageviewOptionsPayload", func() {
+	Description("Parameters to filter pageview counts")
+
+	Attribute("filter_by", ArrayOf(PageviewOptionsFilterBy), "Selection of data filtering type")
+	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
+	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
+	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+})
+
+var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
+	Description("Tags and values used to filter results")
+
+	Attribute("tag", String, "Tag used to filter results (use tag name: user_id, article_id, ...)")
+	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
+
+	Required("tag", "values")
+})
+
+var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
+	Description("Parameters to filter commerce counts")
+
+	Attribute("filter_by", ArrayOf(CommerceOptionsFilterBy), "Selection of data filtering type")
+	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
+	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
+	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+})
+
+var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
+	Description("Tags and values used to filter results")
+
+	Attribute("tag", String, "Tag used to filter results", func() {
+		Enum("user_id", "article_id", "author_id")
+	})
+	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
+
+	Required("tag", "values")
+})

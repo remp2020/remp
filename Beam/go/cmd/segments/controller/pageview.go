@@ -22,25 +22,30 @@ func NewPageviewController(service *goa.Service, ps model.PageviewStorage) *Page
 
 // Count runs the count action.
 func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
-	var o model.PageviewOptions
+	var o model.CountOptions
 	o.Action = ctx.Action
-	if ctx.FilterBy != nil {
-		o.FilterBy = *ctx.FilterBy
-		o.IDs = ctx.Ids
+
+	for _, val := range ctx.Payload.FilterBy {
+		fb := &model.FilterBy{
+			Tag:    val.Tag,
+			Values: val.Values,
+		}
+		o.FilterBy = append(o.FilterBy, fb)
 	}
-	o.GroupBy = ctx.GroupBy
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
+
+	o.GroupBy = ctx.Payload.GroupBy
+	if ctx.Payload.TimeAfter != nil {
+		o.TimeAfter = *ctx.Payload.TimeAfter
 	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
+	if ctx.Payload.TimeBefore != nil {
+		o.TimeBefore = *ctx.Payload.TimeBefore
 	}
 
 	crc, ok, err := c.PageviewStorage.Count(o)
 	if err != nil {
 		return err
 	}
-	ok = false
+
 	if !ok {
 		cr := model.CountRow{
 			Tags:  make(map[string]string),

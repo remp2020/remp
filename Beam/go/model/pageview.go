@@ -52,8 +52,8 @@ type PageviewCollection []*Pageview
 
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
-	// Count returns number of pageviews matching the filter defined by PageviewOptions.
-	Count(o PageviewOptions) (CountRowCollection, bool, error)
+	// Count returns count of pageviews based on the provided filter options.
+	Count(o CountOptions) (CountRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o PageviewOptions) (PageviewCollection, error)
 	// Categories lists all tracked categories.
@@ -69,10 +69,10 @@ type PageviewDB struct {
 	DB *InfluxDB
 }
 
-// Count returns number of pageviews matching the filter defined by PageviewOptions.
-func (eDB *PageviewDB) Count(o PageviewOptions) (CountRowCollection, bool, error) {
+// Count returns count of pageviews based on the provided filter options.
+func (eDB *PageviewDB) Count(o CountOptions) (CountRowCollection, bool, error) {
 	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TablePageviews + `"`)
-	builder = eDB.addQueryFilters(builder, o)
+	builder = addCountQueryFilters(builder, o)
 
 	bb := builder.Build()
 	log.Println("pageview count query:", bb)
@@ -202,31 +202,11 @@ func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOp
 		}
 	}
 
-	groupBy := ""
-	for _, val := range o.GroupBy {
-		if val == "" {
-			continue
-		}
-		if groupBy != "" {
-			groupBy = fmt.Sprintf(`%s, "%s"`, groupBy, val)
-		} else {
-			groupBy = fmt.Sprintf(`"%s"`, val)
-		}
-	}
-	if groupBy != "" {
-		builder = builder.GroupBy(groupBy)
-	}
+	builder = addQueryFilterAction(builder, o.Action)
+	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
+	builder = addQueryFilterTimeBefore(builder, o.TimeBefore)
+	builder = addQueryFilterGroupBy(builder, o.GroupBy)
 
-	if o.Action != "" {
-		builder = builder.Where(fmt.Sprintf("action = '%s'", o.Action))
-	}
-
-	if !o.TimeAfter.IsZero() {
-		builder = builder.Where(fmt.Sprintf("time >= %d", o.TimeAfter.UnixNano()))
-	}
-	if !o.TimeBefore.IsZero() {
-		builder = builder.Where(fmt.Sprintf("time < %d", o.TimeBefore.UnixNano()))
-	}
 	return builder
 }
 

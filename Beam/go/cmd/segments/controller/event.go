@@ -47,7 +47,7 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 		ec = 0
 	}
 
-	return ctx.OK(&app.Count{
+	return ctx.OK(&app.EventCount{
 		Count: ec,
 	})
 }

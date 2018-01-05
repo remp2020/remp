@@ -40,6 +40,12 @@ type CountRow model.CountRow
 // CountRowCollection is the collection of count rows.
 type CountRowCollection model.CountRowCollection
 
+// SumRow represent row with sum result.
+type SumRow model.SumRow
+
+// SumRowCollection is the collection of sum rows.
+type SumRowCollection model.SumRowCollection
+
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() *app.Segment {
 	return &app.Segment{
@@ -225,9 +231,18 @@ func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 	return mt
 }
 
-// ToMediaType converts internal PageviewCountCollection representation to application one.
-func (crc CountRowCollection) ToMediaType() app.PageviewCountCollection {
-	mt := app.PageviewCountCollection{}
+// ToMediaType converts internal CountRow representation to application one.
+func (cr CountRow) ToMediaType() *app.Count {
+	mt := &app.Count{
+		Count: cr.Count,
+		Tags:  cr.Tags,
+	}
+	return mt
+}
+
+// ToMediaType converts internal CountRowCollection representation to application one.
+func (crc CountRowCollection) ToMediaType() app.CountCollection {
+	mt := app.CountCollection{}
 	for _, c := range crc {
 		mtc := (CountRow)(c).ToMediaType()
 		mt = append(mt, mtc)
@@ -235,11 +250,21 @@ func (crc CountRowCollection) ToMediaType() app.PageviewCountCollection {
 	return mt
 }
 
-// ToMediaType converts internal PageviewCount representation to application one.
-func (cr CountRow) ToMediaType() *app.PageviewCount {
-	mt := &app.PageviewCount{
-		Count: cr.Count,
-		Tags:  cr.Tags,
+// ToMediaType converts internal SumRow representation to application one.
+func (sr SumRow) ToMediaType() *app.Sum {
+	mt := &app.Sum{
+		Sum:  sr.Sum,
+		Tags: sr.Tags,
+	}
+	return mt
+}
+
+// ToMediaType converts internal SumRowCollection representation to application one.
+func (src SumRowCollection) ToMediaType() app.SumCollection {
+	mt := app.SumCollection{}
+	for _, c := range src {
+		mtc := (SumRow)(c).ToMediaType()
+		mt = append(mt, mtc)
 	}
 	return mt
 }
