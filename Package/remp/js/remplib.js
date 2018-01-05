@@ -10,6 +10,8 @@ export default {
 
     cacheThreshold: 15 * 60000, // 15 minutes
 
+    rempSessionIDKey: "remp_session_id",
+
     getUserId: function() {
         if (this.userId) {
             return this.userId;
@@ -29,6 +31,24 @@ export default {
         };
         localStorage.setItem(storageKey, JSON.stringify(item));
         return anonId;
+    },
+
+    getRempSessionID: function() {
+        const storageKey = this.rempSessionIDKey;
+        let rempSessionID = this.getFromStorage(storageKey, false);
+        if (rempSessionID) {
+            return rempSessionID;
+        }
+        rempSessionID = remplib.uuidv4();
+        const now = new Date();
+        let item = {
+            "version": 1,
+            "value": rempSessionID,
+            "createdAt": now,
+            "updatedAt": now,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(item));
+        return rempSessionID;
     },
 
     uuidv4: function() {
