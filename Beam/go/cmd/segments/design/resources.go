@@ -111,16 +111,19 @@ var _ = Resource("events", func() {
 
 	Action("count", func() {
 		Description("Returns counts of events")
-		Routing(GET("/count"))
+		Routing(POST("/:category/:action/count"))
+		Payload(EventOptionsPayload)
 		Params(func() {
-			Param("user_id", String, "Identification of user")
 			Param("action", String, "Event action")
 			Param("category", String, "Event category")
-			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
 		})
 		Response(OK, func() {
-			Media(EventCount)
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
 		})
 	})
 	Action("list", func() {

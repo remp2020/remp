@@ -177,6 +177,9 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, userID string, now time
 	for _, cond := range sr.conditions(now, ro) {
 		query = query.Where(cond)
 	}
+	for _, cond := range sr.groups() {
+		query = query.GroupBy(cond)
+	}
 
 	response, err := sDB.InfluxDB.Exec(query.Build())
 	if err != nil {
@@ -186,15 +189,36 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, userID string, now time
 		return 0, err
 	}
 
-	count, ok, err := sDB.InfluxDB.Count(response)
+	crc, ok, err := sDB.InfluxDB.MultiGroupedCount(response)
 	if err != nil {
 		return 0, err
 	}
-	if !ok { // no response from influx mean no data tracked
-		count = 0
+	if !ok {
+		return 0, nil
 	}
 
-	return count, nil
+	flags := sr.flags()
+	matchGroupedCount := func(cr CountRow) bool {
+		for flag, flagVal := range flags {
+			tagVal, ok := cr.Tags[flag]
+			if !ok {
+				return false
+			}
+			if flagVal != tagVal {
+				return false
+			}
+		}
+		return true
+	}
+
+	for _, cr := range crc {
+		if !matchGroupedCount(cr) {
+			continue
+		}
+		return cr.Count, nil
+	}
+
+	return 0, nil
 }
 
 // Users return list of all users within segment.

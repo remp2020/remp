@@ -9,6 +9,7 @@ import (
 
 // CountOptions represent filter options for count-related calls.
 type CountOptions struct {
+	Category   string
 	Action     string
 	Step       string
 	FilterBy   []*FilterBy
@@ -25,6 +26,7 @@ type FilterBy struct {
 
 func addCountQueryFilters(builder influxquery.Builder, o CountOptions) influxquery.Builder {
 	builder = addQueryFilterFilterBy(builder, o.FilterBy)
+	builder = addQueryFilterCategory(builder, o.Category)
 	builder = addQueryFilterAction(builder, o.Action)
 	builder = addQueryFilterStep(builder, o.Step)
 	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
@@ -60,6 +62,13 @@ func addQueryFilterFilterBy(builder influxquery.Builder, filterBy []*FilterBy) i
 		}
 	}
 
+	return builder
+}
+
+func addQueryFilterCategory(builder influxquery.Builder, category string) influxquery.Builder {
+	if category != "" {
+		builder = builder.Where(fmt.Sprintf("category = '%s'", category))
+	}
 	return builder
 }
 
