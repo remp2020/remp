@@ -162,19 +162,20 @@ func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
 		)
 	}
 
+	if sr.Timespan.Valid {
+		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
+		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
+	}
+	return conds
+}
+
+func (sr *SegmentRule) groups() []string {
+	var conds []string
 	for _, def := range sr.Flags {
 		if def["value"] == "" {
 			continue
 		}
-		conds = append(
-			conds,
-			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
-		)
-	}
-
-	if sr.Timespan.Valid {
-		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
-		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
+		conds = append(conds, def["key"])
 	}
 	return conds
 }
@@ -204,7 +205,7 @@ func (sr *SegmentRule) overridableFields() []string {
 	return fields
 }
 
-// overridableFields returns list of fields that can be overriden via RuleOverrides.
+// flags returns map of used flags with values (e.g. "_article": "1")
 func (sr *SegmentRule) flags() map[string]string {
 	flags := make(map[string]string)
 	for _, def := range sr.Flags {

@@ -111,16 +111,19 @@ var _ = Resource("events", func() {
 
 	Action("count", func() {
 		Description("Returns counts of events")
-		Routing(GET("/count"))
+		Routing(POST("/categories/:category/actions/:action/count"))
+		Payload(EventOptionsPayload)
 		Params(func() {
-			Param("user_id", String, "Identification of user")
 			Param("action", String, "Event action")
 			Param("category", String, "Event category")
-			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
 		})
 		Response(OK, func() {
-			Media(EventCount)
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
 		})
 	})
 	Action("list", func() {
@@ -167,7 +170,7 @@ var _ = Resource("commerce", func() {
 	Action("count", func() {
 		Description("Returns counts of commerce events")
 		Payload(CommerceOptionsPayload)
-		Routing(POST("/:step/count"))
+		Routing(POST("/steps/:step/count"))
 		Params(func() {
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
@@ -186,7 +189,7 @@ var _ = Resource("commerce", func() {
 	Action("sum", func() {
 		Description("Returns sum of amounts within events")
 		Payload(CommerceOptionsPayload)
-		Routing(POST("/:step/sum"))
+		Routing(POST("/steps/:step/sum"))
 		Params(func() {
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
@@ -244,7 +247,7 @@ var _ = Resource("pageviews", func() {
 	Action("count", func() {
 		Description("Returns counts of pageviews")
 		Payload(PageviewOptionsPayload)
-		Routing(POST("/:action/count"))
+		Routing(POST("/actions/:action/count"))
 		Params(func() {
 			Param("action", String, "Identification of pageview action", func() {
 				Enum("load")

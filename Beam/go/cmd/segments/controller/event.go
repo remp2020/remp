@@ -22,34 +22,43 @@ func NewEventController(service *goa.Service, es model.EventStorage) *EventContr
 
 // Count runs the count action.
 func (c *EventController) Count(ctx *app.CountEventsContext) error {
-	o := model.EventOptions{}
-	if ctx.Action != nil {
-		o.Action = *ctx.Action
-	}
-	if ctx.Category != nil {
-		o.Category = *ctx.Category
-	}
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
-	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
-	}
-	if ctx.UserID != nil {
-		o.UserID = *ctx.UserID
+	o := model.CountOptions{
+		Action:   ctx.Action,
+		Category: ctx.Category,
 	}
 
-	ec, ok, err := c.EventStorage.Count(o)
+	for _, val := range ctx.Payload.FilterBy {
+		fb := &model.FilterBy{
+			Tag:    val.Tag,
+			Values: val.Values,
+		}
+		o.FilterBy = append(o.FilterBy, fb)
+	}
+
+	o.GroupBy = ctx.Payload.GroupBy
+
+	if ctx.Payload.TimeAfter != nil {
+		o.TimeAfter = *ctx.Payload.TimeAfter
+	}
+	if ctx.Payload.TimeBefore != nil {
+		o.TimeBefore = *ctx.Payload.TimeBefore
+	}
+
+	crc, ok, err := c.EventStorage.Count(o)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		ec = 0
+		cr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
+		}
+		crc = model.CountRowCollection{}
+		crc = append(crc, cr)
 	}
 
-	return ctx.OK(&app.EventCount{
-		Count: ec,
-	})
+	acrc := CountRowCollection(crc).ToMediaType()
+	return ctx.OK(acrc)
 }
 
 // List runs the list action.

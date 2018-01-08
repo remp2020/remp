@@ -44,7 +44,7 @@ type EventCollection []*Event
 // EventStorage is an interface to get generic event related data.
 type EventStorage interface {
 	// Count returns number of events matching the filter defined by EventOptions.
-	Count(o EventOptions) (int, bool, error)
+	Count(o CountOptions) (CountRowCollection, bool, error)
 	// List returns list of all events based on given EventOptions.
 	List(o EventOptions) (EventCollection, error)
 	// Categories lists all tracked categories.
@@ -65,9 +65,9 @@ type EventDB struct {
 }
 
 // Count returns number of events matching the filter defined by EventOptions.
-func (eDB *EventDB) Count(o EventOptions) (int, bool, error) {
-	builder := eDB.DB.QueryBuilder.Select("count(value)").From(`"` + TableEvents + `"`)
-	builder = eDB.addQueryFilters(builder, o)
+func (eDB *EventDB) Count(o CountOptions) (CountRowCollection, bool, error) {
+	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TableEvents + `"`)
+	builder = addCountQueryFilters(builder, o)
 
 	q := client.Query{
 		Command:  builder.Build(),
@@ -76,14 +76,14 @@ func (eDB *EventDB) Count(o EventOptions) (int, bool, error) {
 
 	response, err := eDB.DB.Client.Query(q)
 	if err != nil {
-		return 0, false, err
+		return nil, false, err
 	}
 	if response.Error() != nil {
-		return 0, false, response.Error()
+		return nil, false, response.Error()
 	}
 
 	// process response
-	return eDB.DB.Count(response)
+	return eDB.DB.MultiGroupedCount(response)
 }
 
 // List returns list of all events based on given EventOptions.
