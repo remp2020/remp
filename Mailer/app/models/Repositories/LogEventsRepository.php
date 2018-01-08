@@ -20,4 +20,17 @@ class LogEventsRepository extends Repository
             'type' => $type,
         ]);
     }
+
+    public function findByLogType($logId, $type)
+    {
+        return $this->getTable()->where([
+            'mail_log_id' => $logId,
+            'type' => $type,
+        ])->fetch();
+    }
+
+    public function latestEventTime(): \DateTime
+    {
+        return $this->getTable()->max('event_at');
+    }
 }

@@ -63,4 +63,14 @@ class MailgunMailer extends Mailer implements IMailer
 
         $this->mailer->messages()->send($this->options['domain'], $data);
     }
+
+    public function mailer()
+    {
+        return $this->mailer;
+    }
+
+    public function option($key)
+    {
+        return isset($this->options[$key]) ? $this->options[$key] : null;
+    }
 }
