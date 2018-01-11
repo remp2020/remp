@@ -59,7 +59,7 @@
                     ],
                 }
 
-                Axios.post(this.baseUrl + '/journal/commerce/purchase/sum', payload)
+                Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/sum', payload)
                     .then(function (response) {
                         let sums = {}
                         for (const group of response.data) {
@@ -71,7 +71,7 @@
                         console.warn(error);
                     });
 
-                Axios.post(this.baseUrl + '/journal/commerce/purchase/count', payload)
+                Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/count', payload)
                     .then(function (response) {
                         let counts = {}
                         for (const group of response.data) {
@@ -83,7 +83,7 @@
                         console.warn(error);
                     });
 
-                Axios.get(this.baseUrl + '/journal/pageviews/load/count', payload)
+                Axios.get(this.baseUrl + '/journal/pageviews/actions/load/count', payload)
                     .then(function (response) {
                         let counts = {}
                         for (const group of response.data) {
