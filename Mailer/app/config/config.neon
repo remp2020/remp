@@ -94,6 +94,7 @@ services:
         class: Remp\MailerModule\Commands\HermesWorkerCommand
         setup:
             - add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
+            - add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventHandler())
 #            - add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
 
     eventEmitter:

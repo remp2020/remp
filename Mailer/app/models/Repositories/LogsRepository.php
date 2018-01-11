@@ -20,6 +20,15 @@ class LogsRepository extends Repository
 
     private $logEventsRepository;
 
+    private $eventMap = [
+        'delivered' => 'delivered_at',
+        'clicked' => 'clicked_at',
+        'opened' => 'opened_at',
+        'complained' => 'spam_complained_at',
+        'bounced' => 'hard_bounced_at',
+        'dropped' => 'dropped_at',
+    ];
+
     public function __construct($startStatsDate, Context $database, LogEventsRepository $logEventsRepository)
     {
         parent::__construct($database);
@@ -209,5 +218,25 @@ class LogsRepository extends Repository
                 'mail_logs.email' => $email,
                 'mail_template.code' => $mailTemplateCode
             ])->count('*') > 0;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function mappedEvents(): array
+    {
+        return array_keys($this->eventMap);
+    }
+
+    /**
+     * @param string $externalEvent
+     * @return string|null
+     */
+    public function mapEvent(string $externalEvent)
+    {
+        if (!isset($this->eventMap[$externalEvent])) {
+            return null;
+        }
+        return $this->eventMap[$externalEvent];
     }
 }

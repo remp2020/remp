@@ -2,11 +2,9 @@
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-use Remp\MailerModule\Repository\LogEventsRepository;
-use Nette\Utils\DateTime;
-use Remp\MailerModule\Config\Config;
-use Remp\MailerModule\Repository\LogsRepository;
+use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Sender;
+use Tomaj\Hermes\Emitter;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -15,22 +13,13 @@ class MailgunEventsHandler extends BaseHandler
 {
     private $sender;
 
-    /** @var LogsRepository */
-    private $logsRepository;
+    private $emitter;
 
-    /** @var LogEventsRepository */
-    private $logEventsRepository;
-
-    public function __construct(
-        Config $config,
-        LogsRepository $logsRepository,
-        LogEventsRepository $logEventsRepository,
-        Sender $sender
-    ) {
+    public function __construct(Sender $sender, Emitter $emitter)
+    {
         parent::__construct();
         $this->sender = $sender;
-        $this->logsRepository = $logsRepository;
-        $this->logEventsRepository = $logEventsRepository;
+        $this->emitter = $emitter;
     }
 
     public function params()
@@ -53,32 +42,11 @@ class MailgunEventsHandler extends BaseHandler
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Wrong signature.']);
         }
 
-        $log = $this->logsRepository->findBySenderId($params['mail_sender_id']);
-        if (!$log) {
-            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Message not found.']);
-        }
-
-        $date = DateTime::from($params['timestamp']);
-
-        $updateMapping = [
-            'delivered' => 'delivered_at',
-            'clicked' => 'clicked_at',
-            'opened' => 'opened_at',
-            'complained' => 'spam_complained_at',
-            'bounced' => 'hard_bounced_at',
-            'dropped' => 'dropped_at',
-        ];
-
-        if (isset($updateMapping[$params['event']])) {
-            $this->logsRepository->update($log, [
-                $updateMapping[$params['event']] => $date,
-                'updated_at' => new DateTime(),
-            ]);
-        } else {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Unknown event.']);
-        }
-
-        $this->logEventsRepository->addLog($log, $date, $params['event']);
+        $this->emitter->emit(new HermesMessage('mailgun-event', [
+            'mail_sender_id' => $params['mail_sender_id'],
+            'timestamp' => $params['timestamp'],
+            'event' => $params['event'],
+        ]));
 
         return new JsonApiResponse(200, ['status' => 'ok']);
     }
