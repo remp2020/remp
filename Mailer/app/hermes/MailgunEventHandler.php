@@ -17,8 +17,7 @@ class MailgunEventHandler implements HandlerInterface
     public function __construct(
         LogsRepository $logsRepository,
         LogEventsRepository $logEventsRepository
-    )
-    {
+    ) {
         $this->logsRepository = $logsRepository;
         $this->logEventsRepository = $logEventsRepository;
     }
