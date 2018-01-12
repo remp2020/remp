@@ -232,7 +232,7 @@ class LogsRepository extends Repository
      * @param string $externalEvent
      * @return string|null
      */
-    public function mapEvent(string $externalEvent)
+    public function mapEvent(string $externalEvent): ?string
     {
         if (!isset($this->eventMap[$externalEvent])) {
             return null;
