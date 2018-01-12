@@ -22,15 +22,6 @@ class MailgunEventsCommand extends Command
 
     private $logEventsRepository;
 
-    private static $updateMapping = [
-        'delivered' => 'delivered_at',
-        'clicked' => 'clicked_at',
-        'opened' => 'opened_at',
-        'complained' => 'spam_complained_at',
-        'bounced' => 'hard_bounced_at',
-        'dropped' => 'dropped_at',
-    ];
-
     public function __construct(
         MailerFactory $mailerFactory,
         LogsRepository $logsRepository,
@@ -66,7 +57,7 @@ class MailgunEventsCommand extends Command
         $eventResponse = $this->mailgun->mailer()->events()->get($this->mailgun->option('domain'), [
             'ascending' => true,
             'begin' => $latestEventTime->sub(\DateInterval::createFromDateString($timespan))->getTimestamp(),
-            'event' => implode(' OR ', array_keys(self::$updateMapping))
+            'event' => implode(' OR ', $this->logsRepository->mappedEvents()),
         ]);
 
         do {
@@ -75,7 +66,8 @@ class MailgunEventsCommand extends Command
                 $userVariables = $event->getUserVariables();
                 $date = $event->getEventDate()->format(DATE_RFC3339);
 
-                if (!isset(self::$updateMapping[$event->getEvent()])) {
+                $mappedEvent = $this->logsRepository->mapEvent($event->getEvent());
+                if (!$mappedEvent) {
                     // unsupported event type
                     $output->writeln(sprintf("%s: ignoring event: %s (unsupported)", $date, $event->getEvent()));
                     continue;
@@ -98,7 +90,7 @@ class MailgunEventsCommand extends Command
                 $date = DateTime::from($event->getTimestamp());
 
                 $this->logsRepository->update($log, [
-                    self::$updateMapping[$event->getEvent()] => $date,
+                    $mappedEvent => $date,
                     'updated_at' => new DateTime(),
                 ]);
 
