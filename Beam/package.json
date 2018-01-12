@@ -43,8 +43,7 @@
     "moment": "^2.20.1",
     "node-waves": "^0.7.5",
     "remp": "file:../Package/remp",
-    "vue": "^2.4.2",
-    "vue-currency-filter": "^1.4.0"
+    "vue": "^2.4.2"
   },
   "devDependencies": {
     "bootstrap-sass": "^3.3.7",

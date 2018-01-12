@@ -6567,10 +6567,6 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
-vue-currency-filter@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/vue-currency-filter/-/vue-currency-filter-1.4.0.tgz#1e3e57d620532f0ffed9b2ea005a26e012dce076"
-
 vue-hot-reload-api@^2.2.0:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.2.4.tgz#683bd1d026c0d3b3c937d5875679e9a87ec6cd8f"
