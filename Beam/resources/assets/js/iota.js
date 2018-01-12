@@ -67,7 +67,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (this.targetElementCallback) {
                     let targetElement = this.targetElementCallback(elem);
                     if (!targetElement) {
-//                        console.warn("remplib: targetElementCallback did not return any item")
                         continue;
                     }
                     targetElement.parentNode.insertBefore(iotaElemContainer, targetElement.nextSibling);
@@ -77,7 +76,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                 let aid = this.idCallback(elem);
                 if (!aid) {
-//                    console.warn("remplib: idCallback did not return an articleId");
                     continue;
                 }
 
