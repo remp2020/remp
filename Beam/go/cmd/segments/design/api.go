@@ -16,7 +16,7 @@ var _ = API("journal", func() {
 	Produces("application/json")
 	Origin("*", func() {
 		Methods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-		Headers("Content-Type")
+		Headers("Content-Type", "Authorization")
 	})
 	ResponseTemplate(BadRequest, func() {
 		Description("Invalid request sent")

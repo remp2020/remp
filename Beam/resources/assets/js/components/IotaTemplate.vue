@@ -20,7 +20,7 @@
 
 <template>
     <div>
-        <div class="ri_box ri_box__expanded">
+        <div class="ri_box ri_box__expanded" :data-article-id="articleId">
             <div v-if="sortedRevenueRanges.length > 0" class="ri_box_line">
                 <div class="ri_box_logo">
                     <svg viewBox="0 0 71.61 70.88"><polygon fill="black" points="35.8 2.74 16.91 13.65 23.2 17.29 35.8 10.02 54.7 20.93 35.8 31.84 35.8 31.84 10.61 17.29 10.61 53.59 16.91 57.23 16.91 28.2 35.8 39.11 35.8 39.11 35.8 39.11 35.8 39.11 61 24.57 61 17.29 35.8 2.74" /><polygon fill="black" points="23.2 53.66 23.2 60.93 35.8 68.14 61 53.59 61 46.32 35.8 60.86 23.2 53.66"/><polygon fill="black" points="35.8 46.28 23.2 39.08 23.2 46.35 35.8 53.55 35.8 53.66 61 39.11 61 31.84 35.8 46.39 35.8 46.28"/></svg>
@@ -31,6 +31,16 @@
                     <div class="ri_box_value">
                         {{ revenueStats[range].toFixed(2) }}&euro;
                         <span v-if="countStats[range]" class="ri_box_small">({{ countStats[range] }})</span>&nbsp; 
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="sortedPageviewRanges.length > 0" class="ri_box_line">
+                <div class="ri_box_title">Pageviews</div>
+                <div v-for="range in sortedPageviewRanges" class="ri_box_item">
+                    <div class="ri_box_key">{{ range }}H</div>
+                    <div class="ri_box_value">
+                        {{ pageviewStats[range] }}&nbsp;
                     </div>
                 </div>
             </div>
@@ -87,6 +97,7 @@
                 this.$set(this.countStats, hourRange, counts[this.articleId]);
             },
             updatePageviewStats: function(hourRange, counts) {
+                this.pageviewRanges.push(hourRange);
                 if (counts === null || !counts[this.articleId]) {
                     this.$set(this.pageviewStats, hourRange, 0);
                     return;

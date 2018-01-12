@@ -63,7 +63,7 @@
                     .then(function (response) {
                         let sums = {}
                         for (const group of response.data) {
-                            sums[group["tags"]["article_id"]] = group["count"]
+                            sums[group["tags"]["article_id"]] = group["sum"]
                         }
                         EventHub.$emit('content-conversions-revenue-changed', hourRange, sums)
                     })
@@ -83,7 +83,7 @@
                         console.warn(error);
                     });
 
-                Axios.get(this.baseUrl + '/journal/pageviews/actions/load/count', payload)
+                Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', payload)
                     .then(function (response) {
                         let counts = {}
                         for (const group of response.data) {
