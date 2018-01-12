@@ -348,6 +348,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "utm_content": this.getParam("utm_content")
                 }
             };
+            params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
+
             var cleanup = function(obj) {
                 Object.keys(obj).forEach(function(key) {
                     if (obj[key] && typeof obj[key] === 'object') cleanup(obj[key])
