@@ -139,6 +139,7 @@ class Sender
             'batch_id' => $this->batchId,
             'mail_sender_id' => $senderId,
         ]));
+        $message->setHeader('X-Mailer-Tag', $this->template->code);
 
         $this->logsRepository->add(
             $this->recipient['email'],

@@ -47,6 +47,7 @@ class MailgunMailer extends Mailer implements IMailer
         }
 
         $mailVariables = Json::decode($message->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
+        $tag = $message->getHeader('X-Mailer-Tag');
 
         $data = [
             'from' => $from,
@@ -55,8 +56,10 @@ class MailgunMailer extends Mailer implements IMailer
             'text' => $message->getBody(),
             'html' => $message->getHtmlBody(),
             'attachment' => $attachments,
-            'tag' => $mailVariables['template'],
         ];
+        if ($tag) {
+            $data['o:tag'] = $tag;
+        }
         foreach ($mailVariables as $key => $val) {
             $data["v:".$key] = $val;
         }
