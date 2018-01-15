@@ -3,6 +3,7 @@
 /public/hot
 /public/assets/vendor
 /public/assets/lib
+/public/assets/iota
 /public/mix-manifest.json
 /storage/*.key
 /vendor

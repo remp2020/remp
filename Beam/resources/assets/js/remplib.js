@@ -19,10 +19,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         _: [],
 
-        callbackIterator: 0,
-
-        initIterator: 0,
-
         article: {
             id: null,
             author_id: null,
