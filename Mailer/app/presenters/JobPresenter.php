@@ -16,6 +16,7 @@ use Remp\MailerModule\Forms\NewTemplateFormFactory;
 use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
+use Remp\MailerModule\Repository\JobQueueRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\LogEventsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
@@ -50,13 +51,12 @@ final class JobPresenter extends BasePresenter
 
     private $linkGenerator;
 
-    /** @var  Aggregator */
     private $segmentAggregator;
 
-    /** @var MailCache */
+    private $jobQueueRepository;
+
     private $mailCache;
 
-    /** @var ILatteFactory  */
     private $latteFactory;
 
     public function __construct(
@@ -73,6 +73,7 @@ final class JobPresenter extends BasePresenter
         LogEventsRepository $logEventsRepository,
         Aggregator $segmentAggregator,
         MailCache $mailCache,
+        JobQueueRepository $jobQueueRepository,
         ILatteFactory $latteFactory,
         LinkGenerator $linkGenerator
     ) {
@@ -90,6 +91,7 @@ final class JobPresenter extends BasePresenter
         $this->logEventsRepository = $logEventsRepository;
         $this->segmentAggregator = $segmentAggregator;
         $this->mailCache = $mailCache;
+        $this->jobQueueRepository = $jobQueueRepository;
         $this->latteFactory = $latteFactory;
         $this->linkGenerator = $linkGenerator;
     }
@@ -248,7 +250,17 @@ final class JobPresenter extends BasePresenter
     {
         $batch = $this->batchesRepository->find($id);
 
+        $sentCount = $this->logsRepository->getTable()->where([
+            'mail_job_batch_id' => $batch->id,
+        ])->count('*');
+        if ($sentCount > 0) {
+            $this->flashMessage('Batch was not removed, some emails were already sent');
+            $this->redirect('Show', $batch->job_id);
+        }
+
         $this->batchTemplatesRepository->deleteByBatchId($batch->id);
+        $this->mailCache->removeQueue($batch->id);
+        $this->jobQueueRepository->deleteJobsByBatch($batch->id, true);
         $this->batchesRepository->delete($batch);
 
         $this->flashMessage('Batch was removed.');
