@@ -87,7 +87,8 @@ class MailgunEventsCommand extends Command
                     continue;
                 }
 
-                $date = DateTime::from($event->getTimestamp());
+                $eventTimestamp = explode('.', $event->getTimestamp())[0];
+                $date = DateTime::from($eventTimestamp);
 
                 $this->logsRepository->update($log, [
                     $mappedEvent => $date,
