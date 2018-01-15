@@ -113,6 +113,11 @@
                     "backgroundColor": "#e91e63", "textColor": "#ffffff",
                     "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
                 },
+                "darkRed": {
+                    "label": "Dark red",
+                    "backgroundColor": "#b00c28", "textColor": "#ffffff",
+                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
+                },
                 "black": {
                     "label": "Black",
                     "textColor": "#ffffff", "backgroundColor": "#262325",
