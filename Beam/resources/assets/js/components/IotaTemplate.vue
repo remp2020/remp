@@ -44,6 +44,19 @@
                     </div>
                 </div>
             </div>
+
+            <div v-if="sortedTitleVariants.length > 0" class="ri_box_line">
+                <div v-for="variant in sortedTitleVariants" class="ri_box_item">
+                    <div class="ri_box_title">Title {{ variant }}</div>
+                    <div v-for="(count,range) in titleVariantStats[variant]">
+                        <div class="ri_box_key">{{ range }}H</div>
+                        <div class="ri_box_value">
+                            {{ count }}&nbsp;
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -63,14 +76,17 @@
             revenueStats: {},
             countStats: {},
             pageviewStats: {},
+            titleVariantStats: {},
 
             revenueRanges: [],
             pageviewRanges: [],
+            titleVariants: [],
         }),
         created: function() {
             EventHub.$on("content-conversions-revenue-changed", this.updateRevenueStats)
             EventHub.$on("content-conversions-counts-changed", this.updateCountStats)
             EventHub.$on("content-pageviews-changed", this.updatePageviewStats)
+            EventHub.$on("content-title-variants-changed", this.updateTitleVariantStats)
         },
         computed: {
             sortedRevenueRanges: function() {
@@ -78,7 +94,10 @@
             },
             sortedPageviewRanges: function() {
                 return this.pageviewRanges.slice().sort((a, b) => a - b);
-            }
+            },
+            sortedTitleVariants: function() {
+                return this.titleVariants.slice().sort((a, b) => a - b);
+            },
         },
         methods: {
             updateRevenueStats: function(hourRange, sums) {
@@ -103,6 +122,25 @@
                     return;
                 }
                 this.$set(this.pageviewStats, hourRange, counts[this.articleId]);
+            },
+            updateTitleVariantStats: function(hourRange, variant, counts) {
+                if (variant === "") {
+                    // no A/B test data were tracked, ignoring this section
+                    return;
+                }
+
+                if (this.titleVariants.indexOf(variant) === -1) {
+                    this.titleVariants.push(variant);
+                }
+
+                let val = this.titleVariantStats[variant] || {};
+                if (counts === null || !counts[this.articleId]) {
+                    val[hourRange] = 0
+                } else {
+                    val[hourRange] = counts[this.articleId]
+                }
+                this.titleVariantStats[variant] = val;
+                this.$forceUpdate();
             },
         },
 
