@@ -60,7 +60,7 @@ class MailgunEventsCommand extends Command
         while (true) {
             $events = $eventResponse->getItems();
             if (count($events) == 0) {
-                $output->writeln(sprintf("%s: all events processed, waiting for %d seconds before proceeding", new DateTime(),self::WAIT_SECONDS));
+                $output->writeln(sprintf("%s: all events processed, waiting for %d seconds before proceeding", new DateTime(), self::WAIT_SECONDS));
                 sleep(self::WAIT_SECONDS);
 
                 $dateTo = (new \DateTime())
