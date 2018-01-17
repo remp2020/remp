@@ -193,6 +193,9 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	if article.Category != nil {
 		tags["category"] = *article.Category
 	}
+	for key, variant := range article.Variants {
+		tags[key] = variant
+	}
 	if article.Tags != nil {
 		values["tags"] = strings.Join(article.Tags, ",")
 	}
