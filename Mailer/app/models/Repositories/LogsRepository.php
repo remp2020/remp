@@ -18,8 +18,6 @@ class LogsRepository extends Repository
 
     protected $dataTableSearchable = ['email'];
 
-    private $logEventsRepository;
-
     private $eventMap = [
         'delivered' => 'delivered_at',
         'clicked' => 'clicked_at',
@@ -29,11 +27,10 @@ class LogsRepository extends Repository
         'dropped' => 'dropped_at',
     ];
 
-    public function __construct($startStatsDate, Context $database, LogEventsRepository $logEventsRepository)
+    public function __construct($startStatsDate, Context $database)
     {
         parent::__construct($database);
         $this->startStatsDate = $startStatsDate;
-        $this->logEventsRepository = $logEventsRepository;
     }
 
     public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null)
