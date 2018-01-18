@@ -24,7 +24,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             author_id: null,
             category: null,
             tags: [],
-            variants: []
+            variants: {},
         },
 
         uriParams: {},
