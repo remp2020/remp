@@ -258,4 +258,9 @@ class Sender
         $this->params = [];
         $this->attachments = [];
     }
+
+    public function supportsBatch()
+    {
+        return $this->mailerFactory->getMailer()->supportsBatch();
+    }
 }

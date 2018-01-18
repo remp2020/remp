@@ -170,10 +170,9 @@ class MailWorkerCommand extends Command
                     $email->addRecipient($job->email);
                 }
 
-
                 try {
                     $email = $email->setTemplate($template);
-                    if ($sendAsBatch) {
+                    if ($sendAsBatch && $email->supportsBatch()) {
                         $result = $email->sendBatch();
                     } else {
                         $result = $email->send();
