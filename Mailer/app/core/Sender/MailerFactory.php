@@ -4,7 +4,6 @@ namespace Remp\MailerModule\Sender;
 
 use Nette\Mail\IMailer;
 use Remp\MailerModule\Config\Config;
-use Remp\MailerModule\Config\MailerNotExistsException;
 use Remp\MailerModule\Mailer\Mailer;
 
 class MailerFactory

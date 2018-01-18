@@ -56,6 +56,7 @@ class MailgunMailer extends Mailer implements IMailer
             'text' => $message->getBody(),
             'html' => $message->getHtmlBody(),
             'attachment' => $attachments,
+            'recipient-variables' => $message->getHeader('X-Mailer-Template-Params'),
         ];
         if ($tag) {
             $data['o:tag'] = $tag;
@@ -75,5 +76,24 @@ class MailgunMailer extends Mailer implements IMailer
     public function option($key)
     {
         return isset($this->options[$key]) ? $this->options[$key] : null;
+    }
+
+    public function transformTemplateParams($params)
+    {
+        $transformed = [];
+        foreach ($params as $key => $value) {
+            $prefix = '';
+            if ($value[0] === '?') {
+                $prefix = '?';
+                $params[$key] = substr($value, 1);
+            }
+            $transformed[$key] = "{$prefix}%recipient.{$key}%";
+        }
+        return [$transformed, $params];
+    }
+
+    public function supportsBatch(): bool
+    {
+        return true;
     }
 }

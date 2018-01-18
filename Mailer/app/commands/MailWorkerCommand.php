@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Commands;
 use League\Event\Emitter;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
+use Nette\Utils\Json;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
@@ -16,10 +17,13 @@ use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Sender;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MailWorkerCommand extends Command
 {
+    const MESSAGES_PER_BATCH = 10;
+
     private $applicationMailer;
 
     private $mailJobsRepository;
@@ -72,11 +76,19 @@ class MailWorkerCommand extends Command
     {
         $this->setName('worker:mail')
             ->setDescription('Start worker sending mails')
+            ->addOption(
+                'batch',
+                'b',
+                InputOption::VALUE_NONE,
+                'Flag whether batch sending should be attempted (will fallback to non-batch if selected mailer doesn\'t support batch sending)'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $sendAsBatch = $input->getOption('batch');
+
         $output->writeln('');
         $output->writeln('<info>***** EMAIL WORKER *****</info>');
         $output->writeln('');
@@ -109,48 +121,78 @@ class MailWorkerCommand extends Command
             }
 
             $output->writeln("Sending batch <info>{$batch->id}</info>...");
-            while ($job = json_decode($this->mailCache->getJob($batch->id))) {
+
+            while (true) {
                 if (!$this->mailCache->isQueueActive($batch->id)) {
                     $output->writeln("Queue <info>{$batch->id}</info> not active anymore...");
-                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
                 if (!$this->mailCache->isQueueTopPriority($batch->id)) {
                     $output->writeln("Batch <info>{$batch->id}</info> no longer top priority, switching...");
-                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
                     break;
                 }
 
-                $queueJob = $this->mailJobQueueRepository->getJob($job->email, $batch->id);
-
-                if ($this->isDuplicateJob($job->email, $job->templateCode, $batch->mail_job_id)) {
-                    $this->mailJobQueueRepository->delete($queueJob);
-                    continue;
+                if ($sendAsBatch) {
+                    $jobs = $this->mailCache->getJobs($batch->id, self::MESSAGES_PER_BATCH);
+                } else {
+                    $jobs = [$this->mailCache->getJob($batch->id)];
                 }
 
-                $output->writeln(" * sending from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
-                $template = $this->mailTemplateRepository->getByCode($job->templateCode);
+                if (empty($jobs)) {
+                    break;
+                }
+
+                $email = $this->applicationMailer
+                    ->setJobId($batch->mail_job_id)
+                    ->setBatchId($batch->id)
+                    ->setParams([]);
+                $queueJobs = [];
+
+                $template = null;
+
+                foreach ($jobs as $i => &$job) {
+                    $job = Json::decode($job);
+                    $queueJob = $this->mailJobQueueRepository->getJob($job->email, $batch->id);
+
+                    if ($this->isDuplicateJob($job->email, $job->templateCode, $batch->mail_job_id)) {
+                        $this->mailJobQueueRepository->delete($queueJob);
+                        unset($jobs[$i]);
+                        continue;
+                    } else {
+                        $queueJobs[$i] = $queueJob;
+                    }
+
+                    if (!$template) {
+                        $template = $this->mailTemplateRepository->getByCode($job->templateCode);
+                    }
+
+                    $output->writeln(" * sending from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
+                    $email->addRecipient($job->email);
+                }
+
 
                 try {
-                    $result = $this->applicationMailer->setTemplate($template)
-                        ->setRecipient($job->email)
-                        ->setJobId($batch->mail_job_id)
-                        ->setBatchId($batch->id)
-                        ->setParams([])
-                        ->send();
+                    $email = $email->setTemplate($template);
+                    if ($sendAsBatch) {
+                        $result = $email->sendBatch();
+                    } else {
+                        $result = $email->send();
+                    }
 
                     if ($result) {
-                        $this->mailJobQueueRepository->delete($queueJob);
-                        $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
+                        foreach ($jobs as $i => $job) {
+                            $this->mailJobQueueRepository->delete($queueJobs[$i]);
+                            $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
+                        }
                     } else {
-                        $this->mailJobBatchRepository->update($batch, ['errors_count+=' => 1]);
+                        $this->mailJobBatchRepository->update($batch, ['errors_count+=' => count($jobs)]);
                         $this->mailJobQueueRepository->update($queueJob, ['status' => JobQueueRepository::STATUS_ERROR]);
                     }
                     $this->smtpErrors = 0;
                 } catch (SmtpException $smtpException) {
                     $this->smtpErrors++;
                     $output->writeln("<error>SMTP Error {$smtpException->getMessage()}</error>");
-                    $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batch->id);
+                    $this->cacheJobs($jobs, $batch->id);
 
                     if ($this->smtpErrors >= 10) {
                         $this->mailCache->pauseQueue($batch->id);
@@ -165,7 +207,7 @@ class MailWorkerCommand extends Command
                 $this->mailJobBatchRepository->update($batch, [
                     'first_email_sent_at' => $first_email,
                     'last_email_sent_at' => $now,
-                    'sent_emails+=' => 1,
+                    'sent_emails+=' => count($jobs),
                     'last_ping' => $now
                 ]);
 
@@ -174,9 +216,16 @@ class MailWorkerCommand extends Command
                     'mail_job_batch_id' => $batch->id,
                 ])->fetch();
                 $this->batchTemplatesRepository->update($jobBatchTemplate, [
-                    'sent+=' => 1,
+                    'sent+=' => count($jobs),
                 ]);
             }
+        }
+    }
+
+    private function cacheJobs($jobs, $batchId)
+    {
+        foreach ($jobs as $job) {
+            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId);
         }
     }
 
