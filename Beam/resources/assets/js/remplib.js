@@ -84,6 +84,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (config.tracker.article.tags instanceof Array) {
                     this.article.tags = config.tracker.article.tags;
                 }
+                if (typeof config.tracker.article.variants !== 'undefined') {
+                    this.article.variants = config.tracker.article.variants;
+                }
             } else {
                 this.article = null;
             }
