@@ -18,7 +18,6 @@ use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobQueueRepository;
 use Remp\MailerModule\Repository\JobsRepository;
-use Remp\MailerModule\Repository\LogEventsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
@@ -47,8 +46,6 @@ final class JobPresenter extends BasePresenter
 
     private $userSubscriptionsRepository;
 
-    private $logEventsRepository;
-
     private $linkGenerator;
 
     private $segmentAggregator;
@@ -70,7 +67,6 @@ final class JobPresenter extends BasePresenter
         EditBatchFormFactory $editBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory,
         UserSubscriptionsRepository $userSubscriptionsRepository,
-        LogEventsRepository $logEventsRepository,
         Aggregator $segmentAggregator,
         MailCache $mailCache,
         JobQueueRepository $jobQueueRepository,
@@ -88,7 +84,6 @@ final class JobPresenter extends BasePresenter
         $this->editBatchFormFactory = $editBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
-        $this->logEventsRepository = $logEventsRepository;
         $this->segmentAggregator = $segmentAggregator;
         $this->mailCache = $mailCache;
         $this->jobQueueRepository = $jobQueueRepository;

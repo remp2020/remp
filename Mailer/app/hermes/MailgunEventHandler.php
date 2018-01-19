@@ -3,7 +3,6 @@
 namespace Remp\MailerModule\Hermes;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repository\LogEventsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Tomaj\Hermes\Handler\HandlerInterface;
 use Tomaj\Hermes\MessageInterface;
@@ -12,14 +11,10 @@ class MailgunEventHandler implements HandlerInterface
 {
     private $logsRepository;
 
-    private $logEventsRepository;
-
     public function __construct(
-        LogsRepository $logsRepository,
-        LogEventsRepository $logEventsRepository
+        LogsRepository $logsRepository
     ) {
         $this->logsRepository = $logsRepository;
-        $this->logEventsRepository = $logEventsRepository;
     }
 
     public function handle(MessageInterface $message)
@@ -51,7 +46,6 @@ class MailgunEventHandler implements HandlerInterface
             $mailgunEvent => $date,
             'updated_at' => new DateTime(),
         ]);
-        $this->logEventsRepository->addLog($log, $date, $payload['event']);
 
         return true;
     }
