@@ -80,20 +80,8 @@ class Segment implements SegmentContract
 
         dispatch(new CacheSegmentJob($campaignSegment));
 
-        try {
-            $response = $this->client->get(self::ENDPOINT_CHECK, [
-                'query' => [
-                    'resolver_type' => 'id',
-                    'resolver_value' => $userId,
-                    'code' => $campaignSegment->code,
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
-        }
-
-        $result = json_decode($response->getBody());
-        return $result->check;
+        // CRM segments are expensive; if they're not cached, we rather return false here.
+        return false;
     }
 
     /**
