@@ -46,7 +46,10 @@ class BannerController extends Controller
 
     public function json(Datatables $dataTables)
     {
-        $banners = Banner::query();
+        $banners = Banner::select()
+            ->with('campaigns')
+            ->get();
+
         return $dataTables->of($banners)
             ->addColumn('actions', function (Banner $banner) {
                 return [
@@ -57,7 +60,15 @@ class BannerController extends Controller
             ->addColumn('name', function (Banner $banner) {
                 return Html::linkRoute('banners.edit', $banner->name, $banner);
             })
-            ->rawColumns(['actions', 'name'])
+            ->addColumn('active', function (Banner $banner) {
+                foreach ($banner->campaigns as $campaign) {
+                    if ($campaign->active) {
+                        return true;
+                    }
+                }
+                return false;
+            })
+            ->rawColumns(['actions', 'name', 'active'])
             ->setRowId('id')
             ->make(true);
     }
