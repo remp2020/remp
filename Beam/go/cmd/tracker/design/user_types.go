@@ -17,6 +17,7 @@ var User = Type("User", func() {
 	Attribute("source", Source, "UTM and social source metadata")
 	Attribute("signed_in", Boolean, "Flag whether user is signed into the system")
 	Attribute("remp_session_id", String, "ID of reader's session")
+	Attribute("referer", String, "Value of HTTP referer header (if present)")
 })
 
 var System = Type("System", func() {

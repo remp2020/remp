@@ -194,7 +194,7 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 		tags["category"] = *article.Category
 	}
 	for key, variant := range article.Variants {
-		tags[key] = variant
+		tags[fmt.Sprintf("%s_variant", key)] = variant
 	}
 	if article.Tags != nil {
 		values["tags"] = strings.Join(article.Tags, ",")
@@ -216,6 +216,9 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		}
 		if user.UserAgent != nil {
 			fields["user_agent"] = *user.UserAgent
+		}
+		if user.Referer != nil {
+			fields["referer"] = *user.Referer
 		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID

@@ -340,6 +340,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "id": remplib.getUserId(),
                 "signed_in": remplib.signedIn,
                 "url":  window.location.href,
+                "referer": document.referrer,
+                "user_agent": window.navigator.userAgent,
                 "source": {
                     "social": this.getSocialSource(),
                     "utm_source": this.getParam("utm_source"),
