@@ -104,6 +104,8 @@ class CampaignController extends Controller
         $campaign = new Campaign();
         $campaign->fill($request->all());
         $campaign->save();
+        $campaign->banner_id = $request->get('banner_id');
+        $campaign->alt_banner_id = $request->get('alt_banner_id');
 
         foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
@@ -174,6 +176,8 @@ class CampaignController extends Controller
     {
         $campaign->fill($request->all());
         $campaign->save();
+        $campaign->banner_id = $request->get('banner_id');
+        $campaign->alt_banner_id = $request->get('alt_banner_id');
 
         foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
