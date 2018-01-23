@@ -11,32 +11,31 @@ use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\TemplateFormFactory;
 use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repository\LayoutsRepository;
+use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
 final class TemplatePresenter extends BasePresenter
 {
-    /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var LogsRepository */
     private $logsRepository;
 
-    /** @var TemplateFormFactory */
     private $templateFormFactory;
 
-    /** @var TemplateTestFormFactory */
     private $templateTestFormFactory;
 
-    /** @var LayoutsRepository */
     private $layoutsRepository;
+
+    private $listsRepository;
 
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
         TemplateFormFactory $templateFormFactory,
         TemplateTestFormFactory $templateTestFormFactory,
-        LayoutsRepository $layoutsRepository
+        LayoutsRepository $layoutsRepository,
+        ListsRepository $listsRepository
     ) {
     
         parent::__construct();
@@ -45,16 +44,19 @@ final class TemplatePresenter extends BasePresenter
         $this->templateFormFactory = $templateFormFactory;
         $this->templateTestFormFactory = $templateTestFormFactory;
         $this->layoutsRepository = $layoutsRepository;
+        $this->listsRepository = $listsRepository;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
     {
+        $mailTypePairs = $this->listsRepository->all()->fetchPairs('id', 'title');
+
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setColSetting('code')
             ->setColSetting('subject')
-            ->setColSetting('type', ['orderable' => false, 'filter' => true])
+            ->setColSetting('type', ['orderable' => false, 'filter' => $mailTypePairs])
             ->setColSetting('opened')
             ->setColSetting('clicked')
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
@@ -69,12 +71,23 @@ final class TemplatePresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
+        $listIds = null;
+        foreach ($request['columns'] as $column) {
+            if ($column['name'] !== 'type') {
+                continue;
+            }
+            if (!empty($column['search']['value'])) {
+                $listIds = explode(',', $column['search']['value']);
+            }
+            break;
+        }
+
         $templatesCount = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds)
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, $request['length'], $request['start'])
             ->fetchAll();
 
         $result = [

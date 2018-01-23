@@ -93,12 +93,13 @@ class TemplatesRepository extends Repository
      * @param $query
      * @param $order
      * @param $orderDirection
+     * @param null $listIds
      * @param null $limit
      * @param null $offset
-     * @param null $listId
+     *
      * @return Selection
      */
-    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null, $listId = null)
+    public function tableFilter($query, $order, $orderDirection, $listIds = null, $limit = null, $offset = null)
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -112,8 +113,10 @@ class TemplatesRepository extends Repository
             $selection->whereOr($where);
         }
 
-        if ($listId !== null) {
-            $selection->where('mail_type_id', $listId);
+        if ($listIds !== null) {
+            $selection->where([
+                'mail_type_id' => $listIds
+            ]);
         }
 
         if ($limit !== null) {
