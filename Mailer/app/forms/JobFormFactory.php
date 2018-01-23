@@ -91,7 +91,10 @@ class JobFormFactory extends Object
 
         $templatePairs = [];
         foreach ($this->templatesRepository->all() as $template) {
-            $templatePairs[$template->mail_type_id][$template->id] = $template->name;
+            $templatePairs[$template->mail_type_id][] = [
+                'value' => $template->id,
+                'label' => $template->name,
+            ];
         }
         $form->addHidden('template_pairs', Json::encode($templatePairs))->setHtmlId('template_pairs');
 

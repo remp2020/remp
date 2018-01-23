@@ -45,7 +45,10 @@ class NewTemplateFormFactory extends Object
 
         $templatePairs = [];
         foreach ($this->templatesRepository->all() as $template) {
-            $templatePairs[$template->mail_type_id][$template->id] = $template->name;
+            $templatePairs[$template->mail_type_id][] = [
+                'value' => $template->id,
+                'label' => $template->name,
+            ];
         }
 
         $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'));

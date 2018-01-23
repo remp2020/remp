@@ -28,8 +28,8 @@
         $('#' + {$control['newTemplateForm-' . $batchId][$input]->htmlId}).off('change').on('change', function () {
             var $target = $('#' + {$control['newTemplateForm-' . $batchId][$target]->htmlId});
             $target.empty();
-            $.each(mailTemplates[$(this).val()], function(id, name) {
-                $target.append($("<option></option>").attr("value", id).text(name));
+            $.each(mailTemplates[$(this).val()], function(idx, option) {
+                $target.append($("<option></option>").attr("value", option.value).text(option.label));
             });
             $target.selectpicker('refresh');
         });
