@@ -134,12 +134,15 @@ class MailWorkerCommand extends Command
 
                 if ($sendAsBatch) {
                     $jobs = $this->mailCache->getJobs($batch->id, self::MESSAGES_PER_BATCH);
+                    if (empty($jobs)) {
+                        break;
+                    }
                 } else {
-                    $jobs = [$this->mailCache->getJob($batch->id)];
-                }
-
-                if (empty($jobs)) {
-                    break;
+                    $job = $this->mailCache->getJob($batch->id);
+                    if (!$job) {
+                        break;
+                    }
+                    $jobs = [$job];
                 }
 
                 $email = $this->applicationMailer
