@@ -191,9 +191,9 @@ class MailWorkerCommand extends Command
                         $this->mailJobQueueRepository->update($queueJob, ['status' => JobQueueRepository::STATUS_ERROR]);
                     }
                     $this->smtpErrors = 0;
-                } catch (SmtpException $smtpException) {
+                } catch (SmtpException | Sender\MailerBatchException $exception) {
                     $this->smtpErrors++;
-                    $output->writeln("<error>SMTP Error {$smtpException->getMessage()}</error>");
+                    $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
                     $this->cacheJobs($jobs, $batch->id);
 
                     if ($this->smtpErrors >= 10) {
@@ -201,6 +201,7 @@ class MailWorkerCommand extends Command
                         $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_WORKER_STOP]);
                         break;
                     }
+                    sleep(10);
                 }
 
                 $first_email = new DateTime($batch->first_email_sent_at);
