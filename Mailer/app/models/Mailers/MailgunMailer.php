@@ -33,8 +33,11 @@ class MailgunMailer extends Mailer implements IMailer
         }
 
         $to = null;
+        $first = true;
         foreach ($message->getHeader('To') as $email => $name) {
-            $to = "$name <$email>";
+            $prefix = !$first ? "," : "";
+            $to .= "{$prefix} {$name} <{$email}>";
+            $first = false;
         }
 
         $attachments = [];

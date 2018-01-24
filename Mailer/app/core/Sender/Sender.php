@@ -15,7 +15,7 @@ use Remp\MailerModule\Sender\MailerFactory;
 class Sender
 {
     /** @var array */
-    private $recipients;
+    private $recipients = [];
 
     /** @var \Nette\Database\Table\ActiveRow */
     private $template;
@@ -253,7 +253,7 @@ class Sender
 
     private function reset()
     {
-        $this->recipient = null;
+        $this->recipients = [];
         $this->template = null;
         $this->jobId = null;
         $this->params = [];
