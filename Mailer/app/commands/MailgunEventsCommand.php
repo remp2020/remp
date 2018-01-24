@@ -5,7 +5,6 @@ namespace Remp\MailerModule\Commands;
 use Mailgun\Model\Event\EventResponse;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Mailer\MailgunMailer;
-use Remp\MailerModule\Repository\LogEventsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Sender\MailerFactory;
 use Symfony\Component\Console\Command\Command;
@@ -15,22 +14,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MailgunEventsCommand extends Command
 {
+    const WAIT_SECONDS = 15;
+
+    const INTENTIONAL_DELAY_SECONDS = 60;
+
     /** @var MailgunMailer  */
     private $mailgun;
 
     private $logsRepository;
 
-    private $logEventsRepository;
-
     public function __construct(
         MailerFactory $mailerFactory,
-        LogsRepository $logsRepository,
-        LogEventsRepository $logEventsRepository
+        LogsRepository $logsRepository
     ) {
         parent::__construct();
         $this->mailgun = $mailerFactory->getMailer('remp-mailgun');
         $this->logsRepository = $logsRepository;
-        $this->logEventsRepository = $logEventsRepository;
     }
 
     /**
@@ -40,31 +39,44 @@ class MailgunEventsCommand extends Command
     {
         $this->setName('mailgun:events')
             ->setDescription('Syncs latest mailgun events with local log')
-            ->addArgument('timespan', InputArgument::OPTIONAL, 'Timespan ending with latest processed event for processing', '30s');
+            ->addArgument('now', InputArgument::OPTIONAL, 'Offset from "now" of the first event to be processed in seconds', '30');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $timespan = $input->getArgument('timespan');
+        $nowOffset = $input->getArgument('now');
 
         $output->writeln('');
         $output->writeln('<info>***** SYNCING MAILGUN EVENTS *****</info>');
         $output->writeln('');
 
-        $latestEventTime = $this->logEventsRepository->latestEventTime();
+        $dateTo = (new \DateTime())
+            ->sub(new \DateInterval(sprintf("PT%dS", self::INTENTIONAL_DELAY_SECONDS)));
+        $dateFrom = (clone $dateTo)->sub(new \DateInterval(sprintf("PT%dS", $nowOffset)));
 
-        /** @var EventResponse $eventResponse */
-        $eventResponse = $this->mailgun->mailer()->events()->get($this->mailgun->option('domain'), [
-            'ascending' => true,
-            'begin' => $latestEventTime->sub(\DateInterval::createFromDateString($timespan))->getTimestamp(),
-            'event' => implode(' OR ', $this->logsRepository->mappedEvents()),
-        ]);
+        $eventResponse = $this->getEvents($dateFrom, $dateTo);
+        $latestEventTime = $dateFrom;
 
-        do {
+        while (true) {
+            $events = $eventResponse->getItems();
+            if (count($events) == 0) {
+                $output->writeln(sprintf("%s: all events processed, waiting for %d seconds before proceeding", new DateTime(), self::WAIT_SECONDS));
+                sleep(self::WAIT_SECONDS);
+
+                $dateTo = (new \DateTime())
+                    ->sub(new \DateInterval(sprintf("PT%dS", self::INTENTIONAL_DELAY_SECONDS)));
+
+                $eventResponse = $this->getEvents($latestEventTime, $dateTo);
+                continue;
+            }
+
             /** @var \Mailgun\Model\Event\Event $event */
-            foreach ($eventResponse->getItems() as $event) {
+            foreach ($events as $event) {
                 $userVariables = $event->getUserVariables();
-                $date = $event->getEventDate()->format(DATE_RFC3339);
+                $date = $event->getEventDate();
+                if ($date > $latestEventTime) {
+                    $latestEventTime = $date;
+                }
 
                 $mappedEvent = $this->logsRepository->mapEvent($event->getEvent());
                 if (!$mappedEvent) {
@@ -73,33 +85,35 @@ class MailgunEventsCommand extends Command
                     continue;
                 }
 
-                $log = $this->logsRepository->findBySenderId($userVariables['mail_sender_id']);
-                if (!$log) {
-                    // missing mail_log record
-                    $output->writeln(sprintf("%s: missing mail log record for mail_sender_id: %s", $date, $userVariables['mail_sender_id']));
-                    continue;
-                }
-
-                $logEvent = $this->logEventsRepository->findByLogType($log->id, $event->getEvent());
-                if ($logEvent) {
-                    // already processed event logged
-                    $output->writeln(sprintf("%s: event already logged, ignoring: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
-                    continue;
-                }
-
                 $eventTimestamp = explode('.', $event->getTimestamp())[0];
                 $date = DateTime::from($eventTimestamp);
 
-                $this->logsRepository->update($log, [
+                $updated = $this->logsRepository->getTable()->where([
+                    'mail_sender_id' => $userVariables['mail_sender_id'],
+                ])->update([
                     $mappedEvent => $date,
                     'updated_at' => new DateTime(),
                 ]);
 
-                $this->logEventsRepository->addLog($log, $date, $event->getEvent());
-                $output->writeln(sprintf("%s: event processed: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
+                if (!$updated) {
+                    $output->writeln(sprintf("%s: event ignored, missing mail_logs record: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
+                } else {
+                    $output->writeln(sprintf("%s: event processed: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
+                }
             }
 
             $eventResponse = $this->mailgun->mailer()->events()->nextPage($eventResponse);
-        } while (!empty($eventResponse->getItems()));
+        };
+    }
+
+    private function getEvents(\DateTime $begin, \DateTime $end): EventResponse
+    {
+        /** @var EventResponse $eventResponse */
+        return $this->mailgun->mailer()->events()->get($this->mailgun->option('domain'), [
+            'ascending' => true,
+            'begin' => $begin->getTimestamp(),
+            'end' => $end->getTimestamp(),
+            'event' => implode(' OR ', $this->logsRepository->mappedEvents()),
+        ]);
     }
 }

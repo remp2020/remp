@@ -39,6 +39,10 @@ class Kernel extends ConsoleKernel
                     $schedule->job(new CacheSegmentJob($campaignSegment, true))
                         ->hourly()
                         ->withoutOverlapping();
+
+                    $schedule->job(new CacheSegmentJob($campaignSegment, false))
+                        ->everyMinute()
+                        ->withoutOverlapping();
                 }
             }
         } catch (\PDOException $e) {

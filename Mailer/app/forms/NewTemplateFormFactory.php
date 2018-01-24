@@ -4,33 +4,34 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Object;
+use Nette\Utils\Json;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
-use Remp\MailerModule\Repository\JobsRepository;
-use Remp\MailerModule\Repository\SegmentsRepository;
+use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
 class NewTemplateFormFactory extends Object
 {
-    /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var BatchesRepository */
     private $batchesRepository;
 
-    /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
+
+    private $listsRepository;
 
     public $onSuccess;
 
     public function __construct(
         TemplatesRepository $templatesRepository,
         BatchesRepository $batchesRepository,
-        BatchTemplatesRepository $batchTemplatesRepository
+        BatchTemplatesRepository $batchTemplatesRepository,
+        ListsRepository $listsRepository
     ) {
         $this->templatesRepository = $templatesRepository;
         $this->batchesRepository = $batchesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
+        $this->listsRepository = $listsRepository;
     }
 
     public function create($batchId)
@@ -38,7 +39,20 @@ class NewTemplateFormFactory extends Object
         $form = new Form;
         $form->addProtection();
 
+        $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
+        $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
+            ->setPrompt('Select newsletter list');
+
+        $templatePairs = [];
+        foreach ($this->templatesRepository->all() as $template) {
+            $templatePairs[$template->mail_type_id][] = [
+                'value' => $template->id,
+                'label' => $template->name,
+            ];
+        }
+
         $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'));
+        $form->addHidden('template_pairs', Json::encode($templatePairs))->setHtmlId($batchId . '-template_pairs');
         $form->addHidden('batch_id', $batchId);
 
         $form->addSubmit('save', 'Save')

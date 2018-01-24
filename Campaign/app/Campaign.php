@@ -13,8 +13,6 @@ class Campaign extends Model
 
     protected $fillable = [
         'name',
-        'banner_id',
-        'alt_banner_id',
         'signed_in',
         'active',
         'once_per_session',
@@ -42,12 +40,40 @@ class Campaign extends Model
 
     public function banner()
     {
-        return $this->belongsTo(Banner::class);
+        return $this->belongsToMany(Banner::class, 'campaign_banners')->wherePivot('variant', '=', 'A');
+    }
+
+    public function getBannerAttribute()
+    {
+        if ($this->relationLoaded('banner')) {
+            return $this->getRelation('banner')->first();
+        }
+        return $this->banner()->first();
     }
 
     public function altBanner()
     {
-        return $this->belongsTo(Banner::class, 'alt_banner_id');
+        return $this->belongsToMany(Banner::class, 'campaign_banners')->wherePivot('variant', '=', 'B');
+    }
+
+    public function setBannerIdAttribute($value)
+    {
+        $this->banner()->detach();
+        $this->banner()->attach($value, ['variant' => 'A']);
+    }
+
+    public function getAltBannerAttribute()
+    {
+        if ($this->relationLoaded('altBanner')) {
+            return $this->getRelation('altBanner')->first();
+        }
+        return $this->altBanner()->first();
+    }
+
+    public function setAltBannerIdAttribute($value)
+    {
+        $this->altBanner()->detach();
+        $this->altBanner()->attach($value, ['variant' => 'B']);
     }
 
     public function segments()

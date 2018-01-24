@@ -153,7 +153,6 @@ services:
     - Remp\MailerModule\Repository\UsersRepository
     - Remp\MailerModule\Repository\UserSubscriptionsRepository
     - Remp\MailerModule\Repository\LogsRepository('2000-01-01 00:00:00')
-    - Remp\MailerModule\Repository\LogEventsRepository
     - Remp\MailerModule\Repository\LayoutsRepository
     - Remp\MailerModule\Repository\ListsRepository
     - Remp\MailerModule\Repository\ListCategoriesRepository

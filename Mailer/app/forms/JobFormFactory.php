@@ -4,28 +4,27 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Object;
+use Nette\Utils\Json;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
+use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Segment\Aggregator;
 use Remp\MailerModule\Segment\SegmentException;
 
 class JobFormFactory extends Object
 {
-    /** @var JobsRepository */
     private $jobsRepository;
 
-    /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var BatchesRepository */
+    private $listsRepository;
+
     private $batchesRepository;
 
-    /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
 
-    /** @var Aggregator */
     private $segmentAggregator;
 
     public $onSuccess;
@@ -33,12 +32,14 @@ class JobFormFactory extends Object
     public function __construct(
         JobsRepository $jobsRepository,
         TemplatesRepository $templatesRepository,
+        ListsRepository $listsRepository,
         BatchesRepository $batchesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         Aggregator $segmentAggregator
     ) {
         $this->jobsRepository = $jobsRepository;
         $this->templatesRepository = $templatesRepository;
+        $this->listsRepository = $listsRepository;
         $this->batchesRepository = $batchesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->segmentAggregator = $segmentAggregator;
@@ -59,16 +60,25 @@ class JobFormFactory extends Object
             $form->addError('Unable to fetch list of segments, please check the application configuration.');
         }
 
+        $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
+        $templatePairs = $this->templatesRepository->all()->fetchPairs('id', 'name');
+
         $form->addSelect('segment_code', 'Segment', $segments)
             ->setPrompt('Select segment')
-            ->setRequired();
+            ->setRequired('Segment is required');
 
-        $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'))
+        $form->addSelect('mail_type_id', 'Email A alternative', $listPairs)
+            ->setPrompt('Select newsletter list');
+
+        $form->addSelect('template_id', null, $templatePairs)
             ->setPrompt('Select email')
-            ->setRequired();
+            ->setRequired('Email for A alternative is required');
 
-        $form->addSelect('b_template_id', 'Email B Alternative', $this->templatesRepository->all()->fetchPairs('id', 'name'))
-            ->setPrompt('Select email');
+        $form->addSelect('b_mail_type_id', 'Email B alternative (optional, can be added later)', $listPairs)
+            ->setPrompt('Select newsletter list');
+
+        $form->addSelect('b_template_id', null, $templatePairs)
+            ->setPrompt('Select alternative email');
 
         $form->addText('email_count', 'Max number of sent emails');
 
@@ -78,6 +88,15 @@ class JobFormFactory extends Object
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
+
+        $templatePairs = [];
+        foreach ($this->templatesRepository->all() as $template) {
+            $templatePairs[$template->mail_type_id][] = [
+                'value' => $template->id,
+                'label' => $template->name,
+            ];
+        }
+        $form->addHidden('template_pairs', Json::encode($templatePairs))->setHtmlId('template_pairs');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;

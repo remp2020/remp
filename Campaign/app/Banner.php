@@ -28,13 +28,6 @@ class Banner extends Model
         'template',
     ];
 
-    protected $with = [
-        'htmlTemplate',
-        'mediumRectangleTemplate',
-        'barTemplate',
-        'shortMessageTemplate',
-    ];
-
     protected $casts = [
         'closeable' => 'boolean',
     ];
@@ -78,9 +71,7 @@ class Banner extends Model
 
     public function campaigns()
     {
-        return $this->hasMany(Campaign::class)->orWhere([
-            'alt_banner_id' => $this->id,
-        ]);
+        return $this->belongsToMany(Campaign::class, 'campaign_banners');
     }
 
     public function htmlTemplate()

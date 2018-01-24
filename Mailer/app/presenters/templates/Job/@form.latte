@@ -1,46 +1,74 @@
 {form jobForm}
     <div class="row">
         <div class="col-sm-6">
-            <div class="form-group fg-float m-b-30">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group fg-float m-b-30">
                         {label segment_code /}
                         {input segment_code, class => 'selectpicker', data-live-search => 'true'}
-            </div>
-
-            <div class="row m-b-30">
-                <div class="col-sm-6">
-                    <div class="form-group fg-float m-b-30">
-                        {label template_id /}
-                        {input template_id, class => 'selectpicker',  data-live-search => 'true'}
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group fg-float m-b-30">
-                        {label b_template_id /}
-                        {input b_template_id, class => 'selectpicker',  data-live-search => 'true'}
                     </div>
                 </div>
             </div>
 
-            <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                    {input email_count, class => 'form-control fg-input'}
-                    {label email_count, class => 'fg-label' /}
+            <div class="row form-group">
+                <div class="col-sm-12">
+                    {label mail_type_id /}
+                    {input mail_type_id, class => 'selectpicker',  data-live-search => 'true'}
+                </div>
+                <div class="col-sm-12">
+                    {label template_id /}
+                    {input template_id, class => 'selectpicker',  data-live-search => 'true'}
                 </div>
             </div>
 
-            <div class="form-group fg-float m-b-30">
-                <div class="dtp-container fg-line">
-                    {input start_at, class => 'form-control date-time-picker'}
-                    {label start_at, class => 'fg-label' /}
+            <div class="row form-group">
+                <div class="col-sm-12">
+                    {label b_mail_type_id /}
+                    {input b_mail_type_id, class => 'selectpicker',  data-live-search => 'true'}
+                </div>
+                <div class="col-sm-12">
+                    {label b_template_id /}
+                    {input b_template_id, class => 'selectpicker',  data-live-search => 'true'}
                 </div>
             </div>
 
-            {input save, class => 'btn btn-info waves-effect'}
+            <div class="row form-group m-t-30">
+                <div class="col-sm-12">
+                    <div class="fg-float">
+                        <div class="fg-line">
+                            {input email_count, class => 'form-control fg-input'}
+                            {label email_count, class => 'fg-label' /}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-sm-12">
+                    <div class="fg-float">
+                        <div class="dtp-container fg-line">
+                            {input start_at, class => 'form-control date-time-picker'}
+                            {label start_at, class => 'fg-label' /}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-sm-12">
+                    {input save, class => 'btn btn-info waves-effect'}
+                </div>
+            </div>
         </div>
     </div>
-    {include jsCallback, form => $form}
-{/form}
 
+    {input template_pairs}
+
+    {include jsCallback, form => $form}
+    {include onChangeCallback, input => mail_type_id, target => template_id}
+    {include onChangeCallback, input => b_mail_type_id, target => b_template_id}
+{/form}
 
 {define jsCallback}
 <script n:if="$form->getErrors()" type="application/javascript">
@@ -60,3 +88,18 @@
     });
 </script>
 {/define}
+
+{define onChangeCallback}
+    <script>
+        var mailTemplates = JSON.parse($('#' + {$control['jobForm'][template_pairs]->htmlId}).val());
+        $('#' + {$control['jobForm'][$input]->htmlId}).off('change').on('change', function () {
+            var $target = $('#' + {$control['jobForm'][$target]->htmlId});
+            $target.empty();
+            $.each(mailTemplates[$(this).val()], function(idx, option) {
+                $target.append($("<option></option>").attr("value", option.value).text(option.label));
+            });
+            $target.selectpicker('refresh');
+        });
+    </script>
+{/define}
+
