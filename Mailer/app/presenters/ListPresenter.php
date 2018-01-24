@@ -113,7 +113,6 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('subject')
             ->setColSetting('opened')
             ->setColSetting('clicked')
-            ->setRowLinkAction('show')
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
