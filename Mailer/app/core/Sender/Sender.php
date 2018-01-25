@@ -251,13 +251,16 @@ class Sender
         return $this->mailerFactory->getMailer($alias)->getConfig();
     }
 
-    private function reset()
+    public function reset()
     {
         $this->recipients = [];
         $this->template = null;
         $this->jobId = null;
+        $this->batchId = null;
         $this->params = [];
         $this->attachments = [];
+
+        return $this;
     }
 
     public function supportsBatch()

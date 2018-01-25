@@ -146,9 +146,11 @@ class MailWorkerCommand extends Command
                 }
 
                 $email = $this->applicationMailer
+                    ->reset()
                     ->setJobId($batch->mail_job_id)
                     ->setBatchId($batch->id)
                     ->setParams([]);
+
                 $queueJobs = [];
 
                 $template = null;
