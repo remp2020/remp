@@ -379,8 +379,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             var item = {
                 "version": 1,
                 "value": source,
-                "createdAt": now.getTime(),
-                "updatedAt": now.getTime(),
+                "createdAt": now,
+                "updatedAt": now,
             };
             localStorage.setItem(storageKey, JSON.stringify(item));
             return item.value;
@@ -395,8 +395,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             const item = {
                 "version": 1,
                 "value": this.uriParams[key],
-                "createdAt": now.getTime(),
-                "updatedAt": now.getTime(),
+                "createdAt": now,
+                "updatedAt": now,
             };
             remplib.setToStorage(key, item);
 
