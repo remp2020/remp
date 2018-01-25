@@ -40,15 +40,12 @@ class MailgunMailer extends Mailer implements IMailer
         }
 
         $recipientVariablesHeader = Json::decode($recipientVariablesHeaderJson, Json::FORCE_ARRAY);
-        $to = null;
-        $first = true;
+        $to = [];
         foreach ($toHeader as $email => $name) {
             if (count($toHeader) > 1 && !isset($recipientVariablesHeader[$email])) {
                 throw new MailerBatchException("unsafe use of Mailgun mailer with multiple recipients: recipient variables (X-Mailer-Template-Params header) missing for email: {$email}");
             }
-            $prefix = !$first ? "," : "";
-            $to .= "{$prefix} {$name} <{$email}>";
-            $first = false;
+            $to[] = $email;
         }
 
         $attachments = [];
