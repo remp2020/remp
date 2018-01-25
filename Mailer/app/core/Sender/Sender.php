@@ -104,7 +104,7 @@ class Sender
     public function send($checkEmailSubscribed = true)
     {
         if (count($this->recipients) > 1) {
-            throw new MailerBatchException("attempted to send batch via send() method: please use single recipient");
+            throw new MailerBatchException(sprintf("attempted to send batch via send() method: please use single recipient: %s", Json::encode($this->recipients)));
         }
         $recipient = reset($this->recipients);
 
