@@ -56,4 +56,31 @@ abstract class Mailer
             }
         }
     }
+
+    /**
+     * If Mailer implementation supports template parameters (e.g. within batch email sending)
+     * you can replace the real values of params with names of template variables which will
+     * be used to inject the values by Mailer service.
+     *
+     * Return value is ordered as [transformed params for twig,
+     * altered params for mailer header X-Mailer-Template-Params]
+     *
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function transformTemplateParams($params)
+    {
+        return [$params, $params];
+    }
+
+    /**
+     * supportsBatch returns flag, whether the selected Mailer supports batch sending
+     *
+     * @return bool
+     */
+    public function supportsBatch(): bool
+    {
+        return false;
+    }
 }

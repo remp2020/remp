@@ -48,7 +48,7 @@ class TemplateTestFormFactory extends Object
     {
         $template = $this->templateRepository->find($values['id']);
         $this->sender->setTemplate($template)
-            ->setRecipient($values['email'])
+            ->addRecipient($values['email'])
             ->send(false);
 
         ($this->onSuccess)($template);

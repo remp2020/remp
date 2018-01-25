@@ -8,6 +8,7 @@ use Nette\Mail\Message;
 use Nette\Utils\Json;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Repository\ConfigsRepository;
+use Remp\MailerModule\Sender\MailerBatchException;
 
 class MailgunMailer extends Mailer implements IMailer
 {
@@ -32,9 +33,22 @@ class MailgunMailer extends Mailer implements IMailer
             $from = "$name <$email>";
         }
 
+        $toHeader = $message->getHeader('To');
+        $recipientVariablesHeaderJson = $message->getHeader('X-Mailer-Template-Params');
+        if (count($toHeader) > 1 && !$recipientVariablesHeaderJson) {
+            throw new MailerBatchException("unsafe use of Mailgun mailer with multiple recipients: recipient variables (X-Mailer-Template-Params header) missing");
+        }
+
+        $recipientVariablesHeader = Json::decode($recipientVariablesHeaderJson, Json::FORCE_ARRAY);
         $to = null;
-        foreach ($message->getHeader('To') as $email => $name) {
-            $to = "$name <$email>";
+        $first = true;
+        foreach ($toHeader as $email => $name) {
+            if (count($toHeader) > 1 && !isset($recipientVariablesHeader[$email])) {
+                throw new MailerBatchException("unsafe use of Mailgun mailer with multiple recipients: recipient variables (X-Mailer-Template-Params header) missing for email: {$email}");
+            }
+            $prefix = !$first ? "," : "";
+            $to .= "{$prefix} {$name} <{$email}>";
+            $first = false;
         }
 
         $attachments = [];
@@ -46,7 +60,6 @@ class MailgunMailer extends Mailer implements IMailer
             ];
         }
 
-        $mailVariables = Json::decode($message->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
         $tag = $message->getHeader('X-Mailer-Tag');
 
         $data = [
@@ -56,10 +69,13 @@ class MailgunMailer extends Mailer implements IMailer
             'text' => $message->getBody(),
             'html' => $message->getHtmlBody(),
             'attachment' => $attachments,
+            'recipient-variables' => $message->getHeader('X-Mailer-Template-Params'),
         ];
         if ($tag) {
             $data['o:tag'] = $tag;
         }
+
+        $mailVariables = Json::decode($message->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
         foreach ($mailVariables as $key => $val) {
             $data["v:".$key] = $val;
         }
@@ -75,5 +91,24 @@ class MailgunMailer extends Mailer implements IMailer
     public function option($key)
     {
         return isset($this->options[$key]) ? $this->options[$key] : null;
+    }
+
+    public function transformTemplateParams($params)
+    {
+        $transformed = [];
+        foreach ($params as $key => $value) {
+            $prefix = '';
+            if ($value[0] === '?') {
+                $prefix = '?';
+                $params[$key] = substr($value, 1);
+            }
+            $transformed[$key] = "{$prefix}%recipient.{$key}%";
+        }
+        return [$transformed, $params];
+    }
+
+    public function supportsBatch(): bool
+    {
+        return true;
     }
 }

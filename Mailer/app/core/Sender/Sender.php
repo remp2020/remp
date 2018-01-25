@@ -9,12 +9,13 @@ use Remp\MailerModule\Auth\AutoLogin;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
+use Remp\MailerModule\Sender\MailerBatchException;
 use Remp\MailerModule\Sender\MailerFactory;
 
 class Sender
 {
     /** @var array */
-    private $recipient;
+    private $recipients = [];
 
     /** @var \Nette\Database\Table\ActiveRow */
     private $template;
@@ -55,9 +56,9 @@ class Sender
         $this->logsRepository = $logsRepository;
     }
 
-    public function setRecipient($email, $name = null)
+    public function addRecipient($email, $name = null)
     {
-        $this->recipient = [
+        $this->recipients[] = [
             'email' => $email,
             'name' => $name,
         ];
@@ -102,17 +103,24 @@ class Sender
 
     public function send($checkEmailSubscribed = true)
     {
-        if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($this->recipient['email'], $this->template->mail_type->id)) {
+        if (count($this->recipients) > 1) {
+            throw new MailerBatchException("attempted to send batch via send() method: please use single recipient");
+        }
+        $recipient = reset($this->recipients);
+
+        if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($recipient['email'], $this->template->mail_type->id)) {
             return false;
         }
 
         if ($this->template->autologin) {
-            $token = $this->autoLogin->createToken($this->recipient['email']);
+            $token = $this->autoLogin->createToken($recipient['email']);
             $this->params['autologin'] = "?token={$token->token}";
         }
 
+        $mailer = $this->mailerFactory->getMailer();
+
         $message = new Message();
-        $message->addTo($this->recipient['email'], $this->recipient['name']);
+        $message->addTo($recipient['email'], $recipient['name']);
         $message->setFrom($this->template->from);
         $message->setSubject($this->template->subject);
 
@@ -120,29 +128,17 @@ class Sender
         if ($this->template->mail_body_text) {
             $message->setBody($generator->getTextBody($this->params));
         }
-
         if ($this->template->mail_body_html) {
             $message->setHtmlBody($generator->getHtmlBody($this->params));
         }
 
-        $attachmentSize = null;
-        foreach ($this->attachments as $name => $content) {
-            $message->addAttachment($name, $content);
-            $attachmentSize += strlen($content);
-        }
+        $attachmentSize = $this->setMessageAttachments($message);
 
-        $senderId = md5($this->recipient['email'] . microtime(true));
-
-        $message->setHeader('X-Mailer-Variables', Json::encode([
-            'template' => $this->template->code,
-            'job_id' => $this->jobId,
-            'batch_id' => $this->batchId,
-            'mail_sender_id' => $senderId,
-        ]));
-        $message->setHeader('X-Mailer-Tag', $this->template->code);
+        $senderId = md5($recipient['email'] . microtime(true));
+        $this->setMessageHeaders($message, $senderId, $this->params);
 
         $this->logsRepository->add(
-            $this->recipient['email'],
+            $recipient['email'],
             $this->template->subject,
             $this->template->id,
             $this->jobId,
@@ -151,10 +147,103 @@ class Sender
             $attachmentSize
         );
 
-        $this->mailerFactory->getMailer()->send($message);
+        $mailer->send($message);
         $this->reset();
 
         return true;
+    }
+
+    public function sendBatch()
+    {
+        $mailer = $this->mailerFactory->getMailer();
+        if (!$mailer->supportsBatch()) {
+            throw new MailerBatchException(
+                sprintf('attempted to send batch via %s mailer: not supported', $mailer->getAlias())
+            );
+        }
+
+        $templateParams = [];
+
+        $message = new Message();
+        $message->setFrom($this->template->from);
+        $message->setSubject($this->template->subject);
+
+        foreach ($this->recipients as $recipient) {
+            if (!$this->userSubscriptionsRepository->isEmailSubscribed($recipient['email'], $this->template->mail_type->id)) {
+                continue;
+            }
+
+            $p = $this->params;
+            $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
+
+            if ($this->template->autologin) {
+                $token = $this->autoLogin->createToken($recipient['email']);
+                $p['autologin'] = "?token={$token->token}";
+            }
+
+            list($transformedParams, $p) = $mailer->transformTemplateParams($p);
+            $templateParams[$recipient['email']] = $p;
+
+            $message->addTo($recipient['email'], $recipient['name']);
+        }
+
+        $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
+
+        if ($this->template->mail_body_text) {
+            $message->setBody($generator->getTextBody($transformedParams));
+        }
+
+        if ($this->template->mail_body_html) {
+            $message->setHtmlBody($generator->getHtmlBody($transformedParams));
+        }
+
+        $attachmentSize = $this->setMessageAttachments($message);
+
+        $this->setMessageHeaders($message, '%recipient.mail_sender_id%', $templateParams);
+
+        $insertLogsData = [];
+        foreach ($templateParams as $email => $params) {
+            $insertLogsData[] = [
+                'email' => $email,
+                'subject' => $this->template->subject,
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+                'mail_template_id' => $this->template->id,
+                'mail_job_id' => $this->jobId,
+                'mail_job_batch_id' => $this->batchId,
+                'mail_sender_id' => $params['mail_sender_id'],
+                'attachment_size' => $attachmentSize,
+            ];
+        }
+        $logsTableName = $this->logsRepository->getTable()->getName();
+        $this->logsRepository->getDatabase()->query("INSERT INTO $logsTableName", $insertLogsData);
+
+        $mailer->send($message);
+        $this->reset();
+
+        return true;
+    }
+
+    private function setMessageAttachments(Message $message): ?int
+    {
+        $attachmentSize = null;
+        foreach ($this->attachments as $name => $content) {
+            $message->addAttachment($name, $content);
+            $attachmentSize += strlen($content);
+        }
+        return $attachmentSize;
+    }
+
+    private function setMessageHeaders(Message $message, $mailSenderId, $templateParams): void
+    {
+        $message->setHeader('X-Mailer-Variables', Json::encode([
+            'template' => $this->template->code,
+            'job_id' => $this->jobId,
+            'batch_id' => $this->batchId,
+            'mail_sender_id' => $mailSenderId,
+        ]));
+        $message->setHeader('X-Mailer-Tag', $this->template->code);
+        $message->setHeader('X-Mailer-Template-Params', Json::encode($templateParams));
     }
 
     public function getMailerConfig($alias = null)
@@ -164,10 +253,15 @@ class Sender
 
     private function reset()
     {
-        $this->recipient = null;
+        $this->recipients = [];
         $this->template = null;
         $this->jobId = null;
         $this->params = [];
         $this->attachments = [];
+    }
+
+    public function supportsBatch()
+    {
+        return $this->mailerFactory->getMailer()->supportsBatch();
     }
 }
