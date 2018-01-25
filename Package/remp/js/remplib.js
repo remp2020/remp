@@ -12,12 +12,14 @@ export default {
 
     rempSessionIDKey: "remp_session_id",
 
+    cookieDomain: null,
+
     getUserId: function() {
         if (this.userId) {
             return this.userId;
         }
         var storageKey = "anon_id";
-        var anonId = this.getFromStorage(storageKey, true);
+        var anonId = this.getFromStorage(storageKey, true, true);
         if (anonId) {
             return anonId;
         }
@@ -29,13 +31,13 @@ export default {
             "createdAt": now,
             "updatedAt": now,
         };
-        localStorage.setItem(storageKey, JSON.stringify(item));
+        this.setToStorage(storageKey, item);
         return anonId;
     },
 
     getRempSessionID: function() {
         const storageKey = this.rempSessionIDKey;
-        let rempSessionID = this.getFromStorage(storageKey, false);
+        let rempSessionID = this.getFromStorage(storageKey, false, true);
         if (rempSessionID) {
             return rempSessionID;
         }
@@ -47,7 +49,7 @@ export default {
             "createdAt": now,
             "updatedAt": now,
         };
-        localStorage.setItem(storageKey, JSON.stringify(item));
+        this.setToStorage(storageKey, item);
         return rempSessionID;
     },
 
@@ -69,7 +71,26 @@ export default {
         });
     },
 
-    getFromStorage: function(key, bypassThreshold) {
+    setToStorage: function(key, item) {
+        localStorage.setItem(key, JSON.stringify(item));
+
+        // clone value of item also to cookie
+        let value = item;
+        if (item.hasOwnProperty('value')) {
+            value = item.value;
+        }
+        const now = new Date();
+        let cookieExp = new Date();
+        cookieExp.setTime(now.getTime() + this.cacheThreshold);
+        const expires = "; expires=" + cookieExp.toUTCString();
+        let domain = "";
+        if (this.cookieDomain !== null) {
+            domain = "; domain=" + this.cookieDomain;
+        }
+        document.cookie = key + "=" + JSON.stringify(value) + expires + "; path=/"+ domain + ";";
+    },
+
+    getFromStorage: function(key, bypassThreshold, storeToCookie) {
         var now = new Date();
         var data = localStorage.getItem(key);
         if (data === null) {
@@ -86,7 +107,12 @@ export default {
         if (item.hasOwnProperty("updatedAt")) {
             item.updatedAt = now;
         }
-        localStorage.setItem(key, JSON.stringify(item));
+
+        if (storeToCookie) {
+            this.setToStorage(key, item);
+        } else {
+            localStorage.setItem(key, JSON.stringify(item));
+        }
 
         if (item.hasOwnProperty('value')) {
             return item.value;
