@@ -87,7 +87,7 @@ export default {
         if (this.cookieDomain !== null) {
             domain = "; domain=" + this.cookieDomain;
         }
-        document.cookie = key + "=" + JSON.stringify(value) + expires + "; path=/"+ domain + ";";
+        document.cookie = key + "=" + value + expires + "; path=/"+ domain + ";";
     },
 
     getFromStorage: function(key, bypassThreshold, storeToCookie) {
