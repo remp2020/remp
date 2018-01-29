@@ -10,7 +10,6 @@ use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\Forms\EditBatchFormFactory;
-use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
 use Remp\MailerModule\Job\MailCache;
@@ -36,8 +35,6 @@ final class JobPresenter extends BasePresenter
 
     private $logsRepository;
 
-    private $jobFormFactory;
-
     private $newBatchFormFactory;
 
     private $editBatchFormFactory;
@@ -62,7 +59,6 @@ final class JobPresenter extends BasePresenter
         BatchTemplatesRepository $batchTemplatesRepository,
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
-        JobFormFactory $jobFormFactory,
         NewBatchFormFactory $newBatchFormFactory,
         EditBatchFormFactory $editBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory,
@@ -79,7 +75,6 @@ final class JobPresenter extends BasePresenter
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->templatesRepository = $templatesRepository;
         $this->logsRepository = $logsRepository;
-        $this->jobFormFactory = $jobFormFactory;
         $this->newBatchFormFactory = $newBatchFormFactory;
         $this->editBatchFormFactory = $editBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
@@ -264,18 +259,10 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentJobForm()
     {
-        $form = $this->jobFormFactory->create();
-
-        $presenter = $this;
-        $this->jobFormFactory->onSuccess = function ($segmentCode) use ($presenter) {
-            $batchForm = $this->newBatchFormFactory->create(null, $segmentCode);
-
-            $this->newBatchFormFactory->onSuccess = function ($job) {
-                $this->flashMessage('Batch was added');
-                $this->redirect('Show', $job->id);
-            };
-
-            return $batchForm;
+        $form = $this->newBatchFormFactory->create();
+        $this->newBatchFormFactory->onSuccess = function ($job) {
+            $this->flashMessage('Job was created');
+            $this->redirect('Show', $job->id);
         };
 
         return $form;

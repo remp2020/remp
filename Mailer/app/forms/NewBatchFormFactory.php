@@ -9,24 +9,23 @@ use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\ListsRepository;
-use Remp\MailerModule\Repository\SegmentsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Remp\MailerModule\Segment\Aggregator;
+use Remp\MailerModule\Segment\SegmentException;
 
 class NewBatchFormFactory extends Object
 {
-    /** @var JobsRepository */
     private $jobsRepository;
 
-    /** @var BatchesRepository */
     private $batchesRepository;
 
-    /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
 
     private $listsRepository;
+
+    private $segmentAggregator;
 
     public $onSuccess;
 
@@ -35,19 +34,36 @@ class NewBatchFormFactory extends Object
         BatchesRepository $batchesRepository,
         TemplatesRepository $templatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
-        ListsRepository $listsRepository
+        ListsRepository $listsRepository,
+        Aggregator $segmentAggregator
     ) {
         $this->jobsRepository = $jobsRepository;
         $this->batchesRepository = $batchesRepository;
         $this->templatesRepository = $templatesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->listsRepository = $listsRepository;
+        $this->segmentAggregator = $segmentAggregator;
     }
 
-    public function create($jobId = null, $segmentCode = null)
+    public function create($jobId = null)
     {
         $form = new Form;
         $form->addProtection();
+
+        if (!$jobId) {
+            $segments = [];
+            try {
+                $segmentList = $this->segmentAggregator->list();
+                array_walk($segmentList, function ($segment) use (&$segments) {
+                    $segments[$segment['provider']][$segment['provider'] . '::' . $segment['code']] = $segment['name'];
+                });
+            } catch (SegmentException $e) {
+                $form->addError('Unable to fetch list of segments, please check the application configuration.');
+            }
+            $form->addSelect('segment_code', 'Segment', $segments)
+                ->setPrompt('Select segment')
+                ->setRequired('Segment is required');
+        }
 
         $methods = [
             'random' => 'Random',
@@ -76,8 +92,6 @@ class NewBatchFormFactory extends Object
         $form->addText('start_at', 'Start date');
 
         $form->addHidden('job_id', $jobId);
-
-        $form->addHidden('segment_code', $segmentCode);
 
         $templatePairs = [];
         foreach ($this->templatesRepository->all() as $template) {
