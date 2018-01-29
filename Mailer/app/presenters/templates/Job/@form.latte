@@ -1,13 +1,21 @@
-{form jobForm}
+{form newBatchForm}
+    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
+        {$error}<br>
+    </div>
+
     <div class="row">
         <div class="col-sm-6">
-
-            <div class="row">
+            <div class="row form-group" n:ifset="$control['newBatchForm']['segment_code']">
                 <div class="col-sm-12">
-                    <div class="form-group fg-float m-b-30">
-                        {label segment_code /}
-                        {input segment_code, class => 'selectpicker', data-live-search => 'true'}
-                    </div>
+                    {label segment_code /}
+                    {input segment_code, class => 'selectpicker', data-live-search => 'true'}
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-sm-12">
+                    {label method /}
+                    {input method, class => 'selectpicker'}
                 </div>
             </div>
 
@@ -70,6 +78,7 @@
     {include onChangeCallback, input => b_mail_type_id, target => b_template_id}
 {/form}
 
+
 {define jsCallback}
 <script n:if="$form->getErrors()" type="application/javascript">
     $(document).ready(function() {
@@ -91,9 +100,9 @@
 
 {define onChangeCallback}
     <script>
-        var mailTemplates = JSON.parse($('#' + {$control['jobForm'][template_pairs]->htmlId}).val());
-        $('#' + {$control['jobForm'][$input]->htmlId}).off('change').on('change', function () {
-            var $target = $('#' + {$control['jobForm'][$target]->htmlId});
+        var mailTemplates = JSON.parse($('#' + {$control['newBatchForm'][template_pairs]->htmlId}).val());
+        $('#' + {$control['newBatchForm'][$input]->htmlId}).off('change').on('change', function () {
+            var $target = $('#' + {$control['newBatchForm'][$target]->htmlId});
             $target.empty();
             $.each(mailTemplates[$(this).val()], function(idx, option) {
                 $target.append($("<option></option>").attr("value", option.value).text(option.label));
@@ -102,4 +111,3 @@
         });
     </script>
 {/define}
-
