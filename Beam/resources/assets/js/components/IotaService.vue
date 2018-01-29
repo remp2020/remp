@@ -94,7 +94,7 @@
                 }
             },
 
-            fetchTitleVariantStats: function(now, articleIds) {
+            fetchTitleVariantStats: function(now) {
                 for (let range of this.hourRanges) {
                     let d = new Date(now.getTime());
                     d.setHours(d.getHours() - range);
@@ -104,7 +104,7 @@
                         "filter_by": [
                             {
                                 "tag": "article_id",
-                                "values": articleIds,
+                                "values": this.articleIds,
                             },
                         ],
                         "group_by": [

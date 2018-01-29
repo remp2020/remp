@@ -47,7 +47,7 @@
 
             <div v-if="sortedTitleVariants.length > 0" class="ri_box_line">
                 <div v-for="variant in sortedTitleVariants" class="ri_box_item">
-                    <div class="ri_box_title">Title {{ variant }}</div>
+                    <div class="ri_box_title">Title {{ variant }} (direct)</div>
                     <div v-for="(count,range) in titleVariantStats[variant]">
                         <div class="ri_box_key">{{ range }}H</div>
                         <div class="ri_box_value">
