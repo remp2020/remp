@@ -267,9 +267,15 @@ final class JobPresenter extends BasePresenter
         $form = $this->jobFormFactory->create();
 
         $presenter = $this;
-        $this->jobFormFactory->onSuccess = function ($job) use ($presenter) {
-            $presenter->flashMessage('Job was created');
-            $presenter->redirect('Show', $job->id);
+        $this->jobFormFactory->onSuccess = function ($segmentCode) use ($presenter) {
+            $batchForm = $this->newBatchFormFactory->create(null, $segmentCode);
+
+            $this->newBatchFormFactory->onSuccess = function ($job) {
+                $this->flashMessage('Batch was added');
+                $this->redirect('Show', $job->id);
+            };
+
+            return $batchForm;
         };
 
         return $form;

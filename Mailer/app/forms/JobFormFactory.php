@@ -47,6 +47,10 @@ class JobFormFactory extends Object
 
     public function create()
     {
+        // TODO: job form is very similar to newBatchForm (the only extra thing is segment)
+        // we should probably split the new job process to two steps, using JobForm with
+        // single segment field and then be redirected to the new batch form.
+
         $form = new Form;
         $form->addProtection();
 
@@ -66,23 +70,6 @@ class JobFormFactory extends Object
         $form->addSelect('segment_code', 'Segment', $segments)
             ->setPrompt('Select segment')
             ->setRequired('Segment is required');
-
-        $form->addSelect('mail_type_id', 'Email A alternative', $listPairs)
-            ->setPrompt('Select newsletter list');
-
-        $form->addSelect('template_id', null, $templatePairs)
-            ->setPrompt('Select email')
-            ->setRequired('Email for A alternative is required');
-
-        $form->addSelect('b_mail_type_id', 'Email B alternative (optional, can be added later)', $listPairs)
-            ->setPrompt('Select newsletter list');
-
-        $form->addSelect('b_template_id', null, $templatePairs)
-            ->setPrompt('Select alternative email');
-
-        $form->addText('email_count', 'Max number of sent emails');
-
-        $form->addText('start_at', 'Start date');
 
         $form->addSubmit('save', 'Save')
             ->getControlPrototype()
