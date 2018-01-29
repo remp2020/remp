@@ -246,3 +246,7 @@ tr th.sorting_desc:hover:before {
 .ah-search {
     width: 70%;
 }
+
+.dataTable tr th .bootstrap-select {
+    text-transform: none;
+}

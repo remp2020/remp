@@ -18,6 +18,7 @@ use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobQueueRepository;
 use Remp\MailerModule\Repository\JobsRepository;
+use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
@@ -56,6 +57,8 @@ final class JobPresenter extends BasePresenter
 
     private $latteFactory;
 
+    private $listsRepository;
+
     public function __construct(
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository,
@@ -71,7 +74,8 @@ final class JobPresenter extends BasePresenter
         MailCache $mailCache,
         JobQueueRepository $jobQueueRepository,
         ILatteFactory $latteFactory,
-        LinkGenerator $linkGenerator
+        LinkGenerator $linkGenerator,
+        ListsRepository $listsRepository
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -89,22 +93,24 @@ final class JobPresenter extends BasePresenter
         $this->jobQueueRepository = $jobQueueRepository;
         $this->latteFactory = $latteFactory;
         $this->linkGenerator = $linkGenerator;
+        $this->listsRepository = $listsRepository;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
     {
+        $mailTypePairs = $this->listsRepository->all()->fetchPairs('id', 'title');
+
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('defaultJsonData'))
             ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
             ->setColSetting('segment', ['orderable' => false])
-            ->setColSetting('batches', ['orderable' => false])
+            ->setColSetting('batches', ['orderable' => false, 'filter' => $mailTypePairs])
             ->setColSetting('sent_count', ['header' => 'sent', 'orderable' => false])
             ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
             ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
             ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
-            ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
@@ -114,12 +120,23 @@ final class JobPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
+        $listIds = null;
+        foreach ($request['columns'] as $column) {
+            if ($column['name'] !== 'batches') {
+                continue;
+            }
+            if (!empty($column['search']['value'])) {
+                $listIds = explode(',', $column['search']['value']);
+            }
+            break;
+        }
+
         $jobsCount = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null)
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, null, null)
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, $request['length'], $request['start'])
             ->fetchAll();
 
         $result = [

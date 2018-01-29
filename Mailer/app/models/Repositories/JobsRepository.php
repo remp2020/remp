@@ -64,7 +64,7 @@ class JobsRepository extends Repository
      * @param null $offset
      * @return Selection
      */
-    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null)
+    public function tableFilter($query, $order, $orderDirection, $listIds = null, $limit = null, $offset = null)
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -76,6 +76,12 @@ class JobsRepository extends Repository
             }
 
             $selection->whereOr($where);
+        }
+
+        if ($listIds) {
+            $selection->where([
+                ':mail_job_batch_templates.mail_template.mail_type_id' => $listIds,
+            ]);
         }
 
         if ($limit !== null) {
