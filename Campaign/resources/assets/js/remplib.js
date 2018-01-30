@@ -89,6 +89,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
                 remplib.signedIn = config.signedIn;
             }
+
+            if (typeof config.cookieDomain === 'string') {
+                remplib.cookieDomain = config.cookieDomain;
+            }
         },
 
         run: function() {

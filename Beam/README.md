@@ -129,7 +129,10 @@ Include following snippet into the page to track events. Update `rempConfig` obj
         // userId must be provided if signedIn is set
         // optional
         signedIn: Boolean,
-        
+              
+        // optional, controls where are cookies stored
+        cookieDomain: ".remp.press",
+                
         tracker: {
             // required URL location of BEAM Tracker
             url: "http://tracker.beam.remp.press",
@@ -141,10 +144,6 @@ Include following snippet into the page to track events. Update `rempConfig` obj
                 category: String, // optional
                 tags: [String, String, String] // optional
             },
-            
-            // optional, controls where are BEAM cookies stored
-            // default value (if not set) is current BEAM domain
-            cookieDomain: ".remp.press"
         },
         
         segments: {
@@ -185,7 +184,7 @@ Currently we support:
 Event groups, categories and actions can contain words like _pageviews_, _banners_, _track_ blocked by ad / track blockers. And they are loaded for segment's rules via API call. URL can look like this _(group == pageviews; category == pageview)_:
 
 `https://beam.remp.press/api/journal/pageviews/categories/pageview/actions`
-`
+
 
 #### How to solve
 

@@ -37,8 +37,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         flagsKey: "flags",
 
-        cookieDomain: null,
-
         init: function(config) {
             if (typeof config.token !== 'string') {
                 throw "remplib: configuration token invalid or missing: "+config.token
@@ -91,8 +89,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.article = null;
             }
 
-            if (typeof config.tracker.cookieDomain === 'string') {
-                this.cookieDomain = config.tracker.cookieDomain;
+            if (typeof config.cookieDomain === 'string') {
+                remplib.cookieDomain = config.cookieDomain;
             }
 
             this.parseUriParams();
@@ -381,8 +379,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             var item = {
                 "version": 1,
                 "value": source,
-                "createdAt": now.getTime(),
-                "updatedAt": now.getTime(),
+                "createdAt": now,
+                "updatedAt": now,
             };
             localStorage.setItem(storageKey, JSON.stringify(item));
             return item.value;
@@ -390,27 +388,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         getParam: function(key) {
             if (typeof this.uriParams[key] === 'undefined') {
-                return remplib.getFromStorage(key);
+                return remplib.getFromStorage(key, false, true);
             }
 
             const now = new Date();
             const item = {
                 "version": 1,
                 "value": this.uriParams[key],
-                "createdAt": now.getTime(),
-                "updatedAt": now.getTime(),
+                "createdAt": now,
+                "updatedAt": now,
             };
-            localStorage.setItem(key, JSON.stringify(item));
-
-            // set value to cookie
-            let cookieExp = new Date();
-            cookieExp.setTime(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // expire in 30 days
-            const expires = "; expires=" + cookieExp.toUTCString();
-            let domain = "";
-            if (this.cookieDomain !== null) {
-                domain = "; domain=" + this.cookieDomain;
-            }
-            document.cookie = key + "=" + JSON.stringify(item) + expires + "; path=/"+ domain + ";";
+            remplib.setToStorage(key, item);
 
             return item.value;
         },

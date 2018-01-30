@@ -94,7 +94,7 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
             }
         }
         // change URL to location of CAMPAIGN remplib.js
-        load("http://campaign.remp.app/assets/lib/js/remplib.js");
+        load("http://campaign.remp.press/assets/lib/js/remplib.js");
     })(window, document);
 
     var rempConfig = {
@@ -106,10 +106,19 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
         // optional
         userId: String,
         
+        // signedIn indicates if user is signed in
+        // userId must be provided if signedIn is set
+        // optional
+        signedIn: Boolean,
+              
+        // optional, controls where are cookies stored
+        cookieDomain: ".remp.press",
+
+        
         // required
         campaign: {
             // required URL location of REMP CAMPAIGN
-            url: "http://campaign.remp.app",
+            url: "http://campaign.remp.press",
             
             variables: {
                 // variables replace template placeholders in banners,
