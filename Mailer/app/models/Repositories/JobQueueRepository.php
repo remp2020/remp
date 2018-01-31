@@ -79,10 +79,10 @@ class JobQueueRepository extends Repository
 
     public function removeOtherVariants(IRow $batch, $variantId)
     {
-        $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email IN (
+        $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email NOT IN (
   SELECT users.email FROM users
-  INNER JOIN mail_user_subscriptions ON mail_user_subscriptions.user_id = users.id AND subscribed=1 AND (mail_user_subscriptions.mail_type_variant_id != {$variantId} OR mail_user_subscriptions.mail_type_variant_id IS NULL)
-  WHERE mail_user_subscriptions.mail_type_id IN (SELECT mail_types.id FROM mail_types INNER JOIN mail_templates ON mail_templates.mail_type_id = mail_types.id WHERE mail_templates.id = mail_job_queue.mail_template_id)
+  INNER JOIN mail_user_subscriptions ON mail_user_subscriptions.user_id = users.id AND subscribed=1
+  INNER JOIN mail_user_subscription_variants ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id AND mail_user_subscription_variants.mail_type_variant_id = {$variantId}
 )");
     }
 
