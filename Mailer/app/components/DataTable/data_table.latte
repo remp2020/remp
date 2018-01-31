@@ -107,6 +107,9 @@
             'serverSide': true,
             'ajax': {
                 'url': {$sourceUrl},
+                {ifset $tableSettings['add-params']}
+                'data': {$tableSettings['add-params']|noescape}
+                {/ifset}
             },
             {ifset $tableSettings['order']}
             'order': {$tableSettings['order']|noescape},
