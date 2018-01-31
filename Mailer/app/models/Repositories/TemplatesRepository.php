@@ -19,14 +19,14 @@ class TemplatesRepository extends Repository
 
     public function pairs()
     {
-        $this->all()->select('id, name')->fetchPairs('id', 'name');
+        return $this->all()->select('id, name')->fetchPairs('id', 'name');
     }
 
     public function triples()
     {
         $result = [];
         foreach ($this->all()->select('id, name, mail_type_id') as $template) {
-            $templatePairs[$template->mail_type_id][] = [
+            $result[$template->mail_type_id][] = [
                 'value' => $template->id,
                 'label' => $template->name,
             ];
