@@ -3,6 +3,8 @@
 namespace Remp\MailerModule\Config;
 
 use Remp\MailerModule\Repository\ConfigsRepository;
+use Nette\Caching\Cache;
+use Nette\Caching\IStorage;
 
 class Config
 {
@@ -15,18 +17,22 @@ class Config
 
     private $loaded = false;
 
-    /** @var  ConfigsRepository */
     private $configsRepository;
 
-    /** @var LocalConfig  */
     private $localConfig;
+
+    private $cacheStorage;
 
     private $items = null;
 
-    public function __construct(ConfigsRepository $configsRepository, LocalConfig $localConfig)
-    {
+    public function __construct(
+        ConfigsRepository $configsRepository,
+        LocalConfig $localConfig,
+        IStorage $cacheStorage
+    ) {
         $this->configsRepository = $configsRepository;
         $this->localConfig = $localConfig;
+        $this->cacheStorage = $cacheStorage;
     }
 
     public function get($name)
@@ -62,9 +68,15 @@ class Config
 
     private function initAutoload()
     {
-        $items = $this->configsRepository->loadAllAutoload();
-        foreach ($items as $item) {
-            $this->items[$item->name] = $item;
+        $cacheData = $this->cacheStorage->read('application_autoload_cache');
+        if ($cacheData) {
+            $this->items = $cacheData;
+        } else {
+            $items = $this->configsRepository->loadAllAutoload();
+            foreach ($items as $item) {
+                $this->items[$item->name] = (object)$item->toArray();
+            }
+            $this->cacheStorage->write('application_autoload_cache', $this->items, [Cache::EXPIRE => 60]);
         }
         $this->loaded = true;
     }
