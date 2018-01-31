@@ -43,16 +43,8 @@ class NewTemplateFormFactory extends Object
         $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
             ->setPrompt('Select newsletter list');
 
-        $templatePairs = [];
-        foreach ($this->templatesRepository->all() as $template) {
-            $templatePairs[$template->mail_type_id][] = [
-                'value' => $template->id,
-                'label' => $template->name,
-            ];
-        }
-
-        $form->addSelect('template_id', 'Email', $this->templatesRepository->all()->fetchPairs('id', 'name'));
-        $form->addHidden('template_pairs', Json::encode($templatePairs))->setHtmlId($batchId . '-template_pairs');
+        $form->addSelect('template_id', 'Email', []);
+        $form->addHidden('template_pairs', Json::encode($this->templatesRepository->triples()))->setHtmlId($batchId . '-template_pairs');
         $form->addHidden('batch_id', $batchId);
 
         $form->addSubmit('save', 'Save')

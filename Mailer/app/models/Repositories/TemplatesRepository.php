@@ -17,6 +17,23 @@ class TemplatesRepository extends Repository
         return $this->getTable()->order('created_at DESC');
     }
 
+    public function pairs()
+    {
+        $this->all()->select('id, name')->fetchPairs('id', 'name');
+    }
+
+    public function triples()
+    {
+        $result = [];
+        foreach ($this->all()->select('id, name, mail_type_id') as $template) {
+            $templatePairs[$template->mail_type_id][] = [
+                'value' => $template->id,
+                'label' => $template->name,
+            ];
+        }
+        return $result;
+    }
+
     public function add($name, $code, $description, $autoLogin, $from, $subject, $templateText, $templateHtml, $layoutId, $typeId)
     {
         $result = $this->insert([

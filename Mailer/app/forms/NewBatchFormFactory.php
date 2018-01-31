@@ -72,7 +72,7 @@ class NewBatchFormFactory extends Object
         $form->addSelect('method', 'Method', $methods);
 
         $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
-        $templatePairs = $this->templatesRepository->all()->fetchPairs('id', 'name');
+        $templatePairs = $this->templatesRepository->pairs();
 
         $form->addSelect('mail_type_id', 'Email A alternative', $listPairs)
             ->setPrompt('Select newsletter list');
@@ -93,14 +93,7 @@ class NewBatchFormFactory extends Object
 
         $form->addHidden('job_id', $jobId);
 
-        $templatePairs = [];
-        foreach ($this->templatesRepository->all() as $template) {
-            $templatePairs[$template->mail_type_id][] = [
-                'value' => $template->id,
-                'label' => $template->name,
-            ];
-        }
-        $form->addHidden('template_pairs', Json::encode($templatePairs))->setHtmlId('template_pairs');
+        $form->addHidden('template_pairs', Json::encode($this->templatesRepository->triples()))->setHtmlId('template_pairs');
 
         $form->addSubmit('save', 'Save')
             ->getControlPrototype()
