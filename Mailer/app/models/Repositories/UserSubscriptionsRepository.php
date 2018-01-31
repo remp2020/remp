@@ -32,6 +32,15 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => true])->count('*') > 0;
     }
 
+    public function filterSubscribedEmails(array $emails, $typeId)
+    {
+        return $this->getTable()->where([
+            'user_email' => $emails,
+            'mail_type_id' => $typeId,
+            'subscribed' => true,
+        ])->select('user_email')->fetchPairs('user_email', 'user_email');
+    }
+
     /**
      * @param ActiveRow $mailType
      * @param integer $userId

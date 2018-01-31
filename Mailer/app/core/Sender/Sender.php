@@ -168,8 +168,14 @@ class Sender
         $message->setFrom($this->template->from);
         $message->setSubject($this->template->subject);
 
+        $subscribedEmails = [];
         foreach ($this->recipients as $recipient) {
-            if (!$this->userSubscriptionsRepository->isEmailSubscribed($recipient['email'], $this->template->mail_type->id)) {
+            $subscribedEmails[] = $recipient['email'];
+        }
+        $subscribedEmails = $this->userSubscriptionsRepository->filterSubscribedEmails($subscribedEmails, $this->template->mail_type_id);
+
+        foreach ($this->recipients as $recipient) {
+            if (!isset($subscribedEmails[$recipient['email']]) || !$subscribedEmails[$recipient['email']]) {
                 continue;
             }
 
