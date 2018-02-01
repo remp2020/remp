@@ -4,6 +4,7 @@ namespace Remp\MailerModule;
 
 use Nette\Database\IRow;
 use Nette\Mail\Message;
+use Nette\Utils\AssertionException;
 use Nette\Utils\Json;
 use Remp\MailerModule\Auth\AutoLogin;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
@@ -179,6 +180,12 @@ class Sender
                 continue;
             }
 
+            try {
+                $message->addTo($recipient['email'], $recipient['name']);
+            } catch (AssertionException $e) {
+                // we do nothing; it's invalid email and we want to skip it ASAP
+            }
+
             $p = $this->params;
             $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
 
@@ -189,8 +196,6 @@ class Sender
 
             list($transformedParams, $p) = $mailer->transformTemplateParams($p);
             $templateParams[$recipient['email']] = $p;
-
-            $message->addTo($recipient['email'], $recipient['name']);
         }
 
         $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);

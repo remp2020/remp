@@ -43,7 +43,7 @@ class NewTemplateFormFactory extends Object
         $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
             ->setPrompt('Select newsletter list');
 
-        $form->addSelect('template_id', 'Email', []);
+        $form->addSelect('template_id', 'Email', $this->templatesRepository->pairs());
         $form->addHidden('template_pairs', Json::encode($this->templatesRepository->triples()))->setHtmlId($batchId . '-template_pairs');
         $form->addHidden('batch_id', $batchId);
 
