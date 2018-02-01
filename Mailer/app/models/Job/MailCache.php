@@ -64,16 +64,7 @@ class MailCache
 
     public function getJobs($queueId, $count = 1): array
     {
-        $jobs = [];
-        foreach (range(1, $count) as $_) {
-            $job = $this->connect()->spop(static::REDIS_KEY . $queueId);
-            if (!$job) {
-                break;
-            }
-            $jobs[] = $job;
-        }
-        return $jobs;
-//        return (array) $this->connect()->spop(static::REDIS_KEY . $queueId, $count);
+        return (array) $this->connect()->spop(static::REDIS_KEY . $queueId, $count);
     }
 
     public function hasJobs($queueId)
