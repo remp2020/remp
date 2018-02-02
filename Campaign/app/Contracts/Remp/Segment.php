@@ -19,13 +19,13 @@ class Segment implements SegmentContract
 
     const ENDPOINT_LIST = 'segments';
 
-    const ENDPOINT_CHECK = 'segments/%s/check/%s';
+    const ENDPOINT_USERS_CHECK = 'segments/%s/users/check/%s';
+
+    const ENDPOINT_BROWSERS_CHECK = 'segments/%s/browsers/check/%s';
 
     const ENDPOINT_USERS = 'segments/%s/users';
 
     private $client;
-
-    private $cacheEnabled;
 
     private $cache;
 
@@ -35,10 +35,9 @@ class Segment implements SegmentContract
 
     private $flags;
 
-    public function __construct(Client $client, $cacheEnabled)
+    public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->cacheEnabled = $cacheEnabled;
         $this->cache = new \stdClass;
         $this->eventRules = new \stdClass;
     }
@@ -80,21 +79,32 @@ class Segment implements SegmentContract
      * @return bool
      * @throws SegmentException
      */
-    public function check(CampaignSegment $campaignSegment, $userId): bool
+    public function checkUser(CampaignSegment $campaignSegment, $userId): bool
     {
-        if ($this->cacheEnabled) {
-            $cacheJob = new CacheSegmentJob($campaignSegment);
-            $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
-            if ($bloomFilter) {
-                /** @var Bloom $bloomFilter */
-                $bloomFilter = unserialize($bloomFilter);
-                return $bloomFilter->has($userId);
-            }
+        return $this->check($campaignSegment, self::ENDPOINT_USERS_CHECK, $userId);
+    }
 
-            dispatch($cacheJob);
-        }
+    /**
+     * @param CampaignSegment $campaignSegment
+     * @param $userId
+     * @return bool
+     * @throws SegmentException
+     */
+    public function checkBrowser(CampaignSegment $campaignSegment, $browserId): bool
+    {
+        return $this->check($campaignSegment, self::ENDPOINT_BROWSERS_CHECK, $browserId);
+    }
 
-        // until the cache is filled, let's check directly
+    /**
+     * @param CampaignSegment $campaignSegment
+     * @param string $endpoint
+     * @param string $checkedId
+     *
+     * @return mixed
+     * @throws SegmentException
+     */
+    private function check(CampaignSegment $campaignSegment, $endpoint, $checkedId)
+    {
         try {
             $params = [];
             $cso = $campaignSegment->getOverrides();
@@ -104,7 +114,7 @@ class Segment implements SegmentContract
             if ($this->cache) {
                 $params['cache'] = Json::encode($this->cache);
             }
-            $response = $this->client->get(sprintf(self::ENDPOINT_CHECK, $campaignSegment->code, $userId), [
+            $response = $this->client->get(sprintf($endpoint, $campaignSegment->code, $checkedId), [
                 'query' => $params,
             ]);
         } catch (ConnectException $e) {
@@ -154,7 +164,7 @@ class Segment implements SegmentContract
 
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
     {
-        return $this->cacheEnabled;
+        return false;
     }
 
     public function setCache($cache): void

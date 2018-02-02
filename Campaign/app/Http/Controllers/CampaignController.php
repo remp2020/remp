@@ -224,11 +224,13 @@ class CampaignController extends Controller
         }
 
         $userId = $data->userId ?? null;
-        if (!$userId) {
+
+        $browserId = $data->browserId ?? null;
+        if (!$browserId) {
             return response()
                 ->jsonp($r->get('callback'), [
                     'success' => false,
-                    'errors' => ['userId is required and missing'],
+                    'errors' => ['browserId is required and missing'],
                 ])
                 ->setStatusCode(400);
         }
@@ -341,8 +343,15 @@ class CampaignController extends Controller
             // segment
             foreach ($campaign->segments as $campaignSegment) {
                 $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
-                if (!$sa->check($campaignSegment, $userId)) {
-                    continue 2;
+
+                if ($userId) {
+                    if (!$sa->checkUser($campaignSegment, $userId)) {
+                        continue 2;
+                    }
+                } else {
+                    if (!$sa->checkBrowser($campaignSegment, $browserId)) {
+                        continue 2;
+                    }
                 }
             }
 

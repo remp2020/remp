@@ -32,6 +32,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             prepareData: function() {
                 return {
                     "userId": remplib.getUserId(),
+                    "browserId": remplib.getBrowserId(),
                     "signedIn": remplib.signedIn,
                     "url": window.location.href,
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),

@@ -55,6 +55,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.userId !== 'undefined' && config.userId !== null) {
                 remplib.userId = config.userId;
             }
+            if (typeof config.browserId !== 'undefined' && config.browserId !== null) {
+                remplib.browserId = config.browser;
+            }
             if (typeof config.signedIn !== 'undefined') {
                 if (typeof config.signedIn !== 'boolean') {
                     throw "remplib: configuration signedIn invalid (boolean required): "+config.signedIn
@@ -336,6 +339,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
             params["user"] = {
                 "id": remplib.getUserId(),
+                "browser_id": remplib.getBrowserId(),
                 "signed_in": remplib.signedIn,
                 "url":  window.location.href,
                 "referer": document.referrer,
