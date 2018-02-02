@@ -18,8 +18,10 @@ type SegmentStorage interface {
 	Get(code string) (*Segment, bool, error)
 	// List returns all available segments configured via Beam admin.
 	List() (SegmentCollection, error)
-	// Check verifies presence of user within provided segment.
-	Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
+	// CheckUser verifies presence of user within provided segment.
+	CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
+	// CheckBrowser verifies presence of browser within provided segment.
+	CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
 	// EventRules returns map of rules assigned to given "category/event" key.
@@ -126,8 +128,18 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 	return sc, nil
 }
 
-// Check verifies presence of user within provided segment.
-func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
+// CheckUser verifies presence of user within provided segment.
+func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
+	return sDB.check(segment, "user_id", userID, now, cache, ro)
+}
+
+// CheckBrowser verifies presence of browser within provided segment.
+func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
+	return sDB.check(segment, "browser_id", browserID, now, cache, ro)
+}
+
+// Check verifies presence of provided tag within segment by its value.
+func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
 	c := make(SegmentCache)
 
 	for _, sr := range segment.Rules {
@@ -145,7 +157,7 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 				SyncedAt: cache[cacheKey].SyncedAt,
 			}
 		} else {
-			count, err = sDB.getRuleEventCount(osr, userID, now, ro)
+			count, err = sDB.getRuleEventCount(osr, tagName, tagValue, now, ro)
 			if err != nil {
 				return nil, false, errors.Wrap(err, "unable to get SegmentRule event count")
 			}
@@ -168,12 +180,12 @@ func (sDB *SegmentDB) Check(segment *Segment, userID string, now time.Time, cach
 }
 
 // getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
-func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, userID string, now time.Time, ro RuleOverrides) (int, error) {
+func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue string, now time.Time, ro RuleOverrides) (int, error) {
 	// get count of events directly from influx
 	query := sDB.InfluxDB.QueryBuilder.
 		Select(`COUNT("token")`).
 		From(sr.tableName()).
-		Where(fmt.Sprintf(`"user_id" = '%s'`, userID))
+		Where(fmt.Sprintf(`("%s" = '%s')`, tagName, tagValue))
 	for _, cond := range sr.conditions(now, ro) {
 		query = query.Where(cond)
 	}
