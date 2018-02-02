@@ -106,6 +106,9 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
         // optional
         userId: String,
         
+        // optional
+        browserId: String,
+        
         // signedIn indicates if user is signed in
         // userId must be provided if signedIn is set
         // optional
