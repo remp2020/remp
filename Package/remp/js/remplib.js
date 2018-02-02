@@ -8,8 +8,6 @@ export default {
 
     browserId: null,
 
-    signedIn: false,
-
     cacheThreshold: 15 * 60000, // 15 minutes
 
     rempSessionIDKey: "remp_session_id",

@@ -327,17 +327,8 @@ class CampaignController extends Controller
             }
 
             // signed in state
-            if (isset($campaign->signed_in)) {
-                if (!isset($data->signedIn)) {
-                    return response()
-                        ->jsonp($r->get('callback'), [
-                            'success' => false,
-                            'errors' => ['current campaign requires "signedIn" param to be provided'],
-                        ]);
-                }
-                if ($campaign->signed_in !== $data->signedIn) {
-                    continue;
-                }
+            if (isset($campaign->signed_in) && $campaign->signed_in !== boolval($userId)) {
+                continue;
             }
 
             // segment

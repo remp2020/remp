@@ -85,14 +85,23 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
             doc.getElementsByTagName("head")[0].appendChild(script);
         }
         win.remplib = win.remplib || {};
-        if (!win.remplib.campaign) {
-            var fn, i, funcs = "init".split(" ");
-            win.remplib.campaign = {_: []};
-            for (i = 0; i < funcs.length; i++) {
-                fn = funcs[i];
-                win.remplib.campaign[fn] = mock(fn);
-            }
+        var mockFuncs = {
+            "campaign": "init",
+            "tracker": "init trackEvent trackPageview trackCommerce",
+            "iota": "init"
         }
+
+        Object.keys(mockFuncs).forEach(function (key) {
+            if (!win.remplib[key]) {
+                var fn, i, funcs = mockFuncs[key].split(" ");
+                win.remplib[key] = {_: []};
+
+                for (i = 0; i < funcs.length; i++) {
+                    fn = funcs[i];
+                    win.remplib[key][fn] = mock(fn);
+                }
+            }
+        });
         // change URL to location of CAMPAIGN remplib.js
         load("http://campaign.remp.press/assets/lib/js/remplib.js");
     })(window, document);
@@ -109,11 +118,6 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
         // optional
         browserId: String,
         
-        // signedIn indicates if user is signed in
-        // userId must be provided if signedIn is set
-        // optional
-        signedIn: Boolean,
-              
         // optional, controls where are cookies stored
         cookieDomain: ".remp.press",
 
