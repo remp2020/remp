@@ -35,7 +35,14 @@ class LogsRepository extends Repository
 
     public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null)
     {
-        return $this->insert([
+        return $this->insert(
+            $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize)
+        );
+    }
+
+    public function getInsertData($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null)
+    {
+        return [
             'email' => $email,
             'subject' => $subject,
             'created_at' => new DateTime(),
@@ -45,7 +52,7 @@ class LogsRepository extends Repository
             'mail_job_batch_id' => $batchId,
             'mail_sender_id' => $mailSenderId,
             'attachment_size' => $attachmentSize,
-        ]);
+        ];
     }
 
     public function getEmailLogs($email)

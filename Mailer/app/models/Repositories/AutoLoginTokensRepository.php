@@ -8,9 +8,9 @@ class AutoLoginTokensRepository extends Repository
 {
     protected $tableName = 'autologin_tokens';
 
-    public function add($token, $email, $validFrom, $validTo, $maxCount = 1)
+    public function getInsertData($token, $email, $validFrom, $validTo, $maxCount = 1)
     {
-        return $this->insert([
+        return [
             'token' => $token,
             'email' => $email,
             'valid_from' => $validFrom,
@@ -18,6 +18,6 @@ class AutoLoginTokensRepository extends Repository
             'max_count' => $maxCount,
             'used_count' => 0,
             'created_at' => new \DateTime(),
-        ]);
+        ];
     }
 }

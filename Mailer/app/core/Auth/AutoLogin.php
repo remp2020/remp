@@ -26,19 +26,34 @@ class AutoLogin
         return $this->autoLoginTokensRepository->update($token, ['used_count+=' => 1]);
     }
 
-    public function createToken($email)
+    public function createTokens(array $emails): array
     {
-        $token = md5($email . microtime(true) . rand(100, 100000) . rand(10000, 1000000));
+        if (empty($emails)) {
+            return [];
+        }
+
+        $autologinInsertData = [];
+        $returnData = [];
 
         $validFrom = new DateTime();
         $validTo = $validFrom->modifyClone('+1 month');
 
-        return $this->autoLoginTokensRepository->add(
-            $token,
-            $email,
-            $validFrom,
-            $validTo,
-            10
-        );
+        foreach ($emails as $email) {
+            $token = md5($email . microtime(true) . rand(100, 100000) . rand(10000, 1000000));
+            $autologinInsertData[] = $this->autoLoginTokensRepository->getInsertData(
+                $token,
+                $email,
+                $validFrom,
+                $validTo,
+                10
+            );
+
+            $returnData[$email] = $token;
+        }
+
+        $autologinTokensTableName = $this->autoLoginTokensRepository->getTable()->getName();
+        $this->autoLoginTokensRepository->getDatabase()->query("INSERT INTO $autologinTokensTableName", $autologinInsertData);
+
+        return $returnData;
     }
 }

@@ -113,10 +113,8 @@ class Sender
             return false;
         }
 
-        if ($this->template->autologin) {
-            $token = $this->autoLogin->createToken($recipient['email']);
-            $this->params['autologin'] = "?token={$token->token}";
-        }
+        $tokens = $this->autoLogin->createTokens([$recipient['email']]);
+        $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
 
         $mailer = $this->mailerFactory->getMailer();
 
@@ -175,6 +173,8 @@ class Sender
         }
         $subscribedEmails = $this->userSubscriptionsRepository->filterSubscribedEmails($subscribedEmails, $this->template->mail_type_id);
 
+        $autologinTokens = $this->autoLogin->createTokens($subscribedEmails);
+
         foreach ($this->recipients as $recipient) {
             if (!isset($subscribedEmails[$recipient['email']]) || !$subscribedEmails[$recipient['email']]) {
                 continue;
@@ -188,11 +188,7 @@ class Sender
 
             $p = $this->params;
             $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
-
-            if ($this->template->autologin) {
-                $token = $this->autoLogin->createToken($recipient['email']);
-                $p['autologin'] = "?token={$token->token}";
-            }
+            $p['autologin'] = "?token={$autologinTokens[$recipient['email']]}";
 
             list($transformedParams, $p) = $mailer->transformTemplateParams($p);
             $templateParams[$recipient['email']] = $p;
@@ -214,17 +210,15 @@ class Sender
 
         $insertLogsData = [];
         foreach ($templateParams as $email => $params) {
-            $insertLogsData[] = [
-                'email' => $email,
-                'subject' => $this->template->subject,
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
-                'mail_template_id' => $this->template->id,
-                'mail_job_id' => $this->jobId,
-                'mail_job_batch_id' => $this->batchId,
-                'mail_sender_id' => $params['mail_sender_id'],
-                'attachment_size' => $attachmentSize,
-            ];
+            $insertLogsData[] = $this->logsRepository->getInsertData(
+                $email,
+                $this->template->subject,
+                $this->template->id,
+                $this->jobId,
+                $this->batchId,
+                $params['mail_sender_id'],
+                $attachmentSize
+            );
         }
         $logsTableName = $this->logsRepository->getTable()->getName();
         $this->logsRepository->getDatabase()->query("INSERT INTO $logsTableName", $insertLogsData);
