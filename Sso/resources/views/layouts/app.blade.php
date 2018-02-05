@@ -62,9 +62,13 @@ function route_active($routeName, $classes = '', $activeClasses = '')
                 </a>
             </div>
             <ul class="nav navbar-nav navbar-remp">
-                <li><a href="https://beam.remp2020.com"><i class="zmdi zmdi-album zmdi-hc-fw"></i> Beam</a></li>
-                <li><a href="https://campaign.remp2020.com"><i class="zmdi zmdi-trending-up zmdi-hc-fw"></i> Campaign</a></li>
-                <li><a href="https://mailer.remp2020.com"><i class="zmdi zmdi-email zmdi-hc-fw"></i> Mailer</a></li>
+                @foreach(config('services.remp.linked') as $key => $service)
+                    @isset($service['url'])
+                        <li @class(['active' => $service['url'] === '/'])>
+                        <a href="{{ $service['url'] }}"><i class="zmdi zmdi-{{ $service['icon'] }} zmdi-hc-fw"></i> {{ $key }}</a>
+                        </li>
+                    @endisset
+                @endforeach
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown hm-profile">
