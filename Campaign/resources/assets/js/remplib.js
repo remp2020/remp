@@ -32,7 +32,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             prepareData: function() {
                 return {
                     "userId": remplib.getUserId(),
-                    "signedIn": remplib.signedIn,
+                    "browserId": remplib.getBrowserId(),
                     "url": window.location.href,
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
@@ -79,15 +79,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             // global
             if (typeof config.userId !== 'undefined' && config.userId !== null) {
                 remplib.userId = config.userId;
-            }
-            if (typeof config.signedIn !== 'undefined') {
-                if (typeof config.signedIn !== 'boolean') {
-                    throw "remplib: configuration signedIn invalid (boolean required): "+config.signedIn
-                }
-                if (config.signedIn && remplib.userId === null) {
-                    throw "remplib: cannot set signedIn flag when no userId was provided"
-                }
-                remplib.signedIn = config.signedIn;
             }
 
             if (typeof config.cookieDomain === 'string') {

@@ -96,22 +96,23 @@ Include following snippet into the page to track events. Update `rempConfig` obj
             doc.getElementsByTagName("head")[0].appendChild(script);
         }
         win.remplib = win.remplib || {};
-        if (!win.remplib.campaign) {
-            var fn, i, funcs = "init".split(" ");
-            win.remplib.campaign = {_: []};
-            for (i = 0; i < funcs.length; i++) {
-                fn = funcs[i];
-                win.remplib.campaign[fn] = mock(fn);
-            }
+        var mockFuncs = {
+            "campaign": "init",
+            "tracker": "init trackEvent trackPageview trackCommerce",
+            "iota": "init"
         }
-        if (!win.remplib.tracker) {
-            var fn, i, funcs = "init trackEvent trackPageview trackCommerce".split(" ");
-            win.remplib.tracker = {_: []};
-            for (i = 0; i < funcs.length; i++) {
-                fn = funcs[i];
-                win.remplib.tracker[fn] = mock(fn);
+
+        Object.keys(mockFuncs).forEach(function (key) {
+            if (!win.remplib[key]) {
+                var fn, i, funcs = mockFuncs[key].split(" ");
+                win.remplib[key] = {_: []};
+
+                for (i = 0; i < funcs.length; i++) {
+                    fn = funcs[i];
+                    win.remplib[key][fn] = mock(fn);
+                }
             }
-        }
+        });
         
         // change URL to location of BEAM remplib.js
         load("http://beam.remp.press/assets/vendor/js/remplib.js");
@@ -125,11 +126,9 @@ Include following snippet into the page to track events. Update `rempConfig` obj
         // optional
         userId: String,
         
-        // signedIn indicates if user is signed in
-        // userId must be provided if signedIn is set
         // optional
-        signedIn: Boolean,
-              
+        browserId: String,
+        
         // optional, controls where are cookies stored
         cookieDomain: ".remp.press",
                 

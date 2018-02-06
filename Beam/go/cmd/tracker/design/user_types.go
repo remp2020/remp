@@ -6,7 +6,8 @@ import (
 )
 
 var User = Type("User", func() {
-	Attribute("id", String, "ID of reader")
+	Attribute("id", String, "ID of logged user")
+	Attribute("browser_id", String, "Anonymized ID of user's browser")
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
 	})
@@ -15,7 +16,6 @@ var User = Type("User", func() {
 		Format("ip")
 	})
 	Attribute("source", Source, "UTM and social source metadata")
-	Attribute("signed_in", Boolean, "Flag whether user is signed into the system")
 	Attribute("remp_session_id", String, "ID of reader's session")
 	Attribute("referer", String, "Value of HTTP referer header (if present)")
 })
