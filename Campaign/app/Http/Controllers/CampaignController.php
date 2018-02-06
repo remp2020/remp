@@ -223,9 +223,15 @@ class CampaignController extends Controller
                 ]);
         }
 
-        $userId = $data->userId ?: null;
+        $userId = null;
+        if (isset($data->userId) || !empty($data->userId)) {
+            $userId = $data->userId;
+        }
 
-        $browserId = $data->browserId ?: null;
+        $browserId = null;
+        if (isset($data->browserId) || !empty($data->browserId)) {
+            $browserId = $data->browserId;
+        }
         if (!$browserId) {
             return response()
                 ->jsonp($r->get('callback'), [
