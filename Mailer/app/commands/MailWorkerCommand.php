@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MailWorkerCommand extends Command
 {
-    const MESSAGES_PER_BATCH = 50;
+    const MESSAGES_PER_BATCH = 200;
 
     private $applicationMailer;
 
