@@ -55,7 +55,7 @@ func (c *SegmentController) CheckUser(ctx *app.CheckUserSegmentsContext) error {
 	return ctx.OK(sc)
 }
 
-// CheckBrowser runs the check_user action.
+// CheckBrowser runs the check_browser action.
 func (c *SegmentController) CheckBrowser(ctx *app.CheckBrowserSegmentsContext) error {
 	sc, ok, err := c.handleCheck(BrowserSegment, ctx.SegmentCode, ctx.BrowserID, ctx.Fields, ctx.Cache)
 	if err != nil {
@@ -92,7 +92,7 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 }
 
 // handleCheck determines whether provided identifier is part of segment based on given segment type.
-func (c *SegmentController) handleCheck(st SegmentType, segmentCode, identifier string, fields, cache *string) (*app.SegmentCheck, bool, error) {
+func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, identifier string, fields, cache *string) (*app.SegmentCheck, bool, error) {
 	s, ok, err := c.SegmentStorage.Get(segmentCode)
 	if err != nil {
 		return nil, false, err
@@ -125,13 +125,13 @@ func (c *SegmentController) handleCheck(st SegmentType, segmentCode, identifier 
 		}
 	}
 
-	switch st {
+	switch segmentType {
 	case BrowserSegment:
 		segmentCache, ok, err = c.SegmentStorage.CheckBrowser(s, identifier, now, segmentCache, ro)
 	case UserSegment:
 		segmentCache, ok, err = c.SegmentStorage.CheckUser(s, identifier, now, segmentCache, ro)
 	default:
-		return nil, false, fmt.Errorf("unhandled segment type: %d", st)
+		return nil, false, fmt.Errorf("unhandled segment type: %d", segmentType)
 	}
 
 	if err != nil {

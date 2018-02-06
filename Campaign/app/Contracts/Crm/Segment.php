@@ -68,7 +68,7 @@ class Segment implements SegmentContract
      * @param string $userId
      * @return bool
      */
-    public function checkUser(CampaignSegment $campaignSegment, $userId): bool
+    public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
         /** @var Bloom $bloomFilter */
@@ -88,7 +88,7 @@ class Segment implements SegmentContract
      * @param string $browserId
      * @return bool
      */
-    public function checkBrowser(CampaignSegment $campaignSegment, $browserId): bool
+    public function checkBrowser(CampaignSegment $campaignSegment, string $browserId): bool
     {
         // CRM segments don't support browser tracking
         return false;

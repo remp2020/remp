@@ -35,13 +35,13 @@ class SegmentAggregator implements SegmentContract
         return $collection;
     }
 
-    public function checkUser(CampaignSegment $campaignSegment, $userId): bool
+    public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         return $this->contracts[$campaignSegment->provider]
             ->checkUser($campaignSegment, $userId);
     }
 
-    public function checkBrowser(CampaignSegment $campaignSegment, $browserId): bool
+    public function checkBrowser(CampaignSegment $campaignSegment, string $browserId): bool
     {
         return $this->contracts[$campaignSegment->provider]
             ->checkBrowser($campaignSegment, $browserId);

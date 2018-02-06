@@ -79,18 +79,18 @@ class Segment implements SegmentContract
      * @return bool
      * @throws SegmentException
      */
-    public function checkUser(CampaignSegment $campaignSegment, $userId): bool
+    public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         return $this->check($campaignSegment, self::ENDPOINT_USERS_CHECK, $userId);
     }
 
     /**
      * @param CampaignSegment $campaignSegment
-     * @param $userId
+     * @param string $browserId
      * @return bool
      * @throws SegmentException
      */
-    public function checkBrowser(CampaignSegment $campaignSegment, $browserId): bool
+    public function checkBrowser(CampaignSegment $campaignSegment, string $browserId): bool
     {
         return $this->check($campaignSegment, self::ENDPOINT_BROWSERS_CHECK, $browserId);
     }

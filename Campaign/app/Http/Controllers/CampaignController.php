@@ -223,9 +223,9 @@ class CampaignController extends Controller
                 ]);
         }
 
-        $userId = $data->userId ?? null;
+        $userId = $data->userId ?: null;
 
-        $browserId = $data->browserId ?? null;
+        $browserId = $data->browserId ?: null;
         if (!$browserId) {
             return response()
                 ->jsonp($r->get('callback'), [
@@ -336,11 +336,11 @@ class CampaignController extends Controller
                 $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
 
                 if ($userId) {
-                    if (!$sa->checkUser($campaignSegment, $userId)) {
+                    if (!$sa->checkUser($campaignSegment, strval($userId))) {
                         continue 2;
                     }
                 } else {
-                    if (!$sa->checkBrowser($campaignSegment, $browserId)) {
+                    if (!$sa->checkBrowser($campaignSegment, strval($browserId))) {
                         continue 2;
                     }
                 }

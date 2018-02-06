@@ -11,9 +11,9 @@ interface SegmentContract
 
     public function list(): Collection;
 
-    public function checkUser(CampaignSegment $campaignSegment, $userId): bool;
+    public function checkUser(CampaignSegment $campaignSegment, string $userId): bool;
 
-    public function checkBrowser(CampaignSegment $campaignSegment, $browserId): bool;
+    public function checkBrowser(CampaignSegment $campaignSegment, string $browserId): bool;
 
     public function users(CampaignSegment $campaignSegment): Collection;
 
