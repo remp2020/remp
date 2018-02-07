@@ -219,6 +219,14 @@ export default {
         }
         CustomEvent.prototype = window.Event.prototype;
         window.CustomEvent = CustomEvent;
+
+        // support addEventListener for IE8
+        if (typeof Element.prototype.addEventListener === 'undefined') {
+            Element.prototype.addEventListener = function (e, callback) {
+                e = 'on' + e;
+                return this.attachEvent(e, callback);
+            };
+        }
     },
 
     loadScript: function (src, callback) {

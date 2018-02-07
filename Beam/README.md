@@ -143,6 +143,10 @@ Include following snippet into the page to track events. Update `rempConfig` obj
                 category: String, // optional
                 tags: [String, String, String] // optional
             },
+            
+            // optional time spent measuring (default value `false`)
+            // if enabled, tracks time spent on current page
+            timeSpentEnabled: true,
         },
         
         segments: {

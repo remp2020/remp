@@ -30,11 +30,15 @@ var System = Type("System", func() {
 var Pageview = Type("Pageview", func() {
 	Description("Pageview is the payload for tracking pageview event")
 
+	Attribute("action", String, func() {
+		Enum("load", "timespent")
+	})
 	Attribute("system", System)
 	Attribute("user", User)
 	Attribute("article", Article)
+	Attribute("timespent", TimeSpent)
 
-	Required("system", "user")
+	Required("system", "user", "action")
 })
 
 var Commerce = Type("Commerce", func() {
@@ -79,6 +83,15 @@ var Article = Type("Article", func() {
 	Attribute("variants", HashOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
 
 	Required("id")
+})
+
+var TimeSpent = Type("TimeSpent", func() {
+	Description("Update time spent on page")
+
+	Attribute("seconds", Integer, "Number of seconds from previous update of time spent on page")
+	Attribute("unload", Boolean, "Flag to indicate last update of time spent on page before unload event")
+
+	Required("seconds")
 })
 
 var Source = Type("source", func() {

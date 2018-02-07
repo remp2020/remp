@@ -159,9 +159,27 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 
 	tags := map[string]string{
 		"category": model.CategoryPageview,
-		"action":   model.ActionPageviewLoad,
 	}
 	values := map[string]interface{}{}
+
+	var measurement string
+	switch ctx.Payload.Action {
+	case model.ActionPageviewLoad:
+		tags["action"] = model.ActionPageviewLoad
+		measurement = model.TablePageviews
+	case model.ActionPageviewTimespent:
+		tags["action"] = model.ActionPageviewTimespent
+		measurement = model.TableTimespent
+		if ctx.Payload.Timespent != nil {
+			values["timespent"] = ctx.Payload.Timespent.Seconds
+			tags["unload"] = "0"
+			if ctx.Payload.Timespent.Unload != nil && *ctx.Payload.Timespent.Unload {
+				tags["unload"] = "1"
+			}
+		}
+	default:
+		return ctx.BadRequest(fmt.Errorf("incorrect pageview action [%s]", ctx.Payload.Action))
+	}
 
 	if ctx.Payload.Article != nil {
 		tags[model.FlagArticle] = "1"
@@ -176,7 +194,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		tags[model.FlagArticle] = "0"
 	}
 
-	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, model.TablePageviews, tags, values); err != nil {
+	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, measurement, tags, values); err != nil {
 		return err
 	}
 	return ctx.Accepted()
@@ -204,7 +222,7 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 
 // pushInternal pushes new event to the InfluxDB.
 func (c *TrackController) pushInternal(system *app.System, user *app.User,
-	name string, tags map[string]string, fields map[string]interface{}) error {
+	measurement string, tags map[string]string, fields map[string]interface{}) error {
 	fields["token"] = system.PropertyToken
 
 	if user != nil {
@@ -255,7 +273,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		}
 	}
 
-	p, err := influxClient.NewPoint(name, tags, fields, system.Time)
+	p, err := influxClient.NewPoint(measurement, tags, fields, system.Time)
 	if err != nil {
 		return err
 	}
