@@ -39,7 +39,7 @@
                             'header' => 'Status',
                         ],
                         'updated_at' => [
-                            'header' => 'Status',
+                            'header' => 'Updated at',
                         ],
                     ],
                     'dataSource' => route('schedule.json'),
