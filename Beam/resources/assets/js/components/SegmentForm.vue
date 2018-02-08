@@ -134,8 +134,8 @@
                             <div class="input-group m-t-10">
                                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                                 <div class="fg-line">
-                                    <label class="fg-label">Timespan</label>
-                                    <input v-model="rule.timespan" :name="'rules['+i+'][timespan]'" placeholder="e.g. 1440 (minutes)" class="form-control fg-input" title="timespan" type="number" required>
+                                    <label class="fg-label">Timespan in minutes</label>
+                                    <input v-model="rule.timespan" :name="'rules['+i+'][timespan]'" placeholder="e.g. 1440" class="form-control fg-input" title="timespan" type="number" required>
                                 </div>
                             </div>
 
