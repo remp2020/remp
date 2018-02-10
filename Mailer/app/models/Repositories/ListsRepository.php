@@ -2,7 +2,6 @@
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Database\Table\IRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 use Remp\MailerModule\Selection;
@@ -58,14 +57,11 @@ class ListsRepository extends Repository
         return $this->getTable()->where(['mail_type_category_id' => $categoryId]);
     }
 
-
     /**
      * @return Selection
      */
     public function tableFilter()
     {
-        $selection = $this->getTable()->order('mail_type_category.sorting, mail_types.sorting');
-
-        return $selection;
+        return $this->getTable()->order('mail_type_category.sorting, mail_types.sorting');
     }
 }

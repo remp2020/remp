@@ -147,6 +147,20 @@ services:
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 
+    # Generator
+    generator:
+        class: Remp\MailerModule\Generators\GeneratorFactory
+        setup:
+            - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('empty', 'Empty', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('minuta_medium', 'Minuta medium', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('url_parser', 'Ulr parser', Remp\MailerModule\Generators\EmptyGenerator())
+
+
     # Repositories
     - Remp\MailerModule\Repository\AuditLogRepository
     - Remp\MailerModule\Repository\ConfigsRepository
@@ -164,6 +178,7 @@ services:
     - Remp\MailerModule\Repository\BatchesRepository
     - Remp\MailerModule\Repository\BatchTemplatesRepository
     - Remp\MailerModule\Repository\AutoLoginTokensRepository
+    - Remp\MailerModule\Repository\SourceTemplateRepository
 
     # Factories
     - Remp\MailerModule\Components\IDataTableFactory
@@ -179,6 +194,7 @@ services:
     - Remp\MailerModule\Forms\NewBatchFormFactory
     - Remp\MailerModule\Forms\EditBatchFormFactory
     - Remp\MailerModule\Forms\NewTemplateFormFactory
+    - Remp\MailerModule\Forms\SourceTemplateFormFactory
 
     # Commands
     - Remp\MailerModule\Commands\HelloWorldCommand
