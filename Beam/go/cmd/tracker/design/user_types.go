@@ -17,6 +17,7 @@ var User = Type("User", func() {
 	})
 	Attribute("source", Source, "UTM and social source metadata")
 	Attribute("remp_session_id", String, "ID of reader's session")
+	Attribute("remp_pageview_id", String, "ID of pageview")
 	Attribute("referer", String, "Value of HTTP referer header (if present)")
 })
 

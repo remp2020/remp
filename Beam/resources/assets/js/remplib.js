@@ -343,6 +343,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
+            params["user"][remplib.rempPageviewIDKey] = remplib.getRempPageviewID();
 
             var cleanup = function(obj) {
                 Object.keys(obj).forEach(function(key) {

@@ -232,6 +232,9 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		if user.RempSessionID != nil {
 			tags["remp_session_id"] = *user.RempSessionID
 		}
+		if user.RempPageviewID != nil {
+			tags["remp_pageview_id"] = *user.RempPageviewID
+		}
 
 		if user.Source != nil {
 			if user.Source.Social != nil {

@@ -14,6 +14,10 @@ export default {
 
     cookieDomain: null,
 
+    rempPageviewIDKey: "remp_pageview_id",
+
+    rempPageviewID: null,
+
     getUserId: function() {
         return this.userId;
     },
@@ -69,6 +73,14 @@ export default {
         };
         this.setToStorage(storageKey, item);
         return rempSessionID;
+    },
+
+    getRempPageviewID: function() {
+        if (this.rempPageviewID) {
+            return this.rempPageviewID;
+        }
+        this.rempPageviewID = remplib.uuidv4();
+        return this.rempPageviewID;
     },
 
     uuidv4: function() {
