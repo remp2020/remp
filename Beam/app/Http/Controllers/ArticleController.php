@@ -29,7 +29,7 @@ class ArticleController extends Controller
     public function json(Request $request, Datatables $datatables)
     {
         $articles = Article::select()
-            ->with('property')
+            ->with(['authors', 'sections'])
             ->get();
 
         return $datatables->of($articles)

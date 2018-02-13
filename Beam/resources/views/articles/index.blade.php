@@ -15,8 +15,8 @@
         {!! Widget::run('DataTable', [
             'colSettings' => [
                 'title',
-                'author' => ['header' => 'author'],
-                'section' => ['header' => 'section'],
+                'authors[, ].name' => ['header' => 'authors'],
+                'sections[, ].name' => ['header' => 'sections'],
                 'image_url' => ['header' => 'image'],
                 'url' => ['header' => 'URL'],
                 'published_at' => ['header' => 'published at', 'render' => 'date'],
