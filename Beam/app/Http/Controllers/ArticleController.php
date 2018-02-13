@@ -96,19 +96,37 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Article  $article
+     * @param ArticleRequest|Request $request
+     * @param  \App\Article $article
+     *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Article $article)
+    public function update(ArticleRequest $request, Article $article)
     {
-        $this->validate($request, [
-            'name' => 'bail|required|unique:articles|max:255',
-        ]);
-
         $article->fill($request->all());
         $article->save();
 
-        return redirect(route('articles.index'))->with('success', 'Article updated');
+        $article->sections()->detach();
+        foreach ($request->get('sections', []) as $sectionName) {
+            $section = Section::firstOrCreate([
+                'name' => $sectionName,
+            ]);
+            $article->sections()->attach($section);
+        }
+
+        $article->authors()->detach();
+        foreach ($request->get('authors', []) as $authorName) {
+            $section = Author::firstOrCreate([
+                'name' => $authorName,
+            ]);
+            $article->authors()->attach($section);
+        }
+
+        $article->load(['authors', 'sections']);
+
+        return response()->format([
+            'html' => redirect(route('articles.index'))->with('success', 'Article created'),
+            'json' => new ArticleResource($article),
+        ]);
     }
 }
