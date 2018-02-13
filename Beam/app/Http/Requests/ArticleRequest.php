@@ -28,10 +28,13 @@ class ArticleRequest extends FormRequest
             'property_uuid' => "required|string",
             'title' => "required|string",
             'url' => "required|url",
-            'author' => 'string',
-            'section' => 'string',
+            'authors' => 'array',
+            'sections' => 'array',
             'image_url' => 'url',
             'published_at' => 'date',
+
+            'authors.*' => 'string',
+            'sections.*' => 'string',
         ];
     }
 }

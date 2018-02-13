@@ -29,6 +29,16 @@ class Article extends Model
         return $this->belongsTo(Property::class, 'property_uuid', 'uuid');
     }
 
+    public function authors()
+    {
+        return $this->belongsToMany(Author::class);
+    }
+
+    public function sections()
+    {
+        return $this->belongsToMany(Section::class);
+    }
+
     public function setPublishedAtAttribute($value)
     {
         if (!$value) {

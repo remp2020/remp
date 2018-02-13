@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\Author;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
+use App\Section;
 use HTML;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
@@ -57,6 +59,22 @@ class ArticleController extends Controller
         $article = new Article();
         $article->fill($request->all());
         $article->save();
+
+        foreach ($request->get('sections', []) as $sectionName) {
+            $section = Section::firstOrCreate([
+                'name' => $sectionName,
+            ]);
+            $article->sections()->attach($section);
+        }
+
+        foreach ($request->get('authors', []) as $authorName) {
+            $section = Author::firstOrCreate([
+                'name' => $authorName,
+            ]);
+            $article->authors()->attach($section);
+        }
+
+        $article->load(['authors', 'sections']);
 
         return response()->format([
             'html' => redirect(route('articles.index'))->with('success', 'Article created'),
