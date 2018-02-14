@@ -242,6 +242,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "fields": fields || {},
                 "value": value
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/event", params);
             this.dispatchEvent(category, action, params);
         },
@@ -251,6 +252,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
                 "action": "load",
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "load", params);
         },
@@ -272,8 +274,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "unload": closed,
                 }
             };
+            params = this.addSystemUserParams(params);
+            params = this.timespentParamsCleanup(params);
 
             this.partialTimeSpent = 0; // start counting from 0 again
+
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "timespent", params);
         },
@@ -286,6 +291,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "funnel_id": funnelId
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "checkout", params);
         },
@@ -303,6 +309,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "payment", params);
         },
@@ -320,6 +327,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "purchase", params);
         },
@@ -337,6 +345,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "refund", params);
         },
@@ -351,7 +360,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         post: function (path, params) {
-            params = this.addParams(params);
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.open("POST", path);
             xmlhttp.onreadystatechange = function (oEvent) {
@@ -366,8 +374,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             xmlhttp.send(JSON.stringify(params));
         },
 
-        addParams: function(params) {
-            var d = new Date();
+        addSystemUserParams: function(params) {
+            const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
             params["user"] = {
                 "id": remplib.getUserId(),
@@ -394,6 +402,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             };
             cleanup(params);
             return params
+        },
+
+        timespentParamsCleanup: function(params) {
+            delete params.user.url;
+            delete params.user.referer;
+            delete params.user.user_agent;
+            delete params.user.source.utm_source;
+            delete params.user.source.utm_medium;
+            delete params.user.source.utm_campaign;
+            delete params.user.source.utm_content;
+            return params;
         },
 
         getSocialSource: function() {
