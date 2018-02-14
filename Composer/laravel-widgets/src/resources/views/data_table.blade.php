@@ -35,7 +35,9 @@
                     @endif
                 </th>
             @endforeach
+            @if (!empty($rowActions))
             <th>actions</th>
+            @endif
         </tr>
         </thead>
         <tbody>

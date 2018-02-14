@@ -115,7 +115,7 @@ Include following snippet into the page to track events. Update `rempConfig` obj
         });
         
         // change URL to location of BEAM remplib.js
-        load("http://beam.remp.press/assets/vendor/js/remplib.js");
+        load("http://beam.remp.press/assets/lib/js/remplib.js");
     })(window, document);
 
     var rempConfig = {

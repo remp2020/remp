@@ -136,6 +136,10 @@ function route_active($routeName, $classes = '', $activeClasses = '')
             <li {!! route_active('segments') !!}>
                 <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-accounts-list-alt"></i> Segments</a>
             </li>
+            <li class="m-b-15"></li>
+            <li {!! route_active('articles') !!}>
+                <a href="{{ route('articles.index') }}" ><i class="zmdi zmdi-library"></i> Articles</a>
+            </li>
         </ul>
     </aside>
 

@@ -25,8 +25,12 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('segments/json', 'SegmentController@json')->name('segments.json');
     Route::get('segments/{sourceSegment}/copy', 'SegmentController@copy')->name('segments.copy');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+    Route::get('articles/json', 'ArticleController@json')->name('articles.json');
 
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
     Route::resource('segments', 'SegmentController');
+    Route::resource('articles', 'ArticleController', [
+        'except' => ['create', 'edit', 'destroy']
+    ]);
 });
