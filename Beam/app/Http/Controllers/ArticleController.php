@@ -34,10 +34,7 @@ class ArticleController extends Controller
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::linkRoute('articles.show', $article->title, $article);
-            })
-            ->addColumn('url', function (Article $article) {
-                return HTML::link($article->url, $article->url);
+                return HTML::link($article->url, $article->title);
             })
             ->addColumn('image_url', function (Article $article) {
                 if (!$article->image_url) {
