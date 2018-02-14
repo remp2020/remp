@@ -88,6 +88,7 @@ var Source = Type("source", func() {
 	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
 	Attribute("social", String, "Social source if available")
+	Attribute("ref", String, "Direct referrer source if available")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {
