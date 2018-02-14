@@ -39,6 +39,11 @@ class Article extends Model
         return $this->belongsToMany(Section::class);
     }
 
+    public function conversions()
+    {
+        return $this->hasMany(Conversion::class);
+    }
+
     public function setPublishedAtAttribute($value)
     {
         if (!$value) {

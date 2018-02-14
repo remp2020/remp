@@ -21,6 +21,9 @@ Route::middleware('auth:api')->group(function() {
     Route::apiResource('articles', 'ArticleController', [
         'except' => ['create', 'edit', 'destroy']
     ]);
+    Route::apiResource('conversions', 'ConversionController', [
+        'only' => ['store', 'index']
+    ]);
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', function(\App\Contracts\JournalContract $journalContract, $group, $category) {

@@ -20,7 +20,7 @@
                 'image_url' => ['header' => 'image'],
                 'published_at' => ['header' => 'published at', 'render' => 'date'],
             ],
-            'dataSource' => action('ArticleController@json'),
+            'dataSource' => route('articles.json'),
             'order' => [4, 'desc'],
         ]) !!}
 
