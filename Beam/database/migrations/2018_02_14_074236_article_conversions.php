@@ -18,7 +18,7 @@ class ArticleConversions extends Migration
             $table->integer('article_id')->unsigned();
             $table->float('amount');
             $table->string('currency');
-            $table->date('paid_at');
+            $table->timestamp('paid_at');
             $table->string('transaction_id');
             $table->timestamps();
 
