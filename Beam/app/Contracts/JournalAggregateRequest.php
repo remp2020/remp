@@ -72,5 +72,4 @@ class JournalAggregateRequest
     {
         return $this->timeAfter;
     }
-
 }
