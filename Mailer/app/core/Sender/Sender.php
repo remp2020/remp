@@ -258,6 +258,7 @@ class Sender
             'job_id' => $this->jobId,
             'batch_id' => $this->batchId,
             'mail_sender_id' => $mailSenderId,
+            'context' => $this->context,
         ]));
         $message->setHeader('X-Mailer-Tag', $this->template->code);
         $message->setHeader('X-Mailer-Template-Params', Json::encode($templateParams));
