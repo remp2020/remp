@@ -11,4 +11,6 @@ interface JournalContract
     public function flags(): Collection;
 
     public function actions($group, $category): Collection;
+
+    public function count(JournalAggregateRequest $request): Collection;
 }
