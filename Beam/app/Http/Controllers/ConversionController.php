@@ -21,8 +21,7 @@ class ConversionController extends Controller
     public function json(Request $request, Datatables $datatables)
     {
         $conversions = Conversion::select()
-            ->with(['article', 'article.authors', 'article.sections'])
-            ->get();
+            ->with(['article', 'article.authors', 'article.sections']);
 
         return $datatables->of($conversions)
             ->addColumn('article.title', function (Conversion $conversion) {
