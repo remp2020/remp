@@ -33,6 +33,9 @@ class Sender
     /** @var  array */
     private $attachments = [];
 
+    /** @var string */
+    private $context;
+
     /** @var MailerFactory */
     private $mailerFactory;
 
@@ -102,6 +105,13 @@ class Sender
         return $this;
     }
 
+    public function setContext($context)
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
     public function send($checkEmailSubscribed = true)
     {
         if (count($this->recipients) > 1) {
@@ -143,7 +153,8 @@ class Sender
             $this->jobId,
             $this->batchId,
             $senderId,
-            $attachmentSize
+            $attachmentSize,
+            $this->context
         );
 
         $mailer->send($message);
@@ -217,7 +228,8 @@ class Sender
                 $this->jobId,
                 $this->batchId,
                 $params['mail_sender_id'],
-                $attachmentSize
+                $attachmentSize,
+                $this->context
             );
         }
         $logsTableName = $this->logsRepository->getTable()->getName();
@@ -264,6 +276,7 @@ class Sender
         $this->batchId = null;
         $this->params = [];
         $this->attachments = [];
+        $this->context = null;
 
         return $this;
     }

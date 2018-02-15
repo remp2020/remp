@@ -31,11 +31,12 @@ class JobsRepository extends Repository
         $this->segmentsRepository = $segmentsRepository;
     }
 
-    public function add($segment_code, $segment_provider)
+    public function add($segment_code, $segment_provider, $context = null)
     {
         $data = [
             'segment_code' => $segment_code,
             'segment_provider' => $segment_provider,
+            'context' => $context,
             'status' => static::STATUS_NEW,
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),
