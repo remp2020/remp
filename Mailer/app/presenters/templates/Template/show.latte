@@ -9,8 +9,7 @@
     <div class="card-header">
         <div class="row">
             <div class="col-lg-4">
-                <h2>Show email <small></small></h2>
-                <h4 class="text-muted">{$mailTemplate->name}</h4>
+            <h2 n:block="title">Show email <small>{$mailTemplate->name}</small></h2>
             </div>
         </div>
 
@@ -40,7 +39,6 @@
                     <li class="list-group-item"><strong>List:</strong> <a n:href="List:Show $mailTemplate->mail_type_id">{$mailTemplate->mail_type->title}</a></li>
                     <li class="list-group-item"><strong>Created:</strong> {$mailTemplate->created_at}</li>
                     <li class="list-group-item"><strong>Updated:</strong> {$mailTemplate->updated_at}</li>
-                    <li class="list-group-item" n:if="$mailTemplate->autologin"><strong>Auto Login</strong></li>
                     <li class="list-group-item" n:if="$mailTemplate->description"><strong>Description:</strong> {$mailTemplate->description}</li>
                     <li class="list-group-item" n:if="$mailTemplate->copy_from"><strong>Copy From:</strong> <a n:href="show $mailTemplate->copy_from">{$mailTemplate->ref('copy_from')->name}</a></li>
                 </ul>

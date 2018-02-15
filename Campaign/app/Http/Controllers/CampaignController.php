@@ -223,12 +223,20 @@ class CampaignController extends Controller
                 ]);
         }
 
-        $userId = $data->userId ?? null;
-        if (!$userId) {
+        $userId = null;
+        if (isset($data->userId) || !empty($data->userId)) {
+            $userId = $data->userId;
+        }
+
+        $browserId = null;
+        if (isset($data->browserId) || !empty($data->browserId)) {
+            $browserId = $data->browserId;
+        }
+        if (!$browserId) {
             return response()
                 ->jsonp($r->get('callback'), [
                     'success' => false,
-                    'errors' => ['userId is required and missing'],
+                    'errors' => ['browserId is required and missing'],
                 ])
                 ->setStatusCode(400);
         }
@@ -325,24 +333,22 @@ class CampaignController extends Controller
             }
 
             // signed in state
-            if (isset($campaign->signed_in)) {
-                if (!isset($data->signedIn)) {
-                    return response()
-                        ->jsonp($r->get('callback'), [
-                            'success' => false,
-                            'errors' => ['current campaign requires "signedIn" param to be provided'],
-                        ]);
-                }
-                if ($campaign->signed_in !== $data->signedIn) {
-                    continue;
-                }
+            if (isset($campaign->signed_in) && $campaign->signed_in !== boolval($userId)) {
+                continue;
             }
 
             // segment
             foreach ($campaign->segments as $campaignSegment) {
                 $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
-                if (!$sa->check($campaignSegment, $userId)) {
-                    continue 2;
+
+                if ($userId) {
+                    if (!$sa->checkUser($campaignSegment, strval($userId))) {
+                        continue 2;
+                    }
+                } else {
+                    if (!$sa->checkBrowser($campaignSegment, strval($browserId))) {
+                        continue 2;
+                    }
                 }
             }
 

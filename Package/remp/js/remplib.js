@@ -6,7 +6,7 @@ export default {
 
     userId: null,
 
-    signedIn: false,
+    browserId: null,
 
     cacheThreshold: 15 * 60000, // 15 minutes
 
@@ -15,24 +15,42 @@ export default {
     cookieDomain: null,
 
     getUserId: function() {
-        if (this.userId) {
-            return this.userId;
+        return this.userId;
+    },
+
+    getBrowserId: function() {
+        if (this.browserId) {
+            return this.browserId;
         }
-        var storageKey = "anon_id";
-        var anonId = this.getFromStorage(storageKey, true, true);
+
+        let storageKey = "browser_id";
+        let browserId = this.getFromStorage(storageKey, true, true);
+        if (browserId) {
+            return browserId;
+        }
+
+        // this section is added for historical reasons and migration of value
+        // it will be removed within next couple of weeks
+        let deprecatedStorageKey = "anon_id";
+        let anonId = this.getFromStorage(deprecatedStorageKey, true, true);
         if (anonId) {
-            return anonId;
+            browserId = anonId;
+            this.removeFromStorage(deprecatedStorageKey);
         }
-        anonId = remplib.uuidv4();
-        var now = new Date();
-        var item = {
+
+        if (!browserId) {
+            browserId = remplib.uuidv4();
+        }
+
+        let now = new Date();
+        let item = {
             "version": 1,
-            "value": anonId,
+            "value": browserId,
             "createdAt": now,
             "updatedAt": now,
         };
         this.setToStorage(storageKey, item);
-        return anonId;
+        return browserId;
     },
 
     getRempSessionID: function() {
@@ -54,18 +72,18 @@ export default {
     },
 
     uuidv4: function() {
-        var format = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+        let format = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
         if (!window.crypto) {
             return format.replace(/[xy]/g, function(c) {
-                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                let r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
                 return v.toString(16);
             });
         }
 
-        var nums = window.crypto.getRandomValues(new Uint8ClampedArray(format.split(/[xy]/).length - 1));
-        var pointer = 0;
+        let nums = window.crypto.getRandomValues(new Uint8ClampedArray(format.split(/[xy]/).length - 1));
+        let pointer = 0;
         return format.replace(/[xy]/g, function(c) {
-            var r = nums[pointer++] % 16,
+            let r = nums[pointer++] % 16,
                 v = (c === 'x') ? r : (r&0x3|0x8);
             return v.toString(16);
         });
@@ -91,14 +109,14 @@ export default {
     },
 
     getFromStorage: function(key, bypassThreshold, storeToCookie) {
-        var now = new Date();
-        var data = localStorage.getItem(key);
+        let now = new Date();
+        let data = localStorage.getItem(key);
         if (data === null) {
             return null;
         }
 
-        var item = JSON.parse(data);
-        var threshold = new Date(now.getTime() - this.cacheThreshold);
+        let item = JSON.parse(data);
+        let threshold = new Date(now.getTime() - this.cacheThreshold);
         if (!bypassThreshold && (new Date(item.updatedAt)).getTime() < threshold.getTime()) {
             localStorage.removeItem(key);
             return null;
@@ -120,8 +138,20 @@ export default {
         return item;
     },
 
+    removeFromStorage: function(key) {
+        localStorage.removeItem(key);
+
+        let cookieExp = new Date();
+        const expires = "; expires=" + cookieExp.toUTCString();
+        let domain = "";
+        if (this.cookieDomain !== null) {
+            domain = "; domain=" + this.cookieDomain;
+        }
+        document.cookie = key + "=" + expires + "; path=/"+ domain + ";";
+    },
+
     extend: function() {
-        var a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;
+        let a, b, c, f, l, g = arguments[0] || {}, k = 1, v = arguments.length, n = !1;
         "boolean" === typeof g && (n = g,
             g = arguments[1] || {},
             k = 2);
@@ -148,11 +178,11 @@ export default {
             app.run();
             return;
         }
-        for (var i=0; i < app._.length; i++) {
-            var cb = app._[i];
+        for (let i=0; i < app._.length; i++) {
+            let cb = app._[i];
             setTimeout((function() {
-                var cbf = cb[0];
-                var cbargs = cb[1];
+                let cbf = cb[0];
+                let cbargs = cb[1];
                 return function() {
                     if (cbf !== "run") {
                         app[cbf].apply(app, cbargs);
@@ -171,7 +201,7 @@ export default {
         if ( typeof window.CustomEvent === "function" ) return false;
         function CustomEvent ( event, params ) {
             params = params || { bubbles: false, cancelable: false, detail: undefined };
-            var evt = document.createEvent( 'CustomEvent' );
+            let evt = document.createEvent( 'CustomEvent' );
             evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
             return evt;
         }
@@ -180,7 +210,7 @@ export default {
     },
 
     loadScript: function (src, callback) {
-        var s = document.createElement('script');
+        let s = document.createElement('script');
         s.src = src;
         s.async = true;
         s.onreadystatechange = s.onload = function() {
@@ -193,7 +223,7 @@ export default {
     },
 
     loadStyle: function (src, callback) {
-        var l = document.createElement('link');
+        let l = document.createElement('link');
         l.href = src;
         l.rel = "stylesheet";
         l.onreadystatechange = l.onload = function() {

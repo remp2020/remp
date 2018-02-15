@@ -65,11 +65,10 @@ class Segment implements SegmentContract
 
     /**
      * @param CampaignSegment $campaignSegment
-     * @param $userId
+     * @param string $userId
      * @return bool
-     * @throws SegmentException
      */
-    public function check(CampaignSegment $campaignSegment, $userId): bool
+    public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
         /** @var Bloom $bloomFilter */
@@ -81,6 +80,17 @@ class Segment implements SegmentContract
         dispatch(new CacheSegmentJob($campaignSegment));
 
         // CRM segments are expensive; if they're not cached, we rather return false here.
+        return false;
+    }
+
+    /**
+     * @param CampaignSegment $campaignSegment
+     * @param string $browserId
+     * @return bool
+     */
+    public function checkBrowser(CampaignSegment $campaignSegment, string $browserId): bool
+    {
+        // CRM segments don't support browser tracking
         return false;
     }
 

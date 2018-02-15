@@ -5,9 +5,24 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+// set of constants reused within multiple actions
 const (
-	SegmentPattern = `^[a-zA-Z0-9_\-@.]+$`
-	UserPattern    = `^[a-zA-Z0-9_\-@.]+$`
+	SegmentPattern        = `^[a-zA-Z0-9_\-@.]+$`
+	UserPattern           = `^[a-zA-Z0-9_\-@.]+$`
+	CacheParamDescription = `JSON-encoded object of internal cache with count of events provided by third party (mostly Beam's remplib.js), e.g.:
+
+	{
+		10: { // segment rule ID
+			"d": "2017-11-07T08:06:26.612Z" // RFC3339 date
+			"c": 11 // number of occurrences
+		}
+	}`
+	FieldsParamDescription = `JSON-encoded object of overriden pairs, e.g.:
+
+	{
+		"utm_campaign": "custom-campaign-id",
+		// ...
+	}`
 )
 
 var _ = Resource("swagger", func() {
@@ -35,9 +50,9 @@ var _ = Resource("segments", func() {
 			}))
 		})
 	})
-	Action("check", func() {
-		Description("Retrieve segment with given ID.")
-		Routing(GET("/:segment_code/check/:user_id"))
+	Action("check_user", func() {
+		Description("Check whether given user ID belongs to segment.")
+		Routing(GET("/:segment_code/users/check/:user_id"))
 		Params(func() {
 			Param("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
@@ -45,22 +60,27 @@ var _ = Resource("segments", func() {
 			Param("user_id", String, "User ID", func() {
 				Pattern(UserPattern)
 			})
-			Param("fields", String, `JSON-encoded object of overriden pairs, e.g.:
-
-	{
-		"utm_campaign": "custom-campaign-id",
-		// ...
-	}
-			`)
-			Param("cache", String, `JSON-encoded object of internal cache with count of events provided by third party (mostly Beam's remplib.js), e.g.:
-
-	{
-		10: { // segment rule ID
-			"d": "2017-11-07T08:06:26.612Z" // RFC3339 date
-			"c": 11 // number of occurrences
-		}
-	}
-			`)
+			Param("fields", String, FieldsParamDescription)
+			Param("cache", String, CacheParamDescription)
+		})
+		Response(NotFound)
+		Response(BadRequest)
+		Response(OK, func() {
+			Media(SegmentCheck)
+		})
+	})
+	Action("check_browser", func() {
+		Description("Check whether given browser ID belongs to segment.")
+		Routing(GET("/:segment_code/browsers/check/:browser_id"))
+		Params(func() {
+			Param("segment_code", String, "Segment code", func() {
+				Pattern(SegmentPattern)
+			})
+			Param("browser_id", String, "Browser ID", func() {
+				Pattern(UserPattern)
+			})
+			Param("fields", String, FieldsParamDescription)
+			Param("cache", String, CacheParamDescription)
 		})
 		Response(NotFound)
 		Response(BadRequest)
@@ -77,13 +97,7 @@ var _ = Resource("segments", func() {
 			Param("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
 			})
-			Param("fields", String, `JSON-encoded object of overriden pairs, e.g.:
-
-	{
-		"utm_campaign": "custom-campaign-id",
-		// ...
-	}
-			`)
+			Param("fields", String, FieldsParamDescription)
 		})
 		Payload(RuleOverrides)
 		Response(NotFound)

@@ -222,13 +222,12 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID
+			tags["signed_in"] = "1"
+		} else {
+			tags["signed_in"] = "0"
 		}
-		if user.SignedIn != nil {
-			if *user.SignedIn {
-				tags["signed_in"] = "1"
-			} else {
-				tags["signed_in"] = "0"
-			}
+		if user.BrowserID != nil {
+			tags["browser_id"] = *user.BrowserID
 		}
 		if user.RempSessionID != nil {
 			tags["remp_session_id"] = *user.RempSessionID
@@ -237,6 +236,9 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		if user.Source != nil {
 			if user.Source.Social != nil {
 				tags["social"] = *user.Source.Social
+			}
+			if user.Source.Ref != nil {
+				tags["ref_source"] = *user.Source.Ref
 			}
 			if user.Source.UtmSource != nil {
 				tags["utm_source"] = *user.Source.UtmSource

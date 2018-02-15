@@ -34,14 +34,14 @@ class TemplatesRepository extends Repository
         return $result;
     }
 
-    public function add($name, $code, $description, $autoLogin, $from, $subject, $templateText, $templateHtml, $layoutId, $typeId)
+    public function add($name, $code, $description, $from, $subject, $templateText, $templateHtml, $layoutId, $typeId)
     {
         $result = $this->insert([
             'name' => $name,
             'code' => $code,
             'description' => $description,
             'from' => $from,
-            'autologin' => $autoLogin,
+            'autologin' => true,
             'subject' => $subject,
             'mail_body_text' => $templateText,
             'mail_body_html' => $templateHtml,

@@ -6,7 +6,8 @@ import (
 )
 
 var User = Type("User", func() {
-	Attribute("id", String, "ID of reader")
+	Attribute("id", String, "ID of logged user")
+	Attribute("browser_id", String, "Anonymized ID of user's browser")
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
 	})
@@ -15,7 +16,6 @@ var User = Type("User", func() {
 		Format("ip")
 	})
 	Attribute("source", Source, "UTM and social source metadata")
-	Attribute("signed_in", Boolean, "Flag whether user is signed into the system")
 	Attribute("remp_session_id", String, "ID of reader's session")
 	Attribute("referer", String, "Value of HTTP referer header (if present)")
 })
@@ -88,6 +88,7 @@ var Source = Type("source", func() {
 	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
 	Attribute("social", String, "Social source if available")
+	Attribute("ref", String, "Direct referrer source if available")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {

@@ -250,3 +250,7 @@ tr th.sorting_desc:hover:before {
 .dataTable tr th .bootstrap-select {
     text-transform: none;
 }
+
+.table-responsive {
+    overflow-x: initial;
+}

@@ -3,8 +3,6 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Forms\Rule;
-use Nette\Forms\Rules;
 use Nette\Object;
 use Remp\MailerModule\Forms\Rules\FormRules;
 use Remp\MailerModule\Repository\LayoutsRepository;
@@ -77,8 +75,6 @@ class TemplateFormFactory extends Object
         $form->addText('subject', 'Subject')
             ->setRequired('Required');
 
-        $form->addCheckbox('autologin', 'Auto login');
-
         $form->addTextArea('mail_body_text', 'Text version')
             ->setAttribute('rows', 3);
 
@@ -106,7 +102,6 @@ class TemplateFormFactory extends Object
                 $values['name'],
                 $values['code'],
                 $values['description'],
-                $values['autologin'],
                 $values['from'],
                 $values['subject'],
                 $values['mail_body_text'],

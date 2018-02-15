@@ -7,7 +7,7 @@
 </div>
 <div class="card">
     <div class="card-header">
-        <h2>Show newsletter lists <span class="text-muted">{$list->title}</span> <small></small></h2>
+        <h2 n:block="title">Show newsletter list <span class="text-muted"></span> <small>{$list->title}</small></h2>
         <div class="actions">
             <a n:ifset="$list->preview_url" href="{$list->preview_url}">
                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> Preview</button>
