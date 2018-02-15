@@ -29,8 +29,7 @@ class ArticleController extends Controller
     public function json(Request $request, Datatables $datatables)
     {
         $articles = Article::select()
-            ->with(['authors', 'sections'])
-            ->get();
+            ->with(['authors', 'sections']);
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
