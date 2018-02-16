@@ -126,6 +126,13 @@ class Sender
         $tokens = $this->autoLogin->createTokens([$recipient['email']]);
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
 
+        if (getenv('UNSUBSCRIBE_URL')) {
+            $this->params['unsubscribe'] = str_replace(getenv('UNSUBSCRIBE_URL'), '%type%', $this->template->mail_type->code) . $this->params['autologin'];
+        }
+        if (getenv('SETTINGS_URL')) {
+            $this->params['settings'] = getenv('SETTINGS_URL') . $this->params['autologin'];
+        }
+
         $mailer = $this->mailerFactory->getMailer();
 
         $message = new Message();
