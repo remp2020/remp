@@ -13,18 +13,6 @@ class JobQueueRepository extends Repository
     const STATUS_DONE = 'done';
     const STATUS_ERROR = 'error';
 
-    public function add(IRow $batch, $mailTemplateId, $email, $sorting, $context = null)
-    {
-        return $this->insert([
-            'mail_batch_id' => $batch->id,
-            'mail_template_id' => $mailTemplateId,
-            'status' => JobQueueRepository::STATUS_NEW,
-            'sorting' => $sorting,
-            'context' => $context,
-            'email' => $email,
-        ]);
-    }
-
     public function multiInsert($rows)
     {
         $status = JobQueueRepository::STATUS_NEW;
@@ -107,7 +95,6 @@ class JobQueueRepository extends Repository
 
         $this->getDatabase()->query($query);
     }
-
 
     public function getBatchEmails(IRow $mailBatch, $lastId, $count = null)
     {
