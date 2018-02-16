@@ -17,6 +17,7 @@ const (
 	ActionPageviewTimespent = "timespent"
 	TablePageviews          = "pageviews"
 	TableTimespent          = "pageviews_time_spent"
+	TableTimespentRP        = "timespent_rp"
 	FlagArticle             = "_article"
 )
 
