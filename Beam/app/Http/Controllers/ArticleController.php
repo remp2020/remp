@@ -35,12 +35,6 @@ class ArticleController extends Controller
             ->addColumn('title', function (Article $article) {
                 return HTML::link($article->url, $article->title);
             })
-            ->addColumn('image_url', function (Article $article) {
-                if (!$article->image_url) {
-                    return "";
-                }
-                return HTML::image($article->image_url, $article->title, ['style' => 'height: 80px;']);
-            })
             ->make(true);
     }
 

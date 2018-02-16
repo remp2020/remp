@@ -17,11 +17,10 @@
                 'title',
                 'authors[, ].name' => ['header' => 'authors'],
                 'sections[, ].name' => ['header' => 'sections'],
-                'image_url' => ['header' => 'image'],
                 'published_at' => ['header' => 'published at', 'render' => 'date'],
             ],
             'dataSource' => action('ArticleController@json'),
-            'order' => [4, 'desc'],
+            'order' => [3, 'desc'],
         ]) !!}
 
     </div>
