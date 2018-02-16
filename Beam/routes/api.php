@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::middleware('auth:api')->group(function() {
     Route::apiResource('articles', 'ArticleController', [
-        'except' => ['create', 'edit', 'destroy']
+        'only' => ['index', 'store'],
     ]);
 });
 
