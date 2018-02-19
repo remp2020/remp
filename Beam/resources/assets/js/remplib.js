@@ -38,6 +38,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         flagsKey: "flags",
 
+        timeSpentEnabled: false,
+
+        totalTimeSpent: 0,
+
+        partialTimeSpent: 0,
+
+        timeSpentActive: false,
+
         init: function(config) {
             if (typeof config.token !== 'string') {
                 throw "remplib: configuration token invalid or missing: "+config.token
@@ -95,6 +103,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             this.parseUriParams();
+
+            if (typeof config.tracker.timeSpentEnabled === 'boolean') {
+                this.timeSpentEnabled = config.tracker.timeSpentEnabled;
+            }
 
             window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
             window.addEventListener("campaign_showtime", this.syncEventRulesMap);
@@ -222,6 +234,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         run: function() {
             this.trackPageview();
+
+            if (this.timeSpentEnabled === true) {
+                this.bindTickEvents();
+                this.tickTime();
+            }
         },
 
         trackEvent: function(category, action, tags, fields, value) {
@@ -232,6 +249,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "fields": fields || {},
                 "value": value
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/event", params);
             this.dispatchEvent(category, action, params);
         },
@@ -239,9 +257,37 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         trackPageview: function() {
             var params = {
                 "article": this.article,
+                "action": "load",
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "load", params);
+        },
+
+        trackTimespent: function(closed = false) {
+            // PRE ES2015 safeguard
+            closed = (typeof closed === 'boolean') ? closed : false;
+
+            // send 0 time spent in case it is unload event
+            if (this.partialTimeSpent === 0 && closed === false) {
+                return;
+            }
+
+            let params = {
+                "article": this.article,
+                "action": "timespent",
+                "timespent": {
+                    "seconds": this.partialTimeSpent,
+                    "unload": closed,
+                }
+            };
+            params = this.addSystemUserParams(params);
+            params = this.timespentParamsCleanup(params);
+
+            this.partialTimeSpent = 0; // start counting from 0 again
+
+            this.post(this.url + "/track/pageview", params);
+            this.dispatchEvent("pageview", "timespent", params);
         },
 
         trackCheckout: function(funnelId) {
@@ -252,6 +298,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "funnel_id": funnelId
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "checkout", params);
         },
@@ -269,6 +316,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "payment", params);
         },
@@ -286,6 +334,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "purchase", params);
         },
@@ -303,6 +352,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 }
             };
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "refund", params);
         },
@@ -317,7 +367,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         post: function (path, params) {
-            params = this.addParams(params);
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.open("POST", path);
             xmlhttp.onreadystatechange = function (oEvent) {
@@ -332,8 +381,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             xmlhttp.send(JSON.stringify(params));
         },
 
-        addParams: function(params) {
-            var d = new Date();
+        addSystemUserParams: function(params) {
+            const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
             params["user"] = {
                 "id": remplib.getUserId(),
@@ -352,6 +401,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
+            params["user"][remplib.rempPageviewIDKey] = remplib.getRempPageviewID();
 
             var cleanup = function(obj) {
                 Object.keys(obj).forEach(function(key) {
@@ -361,6 +411,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             };
             cleanup(params);
             return params
+        },
+
+        timespentParamsCleanup: function(params) {
+            delete params.user.url;
+            delete params.user.referer;
+            delete params.user.user_agent;
+            delete params.user.source.utm_source;
+            delete params.user.source.utm_medium;
+            delete params.user.source.utm_campaign;
+            delete params.user.source.utm_content;
+            return params;
         },
 
         getSocialSource: function() {
@@ -420,6 +481,81 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             for (var i = 0; i < vars.length; i++) {
                 var pair = vars[i].split('=');
                 this.uriParams[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+            }
+        },
+
+        tickTime: function () {
+            if (this.timeSpentActive) {
+                this.totalTimeSpent++;
+                this.partialTimeSpent++;
+                this.scheduledSend();
+            }
+            setTimeout('remplib.tracker.tickTime()', 1000);
+        },
+
+        tickStart: function () {
+            if (!this.timeSpentEnabled) {
+                return;
+            }
+            this.timeSpentActive = true;
+        },
+
+        tickStop: function () {
+            this.timeSpentActive = false;
+        },
+
+        bindTickEvents: function() {
+            // listen to events to start tracking time
+            document.addEventListener('focus', function () { remplib.tracker.tickStart(); });
+            document.addEventListener('focusin', function () { remplib.tracker.tickStart(); });
+            document.addEventListener('scroll', function () { remplib.tracker.tickStart(); });
+            document.addEventListener('keyup', function () { remplib.tracker.tickStart(); });
+            document.addEventListener('mousemove', function () { remplib.tracker.tickStart(); });
+            document.addEventListener('click', function () { remplib.tracker.tickStart(); });
+            document.addEventListener('touchstart', function () { remplib.tracker.tickStart(); });
+
+
+            // listen to events to stop tracking time
+            document.addEventListener('blur', function () { remplib.tracker.tickStop(); });
+            document.addEventListener('focusout', function () { remplib.tracker.tickStop(); });
+
+            this.bindPageVisibilityEvents();
+
+            // send data when leaving page
+            window.addEventListener("beforeunload", function () { remplib.tracker.trackTimespent(true); });
+        },
+
+        bindPageVisibilityEvents: function() {
+            // Switch to visibilityState after we decide to drop IE10- support
+            // - https://caniuse.com/#search=visibilityState
+
+            // Source: https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API
+            // Set the name of the hidden property and the change event for visibility
+            let hidden, visibilityChange;
+            if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+                hidden = "hidden";
+                visibilityChange = "visibilitychange";
+            } else if (typeof document.msHidden !== "undefined") {
+                hidden = "msHidden";
+                visibilityChange = "msvisibilitychange";
+            } else if (typeof document.webkitHidden !== "undefined") {
+                hidden = "webkitHidden";
+                visibilityChange = "webkitvisibilitychange";
+            }
+
+            document.addEventListener(visibilityChange, function () {
+                if (document[hidden]) {
+                    remplib.tracker.tickStop();
+                } else {
+                    remplib.tracker.tickStart();
+                }
+            }, false);
+        },
+
+        scheduledSend: function() {
+            let logInterval = Math.round(0.3*(Math.sqrt(this.totalTimeSpent))) * 5;
+            if (0 === this.totalTimeSpent % logInterval) {
+                this.trackTimespent();
             }
         }
     };

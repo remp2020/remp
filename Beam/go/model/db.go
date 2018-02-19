@@ -153,3 +153,90 @@ func (iDB *InfluxDB) GroupedSum(response *client.Response) (SumRowCollection, bo
 
 	return sums, true, nil
 }
+
+// RetentionPolicy sets retention policy.
+//
+// - name     - name under which will be retention policy stored.
+// - duration - duration of retention policy. Must follow
+//              format of duration literal.
+func (iDB *InfluxDB) RetentionPolicy(name, duration string) (bool, error) {
+	cmd := fmt.Sprintf(`CREATE RETENTION POLICY "%s" ON "%s" DURATION %s REPLICATION 1;`, name, iDB.DBName, duration)
+	if iDB.Debug {
+		log.Println("InfluxDB: Create retention policy: ", cmd)
+	}
+	q := client.Query{
+		Command:  cmd,
+		Database: iDB.DBName,
+	}
+
+	response, err := iDB.Client.Query(q)
+	if err != nil {
+		return false, err
+	}
+	if response.Error() != nil {
+		if response.Error().Error() == "retention policy already exists" {
+			if iDB.Debug {
+				log.Printf("InfluxDB: Retention policy [%s] already exist", name)
+			}
+			return false, nil
+		}
+		return false, response.Error()
+	}
+	return true, nil
+}
+
+// AlterRetentionPolicy alters retention policy.
+//
+// - name     - name under which is retention policy stored.
+// - duration - new duration of retention policy. Must follow
+//              format of duration literal.
+func (iDB *InfluxDB) AlterRetentionPolicy(name, duration string) error {
+	cmd := fmt.Sprintf(`ALTER RETENTION POLICY "%s" ON "%s" DURATION %s;`, name, iDB.DBName, duration)
+	if iDB.Debug {
+		log.Printf("InfluxDB: Alter retention policy [%s] with new duration [%s]: %s", name, duration, cmd)
+	}
+	q := client.Query{
+		Command:  cmd,
+		Database: iDB.DBName,
+	}
+
+	response, err := iDB.Client.Query(q)
+	if err != nil {
+		return err
+	}
+	if response.Error() != nil {
+		return response.Error()
+	}
+	return nil
+}
+
+// ContinuousQuery sets continuous query.
+//
+// - name     - name under which will be continuous query stored.
+// - resample - new resample interval of continuous query. Must follow
+// 				format of duration literal.
+// - query    - query of continuous query.
+func (iDB *InfluxDB) ContinuousQuery(name, resample, query string) (bool, error) {
+	cmd := fmt.Sprintf(`CREATE CONTINUOUS QUERY "%s" ON "%s" RESAMPLE EVERY %s BEGIN %s END`, name, iDB.DBName, resample, query)
+	if iDB.Debug {
+		log.Println("InfluxDB: Create continuous query: ", cmd)
+	}
+	q := client.Query{
+		Command:  cmd,
+		Database: iDB.DBName,
+	}
+	response, err := iDB.Client.Query(q)
+	if err != nil {
+		return false, err
+	}
+	if response.Error() != nil {
+		if response.Error().Error() == "continuous query already exists" {
+			if iDB.Debug {
+				log.Printf("InfluxDB: Continuous query [%s] already exist", name)
+			}
+			return false, nil
+		}
+		return false, response.Error()
+	}
+	return true, nil
+}

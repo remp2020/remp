@@ -147,6 +147,10 @@ Include following snippet into the page to track events. Update `rempConfig` obj
                 locked: Boolean, // optional, flag whether content was locked
                 tags: [String, String, String] // optional
             },
+            
+            // optional time spent measuring (default value `false`)
+            // if enabled, tracks time spent on current page
+            timeSpentEnabled: true,
         },
         
         segments: {
