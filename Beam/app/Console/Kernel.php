@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
         }
 
          $schedule->command('aggregate:pageview-load')
-             ->hourly()
+             ->hourlyAt(5)
              ->withoutOverlapping();
     }
 

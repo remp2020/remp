@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Article;
 use App\ArticlePageviews;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
@@ -24,7 +25,7 @@ class AggregatePageviewLoadJob extends Command
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id');
 
-        $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter->toDateTimeString(), $timeBefore->toDateTimeString()));
+        $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
         $records = $journalContract->count($request);
 
@@ -36,11 +37,17 @@ class AggregatePageviewLoadJob extends Command
         foreach ($records as $record) {
             $this->line(sprintf("Processing article pageviews: <info>%s</info>", $record->tags->article_id));
 
-            $ap = new ArticlePageviews();
-            $ap->article_id = $record->tags->article_id;
+            $article = Article::select()->where([
+                'external_id' => $record->tags->article_id,
+            ])->first();
+
+            /** @var ArticlePageviews $ap */
+            $ap = ArticlePageviews::firstOrNew([
+                'article_id' => $article->id,
+                'time_from' => $timeAfter,
+                'time_to' => $timeBefore,
+            ]);
             $ap->sum = $record->count;
-            $ap->time_from = $timeAfter;
-            $ap->time_to = $timeBefore;
             $ap->save();
         }
     }

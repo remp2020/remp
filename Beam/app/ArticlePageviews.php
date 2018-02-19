@@ -8,6 +8,13 @@ class ArticlePageviews extends Model
 {
     public $timestamps = false;
 
+    protected $fillable = [
+        'article_id',
+        'time_from',
+        'time_to',
+        'sum',
+    ];
+
     protected $dates = [
         'time_from',
         'time_to',
