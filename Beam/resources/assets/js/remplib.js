@@ -23,6 +23,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             id: null,
             author_id: null,
             category: null,
+            locked: null,
             tags: [],
             variants: {},
         },
@@ -55,6 +56,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.userId !== 'undefined' && config.userId !== null) {
                 remplib.userId = config.userId;
             }
+            if (typeof config.userSubscribed !== 'undefined' && config.userSubscribed !== null) {
+                remplib.userSubscribed = config.userSubscribed;
+            }
             if (typeof config.browserId !== 'undefined' && config.browserId !== null) {
                 remplib.browserId = config.browser;
             }
@@ -78,6 +82,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
                 if (typeof config.tracker.article.variants !== 'undefined') {
                     this.article.variants = config.tracker.article.variants;
+                }
+                if (typeof config.tracker.article.locked !== 'undefined') {
+                    this.article.locked = config.tracker.article.locked;
                 }
             } else {
                 this.article = null;
@@ -331,6 +338,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             params["user"] = {
                 "id": remplib.getUserId(),
                 "browser_id": remplib.getBrowserId(),
+                "subscriber": remplib.isUserSubscriber(),
                 "url":  window.location.href,
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,

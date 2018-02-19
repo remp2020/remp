@@ -26,7 +26,7 @@ class ArticleRequest extends FormRequest
         $externalId = $this->article->external_id ?? '';
 
         return [
-            'external_id' => "required|string|unique:articles,external_id,{$externalId},external_id",
+            'external_id' => "required|string",
             'property_uuid' => "required|string",
             'title' => "required|string",
             'url' => "required|url",

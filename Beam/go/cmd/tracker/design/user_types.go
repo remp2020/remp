@@ -7,6 +7,7 @@ import (
 
 var User = Type("User", func() {
 	Attribute("id", String, "ID of logged user")
+	Attribute("subscriber", Boolean, "Flag whether user is subscriber (has paid for access)")
 	Attribute("browser_id", String, "Anonymized ID of user's browser")
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
@@ -75,6 +76,7 @@ var Article = Type("Article", func() {
 	Attribute("category", String, "Page category (homepage, world news...")
 	Attribute("tags", ArrayOf(String), "List of tags (breaking news, trump...")
 	Attribute("author_id", String, "ID of author")
+	Attribute("locked", Boolean, "Flag whether content was locked for the visitor")
 	Attribute("variants", HashOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
 
 	Required("id")

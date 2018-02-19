@@ -32,7 +32,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::resource('accounts.properties', 'PropertyController');
     Route::resource('segments', 'SegmentController');
     Route::resource('articles', 'ArticleController', [
-        'except' => ['create', 'edit', 'destroy']
+        'only' => ['index', 'store'],
     ]);
     Route::resource('conversions', 'ConversionController', [
         'only' => ['store', 'index']
