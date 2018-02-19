@@ -12,10 +12,13 @@ import (
 
 // Exported constants for services writing to EventStorage indirectly (e.g. Kafka) and reading from enumerated values.
 const (
-	CategoryPageview   = "pageview"
-	ActionPageviewLoad = "load"
-	TablePageviews     = "pageviews"
-	FlagArticle        = "_article"
+	CategoryPageview        = "pageview"
+	ActionPageviewLoad      = "load"
+	ActionPageviewTimespent = "timespent"
+	TablePageviews          = "pageviews"
+	TableTimespent          = "pageviews_time_spent"
+	TableTimespentRP        = "timespent_rp"
+	FlagArticle             = "_article"
 )
 
 // PageviewOptions represent filter options for pageview-related calls.
