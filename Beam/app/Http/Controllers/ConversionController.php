@@ -46,8 +46,7 @@ class ConversionController extends Controller
 
     public function upsert(ConversionUpsertRequest $request)
     {
-        foreach ($request->get('conversions', []) as $c)
-        {
+        foreach ($request->get('conversions', []) as $c) {
             $conversion = Conversion::firstOrNew([
                 'transaction_id' => $c['transaction_id'],
             ]);
