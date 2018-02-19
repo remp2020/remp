@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Conversion;
 use App\Http\Request;
 use App\Http\Requests\ConversionRequest;
+use App\Http\Requests\ConversionUpsertRequest;
 use App\Http\Resources\ConversionResource;
+use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
 class ConversionController extends Controller
@@ -39,6 +41,23 @@ class ConversionController extends Controller
         return response()->format([
             'html' => redirect(route('conversions.index'))->with('success', 'Conversion created'),
             'json' => new ConversionResource($conversion),
+        ]);
+    }
+
+    public function upsert(ConversionUpsertRequest $request)
+    {
+        foreach ($request->get('conversions', []) as $c)
+        {
+            $conversion = Conversion::firstOrNew([
+                'transaction_id' => $c['transaction_id'],
+            ]);
+            $conversion->fill($c);
+            $conversion->save();
+        }
+
+        return response()->format([
+            'html' => redirect(route('conversions.index'))->with('success', 'Conversions created'),
+            'json' => new JsonResource([]),
         ]);
     }
 }

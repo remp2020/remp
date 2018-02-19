@@ -24,6 +24,7 @@ Route::middleware('auth:api')->group(function() {
     Route::apiResource('conversions', 'ConversionController', [
         'only' => ['store', 'index']
     ]);
+    Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', function(\App\Contracts\JournalContract $journalContract, $group, $category) {

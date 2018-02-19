@@ -27,6 +27,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
     Route::get('articles/json', 'ArticleController@json')->name('articles.json');
     Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
+    Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
