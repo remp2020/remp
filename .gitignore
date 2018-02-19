@@ -5,4 +5,5 @@ docker-compose.override.yml
 .yarn-error.log
 .DS_Store
 # gdrive oath for sample data
-Pythia/Experiments/Data-QA/client_secrets.json
+.virtualenv
+client_secrets.json

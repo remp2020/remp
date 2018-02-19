@@ -25,8 +25,17 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('segments/json', 'SegmentController@json')->name('segments.json');
     Route::get('segments/{sourceSegment}/copy', 'SegmentController@copy')->name('segments.copy');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+    Route::get('articles/json', 'ArticleController@json')->name('articles.json');
+    Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
+    Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
     Route::resource('segments', 'SegmentController');
+    Route::resource('articles', 'ArticleController', [
+        'only' => ['index', 'store'],
+    ]);
+    Route::resource('conversions', 'ConversionController', [
+        'only' => ['store', 'index']
+    ]);
 });

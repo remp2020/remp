@@ -124,7 +124,7 @@
             this.emitValuesChanged();
         },
         data: () => ({
-            headerText: "REMP2020.com",
+            headerText: null,
             mainText: "Limited time offer<br/>30% discount",
             buttonText: "Visit offer",
             width: null,

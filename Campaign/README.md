@@ -115,6 +115,9 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
         // optional
         userId: String,
         
+        // optional, flag whether user is a subscriber
+        userSubscribed: Boolean,
+        
         // optional
         browserId: String,
         

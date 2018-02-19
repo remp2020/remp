@@ -211,6 +211,13 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	if article.Category != nil {
 		tags["category"] = *article.Category
 	}
+	if article.Locked != nil {
+		if *article.Locked {
+			tags["locked"] = "1"
+		} else {
+			tags["locked"] = "0"
+		}
+	}
 	for key, variant := range article.Variants {
 		tags[fmt.Sprintf("%s_variant", key)] = variant
 	}
@@ -253,10 +260,20 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		if user.RempPageviewID != nil {
 			tags["remp_pageview_id"] = *user.RempPageviewID
 		}
+		if user.Subscriber != nil {
+			if *user.Subscriber {
+				tags["subscriber"] = "1"
+			} else {
+				tags["subscriber"] = "0"
+			}
+		}
 
 		if user.Source != nil {
 			if user.Source.Social != nil {
 				tags["social"] = *user.Source.Social
+			}
+			if user.Source.Ref != nil {
+				tags["ref_source"] = *user.Source.Ref
 			}
 			if user.Source.UtmSource != nil {
 				tags["utm_source"] = *user.Source.UtmSource
@@ -271,6 +288,8 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 				tags["utm_content"] = *user.Source.UtmContent
 			}
 		}
+	} else {
+		tags["signed_in"] = "0"
 	}
 
 	p, err := influxClient.NewPoint(measurement, tags, fields, system.Time)
