@@ -35,12 +35,6 @@ class ArticleController extends Controller
             ->addColumn('title', function (Article $article) {
                 return HTML::link($article->url, $article->title);
             })
-            ->addColumn('image_url', function (Article $article) {
-                if (!$article->image_url) {
-                    return "";
-                }
-                return HTML::image($article->image_url, $article->title, ['style' => 'height: 80px;']);
-            })
             ->make(true);
     }
 
@@ -52,53 +46,9 @@ class ArticleController extends Controller
      */
     public function store(ArticleRequest $request)
     {
-        $article = new Article();
-        $article->fill($request->all());
-        $article->save();
-
-        foreach ($request->get('sections', []) as $sectionName) {
-            $section = Section::firstOrCreate([
-                'name' => $sectionName,
-            ]);
-            $article->sections()->attach($section);
-        }
-
-        foreach ($request->get('authors', []) as $authorName) {
-            $section = Author::firstOrCreate([
-                'name' => $authorName,
-            ]);
-            $article->authors()->attach($section);
-        }
-
-        $article->load(['authors', 'sections']);
-
-        return response()->format([
-            'html' => redirect(route('articles.index'))->with('success', 'Article created'),
-            'json' => new ArticleResource($article),
+        $article = Article::firstOrNew([
+            'external_id' => $request->get('external_id'),
         ]);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Article  $article
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Article $article)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param ArticleRequest|Request $request
-     * @param  \App\Article $article
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function update(ArticleRequest $request, Article $article)
-    {
         $article->fill($request->all());
         $article->save();
 

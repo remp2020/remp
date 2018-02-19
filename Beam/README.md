@@ -126,6 +126,9 @@ Include following snippet into the page to track events. Update `rempConfig` obj
         // optional
         userId: String,
         
+        // optional, flag whether user is a subscriber
+        userSubscribed: Boolean,
+        
         // optional
         browserId: String,
         
@@ -141,6 +144,7 @@ Include following snippet into the page to track events. Update `rempConfig` obj
                 id: String, // optional
                 author_id: String, // optional
                 category: String, // optional
+                locked: Boolean, // optional, flag whether content was locked
                 tags: [String, String, String] // optional
             },
         },
