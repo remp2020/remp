@@ -173,7 +173,11 @@ func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time
 		if err != nil {
 			return nil, false, errors.Wrap(err, "unable to evaluate SegmentRule")
 		}
-		return c, ok, nil
+
+		// if user doesn't match current rule, no need to evaluate further
+		if !ok {
+			return c, ok, nil
+		}
 	}
 
 	return c, true, nil
