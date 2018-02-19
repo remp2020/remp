@@ -19,7 +19,7 @@
                 'sections[, ].name' => ['header' => 'sections'],
                 'published_at' => ['header' => 'published at', 'render' => 'date'],
             ],
-            'dataSource' => action('ArticleController@json'),
+            'dataSource' => route('articles.json'),
             'order' => [3, 'desc'],
         ]) !!}
 
