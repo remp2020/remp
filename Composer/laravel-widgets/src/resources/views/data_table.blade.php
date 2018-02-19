@@ -36,7 +36,7 @@
                 </th>
             @endforeach
             @if (!empty($rowActions))
-            <th>actions</th>
+                <th>actions</th>
             @endif
         </tr>
         </thead>
@@ -46,6 +46,14 @@
 </div>
 
 <script>
+    var filterData = filterData || {};
+    filterData['{{ $tableId }}'] = {
+        @foreach ($cols as $col)
+                @continue(!isset($col['filter']))
+        '{{ $col['name'] }}': {!! json_encode($col['filter']) !!},
+        @endforeach
+    };
+
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
             'columns': [
@@ -92,6 +100,40 @@
             },
             'drawCallback': function(settings) {
                 $.fn.dataTables.pagination(settings);
+            },
+            'initComplete': function (a,b,c,d) {
+                var columnsState = this.api().state().columns;
+
+                this.api().columns().every( function () {
+                    var column = this;
+                    var columns = column.settings().init().columns;
+                    var columnDef = columns[column.index()];
+
+                    if (!filterData['{{ $tableId }}'][columnDef.name]) {
+                        return;
+                    }
+
+                    // create select box
+                    var select = $('<select multiple class="selectpicker" data-live-search="true"></select>')
+                        .appendTo( $(column.header()) )
+                        .on( 'change', function() {
+                            column
+                                .search($(this).val())
+                                .draw();
+                        });
+
+                    // restore state and set selected options
+                    var searchValues = columnsState[column.index()].search.search.split(",");
+                    $.each(filterData['{{ $tableId }}'][columnDef.name], function (value, label) {
+                        var newOption = $('<option value="'+value+'">'+label+'</option>');
+                        if (searchValues.indexOf(value) !== -1) {
+                            newOption.prop("selected", true);
+                        }
+                        select.append(newOption);
+                    });
+
+                    select.selectpicker();
+                } );
             }
         });
 

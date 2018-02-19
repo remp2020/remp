@@ -15,8 +15,8 @@
         {!! Widget::run('DataTable', [
             'colSettings' => [
                 'title',
-                'authors[, ].name' => ['header' => 'authors'],
-                'sections[, ].name' => ['header' => 'sections'],
+                'authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
+                'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
                 'published_at' => ['header' => 'published at', 'render' => 'date'],
             ],
             'dataSource' => route('articles.json'),
