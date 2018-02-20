@@ -32,8 +32,10 @@ class ArticleController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
-        $articles = Article::select()
+        $conversionsSumSubquery = '(select sum(amount) from `conversions` where `articles`.`id` = `conversions`.`article_id`) as `conversions_sum`';
+        $articles = Article::selectRaw("articles.*, {$conversionsSumSubquery}")
             ->with(['authors', 'sections'])
+            ->withCount('conversions')
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
@@ -41,6 +43,16 @@ class ArticleController extends Controller
             ->addColumn('title', function (Article $article) {
                 return HTML::link($article->url, $article->title);
             })
+            ->orderColumn('conversions', 'conversions_count $1')
+            ->addColumn('amount', function (Article $article) {
+                $sum = $article->conversions()->selectRaw('sum(amount) as sum, currency')->groupBy('currency')->pluck('sum', 'currency');
+                $amount = null;
+                foreach ($sum as $currency => $c) {
+                    $amount .= "{$sum[$currency]} $currency";
+                }
+                return $amount ?? 0;
+            })
+            ->orderColumn('amount', 'conversions_sum $1')
             ->filterColumn('authors[, ].name', function(Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_author.author_id', $values);

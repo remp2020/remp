@@ -45,7 +45,7 @@ class ReadCommerceEventsCommand extends Command
             }
 
             $message = json_decode($message->payload);
-            if (!$message->article || !$message->article->id) {
+            if (!isset($message->article) || !isset($message->article->id)) {
                 continue;
             }
 
