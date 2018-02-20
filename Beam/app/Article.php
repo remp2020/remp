@@ -44,6 +44,16 @@ class Article extends Model
         return $this->hasMany(Conversion::class);
     }
 
+    public function pageviews()
+    {
+        return $this->hasMany(ArticlePageviews::class);
+    }
+
+    public function pageviewsProcessing()
+    {
+        return $this->hasMany(ArticlePageviewsProcessing::class);
+    }
+
     public function setPublishedAtAttribute($value)
     {
         if (!$value) {
