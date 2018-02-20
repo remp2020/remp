@@ -53,11 +53,11 @@ class ArticleController extends Controller
                 return $amount ?? 0;
             })
             ->orderColumn('amount', 'conversions_sum $1')
-            ->filterColumn('authors[, ].name', function(Builder $query, $value) {
+            ->filterColumn('authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_author.author_id', $values);
             })
-            ->filterColumn('sections[, ].name', function(Builder $query, $value) {
+            ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_section.section_id', $values);
             })
