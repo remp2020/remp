@@ -204,11 +204,11 @@ func influxDBpreparation(c Config) error {
 	}
 
 	query := fmt.Sprintf(`SELECT SUM("timespent")
-	INTO "pageviews_time_spent_hourly"
+	INTO "%s"
 	FROM "%s"."%s"
-	GROUP BY time(15m), "user_id", "_article", "article_id", "remp_pageview_id", "social"`, model.TableTimespentRP, model.TableTimespent)
+	GROUP BY time(15m), "user_id", "_article", "article_id", "remp_pageview_id", "social"`, model.TableTimespentAggregated, model.TableTimespentRP, model.TableTimespent)
 
-	ok, err = influxDB.ContinuousQuery("pageviews_time_spent_hourly", "1m", query)
+	ok, err = influxDB.ContinuousQuery(model.TableTimespentAggregated, "1m", query)
 	if err != nil {
 		return err
 	}

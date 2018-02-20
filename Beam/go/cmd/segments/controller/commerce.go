@@ -22,7 +22,7 @@ func NewCommerceController(service *goa.Service, cs model.CommerceStorage) *Comm
 
 // Count runs the count action.
 func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
-	o := model.CountOptions{
+	o := model.AggregateOptions{
 		Step: ctx.Step,
 	}
 
@@ -93,7 +93,7 @@ func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
 
 // Sum runs the sum action.
 func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
-	o := model.CountOptions{
+	o := model.AggregateOptions{
 		Step: ctx.Step,
 	}
 

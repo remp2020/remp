@@ -12,13 +12,14 @@ import (
 
 // Exported constants for services writing to EventStorage indirectly (e.g. Kafka) and reading from enumerated values.
 const (
-	CategoryPageview        = "pageview"
-	ActionPageviewLoad      = "load"
-	ActionPageviewTimespent = "timespent"
-	TablePageviews          = "pageviews"
-	TableTimespent          = "pageviews_time_spent"
-	TableTimespentRP        = "timespent_rp"
-	FlagArticle             = "_article"
+	CategoryPageview         = "pageview"
+	ActionPageviewLoad       = "load"
+	ActionPageviewTimespent  = "timespent"
+	TablePageviews           = "pageviews"
+	TableTimespent           = "pageviews_time_spent"
+	TableTimespentAggregated = "pageviews_time_spent_hourly"
+	TableTimespentRP         = "timespent_rp"
+	FlagArticle              = "_article"
 )
 
 // PageviewOptions represent filter options for pageview-related calls.
@@ -56,7 +57,9 @@ type PageviewCollection []*Pageview
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
 	// Count returns count of pageviews based on the provided filter options.
-	Count(o CountOptions) (CountRowCollection, bool, error)
+	Count(o AggregateOptions) (CountRowCollection, bool, error)
+	// Sum returns sum of pageviews based on the provided filter options.
+	Sum(o AggregateOptions) (SumRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o PageviewOptions) (PageviewCollection, error)
 	// Categories lists all tracked categories.
@@ -73,9 +76,15 @@ type PageviewDB struct {
 }
 
 // Count returns count of pageviews based on the provided filter options.
-func (eDB *PageviewDB) Count(o CountOptions) (CountRowCollection, bool, error) {
-	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TablePageviews + `"`)
-	builder = addCountQueryFilters(builder, o)
+func (eDB *PageviewDB) Count(o AggregateOptions) (CountRowCollection, bool, error) {
+	table, field, err := eDB.resolveQueryBindings(o.Action)
+	if err != nil {
+		return nil, false, err
+	}
+	o.Action = ""
+
+	builder := eDB.DB.QueryBuilder.Select(fmt.Sprintf("COUNT(%s)", field)).From(fmt.Sprintf("%s", table))
+	builder = addAggregateQueryFilters(builder, o)
 
 	bb := builder.Build()
 	log.Println("pageview count query:", bb)
@@ -95,6 +104,37 @@ func (eDB *PageviewDB) Count(o CountOptions) (CountRowCollection, bool, error) {
 
 	// process response
 	return eDB.DB.MultiGroupedCount(response)
+}
+
+// Sum returns sum of pageviews based on the provided filter options.
+func (eDB *PageviewDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
+	table, field, err := eDB.resolveQueryBindings(o.Action)
+	if err != nil {
+		return nil, false, err
+	}
+	o.Action = ""
+
+	builder := eDB.DB.QueryBuilder.Select(fmt.Sprintf("SUM(%s)", field)).From(fmt.Sprintf("%s", table))
+	builder = addAggregateQueryFilters(builder, o)
+
+	bb := builder.Build()
+	log.Println("pageview sum query:", bb)
+
+	q := client.Query{
+		Command:  bb,
+		Database: eDB.DB.DBName,
+	}
+
+	response, err := eDB.DB.Client.Query(q)
+	if err != nil {
+		return nil, false, err
+	}
+	if response.Error() != nil {
+		return nil, false, response.Error()
+	}
+
+	// process response
+	return eDB.DB.GroupedSum(response)
 }
 
 // List returns list of all pageviews based on given PageviewOptions.
@@ -211,6 +251,18 @@ func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOp
 	builder = addQueryFilterGroupBy(builder, o.GroupBy)
 
 	return builder
+}
+
+// resolveQueryBindings returns name of the table and field used within the aggregate function
+// based on the provided action.
+func (eDB *PageviewDB) resolveQueryBindings(action string) (string, string, error) {
+	switch action {
+	case ActionPageviewLoad:
+		return TablePageviews, "token", nil
+	case ActionPageviewTimespent:
+		return TableTimespentAggregated, "sum", nil
+	}
+	return "", "", fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
 }
 
 func pageviewFromInfluxResult(ir *influxquery.Result) (*Pageview, error) {

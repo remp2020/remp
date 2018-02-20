@@ -22,7 +22,7 @@ func NewEventController(service *goa.Service, es model.EventStorage) *EventContr
 
 // Count runs the count action.
 func (c *EventController) Count(ctx *app.CountEventsContext) error {
-	o := model.CountOptions{
+	o := model.AggregateOptions{
 		Action:   ctx.Action,
 		Category: ctx.Category,
 	}
