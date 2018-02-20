@@ -49,9 +49,9 @@ class Article extends Model
         return $this->hasMany(ArticlePageviews::class);
     }
 
-    public function pageviewsProcessing()
+    public function timespent()
     {
-        return $this->hasMany(ArticlePageviewsProcessing::class);
+        return $this->hasMany(ArticleTimespent::class);
     }
 
     public function setPublishedAtAttribute($value)

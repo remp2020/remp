@@ -167,6 +167,25 @@ $.fn.dataTables = {
                 actions += '</span>';
                 return actions;
             }
+        },
+        duration: function() {
+            return function (data) {
+                if (data === "0") {
+                    return '0s';
+                }
+                let d = moment.duration(parseInt(data), 'seconds');
+                let durationString = ""
+                if (d.asHours() >= 1) {
+                    durationString += Math.floor(d.asHours()) + "h "
+                }
+                if (d.asMinutes() >= 1) {
+                    durationString += Math.floor(d.minutes()) + "m "
+                }
+                if (d.asSeconds() >= 1) {
+                    durationString += Math.floor(d.seconds()) + "s "
+                }
+                return "<span title='" + d.humanize() + "'>" + durationString.trim() + "</span>";
+            };
         }
     }
 };

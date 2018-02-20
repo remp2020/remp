@@ -137,8 +137,16 @@ function route_active($routeName, $classes = '', $activeClasses = '')
                 <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-accounts-list-alt"></i> Segments</a>
             </li>
             <li class="m-b-15"></li>
-            <li {!! route_active('articles') !!}>
-                <a href="{{ route('articles.index') }}" ><i class="zmdi zmdi-library"></i> Articles</a>
+            <li class="sub-menu">
+                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-library"></i> Articles</a>
+                <ul>
+                    <li {!! route_active('articles.conversions') !!}>
+                        <a href="{{ route('articles.conversions') }}" ><i class="zmdi zmdi-chart"></i> Conversion stats</a>
+                    </li>
+                    <li {!! route_active('articles.pageviews') !!}>
+                        <a href="{{ route('articles.pageviews') }}" ><i class="zmdi zmdi-chart"></i> Pageview stats</a>
+                    </li>
+                </ul>
             </li>
             <li {!! route_active('conversions') !!}>
                 <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>

@@ -30,7 +30,18 @@ class ArticleController extends Controller
         ]);
     }
 
-    public function json(Request $request, Datatables $datatables)
+    public function conversions()
+    {
+        return response()->format([
+            'html' => view('articles.conversions', [
+                'authors' => Author::all()->pluck('name', 'id'),
+                'sections' => Section::all()->pluck('name', 'id'),
+            ]),
+            'json' => ArticleResource::collection(Article::paginate()),
+        ]);
+    }
+
+    public function dtConversions(Datatables $datatables)
     {
         $conversionsSumSubquery = '(select sum(amount) from `conversions` where `articles`.`id` = `conversions`.`article_id`) as `conversions_sum`';
         $articles = Article::selectRaw("articles.*, {$conversionsSumSubquery}")
@@ -53,6 +64,44 @@ class ArticleController extends Controller
                 return $amount ?? 0;
             })
             ->orderColumn('amount', 'conversions_sum $1')
+            ->filterColumn('authors[, ].name', function (Builder $query, $value) {
+                $values = explode(",", $value);
+                $query->whereIn('article_author.author_id', $values);
+            })
+            ->filterColumn('sections[, ].name', function (Builder $query, $value) {
+                $values = explode(",", $value);
+                $query->whereIn('article_section.section_id', $values);
+            })
+            ->make(true);
+    }
+
+    public function pageviews()
+    {
+        return response()->format([
+            'html' => view('articles.pageviews', [
+                'authors' => Author::all()->pluck('name', 'id'),
+                'sections' => Section::all()->pluck('name', 'id'),
+            ]),
+            'json' => ArticleResource::collection(Article::paginate()),
+        ]);
+    }
+
+    public function dtPageviews(Datatables $datatables)
+    {
+        $pageviewsSubquery = '(select coalesce(sum(sum),0) from `article_pageviews` where `articles`.`id` = `article_pageviews`.`article_id`) as `pageviews_sum`';
+        $timespentSubquery = '(select coalesce(sum(sum),0) from `article_timespents` where `articles`.`id` = `article_timespents`.`article_id`) as `timespent_sum`';
+
+        $articles = Article::selectRaw("articles.*, {$pageviewsSubquery}, {$timespentSubquery}")
+            ->with(['authors', 'sections'])
+            ->join('article_author', 'articles.id', '=', 'article_author.article_id')
+            ->join('article_section', 'articles.id', '=', 'article_section.article_id');
+
+        return $datatables->of($articles)
+            ->addColumn('title', function (Article $article) {
+                return HTML::link($article->url, $article->title);
+            })
+            ->editColumn('avg_sum', '{{$pageviews_sum ? $timespent_sum / $pageviews_sum : 0}}')
+            ->orderColumn('avg_sum', 'timespent_sum / pageviews_sum $1')
             ->filterColumn('authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_author.author_id', $values);
