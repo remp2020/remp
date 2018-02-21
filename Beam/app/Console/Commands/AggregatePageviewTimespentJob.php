@@ -49,6 +49,9 @@ class AggregatePageviewTimespentJob extends Command
             ]);
             $ap->sum = $record->sum;
             $ap->save();
+
+            $ap->article->timespent_sum = $ap->article->timespent()->sum('sum');
+            $ap->article->save();
         }
     }
 }

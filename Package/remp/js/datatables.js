@@ -79,6 +79,29 @@ $.fn.dataTables = {
         });
     },
 
+    selectFilters: function (column, filterData, state) {
+        // create select box
+        var select = $('<select multiple class="selectpicker" data-live-search="true"></select>')
+            .appendTo( $(column.header()) )
+            .on( 'change', function() {
+                column
+                    .search($(this).val())
+                    .draw();
+            });
+
+        // restore state and set selected options
+        var searchValues = state[column.index()].search.search.split(",");
+        $.each(filterData, function (value, label) {
+            var newOption = $('<option value="'+value+'">'+label+'</option>');
+            if (searchValues.indexOf(value) !== -1) {
+                newOption.prop("selected", true);
+            }
+            select.append(newOption);
+        });
+
+        select.selectpicker();
+    },
+
     render: {
         date: function () {
             return function(data) {
@@ -170,19 +193,20 @@ $.fn.dataTables = {
         },
         duration: function() {
             return function (data) {
-                if (data === "0") {
+                let duration = parseInt(data);
+                if (data === 0) {
                     return '0s';
                 }
-                let d = moment.duration(parseInt(data), 'seconds');
+                let d = moment.duration(duration, 'seconds');
                 let durationString = ""
                 if (d.asHours() >= 1) {
-                    durationString += Math.floor(d.asHours()) + "h "
+                    durationString += Math.floor(d.asHours()) + "h&nbsp;"
                 }
                 if (d.asMinutes() >= 1) {
-                    durationString += Math.floor(d.minutes()) + "m "
+                    durationString += Math.floor(d.minutes()) + "m&nbsp;"
                 }
                 if (d.asSeconds() >= 1) {
-                    durationString += Math.floor(d.seconds()) + "s "
+                    durationString += Math.floor(d.seconds()) + "s"
                 }
                 return "<span title='" + d.humanize() + "'>" + durationString.trim() + "</span>";
             };

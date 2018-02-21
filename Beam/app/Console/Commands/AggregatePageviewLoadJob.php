@@ -49,6 +49,9 @@ class AggregatePageviewLoadJob extends Command
             ]);
             $ap->sum = $record->count;
             $ap->save();
+
+            $ap->article->pageview_sum = $ap->article->pageviews()->sum('sum');
+            $ap->article->save();
         }
     }
 }

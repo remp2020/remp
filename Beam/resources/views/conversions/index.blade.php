@@ -19,7 +19,7 @@
                 'article.sections[, ].name' => ['header' => 'sections'],
                 'amount' => ['header' => 'amount'],
                 'currency' => ['header' => 'currency'],
-                'paid_at' => ['header' => 'paid at'],
+                'paid_at' => ['header' => 'paid at', 'render' => 'date'],
             ],
             'dataSource' => route('conversions.json'),
             'order' => [5, 'desc'],

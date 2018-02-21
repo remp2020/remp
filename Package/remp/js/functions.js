@@ -410,7 +410,10 @@ $(document).ready(function(){
     //Date
     if ($('.date-picker')[0]) {
         $('.date-picker').datetimepicker({
-            format: 'YYYY-MM-DD'
+            locale: moment.locale(),
+            format: 'l'
+            extraFormats: [ 'YYYY-MM-DD' ],
+//            format: 'YYYY-MM-DD'
         });
     }
 
