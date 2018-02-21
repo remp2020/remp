@@ -7,8 +7,8 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
-// CountOptions represent filter options for count-related calls.
-type CountOptions struct {
+// AggregateOptions represent filter options for aggregate-related calls.
+type AggregateOptions struct {
 	Category   string
 	Action     string
 	Step       string
@@ -24,7 +24,7 @@ type FilterBy struct {
 	Values []string
 }
 
-func addCountQueryFilters(builder influxquery.Builder, o CountOptions) influxquery.Builder {
+func addAggregateQueryFilters(builder influxquery.Builder, o AggregateOptions) influxquery.Builder {
 	builder = addQueryFilterFilterBy(builder, o.FilterBy)
 	builder = addQueryFilterCategory(builder, o.Category)
 	builder = addQueryFilterAction(builder, o.Action)

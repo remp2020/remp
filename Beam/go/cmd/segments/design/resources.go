@@ -276,6 +276,24 @@ var _ = Resource("pageviews", func() {
 			}))
 		})
 	})
+	Action("sum", func() {
+		Description("Returns sum of amounts within events")
+		Payload(PageviewOptionsPayload)
+		Routing(POST("/actions/:action/sum"))
+		Params(func() {
+			Param("action", String, "Identification of pageview action", func() {
+				Enum("timespent")
+			})
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Sum, func() {
+				View("default")
+			}))
+		})
+	})
 	Action("list", func() {
 		Description("Returns full list of pageviews")
 		Routing(GET("/list"))
