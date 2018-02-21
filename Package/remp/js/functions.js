@@ -411,7 +411,7 @@ $(document).ready(function(){
     if ($('.date-picker')[0]) {
         $('.date-picker').datetimepicker({
             locale: moment.locale(),
-            format: 'l'
+            format: 'l',
             extraFormats: [ 'YYYY-MM-DD' ],
 //            format: 'YYYY-MM-DD'
         });

@@ -87,9 +87,15 @@
             'ajax': {
                 'url': '{{ $dataSource }}',
                 'data': function (data) {
+                    var url = window.location.href
                     @foreach ($requestParams as $var => $def)
-                        data['{{ $var }}'] = {!! $def !!}
+                        var param = '{!! $var !!}';
+                        data[param] = {!! $def !!};
+
+                        // update browser URL to persist the selection
+                        url = $.fn.dataTables.upsertQueryStringParam(url, param, data[param]);
                     @endforeach
+                    window.history.pushState(null, null, url);
                 }
             },
             'createdRow': function (row, data, index) {

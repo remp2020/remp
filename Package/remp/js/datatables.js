@@ -102,6 +102,17 @@ $.fn.dataTables = {
         select.selectpicker();
     },
 
+    upsertQueryStringParam(url, key, value) {
+        let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+        let separator = url.indexOf('?') !== -1 ? "&" : "?";
+        if (url.match(re)) {
+            return url.replace(re, '$1' + key + "=" + value + '$2');
+        }
+        else {
+            return url + separator + key + "=" + value;
+        }
+    },
+
     render: {
         date: function () {
             return function(data) {
