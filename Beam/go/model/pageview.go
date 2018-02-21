@@ -70,6 +70,12 @@ type PageviewStorage interface {
 	Actions(category string) ([]string, error)
 }
 
+// queryBinding represents information about where and how the data should be fetched.
+type queryBinding struct {
+	Measurement string
+	Field       string
+}
+
 // PageviewDB is Influx implementation of PageviewStorage.
 type PageviewDB struct {
 	DB *InfluxDB
@@ -77,13 +83,17 @@ type PageviewDB struct {
 
 // Count returns count of pageviews based on the provided filter options.
 func (eDB *PageviewDB) Count(o AggregateOptions) (CountRowCollection, bool, error) {
-	table, field, err := eDB.resolveQueryBindings(o.Action)
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := eDB.resolveQueryBindings(o.Action)
 	if err != nil {
 		return nil, false, err
 	}
+
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
 	o.Action = ""
 
-	builder := eDB.DB.QueryBuilder.Select(fmt.Sprintf("COUNT(%s)", field)).From(fmt.Sprintf("%s", table))
+	builder := eDB.DB.QueryBuilder.Select(fmt.Sprintf("COUNT(%s)", binding.Field)).From(fmt.Sprintf("%s", binding.Measurement))
 	builder = addAggregateQueryFilters(builder, o)
 
 	bb := builder.Build()
@@ -108,13 +118,17 @@ func (eDB *PageviewDB) Count(o AggregateOptions) (CountRowCollection, bool, erro
 
 // Sum returns sum of pageviews based on the provided filter options.
 func (eDB *PageviewDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
-	table, field, err := eDB.resolveQueryBindings(o.Action)
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := eDB.resolveQueryBindings(o.Action)
 	if err != nil {
 		return nil, false, err
 	}
+
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
 	o.Action = ""
 
-	builder := eDB.DB.QueryBuilder.Select(fmt.Sprintf("SUM(%s)", field)).From(fmt.Sprintf("%s", table))
+	builder := eDB.DB.QueryBuilder.Select(fmt.Sprintf("SUM(%s)", binding.Field)).From(fmt.Sprintf("%s", binding.Measurement))
 	builder = addAggregateQueryFilters(builder, o)
 
 	bb := builder.Build()
@@ -255,14 +269,20 @@ func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOp
 
 // resolveQueryBindings returns name of the table and field used within the aggregate function
 // based on the provided action.
-func (eDB *PageviewDB) resolveQueryBindings(action string) (string, string, error) {
+func (eDB *PageviewDB) resolveQueryBindings(action string) (queryBinding, error) {
 	switch action {
 	case ActionPageviewLoad:
-		return TablePageviews, "token", nil
+		return queryBinding{
+			Measurement: TablePageviews,
+			Field:       "token",
+		}, nil
 	case ActionPageviewTimespent:
-		return TableTimespentAggregated, "sum", nil
+		return queryBinding{
+			Measurement: TableTimespentAggregated,
+			Field:       "sum",
+		}, nil
 	}
-	return "", "", fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
+	return queryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
 }
 
 func pageviewFromInfluxResult(ir *influxquery.Result) (*Pageview, error) {
