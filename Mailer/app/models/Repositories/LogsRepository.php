@@ -227,7 +227,7 @@ class LogsRepository extends Repository
 
     public function filterAlreadySent($emails, $mailTemplateCode, $jobId, $context = null)
     {
-        $alreadySentEmails = $this->getTable()->where([
+        $query = $this->getTable()->where([
             'mail_logs.email' => $emails,
             'mail_template.code' => $mailTemplateCode
         ])->whereOr([
@@ -236,13 +236,13 @@ class LogsRepository extends Repository
         ]);
 
         if ($context) {
-            $alreadySentEmails->whereOr([
+            $query->whereOr([
                 'mail_logs.email' => $emails,
                 'mail_logs.context' => $context,
             ]);
         }
 
-        $alreadySentEmails->select('email')->fetchPairs(null, 'email');
+        $alreadySentEmails = $query->select('email')->fetchPairs(null, 'email');
 
         return array_diff($emails, $alreadySentEmails);
     }
