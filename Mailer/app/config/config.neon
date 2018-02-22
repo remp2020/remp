@@ -181,7 +181,6 @@ services:
     - Remp\MailerModule\Forms\NewTemplateFormFactory
 
     # Commands
-    - Remp\MailerModule\Commands\HelloWorldCommand
     - Remp\MailerModule\Commands\ProcessJobCommand
     - Remp\MailerModule\Commands\MailWorkerCommand
     - Remp\MailerModule\Commands\SyncUserSubscriptionsCommand
