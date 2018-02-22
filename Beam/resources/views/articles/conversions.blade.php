@@ -37,7 +37,7 @@
                 <div class="input-group m-b-10">
                     <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
                     <div class="dtp-container fg-line">
-                        {!! Form::datetime('conversion_to', $conversionFrom, array_filter([
+                        {!! Form::datetime('conversion_from', $conversionFrom, array_filter([
                             'class' => 'form-control date-picker',
                             'placeholder' => 'Conversion from...'
                         ])) !!}
@@ -45,7 +45,7 @@
                     <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
                     <div class="dtp-container fg-line">
                         <div class="dtp-container fg-line">
-                            {!! Form::datetime('conversion_from', $conversionTo, array_filter([
+                            {!! Form::datetime('conversion_to', $conversionTo, array_filter([
                                 'class' => 'form-control date-picker',
                                 'placeholder' => 'Conversion to...'
                             ])) !!}
@@ -95,7 +95,7 @@
                     'event' => 'dp.change',
                     'selector' => '[name="conversion_to"]',
                 ],
-            ]
+            ],
         ]) !!}
 
     </div>

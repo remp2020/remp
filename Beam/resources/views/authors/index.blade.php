@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Articles - Pageview stats')
+@section('title', 'Conversions')
 
 @section('content')
 
     <div class="c-header">
-        <h2>Articles - Pageview stats</h2>
+        <h2>Authors</h2>
     </div>
 
     <div class="well">
@@ -35,23 +35,18 @@
     </div>
 
     <div class="card">
-
         <div class="card-header">
-            <h2>Pageview stats <small></small></h2>
+            <h2>Author stats <small></small></h2>
         </div>
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'title',
-                'pageview_sum' => ['header' => 'pageviews'],
-                'timespent_sum' => ['header' => 'total time read', 'render' => 'duration'],
-                'avg_sum' => ['header' => 'avg time read', 'render' => 'duration'],
-                'authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
-                'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                'published_at' => ['header' => 'published at', 'render' => 'date'],
+                'name' => ['header' => 'author', 'orderable' => false, 'filter' => $authors],
+                'articles_count' => ['header' => '# articles'],
+                'conversions_count' => ['header' => 'conversions'],
+                'conversions_amount' => ['header' => 'amount'],
             ],
-            'dataSource' => route('articles.dtPageviews'),
-            'order' => [4, 'desc'],
+            'dataSource' => route('authors.json'),
             'requestParams' => [
                 'published_from' => '$("[name=\"published_from\"]").data("DateTimePicker").date().set({hour:0,minute:0,second:0,millisecond:0}).toISOString()',
                 'published_to' => '$("[name=\"published_to\"]").data("DateTimePicker").date().set({hour:23,minute:59,second:59,millisecond:999}).toISOString()',

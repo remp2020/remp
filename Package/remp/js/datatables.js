@@ -81,7 +81,7 @@ $.fn.dataTables = {
 
     selectFilters: function (column, filterData, state) {
         // create select box
-        var select = $('<select multiple class="selectpicker" data-live-search="true"></select>')
+        var select = $('<select multiple class="selectpicker" data-live-search="true" data-live-search-normalize="true"></select>')
             .appendTo( $(column.header()) )
             .on( 'change', function() {
                 column

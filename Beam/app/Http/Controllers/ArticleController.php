@@ -37,10 +37,10 @@ class ArticleController extends Controller
             'html' => view('articles.conversions', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->get('published_from', Carbon::now()->subMonth()),
-                'publishedTo' => $request->get('published_to', Carbon::now()),
-                'conversionFrom' => $request->get('conversion_from', Carbon::now()->subMonth()),
-                'conversionTo' => $request->get('conversion_to', Carbon::now()),
+                'publishedFrom' => $request->input('published_from', Carbon::now()->subMonth()),
+                'publishedTo' => $request->input('published_to', Carbon::now()),
+                'conversionFrom' => $request->input('conversion_from', Carbon::now()->subMonth()),
+                'conversionTo' => $request->input('conversion_to', Carbon::now()),
             ]),
             'json' => ArticleResource::collection(Article::paginate()),
         ]);
@@ -56,17 +56,17 @@ class ArticleController extends Controller
             ->join('article_section', 'articles.id', '=', 'article_section.article_id')
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id');
 
-        if ($request->has('published_from')) {
-            $articles->where('published_at', '>=', $request->get('published_from'));
+        if ($request->input('published_from')) {
+            $articles->where('published_at', '>=', $request->input('published_from'));
         }
-        if ($request->has('published_to')) {
-            $articles->where('published_at', '<=', $request->get('published_to'));
+        if ($request->input('published_to')) {
+            $articles->where('published_at', '<=', $request->input('published_to'));
         }
-        if ($request->has('conversion_from')) {
-            $articles->where('paid_at', '>=', $request->get('conversion_from'));
+        if ($request->input('conversion_from')) {
+            $articles->where('paid_at', '>=', $request->input('conversion_from'));
         }
-        if ($request->has('conversion_to')) {
-            $articles->where('paid_at', '<=', $request->get('conversion_to'));
+        if ($request->input('conversion_to')) {
+            $articles->where('paid_at', '<=', $request->input('conversion_to'));
         }
 
         return $datatables->of($articles)
@@ -100,8 +100,8 @@ class ArticleController extends Controller
             'html' => view('articles.pageviews', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->get('published_from', Carbon::now()->subMonth()),
-                'publishedTo' => $request->get('published_to', Carbon::now()),
+                'publishedFrom' => $request->input('published_from', Carbon::now()->subMonth()),
+                'publishedTo' => $request->input('published_to', Carbon::now()),
             ]),
             'json' => ArticleResource::collection(Article::paginate()),
         ]);
@@ -114,18 +114,23 @@ class ArticleController extends Controller
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
-        if ($request->has('published_from')) {
-            $articles->where('published_at', '>=', $request->get('published_from'));
+        if ($request->input('published_from')) {
+            $articles->where('published_at', '>=', $request->input('published_from'));
         }
-        if ($request->has('published_to')) {
-            $articles->where('published_at', '<=', $request->get('published_to'));
+        if ($request->input('published_to')) {
+            $articles->where('published_at', '<=', $request->input('published_to'));
         }
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
                 return HTML::link($article->url, $article->title);
             })
-            ->editColumn('avg_sum', '{{$pageview_sum ? $timespent_sum / $pageview_sum : 0}}')
+            ->addColumn('avg_sum', function (Article $article) {
+                if (!$article->timespent_sum || !$article->pageview_sum) {
+                    return 0;
+                }
+                return round($article->timespent_sum / $article->pageview_sum);
+            })
             ->orderColumn('avg_sum', 'timespent_sum / pageview_sum $1')
             ->filterColumn('authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
