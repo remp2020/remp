@@ -152,7 +152,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
                 <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
             </li>
             <li {!! route_active('authors') !!}>
-                <a href="{{ route('authors.index') }}" ><i class="zmdi zmdi-money-box"></i> Authors</a>
+                <a href="{{ route('authors.index') }}" ><i class="zmdi zmdi-account-box"></i> Authors</a>
             </li>
         </ul>
     </aside>

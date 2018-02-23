@@ -42,7 +42,7 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'title',
+                'title' => ['orderable' => false],
                 'pageview_sum' => ['header' => 'pageviews'],
                 'timespent_sum' => ['header' => 'total time read', 'render' => 'duration'],
                 'avg_sum' => ['header' => 'avg time read', 'render' => 'duration'],

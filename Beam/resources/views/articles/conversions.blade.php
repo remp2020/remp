@@ -11,7 +11,7 @@
     <div class="well">
         <div class="row">
             <div class="col-md-3">
-                <h4>Filter by publish date</h4>
+                <h4>Filter by article publish date</h4>
                 <div class="input-group m-b-10">
                     <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
                     <div class="dtp-container fg-line">
@@ -63,7 +63,7 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'title',
+                'title' => ['orderable' => false],
                 'conversions_count' => ['header' => 'conversions'],
                 'amount' => ['header' => 'amount'],
                 'authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],

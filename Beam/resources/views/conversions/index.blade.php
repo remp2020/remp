@@ -41,7 +41,7 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'article.title' => ['header' => 'article'],
+                'article.title' => ['header' => 'article', 'orderable' => false],
                 'article.authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
                 'article.sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
                 'amount' => ['header' => 'amount'],

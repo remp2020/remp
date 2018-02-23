@@ -45,6 +45,9 @@
                 'articles_count' => ['header' => '# articles'],
                 'conversions_count' => ['header' => 'conversions'],
                 'conversions_amount' => ['header' => 'amount'],
+                'pageviews_count' => ['header' => 'pageviews'],
+                'pageviews_timespent' => ['header' => 'total time read', 'render' => 'duration'],
+                'avg_timespent' => ['header' => 'avg time read', 'render' => 'duration'],
             ],
             'dataSource' => route('authors.json'),
             'requestParams' => [

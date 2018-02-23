@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Conversion;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Section;
@@ -48,25 +49,38 @@ class ArticleController extends Controller
 
     public function dtConversions(Request $request, Datatables $datatables)
     {
-        $conversionsSumSubquery = '(select sum(amount) from `conversions` where `articles`.`id` = `conversions`.`article_id`) as `conversions_sum`';
-        $articles = Article::selectRaw("articles.*, {$conversionsSumSubquery}")
+        $articles = Article::selectRaw("articles.*, count(conversions.id) as conversions_count, coalesce(sum(conversions.amount), 0) as conversions_sum")
             ->with(['authors', 'sections'])
-            ->withCount('conversions')
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id')
-            ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id');
+            ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
+            ->groupBy(['articles.id']);
+
+        $conversionsQuery = Conversion::selectRaw('sum(amount) as sum, currency, article_author.article_id')
+            ->join('article_author', 'conversions.article_id', '=', 'article_author.article_id')
+            ->join('articles', 'article_author.article_id', '=', 'articles.id')
+            ->groupBy(['article_author.article_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
             $articles->where('published_at', '>=', $request->input('published_from'));
+            $conversionsQuery->where('published_at', '>=', $request->input('published_from'));
         }
         if ($request->input('published_to')) {
             $articles->where('published_at', '<=', $request->input('published_to'));
+            $conversionsQuery->where('published_at', '<=', $request->input('published_to'));
         }
         if ($request->input('conversion_from')) {
             $articles->where('paid_at', '>=', $request->input('conversion_from'));
+            $conversionsQuery->where('paid_at', '>=', $request->input('conversion_from'));
         }
         if ($request->input('conversion_to')) {
             $articles->where('paid_at', '<=', $request->input('conversion_to'));
+            $conversionsQuery->where('paid_at', '<=', $request->input('conversion_to'));
+        }
+
+        $conversions = [];
+        foreach ($conversionsQuery->get() as $record) {
+            $conversions[$record->article_id][$record->currency] = $record->sum;
         }
 
         return $datatables->of($articles)
@@ -74,11 +88,14 @@ class ArticleController extends Controller
                 return HTML::link($article->url, $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
-            ->addColumn('amount', function (Article $article) {
-                $sum = $article->conversions()->selectRaw('sum(amount) as sum, currency')->groupBy('currency')->pluck('sum', 'currency');
+            ->addColumn('amount', function (Article $article) use ($conversions) {
+                if (!isset($conversions[$article->id])) {
+                    return 0;
+                }
                 $amount = null;
-                foreach ($sum as $currency => $c) {
-                    $amount .= "{$sum[$currency]} $currency";
+                foreach ($conversions[$article->id] as $currency => $c) {
+                    $c = round($c, 2);
+                    $amount .= "{$c} {$currency}";
                 }
                 return $amount ?? 0;
             })
