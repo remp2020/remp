@@ -10,6 +10,7 @@ use App\Contracts\SegmentException;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use Cache;
+use GeoIp2;
 use HTML;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -332,6 +333,37 @@ class CampaignController extends Controller
             // signed in state
             if (isset($campaign->signed_in) && $campaign->signed_in !== boolval($userId)) {
                 continue;
+            }
+
+            // country rules
+
+            //TEMP VARS BEGIN
+            $campaignWhitelistedCountries = ['US'];
+            $campaignBlacklistedCountries = ['SK'];
+            //TEMP VARS END
+
+            if(!empty($campaignWhitelistedCountries) || !empty($campaignBlacklistedCountries)) {
+
+                try {
+                    $reader = new GeoIp2\Database\Reader('./assets/vendor/maxmind/GeoLite2-Country.mmdb');
+                    $record = $reader->country('128.101.101.101'); //USA IP
+//                    $record = $reader->country('92.60.48.42'); //SK IP
+                    $countryCode = $record->country->isoCode;
+                } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
+                    return response()
+                        ->jsonp($r->get('callback'), [
+                            'success' => false,
+                            'errors' => ["Unable to load country for campaign with country rules: " . $e->getMessage()],
+                        ]);
+                }
+
+                if (in_array($countryCode, $campaignBlacklistedCountries)) {
+                    \Tracy\Debugger::dump("country is blacklisted");
+                }
+                if (!in_array($countryCode, $campaignWhitelistedCountries)) {
+                    \Tracy\Debugger::dump("country is whitelisted");
+                }
+                \Tracy\Debugger::dump("display banner");
             }
 
             // segment

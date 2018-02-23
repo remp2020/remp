@@ -14,15 +14,17 @@ if (process.env.REMP_TARGET === 'lib') {
         .js("resources/assets/js/banner.js", "js/banner.js")
         .js("resources/assets/js/remplib.js", "js/remplib.js")
 } else {
+    const publicPath = "public/assets/vendor/";
     mix
         .options({
-            publicPath: "public/assets/vendor/",
+            publicPath: publicPath,
             resourceRoot: "/assets/vendor/"
         })
         .js("resources/assets/js/app.js", "js/app.js")
         .js("resources/assets/js/banner.js", "js/banner.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
+        .copy('resources/assets/maxmind/GeoLite2-Country.mmdb', publicPath + 'maxmind/GeoLite2-Country.mmdb')
         .extract([
             "./resources/assets/js/bootstrap.js",
             "jquery",

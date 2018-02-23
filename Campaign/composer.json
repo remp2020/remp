@@ -32,6 +32,7 @@
     "require": {
         "php": "~7.1.0",
         "doctrine/dbal": "~2.3",
+        "geoip2/geoip2": "~2.0",
         "laravel/framework": "~5.5.0",
         "laravelcollective/html": "~5.5.0",
         "laravel/tinker": "~1.0",
