@@ -68,7 +68,7 @@
                 'amount' => ['header' => 'amount'],
                 'authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
                 'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                'published_at' => ['header' => 'published at', 'render' => 'date'],
+                'published_at' => ['header' => 'published', 'render' => 'date'],
             ],
             'dataSource' => route('articles.dtConversions'),
             'order' => [5, 'desc'],

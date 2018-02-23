@@ -12,7 +12,6 @@ use App\Http\Resources\CampaignResource;
 use Cache;
 use HTML;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\Collection;
 use View;
 use Yajra\Datatables\Datatables;
