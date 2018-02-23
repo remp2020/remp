@@ -51,8 +51,8 @@
             'dataSource' => route('conversions.json'),
             'order' => [5, 'desc'],
             'requestParams' => [
-                'conversion_from' => '$("[name=\"conversion_from\"]").data("DateTimePicker").date().set({hour:0,minute:0,second:0,millisecond:0}).toISOString()',
-                'conversion_to' => '$("[name=\"conversion_to\"]").data("DateTimePicker").date().set({hour:23,minute:59,second:59,millisecond:999}).toISOString()',
+                'conversion_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
+                'conversion_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
             ],
             'refreshTriggers' => [
                 [

@@ -88,12 +88,13 @@
                 'url': '{{ $dataSource }}',
                 'data': function (data) {
                     var url = window.location.href
+                    var param = null;
                     @foreach ($requestParams as $var => $def)
-                        var param = '{!! $var !!}';
-                        data[param] = {!! $def !!};
+                        param = '{!! $var !!}';
+                    data[param] = {!! $def !!};
 
-                        // update browser URL to persist the selection
-                        url = $.fn.dataTables.upsertQueryStringParam(url, param, data[param]);
+                    // update browser URL to persist the selection
+                    url = $.fn.dataTables.upsertQueryStringParam(url, param, data[param]);
                     @endforeach
                     window.history.pushState(null, null, url);
                 }

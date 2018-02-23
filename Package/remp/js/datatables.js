@@ -103,6 +103,9 @@ $.fn.dataTables = {
     },
 
     upsertQueryStringParam(url, key, value) {
+        if (!value) {
+            value = "";
+        }
         let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
         let separator = url.indexOf('?') !== -1 ? "&" : "?";
         if (url.match(re)) {
