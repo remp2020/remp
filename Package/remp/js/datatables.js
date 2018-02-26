@@ -247,11 +247,11 @@ $.fn.dataTables = {
                 if (data.length === 1) {
                     return data[0];
                 }
-                data[0] = parseInt(data[0]);
-                data[1] = parseInt(data[1]);
+                let d0 = parseFloat(data[0]);
+                let d1 = parseFloat(data[1]);
 
                 let cls, icon;
-                if (data[0] >= data[1]) {
+                if (d0 >= d1) {
                     cls = 'text-success';
                     icon = 'zmdi-caret-up'
                 } else {
@@ -259,16 +259,25 @@ $.fn.dataTables = {
                     icon = 'zmdi-caret-down';
                 }
 
-                return "<span>" + data[0] + "</span> <small class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + Math.abs(data[0] - data[1]) + ")</small>";
+                return "<span>" + data[0] + "</span> <small style='white-space: nowrap;' class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + Math.abs(d0 - d1).toFixed(2) + ")</small>";
             };
+        },
+        multiNumberStat: function() {
+            return function (data) {
+                let result = "";
+                for (item of data) {
+                    result += $.fn.dataTables.render.numberStat()(item) + '<br/>';
+                }
+                return result.trim();
+            }
         },
         durationStat: function() {
             return function (data) {
                 if (data.length === 1) {
                     return data[0];
                 }
-                data[0] = parseInt(data[0]);
-                data[1] = parseInt(data[1]);
+                data[0] = parseFloat(data[0]);
+                data[1] = parseFloat(data[1]);
 
                 let d = moment.duration(data[0], 'seconds')
                 let durationText = $.fn.dataTables.durationToText(d);
