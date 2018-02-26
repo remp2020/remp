@@ -1,20 +1,3 @@
-<?php
-
-function route_active($routeName, $classes = '', $activeClasses = '')
-{
-    $currentRouteName = Route::currentRouteName();
-
-    $currentRouteSegmentsCount = count(explode(".", $currentRouteName));
-    $passedRouteSegmentsCount = count(explode(".", $routeName));
-
-    if (strpos($currentRouteName, $routeName) === 0 && abs($currentRouteSegmentsCount-$passedRouteSegmentsCount) <= 1) {
-        return "class=\"{$classes} active {$activeClasses}\"";
-    }
-    return "class=\"{$classes}\"";
-}
-
-?>
-
 <!DOCTYPE html>
 <!--[if IE 9 ]><html class="ie9"><![endif]-->
 <head>
@@ -118,7 +101,7 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
-            <li {!! route_active('api-tokens.index') !!}>
+            <li {!! route_active(['api-tokens.index']) !!}>
                 <a href="{{ route('api-tokens.index') }}"><i class="zmdi zmdi-key"></i> API Tokens</a>
             </li>
         </ul>
