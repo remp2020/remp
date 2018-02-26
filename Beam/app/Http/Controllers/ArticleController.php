@@ -186,6 +186,7 @@ class ArticleController extends Controller
      */
     public function store(ArticleRequest $request)
     {
+        /** @var Article $article */
         $article = Article::firstOrNew([
             'external_id' => $request->get('external_id'),
         ]);

@@ -11,7 +11,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-         $this->call(PropertySeeder::class);
-         $this->call(SegmentSeeder::class);
+//         $this->call(PropertySeeder::class);
+//         $this->call(SegmentSeeder::class);
+         $this->call(ArticleSeeder::class);
     }
 }

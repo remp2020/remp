@@ -16,8 +16,6 @@ $factory->define(\App\Property::class, function (Faker\Generator $faker) {
     return [
         'name' => 'DEMO property',
         'uuid' => $faker->uuid,
-        'created_at' => $faker->date(),
-        'updated_at' => $faker->date(),
     ];
 });
 
@@ -25,8 +23,6 @@ $factory->define(\App\Account::class, function (Faker\Generator $faker) {
     return [
         'name' => 'DEMO account',
         'uuid' => $faker->uuid,
-        'created_at' => $faker->date(),
-        'updated_at' => $faker->date(),
     ];
 });
 
@@ -35,21 +31,53 @@ $factory->define(\App\Segment::class, function (Faker\Generator $faker) {
         'name' => 'DEMO segment',
         'code' => 'demo-segment',
         'active' => true,
-        'created_at' => $faker->date(),
-        'updated_at' => $faker->date(),
     ];
 });
 
 $factory->define(\App\SegmentRule::class, function (Faker\Generator $faker) {
     return [
-        'event_category' => 'demo',
-        'event_action' => 'action',
-        'timespan' => 1440 * $faker->numberBetween(1, 7),
-        'fields' => \Psy\Util\Json::encode([
-            'myfield' => 'myvalue',
-        ]),
-        'created_at' => $faker->date(),
-        'updated_at' => $faker->date(),
+        'event_category' => 'banner',
+        'event_action' => 'show',
+        'operator' => '<',
         'count' => $faker->numberBetween(1, 5),
+        'timespan' => 1440 * $faker->numberBetween(1, 7),
+        'fields' => [
+            [
+                'key' => 'utm_campaign',
+                'value' => null,
+            ]
+        ],
+        'flags' => [],
+    ];
+});
+
+$factory->define(\App\Author::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name(),
+    ];
+});
+
+$factory->define(\App\Section::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->domainWord,
+    ];
+});
+
+$factory->define(\App\Article::class, function (Faker\Generator $faker) {
+    return [
+        'external_id' => $faker->uuid,
+        'title' => $faker->words(5, true),
+        'url' => $faker->url,
+        'image_url' => $faker->imageUrl(),
+        'published_at' => $faker->dateTime()->format(DATE_RFC3339),
+    ];
+});
+
+$factory->define(\App\Conversion::class, function (Faker\Generator $faker) {
+    return [
+        'amount' => $faker->numberBetween(5,50),
+        'currency' => $faker->randomElement(['EUR','USD']),
+        'paid_at' => $faker->dateTime()->format(DATE_RFC3339),
+        'transaction_id' => $faker->uuid,
     ];
 });
