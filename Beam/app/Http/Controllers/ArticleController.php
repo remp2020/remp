@@ -119,7 +119,7 @@ class ArticleController extends Controller
                 return $amount ?? 0;
             })
             ->addColumn('authors', function (Article $article) {
-                $authors = $article->authors->map(function(Author $author) {
+                $authors = $article->authors->map(function (Author $author) {
                     return ['link' => HTML::linkRoute('authors.show', $author->name, [$author])];
                 });
                 return $authors->implode('link', '<br/>');
