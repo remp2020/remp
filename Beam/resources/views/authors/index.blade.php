@@ -44,7 +44,7 @@
                 'name' => ['header' => 'author', 'orderable' => false, 'filter' => $authors],
                 'articles_count' => ['header' => 'articles'],
                 'conversions_count' => ['header' => 'conversions'],
-                'conversions_amount' => ['header' => 'amount'],
+                'conversions_amount' => ['header' => 'amount', 'render' => 'array'],
                 'pageviews_count' => ['header' => 'pageviews'],
                 'pageviews_timespent' => ['header' => 'total time read', 'render' => 'duration'],
                 'avg_timespent' => ['header' => 'avg time read', 'render' => 'duration'],

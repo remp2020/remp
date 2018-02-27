@@ -54,8 +54,6 @@ services:
     hostname: "campaign"
     volumes:
       - ".:/var/www/html:rw"
-      - "composer-data:/composer:rw"
-      - "yarn-data:/yarn:rw"
     depends_on:
       - "campaign_mysql"
     restart: "unless-stopped"
@@ -85,8 +83,6 @@ services:
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
-      - "composer-data:/composer:rw"
-      - "yarn-data:/yarn:rw"
     depends_on:
       - "mailer_mysql"
       - "redis"
@@ -118,8 +114,6 @@ services:
     hostname: "sso"
     volumes:
       - ".:/var/www/html:rw"
-      - "composer-data:/composer:rw"
-      - "yarn-data:/yarn:rw"
     depends_on:
       - "sso_mysql"
     restart: "unless-stopped"
@@ -149,8 +143,6 @@ services:
       PHP_IDE_CONFIG: "serverName=beam.remp.press"
     volumes:
       - ".:/var/www/html:rw"
-      - "composer-data:/composer:rw"
-      - "yarn-data:/yarn:rw"
     depends_on:
       - "beam_mysql"
     restart: "unless-stopped"
@@ -239,11 +231,6 @@ volumes:
   redis-data:
     driver: "local"
   grafana-data:
-    driver: "local"
-
-  composer-data:
-    driver: "local"
-  yarn-data:
     driver: "local"
 
 networks:

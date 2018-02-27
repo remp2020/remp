@@ -89,12 +89,12 @@ class AuthorController extends Controller
                 if (!isset($conversions[$author->id])) {
                     return 0;
                 }
-                $amount = null;
+                $amounts = [];
                 foreach ($conversions[$author->id] as $currency => $c) {
                     $c = round($c, 2);
-                    $amount .= "{$c} {$currency}";
+                    $amounts[] = "{$c} {$currency}";
                 }
-                return $amount ?? 0;
+                return $amounts ?? [0];
             })
             ->addColumn('name', function (Author $author) {
                 return HTML::linkRoute('authors.show', $author->name, $author);
