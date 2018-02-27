@@ -49,16 +49,22 @@ class ArticleController extends Controller
 
     public function dtConversions(Request $request, Datatables $datatables)
     {
-        $articles = Article::selectRaw("articles.*, count(conversions.id) as conversions_count, coalesce(sum(conversions.amount), 0) as conversions_sum")
+        $articles = Article::selectRaw(implode(',', [
+                "articles.*",
+                "count(conversions.id) as conversions_count",
+                "coalesce(sum(conversions.amount), 0) as conversions_sum",
+                "avg(conversions.amount) as conversions_avg"
+            ]))
             ->with(['authors', 'sections'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id')
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
             ->groupBy(['articles.id']);
 
-        $conversionsQuery = Conversion::selectRaw('sum(amount) as sum, currency, article_author.article_id')
+        $conversionsQuery = \DB::table('conversions')
+            ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_author.article_id')
             ->join('article_author', 'conversions.article_id', '=', 'article_author.article_id')
-            ->join('articles', 'article_author.article_id', '=', 'articles.id')
+            ->join('articles', 'articles.id', '=', 'article_author.article_id')
             ->groupBy(['article_author.article_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
@@ -78,9 +84,11 @@ class ArticleController extends Controller
             $conversionsQuery->where('paid_at', '<=', $request->input('conversion_to'));
         }
 
-        $conversions = [];
+        $conversionSums = [];
+        $conversionAverages = [];
         foreach ($conversionsQuery->get() as $record) {
-            $conversions[$record->article_id][$record->currency] = $record->sum;
+            $conversionSums[$record->article_id][$record->currency] = $record->sum;
+            $conversionAverages[$record->article_id][$record->currency] = $record->avg;
         }
 
         return $datatables->of($articles)
@@ -88,18 +96,36 @@ class ArticleController extends Controller
                 return HTML::link($article->url, $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
-            ->addColumn('amount', function (Article $article) use ($conversions) {
-                if (!isset($conversions[$article->id])) {
+            ->addColumn('amount', function (Article $article) use ($conversionSums) {
+                if (!isset($conversionSums[$article->id])) {
                     return 0;
                 }
                 $amount = null;
-                foreach ($conversions[$article->id] as $currency => $c) {
+                foreach ($conversionSums[$article->id] as $currency => $c) {
                     $c = round($c, 2);
                     $amount .= "{$c} {$currency}";
                 }
                 return $amount ?? 0;
             })
+            ->addColumn('average', function (Article $article) use ($conversionAverages) {
+                if (!isset($conversionAverages[$article->id])) {
+                    return 0;
+                }
+                $amount = null;
+                foreach ($conversionAverages[$article->id] as $currency => $c) {
+                    $c = round($c, 2);
+                    $amount .= "{$c} {$currency}";
+                }
+                return $amount ?? 0;
+            })
+            ->addColumn('authors', function (Article $article) {
+                $authors = $article->authors->map(function (Author $author) {
+                    return ['link' => HTML::linkRoute('authors.show', $author->name, [$author])];
+                });
+                return $authors->implode('link', '<br/>');
+            })
             ->orderColumn('amount', 'conversions_sum $1')
+            ->orderColumn('average', 'conversions_avg $1')
             ->filterColumn('authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_author.author_id', $values);
@@ -108,6 +134,7 @@ class ArticleController extends Controller
                 $values = explode(",", $value);
                 $query->whereIn('article_section.section_id', $values);
             })
+            ->rawColumns(['authors'])
             ->make(true);
     }
 
@@ -127,7 +154,6 @@ class ArticleController extends Controller
     public function dtPageviews(Request $request, Datatables $datatables)
     {
         $articles = Article::selectRaw("articles.*")
-            ->with(['authors', 'sections'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
@@ -149,14 +175,6 @@ class ArticleController extends Controller
                 return round($article->timespent_sum / $article->pageview_sum);
             })
             ->orderColumn('avg_sum', 'timespent_sum / pageview_sum $1')
-            ->filterColumn('authors[, ].name', function (Builder $query, $value) {
-                $values = explode(",", $value);
-                $query->whereIn('article_author.author_id', $values);
-            })
-            ->filterColumn('sections[, ].name', function (Builder $query, $value) {
-                $values = explode(",", $value);
-                $query->whereIn('article_section.section_id', $values);
-            })
             ->make(true);
     }
 

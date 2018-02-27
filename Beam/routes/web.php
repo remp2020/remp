@@ -31,7 +31,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('articles/dtPageviews', 'ArticleController@dtPageviews')->name('articles.dtPageviews');
     Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
-    Route::get('authors/json', 'AuthorController@json')->name('authors.json');
+    Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
+    Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
 
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
@@ -43,6 +44,6 @@ Route::middleware('auth.jwt')->group(function () {
         'only' => ['index', 'store']
     ]);
     Route::resource('authors', 'AuthorController', [
-        'only' => ['index']
+        'only' => ['index', 'show']
     ]);
 });

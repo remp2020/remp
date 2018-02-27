@@ -116,6 +116,23 @@ $.fn.dataTables = {
         }
     },
 
+    durationToText(d) {
+        if (d.asSeconds() === 0) {
+            return '0s';
+        }
+        let durationString = ""
+        if (d.asHours() >= 1) {
+            durationString += Math.floor(d.asHours()) + "h&nbsp;"
+        }
+        if (d.asMinutes() >= 1) {
+            durationString += Math.floor(d.minutes()) + "m&nbsp;"
+        }
+        if (d.asSeconds() >= 1) {
+            durationString += Math.floor(d.seconds()) + "s"
+        }
+        return durationString;
+    },
+
     render: {
         date: function () {
             return function(data) {
@@ -223,6 +240,61 @@ $.fn.dataTables = {
                     durationString += Math.floor(d.seconds()) + "s"
                 }
                 return "<span title='" + d.humanize() + "'>" + durationString.trim() + "</span>";
+            };
+        },
+        numberStat: function() {
+            return function (data) {
+                if (data.length === 1) {
+                    return data[0];
+                }
+                let d0 = parseFloat(data[0]);
+                let d1 = parseFloat(data[1]);
+
+                let cls, icon;
+                if (d0 >= d1) {
+                    cls = 'text-success';
+                    icon = 'zmdi-caret-up'
+                } else {
+                    cls = 'text-danger';
+                    icon = 'zmdi-caret-down';
+                }
+
+                return "<span>" + data[0] + "</span> <small style='white-space: nowrap;' class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + Math.abs(d0 - d1).toFixed(2) + ")</small>";
+            };
+        },
+        multiNumberStat: function() {
+            return function (data) {
+                let result = "";
+                for (item of data) {
+                    result += $.fn.dataTables.render.numberStat()(item) + '<br/>';
+                }
+                return result.trim();
+            }
+        },
+        durationStat: function() {
+            return function (data) {
+                if (data.length === 1) {
+                    return data[0];
+                }
+                data[0] = parseFloat(data[0]);
+                data[1] = parseFloat(data[1]);
+
+                let d = moment.duration(data[0], 'seconds')
+                let durationText = $.fn.dataTables.durationToText(d);
+
+                let sd = moment.duration(Math.abs(data[0] - data[1]), 'seconds')
+                let statText = $.fn.dataTables.durationToText(sd);
+
+                let cls, icon;
+                if (data[0] >= data[1]) {
+                    cls = 'text-success';
+                    icon = 'zmdi-caret-up'
+                } else {
+                    cls = 'text-danger';
+                    icon = 'zmdi-caret-down';
+                }
+
+                return "<span title='" + d.humanize() + "'>" + durationText.trim() + "</span> <small title='" + sd.humanize() + "' class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + statText.trim() + ")</small>";
             };
         }
     }
