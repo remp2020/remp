@@ -24,6 +24,8 @@ class Journal implements JournalContract
 
     const ENDPOINT_GENERIC_COUNT = 'journal/%s/actions/%s/count';
 
+    const ENDPOINT_GENERIC_SUM = 'journal/%s/actions/%s/sum';
+
     private $client;
 
     public function __construct(Client $client)
@@ -87,6 +89,28 @@ class Journal implements JournalContract
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:Count endpoint: {$e->getMessage()}");
+        } catch (ClientException $e) {
+            \Log::error($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+
+        $list = json_decode($response->getBody());
+        return collect($list);
+    }
+
+    public function sum(JournalAggregateRequest $request): Collection
+    {
+        try {
+            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_SUM), [
+                'json' => [
+                    'filter_by' => $request->getFilterBy(),
+                    'group_by' => $request->getGroupBy(),
+                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:Sum endpoint: {$e->getMessage()}");
         } catch (ClientException $e) {
             \Log::error($e->getResponse()->getBody()->getContents());
             throw $e;

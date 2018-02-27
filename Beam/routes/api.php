@@ -19,10 +19,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::middleware('auth:api')->group(function() {
     Route::apiResource('articles', 'ArticleController', [
-        'only' => ['index', 'store'],
+        'only' => ['store'],
     ]);
     Route::apiResource('conversions', 'ConversionController', [
-        'only' => ['store', 'index']
+        'only' => ['index', 'store']
     ]);
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 });

@@ -99,127 +99,6 @@ $(document).ready(function(){
     }
 
     /*
-     * Calendar Widget
-     */
-    if($('#calendar-widget')[0]) {
-
-
-
-        (function(){
-            $('#cw-body').fullCalendar({
-                contentHeight: 'auto',
-                theme: true,
-                header: {
-                    right: 'next',
-                    center: 'title, ',
-                    left: 'prev'
-                },
-                defaultDate: '2014-06-12',
-                editable: true,
-                events: [
-                    {
-                        title: 'All Day',
-                        start: '2014-06-01',
-                        className: 'bgm-cyan'
-                    },
-                    {
-                        title: 'Long Event',
-                        start: '2014-06-07',
-                        end: '2014-06-10',
-                        className: 'bgm-orange'
-                    },
-                    {
-                        id: 999,
-                        title: 'Repeat',
-                        start: '2014-06-09',
-                        className: 'bgm-lightgreen'
-                    },
-                    {
-                        id: 999,
-                        title: 'Repeat',
-                        start: '2014-06-16',
-                        className: 'bgm-lightblue'
-                    },
-                    {
-                        title: 'Meet',
-                        start: '2014-06-12',
-                        end: '2014-06-12',
-                        className: 'bgm-green'
-                    },
-                    {
-                        title: 'Lunch',
-                        start: '2014-06-12',
-                        className: 'bgm-cyan'
-                    },
-                    {
-                        title: 'Birthday',
-                        start: '2014-06-13',
-                        className: 'bgm-amber'
-                    },
-                    {
-                        title: 'Google',
-                        url: 'http://google.com/',
-                        start: '2014-06-28',
-                        className: 'bgm-amber'
-                    }
-                ]
-            });
-        })();
-
-        //Display Current Date as Calendar widget header
-        var mYear = moment().format('YYYY');
-        var mDay = moment().format('dddd, MMM D');
-        $('#calendar-widget .cwh-year').html(mYear);
-        $('#calendar-widget .cwh-day').html(mDay);
-
-    }
-
-    /*
-     * Weather Card
-     */
-    if ($('#c-weather')[0]) {
-        $.simpleWeather({
-            location: 'Austin, TX',
-            woeid: '',
-            unit: 'f',
-            success: function(weather) {
-                var html = '<div class="cw-current media">' +
-                    '<div class="pull-left cwc-icon cwci-'+weather.code+'"></div>' +
-                    '<div class="cwc-info media-body">' +
-                    '<div class="cwci-temp">'+weather.temp+'&deg;'+weather.units.temp+'</div>' +
-                    '<ul class="cwci-info">' +
-                    '<li>'+weather.city+', '+weather.region+'</li>' +
-                    '<li>'+weather.currently+'</li>' +
-                    '</ul>' +
-                    '</div>' +
-                    '</div>' +
-                    '<div class="cw-upcoming"></div>';
-
-                $("#c-weather").html(html);
-
-                setTimeout(function() {
-
-
-                    for(i = 0; i < 5; i++) {
-                        var l = '<ul class="clearfix">' +
-                            '<li class="m-r-15">' +
-                            '<i class="cwc-icon cwci-sm cwci-'+weather.forecast[i].code+'"></i>' +
-                            '</li>' +
-                            '<li class="cwu-forecast">'+weather.forecast[i].high+'/'+weather.forecast[i].low+'</li>' +
-                            '<li>'+weather.forecast[i].text+'</li>' +
-                            '</ul>';
-
-                        $('.cw-upcoming').append(l);
-                    }
-                });
-            },
-            error: function(error) {
-                $("#c-weather").html('<p>'+error+'</p>');
-            }
-        });
-    }
-
-    /*
      * Auto Hight Textarea
      */
     if ($('.auto-size')[0]) {
@@ -403,14 +282,19 @@ $(document).ready(function(){
     //Time
     if ($('.time-picker')[0]) {
         $('.time-picker').datetimepicker({
-            format: 'HH:mm:ss'
+            format: 'HH:mm:ss',
+            useCurrent: false,
         });
     }
 
     //Date
     if ($('.date-picker')[0]) {
         $('.date-picker').datetimepicker({
-            format: 'YYYY-MM-DD'
+            locale: moment.locale(),
+            format: 'l',
+            useCurrent: false,
+            extraFormats: [ 'YYYY-MM-DD' ],
+//            format: 'YYYY-MM-DD'
         });
     }
 
@@ -641,39 +525,6 @@ $(document).ready(function(){
     }
 
     /*
-     * Typeahead Auto Complete
-     */
-    if($('.typeahead')[0]) {
-
-        var statesArray = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
-            'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
-            'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
-            'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
-            'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-            'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
-            'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
-            'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
-            'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
-        ];
-        var states = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            local: statesArray
-        });
-
-        $('.typeahead').typeahead({
-                hint: true,
-                highlight: true,
-                minLength: 1
-            },
-            {
-                name: 'states',
-                source: states
-            });
-    }
-
-
-    /*
      * Wall
      */
     if ($('.wcc-toggle')[0]) {
@@ -721,5 +572,18 @@ $(document).ready(function(){
 
         $(this).prop('disabled', true)
         window.location.href = url;
+    });
+
+    $.extend( $.fn.datetimepicker, {
+        'isoDateFromSelector': function(selector, setDate) {
+            let d = $(selector).data("DateTimePicker").date();
+            if (!d) {
+                return null;
+            }
+            if (setDate) {
+                d = d.set({hour:0,minute:0,second:0,millisecond:0})
+            }
+            return d.toISOString();
+        },
     });
 });
