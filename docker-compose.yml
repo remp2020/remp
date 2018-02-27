@@ -22,11 +22,20 @@ services:
           - "segments.beam.remp.press"
           - "grafana.beam.remp.press"
           - "mailhog.remp.press"
-    depends_on:
-      - "campaign"
-      - "mailer"
-      - "sso"
-      - "beam"
+
+  mysql:
+    image: "mysql:8.0"
+    volumes:
+      - "mysql-data:/var/lib/mysql"
+      - "./Docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+      - "--skip-character-set-client-handshake"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+      MYSQL_ROOT_PASSWORD: "secret"
+    restart: "unless-stopped"
 
   redis:
     image: "redis:3.2"
@@ -55,21 +64,8 @@ services:
     volumes:
       - ".:/var/www/html:rw"
     depends_on:
-      - "campaign_mysql"
-    restart: "unless-stopped"
-
-  campaign_mysql:
-    image: "mysql:8.0"
-    volumes:
-      - "mysql-data-campaign:/var/lib/mysql"
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_ci"
-      - "--skip-character-set-client-handshake"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
-      MYSQL_ROOT_PASSWORD: "secret"
-      MYSQL_DATABASE: "remp_campaign"
+      - "nginx"
+      - "mysql"
     restart: "unless-stopped"
 
   # mailer
@@ -84,23 +80,10 @@ services:
     volumes:
       - ".:/var/www/html:rw"
     depends_on:
-      - "mailer_mysql"
+      - "nginx"
+      - "mysql"
       - "redis"
       - "mailhog"
-    restart: "unless-stopped"
-
-  mailer_mysql:
-    image: "mysql:8.0"
-    volumes:
-      - "mysql-data-mailer:/var/lib/mysql"
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_ci"
-      - "--skip-character-set-client-handshake"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
-      MYSQL_ROOT_PASSWORD: "secret"
-      MYSQL_DATABASE: "remp_mailer"
     restart: "unless-stopped"
 
   # sso
@@ -115,21 +98,8 @@ services:
     volumes:
       - ".:/var/www/html:rw"
     depends_on:
-      - "sso_mysql"
-    restart: "unless-stopped"
-
-  sso_mysql:
-    image: "mysql:8.0"
-    volumes:
-      - "mysql-data-sso:/var/lib/mysql"
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_ci"
-      - "--skip-character-set-client-handshake"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
-      MYSQL_ROOT_PASSWORD: "secret"
-      MYSQL_DATABASE: "remp_sso"
+      - "nginx"
+      - "mysql"
     restart: "unless-stopped"
 
   # beam
@@ -144,23 +114,8 @@ services:
     volumes:
       - ".:/var/www/html:rw"
     depends_on:
-      - "beam_mysql"
-    restart: "unless-stopped"
-
-  beam_mysql:
-    image: "mysql:8.0"
-    volumes:
-      - "mysql-data-beam:/var/lib/mysql"
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_ci"
-      - "--skip-character-set-client-handshake"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
-      MYSQL_ROOT_PASSWORD: "secret"
-      MYSQL_DATABASE: "remp_beam"
-    ports:
-      - "3313:3306"
+      - "nginx"
+      - "mysql"
     restart: "unless-stopped"
 
   kafka:
@@ -220,13 +175,7 @@ volumes:
     driver: "local"
   kafka-data:
     driver: "local"
-  mysql-data-campaign:
-    driver: "local"
-  mysql-data-mailer:
-    driver: "local"
-  mysql-data-beam:
-    driver: "local"
-  mysql-data-sso:
+  mysql-data:
     driver: "local"
   redis-data:
     driver: "local"

@@ -1,0 +1,4 @@
+CREATE DATABASE IF NOT EXISTS beam COLLATE 'utf8mb4_unicode_ci';
+CREATE DATABASE IF NOT EXISTS campaign COLLATE 'utf8mb4_unicode_ci';
+CREATE DATABASE IF NOT EXISTS mailer COLLATE 'utf8mb4_unicode_ci';
+CREATE DATABASE IF NOT EXISTS sso COLLATE 'utf8mb4_unicode_ci';

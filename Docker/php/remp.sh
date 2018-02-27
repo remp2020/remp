@@ -18,9 +18,9 @@ then
         php artisan ide-helper:models
     elif [ -f "bin/command.php" ]
     then
-        php bin/command.php db:migrate
-        php bin/command.php db:seed
-        php bin/command.php demo:seed
+        php bin/command.php migrate:migrate
+        php bin/command.php seed:db
+        php bin/command.php seed:demo
     fi
 fi
 php-fpm

@@ -36,7 +36,7 @@ class DemoSeedCommand extends Command
 
     protected function configure()
     {
-        $this->setName('demo:seed')
+        $this->setName('seed:demo')
             ->setDescription('Seed database with demo values');
     }
 
