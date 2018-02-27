@@ -76,6 +76,15 @@ class Campaign extends Model
         $this->altBanner()->attach($value, ['variant' => 'B']);
     }
 
+    public function countries()
+    {
+        return $this->belongsToMany(
+            Country::class, null,
+            null,'country_iso_code',
+            null, 'iso_code'
+        )->withPivot('blacklisted');
+    }
+
     public function segments()
     {
         return $this->hasMany(CampaignSegment::class);
@@ -101,6 +110,7 @@ class Campaign extends Model
             'altBanner.mediumRectangleTemplate',
             'altBanner.barTemplate',
             'altBanner.shortMessageTemplate',
+            'countries',
             'schedules',
         ])->first();
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);

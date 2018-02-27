@@ -29,7 +29,7 @@
     let props = {
         'name': String,
         'options': [Array, Object],
-        'value': [String, Number, Boolean],
+        'value': [Array, Boolean, Number, String],
         'multiple': Boolean,
         'title': String,
         'liveSearch': {

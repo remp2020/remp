@@ -97,6 +97,50 @@
         </div>
 
         <div class="col-md-6">
+            <h4>Countries</h4>
+            <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
+                <div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label for="countries_blacklist" class="fg-label">Whitelist / Blacklist</label>
+                        </div>
+                        <div class="col-md-8">
+                            <v-select v-model="countriesBlacklist"
+                                      id="countries_blacklist"
+                                      :name="'countries_blacklist'"
+                                      :value="countriesBlacklist"
+                                      :options.sync="countriesBlacklistOptions"
+                            >
+                            </v-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
+                <div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label for="countries" class="fg-label">Countries</label>
+                        </div>
+                        <div class="col-md-8">
+                            <v-select v-model="countries"
+                                      id="countries"
+                                      :name="'countries[]'"
+                                      :value="countries"
+                                      :options.sync="availableCountries"
+                                      multiple
+                            >
+                            </v-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <br>
+
             <h4>Segments</h4>
 
             <div class="row">
@@ -156,12 +200,17 @@
         "_signedIn",
         "_oncePerSession",
         "_active",
+        "_countries",
+        "_countriesBlacklist",
+
         "_banners",
         "_availableSegments",
         "_addedSegment",
         "_removedSegments",
         "_segmentMap",
         "_eventTypes",
+        "_availableCountries",
+        "_countriesBlacklistOptions",
     ];
     export default {
         components: {
@@ -183,6 +232,8 @@
                 "signedIn": null,
                 "oncePerSession": null,
                 "active": null,
+                "countries": [],
+                "countriesBlacklist": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -190,6 +241,8 @@
                 "removedSegments": [],
                 "segmentMap": null,
                 "eventTypes": null,
+                "availableCountries": null,
+                "countriesBlacklistOptions": null,
             }
         },
         computed: {

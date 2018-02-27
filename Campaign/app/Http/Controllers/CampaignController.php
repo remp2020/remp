@@ -7,6 +7,7 @@ use App\Campaign;
 use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
+use App\Country;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use Cache;
@@ -38,7 +39,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'altBanner', 'segments'])
+            ->with(['banner', 'altBanner', 'segments', 'countries'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -76,7 +77,6 @@ class CampaignController extends Controller
         $campaign->fill(old());
         $selectedSegments = collect(old('segments'));
 
-        $banners = Banner::all();
         $segments = $segmentAggregator->list();
         foreach ($segmentAggregator->getErrors() as $error) {
             flash($error)->error();
@@ -85,7 +85,8 @@ class CampaignController extends Controller
 
         return view('campaigns.create', [
             'campaign' => $campaign,
-            'banners' => $banners,
+            'banners' => Banner::all(),
+            'availableCountries' => Country::all(),
             'segments' => $segments,
             'selectedSegments' => $selectedSegments,
         ]);
@@ -104,6 +105,8 @@ class CampaignController extends Controller
         $campaign->save();
         $campaign->banner_id = $request->get('banner_id');
         $campaign->alt_banner_id = $request->get('alt_banner_id');
+
+        $campaign->countries()->sync($this->processCountries($request));
 
         foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
@@ -146,7 +149,6 @@ class CampaignController extends Controller
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
         $campaign->fill(old());
-        $banners = Banner::all();
 
         try {
             $segments = $segmentAggregator->list();
@@ -158,7 +160,8 @@ class CampaignController extends Controller
 
         return view('campaigns.edit', [
             'campaign' => $campaign,
-            'banners' => $banners,
+            'availableCountries' => Country::all(),
+            'banners' => Banner::all(),
             'segments' => $segments,
         ]);
     }
@@ -177,6 +180,8 @@ class CampaignController extends Controller
         $campaign->banner_id = $request->get('banner_id');
         $campaign->alt_banner_id = $request->get('alt_banner_id');
 
+        $campaign->countries()->sync($this->processCountries($request));
+
         foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
             $campaignSegment = CampaignSegment::findOrNew($r['id']);
@@ -192,6 +197,21 @@ class CampaignController extends Controller
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
             'json' => new CampaignResource($campaign),
         ]);
+    }
+
+    /**
+     * Processes campaign $request and returns countries array ready to sync with campaign_country pivot table
+     *
+     * @param CampaignRequest $request
+     * @return array
+     */
+    private function processCountries(CampaignRequest $request): array {
+        $blacklist = $request->get('countries_blacklist');
+        $countries = [];
+        foreach ($request->get('countries') as $cid) {
+            $countries[$cid] = ['blacklisted' => (bool) $blacklist];
+        }
+        return $countries;
     }
 
     /**
