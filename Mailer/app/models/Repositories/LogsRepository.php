@@ -33,14 +33,14 @@ class LogsRepository extends Repository
         $this->startStatsDate = $startStatsDate;
     }
 
-    public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null)
+    public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null, $context = null)
     {
         return $this->insert(
-            $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize)
+            $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize, $context)
         );
     }
 
-    public function getInsertData($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null)
+    public function getInsertData($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null, $context = null)
     {
         return [
             'email' => $email,
@@ -52,6 +52,7 @@ class LogsRepository extends Repository
             'mail_job_batch_id' => $batchId,
             'mail_sender_id' => $mailSenderId,
             'attachment_size' => $attachmentSize,
+            'context' => $context,
         ];
     }
 
@@ -224,15 +225,24 @@ class LogsRepository extends Repository
             ])->count('*') > 0;
     }
 
-    public function filterAlreadySent($emails, $mailTemplateCode, $jobId)
+    public function filterAlreadySent($emails, $mailTemplateCode, $jobId, $context = null)
     {
-        $alreadySentEmails = $this->getTable()->where([
+        $query = $this->getTable()->where([
             'mail_logs.email' => $emails,
             'mail_template.code' => $mailTemplateCode
         ])->whereOr([
             'mail_logs.email' => $emails,
             'mail_logs.mail_job_id' => $jobId,
-        ])->select('email')->fetchPairs(null, 'email');
+        ]);
+
+        if ($context) {
+            $query->whereOr([
+                'mail_logs.email' => $emails,
+                'mail_logs.context' => $context,
+            ]);
+        }
+
+        $alreadySentEmails = $query->select('email')->fetchPairs(null, 'email');
 
         return array_diff($emails, $alreadySentEmails);
     }

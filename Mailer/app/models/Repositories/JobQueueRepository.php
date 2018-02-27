@@ -13,27 +13,21 @@ class JobQueueRepository extends Repository
     const STATUS_DONE = 'done';
     const STATUS_ERROR = 'error';
 
-    public function add(IRow $batch, $mailTemplateId, $email, $sorting)
-    {
-        return $this->insert([
-            'mail_batch_id' => $batch->id,
-            'mail_template_id' => $mailTemplateId,
-            'status' => JobQueueRepository::STATUS_NEW,
-            'sorting' => $sorting,
-            'email' => $email,
-        ]);
-    }
-
     public function multiInsert($rows)
     {
-        $values = [];
         $status = JobQueueRepository::STATUS_NEW;
+        $insertLogsData = [];
         foreach ($rows as $row) {
-            $email = addslashes($row['email']);
-            $values[] = "({$row['batch']},{$row['templateId']},'{$status}',{$row['sorting']},'{$email}')";
+            $insertLogsData[] = [
+                'mail_batch_id' => $row['batch'],
+                'mail_template_id' => $row['templateId'],
+                'status' => $status,
+                'sorting' => $row['sorting'],
+                'email' => $row['email'],
+                'context' => $row['context'],
+            ];
         }
-        $values = implode(',', $values);
-        $this->database->query("INSERT INTO {$this->tableName} (mail_batch_id, mail_template_id, status, sorting, email) VALUES $values");
+        $this->database->query("INSERT INTO {$this->tableName}", $insertLogsData);
     }
 
     public function clearBatch($batch)
@@ -84,6 +78,22 @@ class JobQueueRepository extends Repository
   INNER JOIN mail_user_subscriptions ON mail_user_subscriptions.user_id = users.id AND subscribed=1
   INNER JOIN mail_user_subscription_variants ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id AND mail_user_subscription_variants.mail_type_variant_id = {$variantId}
 )");
+    }
+
+    public function removeAlreadySentContext(IRow $batch, $context)
+    {
+        $query = "DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email IN (
+  SELECT email FROM mail_logs WHERE context = '$context')";
+        $this->getDatabase()->query($query);
+
+        $query = "DELETE mjq1.* 
+            FROM mail_job_queue mjq1 
+            INNER JOIN mail_job_queue mjq2 ON mjq1.email = mjq2.email AND 
+              mjq2.context = mjq1.context AND 
+              mjq2.mail_batch_id != {$batch->id}
+            WHERE mjq1.mail_batch_id = {$batch->id}";
+
+        $this->getDatabase()->query($query);
     }
 
     public function getBatchEmails(IRow $mailBatch, $lastId, $count = null)

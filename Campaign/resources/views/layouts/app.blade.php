@@ -1,21 +1,3 @@
-
-<?php
-
-function route_active($routeName, $classes = '', $activeClasses = '')
-{
-    $currentRouteName = Route::currentRouteName();
-
-    $currentRouteSegmentsCount = count(explode(".", $currentRouteName));
-    $passedRouteSegmentsCount = count(explode(".", $routeName));
-
-    if (strpos($currentRouteName, $routeName) === 0 && abs($currentRouteSegmentsCount-$passedRouteSegmentsCount) <= 1) {
-        return "class=\"{$classes} active {$activeClasses}\"";
-    }
-    return "class=\"{$classes}\"";
-}
-
-?>
-
 <!DOCTYPE html>
 <!--[if IE 9 ]><html class="ie9"><![endif]-->
 <head>
@@ -123,13 +105,13 @@ function route_active($routeName, $classes = '', $activeClasses = '')
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
-            <li {!! route_active('banners') !!}>
+            <li {!! route_active(['banners']) !!}>
                 <a href="{{ route('banners.index') }}" ><i class="zmdi zmdi-collection-folder-image"></i> Banners</a>
             </li>
-            <li {!! route_active('campaigns') !!}>
+            <li {!! route_active(['campaigns']) !!}>
                 <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-ticket-star"></i> Campaigns</a>
             </li>
-            <li {!! route_active('schedule') !!}>
+            <li {!! route_active(['schedule']) !!}>
                 <a href="{{ route('schedule.index') }}" ><i class="zmdi zmdi-calendar-check"></i> Schedule</a>
             </li>
         </ul>

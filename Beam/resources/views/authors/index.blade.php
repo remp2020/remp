@@ -42,7 +42,7 @@
         {!! Widget::run('DataTable', [
             'colSettings' => [
                 'name' => ['header' => 'author', 'orderable' => false, 'filter' => $authors],
-                'articles_count' => ['header' => '# articles'],
+                'articles_count' => ['header' => 'articles'],
                 'conversions_count' => ['header' => 'conversions'],
                 'conversions_amount' => ['header' => 'amount'],
                 'pageviews_count' => ['header' => 'pageviews'],
