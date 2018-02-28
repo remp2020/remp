@@ -31,15 +31,17 @@ class ListFormFactory extends Object
         $form->addProtection();
 
         $categoryPairs = $this->listCategoriesRepository->all()->fetchPairs('id', 'title');
-        $form->addSelect('mail_type_category_id', 'Category', $categoryPairs);
+        $form
+            ->addSelect('mail_type_category_id', 'Category', $categoryPairs)
+            ->setRequired('Category is required');
 
         $form->addSelect('priority', 'Priority', [10 => 'High', 100 => 'Normal', 1000 => 'Low']);
 
         $form->addText('code', 'Code')
-            ->setRequired('Required');
+            ->setRequired('Code is required');
 
         $form->addText('title', 'Title')
-            ->setRequired('Required');
+            ->setRequired('Title is required');
 
         $form->addTextArea('description', 'Description')
             ->setAttribute('rows', 3);

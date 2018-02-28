@@ -2,12 +2,9 @@
 
 namespace Remp\MailerModule\Commands;
 
-use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Broker\ConsumerFactory;
-use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
-use Remp\MailerModule\User\IUser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,17 +17,13 @@ class EmailChangedWorkerCommand extends Command
 
     private $userSubscriptionsRepository;
 
-    private $userProvider;
-
     public function __construct(
         ConsumerFactory $consumerFactory,
-        UserSubscriptionsRepository $userSubscriptionsRepository,
-        IUser $userProvider
+        UserSubscriptionsRepository $userSubscriptionsRepository
     ) {
         parent::__construct();
         $this->consumerFactory = $consumerFactory;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
-        $this->userProvider = $userProvider;
     }
 
     /**

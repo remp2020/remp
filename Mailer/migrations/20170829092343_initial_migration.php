@@ -70,10 +70,12 @@ class InitialMigration extends AbstractMigration
             ->addColumn('mail_body_text', 'text')
             ->addColumn('mail_body_html', 'text')
             ->addColumn('mail_layout_id', 'integer', ['null' => true])
+            ->addColumn('copy_from', 'integer', ['null' => true])
             ->addColumn('autologin', 'integer')
             ->addColumn('mail_type_id', 'integer')
             ->addForeignKey('mail_layout_id', 'mail_layouts', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->addForeignKey('mail_type_id', 'mail_types', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
+            ->addForeignKey('copy_from', 'mail_templates', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->addTimestamps()
             ->create();
 
@@ -129,7 +131,7 @@ class InitialMigration extends AbstractMigration
             ->addColumn('user_id', 'integer')
             ->addColumn('user_email', 'integer')
             ->addColumn('mail_type_id', 'integer')
-            ->addColumn('susbcribed', 'boolean')
+            ->addColumn('subscribed', 'boolean')
             ->addColumn('mail_type_variant_id', 'integer', ['null' => true])
             ->addForeignKey('mail_type_id', 'mail_types', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->addForeignKey('mail_type_variant_id', 'mail_type_variants', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])

@@ -51,29 +51,30 @@ class TemplateFormFactory extends Object
         $form->addHidden('id', $id);
 
         $form->addText('name', 'Name')
-            ->setRequired('Required');
+            ->setRequired('Name is required');
 
         if (isset($id) && $count > 0) {
             $form->addText('code', 'Code')
-                ->setRequired('Required')
+                ->setRequired('Code is required')
                 ->setDisabled();
         } else {
             $form->addText('code', 'Code')
-                ->setRequired('Required');
+                ->setRequired('Code is required');
         }
 
         $form->addText('description', 'Description');
 
         $form->addSelect('mail_layout_id', 'Layout', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
-        $form->addSelect('mail_type_id', 'Newsletter list', $this->listsRepository->all()->fetchPairs('id', 'title'));
+        $form->addSelect('mail_type_id', 'Newsletter list', $this->listsRepository->all()->fetchPairs('id', 'title'))
+            ->setRequired('Newsletter list is required');
 
         $form->addText('from', 'From')
             ->addRule(FormRules::ADVANCED_EMAIL, 'Enter correct email')
-            ->setRequired('Required');
+            ->setRequired('From field is required');
 
         $form->addText('subject', 'Subject')
-            ->setRequired('Required');
+            ->setRequired('Subject is required');
 
         $form->addTextArea('mail_body_text', 'Text version')
             ->setAttribute('rows', 3);
