@@ -25,6 +25,9 @@ php artisan migrate
 
 # 5. Generate app key
 php artisan key:generate
+
+# 6. Run seeders (optional)
+php artisan db:seed
 ```
 
 ### Dependencies

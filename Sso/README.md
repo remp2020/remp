@@ -26,6 +26,9 @@ php artisan migrate
 php artisan key:generate
 php artisan jwt:secret
 
+# 6. Run seeders (optional)
+php artisan db:seed
+
 ```
 
 #### Dependencies

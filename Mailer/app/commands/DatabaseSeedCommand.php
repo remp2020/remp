@@ -25,7 +25,7 @@ class DatabaseSeedCommand extends Command
 
     protected function configure()
     {
-        $this->setName('seed:db')
+        $this->setName('db:seed')
             ->setDescription('Seed database with required values');
     }
 

@@ -36,8 +36,8 @@ then
     then
         cp app/config/config.local.neon.example app/config/config.local.neon
         php bin/command.php migrate:migrate
-        php bin/command.php seed:db
-        php bin/command.php seed:demo
+        php bin/command.php db:seed
+        php bin/command.php demo:seed
     fi
 fi
 php-fpm
