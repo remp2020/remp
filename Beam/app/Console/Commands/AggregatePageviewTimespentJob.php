@@ -36,6 +36,9 @@ class AggregatePageviewTimespentJob extends Command
         }
 
         foreach ($records as $record) {
+            if (empty($record->tags->article_id)) {
+                continue;
+            }
             $this->line(sprintf("Processing article pageviews: <info>%s</info>", $record->tags->article_id));
 
             $article = Article::select()->where([

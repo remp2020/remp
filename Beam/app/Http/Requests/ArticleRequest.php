@@ -23,8 +23,6 @@ class ArticleRequest extends FormRequest
      */
     public function rules()
     {
-        $externalId = $this->article->external_id ?? '';
-
         return [
             'external_id' => "required|string",
             'property_uuid' => "required|string",

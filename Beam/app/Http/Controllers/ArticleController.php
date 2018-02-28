@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
-use App\Conversion;
 use App\Http\Requests\ArticleRequest;
+use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Resources\ArticleResource;
 use App\Section;
 use Carbon\Carbon;
@@ -52,6 +52,7 @@ class ArticleController extends Controller
         $articles = Article::selectRaw(implode(',', [
                 "articles.id",
                 "articles.title",
+                "articles.url",
                 "articles.published_at",
                 "count(conversions.id) as conversions_count",
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
@@ -61,7 +62,7 @@ class ArticleController extends Controller
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id')
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
-            ->groupBy(['articles.id', 'articles.title', 'articles.published_at']);
+            ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at']);
 
         $conversionsQuery = \DB::table('conversions')
             ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_author.article_id')
@@ -215,6 +216,40 @@ class ArticleController extends Controller
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
             'json' => new ArticleResource($article),
+        ]);
+    }
+
+    public function upsert(ArticleUpsertRequest $request)
+    {
+        foreach ($request->get('articles', []) as $a) {
+            $article = Article::firstOrNew([
+                'external_id' => $a['external_id'],
+            ]);
+            $article->fill($a);
+            $article->save();
+
+            $article->sections()->detach();
+            foreach ($a['sections'] as $sectionName) {
+                $section = Section::firstOrCreate([
+                    'name' => $sectionName,
+                ]);
+                $article->sections()->attach($section);
+            }
+
+            $article->authors()->detach();
+            foreach ($a['authors'] as $authorName) {
+                $section = Author::firstOrCreate([
+                    'name' => $authorName,
+                ]);
+                $article->authors()->attach($section);
+            }
+
+            $article->load(['authors', 'sections']);
+        }
+
+        return response()->format([
+            'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
+            'json' => new JsonResource([]),
         ]);
     }
 }
