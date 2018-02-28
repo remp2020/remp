@@ -43,6 +43,7 @@ Once you have your environment variables set or `.env` file ready, run the built
 variable|example value
 --- | ---
 SEGMENTS_ADDR|`:8082`
+SEGMENTS_DEBUG|`true`
 SEGMENTS_INFLUX_ADDR|`http://influxdb:8086`
 SEGMENTS_INFLUX_DBNAME|`beam`
 SEGMENTS_INFLUX_USERNAME|`root`

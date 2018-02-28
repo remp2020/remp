@@ -1,5 +1,39 @@
 # SSO
 
+## Admin (Laravel)
+
+SSO Admin serves as a tool for management of API keys.
+
+When the backend is ready, don't forget to create `.env` file (use `.env.example` as boilerplate), install dependencies and run DB migrations:
+
+```bash
+# 1. Download PHP dependencies
+composer install
+
+# 2. Download JS/HTML dependencies
+yarn install
+
+# !. use extra switch if your system doesn't support symlinks (Windows; can be enabled)
+yarn install --no-bin-links
+
+# 3. Generate assets
+yarn run dev // or any other alternative defined within package.json
+
+# 4. Run migrations
+php artisan migrate
+
+# 5. Generate app key and JWT secret
+php artisan key:generate
+php artisan jwt:secret
+
+```
+
+#### Dependencies
+
+- PHP 7.1
+- MySQL 5.7
+- Redis 3.2
+
 ## Auth endpoints
 
 ### GET /auth/login

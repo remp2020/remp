@@ -5,7 +5,7 @@
 Campaign Admin serves as a tool for configuration of banners and campaigns. It's the place for UI generation of banners
 and definition of how and to whom display Campaigns. 
 
-When the backend is ready, don't forget to install dependencies and run DB migrations:
+When the backend is ready, don't forget to create `.env` file (use `.env.example` as boilerplate), install dependencies and run DB migrations:
 
 ```bash
 # 1. Download PHP dependencies
@@ -18,16 +18,19 @@ yarn install
 yarn install --no-bin-links
 
 # 3. Generate assets
-yarn run dev // or any other alternative defined within package.json
+yarn run all-dev // or any other alternative defined within package.json
 
 # 4. Run migrations
 php artisan migrate
+
+# 5. Generate app key
+php artisan key:generate
 ```
 
 ### Dependencies
 
-- PHP 7.1
-- MySQL 5.7
+- PHP ^7.1
+- MySQL ^5.7
 - Redis ^3.2
 
 ### Schedule

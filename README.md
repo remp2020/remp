@@ -29,6 +29,32 @@ docker-compose up
 
 Feel free to override/add services via `docker-compose.override.yml`.
 
+This is an excerpt of override we use. It handles proper connection of XDebug to host machine, exposing services
+running outside of this appliance (such as our internal CRM) and caching of yarn/composer packages.
+
+We highly recommend to place the yarn/composer cache volumes to all PHP-based services, but only after the first run.
+Otherwise the installation of project would be downloading the packages simultaneously and would be overriding stored
+packages in cache. This would cause an error.
+
+```yml
+version: "3"
+
+services:
+  campaign:
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1"
+    extra_hosts:
+      - "crm.press:172.17.0.1"
+    volumes:
+      - "/home/developer/.cache/composer:/composer:rw"
+      - "/home/developer/.cache/yarn:/yarn:rw"
+
+  mysql:
+    volumes:
+      - ".:/data"
+
+```
+
 Application exposes all services via Nginx container.
 Following is list of available hosts. We advise you to add them to your
 `/etc/hosts`:
@@ -82,7 +108,7 @@ Couple of neat commands:
 
 ## PHP Debugging
 
-Docker compose and custom images are ready for PHPStorm debugger. All you need to do is set folder mapping within
+Docker compose and custom images are pre-installed with XDebug and pre-configured for PHPStorm debugger. All you need to do is set folder mapping within
 your IDE for each debuggable host.
 
 ## Error tracking
@@ -94,6 +120,11 @@ We recommend to use self-hosted [Errbit](https://github.com/errbit/errbit) insta
 as it's compatible with Airbrake APIs and completely open-source.
 
 ## Known issues
+
+- PHP images are coming with preinstalled and always-on XDebug. We made the always-on choise for easier debugging and
+availability to debug also console scripts. However if it can't connect to the host machine, it slows down the request
+because it waits for connection timeout. Therefore is very important to have proper `XDEBUG_CONFIG` variables
+configured in your `docker-compose.override.yml`. 
 
 - Windows is pushing scripts to Docker with CRLF new lines which is causing issues described 
 [in this blog](http://willi.am/blog/2016/08/11/docker-for-windows-dealing-with-windows-line-endings).

@@ -11,7 +11,13 @@ then
     yarn install --no-bin-links
     npm rebuild node-sass optipng-bin --no-bin-links
     chmod -R u+x node_modules
-    yarn run dev
+
+    npm run | grep "all-dev"
+    if [ $? -eq "0" ]; then
+        yarn run all-dev
+    else
+        yarn run dev
+    fi
 
     if [ -f "artisan" ]
     then
