@@ -11,13 +11,14 @@ use Illuminate\Support\Carbon;
 
 class AggregatePageviewTimespentJob extends Command
 {
-    protected $signature = 'aggregate:pageview-timespent';
+    protected $signature = 'aggregate:pageview-timespent {--now=}';
 
     protected $description = 'Reads pageview/timespent data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
-        $timeBefore = Carbon::now()->minute(0)->second(0);
+        $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+        $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
         $request = new JournalAggregateRequest('pageviews', 'timespent');
