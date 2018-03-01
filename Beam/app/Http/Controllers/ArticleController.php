@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use HTML;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
