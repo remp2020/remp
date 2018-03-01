@@ -79,10 +79,23 @@ class Campaign extends Model
     public function countries()
     {
         return $this->belongsToMany(
-            Country::class, null,
-            null,'country_iso_code',
-            null, 'iso_code'
+            Country::class,
+            null,
+            null,
+            'country_iso_code',
+            null,
+            'iso_code'
         )->withPivot('blacklisted');
+    }
+
+    public function countriesWhitelist()
+    {
+        return $this->countries()->wherePivot('blacklisted', '=', false);
+    }
+
+    public function countriesBlacklist()
+    {
+        return $this->countries()->wherePivot('blacklisted', '=', true);
     }
 
     public function segments()
@@ -111,6 +124,8 @@ class Campaign extends Model
             'altBanner.barTemplate',
             'altBanner.shortMessageTemplate',
             'countries',
+            'countriesWhitelist',
+            'countriesBlacklist',
             'schedules',
         ])->first();
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);

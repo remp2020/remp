@@ -22,6 +22,15 @@ $availableCountries = $availableCountries->map(function(\App\Country $country) {
    return ['value' => $country->iso_code, 'label' => $country->name];
 });
 
+$selectedCountries = $campaign->countries->map(function(\App\Country $country) {
+   return $country->iso_code;
+});
+
+$countriesBlacklist = 0;
+foreach ($campaign->countries as $country) {
+    $countriesBlacklist = (int) $country->pivot->blacklisted;
+}
+
 @endphp
 
 <div id="campaign-form">
@@ -39,8 +48,8 @@ $availableCountries = $availableCountries->map(function(\App\Country $country) {
         "signedIn": {!! @json($campaign->signed_in) !!},
         "oncePerSession": {!! @json($campaign->once_per_session) !!},
         "active": {!! @json($campaign->active) !!},
-        "countries": [],
-        "countriesBlacklist": 0,
+        "countries": {!! $selectedCountries->toJson(JSON_UNESCAPED_UNICODE) !!},
+        "countriesBlacklist": {!! @json($countriesBlacklist ?? 0) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

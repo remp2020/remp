@@ -205,7 +205,8 @@ class CampaignController extends Controller
      * @param CampaignRequest $request
      * @return array
      */
-    private function processCountries(CampaignRequest $request): array {
+    private function processCountries(CampaignRequest $request): array
+    {
         $blacklist = $request->get('countries_blacklist');
         $countries = [];
         foreach ($request->get('countries') as $cid) {
@@ -357,17 +358,11 @@ class CampaignController extends Controller
 
             // country rules
 
-            //TEMP VARS BEGIN
-            $campaignWhitelistedCountries = ['US'];
-            $campaignBlacklistedCountries = ['SK'];
-            //TEMP VARS END
-
-            if(!empty($campaignWhitelistedCountries) || !empty($campaignBlacklistedCountries)) {
-
+            if (!empty($campaign->countries)) {
+                // load country ISO code based on IP
                 try {
                     $reader = new GeoIp2\Database\Reader('./assets/vendor/maxmind/GeoLite2-Country.mmdb');
-                    $record = $reader->country('128.101.101.101'); //USA IP
-//                    $record = $reader->country('92.60.48.42'); //SK IP
+                    $record = $reader->country($_SERVER['REMOTE_ADDR']);
                     $countryCode = $record->country->isoCode;
                 } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
                     return response()
@@ -376,14 +371,31 @@ class CampaignController extends Controller
                             'errors' => ["Unable to load country for campaign with country rules: " . $e->getMessage()],
                         ]);
                 }
+                if (is_null($countryCode)) {
+                    return response()
+                        ->jsonp($r->get('callback'), [
+                            'success' => false,
+                            'errors' => ["Unable to load country for campaign with country rules"],
+                        ]);
+                }
 
-                if (in_array($countryCode, $campaignBlacklistedCountries)) {
-                    \Tracy\Debugger::dump("country is blacklisted");
+                // check against white / black listed countries
+
+                // simplify objects with countries
+                $countriesBlacklist = array_map(function ($country) {
+                    return $country['iso_code'];
+                }, $campaign->countriesBlacklist->toArray());
+                $countriesWhitelist = array_map(function ($country) {
+                    return $country['iso_code'];
+                }, $campaign->countriesWhitelist->toArray());
+
+                // country blacklisted or not whitelisted? continue to next campaign
+                if (!empty($countriesBlacklist) && in_array($countryCode, $countriesBlacklist)) {
+                    continue;
                 }
-                if (!in_array($countryCode, $campaignWhitelistedCountries)) {
-                    \Tracy\Debugger::dump("country is whitelisted");
+                if (!empty($countriesWhitelist) && !in_array($countryCode, $countriesWhitelist)) {
+                    continue;
                 }
-                \Tracy\Debugger::dump("display banner");
             }
 
             // segment
