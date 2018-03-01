@@ -84,7 +84,7 @@ Note: If you use Docker Toolbox, the IP won't be `127.0.0.1`. Use `docker-machin
 
 Docker will install all the dependencies, prepares the DB structure and also inserts demo data.
 
-The appliance was tested with Docker CE 2017.06.  
+The appliance was tested with Docker CE 17.12.0 and Docker Compose 1.16.1.
 
 ## Manual installation
 
@@ -104,6 +104,7 @@ Couple of neat commands:
 * `docker-compose ps` to list all services with their status
 * `docker-compose logs` to read services logs
 * `docker-compose build` to force rebuild of images
+* `docker-compose exec campaign /bin/bash` to connect to `campaign` container
 * `docker images` to list all available docker images
 
 ## PHP Debugging

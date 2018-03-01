@@ -4,7 +4,8 @@ cd ${APP_NAME}
 
 if [ ! -f ".env" ]
 then
-    cp .env.example .env
+    # create .env with default values, preserve user permissions
+    cp -p .env.example .env
 
     composer install
 
@@ -32,12 +33,18 @@ then
         if [ $? -eq "0" ]; then
             php artisan jwt:secret
         fi
+
+        # Update permissions for Laravel storage (cache) folder
+        chmod -R 777 storage
     elif [ -f "bin/command.php" ]
     then
         cp app/config/config.local.neon.example app/config/config.local.neon
         php bin/command.php migrate:migrate
         php bin/command.php db:seed
         php bin/command.php demo:seed
+
+        # Update permissions for Nette temp (cache) & log folder
+        chmod -R 777 temp log
     fi
 fi
 php-fpm
