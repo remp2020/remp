@@ -16,8 +16,8 @@ class ArticlePageviews extends Migration
         Schema::create('article_pageviews', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('article_id')->unsigned();
-            $table->timestamp('time_from');
-            $table->timestamp('time_to');
+            $table->timestamp('time_from')->nullable();
+            $table->timestamp('time_to')->nullable();
             $table->integer('sum');
 
             $table->foreign('article_id')->references('id')->on('articles');

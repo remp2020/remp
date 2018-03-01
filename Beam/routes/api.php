@@ -24,6 +24,7 @@ Route::middleware('auth:api')->group(function() {
     Route::apiResource('conversions', 'ConversionController', [
         'only' => ['index', 'store']
     ]);
+    Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 });
 
