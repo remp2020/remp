@@ -1,7 +1,3 @@
-<style>
-	
-</style>
-
 <template>
     <div class="row">
         <div class="col-md-12">
@@ -25,12 +21,17 @@
 		        <div class="col-md-4">
 		            <span style="line-height: 31px;">request</span>
 		        </div>
+
+                <div class="col-md-2">
+                    <span class="btn btn-sm palette-Red bg waves-effect" v-on:click="removeRule(i)"><i class="zmdi zmdi-minus-square"></i></span>
+                </div>
+
 	        </div>
         </div>
 
 
         <div class="col-md-2">
-        	<a href="" v-on:click.prevent="addRule"><i class="zmdi zmdi-plus-circle"></i></a>
+        	<span class="btn btn-sm palette-Green bg waves-effect" v-on:click.prevent="addRule"><i class="zmdi zmdi-plus-circle"></i></span>
         </div>
     </div>
 </template>
@@ -38,34 +39,32 @@
 <script type="text/javascript">
 	import vSelect from "remp/js/components/vSelect.vue";
 
-	let props = [
-		"additionalRules"
-	];
-
     export default {
         components: {
             vSelect
         },
-        props: props,
-        data: function() {
-        	return {};
-        },
-        methods: {
-        	addRule: function () {
-    			this.$parent.additionalRules.push({
-    				num: null,
-    				rule: null
-    			})
-        	}
-        },
-        computed: {
-            "additionalRulesOptions": function() {
-                return [
+        props: [
+            "additionalRules"
+        ],
+        data() {
+            return {
+                additionalRulesOptions: [
                     {"label": "Every", "value": "every"},
                     {"label": "Since", "value": "since"},
                     {"label": "Before", "value": "before"},
                     {"label": "Till", "value": "till"}
-                ];
+                ]
+            };
+        },
+        methods: {
+        	addRule() {
+    			this.$parent.additionalRules.push({
+    				num: null,
+    				rule: null
+    			})
+        	},
+            removeRule(i) {
+                this.$parent.additionalRules.splice(i, 1);
             }
         }
     }
