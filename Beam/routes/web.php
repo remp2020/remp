@@ -29,6 +29,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('articles/dtConversions', 'ArticleController@dtConversions')->name('articles.dtConversions');
     Route::get('articles/pageviews', 'ArticleController@pageviews')->name('articles.pageviews');
     Route::get('articles/dtPageviews', 'ArticleController@dtPageviews')->name('articles.dtPageviews');
+    Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
     Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');

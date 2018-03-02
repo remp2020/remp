@@ -105,7 +105,10 @@ class AuthorController extends Controller
     public function dtArticles(Author $author, Request $request, Datatables $datatables)
     {
         $articles = Article::selectRaw(implode(',', [
-                "articles.*",
+                "articles.id",
+                "articles.title",
+                "articles.published_at",
+                "articles.url",
                 "count(conversions.id) as conversions_count",
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
                 "avg(conversions.amount) as conversions_avg",
@@ -117,7 +120,7 @@ class AuthorController extends Controller
             ->where([
                 'article_author.author_id' => $author->id
             ])
-            ->groupBy(['articles.id']);
+            ->groupBy(['articles.id', 'articles.title', 'articles.published_at', 'articles.url']);
 
         $conversionsQuery = \DB::table('conversions')
             ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_author.article_id')
