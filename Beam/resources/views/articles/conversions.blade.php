@@ -65,8 +65,8 @@
             'colSettings' => [
                 'title' => ['orderable' => false],
                 'conversions_count' => ['header' => 'conversions'],
-                'amount' => ['header' => 'amount'],
-                'average' => ['header' => 'average'],
+                'amount' => ['header' => 'amount', 'render' => 'array'],
+                'average' => ['header' => 'average', 'render' => 'array'],
                 'authors' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
                 'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
                 'published_at' => ['header' => 'published', 'render' => 'date'],
