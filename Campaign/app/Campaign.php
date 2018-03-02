@@ -16,17 +16,20 @@ class Campaign extends Model
         'signed_in',
         'active',
         'once_per_session',
+        'additional_rules'
     ];
 
     protected $casts = [
         'active' => 'boolean',
         'signed_in' => 'boolean',
         'once_per_session' => 'boolean',
+        'additional_rules' => 'json'
     ];
 
     protected $attributes = [
         'active' => false,
         'once_per_session' => false,
+        'additional_rules' => '[]'
     ];
 
     protected static function boot()

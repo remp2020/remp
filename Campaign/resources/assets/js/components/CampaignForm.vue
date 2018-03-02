@@ -71,6 +71,14 @@
                 </div>
             </div>
 
+
+            <div class="input-group m-t-30">
+                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+                <div>
+                    <rules :additionalRules="additionalRules"></rules>   
+                </div>
+            </div>
+
             <div class="input-group fg-float m-t-30 checkbox">
                 <label class="m-l-15">
                     Display once per session
@@ -147,6 +155,7 @@
 
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect.vue";
+    import Rules from "./templates/Rules";
 
     let props = [
         "_name",
@@ -158,6 +167,7 @@
         "_active",
         "_banners",
         "_availableSegments",
+        "_additionalRules",
         "_addedSegment",
         "_removedSegments",
         "_segmentMap",
@@ -166,6 +176,7 @@
     export default {
         components: {
             vSelect,
+            Rules
         },
         created: function(){
             let self = this;
@@ -190,6 +201,12 @@
                 "removedSegments": [],
                 "segmentMap": null,
                 "eventTypes": null,
+                "additionalRules": [
+                    {
+                        "rule": null,
+                        "num": null
+                    }
+                ]
             }
         },
         computed: {
