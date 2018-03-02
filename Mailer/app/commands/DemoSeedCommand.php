@@ -54,10 +54,10 @@ class DemoSeedCommand extends Command
         // list category
         $output->write('List categories: ');
         /** @var ActiveRow $category */
-        $category = $this->listCategoriesRepository->findBy('title', 'DEMO newsletters');
+        $category = $this->listCategoriesRepository->findBy('title', 'Newsletters');
         if (!$category) {
             $category = $this->listCategoriesRepository->insert([
-                'title' => 'DEMO newsletters',
+                'title' => 'Newsletters',
                 'sorting' => 100,
                 'created_at' => new \DateTime(),
             ]);

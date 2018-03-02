@@ -14,32 +14,46 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Banner::class, function (Faker\Generator $faker) {
     return [
-        'name' => 'DEMO banner',
         'uuid' => $faker->uuid,
         'transition' => $faker->randomElement(['fade', 'bounce', 'shake', 'none']),
         'target_url' => $faker->url,
-        'text' => $faker->words(3, true),
-        'dimensions' => $faker->randomElement(['medium_rectangle', 'landscape']),
-        'text_align' => $faker->randomElement(['center', 'left', 'right']),
-        'text_color' => $faker->hexColor,
-        'font_size' => $faker->numberBetween(30, 50),
-        'background_color' => $faker->hexColor,
         'position' => $faker->randomElement(['top_left', 'top_right', 'bottom_left', 'bottom_right']),
         'display_delay' => $faker->numberBetween(1000, 5000),
+        'display_type' => 'overlay',
         'closeable' => $faker->boolean(),
-        'created_at' => $faker->date(),
-        'updated_at' => $faker->date(),
+    ];
+});
+
+$factory->define(App\MediumRectangleTemplate::class, function (Faker\Generator $faker) {
+    return [
+        'header_text' => $faker->words(1, true),
+        'main_text' => $faker->words(3, true),
+        'button_text' => $faker->words(1, true),
+        'text_color' => '#000000',
+        'background_color' => '#f7bc1e',
+        'button_text_color' => '#ffffff',
+        'button_background_color' => '#000000',
+    ];
+});
+
+$factory->define(App\BarTemplate::class, function (Faker\Generator $faker) {
+    return [
+        'main_text' => $faker->words(3, true),
+        'button_text' => $faker->words(1, true),
+        'text_color' => '#000000',
+        'background_color' => '#f7bc1e',
+        'button_text_color' => '#ffffff',
+        'button_background_color' => '#000000',
     ];
 });
 
 $factory->define(App\Campaign::class, function (Faker\Generator $faker) {
     return [
-        'name' => 'DEMO campaign',
+        'name' => 'DEMO Campaign',
         'uuid' => $faker->uuid,
         'active' => true,
-        'banner_id' => 1,
-        'created_at' => $faker->date(),
-        'updated_at' => $faker->date(),
+        'signed_in' => $faker->boolean(),
+        'once_per_session' => $faker->boolean(),
     ];
 });
 
@@ -48,7 +62,5 @@ $factory->define(App\CampaignSegment::class, function (Faker\Generator $faker) {
         'campaign_id' => 1,
         'code' => 'demo_segment',
         'provider' => 'remp_segment',
-        'created_at' => $faker->date(),
-        'updated_at' => $faker->date(),
     ];
 });

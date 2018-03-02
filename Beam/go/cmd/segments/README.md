@@ -43,12 +43,13 @@ Once you have your environment variables set or `.env` file ready, run the built
 variable|example value
 --- | ---
 SEGMENTS_ADDR|`:8082`
-SEGMENTS_INFLUX_ADDR|`http://influxdb:8086`
-SEGMENTS_INFLUX_DBNAME|`beam`
-SEGMENTS_INFLUX_USERNAME|`root`
-SEGMENTS_INFLUX_PASSWORD|`secret`
+SEGMENTS_DEBUG|`true`
 SEGMENTS_MYSQL_NET|`tcp`
-SEGMENTS_MYSQL_ADDR|`beam_mysql:3306`
-SEGMENTS_MYSQL_DBNAME|`remp_beam`
+SEGMENTS_MYSQL_ADDR|`mysql:3306`
+SEGMENTS_MYSQL_DBNAME|`beam`
 SEGMENTS_MYSQL_USER|`root`
 SEGMENTS_MYSQL_PASSWD|`secret`
+SEGMENTS_INFLUX_ADDR|`http://influxdb:8086`
+SEGMENTS_INFLUX_DBNAME|`beam`
+SEGMENTS_INFLUX_USER|`root`
+SEGMENTS_INFLUX_PASS|`secret`

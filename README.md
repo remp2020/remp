@@ -10,8 +10,7 @@ See separate documentations of each app:
 
 ## Install
 
- 
-**1. Pre-building binaries of Go apps**
+#### 1. Pre-building binaries of Go apps
 
 There's a need for pre-building binaries of Go apps before you can run Docker compose. You don't need Go environment 
 to have set up, but you need Docker to build docker-ready tarballs properly.
@@ -20,14 +19,57 @@ to have set up, but you need Docker to build docker-ready tarballs properly.
 make docker-build
 ```
 
-**2. Docker-compose**
+#### 2. Docker-compose
 
 We've prepared `docker-compose.yml` in a way it's ready for development.
 ```bash
 docker-compose up
 ```
 
+> The appliance was tested with Docker CE 17.12.0 and Docker Compose 1.16.1.
+
+#### 3. First run
+
+If some of the application doesn't have `.env` file, docker will assume it's not installed and it will automatically proceed with all required steps to install project. It will:
+* create `.env` file,
+* install all the dependencies _(composer & yarn)_,
+* prepare the DB structure and insert demo data.
+
+You can see what is installed in [Docker/php/remp.sh](Docker/php/remp.sh).
+
+#### 4. Override services & enviroment settings
+
 Feel free to override/add services via `docker-compose.override.yml`.
+
+This is an excerpt of override we use. It handles proper connection of XDebug to host machine, exposing services
+running outside of this appliance (such as our internal CRM) and caching of yarn/composer packages.
+
+We highly recommend to place the yarn/composer cache volumes to all PHP-based services, but only after the first run.
+Otherwise the installation of project would be downloading the packages simultaneously and would be overriding stored
+packages in cache. This would cause an error.
+
+```yml
+version: "3"
+
+services:
+  campaign:
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1"
+    extra_hosts:
+      - "crm.press:172.17.0.1"
+    volumes:
+      - "/home/developer/.cache/composer:/composer:rw"
+      - "/home/developer/.cache/yarn:/yarn:rw"
+
+  mysql:
+    volumes:
+      - ".:/data"
+
+```
+
+You can also override enviroment variables in `.env` file of each project. After [first run](#3-first-run) this file contains default values _(copy of `.env.example`)_.
+
+#### 5. Hosts
 
 Application exposes all services via Nginx container.
 Following is list of available hosts. We advise you to add them to your
@@ -54,21 +96,19 @@ Following is list of available hosts. We advise you to add them to your
 127.0.0.1 grafana.beam.remp.press # grafana for manipulating with InfluxDB and displaying charts
 ```
 
-Note: If you use Docker Toolbox, the IP won't be `127.0.0.1`. Use `docker-machine ls` to get IP address of the machine.
-
-Docker will install all the dependencies, prepares the DB structure and also inserts demo data.
-
-The appliance was tested with Docker CE 2017.06.  
+> Note: If you use Docker Toolbox, the IP won't be `127.0.0.1`. Use `docker-machine ls` to get IP address of the machine.
 
 ## Manual installation
 
 Please use `docker-compose.yml` and configuration/scripts within [Docker](./Docker) folder as a reference for manual
 installation of each service.
 
+Steps to install dependencies of each project are part of README file for that particular service.
+
 Be aware of `.env.example` files across projects. These need to be copied to `.env` and configured based on your
 configuration.
 
-### Docker Compose
+## Docker Compose
 
 If you're unfamiliar with `docker-compose`, try running `docker-compose --help` as a starter. Each of the subcommands 
 of Docker also supports its own `--help` switch. Feel free to explore it.
@@ -78,11 +118,12 @@ Couple of neat commands:
 * `docker-compose ps` to list all services with their status
 * `docker-compose logs` to read services logs
 * `docker-compose build` to force rebuild of images
+* `docker-compose exec campaign /bin/bash` to connect to `campaign` container
 * `docker images` to list all available docker images
 
 ## PHP Debugging
 
-Docker compose and custom images are ready for PHPStorm debugger. All you need to do is set folder mapping within
+Docker compose and custom images are pre-installed with XDebug and pre-configured for PHPStorm debugger. All you need to do is set folder mapping within
 your IDE for each debuggable host.
 
 ## Error tracking
@@ -94,6 +135,11 @@ We recommend to use self-hosted [Errbit](https://github.com/errbit/errbit) insta
 as it's compatible with Airbrake APIs and completely open-source.
 
 ## Known issues
+
+- PHP images are coming with preinstalled and always-on XDebug. We made the always-on choise for easier debugging and
+availability to debug also console scripts. However if it can't connect to the host machine, it slows down the request
+because it waits for connection timeout. Therefore is very important to have proper `XDEBUG_CONFIG` variables
+configured in your `docker-compose.override.yml`. 
 
 - Windows is pushing scripts to Docker with CRLF new lines which is causing issues described 
 [in this blog](http://willi.am/blog/2016/08/11/docker-for-windows-dealing-with-windows-line-endings).

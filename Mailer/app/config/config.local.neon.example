@@ -1,0 +1,20 @@
+services:
+    # This is a reference IUser implementation.
+    # You should make your own implementation against your CRM system and register it here.
+    - Remp\MailerModule\User\Dummy
+
+    # To be able to send an email, you need to provide at least one ISegment implementation
+    # You should make your own implementation against your CRM system and register it here.
+    segmentAgreggator:
+        setup:
+            - register(Remp\MailerModule\Segment\Dummy())
+
+# local_configs override DBs configs records.
+local_configs:
+
+    # Configuring usage of mailhog for local development
+    remp_mailermodule_mailer_smtpmailer_host: mailhog
+    remp_mailermodule_mailer_smtpmailer_port: 1025
+    remp_mailermodule_mailer_smtpmailer_username: ''
+    remp_mailermodule_mailer_smtpmailer_password: ''
+    remp_mailermodule_mailer_smtpmailer_secure: ''

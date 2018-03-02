@@ -4,7 +4,7 @@ ENV LIBRDKAFKA_VERSION v0.9.5
 
 ENV BUILD_DEPS libzip-dev zlib1g-dev g++ build-essential libsasl2-dev libssl-dev python-minimal
 
-ENV RUN_DEPS libicu-dev git
+ENV RUN_DEPS libicu-dev git wget vim curl less
 
 # INIT (single command so the intermediates are not stored)
 # librdkafka is built manually because packages contain only v0.8.5
@@ -68,4 +68,10 @@ ADD remp.sh /root/remp.sh
 
 RUN chmod +x /root/remp.sh
 
-CMD /root/remp.sh
+ENV DOCKERIZE_VERSION v0.6.0
+
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
+CMD ["dockerize", "-timeout", "1m", "-wait-retry-interval", "10s", "-wait", "tcp://mysql:3306", "-wait", "tcp://redis:6379", "/root/remp.sh"]
