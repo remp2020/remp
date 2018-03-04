@@ -51,8 +51,7 @@
                 additionalRulesOptions: [
                     {"label": "Every", "value": "every"},
                     {"label": "Since", "value": "since"},
-                    {"label": "Before", "value": "before"},
-                    {"label": "Till", "value": "till"}
+                    {"label": "Before", "value": "before"}
                 ]
             };
         },

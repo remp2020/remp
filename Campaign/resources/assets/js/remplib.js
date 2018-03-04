@@ -37,6 +37,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
+                    "pageviewCount": remplib.getFromStorage('pageview_count')
                 }
             },
             processResponse: function(result) {
@@ -86,7 +87,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (typeof config.cookieDomain === 'string') {
                 remplib.cookieDomain = config.cookieDomain;
-            }
+            } 
+
+            this.storePageviewCount();
         },
 
         run: function() {
@@ -136,6 +139,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 return campaigns.values;
             }
             return null;
+        },
+
+        storePageviewCount: function ()  {
+            if (remplib.getFromStorage('pageview_count')) {
+                remplib.setToStorage('pageview_count', remplib.getFromStorage('pageview_count')+1)
+            } else {
+                remplib.setToStorage('pageview_count', 1);
+            }
         },
 
         // used to store campaign details, called from banner view

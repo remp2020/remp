@@ -351,6 +351,23 @@ class CampaignController extends Controller
                 }
             }
 
+            // additional rules
+            foreach($campaign->additional_rules as $rule) {
+                if (!$rule['num'] || !$rule['rule']) continue;
+
+                if ($rule['rule'] == 'every' && $data->pageviewCount % $rule['num'] !== 0) {
+                    continue 2;
+                }
+
+                if ($rule['rule'] == 'since' && $data->pageviewCount < $rule['num']) {
+                    continue 2;
+                }
+
+                if ($rule['rule'] == 'before' && $data->pageviewCount >= $rule['num']) {
+                    continue 2;
+                }
+            }
+
             //render
             $displayedCampaigns[] = View::make('banners.preview', [
                 'banner' => $banner,
