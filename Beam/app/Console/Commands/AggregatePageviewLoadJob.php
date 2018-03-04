@@ -45,6 +45,11 @@ class AggregatePageviewLoadJob extends Command
                 'external_id' => $record->tags->article_id,
             ])->first();
 
+            if (!$article) {
+                // article not inserted to beam
+                continue;
+            }
+
             /** @var ArticlePageviews $ap */
             $ap = ArticlePageviews::firstOrNew([
                 'article_id' => $article->id,
