@@ -352,8 +352,10 @@ class CampaignController extends Controller
             }
 
             // additional rules
-            foreach($campaign->additional_rules as $rule) {
-                if (!$rule['num'] || !$rule['rule']) continue;
+            foreach ($campaign->additional_rules as $rule) {
+                if (!$rule['num'] || !$rule['rule']) {
+                    continue;
+                }
 
                 if ($rule['rule'] == 'every' && $data->pageviewCount % $rule['num'] !== 0) {
                     continue 2;
