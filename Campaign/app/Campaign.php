@@ -11,25 +11,29 @@ class Campaign extends Model
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
     const CAMPAIGN_TAG = 'campaign';
 
+    const PAGEVIEW_RULE_EVERY = 'every';
+    const PAGEVIEW_RULE_SINCE = 'since';
+    const PAGEVIEW_RULE_BEFORE = 'before';
+
     protected $fillable = [
         'name',
         'signed_in',
         'active',
         'once_per_session',
-        'additional_rules'
+        'pageview_rules'
     ];
 
     protected $casts = [
         'active' => 'boolean',
         'signed_in' => 'boolean',
         'once_per_session' => 'boolean',
-        'additional_rules' => 'json'
+        'pageview_rules' => 'json'
     ];
 
     protected $attributes = [
         'active' => false,
         'once_per_session' => false,
-        'additional_rules' => '[]'
+        'pageview_rules' => '[]'
     ];
 
     protected static function boot()

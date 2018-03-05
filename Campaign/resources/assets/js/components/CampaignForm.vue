@@ -75,7 +75,7 @@
             <div class="input-group m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                 <div>
-                    <rules :additionalRules="additionalRules"></rules>   
+                    <rules :pageviewRules="pageviewRules"></rules>   
                 </div>
             </div>
 
@@ -167,7 +167,7 @@
         "_active",
         "_banners",
         "_availableSegments",
-        "_additionalRules",
+        "_pageviewRules",
         "_addedSegment",
         "_removedSegments",
         "_segmentMap",
@@ -201,7 +201,7 @@
                 "removedSegments": [],
                 "segmentMap": null,
                 "eventTypes": null,
-                "additionalRules": [
+                "pageviewRules": [
                     {
                         "rule": null,
                         "num": null

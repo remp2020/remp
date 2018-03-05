@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CampaignsAdditionalRules extends Migration
+class CampaignsPageviewRules extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class CampaignsAdditionalRules extends Migration
     public function up()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->string("additional_rules")->nullable(true);
+            $table->string("pageview_rules")->nullable(true);
         });
     }
 
@@ -26,7 +26,7 @@ class CampaignsAdditionalRules extends Migration
     public function down()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->dropColumn("additional_rules");
+            $table->dropColumn("pageview_rules");
         });
     }
 }
