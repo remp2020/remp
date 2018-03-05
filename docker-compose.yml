@@ -24,7 +24,7 @@ services:
           - "mailhog.remp.press"
 
   mysql:
-    image: "mysql:8.0"
+    image: "mysql:5.7"
     volumes:
       - "mysql-data:/var/lib/mysql"
       - "./Docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql"

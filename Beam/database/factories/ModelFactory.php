@@ -69,7 +69,7 @@ $factory->define(\App\Article::class, function (Faker\Generator $faker) {
         'title' => $faker->words(5, true),
         'url' => $faker->url,
         'image_url' => $faker->imageUrl(),
-        'published_at' => $faker->dateTime()->format(DATE_RFC3339),
+        'published_at' => $faker->dateTimeBetween('-30 days', 'now')->format(DATE_RFC3339),
     ];
 });
 
@@ -77,7 +77,7 @@ $factory->define(\App\Conversion::class, function (Faker\Generator $faker) {
     return [
         'amount' => $faker->numberBetween(5,50),
         'currency' => $faker->randomElement(['EUR','USD']),
-        'paid_at' => $faker->dateTime()->format(DATE_RFC3339),
+        'paid_at' => $faker->dateTimeBetween('-30 days', 'now')->format(DATE_RFC3339),
         'transaction_id' => $faker->uuid,
     ];
 });

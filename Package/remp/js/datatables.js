@@ -178,11 +178,18 @@ $.fn.dataTables = {
             };
         },
         array: function (config) {
-            var column = config["column"];
+            let column = null;
+            if (typeof config !== 'undefined' && config.hasOwnProperty('column')) {
+                column = config["column"];
+            }
             return function(data) {
                 var result = '';
                 for (var i=0; i<data.length; i++) {
-                    result += data[i][column] + '<br/>';
+                    if (column === null) {
+                        result += data[i] + '<br/>';
+                    } else {
+                        result += data[i][column] + '<br/>';
+                    }
                 }
                 return result;
             }

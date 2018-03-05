@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use HTML;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
@@ -101,25 +102,25 @@ class ArticleController extends Controller
             ->orderColumn('conversions', 'conversions_count $1')
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {
-                    return 0;
+                    return [0];
                 }
-                $amount = null;
+                $amounts = [];
                 foreach ($conversionSums[$article->id] as $currency => $c) {
                     $c = round($c, 2);
-                    $amount .= "{$c} {$currency}";
+                    $amounts[] = "{$c} {$currency}";
                 }
-                return $amount ?? 0;
+                return $amounts ?? [0];
             })
             ->addColumn('average', function (Article $article) use ($conversionAverages) {
                 if (!isset($conversionAverages[$article->id])) {
-                    return 0;
+                    return [0];
                 }
-                $amount = null;
+                $average = [];
                 foreach ($conversionAverages[$article->id] as $currency => $c) {
                     $c = round($c, 2);
-                    $amount .= "{$c} {$currency}";
+                    $average[] = "{$c} {$currency}";
                 }
-                return $amount ?? 0;
+                return $average ?? [0];
             })
             ->addColumn('authors', function (Article $article) {
                 $authors = $article->authors->map(function (Author $author) {
