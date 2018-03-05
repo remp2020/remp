@@ -130,7 +130,7 @@ class ArticleController extends Controller
             })
             ->orderColumn('amount', 'conversions_sum $1')
             ->orderColumn('average', 'conversions_avg $1')
-            ->filterColumn('authors[, ].name', function (Builder $query, $value) {
+            ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_author.author_id', $values);
             })
@@ -158,6 +158,7 @@ class ArticleController extends Controller
     public function dtPageviews(Request $request, Datatables $datatables)
     {
         $articles = Article::selectRaw("articles.*")
+            ->with(['authors', 'sections'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
@@ -178,7 +179,22 @@ class ArticleController extends Controller
                 }
                 return round($article->timespent_sum / $article->pageview_sum);
             })
+            ->addColumn('authors', function (Article $article) {
+                $authors = $article->authors->map(function (Author $author) {
+                    return ['link' => HTML::linkRoute('authors.show', $author->name, [$author])];
+                });
+                return $authors->implode('link', '<br/>');
+            })
+            ->filterColumn('authors', function (Builder $query, $value) {
+                $values = explode(",", $value);
+                $query->whereIn('article_author.author_id', $values);
+            })
+            ->filterColumn('sections[, ].name', function (Builder $query, $value) {
+                $values = explode(",", $value);
+                $query->whereIn('article_section.section_id', $values);
+            })
             ->orderColumn('avg_sum', 'timespent_sum / pageview_sum $1')
+            ->rawColumns(['authors'])
             ->make(true);
     }
 

@@ -46,7 +46,7 @@
                 'pageview_sum' => ['header' => 'pageviews'],
                 'timespent_sum' => ['header' => 'total time read', 'render' => 'duration'],
                 'avg_sum' => ['header' => 'avg time read', 'render' => 'duration'],
-                'authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
+                'authors' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
                 'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
                 'published_at' => ['header' => 'published', 'render' => 'date'],
             ],

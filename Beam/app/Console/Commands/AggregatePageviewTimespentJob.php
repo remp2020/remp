@@ -26,7 +26,7 @@ class AggregatePageviewTimespentJob extends Command
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id');
 
-        $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
+        $this->line(sprintf("Fetching aggregated timespent data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
         $records = $journalContract->sum($request);
 
@@ -39,23 +39,28 @@ class AggregatePageviewTimespentJob extends Command
             if (empty($record->tags->article_id)) {
                 continue;
             }
-            $this->line(sprintf("Processing article pageviews: <info>%s</info>", $record->tags->article_id));
+            $this->line(sprintf("Processing article timespent: <info>%s</info>", $record->tags->article_id));
 
             $article = Article::select()->where([
                 'external_id' => $record->tags->article_id,
             ])->first();
 
-            /** @var ArticleTimespent $ap */
-            $ap = ArticleTimespent::firstOrNew([
+            if (!$article) {
+                // article not inserted to beam
+                continue;
+            }
+
+            /** @var ArticleTimespent $at */
+            $at = ArticleTimespent::firstOrNew([
                 'article_id' => $article->id,
                 'time_from' => $timeAfter,
                 'time_to' => $timeBefore,
             ]);
-            $ap->sum = $record->sum;
-            $ap->save();
+            $at->sum = $record->sum;
+            $at->save();
 
-            $ap->article->timespent_sum = $ap->article->timespent()->sum('sum');
-            $ap->article->save();
+            $at->article->timespent_sum = $at->article->timespent()->sum('sum');
+            $at->article->save();
         }
     }
 }
