@@ -15,6 +15,7 @@ use Cache;
 use GeoIp2;
 use HTML;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
@@ -80,7 +81,7 @@ class CampaignController extends Controller
         $segments = $segmentAggregator->list();
         foreach ($segmentAggregator->getErrors() as $error) {
             flash($error)->error();
-            \Log::error($error);
+            Log::error($error);
         }
 
         return view('campaigns.create', [
@@ -155,7 +156,7 @@ class CampaignController extends Controller
         } catch (SegmentException $e) {
             $segments = new Collection();
             flash('Unable to fetch list of segments, please check the application configuration.')->error();
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
         }
 
         return view('campaigns.edit', [
@@ -296,11 +297,8 @@ class CampaignController extends Controller
             // banner
             $bannerVariantA = $campaign->banner ?? false;
             if (!$bannerVariantA) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => false,
-                        'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
-                    ]);
+                Log::error("Active campaign [{$campaign->uuid}] has no banner set");
+                continue;
             }
 
             $banner = null;
@@ -365,18 +363,12 @@ class CampaignController extends Controller
                     $record = $reader->country($r->ip());
                     $countryCode = $record->country->isoCode;
                 } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
-                    return response()
-                        ->jsonp($r->get('callback'), [
-                            'success' => false,
-                            'errors' => ["Unable to load country for campaign with country rules: " . $e->getMessage()],
-                        ]);
+                    Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
+                    continue;
                 }
                 if (is_null($countryCode)) {
-                    return response()
-                        ->jsonp($r->get('callback'), [
-                            'success' => false,
-                            'errors' => ["Unable to load country for campaign with country rules"],
-                        ]);
+                    Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules");
+                    continue;
                 }
 
                 // check against white / black listed countries
