@@ -361,7 +361,7 @@ class CampaignController extends Controller
             if (!empty($campaign->countries)) {
                 // load country ISO code based on IP
                 try {
-                    $reader = new GeoIp2\Database\Reader('./assets/vendor/maxmind/GeoLite2-Country.mmdb');
+                    $reader = new GeoIp2\Database\Reader(base_path() . '/resources/assets/maxmind/GeoLite2-Country.mmdb');
                     $record = $reader->country($_SERVER['REMOTE_ADDR']);
                     $countryCode = $record->country->isoCode;
                 } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
