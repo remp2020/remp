@@ -8,12 +8,12 @@ use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
 use App\Country;
+use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use Cache;
 use GeoIp2;
 use HTML;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use View;
 use Yajra\Datatables\Datatables;
@@ -209,7 +209,7 @@ class CampaignController extends Controller
     {
         $blacklist = $request->get('countries_blacklist');
         $countries = [];
-        foreach ($request->get('countries') as $cid) {
+        foreach ($request->get('countries', []) as $cid) {
             $countries[$cid] = ['blacklisted' => (bool) $blacklist];
         }
         return $countries;
@@ -362,7 +362,7 @@ class CampaignController extends Controller
                 // load country ISO code based on IP
                 try {
                     $reader = new GeoIp2\Database\Reader(base_path() . '/resources/assets/maxmind/GeoLite2-Country.mmdb');
-                    $record = $reader->country($_SERVER['REMOTE_ADDR']);
+                    $record = $reader->country($r->ip());
                     $countryCode = $record->country->isoCode;
                 } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
                     return response()
