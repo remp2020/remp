@@ -75,7 +75,7 @@
             <div class="input-group m-t-30">
                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                 <div>
-                    <rules :pageviewRules="pageviewRules"></rules>   
+                    <pageview-rules :pageviewRules="pageviewRules"></pageview-rules>   
                 </div>
             </div>
 
@@ -155,7 +155,7 @@
 
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect.vue";
-    import Rules from "./templates/Rules";
+    import PageviewRules from "./templates/PageviewRules";
 
     let props = [
         "_name",
@@ -176,7 +176,7 @@
     export default {
         components: {
             vSelect,
-            Rules
+            PageviewRules
         },
         created: function(){
             let self = this;
@@ -201,12 +201,7 @@
                 "removedSegments": [],
                 "segmentMap": null,
                 "eventTypes": null,
-                "pageviewRules": [
-                    {
-                        "rule": null,
-                        "num": null
-                    }
-                ]
+                "pageviewRules": []
             }
         },
         computed: {

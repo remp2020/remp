@@ -54,6 +54,9 @@
                 ]
             };
         },
+        created: function () {
+            if (!this.$parent.pageviewRules.length) this.addRule();
+        },
         methods: {
             addRule() {
                 this.$parent.pageviewRules.push({
