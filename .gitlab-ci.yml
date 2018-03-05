@@ -23,38 +23,9 @@ test:sniffer:
   script:
     - make sniff
 
-build:beam:tracker:
-  stage: build
-  script:
-    - cd Beam/go/cmd/tracker
-    - make docker-build
-    - mv tracker.tar ../../../../
-  artifacts:
-    paths:
-      - tracker.tar
-    expire_in: 1 month
-  when: manual
-  tags:
-    - remp2020
-    - deploy
-
-build:beam:segments:
-  stage: build
-  script:
-    - cd Beam/go/cmd/segments
-    - make docker-build
-    - mv segments.tar ../../../../
-  artifacts:
-    paths:
-      - segments.tar
-    expire_in: 1 month
-  when: manual
-  tags:
-    - remp2020
-    - deploy
-
 deploy:mailer:admin:
   cache:
+    key: "$CI_JOB_NAME"
     paths:
       - node_modules/
   stage: deploy
@@ -78,6 +49,7 @@ deploy:mailer:admin:
 
 deploy:campaign:admin:
   cache:
+    key: "$CI_JOB_NAME"
     paths:
       - node_modules/
   stage: deploy
@@ -103,6 +75,7 @@ deploy:campaign:admin:
 
 deploy:beam:admin:
   cache:
+    key: "$CI_JOB_NAME"
     paths:
       - node_modules/
   stage: deploy
@@ -126,6 +99,7 @@ deploy:beam:admin:
 
 deploy:sso:admin:
   cache:
+    key: "$CI_JOB_NAME"
     paths:
       - node_modules/
   stage: deploy
