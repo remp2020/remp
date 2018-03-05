@@ -229,7 +229,8 @@ class CampaignController extends Controller
         DimensionMap $dm,
         PositionMap $pm,
         AlignmentMap $am,
-        SegmentAggregator $sa
+        SegmentAggregator $sa,
+        GeoIp2\Database\Reader $geoIPreader
     ) {
         // validation
 
@@ -359,8 +360,7 @@ class CampaignController extends Controller
             if (!empty($campaign->countries)) {
                 // load country ISO code based on IP
                 try {
-                    $reader = new GeoIp2\Database\Reader(base_path() . '/resources/assets/maxmind/GeoLite2-Country.mmdb');
-                    $record = $reader->country($r->ip());
+                    $record = $geoIPreader->country($r->ip());
                     $countryCode = $record->country->isoCode;
                 } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
                     Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
