@@ -58,9 +58,7 @@ deploy:campaign:admin:
     - cd Campaign/
     - ln -s ~/.env.campaign .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - mkdir -p ../node_modules && mv ../node_modules . && yarn install && yarn run production && mv node_modules ../
-    - whoami
-    - pwd
+    - mkdir -p ../node_modules && mv ../node_modules . && yarn install && yarn run all-production && mv node_modules ../
     - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/campaign
@@ -84,7 +82,7 @@ deploy:beam:admin:
     - cd Beam/
     - ln -s ~/.env.beam .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - mkdir -p ../node_modules && mv ../node_modules . && yarn install && yarn run production && mv node_modules ../
+    - mkdir -p ../node_modules && mv ../node_modules . && yarn install && yarn run all-production && mv node_modules ../
     - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/beam
