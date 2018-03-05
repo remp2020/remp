@@ -76,12 +76,10 @@ class CampaignController extends Controller
         $selectedSegments = collect(old('segments'));
 
         $banners = Banner::all();
-        try {
-            $segments = $segmentAggregator->list();
-        } catch (SegmentException $e) {
-            $segments = new Collection();
-            flash('Unable to fetch list of segments, please check the application configuration.')->error();
-            \Log::error($e->getMessage());
+        $segments = $segmentAggregator->list();
+        foreach ($segmentAggregator->getErrors() as $error) {
+            flash($error)->error();
+            \Log::error($error);
         }
 
         return view('campaigns.create', [
