@@ -373,19 +373,10 @@ class CampaignController extends Controller
 
                 // check against white / black listed countries
 
-                // simplify objects with countries
-                $countriesBlacklist = array_map(function ($country) {
-                    return $country['iso_code'];
-                }, $campaign->countriesBlacklist->toArray());
-                $countriesWhitelist = array_map(function ($country) {
-                    return $country['iso_code'];
-                }, $campaign->countriesWhitelist->toArray());
-
-                // country blacklisted or not whitelisted? continue to next campaign
-                if (!empty($countriesBlacklist) && in_array($countryCode, $countriesBlacklist)) {
+                if (!$campaign->countriesBlacklist->isEmpty() && $campaign->countriesBlacklist->contains('iso_code', $countryCode)) {
                     continue;
                 }
-                if (!empty($countriesWhitelist) && !in_array($countryCode, $countriesWhitelist)) {
+                if (!$campaign->countriesWhitelist->isEmpty() && !$campaign->countriesWhitelist->contains('iso_code', $countryCode)) {
                     continue;
                 }
             }
