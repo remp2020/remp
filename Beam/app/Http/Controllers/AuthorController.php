@@ -109,6 +109,8 @@ class AuthorController extends Controller
                 "articles.title",
                 "articles.published_at",
                 "articles.url",
+                "articles.pageview_sum",
+                "articles.timespent_sum",
                 "count(conversions.id) as conversions_count",
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
                 "avg(conversions.amount) as conversions_avg",
