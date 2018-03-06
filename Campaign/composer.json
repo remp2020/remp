@@ -49,7 +49,8 @@
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "recca0120/laravel-tracy": "^1.8",
-        "php-amqplib/php-amqplib": "^2.7"
+        "php-amqplib/php-amqplib": "^2.7",
+        "fico7489/laravel-pivot": "^2.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

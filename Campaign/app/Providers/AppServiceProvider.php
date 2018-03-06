@@ -44,8 +44,8 @@ class AppServiceProvider extends ServiceProvider
     public function bindObservers()
     {
         \App\Banner::observe(\App\Observers\Banner::class);
-        \App\Campaign::observe(\App\Observers\Campaign::class);
-        \App\CampaignSegment::observe(\App\Observers\CampaignSegment::class);
+//        \App\Campaign::observe(\App\Observers\Campaign::class);
+//        \App\CampaignSegment::observe(\App\Observers\CampaignSegment::class);
         \App\Schedule::observe(\App\Observers\Schedule::class);
     }
 

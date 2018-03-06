@@ -118,6 +118,7 @@ class CampaignController extends Controller
             $campaignSegment->save();
         }
 
+        $campaign->cache();
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
             'json' => new CampaignResource($campaign),
@@ -194,6 +195,7 @@ class CampaignController extends Controller
 
         CampaignSegment::destroy($request->get('removedSegments'));
 
+        $campaign->cache();
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
             'json' => new CampaignResource($campaign),
@@ -357,7 +359,7 @@ class CampaignController extends Controller
 
             // country rules
 
-            if (!empty($campaign->countries)) {
+            if (!$campaign->countries->isEmpty()) {
                 // load country ISO code based on IP
                 try {
                     $record = $geoIPreader->country($r->ip());
