@@ -21,4 +21,8 @@ class Country extends Model
         'iso_code' => 'string',
         'name' => 'string',
     ];
+
+    protected $touches = [
+        'campaigns'
+    ];
 }
