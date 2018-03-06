@@ -35,7 +35,7 @@ class CampaignRequest extends FormRequest
             'pageview_rules.0.rule' => 'required_with:pageview_rules.0.num',
         ];
 
-        foreach($this->request->get('pageview_rules') as $key => $val) {
+        foreach ($this->request->get('pageview_rules') as $key => $val) {
             $validationArray['pageview_rules.' . $key . '.num'] = 'required_with:pageview_rules.' . $key . '.rule';
             $validationArray['pageview_rules.' . $key . '.rule'] = 'required_with:pageview_rules.' . $key . '.num';
         }
