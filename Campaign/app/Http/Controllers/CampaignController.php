@@ -195,7 +195,6 @@ class CampaignController extends Controller
 
         CampaignSegment::destroy($request->get('removedSegments'));
 
-        $campaign->cache();
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
             'json' => new CampaignResource($campaign),
