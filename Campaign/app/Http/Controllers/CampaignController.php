@@ -358,16 +358,22 @@ class CampaignController extends Controller
                         continue;
                     }
 
-                    if ($rule['rule'] == Campaign::PAGEVIEW_RULE_EVERY && $data->pageviewCount % $rule['num'] !== 0) {
-                        continue 2;
-                    }
-
-                    if ($rule['rule'] == Campaign::PAGEVIEW_RULE_SINCE && $data->pageviewCount < $rule['num']) {
-                        continue 2;
-                    }
-
-                    if ($rule['rule'] == Campaign::PAGEVIEW_RULE_BEFORE && $data->pageviewCount >= $rule['num']) {
-                        continue 2;
+                    switch ($rule['rule']) {
+                        case Campaign::PAGEVIEW_RULE_EVERY:
+                            if ($data->pageviewCount % $rule['num'] !== 0) {
+                                continue 3;
+                            }
+                            break;
+                        case Campaign::PAGEVIEW_RULE_SINCE:
+                            if ($data->pageviewCount < $rule['num']) {
+                                continue 3;
+                            }
+                            break;
+                        case Campaign::PAGEVIEW_RULE_BEFORE:
+                            if ($data->pageviewCount >= $rule['num']) {
+                                continue 3;
+                            }
+                            break;
                     }
                 }
             }

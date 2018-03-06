@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <h4>Settings</h4>
 
             <div class="input-group fg-float m-t-30">
@@ -72,12 +72,9 @@
             </div>
 
 
-            <div class="input-group m-t-30">
-                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
-                <div>
-                    <pageview-rules :pageviewRules="pageviewRules"></pageview-rules>   
-                </div>
-            </div>
+
+            <pageview-rules :pageviewRules="pageviewRules"></pageview-rules>
+
 
             <div class="input-group fg-float m-t-30 checkbox">
                 <label class="m-l-15">
