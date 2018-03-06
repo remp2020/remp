@@ -78,6 +78,12 @@ class MailgunEventsCommand extends Command
                     $latestEventTime = $date;
                 }
 
+                if (!isset($userVariables['mail_sender_id'])) {
+                    // cannot map to logsRepository instance
+                    $output->writeln(sprintf("%s: ignoring event: %s (unsupported)", $date, $event->getEvent()));
+                    continue;
+                }
+
                 $mappedEvent = $this->logsRepository->mapEvent($event->getEvent());
                 if (!$mappedEvent) {
                     // unsupported event type
