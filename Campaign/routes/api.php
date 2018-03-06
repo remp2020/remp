@@ -24,8 +24,14 @@ Route::middleware('auth:api')->group(function() {
         Route::post('{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
     });
 
-    Route::apiResource('campaigns', 'CampaignController');
+    Route::apiResource('campaigns', 'CampaignController', [
+        'names'=> [
+            'update' => 'campaigns.api.update'
+        ]
+    ]);
     Route::apiResource('banners', 'BannerController');
     Route::apiResource('schedule', 'ScheduleController');
+
+    Route::patch('api/campaigns/toggle-active/{campaign}', 'CampaignController@toggleActive')->name('campaigns.api.toggle_active');
 });
 

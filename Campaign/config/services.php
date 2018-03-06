@@ -52,6 +52,7 @@ return [
         ],
         'sso' => [
             'web_addr' => env('REMP_SSO_ADDR'),
+            'api_token' => env('REMP_SSO_API_TOKEN')
         ],
         'linked' => [
             'beam' => [

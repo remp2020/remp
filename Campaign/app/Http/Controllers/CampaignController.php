@@ -58,6 +58,12 @@ class CampaignController extends Controller
                 }
                 return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
             })
+            ->addColumn('active', function (Campaign $campaign) {
+                return view('campaigns.partials.active', [
+                    'id' => $campaign->id,
+                    'active' => $campaign->active
+                ])->render();
+            })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
             ->make(true);
@@ -190,6 +196,16 @@ class CampaignController extends Controller
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
             'json' => new CampaignResource($campaign),
+        ]);
+    }
+
+    public function toggleActive(Campaign $campaign)
+    {
+        $campaign->active = !$campaign->active;
+        $campaign->save();
+
+        return response()->json([
+            'active' => $campaign->active
         ]);
     }
 
