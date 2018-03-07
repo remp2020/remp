@@ -26,12 +26,12 @@ Route::middleware('auth:api')->group(function() {
 
     Route::apiResource('campaigns', 'CampaignController', [
         'names'=> [
-            'update' => 'campaigns.api.update'
+            'update' => 'api.campaigns.update'
         ]
     ]);
     Route::apiResource('banners', 'BannerController');
     Route::apiResource('schedule', 'ScheduleController');
 
-    Route::patch('api/campaigns/toggle-active/{campaign}', 'CampaignController@toggleActive')->name('campaigns.api.toggle_active');
+    Route::patch('campaigns/toggle-active/{campaign}', 'CampaignController@toggleActive')->name('api.campaigns.toggle_active');
 });
 

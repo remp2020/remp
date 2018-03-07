@@ -1,14 +1,12 @@
 <template>
-    <div class="toggle-switch">
+    <div class="toggle-switch" :class="{ disabled: disabled }">
         <input  :id="id"
                 :name="name"
                 value="1"
-                :disabled="disabled"
-                v-model="checked"
-                @change="onChange"
+                :checked="checked"
                 type="checkbox"
                 hidden="hidden">
-        <label :for="id" class="ts-helper"></label>
+        <label :for="id" class="ts-helper" @click.prevent="onChange"></label>
     </div>
 </template>
 
@@ -21,7 +19,7 @@
             }
         },
         name: String,
-        disabled: {
+        isDisabled: {
             type: Boolean,
             default: false
         },
@@ -32,11 +30,8 @@
 
         authToken: String,
         method: String,
-        activateUrl: String,
-        deactivateUrl: String,
-        data: Object,
-        activateData: Object,
-        deactivateData: Object,
+        toggleUrl: String,
+        toggleData: Object,
         callback: Function
     };
 
@@ -45,55 +40,48 @@
         props: props,
         data() {
             return {
-                checked: this.isChecked
+                checked: this.isChecked,
+                disabled: this.isDisabled
             }
         },
         methods: {
-            request(url, data, callback) {
+            request(url, data) {
+                var self = this;
+
                 $.ajax({
                     type: this.method,
                     url: url,
                     data: data,
                     headers: {
-                        'Authorization': 'Bearer ' + this.authToken
+                        'Authorization': 'Bearer ' + self.authToken
                     },
                     complete: function (response, status) {
-                        if (this.callback) this.callback(response, status)
+                        self.disabled = false;
+
+                        if (response.status == 200) {
+                            if (response.responseJSON.active == true) {
+                                self.checked = true;
+                            } else {
+                                self.checked = false;
+                            }
+                        }
+
+                        if (self.callback) self.callback(response, status)
                     }
                 })
 
             },
-            activate() {
-                var data = {};
-
-                if (this.activateData) {
-                    data = Object.assign(this.data, this.activateData);
-                } else if (this.data) {
-                    data = this.data;
+            toggle() {
+                if (this.toggleData) {
+                    this.request(this.toggleUrl, this.toggleData);
                 } else {
-                    data = {};
+                    this.request(this.toggleUrl, {});
                 }
-
-                this.request(this.activateUrl, data);
-            },
-            deactivate() {
-                var data = {};
-
-                if (this.activateData) {
-                    data = Object.assign(this.data, this.deactivateData);
-                } else if (this.data) {
-                    data = this.data;
-                } else {
-                    data = {};
-                }
-
-                this.request(this.deactivateUrl, data)
             },
             onChange() {
-                if (this.checked) {
-                    this.deactivate();
-                } else {
-                    this.activate();
+                if (!this.disabled) {
+                    this.disabled = true;
+                    this.toggle();
                 }
             }
         }

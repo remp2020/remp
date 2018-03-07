@@ -59,7 +59,7 @@ class CampaignController extends Controller
                 return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
             })
             ->addColumn('active', function (Campaign $campaign) {
-                return view('campaigns.partials.active', [
+                return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
                     'active' => $campaign->active
                 ])->render();
