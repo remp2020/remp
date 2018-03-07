@@ -118,7 +118,6 @@ class CampaignController extends Controller
             $campaignSegment->save();
         }
 
-        $campaign->cache();
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
             'json' => new CampaignResource($campaign),
