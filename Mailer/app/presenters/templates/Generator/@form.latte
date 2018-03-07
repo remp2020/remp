@@ -1,7 +1,7 @@
 {form mailSourceTemplateForm}
     {input id}
     <div class="row">
-        <div class="col-lg-4">
+        <div class="col-lg-6">
             <div class="form-group fg-float m-b-30">
                 <div class="fg-line">
                     {input title, class => 'form-control fg-input'}
@@ -16,31 +16,28 @@
                 </div>
             </div>
 
-            <div class="clearfix m-b-30"></div>
-
-            <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                    {input content_text, class => 'form-control fg-input auto-size'}
-                    {label content_text, class => 'fg-label' /}
-                </div>
-            </div>
-
             <div class="form-group m-b-30">
                 {label content_html /}
                 {input content_html, class => 'form-control html-editor'}
             </div>
 
-            <div class="row">
-                <div class="col-lg-6">
-                    {input submit, class => 'btn btn-info waves-effect'}
-                </div>
+            <div class="form-group fg-float m-b-30">
+                {label content_text /}
+                {input content_text, class => 'form-control html-editor'}
+            </div>
+
+            <div class="form-group m-b-30">
+                {input submit, class => 'btn btn-info waves-effect'}
             </div>
         </div>
 
-        <div class="col-lg-6 col-lg-offset-1">
-            <div id="mail-preview">
-                <mail-preview></mail-preview>
-            </div>
+        <div class="col-lg-6">
+            <p>Both Text and HTML contents support Twig syntax. Available variables to use are:</p>
+            <ul>
+                <li><code>autologin: String</code>: Autologin token that can be appended as GET parameter in URL.</li>
+                <li n:if="getenv('UNSUBSCRIBE_URL')"><code>unsubscribe: String</code>: Full link to unsubscribe page (including autologin token).</li>
+                <li n:if="getenv('SETTINGS_URL')"><code>settings: String</code>: Full link to email settings page (including autologin token).</li>
+            </ul>
         </div>
     </div>
 

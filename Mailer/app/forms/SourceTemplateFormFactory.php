@@ -38,9 +38,8 @@ class SourceTemplateFormFactory
 
         $form->addHidden('id', $id);
 
-        $form->addText('title', 'title')
-            ->setRequired()
-            ->setAttribute('placeholder', 'Source template title');
+        $form->addText('title', 'Title')
+            ->setRequired();
 
         $items = $this->mailGeneratorFactory->pairs();
         $form->addSelect('generator', 'Generator', $items)
