@@ -4,7 +4,7 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Generators\GeneratorFactory;
-use Remp\MailerModule\Repository\SourceTemplateRepository;
+use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
 class SourceTemplateFormFactory
 {
@@ -17,7 +17,7 @@ class SourceTemplateFormFactory
     public $onSave;
 
     public function __construct(
-        SourceTemplateRepository $mailSourceTemplateRepository,
+        SourceTemplatesRepository $mailSourceTemplateRepository,
         GeneratorFactory $mailGeneratorFactory
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;

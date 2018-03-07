@@ -2,7 +2,7 @@
 
 namespace Remp\MailerModule\Generators;
 
-use Remp\MailerModule\Repository\SourceTemplateRepository;
+use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
 class GeneratorFactory
 {
@@ -13,7 +13,7 @@ class GeneratorFactory
 
     private $pairs = [];
 
-    public function __construct(SourceTemplateRepository $sourceTemplateRepository)
+    public function __construct(SourceTemplatesRepository $sourceTemplateRepository)
     {
         $this->sourceTemplateRepository = $sourceTemplateRepository;
     }

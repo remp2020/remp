@@ -177,7 +177,7 @@ services:
     - Remp\MailerModule\Repository\BatchesRepository
     - Remp\MailerModule\Repository\BatchTemplatesRepository
     - Remp\MailerModule\Repository\AutoLoginTokensRepository
-    - Remp\MailerModule\Repository\SourceTemplateRepository
+    - Remp\MailerModule\Repository\SourceTemplatesRepository
 
     # Factories
     - Remp\MailerModule\Components\IDataTableFactory

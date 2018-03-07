@@ -3,23 +3,24 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\SourceTemplateFormFactory;
-use Remp\MailerModule\Repository\SourceTemplateRepository;
+use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
 final class GeneratorPresenter extends BasePresenter
 {
-    private $mailSourceTemplateRepository;
+    private $sourceTemplatesRepository;
 
     private $sourceTemplateFormFactory;
 
     public function __construct(
-        SourceTemplateRepository $mailSourceTemplateRepository,
+        SourceTemplatesRepository $sourceTemplatesRepository,
         SourceTemplateFormFactory $sourceTemplateFormFactory
     ) {
         parent::__construct();
-        $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
+        $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->sourceTemplateFormFactory = $sourceTemplateFormFactory;
     }
 
@@ -39,17 +40,24 @@ final class GeneratorPresenter extends BasePresenter
 
     public function renderDefaultJsonData()
     {
-        $mailSourceTemplates = $this->mailSourceTemplateRepository->all();
-        $templatesCount = $mailSourceTemplates->count('*');
+        $request = $this->request->getParameters();
+
+        $sourceTemplatesCount = $this->sourceTemplatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+            ->count('*');
+
+        $sourceTemplates = $this->sourceTemplatesRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->fetchAll();
 
         $result = [
-            'recordsTotal' => $templatesCount,
-            'recordsFiltered' => $templatesCount,
+            'recordsTotal' => $this->sourceTemplatesRepository->totalCount(),
+            'recordsFiltered' => $sourceTemplatesCount,
             'data' => []
         ];
 
         /** @var ActiveRow $list */
-        foreach ($mailSourceTemplates as $sourceTemplate) {
+        foreach ($sourceTemplates as $sourceTemplate) {
             $editUrl = $this->link('Edit', $sourceTemplate->id);
             $generateUrl = $this->link('Generate', $sourceTemplate->id);
             $result['data'][] = [
@@ -67,7 +75,7 @@ final class GeneratorPresenter extends BasePresenter
 
     public function renderEdit($id)
     {
-        $generator = $this->mailSourceTemplateRepository->find($id);
+        $generator = $this->sourceTemplatesRepository->find($id);
         if (!$generator) {
             throw new BadRequestException();
         }

@@ -2,12 +2,15 @@
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Database\Table\Selection;
 use Remp\MailerModule\Repository;
 use Nette\Utils\DateTime;
 
-class SourceTemplateRepository extends Repository
+class SourceTemplatesRepository extends Repository
 {
     protected $tableName = 'mail_source_template';
+
+    protected $dataTableSearchable = ['title'];
 
     public function all()
     {
@@ -50,5 +53,35 @@ class SourceTemplateRepository extends Repository
             'text' => $twig->render('textTemplate', $data),
             'html' => $twig->render('htmlTemplate', $data),
         ];
+    }
+
+    /**
+     * @param $query
+     * @param $order
+     * @param $orderDirection
+     * @param null $limit
+     * @param null $offset
+     *
+     * @return Selection
+     */
+    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null)
+    {
+        $selection = $this->getTable()
+            ->order($order . ' ' . strtoupper($orderDirection));
+
+        if (!empty($query)) {
+            $where = [];
+            foreach ($this->dataTableSearchable as $col) {
+                $where[$col . ' LIKE ?'] = '%' . $query . '%';
+            }
+
+            $selection->whereOr($where);
+        }
+
+        if ($limit !== null) {
+            $selection->limit($limit, $offset);
+        }
+
+        return $selection;
     }
 }
