@@ -12,6 +12,8 @@ class SegmentAggregator implements SegmentContract
     /** @var SegmentContract[] */
     private $contracts;
 
+    private $errors = [];
+
     public function __construct($segmentContracts)
     {
         /** @var SegmentContract $contract */
@@ -29,8 +31,12 @@ class SegmentAggregator implements SegmentContract
     {
         $collection = collect([]);
         foreach ($this->contracts as $contract) {
-            $list = $contract->list();
-            $collection = $collection->merge($list);
+            try {
+                $list = $contract->list();
+                $collection = $collection->merge($list);
+            } catch (\Exception $e) {
+                $this->errors[] = sprintf("%s: %s", $contract->provider(), $e->getMessage());
+            }
         }
         return $collection;
     }
@@ -77,5 +83,15 @@ class SegmentAggregator implements SegmentContract
             }
         }
         return $cache;
+    }
+
+    public function hasErrors()
+    {
+        return count($this->errors) > 0;
+    }
+
+    public function getErrors()
+    {
+        return $this->errors;
     }
 }

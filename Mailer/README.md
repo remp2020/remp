@@ -22,6 +22,10 @@ yarn run dev // or any other alternative defined within package.json
 
 # 4. Run migrations
 php bin/command.php migrate:migrate
+
+# 5. Run seeders
+php bin/command.php db:seed
+php bin/command.php demo:seed # optional
 ```
 
 You can override any default config from
@@ -36,14 +40,16 @@ You can override any default config from
 
 ### Integration with user base
 
-Mailer is dependent on external user base provider. After the installation the application will trigger the error
-saying that `Service of type Remp\MailerModule\User\IUser needed by ...`.
+Mailer is dependent on external user base and segment provider. After the installation the application uses dummy
+implementations `Remp\MailerModule\Segment\Dummy` and `Remp\MailerModule\User\Dummy`.
 
 To integrate with your user base, you need to implement `Remp\MailerModule\User\IUser` interface and register it
-as an service within [`config.neon`](./app/config/config.neon) or your `config.local.neon`.
+as an service within your your [`config.local.neon`](./app/config/config_local.neon).
 
-You can check reference implementation against our user base in
-[`Remp\MailerModule\User\Crm`](./app/models/Users/Crm.php). 
+You can check our reference implementation against our user base in
+[`Remp\MailerModule\User\Crm`](./app/models/Users/Crm.php) and against our segment API in
+[`Remp\MailerModule\Segment\Crm`](./app/models/Segments/Crm.php) or
+[`Remp\MailerModule\Segment\Remp`](./app/models/Segments/Remp.php). 
 
 ### Mailers
 
@@ -53,7 +59,7 @@ By default application includes implementation of:
 - [MailgunMailer](./app/models/Mailers/SmtpMailer.php).
 
 To switch to your implementation, make sure your class implements `Nette\Mail\IMailer`
-interface and override *mailFactory* section within your `config.local.neon`.
+interface and override *mailFactory* section within your `config_local.neon`.
 
 ### Workers
 

@@ -66,6 +66,7 @@ class BatchEmailGenerator
                         'templateId' => $templateId,
                         'email' => $user['email'],
                         'sorting' => rand(),
+                        'context' => $job->context,
                     ];
                     ++$processed;
                     if ($processed == $batchInsert) {
@@ -86,6 +87,9 @@ class BatchEmailGenerator
         if ($job->mail_type_variant_id) {
             $this->mailJobQueueRepository->removeOtherVariants($batch, $job->mail_type_variant_id);
         }
+        if ($job->context) {
+            $this->mailJobQueueRepository->removeOtherVariants($batch, $job->context);
+        }
         $this->mailJobQueueRepository->removeAlreadyQueued($batch);
         $this->mailJobQueueRepository->removeAlreadySent($batch);
         $this->mailJobQueueRepository->stripEmails($batch, $batch->max_emails);
@@ -97,7 +101,7 @@ class BatchEmailGenerator
         foreach ($queueJobs as $queueJob) {
             /** @var ActiveRow $template */
             $template = $queueJob->ref('mail_templates', 'mail_template_id');
-            $this->mailCache->addJob($userMap[$queueJob->email], $queueJob->email, $template->code, $queueJob->mail_batch_id);
+            $this->mailCache->addJob($userMap[$queueJob->email], $queueJob->email, $template->code, $queueJob->mail_batch_id, $queueJob->context);
         }
         $priority = $this->batchesRepository->getBatchPriority($batch);
         $this->mailCache->restartQueue($batch->id, $priority);

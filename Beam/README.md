@@ -5,7 +5,7 @@
 Beam Admin serves as a tool for configuration of sites, properties and segments. It's the place to get tracking snippets
 and manage metadata about your websites.
 
-When the backend is ready, don't forget to install dependencies and run DB migrations:
+When the backend is ready, don't forget to create `.env` file (use `.env.example` as boilerplate), install dependencies and run DB migrations:
 
 ```bash
 # 1. Download PHP dependencies
@@ -18,17 +18,36 @@ yarn install
 yarn install --no-bin-links
 
 # 3. Generate assets
-yarn run dev // or any other alternative defined within package.json
+yarn run all-dev // or any other alternative defined within package.json
 
 # 4. Run migrations
 php artisan migrate
+
+# 5. Generate app key
+php artisan key:generate
+
+# 6. Run seeders (optional)
+php artisan db:seed
 ```
 
-#### Dependencies
+### Dependencies
 
-- PHP 7.1
-- MySQL 5.7
-- Redis 3.2
+- PHP ^7.1
+- MySQL ^5.7
+- Redis ^3.2
+
+### Schedule
+
+For application to function properly you need to add Laravel's schedule running into your crontab:
+
+```
+* * * * * php artisan schedule:run >> storage/logs/schedule.log 2>&1
+```
+
+Laravel's scheduler currently includes:
+
+* *aggregate:pageview-load*: aggregates article-based pageview data
+* *aggregate:pageview-timespent*: aggregates article-based timespent data
 
 ## [Tracker](go/cmd/tracker) (Go)
 
@@ -81,89 +100,78 @@ All tracked events are also pushed to Kafka.
 Include following snippet into the page to track events. Update `rempConfig` object as needed.
 
 ```javascript
-<script type="text/javascript">
-    (function(win, doc) {
-        function mock(fn) {
-            return function() {
-                this._.push([fn, arguments])
+(function(win, doc) {
+    function mock(fn) {
+        return function() {
+            this._.push([fn, arguments])
+        }
+    }
+    function load(url) {
+        var script = doc.createElement("script");
+        script.type = "text/javascript";
+        script.async = true;
+        script.src = url;
+        doc.getElementsByTagName("head")[0].appendChild(script);
+    }
+    win.remplib = win.remplib || {};
+    var mockFuncs = {
+        "campaign": "init",
+        "tracker": "init trackEvent trackPageview trackCommerce",
+        "iota": "init"
+    }
+
+    Object.keys(mockFuncs).forEach(function (key) {
+        if (!win.remplib[key]) {
+            var fn, i, funcs = mockFuncs[key].split(" ");
+            win.remplib[key] = {_: []};
+
+            for (i = 0; i < funcs.length; i++) {
+                fn = funcs[i];
+                win.remplib[key][fn] = mock(fn);
             }
         }
-        function load(url) {
-            var script = doc.createElement("script");
-            script.type = "text/javascript";
-            script.async = true;
-            script.src = url;
-            doc.getElementsByTagName("head")[0].appendChild(script);
-        }
-        win.remplib = win.remplib || {};
-        var mockFuncs = {
-            "campaign": "init",
-            "tracker": "init trackEvent trackPageview trackCommerce",
-            "iota": "init"
-        }
+    });
+    
+    // change URL to location of BEAM remplib.js
+    load("http://beam.remp.press/assets/lib/js/remplib.js");
+})(window, document);
 
-        Object.keys(mockFuncs).forEach(function (key) {
-            if (!win.remplib[key]) {
-                var fn, i, funcs = mockFuncs[key].split(" ");
-                win.remplib[key] = {_: []};
-
-                for (i = 0; i < funcs.length; i++) {
-                    fn = funcs[i];
-                    win.remplib[key][fn] = mock(fn);
-                }
-            }
-        });
-        
-        // change URL to location of BEAM remplib.js
-        load("http://beam.remp.press/assets/vendor/js/remplib.js");
-    })(window, document);
-
-    var rempConfig = {
-        // UUIDv4 based REMP BEAM token of appropriate property
-        // (see BEAM Admin -> Properties)
-        token: String,
-        
-        // optional
-        userId: String,
-        
-        // optional
-        browserId: String,
-        
-        // optional, controls where are cookies stored
-        cookieDomain: ".remp.press",
-                
-        tracker: {
-            // required URL location of BEAM Tracker
-            url: "http://tracker.beam.remp.press",
+var rempConfig = {
+    // UUIDv4 based REMP BEAM token of appropriate property
+    // (see BEAM Admin -> Properties)
+    token: String,
+    
+    // optional
+    userId: String,
+    
+    // optional, flag whether user is a subscriber
+    userSubscribed: Boolean,
+    
+    // optional
+    browserId: String,
+    
+    // optional, controls where are cookies stored
+    cookieDomain: ".remp.press",
             
-            // optional article details
-            article: {
-                id: String, // optional
-                author_id: String, // optional
-                category: String, // optional
-                tags: [String, String, String] // optional
-            },
+    tracker: {
+        // required URL location of BEAM Tracker
+        url: "http://tracker.beam.remp.press",
+        
+        // optional article details
+        article: {
+            id: String, // optional
+            author_id: String, // optional
+            category: String, // optional
+            locked: Boolean, // optional, flag whether content was locked
+            tags: [String, String, String] // optional
         },
         
-        segments: {
-            // optional URL of BEAM segments API; required if Iota is used
-            url: "http://segments.beam.remp.press"
-        },
-        
-        iota: {
-            // required: selector matching all "article" elements on site you want to be reported
-            articleSelector: String,
-            // required: callback for articleId extraction out of matched element
-            idCallback: Function, // function (matchedElement) {}
-            // optional: callback for selecting element where the stats will be placed as next sibling; if not present, stats are appended as next sibling to matchedElement
-            targetElementCallback: Function, // function (matchedElement) {}
-            // optional: HTTP headers to be used in API calls 
-            httpHeaders: Object
-        }
-    };
-    remplib.tracker.init(rempConfig);
-</script>
-
+        // optional time spent measuring (default value `false`)
+        // if enabled, tracks time spent on current page
+        timeSpentEnabled: true,
+    },
+};
+remplib.tracker.init(rempConfig);
 ```
 
 ## Iota (on-site reporting)
@@ -173,6 +181,32 @@ Currently we support:
 
 - Revenue-based statistics
 - Event-based statistics (primarily for reporting A/B test data)
+
+To initialize, put `iota` property into the `rempConfig` variable:
+
+```javascript
+var rempConfig = typeof(rempConfig) === 'undefined' ? {} : rempConfig;
+rempConfig.iota = {
+    // required: URL of BEAM segments API
+    url: String,
+    // required: selector matching all "article" elements on site you want to be reported
+    articleSelector: String,
+    // required: callback for articleId extraction out of matched element
+    idCallback: Function, // function (matchedElement) {}
+    // optional: callback for selecting element where the stats will be placed as next sibling; if not present, stats are appended as next sibling to matchedElement
+    targetElementCallback: Function, // function (matchedElement) {}
+    // optional: HTTP headers to be used in API calls 
+    httpHeaders: Object
+};
+
+if (remplib.iota.init(t), !document.getElementById("remplib-iota-loader")) {
+    var e = document.createElement("script");
+    // change URL to location of BEAM iota.js
+    e.src = "http://beam.remp.press/assets/iota/js/iota.js", e.id = "remplib-iota-loader", document.body.appendChild(e)
+}
+```
+
+You can place the script directly on-site, or create a bookmarklet and execute it on-demand.
 
 ## Known issues
 

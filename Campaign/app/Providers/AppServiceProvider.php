@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\SegmentAggregator;
+use GeoIp2\Database\Reader;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(\App\Models\Alignment\Map::class, function ($app) {
             return new \App\Models\Alignment\Map(config('banners.alignments'));
+        });
+
+        $this->app->bind(Reader::class, function (Application $app) {
+            return new Reader(config("services.maxmind.database"));
         });
 
         $this->bindObservers();

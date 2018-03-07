@@ -2,9 +2,11 @@
 
 namespace App\Contracts\Remp;
 
+use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
 
@@ -19,6 +21,10 @@ class Journal implements JournalContract
     const ENDPOINT_GROUP_CATEGORY_ACTIONS = 'journal/%s/categories/%s/actions';
 
     const ENDPOINT_GROUP_FLAGS = 'journal/flags';
+
+    const ENDPOINT_GENERIC_COUNT = 'journal/%s/actions/%s/count';
+
+    const ENDPOINT_GENERIC_SUM = 'journal/%s/actions/%s/sum';
 
     private $client;
 
@@ -64,6 +70,50 @@ class Journal implements JournalContract
             $response = $this->client->get(sprintf(self::ENDPOINT_GROUP_CATEGORY_ACTIONS, $group, $category));
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:ListActions endpoint: {$e->getMessage()}");
+        }
+
+        $list = json_decode($response->getBody());
+        return collect($list);
+    }
+
+    public function count(JournalAggregateRequest $request): Collection
+    {
+        try {
+            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_COUNT), [
+                'json' => [
+                    'filter_by' => $request->getFilterBy(),
+                    'group_by' => $request->getGroupBy(),
+                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:Count endpoint: {$e->getMessage()}");
+        } catch (ClientException $e) {
+            \Log::error($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+
+        $list = json_decode($response->getBody());
+        return collect($list);
+    }
+
+    public function sum(JournalAggregateRequest $request): Collection
+    {
+        try {
+            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_SUM), [
+                'json' => [
+                    'filter_by' => $request->getFilterBy(),
+                    'group_by' => $request->getGroupBy(),
+                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:Sum endpoint: {$e->getMessage()}");
+        } catch (ClientException $e) {
+            \Log::error($e->getResponse()->getBody()->getContents());
+            throw $e;
         }
 
         $list = json_decode($response->getBody());

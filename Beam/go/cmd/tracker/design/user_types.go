@@ -7,6 +7,7 @@ import (
 
 var User = Type("User", func() {
 	Attribute("id", String, "ID of logged user")
+	Attribute("subscriber", Boolean, "Flag whether user is subscriber (has paid for access)")
 	Attribute("browser_id", String, "Anonymized ID of user's browser")
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
@@ -17,6 +18,7 @@ var User = Type("User", func() {
 	})
 	Attribute("source", Source, "UTM and social source metadata")
 	Attribute("remp_session_id", String, "ID of reader's session")
+	Attribute("remp_pageview_id", String, "ID of pageview")
 	Attribute("referer", String, "Value of HTTP referer header (if present)")
 })
 
@@ -29,11 +31,15 @@ var System = Type("System", func() {
 var Pageview = Type("Pageview", func() {
 	Description("Pageview is the payload for tracking pageview event")
 
+	Attribute("action", String, func() {
+		Enum("load", "timespent")
+	})
 	Attribute("system", System)
 	Attribute("user", User)
 	Attribute("article", Article)
+	Attribute("timespent", TimeSpent)
 
-	Required("system", "user")
+	Required("system", "user", "action")
 })
 
 var Commerce = Type("Commerce", func() {
@@ -75,9 +81,19 @@ var Article = Type("Article", func() {
 	Attribute("category", String, "Page category (homepage, world news...")
 	Attribute("tags", ArrayOf(String), "List of tags (breaking news, trump...")
 	Attribute("author_id", String, "ID of author")
+	Attribute("locked", Boolean, "Flag whether content was locked for the visitor")
 	Attribute("variants", HashOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
 
 	Required("id")
+})
+
+var TimeSpent = Type("TimeSpent", func() {
+	Description("Update time spent on page")
+
+	Attribute("seconds", Integer, "Number of seconds from previous update of time spent on page")
+	Attribute("unload", Boolean, "Flag to indicate last update of time spent on page before unload event")
+
+	Required("seconds")
 })
 
 var Source = Type("source", func() {
@@ -88,6 +104,7 @@ var Source = Type("source", func() {
 	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
 	Attribute("social", String, "Social source if available")
+	Attribute("ref", String, "Direct referrer source if available")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {

@@ -31,7 +31,6 @@ class PropertyController extends Controller
         return $datatables->of($properties)
             ->addColumn('actions', function (Property $property) use ($account) {
                 return [
-                    'show' => route('accounts.properties.show', [$account, $property]),
                     'edit' => route('accounts.properties.edit', [$account, $property]),
                 ];
             })
@@ -78,19 +77,6 @@ class PropertyController extends Controller
         $property->save();
 
         return redirect(route('accounts.properties.index', $account))->with('success', 'Property created');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Property  $property
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Account $account, Property $property)
-    {
-        return view('properties.show', [
-            'property' => $property,
-        ]);
     }
 
     /**

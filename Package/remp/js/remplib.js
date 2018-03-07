@@ -6,6 +6,8 @@ export default {
 
     userId: null,
 
+    userSubscribed: null,
+
     browserId: null,
 
     cacheThreshold: 15 * 60000, // 15 minutes
@@ -14,8 +16,16 @@ export default {
 
     cookieDomain: null,
 
+    rempPageviewIDKey: "remp_pageview_id",
+
+    rempPageviewID: null,
+
     getUserId: function() {
         return this.userId;
+    },
+
+    isUserSubscriber: function() {
+        return this.userSubscribed;
     },
 
     getBrowserId: function() {
@@ -69,6 +79,14 @@ export default {
         };
         this.setToStorage(storageKey, item);
         return rempSessionID;
+    },
+
+    getRempPageviewID: function() {
+        if (this.rempPageviewID) {
+            return this.rempPageviewID;
+        }
+        this.rempPageviewID = remplib.uuidv4();
+        return this.rempPageviewID;
     },
 
     uuidv4: function() {
@@ -207,6 +225,14 @@ export default {
         }
         CustomEvent.prototype = window.Event.prototype;
         window.CustomEvent = CustomEvent;
+
+        // support addEventListener for IE8
+        if (typeof Element.prototype.addEventListener === 'undefined') {
+            Element.prototype.addEventListener = function (e, callback) {
+                e = 'on' + e;
+                return this.attachEvent(e, callback);
+            };
+        }
     },
 
     loadScript: function (src, callback) {

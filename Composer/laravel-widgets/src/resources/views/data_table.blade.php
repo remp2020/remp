@@ -35,7 +35,9 @@
                     @endif
                 </th>
             @endforeach
-            <th>actions</th>
+            @if (!empty($rowActions))
+                <th>actions</th>
+            @endif
         </tr>
         </thead>
         <tbody>
@@ -44,6 +46,14 @@
 </div>
 
 <script>
+    var filterData = filterData || {};
+    filterData['{{ $tableId }}'] = {
+        @foreach ($cols as $col)
+                @continue(!isset($col['filter']))
+        '{{ $col['name'] }}': {!! json_encode($col['filter']) !!},
+        @endforeach
+    };
+
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
             'columns': [
@@ -74,7 +84,21 @@
             'processing': true,
             'serverSide': true,
             'order': {!! @json($order) !!},
-            'ajax': '{{ $dataSource }}',
+            'ajax': {
+                'url': '{{ $dataSource }}',
+                'data': function (data) {
+                    var url = window.location.href
+                    var param = null;
+                    @foreach ($requestParams as $var => $def)
+                        param = '{!! $var !!}';
+                    data[param] = {!! $def !!};
+
+                    // update browser URL to persist the selection
+                    url = $.fn.dataTables.upsertQueryStringParam(url, param, data[param]);
+                    @endforeach
+                    window.history.pushState(null, null, url);
+                }
+            },
             'createdRow': function (row, data, index) {
                 var highlight = true;
                 @forelse($rowHighlights as $column => $value)
@@ -90,9 +114,28 @@
             },
             'drawCallback': function(settings) {
                 $.fn.dataTables.pagination(settings);
+            },
+            'initComplete': function (a,b,c,d) {
+                var state = this.api().state().columns;
+
+                this.api().columns().every( function () {
+                    var column = this;
+                    var columns = column.settings().init().columns;
+                    var columnDef = columns[column.index()];
+
+                    if (filterData['{{ $tableId }}'][columnDef.name]) {
+                        $.fn.dataTables.selectFilters(column, filterData['{{ $tableId }}'][columnDef.name], state);
+                    }
+                } );
             }
         });
 
         $.fn.dataTables.navigation(dataTable);
+
+        @foreach ($refreshTriggers as $def)
+        $('{!! $def['selector'] !!}').on('{!! $def['event'] !!}', function() {
+            dataTable.draw();
+        });
+        @endforeach
     });
 </script>

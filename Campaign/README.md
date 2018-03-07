@@ -5,7 +5,7 @@
 Campaign Admin serves as a tool for configuration of banners and campaigns. It's the place for UI generation of banners
 and definition of how and to whom display Campaigns. 
 
-When the backend is ready, don't forget to install dependencies and run DB migrations:
+When the backend is ready, don't forget to create `.env` file (use `.env.example` as boilerplate), install dependencies and run DB migrations:
 
 ```bash
 # 1. Download PHP dependencies
@@ -18,16 +18,22 @@ yarn install
 yarn install --no-bin-links
 
 # 3. Generate assets
-yarn run dev // or any other alternative defined within package.json
+yarn run all-dev // or any other alternative defined within package.json
 
 # 4. Run migrations
 php artisan migrate
+
+# 5. Generate app key
+php artisan key:generate
+
+# 6. Run seeders (optional)
+php artisan db:seed
 ```
 
 ### Dependencies
 
-- PHP 7.1
-- MySQL 5.7
+- PHP ^7.1
+- MySQL ^5.7
 - Redis ^3.2
 
 ### Schedule
@@ -115,6 +121,9 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
         // optional
         userId: String,
         
+        // optional, flag whether user is a subscriber
+        userSubscribed: Boolean,
+        
         // optional
         browserId: String,
         
@@ -151,3 +160,7 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
     remplib.campaign.init(rempConfig);
 </script>
 ```
+
+## MaxMind - GeoIP2 Lite
+
+This product includes GeoLite2 data created by MaxMind, available from [http://www.maxmind.com](http://www.maxmind.com).

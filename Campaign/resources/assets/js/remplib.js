@@ -80,6 +80,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.userId !== 'undefined' && config.userId !== null) {
                 remplib.userId = config.userId;
             }
+            if (typeof config.userSubscribed !== 'undefined' && config.userSubscribed !== null) {
+                remplib.userSubscribed = config.userSubscribed;
+            }
 
             if (typeof config.cookieDomain === 'string') {
                 remplib.cookieDomain = config.cookieDomain;

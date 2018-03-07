@@ -25,8 +25,26 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('segments/json', 'SegmentController@json')->name('segments.json');
     Route::get('segments/{sourceSegment}/copy', 'SegmentController@copy')->name('segments.copy');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+    Route::get('articles/conversions', 'ArticleController@conversions')->name('articles.conversions');
+    Route::get('articles/dtConversions', 'ArticleController@dtConversions')->name('articles.dtConversions');
+    Route::get('articles/pageviews', 'ArticleController@pageviews')->name('articles.pageviews');
+    Route::get('articles/dtPageviews', 'ArticleController@dtPageviews')->name('articles.dtPageviews');
+    Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
+    Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
+    Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
+    Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
+    Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
 
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
     Route::resource('segments', 'SegmentController');
+    Route::resource('articles', 'ArticleController', [
+        'only' => ['store'],
+    ]);
+    Route::resource('conversions', 'ConversionController', [
+        'only' => ['index', 'store']
+    ]);
+    Route::resource('authors', 'AuthorController', [
+        'only' => ['index', 'show']
+    ]);
 });

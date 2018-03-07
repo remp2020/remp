@@ -118,17 +118,22 @@ func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, id
 		}
 	}
 
-	// unset invalidated elements
-	for id, c := range segmentCache {
-		if c.SyncedAt.Before(now.Add(-1 * time.Hour)) {
-			delete(segmentCache, id)
-		}
-	}
-
 	switch segmentType {
 	case BrowserSegment:
+		// unset invalidated elements, keeping the cache longer as single-browser doesn't need count syncing that often (no other devices affect the count)
+		for id, c := range segmentCache {
+			if c.SyncedAt.Before(now.Add(-24 * time.Hour)) {
+				delete(segmentCache, id)
+			}
+		}
 		segmentCache, ok, err = c.SegmentStorage.CheckBrowser(s, identifier, now, segmentCache, ro)
 	case UserSegment:
+		// unset invalidated elements, removing the cache after one hour to sync count which could include other user's devices
+		for id, c := range segmentCache {
+			if c.SyncedAt.Before(now.Add(-1 * time.Hour)) {
+				delete(segmentCache, id)
+			}
+		}
 		segmentCache, ok, err = c.SegmentStorage.CheckUser(s, identifier, now, segmentCache, ro)
 	default:
 		return nil, false, fmt.Errorf("unhandled segment type: %d", segmentType)

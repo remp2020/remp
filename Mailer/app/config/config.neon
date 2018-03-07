@@ -65,7 +65,6 @@ services:
     console:
         class: Remp\MailerModule\Console\Application
         setup:
-            - announce(Remp\MailerModule\Commands\HelloWorldCommand)
             - announce(Remp\MailerModule\Commands\ProcessJobCommand)
             - announce(Remp\MailerModule\Commands\MailWorkerCommand)
             - announce(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand)
@@ -197,7 +196,6 @@ services:
     - Remp\MailerModule\Forms\SourceTemplateFormFactory
 
     # Commands
-    - Remp\MailerModule\Commands\HelloWorldCommand
     - Remp\MailerModule\Commands\ProcessJobCommand
     - Remp\MailerModule\Commands\MailWorkerCommand
     - Remp\MailerModule\Commands\SyncUserSubscriptionsCommand

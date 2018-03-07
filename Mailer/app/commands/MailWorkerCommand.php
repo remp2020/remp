@@ -176,6 +176,7 @@ class MailWorkerCommand extends Command
 
                         $output->writeln(" * sending <info>{$job->templateCode}</info> from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
                         $email->addRecipient($job->email);
+                        $email->setContext($job->context);
                     }
 
                     try {
@@ -234,7 +235,7 @@ class MailWorkerCommand extends Command
     private function cacheJobs($jobs, $batchId)
     {
         foreach ($jobs as $job) {
-            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId);
+            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId, $job->context);
         }
     }
 

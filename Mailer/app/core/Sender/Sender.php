@@ -33,6 +33,9 @@ class Sender
     /** @var  array */
     private $attachments = [];
 
+    /** @var string */
+    private $context;
+
     /** @var MailerFactory */
     private $mailerFactory;
 
@@ -102,6 +105,13 @@ class Sender
         return $this;
     }
 
+    public function setContext($context)
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
     public function send($checkEmailSubscribed = true)
     {
         if (count($this->recipients) > 1) {
@@ -115,6 +125,13 @@ class Sender
 
         $tokens = $this->autoLogin->createTokens([$recipient['email']]);
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
+
+        if (getenv('UNSUBSCRIBE_URL')) {
+            $this->params['unsubscribe'] = str_replace(getenv('UNSUBSCRIBE_URL'), '%type%', $this->template->mail_type->code) . $this->params['autologin'];
+        }
+        if (getenv('SETTINGS_URL')) {
+            $this->params['settings'] = getenv('SETTINGS_URL') . $this->params['autologin'];
+        }
 
         $mailer = $this->mailerFactory->getMailer();
 
@@ -143,7 +160,8 @@ class Sender
             $this->jobId,
             $this->batchId,
             $senderId,
-            $attachmentSize
+            $attachmentSize,
+            $this->context
         );
 
         $mailer->send($message);
@@ -217,7 +235,8 @@ class Sender
                 $this->jobId,
                 $this->batchId,
                 $params['mail_sender_id'],
-                $attachmentSize
+                $attachmentSize,
+                $this->context
             );
         }
         $logsTableName = $this->logsRepository->getTable()->getName();
@@ -246,6 +265,7 @@ class Sender
             'job_id' => $this->jobId,
             'batch_id' => $this->batchId,
             'mail_sender_id' => $mailSenderId,
+            'context' => $this->context,
         ]));
         $message->setHeader('X-Mailer-Tag', $this->template->code);
         $message->setHeader('X-Mailer-Template-Params', Json::encode($templateParams));
@@ -264,6 +284,7 @@ class Sender
         $this->batchId = null;
         $this->params = [];
         $this->attachments = [];
+        $this->context = null;
 
         return $this;
     }

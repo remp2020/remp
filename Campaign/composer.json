@@ -32,6 +32,7 @@
     "require": {
         "php": "~7.1.0",
         "doctrine/dbal": "~2.3",
+        "geoip2/geoip2": "~2.0",
         "laravel/framework": "~5.5.0",
         "laravelcollective/html": "~5.5.0",
         "laravel/tinker": "~1.0",
@@ -48,7 +49,8 @@
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "recca0120/laravel-tracy": "^1.8",
-        "php-amqplib/php-amqplib": "^2.7"
+        "php-amqplib/php-amqplib": "^2.7",
+        "fico7489/laravel-pivot": "^2.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -79,6 +79,60 @@ $.fn.dataTables = {
         });
     },
 
+    selectFilters: function (column, filterData, state) {
+        // create select box
+        var select = $('<select multiple class="selectpicker" data-live-search="true" data-live-search-normalize="true"></select>')
+            .appendTo( $(column.header()) )
+            .on( 'change', function() {
+                column
+                    .search($(this).val())
+                    .draw();
+            });
+
+        // restore state and set selected options
+        var searchValues = state[column.index()].search.search.split(",");
+        $.each(filterData, function (value, label) {
+            var newOption = $('<option value="'+value+'">'+label+'</option>');
+            if (searchValues.indexOf(value) !== -1) {
+                newOption.prop("selected", true);
+            }
+            select.append(newOption);
+        });
+
+        select.selectpicker();
+    },
+
+    upsertQueryStringParam(url, key, value) {
+        if (!value) {
+            value = "";
+        }
+        let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+        let separator = url.indexOf('?') !== -1 ? "&" : "?";
+        if (url.match(re)) {
+            return url.replace(re, '$1' + key + "=" + value + '$2');
+        }
+        else {
+            return url + separator + key + "=" + value;
+        }
+    },
+
+    durationToText(d) {
+        if (d.asSeconds() === 0) {
+            return '0s';
+        }
+        let durationString = ""
+        if (d.asHours() >= 1) {
+            durationString += Math.floor(d.asHours()) + "h&nbsp;"
+        }
+        if (d.asMinutes() >= 1) {
+            durationString += Math.floor(d.minutes()) + "m&nbsp;"
+        }
+        if (d.asSeconds() >= 1) {
+            durationString += Math.floor(d.seconds()) + "s"
+        }
+        return durationString;
+    },
+
     render: {
         date: function () {
             return function(data) {
@@ -124,11 +178,18 @@ $.fn.dataTables = {
             };
         },
         array: function (config) {
-            var column = config["column"];
+            let column = null;
+            if (typeof config !== 'undefined' && config.hasOwnProperty('column')) {
+                column = config["column"];
+            }
             return function(data) {
                 var result = '';
                 for (var i=0; i<data.length; i++) {
-                    result += data[i][column] + '<br/>';
+                    if (column === null) {
+                        result += data[i] + '<br/>';
+                    } else {
+                        result += data[i][column] + '<br/>';
+                    }
                 }
                 return result;
             }
@@ -167,6 +228,81 @@ $.fn.dataTables = {
                 actions += '</span>';
                 return actions;
             }
+        },
+        duration: function() {
+            return function (data) {
+                let duration = parseInt(data);
+                if (data === 0) {
+                    return '0s';
+                }
+                let d = moment.duration(duration, 'seconds');
+                let durationString = ""
+                if (d.asHours() >= 1) {
+                    durationString += Math.floor(d.asHours()) + "h&nbsp;"
+                }
+                if (d.asMinutes() >= 1) {
+                    durationString += Math.floor(d.minutes()) + "m&nbsp;"
+                }
+                if (d.asSeconds() >= 1) {
+                    durationString += Math.floor(d.seconds()) + "s"
+                }
+                return "<span title='" + d.humanize() + "'>" + durationString.trim() + "</span>";
+            };
+        },
+        numberStat: function() {
+            return function (data) {
+                if (data.length === 1) {
+                    return data[0];
+                }
+                let d0 = parseFloat(data[0]);
+                let d1 = parseFloat(data[1]);
+
+                let cls, icon;
+                if (d0 >= d1) {
+                    cls = 'text-success';
+                    icon = 'zmdi-caret-up'
+                } else {
+                    cls = 'text-danger';
+                    icon = 'zmdi-caret-down';
+                }
+
+                return "<span>" + data[0] + "</span> <small style='white-space: nowrap;' class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + Math.abs(d0 - d1).toFixed(2) + ")</small>";
+            };
+        },
+        multiNumberStat: function() {
+            return function (data) {
+                let result = "";
+                for (item of data) {
+                    result += $.fn.dataTables.render.numberStat()(item) + '<br/>';
+                }
+                return result.trim();
+            }
+        },
+        durationStat: function() {
+            return function (data) {
+                if (data.length === 1) {
+                    return data[0];
+                }
+                data[0] = parseFloat(data[0]);
+                data[1] = parseFloat(data[1]);
+
+                let d = moment.duration(data[0], 'seconds')
+                let durationText = $.fn.dataTables.durationToText(d);
+
+                let sd = moment.duration(Math.abs(data[0] - data[1]), 'seconds')
+                let statText = $.fn.dataTables.durationToText(sd);
+
+                let cls, icon;
+                if (data[0] >= data[1]) {
+                    cls = 'text-success';
+                    icon = 'zmdi-caret-up'
+                } else {
+                    cls = 'text-danger';
+                    icon = 'zmdi-caret-down';
+                }
+
+                return "<span title='" + d.humanize() + "'>" + durationText.trim() + "</span> <small title='" + sd.humanize() + "' class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + statText.trim() + ")</small>";
+            };
         }
     }
 };

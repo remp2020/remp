@@ -44,9 +44,9 @@ type CommerceCollection []*Commerce
 // CommerceStorage is an interface to get commerce event related data.
 type CommerceStorage interface {
 	// Count returns count of events based on the provided filter options.
-	Count(o CountOptions) (CountRowCollection, bool, error)
+	Count(o AggregateOptions) (CountRowCollection, bool, error)
 	// Sum returns sum of events based on the provided filter options.
-	Sum(o CountOptions) (SumRowCollection, bool, error)
+	Sum(o AggregateOptions) (SumRowCollection, bool, error)
 	// List returns list of all events based on given CommerceOptions.
 	List(o CommerceOptions) (CommerceCollection, error)
 	// Categories lists all available categories.
@@ -63,9 +63,9 @@ type CommerceDB struct {
 }
 
 // Count returns count of events based on the provided filter options.
-func (cDB *CommerceDB) Count(o CountOptions) (CountRowCollection, bool, error) {
+func (cDB *CommerceDB) Count(o AggregateOptions) (CountRowCollection, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"` + TableCommerce + `"`)
-	builder = addCountQueryFilters(builder, o)
+	builder = addAggregateQueryFilters(builder, o)
 
 	bb := builder.Build()
 	log.Println("commerce count query:", bb)
@@ -127,9 +127,9 @@ func (cDB *CommerceDB) List(o CommerceOptions) (CommerceCollection, error) {
 }
 
 // Sum returns sum of events based on the provided filter options.
-func (cDB *CommerceDB) Sum(o CountOptions) (SumRowCollection, bool, error) {
+func (cDB *CommerceDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`sum("revenue")`).From(`"` + TableCommerce + `"`)
-	builder = addCountQueryFilters(builder, o)
+	builder = addAggregateQueryFilters(builder, o)
 
 	bb := builder.Build()
 	log.Println("commerce sum query:", bb)
