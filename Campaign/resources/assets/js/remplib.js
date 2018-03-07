@@ -22,7 +22,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsStorageKey: "campaigns",
 
-        pageviewStorageKey: "pageview_count",
+        pageviewCountStorageKey: "pageview_count",
 
         campaignsSessionStorageKey: "campaigns_session",
 
@@ -39,7 +39,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
-                    "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewStorageKey)
+                    "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewCountStorageKey)
                 }
 
             },
@@ -145,12 +145,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         incrementPageviewCount: function ()  {
-            var pageviewCount = remplib.getFromStorage(this.pageviewStorageKey);
+            var pageviewCount = remplib.getFromStorage(this.pageviewCountStorageKey);
 
             if (pageviewCount) {
-                remplib.setToStorage(this.pageviewStorageKey, pageviewCount+1);
+                remplib.setToStorage(this.pageviewCountStorageKey, pageviewCount+1);
             } else {
-                remplib.setToStorage(this.pageviewStorageKey, 1);
+                remplib.setToStorage(this.pageviewCountStorageKey, 1);
             }
         },
 

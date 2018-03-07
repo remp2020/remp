@@ -8,7 +8,7 @@
                 </div>
 
                 <div class="col-md-8 pageview-rules-wrapper">
-                    <div class="row" v-for="(pageviewRule, i) in pageviewRules">
+                    <div class="row" v-for="(pageviewRule, i) in pageviewRulesData">
                         <div class="col-md-4">
                             <v-select v-model="pageviewRule.rule"
                                     id="rule"
@@ -17,6 +17,7 @@
                                     :options.sync="pageviewRulesOptions"
                                     placeholder="Rule"
                                     :title="'Rule'"
+                                    ref="pageviewRulesDataRefs"
                             ></v-select>
                         </div>
                         <div class="col-md-3">
@@ -64,6 +65,7 @@
         ],
         data() {
             return {
+                pageviewRulesData: null,
                 pageviewRulesOptions: [
                     {"label": "Every", "value": "every"},
                     {"label": "Since", "value": "since"},
@@ -72,19 +74,26 @@
             };
         },
         created: function () {
-            if (!this.$parent.pageviewRules.length) this.addRule();
+            this.pageviewRulesData = this.pageviewRules;
+
+            if (!this.pageviewRulesData.length) this.addRule();
         },
         methods: {
             addRule() {
-                this.$parent.pageviewRules.push({
+                this.pageviewRulesData.push({
                     rule: null,
                     num: null,
                 })
             },
             removeRule(i) {
-                this.$parent.pageviewRules.splice(i, 1);
+                var self = this;
 
-                if (!this.$parent.pageviewRules.length) this.addRule();
+                this.pageviewRulesData.splice(i, 1);
+
+                if (!this.pageviewRulesData.length) {
+                    self.addRule();
+                    this.$refs.pageviewRulesDataRefs[0].resetValue();
+                }
             }
         }
     }

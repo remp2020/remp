@@ -130,6 +130,10 @@
             }
         },
         methods: {
+            resetValue: function() {
+                let $select = $(this.$el).find('select');
+                $select.selectpicker('val', null);
+            },
             optionsEmpty: function() {
                 return typeof this.options === 'undefined' || this.options.length === 0;
             },

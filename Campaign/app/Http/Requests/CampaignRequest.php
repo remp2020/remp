@@ -23,7 +23,7 @@ class CampaignRequest extends FormRequest
      */
     public function rules()
     {
-        $validationArray = [
+        return [
             'name' => 'required|max:255',
             'active' => 'boolean|required',
             'banner_id' => 'integer|required',
@@ -31,16 +31,9 @@ class CampaignRequest extends FormRequest
             'signed_in' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
             'segments' => 'array',
-            'pageview_rules.0.num' => 'required_with:pageview_rules.0.rule',
-            'pageview_rules.0.rule' => 'required_with:pageview_rules.0.num',
+            'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
+            'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
         ];
-
-        foreach ($this->request->get('pageview_rules') as $key => $val) {
-            $validationArray['pageview_rules.' . $key . '.num'] = 'required_with:pageview_rules.' . $key . '.rule';
-            $validationArray['pageview_rules.' . $key . '.rule'] = 'required_with:pageview_rules.' . $key . '.num';
-        }
-
-        return $validationArray;
     }
 
     public function all($keys = null)
