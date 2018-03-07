@@ -160,3 +160,7 @@ Note: If you want to automatically track banner events to BEAM Tracker, add also
     remplib.campaign.init(rempConfig);
 </script>
 ```
+
+## MaxMind - GeoIP2 Lite
+
+This product includes GeoLite2 data created by MaxMind, available from [http://www.maxmind.com](http://www.maxmind.com).

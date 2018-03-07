@@ -16,7 +16,20 @@ $segments = $segments->mapToGroups(function ($item) {
 
 $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
     return [$item->code => $item->name];
-})
+});
+
+$availableCountries = $availableCountries->map(function(\App\Country $country) {
+   return ['value' => $country->iso_code, 'label' => $country->name];
+});
+
+$selectedCountries = $campaign->countries->map(function(\App\Country $country) {
+   return $country->iso_code;
+});
+
+$countriesBlacklist = 0;
+foreach ($campaign->countries as $country) {
+    $countriesBlacklist = (int) $country->pivot->blacklisted;
+}
 
 @endphp
 
@@ -35,6 +48,8 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "signedIn": {!! @json($campaign->signed_in) !!},
         "oncePerSession": {!! @json($campaign->once_per_session) !!},
         "active": {!! @json($campaign->active) !!},
+        "countries": {!! $selectedCountries->toJson(JSON_UNESCAPED_UNICODE) !!},
+        "countriesBlacklist": {!! @json($countriesBlacklist ?? 0) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},
@@ -53,6 +68,17 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
                 "action": "click",
                 "value": "banner|click",
                 "label": "banner / click"
+            }
+        ],
+        "availableCountries": {!! $availableCountries->toJson(JSON_UNESCAPED_UNICODE) !!},
+        "countriesBlacklistOptions": [
+            {
+                "value": 0,
+                "label": "Whitelist"
+            },
+            {
+                "value": 1,
+                "label": "Blacklist"
             }
         ]
     };
