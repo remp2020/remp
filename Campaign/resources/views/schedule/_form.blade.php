@@ -14,13 +14,13 @@
                        array_filter([
                            'class' => 'selectpicker',
                            'data-live-search' => 'true',
-                           'disabled' => $schedule->id ? 'disabled' : null,
+                           'disabled' => ($schedule->id || $schedule->campaign_id) ? 'disabled' : null,
                            'placeholder' => 'Please select...'
                        ])
                    ) !!}
-                    @isset($schedule->id)
+                    @if($schedule->id || $schedule->campaign_id)
                     {!! Form::hidden('campaign_id') !!}
-                    @endisset
+                    @endif
                 </div>
             </div>
         </div>

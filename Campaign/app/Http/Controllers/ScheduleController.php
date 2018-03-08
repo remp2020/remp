@@ -23,16 +23,30 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables)
+    /**
+     * Return data for Schedule Datatable.
+     *
+     * If $campaign is provided, only schedules for that one Campaign are returned.
+     *
+     * @param Datatables $dataTables
+     * @param Campaign|null $campaign
+     * @return mixed
+     */
+    public function json(Datatables $dataTables, Campaign $campaign = null)
     {
-        $schedule = Schedule::select()
+        $scheduleSelect = Schedule::select()
             ->with(['campaign', 'campaign.banner'])
             ->whereHas('campaign', function (\Illuminate\Database\Eloquent\Builder $query) {
                 $query->where('active', '=', true);
             })
             ->orderBy('start_time', 'DESC')
-            ->orderBy('end_time', 'DESC')
-            ->get();
+            ->orderBy('end_time', 'DESC');
+
+        if (!is_null($campaign)) {
+            $scheduleSelect->where('campaign_id', '=' , $campaign->id);
+        }
+
+        $schedule = $scheduleSelect->get();
 
         return $dataTables->of($schedule)
             ->addColumn('actions', function (Schedule $s) {
@@ -92,14 +106,19 @@ class ScheduleController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new schedule.
+     *
+     * If $campaign is provided, campaign is pre-selected and selectbox disabled.
+     *
+     * @param Campaign $campaign
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Campaign $campaign)
     {
         $schedule = new Schedule();
         $schedule->fill(old());
+        $schedule->campaign_id = $campaign->id;
         $campaigns = Campaign::whereActive(true)->get();
 
         return view('schedule.create', [
