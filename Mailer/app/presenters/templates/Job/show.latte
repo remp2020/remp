@@ -69,7 +69,7 @@
                 <div class="card z-depth-1">
                     <div class="card-header">
                         <h2><i class="zmdi zmdi-collection-item"></i> Batch #{$batch->id}</h2>
-                        <div class="actions {if ($batch->status !== "done")}actions-relative{/if}">
+                        <div class="actions {if !($batch->status == "done" && $batch->sent_emails)}actions-relative{/if}">
                             <a n:href="EditBatch $batch->id" n:if="in_array($batch->status, [created, updated, ready])">
                                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Edit</button>
                             </a>
