@@ -13,10 +13,13 @@ return [
     | to have a conventional place to find your various credentials.
     |
     */
-
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),
+    ],
+
+    'maxmind' => [
+        'database' => base_path(env('MAXMIND_DATABASE')),
     ],
 
     'ses' => [

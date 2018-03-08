@@ -33,6 +33,11 @@
                             'render' => 'array',
                             'renderParams' => ['column' => 'code']
                         ],
+                        'countries' => [
+                            'header' => 'Countries',
+                            'render' => 'array',
+                            'renderParams' => ['column' => 'name'],
+                        ],
                         'active' => [
                             'header' => 'Is active',
                             'render' => 'boolean'

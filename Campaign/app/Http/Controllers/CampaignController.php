@@ -7,12 +7,15 @@ use App\Campaign;
 use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
+use App\Country;
+use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use Cache;
+use GeoIp2;
 use HTML;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
@@ -37,7 +40,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'altBanner', 'segments'])
+            ->with(['banner', 'altBanner', 'segments', 'countries'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -75,18 +78,16 @@ class CampaignController extends Controller
         $campaign->fill(old());
         $selectedSegments = collect(old('segments'));
 
-        $banners = Banner::all();
-        try {
-            $segments = $segmentAggregator->list();
-        } catch (SegmentException $e) {
-            $segments = new Collection();
-            flash('Unable to fetch list of segments, please check the application configuration.')->error();
-            \Log::error($e->getMessage());
+        $segments = $segmentAggregator->list();
+        foreach ($segmentAggregator->getErrors() as $error) {
+            flash($error)->error();
+            Log::error($error);
         }
 
         return view('campaigns.create', [
             'campaign' => $campaign,
-            'banners' => $banners,
+            'banners' => Banner::all(),
+            'availableCountries' => Country::all(),
             'segments' => $segments,
             'selectedSegments' => $selectedSegments,
         ]);
@@ -105,6 +106,8 @@ class CampaignController extends Controller
         $campaign->save();
         $campaign->banner_id = $request->get('banner_id');
         $campaign->alt_banner_id = $request->get('alt_banner_id');
+
+        $campaign->countries()->sync($this->processCountries($request));
 
         foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
@@ -147,19 +150,19 @@ class CampaignController extends Controller
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
         $campaign->fill(old());
-        $banners = Banner::all();
 
         try {
             $segments = $segmentAggregator->list();
         } catch (SegmentException $e) {
             $segments = new Collection();
             flash('Unable to fetch list of segments, please check the application configuration.')->error();
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
         }
 
         return view('campaigns.edit', [
             'campaign' => $campaign,
-            'banners' => $banners,
+            'availableCountries' => Country::all(),
+            'banners' => Banner::all(),
             'segments' => $segments,
         ]);
     }
@@ -177,6 +180,8 @@ class CampaignController extends Controller
         $campaign->save();
         $campaign->banner_id = $request->get('banner_id');
         $campaign->alt_banner_id = $request->get('alt_banner_id');
+
+        $campaign->countries()->sync($this->processCountries($request));
 
         foreach ($request->get('segments', []) as $r) {
             /** @var CampaignSegment $campaignSegment */
@@ -196,6 +201,22 @@ class CampaignController extends Controller
     }
 
     /**
+     * Processes campaign $request and returns countries array ready to sync with campaign_country pivot table
+     *
+     * @param CampaignRequest $request
+     * @return array
+     */
+    private function processCountries(CampaignRequest $request): array
+    {
+        $blacklist = $request->get('countries_blacklist');
+        $countries = [];
+        foreach ($request->get('countries', []) as $cid) {
+            $countries[$cid] = ['blacklisted' => (bool) $blacklist];
+        }
+        return $countries;
+    }
+
+    /**
      * @param Request $r
      * @param DimensionMap $dm
      * @param PositionMap $pm
@@ -208,7 +229,8 @@ class CampaignController extends Controller
         DimensionMap $dm,
         PositionMap $pm,
         AlignmentMap $am,
-        SegmentAggregator $sa
+        SegmentAggregator $sa,
+        GeoIp2\Database\Reader $geoIPreader
     ) {
         // validation
 
@@ -276,11 +298,8 @@ class CampaignController extends Controller
             // banner
             $bannerVariantA = $campaign->banner ?? false;
             if (!$bannerVariantA) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => false,
-                        'errors' => ["active campaign [{$campaign->uuid}] has no banner set"],
-                    ]);
+                Log::error("Active campaign [{$campaign->uuid}] has no banner set");
+                continue;
             }
 
             $banner = null;
@@ -334,6 +353,32 @@ class CampaignController extends Controller
             // signed in state
             if (isset($campaign->signed_in) && $campaign->signed_in !== boolval($userId)) {
                 continue;
+            }
+
+            // country rules
+
+            if (!$campaign->countries->isEmpty()) {
+                // load country ISO code based on IP
+                try {
+                    $record = $geoIPreader->country($r->ip());
+                    $countryCode = $record->country->isoCode;
+                } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
+                    Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
+                    continue;
+                }
+                if (is_null($countryCode)) {
+                    Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules");
+                    continue;
+                }
+
+                // check against white / black listed countries
+
+                if (!$campaign->countriesBlacklist->isEmpty() && $campaign->countriesBlacklist->contains('iso_code', $countryCode)) {
+                    continue;
+                }
+                if (!$campaign->countriesWhitelist->isEmpty() && !$campaign->countriesWhitelist->contains('iso_code', $countryCode)) {
+                    continue;
+                }
             }
 
             // segment

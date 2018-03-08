@@ -82,7 +82,7 @@ class InitialMigration extends AbstractMigration
         $this->table('mail_jobs')
             ->addColumn('segment_code', 'string')
             ->addColumn('segment_provider', 'string')
-            ->addColumn('mail_type_variant_id', 'integer')
+            ->addColumn('mail_type_variant_id', 'integer', ['null' => true])
             ->addColumn('status', 'string')
             ->addColumn('emails_sent_count', 'integer', ['default' => 0])
             ->addForeignKey('mail_type_variant_id', 'mail_type_variants', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])

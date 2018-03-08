@@ -3,11 +3,14 @@
 namespace App;
 
 use Cache;
+use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
 
 class Campaign extends Model
 {
+    use PivotEventTrait;
+
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
     const CAMPAIGN_TAG = 'campaign';
 
@@ -45,9 +48,14 @@ class Campaign extends Model
         });
     }
 
+    public function banners()
+    {
+        return $this->belongsToMany(Banner::class, 'campaign_banners')->withPivot('variant');
+    }
+
     public function banner()
     {
-        return $this->belongsToMany(Banner::class, 'campaign_banners')->wherePivot('variant', '=', 'A');
+        return $this->banners()->wherePivot('variant', '=', 'A');
     }
 
     public function getBannerAttribute()
@@ -60,13 +68,13 @@ class Campaign extends Model
 
     public function altBanner()
     {
-        return $this->belongsToMany(Banner::class, 'campaign_banners')->wherePivot('variant', '=', 'B');
+        return $this->banners()->wherePivot('variant', '=', 'B');
     }
 
     public function setBannerIdAttribute($value)
     {
-        $this->banner()->detach();
-        $this->banner()->attach($value, ['variant' => 'A']);
+        $data = [$value => ['variant' => 'A']];
+        $this->banner()->sync($data);
     }
 
     public function getAltBannerAttribute()
@@ -79,8 +87,33 @@ class Campaign extends Model
 
     public function setAltBannerIdAttribute($value)
     {
-        $this->altBanner()->detach();
-        $this->altBanner()->attach($value, ['variant' => 'B']);
+        $data = [];
+        if (!empty($value)) {
+            $data[$value] = ['variant' => 'B'];
+        }
+        $this->altBanner()->sync($data);
+    }
+
+    public function countries()
+    {
+        return $this->belongsToMany(
+            Country::class,
+            null,
+            null,
+            'country_iso_code',
+            null,
+            'iso_code'
+        )->withPivot('blacklisted');
+    }
+
+    public function countriesWhitelist()
+    {
+        return $this->countries()->wherePivot('blacklisted', '=', false);
+    }
+
+    public function countriesBlacklist()
+    {
+        return $this->countries()->wherePivot('blacklisted', '=', true);
     }
 
     public function segments()
@@ -108,6 +141,9 @@ class Campaign extends Model
             'altBanner.mediumRectangleTemplate',
             'altBanner.barTemplate',
             'altBanner.shortMessageTemplate',
+            'countries',
+            'countriesWhitelist',
+            'countriesBlacklist',
             'schedules',
         ])->first();
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);

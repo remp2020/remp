@@ -581,7 +581,7 @@ $(document).ready(function(){
                 return null;
             }
             if (setDate) {
-                d = d.set({hour:0,minute:0,second:0,millisecond:0})
+                d = d.set(setDate)
             }
             return d.toISOString();
         },
