@@ -3,16 +3,30 @@
     import EventHub from "./EventHub"
 
     export default {
-        name: 'conversion-service',
+        name: 'iota-service',
         props: {
             articleIds: {
                 type: Array,
                 required: true,
             },
-            hourRanges: {
+            conversionMinuteRanges: {
                 type: Array,
                 default: function() {
-                    return [1,4,12];
+                    return [
+                        {"minutes": 60, "label": "1h"},
+                        {"minutes": 60*6, "label": "6h"},
+                        {"minutes": 60*24, "label": "24h"},
+                    ];
+                },
+            },
+            pageviewMinuteRanges: {
+                type: Array,
+                default: function() {
+                    return [
+                        {"minutes": 15, "label": "15m"},
+                        {"minutes": 60, "label": "1h"},
+                        {"minutes": 60*4, "label": "4h"},
+                    ];
                 },
             },
             baseUrl: {
@@ -34,14 +48,15 @@
             Axios.defaults.headers.common['Content-Type'] = 'application/json';
 
             let now = new Date();
-            this.fetchArticleStats(now);
+            this.fetchCommerceStats(now);
+            this.fetchPageviewStats(now);
             this.fetchTitleVariantStats(now);
         },
         methods: {
-            fetchArticleStats: function(now) {
-                for (let range of this.hourRanges) {
+            fetchCommerceStats: function(now) {
+                for (let range of this.conversionMinuteRanges) {
                     let d = new Date(now.getTime());
-                    d.setHours(d.getHours() - range);
+                    d.setMinutes(d.getMinutes() - range.minutes);
 
                     const payload = {
                         "time_after": d.toISOString(),
@@ -79,6 +94,26 @@
                         .catch(function (error) {
                             console.warn(error);
                         });
+                }
+            },
+
+            fetchPageviewStats: function(now) {
+                for (let range of this.pageviewMinuteRanges) {
+                    let d = new Date(now.getTime());
+                    d.setMinutes(d.getMinutes() - range.minutes);
+
+                    const payload = {
+                        "time_after": d.toISOString(),
+                        "filter_by": [
+                            {
+                                "tag": "article_id",
+                                "values": this.articleIds,
+                            },
+                        ],
+                        "group_by": [
+                            "article_id",
+                        ],
+                    }
 
                     Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', payload)
                         .then(function (response) {
@@ -95,9 +130,9 @@
             },
 
             fetchTitleVariantStats: function(now) {
-                for (let range of this.hourRanges) {
+                for (let range of this.pageviewMinuteRanges) {
                     let d = new Date(now.getTime());
-                    d.setHours(d.getHours() - range);
+                    d.setMinutes(d.getMinutes() - range.minutes);
 
                     const titleVariantPayload = {
                         "time_after": d.toISOString(),

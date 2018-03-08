@@ -27,10 +27,10 @@
                 </div>
                 <div class="ri_box_title">Revenue</div>
                 <div v-for="range in sortedRevenueRanges" class="ri_box_item">
-                    <div class="ri_box_key">{{ range }}H</div>
+                    <div class="ri_box_key">{{ range.label }}</div>
                     <div class="ri_box_value">
-                        {{ revenueStats[range].toFixed(2) }}&euro;
-                        <span v-if="countStats[range]" class="ri_box_small">({{ countStats[range] }})</span>&nbsp; 
+                        {{ revenueStats[range.minutes].toFixed(2) }}&euro;
+                        <span v-if="countStats[range.minutes]" class="ri_box_small">({{ countStats[range.minutes] }})</span>&nbsp;
                     </div>
                 </div>
             </div>
@@ -38,9 +38,9 @@
             <div v-if="sortedPageviewRanges.length > 0" class="ri_box_line">
                 <div class="ri_box_title">Pageviews</div>
                 <div v-for="range in sortedPageviewRanges" class="ri_box_item">
-                    <div class="ri_box_key">{{ range }}H</div>
+                    <div class="ri_box_key">{{ range.label }}</div>
                     <div class="ri_box_value">
-                        {{ pageviewStats[range] }}&nbsp;
+                        {{ pageviewStats[range.minutes] }}&nbsp;
                     </div>
                 </div>
             </div>
@@ -48,13 +48,12 @@
             <div v-if="sortedTitleVariants.length > 0" class="ri_box_line">
                 <div v-for="variant in sortedTitleVariants" class="ri_box_item">
                     <div class="ri_box_title">Title {{ variant }} (direct)</div>
-                    <div v-for="(count,range) in titleVariantStats[variant]">
-                        <div class="ri_box_key">{{ range }}H</div>
+                    <div v-for="range in sortedTitleVariantRanges">
+                        <div class="ri_box_key">{{ range.label }}</div>
                         <div class="ri_box_value">
-                            {{ count }}&nbsp;
+                            {{ titleVariantStats[variant][range.minutes] }}&nbsp;
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -65,7 +64,7 @@
     import EventHub from "./EventHub"
 
     export default {
-        name: 'conversion-template',
+        name: 'iota-article-stats',
         props: {
             articleId: {
                 type: String,
@@ -78,8 +77,10 @@
             pageviewStats: {},
             titleVariantStats: {},
 
-            revenueRanges: [],
-            pageviewRanges: [],
+            revenueRanges: {},
+            pageviewRanges: {},
+            titleVariantRanges: {},
+
             titleVariants: [],
         }),
         created: function() {
@@ -90,54 +91,58 @@
         },
         computed: {
             sortedRevenueRanges: function() {
-                return this.revenueRanges.slice().sort((a, b) => a - b);
+                return Object.values(this.revenueRanges).slice().sort((a, b) => a.minutes - b.minutes);
             },
             sortedPageviewRanges: function() {
-                return this.pageviewRanges.slice().sort((a, b) => a - b);
+                return Object.values(this.pageviewRanges).slice().sort((a, b) => a.minutes - b.minutes);
+            },
+            sortedTitleVariantRanges: function() {
+                return Object.values(this.titleVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
             },
             sortedTitleVariants: function() {
                 return this.titleVariants.slice().sort((a, b) => a - b);
             },
         },
         methods: {
-            updateRevenueStats: function(hourRange, sums) {
-                this.revenueRanges.push(hourRange);
+            updateRevenueStats: function(range, sums) {
+                this.$set(this.revenueRanges, range.minutes, range);
                 if (sums === null || !sums[this.articleId]) {
-                    this.$set(this.revenueStats, hourRange, 0);
+                    this.$set(this.revenueStats, range.minutes, 0);
                     return;
                 }
-                this.$set(this.revenueStats, hourRange, sums[this.articleId]);
+                this.$set(this.revenueStats, range.minutes, sums[this.articleId]);
             },
-            updateCountStats: function(hourRange, counts) {
+            updateCountStats: function(range, counts) {
                 if (counts === null || !counts[this.articleId]) {
-                    this.$set(this.countStats, hourRange, 0);
+                    this.$set(this.countStats, range.minutes, 0);
                     return;
                 }
-                this.$set(this.countStats, hourRange, counts[this.articleId]);
+                this.$set(this.countStats, range.minutes, counts[this.articleId]);
             },
-            updatePageviewStats: function(hourRange, counts) {
-                this.pageviewRanges.push(hourRange);
+            updatePageviewStats: function(range, counts) {
+                this.$set(this.pageviewRanges, range.minutes, range);
                 if (counts === null || !counts[this.articleId]) {
-                    this.$set(this.pageviewStats, hourRange, 0);
+                    this.$set(this.pageviewStats, range.minutes, 0);
                     return;
                 }
-                this.$set(this.pageviewStats, hourRange, counts[this.articleId]);
+                this.$set(this.pageviewStats, range.minutes, counts[this.articleId]);
             },
-            updateTitleVariantStats: function(hourRange, variant, counts) {
+            updateTitleVariantStats: function(range, variant, counts) {
                 if (variant === "") {
                     // no A/B test data were tracked, ignoring this section
                     return;
                 }
 
+                this.$set(this.titleVariantRanges, range.minutes, range);
                 if (this.titleVariants.indexOf(variant) === -1) {
                     this.titleVariants.push(variant);
                 }
 
                 let val = this.titleVariantStats[variant] || {};
                 if (counts === null || !counts[this.articleId]) {
-                    val[hourRange] = 0
+                    val[range.minutes] = 0
                 } else {
-                    val[hourRange] = counts[this.articleId]
+                    val[range.minutes] = counts[this.articleId]
                 }
                 this.titleVariantStats[variant] = val;
                 this.$forceUpdate();
