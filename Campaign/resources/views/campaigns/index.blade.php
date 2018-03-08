@@ -39,8 +39,7 @@
                             'renderParams' => ['column' => 'name'],
                         ],
                         'active' => [
-                            'header' => 'Is active',
-                            'render' => 'boolean'
+                            'header' => 'Is active'
                         ],
                         'signed_in' => [
                             'header' => 'Signed in',
