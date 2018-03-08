@@ -18,6 +18,8 @@
         </div>
     </div>
 
+    @include('flash::message')
+
     {!! Form::model($banner, ['route' => 'banners.store']) !!}
     @include('banners._form')
     {!! Form::close() !!}

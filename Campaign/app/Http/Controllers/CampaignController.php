@@ -47,6 +47,7 @@ class CampaignController extends Controller
             ->addColumn('actions', function (Campaign $campaign) {
                 return [
                     'edit' => route('campaigns.edit', $campaign),
+                    'copy' => route('campaigns.copy', $campaign),
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
@@ -96,6 +97,27 @@ class CampaignController extends Controller
             'availableCountries' => Country::all(),
             'segments' => $segments,
             'selectedSegments' => $selectedSegments,
+        ]);
+    }
+
+    public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
+    {
+        $sourceCampaign->load('banner', 'altBanner', 'segments', 'countries');
+        $campaign = $sourceCampaign->replicate();
+
+        $segments = $segmentAggregator->list();
+        foreach ($segmentAggregator->getErrors() as $error) {
+            flash($error)->error();
+            Log::error($error);
+        }
+
+        flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
+
+        return view('campaigns.create', [
+            'campaign' => $campaign,
+            'banners' => Banner::all(),
+            'availableCountries' => Country::all(),
+            'segments' => $segments,
         ]);
     }
 
