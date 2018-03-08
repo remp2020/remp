@@ -5,13 +5,11 @@ namespace App\Contracts\Remp;
 use App\CampaignSegment;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
-use App\Jobs\CacheSegmentJob;
-use Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Psy\Util\Json;
-use Razorpay\BloomFilter\Bloom;
 
 class Segment implements SegmentContract
 {
@@ -118,7 +116,8 @@ class Segment implements SegmentContract
                 'query' => $params,
             ]);
         } catch (ConnectException $e) {
-            throw new SegmentException("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
+            Log::warning("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
+            return false;
         }
 
         $result = json_decode($response->getBody());
