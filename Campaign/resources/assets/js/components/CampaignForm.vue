@@ -190,12 +190,36 @@
                     </div>
                 </div>
             </div>
+
+
+            <h4>Platforms</h4>
+
+            <div class="row m-t-30">
+                <div class="col-md-12">
+                    <div class="toggle-switch" data-ts-color="cyan">
+                        <label for="targetDesktop" class="ts-label">Show on desktop</label>
+                        <input id="targetDesktop" v-model="targetDesktop" type="checkbox" hidden="hidden">
+                        <label for="targetDesktop" class="ts-helper"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row m-t-20">
+                <div class="col-md-12">
+                    <div class="toggle-switch" data-ts-color="cyan">
+                        <label for="targetMobile" class="ts-label">Show on mobile</label>
+                        <input id="targetMobile" v-model="targetMobile" type="checkbox" hidden="hidden">
+                        <label for="targetMobile" class="ts-helper"></label>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script type="text/javascript">
-    import vSelect from "remp/js/components/vSelect.vue";
+    import vSelect from "remp/js/components/vSelect";
     import PageviewRules from "./templates/PageviewRules";
 
     let props = [
@@ -208,6 +232,8 @@
         "_active",
         "_countries",
         "_countriesBlacklist",
+        "_targetDesktop",
+        "_targetMobile",
 
         "_banners",
         "_availableSegments",
@@ -217,7 +243,7 @@
         "_segmentMap",
         "_eventTypes",
         "_availableCountries",
-        "_countriesBlacklistOptions",
+        "_countriesBlacklistOptions"
     ];
     export default {
         components: {
@@ -242,6 +268,8 @@
                 "active": null,
                 "countries": [],
                 "countriesBlacklist": null,
+                "targetDesktop": null,
+                "targetMobile": null,
 
                 "banners": null,
                 "availableSegments": null,
