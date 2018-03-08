@@ -24,17 +24,13 @@ test:sniffer:
     - make sniff
 
 deploy:mailer:admin:
-  cache:
-    key: "$CI_JOB_NAME"
-    paths:
-      - node_modules/
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Mailer/
     - ln -s ~/.env.mailer .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - mkdir -p ../node_modules && mv ../node_modules . && rm -fr ./node_modules/remp && yarn install && yarn run production && mv node_modules ../
+    - yarn install && yarn run production ; rm -fr ./node_modules
     - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/mailer
@@ -48,17 +44,13 @@ deploy:mailer:admin:
   dependencies: []
 
 deploy:campaign:admin:
-  cache:
-    key: "$CI_JOB_NAME"
-    paths:
-      - node_modules/
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Campaign/
     - ln -s ~/.env.campaign .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - mkdir -p ../node_modules && mv ../node_modules . && rm -fr ./node_modules/remp && yarn install && yarn run all-production && mv node_modules ../
+    - yarn install && yarn run all-production ; rm -fr ./node_modules
     - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/campaign
@@ -72,17 +64,13 @@ deploy:campaign:admin:
   dependencies: []
 
 deploy:beam:admin:
-  cache:
-    key: "$CI_JOB_NAME"
-    paths:
-      - node_modules/
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Beam/
     - ln -s ~/.env.beam .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - mkdir -p ../node_modules && mv ../node_modules . && rm -fr ./node_modules/remp && yarn install && yarn run all-production && mv node_modules ../
+    - yarn install && yarn run all-production ; rm -fr ./node_modules
     - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/beam
@@ -96,17 +84,13 @@ deploy:beam:admin:
   dependencies: []
 
 deploy:sso:admin:
-  cache:
-    key: "$CI_JOB_NAME"
-    paths:
-      - node_modules/
   stage: deploy
   script:
     - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
     - cd Sso/
     - ln -s ~/.env.sso .env
     - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - mkdir -p ../node_modules && mv ../node_modules . && rm -fr ./node_modules/remp && yarn install && yarn run production && mv node_modules ../
+    - yarn install && yarn run production ; rm -fr ./node_modules
     - vendor/bin/dep deploy sso --revision=$CI_COMMIT_SHA -vvv
   environment:
     name: production/remp2020/sso
