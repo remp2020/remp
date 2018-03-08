@@ -14,8 +14,8 @@
                 default: function() {
                     return [
                         {"minutes": 60, "label": "1h"},
-                        {"minutes": 60*6, "label": "6h"},
-                        {"minutes": 60*24, "label": "24h"},
+//                        {"minutes": 60*6, "label": "6h"},
+//                        {"minutes": 60*24, "label": "24h"},
                     ];
                 },
             },
@@ -158,17 +158,18 @@
                                     // we include only direct pageviews into the A/B test
                                     continue
                                 }
+                                if (parseInt(group["count"]) === 0) {
+                                    continue;
+                                }
 
                                 const titleVariant = group["tags"]["title_variant"]
                                 const articleId = group["tags"]["article_id"]
-                                if (!counts[titleVariant]) {
-                                    counts[titleVariant] = {}
+                                if (!counts[articleId]) {
+                                    counts[articleId] = {};
                                 }
-                                counts[titleVariant][articleId] = group["count"]
+                                counts[articleId][titleVariant] = group["count"]
                             }
-                            Object.keys(counts).forEach(function(variant) {
-                                EventHub.$emit('content-title-variants-changed', range, variant, counts[variant])
-                            });
+                            EventHub.$emit('content-title-variants-changed', range, counts)
 
                         })
                         .catch(function (error) {

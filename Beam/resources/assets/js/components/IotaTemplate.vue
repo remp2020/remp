@@ -51,7 +51,7 @@
                     <div v-for="range in sortedTitleVariantRanges">
                         <div class="ri_box_key">{{ range.label }}</div>
                         <div class="ri_box_value">
-                            {{ titleVariantStats[variant][range.minutes] }}&nbsp;
+                            {{ titleVariantStats[variant][range.minutes] || 0 }}&nbsp;
                         </div>
                     </div>
                 </div>
@@ -127,24 +127,27 @@
                 }
                 this.$set(this.pageviewStats, range.minutes, counts[this.articleId]);
             },
-            updateTitleVariantStats: function(range, variant, counts) {
-                if (variant === "") {
-                    // no A/B test data were tracked, ignoring this section
-                    return;
-                }
-
+            updateTitleVariantStats: function(range, counts) {
                 this.$set(this.titleVariantRanges, range.minutes, range);
-                if (this.titleVariants.indexOf(variant) === -1) {
-                    this.titleVariants.push(variant);
+
+                for (let variant in counts[this.articleId]) {
+                    if (!counts[this.articleId].hasOwnProperty(variant)) {
+                        continue;
+                    }
+                    if (this.titleVariants.indexOf(variant) === -1) {
+                        this.titleVariants.push(variant);
+                    }
+
+                    let val = this.titleVariantStats[variant] || {};
+                    if (counts === null || !counts[this.articleId][variant]) {
+                        val[range.minutes] = 0
+                    } else {
+                        val[range.minutes] = counts[this.articleId][variant]
+                    }
+                    this.titleVariantStats[variant] = val;
                 }
 
-                let val = this.titleVariantStats[variant] || {};
-                if (counts === null || !counts[this.articleId]) {
-                    val[range.minutes] = 0
-                } else {
-                    val[range.minutes] = counts[this.articleId]
-                }
-                this.titleVariantStats[variant] = val;
+
                 this.$forceUpdate();
             },
         },
