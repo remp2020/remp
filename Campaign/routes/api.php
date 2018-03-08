@@ -27,5 +27,7 @@ Route::middleware('auth:api')->group(function() {
     Route::apiResource('campaigns', 'CampaignController');
     Route::apiResource('banners', 'BannerController');
     Route::apiResource('schedule', 'ScheduleController');
+
+    Route::post('campaigns/toggle-active/{campaign}', 'CampaignController@toggleActive')->name('api.campaigns.toggle_active');
 });
 
