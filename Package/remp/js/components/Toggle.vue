@@ -59,11 +59,7 @@
                         self.disabled = false;
 
                         if (response.status == 200) {
-                            if (response.responseJSON.active == true) {
-                                self.checked = true;
-                            } else {
-                                self.checked = false;
-                            }
+                            self.checked = response.responseJSON.active;
                         }
 
                         if (self.callback) self.callback(response, status)

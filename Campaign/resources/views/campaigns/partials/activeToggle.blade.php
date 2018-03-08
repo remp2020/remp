@@ -4,7 +4,7 @@
         id="campaigns-list-item-active-toggle-{{ $id }}"
         :is-checked="{!! @json($active) !!}"
 
-        method="patch"
+        method="post"
         toggle-url="{!! route('api.campaigns.toggle_active', ['campaign' => $id]) !!}"
         auth-token="{{ config('services.remp.sso.api_token') }}"
         :callback="callback"
@@ -21,7 +21,7 @@
             callback: function (response, status) {
                 if (response.status !== 200) {
                     $.notify({
-                        message: 'Can\'t de/activate campaign.' 
+                        message: 'Cannot toggle campaign active status' 
                     }, {
                         allow_dismiss: false,
                         type: 'danger'
