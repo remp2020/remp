@@ -1,0 +1,20 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Generators</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-lg-4">
+                <h2 n:block="title">Edit generator <small>{$generator->title}</small></h2>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-body card-padding">
+        {include '@form.latte'}
+    </div>
+</div>
