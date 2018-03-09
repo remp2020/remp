@@ -21,6 +21,7 @@ use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
+use DeviceDetector\Parser\Device\Mobile as MobileParser;
 
 class CampaignController extends Controller
 {
@@ -371,8 +372,20 @@ class CampaignController extends Controller
                 continue;
             }
 
-            // country rules
+            // platform rules
+            $mobileParser = new MobileParser();
+            $mobileParser->setUserAgent($data->userAgent);
+            $isMobile = $mobileParser->parse();
 
+            if (!$campaign->target_mobile && $isMobile) {
+                continue;
+            }
+
+            if (!$campaign->target_desktop && !$isMobile) {
+                continue;
+            }
+
+            // country rules
             if (!$campaign->countries->isEmpty()) {
                 // load country ISO code based on IP
                 try {

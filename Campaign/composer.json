@@ -50,7 +50,8 @@
         "deployer/recipes": "^6.0",
         "recca0120/laravel-tracy": "^1.8",
         "php-amqplib/php-amqplib": "^2.7",
-        "fico7489/laravel-pivot": "^2.1"
+        "fico7489/laravel-pivot": "^2.1",
+        "piwik/device-detector": "^3.10"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

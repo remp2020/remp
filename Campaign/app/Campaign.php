@@ -23,7 +23,9 @@ class Campaign extends Model
         'signed_in',
         'active',
         'once_per_session',
-        'pageview_rules'
+        'pageview_rules',
+        'target_desktop',
+        'target_mobile'
     ];
 
     protected $casts = [

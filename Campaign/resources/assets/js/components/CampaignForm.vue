@@ -198,7 +198,8 @@
                 <div class="col-md-12">
                     <div class="toggle-switch" data-ts-color="cyan">
                         <label for="targetDesktop" class="ts-label">Show on desktop</label>
-                        <input id="targetDesktop" v-model="targetDesktop" type="checkbox" hidden="hidden">
+                        <input type="hidden" name="target_desktop" value="0">
+                        <input id="targetDesktop" name="target_desktop" value="1" v-model="targetDesktop" type="checkbox" hidden="hidden">
                         <label for="targetDesktop" class="ts-helper"></label>
                     </div>
                 </div>
@@ -208,7 +209,8 @@
                 <div class="col-md-12">
                     <div class="toggle-switch" data-ts-color="cyan">
                         <label for="targetMobile" class="ts-label">Show on mobile</label>
-                        <input id="targetMobile" v-model="targetMobile" type="checkbox" hidden="hidden">
+                        <input type="hidden" name="target_mobile" value="0">
+                        <input id="targetMobile" name="target_mobile" value="1" v-model="targetMobile" type="checkbox" hidden="hidden">
                         <label for="targetMobile" class="ts-helper"></label>
                     </div>
                 </div>
