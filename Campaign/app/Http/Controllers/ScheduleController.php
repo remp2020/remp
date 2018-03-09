@@ -26,13 +26,14 @@ class ScheduleController extends Controller
     /**
      * Return data for Schedule Datatable.
      *
-     * If $campaign is provided, only schedules for that one Campaign are returned.
+     * If `$campaign` is provided, only schedules for that one Campaign are returned.
+     * If request parameter `limit` is used, count of results will be limited to that number.
      *
      * @param Datatables $dataTables
      * @param Campaign|null $campaign
      * @return mixed
      */
-    public function json(Datatables $dataTables, Campaign $campaign = null)
+    public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
     {
         $scheduleSelect = Schedule::select()
             ->with(['campaign', 'campaign.banner'])
@@ -45,7 +46,9 @@ class ScheduleController extends Controller
         if (!is_null($campaign)) {
             $scheduleSelect->where('campaign_id', '=' , $campaign->id);
         }
-
+        if (is_numeric($request->limit)) {
+            $scheduleSelect->limit($request->limit);
+        }
         $schedule = $scheduleSelect->get();
 
         return $dataTables->of($schedule)
