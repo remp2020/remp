@@ -14,8 +14,8 @@
                 default: function() {
                     return [
                         {"minutes": 60, "label": "1h"},
-//                        {"minutes": 60*6, "label": "6h"},
-//                        {"minutes": 60*24, "label": "24h"},
+                        {"minutes": 60*6, "label": "6h"},
+                        {"minutes": 60*24, "label": "24h"},
                     ];
                 },
             },
