@@ -182,13 +182,13 @@ return [
         App\Providers\RempSegmentsServiceProvider::class,
         App\Providers\RempTrackerServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
-        App\Providers\DeviceDetectorServiceProvider::class,
 
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
+        App\Providers\DeviceDetectorServiceProvider::class
     ],
 
     /*
