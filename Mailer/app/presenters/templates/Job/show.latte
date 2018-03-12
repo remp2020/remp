@@ -69,15 +69,15 @@
                 <div class="card z-depth-1">
                     <div class="card-header">
                         <h2><i class="zmdi zmdi-collection-item"></i> Batch #{$batch->id}</h2>
-                        <div class="actions">
+                        <div class="actions actions-relative">
                             <a n:href="EditBatch $batch->id" n:if="in_array($batch->status, [created, updated, ready])">
-                                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Edit</button>
+                                <button type="button" class="btn palette-Cyan bg waves-effect m-b-5"><i class="zmdi zmdi-edit"></i> Edit</button>
                             </a>
                             <a href="#new-template-form-batch-{$batch->id}" data-toggle="collapse">
-                                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-plus-circle"></i> Add email variant</button>
+                                <button type="button" class="btn palette-Cyan bg waves-effect m-b-5"><i class="zmdi zmdi-plus-circle"></i> Add email variant</button>
                             </a>
                             <a n:if="$batch->sent_emails == 0" n:href="RemoveBatch! $batch->id">
-                                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-close"></i> Remove</button>
+                                <button type="button" class="btn palette-Cyan bg waves-effect m-b-5"><i class="zmdi zmdi-close"></i> Remove</button>
                             </a>
                         </div>
                     </div>
