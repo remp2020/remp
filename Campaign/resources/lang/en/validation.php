@@ -117,6 +117,8 @@ return [
     'attributes' => [
         'banner_id' => 'banner',
         'alt_banner_id' => 'banner B alternative',
+        'pageview_rules.*.num' => 'pageview rule n-th',
+        'pageview_rules.*.rule' => 'pageview rule type'
     ],
 
 ];

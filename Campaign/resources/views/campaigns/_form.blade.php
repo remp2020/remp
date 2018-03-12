@@ -48,6 +48,7 @@ foreach ($campaign->countries as $country) {
         "signedIn": {!! @json($campaign->signed_in) !!},
         "oncePerSession": {!! @json($campaign->once_per_session) !!},
         "active": {!! @json($campaign->active) !!},
+        "pageviewRules": {!! @json($campaign->pageview_rules) !!} || [],
         "countries": {!! $selectedCountries->toJson(JSON_UNESCAPED_UNICODE) !!},
         "countriesBlacklist": {!! @json($countriesBlacklist ?? 0) !!},
 

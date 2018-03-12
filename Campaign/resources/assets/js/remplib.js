@@ -22,6 +22,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsStorageKey: "campaigns",
 
+        pageviewCountStorageKey: "pageview_count",
+
         campaignsSessionStorageKey: "campaigns_session",
 
         /* JSONP START */
@@ -37,7 +39,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
+                    "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewCountStorageKey)
                 }
+
             },
             processResponse: function(result) {
                 if (!result["success"]) {
@@ -86,7 +90,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (typeof config.cookieDomain === 'string') {
                 remplib.cookieDomain = config.cookieDomain;
-            }
+            } 
+
+            this.incrementPageviewCount();
         },
 
         run: function() {
@@ -136,6 +142,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 return campaigns.values;
             }
             return null;
+        },
+
+        incrementPageviewCount: function ()  {
+            var pageviewCount = remplib.getFromStorage(this.pageviewCountStorageKey);
+
+            if (pageviewCount) {
+                remplib.setToStorage(this.pageviewCountStorageKey, pageviewCount+1);
+            } else {
+                remplib.setToStorage(this.pageviewCountStorageKey, 1);
+            }
         },
 
         // used to store campaign details, called from banner view

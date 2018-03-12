@@ -127,9 +127,18 @@
                 $select.selectpicker('val', val);
                 this.$emit('input', val);
                 $select.selectpicker('refresh');
+            },
+            value: function () {
+                let $select = $(this.$el).find('select');
+                $select.val(this.value);
+                $select.selectpicker('refresh');
             }
         },
         methods: {
+            resetValue: function() {
+                let $select = $(this.$el).find('select');
+                $select.selectpicker('val', null);
+            },
             optionsEmpty: function() {
                 return typeof this.options === 'undefined' || this.options.length === 0;
             },

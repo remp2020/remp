@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <h4>Settings</h4>
 
             <div class="input-group fg-float m-t-30">
@@ -70,6 +70,8 @@
                     </div>
                 </div>
             </div>
+
+            <pageview-rules :pageviewRules="pageviewRules"></pageview-rules>
 
             <div class="input-group fg-float m-t-30 checkbox">
                 <label class="m-l-15">
@@ -191,6 +193,7 @@
 
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect.vue";
+    import PageviewRules from "./templates/PageviewRules";
 
     let props = [
         "_name",
@@ -205,6 +208,7 @@
 
         "_banners",
         "_availableSegments",
+        "_pageviewRules",
         "_addedSegment",
         "_removedSegments",
         "_segmentMap",
@@ -215,6 +219,7 @@
     export default {
         components: {
             vSelect,
+            PageviewRules
         },
         created: function(){
             let self = this;
@@ -241,8 +246,9 @@
                 "removedSegments": [],
                 "segmentMap": null,
                 "eventTypes": null,
+                "pageviewRules": [],
                 "availableCountries": null,
-                "countriesBlacklistOptions": null,
+                "countriesBlacklistOptions": null
             }
         },
         computed: {

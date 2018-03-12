@@ -412,6 +412,33 @@ class CampaignController extends Controller
                 }
             }
 
+            // pageview rules
+            if ($campaign->pageview_rules !== null) {
+                foreach ($campaign->pageview_rules as $rule) {
+                    if (!$rule['num'] || !$rule['rule']) {
+                        continue;
+                    }
+
+                    switch ($rule['rule']) {
+                        case Campaign::PAGEVIEW_RULE_EVERY:
+                            if ($data->pageviewCount % $rule['num'] !== 0) {
+                                continue 3;
+                            }
+                            break;
+                        case Campaign::PAGEVIEW_RULE_SINCE:
+                            if ($data->pageviewCount < $rule['num']) {
+                                continue 3;
+                            }
+                            break;
+                        case Campaign::PAGEVIEW_RULE_BEFORE:
+                            if ($data->pageviewCount >= $rule['num']) {
+                                continue 3;
+                            }
+                            break;
+                    }
+                }
+            }
+
             //render
             $displayedCampaigns[] = View::make('banners.preview', [
                 'banner' => $banner,

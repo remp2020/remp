@@ -31,6 +31,8 @@ class CampaignRequest extends FormRequest
             'signed_in' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
             'segments' => 'array',
+            'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
+            'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
         ];
     }
 
