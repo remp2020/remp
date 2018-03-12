@@ -91,8 +91,7 @@
                 this.pageviewRulesData.splice(i, 1);
 
                 if (!this.pageviewRulesData.length) {
-                    self.addRule();
-                    this.$refs.pageviewRulesDataRefs[0].resetValue();
+                    this.addRule();
                 }
             }
         }

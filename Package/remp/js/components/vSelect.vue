@@ -127,6 +127,11 @@
                 $select.selectpicker('val', val);
                 this.$emit('input', val);
                 $select.selectpicker('refresh');
+            },
+            value: function () {
+                let $select = $(this.$el).find('select');
+                $select.val(this.value);
+                $select.selectpicker('refresh');
             }
         },
         methods: {
