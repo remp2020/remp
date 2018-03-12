@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "cross-env": "^5.0.1",
-    "laravel-mix": "^1.4.2",
+    "laravel-mix": "^1.4.3",
     "node-sass": "^4.5.3",
     "optipng-bin": "^4.0.0"
   }
