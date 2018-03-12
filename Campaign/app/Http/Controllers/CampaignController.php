@@ -21,7 +21,9 @@ use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
-use DeviceDetector\Parser\Device\Mobile as MobileParser;
+use DeviceDetector\Cache\PSR6Bridge;
+use DeviceDetector\DeviceDetector;
+
 
 class CampaignController extends Controller
 {
@@ -248,7 +250,8 @@ class CampaignController extends Controller
         AlignmentMap $am,
         SegmentAggregator $sa,
         GeoIp2\Database\Reader $geoIPreader,
-        MobileParser $mobileParser
+        DeviceDetector $dd,
+        PSR6Bridge $ddPsr6Bridge
     ) {
         // validation
 
@@ -374,8 +377,11 @@ class CampaignController extends Controller
             }
 
             // platform rules
-            $mobileParser->setUserAgent($data->userAgent);
-            $isMobile = $mobileParser->parse();
+            $dd->setUserAgent($data->userAgent);
+            $dd->setCache($ddPsr6Bridge);
+            $dd->parse();
+
+            $isMobile = $dd->isMobile();
 
             if (!$campaign->target_mobile && $isMobile) {
                 continue;
