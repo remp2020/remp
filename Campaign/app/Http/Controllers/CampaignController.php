@@ -247,7 +247,8 @@ class CampaignController extends Controller
         PositionMap $pm,
         AlignmentMap $am,
         SegmentAggregator $sa,
-        GeoIp2\Database\Reader $geoIPreader
+        GeoIp2\Database\Reader $geoIPreader,
+        MobileParser $mobileParser
     ) {
         // validation
 
@@ -373,7 +374,6 @@ class CampaignController extends Controller
             }
 
             // platform rules
-            $mobileParser = new MobileParser();
             $mobileParser->setUserAgent($data->userAgent);
             $isMobile = $mobileParser->parse();
 
