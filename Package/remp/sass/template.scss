@@ -8991,6 +8991,12 @@ pre {
   z-index: 2;
   top: 25px;
 }
+
+.card-header .actions.actions-relative {
+  position: relative;
+  margin-left: 5px;
+}
+
 .card-body.card-padding {
   padding: 30px 33px;
 }
@@ -9005,6 +9011,11 @@ pre {
   position: relative;
   padding: 30px;
   border-radius: 2px 2px 0 0;
+}
+@media(max-width: 1770px) {
+  .card-header {
+    padding: 30px 30px 20px 30px;
+  }
 }
 .card-header h2 {
   margin: 0;
