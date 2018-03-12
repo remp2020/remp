@@ -24,7 +24,6 @@ use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\Cache\PSR6Bridge;
 use DeviceDetector\DeviceDetector;
 
-
 class CampaignController extends Controller
 {
     /**
