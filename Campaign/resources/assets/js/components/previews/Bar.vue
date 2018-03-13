@@ -32,6 +32,7 @@
         min-height: 68px;
         justify-content: space-between;
         align-items: center;
+        box-sizing: border-box;
     }
 
     .bar-main {
