@@ -42,6 +42,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         usingAdblock: false,
 
+        cookiesEnabled: false,
+
         totalTimeSpent: 0,
 
         partialTimeSpent: 0,
@@ -105,6 +107,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             this.parseUriParams();
+
+            this.checkCookiesEnabled();
 
             if (typeof config.tracker.timeSpentEnabled === 'boolean') {
                 this.timeSpentEnabled = config.tracker.timeSpentEnabled;
@@ -400,6 +404,18 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             });
         },
 
+        checkCookiesEnabled: function () {
+            if (navigator.cookieEnabled) {
+                return remplib.tracker.cookiesEnabled = true;
+            }
+
+            document.cookie = "cookietest=1";
+            remplib.tracker.cookiesEnabled = document.cookie.indexOf("cookietest=") != -1;
+
+            document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
+            return ret;
+        },
+
         addSystemUserParams: function(params) {
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
@@ -411,6 +427,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
                 "using_adblock": remplib.tracker.usingAdblock,
+                "window_height": window.outerHeight,
+                "window_width": window.outerWidth,
+                "cookies_enabled": remplib.tracker.cookiesEnabled,
+                "websockets_supported": 'WebSocket' in window || false,
                 "source": {
                     "ref": this.getRefSource(),
                     "social": this.getSocialSource(),
