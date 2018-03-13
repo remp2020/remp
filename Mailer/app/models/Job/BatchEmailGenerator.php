@@ -88,7 +88,7 @@ class BatchEmailGenerator
             $this->mailJobQueueRepository->removeOtherVariants($batch, $job->mail_type_variant_id);
         }
         if ($job->context) {
-            $this->mailJobQueueRepository->removeOtherVariants($batch, $job->context);
+            $this->mailJobQueueRepository->removeAlreadySentContext($batch, $job->context);
         }
         $this->mailJobQueueRepository->removeAlreadyQueued($batch);
         $this->mailJobQueueRepository->removeAlreadySent($batch);
