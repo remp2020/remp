@@ -23,7 +23,7 @@ parameters:
 
 extensions:
     local_configs: Remp\MailerModule\Config\ConfigExtension
-    webpack: Oops\WebpackNetteAdapter\DI\WebpackExtension(%debugMode%)
+    webpack: Oops\WebpackNetteAdapter\DI\WebpackExtension(true)
 
 webpack:
     devServer:
