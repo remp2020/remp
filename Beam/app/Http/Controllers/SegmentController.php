@@ -113,7 +113,18 @@ class SegmentController extends Controller
             $rule->save();
         }
 
-        return redirect(route('segments.index'))->with('success', 'Segment created');
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('segments.index'))->with('success', 'Segment created')
+                ]);
+            default:
+                // save & all unknown actions result in creating entity & redirecting to edit
+                return response()->format([
+                    'html' => redirect(route('segments.edit', $segment))->with('success', 'Segment created'),
+                ]);
+        }
     }
 
     /**
@@ -168,7 +179,18 @@ class SegmentController extends Controller
         }
         SegmentRule::destroy($request->get('removedRules'));
 
-        return redirect(route('segments.index'))->with('success', 'Segment updated');
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('segments.index'))->with('success', 'Segment updated'),
+                ]);
+            default:
+                // save & all unknown actions result in updating entity & not redirecting away
+                return response()->format([
+                    'html' => redirect()->back()->with('success', 'Segment updated'),
+                ]);
+        }
     }
 
     /**

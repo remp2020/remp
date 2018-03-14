@@ -122,10 +122,20 @@ class BannerController extends Controller
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
         }
 
-        return response()->format([
-            'html' => redirect(route('banners.index'))->with('success', 'Banner created'),
-            'json' => new BannerResource($banner),
-        ]);
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('banners.index'))->with('success', 'Banner created'),
+                    'json' => new BannerResource($banner),
+                ]);
+            default:
+                // save & all unknown actions result in creating entity & redirecting to edit
+                return response()->format([
+                    'html' => redirect(route('banners.edit', $banner))->with('success', 'Banner created'),
+                    'json' => new BannerResource($banner),
+                ]);
+        }
     }
 
     /**
@@ -193,10 +203,20 @@ class BannerController extends Controller
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
         }
 
-        return response()->format([
-            'html' => redirect(route('banners.index'))->with('success', 'Banner updated'),
-            'json' => new BannerResource($banner),
-        ]);
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('banners.index'))->with('success', 'Banner updated'),
+                    'json' => new BannerResource($banner),
+                ]);
+            default:
+                // save & all unknown actions result in creating entity & redirecting to edit
+                return response()->format([
+                    'html' => redirect(route('banners.edit', $banner))->with('success', 'Banner updated'),
+                    'json' => new BannerResource($banner),
+                ]);
+        }
     }
 
     /**

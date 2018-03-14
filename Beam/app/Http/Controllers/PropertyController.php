@@ -76,7 +76,18 @@ class PropertyController extends Controller
         $property->account()->associate($account);
         $property->save();
 
-        return redirect(route('accounts.properties.index', $account))->with('success', 'Property created');
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('accounts.properties.index', $account))->with('success', 'Property created'),
+                ]);
+            default:
+                // save & all unknown actions result in updating entity & not redirecting away
+                return response()->format([
+                    'html' => redirect(route('accounts.properties.edit', [$account, $property]))->with('success', 'Property created'),
+                ]);
+        }
     }
 
     /**
@@ -111,7 +122,18 @@ class PropertyController extends Controller
         $property->fill($request->all());
         $property->save();
 
-        return redirect(route('accounts.properties.index', $account))->with('success', 'Property updated');
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('accounts.properties.index', $account))->with('success', 'Property updated'),
+                ]);
+            default:
+                // save & all unknown actions result in updating entity & not redirecting away
+                return response()->format([
+                    'html' => redirect()->back()->with('success', 'Property updated'),
+                ]);
+        }
     }
 
     /**

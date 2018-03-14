@@ -10,4 +10,13 @@
 {!! Form::button('<i class="zmdi zmdi-mail-send"></i> Save', [
     'class' => 'btn btn-info waves-effect',
     'type' => 'submit',
+    'name' => 'action',
+    'value' => 'save'
+]) !!}
+
+{!! Form::button('<i class="zmdi zmdi-mail-send"></i> Save and close', [
+    'class' => 'btn btn-info waves-effect',
+    'type' => 'submit',
+    'name' => 'action',
+    'value' => 'save_close'
 ]) !!}

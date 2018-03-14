@@ -302,9 +302,15 @@ final class JobPresenter extends BasePresenter
         $batch = $this->batchesRepository->find($this->getParameter('id'));
         $form = $this->editBatchFormFactory->create($batch);
 
-        $this->editBatchFormFactory->onSuccess = function ($batch) {
+        $this->editBatchFormFactory->onSuccess = function ($batch, $buttonSubmitted) {
             $this->flashMessage(sprintf('Batch #%d was updated', $batch->id));
-            $this->redirect('Show', $batch->job->id);
+
+            // redirect based on button clicked by user
+            if ($buttonSubmitted === EditBatchFormFactory::FORM_ACTION_SAVE_CLOSE) {
+                $this->redirect('Show', $batch->job->id);
+            } else {
+                $this->redirect('EditBatch', $batch->job->id);
+            }
         };
 
         return $form;

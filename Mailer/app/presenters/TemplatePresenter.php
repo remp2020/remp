@@ -230,13 +230,23 @@ final class TemplatePresenter extends BasePresenter
         $form = $this->templateFormFactory->create($id);
 
         $presenter = $this;
-        $this->templateFormFactory->onCreate = function ($template) use ($presenter) {
+        $this->templateFormFactory->onCreate = function ($template, $buttonSubmitted) use ($presenter) {
             $presenter->flashMessage('Email was created');
-            $presenter->redirect('Edit', $template->id);
+            // redirect based on button clicked by user
+            if ($buttonSubmitted === TemplateFormFactory::FORM_ACTION_SAVE_CLOSE) {
+                $presenter->redirect('Default');
+            } else {
+                $presenter->redirect('Edit', $template->id);
+            }
         };
-        $this->templateFormFactory->onUpdate = function ($template) use ($presenter) {
+        $this->templateFormFactory->onUpdate = function ($template, $buttonSubmitted) use ($presenter) {
             $presenter->flashMessage('Email was updated');
-            $presenter->redirect('Edit', $template->id);
+            // redirect based on button clicked by user
+            if ($buttonSubmitted === TemplateFormFactory::FORM_ACTION_SAVE_CLOSE) {
+                $presenter->redirect('Default');
+            } else {
+                $presenter->redirect('Edit', $template->id);
+            }
         };
 
         return $form;

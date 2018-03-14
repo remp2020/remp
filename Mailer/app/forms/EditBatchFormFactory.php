@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Database\Table\ActiveRow;
+use Nette\Forms\Controls\SubmitButton;
 use Nette\Object;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
@@ -12,6 +13,9 @@ use Remp\MailerModule\Repository\TemplatesRepository;
 
 class EditBatchFormFactory extends Object
 {
+    const FORM_ACTION_SAVE = 'save';
+    const FORM_ACTION_SAVE_CLOSE = 'save_close';
+
     /** @var JobsRepository */
     private $jobsRepository;
 
@@ -57,10 +61,15 @@ class EditBatchFormFactory extends Object
 
         $form->addHidden('id', $batch->id);
 
-        $form->addSubmit('save', 'Save')
+        $form->addSubmit(self::FORM_ACTION_SAVE, self::FORM_ACTION_SAVE)
             ->getControlPrototype()
             ->setName('button')
-            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
+            ->setHtml('<i class="zmdi zmdi-check"></i> Save');
+
+        $form->addSubmit(self::FORM_ACTION_SAVE_CLOSE, self::FORM_ACTION_SAVE_CLOSE)
+            ->getControlPrototype()
+            ->setName('button')
+            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and close');
 
         $form->setDefaults([
             'method' => $batch->method,
@@ -88,6 +97,14 @@ class EditBatchFormFactory extends Object
             'start_at' => new \DateTime($values['start_at']),
         ]));
 
-        ($this->onSuccess)($batch);
+        // decide if user wants to save or save and leave
+        $buttonSubmitted = self::FORM_ACTION_SAVE;
+        /** @var $buttonSaveClose SubmitButton */
+        $buttonSaveClose = $form['save_close'];
+        if ($buttonSaveClose->isSubmittedBy()) {
+            $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
+        }
+
+        ($this->onSuccess)($batch, $buttonSubmitted);
     }
 }

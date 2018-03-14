@@ -67,7 +67,18 @@ class AccountController extends Controller
         $account->uuid = Uuid::uuid4();
         $account->save();
 
-        return redirect(route('accounts.index'))->with('success', 'Account created');
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('accounts.index'))->with('success', 'Account created'),
+                ]);
+            default:
+                // save & all unknown actions result in updating entity & not redirecting away
+                return response()->format([
+                    'html' => redirect(route('accounts.edit', $account))->with('success', 'Account created'),
+                ]);
+        }
     }
 
     /**
@@ -110,7 +121,18 @@ class AccountController extends Controller
         $account->fill($request->all());
         $account->save();
 
-        return redirect(route('accounts.index'))->with('success', 'Account updated');
+        // process actions
+        switch ($request->get('action')) {
+            case 'save_close':
+                return response()->format([
+                    'html' => redirect(route('accounts.index'))->with('success', 'Account updated'),
+                ]);
+            default:
+                // save & all unknown actions result in updating entity & not redirecting away
+                return response()->format([
+                    'html' => redirect()->back()->with('success', 'Account updated'),
+                ]);
+        }
     }
 
     /**
