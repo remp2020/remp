@@ -22,6 +22,7 @@
         vertical-align: middle;
         padding: 5px 10px;
         display: flex;
+        box-sizing: border-box;
         height: 100%;
         align-items: center;
     }

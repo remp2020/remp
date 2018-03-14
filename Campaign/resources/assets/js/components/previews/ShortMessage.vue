@@ -27,6 +27,7 @@
         padding: 0 20px;
         text-align: center;
         display: flex;
+        box-sizing: border-box;
         flex-direction: column;
         justify-content: space-around;
         align-items: center;

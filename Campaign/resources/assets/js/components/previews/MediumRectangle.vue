@@ -31,6 +31,7 @@
         flex-direction: column;
         justify-content: space-around;
         align-items: center;
+        box-sizing: border-box;
     }
 
     .medium-rectangle-header {
