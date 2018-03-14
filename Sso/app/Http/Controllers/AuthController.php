@@ -12,10 +12,6 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class AuthController extends Controller
 {
-    public function index()
-    {
-        return redirect(route('api-tokens.index'));
-    }
 
     public function login(Request $request, UrlHelper $urlHelper)
     {

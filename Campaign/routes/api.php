@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 */
 
 Route::middleware('auth:api')->group(function() {
-    Route::get('/user', 'Auth\UserController@get');
 
     Route::prefix('schedule')->group(function() {
         Route::post('{schedule}/start', 'ScheduleController@start')->name('schedule.start');

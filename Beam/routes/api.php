@@ -14,8 +14,6 @@ use Illuminate\Http\Request;
 */  
 
 Route::middleware('auth:api')->group(function() {
-    Route::get('/user', 'Auth\UserController@get');
-
     Route::apiResource('articles', 'ArticleController', [
         'only' => ['store'],
     ]);

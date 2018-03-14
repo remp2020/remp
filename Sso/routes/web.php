@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', 'AuthController@index');
+Route::get('/', 'ApiTokenController@index');
 
 Route::get('/error', 'AuthController@error')->name('sso.error');
 
