@@ -39,6 +39,11 @@ class VerifyJwtToken
                 return $this->handleCallback($request);
             }
 
+            // invalidate token after logging user out
+            if ($token && $this->guard->guest()) {
+                $this->sso->invalidate($token);
+            }
+
             // check whether guard has a user
             if (!$this->guard->check()) {
                 // empty introspect to get redirect URL from SSO

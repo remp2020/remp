@@ -25,6 +25,8 @@ class User extends Authenticatable implements JWTSubject
 {
     const PROVIDER_GOOGLE = 'google';
 
+    const USER_TOKEN_SESSION_KEY = 'user_token';
+
     public $latestProvider;
 
     /**

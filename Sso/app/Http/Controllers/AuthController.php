@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ApiToken;
 use App\UrlHelper;
+use App\User;
 use Illuminate\Http\Request;
 use JWTAuth;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -12,7 +13,7 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request, UrlHelper $urlHelper)
+    public function login(Request $request, UrlHelper $urlHelper, \Tymon\JWTAuth\JWTAuth $auth)
     {
         $successUrl = $request->input('successUrl');
         if (!$successUrl) {
@@ -21,6 +22,18 @@ class AuthController extends Controller
         $errorUrl = $request->input('errorUrl');
         if (!$errorUrl) {
             throw new BadRequestHttpException('missing errorUrl query param');
+        }
+
+        if ($token = session()->get(User::USER_TOKEN_SESSION_KEY)) {
+            try {
+                $refreshedToken = $auth->setToken($token)->refresh();
+                $redirectUrl = $urlHelper->appendQueryParams($successUrl, [
+                    'token' => $refreshedToken,
+                ]);
+                return redirect($redirectUrl);
+            } catch (JWTException $e) {
+                // cannot refresh the token (it might have been already blacklisted), let user log in again
+            }
         }
 
         // TODO: get providers from container; display login page if multiple, autoredirect if single
@@ -32,10 +45,11 @@ class AuthController extends Controller
         return redirect($redirectUrl);
     }
 
-    public function refresh(\Tymon\JWTAuth\JWTAuth $auth, \Illuminate\Http\Request $request)
+    public function refresh(\Tymon\JWTAuth\JWTAuth $auth, Request $request)
     {
         try {
             $refreshedToken = $auth->setRequest($request)->parseToken()->refresh();
+            session()->put(User::USER_TOKEN_SESSION_KEY, $refreshedToken);
             return response()->json([
                 'token' => $refreshedToken,
             ]);
@@ -66,13 +80,24 @@ class AuthController extends Controller
         ]);
     }
 
-    public function apiToken(\Illuminate\Http\Request $request)
+    public function apiToken(Request $request)
     {
         $bearerToken = $request->bearerToken();
         $token = ApiToken::whereToken($bearerToken)->first();
         if (!$token) {
             return response()->json(null, 404);
         }
+        return response()->json(null, 200);
+    }
+
+    public function invalidate(\Tymon\JWTAuth\JWTAuth $auth, Request $request)
+    {
+        try {
+            $auth->setRequest($request)->parseToken()->invalidate()->refresh();
+        } catch (\Exception $e) {
+            // no token found or token blacklisted, we're fine
+        }
+        session()->remove(User::USER_TOKEN_SESSION_KEY);
         return response()->json(null, 200);
     }
 }

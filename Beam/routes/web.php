@@ -35,6 +35,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
 
+    Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
+
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
     Route::resource('segments', 'SegmentController');

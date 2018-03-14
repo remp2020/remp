@@ -3,7 +3,6 @@
 namespace Remp\LaravelSso\Contracts\Jwt;
 
 use Remp\LaravelSso\Contracts\JwtException;
-use Remp\LaravelSso\Contracts\SsoContract;
 use Remp\LaravelSso\Contracts\SsoException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard as AuthGuard;
@@ -15,13 +14,10 @@ class Guard implements AuthGuard
 
     const JWT_TOKEN_SESSION = 'jwt.token';
 
-    private $ssoContract;
-
     private $session;
 
-    public function __construct(SsoContract $ssoContract, Session $session)
+    public function __construct(Session $session)
     {
-        $this->ssoContract = $ssoContract;
         $this->session = $session;
     }
 
@@ -47,7 +43,7 @@ class Guard implements AuthGuard
      */
     public function guest()
     {
-        return $this->session->get(self::JWT_USER_SESSION) !== null;
+        return $this->session->get(self::JWT_USER_SESSION) === null;
     }
 
     /**
@@ -125,5 +121,10 @@ class Guard implements AuthGuard
     public function getName()
     {
         return self::JWT_USER_SESSION;
+    }
+
+    public function logout()
+    {
+        $this->session->remove(self::JWT_USER_SESSION);
     }
 }

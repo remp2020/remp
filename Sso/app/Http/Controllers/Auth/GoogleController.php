@@ -84,6 +84,8 @@ class GoogleController extends Controller
         $user->latestProvider = User::PROVIDER_GOOGLE;
         $token = $jwt->fromSubject($user);
 
+        session()->put(User::USER_TOKEN_SESSION_KEY, $token);
+
         $redirectUrl = $urlHelper->appendQueryParams($backUrl, [
             'token' => $token,
         ]);

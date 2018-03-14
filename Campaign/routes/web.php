@@ -30,6 +30,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
     Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
 
+    Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
+
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');
     Route::resource('schedule', 'ScheduleController');
