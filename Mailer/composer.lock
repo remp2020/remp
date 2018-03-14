@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "752732cca1c342ec613cdc4f53882a1b",
+    "content-hash": "c055708f0eaf9b9567addb89cd0fc4b0",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -1852,6 +1852,62 @@
                 "validation"
             ],
             "time": "2017-08-20T17:32:29+00:00"
+        },
+        {
+            "name": "oops/webpack-nette-adapter",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/o2ps/WebpackNetteAdapter.git",
+                "reference": "cf9ac3c29eb9cbd5aafeee64b26a9cb5367dff96"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/o2ps/WebpackNetteAdapter/zipball/cf9ac3c29eb9cbd5aafeee64b26a9cb5367dff96",
+                "reference": "cf9ac3c29eb9cbd5aafeee64b26a9cb5367dff96",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~6.3",
+                "nette/di": "~2.4",
+                "php": ">= 7.0.0"
+            },
+            "require-dev": {
+                "jakub-onderka/php-parallel-lint": "~0.8",
+                "latte/latte": "~2.4",
+                "mockery/mockery": "~0.9",
+                "nette/application": "~2.4",
+                "nette/bootstrap": "~2.4",
+                "nette/tester": "~1.0",
+                "tracy/tracy": "~2.4"
+            },
+            "suggest": {
+                "latte/latte": "to enable Latte integration via {webpack} macro",
+                "tracy/tracy": "to enable asset debugging in the debug bar panel"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Oops\\WebpackNetteAdapter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Jiří Pudil",
+                    "email": "me@jiripudil.cz",
+                    "homepage": "https://jiripudil.cz"
+                }
+            ],
+            "description": "Webpack adapter for Nette Framework.",
+            "keywords": [
+                "nette",
+                "webpack"
+            ],
+            "time": "2017-10-29T11:06:48+00:00"
         },
         {
             "name": "paragonie/random_compat",
