@@ -41,7 +41,9 @@ class VerifyJwtToken
 
             // invalidate token after logging user out
             if ($token && $this->guard->guest()) {
-                $this->sso->invalidate($token);
+                $tokenInvalidated = $this->sso->invalidate($token);
+                $this->guard->setToken(null);
+                return redirect($tokenInvalidated['redirect']);
             }
 
             // check whether guard has a user

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\ApiToken;
 use App\UrlHelper;
 use App\User;
+use Auth;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use JWTAuth;
+use Redis;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
@@ -24,15 +27,16 @@ class AuthController extends Controller
             throw new BadRequestHttpException('missing errorUrl query param');
         }
 
-        if ($token = session()->get(User::USER_TOKEN_SESSION_KEY)) {
+        if ($user = session()->get(User::USER_SUBJECT_SESSION_KEY)) {
             try {
-                $refreshedToken = $auth->setToken($token)->refresh();
+                $token = $auth->fromSubject($user);
                 $redirectUrl = $urlHelper->appendQueryParams($successUrl, [
-                    'token' => $refreshedToken,
+                    'token' => $token,
                 ]);
                 return redirect($redirectUrl);
             } catch (JWTException $e) {
                 // cannot refresh the token (it might have been already blacklisted), let user log in again
+                session()->forget(User::USER_SUBJECT_SESSION_KEY);
             }
         }
 
@@ -45,11 +49,26 @@ class AuthController extends Controller
         return redirect($redirectUrl);
     }
 
+    public function logout(\Tymon\JWTAuth\JWTAuth $auth)
+    {
+        $user = session()->remove(User::USER_SUBJECT_SESSION_KEY);
+        if ($user) {
+            $user->last_logout_at = Carbon::now();
+            $user->save();
+        }
+        return redirect()->back();
+    }
+
+    public function logoutWeb()
+    {
+        Auth::logout();
+        return redirect()->back();
+    }
+
     public function refresh(\Tymon\JWTAuth\JWTAuth $auth, Request $request)
     {
         try {
             $refreshedToken = $auth->setRequest($request)->parseToken()->refresh();
-            session()->put(User::USER_TOKEN_SESSION_KEY, $refreshedToken);
             return response()->json([
                 'token' => $refreshedToken,
             ]);
@@ -92,12 +111,17 @@ class AuthController extends Controller
 
     public function invalidate(\Tymon\JWTAuth\JWTAuth $auth, Request $request)
     {
+        $auth = $auth->setRequest($request)->parseToken();
+        Redis::hset(User::USER_LAST_LOGOUT_KEY, $auth->payload()->get('id'), time());
+
         try {
-            $auth->setRequest($request)->parseToken()->invalidate()->refresh();
+            $auth->invalidate();
         } catch (\Exception $e) {
             // no token found or token blacklisted, we're fine
         }
-        session()->remove(User::USER_TOKEN_SESSION_KEY);
-        return response()->json(null, 200);
+
+        return response()->json([
+            'redirect' => route('auth.logout'),
+        ], 200);
     }
 }

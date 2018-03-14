@@ -96,7 +96,7 @@ class Sso implements SsoContract
         return $response->getStatusCode() == 200;
     }
 
-    public function invalidate($token): bool
+    public function invalidate($token): array
     {
         try {
             $response = $this->client->request('POST', self::ENDPOINT_INVALIDATE, [
@@ -110,6 +110,7 @@ class Sso implements SsoContract
             throw new SsoException($contents);
         }
 
-        return $response->getStatusCode() == 200;
+        $tokenResponse = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        return $tokenResponse;
     }
 }

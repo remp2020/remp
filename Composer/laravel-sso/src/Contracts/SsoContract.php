@@ -10,5 +10,5 @@ interface SsoContract
 
     public function apiToken($token): bool;
 
-    public function invalidate($token): bool;
+    public function invalidate($token): array;
 }
