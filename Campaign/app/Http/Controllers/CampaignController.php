@@ -11,9 +11,12 @@ use App\Country;
 use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
+use App\Schedule;
 use Cache;
+use Carbon\Carbon;
 use GeoIp2;
 use HTML;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use View;
@@ -206,9 +209,40 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function toggleActive(Campaign $campaign)
+    /**
+     * Toggle campaign status and activate / deactivate current schedule.
+     *
+     * If campaign is not active, activate it:
+     * - change active flag to true,
+     * - create new schedule with status executed (it wasn't planned).
+     *
+     * If campaign is active, deactivate it:
+     * - change active flag to false,
+     * - stop all running or planned schedules.
+     *
+     * @param Campaign $campaign
+     * @return JsonResponse
+     */
+    public function toggleActive(Campaign $campaign): JsonResponse
     {
-        $campaign->active = !$campaign->active;
+        if (!$campaign->active) {
+            $campaign->active = true;
+
+            $schedule = new Schedule();
+            $schedule->campaign_id = $campaign->id;
+            $schedule->start_time = Carbon::now();
+            $schedule->status = Schedule::STATUS_EXECUTED;
+            $schedule->save();
+        } else {
+            $campaign->active = false;
+
+            /** @var Schedule $schedule */
+            foreach ($campaign->schedules()->RunningOrPlanned()->get() as $schedule) {
+                $schedule->status = Schedule::STATUS_STOPPED;
+                $schedule->save();
+            }
+        }
+
         $campaign->save();
 
         return response()->json([
@@ -238,7 +272,7 @@ class CampaignController extends Controller
      * @param PositionMap $pm
      * @param AlignmentMap $am
      * @param SegmentAggregator $sa
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function showtime(
         Request $r,
