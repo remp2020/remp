@@ -40,9 +40,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentEnabled: false,
 
-        usingAdblock: false,
+        usingAdblock: null,
 
-        cookiesEnabled: false,
+        cookiesEnabled: null,
+
+        websocketsSupported: null,
 
         totalTimeSpent: 0,
 
@@ -109,6 +111,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.parseUriParams();
 
             this.checkCookiesEnabled();
+
+            this.checkWebsocketsSupport();
 
             if (typeof config.tracker.timeSpentEnabled === 'boolean') {
                 this.timeSpentEnabled = config.tracker.timeSpentEnabled;
@@ -405,15 +409,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         checkCookiesEnabled: function () {
-            if (navigator.cookieEnabled) {
-                return remplib.tracker.cookiesEnabled = true;
-            }
-
             document.cookie = "cookietest=1";
             remplib.tracker.cookiesEnabled = document.cookie.indexOf("cookietest=") != -1;
 
             document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
-            return ret;
+        },
+
+        checkWebsocketsSupport: function () {
+            remplib.tracker.websocketsSupported = 'WebSocket' in window || false;
         },
 
         addSystemUserParams: function(params) {
@@ -426,11 +429,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "url":  window.location.href,
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
-                "using_adblock": remplib.tracker.usingAdblock,
+                "adblock": remplib.tracker.usingAdblock,
                 "window_height": window.outerHeight,
                 "window_width": window.outerWidth,
-                "cookies_enabled": remplib.tracker.cookiesEnabled,
-                "websockets_supported": 'WebSocket' in window || false,
+                "cookies": remplib.tracker.cookiesEnabled,
+                "websockets": remplib.tracker.websocketsSupported,
                 "source": {
                     "ref": this.getRefSource(),
                     "social": this.getSocialSource(),
