@@ -98,9 +98,12 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'target_desktop' => [
+            'required_true_without' => 'If you do not set any platform campaign will not show to anyone.',
         ],
+        'target_mobile' => [
+            'required_true_without' => 'If you do not set any platform campaign will not show to anyone.',
+        ]
     ],
 
     /*

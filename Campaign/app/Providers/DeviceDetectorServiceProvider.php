@@ -19,7 +19,7 @@ class DeviceDetectorServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(DeviceDetector::class, function ($app) {
+        $this->app->bind(DeviceDetector::class, function ($app) {
             $dd = new DeviceDetector();
             $dd->setCache(
                 new PSR6Bridge(

@@ -32,7 +32,9 @@ class Campaign extends Model
         'active' => 'boolean',
         'signed_in' => 'boolean',
         'once_per_session' => 'boolean',
-        'pageview_rules' => 'json'
+        'pageview_rules' => 'json',
+        'target_desktop' => 'boolean',
+        'target_mobile' => 'boolean'
     ];
 
     protected $attributes = [

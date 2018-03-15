@@ -191,26 +191,22 @@
 
             <h4>Platforms</h4>
 
-            <div class="row m-t-30">
-                <div class="col-md-12">
-                    <div class="toggle-switch" data-ts-color="cyan">
-                        <label for="targetDesktop" class="ts-label">Show on desktop</label>
-                        <input type="hidden" name="target_desktop" value="0">
-                        <input id="targetDesktop" name="target_desktop" value="1" v-model="targetDesktop" type="checkbox" hidden="hidden">
-                        <label for="targetDesktop" class="ts-helper"></label>
-                    </div>
-                </div>
+            <div class="input-group fg-float m-t-30 checkbox">
+                <span class="input-group-addon"><i class="zmdi zmdi-desktop-windows"></i></span>
+                <label class="m-l-15 m-t-5">
+                    Show on desktop
+                    <input v-model="targetDesktop" value="1" name="target_desktop" type="checkbox">
+                    <i class="input-helper"></i>
+                </label>
             </div>
 
-            <div class="row m-t-20">
-                <div class="col-md-12">
-                    <div class="toggle-switch" data-ts-color="cyan">
-                        <label for="targetMobile" class="ts-label">Show on mobile</label>
-                        <input type="hidden" name="target_mobile" value="0">
-                        <input id="targetMobile" name="target_mobile" value="1" v-model="targetMobile" type="checkbox" hidden="hidden">
-                        <label for="targetMobile" class="ts-helper"></label>
-                    </div>
-                </div>
+            <div class="input-group fg-float m-t-30 checkbox">
+                <span class="input-group-addon"><i class="zmdi zmdi-smartphone-iphone"></i></span>
+                <label class="m-l-15 m-t-5">
+                    Show on mobile
+                    <input v-model="targetMobile" value="1" name="target_mobile" type="checkbox">
+                    <i class="input-helper"></i>
+                </label>
             </div>
 
         </div>
