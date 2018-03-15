@@ -63,7 +63,17 @@
 
 [[projects]]
   name = "github.com/goadesign/goa"
-  packages = [".","client","cors","design","design/apidsl","dslengine","goatest","middleware","uuid"]
+  packages = [
+    ".",
+    "client",
+    "cors",
+    "design",
+    "design/apidsl",
+    "dslengine",
+    "goatest",
+    "middleware",
+    "uuid"
+  ]
   revision = "58f3177f36f2c50ee6119da92795e48bac6d6243"
   version = "v1.2.0"
 
@@ -81,14 +91,21 @@
 
 [[projects]]
   name = "github.com/influxdata/influxdb"
-  packages = ["client/v2","models","pkg/escape"]
+  packages = [
+    "client/v2",
+    "models",
+    "pkg/escape"
+  ]
   revision = "76124df5c121e411e99807b9473a03eb785cd43b"
   version = "v1.3.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/jmoiron/sqlx"
-  packages = [".","reflectx"]
+  packages = [
+    ".",
+    "reflectx"
+  ]
   revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
 
 [[projects]]
@@ -178,8 +195,17 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "53aa286056ef226755cd898109dbcdaba8ac0b81"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/tools"
+  packages = ["go/ast/astutil"]
+  revision = "c41d1439521820892798a1ede0322bc890f8dd4c"
 
 [[projects]]
   branch = "v2"
@@ -190,6 +216,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "020bf0e940a67b4cf49d0b80d608479e17f29a3bdd800d2e8db91c54580988f2"
+  inputs-digest = "13e77e52105dadd85a255f35c92dc2357d17ce34dc121f3cf8ccc48cd0350059"
   solver-name = "gps-cdcl"
   solver-version = 1
