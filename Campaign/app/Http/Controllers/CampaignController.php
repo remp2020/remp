@@ -379,11 +379,11 @@ class CampaignController extends Controller
 
             $isMobile = $dd->isMobile();
 
-            if (!$campaign->target_mobile && $isMobile) {
+            if (!in_array(Campaign::PLATFORM_MOBILE, $campaign->platforms) && $isMobile) {
                 continue;
             }
 
-            if (!$campaign->target_desktop && !$isMobile) {
+            if (!in_array(Campaign::PLATFORM_DESKTOP, $campaign->platforms) && !$isMobile) {
                 continue;
             }
 

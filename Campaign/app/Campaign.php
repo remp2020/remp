@@ -18,14 +18,16 @@ class Campaign extends Model
     const PAGEVIEW_RULE_SINCE = 'since';
     const PAGEVIEW_RULE_BEFORE = 'before';
 
+    const PLATFORM_MOBILE = 'mobile';
+    const PLATFORM_DESKTOP = 'desktop';
+
     protected $fillable = [
         'name',
         'signed_in',
         'active',
         'once_per_session',
         'pageview_rules',
-        'target_desktop',
-        'target_mobile'
+        'platforms'
     ];
 
     protected $casts = [
@@ -33,14 +35,14 @@ class Campaign extends Model
         'signed_in' => 'boolean',
         'once_per_session' => 'boolean',
         'pageview_rules' => 'json',
-        'target_desktop' => 'boolean',
-        'target_mobile' => 'boolean'
+        'platforms' => 'json'
     ];
 
     protected $attributes = [
         'active' => false,
         'once_per_session' => false,
-        'pageview_rules' => '[]'
+        'pageview_rules' => '[]',
+        'platforms' => "[\"" . self::PLATFORM_DESKTOP . "\", \"" . self::PLATFORM_MOBILE . "\"]"
     ];
 
     protected static function boot()

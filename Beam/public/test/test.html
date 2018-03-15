@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+
+<script type="text/javascript">
+    (function(win, doc) {
+    function mock(fn) {
+        return function() {
+            this._.push([fn, arguments])
+        }
+    }
+    function load(url) {
+        var script = doc.createElement("script");
+        script.type = "text/javascript";
+        script.async = true;
+        script.src = url;
+        doc.getElementsByTagName("head")[0].appendChild(script);
+    }
+    win.remplib = win.remplib || {};
+    var mockFuncs = {
+        "campaign": "init",
+        "tracker": "init trackEvent trackPageview trackCommerce",
+        "iota": "init"
+    }
+
+    Object.keys(mockFuncs).forEach(function (key) {
+        if (!win.remplib[key]) {
+            var fn, i, funcs = mockFuncs[key].split(" ");
+            win.remplib[key] = {_: []};
+
+            for (i = 0; i < funcs.length; i++) {
+                fn = funcs[i];
+                win.remplib[key][fn] = mock(fn);
+            }
+        }
+    });
+
+    // change URL to location of BEAM remplib.js
+    load("http://beam.remp.press/assets/lib/js/remplib.js");
+})(window, document);
+
+var rempConfig = {
+    // UUIDv4 based REMP BEAM token of appropriate property
+    // (see BEAM Admin -> Properties)
+    token: '9db09825-a1cc-3cf1-bc26-83371dbe9ef4',
+
+    // optional
+    // userId: String,
+
+    // optional, flag whether user is a subscriber
+    // userSubscribed: Boolean,
+
+    // optional
+    // browserId: String,
+
+    // optional, controls where are cookies stored
+    cookieDomain: ".remp.press",
+
+    tracker: {
+        // required URL location of BEAM Tracker
+        url: "http://tracker.beam.remp.press",
+
+        // optional article details
+        // article: {
+        //     id: String, // optional
+        //     author_id: String, // optional
+        //     category: String, // optional
+        //     locked: Boolean, // optional, flag whether content was locked
+        //     tags: [String, String, String] // optional
+        // },
+
+        // optional time spent measuring (default value `false`)
+        // if enabled, tracks time spent on current page
+        timeSpentEnabled: true,
+    },
+};
+remplib.tracker.init(rempConfig);
+
+</script>
+</body>
+</html>

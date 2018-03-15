@@ -195,7 +195,7 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-desktop-windows"></i></span>
                 <label class="m-l-15 m-t-5">
                     Show on desktop
-                    <input v-model="targetDesktop" value="1" name="target_desktop" type="checkbox">
+                    <input v-model="targetDesktop" value="desktop" name="platforms[]" type="checkbox">
                     <i class="input-helper"></i>
                 </label>
             </div>
@@ -204,7 +204,7 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-smartphone-iphone"></i></span>
                 <label class="m-l-15 m-t-5">
                     Show on mobile
-                    <input v-model="targetMobile" value="1" name="target_mobile" type="checkbox">
+                    <input v-model="targetMobile" value="mobile" name="platforms[]" type="checkbox">
                     <i class="input-helper"></i>
                 </label>
             </div>

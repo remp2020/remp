@@ -98,11 +98,8 @@ return [
     */
 
     'custom' => [
-        'target_desktop' => [
-            'required_true_without' => 'If you do not set any platform campaign will not show to anyone.',
-        ],
-        'target_mobile' => [
-            'required_true_without' => 'If you do not set any platform campaign will not show to anyone.',
+        'platforms.0' => [
+            'required' => 'At least one platform needs to be enabled.',
         ]
     ],
 

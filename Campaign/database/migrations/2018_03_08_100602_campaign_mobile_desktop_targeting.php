@@ -14,8 +14,7 @@ class CampaignMobileDesktopTargeting extends Migration
     public function up()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->boolean("target_mobile")->default(true);
-            $table->boolean("target_desktop")->default(true);
+            $table->string("platforms")->default(json_encode(['desktop', 'mobile']));
         });
     }
 
@@ -27,8 +26,7 @@ class CampaignMobileDesktopTargeting extends Migration
     public function down()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->dropColumn("target_mobile");
-            $table->dropColumn("target_desktop");
+            $table->dropColumn("platforms");
         });
     }
 }
