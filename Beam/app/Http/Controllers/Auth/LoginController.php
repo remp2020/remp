@@ -36,4 +36,9 @@ class LoginController extends Controller
     {
         $this->middleware('guest', ['except' => 'logout']);
     }
+
+    public function ssoError(Request $request)
+    {
+        return 'error during login: ' . $request->get('error');
+    }
 }

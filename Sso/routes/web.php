@@ -11,13 +11,9 @@
 |
 */
 
-Route::get('/', function () {
-    return redirect(route('api-tokens.index'));
-});
+Route::get('/', 'ApiTokenController@index');
 
-Route::get('/error', function() {
-    return 'error during login: ' . $_GET['error'];
-})->name('sso.error');
+Route::get('/error', 'AuthController@error')->name('sso.error');
 
 Route::middleware('auth.jwt')->group(function () {
     Route::get('api-tokens/json', 'ApiTokenController@json')->name('api-tokens.json');
