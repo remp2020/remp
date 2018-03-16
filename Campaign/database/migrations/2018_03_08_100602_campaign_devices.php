@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CampaignMobileDesktopTargeting extends Migration
+class CampaignDevices extends Migration
 {
     /**
      * Run the migrations.
@@ -15,16 +15,16 @@ class CampaignMobileDesktopTargeting extends Migration
     public function up()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->json("platforms")->nullable(true);
+            $table->json("devices")->nullable(true);
         });
 
         foreach (Campaign::all() as $campaign) {
-            $campaign->platforms = [Campaign::PLATFORM_DESKTOP, Campaign::PLATFORM_MOBILE];
+            $campaign->devices = [Campaign::DEVICE_DESKTOP, Campaign::DEVICE_MOBILE];
             $campaign->save();
         }
 
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->json("platforms")->nullable(false)->change();
+            $table->json("devices")->nullable(false)->change();
         });
     }
 
@@ -36,7 +36,7 @@ class CampaignMobileDesktopTargeting extends Migration
     public function down()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->dropColumn("platforms");
+            $table->dropColumn("devices");
         });
     }
 }

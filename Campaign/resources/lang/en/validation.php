@@ -98,8 +98,8 @@ return [
     */
 
     'custom' => [
-        'platforms.0' => [
-            'required' => 'At least one platform needs to be enabled.',
+        'devices.0' => [
+            'required' => 'At least one device needs to be enabled.',
         ]
     ],
 

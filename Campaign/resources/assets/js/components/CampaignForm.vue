@@ -189,22 +189,13 @@
             </div>
 
 
-            <h4>Platforms</h4>
+            <h4>Devices</h4>
 
-            <div class="input-group fg-float m-t-30 checkbox">
-                <span class="input-group-addon"><i class="zmdi zmdi-desktop-windows"></i></span>
+            <div class="input-group fg-float m-t-30 checkbox" v-for="(device,i) in allDevices">
+                <span class="input-group-addon"><i :class="['zmdi', getDeviceClassName(device)]"></i></span>
                 <label class="m-l-15 m-t-5">
-                    Show on desktop
-                    <input v-model="targetDesktop" value="desktop" name="platforms[]" type="checkbox">
-                    <i class="input-helper"></i>
-                </label>
-            </div>
-
-            <div class="input-group fg-float m-t-30 checkbox">
-                <span class="input-group-addon"><i class="zmdi zmdi-smartphone-iphone"></i></span>
-                <label class="m-l-15 m-t-5">
-                    Show on mobile
-                    <input v-model="targetMobile" value="mobile" name="platforms[]" type="checkbox">
+                    Show on {{ device }}
+                    <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox">
                     <i class="input-helper"></i>
                 </label>
             </div>
@@ -227,8 +218,8 @@
         "_active",
         "_countries",
         "_countriesBlacklist",
-        "_targetDesktop",
-        "_targetMobile",
+        "_allDevices",
+        "_selectedDevices",
 
         "_banners",
         "_availableSegments",
@@ -263,8 +254,8 @@
                 "active": null,
                 "countries": [],
                 "countriesBlacklist": null,
-                "targetDesktop": null,
-                "targetMobile": null,
+                "allDevices": null,
+                "selectedDevices": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -278,7 +269,7 @@
             }
         },
         computed: {
-            "bannerOptions": function() {
+            bannerOptions: function() {
                 let result = [];
                 for (let banner of this.banners) {
                     result.push({
@@ -288,7 +279,7 @@
                 }
                 return result;
             },
-            "altBannerOptions": function() {
+            altBannerOptions: function() {
                 //same as bannerOptions, just add null element (alternative banner is nullable)
                 let result = [];
                 result.push({
@@ -297,7 +288,7 @@
                 })
                 return result.concat(this.bannerOptions);
             },
-            "signedInOptions": function() {
+            signedInOptions: function() {
                 return [
                     {"label": "Everyone", "value": null},
                     {"label": "Only signed in", "value": true},
@@ -306,7 +297,26 @@
             }
         },
         methods: {
-            'selectSegment': function() {
+            deviceSelected: function (device) {
+                if (this.selectedDevices.indexOf(device) != -1) {
+                    return true;
+                }
+
+                return false;
+            },
+
+            getDeviceClassName: function (device) {
+                var iconName = '';
+
+                if (device == 'desktop') {
+                    iconName = 'desktop-windows';
+                } else if (device == 'mobile') {
+                    iconName = 'smartphone';
+                }
+
+                return 'zmdi-' + iconName;
+            },
+            selectSegment: function() {
                 if (typeof this.addedSegment === 'undefined') {
                     return;
                 }
@@ -317,7 +327,7 @@
                 }
                 this.segments.push(this.addedSegment);
             },
-            'removeSegment': function(index) {
+            removeSegment: function(index) {
                 let toRemove = this.segments[index];
                 this.segments.splice(index, 1);
                 this.removedSegments.push(toRemove.id);

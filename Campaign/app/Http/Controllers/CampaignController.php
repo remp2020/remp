@@ -68,8 +68,8 @@ class CampaignController extends Controller
                     'active' => $campaign->active
                 ])->render();
             })
-            ->addColumn('platforms', function (Campaign $campaign) {
-                return count($campaign->platforms) == 2 ? 'all' : $campaign->platforms;
+            ->addColumn('devices', function (Campaign $campaign) {
+                return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : $campaign->devices;
             })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
@@ -376,15 +376,15 @@ class CampaignController extends Controller
                 continue;
             }
 
-            // platform rules
+            // device rules
             $dd->setUserAgent($data->userAgent);
             $dd->parse();
 
-            if (!in_array(Campaign::PLATFORM_MOBILE, $campaign->platforms) && $dd->isMobile()) {
+            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $dd->isMobile()) {
                 continue;
             }
 
-            if (!in_array(Campaign::PLATFORM_DESKTOP, $campaign->platforms) && $dd->isDesktop()) {
+            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $dd->isDesktop()) {
                 continue;
             }
 

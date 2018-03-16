@@ -18,8 +18,8 @@ class Campaign extends Model
     const PAGEVIEW_RULE_SINCE = 'since';
     const PAGEVIEW_RULE_BEFORE = 'before';
 
-    const PLATFORM_MOBILE = 'mobile';
-    const PLATFORM_DESKTOP = 'desktop';
+    const DEVICE_MOBILE = 'mobile';
+    const DEVICE_DESKTOP = 'desktop';
 
     protected $fillable = [
         'name',
@@ -27,7 +27,7 @@ class Campaign extends Model
         'active',
         'once_per_session',
         'pageview_rules',
-        'platforms'
+        'devices'
     ];
 
     protected $casts = [
@@ -35,14 +35,14 @@ class Campaign extends Model
         'signed_in' => 'boolean',
         'once_per_session' => 'boolean',
         'pageview_rules' => 'json',
-        'platforms' => 'json'
+        'devices' => 'json'
     ];
 
     protected $attributes = [
         'active' => false,
         'once_per_session' => false,
         'pageview_rules' => '[]',
-        'platforms' => "[\"desktop\", \"mobile\"]"
+        'devices' => "[\"desktop\", \"mobile\"]"
     ];
 
     protected static function boot()
@@ -132,9 +132,14 @@ class Campaign extends Model
         return $this->hasMany(Schedule::class);
     }
 
-    public function supportsPlatform($platform)
+    public function getAllDevices()
     {
-        if (in_array($platform, $this->platforms)) {
+        return [self::DEVICE_DESKTOP, self::DEVICE_MOBILE];
+    }
+
+    public function supportsDevice($device)
+    {
+        if (in_array($device, $this->devices)) {
             return true;
         }
 

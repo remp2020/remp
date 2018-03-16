@@ -45,8 +45,8 @@
                             'header' => 'Signed in',
                             'render' => 'boolean',
                         ],
-                        'platforms' => [
-                            'header' => 'Platforms'
+                        'devices' => [
+                            'header' => 'Devices'
                         ],
                         'created_at' => [
                             'header' => 'Created at',

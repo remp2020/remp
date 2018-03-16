@@ -35,7 +35,7 @@ class CampaignRequest extends FormRequest
             'segments' => 'array',
             'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
             'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
-            'platforms.0' => 'required'
+            'devices.0' => 'required'
         ];
     }
 
