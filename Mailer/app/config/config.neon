@@ -23,6 +23,16 @@ parameters:
 
 extensions:
     local_configs: Remp\MailerModule\Config\ConfigExtension
+    webpack: Oops\WebpackNetteAdapter\DI\WebpackExtension(true)
+
+webpack:
+    devServer:
+        enabled: false
+    build:
+        directory: %wwwDir%/assets/vendor
+        publicPath: assets/vendor/
+    manifest:
+        name: mix-manifest.json
 
 application:
     errorPresenter: Mailer:Error

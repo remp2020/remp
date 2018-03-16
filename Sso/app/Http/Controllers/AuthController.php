@@ -124,4 +124,9 @@ class AuthController extends Controller
             'redirect' => route('auth.logout'),
         ], 200);
     }
+
+    public function error(Request $request)
+    {
+        return 'error during login: ' . $request->get('error');
+    }
 }

@@ -11,27 +11,27 @@
 |
 */
 
-Route::get('/', function () {
-    return redirect(route('dashboard'));
-});
-
-Route::get('/error', function() {
-    return 'error during login: ' . $_GET['error'];
-})->name('sso.error');
+Route::get('/error', 'Auth\LoginController@ssoError')->name('sso.error');
 
 Route::middleware('auth.jwt')->group(function () {
+    Route::get('/', 'DashboardController@index')->name('dashboard');
+    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+
     Route::get('accounts/json', 'AccountController@json');
     Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');
+
     Route::get('segments/json', 'SegmentController@json')->name('segments.json');
     Route::get('segments/{sourceSegment}/copy', 'SegmentController@copy')->name('segments.copy');
-    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+
     Route::get('articles/conversions', 'ArticleController@conversions')->name('articles.conversions');
     Route::get('articles/dtConversions', 'ArticleController@dtConversions')->name('articles.dtConversions');
     Route::get('articles/pageviews', 'ArticleController@pageviews')->name('articles.pageviews');
     Route::get('articles/dtPageviews', 'ArticleController@dtPageviews')->name('articles.dtPageviews');
     Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
+
     Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
+
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
 
@@ -39,7 +39,9 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
+
     Route::resource('segments', 'SegmentController');
+
     Route::resource('articles', 'ArticleController', [
         'only' => ['store'],
     ]);

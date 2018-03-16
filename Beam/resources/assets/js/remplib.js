@@ -40,6 +40,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentEnabled: false,
 
+        usingAdblock: null,
+
+        cookiesEnabled: null,
+
+        websocketsSupported: null,
+
         totalTimeSpent: 0,
 
         partialTimeSpent: 0,
@@ -103,6 +109,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             this.parseUriParams();
+
+            this.checkCookiesEnabled();
+
+            this.checkWebsocketsSupport();
 
             if (typeof config.tracker.timeSpentEnabled === 'boolean') {
                 this.timeSpentEnabled = config.tracker.timeSpentEnabled;
@@ -233,12 +243,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         run: function() {
-            this.trackPageview();
+            Promise.all([remplib.tracker.checkUsingAdblock()]).then((res) => {
+                this.trackPageview();
 
-            if (this.timeSpentEnabled === true) {
-                this.bindTickEvents();
-                this.tickTime();
-            }
+                if (this.timeSpentEnabled === true) {
+                    this.bindTickEvents();
+                    this.tickTime();
+                }
+            })
         },
 
         trackEvent: function(category, action, tags, fields, value) {
@@ -381,6 +393,32 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             xmlhttp.send(JSON.stringify(params));
         },
 
+        checkUsingAdblock: function () {
+            return new Promise(function (resolve, reject) {
+                var testAd = document.createElement('div');
+                testAd.innerHTML = '&nbsp;';
+                testAd.setAttribute('class', 'pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
+                testAd.setAttribute('style', 'width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px');
+                document.body.appendChild(testAd);
+                window.setTimeout(function() {
+                    remplib.tracker.usingAdblock = testAd.offsetHeight === 0 || false
+                    testAd.remove();
+                    resolve(remplib.tracker.usingAdblock);
+                }, 100);
+            });
+        },
+
+        checkCookiesEnabled: function () {
+            document.cookie = "cookietest=1";
+            remplib.tracker.cookiesEnabled = document.cookie.indexOf("cookietest=") != -1;
+
+            document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
+        },
+
+        checkWebsocketsSupport: function () {
+            remplib.tracker.websocketsSupported = 'WebSocket' in window || false;
+        },
+
         addSystemUserParams: function(params) {
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
@@ -391,6 +429,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "url":  window.location.href,
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
+                "adblock": remplib.tracker.usingAdblock,
+                "window_height": window.outerHeight,
+                "window_width": window.outerWidth,
+                "cookies": remplib.tracker.cookiesEnabled,
+                "websockets": remplib.tracker.websocketsSupported,
                 "source": {
                     "ref": this.getRefSource(),
                     "social": this.getSocialSource(),

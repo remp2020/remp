@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use Request;
 
 class AuthController extends Controller
 {
@@ -11,4 +12,10 @@ class AuthController extends Controller
         Auth::logout();
         return redirect()->back();
     }
+
+    public function error(Request $request)
+    {
+        return 'error during login: ' . $request->get('error');
+    }
+
 }
