@@ -45,6 +45,9 @@
                             'header' => 'Signed in',
                             'render' => 'boolean',
                         ],
+                        'platforms' => [
+                            'header' => 'Platforms'
+                        ],
                         'created_at' => [
                             'header' => 'Created at',
                             'render' => 'date',

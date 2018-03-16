@@ -42,7 +42,7 @@ class Campaign extends Model
         'active' => false,
         'once_per_session' => false,
         'pageview_rules' => '[]',
-        'platforms' => "[\"" . self::PLATFORM_DESKTOP . "\", \"" . self::PLATFORM_MOBILE . "\"]"
+        'platforms' => "[\"desktop\", \"mobile\"]"
     ];
 
     protected static function boot()
@@ -130,6 +130,15 @@ class Campaign extends Model
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function supportsPlatform($platform)
+    {
+        if (in_array($platform, $this->platforms)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function cache()

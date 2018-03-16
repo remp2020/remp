@@ -68,6 +68,9 @@ class CampaignController extends Controller
                     'active' => $campaign->active
                 ])->render();
             })
+            ->addColumn('platforms', function (Campaign $campaign) {
+                return count($campaign->platforms) == 2 ? 'all' : $campaign->platforms;
+            })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
             ->make(true);
@@ -377,13 +380,11 @@ class CampaignController extends Controller
             $dd->setUserAgent($data->userAgent);
             $dd->parse();
 
-            $isMobile = $dd->isMobile();
-
-            if (!in_array(Campaign::PLATFORM_MOBILE, $campaign->platforms) && $isMobile) {
+            if (!in_array(Campaign::PLATFORM_MOBILE, $campaign->platforms) && $dd->isMobile()) {
                 continue;
             }
 
-            if (!in_array(Campaign::PLATFORM_DESKTOP, $campaign->platforms) && !$isMobile) {
+            if (!in_array(Campaign::PLATFORM_DESKTOP, $campaign->platforms) && $dd->isDesktop()) {
                 continue;
             }
 
