@@ -17,5 +17,4 @@ class AuthController extends Controller
     {
         return 'error during login: ' . $request->get('error');
     }
-
 }
