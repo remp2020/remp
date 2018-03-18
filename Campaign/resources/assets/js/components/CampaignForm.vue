@@ -191,13 +191,14 @@
 
             <h4>Devices</h4>
 
-            <div class="input-group fg-float m-t-30 checkbox" v-for="(device,i) in allDevices">
-                <span class="input-group-addon"><i :class="['zmdi', getDeviceClassName(device)]"></i></span>
-                <label class="m-l-15 m-t-5">
+            <div class="input-group fg-float m-t-10">
+                <div class="checkbox" v-for="(device) in allDevices" :key="device">
+                <label class="m-l-15 m-t-15">
                     Show on {{ device }}
                     <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox">
                     <i class="input-helper"></i>
                 </label>
+                </div>
             </div>
 
         </div>
@@ -303,18 +304,6 @@
                 }
 
                 return false;
-            },
-
-            getDeviceClassName: function (device) {
-                var iconName = '';
-
-                if (device == 'desktop') {
-                    iconName = 'desktop-windows';
-                } else if (device == 'mobile') {
-                    iconName = 'smartphone';
-                }
-
-                return 'zmdi-' + iconName;
             },
             selectSegment: function() {
                 if (typeof this.addedSegment === 'undefined') {
