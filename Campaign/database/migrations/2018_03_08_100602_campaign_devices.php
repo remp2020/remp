@@ -1,6 +1,5 @@
 <?php
 
-use App\Campaign;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -18,10 +17,7 @@ class CampaignDevices extends Migration
             $table->json("devices")->nullable(true);
         });
 
-        foreach (Campaign::all() as $campaign) {
-            $campaign->devices = [Campaign::DEVICE_DESKTOP, Campaign::DEVICE_MOBILE];
-            $campaign->save();
-        }
+        DB::statement("UPDATE campaigns SET devices = '[\"desktop\", \"mobile\"]'");
 
         Schema::table('campaigns', function (Blueprint $table) {
             $table->json("devices")->nullable(false)->change();
