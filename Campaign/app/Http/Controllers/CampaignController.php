@@ -237,7 +237,7 @@ class CampaignController extends Controller
             $campaign->active = false;
 
             /** @var Schedule $schedule */
-            foreach ($campaign->schedules()->RunningOrPlanned()->get() as $schedule) {
+            foreach ($campaign->schedules()->runningOrPlanned()->get() as $schedule) {
                 $schedule->status = Schedule::STATUS_STOPPED;
                 $schedule->save();
             }
