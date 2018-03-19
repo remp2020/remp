@@ -3,14 +3,12 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 use Remp\MailerModule\Generators\GeneratorFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
-class SourceTemplateFormFactory
+class SourceTemplateFormFactory implements IFormFactory
 {
-    const FORM_ACTION_SAVE = 'save';
-    const FORM_ACTION_SAVE_CLOSE = 'save_close';
-
     private $mailSourceTemplateRepository;
 
     private $mailGeneratorFactory;
@@ -79,7 +77,7 @@ class SourceTemplateFormFactory
         // decide if user wants to save or save and leave
         $buttonSubmitted = self::FORM_ACTION_SAVE;
         /** @var $buttonSaveClose SubmitButton */
-        $buttonSaveClose = $form['save_close'];
+        $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
         if ($buttonSaveClose->isSubmittedBy()) {
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }

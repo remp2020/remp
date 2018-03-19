@@ -11,11 +11,8 @@ use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class EditBatchFormFactory extends Object
+class EditBatchFormFactory extends Object implements IFormFactory
 {
-    const FORM_ACTION_SAVE = 'save';
-    const FORM_ACTION_SAVE_CLOSE = 'save_close';
-
     /** @var JobsRepository */
     private $jobsRepository;
 
@@ -100,7 +97,7 @@ class EditBatchFormFactory extends Object
         // decide if user wants to save or save and leave
         $buttonSubmitted = self::FORM_ACTION_SAVE;
         /** @var $buttonSaveClose SubmitButton */
-        $buttonSaveClose = $form['save_close'];
+        $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
         if ($buttonSaveClose->isSubmittedBy()) {
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }

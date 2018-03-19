@@ -89,21 +89,11 @@ final class LayoutPresenter extends BasePresenter
         $presenter = $this;
         $this->layoutFormFactory->onCreate = function ($layout, $buttonSubmitted) use ($presenter) {
             $presenter->flashMessage('Layout was created');
-            // redirect based on button clicked by user
-            if ($buttonSubmitted === LayoutFormFactory::FORM_ACTION_SAVE_CLOSE) {
-                $presenter->redirect('Default');
-            } else {
-                $presenter->redirect('Edit', $layout->id);
-            }
+            $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $layout->id);
         };
         $this->layoutFormFactory->onUpdate = function ($layout, $buttonSubmitted) use ($presenter) {
             $presenter->flashMessage('Layout was updated');
-            // redirect based on button clicked by user
-            if ($buttonSubmitted === LayoutFormFactory::FORM_ACTION_SAVE_CLOSE) {
-                $presenter->redirect('Default');
-            } else {
-                $presenter->redirect('Edit', $layout->id);
-            }
+            $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $layout->id);
         };
 
         return $form;

@@ -10,11 +10,8 @@ use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class TemplateFormFactory extends Object
+class TemplateFormFactory extends Object implements IFormFactory
 {
-    const FORM_ACTION_SAVE = 'save';
-    const FORM_ACTION_SAVE_CLOSE = 'save_close';
-
     /** @var TemplatesRepository */
     private $templatesRepository;
 
@@ -106,7 +103,7 @@ class TemplateFormFactory extends Object
         // decide if user wants to save or save and leave
         $buttonSubmitted = self::FORM_ACTION_SAVE;
         /** @var $buttonSaveClose SubmitButton */
-        $buttonSaveClose = $form['save_close'];
+        $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
         if ($buttonSaveClose->isSubmittedBy()) {
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }

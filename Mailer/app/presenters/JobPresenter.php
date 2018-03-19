@@ -10,6 +10,7 @@ use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\Forms\EditBatchFormFactory;
+use Remp\MailerModule\Forms\IFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
 use Remp\MailerModule\Job\MailCache;
@@ -306,7 +307,7 @@ final class JobPresenter extends BasePresenter
             $this->flashMessage(sprintf('Batch #%d was updated', $batch->id));
 
             // redirect based on button clicked by user
-            if ($buttonSubmitted === EditBatchFormFactory::FORM_ACTION_SAVE_CLOSE) {
+            if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE) {
                 $this->redirect('Show', $batch->job->id);
             } else {
                 $this->redirect('EditBatch', $batch->job->id);

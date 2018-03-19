@@ -96,21 +96,11 @@ final class GeneratorPresenter extends BasePresenter
         $form = $this->sourceTemplateFormFactory->create(isset($this->params['id']) ? $this->params['id'] : null);
         $this->sourceTemplateFormFactory->onUpdate = function ($form, $mailSourceTemplate, $buttonSubmitted) {
             $this->flashMessage('Source template was successfully updated');
-            // redirect based on button clicked by user
-            if ($buttonSubmitted === SourceTemplateFormFactory::FORM_ACTION_SAVE_CLOSE) {
-                $this->redirect('Default');
-            } else {
-                $this->redirect('Edit', $mailSourceTemplate->id);
-            }
+            $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);
         };
         $this->sourceTemplateFormFactory->onSave = function ($form, $mailSourceTemplate, $buttonSubmitted) {
             $this->flashMessage('Source template was successfully created');
-            // redirect based on button clicked by user
-            if ($buttonSubmitted === SourceTemplateFormFactory::FORM_ACTION_SAVE_CLOSE) {
-                $this->redirect('Default');
-            } else {
-                $this->redirect('Edit', $mailSourceTemplate->id);
-            }
+            $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);
         };
         return $form;
     }

@@ -7,11 +7,8 @@ use Nette\Forms\Controls\SubmitButton;
 use Nette\Object;
 use Remp\MailerModule\Repository\LayoutsRepository;
 
-class LayoutFormFactory extends Object
+class LayoutFormFactory extends Object implements IFormFactory
 {
-    const FORM_ACTION_SAVE = 'save';
-    const FORM_ACTION_SAVE_CLOSE = 'save_close';
-
     /** @var LayoutsRepository */
     private $layoutsRepository;
 
@@ -66,7 +63,7 @@ class LayoutFormFactory extends Object
         // decide if user wants to save or save and leave
         $buttonSubmitted = self::FORM_ACTION_SAVE;
         /** @var $buttonSaveClose SubmitButton */
-        $buttonSaveClose = $form['save_close'];
+        $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
         if ($buttonSaveClose->isSubmittedBy()) {
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }
