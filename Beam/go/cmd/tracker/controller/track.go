@@ -245,6 +245,21 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		if user.Referer != nil {
 			fields["referer"] = *user.Referer
 		}
+		if user.Adblock != nil {
+			fields["adblock"] = *user.Adblock
+		}
+		if user.WindowHeight != nil {
+			fields["window_height"] = *user.WindowHeight
+		}
+		if user.WindowWidth != nil {
+			fields["window_width"] = *user.WindowWidth
+		}
+		if user.Cookies != nil {
+			fields["cookies"] = *user.Cookies
+		}
+		if user.Websockets != nil {
+			fields["websockets"] = *user.Websockets
+		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID
 			tags["signed_in"] = "1"
