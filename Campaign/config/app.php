@@ -188,6 +188,7 @@ return [
         Yajra\DataTables\DataTablesServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
+        App\Providers\DeviceDetectorServiceProvider::class
     ],
 
     /*

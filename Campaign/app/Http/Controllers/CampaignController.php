@@ -24,6 +24,7 @@ use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
+use DeviceDetector\DeviceDetector;
 
 class CampaignController extends Controller
 {
@@ -64,11 +65,20 @@ class CampaignController extends Controller
                 }
                 return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
             })
+            ->addColumn('segments', function (Campaign $campaign) {
+                return implode(' ', $campaign->segments->pluck('code')->toArray());
+            })
+            ->addColumn('countries', function (Campaign $campaign) {
+                return implode(' ', $campaign->countries->pluck('name')->toArray());
+            })
             ->addColumn('active', function (Campaign $campaign) {
                 return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
                     'active' => $campaign->active
                 ])->render();
+            })
+            ->addColumn('devices', function (Campaign $campaign) {
+                return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
@@ -280,7 +290,8 @@ class CampaignController extends Controller
         PositionMap $pm,
         AlignmentMap $am,
         SegmentAggregator $sa,
-        GeoIp2\Database\Reader $geoIPreader
+        GeoIp2\Database\Reader $geoIPreader,
+        DeviceDetector $dd
     ) {
         // validation
 
@@ -405,8 +416,19 @@ class CampaignController extends Controller
                 continue;
             }
 
-            // country rules
+            // device rules
+            $dd->setUserAgent($data->userAgent);
+            $dd->parse();
 
+            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $dd->isMobile()) {
+                continue;
+            }
+
+            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $dd->isDesktop()) {
+                continue;
+            }
+
+            // country rules
             if (!$campaign->countries->isEmpty()) {
                 // load country ISO code based on IP
                 try {

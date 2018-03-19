@@ -29,14 +29,10 @@
                             'header' => 'Banner B'
                         ],
                         'segments' => [
-                            'header' => 'Segments',
-                            'render' => 'array',
-                            'renderParams' => ['column' => 'code']
+                            'header' => 'Segments'
                         ],
                         'countries' => [
-                            'header' => 'Countries',
-                            'render' => 'array',
-                            'renderParams' => ['column' => 'name'],
+                            'header' => 'Countries'
                         ],
                         'active' => [
                             'header' => 'Is active'
@@ -44,6 +40,9 @@
                         'signed_in' => [
                             'header' => 'Signed in',
                             'render' => 'boolean',
+                        ],
+                        'devices' => [
+                            'header' => 'Devices'
                         ],
                         'created_at' => [
                             'header' => 'Created at',

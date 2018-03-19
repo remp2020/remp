@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CampaignRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -33,6 +35,7 @@ class CampaignRequest extends FormRequest
             'segments' => 'array',
             'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
             'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
+            'devices.0' => 'required'
         ];
     }
 
