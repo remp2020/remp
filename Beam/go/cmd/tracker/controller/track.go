@@ -246,7 +246,11 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			fields["referer"] = *user.Referer
 		}
 		if user.Adblock != nil {
-			fields["adblock"] = *user.Adblock
+			if *user.Adblock {
+				tags["adblock"] = "1"
+			} else {
+				tags["adblock"] = "0"
+			}
 		}
 		if user.WindowHeight != nil {
 			fields["window_height"] = *user.WindowHeight
@@ -255,10 +259,18 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			fields["window_width"] = *user.WindowWidth
 		}
 		if user.Cookies != nil {
-			fields["cookies"] = *user.Cookies
+			if *user.Cookies {
+				tags["cookies"] = "1"
+			} else {
+				tags["cookies"] = "0"
+			}
 		}
 		if user.Websockets != nil {
-			fields["websockets"] = *user.Websockets
+			if *user.Websockets {
+				tags["websockets"] = "1"
+			} else {
+				tags["websockets"] = "0"
+			}
 		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID
