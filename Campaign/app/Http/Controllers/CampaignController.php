@@ -62,6 +62,12 @@ class CampaignController extends Controller
                 }
                 return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
             })
+            ->addColumn('segments', function (Campaign $campaign) {
+                return implode(' ', $campaign->segments->pluck('code')->toArray());
+            })
+            ->addColumn('countries', function (Campaign $campaign) {
+                return implode(' ', $campaign->countries->pluck('name')->toArray());
+            })
             ->addColumn('active', function (Campaign $campaign) {
                 return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
@@ -69,7 +75,7 @@ class CampaignController extends Controller
                 ])->render();
             })
             ->addColumn('devices', function (Campaign $campaign) {
-                return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : $campaign->devices;
+                return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')

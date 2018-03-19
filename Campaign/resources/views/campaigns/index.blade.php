@@ -29,14 +29,10 @@
                             'header' => 'Banner B'
                         ],
                         'segments' => [
-                            'header' => 'Segments',
-                            'render' => 'array',
-                            'renderParams' => ['column' => 'code']
+                            'header' => 'Segments'
                         ],
                         'countries' => [
-                            'header' => 'Countries',
-                            'render' => 'array',
-                            'renderParams' => ['column' => 'name'],
+                            'header' => 'Countries'
                         ],
                         'active' => [
                             'header' => 'Is active'
