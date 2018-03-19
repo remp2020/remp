@@ -139,7 +139,7 @@ class CampaignController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
                     'json' => new CampaignResource($campaign),
@@ -225,7 +225,7 @@ class CampaignController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
                     'json' => new CampaignResource($campaign),

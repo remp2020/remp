@@ -115,7 +115,7 @@ class SegmentController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('segments.index'))->with('success', 'Segment created')
                 ]);
@@ -181,7 +181,7 @@ class SegmentController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('segments.index'))->with('success', 'Segment updated'),
                 ]);

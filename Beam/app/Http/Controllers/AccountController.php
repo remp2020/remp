@@ -69,7 +69,7 @@ class AccountController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('accounts.index'))->with('success', 'Account created'),
                 ]);
@@ -123,7 +123,7 @@ class AccountController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('accounts.index'))->with('success', 'Account updated'),
                 ]);

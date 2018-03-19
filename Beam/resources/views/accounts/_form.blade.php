@@ -7,7 +7,7 @@
     </div>
 </div>
 
-{!! Form::button('<i class="zmdi zmdi-mail-send"></i> Save', [
+{!! Form::button('<i class="zmdi zmdi-check"></i> Save', [
     'class' => 'btn btn-info waves-effect',
     'type' => 'submit',
     'name' => 'action',

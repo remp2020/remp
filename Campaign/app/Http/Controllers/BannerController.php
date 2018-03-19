@@ -124,7 +124,7 @@ class BannerController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('banners.index'))->with('success', 'Banner created'),
                     'json' => new BannerResource($banner),
@@ -205,7 +205,7 @@ class BannerController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('banners.index'))->with('success', 'Banner updated'),
                     'json' => new BannerResource($banner),

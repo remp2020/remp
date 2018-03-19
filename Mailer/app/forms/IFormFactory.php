@@ -2,7 +2,6 @@
 
 namespace Remp\MailerModule\Forms;
 
-
 interface IFormFactory
 {
     const FORM_ACTION_SAVE = 'save';

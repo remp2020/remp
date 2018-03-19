@@ -19,10 +19,19 @@
 
         <div class="input-group m-t-20">
             <div class="fg-line">
-                {!! Form::button('<i class="zmdi zmdi-mail-send"></i> Save', [
-                   'class' => 'btn btn-info waves-effect',
-                   'type' => 'submit',
-               ]) !!}
+                {!! Form::button('<i class="zmdi zmdi-check"></i> Save', [
+                    'class' => 'btn btn-info waves-effect',
+                    'type' => 'submit',
+                    'name' => 'action',
+                    'value' => 'save'
+                ]) !!}
+
+                {!! Form::button('<i class="zmdi zmdi-mail-send"></i> Save and close', [
+                    'class' => 'btn btn-info waves-effect',
+                    'type' => 'submit',
+                    'name' => 'action',
+                    'value' => 'save_close'
+                ]) !!}
             </div>
         </div>
     </div>

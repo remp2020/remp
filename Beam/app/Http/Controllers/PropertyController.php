@@ -78,7 +78,7 @@ class PropertyController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('accounts.properties.index', $account))->with('success', 'Property created'),
                 ]);
@@ -124,7 +124,7 @@ class PropertyController extends Controller
 
         // process actions
         switch ($request->get('action')) {
-            case 'save_close':
+            case self::FORM_ACTION_SAVE_CLOSE:
                 return response()->format([
                     'html' => redirect(route('accounts.properties.index', $account))->with('success', 'Property updated'),
                 ]);
