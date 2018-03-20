@@ -137,8 +137,16 @@ class CampaignController extends Controller
             $campaignSegment->save();
         }
 
+        $message = ['success' => 'Campaign created'];
+
+        // process active flag & toggle schedules
+        $activeStatusMsg = $this->toggleSchedules($campaign);
+        if (!is_null($activeStatusMsg)) {
+            $message['warning'] = $activeStatusMsg;
+        }
+
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
+            'html' => redirect(route('campaigns.index'))->with($message),
             'json' => new CampaignResource($campaign),
         ]);
     }
@@ -213,8 +221,16 @@ class CampaignController extends Controller
 
         CampaignSegment::destroy($request->get('removedSegments'));
 
+        $message = ['success' => sprintf('Campaign [%s] was updated.', $campaign->name)];
+
+        // process active flag & toggle schedules
+        $activeStatusMsg = $this->toggleSchedules($campaign);
+        if (!is_null($activeStatusMsg)) {
+            $message['warning'] = $activeStatusMsg;
+        }
+
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
+            'html' => redirect(route('campaigns.index'))->with($message),
             'json' => new CampaignResource($campaign),
         ]);
     }
@@ -237,27 +253,81 @@ class CampaignController extends Controller
     {
         if (!$campaign->active) {
             $campaign->active = true;
+        } else {
+            $campaign->active = false;
+        }
+        $campaign->save();
 
+        $this->toggleSchedules($campaign);
+
+        // TODO: maybe add message from toggleSchedules to response?
+        return response()->json([
+            'active' => $campaign->active
+        ]);
+    }
+
+    /**
+     * Toggle schedules based on campaign active flag.
+     *
+     * @param Campaign $campaign
+     * @return null|string Returns message about schedules state change.
+     */
+    private function toggleSchedules(Campaign $campaign): ?string
+    {
+        $schedulesChangeMsg = null;
+        if($campaign->active) {
+            $activated = $this->startCampaignSchedule($campaign);
+            if ($activated) {
+                $schedulesChangeMsg = "Campaign was activated and is running.";
+            }
+        } else {
+            $stopped = $this->stopCampaignSchedule($campaign);
+            if ($stopped) {
+                $schedulesChangeMsg = "Campaign was deactivated, all schedules were stopped.";
+            }
+        }
+
+        return $schedulesChangeMsg;
+    }
+
+
+    /**
+     * If no campaign's schedule is running, start new one.
+     *
+     * @param Campaign $campaign
+     * @return bool Returns true if new schedule was added.
+     */
+    private function startCampaignSchedule(Campaign $campaign)
+    {
+        $activated = false;
+        if (!$campaign->schedules()->running()->count()) {
             $schedule = new Schedule();
             $schedule->campaign_id = $campaign->id;
             $schedule->start_time = Carbon::now();
             $schedule->status = Schedule::STATUS_EXECUTED;
             $schedule->save();
-        } else {
-            $campaign->active = false;
-
-            /** @var Schedule $schedule */
-            foreach ($campaign->schedules()->runningOrPlanned()->get() as $schedule) {
-                $schedule->status = Schedule::STATUS_STOPPED;
-                $schedule->save();
-            }
+            $activated = true;
         }
 
-        $campaign->save();
+        return $activated;
+    }
 
-        return response()->json([
-            'active' => $campaign->active
-        ]);
+    /**
+     * Stop all campaign schedules.
+     *
+     * @param Campaign $campaign
+     * @return bool Returns true if any schedule was running and was stopped.
+     */
+    private function stopCampaignSchedule(Campaign $campaign): bool
+    {
+        $stopped = false;
+        /** @var Schedule $schedule */
+        foreach ($campaign->schedules()->runningOrPlanned()->get() as $schedule) {
+            $schedule->status = Schedule::STATUS_STOPPED;
+            $schedule->save();
+            $stopped = true;
+        }
+        return $stopped;
     }
 
     /**
