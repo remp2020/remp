@@ -140,14 +140,21 @@ final class ListPresenter extends BasePresenter
 
         /** @var ActiveRow $template */
         foreach ($templates as $template) {
+            $opened = 0;
+            $clicked = 0;
+            /** @var ActiveRow $jobBatchTemplate */
+            foreach ($template->related('mail_job_batch_template') as $jobBatchTemplate) {
+                $opened += $jobBatchTemplate->opened;
+                $clicked += $jobBatchTemplate->clicked;
+            }
             $result['data'][] = [
                 'actions' => [
                     'show' => $this->link('Template:Show', $template->id),
                 ],
                 $template->created_at,
                 $template->subject,
-                $template->opened,
-                $template->clicked,
+                $opened,
+                $clicked,
             ];
         }
         $this->presenter->sendJson($result);
