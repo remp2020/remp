@@ -1,1 +1,85 @@
-{block #content}
+{layout '../@layout.latte'} {block #content}
+
+<div class="c-header">
+    <h2>Dashboard</h2>
+</div>
+
+<div id="c-grid" class="clearfix" data-columns="3">
+
+    <div class="column size-1of2">
+        {foreach $datasets as $key => $dataset}
+                <div class="column size-1of2">
+                    <div class="card p-10 p-r-20">
+                        <canvas id="mailer-dashboard-statistics-graph-{$key}" width="300" height="150"></canvas>
+                        <script>
+                            var ctx = document.getElementById("mailer-dashboard-statistics-graph-{$key}").getContext('2d');
+                            var myLineChart = new Chart(ctx, {
+                                type: "line",
+                                data: {
+                                    "labels": {$labels},
+                                    "datasets": [{$dataset}]
+                                },
+                                options: {
+                                    title: {
+                                        text: {$dataset['label']|truncate:30},
+                                        display: true,
+                                        position: "bottom"
+                                    },
+                                    elements: {
+                                        point: {
+                                            radius: 0
+                                        }
+                                    },
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+                                                display: false,
+                                                beginAtZero: true
+                                            },
+                                            gridLines: {
+                                                display: false,
+                                                color: "rgba(0, 0, 0, 0)",
+                                                lineWidth: 0 
+                                            }
+                                        }],
+                                        xAxes: [{
+                                            ticks: {
+                                                display: false
+                                            },
+                                            gridLines: {
+                                                display: false,
+                                                color: "rgba(0, 0, 0, 0)",
+                                                lineWidth: 0 
+                                            }
+                                        }]
+                                    },
+                                    legend: {
+                                        display: false,
+                                        position: "right"
+                                    },
+                                    tooltips: {
+                                        enabled: false
+                                    }
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
+        {/foreach}
+    </div><!-- .column -->
+
+
+    <div class="column size-1of2">
+        <div class="card clearfix">
+            <div class="card-header">
+                <h2>Mailer statistics</h2>
+                <ul>
+                    <li>Emails sent last 24 hours: {$emailsSentToday|number}</li>
+                    <li>Emails sent last week: {$emailsSentLastWeek|number}</li>
+                    <li>Templates send last week: {$templatesSentLastWeek|number}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
