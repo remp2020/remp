@@ -169,7 +169,7 @@ func (eDB *PageviewDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 func (eDB *PageviewDB) List(o ListOptions) (PageviewRowCollection, error) {
 	var selectFields string
 	if len(o.SelectFields) > 0 {
-		o.SelectFields = append(o.SelectFields, "token") // at least one value needs to be always selected
+		o.SelectFields = append(o.SelectFields, "token", "remp_pageview_id") // at least one value needs to be always selected
 		selectFields = strings.Join(o.SelectFields, ",")
 	} else {
 		selectFields = "*"
@@ -182,8 +182,7 @@ func (eDB *PageviewDB) List(o ListOptions) (PageviewRowCollection, error) {
 		Command:  builder.Build(),
 		Database: eDB.DB.DBName,
 	}
-
-	log.Println(q.Command)
+	log.Println("pageview list query:", q.Command)
 
 	response, err := eDB.DB.Client.Query(q)
 	if err != nil {
@@ -307,45 +306,53 @@ func pageviewFromInfluxResult(ir *influxquery.Result) (*Pageview, error) {
 		Time:  t,
 	}
 
-	utmSource, ok := ir.StringValue("utm_source")
-	if ok {
+	if utmSource, ok := ir.StringValue("utm_source"); ok {
 		pageview.UTMSource = utmSource
 	}
-	utmMedium, ok := ir.StringValue("utm_medium")
-	if ok {
+	if utmMedium, ok := ir.StringValue("utm_medium"); ok {
 		pageview.UTMMedium = utmMedium
 	}
-	utmCampaign, ok := ir.StringValue("utm_campaign")
-	if ok {
+	if utmCampaign, ok := ir.StringValue("utm_campaign"); ok {
 		pageview.UTMCampaign = utmCampaign
 	}
-	utmContent, ok := ir.StringValue("utm_content")
-	if ok {
+	if utmContent, ok := ir.StringValue("utm_content"); ok {
 		pageview.UTMContent = utmContent
 	}
-	social, ok := ir.StringValue("social")
-	if ok {
+	if social, ok := ir.StringValue("social"); ok {
 		pageview.SocialSource = social
 	}
-	host, ok := ir.StringValue("host")
-	if ok {
+	if host, ok := ir.StringValue("host"); ok {
 		pageview.Host = host
 	}
-	ip, ok := ir.StringValue("ip")
-	if ok {
+	if ip, ok := ir.StringValue("ip"); ok {
 		pageview.IP = ip
 	}
-	userID, ok := ir.StringValue("user_id")
-	if ok {
+	if userID, ok := ir.StringValue("user_id"); ok {
 		pageview.UserID = userID
 	}
-	url, ok := ir.StringValue("url")
-	if ok {
+	if url, ok := ir.StringValue("url"); ok {
 		pageview.URL = url
 	}
-	userAgent, ok := ir.StringValue("user_agent")
-	if ok {
+	if userAgent, ok := ir.StringValue("user_agent"); ok {
 		pageview.UserAgent = userAgent
+	}
+	if referer, ok := ir.StringValue("referer"); ok {
+		pageview.Referer = referer
+	}
+	if browserID, ok := ir.StringValue("browser_id"); ok {
+		pageview.BrowserID = browserID
+	}
+	if subscriber, ok := ir.BoolValue("subscriber"); ok {
+		pageview.Subscriber = subscriber
+	}
+	if articleLocked, ok := ir.BoolValue("locked"); ok {
+		pageview.ArticleLocked = articleLocked
+	}
+	if sessionID, ok := ir.StringValue("remp_session_id"); ok {
+		pageview.SessionID = sessionID
+	}
+	if pageviewID, ok := ir.StringValue("remp_pageview_id"); ok {
+		pageview.PageviewID = pageviewID
 	}
 
 	return pageview, nil

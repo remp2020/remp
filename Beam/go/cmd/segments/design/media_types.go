@@ -162,7 +162,7 @@ var Pageview = MediaType("application/vnd.pageview+json", func() {
 		Attribute("user")
 		Attribute("article")
 	})
-	Required("system", "user")
+	Required("system")
 })
 
 var User = MediaType("application/vnd.user+json", func() {
@@ -194,7 +194,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("remp_pageview_id")
 		Attribute("referer")
 	})
-	Required("browser_id", "url", "user_agent", "remp_session_id", "remp_pageview_id")
+	Required("remp_pageview_id")
 })
 
 var System = MediaType("application/vnd.system+json", func() {

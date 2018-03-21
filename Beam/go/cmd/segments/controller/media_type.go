@@ -84,8 +84,7 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 			PropertyToken: token,
 		},
 		User: &app.User{
-			URL:       e.URL,
-			UserAgent: e.UserAgent,
+			Source: &app.Source{},
 		},
 	}
 	if e.IP != "" {
@@ -93,6 +92,12 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 	}
 	if e.UserID != "" {
 		event.User.ID = &e.UserID
+	}
+	if e.URL != "" {
+		event.User.URL = &e.URL
+	}
+	if e.UserAgent != "" {
+		event.User.UserAgent = &e.UserAgent
 	}
 	return event, nil
 }
@@ -123,8 +128,7 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 			PropertyToken: token,
 		},
 		User: &app.User{
-			URL:       c.URL,
-			UserAgent: c.UserAgent,
+			Source: &app.Source{},
 		},
 	}
 	if c.IP != "" {
@@ -132,6 +136,12 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 	}
 	if c.UserID != "" {
 		event.User.ID = &c.UserID
+	}
+	if c.URL != "" {
+		event.User.URL = &c.URL
+	}
+	if c.UserAgent != "" {
+		event.User.UserAgent = &c.UserAgent
 	}
 	return event, nil
 }
@@ -163,10 +173,8 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 			PropertyToken: token,
 		},
 		User: &app.User{
-			BrowserID: p.BrowserID,
-			URL:       p.URL,
-			UserAgent: p.UserAgent,
-			Source:    &app.Source{},
+			Source:         &app.Source{},
+			RempPageviewID: p.PageviewID,
 		},
 	}
 
@@ -208,6 +216,12 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	}
 	if p.Referer != "" {
 		pageview.User.Referer = &p.Referer
+	}
+	if p.BrowserID != "" {
+		pageview.User.BrowserID = &p.BrowserID
+	}
+	if p.SessionID != "" {
+		pageview.User.RempSessionID = &p.SessionID
 	}
 
 	return pageview, nil
