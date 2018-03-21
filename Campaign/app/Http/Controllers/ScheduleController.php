@@ -27,7 +27,11 @@ class ScheduleController extends Controller
      * Return data for Schedule Datatable.
      *
      * If `$campaign` is provided, only schedules for that one Campaign are returned.
-     * If request parameter `limit` is used, count of results will be limited to that number.
+     *
+     * Request parameters can be used:
+     *
+     *   * `active` - (bool) display only active (running or planned) schedules.
+     *   * `limit`  - (int) count of results will be limited to that number.
      *
      * @param Datatables $dataTables
      * @param Campaign|null $campaign
@@ -46,6 +50,16 @@ class ScheduleController extends Controller
         if (!is_null($campaign)) {
             $scheduleSelect->where('campaign_id', '=' , $campaign->id);
         }
+
+        if($request->active) {
+            $scheduleSelect->where(function (\Illuminate\Database\Eloquent\Builder $query) {
+                $query
+                    ->whereNull('end_time')
+                    ->orWhere('end_time', '>=', Carbon::now());
+            })
+                ->whereIn('status', [Schedule::STATUS_READY, Schedule::STATUS_EXECUTED]);
+        }
+
         if (is_numeric($request->limit)) {
             $scheduleSelect->limit($request->limit);
         }

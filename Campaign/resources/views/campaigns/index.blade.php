@@ -34,7 +34,7 @@
                     'header' => 'Status',
                 ],
             ],
-            'dataSource' => route('schedule.json', ['limit' => 5]),
+            'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
             'rowActions' => [
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                 ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play'],
