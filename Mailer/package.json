@@ -29,6 +29,7 @@
     "nette.ajax.js": "^2.3.0",
     "node-waves": "^0.7.5",
     "remp": "file:../Package/remp",
+    "salvattore": "^1.0.9",
     "vue": "^2.4.2"
   },
   "devDependencies": {
