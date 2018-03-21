@@ -134,10 +134,3 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) mo
 
 	return o
 }
-
-// aggregateOptionsFromCommerceOptions converts payload data to AggregateOptions keeping only real filter options.
-func filterOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) model.AggregateOptions {
-	o := aggregateOptionsFromCommerceOptions(payload)
-	o.GroupBy = []string{}
-	return o
-}

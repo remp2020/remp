@@ -83,9 +83,7 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 			Time:          e.Time,
 			PropertyToken: token,
 		},
-		User: &app.User{
-			Source: &app.Source{},
-		},
+		User: &app.User{},
 	}
 	if e.IP != "" {
 		event.User.IPAddress = &e.IP
@@ -127,9 +125,7 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 			Time:          c.Time,
 			PropertyToken: token,
 		},
-		User: &app.User{
-			Source: &app.Source{},
-		},
+		User: &app.User{},
 	}
 	if c.IP != "" {
 		event.User.IPAddress = &c.IP
@@ -192,7 +188,6 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	// user data
 	if p.UserID != "" {
 		pageview.User.ID = &p.UserID
-		pageview.User.Subscriber = &p.Subscriber
 	}
 
 	// optional tracked params
