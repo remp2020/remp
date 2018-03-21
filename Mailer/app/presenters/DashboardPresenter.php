@@ -100,9 +100,6 @@ final class DashboardPresenter extends BasePresenter
             return ($a['count'] == 0) ? null : $a;
         });
 
-        // $this->template->emailsSentLastWeek = $this->batchTemplatesRepository->countMailsSent(7)->fetch()->count;
-        // $this->template->emailsSentToday = $this->batchTemplatesRepository->countMailsSent(1)->fetch()->count;
-        // $this->template->templatesSentLastWeek = $this->templatesRepository->countSent(7)->fetch()->count;
         $this->template->typeDataSets = array_values($typeDataSets);
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->labels = $labels;
@@ -112,7 +109,7 @@ final class DashboardPresenter extends BasePresenter
     {
         $labels = [];
         $dataSet = [];
-        $numOfDays = 14;
+        $numOfDays = 30;
 
         // fill graph columns
         for ($i = $numOfDays; $i > 0; $i--) {
@@ -131,6 +128,7 @@ final class DashboardPresenter extends BasePresenter
 
         $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $numOfDays)->fetchAll();
 
+        // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
             $dataSet['data'][
                 array_search(
