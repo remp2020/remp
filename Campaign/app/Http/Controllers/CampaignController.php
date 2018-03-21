@@ -275,7 +275,7 @@ class CampaignController extends Controller
     private function toggleSchedules(Campaign $campaign): ?string
     {
         $schedulesChangeMsg = null;
-        if($campaign->active) {
+        if ($campaign->active) {
             $activated = $this->startCampaignSchedule($campaign);
             if ($activated) {
                 $schedulesChangeMsg = "Campaign was activated and is running.";

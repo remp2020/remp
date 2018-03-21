@@ -48,10 +48,10 @@ class ScheduleController extends Controller
             ->orderBy('end_time', 'DESC');
 
         if (!is_null($campaign)) {
-            $scheduleSelect->where('campaign_id', '=' , $campaign->id);
+            $scheduleSelect->where('campaign_id', '=', $campaign->id);
         }
 
-        if($request->active) {
+        if ($request->active) {
             $scheduleSelect->where(function (\Illuminate\Database\Eloquent\Builder $query) {
                 $query
                     ->whereNull('end_time')
