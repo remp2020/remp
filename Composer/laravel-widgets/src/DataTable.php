@@ -21,6 +21,7 @@ use Psy\Util\Json;
  *          'published_at' => ['header' => 'published at', 'render' => 'date'],
  *      ],
  *      'dataSource' => route('articles.dtPageviews'),
+ *      'displaySearchAndPaging' => true,
  *      'order' => [4, 'desc'],
  *      'requestParams' => [
  *          'published_from' => '$("[name=\"published_from\"]").data("DateTimePicker").date().set({hour:0,minute:0,second:0,millisecond:0}).toISOString()',
@@ -56,6 +57,7 @@ class DataTable extends AbstractWidget
         'rowHighlights' => [], // column-value conditions that have to be met to highlight the row
         'requestParams' => [], // extra request parameters attached to JSON dataSource request
         'refreshTriggers' => [], // external triggers that should execute datatable ajax reload
+        'displaySearchAndPaging' => true, // display header with search & pagination
     ];
 
     /**
@@ -91,6 +93,7 @@ class DataTable extends AbstractWidget
             'order' => $this->config['order'],
             'requestParams' => $this->config['requestParams'],
             'refreshTriggers' => $this->config['refreshTriggers'],
+            'displaySearchAndPaging' => $this->config['displaySearchAndPaging'],
         ]);
     }
 }

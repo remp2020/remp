@@ -42,6 +42,7 @@
                 ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
                 ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
             ],
+            'displaySearchAndPaging' => false,
             ]) !!}
         </div>
     </div>

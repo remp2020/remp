@@ -1,4 +1,6 @@
 <div class="table-responsive">
+
+    @if ($displaySearchAndPaging)
     <div class="action-header m-0 palette-White bg clearfix">
         <div class="ah-search" style="display: none;">
             <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{{ $tableId }}">
@@ -22,6 +24,7 @@
             <li class="ah-pagination ah-next"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-right"></i></button></li>
         </ul>
     </div>
+    @endif
 
     <table id="{{ $tableId }}" class="table table-striped table-bordered table-hover" aria-busy="false">
         <thead>
