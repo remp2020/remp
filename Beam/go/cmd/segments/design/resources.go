@@ -220,18 +220,13 @@ var _ = Resource("commerce", func() {
 	})
 	Action("list", func() {
 		Description("Returns full list of events")
-		Routing(GET("/list"))
+		Routing(POST("/steps/:step/list"))
 		Params(func() {
-			Param("filter_by", String, "Selection of data filtering type", func() {
-				Enum("users", "articles", "authors")
-			})
-			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
 			Param("step", String, "Identification of commerce step", func() {
 				Enum("checkout", "payment", "purchase", "refund")
 			})
-			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
 		})
+		Payload(CommerceOptionsPayload)
 		Response(OK, func() {
 			Media(CollectionOf(Commerce, func() {
 				View("default")
@@ -296,18 +291,10 @@ var _ = Resource("pageviews", func() {
 	})
 	Action("list", func() {
 		Description("Returns full list of pageviews")
-		Routing(GET("/list"))
-		Params(func() {
-			Param("action", String, "Identification of pageview action", func() {
-				Enum("load")
-			})
-			Param("filter_by", String, "Selection of data filtering type (use tag name: user_id, article_id, ...)")
-			Param("ids", ArrayOf(String), "Filter for selection groupping (used only when _filter_by_ is set)")
-			Param("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
-		})
+		Routing(POST("/list"))
+		Payload(ListPageviewOptionsPayload)
 		Response(OK, func() {
-			Media(CollectionOf(Pageview, func() {
+			Media(CollectionOf(Pageviews, func() {
 				View("default")
 			}))
 		})

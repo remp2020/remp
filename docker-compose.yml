@@ -134,7 +134,8 @@ services:
     volumes:
       - "influxdb-data:/var/lib/influxdb"
     environment:
-      INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0 # unlimited due to user_id being a tag (for grouping by)
+      INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0
+      INFLUXDB_DATA_MAX_SERIES_PER_DATABASE: 0
     ports:
       - "8098:8086"
     restart: "unless-stopped"

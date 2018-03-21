@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -34,25 +35,38 @@ type PageviewOptions struct {
 
 // Pageview represents pageview data.
 type Pageview struct {
-	ArticleID    string
-	AuthorID     string
-	UTMSource    string
-	UTMCampaign  string
-	UTMMedium    string
-	UTMContent   string
-	SocialSource string
+	ArticleID     string
+	ArticleLocked bool
+	TitleVariant  string
+	AuthorID      string
+	UTMSource     string
+	UTMCampaign   string
+	UTMMedium     string
+	UTMContent    string
+	SocialSource  string
 
-	Token     string
-	Time      time.Time
-	Host      string
-	IP        string
-	UserID    string
-	URL       string
-	UserAgent string
+	Token      string
+	Time       time.Time
+	Host       string
+	IP         string
+	UserID     string
+	URL        string
+	UserAgent  string
+	BrowserID  string
+	SessionID  string
+	PageviewID string
+	Referer    string
+	Subscriber bool
 }
 
-// PageviewCollection is collection of pageviews.
-type PageviewCollection []*Pageview
+// PageviewRow represents one row of grouped list.
+type PageviewRow struct {
+	Tags      map[string]string
+	Pageviews []*Pageview
+}
+
+// PageviewRowCollection represents collection of rows of grouped list.
+type PageviewRowCollection []PageviewRow
 
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
@@ -61,7 +75,7 @@ type PageviewStorage interface {
 	// Sum returns sum of pageviews based on the provided filter options.
 	Sum(o AggregateOptions) (SumRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
-	List(o PageviewOptions) (PageviewCollection, error)
+	List(o ListOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.
 	Categories() []string
 	// Flags lists all available flags.
@@ -152,14 +166,24 @@ func (eDB *PageviewDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 }
 
 // List returns list of all pageviews based on given PageviewOptions.
-func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
-	builder := eDB.DB.QueryBuilder.Select("*").From(`"` + TablePageviews + `"`)
-	builder = eDB.addQueryFilters(builder, o)
+func (eDB *PageviewDB) List(o ListOptions) (PageviewRowCollection, error) {
+	var selectFields string
+	if len(o.SelectFields) > 0 {
+		o.SelectFields = append(o.SelectFields, "token") // at least one value needs to be always selected
+		selectFields = strings.Join(o.SelectFields, ",")
+	} else {
+		selectFields = "*"
+	}
+
+	builder := eDB.DB.QueryBuilder.Select(selectFields).From(`"` + TablePageviews + `"`)
+	builder = addAggregateQueryFilters(builder, o.AggregateOptions)
 
 	q := client.Query{
 		Command:  builder.Build(),
 		Database: eDB.DB.DBName,
 	}
+
+	log.Println(q.Command)
 
 	response, err := eDB.DB.Client.Query(q)
 	if err != nil {
@@ -169,25 +193,29 @@ func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
 		return nil, response.Error()
 	}
 
-	ec := PageviewCollection{}
+	prc := PageviewRowCollection{}
 
 	// no data returned
 	if len(response.Results[0].Series) == 0 {
-		return ec, nil
+		return prc, nil
 	}
 
 	for _, s := range response.Results[0].Series {
+		row := PageviewRow{
+			Tags: s.Tags,
+		}
 		for idx := range s.Values {
 			ir := influxquery.NewInfluxResult(s, idx)
-			e, err := pageviewFromInfluxResult(ir)
+			p, err := pageviewFromInfluxResult(ir)
 			if err != nil {
 				return nil, err
 			}
-			ec = append(ec, e)
+			row.Pageviews = append(row.Pageviews, p)
 		}
+		prc = append(prc, row)
 	}
 
-	return ec, nil
+	return prc, nil
 }
 
 // Categories lists all tracked categories.
@@ -242,29 +270,6 @@ func (eDB *PageviewDB) Users() ([]string, error) {
 		users = append(users, strVal)
 	}
 	return users, nil
-}
-
-func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOptions) influxquery.Builder {
-	if o.FilterBy != "" {
-		cond := ""
-		for i, val := range o.IDs {
-			if i > 0 {
-				cond += " OR "
-			}
-			//o.FilterBy should be influx table column
-			cond = fmt.Sprintf("%s%s = '%s'", cond, o.FilterBy, val)
-		}
-		if cond != "" {
-			builder = builder.Where(fmt.Sprintf("(%s)", cond))
-		}
-	}
-
-	builder = addQueryFilterAction(builder, o.Action)
-	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
-	builder = addQueryFilterTimeBefore(builder, o.TimeBefore)
-	builder = addQueryFilterGroupBy(builder, o.GroupBy)
-
-	return builder
 }
 
 // resolveQueryBindings returns name of the table and field used within the aggregate function

@@ -48,7 +48,7 @@ type CommerceStorage interface {
 	// Sum returns sum of events based on the provided filter options.
 	Sum(o AggregateOptions) (SumRowCollection, bool, error)
 	// List returns list of all events based on given CommerceOptions.
-	List(o CommerceOptions) (CommerceCollection, error)
+	List(o AggregateOptions) (CommerceCollection, error)
 	// Categories lists all available categories.
 	Categories() []string
 	// Flags lists all available flags.
@@ -88,9 +88,9 @@ func (cDB *CommerceDB) Count(o AggregateOptions) (CountRowCollection, bool, erro
 }
 
 // List returns list of all events based on given CommerceOptions.
-func (cDB *CommerceDB) List(o CommerceOptions) (CommerceCollection, error) {
+func (cDB *CommerceDB) List(o AggregateOptions) (CommerceCollection, error) {
 	builder := cDB.DB.QueryBuilder.Select("*").From(`"` + TableCommerce + `"`)
-	builder = cDB.addQueryFilters(builder, o)
+	builder = addAggregateQueryFilters(builder, o)
 
 	q := client.Query{
 		Command:  builder.Build(),
@@ -175,30 +175,6 @@ func (cDB *CommerceDB) Actions(category string) ([]string, error) {
 		}, nil
 	}
 	return nil, fmt.Errorf("unknown commerce category: %s", category)
-}
-
-func (cDB *CommerceDB) addQueryFilters(builder influxquery.Builder, o CommerceOptions) influxquery.Builder {
-	if o.FilterBy != "" {
-		cond := ""
-		for i, val := range o.IDs {
-			if i > 0 {
-				cond += " OR "
-			}
-			cond = fmt.Sprintf("%s%s = '%s'", cond, o.FilterBy.column(), val)
-		}
-		if cond != "" {
-			builder = builder.Where(fmt.Sprintf("(%s)", cond))
-		}
-		if o.Group {
-			builder = builder.GroupBy(fmt.Sprintf(`"%s"`, o.FilterBy.column()))
-		}
-	}
-
-	builder = addQueryFilterStep(builder, o.Step)
-	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
-	builder = addQueryFilterTimeBefore(builder, o.TimeBefore)
-
-	return builder
 }
 
 func commerceFromInfluxResult(ir *influxquery.Result) (*Commerce, error) {
