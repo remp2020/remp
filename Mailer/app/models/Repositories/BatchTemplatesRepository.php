@@ -42,6 +42,23 @@ class BatchTemplatesRepository extends Repository
             ->order('mail_job:mail_job_batch.first_email_sent_at DESC');
     }
 
+    public function getDashboardDetailGraphData($mailTypeId, $numOfDays)
+    {
+        return $this->getTable()
+            ->select('
+                SUM(mail_job_batch_templates.sent) AS sent_mails,
+                mail_template.mail_type_id,
+                mail_template.mail_type.title AS mail_type_title,
+                mail_job:mail_job_batch.first_email_sent_at')
+            ->where('mail_job:mail_job_batch.first_email_sent_at IS NOT NULL')
+            ->where('mail_template.mail_type_id = ?', $mailTypeId)
+            ->where('DATE(mail_job:mail_job_batch.first_email_sent_at) > DATE(NOW() - INTERVAL ? DAY)', $numOfDays)
+            ->group('mail_template.mail_type_id')
+            ->group('DATE(mail_job:mail_job_batch.first_email_sent_at)')
+            ->order('mail_template.mail_type_id')
+            ->order('mail_job:mail_job_batch.first_email_sent_at DESC');
+    }
+
     public function add($jobId, $batchId, $templateId, $weight = 100)
     {
         $result = $this->insert([

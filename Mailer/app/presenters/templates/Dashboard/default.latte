@@ -7,8 +7,9 @@
 <div id="c-grid" class="clearfix" data-columns="3">
 
     <div class="column size-1of2">
-        {foreach $datasets as $key => $dataset}
+        {foreach $dataSets as $key => $dataset}
                 <div class="column size-1of2">
+                <a n:href="Dashboard:detail $dataset['id']">
                     <div class="card p-10 p-r-20">
                         <canvas id="mailer-dashboard-statistics-graph-{$key}" width="300" height="150"></canvas>
                         <script>
@@ -64,6 +65,7 @@
                             });
                         </script>
                     </div>
+                    </a>
                 </div>
         {/foreach}
     </div><!-- .column -->
