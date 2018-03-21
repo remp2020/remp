@@ -25,7 +25,7 @@ class BatchTemplatesRepository extends Repository
         return $selection;
     }
 
-    public function getDashboardGraphsData($numOfDays)
+    public function getDashboardGraphDataForTypes($numOfDays)
     {
         return $this->getTable()
             ->select('
@@ -39,6 +39,18 @@ class BatchTemplatesRepository extends Repository
             ->group('mail_template.mail_type_id, DATE(mail_job:mail_job_batch.first_email_sent_at)')
             ->order('mail_template.mail_type_id')
             ->order('mail_job:mail_job_batch.first_email_sent_at DESC');
+    }
+
+    public function getDashboardGraphData($numOfDays)
+    {
+        return $this->getTable()
+            ->select('
+                SUM(mail_job_batch_templates.sent) AS sent_mails,
+                mail_job:mail_job_batch.first_email_sent_at
+            ')
+            ->where('mail_job:mail_job_batch.first_email_sent_at IS NOT NULL')
+            ->where('DATE(mail_job:mail_job_batch.first_email_sent_at) > DATE(NOW() - INTERVAL ? DAY)', $numOfDays)
+            ->group('DATE(mail_job:mail_job_batch.first_email_sent_at)');
     }
 
     public function getDashboardDetailGraphData($mailTypeId, $numOfDays)
