@@ -36,8 +36,7 @@ class BatchTemplatesRepository extends Repository
             ->where('mail_job:mail_job_batch.first_email_sent_at IS NOT NULL')
             ->where('mail_template.mail_type_id IS NOT NULL')
             ->where('DATE(mail_job:mail_job_batch.first_email_sent_at) > DATE(NOW() - INTERVAL ? DAY)', $numOfDays)
-            ->group('mail_template.mail_type_id')
-            ->group('DATE(mail_job:mail_job_batch.first_email_sent_at)')
+            ->group('mail_template.mail_type_id, DATE(mail_job:mail_job_batch.first_email_sent_at)')
             ->order('mail_template.mail_type_id')
             ->order('mail_job:mail_job_batch.first_email_sent_at DESC');
     }
@@ -53,8 +52,7 @@ class BatchTemplatesRepository extends Repository
             ->where('mail_job:mail_job_batch.first_email_sent_at IS NOT NULL')
             ->where('mail_template.mail_type_id = ?', $mailTypeId)
             ->where('DATE(mail_job:mail_job_batch.first_email_sent_at) > DATE(NOW() - INTERVAL ? DAY)', $numOfDays)
-            ->group('mail_template.mail_type_id')
-            ->group('DATE(mail_job:mail_job_batch.first_email_sent_at)')
+            ->group('mail_template.mail_type_id, DATE(mail_job:mail_job_batch.first_email_sent_at)')
             ->order('mail_template.mail_type_id')
             ->order('mail_job:mail_job_batch.first_email_sent_at DESC');
     }
