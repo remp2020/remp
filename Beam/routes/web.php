@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/error', 'Auth\LoginController@ssoError')->name('sso.error');
+Route::get('/error', 'AuthController@error')->name('sso.error');
 
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard');
