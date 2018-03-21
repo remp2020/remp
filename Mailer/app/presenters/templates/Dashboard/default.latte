@@ -73,13 +73,17 @@
 
     <div class="column size-1of2">
         <div class="card clearfix">
-            <div class="card-header">
-                <h2>Mailer statistics</h2>
-                <ul>
-                    <li>Emails sent last 24 hours: {$emailsSentToday|number}</li>
-                    <li>Emails sent last week: {$emailsSentLastWeek|number}</li>
-                    <li>Templates send last week: {$templatesSentLastWeek|number}</li>
-                </ul>
+            <div class="card-body p-20 clearfix">
+                
+                <div class="col-md-6">
+                    <h1 class="m-t-10"><small>Emails sent last 24 hours:</small> <br> <strong>{$emailsSentToday|number}</strong></h1>
+                    <h1 class="m-t-20"><small>Emails sent last week:</small> <br> <strong>{$emailsSentLastWeek|number}</strong></h1>
+                </div>
+                <div class="col-md-6">
+                    <h1 class="m-t-10"><small>Templates sent last week:</small> <br> <strong>{$templatesSentLastWeek|number}</strong></h1>
+                </div>
+                    
+                
             </div>
         </div>
     </div>
