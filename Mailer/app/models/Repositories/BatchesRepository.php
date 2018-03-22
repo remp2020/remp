@@ -69,7 +69,8 @@ class BatchesRepository extends Repository
         return $this->getTable()
             ->select('
                 mail_job_batch.*,
-                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name
+                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name,
+                :mail_job_batch_template.mail_job_id
             ')
             ->where([
                 'mail_job_batch.status' => [
@@ -89,7 +90,8 @@ class BatchesRepository extends Repository
         return $this->getTable()
             ->select('
                 mail_job_batch.*,
-                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name
+                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name,
+                :mail_job_batch_template.mail_job_id
             ')
             ->where([
                 'mail_job_batch.status' => [

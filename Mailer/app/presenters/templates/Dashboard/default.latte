@@ -155,17 +155,26 @@
                     </div>
                     <div class="cw-upcoming">
                         {foreach $inProgressBatches as $batch}
-                        <ul class="clearfix p-t-20 p-b-20">
-                            <li class="cwu-forecast">{$batch->id}</li>
-                            <li style="display: block;">
-                                <strong>status:</strong> {$batch->status}</li>
-                            <li style="display: block;">
-                                <strong>created at:</strong> {$batch->created_at}</li>
-                            <li style="display: block;">
-                                <strong>sent mails:</strong> {$batch->sent_emails}</li>
-                            <li style="display: block;">
-                                <strong>template name:</strong> {$batch->template_name}</li>
-                        </ul>
+                            <ul class="clearfix p-t-20 p-b-20">
+                                <li class="cwu-forecast">
+                                    <a n:href="Job:show $batch->mail_job_id">
+                                        {$batch->id}
+                                    </a>
+                                </li>
+                                <li style="display: block;">
+                                    <strong>status:</strong> {$batch->status}
+                                </li>
+                                <li style="display: block;">
+                                    <strong>created at:</strong> {$batch->created_at}
+                                </li>
+                                <li style="display: block;">
+                                    <strong>sent mails:</strong> {$batch->sent_emails}
+                                </li>
+                                <li style="display: block;">
+                                    <strong>template name:</strong> {$batch->template_name}
+                                </li>
+
+                            </ul>
                         {/foreach}
                     </div>
                 </div>
@@ -185,7 +194,11 @@
                     <div class="cw-upcoming">
                         {foreach $lastDoneBatches as $batch}
                         <ul class="clearfix p-t-20 p-b-20">
-                            <li class="cwu-forecast">{$batch->id}</li>
+                            <li class="cwu-forecast">
+                                <a n:href="Job:show $batch->mail_job_id">
+                                    {$batch->id}
+                                </a>
+                            </li>
                             <li style="display: block;">
                                 <strong>sent mails:</strong> {$batch->sent_emails}</li>
                             <li style="display: block;">
