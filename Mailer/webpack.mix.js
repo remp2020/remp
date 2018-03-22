@@ -43,7 +43,6 @@ mix
         "node-waves": ["Waves", "window.Waves"],
         "autosize": ["autosize", "window.autosize"],
         "vue": ["Vue", "window.vue"],
-        "moment": ["Moment", "window.Moment"],
-        "salvattore": ["window.salvattore"]
+        "moment": ["Moment", "window.Moment"]
     })
     .version();

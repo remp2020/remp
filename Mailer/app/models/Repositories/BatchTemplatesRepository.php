@@ -14,7 +14,7 @@ class BatchTemplatesRepository extends Repository
     {
         return $this->getTable()
             ->select('
-                SUM(mail_job_batch_templates.sent) AS sent_mails,
+                SUM(COALESCE(mail_job_batch_templates.sent, 0)) AS sent_mails,
                 mail_template.mail_type_id,
                 mail_template.mail_type.title AS mail_type_title,
                 mail_job_batch.first_email_sent_at')
@@ -35,7 +35,7 @@ class BatchTemplatesRepository extends Repository
     {
         return $this->getTable()
             ->select('
-                SUM(mail_job_batch_templates.sent) AS sent_mails,
+                SUM(COALESCE(mail_job_batch_templates.sent, 0)) AS sent_mails,
                 mail_job_batch.first_email_sent_at
             ')
             ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
@@ -48,7 +48,7 @@ class BatchTemplatesRepository extends Repository
     {
         return $this->getTable()
             ->select('
-                SUM(mail_job_batch_templates.sent) AS sent_mails,
+                SUM(COALESCE(mail_job_batch_templates.sent, 0)) AS sent_mails,
                 mail_template.mail_type_id,
                 mail_template.mail_type.title AS mail_type_title,
                 mail_job_batch.first_email_sent_at')

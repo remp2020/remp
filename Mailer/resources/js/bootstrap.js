@@ -10,4 +10,6 @@ global.moment = require('moment');
 
 global.Chart = require('chart.js');
 
+global.salvattore = require("salvattore");
+
 Nette.initOnLoad();
