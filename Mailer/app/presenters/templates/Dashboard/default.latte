@@ -70,69 +70,69 @@
 
                     <div class="list-group lg-alt lg-even-white">
                         {foreach $typeDataSets as $key => $dataset}
-                        <a n:href="Dashboard:detail $dataset['id']">
                             <div class="list-group-item media">
-                                <div class="pull-right hidden-sm">
-                                    <canvas id="mailer-dashboard-statistics-graph-{$key}" width="80" height="40"></canvas>
-                                    <script>
-                                        var ctx = document.getElementById("mailer-dashboard-statistics-graph-{$key}").getContext('2d');
-                                        var myLineChart = new Chart(ctx, {
-                                            type: "line",
-                                            data: {
-                                                "labels": {$labels},
-                                                "datasets": [{$dataset}]
-                                            },
-                                            options: {
-                                                elements: { 
-                                                    point: { 
-                                                        radius: 0
+                                <a n:href="Dashboard:detail $dataset['id']">
+                                    <div class="pull-right hidden-sm">
+                                        <canvas id="mailer-dashboard-statistics-graph-{$key}" width="80" height="40"></canvas>
+                                        <script>
+                                            var ctx = document.getElementById("mailer-dashboard-statistics-graph-{$key}").getContext('2d');
+                                            var myLineChart = new Chart(ctx, {
+                                                type: "line",
+                                                data: {
+                                                    "labels": {$labels},
+                                                    "datasets": [{$dataset}]
+                                                },
+                                                options: {
+                                                    elements: { 
+                                                        point: { 
+                                                            radius: 0
+                                                        }
+                                                    }, 
+                                                    layout: {
+                                                        padding: -20
+                                                    },
+                                                    scales: {
+                                                        yAxes: [{
+                                                            ticks: {
+                                                                display: false,
+                                                                beginAtZero: true
+                                                            },
+                                                            gridLines: {
+                                                                display: false,
+                                                                // color: "rgba(255, 255, 255, 1)",
+                                                                color: "rgba(0, 0, 0, 0)",
+                                                                lineWidth: 0
+                                                            }
+                                                        }],
+                                                        xAxes: [{
+                                                            ticks: {
+                                                                display: false
+                                                            },
+                                                            gridLines: {
+                                                                display: false,
+                                                                // color: "rgba(255, 255, 255, 1)",
+                                                                color: "rgba(0, 0, 0, 0)",
+                                                                lineWidth: 0
+                                                            }
+                                                        }]
+                                                    },
+                                                    legend: {
+                                                        display: false
+                                                    },
+                                                    tooltips: {
+                                                        enabled: false
                                                     }
-                                                }, 
-                                                layout: {
-                                                    padding: -20
-                                                },
-                                                scales: {
-                                                    yAxes: [{
-                                                        ticks: {
-                                                            display: false,
-                                                            beginAtZero: true
-                                                        },
-                                                        gridLines: {
-                                                            display: false,
-                                                            // color: "rgba(255, 255, 255, 1)",
-                                                            color: "rgba(0, 0, 0, 0)",
-                                                            lineWidth: 0
-                                                        }
-                                                    }],
-                                                    xAxes: [{
-                                                        ticks: {
-                                                            display: false
-                                                        },
-                                                        gridLines: {
-                                                            display: false,
-                                                            // color: "rgba(255, 255, 255, 1)",
-                                                            color: "rgba(0, 0, 0, 0)",
-                                                            lineWidth: 0
-                                                        }
-                                                    }]
-                                                },
-                                                legend: {
-                                                    display: false
-                                                },
-                                                tooltips: {
-                                                    enabled: false
                                                 }
-                                            }
-                                        });
-                                    </script>
-                                </div>
+                                            });
+                                        </script>
+                                    </div>
 
-                                <div class="media-body ns-item">
-                                    <small>{$dataset['label']}</small>
-                                    <h3>{$dataset['count']}</h3>
-                                </div>
+                                    <div class="media-body ns-item">
+                                        <small>{$dataset['label']}</small>
+                                        <h3>{$dataset['count']}</h3>
+                                    </div>
+                                </a>
                             </div>
-                        </a>
                         {/foreach}
                     </div><!-- .list-group -->
                 </div><!-- .card-body -->
