@@ -33,16 +33,29 @@ final class DashboardPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $ct = 0;
-        $labels = [];
         $numOfDays = 30;
+        $graphLabels = [];
         $typeDataSets = [];
         $now = new \DateTime();
+
         $from = (new \DateTime())->sub(new \DateInterval('P' . $numOfDays . 'D'));
 
-        // fill graph columns
+        // init graph data set settings
+        $defaualtGraphSettings = [
+            'data' => array_fill(0, $numOfDays, 0),
+            'fill' => true,
+            'backgroundColor' => '#FDECB7',
+            'strokeColor' => '#FDECB7',
+            'borderColor' => '#FDECB7',
+            'lineColor' => '#FDECB7',
+            'count' => 0,
+            'prevPeriodCount' => 0
+        ];
+
+
+        // fill graph column labels
         for ($i = $numOfDays; $i > 0; $i--) {
-            $labels[] = date("d. m. Y", strtotime('-' . $i . ' days'));
+            $graphLabels[] = date("d. m. Y", strtotime('-' . $i . ' days'));
         }
 
         $allMailTypes = $this->listsRepository->all();
@@ -51,34 +64,19 @@ final class DashboardPresenter extends BasePresenter
         foreach ($allMailTypes as $mailType) {
             $typeDataSets[$mailType->id] = [
                 'id' => $mailType->id,
-                'label' => $mailType->title,
-                'data' => array_fill(0, $numOfDays, 0),
-                'fill' => true,
-                'backgroundColor' => '#FDECB7',
-                'strokeColor' => '#FDECB7',
-                'borderColor' => '#FDECB7',
-                'lineColor' => '#FDECB7',
-                'count' => 0
-            ];
+                'label' => $mailType->title
+            ] + $defaualtGraphSettings;
         }
 
         $allSentMailsData = $this->batchTemplatesRepository->getDashboardAllMailsGraphData($from, $now);
 
-        $allSentEmailsDataSet = [
-            'data' => array_fill(0, $numOfDays, 0),
-            'fill' => true,
-            'backgroundColor' => '#FDECB7',
-            'strokeColor' => '#FDECB7',
-            'borderColor' => '#FDECB7',
-            'lineColor' => '#FDECB7',
-            'count' => 0
-        ];
+        $allSentEmailsDataSet = [] + $defaualtGraphSettings;
 
         // parse all sent mails data to chart.js format
         foreach ($allSentMailsData as $row) {
             $allSentEmailsDataSet['data'][array_search(
                 $row->first_email_sent_at->format('d. m. Y'),
-                $labels
+                $graphLabels
             )] = $row->sent_mails;
         }
 
@@ -91,10 +89,21 @@ final class DashboardPresenter extends BasePresenter
             $typeDataSets[$row->mail_type_id]['data'][
                 array_search(
                     $row->first_email_sent_at->format('d. m. Y'),
-                    $labels
+                    $graphLabels
                 )
             ] = $row->sent_mails;
         }
+
+        // parse previous period data (counts)
+        $prevPeriodFrom = (new \DateTime($from->format('Y-m-d')))
+            ->sub(new \DateInterval('P' . $numOfDays . 'D'));
+
+        $prevPeriodTypesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($prevPeriodFrom, $from);
+
+        foreach ($prevPeriodTypesData as $row) {
+            $typeDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->sent_mails; 
+        }
+
 
         // order sets by sent count
         usort($typeDataSets, function ($a, $b) {
@@ -106,15 +115,13 @@ final class DashboardPresenter extends BasePresenter
             return ($a['count'] == 0) ? null : $a;
         });
 
-
         $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
         $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
-
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->typeDataSets = array_values($typeDataSets);
         $this->template->inProgressBatches = $inProgressBatches;
         $this->template->lastDoneBatches = $lastDoneBatches;
-        $this->template->labels = $labels;
+        $this->template->labels = $graphLabels;
     }
 
     public function renderDetail($id)

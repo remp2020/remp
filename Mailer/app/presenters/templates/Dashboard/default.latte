@@ -129,7 +129,11 @@
 
                                     <div class="media-body ns-item">
                                         <small>{$dataset['label']}</small>
-                                        <h3>{$dataset['count']}</h3>
+                                        <h3 class="m-t-5">
+                                            {if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}
+                                            {$dataset['count']}
+                                            <small style="color: #fff">({$dataset['prevPeriodCount']})</small>
+                                        </h3>
                                     </div>
                                 </a>
                             </div>
