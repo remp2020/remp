@@ -31,7 +31,7 @@ class BatchTemplatesRepository extends Repository
             ->order('mail_job_batch.first_email_sent_at DESC');
     }
 
-    public function getDashboardGraphData(\DateTime $from, \DateTime $to)
+    public function getDashboardAllMailsGraphData(\DateTime $from, \DateTime $to)
     {
         return $this->getTable()
             ->select('

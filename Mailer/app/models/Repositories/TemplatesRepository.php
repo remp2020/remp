@@ -142,5 +142,4 @@ class TemplatesRepository extends Repository
 
         return $selection;
     }
-
 }

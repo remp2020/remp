@@ -6,7 +6,6 @@ use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
-use Faker\Provider\tr_TR\DateTime;
 
 final class DashboardPresenter extends BasePresenter
 {
@@ -63,7 +62,7 @@ final class DashboardPresenter extends BasePresenter
             ];
         }
 
-        $allSentMailsData = $this->batchTemplatesRepository->getDashboardGraphData($from, $now);
+        $allSentMailsData = $this->batchTemplatesRepository->getDashboardAllMailsGraphData($from, $now);
 
         $allSentEmailsDataSet = [
             'data' => array_fill(0, $numOfDays, 0),
