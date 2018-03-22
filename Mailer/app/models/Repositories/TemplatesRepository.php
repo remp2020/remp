@@ -143,17 +143,4 @@ class TemplatesRepository extends Repository
         return $selection;
     }
 
-    public function countSent($numOfDays = null)
-    {
-        $selection = $this->getTable()
-                        ->select('SUM(mail_templates.sent) AS count');
-
-        if (!is_null($numOfDays)) {
-            $selection->where('
-                DATE(:mail_job_batch_templates.mail_job:mail_job_batch.first_email_sent_at) > DATE(NOW() - INTERVAL ? DAY)
-            ', $numOfDays);
-        }
-
-        return $selection;
-    }
 }

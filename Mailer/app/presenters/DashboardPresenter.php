@@ -3,8 +3,10 @@
 namespace Remp\MailerModule\Presenters;
 
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
+use Faker\Provider\tr_TR\DateTime;
 
 final class DashboardPresenter extends BasePresenter
 {
@@ -12,17 +14,21 @@ final class DashboardPresenter extends BasePresenter
     
     private $templatesRepository;
     
+    private $batchesRepository;
+
     private $listsRepository;
 
     public function __construct(
         BatchTemplatesRepository $batchTemplatesRepository,
         TemplatesRepository $templatesRepository,
+        BatchesRepository $batchesRepository,
         ListsRepository $listsRepository
     ) {
         parent::__construct();
 
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->templatesRepository = $templatesRepository;
+        $this->batchesRepository = $batchesRepository;
         $this->listsRepository = $listsRepository;
     }
 
@@ -30,8 +36,10 @@ final class DashboardPresenter extends BasePresenter
     {
         $ct = 0;
         $labels = [];
-        $typeDataSets = [];
         $numOfDays = 30;
+        $typeDataSets = [];
+        $now = new \DateTime();
+        $from = (new \DateTime())->sub(new \DateInterval('P' . $numOfDays . 'D'));
 
         // fill graph columns
         for ($i = $numOfDays; $i > 0; $i--) {
@@ -55,7 +63,7 @@ final class DashboardPresenter extends BasePresenter
             ];
         }
 
-        $allSentMailsData = $this->batchTemplatesRepository->getDashboardGraphData($numOfDays);
+        $allSentMailsData = $this->batchTemplatesRepository->getDashboardGraphData($from, $now);
 
         $allSentEmailsDataSet = [
             'data' => array_fill(0, $numOfDays, 0),
@@ -68,15 +76,14 @@ final class DashboardPresenter extends BasePresenter
         ];
 
         // parse all sent mails data to chart.js format
-        foreach($allSentMailsData as $row) {
+        foreach ($allSentMailsData as $row) {
             $allSentEmailsDataSet['data'][array_search(
                 $row->first_email_sent_at->format('d. m. Y'),
                 $labels
             )] = $row->sent_mails;
         }
 
-
-        $typesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($numOfDays);
+        $typesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($from, $now);
 
         // parse sent mails by type data to chart.js format
         foreach ($typesData as $row) {
@@ -100,8 +107,14 @@ final class DashboardPresenter extends BasePresenter
             return ($a['count'] == 0) ? null : $a;
         });
 
-        $this->template->typeDataSets = array_values($typeDataSets);
+
+        $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
+        $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
+
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
+        $this->template->typeDataSets = array_values($typeDataSets);
+        $this->template->inProgressBatches = $inProgressBatches;
+        $this->template->lastDoneBatches = $lastDoneBatches;
         $this->template->labels = $labels;
     }
 
@@ -110,6 +123,8 @@ final class DashboardPresenter extends BasePresenter
         $labels = [];
         $dataSet = [];
         $numOfDays = 30;
+        $now = new \DateTime();
+        $from = (new \DateTime())->sub(new \DateInterval('P' . $numOfDays . 'D'));
 
         // fill graph columns
         for ($i = $numOfDays; $i > 0; $i--) {
@@ -126,7 +141,7 @@ final class DashboardPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $numOfDays)->fetchAll();
+        $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $from, $now)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
