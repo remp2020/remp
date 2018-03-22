@@ -137,20 +137,17 @@ class CampaignController extends Controller
             $campaignSegment->save();
         }
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
-                    'json' => new CampaignResource($campaign),
-                ]);
-            default:
-                // save & all unknown actions result in creating entity & redirecting to edit
-                return response()->format([
-                    'html' => redirect(route('campaigns.edit', $campaign))->with('success', 'Campaign created'),
-                    'json' => new CampaignResource($campaign),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                    self::FORM_ACTION_SAVE => 'campaigns.edit',
+                ],
+                $campaign
+            )->with('success', sprintf('Campaign [%s] was created', $campaign->name)),
+            'json' => new CampaignResource($campaign),
+        ]);
     }
 
     /**
@@ -223,20 +220,17 @@ class CampaignController extends Controller
 
         CampaignSegment::destroy($request->get('removedSegments'));
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
-                    'json' => new CampaignResource($campaign),
-                ]);
-            default:
-                // save & all unknown actions result in updating entity & not redirecting away
-                return response()->format([
-                    'html' => redirect()->back()->with('success', 'Campaign updated'),
-                    'json' => new CampaignResource($campaign),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                        self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                        self::FORM_ACTION_SAVE => 'campaigns.edit',
+                    ],
+                $campaign
+            )->with('success', sprintf('Campaign [%s] was updated', $campaign->name)),
+            'json' => new CampaignResource($campaign),
+        ]);
     }
 
     /**

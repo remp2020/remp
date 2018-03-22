@@ -122,20 +122,17 @@ class BannerController extends Controller
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
         }
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('banners.index'))->with('success', 'Banner created'),
-                    'json' => new BannerResource($banner),
-                ]);
-            default:
-                // save & all unknown actions result in creating entity & redirecting to edit
-                return response()->format([
-                    'html' => redirect(route('banners.edit', $banner))->with('success', 'Banner created'),
-                    'json' => new BannerResource($banner),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'banners.index',
+                    self::FORM_ACTION_SAVE => 'banners.edit',
+                ],
+                $banner
+            )->with('success', sprintf('Banner [%s] was created', $banner->name)),
+            'json' => new BannerResource($banner),
+        ]);
     }
 
     /**
@@ -203,20 +200,17 @@ class BannerController extends Controller
                 throw new BadRequestHttpException('unhandled template type: '. $banner->template);
         }
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('banners.index'))->with('success', 'Banner updated'),
-                    'json' => new BannerResource($banner),
-                ]);
-            default:
-                // save & all unknown actions result in creating entity & redirecting to edit
-                return response()->format([
-                    'html' => redirect(route('banners.edit', $banner))->with('success', 'Banner updated'),
-                    'json' => new BannerResource($banner),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'banners.index',
+                    self::FORM_ACTION_SAVE => 'banners.edit',
+                ],
+                $banner
+            )->with('success', sprintf('Banner [%s] was updated', $banner->name)),
+            'json' => new BannerResource($banner),
+        ]);
     }
 
     /**

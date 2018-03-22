@@ -52,20 +52,17 @@ class ApiTokenController extends Controller
         $apiToken->fill($request->all());
         $apiToken->save();
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('api-tokens.index'))->with('success', sprintf('API token [%s] was created', $apiToken->token)),
-                    'json' => new ApiTokenResource($apiToken),
-                ]);
-            default:
-                // save & all unknown actions result in creating entity & redirecting to edit
-                return response()->format([
-                    'html' => redirect(route('api-tokens.edit', $apiToken))->with('success', sprintf('API token [%s] was created', $apiToken->token)),
-                    'json' => new ApiTokenResource($apiToken),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'api-tokens.index',
+                    self::FORM_ACTION_SAVE => 'api-tokens.edit',
+                ],
+                $apiToken
+            )->with('success', sprintf('API token [%s] was created', $apiToken->token)),
+            'json' => new ApiTokenResource($apiToken),
+        ]);
     }
 
     public function show(ApiToken $apiToken)
@@ -92,20 +89,17 @@ class ApiTokenController extends Controller
         $apiToken->fill($request->all());
         $apiToken->save();
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('api-tokens.index'))->with('success', sprintf('API token [%s] was updated', $apiToken->token)),
-                    'json' => new ApiTokenResource($apiToken),
-                ]);
-            default:
-                // save & all unknown actions result in creating entity & redirecting to edit
-                return response()->format([
-                    'html' => redirect(route('api-tokens.edit', $apiToken))->with('success', sprintf('API token [%s] was updated', $apiToken->token)),
-                    'json' => new ApiTokenResource($apiToken),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'api-tokens.index',
+                    self::FORM_ACTION_SAVE => 'api-tokens.edit',
+                ],
+                $apiToken
+            )->with('success', sprintf('API token [%s] was updated', $apiToken->token)),
+            'json' => new ApiTokenResource($apiToken),
+        ]);
     }
 
     public function destroy(ApiToken $apiToken)

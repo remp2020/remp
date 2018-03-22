@@ -113,18 +113,16 @@ class SegmentController extends Controller
             $rule->save();
         }
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('segments.index'))->with('success', 'Segment created')
-                ]);
-            default:
-                // save & all unknown actions result in creating entity & redirecting to edit
-                return response()->format([
-                    'html' => redirect(route('segments.edit', $segment))->with('success', 'Segment created'),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'segments.index',
+                    self::FORM_ACTION_SAVE => 'segments.edit',
+                ],
+                $segment
+            )->with('success', sprintf('Segment [%s] was created', $segment->name)),
+        ]);
     }
 
     /**
@@ -179,18 +177,16 @@ class SegmentController extends Controller
         }
         SegmentRule::destroy($request->get('removedRules'));
 
-        // process actions
-        switch ($request->get('action')) {
-            case self::FORM_ACTION_SAVE_CLOSE:
-                return response()->format([
-                    'html' => redirect(route('segments.index'))->with('success', 'Segment updated'),
-                ]);
-            default:
-                // save & all unknown actions result in updating entity & not redirecting away
-                return response()->format([
-                    'html' => redirect()->back()->with('success', 'Segment updated'),
-                ]);
-        }
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'segments.index',
+                    self::FORM_ACTION_SAVE => 'segments.edit',
+                ],
+                $segment
+            )->with('success', sprintf('Segment [%s] was updated', $segment->name)),
+        ]);
     }
 
     /**
