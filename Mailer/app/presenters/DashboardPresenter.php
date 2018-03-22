@@ -101,7 +101,7 @@ final class DashboardPresenter extends BasePresenter
         $prevPeriodTypesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($prevPeriodFrom, $from);
 
         foreach ($prevPeriodTypesData as $row) {
-            $typeDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->sent_mails; 
+            $typeDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->sent_mails;
         }
 
 
