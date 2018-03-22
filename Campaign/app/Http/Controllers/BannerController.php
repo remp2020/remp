@@ -54,7 +54,8 @@ class BannerController extends Controller
             ->addColumn('actions', function (Banner $banner) {
                 return [
                     'show' => route('banners.show', $banner),
-                    'edit' => route('banners.edit', $banner) ,
+                    'edit' => route('banners.edit', $banner),
+                    'copy' => route('banners.copy', $banner),
                 ];
             })
             ->addColumn('name', function (Banner $banner) {
@@ -84,6 +85,21 @@ class BannerController extends Controller
         $banner = new Banner;
         $banner->template = $request->get('template');
         $banner->fill(old());
+
+        return view('banners.create', [
+            'banner' => $banner,
+            'positions' => $this->positionMap->positions(),
+            'dimensions' => $this->dimensionMap->dimensions(),
+            'alignments' => $this->alignmentMap->alignments(),
+        ]);
+    }
+
+    public function copy(Banner $sourceBanner)
+    {
+        $sourceBanner->load('htmlTemplate', 'mediumRectangleTemplate', 'barTemplate', 'shortMessageTemplate');
+        $banner = $sourceBanner->replicate();
+
+        flash(sprintf('Form has been pre-filled with data from banner "%s"', $sourceBanner->name))->info();
 
         return view('banners.create', [
             'banner' => $banner,
