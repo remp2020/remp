@@ -24,7 +24,6 @@ class Campaign extends Model
     protected $fillable = [
         'name',
         'signed_in',
-        'active',
         'once_per_session',
         'pageview_rules',
         'devices'
@@ -39,11 +38,12 @@ class Campaign extends Model
     ];
 
     protected $attributes = [
-        'active' => false,
         'once_per_session' => false,
         'pageview_rules' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]"
     ];
+
+    protected $appends = ['active'];
 
     protected static function boot()
     {
@@ -52,6 +52,19 @@ class Campaign extends Model
         static::creating(function (Campaign $campaign) {
             $campaign->uuid = Uuid::uuid4()->toString();
         });
+    }
+
+    /**
+     * Get virtual field `active` which indicates if campaign has active schedules.
+     *
+     * @return bool
+     */
+    public function getActiveAttribute()
+    {
+        if ($this->schedules()->runningOrPlanned()->count()) {
+            return true;
+        }
+        return false;
     }
 
     public function banners()
@@ -148,7 +161,7 @@ class Campaign extends Model
 
     public function cache()
     {
-        $activeCampaignIds = self::whereActive(true)->pluck('id')->toArray();
+        $activeCampaignIds = Schedule::applyScopes()->runningOrPlanned()->orderBy('start_time')->pluck('campaign_id')->unique()->toArray();
         $campaign = $this->where(['id' => $this->id])->with([
             'segments',
             'banner',

@@ -140,7 +140,8 @@ class CampaignController extends Controller
         $message = ['success' => 'Campaign created'];
 
         // process active flag & toggle schedules
-        $activeStatusMsg = $this->toggleSchedules($campaign);
+        $activate = $request->get('active', false);
+        $activeStatusMsg = $this->toggleSchedules($campaign, $activate);
         if (!is_null($activeStatusMsg)) {
             $message['warning'] = $activeStatusMsg;
         }
@@ -224,7 +225,8 @@ class CampaignController extends Controller
         $message = ['success' => sprintf('Campaign [%s] was updated.', $campaign->name)];
 
         // process active flag & toggle schedules
-        $activeStatusMsg = $this->toggleSchedules($campaign);
+        $activate = $request->get('active', false);
+        $activeStatusMsg = $this->toggleSchedules($campaign, $activate);
         if (!is_null($activeStatusMsg)) {
             $message['warning'] = $activeStatusMsg;
         }
@@ -236,14 +238,12 @@ class CampaignController extends Controller
     }
 
     /**
-     * Toggle campaign status and activate / deactivate current schedule.
+     * Toggle campaign status - create or stop schedules.
      *
      * If campaign is not active, activate it:
-     * - change active flag to true,
      * - create new schedule with status executed (it wasn't planned).
      *
      * If campaign is active, deactivate it:
-     * - change active flag to false,
      * - stop all running or planned schedules.
      *
      * @param Campaign $campaign
@@ -251,14 +251,12 @@ class CampaignController extends Controller
      */
     public function toggleActive(Campaign $campaign): JsonResponse
     {
+        $activate = false;
         if (!$campaign->active) {
-            $campaign->active = true;
-        } else {
-            $campaign->active = false;
+            $activate = true;
         }
-        $campaign->save();
 
-        $this->toggleSchedules($campaign);
+        $this->toggleSchedules($campaign, $activate);
 
         // TODO: maybe add message from toggleSchedules to response?
         return response()->json([
@@ -267,15 +265,23 @@ class CampaignController extends Controller
     }
 
     /**
-     * Toggle schedules based on campaign active flag.
+     * Toggle schedules of campaign.
+     *
+     * When `activate` argument is not passed, no change is triggered.
      *
      * @param Campaign $campaign
+     * @param null|boolean $activate
      * @return null|string Returns message about schedules state change.
      */
-    private function toggleSchedules(Campaign $campaign): ?string
+    private function toggleSchedules(Campaign $campaign, $activate = null): ?string
     {
+        // do not change schedules when there is no `activate` order
+        if (is_null($activate)) {
+            return null;
+        }
+
         $schedulesChangeMsg = null;
-        if ($campaign->active) {
+        if ($activate) {
             $activated = $this->startCampaignSchedule($campaign);
             if ($activated) {
                 $schedulesChangeMsg = "Campaign was activated and is running.";

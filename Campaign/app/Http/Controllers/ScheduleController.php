@@ -41,9 +41,6 @@ class ScheduleController extends Controller
     {
         $scheduleSelect = Schedule::select()
             ->with(['campaign', 'campaign.banner'])
-            ->whereHas('campaign', function (\Illuminate\Database\Eloquent\Builder $query) {
-                $query->where('active', '=', true);
-            })
             ->orderBy('start_time', 'DESC')
             ->orderBy('end_time', 'DESC');
 
