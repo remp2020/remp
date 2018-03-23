@@ -15,4 +15,6 @@ interface JournalContract
     public function count(JournalAggregateRequest $request): Collection;
 
     public function sum(JournalAggregateRequest $request): Collection;
+
+    public function list(JournalListRequest $request): Collection;
 }

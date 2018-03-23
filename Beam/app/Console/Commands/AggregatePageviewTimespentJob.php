@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 class AggregatePageviewTimespentJob extends Command
 {
-    protected $signature = 'aggregate:pageview-timespent {--now=}';
+    protected $signature = 'pageviews:aggregate-timespent {--now=}';
 
     protected $description = 'Reads pageview/timespent data from journal and stores aggregated data';
 

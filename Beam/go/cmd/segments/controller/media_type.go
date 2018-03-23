@@ -209,6 +209,9 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	if p.IP != "" {
 		pageview.User.IPAddress = &p.IP
 	}
+	if p.URL != "" {
+		pageview.User.URL = &p.URL
+	}
 	if p.Referer != "" {
 		pageview.User.Referer = &p.Referer
 	}
@@ -217,6 +220,9 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	}
 	if p.SessionID != "" {
 		pageview.User.RempSessionID = &p.SessionID
+	}
+	if p.UserAgent != "" {
+		pageview.User.UserAgent = &p.UserAgent
 	}
 
 	return pageview, nil

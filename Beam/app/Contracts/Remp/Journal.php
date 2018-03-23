@@ -5,6 +5,7 @@ namespace App\Contracts\Remp;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalException;
+use App\Contracts\JournalListRequest;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
@@ -25,6 +26,8 @@ class Journal implements JournalContract
     const ENDPOINT_GENERIC_COUNT = 'journal/%s/actions/%s/count';
 
     const ENDPOINT_GENERIC_SUM = 'journal/%s/actions/%s/sum';
+
+    const ENDPOINT_GENERIC_LIST = 'journal/%s/list';
 
     private $client;
 
@@ -111,6 +114,31 @@ class Journal implements JournalContract
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:Sum endpoint: {$e->getMessage()}");
+        } catch (ClientException $e) {
+            \Log::error($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+
+        $list = json_decode($response->getBody());
+        return collect($list);
+    }
+
+    public function list(JournalListRequest $request): Collection
+    {
+        try {
+            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_LIST), [
+                'json' => [
+                    'select_fields' => $request->getSelect(),
+                    'conditions' => [
+                        'filter_by' => $request->getFilterBy(),
+                        'group_by' => $request->getGroupBy(),
+                        'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                        'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+                    ],
+                ],
+            ]);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:List endpoint: {$e->getMessage()}");
         } catch (ClientException $e) {
             \Log::error($e->getResponse()->getBody()->getContents());
             throw $e;
