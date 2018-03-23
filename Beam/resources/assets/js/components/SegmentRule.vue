@@ -83,7 +83,8 @@
                     <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                     <div class="fg-line">
                         <label class="fg-label">Timespan in minutes</label>
-                        <input v-model="mutTimespan" :name="'rules['+index+'][timespan]'" placeholder="e.g. 1440" class="form-control fg-input" title="timespan" type="number" required>
+                        <input type="hidden" :name="'rules['+index+'][timespan]'" v-model="mutTimespan">
+                        <input v-model="timespanUserFormatted" placeholder="e.g. 3d 1h 4m 4s" class="form-control fg-input" title="timespan" type="text" required>
                     </div>
                 </div>
 
@@ -170,6 +171,7 @@
                 "mutEventAction": this.eventAction, 
                 "mutEventCategory": this.eventCategory,
                 "mutEventCategories" : this.eventCategories,
+                "timespanUserFormatted": null,
 
                 "showEventsLoader": false,
                 "showEventsInput": false,
@@ -190,8 +192,28 @@
                 ]
             }
         },
+        watch: {
+            timespanUserFormatted: function (val) {
+                var groups = /(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?/.exec(val);
+
+                var days = groups[1];
+                var hours = groups[2];
+                var minutes = groups[3];
+                var seconds = groups[4];
+
+                var timespan = moment.duration({
+                    days: days,
+                    hours: hours,
+                    minutes: minutes,
+                    seconds: seconds
+                })
+
+                this.mutTimespan = timespan.asMinutes();
+            }
+        },
         created: function () {
             this.fetchFlags();
+            this.initTimespan();
 
             for (let group in this.eventCategories) {
                 if (!this.eventCategories.hasOwnProperty(group)) {
@@ -266,6 +288,28 @@
                 if (this.fields.length === 0) {
                     this.addField();
                 }
+            },
+            initTimespan: function () {
+                var timespan = moment.duration(this.mutTimespan, "minutes"),
+                    timespanStr = "";
+
+                if (timespan.days()) {
+                    timespanStr += timespan.days() + "d ";
+                }
+
+                if (timespan.hours()) {
+                    timespanStr += " " + timespan.hours() + "h ";
+                }
+
+                if (timespan.minutes()) {
+                    timespanStr += " " + timespan.minutes() + "m ";
+                }
+
+                if (timespan.seconds()) {
+                    timespanStr += " " + timespan.seconds() + "s ";
+                }
+
+                this.timespanUserFormatted = timespanStr.trim();
             }
         }
     }
