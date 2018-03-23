@@ -164,7 +164,6 @@
                 "mutId": this.id,
                 "mutCount": this.count,
                 "mutFlags": this.flags,
-                "ruleIndex": this.index,
                 "mutFields": this.fields,
                 "mutOperator": this.operator,
                 "mutTimespan": this.timespan,
@@ -280,8 +279,6 @@
                 })
             },
             removeField: function(fieldIndex) {
-                let fields = this.rules[ruleIndex].fields;
-
                 this.fields.splice(fieldIndex, 1);
                 if (this.fields.length === 0) {
                     this.addField();
