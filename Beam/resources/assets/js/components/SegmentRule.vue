@@ -82,9 +82,9 @@
                 <div class="input-group m-t-10">
                     <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                     <div class="fg-line">
-                        <label class="fg-label">Timespan in minutes</label>
+                        <label class="fg-label">Timespan</label>
                         <input type="hidden" :name="'rules['+index+'][timespan]'" v-model="mutTimespan">
-                        <input v-model="timespanUserFormatted" placeholder="e.g. 3d 1h 4m 4s" class="form-control fg-input" title="timespan" type="text" required>
+                        <input v-model="timespanUserFormatted" placeholder="e.g. 3d 1h 4m" class="form-control fg-input" title="timespan" type="text" required>
                     </div>
                 </div>
 
@@ -194,21 +194,19 @@
         },
         watch: {
             timespanUserFormatted: function (val) {
-                var groups = /(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?/.exec(val);
+                var groups = /(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?/.exec(val);
 
                 var days = groups[1];
                 var hours = groups[2];
                 var minutes = groups[3];
-                var seconds = groups[4];
 
                 var timespan = moment.duration({
                     days: days,
                     hours: hours,
-                    minutes: minutes,
-                    seconds: seconds
+                    minutes: minutes
                 })
 
-                this.mutTimespan = timespan.asMinutes();
+                this.mutTimespan = parseInt(timespan.asMinutes());
             }
         },
         created: function () {
@@ -303,10 +301,6 @@
 
                 if (timespan.minutes()) {
                     timespanStr += " " + timespan.minutes() + "m ";
-                }
-
-                if (timespan.seconds()) {
-                    timespanStr += " " + timespan.seconds() + "s ";
                 }
 
                 this.timespanUserFormatted = timespanStr.trim();
