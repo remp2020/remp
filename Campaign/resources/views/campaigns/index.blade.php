@@ -43,6 +43,13 @@
                 ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
             ],
             'displaySearchAndPaging' => false,
+            'refreshTriggers' => [
+                [
+                // refresh when campaign's active toggle is toggled
+                'event' => 'campaign_active_toggled',
+                'selector' => 'document'
+                ],
+            ],
             ]) !!}
         </div>
     </div>

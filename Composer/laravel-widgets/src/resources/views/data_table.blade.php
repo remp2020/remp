@@ -136,9 +136,17 @@
         $.fn.dataTables.navigation(dataTable);
 
         @foreach ($refreshTriggers as $def)
-        $('{!! $def['selector'] !!}').on('{!! $def['event'] !!}', function() {
-            dataTable.draw();
-        });
+            var triggerEvent = '{!! $def['event'] !!}';
+
+            @if ($def['selector'] === 'document')
+                var triggerElement = $(document);
+            @else
+                var triggerElement = $('{!! $def['selector'] !!}');
+            @endif
+
+            triggerElement.on(triggerEvent, function() {
+                dataTable.draw();
+            });
         @endforeach
     });
 </script>
