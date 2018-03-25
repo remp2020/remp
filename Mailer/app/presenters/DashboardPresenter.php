@@ -2,6 +2,9 @@
 
 namespace Remp\MailerModule\Presenters;
 
+use DateTime;
+use DateInterval;
+
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
@@ -36,9 +39,11 @@ final class DashboardPresenter extends BasePresenter
         $numOfDays = 30;
         $graphLabels = [];
         $typeDataSets = [];
-        $now = new \DateTime();
 
-        $from = (new \DateTime())->sub(new \DateInterval('P' . $numOfDays . 'D'));
+        $now = new DateTime();
+        $from = (new DateTime())->sub(
+            new DateInterval('P' . $numOfDays . 'D')
+        );
 
         // init graph data set settings
         $defaualtGraphSettings = [
@@ -95,8 +100,8 @@ final class DashboardPresenter extends BasePresenter
         }
 
         // parse previous period data (counts)
-        $prevPeriodFrom = (new \DateTime($from->format('Y-m-d')))
-            ->sub(new \DateInterval('P' . $numOfDays . 'D'));
+        $prevPeriodFrom = (new DateTime($from->format('Y-m-d')))
+            ->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         $prevPeriodTypesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($prevPeriodFrom, $from);
 
@@ -104,19 +109,19 @@ final class DashboardPresenter extends BasePresenter
             $typeDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->sent_mails;
         }
 
+        // remove sets with zero sent count
+        $typeDataSets = array_filter($typeDataSets, function ($a) {
+            return ($a['count'] == 0) ? null : $a;
+        });
 
         // order sets by sent count
         usort($typeDataSets, function ($a, $b) {
             return $b['count'] <=> $a['count'];
         });
 
-        // remove sets with zero sent count
-        $typeDataSets = array_filter($typeDataSets, function ($a) {
-            return ($a['count'] == 0) ? null : $a;
-        });
-
         $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
         $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
+
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->typeDataSets = array_values($typeDataSets);
         $this->template->inProgressBatches = $inProgressBatches;
@@ -129,8 +134,8 @@ final class DashboardPresenter extends BasePresenter
         $labels = [];
         $dataSet = [];
         $numOfDays = 30;
-        $now = new \DateTime();
-        $from = (new \DateTime())->sub(new \DateInterval('P' . $numOfDays . 'D'));
+        $now = new DateTime();
+        $from = (new DateTime())->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         // fill graph columns
         for ($i = $numOfDays; $i > 0; $i--) {
