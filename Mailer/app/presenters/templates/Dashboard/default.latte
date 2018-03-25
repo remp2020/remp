@@ -8,13 +8,19 @@
     <div class="container">
         <div id="c-grid" class="clearfix" data-columns>
             <div class="card c-dark palette-Amber bg">
-                <div class="card-header p-b-0">
-                    <h2>Emails sent
-                        <small>for past 30 days</small>
-                    </h2>
-                </div><!-- .cart-header -->
-                <div class="card-body">
 
+                <div class="cw-current media">
+                    <div class="pull-left zmdi zmdi-graphic-eq m-t-10 p-r-0" style="font-size: 4em;"></div>
+                    <div class="cwc-info media-body">
+                        <div class="cwci-temp">Emails sent</div>
+                        <ul class="cwci-info">
+                            <li>Statistics</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {if $allSentEmailsDataSet['count']}
                     <canvas id="mailer-dashboard-statistics-graph" width="300" height="100"></canvas>
                     <script>
                         var ctx = document.getElementById("mailer-dashboard-statistics-graph").getContext('2d');
@@ -67,6 +73,15 @@
                             }
                         });
                     </script>
+                    {else}
+                    <div class="list-group lg-alt lg-even-white">
+                        <div class="list-group-item media">
+                            <div class="media-body ns-item">
+                                <small>You didn't sent any mails for past 30 days.</small>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
 
                     <div class="list-group lg-alt lg-even-white">
                         {foreach $typeDataSets as $key => $dataset}
@@ -153,6 +168,8 @@
                             </ul>
                         </div>
                     </div>
+
+                    {if count($inProgressBatches)}
                     <div class="cw-upcoming">
                         {foreach $inProgressBatches as $batch}
                             <ul class="clearfix p-t-20 p-b-20">
@@ -177,6 +194,15 @@
                             </ul>
                         {/foreach}
                     </div>
+                    {else}
+                    <div class="list-group lg-alt lg-even-white">
+                        <div class="list-group-item media">
+                            <div class="media-body ns-item">
+                                <small>You don't have any mail batches planed.</small>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
                 </div>
             </div>
 
@@ -191,6 +217,7 @@
                             </ul>
                         </div>
                     </div>
+                    {if count($lastDoneBatches)}
                     <div class="cw-upcoming">
                         {foreach $lastDoneBatches as $batch}
                         <ul class="clearfix p-t-20 p-b-20">
@@ -206,6 +233,15 @@
                         </ul>
                         {/foreach}
                     </div>
+                    {else}
+                    <div class="list-group lg-alt lg-even-white">
+                        <div class="list-group-item media">
+                            <div class="media-body ns-item">
+                                <small>You didn't sent any email batches.</small>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
                 </div>
             </div>
 
