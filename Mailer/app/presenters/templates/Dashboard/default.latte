@@ -179,16 +179,13 @@
                                     </a>
                                 </li>
                                 <li style="display: block;">
-                                    <strong>status:</strong> {$batch->status}
+                                    <strong>Email:</strong> {$batch->template_name}
                                 </li>
                                 <li style="display: block;">
-                                    <strong>created at:</strong> {$batch->created_at}
+                                    <strong>Status:</strong> {$batch->status}
                                 </li>
                                 <li style="display: block;">
-                                    <strong>sent mails:</strong> {$batch->sent_emails}
-                                </li>
-                                <li style="display: block;">
-                                    <strong>template name:</strong> {$batch->template_name}
+                                    <strong>Sent:</strong> {$batch->sent_emails}
                                 </li>
 
                             </ul>
@@ -227,9 +224,11 @@
                                 </a>
                             </li>
                             <li style="display: block;">
-                                <strong>sent mails:</strong> {$batch->sent_emails}</li>
+                                <strong>Email:</strong> {$batch->template_name}
+                            </li>
                             <li style="display: block;">
-                                <strong>template name:</strong> {$batch->template_name}</li>
+                                <strong>Sent:</strong> {$batch->sent_emails}
+                            </li>
                         </ul>
                         {/foreach}
                     </div>
