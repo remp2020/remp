@@ -76,7 +76,16 @@ class PropertyController extends Controller
         $property->account()->associate($account);
         $property->save();
 
-        return redirect(route('accounts.properties.index', $account))->with('success', 'Property created');
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'accounts.properties.index',
+                    self::FORM_ACTION_SAVE => 'accounts.properties.edit',
+                ],
+                [$account, $property]
+            )->with('success', sprintf('Property [%s] was created', $property->name)),
+        ]);
     }
 
     /**
@@ -111,7 +120,16 @@ class PropertyController extends Controller
         $property->fill($request->all());
         $property->save();
 
-        return redirect(route('accounts.properties.index', $account))->with('success', 'Property updated');
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'accounts.properties.index',
+                    self::FORM_ACTION_SAVE => 'accounts.properties.edit',
+                ],
+                [$account, $property]
+            )->with('success', sprintf('Property [%s] was updated', $property->name)),
+        ]);
     }
 
     /**

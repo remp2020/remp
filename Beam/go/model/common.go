@@ -7,6 +7,12 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
+// ListOptions represent select and filter options for listing-related calls.
+type ListOptions struct {
+	AggregateOptions
+	SelectFields []string
+}
+
 // AggregateOptions represent filter options for aggregate-related calls.
 type AggregateOptions struct {
 	Category   string

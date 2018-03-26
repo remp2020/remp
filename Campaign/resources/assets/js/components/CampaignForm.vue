@@ -242,11 +242,14 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12">
-                <div class="input-group m-t-20">
-                    <div class="fg-line">
-                        <button class="btn btn-info waves-effect" type="submit"><i class="zmdi zmdi-mail-send"></i> Save</button>
-                    </div>
+            <div class="input-group m-t-20">
+                <div class="fg-line">
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save">
+                        <i class="zmdi zmdi-check"></i> Save
+                    </button>
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close">
+                        <i class="zmdi zmdi-mail-send"></i> Save and close
+                    </button>
                 </div>
             </div>
         </div>

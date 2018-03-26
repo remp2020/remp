@@ -30,39 +30,42 @@ $.extend( $.fn.dataTable.defaults, {
 });
 
 $.fn.dataTables = {
-    pagination: function (settings) {
-        var start = settings._iDisplayStart;
-        var length = settings._iDisplayLength;
-        var count = settings._iRecordsDisplay;
+    pagination: function (settings, navId) {
+        let start = settings._iDisplayStart;
+        let length = settings._iDisplayLength;
+        let count = settings._iRecordsDisplay;
+        let nav = '#' + navId;
 
-        $('.ah-pagination button').removeAttr('disabled');
+        $(nav + ' .ah-pagination button').removeAttr('disabled');
 
         if (start == 0) {
-            $('.ah-prev button').attr('disabled', 'disabled');
+            $(nav + ' .ah-prev button').attr('disabled', 'disabled');
         }
 
         if (start + length >= count) {
-            $('.ah-next button').attr('disabled', 'disabled');
+            $(nav + ' .ah-next button').attr('disabled', 'disabled');
         }
     },
 
-    navigation: function (dataTable) {
-        $('.ah-search input').on('change', function () {
+    navigation: function (dataTable, navId) {
+        let nav = '#' + navId;
+
+        $(nav + ' .ah-search input').on('change', function () {
             dataTable.search($(this).val()).draw();
         });
 
-        $('.ah-length li').on('click', function () {
+        $(nav + ' .ah-length li').on('click', function () {
             var value = $(this).data('value');
 
-            $('.ah-length button').html($(this).find('a').text());
-            $('.ah-length li').removeClass('active');
+            $(nav + ' .ah-length button').html($(this).find('a').text());
+            $(nav + ' .ah-length li').removeClass('active');
             $(this).addClass('active');
 
             dataTable.page.len(value).draw();
             $(this).closest('.ah-actions').find('.ah-curr button').text(dataTable.page.info().page + 1)
         });
 
-        $('.ah-prev').on('click', function () {
+        $(nav + ' .ah-prev').on('click', function () {
             if ($(this).find('button').is(':disabled')) {
                 return;
             }
@@ -70,7 +73,7 @@ $.fn.dataTables = {
             $(this).closest('.ah-actions').find('.ah-curr button').text(dataTable.page.info().page + 1)
         });
 
-        $('.ah-next').on('click', function () {
+        $(nav + ' .ah-next').on('click', function () {
             if ($(this).find('button').is(':disabled')) {
                 return;
             }

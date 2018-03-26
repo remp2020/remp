@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 class AggregatePageviewLoadJob extends Command
 {
-    protected $signature = 'aggregate:pageview-load {--now=}';
+    protected $signature = 'pageviews:aggregate-load {--now=}';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 

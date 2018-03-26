@@ -137,6 +137,17 @@
             <li {!! route_active(['authors']) !!}>
                 <a href="{{ route('authors.index') }}" ><i class="zmdi zmdi-account-box"></i> Authors</a>
             </li>
+            <li {!! route_active(['visitors.devices'], 'sub-menu', 'toggled') !!}>
+                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-face"></i> Visitors</a>
+                <ul>
+                    <li {!! route_active(['visitors.devices']) !!}>
+                        <a href="{{ route('visitors.devices') }}" ><i class="zmdi zmdi-smartphone"></i> Devices</a>
+                    </li>
+                    <li {!! route_active(['visitors.sources']) !!}>
+                        <a href="{{ route('visitors.sources') }}" ><i class="zmdi zmdi-shape"></i> Sources</a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </aside>
 

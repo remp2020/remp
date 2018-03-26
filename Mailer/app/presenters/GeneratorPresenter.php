@@ -94,13 +94,13 @@ final class GeneratorPresenter extends BasePresenter
     public function createComponentMailSourceTemplateForm()
     {
         $form = $this->sourceTemplateFormFactory->create(isset($this->params['id']) ? $this->params['id'] : null);
-        $this->sourceTemplateFormFactory->onUpdate = function ($form, $mailSourceTemplate) {
+        $this->sourceTemplateFormFactory->onUpdate = function ($form, $mailSourceTemplate, $buttonSubmitted) {
             $this->flashMessage('Source template was successfully updated');
-            $this->redirect('Edit', $mailSourceTemplate->id);
+            $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);
         };
-        $this->sourceTemplateFormFactory->onSave = function ($form, $mailSourceTemplate) {
-            $this->flashMessage('Source template was successfully Created');
-            $this->redirect('Edit', $mailSourceTemplate->id);
+        $this->sourceTemplateFormFactory->onSave = function ($form, $mailSourceTemplate, $buttonSubmitted) {
+            $this->flashMessage('Source template was successfully created');
+            $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);
         };
         return $form;
     }

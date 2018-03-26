@@ -67,7 +67,16 @@ class AccountController extends Controller
         $account->uuid = Uuid::uuid4();
         $account->save();
 
-        return redirect(route('accounts.index'))->with('success', 'Account created');
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'accounts.index',
+                    self::FORM_ACTION_SAVE => 'accounts.edit',
+                ],
+                $account
+            )->with('success', sprintf('Account [%s] was created', $account->name)),
+        ]);
     }
 
     /**
@@ -110,7 +119,16 @@ class AccountController extends Controller
         $account->fill($request->all());
         $account->save();
 
-        return redirect(route('accounts.index'))->with('success', 'Account updated');
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'accounts.index',
+                    self::FORM_ACTION_SAVE => 'accounts.edit',
+                ],
+                $account
+            )->with('success', sprintf('Account [%s] was updated', $account->name)),
+        ]);
     }
 
     /**

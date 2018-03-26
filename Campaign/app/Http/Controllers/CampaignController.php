@@ -51,6 +51,7 @@ class CampaignController extends Controller
             ->addColumn('actions', function (Campaign $campaign) {
                 return [
                     'edit' => route('campaigns.edit', $campaign),
+                    'copy' => route('campaigns.copy', $campaign),
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
@@ -112,6 +113,27 @@ class CampaignController extends Controller
         ]);
     }
 
+    public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
+    {
+        $sourceCampaign->load('banner', 'altBanner', 'segments', 'countries');
+        $campaign = $sourceCampaign->replicate();
+
+        $segments = $segmentAggregator->list();
+        foreach ($segmentAggregator->getErrors() as $error) {
+            flash($error)->error();
+            Log::error($error);
+        }
+
+        flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
+
+        return view('campaigns.create', [
+            'campaign' => $campaign,
+            'banners' => Banner::all(),
+            'availableCountries' => Country::all(),
+            'segments' => $segments,
+        ]);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -137,7 +159,7 @@ class CampaignController extends Controller
             $campaignSegment->save();
         }
 
-        $message = ['success' => 'Campaign created'];
+        $message = ['success' => sprintf('Campaign [%s] was created', $campaign->name)];
 
         // (de)activate campaign (based on flag or new schedule)
         $message['warning'] = $this->processCampaignActivation(
@@ -149,7 +171,14 @@ class CampaignController extends Controller
         );
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with($message),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                    self::FORM_ACTION_SAVE => 'campaigns.edit',
+                ],
+                $campaign
+            )->with($message),
             'json' => new CampaignResource($campaign),
         ]);
     }
@@ -236,7 +265,14 @@ class CampaignController extends Controller
         );
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with($message),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                        self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                        self::FORM_ACTION_SAVE => 'campaigns.edit',
+                    ],
+                $campaign
+            )->with($message),
             'json' => new CampaignResource($campaign),
         ]);
     }
