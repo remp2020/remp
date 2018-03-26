@@ -118,7 +118,7 @@
     </section>
 
     <footer id="footer">
-        Copyright &copy; 2017 REMP
+        Copyright &copy; 2017 - {{ date('Y') }} REMP
     </footer>
 </section>
 
