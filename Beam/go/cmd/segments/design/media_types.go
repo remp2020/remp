@@ -42,6 +42,19 @@ var Sum = MediaType("application/vnd.sum+json", func() {
 	Required("tags", "sum")
 })
 
+var Pageviews = MediaType("application/vnd.pageviews+json", func() {
+	Description("Pageviews")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("pageviews", CollectionOf(Pageview))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("pageviews")
+	})
+	Required("tags", "pageviews")
+})
+
 var Segment = MediaType("application/vnd.segment+json", func() {
 	Description("Segment check")
 	Attributes(func() {
@@ -149,12 +162,14 @@ var Pageview = MediaType("application/vnd.pageview+json", func() {
 		Attribute("user")
 		Attribute("article")
 	})
-	Required("system", "user")
+	Required("system")
 })
 
 var User = MediaType("application/vnd.user+json", func() {
 	Attributes(func() {
 		Attribute("id", String, "ID of reader")
+		Attribute("subscriber", Boolean, "Flag whether user is subscriber (has paid for access)")
+		Attribute("browser_id", String, "Anonymized ID of user's browser")
 		Attribute("url", String, "URL of the content/conversion point", func() {
 			Format("uri")
 		})
@@ -163,14 +178,23 @@ var User = MediaType("application/vnd.user+json", func() {
 			Format("ip")
 		})
 		Attribute("source", Source, "UTM and social source metadata")
+		Attribute("remp_session_id", String, "ID of reader's session")
+		Attribute("remp_pageview_id", String, "ID of pageview")
+		Attribute("referer", String, "Value of HTTP referer header (if present)")
 	})
 	View("default", func() {
 		Attribute("id")
+		Attribute("subscriber")
+		Attribute("browser_id")
 		Attribute("url")
 		Attribute("user_agent")
 		Attribute("ip_address")
 		Attribute("source")
+		Attribute("remp_session_id")
+		Attribute("remp_pageview_id")
+		Attribute("referer")
 	})
+	Required("remp_pageview_id")
 })
 
 var System = MediaType("application/vnd.system+json", func() {
@@ -191,12 +215,16 @@ var Article = MediaType("application/vnd.article+json", func() {
 		Attribute("category", String, "Page category (homepage, world news...")
 		Attribute("tags", ArrayOf(String), "List of tags (breaking news, trump...")
 		Attribute("author_id", String, "ID of author")
+		Attribute("locked", Boolean, "Flag whether content was locked for the visitor")
+		Attribute("variants", HashOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("category")
 		Attribute("tags")
 		Attribute("author_id")
+		Attribute("locked")
+		Attribute("variants")
 	})
 	Required("id")
 })

@@ -25,11 +25,14 @@ type Commerce model.Commerce
 // CommerceCollection is the collection of Commerce events.
 type CommerceCollection model.CommerceCollection
 
-// Pageview represent tracked pageview events data.
+// Pageview represent tracked Pageview events data.
 type Pageview model.Pageview
 
-// PageviewCollection is the collection of Pageview events.
-type PageviewCollection model.PageviewCollection
+// PageviewRow represent tracked pageview data with tags.
+type PageviewRow model.PageviewRow
+
+// PageviewRowCollection is the collection of PageviewRow events.
+type PageviewRowCollection model.PageviewRowCollection
 
 // SegmentCache represent cache object for count of events of SegmentRules.
 type SegmentCache model.SegmentCache
@@ -152,30 +155,42 @@ func (cc CommerceCollection) ToMediaType() (app.CommerceCollection, error) {
 	return mt, nil
 }
 
-// ToMediaType converts internal Pageview representation to application one.
+// ToMediaType converts internal PageviewRow representation to application one.
 func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	token, err := uuid.FromString(p.Token)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to parse property token as UUID")
 	}
+
+	// PageviewRow, generic user and system data
 	pageview := &app.Pageview{
 		System: &app.System{
 			Time:          p.Time,
 			PropertyToken: token,
 		},
 		User: &app.User{
-			Source: &app.Source{},
+			Source:         &app.Source{},
+			RempPageviewID: p.PageviewID,
 		},
 	}
+
+	// article data
 	if p.ArticleID != "" {
-		article := &app.Article{
-			ID: p.ArticleID,
+		pageview.Article = &app.Article{
+			ID:     p.ArticleID,
+			Locked: &p.ArticleLocked,
 		}
 		if p.AuthorID != "" {
-			article.AuthorID = &p.AuthorID
+			pageview.Article.AuthorID = &p.AuthorID
 		}
-		pageview.Article = article
 	}
+
+	// user data
+	if p.UserID != "" {
+		pageview.User.ID = &p.UserID
+	}
+
+	// optional tracked params
 	if p.UTMSource != "" {
 		pageview.User.Source.UtmSource = &p.UTMSource
 	}
@@ -194,32 +209,39 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	if p.IP != "" {
 		pageview.User.IPAddress = &p.IP
 	}
-	if p.UserID != "" {
-		pageview.User.ID = &p.UserID
+	if p.Referer != "" {
+		pageview.User.Referer = &p.Referer
 	}
-	if p.URL != "" {
-		pageview.User.URL = &p.URL
+	if p.BrowserID != "" {
+		pageview.User.BrowserID = &p.BrowserID
 	}
-	if p.UserAgent != "" {
-		pageview.User.UserAgent = &p.UserAgent
+	if p.SessionID != "" {
+		pageview.User.RempSessionID = &p.SessionID
 	}
+
 	return pageview, nil
 }
 
-// ToMediaType converts internal PageviewCollection representation to application one.
-func (pc PageviewCollection) ToMediaType() (app.PageviewCollection, error) {
-	mt := app.PageviewCollection{}
-	for _, c := range pc {
-		event, err := (*Pageview)(c).ToMediaType()
-		if err != nil {
-			return nil, err
+// ToMediaType converts internal PageviewRowCollection representation to application one.
+func (prc PageviewRowCollection) ToMediaType() (app.PageviewsCollection, error) {
+	mt := app.PageviewsCollection{}
+	for _, rc := range prc {
+		pr := &app.Pageviews{
+			Tags: rc.Tags,
 		}
-		mt = append(mt, event)
+		for _, p := range rc.Pageviews {
+			pageview, err := (*Pageview)(p).ToMediaType()
+			if err != nil {
+				return nil, err
+			}
+			pr.Pageviews = append(pr.Pageviews, pageview)
+		}
+		mt = append(mt, pr)
 	}
 	return mt, nil
 }
 
-// ToMediaType converts internal PageviewCollection representation to application one.
+// ToMediaType converts internal PageviewRowCollection representation to application one.
 func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 	mt := make(map[int]*app.SegmentRuleCache)
 	for key, c := range sc {

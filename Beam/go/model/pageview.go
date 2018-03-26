@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -34,25 +35,38 @@ type PageviewOptions struct {
 
 // Pageview represents pageview data.
 type Pageview struct {
-	ArticleID    string
-	AuthorID     string
-	UTMSource    string
-	UTMCampaign  string
-	UTMMedium    string
-	UTMContent   string
-	SocialSource string
+	ArticleID     string
+	ArticleLocked bool
+	TitleVariant  string
+	AuthorID      string
+	UTMSource     string
+	UTMCampaign   string
+	UTMMedium     string
+	UTMContent    string
+	SocialSource  string
 
-	Token     string
-	Time      time.Time
-	Host      string
-	IP        string
-	UserID    string
-	URL       string
-	UserAgent string
+	Token      string
+	Time       time.Time
+	Host       string
+	IP         string
+	UserID     string
+	URL        string
+	UserAgent  string
+	BrowserID  string
+	SessionID  string
+	PageviewID string
+	Referer    string
+	Subscriber bool
 }
 
-// PageviewCollection is collection of pageviews.
-type PageviewCollection []*Pageview
+// PageviewRow represents one row of grouped list.
+type PageviewRow struct {
+	Tags      map[string]string
+	Pageviews []*Pageview
+}
+
+// PageviewRowCollection represents collection of rows of grouped list.
+type PageviewRowCollection []PageviewRow
 
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
@@ -61,7 +75,7 @@ type PageviewStorage interface {
 	// Sum returns sum of pageviews based on the provided filter options.
 	Sum(o AggregateOptions) (SumRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
-	List(o PageviewOptions) (PageviewCollection, error)
+	List(o ListOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.
 	Categories() []string
 	// Flags lists all available flags.
@@ -152,14 +166,23 @@ func (eDB *PageviewDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 }
 
 // List returns list of all pageviews based on given PageviewOptions.
-func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
-	builder := eDB.DB.QueryBuilder.Select("*").From(`"` + TablePageviews + `"`)
-	builder = eDB.addQueryFilters(builder, o)
+func (eDB *PageviewDB) List(o ListOptions) (PageviewRowCollection, error) {
+	var selectFields string
+	if len(o.SelectFields) > 0 {
+		o.SelectFields = append(o.SelectFields, "token", "remp_pageview_id") // at least one value needs to be always selected
+		selectFields = strings.Join(o.SelectFields, ",")
+	} else {
+		selectFields = "*"
+	}
+
+	builder := eDB.DB.QueryBuilder.Select(selectFields).From(`"` + TablePageviews + `"`)
+	builder = addAggregateQueryFilters(builder, o.AggregateOptions)
 
 	q := client.Query{
 		Command:  builder.Build(),
 		Database: eDB.DB.DBName,
 	}
+	log.Println("pageview list query:", q.Command)
 
 	response, err := eDB.DB.Client.Query(q)
 	if err != nil {
@@ -169,25 +192,29 @@ func (eDB *PageviewDB) List(o PageviewOptions) (PageviewCollection, error) {
 		return nil, response.Error()
 	}
 
-	ec := PageviewCollection{}
+	prc := PageviewRowCollection{}
 
 	// no data returned
 	if len(response.Results[0].Series) == 0 {
-		return ec, nil
+		return prc, nil
 	}
 
 	for _, s := range response.Results[0].Series {
+		row := PageviewRow{
+			Tags: s.Tags,
+		}
 		for idx := range s.Values {
 			ir := influxquery.NewInfluxResult(s, idx)
-			e, err := pageviewFromInfluxResult(ir)
+			p, err := pageviewFromInfluxResult(ir)
 			if err != nil {
 				return nil, err
 			}
-			ec = append(ec, e)
+			row.Pageviews = append(row.Pageviews, p)
 		}
+		prc = append(prc, row)
 	}
 
-	return ec, nil
+	return prc, nil
 }
 
 // Categories lists all tracked categories.
@@ -244,29 +271,6 @@ func (eDB *PageviewDB) Users() ([]string, error) {
 	return users, nil
 }
 
-func (eDB *PageviewDB) addQueryFilters(builder influxquery.Builder, o PageviewOptions) influxquery.Builder {
-	if o.FilterBy != "" {
-		cond := ""
-		for i, val := range o.IDs {
-			if i > 0 {
-				cond += " OR "
-			}
-			//o.FilterBy should be influx table column
-			cond = fmt.Sprintf("%s%s = '%s'", cond, o.FilterBy, val)
-		}
-		if cond != "" {
-			builder = builder.Where(fmt.Sprintf("(%s)", cond))
-		}
-	}
-
-	builder = addQueryFilterAction(builder, o.Action)
-	builder = addQueryFilterTimeAfter(builder, o.TimeAfter)
-	builder = addQueryFilterTimeBefore(builder, o.TimeBefore)
-	builder = addQueryFilterGroupBy(builder, o.GroupBy)
-
-	return builder
-}
-
 // resolveQueryBindings returns name of the table and field used within the aggregate function
 // based on the provided action.
 func (eDB *PageviewDB) resolveQueryBindings(action string) (queryBinding, error) {
@@ -302,45 +306,53 @@ func pageviewFromInfluxResult(ir *influxquery.Result) (*Pageview, error) {
 		Time:  t,
 	}
 
-	utmSource, ok := ir.StringValue("utm_source")
-	if ok {
+	if utmSource, ok := ir.StringValue("utm_source"); ok {
 		pageview.UTMSource = utmSource
 	}
-	utmMedium, ok := ir.StringValue("utm_medium")
-	if ok {
+	if utmMedium, ok := ir.StringValue("utm_medium"); ok {
 		pageview.UTMMedium = utmMedium
 	}
-	utmCampaign, ok := ir.StringValue("utm_campaign")
-	if ok {
+	if utmCampaign, ok := ir.StringValue("utm_campaign"); ok {
 		pageview.UTMCampaign = utmCampaign
 	}
-	utmContent, ok := ir.StringValue("utm_content")
-	if ok {
+	if utmContent, ok := ir.StringValue("utm_content"); ok {
 		pageview.UTMContent = utmContent
 	}
-	social, ok := ir.StringValue("social")
-	if ok {
+	if social, ok := ir.StringValue("social"); ok {
 		pageview.SocialSource = social
 	}
-	host, ok := ir.StringValue("host")
-	if ok {
+	if host, ok := ir.StringValue("host"); ok {
 		pageview.Host = host
 	}
-	ip, ok := ir.StringValue("ip")
-	if ok {
+	if ip, ok := ir.StringValue("ip"); ok {
 		pageview.IP = ip
 	}
-	userID, ok := ir.StringValue("user_id")
-	if ok {
+	if userID, ok := ir.StringValue("user_id"); ok {
 		pageview.UserID = userID
 	}
-	url, ok := ir.StringValue("url")
-	if ok {
+	if url, ok := ir.StringValue("url"); ok {
 		pageview.URL = url
 	}
-	userAgent, ok := ir.StringValue("user_agent")
-	if ok {
+	if userAgent, ok := ir.StringValue("user_agent"); ok {
 		pageview.UserAgent = userAgent
+	}
+	if referer, ok := ir.StringValue("referer"); ok {
+		pageview.Referer = referer
+	}
+	if browserID, ok := ir.StringValue("browser_id"); ok {
+		pageview.BrowserID = browserID
+	}
+	if subscriber, ok := ir.BoolValue("subscriber"); ok {
+		pageview.Subscriber = subscriber
+	}
+	if articleLocked, ok := ir.BoolValue("locked"); ok {
+		pageview.ArticleLocked = articleLocked
+	}
+	if sessionID, ok := ir.StringValue("remp_session_id"); ok {
+		pageview.SessionID = sessionID
+	}
+	if pageviewID, ok := ir.StringValue("remp_pageview_id"); ok {
+		pageview.PageviewID = pageviewID
 	}
 
 	return pageview, nil

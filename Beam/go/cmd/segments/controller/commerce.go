@@ -61,24 +61,8 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 
 // List runs the list action.
 func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
-	var o model.CommerceOptions
-	if ctx.FilterBy != nil {
-		ft, err := model.NewFilterType(*ctx.FilterBy)
-		if err != nil {
-			return err
-		}
-		o.FilterBy = ft
-		o.IDs = ctx.Ids
-	}
-	if ctx.Step != nil {
-		o.Step = *ctx.Step
-	}
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
-	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
-	}
+	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	o.Step = ctx.Step
 
 	cc, err := c.CommerceStorage.List(o)
 	if err != nil {
@@ -93,25 +77,8 @@ func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
 
 // Sum runs the sum action.
 func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
-	o := model.AggregateOptions{
-		Step: ctx.Step,
-	}
-
-	for _, val := range ctx.Payload.FilterBy {
-		fb := &model.FilterBy{
-			Tag:    val.Tag,
-			Values: val.Values,
-		}
-		o.FilterBy = append(o.FilterBy, fb)
-	}
-
-	o.GroupBy = ctx.Payload.GroupBy
-	if ctx.Payload.TimeAfter != nil {
-		o.TimeAfter = *ctx.Payload.TimeAfter
-	}
-	if ctx.Payload.TimeBefore != nil {
-		o.TimeBefore = *ctx.Payload.TimeBefore
-	}
+	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	o.Step = ctx.Step
 
 	src, ok, err := c.CommerceStorage.Sum(o)
 	if err != nil {
@@ -143,4 +110,27 @@ func (c *CommerceController) Actions(ctx *app.ActionsCommerceContext) error {
 		return err
 	}
 	return ctx.OK(actions)
+}
+
+// aggregateOptionsFromCommerceOptions converts payload data to AggregateOptions.
+func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) model.AggregateOptions {
+	var o model.AggregateOptions
+
+	for _, val := range payload.FilterBy {
+		fb := &model.FilterBy{
+			Tag:    val.Tag,
+			Values: val.Values,
+		}
+		o.FilterBy = append(o.FilterBy, fb)
+	}
+
+	o.GroupBy = payload.GroupBy
+	if payload.TimeAfter != nil {
+		o.TimeAfter = *payload.TimeAfter
+	}
+	if payload.TimeBefore != nil {
+		o.TimeBefore = *payload.TimeBefore
+	}
+
+	return o
 }

@@ -68,26 +68,17 @@ func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
 
 // List runs the list action.
 func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
-	var o model.PageviewOptions
-	if ctx.Action != nil {
-		o.Action = *ctx.Action
-	}
-	if ctx.FilterBy != nil {
-		o.FilterBy = *ctx.FilterBy
-		o.IDs = ctx.Ids
-	}
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
-	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
+	aggOptions := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)
+	o := model.ListOptions{
+		AggregateOptions: aggOptions,
+		SelectFields:     ctx.Payload.SelectFields,
 	}
 
-	pc, err := c.PageviewStorage.List(o)
+	prc, err := c.PageviewStorage.List(o)
 	if err != nil {
 		return err
 	}
-	mt, err := PageviewCollection(pc).ToMediaType()
+	mt, err := PageviewRowCollection(prc).ToMediaType()
 	if err != nil {
 		return err
 	}
