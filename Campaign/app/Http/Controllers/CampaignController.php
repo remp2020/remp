@@ -139,12 +139,14 @@ class CampaignController extends Controller
 
         $message = ['success' => 'Campaign created'];
 
-        // process active flag & toggle schedules
-        $activate = $request->get('active', false);
-        $activeStatusMsg = $this->toggleSchedules($campaign, $activate);
-        if (!is_null($activeStatusMsg)) {
-            $message['warning'] = $activeStatusMsg;
-        }
+        // (de)activate campaign (based on flag or new schedule)
+        $message['warning'] = $this->processCampaignActivation(
+            $campaign,
+            $request->get('activation_mode'),
+            $request->get('active', false),
+            $request->get('new_schedule_start_time'),
+            $request->get('new_schedule_end_time')
+        );
 
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with($message),
@@ -224,17 +226,53 @@ class CampaignController extends Controller
 
         $message = ['success' => sprintf('Campaign [%s] was updated.', $campaign->name)];
 
-        // process active flag & toggle schedules
-        $activate = $request->get('active', false);
-        $activeStatusMsg = $this->toggleSchedules($campaign, $activate);
-        if (!is_null($activeStatusMsg)) {
-            $message['warning'] = $activeStatusMsg;
-        }
+        // (de)activate campaign (based on flag or new schedule)
+        $message['warning'] = $this->processCampaignActivation(
+            $campaign,
+            $request->get('activation_mode'),
+            $request->get('active', false),
+            $request->get('new_schedule_start_time'),
+            $request->get('new_schedule_end_time')
+        );
 
         return response()->format([
             'html' => redirect(route('campaigns.index'))->with($message),
             'json' => new CampaignResource($campaign),
         ]);
+    }
+
+    /**
+     * (De)Activate campaign (based on flag or new schedule).
+     *
+     * If `$activationMode` is 'activate-schedule' and new schedule has start time, create new schedule.
+     * Otherwise activate / deactivate schedules - action based on provided `$activate` flag.
+     *
+     * @param $campaign
+     * @param $activationMode
+     * @param null $activate
+     * @param null $new_schedule_start_time
+     * @param null $new_schedule_end_time
+     * @return null|string
+     */
+    private function processCampaignActivation(
+        $campaign,
+        $activationMode,
+        $activate = null,
+        $new_schedule_start_time = null,
+        $new_schedule_end_time = null
+    ): ?string {
+    
+        if ($activationMode === 'activate-schedule'
+            && !is_null($new_schedule_start_time)) {
+            $schedule = new Schedule();
+            $schedule->campaign_id = $campaign->id;
+            $schedule->start_time = $new_schedule_start_time;
+            $schedule->end_time = $new_schedule_end_time;
+            $schedule->save();
+            return sprintf("Schedule with start time '%s' added", Carbon::parse($schedule->start_time)->toDayDateTimeString());
+        } else {
+            return $this->toggleSchedules($campaign, $activate);
+        }
     }
 
     /**

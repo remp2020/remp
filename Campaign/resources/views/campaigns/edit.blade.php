@@ -24,9 +24,6 @@
     <div class="card">
         <div class="card-header">
             <h2>Scheduled runs<small></small></h2>
-            <div class="actions">
-                <a href="{{ route('campaigns.schedule.create', ['campaign' => $campaign->id]) }}" class="btn palette-Cyan bg waves-effect">Schedule new run</a>
-            </div>
         </div>
         <div class="card-body">
             {!! Widget::run('DataTable', [
