@@ -8,7 +8,7 @@ global.Vue = require('vue');
 
 global.moment = require('moment');
 
-global.Chart = require('chart.js');
+require("./chart.js");
 
 global.salvattore = require("salvattore");
 

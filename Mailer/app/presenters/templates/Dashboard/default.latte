@@ -67,9 +67,6 @@
                                 },
                                 legend: {
                                     display: false
-                                },
-                                tooltips: {
-                                    enabled: true
                                 }
                             }
                         });
@@ -100,8 +97,9 @@
                                                 },
                                                 options: {
                                                     elements: { 
-                                                        point: { 
-                                                            radius: 0
+                                                        point: {
+                                                            radius: 0,
+                                                            hitRadius: 4
                                                         }
                                                     }, 
                                                     layout: {
@@ -134,9 +132,6 @@
                                                     },
                                                     legend: {
                                                         display: false
-                                                    },
-                                                    tooltips: {
-                                                        enabled: false
                                                     }
                                                 }
                                             });
