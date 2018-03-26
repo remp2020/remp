@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="card-body">
-                    {if $allSentEmailsDataSet['count']}
+                    {if ($allSentEmailsDataSet['count'] != 0)}
                     <canvas id="mailer-dashboard-statistics-graph" width="300" height="100"></canvas>
                     <script>
                         var ctx = document.getElementById("mailer-dashboard-statistics-graph").getContext('2d');

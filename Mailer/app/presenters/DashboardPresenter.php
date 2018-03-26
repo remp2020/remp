@@ -83,6 +83,8 @@ final class DashboardPresenter extends BasePresenter
                 $row->first_email_sent_at->format('d. m. Y'),
                 $graphLabels
             )] = $row->sent_mails;
+
+            $allSentEmailsDataSet['count'] += $row->sent_mails;
         }
 
         $typesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($from, $now);
