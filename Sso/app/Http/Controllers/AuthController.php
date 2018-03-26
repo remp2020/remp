@@ -9,7 +9,7 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use JWTAuth;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
