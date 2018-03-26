@@ -286,24 +286,24 @@ class CampaignController extends Controller
      * @param $campaign
      * @param $activationMode
      * @param null $activate
-     * @param null $new_schedule_start_time
-     * @param null $new_schedule_end_time
+     * @param null $newScheduleStartTime
+     * @param null $newScheduleEndTime
      * @return null|string
      */
     private function processCampaignActivation(
         $campaign,
         $activationMode,
         $activate = null,
-        $new_schedule_start_time = null,
-        $new_schedule_end_time = null
+        $newScheduleStartTime = null,
+        $newScheduleEndTime = null
     ): ?string {
     
         if ($activationMode === 'activate-schedule'
-            && !is_null($new_schedule_start_time)) {
+            && !is_null($newScheduleStartTime)) {
             $schedule = new Schedule();
             $schedule->campaign_id = $campaign->id;
-            $schedule->start_time = $new_schedule_start_time;
-            $schedule->end_time = $new_schedule_end_time;
+            $schedule->start_time = $newScheduleStartTime;
+            $schedule->end_time = $newScheduleEndTime;
             $schedule->save();
             return sprintf("Schedule with start time '%s' added", Carbon::parse($schedule->start_time)->toDayDateTimeString());
         } else {
