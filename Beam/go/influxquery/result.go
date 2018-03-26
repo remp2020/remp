@@ -53,3 +53,16 @@ func (ir *Result) TimeValue(col string) (time.Time, bool, error) {
 	}
 	return t, true, nil
 }
+
+// BoolValue parses bool out of Result's column.
+func (ir *Result) BoolValue(col string) (bool, bool) {
+	colIdx, ok := ir.colMap[col]
+	if !ok {
+		return false, false
+	}
+	val, ok := ir.series.Values[ir.rowIdx][colIdx].(bool)
+	if !ok {
+		return false, false
+	}
+	return val, true
+}

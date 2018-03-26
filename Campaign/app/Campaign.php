@@ -18,25 +18,31 @@ class Campaign extends Model
     const PAGEVIEW_RULE_SINCE = 'since';
     const PAGEVIEW_RULE_BEFORE = 'before';
 
+    const DEVICE_MOBILE = 'mobile';
+    const DEVICE_DESKTOP = 'desktop';
+
     protected $fillable = [
         'name',
         'signed_in',
         'active',
         'once_per_session',
-        'pageview_rules'
+        'pageview_rules',
+        'devices'
     ];
 
     protected $casts = [
         'active' => 'boolean',
         'signed_in' => 'boolean',
         'once_per_session' => 'boolean',
-        'pageview_rules' => 'json'
+        'pageview_rules' => 'json',
+        'devices' => 'json'
     ];
 
     protected $attributes = [
         'active' => false,
         'once_per_session' => false,
-        'pageview_rules' => '[]'
+        'pageview_rules' => '[]',
+        'devices' => "[\"desktop\", \"mobile\"]"
     ];
 
     protected static function boot()
@@ -124,6 +130,20 @@ class Campaign extends Model
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function getAllDevices()
+    {
+        return [self::DEVICE_DESKTOP, self::DEVICE_MOBILE];
+    }
+
+    public function supportsDevice($device)
+    {
+        if (in_array($device, $this->devices)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function cache()

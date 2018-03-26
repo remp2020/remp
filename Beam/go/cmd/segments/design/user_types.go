@@ -38,6 +38,15 @@ var EventOptionsFilterBy = Type("EventOptionsFilterBy", func() {
 	Required("tag", "values")
 })
 
+var ListPageviewOptionsPayload = Type("ListPageviewOptionsPayload", func() {
+	Description("Parameters to filter pageview list")
+
+	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("conditions", PageviewOptionsPayload, "Condition definition")
+
+	Required("conditions")
+})
+
 var PageviewOptionsPayload = Type("PageviewOptionsPayload", func() {
 	Description("Parameters to filter pageview counts")
 

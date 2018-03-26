@@ -56,6 +56,30 @@
                     </div>
                 </div>
             </div>
+
+            <div v-if="sortedImageVariants.length > 0" class="ri_box_line">
+                <div v-for="variant in sortedImageVariants" class="ri_box_item">
+                    <div class="ri_box_title">Image {{ variant }} (direct)</div>
+                    <div v-for="range in sortedImageVariantRanges">
+                        <div class="ri_box_key">{{ range.label }}</div>
+                        <div class="ri_box_value">
+                            {{ imageVariantStats[variant][range.minutes] || 0 }}&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="sortedLockVariants.length > 0" class="ri_box_line">
+                <div v-for="variant in sortedLockVariants" class="ri_box_item">
+                    <div class="ri_box_title">Image {{ variant }} (direct)</div>
+                    <div v-for="range in sortedLockVariantRanges">
+                        <div class="ri_box_key">{{ range.label }}</div>
+                        <div class="ri_box_value">
+                            {{ lockVariantStats[variant][range.minutes] || 0 }}&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -76,18 +100,24 @@
             countStats: {},
             pageviewStats: {},
             titleVariantStats: {},
+            imageVariantStats: {},
+            lockVariantStats: {},
 
             revenueRanges: {},
             pageviewRanges: {},
             titleVariantRanges: {},
+            imageVariantRanges: {},
+            lockVariantRanges: {},
 
             titleVariants: [],
+            imageVariants: [],
+            lockVariants: [],
         }),
         created: function() {
-            EventHub.$on("content-conversions-revenue-changed", this.updateRevenueStats)
-            EventHub.$on("content-conversions-counts-changed", this.updateCountStats)
-            EventHub.$on("content-pageviews-changed", this.updatePageviewStats)
-            EventHub.$on("content-title-variants-changed", this.updateTitleVariantStats)
+            EventHub.$on("content-conversions-revenue-changed", this.updateRevenueStats);
+            EventHub.$on("content-conversions-counts-changed", this.updateCountStats);
+            EventHub.$on("content-pageviews-changed", this.updatePageviewStats);
+            EventHub.$on("content-variants-changed", this.updateVariantStats);
         },
         computed: {
             sortedRevenueRanges: function() {
@@ -99,8 +129,20 @@
             sortedTitleVariantRanges: function() {
                 return Object.values(this.titleVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
             },
+            sortedImageVariantRanges: function() {
+                return Object.values(this.imageVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
+            },
+            sortedLockVariantRanges: function() {
+                return Object.values(this.lockVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
+            },
             sortedTitleVariants: function() {
                 return this.titleVariants.slice().sort((a, b) => a - b);
+            },
+            sortedImageVariants: function() {
+                return this.imageVariants.slice().sort((a, b) => a - b);
+            },
+            sortedLockVariants: function() {
+                return this.lockVariants.slice().sort((a, b) => a - b);
             },
         },
         methods: {
@@ -127,27 +169,37 @@
                 }
                 this.$set(this.pageviewStats, range.minutes, counts[this.articleId]);
             },
-            updateTitleVariantStats: function(range, counts) {
-                this.$set(this.titleVariantRanges, range.minutes, range);
+            updateVariantStats: function(variantTypes, range, counts) {
+                for (const variantType of variantTypes) {
+                    switch (variantType) {
+                        case "title_variant":
+                            return this.updateVariants(this.titleVariantRanges, this.titleVariants, this.titleVariantStats, range, counts[variantType]);
+                        case "image_variant":
+                            return this.updateVariants(this.imageVariantRanges, this.imageVariants, this.imageVariantStats, range, counts[variantType]);
+                        case "lock_variant":
+                            return this.updateVariants(this.lockVariantRanges, this.lockVariants, this.lockVariantStats, range, counts[variantType]);
+                    }
+                }
+            },
+            updateVariants: function(variantRanges, variants, variantStats, range, counts) {
+                this.$set(variantRanges, range.minutes, range);
 
                 for (let variant in counts[this.articleId]) {
                     if (!counts[this.articleId].hasOwnProperty(variant)) {
                         continue;
                     }
-                    if (this.titleVariants.indexOf(variant) === -1) {
-                        this.titleVariants.push(variant);
+                    if (variants.indexOf(variant) === -1) {
+                        variants.push(variant);
                     }
 
-                    let val = this.titleVariantStats[variant] || {};
+                    let val = variantStats[variant] || {};
                     if (counts === null || !counts[this.articleId][variant]) {
                         val[range.minutes] = 0
                     } else {
                         val[range.minutes] = counts[this.articleId][variant]
                     }
-                    this.titleVariantStats[variant] = val;
+                    variantStats[variant] = val;
                 }
-
-
                 this.$forceUpdate();
             },
         },

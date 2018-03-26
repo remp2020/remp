@@ -3,10 +3,11 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 use Remp\MailerModule\Generators\GeneratorFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
-class SourceTemplateFormFactory
+class SourceTemplateFormFactory implements IFormFactory
 {
     private $mailSourceTemplateRepository;
 
@@ -57,10 +58,15 @@ class SourceTemplateFormFactory
 
         $form->setDefaults($defaults);
 
-        $form->addSubmit('submit', 'system.save')
+        $form->addSubmit(self::FORM_ACTION_SAVE, self::FORM_ACTION_SAVE)
             ->getControlPrototype()
             ->setName('button')
-            ->setHtml('<i class="fa fa-save"></i> Save');
+            ->setHtml('<i class="zmdi zmdi-check"></i> Save');
+
+        $form->addSubmit(self::FORM_ACTION_SAVE_CLOSE, self::FORM_ACTION_SAVE_CLOSE)
+            ->getControlPrototype()
+            ->setName('button')
+            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and close');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
@@ -68,13 +74,21 @@ class SourceTemplateFormFactory
 
     public function formSucceeded(Form $form, $values)
     {
+        // decide if user wants to save or save and leave
+        $buttonSubmitted = self::FORM_ACTION_SAVE;
+        /** @var $buttonSaveClose SubmitButton */
+        $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
+        if ($buttonSaveClose->isSubmittedBy()) {
+            $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
+        }
+
         if (!empty($values['id'])) {
             $id = $values['id'];
             unset($values['id']);
 
             $row = $this->mailSourceTemplateRepository->find($id);
             $this->mailSourceTemplateRepository->update($row, $values);
-            $this->onUpdate->__invoke($form, $row);
+            $this->onUpdate->__invoke($form, $row, $buttonSubmitted);
         } else {
             $template = $this->mailSourceTemplateRepository->findLast()->fetch();
 
@@ -86,7 +100,7 @@ class SourceTemplateFormFactory
                 $template ? $template->sorting + 100 : 100
             );
 
-            $this->onSave->__invoke($form, $row);
+            $this->onSave->__invoke($form, $row, $buttonSubmitted);
         }
     }
 }

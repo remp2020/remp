@@ -3,13 +3,14 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 use Nette\Object;
 use Remp\MailerModule\Forms\Rules\FormRules;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class TemplateFormFactory extends Object
+class TemplateFormFactory extends Object implements IFormFactory
 {
     /** @var TemplatesRepository */
     private $templatesRepository;
@@ -83,10 +84,15 @@ class TemplateFormFactory extends Object
 
         $form->setDefaults($defaults);
 
-        $form->addSubmit('save', 'Save')
+        $form->addSubmit(self::FORM_ACTION_SAVE, self::FORM_ACTION_SAVE)
             ->getControlPrototype()
             ->setName('button')
-            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
+            ->setHtml('<i class="zmdi zmdi-check"></i> Save');
+
+        $form->addSubmit(self::FORM_ACTION_SAVE_CLOSE, self::FORM_ACTION_SAVE_CLOSE)
+            ->getControlPrototype()
+            ->setName('button')
+            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and close');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
@@ -94,10 +100,18 @@ class TemplateFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
+        // decide if user wants to save or save and leave
+        $buttonSubmitted = self::FORM_ACTION_SAVE;
+        /** @var $buttonSaveClose SubmitButton */
+        $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
+        if ($buttonSaveClose->isSubmittedBy()) {
+            $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
+        }
+
         if (!empty($values['id'])) {
             $row = $this->templatesRepository->find($values['id']);
             $this->templatesRepository->update($row, $values);
-            ($this->onUpdate)($row);
+            ($this->onUpdate)($row, $buttonSubmitted);
         } else {
             $row = $this->templatesRepository->add(
                 $values['name'],
@@ -110,7 +124,7 @@ class TemplateFormFactory extends Object
                 $values['mail_layout_id'],
                 $values['mail_type_id']
             );
-            ($this->onCreate)($row);
+            ($this->onCreate)($row, $buttonSubmitted);
         }
     }
 }

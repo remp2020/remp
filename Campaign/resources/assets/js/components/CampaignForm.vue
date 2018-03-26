@@ -92,7 +92,12 @@
 
             <div class="input-group m-t-20">
                 <div class="fg-line">
-                    <button class="btn btn-info waves-effect" type="submit"><i class="zmdi zmdi-mail-send"></i> Save</button>
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save">
+                        <i class="zmdi zmdi-check"></i> Save
+                    </button>
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close">
+                        <i class="zmdi zmdi-mail-send"></i> Save and close
+                    </button>
                 </div>
             </div>
 
@@ -187,12 +192,26 @@
                     </div>
                 </div>
             </div>
+
+
+            <h4>Devices</h4>
+
+            <div class="input-group fg-float m-t-10">
+                <div class="checkbox" v-for="(device) in allDevices" :key="device">
+                <label class="m-l-15 m-t-15">
+                    Show on {{ device }}
+                    <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox">
+                    <i class="input-helper"></i>
+                </label>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script type="text/javascript">
-    import vSelect from "remp/js/components/vSelect.vue";
+    import vSelect from "remp/js/components/vSelect";
     import PageviewRules from "./templates/PageviewRules";
 
     let props = [
@@ -205,6 +224,8 @@
         "_active",
         "_countries",
         "_countriesBlacklist",
+        "_allDevices",
+        "_selectedDevices",
 
         "_banners",
         "_availableSegments",
@@ -214,7 +235,7 @@
         "_segmentMap",
         "_eventTypes",
         "_availableCountries",
-        "_countriesBlacklistOptions",
+        "_countriesBlacklistOptions"
     ];
     export default {
         components: {
@@ -239,6 +260,8 @@
                 "active": null,
                 "countries": [],
                 "countriesBlacklist": null,
+                "allDevices": null,
+                "selectedDevices": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -252,7 +275,7 @@
             }
         },
         computed: {
-            "bannerOptions": function() {
+            bannerOptions: function() {
                 let result = [];
                 for (let banner of this.banners) {
                     result.push({
@@ -262,7 +285,7 @@
                 }
                 return result;
             },
-            "altBannerOptions": function() {
+            altBannerOptions: function() {
                 //same as bannerOptions, just add null element (alternative banner is nullable)
                 let result = [];
                 result.push({
@@ -271,7 +294,7 @@
                 })
                 return result.concat(this.bannerOptions);
             },
-            "signedInOptions": function() {
+            signedInOptions: function() {
                 return [
                     {"label": "Everyone", "value": null},
                     {"label": "Only signed in", "value": true},
@@ -280,7 +303,14 @@
             }
         },
         methods: {
-            'selectSegment': function() {
+            deviceSelected: function (device) {
+                if (this.selectedDevices.indexOf(device) != -1) {
+                    return true;
+                }
+
+                return false;
+            },
+            selectSegment: function() {
                 if (typeof this.addedSegment === 'undefined') {
                     return;
                 }
@@ -291,7 +321,7 @@
                 }
                 this.segments.push(this.addedSegment);
             },
-            'removeSegment': function(index) {
+            removeSegment: function(index) {
                 let toRemove = this.segments[index];
                 this.segments.splice(index, 1);
                 this.removedSegments.push(toRemove.id);

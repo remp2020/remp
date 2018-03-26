@@ -11,9 +11,12 @@ use App\Country;
 use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
+use App\Schedule;
 use Cache;
+use Carbon\Carbon;
 use GeoIp2;
 use HTML;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use View;
@@ -21,6 +24,7 @@ use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
+use DeviceDetector\DeviceDetector;
 
 class CampaignController extends Controller
 {
@@ -47,6 +51,7 @@ class CampaignController extends Controller
             ->addColumn('actions', function (Campaign $campaign) {
                 return [
                     'edit' => route('campaigns.edit', $campaign),
+                    'copy' => route('campaigns.copy', $campaign),
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
@@ -61,11 +66,20 @@ class CampaignController extends Controller
                 }
                 return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
             })
+            ->addColumn('segments', function (Campaign $campaign) {
+                return implode(' ', $campaign->segments->pluck('code')->toArray());
+            })
+            ->addColumn('countries', function (Campaign $campaign) {
+                return implode(' ', $campaign->countries->pluck('name')->toArray());
+            })
             ->addColumn('active', function (Campaign $campaign) {
                 return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
                     'active' => $campaign->active
                 ])->render();
+            })
+            ->addColumn('devices', function (Campaign $campaign) {
+                return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
             ->setRowId('id')
@@ -99,6 +113,27 @@ class CampaignController extends Controller
         ]);
     }
 
+    public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
+    {
+        $sourceCampaign->load('banner', 'altBanner', 'segments', 'countries');
+        $campaign = $sourceCampaign->replicate();
+
+        $segments = $segmentAggregator->list();
+        foreach ($segmentAggregator->getErrors() as $error) {
+            flash($error)->error();
+            Log::error($error);
+        }
+
+        flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
+
+        return view('campaigns.create', [
+            'campaign' => $campaign,
+            'banners' => Banner::all(),
+            'availableCountries' => Country::all(),
+            'segments' => $segments,
+        ]);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -125,7 +160,14 @@ class CampaignController extends Controller
         }
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                    self::FORM_ACTION_SAVE => 'campaigns.edit',
+                ],
+                $campaign
+            )->with('success', sprintf('Campaign [%s] was created', $campaign->name)),
             'json' => new CampaignResource($campaign),
         ]);
     }
@@ -201,14 +243,52 @@ class CampaignController extends Controller
         CampaignSegment::destroy($request->get('removedSegments'));
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                        self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                        self::FORM_ACTION_SAVE => 'campaigns.edit',
+                    ],
+                $campaign
+            )->with('success', sprintf('Campaign [%s] was updated', $campaign->name)),
             'json' => new CampaignResource($campaign),
         ]);
     }
 
-    public function toggleActive(Campaign $campaign)
+    /**
+     * Toggle campaign status and activate / deactivate current schedule.
+     *
+     * If campaign is not active, activate it:
+     * - change active flag to true,
+     * - create new schedule with status executed (it wasn't planned).
+     *
+     * If campaign is active, deactivate it:
+     * - change active flag to false,
+     * - stop all running or planned schedules.
+     *
+     * @param Campaign $campaign
+     * @return JsonResponse
+     */
+    public function toggleActive(Campaign $campaign): JsonResponse
     {
-        $campaign->active = !$campaign->active;
+        if (!$campaign->active) {
+            $campaign->active = true;
+
+            $schedule = new Schedule();
+            $schedule->campaign_id = $campaign->id;
+            $schedule->start_time = Carbon::now();
+            $schedule->status = Schedule::STATUS_EXECUTED;
+            $schedule->save();
+        } else {
+            $campaign->active = false;
+
+            /** @var Schedule $schedule */
+            foreach ($campaign->schedules()->runningOrPlanned()->get() as $schedule) {
+                $schedule->status = Schedule::STATUS_STOPPED;
+                $schedule->save();
+            }
+        }
+
         $campaign->save();
 
         return response()->json([
@@ -238,7 +318,7 @@ class CampaignController extends Controller
      * @param PositionMap $pm
      * @param AlignmentMap $am
      * @param SegmentAggregator $sa
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function showtime(
         Request $r,
@@ -246,7 +326,8 @@ class CampaignController extends Controller
         PositionMap $pm,
         AlignmentMap $am,
         SegmentAggregator $sa,
-        GeoIp2\Database\Reader $geoIPreader
+        GeoIp2\Database\Reader $geoIPreader,
+        DeviceDetector $dd
     ) {
         // validation
 
@@ -371,8 +452,19 @@ class CampaignController extends Controller
                 continue;
             }
 
-            // country rules
+            // device rules
+            $dd->setUserAgent($data->userAgent);
+            $dd->parse();
 
+            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $dd->isMobile()) {
+                continue;
+            }
+
+            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $dd->isDesktop()) {
+                continue;
+            }
+
+            // country rules
             if (!$campaign->countries->isEmpty()) {
                 // load country ISO code based on IP
                 try {

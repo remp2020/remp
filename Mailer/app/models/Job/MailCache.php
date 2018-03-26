@@ -103,18 +103,22 @@ class MailCache
 
     public function isQueueTopPriority($queueId)
     {
-        $queues = $this->connect()->zrevrangebyscore(
+        $selectedQueueScore = $this->connect()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
+
+        $topPriorityQueue = $this->connect()->zrevrangebyscore(
             static::REDIS_PRIORITY_QUEUES_KEY,
             '+inf',
             1,
             [
-                'withscores' => false,
+                'withscores' => true,
                 'limit' => [
                     'offset' => 0,
                     'count' => 1,
                 ],
             ]
         );
-        return count($queues) == 1 && $queues[0] == $queueId;
+
+        return isset($topPriorityQueue[$queueId]) || // topPriorityQueue is requested queue
+            reset($topPriorityQueue) == $selectedQueueScore; // or requested queue has same priority as topPriorityQueue
     }
 }

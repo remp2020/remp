@@ -4,6 +4,7 @@ namespace App;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Schedule extends Model
 {
@@ -97,5 +98,20 @@ class Schedule extends Model
     public function endsInFuture()
     {
         return !$this->end_time || $this->end_time > Carbon::now();
+    }
+
+    /** Scopes */
+
+    public function scopeRunningOrPlanned(Builder $query): Builder
+    {
+        return $query
+            ->whereIn('status', [self::STATUS_READY, self::STATUS_EXECUTED])
+            ->where(
+                function (Builder $endTimeQuery) {
+                    $endTimeQuery
+                        ->whereNull('end_time')
+                        ->orWhere('end_time', '>=', Carbon::now());
+                }
+            );
     }
 }

@@ -6,7 +6,7 @@
             <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
         </div>
 
-        <ul class="ah-actions actions a-alt">
+        <ul id="dt-nav-{$tableId|noescape}" class="ah-actions actions a-alt">
             <li n:if="!isset($tableSettings['remove-search'])"><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
             <li class="ah-length dropdown">
                 <button class="btn palette-Cyan bg" data-toggle="dropdown">10</button>
@@ -118,7 +118,7 @@
             'pageLength': {$tableSettings['length']|noescape},
             {/ifset}
             'drawCallback': function(settings) {
-                $.fn.dataTables.pagination(settings);
+                $.fn.dataTables.pagination(settings, 'dt-nav-{$tableId|noescape}');
             },
             'initComplete': function (a,b,c,d) {
                 var state = this.api().state().columns;
@@ -135,7 +135,7 @@
             }
         });
 
-        $.fn.dataTables.navigation(dataTable);
+        $.fn.dataTables.navigation(dataTable, 'dt-nav-{$tableId|noescape}');
 
         {ifset $rowLinkAction}
         $('#{$tableId|noescape} tbody').on('click', 'tr', function () {

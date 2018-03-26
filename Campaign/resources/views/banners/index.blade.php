@@ -34,6 +34,7 @@
             'rowActions' => [
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
             ],
             'rowHighlights' => [
                 'active' => true

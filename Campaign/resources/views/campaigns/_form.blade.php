@@ -51,6 +51,8 @@ foreach ($campaign->countries as $country) {
         "pageviewRules": {!! @json($campaign->pageview_rules) !!} || [],
         "countries": {!! $selectedCountries->toJson(JSON_UNESCAPED_UNICODE) !!},
         "countriesBlacklist": {!! @json($countriesBlacklist ?? 0) !!},
+        "allDevices": {!! @json($campaign->getAllDevices()) !!},
+        "selectedDevices": {!! @json($campaign->devices) !!} || [],
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

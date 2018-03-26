@@ -39,7 +39,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
-                    "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewCountStorageKey)
+                    "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewCountStorageKey),
+                    "userAgent": window.navigator.userAgent
                 }
 
             },

@@ -6,6 +6,10 @@ use App\Contracts\SegmentAggregator;
 use GeoIp2\Database\Reader;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Cache\Repository;
+use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
+use Psr\Cache\CacheItemPoolInterface;
+use Illuminate\Support\Facades\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +32,12 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(\App\Models\Alignment\Map::class, function ($app) {
             return new \App\Models\Alignment\Map(config('banners.alignments'));
+        });
+
+        $this->app->singleton(CacheItemPoolInterface::class, function ($app) {
+            $repository = $app->make(Repository::class);
+
+            return new CacheItemPool($repository);
         });
 
         $this->app->bind(Reader::class, function (Application $app) {

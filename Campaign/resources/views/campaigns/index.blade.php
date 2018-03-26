@@ -29,14 +29,10 @@
                             'header' => 'Banner B'
                         ],
                         'segments' => [
-                            'header' => 'Segments',
-                            'render' => 'array',
-                            'renderParams' => ['column' => 'code']
+                            'header' => 'Segments'
                         ],
                         'countries' => [
-                            'header' => 'Countries',
-                            'render' => 'array',
-                            'renderParams' => ['column' => 'name'],
+                            'header' => 'Countries'
                         ],
                         'active' => [
                             'header' => 'Is active'
@@ -44,6 +40,9 @@
                         'signed_in' => [
                             'header' => 'Signed in',
                             'render' => 'boolean',
+                        ],
+                        'devices' => [
+                            'header' => 'Devices'
                         ],
                         'created_at' => [
                             'header' => 'Created at',
@@ -60,8 +59,9 @@
                     'dataSource' => route('campaigns.json'),
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                        ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
                     ],
-                    'order' => [7, 'desc'],
+                    'order' => [9, 'desc'],
                 ]) !!}
                 </div>
             </div>

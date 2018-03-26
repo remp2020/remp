@@ -53,7 +53,14 @@ class ApiTokenController extends Controller
         $apiToken->save();
 
         return response()->format([
-            'html' => redirect(route('api-tokens.index'))->with('success', sprintf('API token [%s] was created', $apiToken->token)),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'api-tokens.index',
+                    self::FORM_ACTION_SAVE => 'api-tokens.edit',
+                ],
+                $apiToken
+            )->with('success', sprintf('API token [%s] was created', $apiToken->token)),
             'json' => new ApiTokenResource($apiToken),
         ]);
     }
@@ -83,7 +90,14 @@ class ApiTokenController extends Controller
         $apiToken->save();
 
         return response()->format([
-            'html' => redirect(route('api-tokens.index'))->with('success', sprintf('API token [%s] was updated', $apiToken->token)),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'api-tokens.index',
+                    self::FORM_ACTION_SAVE => 'api-tokens.edit',
+                ],
+                $apiToken
+            )->with('success', sprintf('API token [%s] was updated', $apiToken->token)),
             'json' => new ApiTokenResource($apiToken),
         ]);
     }

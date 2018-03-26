@@ -35,6 +35,12 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
 
+    Route::get('visitors/devices', 'VisitorController@devices')->name('visitors.devices');
+    Route::get('visitors/sources', 'VisitorController@sources')->name('visitors.sources');
+    Route::get('visitors/dtBrowsers', 'VisitorController@dtBrowsers')->name('visitors.dtBrowsers');
+    Route::get('visitors/dtDevices', 'VisitorController@dtDevices')->name('visitors.dtDevices');
+    Route::get('visitors/dtReferers', 'VisitorController@dtReferers')->name('visitors.dtReferers');
+
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
     Route::resource('accounts', 'AccountController');

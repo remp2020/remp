@@ -12,6 +12,11 @@ var User = Type("User", func() {
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
 	})
+	Attribute("adblock", Boolean, "Flag whether user has adblock enabled")
+	Attribute("window_height", Number, "Height of the users browser window")
+	Attribute("window_width", Number, "Width of the users browser window")
+	Attribute("cookies", Boolean, "Flag whether user has cookies enabled")
+	Attribute("websockets", Boolean, "Flag whether user has websockets supported browser")
 	Attribute("user_agent", String, "User agent of client")
 	Attribute("ip_address", String, "IP address of client", func() {
 		Format("ip")

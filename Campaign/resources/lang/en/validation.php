@@ -98,9 +98,9 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
-        ],
+        'devices.0' => [
+            'required' => 'At least one device needs to be enabled.',
+        ]
     ],
 
     /*
