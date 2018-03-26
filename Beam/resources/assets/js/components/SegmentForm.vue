@@ -100,6 +100,11 @@
                     categories.push(self.rules[i].event_category);
                 }
             }
+
+            this.$on('removeRule', function(data) {
+                this.removedRules.push(data.id);
+                this.rules.splice(data.index, 1)
+            });
         },
         data: () => ({
             "name": null,

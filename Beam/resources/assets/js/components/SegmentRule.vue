@@ -264,8 +264,10 @@
                 return this.mutFlags.length - 1;
             },
             removeRule: function(index) {
-                this.$parent.removedRules.push(this.id);
-                this.$parent.rules.splice(index, 1)
+                this.$parent.$emit('removeRule', {
+                    id: this.id,
+                    index: index
+                });
             },
             addField: function() {
                 this.fields.push({
