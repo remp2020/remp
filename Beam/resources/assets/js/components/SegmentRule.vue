@@ -281,10 +281,20 @@
             },
             initTimespan: function () {
                 var timespan = moment.duration(this.mutTimespan, "minutes"),
-                    timespanStr = "";
+                    timespanStr = "",
+                    additionalDays = 0;
 
-                if (timespan.days()) {
-                    timespanStr += timespan.days() + "d ";
+
+                if (timespan.years()) {
+                    additionalDays += timespan.years()*365;
+                }
+
+                if (timespan.months()) {
+                    additionalDays += timespan.months()*31;
+                }
+
+                if (timespan.days() || additionalDays) {
+                    timespanStr += (additionalDays + timespan.days()) + "d ";
                 }
 
                 if (timespan.hours()) {
