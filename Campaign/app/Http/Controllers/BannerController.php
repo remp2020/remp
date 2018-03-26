@@ -139,7 +139,14 @@ class BannerController extends Controller
         }
 
         return response()->format([
-            'html' => redirect(route('banners.index'))->with('success', 'Banner created'),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'banners.index',
+                    self::FORM_ACTION_SAVE => 'banners.edit',
+                ],
+                $banner
+            )->with('success', sprintf('Banner [%s] was created', $banner->name)),
             'json' => new BannerResource($banner),
         ]);
     }
@@ -210,7 +217,14 @@ class BannerController extends Controller
         }
 
         return response()->format([
-            'html' => redirect(route('banners.index'))->with('success', 'Banner updated'),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'banners.index',
+                    self::FORM_ACTION_SAVE => 'banners.edit',
+                ],
+                $banner
+            )->with('success', sprintf('Banner [%s] was updated', $banner->name)),
             'json' => new BannerResource($banner),
         ]);
     }

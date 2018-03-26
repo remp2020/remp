@@ -3,10 +3,11 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 use Nette\Object;
 use Remp\MailerModule\Repository\LayoutsRepository;
 
-class LayoutFormFactory extends Object
+class LayoutFormFactory extends Object implements IFormFactory
 {
     /** @var LayoutsRepository */
     private $layoutsRepository;
@@ -43,10 +44,15 @@ class LayoutFormFactory extends Object
 
         $form->setDefaults($defaults);
 
-        $form->addSubmit('save', 'Save')
+        $form->addSubmit(self::FORM_ACTION_SAVE, self::FORM_ACTION_SAVE)
             ->getControlPrototype()
             ->setName('button')
-            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
+            ->setHtml('<i class="zmdi zmdi-check"></i> Save');
+
+        $form->addSubmit(self::FORM_ACTION_SAVE_CLOSE, self::FORM_ACTION_SAVE_CLOSE)
+            ->getControlPrototype()
+            ->setName('button')
+            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and close');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
@@ -54,13 +60,21 @@ class LayoutFormFactory extends Object
 
     public function formSucceeded($form, $values)
     {
+        // decide if user wants to save or save and leave
+        $buttonSubmitted = self::FORM_ACTION_SAVE;
+        /** @var $buttonSaveClose SubmitButton */
+        $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
+        if ($buttonSaveClose->isSubmittedBy()) {
+            $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
+        }
+
         if (!empty($values['id'])) {
             $row = $this->layoutsRepository->find($values['id']);
             $this->layoutsRepository->update($row, $values);
-            ($this->onUpdate)($row);
+            ($this->onUpdate)($row, $buttonSubmitted);
         } else {
             $row = $this->layoutsRepository->add($values['name'], $values['layout_text'], $values['layout_html']);
-            ($this->onCreate)($row);
+            ($this->onCreate)($row, $buttonSubmitted);
         }
     }
 }

@@ -160,7 +160,14 @@ class CampaignController extends Controller
         }
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign created'),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                    self::FORM_ACTION_SAVE => 'campaigns.edit',
+                ],
+                $campaign
+            )->with('success', sprintf('Campaign [%s] was created', $campaign->name)),
             'json' => new CampaignResource($campaign),
         ]);
     }
@@ -236,7 +243,14 @@ class CampaignController extends Controller
         CampaignSegment::destroy($request->get('removedSegments'));
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', 'Campaign updated'),
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                        self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
+                        self::FORM_ACTION_SAVE => 'campaigns.edit',
+                    ],
+                $campaign
+            )->with('success', sprintf('Campaign [%s] was updated', $campaign->name)),
             'json' => new CampaignResource($campaign),
         ]);
     }
