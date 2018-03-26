@@ -6,13 +6,22 @@ use IntlDateFormatter;
 
 class DateFormatterFactory
 {
+    private $locale;
+    private $timezone;
+
+    public function __construct($locale, $timezone)
+    {
+        $this->locale = $locale;
+        $this->timezone = $timezone;
+    }
+
     public function getInstance($datetype, $timetype)
     {
         return new IntlDateFormatter(
-            getenv('LOCALE'),
+            $this->locale,
             $datetype,
             $timetype,
-            getenv('TIMEZONE')
+            $this->timezone
         );
     }
 }

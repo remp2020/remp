@@ -89,7 +89,7 @@ services:
             - setCatchExceptions(true)
 
     dateFormatterFactory:
-        class: Remp\MailerModule\Formatters\DateFormatterFactory
+        class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
 
     hermesLogger:
         class: Monolog\Logger('hermes-logger')
