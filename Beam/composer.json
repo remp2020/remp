@@ -39,13 +39,18 @@
         "laravel/framework": "~5.5.0",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "~5.5.0",
+        "league/uri": "^5.0",
+        "madewithlove/illuminate-psr-cache-bridge": "^1.0",
+        "matomo/searchengine-and-social-list": "^1.4",
         "php-amqplib/php-amqplib": "^2.7",
+        "piwik/device-detector": "^3.10",
         "predis/predis": " ~1.0",
         "recca0120/laravel-tracy": "^1.8",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
         "rigor789/airbrake-laravel": "dev-master",
+        "snowplow/referer-parser": "dev-master",
         "yajra/laravel-datatables-oracle": "^8.0"
     },
     "require-dev": {
