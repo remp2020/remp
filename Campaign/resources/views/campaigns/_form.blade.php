@@ -83,7 +83,8 @@ foreach ($campaign->countries as $country) {
                 "value": 1,
                 "label": "Blacklist"
             }
-        ]
+        ],
+        "activationMode": "activate-now",
     };
     remplib.campaignForm.bind("#campaign-form", campaign);
 </script>

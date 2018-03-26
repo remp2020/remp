@@ -102,6 +102,20 @@ class Schedule extends Model
 
     /** Scopes */
 
+    public function scopeRunning(Builder $query): Builder
+    {
+        return $query
+            ->whereIn('status', [self::STATUS_READY, self::STATUS_EXECUTED])
+            ->where('start_time', '<=', Carbon::now())
+            ->where(
+                function (Builder $endTimeQuery) {
+                    $endTimeQuery
+                        ->whereNull('end_time')
+                        ->orWhere('end_time', '>=', Carbon::now());
+                }
+            );
+    }
+
     public function scopeRunningOrPlanned(Builder $query): Builder
     {
         return $query

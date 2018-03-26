@@ -23,16 +23,44 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables)
+    /**
+     * Return data for Schedule Datatable.
+     *
+     * If `$campaign` is provided, only schedules for that one Campaign are returned.
+     *
+     * Request parameters can be used:
+     *
+     *   * `active` - (bool) display only active (running or planned) schedules.
+     *   * `limit`  - (int) count of results will be limited to that number.
+     *
+     * @param Datatables $dataTables
+     * @param Campaign|null $campaign
+     * @return mixed
+     */
+    public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
     {
-        $schedule = Schedule::select()
+        $scheduleSelect = Schedule::select()
             ->with(['campaign', 'campaign.banner'])
-            ->whereHas('campaign', function (\Illuminate\Database\Eloquent\Builder $query) {
-                $query->where('active', '=', true);
+            ->orderBy('start_time', 'ASC')
+            ->orderBy('end_time', 'ASC');
+
+        if (!is_null($campaign)) {
+            $scheduleSelect->where('campaign_id', '=', $campaign->id);
+        }
+
+        if ($request->active) {
+            $scheduleSelect->where(function (\Illuminate\Database\Eloquent\Builder $query) {
+                $query
+                    ->whereNull('end_time')
+                    ->orWhere('end_time', '>=', Carbon::now());
             })
-            ->orderBy('start_time', 'DESC')
-            ->orderBy('end_time', 'DESC')
-            ->get();
+                ->whereIn('status', [Schedule::STATUS_READY, Schedule::STATUS_EXECUTED]);
+        }
+
+        if (is_numeric($request->limit)) {
+            $scheduleSelect->limit($request->limit);
+        }
+        $schedule = $scheduleSelect->get();
 
         return $dataTables->of($schedule)
             ->addColumn('actions', function (Schedule $s) {
@@ -80,27 +108,26 @@ class ScheduleController extends Controller
                 }
                 throw new \Exception('unhandled schedule status');
             })
-            ->editColumn('start_time', function (Schedule $schedule) {
-                return $schedule->start_time;
-            })
-            ->editColumn('end_time', function (Schedule $schedule) {
-                return $schedule->end_time;
-            })
             ->rawColumns(['actions', 'action_methods', 'status', 'banners', 'campaign'])
             ->setRowId('id')
             ->make(true);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new schedule.
+     *
+     * If $campaign is provided, campaign is pre-selected and selectbox disabled.
+     *
+     * @param Campaign $campaign
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Campaign $campaign)
     {
         $schedule = new Schedule();
         $schedule->fill(old());
-        $campaigns = Campaign::whereActive(true)->get();
+        $schedule->campaign_id = $campaign->id;
+        $campaigns = Campaign::all();
 
         return view('schedule.create', [
             'schedule' => $schedule,
@@ -121,7 +148,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                 "Campaign %s scheduled from %s to %s",
                 $schedule->campaign->name,
                 Carbon::parse($schedule->start_time)->toDayDateTimeString(),
@@ -148,7 +175,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                 "Campaign %s rescheduled starting on %s and ending on %s",
                 $schedule->campaign->name,
                 Carbon::parse($schedule->start_time)->toDayDateTimeString(),
@@ -163,7 +190,7 @@ class ScheduleController extends Controller
         $schedule->delete();
 
         return response()->format([
-            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                 "Schedule for campaign %s from %s to %s was removed",
                 $schedule->campaign->name,
                 Carbon::parse($schedule->start_time)->toDayDateTimeString(),
@@ -181,7 +208,7 @@ class ScheduleController extends Controller
     {
         if (!$schedule->isRunning()) {
             return response()->format([
-                'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                     "Schedule for campaign %s was not running, pause request ignored",
                     $schedule->campaign->name
                 )),
@@ -193,7 +220,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                 "Schedule for campaign %s is now paused",
                 $schedule->campaign->name
             )),
@@ -209,7 +236,7 @@ class ScheduleController extends Controller
     {
         if (!$schedule->isRunnable()) {
             return response()->format([
-                'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                     "Schedule for campaign %s was not runnable, satrt request ignored",
                     $schedule->campaign->name
                 )),
@@ -221,7 +248,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                 "Schedule for campaign %s was started manually",
                 $schedule->campaign->name
             )),
@@ -237,7 +264,7 @@ class ScheduleController extends Controller
     {
         if (!$schedule->isRunnable()) {
             return response()->format([
-                'html' => redirect(route('schedule.index'))->with('success', sprintf(
+                'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                     "Schedule for campaign %s was not running, stop request ignored",
                     $schedule->campaign->name
                 )),
@@ -249,7 +276,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('schedule.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                 "Schedule for campaign %s was stopped",
                 $schedule->campaign->name
             )),

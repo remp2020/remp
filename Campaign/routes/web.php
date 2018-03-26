@@ -23,6 +23,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('banners/{sourceBanner}/copy', 'BannerController@copy')->name('banners.copy');
     Route::get('campaigns/json', 'CampaignController@json')->name('campaigns.json');
     Route::get('campaigns/{sourceCampaign}/copy', 'CampaignController@copy')->name('campaigns.copy');
+    Route::get('campaigns/{campaign}/schedule/json', 'ScheduleController@json')->name('campaign.schedule.json');
     Route::get('schedule/json', 'ScheduleController@json')->name('schedule.json');
     Route::post('schedule/{schedule}/start', 'ScheduleController@start')->name('schedule.start');
     Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
@@ -33,4 +34,5 @@ Route::middleware('auth.jwt')->group(function () {
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');
     Route::resource('schedule', 'ScheduleController');
+    Route::resource('campaigns.schedule', 'ScheduleController');
 });

@@ -14,7 +14,7 @@
                 <div class="card-header">
                     <h2>Schedule <small></small></h2>
                     <div class="actions">
-                        <a href="{{ route('schedule.create') }}" class="btn palette-Cyan bg waves-effect">Schedule new run</a>
+                        <a href="{{ route('campaigns.index') }}" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-long-arrow-return"></i> Back to campaigns</a>
                     </div>
                 </div>
 

@@ -51,7 +51,6 @@ $factory->define(App\Campaign::class, function (Faker\Generator $faker) {
     return [
         'name' => 'DEMO Campaign',
         'uuid' => $faker->uuid,
-        'active' => true,
         'signed_in' => $faker->boolean(),
         'once_per_session' => $faker->boolean(),
     ];

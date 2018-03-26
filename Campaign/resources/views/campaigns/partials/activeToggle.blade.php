@@ -27,8 +27,9 @@
                         type: 'danger'
                     });
                 }
+                // dispatch event used by schedules to reload datatable
+                document.dispatchEvent(new Event('campaign_active_toggled'));
             }
         }
     });
 </script>
-
