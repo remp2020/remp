@@ -113,6 +113,9 @@ class Banner extends Model
             case self::TEMPLATE_SHORT_MESSAGE:
                 $relationName = 'shortMessageTemplate';
                 break;
+            default:
+                throw new \Exception('Not existing template name: ' . $this->template);
+                break;
         }
 
         return $relationName;
