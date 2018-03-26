@@ -2,7 +2,7 @@
     <div class="col-md-6">
         <div class="card z-depth-2">
             <div class="card-body card-padding-sm">
-                <input v-model="id" :name="'rules['+index+'][id]'" type="hidden" required>
+                <input :value="id" :name="'rules['+index+'][id]'" type="hidden" required>
 
                 <div class="input-group m-t-10">
                     <span class="input-group-addon"><i class="zmdi zmdi-badge-check"></i></span>
@@ -15,7 +15,7 @@
                                     v-model="mutEventCategory"
                                     :name="'rules['+index+'][event_category]'"
                                     :value="mutEventCategory"
-                                    :options.sync="mutEventCategories"
+                                    :options.sync="eventCategories"
                                     :dataType="'category'"
                                     :allowCustomValue="true"
                                     :liveSearch="true"
@@ -59,9 +59,8 @@
                             <div class="fg-line">
                                 <label class="fg-label">Operator</label>
                                 <v-select class="col-md-12 p-l-0 p-r-0"
-                                        v-model="mutOperator"
                                         :name="'rules['+index+'][operator]'"
-                                        :value="mutOperator"
+                                        :value="operator"
                                         :options.sync="operators"
                                         :required="true"
                                 ></v-select>
@@ -73,7 +72,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-n-1-square"></i></span>
                             <div class="fg-line">
                                 <label class="fg-label">Count</label>
-                                <input v-model="mutCount" :name="'rules['+index+'][count]'" placeholder="e.g. 5" class="form-control fg-input" title="count" type="number" required />
+                                <input :value="count" :name="'rules['+index+'][count]'" placeholder="e.g. 5" class="form-control fg-input" title="count" type="number" required />
                             </div>
                         </div>
                     </div>
@@ -161,15 +160,11 @@
         ],
         data: function () {
             return {
-                "mutId": this.id,
-                "mutCount": this.count,
                 "mutFlags": this.flags,
                 "mutFields": this.fields,
-                "mutOperator": this.operator,
                 "mutTimespan": this.timespan,
                 "mutEventAction": this.eventAction, 
                 "mutEventCategory": this.eventCategory,
-                "mutEventCategories" : this.eventCategories,
                 "timespanUserFormatted": null,
 
                 "showEventsLoader": false,
