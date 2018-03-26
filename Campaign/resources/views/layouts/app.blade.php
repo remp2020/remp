@@ -111,9 +111,6 @@
             <li {!! route_active(['campaigns']) !!}>
                 <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-ticket-star"></i> Campaigns</a>
             </li>
-            <li {!! route_active(['schedule']) !!}>
-                <a href="{{ route('schedule.index') }}" ><i class="zmdi zmdi-calendar-check"></i> Schedule</a>
-            </li>
         </ul>
     </aside>
 
