@@ -368,6 +368,7 @@ class CampaignController extends Controller
         /** @var Schedule $schedule */
         foreach ($campaign->schedules()->runningOrPlanned()->get() as $schedule) {
             $schedule->status = Schedule::STATUS_STOPPED;
+            $schedule->end_time = Carbon::now();
             $schedule->save();
             $stopped = true;
         }
