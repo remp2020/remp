@@ -71,11 +71,11 @@ class ProcessPageviewSessions extends Command
                 $os = $deviceDetector->getOs();
 
                 $deviceData['subscriber'] = boolval($record->tags->subscriber);
-                $deviceData['os_name'] = isset($os['name']) ? $os['name'] : null;
-                $deviceData['os_version'] = isset($os['version']) ? $os['version'] : null;
-                $deviceData['client_type'] = isset($client['type']) ? $client['type'] : null;
-                $deviceData['client_name'] = isset($client['name']) ? $client['name'] : null;
-                $deviceData['client_version'] = isset($client['version']) ? $client['version'] : null;
+                $deviceData['os_name'] = $os['name'] ?? null;
+                $deviceData['os_version'] = $os['version'] ?? null;
+                $deviceData['client_type'] = $client['type'] ?? null;
+                $deviceData['client_name'] = $client['name'] ?? null;
+                $deviceData['client_version'] = $client['version'] ?? null;
                 $deviceData['model'] = $deviceDetector->getModel();
                 $deviceData['brand'] = $deviceDetector->getBrandName();
                 $deviceData['type'] = $deviceDetector->getDeviceName();
