@@ -63,17 +63,11 @@
                         <img src="https://www.gravatar.com/avatar/{{ md5(Auth::user()->email) }}" alt="">
                     </a>
 
-                    {{--<ul class="dropdown-menu pull-right dm-icon">--}}
-                    {{--<li>--}}
-                    {{--<a href="#"><i class="zmdi zmdi-account"></i> View Profile</a>--}}
-                    {{--</li>--}}
-                    {{--<li>--}}
-                    {{--<a href="#"><i class="zmdi zmdi-settings"></i> Settings</a>--}}
-                    {{--</li>--}}
-                    {{--<li>--}}
-                    {{--<a href="#"><i class="zmdi zmdi-time-restore"></i> Logout</a>*}--}}
-                    {{--</li>--}}
-                    {{--</ul>--}}
+                    <ul class="dropdown-menu pull-right dm-icon">
+                        <li>
+                            <a href="{{ route('auth.logout') }}"><i class="zmdi zmdi-time-restore"></i> Logout</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>

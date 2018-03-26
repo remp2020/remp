@@ -21,5 +21,7 @@ Route::middleware('auth.jwt')->group(function () {
 });
 
 Route::get('auth/login', 'AuthController@login')->name('auth.login');
+Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
+Route::get('auth/logout-web', 'AuthController@logoutWeb')->name('auth.logout-web');
 Route::get('auth/google', 'Auth\GoogleController@redirect')->name('auth.google');
 Route::get('auth/google/callback', 'Auth\GoogleController@callback');

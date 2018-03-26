@@ -9,4 +9,6 @@ interface SsoContract
     public function refresh($token): array;
 
     public function apiToken($token): bool;
+
+    public function invalidate($token): array;
 }

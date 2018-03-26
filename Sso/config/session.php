@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'lifetime' => 120,
+    'lifetime' => 20160, // 2 weeks, same as JWT lifetime
 
     'expire_on_close' => false,
 

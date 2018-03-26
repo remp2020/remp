@@ -10,11 +10,13 @@ use GuzzleHttp\Exception\ClientException;
 
 class Sso implements SsoContract
 {
-    const ENDPOINT_INTROSPECT = 'api/auth/introspect';
+    const ENDPOINT_INTROSPECT = '/api/auth/introspect';
 
-    const ENDPOINT_REFRESH = 'api/auth/refresh';
+    const ENDPOINT_REFRESH = '/api/auth/refresh';
 
-    const ENDPOINT_CHECK_TOKEN = 'api/auth/api-token';
+    const ENDPOINT_CHECK_TOKEN = '/api/auth/api-token';
+
+    const ENDPOINT_INVALIDATE = '/api/auth/invalidate';
 
     private $client;
 
@@ -92,5 +94,23 @@ class Sso implements SsoContract
         }
 
         return $response->getStatusCode() == 200;
+    }
+
+    public function invalidate($token): array
+    {
+        try {
+            $response = $this->client->request('POST', self::ENDPOINT_INVALIDATE, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$token,
+                ]
+            ]);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+            $contents = $response->getBody()->getContents();
+            throw new SsoException($contents);
+        }
+
+        $tokenResponse = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        return $tokenResponse;
     }
 }

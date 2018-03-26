@@ -25,6 +25,10 @@ class User extends Authenticatable implements JWTSubject
 {
     const PROVIDER_GOOGLE = 'google';
 
+    const USER_SUBJECT_SESSION_KEY = 'user_token';
+
+    const USER_LAST_LOGOUT_KEY = 'user_logout';
+
     public $latestProvider;
 
     /**
@@ -35,6 +39,10 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'name',
         'email',
+    ];
+
+    protected $dates = [
+        'last_logout_at',
     ];
 
     public function googleUser()

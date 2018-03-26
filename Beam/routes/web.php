@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/error', 'Auth\LoginController@ssoError')->name('sso.error');
+Route::get('/error', 'AuthController@error')->name('sso.error');
 
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard');
@@ -40,6 +40,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('visitors/dtBrowsers', 'VisitorController@dtBrowsers')->name('visitors.dtBrowsers');
     Route::get('visitors/dtDevices', 'VisitorController@dtDevices')->name('visitors.dtDevices');
     Route::get('visitors/dtReferers', 'VisitorController@dtReferers')->name('visitors.dtReferers');
+
+    Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
     Route::resource('accounts', 'AccountController');
     Route::resource('accounts.properties', 'PropertyController');
