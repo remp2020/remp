@@ -1,5 +1,6 @@
 parameters:
     locale: @environmentConfig::get('LOCALE')
+    timezone: @environmentConfig::get('TIMEZONE')
     sso_addr: @environmentConfig::get('SSO_ADDR')
     sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
     redis:
@@ -86,6 +87,9 @@ services:
             - announce(Remp\MailerModule\Commands\ProcessJobStatsCommand)
             - announce(Remp\MailerModule\Commands\MailgunEventsCommand)
             - setCatchExceptions(true)
+
+    dateFormatterFactory:
+        class: Remp\MailerModule\Formatters\DateFormatterFactory
 
     hermesLogger:
         class: Monolog\Logger('hermes-logger')

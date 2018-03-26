@@ -4,6 +4,8 @@ namespace Remp\MailerModule\Presenters;
 
 use DateTime;
 use DateInterval;
+use IntlDateFormatter;
+use Remp\MailerModule\Formatters\DateFormatterFactory;
 
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
@@ -20,14 +22,20 @@ final class DashboardPresenter extends BasePresenter
 
     private $listsRepository;
 
+    private $dateFormatter;
+
     public function __construct(
         BatchTemplatesRepository $batchTemplatesRepository,
+        DateFormatterFactory $dateFormatterFactory,
         TemplatesRepository $templatesRepository,
         BatchesRepository $batchesRepository,
         ListsRepository $listsRepository
     ) {
         parent::__construct();
 
+        $this->dateFormatter = $dateFormatterFactory
+            ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+            
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->templatesRepository = $templatesRepository;
         $this->batchesRepository = $batchesRepository;
@@ -48,19 +56,19 @@ final class DashboardPresenter extends BasePresenter
         // init graph data set settings
         $defaualtGraphSettings = [
             'data' => array_fill(0, $numOfDays, 0),
-            'fill' => true,
             'backgroundColor' => '#FDECB7',
             'strokeColor' => '#FDECB7',
             'borderColor' => '#FDECB7',
             'lineColor' => '#FDECB7',
-            'count' => 0,
-            'prevPeriodCount' => 0
+            'prevPeriodCount' => 0,
+            'fill' => true,
+            'count' => 0
         ];
 
 
         // fill graph column labels
         for ($i = $numOfDays; $i > 0; $i--) {
-            $graphLabels[] = date("d. m. Y", strtotime('-' . $i . ' days'));
+            $graphLabels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
         }
 
         $allMailTypes = $this->listsRepository->all();
@@ -80,7 +88,7 @@ final class DashboardPresenter extends BasePresenter
         // parse all sent mails data to chart.js format
         foreach ($allSentMailsData as $row) {
             $allSentEmailsDataSet['data'][array_search(
-                $row->first_email_sent_at->format('d. m. Y'),
+                $this->dateFormatter->format($row->first_email_sent_at),
                 $graphLabels
             )] = $row->sent_mails;
 
@@ -95,14 +103,14 @@ final class DashboardPresenter extends BasePresenter
 
             $typeDataSets[$row->mail_type_id]['data'][
                 array_search(
-                    $row->first_email_sent_at->format('d. m. Y'),
+                    $this->dateFormatter->format($row->first_email_sent_at->getTimestamp()),
                     $graphLabels
                 )
             ] = $row->sent_mails;
         }
 
         // parse previous period data (counts)
-        $prevPeriodFrom = (new DateTime($from->format('Y-m-d')))
+        $prevPeriodFrom = (new DateTime($from->getTimestamp()))
             ->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         $prevPeriodTypesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($prevPeriodFrom, $from);

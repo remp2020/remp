@@ -15,7 +15,7 @@ if ($environment == 'local') {
 }
 $configurator->enableTracy(__DIR__ . '/../log');
 
-$configurator->setTimeZone('Europe/Bratislava');
+$configurator->setTimeZone(getenv('TIMEZONE'));
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 
 $configurator->createRobotLoader()
