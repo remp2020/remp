@@ -142,7 +142,7 @@ $.fn.dataTables = {
                 if (data === null) {
                     return "";
                 }
-                return "<span title='" + moment(data).format('LLL') + "'>" + moment(data).locale('en').fromNow() + "</span>";
+                return "<span title='" + moment.utc(data).format('LLL') + "'>" + moment.utc(data).locale('en').fromNow() + "</span>";
             }
         },
         number: function () {
