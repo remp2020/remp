@@ -180,13 +180,13 @@
                                             <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
                                         </div>
 
-                                        <div class="row m-t-20 m-l-30">
+                                        <div class="row m-t-10 m-l-30">
                                             <div class="col-md-10">
                                                 <div class="row m-b-10" v-for="(segment,i) in segments" style="line-height: 25px">
                                                     <div class="col-md-12 text-left">
                                                         {{ segmentMap[segment.code] }}
                                                         <div class="pull-left m-r-20">
-                                                            <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment" style="font-size: 1.8em; line-height: 0.5; padding-bottom: 6px !important;">&times;</span>
+                                                            <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment">&times;</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -547,3 +547,13 @@
         }
     }
 </script>
+
+
+<style scoped>
+    .remove-segment {
+        font-size: 1.5em;
+        line-height: 0.5;
+        padding-bottom: 7px !important;
+    }
+</style>
+
