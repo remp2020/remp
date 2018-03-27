@@ -20,8 +20,9 @@
 .panel-title {
     > a {
         padding: 25px;
-        font-size: 1em;
+        font-size: 0.9em;
         font-weight: bold;
+        color: #5e5e5e;
 
         &[aria-expanded="true"] {
             color: #E13061;

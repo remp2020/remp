@@ -165,6 +165,11 @@
                                             </div>
                                         </div>
 
+                                        <div class="row m-t-20 m-l-30">
+                                            <div class="col-md-10">
+                                                <small>Active user segments</small>
+                                            </div>
+                                        </div>
 
                                         <div v-for="(segment,i) in segments">
                                             <input type="hidden" v-bind:name="'segments['+i+'][id]'" v-model="segment.id" />
@@ -175,13 +180,13 @@
                                             <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
                                         </div>
 
-                                        <div class="row m-t-20">
+                                        <div class="row m-t-20 m-l-30">
                                             <div class="col-md-10">
                                                 <div class="row m-b-10" v-for="(segment,i) in segments" style="line-height: 25px">
-                                                    <div class="col-md-12 text-right">
+                                                    <div class="col-md-12 text-left">
                                                         {{ segmentMap[segment.code] }}
-                                                        <div class="pull-right m-l-20">
-                                                            <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect"><i class="zmdi zmdi-minus-square"></i> Delete</span>
+                                                        <div class="pull-left m-r-20">
+                                                            <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment" style="font-size: 1.8em; line-height: 0.5; padding-bottom: 6px !important;">&times;</span>
                                                         </div>
                                                     </div>
                                                 </div>
