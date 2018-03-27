@@ -1,0 +1,50 @@
+{layout '../@layout.latte'} {block #content}
+
+<div class="c-header">
+    <h2>Dashboard</h2>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">{$dataSet['label']}<small></small></h2>
+
+        <div class="actions">
+            <a n:href="Dashboard:default" class="btn palette-Cyan bg waves-effect">Back to dashboard</a>
+        </div>
+    </div>
+
+    <div class="p-30">
+        <canvas id="mailer-dashboard-detail-statistics-graph" width="1500" height="500"></canvas>
+    </div>
+
+    <script>
+        var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph").getContext('2d');
+        var myLineChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                "labels": {$labels},
+                "datasets": [{$dataSet}]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            display: true
+                        }
+                    }]
+                },
+                legend: {
+                    display: false,
+                    position: "right"
+                }
+            }
+        });
+    </script>
+</div>
+
+

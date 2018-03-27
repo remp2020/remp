@@ -1,1 +1,246 @@
-{block #content}
+{layout '../@layout.latte'} {block #content}
+
+<div class="c-header">
+    <h2>Dashboard</h2>
+</div>
+
+<section id="content">
+    <div class="container">
+        <div id="c-grid" class="clearfix" data-columns>
+            <div class="card c-dark palette-Amber bg">
+
+                <div class="cw-current media">
+                    <div class="pull-left zmdi zmdi-graphic-eq m-t-10 p-r-0" style="font-size: 4em;"></div>
+                    <div class="cwc-info media-body">
+                        <div class="cwci-temp">Emails sent</div>
+                        <ul class="cwci-info">
+                            <li>Statistics</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {if $allSentEmailsDataSet['count'] != 0}
+                    <canvas id="mailer-dashboard-statistics-graph" width="300" height="100"></canvas>
+                    <script>
+                        var ctx = document.getElementById("mailer-dashboard-statistics-graph").getContext('2d');
+                        var myLineChart = new Chart(ctx, {
+                            type: "line",
+                            data: {
+                                "labels": {$labels},
+                                "datasets": [{$allSentEmailsDataSet}]
+                            },
+                            options: {
+                                elements: { 
+                                    point: { 
+                                        radius: 0,
+                                        hitRadius: 3
+                                    }
+                                }, 
+                                layout: {
+                                    padding: -20
+                                },
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                            beginAtZero: true
+                                        },
+                                        gridLines: {
+                                            display: false,
+                                            // color: "rgba(255, 255, 255, 1)",
+                                            color: "rgba(0, 0, 0, 0)",
+                                            lineWidth: 0
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display: false,
+                                            // color: "rgba(255, 255, 255, 1)",
+                                            color: "rgba(0, 0, 0, 0)",
+                                            lineWidth: 0
+                                        }
+                                    }]
+                                },
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        });
+                    </script>
+                    {else}
+                    <div class="list-group lg-alt lg-even-white">
+                        <div class="list-group-item media">
+                            <div class="media-body ns-item">
+                                <small>You didn't sent any mails for past 30 days.</small>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+
+                    <div class="list-group lg-alt lg-even-white">
+                        {foreach $typeDataSets as $key => $dataset}
+                            <div class="list-group-item media">
+                                <a n:href="Dashboard:detail $dataset['id']">
+                                    <div class="pull-right hidden-sm">
+                                        <canvas id="mailer-dashboard-statistics-graph-{$key}" width="80" height="40"></canvas>
+                                        <script>
+                                            var ctx = document.getElementById("mailer-dashboard-statistics-graph-{$key}").getContext('2d');
+                                            var myLineChart = new Chart(ctx, {
+                                                type: "line",
+                                                data: {
+                                                    "labels": {$labels},
+                                                    "datasets": [{$dataset}]
+                                                },
+                                                options: {
+                                                    elements: { 
+                                                        point: {
+                                                            radius: 0,
+                                                            hitRadius: 4
+                                                        }
+                                                    }, 
+                                                    layout: {
+                                                        padding: -20
+                                                    },
+                                                    scales: {
+                                                        yAxes: [{
+                                                            ticks: {
+                                                                display: false,
+                                                                beginAtZero: true
+                                                            },
+                                                            gridLines: {
+                                                                display: false,
+                                                                // color: "rgba(255, 255, 255, 1)",
+                                                                color: "rgba(0, 0, 0, 0)",
+                                                                lineWidth: 0
+                                                            }
+                                                        }],
+                                                        xAxes: [{
+                                                            ticks: {
+                                                                display: false
+                                                            },
+                                                            gridLines: {
+                                                                display: false,
+                                                                // color: "rgba(255, 255, 255, 1)",
+                                                                color: "rgba(0, 0, 0, 0)",
+                                                                lineWidth: 0
+                                                            }
+                                                        }]
+                                                    },
+                                                    legend: {
+                                                        display: false
+                                                    }
+                                                }
+                                            });
+                                        </script>
+                                    </div>
+
+                                    <div class="media-body ns-item">
+                                        <small>{$dataset['label']}</small>
+                                        <h3 class="m-t-5">
+                                            {if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}
+                                            {$dataset['count']}
+                                            <small style="color: #fff">({$dataset['prevPeriodCount']})</small>
+                                        </h3>
+                                    </div>
+                                </a>
+                            </div>
+                        {/foreach}
+                    </div><!-- .list-group -->
+                </div><!-- .card-body -->
+            </div><!-- .card -->
+
+            <div class="card palette-Cyan bg">
+                <div id="c-weather">
+                    <div class="cw-current media">
+                        <div class="pull-left zmdi zmdi-mail-send m-t-10 p-r-0" style="font-size: 4em;"></div>
+                        <div class="cwc-info media-body">
+                            <div class="cwci-temp">In progress</div>
+                            <ul class="cwci-info">
+                                <li>Batches</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {if count($inProgressBatches)}
+                    <div class="cw-upcoming">
+                        {foreach $inProgressBatches as $batch}
+                            <ul class="clearfix p-t-20 p-b-20">
+                                <li class="cwu-forecast">
+                                    <a n:href="Job:show $batch->mail_job_id">
+                                        #{$batch->id}
+                                    </a>
+                                </li>
+                                <li style="display: block;">
+                                    <strong>Email:</strong> {$batch->template_name}
+                                </li>
+                                <li style="display: block;">
+                                    <strong>Status:</strong> {$batch->status}
+                                </li>
+                                <li style="display: block;">
+                                    <strong>Sent:</strong> {$batch->sent_emails}
+                                </li>
+
+                            </ul>
+                        {/foreach}
+                    </div>
+                    {else}
+                    <div class="list-group lg-alt lg-even-white">
+                        <div class="list-group-item media">
+                            <div class="media-body ns-item">
+                                <small>You don't have any mail batches planed.</small>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="card palette-Green-A700 bg">
+                <div id="c-weather">
+                    <div class="cw-current media">
+                        <div class="pull-left zmdi zmdi-email m-t-10 p-r-0" style="font-size: 4em;"></div>
+                        <div class="cwc-info media-body">
+                            <div class="cwci-temp">Done</div>
+                            <ul class="cwci-info">
+                                <li>Batches</li>
+                            </ul>
+                        </div>
+                    </div>
+                    {if count($lastDoneBatches)}
+                    <div class="cw-upcoming">
+                        {foreach $lastDoneBatches as $batch}
+                        <ul class="clearfix p-t-20 p-b-20">
+                            <li class="cwu-forecast">
+                                <a n:href="Job:show $batch->mail_job_id">
+                                    #{$batch->id}
+                                </a>
+                            </li>
+                            <li style="display: block;">
+                                <strong>Email:</strong> {$batch->template_name}
+                            </li>
+                            <li style="display: block;">
+                                <strong>Sent:</strong> {$batch->sent_emails}
+                            </li>
+                        </ul>
+                        {/foreach}
+                    </div>
+                    {else}
+                    <div class="list-group lg-alt lg-even-white">
+                        <div class="list-group-item media">
+                            <div class="media-body ns-item">
+                                <small>You didn't sent any email batches.</small>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+
+
+        </div><!-- #c-grid -->
+    </div>
+</section>

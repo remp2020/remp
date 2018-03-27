@@ -102,6 +102,7 @@
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
+            <li n:class="$presenter->isLinkCurrent('Dashboard:*') ? active"><a n:href="Dashboard:default"><i class="zmdi zmdi-balance"></i> Dashboard</a></li>
             <li n:class="$presenter->isLinkCurrent('Template:*') ? active"><a n:href="Template:default"><i class="zmdi zmdi-view-quilt"></i> Emails</a></li>
             <li n:class="$presenter->isLinkCurrent('Layout:*') ? active"><a n:href="Layout:default"><i class="zmdi zmdi-widgets"></i> Layouts (Templates)</a></li>
             <li n:class="$presenter->isLinkCurrent('List:*') ? active"><a n:href="List:default"><i class="zmdi zmdi-arrow-split"></i> Newsletter lists</a></li>
@@ -169,6 +170,7 @@
 <!-- Javascript Libraries -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
+<script>salvattore.init();</script>
 
 <script type="application/javascript">
     $(document).ready(function() {

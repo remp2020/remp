@@ -36,12 +36,13 @@ mix
         "codemirror",
         "codemirror/mode/htmlmixed/htmlmixed.js",
         "vue",
+        "salvattore/dist/salvattore.js"
     ])
     .autoload({
         "jquery": ['$', 'jQuery', "window.jQuery"],
         "node-waves": ["Waves", "window.Waves"],
         "autosize": ["autosize", "window.autosize"],
         "vue": ["Vue", "window.vue"],
-        "moment": ["Moment", "window.Moment"],
+        "moment": ["Moment", "window.Moment"]
     })
     .version();

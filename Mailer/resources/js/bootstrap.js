@@ -8,4 +8,8 @@ global.Vue = require('vue');
 
 global.moment = require('moment');
 
+require("./chart.js");
+
+global.salvattore = require("salvattore");
+
 Nette.initOnLoad();
