@@ -6,7 +6,7 @@
                 <div class="panel-group z-depth-1-top">
                     <div class="panel">
                         <div class="card-header">
-                            <h2 class="m-t-0">Settings <small>Camp name</small></h2>
+                            <h2 class="m-t-0">Settings <small>{{ name }}</small></h2>
                             <p class="m-t-20 m-b-10">We've developed a single process for freelancers with proven industry expirience to access the best projects from clients that use additional services on Workspace.</p>
                         </div>
                     </div>

@@ -4,20 +4,12 @@
 
 @section('content')
 
-    <div class="c-header">
-        <h2>Campaigns</h2>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            <h2>Add new campaign</h2>
-        </div>
-        <div class="card-body card-padding">
-            @include('flash::message')
+    <div class="container">
+        @include('flash::message')
 
-            {!! Form::model($campaign, ['route' => 'campaigns.store']) !!}
-            @include('campaigns._form')
-            {!! Form::close() !!}
-        </div>
+        {!! Form::model($campaign, ['route' => 'campaigns.store']) !!}
+        @include('campaigns._form')
+        {!! Form::close() !!}
     </div>
 
 @endsection
