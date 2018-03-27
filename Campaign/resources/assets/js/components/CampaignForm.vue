@@ -1,8 +1,6 @@
 <template>
     <div class="container">
         <div class="row">
-
-
             <div class="col-md-12 col-lg-8">
 
                 <div class="panel-group z-depth-1-top">
@@ -19,7 +17,7 @@
                         <div class="panel-heading" role="tab" id="headingOne">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Primary
+                                    Campaign name &amp; primary banner (required)
                                 </a>
                             </h4>
                         </div>
@@ -68,7 +66,7 @@
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    A/B Testing
+                                    A/B test
                                 </a>
                             </h4>
                         </div>
@@ -109,7 +107,7 @@
                         <div class="panel-heading" role="tab" id="headingThree">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                    Segments
+                                    Segments - who will see the banner?
                                 </a>
                             </h4>
                         </div>
@@ -192,7 +190,7 @@
                         <div class="panel-heading" role="tab" id="headingFour">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                    Banner rules
+                                    Banner rules - how often to display?
                                 </a>
                             </h4>
                         </div>
@@ -217,7 +215,7 @@
                         <div class="panel-heading" role="tab" id="headingFive">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                                    Geo targeting
+                                    Geo targeting - which countries?
                                 </a>
                             </h4>
                         </div>
@@ -272,7 +270,7 @@
                         <div class="panel-heading" role="tab" id="headingSix">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                                    Device targeting
+                                    Devices targeting (mobile/desktop)
                                 </a>
                             </h4>
                         </div>
@@ -297,15 +295,14 @@
                         <div class="panel-heading" role="tab" id="headingSeven">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-                                    Timing launch
+                                    When to launch
                                 </a>
                             </h4>
                         </div>
                         <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
                             <div class="panel-body p-l-10 p-r-20">
 
-                                <div class="">
-
+                                <div>
                                     <div class="row">
                                         <div class="col-md-6 p-l-30">
                                             <ul class="tab-nav" role="tablist" data-tab-color="teal">
@@ -358,21 +355,11 @@
                                     </div>
                                 </div>
 
-
-
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (schedule) -->
-
-
-
-
-
                 </div><!-- .panel-group -->
-
             </div>
-
-
         </div>
 
         <div class="row">
