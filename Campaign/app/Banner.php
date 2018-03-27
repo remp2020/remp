@@ -44,29 +44,31 @@ class Banner extends Model
     public function fill(array $attributes)
     {
         parent::fill($attributes);
-        switch ($this->template) {
-            case self::TEMPLATE_HTML:
-                $this->htmlTemplate ?
-                    $this->htmlTemplate->fill($attributes) :
-                    $this->setRelation('htmlTemplate', $this->htmlTemplate()->make($attributes));
-                break;
-            case self::TEMPLATE_MEDIUM_RECTANGLE:
-                $this->mediumRectangleTemplate ?
-                    $this->mediumRectangleTemplate->fill($attributes) :
-                    $this->setRelation('mediumRectangleTemplate', $this->mediumRectangleTemplate()->make($attributes));
-                break;
-            case self::TEMPLATE_BAR:
-                $this->barTemplate ?
-                    $this->barTemplate->fill($attributes) :
-                    $this->setRelation('barTemplate', $this->barTemplate()->make($attributes));
-                break;
-            case self::TEMPLATE_SHORT_MESSAGE:
-                $this->shortMessageTemplate ?
-                    $this->shortMessageTemplate->fill($attributes) :
-                    $this->setRelation('shortMessageTemplate', $this->shortMessageTemplate()->make($attributes));
-                break;
+
+        return $this->template ? $this->fillTemplate($attributes) : $this;
+    }
+
+    public function fillTemplate(array $attributes)
+    {
+        $relationName = $this->getTemplateRelationName();
+
+        if ($this[$relationName]) {
+            $this->{$relationName}->fill($attributes);
+        } else {
+            $this->setRelation($relationName, $this->{$relationName}()->make($attributes));
         }
+
         return $this;
+    }
+
+    public function withTemplate()
+    {
+        return $this->with($this->getTemplateRelationName());
+    }
+
+    public function loadTemplate()
+    {
+        return $this->load($this->getTemplateRelationName());
     }
 
     public function campaigns()
@@ -92,5 +94,30 @@ class Banner extends Model
     public function shortMessageTemplate()
     {
         return $this->hasOne(ShortMessageTemplate::class);
+    }
+
+    public function getTemplateRelationName()
+    {
+        $relationName = null;
+
+        switch ($this->template) {
+            case self::TEMPLATE_HTML:
+                $relationName = 'htmlTemplate';
+                break;
+            case self::TEMPLATE_MEDIUM_RECTANGLE:
+                $relationName = 'mediumRectangleTemplate';
+                break;
+            case self::TEMPLATE_BAR:
+                $relationName = 'barTemplate';
+                break;
+            case self::TEMPLATE_SHORT_MESSAGE:
+                $relationName = 'shortMessageTemplate';
+                break;
+            default:
+                throw new \Exception('Not existing template name: ' . $this->template);
+                break;
+        }
+
+        return $relationName;
     }
 }

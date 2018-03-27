@@ -161,7 +161,7 @@ class BannerController extends Controller
     {
         return response()->format([
             'html' => view('banners.show', [
-                'banner' => $banner,
+                'banner' => $banner->loadTemplate(),
                 'positions' => $this->positionMap->positions(),
                 'dimensions' => $this->dimensionMap->dimensions(),
                 'alignments' => $this->alignmentMap->alignments(),
