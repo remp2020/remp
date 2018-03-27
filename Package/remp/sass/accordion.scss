@@ -1,0 +1,30 @@
+.panel-default {
+    > .panel-heading {
+        background: #fff;
+        border-bottom: 1px solid #efefef;
+
+        + .panel-collapse > .panel-body {
+            background: #FBFBFB;
+        }
+    }
+}
+
+.panel-collapse {
+    border-bottom: 1px solid #efefef;
+}
+
+.panel-group .panel+.panel {
+    margin-top: 0;
+}
+
+.panel-title {
+    > a {
+        padding: 25px;
+        font-size: 1em;
+        font-weight: bold;
+
+        &[aria-expanded="true"] {
+            color: #E13061;
+        }
+    }
+}

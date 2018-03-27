@@ -8038,13 +8038,13 @@ pre {
 #main {
   position: relative;
 }
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   #main {
     padding: 0 40px 30px 270px;
     min-height: calc(100vh - 159px);
   }
 }
-@media (max-width: 1279px) and (min-width: 768px) {
+@media (max-width: 1199px) and (min-width: 768px) {
   #main {
     padding: 0 40px 30px;
   }
@@ -8110,12 +8110,12 @@ pre {
   margin-top: -3px;
   color: rgba(255, 255, 255, 0.6);
 }
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   .h-logo .menu-collapse {
     display: none;
   }
 }
-@media (max-width: 1279px) {
+@media (max-width: 1199px) {
   .h-logo .menu-collapse {
     margin-top: 8px;
     float: left;
@@ -8331,7 +8331,7 @@ pre {
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.8);
 }
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   .hm-alerts {
     display: none !important;
   }
@@ -8409,7 +8409,7 @@ pre {
 #s-main-menu {
   left: 0;
 }
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   #s-main-menu {
     width: 270px;
     position: absolute;
@@ -8417,7 +8417,7 @@ pre {
     top: 115px;
   }
 }
-@media (max-width: 1279px) {
+@media (max-width: 1199px) {
   #s-main-menu {
     padding-top: 80px;
     opacity: 0;
@@ -8450,7 +8450,7 @@ pre {
 .smm-header {
   display: none;
 }
-@media (max-width: 1279px) {
+@media (max-width: 1199px) {
   .smm-header {
     display: block;
     height: 80px;
@@ -8545,7 +8545,7 @@ pre {
 .smm-alerts > li:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.3);
 }
-@media (max-width: 1279px) {
+@media (max-width: 1199px) {
   .smm-alerts {
     display: none;
   }
@@ -8570,14 +8570,14 @@ pre {
   opacity: 1;
   z-index: 101;
 }
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   #s-user-alerts .m-btn {
     position: absolute;
     right: auto;
     left: 230px;
   }
 }
-@media (max-width: 1279px) {
+@media (max-width: 1199px) {
   #s-user-alerts {
     left: auto;
     right: -320px;
@@ -8663,7 +8663,7 @@ pre {
   text-align: center;
   padding: 13px 0;
 }
-@media (max-width: 1279px) {
+@media (max-width: 1199px) {
   .main-menu {
     height: 100%;
     overflow-y: auto;
