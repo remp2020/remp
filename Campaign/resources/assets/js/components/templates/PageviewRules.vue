@@ -1,5 +1,5 @@
 <template>
-    <div class="input-group m-t-30">
+    <div class="input-group m-t-20">
         <span class="input-group-addon pageview-rules-addon"><i class="zmdi zmdi-eye"></i></span>
         <div>
             <div class="row">

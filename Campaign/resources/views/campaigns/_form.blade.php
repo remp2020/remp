@@ -42,6 +42,7 @@ foreach ($campaign->countries as $country) {
 <script type="text/javascript">
     var campaign = {
         "name": '{!! $campaign->name !!}' || null,
+        "action": '{{ $action }}',
         "segments": {!! isset($selectedSegments) ? $selectedSegments->toJson(JSON_UNESCAPED_UNICODE) : $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
         "bannerId": {!! @json($campaign->banner ? $campaign->banner->id : null) !!},
         "altBannerId": {!! @json($campaign->altBanner ? $campaign->altBanner->id : null) !!},

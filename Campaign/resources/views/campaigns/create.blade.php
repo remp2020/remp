@@ -7,17 +7,13 @@
     <div class="c-header">
         <h2>Campaigns</h2>
     </div>
-    <div class="card">
-        <div class="card-header">
-            <h2>Add new campaign</h2>
-        </div>
-        <div class="card-body card-padding">
-            @include('flash::message')
 
-            {!! Form::model($campaign, ['route' => 'campaigns.store']) !!}
-            @include('campaigns._form')
-            {!! Form::close() !!}
-        </div>
+    <div class="container">
+        @include('flash::message')
+
+        {!! Form::model($campaign, ['route' => 'campaigns.store']) !!}
+        @include('campaigns._form', ['action' => 'create'])
+        {!! Form::close() !!}
     </div>
 
 @endsection
