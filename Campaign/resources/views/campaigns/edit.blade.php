@@ -4,11 +4,15 @@
 
 @section('content')
 
+    <div class="c-header">
+        <h2>Campaigns: {{ $campaign->name }}</h2>
+    </div>
+
     <div class="container">
         @include('flash::message')
 
         {!! Form::model($campaign, ['route' => ['campaigns.update', $campaign], 'method' => 'PATCH']) !!}
-        @include('campaigns._form')
+        @include('campaigns._form', ['action' => 'edit'])
         {!! Form::close() !!}
     </div>
 
