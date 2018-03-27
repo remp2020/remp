@@ -9,6 +9,7 @@ class SegmentRule extends Model
     protected $casts = [
         'fields' => 'json',
         'flags' => 'json',
+        'timespan' => 'integer',
     ];
 
     protected $attributes = [

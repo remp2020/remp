@@ -67,7 +67,7 @@
                 </segment-rule>
             </div>
 
-        </div>v-
+        </div>
     </div>
 </template>
 

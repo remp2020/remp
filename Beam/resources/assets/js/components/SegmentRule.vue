@@ -99,8 +99,8 @@
                     </div>
                     <div v-for="(flag,j) in eventFlags[eventGroup(mutEventCategory)]" class="row">
                         <div class="col-md-5">
-                            <input v-model="mutFlags[flagIdx(flag)].key" disabled="disabled" class="form-control fg-input" title="field key" type="text" style="background-color: transparent"/>
-                            <input v-model="mutFlags[flagIdx(flag)].key" :name="'rules['+index+'][flags]['+j+'][key]'" type="hidden" />
+                            <input :value="mutFlags[flagIdx(flag)].key" disabled="disabled" class="form-control fg-input" title="field key" type="text" style="background-color: transparent"/>
+                            <input :value="mutFlags[flagIdx(flag)].key" :name="'rules['+index+'][flags]['+j+'][key]'" type="hidden" />
                         </div>
                         <div class="col-md-5">
                             <v-select class="col-md-12 p-l-0 p-r-0"
@@ -122,12 +122,12 @@
                             <input v-model="field.value" :name="'rules['+index+'][fields]['+j+'][value]'" placeholder="e.g. christmas" class="form-control fg-input" title="field value" type="text" />
                         </div>
                         <div class="col-md-2 p-0" v-if="j > 0 || field.key || field.value">
-                            <span v-on:click="removeField(index,j)" class="btn btn-sm palette-Red bg waves-effect"><i class="zmdi zmdi-minus-square"></i></span>
+                            <span v-on:click="removeField(j)" class="btn btn-sm palette-Red bg waves-effect"><i class="zmdi zmdi-minus-square"></i></span>
                         </div>
                     </div>
 
                     <div class="m-t-10">
-                        <span v-on:click="addField(index)" class="btn btn-sm btn-info bg waves-effect m-t-10"><i class="zmdi zmdi-plus-square"></i> Add field</span>
+                        <span v-on:click="addField()" class="btn btn-sm btn-info bg waves-effect m-t-10"><i class="zmdi zmdi-plus-square"></i> Add field</span>
                     </div>
                 </div>
 
@@ -141,7 +141,7 @@
 </template>
 
 <script>
-    var vSelect = require("remp/js/components/vSelect.vue");
+    let vSelect = require("remp/js/components/vSelect.vue");
 
     export default {
         name: "segment-rule",
@@ -163,7 +163,7 @@
                 "mutFlags": this.flags,
                 "mutFields": this.fields,
                 "mutTimespan": this.timespan,
-                "mutEventAction": this.eventAction, 
+                "mutEventAction": this.eventAction,
                 "mutEventCategory": this.eventCategory,
                 "timespanUserFormatted": null,
 
@@ -188,17 +188,17 @@
         },
         watch: {
             timespanUserFormatted: function (val) {
-                var groups = /(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?/.exec(val);
+                let groups = /(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?/.exec(val);
 
-                var days = groups[1];
-                var hours = groups[2];
-                var minutes = groups[3];
+                let days = groups[1];
+                let hours = groups[2];
+                let minutes = groups[3];
 
-                var timespan = moment.duration({
+                let timespan = moment.duration({
                     days: days,
                     hours: hours,
                     minutes: minutes
-                })
+                });
 
                 this.mutTimespan = parseInt(timespan.asMinutes());
             }
@@ -225,6 +225,10 @@
                     this.fetchFlags(data.group);
                 }
             });
+
+            if (this.fields.length === 0) {
+                this.addField();
+            }
         },
         methods: {
             eventGroup: function(category) {
@@ -282,21 +286,11 @@
                 }
             },
             initTimespan: function () {
-                var timespan = moment.duration(this.mutTimespan, "minutes"),
-                    timespanStr = "",
-                    additionalDays = 0;
+                let timespan = moment.duration(this.mutTimespan, "minutes"),
+                    timespanStr = "";
 
-
-                if (timespan.years()) {
-                    additionalDays += timespan.years()*365;
-                }
-
-                if (timespan.months()) {
-                    additionalDays += timespan.months()*31;
-                }
-
-                if (timespan.days() || additionalDays) {
-                    timespanStr += (additionalDays + timespan.days()) + "d ";
+                if (timespan.asDays()) {
+                    timespanStr += (timespan.asDays()) + "d ";
                 }
 
                 if (timespan.hours()) {
@@ -307,7 +301,7 @@
                     timespanStr += " " + timespan.minutes() + "m ";
                 }
 
-                this.timespanUserFormatted = timespanStr.trim();
+                this.timespanUserFormatted = timespanStr.replace(/  +/g, ' ').trim();
             }
         }
     }
