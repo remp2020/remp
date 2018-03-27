@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\ArticleAuthor;
+use App\ArticlePageviews;
+use App\ArticleTimespent;
 use App\Author;
+use App\Conversion;
 use App\Http\Resources\AuthorResource;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 use HTML;
 
@@ -44,20 +49,65 @@ class AuthorController extends Controller
         $cols = [
             'authors.id',
             'authors.name',
-            'count(articles.id) as articles_count',
+            'articles_count',
+            'conversions_count',
+            'conversions_amount',
+            'pageviews_count',
+            'pageviews_timespent / pageviews_count as avg_timespent',
+        ];
+
+        $authorArticlesQuery = ArticleAuthor::selectRaw(implode(',', [
+            'author_id',
+            'COUNT(*) as articles_count'
+        ]))
+            ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
+            ->groupBy('author_id');
+
+        $conversionsQuery = Conversion::selectRaw(implode(',', [
+            'author_id',
             'count(conversions.id) as conversions_count',
             'sum(conversions.amount) as conversions_amount',
-            'coalesce(sum(article_pageviews.sum), 0) as pageviews_count',
-            'coalesce(sum(article_timespents.sum), 0) as pageviews_timespent',
-            'coalesce(sum(article_timespents.sum) / sum(article_pageviews.sum), 0) as avg_timespent',
-        ];
+        ]))
+            ->leftJoin('article_author', 'conversions.article_id', '=', 'article_author.article_id')
+            ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
+            ->groupBy('author_id');
+
+        $pageviewsQuery = ArticlePageviews::selectRaw(implode(',', [
+            'author_id',
+            'COALESCE(SUM(sum), 0) as pageviews_count',
+        ]))
+            ->leftJoin('article_author', 'article_pageviews.article_id', '=', 'article_author.article_id')
+            ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
+            ->groupBy('author_id');
+
+        $timespentQuery = ArticleTimespent::selectRaw(implode(',', [
+            'author_id',
+            'COALESCE(SUM(sum), 0) as pageviews_timespent',
+        ]))
+            ->leftJoin('article_author', 'article_timespents.article_id', '=', 'article_author.article_id')
+            ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
+            ->groupBy('author_id');
+
+        if ($request->input('published_from')) {
+            $authorArticlesQuery->whereDate('published_at', '>=', $request->input('published_from'));
+            $conversionsQuery->whereDate('published_at', '>=', $request->input('published_from'));
+            $pageviewsQuery->whereDate('published_at', '>=', $request->input('published_from'));
+            $timespentQuery->whereDate('published_at', '>=', $request->input('published_from'));
+        }
+
+        if ($request->input('published_to')) {
+            $authorArticlesQuery->whereDate('published_at', '<=', $request->input('published_to'));
+            $conversionsQuery->whereDate('published_at', '<=', $request->input('published_to'));
+            $pageviewsQuery->whereDate('published_at', '<=', $request->input('published_to'));
+            $timespentQuery->whereDate('published_at', '<=', $request->input('published_to'));
+        }
+
         $authors = Author::selectRaw(implode(",", $cols))
-            ->leftJoin('article_author', 'authors.id', '=', 'article_author.author_id')
-            ->leftJoin('articles', 'articles.id', '=', 'article_author.article_id')
-            ->leftJoin('conversions', 'conversions.article_id', '=', 'article_author.article_id')
-            ->leftJoin('article_pageviews', 'articles.id', '=', 'article_pageviews.article_id')
-            ->leftJoin('article_timespents', 'articles.id', '=', 'article_timespents.article_id')
-            ->groupBy(['authors.name', 'authors.id']);
+            ->leftJoin(DB::raw("({$authorArticlesQuery->toSql()}) as aa"), 'authors.id', '=', 'aa.author_id')->addBinding($authorArticlesQuery->getBindings())
+            ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($authorArticlesQuery->getBindings())
+            ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'authors.id', '=', 'pv.author_id')->addBinding($authorArticlesQuery->getBindings())
+            ->leftJoin(DB::raw("({$timespentQuery->toSql()}) as ts"), 'authors.id', '=', 'ts.author_id')->addBinding($authorArticlesQuery->getBindings())
+            ->groupBy(['authors.name', 'authors.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_count', 'pageviews_timespent']);
 
         $conversionsQuery = \DB::table('conversions')
             ->selectRaw('sum(amount) as sum, currency, article_author.author_id')
@@ -66,11 +116,9 @@ class AuthorController extends Controller
             ->groupBy(['article_author.author_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
-            $authors->where('published_at', '>=', $request->input('published_from'));
             $conversionsQuery->where('published_at', '>=', $request->input('published_from'));
         }
         if ($request->input('published_to')) {
-            $authors->where('published_at', '<=', $request->input('published_to'));
             $conversionsQuery->where('published_at', '<=', $request->input('published_to'));
         }
 
