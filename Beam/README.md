@@ -208,6 +208,37 @@ if (remplib.iota.init(t), !document.getElementById("remplib-iota-loader")) {
 
 You can place the script directly on-site, or create a bookmarklet and execute it on-demand.
 
+## Segment guidelines
+
+### The highest loyalty visitors
+
+Each website has its own distribution of visitors based on the served content. Due to this,
+it's impossible to create segments which could target this group in a generic fashion.
+
+We've prepared a command, that will process 30 days of tracked pageviews data and will generate
+a segment which will include top 10% of users based on the number of articles read. To run it,
+please execute `pageviews:loyal-visitors` command.
+
+It's highly recommended to run the command during the low-traffic period of the day, as its
+computationally intensive. Also it's recommended to run it only when you really have 30 days
+of the data tracked.
+
+### Visitors with low probability of conversion
+
+Similar to previous section, we're not able to generate generic segments that would be 100%
+accurate. Thanks to industry knowledge and tracked data we're able to provide set of segments
+to target visitors with low conversion probability which you can test and find which one
+suits your visitor base the best. 
+
+Segments are generated during the installation of Beam and can be generated also manually via
+running `db:seed` command. Recommended segments contain users matching these criteria:
+
+* First website pageview
+* One pageview within 90 days
+* One pageview within 30 days (additionally could be swapped with 2-5, 6-10pvs and 11+ pageviews)
+* Never started the checkout process (additionally could be swapped with 2-5 checkouts but no purchase)
+* First article pageview within 30 days (aditionally could be swapped with 2-3 and 4+ article pageviews)
+
 ## Known issues
 
 ### Some internal API calls are not going through
