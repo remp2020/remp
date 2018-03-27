@@ -142,14 +142,13 @@ final class DashboardPresenter extends BasePresenter
     public function renderDetail($id)
     {
         $labels = [];
-        $dataSet = [];
         $numOfDays = 30;
         $now = new DateTime();
         $from = (new DateTime())->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         // fill graph columns
         for ($i = $numOfDays; $i > 0; $i--) {
-            $labels[] = date("d. m. Y", strtotime('-' . $i . ' days'));
+            $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
         }
 
         $mailType = $this->listsRepository->find($id);
@@ -168,7 +167,7 @@ final class DashboardPresenter extends BasePresenter
         foreach ($data as $row) {
             $dataSet['data'][
                 array_search(
-                    $row->first_email_sent_at->format('d. m. Y'),
+                    $this->dateFormatter->format($row->first_email_sent_at),
                     $labels
                 )
             ] = $row->sent_mails;
