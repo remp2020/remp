@@ -135,9 +135,16 @@ class CampaignController extends Controller
         ]);
     }
 
+    /**
+     * Ajax validate form method.
+     *
+     * @param CampaignRequest|Request $request
+     * @param Campaign $campaign
+     * @return \Illuminate\Http\Response
+     */
     public function validateForm(CampaignRequest $request, Campaign $campaign)
     {
-        //
+        return response()->json(false);
     }
 
     /**

@@ -73,7 +73,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="[ altBannerId ? 'green': '' ]">
                                     A/B test
                                 </a>
                             </h4>
@@ -114,7 +114,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingThree">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree" :class="[ (segments.length || signedIn) ? 'green': '' ]">
                                     Segments - who will see the banner?
                                 </a>
                             </h4>
@@ -202,7 +202,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFour">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour" :class="[ (pageviewRulesNotDefault || oncePerSession == true) ? 'green': '' ]">
                                     Banner rules - how often to display?
                                 </a>
                             </h4>
@@ -227,7 +227,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFive">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive" :class="[ (countries.length) ? 'green': '' ]">
                                     Geo targeting - which countries?
                                 </a>
                             </h4>
@@ -282,7 +282,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingSix">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix" :class="[ (selectedDevices.length < allDevices.length) ? 'green': '' ]">
                                     Devices targeting (mobile/desktop)
                                 </a>
                             </h4>
@@ -294,7 +294,7 @@
                                     <div class="checkbox" v-for="(device) in allDevices" :key="device">
                                     <label class="m-l-15 m-t-15">
                                         Show on {{ device }}
-                                        <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox">
+                                        <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox" @change="handleToggleSelectDevice(device)">
                                         <i class="input-helper"></i>
                                     </label>
                                     </div>
@@ -307,7 +307,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingSeven">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" :class="[ activationMode ? 'green' : '' ]">
                                     When to launch
                                 </a>
                             </h4>
@@ -535,6 +535,16 @@
                     {"label": "Only signed in", "value": true},
                     {"label": "Only anonymous ", "value": false},
                 ];
+            },
+            pageviewRulesNotDefault: function () {
+                console.log('pageviewRules.length', this.pageviewRules.length)
+                if (this.pageviewRules.length && this.pageviewRules[0].rule) {
+                    return true;
+                }
+
+                console.log('cosi')
+
+                return false;
             }
         },
         methods: {
@@ -562,6 +572,16 @@
                         type: 'danger'
                     });
                 }
+            },
+            handleToggleSelectDevice: function (device) {
+                if (this.deviceSelected(device)) {
+                    this.selectedDevices.splice(
+                        this.selectedDevices.indexOf(device), 1
+                    );
+                    return;
+                }
+
+                this.selectedDevices.push(device);
             },
             deviceSelected: function (device) {
                 if (this.selectedDevices.indexOf(device) != -1) {

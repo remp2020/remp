@@ -27,5 +27,8 @@
         &[aria-expanded="true"] {
             color: #E13061;
         }
+        &.green {
+            color: $highlightColor;
+        }
     }
 }
