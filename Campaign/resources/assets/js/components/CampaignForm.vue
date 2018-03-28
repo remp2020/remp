@@ -307,7 +307,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingSeven">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" :class="[ activationMode ? 'green' : '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" :class="[ (active || isScheduled) ? 'green' : '' ]">
                                     When to launch
                                 </a>
                             </h4>
@@ -454,20 +454,25 @@
             var $startTime = $('input[name="new_schedule_start_time"]');
             var $endTimeFE = $("#new_schedule_end_time_frontend");
             var $endTime = $('input[name="new_schedule_end_time"]');
+            var self = this;
 
             $startTimeFE.on('dp.change', function() {
                 var st = $(this).data("DateTimePicker").date();
                 var et = $endTimeFE.data("DateTimePicker").date();
                 if (st && et && st.unix() > et.unix()) {
                     $endTimeFE.data("DateTimePicker").date(st);
+                    self.isScheduled = true;
                 }
+                self.isScheduled = ($startTimeFE.val() && $endTimeFE.val()) ? true : false;
             });
             $endTimeFE.on("dp.change", function (e) {
                 var st = $startTimeFE.data("DateTimePicker").date();
                 var et = $(this).data("DateTimePicker").date();
                 if (st && et && et.unix() < st.unix()) {
                     $startTimeFE.data("DateTimePicker").date(et);
+                    self.isScheduled = true;
                 }
+                self.isScheduled = ($startTimeFE.val() && $endTimeFE.val()) ? true : false;
             }).datetimepicker({useCurrent: false});
 
             $('form').on('submit', function() {
@@ -494,6 +499,7 @@
                 "selectedDevices": null,
                 "validateUrl": null,
                 "submitAction": null,
+                "isScheduled": false,
 
                 "banners": null,
                 "availableSegments": null,
@@ -537,12 +543,9 @@
                 ];
             },
             pageviewRulesNotDefault: function () {
-                console.log('pageviewRules.length', this.pageviewRules.length)
                 if (this.pageviewRules.length && this.pageviewRules[0].rule) {
                     return true;
                 }
-
-                console.log('cosi')
 
                 return false;
             }
