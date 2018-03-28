@@ -49,7 +49,7 @@ final class DashboardPresenter extends BasePresenter
         $typeDataSets = [];
 
         $now = new DateTime();
-        $from = (new DateTime())->sub(
+        $from = (clone $now)->sub(
             new DateInterval('P' . $numOfDays . 'D')
         );
 
@@ -110,8 +110,7 @@ final class DashboardPresenter extends BasePresenter
         }
 
         // parse previous period data (counts)
-        $prevPeriodFrom = (new DateTime($from->getTimestamp()))
-            ->sub(new DateInterval('P' . $numOfDays . 'D'));
+        $prevPeriodFrom = (clone $from)->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         $prevPeriodTypesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($prevPeriodFrom, $from);
 
@@ -144,7 +143,7 @@ final class DashboardPresenter extends BasePresenter
         $labels = [];
         $numOfDays = 30;
         $now = new DateTime();
-        $from = (new DateTime())->sub(new DateInterval('P' . $numOfDays . 'D'));
+        $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         // fill graph columns
         for ($i = $numOfDays; $i > 0; $i--) {
