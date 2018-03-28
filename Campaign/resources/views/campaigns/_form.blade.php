@@ -55,6 +55,8 @@ foreach ($campaign->countries as $country) {
         "allDevices": {!! @json($campaign->getAllDevices()) !!},
         "selectedDevices": {!! @json($campaign->devices) !!} || [],
 
+        "validateUrl": "@if($action === 'create') {{ route('campaigns.validateForm') }} @else {{ route('campaigns.validateForm', ['campaign' => $campaign]) }} @endif",
+
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},
         "addedSegment": null,

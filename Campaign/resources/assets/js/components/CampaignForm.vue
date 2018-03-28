@@ -379,10 +379,12 @@
             <div class="col-md-12 col-lg-8">
                 <div class="input-group m-t-20 m-b-30">
                     <div class="fg-line">
-                        <button class="btn btn-info waves-effect" type="submit" name="action" value="save">
+                        <input type="hidden" name="action" :value="submitAction">
+
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save'">
                             <i class="zmdi zmdi-check"></i> Save
                         </button>
-                        <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close">
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save_close'">
                             <i class="zmdi zmdi-mail-send"></i> Save and close
                         </button>
                     </div>
@@ -408,6 +410,7 @@
         "_countriesBlacklist",
         "_allDevices",
         "_selectedDevices",
+        "_validateUrl",
 
         "_banners",
         "_availableSegments",
@@ -429,8 +432,21 @@
         },
         created: function(){
             let self = this;
+
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
+            });
+
+            $('#campaign-form-root').on('submit', function () {
+                var form = this;
+
+                if ($(form).attr('data-valid')) return true;
+
+                self.validate(form).then(function () {
+                    $(form).attr('data-valid', true).submit();
+                }, self.handleErrors);
+
+                return false;
             });
         },
         mounted: function() {
@@ -476,6 +492,8 @@
                 "countriesBlacklist": null,
                 "allDevices": null,
                 "selectedDevices": null,
+                "validateUrl": null,
+                "submitAction": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -520,6 +538,31 @@
             }
         },
         methods: {
+            validate(el) {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: 'patch',
+                        url: this.validateUrl.trim(),
+                        data: $(el).serializeArray(),
+                        success: function(data) {
+                            resolve();
+                        },
+                        error: function(data) {
+                            reject(data.responseJSON.errors);
+                        }
+                    });
+                })
+            },
+            handleErrors(errors) {
+                for (var i in errors) {
+                    $.notify({
+                        message: errors[i][0]
+                    }, {
+                        allow_dismiss: false,
+                        type: 'danger'
+                    });
+                }
+            },
             deviceSelected: function (device) {
                 if (this.selectedDevices.indexOf(device) != -1) {
                     return true;

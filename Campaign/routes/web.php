@@ -29,6 +29,9 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
     Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
 
+    Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
+    Route::patch('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
+
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
     Route::resource('banners', 'BannerController');
