@@ -184,33 +184,42 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /***************/
 /* DATA TABLES */
 /***************/
-.dataTables_wrapper .dataTables_processing {
-    position: absolute;
-    top: 85px;
-    left: 42%;
-    z-index: 200;
-}
 
-.dataTables_wrapper .dataTable {
-    .group {
-        cursor: default;
-        font-weight: 700;
-        background: rgba(0, 188, 212, .10);
+.dataTables_wrapper {
+    overflow-x: scroll;
+
+    .dataTables_processing {
+        position: absolute;
+        top: 85px;
+        left: 42%;
+        z-index: 200;
     }
 
-    tbody tr {
-        $rowBackground: #fff;
-        border-left: 12px solid transparent;
-
-        &.odd {
-            background-color: $rowBackground;
-        }
-        &.even {
-            background-color: darken($rowBackground, 5%);
+    .dataTable {
+        .group {
+            cursor: default;
+            font-weight: 700;
+            background: rgba(0, 188, 212, .10);
         }
 
-        &.highlight {
-            border-color: $highlightColor;
+        tbody tr {
+            $rowBackground: #fff;
+            border-left: 12px solid transparent;
+
+            &.odd {
+                background-color: $rowBackground;
+            }
+            &.even {
+                background-color: darken($rowBackground, 5%);
+            }
+
+            &.highlight {
+                border-color: $highlightColor;
+            }
+
+            th .bootstrap-select {
+                text-transform: none;
+            }
         }
     }
 }
@@ -258,10 +267,6 @@ tr th.sorting_desc:hover:before {
 
 .ah-search {
     width: 70%;
-}
-
-.dataTable tr th .bootstrap-select {
-    text-transform: none;
 }
 
 .table-responsive {
