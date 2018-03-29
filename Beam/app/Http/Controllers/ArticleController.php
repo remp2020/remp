@@ -174,10 +174,10 @@ class ArticleController extends Controller
                 return HTML::link($article->url, $article->title);
             })
             ->addColumn('avg_sum', function (Article $article) {
-                if (!$article->timespent_sum || !$article->pageview_sum) {
+                if (!$article->timespent_sum || !$article->pageviews_all) {
                     return 0;
                 }
-                return round($article->timespent_sum / $article->pageview_sum);
+                return round($article->timespent_sum / $article->pageviews_all);
             })
             ->addColumn('authors', function (Article $article) {
                 $authors = $article->authors->map(function (Author $author) {
@@ -193,7 +193,7 @@ class ArticleController extends Controller
                 $values = explode(",", $value);
                 $query->whereIn('article_section.section_id', $values);
             })
-            ->orderColumn('avg_sum', 'timespent_sum / pageview_sum $1')
+            ->orderColumn('avg_sum', 'timespent_sum / pageviews_all $1')
             ->rawColumns(['authors'])
             ->make(true);
     }

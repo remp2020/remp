@@ -16,6 +16,9 @@ class Article extends Model
         'section',
         'image_url',
         'published_at',
+        'pageviews_all',
+        'pageviews_signed_in',
+        'pageviews_subscribers',
     ];
 
     protected $dates = [
