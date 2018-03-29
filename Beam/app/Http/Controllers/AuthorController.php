@@ -52,8 +52,10 @@ class AuthorController extends Controller
             'articles_count',
             'conversions_count',
             'conversions_amount',
-            'pageviews_count',
-            'pageviews_timespent / pageviews_count as avg_timespent',
+            'pageviews_all',
+            'pageviews_signed_in',
+            'pageviews_subscribers',
+            'timespent_all / pageviews_all as avg_timespent',
         ];
 
         $authorArticlesQuery = ArticleAuthor::selectRaw(implode(',', [
@@ -72,42 +74,33 @@ class AuthorController extends Controller
             ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
             ->groupBy('author_id');
 
-        $pageviewsQuery = ArticlePageviews::selectRaw(implode(',', [
+        $pageviewsQuery = Article::selectRaw(implode(',', [
             'author_id',
-            'COALESCE(SUM(sum), 0) as pageviews_count',
+            'COALESCE(SUM(pageviews_all), 0) as pageviews_all',
+            'COALESCE(SUM(pageviews_signed_in), 0) as pageviews_signed_in',
+            'COALESCE(SUM(pageviews_subscribers), 0) as pageviews_subscribers',
+            'COALESCE(SUM(timespent_sum), 0) as timespent_all',
         ]))
-            ->leftJoin('article_author', 'article_pageviews.article_id', '=', 'article_author.article_id')
-            ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
-            ->groupBy('author_id');
-
-        $timespentQuery = ArticleTimespent::selectRaw(implode(',', [
-            'author_id',
-            'COALESCE(SUM(sum), 0) as pageviews_timespent',
-        ]))
-            ->leftJoin('article_author', 'article_timespents.article_id', '=', 'article_author.article_id')
-            ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
+            ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
             ->groupBy('author_id');
 
         if ($request->input('published_from')) {
             $authorArticlesQuery->whereDate('published_at', '>=', $request->input('published_from'));
             $conversionsQuery->whereDate('published_at', '>=', $request->input('published_from'));
             $pageviewsQuery->whereDate('published_at', '>=', $request->input('published_from'));
-            $timespentQuery->whereDate('published_at', '>=', $request->input('published_from'));
         }
 
         if ($request->input('published_to')) {
             $authorArticlesQuery->whereDate('published_at', '<=', $request->input('published_to'));
             $conversionsQuery->whereDate('published_at', '<=', $request->input('published_to'));
             $pageviewsQuery->whereDate('published_at', '<=', $request->input('published_to'));
-            $timespentQuery->whereDate('published_at', '<=', $request->input('published_to'));
         }
 
         $authors = Author::selectRaw(implode(",", $cols))
             ->leftJoin(DB::raw("({$authorArticlesQuery->toSql()}) as aa"), 'authors.id', '=', 'aa.author_id')->addBinding($authorArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($authorArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'authors.id', '=', 'pv.author_id')->addBinding($authorArticlesQuery->getBindings())
-            ->leftJoin(DB::raw("({$timespentQuery->toSql()}) as ts"), 'authors.id', '=', 'ts.author_id')->addBinding($authorArticlesQuery->getBindings())
-            ->groupBy(['authors.name', 'authors.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_count', 'pageviews_timespent']);
+            ->groupBy(['authors.name', 'authors.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all', 'pageviews_signed_in', 'pageviews_subscribers', 'timespent_all']);
 
         $conversionsQuery = \DB::table('conversions')
             ->selectRaw('sum(amount) as sum, currency, article_author.author_id')
@@ -157,7 +150,9 @@ class AuthorController extends Controller
                 "articles.title",
                 "articles.published_at",
                 "articles.url",
-                "articles.pageview_sum",
+                "articles.pageviews_all",
+                "articles.pageviews_signed_in",
+                "articles.pageviews_subscribers",
                 "articles.timespent_sum",
                 "count(conversions.id) as conversions_count",
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
@@ -180,9 +175,11 @@ class AuthorController extends Controller
 
         $averages = \DB::table('articles')
             ->selectRaw(implode(',', [
-                'avg(nullif(pageview_sum, 0)) as pageview_avg',
+                'avg(nullif(pageviews_all, 0)) as pageview_avg',
+                'avg(nullif(pageviews_signed_in, 0)) as signed_in_avg',
+                'avg(nullif(pageviews_subscribers, 0)) as subscriber_avg',
                 'avg(nullif(timespent_sum, 0)) as timespent_avg',
-                'avg(nullif(timespent_sum / pageview_sum, 0)) as average_avg',
+                'avg(nullif(timespent_sum / pageviews_all, 0)) as average_avg',
                 'sum(case when conversions.id is not null then 1 else 0 end) / count(distinct articles.id) as conversion_count_avg',
             ]))
             ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
@@ -228,10 +225,24 @@ class AuthorController extends Controller
             ->addColumn('title', function (Article $article) {
                 return HTML::link($article->url, $article->title);
             })
-            ->addColumn('pageview_sum', function (Article $article) use ($averages) {
-                $arr = [$article->pageview_sum];
-                if ($article->pageview_sum > 0) {
+            ->addColumn('pageviews_all', function (Article $article) use ($averages) {
+                $arr = [$article->pageviews_all];
+                if ($article->pageviews_all > 0) {
                     $arr[] = $averages->pageview_avg;
+                }
+                return $arr;
+            })
+            ->addColumn('pageviews_signed_in', function (Article $article) use ($averages) {
+                $arr = [$article->signed_in_sum];
+                if ($article->signed_in_sum > 0) {
+                    $arr[] = $averages->signed_in_avg;
+                }
+                return $arr;
+            })
+            ->addColumn('pageviews_subscribers', function (Article $article) use ($averages) {
+                $arr = [$article->subscriber_sum];
+                if ($article->subscriber_sum > 0) {
+                    $arr[] = $averages->subscriber_avg;
                 }
                 return $arr;
             })
@@ -243,10 +254,10 @@ class AuthorController extends Controller
                 return $arr;
             })
             ->addColumn('avg_sum', function (Article $article) use ($averages) {
-                if (!$article->timespent_sum || !$article->pageview_sum) {
+                if (!$article->timespent_sum || !$article->pageviews_all) {
                     return [0];
                 }
-                return [round($article->timespent_sum / $article->pageview_sum), $averages->average_avg];
+                return [round($article->timespent_sum / $article->pageviews_all), $averages->average_avg];
             })
             ->addColumn('conversions_count', function (Article $article) use ($averages) {
                 if (!$article->conversions_count) {
@@ -280,8 +291,8 @@ class AuthorController extends Controller
                 $values = explode(",", $value);
                 $query->whereIn('article_section.section_id', $values);
             })
-            ->orderColumn('avg_sum', 'timespent_sum / pageview_sum $1')
-            ->orderColumn('pageview_sum', 'pageview_sum $1')
+            ->orderColumn('avg_sum', 'timespent_sum / pageviews_all $1')
+            ->orderColumn('pageviews_all', 'pageviews_all $1')
             ->orderColumn('timespent_sum', 'timespent_sum $1')
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_sum', 'conversions_sum $1')

@@ -43,8 +43,9 @@
             {!! Widget::run('DataTable', [
                 'colSettings' => [
                     'title' => ['orderable' => false],
-                    'pageview_sum' => ['header' => 'pageviews', 'render' => 'numberStat'],
-                    'timespent_sum' => ['header' => 'total time read', 'render' => 'durationStat'],
+                    'pageviews_all' => ['header' => 'all pageviews', 'render' => 'numberStat'],
+                    'pageviews_signed_in' => ['header' => 'signed in pageviews', 'render' => 'numberStat'],
+                    'pageviews_subscribers' => ['header' => 'subscriber pageviews', 'render' => 'numberStat'],
                     'avg_sum' => ['header' => 'avg time read', 'render' => 'durationStat'],
                     'conversions_count' => ['header' => 'conversions', 'render' => 'numberStat'],
                     'conversions_sum' => ['header' => 'amount', 'render' => 'multiNumberStat'],

@@ -13,6 +13,8 @@ class ArticlePageviews extends Model
         'time_from',
         'time_to',
         'sum',
+        'signed_in',
+        'subscribers',
     ];
 
     protected $dates = [
