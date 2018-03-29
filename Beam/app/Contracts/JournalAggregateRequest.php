@@ -22,7 +22,7 @@ class JournalAggregateRequest
         $this->action = $action;
     }
 
-    public function addFilter(string $tag, array $values)
+    public function addFilter(string $tag, string ...$values)
     {
         foreach ($values as &$v) {
             $v = strval($v);
@@ -33,9 +33,9 @@ class JournalAggregateRequest
         ];
     }
 
-    public function addGroup(string $tag)
+    public function addGroup(string ...$tags)
     {
-        $this->groupBy[] = $tag;
+        $this->groupBy = array_merge($this->groupBy, $tags);
     }
 
     public function setTimeBefore(\DateTime $timeBefore)

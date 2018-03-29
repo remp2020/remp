@@ -49,6 +49,7 @@
                 'avg_timespent' => ['header' => 'avg time read', 'render' => 'duration'],
             ],
             'dataSource' => route('authors.dtAuthors'),
+            'order' => [3, 'desc'],
             'requestParams' => [
                 'published_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"published_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
                 'published_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"published_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
