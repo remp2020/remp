@@ -175,9 +175,9 @@ class AuthorController extends Controller
 
         $averages = \DB::table('articles')
             ->selectRaw(implode(',', [
-                'avg(nullif(pageviews_all, 0)) as pageview_avg',
-                'avg(nullif(pageviews_signed_in, 0)) as signed_in_avg',
-                'avg(nullif(pageviews_subscribers, 0)) as subscriber_avg',
+                'avg(nullif(pageviews_all, 0)) as pageviews_all_avg',
+                'avg(nullif(pageviews_signed_in, 0)) as pageviews_signed_in_avg',
+                'avg(nullif(pageviews_subscribers, 0)) as pageviews_subscribers_avg',
                 'avg(nullif(timespent_sum, 0)) as timespent_avg',
                 'avg(nullif(timespent_sum / pageviews_all, 0)) as average_avg',
                 'sum(case when conversions.id is not null then 1 else 0 end) / count(distinct articles.id) as conversion_count_avg',
@@ -228,21 +228,21 @@ class AuthorController extends Controller
             ->addColumn('pageviews_all', function (Article $article) use ($averages) {
                 $arr = [$article->pageviews_all];
                 if ($article->pageviews_all > 0) {
-                    $arr[] = $averages->pageview_avg;
+                    $arr[] = $averages->pageviews_all_avg;
                 }
                 return $arr;
             })
             ->addColumn('pageviews_signed_in', function (Article $article) use ($averages) {
-                $arr = [$article->signed_in_sum];
-                if ($article->signed_in_sum > 0) {
-                    $arr[] = $averages->signed_in_avg;
+                $arr = [$article->pageviews_signed_in];
+                if ($article->pageviews_signed_in > 0) {
+                    $arr[] = $averages->pageviews_signed_in_avg;
                 }
                 return $arr;
             })
             ->addColumn('pageviews_subscribers', function (Article $article) use ($averages) {
-                $arr = [$article->subscriber_sum];
-                if ($article->subscriber_sum > 0) {
-                    $arr[] = $averages->subscriber_avg;
+                $arr = [$article->pageviews_subscribers];
+                if ($article->pageviews_subscribers > 0) {
+                    $arr[] = $averages->pageviews_subscribers_avg;
                 }
                 return $arr;
             })
