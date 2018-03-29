@@ -14,7 +14,8 @@ class ProcessPageviewLoyalVisitors extends Command
 
     protected $description = 'Determines number of articles read by top 10% of readers and creates segment based on it';
 
-    public function handle(JournalContract $journalContract) {
+    public function handle(JournalContract $journalContract)
+    {
         ini_set('memory_limit', '-1');
         $days = $this->option('days') ?? 30;
 
@@ -107,4 +108,3 @@ class ProcessPageviewLoyalVisitors extends Command
         $this->line("Segment <info>{$segmentCode}</info> was created, you can use it to target your loyal audience");
     }
 }
-
