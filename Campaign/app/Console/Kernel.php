@@ -34,7 +34,8 @@ class Kernel extends ConsoleKernel
 
         // invalidate segments cache
         try {
-            $campaigns = Campaign::join('schedules', 'campaigns.id', '=', 'campaign_id')
+            $campaigns = Campaign::selectRaw('campaigns.*')
+                ->join('schedules', 'campaigns.id', '=', 'campaign_id')
                 ->where(function (\Illuminate\Database\Eloquent\Builder $query) {
                     $query
                         ->whereNull('end_time')
