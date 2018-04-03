@@ -391,12 +391,16 @@
                 </div>
             </div>
         </div>
+
+
+        <form-validator :url="validateUrl"></form-validator>
     </div>
 </template>
 
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect";
     import PageviewRules from "./templates/PageviewRules";
+    import FormValidator from "./FormValidator";
 
     let props = [
         "_name",
@@ -428,7 +432,8 @@
     export default {
         components: {
             vSelect,
-            PageviewRules
+            PageviewRules,
+            FormValidator
         },
         created: function(){
             let self = this;
@@ -461,18 +466,6 @@
                 }
                 self.endTime = et ? et.toISOString() : null;
             }).datetimepicker({useCurrent: false});
-
-            $(this.$el).closest('form').on('submit', function () {
-                var form = this;
-
-                if ($(form).attr('data-valid')) return true;
-
-                self.validate(form).then(function () {
-                    $(form).attr('data-valid', true).submit();
-                }, self.handleErrors);
-
-                return false;
-            });
         },
         props: props,
         data: function() {
@@ -566,37 +559,6 @@
 
         },
         methods: {
-            validate(el) {
-                return new Promise((resolve, reject) => {
-                    var data = $(el).serializeArray();
-
-                    for(var i in data) {
-                        if (data[i].name == '_method') data[i].value = 'POST'
-                    }
-
-                    $.ajax({
-                        type: 'POST',
-                        url: this.validateUrl.trim(),
-                        data: data,
-                        success: function(data) {
-                            resolve();
-                        },
-                        error: function(data) {
-                            reject(data.responseJSON.errors);
-                        }
-                    });
-                })
-            },
-            handleErrors(errors) {
-                for (var i in errors) {
-                    $.notify({
-                        message: errors[i][0]
-                    }, {
-                        allow_dismiss: false,
-                        type: 'danger'
-                    });
-                }
-            },
             handleToggleSelectDevice: function (device) {
                 if (this.deviceSelected(device)) {
                     this.selectedDevices.splice(
