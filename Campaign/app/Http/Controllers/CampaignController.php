@@ -112,11 +112,10 @@ class CampaignController extends Controller
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
         return view('campaigns.create', [
-            'campaign' => $campaign,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
-            'segments' => $this->getAllSegments($segmentAggregator),
-        ]);
+            'segments' => $this->getAllSegments($segmentAggregator)
+        ] + $this->processOldCampaign($campaign, old()));
     }
 
     /**
@@ -680,7 +679,7 @@ class CampaignController extends Controller
         $removedSegments = isset($data['removedSegments']) ? $data['removedSegments'] : [];
 
         foreach ($segmentsData as $segment) {
-            if (!array_search($segment['id'], $removedSegments)) {
+            if (is_null($segment['id']) || !array_search($segment['id'], $removedSegments)) {
                 $segments[] = $campaign->segments()->make($segment);
             }
         }
@@ -702,13 +701,13 @@ class CampaignController extends Controller
         $bannerId = null;
         $altBannerId = null;
 
-        if (isset($data['banner_id'])) {
+        if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
             $bannerId = $campaign->banner ? $campaign->banner->id : null;
         }
 
-        if (isset($data['alt_banner_id'])) {
+        if (array_key_exists('alt_banner_id', $data)) {
             $altBannerId = $data['alt_banner_id'];
         } else {
             $altBannerId = $campaign->altBanner ? $campaign->altBanner->id : null;
