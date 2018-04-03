@@ -18,10 +18,9 @@
         position: relative
     }
     .html-preview-text {
-        word-break: break-all;
         vertical-align: middle;
         padding: 5px 10px;
-        display: flex;
+        display: inline-block;
         box-sizing: border-box;
         height: 100%;
         align-items: center;
@@ -50,7 +49,7 @@
                 customBoxStyles
             ]">
                 <a class="html-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
-                <p v-html="$parent.injectVars(text)" class="html-preview-text" v-bind:style="[_textAlign, textStyles]"></p>
+                <div v-html="$parent.injectVars(text)" class="html-preview-text" v-bind:style="[_textAlign, textStyles]"></div>
             </div>
         </transition>
     </a>

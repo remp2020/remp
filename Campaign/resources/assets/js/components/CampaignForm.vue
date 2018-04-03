@@ -152,7 +152,7 @@
                                             <div>
                                                 <div class="row">
                                                     <div class="col-md-10">
-                                                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="false">
+                                                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true">
                                                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
                                                                 <option v-for="(obj,code) in list" v-bind:value="obj">
                                                                     {{ obj.name }}

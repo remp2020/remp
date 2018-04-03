@@ -27,6 +27,11 @@ return [
             'width' => '300px',
             'height' => '300px',
         ],
+        'full_width' => [
+            'name' => 'Full width',
+            'width' => '100%',
+            'height' => 'auto',
+        ],
     ],
     'positions' => [
         'top_left' => [

@@ -51,7 +51,6 @@ class BannerRequest extends FormRequest
                         'text_color' => 'required',
                         'background_color' => 'required',
                         'font_size' => 'required',
-                        'dimensions' => 'required|in:landscape,medium_rectangle,bar',
                     ]);
                     break;
                 case Banner::TEMPLATE_MEDIUM_RECTANGLE:
