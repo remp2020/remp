@@ -127,28 +127,8 @@ class CampaignController extends Controller
     public function store(CampaignRequest $request)
     {
         $campaign = new Campaign();
-        $campaign->fill($request->all());
-        $campaign->save();
-        $campaign->banner_id = $request->get('banner_id');
-        $campaign->alt_banner_id = $request->get('alt_banner_id');
 
-        $campaign->countries()->sync(
-            $this->processCountries(
-                $request->get('countries'),
-                (bool)$request->get('countries_blacklisted')
-            )
-        );
-
-        foreach ($request->get('segments', []) as $r) {
-            /** @var CampaignSegment $campaignSegment */
-            $campaignSegment = new CampaignSegment();
-            $campaignSegment->code = $r['code'];
-            $campaignSegment->provider = $r['provider'];
-            $campaignSegment->campaign_id = $campaign->id;
-            $campaignSegment->save();
-
-            dispatch(new CacheSegmentJob($campaignSegment));
-        }
+        $this->saveCampaign($campaign, $request->all());
 
         $message = ['success' => sprintf('Campaign [%s] was created', $campaign->name)];
 
@@ -215,31 +195,7 @@ class CampaignController extends Controller
      */
     public function update(CampaignRequest $request, Campaign $campaign)
     {
-        $campaign->fill($request->all());
-        $campaign->save();
-        $campaign->banner_id = $request->get('banner_id');
-        $campaign->alt_banner_id = $request->get('alt_banner_id');
-
-
-        $campaign->countries()->sync(
-            $this->processCountries(
-                $request->get('countries'),
-                (bool)$request->get('countries_blacklisted')
-            )
-        );
-
-        foreach ($request->get('segments', []) as $r) {
-            /** @var CampaignSegment $campaignSegment */
-            $campaignSegment = CampaignSegment::findOrNew($r['id']);
-            $campaignSegment->code = $r['code'];
-            $campaignSegment->provider = $r['provider'];
-            $campaignSegment->campaign_id = $campaign->id;
-            $campaignSegment->save();
-
-            dispatch(new CacheSegmentJob($campaignSegment));
-        }
-
-        CampaignSegment::destroy($request->get('removedSegments'));
+        $this->saveCampaign($campaign, $request->all());
 
         $message = ['success' => sprintf('Campaign [%s] was updated.', $campaign->name)];
 
@@ -660,13 +616,39 @@ class CampaignController extends Controller
                 'success' => true,
                 'errors' => [],
                 'data' => $displayedCampaigns,
-            'providerData' => $sa->getProviderData(),
+                'providerData' => $sa->getProviderData()
             ]);
     }
 
     public function saveCampaign(Campaign $campaign, array $data)
     {
+        $campaign->fill($data);
+        $campaign->save();
 
+        $campaign->banner_id = $data['banner_id'];
+        $campaign->alt_banner_id = $data['alt_banner_id'];
+
+        if (isset($data['countries'])) {
+            $campaign->countries()->sync(
+                $this->processCountries(
+                    $data['countries'],
+                    (bool)$data['countries_blacklist']
+                )
+            );
+        }
+
+        $segments = $data['segments'] ?? [];
+
+        foreach ($segments as $r) {
+            /** @var CampaignSegment $campaignSegment */
+            $campaignSegment = CampaignSegment::findOrNew($r['id']);
+            $campaignSegment->code = $r['code'];
+            $campaignSegment->provider = $r['provider'];
+            $campaignSegment->campaign_id = $campaign->id;
+            $campaignSegment->save();
+        }
+
+        if (isset($data['removedSegments'])) CampaignSegment::destroy($data['removedSegments']);
     }
 
     public function processOldCampaign(Campaign $campaign, array $data)

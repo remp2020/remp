@@ -9,6 +9,7 @@ class CampaignSegment extends Model
     protected $appends = ['name', 'group'];
 
     protected $fillable = [
+        'id',
         'code',
         'provider',
         'campaign_id'
