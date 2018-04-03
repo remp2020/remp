@@ -6,6 +6,7 @@ use App\Campaign;
 use App\Jobs\CacheSegmentJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Carbon;
 use Schema;
 
 class Kernel extends ConsoleKernel
@@ -33,8 +34,16 @@ class Kernel extends ConsoleKernel
 
         // invalidate segments cache
         try {
+            $campaigns = Campaign::join('schedules', 'campaigns.id', '=', 'campaign_id')
+                ->where(function (\Illuminate\Database\Eloquent\Builder $query) {
+                    $query
+                        ->whereNull('end_time')
+                        ->orWhere('end_time', '>=', Carbon::now());
+                })
+                ->whereIn('status', [\App\Schedule::STATUS_READY, \App\Schedule::STATUS_EXECUTED, \App\Schedule::STATUS_PAUSED])->cursor();
+
             /** @var Campaign $campaign */
-            foreach (Campaign::whereActive(true)->cursor() as $campaign) {
+            foreach ($campaigns as $campaign) {
                 foreach ($campaign->segments as $campaignSegment) {
                     $schedule->job(new CacheSegmentJob($campaignSegment, true))
                         ->hourly()
