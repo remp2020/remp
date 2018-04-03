@@ -436,18 +436,6 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
-
-            $('#campaign-form-root').on('submit', function () {
-                var form = this;
-
-                if ($(form).attr('data-valid')) return true;
-
-                self.validate(form).then(function () {
-                    $(form).attr('data-valid', true).submit();
-                }, self.handleErrors);
-
-                return false;
-            });
         },
         mounted: function() {
             var $startTimeFE = $("#new_schedule_start_time_frontend");
@@ -465,6 +453,7 @@
                 }
                 self.isScheduled = ($startTimeFE.val() && $endTimeFE.val()) ? true : false;
             });
+
             $endTimeFE.on("dp.change", function (e) {
                 var st = $startTimeFE.data("DateTimePicker").date();
                 var et = $(this).data("DateTimePicker").date();
@@ -475,7 +464,19 @@
                 self.isScheduled = ($startTimeFE.val() && $endTimeFE.val()) ? true : false;
             }).datetimepicker({useCurrent: false});
 
-            $('form').on('submit', function() {
+            $(this.$el).closest('form').on('submit', function () {
+                var form = this;
+
+                if ($(form).attr('data-valid')) return true;
+
+                self.validate(form).then(function () {
+                    $(form).attr('data-valid', true).submit();
+                }, self.handleErrors);
+
+                return false;
+            });
+
+            $(this.$el).closest('form').on('submit', function() {
                 var st = $startTimeFE.data("DateTimePicker").date();
                 $startTime.val(st ? st.toISOString() : null);
                 var et = $endTimeFE.data("DateTimePicker").date();
