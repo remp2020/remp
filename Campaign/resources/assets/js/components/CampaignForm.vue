@@ -114,7 +114,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingThree">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree" :class="[ (segments.length || signedIn) ? 'green': '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree" :class="{ green: highlightSegmentsCollapse }">
                                     Segments - who will see the banner?
                                 </a>
                             </h4>
@@ -202,7 +202,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFour">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour" :class="[ (pageviewRulesNotDefault || oncePerSession == true) ? 'green': '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour" :class="{ green: highlightBannerRulesCollapse }">
                                     Banner rules - how often to display?
                                 </a>
                             </h4>
@@ -227,7 +227,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFive">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive" :class="[ (countries.length) ? '': '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive" :class="{ green: highlightCountriesCollapse }">
                                     Geo targeting - which countries?
                                 </a>
                             </h4>
@@ -282,7 +282,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingSix">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix" :class="[ (selectedDevices.length < allDevices.length) ? 'green': '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix" :class="{ green: highlightDevicesCollapse }">
                                     Devices targeting (mobile/desktop)
                                 </a>
                             </h4>
@@ -550,7 +550,20 @@
 
 
                 return false;
+            },
+            highlightSegmentsCollapse: function () {
+                return (this.segments.length || this.signedIn);
+            },
+            highlightBannerRulesCollapse: function () {
+                return (this.pageviewRulesNotDefault || this.oncePerSession == true);
+            },
+            highlightCountriesCollapse: function () {
+                return (this.countries && this.countries.length);
+            },
+            highlightDevicesCollapse: function () {
+                return (this.selectedDevices.length < this.allDevices.length);
             }
+
         },
         methods: {
             validate(el) {
