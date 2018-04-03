@@ -366,7 +366,7 @@ class CampaignController extends Controller
     {
         $processed = [];
 
-        foreach($countries as $cid) {
+        foreach ($countries as $cid) {
             $processed[$cid] = ['blacklisted' => $blacklist];
         }
 
@@ -648,7 +648,9 @@ class CampaignController extends Controller
             $campaignSegment->save();
         }
 
-        if (isset($data['removedSegments'])) CampaignSegment::destroy($data['removedSegments']);
+        if (isset($data['removedSegments'])) {
+            CampaignSegment::destroy($data['removedSegments']);
+        }
     }
 
     public function processOldCampaign(Campaign $campaign, array $data)
