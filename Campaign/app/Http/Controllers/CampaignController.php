@@ -11,6 +11,7 @@ use App\Country;
 use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
+use App\Jobs\CacheSegmentJob;
 use App\Schedule;
 use Cache;
 use Carbon\Carbon;
@@ -157,6 +158,8 @@ class CampaignController extends Controller
             $campaignSegment->provider = $r['provider'];
             $campaignSegment->campaign_id = $campaign->id;
             $campaignSegment->save();
+
+            dispatch(new CacheSegmentJob($campaignSegment));
         }
 
         $message = ['success' => sprintf('Campaign [%s] was created', $campaign->name)];
@@ -249,6 +252,8 @@ class CampaignController extends Controller
             $campaignSegment->provider = $r['provider'];
             $campaignSegment->campaign_id = $campaign->id;
             $campaignSegment->save();
+
+            dispatch(new CacheSegmentJob($campaignSegment));
         }
 
         CampaignSegment::destroy($request->get('removedSegments'));

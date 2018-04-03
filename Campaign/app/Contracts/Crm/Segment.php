@@ -10,7 +10,6 @@ use Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
-use Razorpay\BloomFilter\Bloom;
 
 class Segment implements SegmentContract
 {
@@ -71,10 +70,10 @@ class Segment implements SegmentContract
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
-        /** @var Bloom $bloomFilter */
-        $bloomFilter = Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($cacheJob->key());
-        if ($bloomFilter) {
-            return $bloomFilter->has($userId);
+        /** @var array $userIdMap */
+        $userIdMap = Cache::tags([SegmentContract::CACHE_TAG])->get($cacheJob->key());
+        if ($userIdMap) {
+            return array_key_exists($userId, $userIdMap);
         }
 
         dispatch(new CacheSegmentJob($campaignSegment));

@@ -11,7 +11,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Razorpay\BloomFilter\Bloom;
 
 class CacheSegmentJob implements ShouldQueue
 {
@@ -40,7 +39,7 @@ class CacheSegmentJob implements ShouldQueue
      */
     public function handle(SegmentAggregator $segmentAggregator)
     {
-        if (!$this->force && Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->get($this->key())) {
+        if (!$this->force && Cache::tags([SegmentContract::CACHE_TAG])->get($this->key())) {
             return;
         }
 
@@ -49,17 +48,11 @@ class CacheSegmentJob implements ShouldQueue
         }
 
         $users = $segmentAggregator->users($this->campaignSegment);
-        $userIds = $users->map(function ($item) {
-            return $item->id;
+        $userIdMap = $users->mapWithKeys(function ($item) {
+            return [$item->id => true];
         })->toArray();
 
-        $bloomFilter = new Bloom([
-            'entries_max' => count($userIds),
-            'error_chance' => 0.001
-        ]);
-        $bloomFilter->set($userIds);
-
-        Cache::tags([SegmentContract::BLOOM_FILTER_CACHE_TAG])->put($this->key(), $bloomFilter, 60*24);
+        Cache::tags([SegmentContract::CACHE_TAG])->put($this->key(), $userIdMap, 60*24);
     }
 
     /**

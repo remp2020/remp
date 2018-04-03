@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8a605aa5d3dcf49bfb230c6ab0d2735",
+    "content-hash": "38bd1a765b6e6bcfdd2ccba704b02c56",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -3269,50 +3269,6 @@
                 "uuid"
             ],
             "time": "2018-01-20T00:28:24+00:00"
-        },
-        {
-            "name": "razorpay/php-bloom-filter",
-            "version": "0.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/razorpay/php-bloom-filter.git",
-                "reference": "f7c1fa61b8652b5c9a406c43829ff3e71ab1191b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/razorpay/php-bloom-filter/zipball/f7c1fa61b8652b5c9a406c43829ff3e71ab1191b",
-                "reference": "f7c1fa61b8652b5c9a406c43829ff3e71ab1191b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "3.7.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Razorpay\\BloomFilter\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Spartak (Assorium)",
-                    "email": "mr.spartak@rambler.ru"
-                }
-            ],
-            "description": "The best way to check object existence and save memory and disk usage.",
-            "homepage": "https://github.com/Razorpay/php-bloom-filter",
-            "keywords": [
-                "bloom",
-                "filter"
-            ],
-            "time": "2016-04-29T08:52:15+00:00"
         },
         {
             "name": "recca0120/laravel-tracy",

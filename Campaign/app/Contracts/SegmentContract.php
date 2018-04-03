@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 interface SegmentContract
 {
-    const BLOOM_FILTER_CACHE_TAG = 'segment_bloom';
+    const CACHE_TAG = 'segment';
 
     public function list(): Collection;
 
