@@ -73,7 +73,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="[ altBannerId ? 'green': '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: altBannerId }">
                                     A/B test
                                 </a>
                             </h4>
@@ -227,7 +227,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFive">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive" :class="[ (countries.length) ? 'green': '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive" :class="[ (countries.length) ? '': '' ]">
                                     Geo targeting - which countries?
                                 </a>
                             </h4>
@@ -307,7 +307,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingSeven">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" :class="[ (active || isScheduled) ? 'green' : '' ]">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" :class="{ green: isScheduled }">
                                     When to launch
                                 </a>
                             </h4>
@@ -348,7 +348,7 @@
                                                                     <label for="new_schedule_start_time_frontend" class="fg-label">Start time</label>
                                                                     <input class="form-control date-time-picker" name="new_schedule_start_time_frontend" type="datetime" id="new_schedule_start_time_frontend">
                                                                 </div>
-                                                                <input name="new_schedule_start_time" type="hidden">
+                                                                <input name="new_schedule_start_time" type="hidden" v-model="startTime">
                                                             </div>
 
                                                             <div class="input-group">
@@ -357,7 +357,7 @@
                                                                     <label for="new_schedule_end_time_frontend" class="fg-label">End time</label>
                                                                     <input class="form-control date-time-picker" name="new_schedule_end_time_frontend" type="datetime" id="new_schedule_end_time_frontend">
                                                                 </div>
-                                                                <input name="new_schedule_end_time" type="hidden">
+                                                                <input name="new_schedule_end_time" type="hidden" v-model="endTime">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -449,9 +449,8 @@
                 var et = $endTimeFE.data("DateTimePicker").date();
                 if (st && et && st.unix() > et.unix()) {
                     $endTimeFE.data("DateTimePicker").date(st);
-                    self.isScheduled = true;
                 }
-                self.isScheduled = ($startTimeFE.val() && $endTimeFE.val()) ? true : false;
+                self.startTime = st ? st.toISOString() : null;
             });
 
             $endTimeFE.on("dp.change", function (e) {
@@ -459,9 +458,8 @@
                 var et = $(this).data("DateTimePicker").date();
                 if (st && et && et.unix() < st.unix()) {
                     $startTimeFE.data("DateTimePicker").date(et);
-                    self.isScheduled = true;
                 }
-                self.isScheduled = ($startTimeFE.val() && $endTimeFE.val()) ? true : false;
+                self.endTime = et ? et.toISOString() : null;
             }).datetimepicker({useCurrent: false});
 
             $(this.$el).closest('form').on('submit', function () {
@@ -475,14 +473,6 @@
 
                 return false;
             });
-
-            $(this.$el).closest('form').on('submit', function() {
-                var st = $startTimeFE.data("DateTimePicker").date();
-                $startTime.val(st ? st.toISOString() : null);
-                var et = $endTimeFE.data("DateTimePicker").date();
-                $endTime.val(et ? et.toISOString() : null);
-                return true;
-            })
         },
         props: props,
         data: function() {
@@ -500,7 +490,6 @@
                 "selectedDevices": null,
                 "validateUrl": null,
                 "submitAction": null,
-                "isScheduled": false,
 
                 "banners": null,
                 "availableSegments": null,
@@ -512,6 +501,8 @@
                 "availableCountries": null,
                 "countriesBlacklistOptions": null,
 
+                "startTime": null,
+                "endTime": null,
                 "activationMode": null,
                 "action": null
             }
@@ -549,15 +540,31 @@
                 }
 
                 return false;
+            },
+            isScheduled: function () {
+                if ((this.active && this.activationMode == 'activate-now') ||
+                    (this.startTime != null && this.endTime != null && this.activationMode == 'activate-schedule')
+                ) {
+                    return true;
+                }
+
+
+                return false;
             }
         },
         methods: {
             validate(el) {
                 return new Promise((resolve, reject) => {
+                    var data = $(el).serializeArray();
+
+                    for(var i in data) {
+                        if (data[i].name == '_method') data[i].value = 'POST'
+                    }
+
                     $.ajax({
-                        type: 'patch',
+                        type: 'POST',
                         url: this.validateUrl.trim(),
-                        data: $(el).serializeArray(),
+                        data: data,
                         success: function(data) {
                             resolve();
                         },

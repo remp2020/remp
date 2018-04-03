@@ -142,7 +142,7 @@ class CampaignController extends Controller
      * @param Campaign $campaign
      * @return \Illuminate\Http\Response
      */
-    public function validateForm(CampaignRequest $request, Campaign $campaign)
+    public function validateForm(CampaignRequest $request)
     {
         return response()->json(false);
     }
