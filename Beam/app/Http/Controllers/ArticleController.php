@@ -173,11 +173,23 @@ class ArticleController extends Controller
             ->addColumn('title', function (Article $article) {
                 return HTML::link($article->url, $article->title);
             })
-            ->addColumn('avg_sum', function (Article $article) {
-                if (!$article->timespent_sum || !$article->pageviews_all) {
+            ->addColumn('avg_sum_all', function (Article $article) {
+                if (!$article->timespent_all || !$article->pageviews_all) {
                     return 0;
                 }
-                return round($article->timespent_sum / $article->pageviews_all);
+                return round($article->timespent_all / $article->pageviews_all);
+            })
+            ->addColumn('avg_sum_signed_in', function (Article $article) {
+                if (!$article->timespent_signed_in || !$article->pageviews_signed_in) {
+                    return 0;
+                }
+                return round($article->timespent_signed_in / $article->pageviews_signed_in);
+            })
+            ->addColumn('avg_sum_subscribers', function (Article $article) {
+                if (!$article->timespent_subscribers || !$article->pageviews_subscribers) {
+                    return 0;
+                }
+                return round($article->timespent_subscribers / $article->pageviews_subscribers);
             })
             ->addColumn('authors', function (Article $article) {
                 $authors = $article->authors->map(function (Author $author) {
@@ -193,7 +205,9 @@ class ArticleController extends Controller
                 $values = explode(",", $value);
                 $query->whereIn('article_section.section_id', $values);
             })
-            ->orderColumn('avg_sum', 'timespent_sum / pageviews_all $1')
+            ->orderColumn('avg_sum_all', 'timespent_all / pageviews_all $1')
+            ->orderColumn('avg_sum_signed_in', 'timespent_signed_in / pageviews_signed_in $1')
+            ->orderColumn('avg_sum_subscribers', 'timespent_subscribers / pageviews_subscribers $1')
             ->rawColumns(['authors'])
             ->make(true);
     }

@@ -55,7 +55,12 @@ class AuthorController extends Controller
             'pageviews_all',
             'pageviews_signed_in',
             'pageviews_subscribers',
-            'timespent_all / pageviews_all as avg_timespent',
+			'timespent_all',
+			'timespent_signed_in',
+			'timespent_subscribers',
+            'timespent_all / pageviews_all as avg_timespent_all',
+            'timespent_signed_in / pageviews_signed_in as avg_timespent_signed_in',
+            'timespent_subscribers / pageviews_subscribers as avg_timespent_subscribers',
         ];
 
         $authorArticlesQuery = ArticleAuthor::selectRaw(implode(',', [
@@ -79,7 +84,9 @@ class AuthorController extends Controller
             'COALESCE(SUM(pageviews_all), 0) as pageviews_all',
             'COALESCE(SUM(pageviews_signed_in), 0) as pageviews_signed_in',
             'COALESCE(SUM(pageviews_subscribers), 0) as pageviews_subscribers',
-            'COALESCE(SUM(timespent_sum), 0) as timespent_all',
+            'COALESCE(SUM(timespent_all), 0) as timespent_all',
+            'COALESCE(SUM(timespent_signed_in), 0) as timespent_signed_in',
+            'COALESCE(SUM(timespent_subscribers), 0) as timespent_subscribers',
         ]))
             ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
             ->groupBy('author_id');
@@ -100,7 +107,8 @@ class AuthorController extends Controller
             ->leftJoin(DB::raw("({$authorArticlesQuery->toSql()}) as aa"), 'authors.id', '=', 'aa.author_id')->addBinding($authorArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($authorArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'authors.id', '=', 'pv.author_id')->addBinding($authorArticlesQuery->getBindings())
-            ->groupBy(['authors.name', 'authors.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all', 'pageviews_signed_in', 'pageviews_subscribers', 'timespent_all']);
+            ->groupBy(['authors.name', 'authors.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
+				'pageviews_signed_in', 'pageviews_subscribers', 'timespent_all', 'timespent_signed_in', 'timespent_subscribers']);
 
         $conversionsQuery = \DB::table('conversions')
             ->selectRaw('sum(amount) as sum, currency, article_author.author_id')
@@ -153,7 +161,9 @@ class AuthorController extends Controller
                 "articles.pageviews_all",
                 "articles.pageviews_signed_in",
                 "articles.pageviews_subscribers",
-                "articles.timespent_sum",
+                "articles.timespent_all",
+                "articles.timespent_signed_in",
+                "articles.timespent_subscribers",
                 "count(conversions.id) as conversions_count",
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
                 "avg(conversions.amount) as conversions_avg",
@@ -178,8 +188,12 @@ class AuthorController extends Controller
                 'avg(nullif(pageviews_all, 0)) as pageviews_all_avg',
                 'avg(nullif(pageviews_signed_in, 0)) as pageviews_signed_in_avg',
                 'avg(nullif(pageviews_subscribers, 0)) as pageviews_subscribers_avg',
-                'avg(nullif(timespent_sum, 0)) as timespent_avg',
-                'avg(nullif(timespent_sum / pageviews_all, 0)) as average_avg',
+                'avg(nullif(timespent_all, 0)) as timespent_all_avg',
+                'avg(nullif(timespent_signed_in, 0)) as timespent_signed_in_avg',
+                'avg(nullif(timespent_subscribers, 0)) as timespent_subscribers_avg',
+                'avg(nullif(timespent_all / pageviews_all, 0)) as average_timespent_all',
+                'avg(nullif(timespent_signed_in / pageviews_signed_in, 0)) as average_timespent_signed_in',
+                'avg(nullif(timespent_subscribers / pageviews_subscribers, 0)) as average_timespent_subscribers',
                 'sum(case when conversions.id is not null then 1 else 0 end) / count(distinct articles.id) as conversion_count_avg',
             ]))
             ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
@@ -246,19 +260,24 @@ class AuthorController extends Controller
                 }
                 return $arr;
             })
-            ->addColumn('timespent_sum', function (Article $article) use ($averages) {
-                $arr = [$article->timespent_sum];
-                if ($article->timespent_sum > 0) {
-                    $arr[] = $averages->timespent_avg;
-                }
-                return $arr;
-            })
-            ->addColumn('avg_sum', function (Article $article) use ($averages) {
-                if (!$article->timespent_sum || !$article->pageviews_all) {
+            ->addColumn('avg_timespent_all', function (Article $article) use ($averages) {
+                if (!$article->timespent_all || !$article->pageviews_all) {
                     return [0];
                 }
-                return [round($article->timespent_sum / $article->pageviews_all), $averages->average_avg];
+                return [round($article->timespent_all / $article->pageviews_all), $averages->average_timespent_all];
             })
+			->addColumn('avg_timespent_signed_in', function (Article $article) use ($averages) {
+				if (!$article->timespent_signed_in || !$article->pageviews_signed_in) {
+					return [0];
+				}
+				return [round($article->timespent_signed_in / $article->pageviews_signed_in), $averages->average_timespent_signed_in];
+			})
+			->addColumn('avg_timespent_subscribers', function (Article $article) use ($averages) {
+				if (!$article->timespent_subscribers || !$article->pageviews_subscribers) {
+					return [0];
+				}
+				return [round($article->timespent_subscribers / $article->pageviews_subscribers), $averages->average_timespent_subscribers];
+			})
             ->addColumn('conversions_count', function (Article $article) use ($averages) {
                 if (!$article->conversions_count) {
                     return [0];

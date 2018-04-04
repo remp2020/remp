@@ -269,7 +269,7 @@ $.fn.dataTables = {
                     icon = 'zmdi-caret-down';
                 }
 
-                return "<span>" + data[0] + "</span> <small style='white-space: nowrap;' class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + Math.abs(d0 - d1).toFixed(2) + ")</small>";
+                return "<span>" + data[0] + "</span> <small style='white-space: nowrap;' class='" + cls + "'><br/>(<i class='zmdi " + icon + "'></i>" + Math.abs(d0 - d1).toFixed(2) + ")</small>";
             };
         },
         multiNumberStat: function() {
@@ -304,7 +304,7 @@ $.fn.dataTables = {
                     icon = 'zmdi-caret-down';
                 }
 
-                return "<span title='" + d.humanize() + "'>" + durationText.trim() + "</span> <small title='" + sd.humanize() + "' class='" + cls + "'>(<i class='zmdi " + icon + "'></i>" + statText.trim() + ")</small>";
+                return "<span title='" + d.humanize() + "'>" + durationText.trim() + "</span> <small title='" + sd.humanize() + "' class='" + cls + "'><br/>(<i class='zmdi " + icon + "'></i>" + statText.trim() + ")</small>";
             };
         }
     }

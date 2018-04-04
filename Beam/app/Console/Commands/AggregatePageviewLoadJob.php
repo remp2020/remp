@@ -15,29 +15,20 @@ class AggregatePageviewLoadJob extends Command
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
-    /** @var JournalContract */
-    private $journalContract;
-
-    private $timeBefore;
-
-    private $timeAfter;
-
     public function handle(JournalContract $journalContract)
     {
         $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
-        $this->timeBefore = $now->minute(0)->second(0);
-        $this->timeAfter = (clone $this->timeBefore)->subHour();
+        $timeBefore = $now->minute(0)->second(0);
+        $timeAfter = (clone $timeBefore)->subHour();
 
-        $this->journalContract = $journalContract;
-
-        $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $this->timeAfter, $this->timeBefore));
+        $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
         $request = new JournalAggregateRequest('pageviews', 'load');
-        $request->setTimeAfter($this->timeAfter);
-        $request->setTimeBefore($this->timeBefore);
+        $request->setTimeAfter($timeAfter);
+        $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'signed_in', 'subscriber');
 
-        $records = $this->journalContract->count($request);
+        $records = $journalContract->count($request);
 
         if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
             $this->line(sprintf("No articles to process, exiting."));
@@ -83,12 +74,13 @@ class AggregatePageviewLoadJob extends Command
         $bar->setMessage('Storing aggregated data');
 
         foreach ($all as $articleId => $count) {
+            $bar->setMessage(sprintf('Storing aggregated data for article <info>%s</info>', $articleId));
+
             $article = Article::select()->where([
                 'external_id' => $articleId,
             ])->first();
 
             if (!$article) {
-                $this->line(sprintf("\nUnable to find article with ID <error>%s</error> in article table.", $articleId));
                 $bar->advance();
                 continue;
             }
@@ -96,8 +88,8 @@ class AggregatePageviewLoadJob extends Command
             /** @var ArticlePageviews $ap */
             $ap = ArticlePageviews::firstOrNew([
                 'article_id' => $article->id,
-                'time_from' => $this->timeAfter,
-                'time_to' => $this->timeBefore,
+                'time_from' => $timeAfter,
+                'time_to' => $timeBefore,
             ]);
 
             $ap->sum = $count;
