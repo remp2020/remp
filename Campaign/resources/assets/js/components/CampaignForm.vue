@@ -400,7 +400,7 @@
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect";
     import PageviewRules from "./templates/PageviewRules";
-    import FormValidator from "./FormValidator";
+    import FormValidator from "remp/js/components/FormValidator";
 
     let props = [
         "_name",

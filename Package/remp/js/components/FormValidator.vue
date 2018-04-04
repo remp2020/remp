@@ -4,16 +4,21 @@
 
 <script>
 export default {
-    props: [
-        "url"
-    ],
+    props: {
+        "url": {
+            type: String,
+            required: true
+        }
+    },
     mounted() {
         var self = this;
 
         $(this.$el).closest('form').on('submit', function () {
             var form = this;
 
-            if ($(form).attr('data-valid')) return true;
+            if ($(form).attr('data-valid')) {
+                return true;
+            }
 
             self.validate(form).then(function () {
                 $(form).attr('data-valid', true).submit();
@@ -27,8 +32,11 @@ export default {
             return new Promise((resolve, reject) => {
                 var data = $(el).serializeArray();
 
-                for(var i in data) {
-                    if (data[i].name == '_method') data[i].value = 'POST'
+                for (var i in data) {
+                    if (data[i].name == '_method') {
+                        data.splice(i, 1)
+                        break;
+                    }
                 }
 
                 $.ajax({
