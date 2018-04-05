@@ -66,6 +66,7 @@ type EventDB struct {
 
 // Count returns number of events matching the filter defined by EventOptions.
 func (eDB *EventDB) Count(o AggregateOptions) (CountRowCollection, bool, error) {
+
 	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TableEvents + `"`)
 	builder = addAggregateQueryFilters(builder, o)
 

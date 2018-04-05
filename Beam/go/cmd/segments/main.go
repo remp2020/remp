@@ -12,6 +12,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/olivere/elastic"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
@@ -82,18 +84,33 @@ func main() {
 		Debug:        c.Debug,
 	}
 
+	ec, err := elastic.NewClient(
+		elastic.SetURL("http://localhost:9200"),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheckInterval(10*time.Second),
+		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
+		elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
+		elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)))
+	if err != nil {
+		log.Fatalln(errors.Wrap(err, "unable to initialize elasticsearch client"))
+	}
+	elasticDB := &model.ElasticDB{
+		Client: ec,
+		Debug:  c.Debug,
+	}
+
 	countCache := cache.New(5*time.Minute, 10*time.Minute)
 
-	eventDB := &model.EventDB{
+	eventStorage := &model.EventElastic{
+		DB: elasticDB,
+	}
+	commerceStorage := &model.CommerceDB{
 		DB: influxDB,
 	}
-	commerceDB := &model.CommerceDB{
+	pageviewStorage := &model.PageviewDB{
 		DB: influxDB,
 	}
-	pageviewDB := &model.PageviewDB{
-		DB: influxDB,
-	}
-	segmentDB := &model.SegmentDB{
+	segmentStorage := &model.SegmentDB{
 		MySQL:          mysqlDB,
 		InfluxDB:       influxDB,
 		RuleCountCache: countCache,
@@ -113,12 +130,12 @@ func main() {
 	defer ticker1h.Stop()
 
 	cacheSegmentDB := func() {
-		if err := segmentDB.Cache(); err != nil {
+		if err := segmentStorage.Cache(); err != nil {
 			service.LogError("unable to cache segments", "err", err)
 		}
 	}
 	cacheEventDB := func() {
-		if err := eventDB.Cache(); err != nil {
+		if err := eventStorage.Cache(); err != nil {
 			service.LogError("unable to cache events", "err", err)
 		}
 	}
@@ -144,11 +161,11 @@ func main() {
 
 	// controllers init
 
-	app.MountJournalController(service, controller.NewJournalController(service, eventDB, commerceDB, pageviewDB))
-	app.MountEventsController(service, controller.NewEventController(service, eventDB))
-	app.MountCommerceController(service, controller.NewCommerceController(service, commerceDB))
-	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewDB))
-	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentDB))
+	app.MountJournalController(service, controller.NewJournalController(service, eventStorage, commerceStorage, pageviewStorage))
+	app.MountEventsController(service, controller.NewEventController(service, eventStorage))
+	app.MountCommerceController(service, controller.NewCommerceController(service, commerceStorage))
+	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewStorage))
+	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage))
 
 	// server init
 
