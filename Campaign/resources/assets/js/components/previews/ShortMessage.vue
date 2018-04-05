@@ -68,6 +68,10 @@
             "show",
             "transition",
             "position",
+            "top",
+            "left",
+            "right",
+            "bottom",
             "targetUrl",
             "closeable",
             "displayType",
@@ -98,7 +102,14 @@
                 if (!this.customPositioned()) {
                     return {};
                 }
-                return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
+
+                var positionsStyle = {};
+                var positions = this.position.split('_');
+
+                positionsStyle[positions[0]] = this[positions[0]] + 'px';
+                positionsStyle[positions[1]] = this[positions[1]] + 'px';
+
+                return positionsStyle;
             },
             linkStyles: function() {
                 let position, zIndex;

@@ -10,6 +10,7 @@
             <html-template v-if="template === 'html'"
                 v-bind:_backgroundColor="htmlTemplate.backgroundColor"
                 v-bind:_text="htmlTemplate.text"
+                v-bind:_css="htmlTemplate.css"
                 v-bind:_textColor="htmlTemplate.textColor"
                 v-bind:_fontSize="htmlTemplate.fontSize"
                 v-bind:_textAlign="htmlTemplate.textAlign"
@@ -128,7 +129,43 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float" v-if="showTop">
+                                <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
+
+                                <div class="fg-line">
+                                    <label for="position_top" class="fg-label">Top (px)</label>
+                                    <input v-model="top" class="form-control fg-input" name="position_top" type="number" id="position_top">
+                                </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float" v-if="showLeft">
+                                <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
+
+                                <div class="fg-line">
+                                    <label for="position_left" class="fg-label">Left (px)</label>
+                                    <input v-model="left" class="form-control fg-input" name="position_left" type="number" id="position_left">
+                                </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float" v-if="showRight">
+                                <span class="input-group-addon"><i class="zmdi zmdi-arrow-left"></i></span>
+
+                                <div class="fg-line">
+                                    <label for="position_right" class="fg-label">Right (px)</label>
+                                    <input v-model="right" class="form-control fg-input" name="position_right" type="number" id="position_right">
+                                </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float" v-if="showBottom">
+                                <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-up"></i></span>
+
+                                <div class="fg-line">
+                                    <label for="position_bottom" class="fg-label">Bottom (px)</label>
+                                    <input v-model="bottom" class="form-control fg-input" name="position_bottom" type="number" id="position_bottom">
+                                </div>
+                            </div><!-- .input-group -->
 
                             <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
@@ -136,7 +173,7 @@
                                     <label for="display_delay" class="fg-label">Display delay (milliseconds)</label>
                                     <input v-model="displayDelay" class="form-control fg-input" name="display_delay" type="number" id="display_delay">
                                 </div>
-                            </div>
+                            </div><!-- .input-group -->
 
                             <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
@@ -144,7 +181,7 @@
                                     <label for="automatic_close" class="fg-label">Automatic close after (milliseconds)</label>
                                     <input v-model="closeTimeout" class="form-control fg-input" name="close_timeout" type="number" id="automatic_close">
                                 </div>
-                            </div>
+                            </div><!-- .input-group -->
 
                             <div class="input-group fg-float checkbox">
                                 <label class="m-l-15">
@@ -152,7 +189,7 @@
                                     <input v-model="closeable" value="1" name="closeable" type="checkbox">
                                     <i class="input-helper"></i>
                                 </label>
-                            </div>
+                            </div><!-- .input-group -->
 
                         </div>
                     </div>
@@ -219,6 +256,10 @@
                                         :shortMessageTemplate="shortMessageTemplate"
 
                                         :position="position"
+                                        :top="top"
+                                        :left="left"
+                                        :right="right"
+                                        :bottom="bottom"
                                         :targetUrl="targetUrl"
                                         :closeable="closeable"
                                         :transition="transition"
@@ -249,6 +290,10 @@
         "_name",
         "_targetUrl",
         "_position",
+        "_top",
+        "_left",
+        "_right",
+        "_bottom",
         "_transition",
         "_closeable",
         "_displayDelay",
@@ -292,6 +337,14 @@
             name: null,
             targetUrl: null,
             position: null,
+            top: null,
+            left: null,
+            right: null,
+            bottom: null,
+            showTop: false,
+            showLeft: false,
+            showRight: false,
+            showBottom: false,
             transition: null,
             closeable: null,
             displayDelay: null,
@@ -318,5 +371,16 @@
                 {"label": "Fade in down", "value": "fade-in-down"},
             ]
         }),
+        watch: {
+            position: function () {
+                var positions = this.position.split('_');
+
+                this.showTop = (positions.indexOf('top') != -1);
+                this.showBottom = !(positions.indexOf('top') != -1);
+
+                this.showLeft = (positions.indexOf('left') != -1);
+                this.showRight = !(positions.indexOf('left') != -1);
+            }
+        }
     }
 </script>

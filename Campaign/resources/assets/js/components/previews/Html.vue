@@ -13,9 +13,10 @@
         font-family: Noto Sans, sans-serif;
         color: white;
         white-space: pre-line;
-        display: inline-block;
+        display: block;
         overflow: hidden;
-        position: relative
+        position: relative;
+        text-align: center;
     }
     .html-preview-text {
         vertical-align: middle;
@@ -45,7 +46,6 @@
             <div class="html-preview-box" v-bind:style="[
                 boxStyles,
                 dimensionOptions[dimensions],
-                _textAlign,
                 customBoxStyles
             ]">
                 <a class="html-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
@@ -65,6 +65,10 @@
             "textAlign",
             "transition",
             "position",
+            "top",
+            "left",
+            "right",
+            "bottom",
             "dimensions",
             "show",
             "textColor",
@@ -73,6 +77,7 @@
             "targetUrl",
             "closeable",
             "text",
+            "css",
             "displayType",
             "forcedPosition",
             "uuid",
@@ -84,6 +89,12 @@
                 closeTracked: false,
                 clickTracked: false,
             }
+        },
+        mounted: function () {
+            var st = document.createElement('style');
+            st.innerText = this.css;
+
+            document.body.appendChild(st);
         },
         methods: {
             customPositioned: function() {
@@ -104,7 +115,14 @@
                 if (!this.customPositioned()) {
                     return {};
                 }
-                return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
+
+                var positionsStyle = {};
+                var positions = this.position.split('_');
+
+                positionsStyle[positions[0]] = this[positions[0]] + 'px';
+                positionsStyle[positions[1]] = this[positions[1]] + 'px';
+
+                return positionsStyle;
             },
             linkStyles: function() {
                 let position, zIndex;

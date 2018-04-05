@@ -19,8 +19,13 @@
                 :fontSize="htmlTemplate.fontSize"
                 :backgroundColor="htmlTemplate.backgroundColor"
                 :text="htmlTemplate.text"
+                :css="htmlTemplate.css"
 
                 :position="position"
+                :top="top"
+                :left="left"
+                :right="right"
+                :bottom="bottom"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :transition="transition"
@@ -46,6 +51,10 @@
                 :buttonTextColor="mediumRectangleTemplate.buttonTextColor"
 
                 :position="position"
+                :top="top"
+                :left="left"
+                :right="right"
+                :bottom="bottom"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :transition="transition"
@@ -68,6 +77,10 @@
                 :buttonTextColor="barTemplate.buttonTextColor"
 
                 :position="position"
+                :top="top"
+                :left="left"
+                :right="right"
+                :bottom="bottom"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :transition="transition"
@@ -75,22 +88,26 @@
         ></bar-preview>
 
         <short-message-preview v-if="template === 'short_message'"
-                 :alignmentOptions="alignmentOptions"
-                 :positionOptions="positionOptions"
-                 :show="visible"
-                 :uuid="uuid"
-                 :campaignUuid="campaignUuid"
-                 :forcedPosition="forcedPosition"
+                :alignmentOptions="alignmentOptions"
+                :positionOptions="positionOptions"
+                :show="visible"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
 
-                 :text="shortMessageTemplate.text"
-                 :backgroundColor="shortMessageTemplate.backgroundColor"
-                 :textColor="shortMessageTemplate.textColor"
+                :text="shortMessageTemplate.text"
+                :backgroundColor="shortMessageTemplate.backgroundColor"
+                :textColor="shortMessageTemplate.textColor"
 
-                 :position="position"
-                 :targetUrl="targetUrl"
-                 :closeable="closeable"
-                 :transition="transition"
-                 :displayType="displayType"
+                :position="position"
+                :top="top"
+                :left="left"
+                :right="right"
+                :bottom="bottom"
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :transition="transition"
+                :displayType="displayType"
         ></short-message-preview>
     </div>
 </template>
@@ -106,6 +123,10 @@
         "name",
         "targetUrl",
         "position",
+        "top",
+        "left",
+        "right",
+        "bottom",
         "transition",
         "closeable",
         "displayDelay",

@@ -97,6 +97,10 @@
             "show",
             "transition",
             "position",
+            "top",
+            "left",
+            "right",
+            "bottom",
             "targetUrl",
             "closeable",
             "displayType",
@@ -128,18 +132,16 @@
                 if (!this.customPositioned()) {
                     return {};
                 }
-                if (!this.positionOptions[this.position]) {
-                    return {};
-                }
-                let styles = this.positionOptions[this.position].style;
-                // if there's custom offset set, we want to remove it for bar so it's either on the top or bottom of page without any paddings
-                for (let style in styles) {
-                    if (!styles.hasOwnProperty(style)) {
-                        continue;
-                    }
-                    styles[style] = 0;
-                }
-                return styles;
+
+                var positionsStyle = {};
+                var positions = this.position.split('_');
+
+                positionsStyle[positions[0]] = this[positions[0]] + 'px';
+                positionsStyle[positions[1]] = this[positions[1]] + 'px';
+
+                console.log(positionsStyle)
+
+                return positionsStyle;
             },
             linkStyles: function() {
                 let position, zIndex;
