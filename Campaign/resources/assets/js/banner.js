@@ -22,7 +22,7 @@ window.remplib = window.remplib || {};
                 left: model['position_left'] || 0,
                 right: model['position_right'] || 0,
                 bottom: model['position_bottom'] || 0,
-                close_text: model['close_text'] || null,
+                closeText: model['close_text'] || null,
                 closeable: model['closeable'] || null,
                 displayDelay: model['display_delay'] || 0,
                 closeTimeout: model['close_timeout'] || null,

@@ -191,6 +191,16 @@
                                 </label>
                             </div><!-- .input-group -->
 
+                            <div class="input-group fg-float" v-if="closeable">
+                                <span class="input-group-addon"><i class="zmdi zmdi-close-circle-o"></i></span>
+                                <div class="fg-line">
+                                    <label for="close_text" class="fg-label">Close Text</label>
+                                    <input v-model="closeText" class="form-control fg-input" name="close_text" type="text" id="close_text">
+                                </div>
+                            </div><!-- .input-group -->
+
+
+
                         </div>
                     </div>
 
@@ -262,6 +272,7 @@
                                         :bottom="bottom"
                                         :targetUrl="targetUrl"
                                         :closeable="closeable"
+                                        :closeText="closeText"
                                         :transition="transition"
                                         :displayType="displayType"
                                         :forcedPosition="'absolute'"
@@ -296,6 +307,7 @@
         "_bottom",
         "_transition",
         "_closeable",
+        "_closeText",
         "_displayDelay",
         "_closeTimeout",
         "_targetSelector",
@@ -347,6 +359,7 @@
             showBottom: false,
             transition: null,
             closeable: null,
+            closeText: null,
             displayDelay: null,
             closeTimeout: null,
             targetSelector: null,

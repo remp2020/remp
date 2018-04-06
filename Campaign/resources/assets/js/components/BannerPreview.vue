@@ -28,6 +28,7 @@
                 :bottom="bottom"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
+                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></html-preview>
@@ -57,6 +58,7 @@
                 :bottom="bottom"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
+                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></medium-rectangle-preview>
@@ -83,6 +85,7 @@
                 :bottom="bottom"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
+                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></bar-preview>
@@ -106,6 +109,7 @@
                 :bottom="bottom"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
+                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></short-message-preview>
@@ -129,6 +133,7 @@
         "bottom",
         "transition",
         "closeable",
+        "closeText",
         "displayDelay",
         "closeTimeout",
         "targetSelector",

@@ -25,6 +25,7 @@ class Banner extends Model
         'position_bottom',
         'transition',
         'closeable',
+        'close_text',
         'display_delay',
         'close_timeout',
         'display_type',

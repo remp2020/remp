@@ -24,6 +24,7 @@
         display: inline-block;
         box-sizing: border-box;
         height: 100%;
+        width: 100%;
         align-items: center;
     }
     .html-preview-close {
@@ -48,7 +49,7 @@
                 dimensionOptions[dimensions],
                 customBoxStyles
             ]">
-                <a class="html-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
+                <a class="html-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles"><small>{{ closeText }}</small> &times;</a>
                 <div v-html="$parent.injectVars(text)" class="html-preview-text" v-bind:style="[_textAlign, textStyles]"></div>
             </div>
         </transition>
@@ -76,6 +77,7 @@
             "backgroundColor",
             "targetUrl",
             "closeable",
+            "closeText",
             "text",
             "css",
             "displayType",
@@ -91,8 +93,10 @@
             }
         },
         mounted: function () {
-            var st = document.createElement('style');
-            st.innerText = this.css;
+            var st = document.createElement('style'),
+                styles = this.css.replace(/\r?\n|\r/gm,"");
+
+            st.innerText = styles;
 
             document.body.appendChild(st);
         },
