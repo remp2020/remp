@@ -139,8 +139,6 @@
                 positionsStyle[positions[0]] = this[positions[0]] + 'px';
                 positionsStyle[positions[1]] = this[positions[1]] + 'px';
 
-                console.log(positionsStyle)
-
                 return positionsStyle;
             },
             linkStyles: function() {
