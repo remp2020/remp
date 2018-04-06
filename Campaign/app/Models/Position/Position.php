@@ -8,12 +8,9 @@ class Position
 
     public $name;
 
-    public $style;
-
-    public function __construct(string $key, string $name, array $style)
+    public function __construct(string $key, string $name)
     {
         $this->key = $key;
         $this->name = $name;
-        $this->style = $style;
     }
 }

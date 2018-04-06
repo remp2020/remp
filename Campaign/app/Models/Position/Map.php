@@ -14,8 +14,7 @@ class Map
         foreach ($positionsConfig as $key => $dc) {
             $this->positions[$key] = new Position(
                 $key,
-                $dc['name'],
-                $dc['style']
+                $dc['name']
             );
         }
     }
