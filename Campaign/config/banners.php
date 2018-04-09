@@ -35,16 +35,32 @@ return [
     ],
     'positions' => [
         'top_left' => [
-            'name' => 'Top-Left'
+            'name' => 'Top-Left',
+            'style' => [
+                'top' => '10px',
+                'left' => '10px',
+            ],
         ],
         'top_right' => [
-            'name' => 'Top-Right'
+            'name' => 'Top-Right',
+            'style' => [
+                'top' => '10px',
+                'right' => '10px',
+            ],
         ],
         'bottom_left' => [
-            'name' => 'Bottom-Left'
+            'name' => 'Bottom-Left',
+            'style' => [
+                'bottom' => '10px',
+                'left' => '10px',
+            ],
         ],
         'bottom_right' => [
-            'name' => 'Bottom-Right'
+            'name' => 'Bottom-Right',
+            'style' => [
+                'bottom' => '10px',
+                'right' => '10px',
+            ],
         ],
     ],
     'alignments' => [

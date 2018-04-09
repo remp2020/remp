@@ -131,39 +131,21 @@
                                 </div>
                             </div><!-- .input-group -->
 
-                            <div class="input-group fg-float" v-if="showTop">
-                                <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
-
-                                <div class="fg-line">
-                                    <label for="position_top" class="fg-label">Top (px)</label>
-                                    <input v-model="top" class="form-control fg-input" name="position_top" type="number" id="position_top">
-                                </div>
-                            </div><!-- .input-group -->
-
-                            <div class="input-group fg-float" v-if="showLeft">
+                            <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
 
                                 <div class="fg-line">
-                                    <label for="position_left" class="fg-label">Left (px)</label>
-                                    <input v-model="left" class="form-control fg-input" name="position_left" type="number" id="position_left">
+                                    <label for="offsetHorizontal" class="fg-label">Hortizontal offset</label>
+                                    <input v-model="offsetHorizontal" class="form-control fg-input" name="offset_horizontal" type="number" id="offsetHorizontal">
                                 </div>
                             </div><!-- .input-group -->
 
-                            <div class="input-group fg-float" v-if="showRight">
-                                <span class="input-group-addon"><i class="zmdi zmdi-arrow-left"></i></span>
+                            <div class="input-group fg-float">
+                                <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
 
                                 <div class="fg-line">
-                                    <label for="position_right" class="fg-label">Right (px)</label>
-                                    <input v-model="right" class="form-control fg-input" name="position_right" type="number" id="position_right">
-                                </div>
-                            </div><!-- .input-group -->
-
-                            <div class="input-group fg-float" v-if="showBottom">
-                                <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-up"></i></span>
-
-                                <div class="fg-line">
-                                    <label for="position_bottom" class="fg-label">Bottom (px)</label>
-                                    <input v-model="bottom" class="form-control fg-input" name="position_bottom" type="number" id="position_bottom">
+                                    <label for="offsetVertical" class="fg-label">Vertical offset</label>
+                                    <input v-model="offsetVertical" class="form-control fg-input" name="offset_vertical" type="number" id="offsetVertical">
                                 </div>
                             </div><!-- .input-group -->
 
@@ -266,10 +248,8 @@
                                         :shortMessageTemplate="shortMessageTemplate"
 
                                         :position="position"
-                                        :top="top"
-                                        :left="left"
-                                        :right="right"
-                                        :bottom="bottom"
+                                        :offsetVertical="offsetVertical"
+                                        :offsetHorizontal="offsetHorizontal"
                                         :targetUrl="targetUrl"
                                         :closeable="closeable"
                                         :closeText="closeText"
@@ -301,10 +281,8 @@
         "_name",
         "_targetUrl",
         "_position",
-        "_top",
-        "_left",
-        "_right",
-        "_bottom",
+        "_offsetVertical",
+        "_offsetHorizontal",
         "_transition",
         "_closeable",
         "_closeText",
@@ -349,14 +327,8 @@
             name: null,
             targetUrl: null,
             position: null,
-            top: null,
-            left: null,
-            right: null,
-            bottom: null,
-            showTop: false,
-            showLeft: false,
-            showRight: false,
-            showBottom: false,
+            offsetVertical: null,
+            offsetHorizontal: null,
             transition: null,
             closeable: null,
             closeText: null,
@@ -383,17 +355,6 @@
                 {"label": "Shake", "value": "shake"},
                 {"label": "Fade in down", "value": "fade-in-down"},
             ]
-        }),
-        watch: {
-            position: function () {
-                var positions = this.position.split('_');
-
-                this.showTop = (positions.indexOf('top') != -1);
-                this.showBottom = !(positions.indexOf('top') != -1);
-
-                this.showLeft = (positions.indexOf('left') != -1);
-                this.showRight = !(positions.indexOf('left') != -1);
-            }
-        }
+        })
     }
 </script>

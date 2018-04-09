@@ -103,13 +103,29 @@
                     return {};
                 }
 
-                var positionsStyle = {};
-                var positions = this.position.split('_');
+                if (this.positionOptions[this.position]) {
+                    var styles = this.positionOptions[this.position].style;
 
-                positionsStyle[positions[0]] = this[positions[0]] + 'px';
-                positionsStyle[positions[1]] = this[positions[1]] + 'px';
+                    if ('top' in styles && this.offsetVertical != null) {
+                        styles.top = this.offsetVertical + 'px';
+                    }
 
-                return positionsStyle;
+                    if ('bottom' in styles && this.offsetVertical != null) {
+                        styles.bottom = this.offsetVertical + 'px';
+                    }
+
+                    if ('left' in styles && this.offsetHorizontal != null) {
+                        styles.left = this.offsetHorizontal + 'px';
+                    }
+
+                    if ('right' in styles && this.offsetHorizontal != null) {
+                        styles.right = this.offsetHorizontal + 'px';
+                    }
+
+                    return styles;
+                }
+
+                return {};
             },
             linkStyles: function() {
                 let position, zIndex;

@@ -22,10 +22,8 @@
                 :css="htmlTemplate.css"
 
                 :position="position"
-                :top="top"
-                :left="left"
-                :right="right"
-                :bottom="bottom"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :closeText="closeText"
@@ -52,10 +50,8 @@
                 :buttonTextColor="mediumRectangleTemplate.buttonTextColor"
 
                 :position="position"
-                :top="top"
-                :left="left"
-                :right="right"
-                :bottom="bottom"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :closeText="closeText"
@@ -79,10 +75,8 @@
                 :buttonTextColor="barTemplate.buttonTextColor"
 
                 :position="position"
-                :top="top"
-                :left="left"
-                :right="right"
-                :bottom="bottom"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :closeText="closeText"
@@ -103,10 +97,8 @@
                 :textColor="shortMessageTemplate.textColor"
 
                 :position="position"
-                :top="top"
-                :left="left"
-                :right="right"
-                :bottom="bottom"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :closeText="closeText"
@@ -127,10 +119,8 @@
         "name",
         "targetUrl",
         "position",
-        "top",
-        "left",
-        "right",
-        "bottom",
+        "offsetVertical",
+        "offsetHorizontal",
         "transition",
         "closeable",
         "closeText",

@@ -14,35 +14,9 @@ class PreciseBannerPosition extends Migration
     public function up()
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->integer('position_top')->default(0);
-            $table->integer('position_left')->default(0);
-            $table->integer('position_right')->default(0);
-            $table->integer('position_bottom')->default(0);
+            $table->integer('offset_vertical')->nullable()->after('position');
+            $table->integer('offset_horizontal')->nullable()->after('position');
         });
-
-        foreach (DB::query()->from('banners')->get() as $banner) {
-            $pos = config('banners.positions.' . $banner->position);
-
-            $query = DB::table('banners')->where([
-                'id' => $banner->id
-            ]);
-
-            if ($banner->template == 'bar') {
-                $pos['style'] = [
-                    'top' => 0,
-                    'left' => 0,
-                    'right' => 0,
-                    'bottom' => 0
-                ];
-            }
-
-            $query->update([
-                'position_top' => isset($pos['style']['top']) ? intval($pos['style']['top']) : 0,
-                'position_left' => isset($pos['style']['left']) ? intval($pos['style']['left']) : 0,
-                'position_right' => isset($pos['style']['right']) ? intval($pos['style']['right']) : 0,
-                'position_bottom' => isset($pos['style']['bottom']) ? intval($pos['style']['bottom']) : 0,
-            ]);
-        }
     }
 
     /**
@@ -53,10 +27,8 @@ class PreciseBannerPosition extends Migration
     public function down()
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->dropColumn('position_top');
-            $table->dropColumn('position_left');
-            $table->dropColumn('position_right');
-            $table->dropColumn('position_bottom');
+            $table->dropColumn('offset_horizontal');
+            $table->dropColumn('offset_vertical');
         });
     }
 }
