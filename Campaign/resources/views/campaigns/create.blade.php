@@ -11,7 +11,7 @@
     <div class="container">
         @include('flash::message')
 
-        {!! Form::model($campaign, ['route' => 'campaigns.store']) !!}
+        {!! Form::model($campaign, ['route' => 'campaigns.store', 'id' => 'campaign-form-root']) !!}
         @include('campaigns._form', ['action' => 'create'])
         {!! Form::close() !!}
     </div>

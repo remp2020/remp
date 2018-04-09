@@ -54,7 +54,7 @@ class ScheduleController extends Controller
                     ->whereNull('end_time')
                     ->orWhere('end_time', '>=', Carbon::now());
             })
-                ->whereIn('status', [Schedule::STATUS_READY, Schedule::STATUS_EXECUTED]);
+                ->whereIn('status', [Schedule::STATUS_READY, Schedule::STATUS_EXECUTED, Schedule::STATUS_PAUSED]);
         }
 
         if (is_numeric($request->limit)) {

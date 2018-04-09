@@ -2,7 +2,7 @@
 
     @if ($displaySearchAndPaging)
     <div class="action-header m-0 palette-White bg clearfix">
-        <div class="ah-search" style="display: none;">
+        <div id="dt-search-{{ $tableId }}" class="ah-search" style="display: none;">
             <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{{ $tableId }}">
             <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
         </div>
@@ -136,6 +136,7 @@
             }
         });
 
+        $.fn.dataTables.search(dataTable, 'dt-search-{{ $tableId }}');
         $.fn.dataTables.navigation(dataTable, 'dt-nav-{{ $tableId }}');
 
         @foreach ($refreshTriggers as $def)
