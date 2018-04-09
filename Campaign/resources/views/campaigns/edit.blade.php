@@ -11,7 +11,7 @@
     <div class="container">
         @include('flash::message')
 
-        {!! Form::model($campaign, ['route' => ['campaigns.update', $campaign], 'method' => 'PATCH']) !!}
+        {!! Form::model($campaign, ['route' => ['campaigns.update', $campaign], 'method' => 'PATCH', 'id' => 'campaign-form-root']) !!}
         @include('campaigns._form', ['action' => 'edit'])
         {!! Form::close() !!}
     </div>

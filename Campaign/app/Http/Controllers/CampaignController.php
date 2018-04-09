@@ -136,6 +136,18 @@ class CampaignController extends Controller
     }
 
     /**
+     * Ajax validate form method.
+     *
+     * @param CampaignRequest|Request $request
+     * @param Campaign $campaign
+     * @return \Illuminate\Http\Response
+     */
+    public function validateForm(CampaignRequest $request)
+    {
+        return response()->json(false);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param CampaignRequest|Request $request
@@ -302,7 +314,7 @@ class CampaignController extends Controller
         $newScheduleStartTime = null,
         $newScheduleEndTime = null
     ): ?string {
-    
+
         if ($activationMode === 'activate-schedule'
             && !is_null($newScheduleStartTime)) {
             $schedule = new Schedule();

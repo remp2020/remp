@@ -54,6 +54,7 @@ foreach ($campaign->countries as $country) {
         "countriesBlacklist": {!! @json($countriesBlacklist ?? 0) !!},
         "allDevices": {!! @json($campaign->getAllDevices()) !!},
         "selectedDevices": {!! @json($campaign->devices) !!} || [],
+        "validateUrl": {!! @json(route('campaigns.validateForm')) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

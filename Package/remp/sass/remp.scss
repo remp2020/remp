@@ -202,6 +202,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
             background: rgba(0, 188, 212, .10);
         }
 
+        th .bootstrap-select {
+            text-transform: none;
+        }
+
         tbody tr {
             $rowBackground: #fff;
             border-left: 12px solid transparent;
@@ -215,10 +219,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
             &.highlight {
                 border-color: $highlightColor;
-            }
-
-            th .bootstrap-select {
-                text-transform: none;
             }
         }
     }

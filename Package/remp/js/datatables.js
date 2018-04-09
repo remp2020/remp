@@ -50,10 +50,6 @@ $.fn.dataTables = {
     navigation: function (dataTable, navId) {
         let nav = '#' + navId;
 
-        $(nav + ' .ah-search input').on('change', function () {
-            dataTable.search($(this).val()).draw();
-        });
-
         $(nav + ' .ah-length li').on('click', function () {
             var value = $(this).data('value');
 
@@ -79,6 +75,14 @@ $.fn.dataTables = {
             }
             dataTable.page('next').draw('page');
             $(this).closest('.ah-actions').find('.ah-curr button').text(dataTable.page.info().page + 1)
+        });
+    },
+
+    search: function (dataTable, searchId) {
+        let search = '#' + searchId;
+
+        $(search + ' input').on('change', function () {
+            dataTable.search($(this).val()).draw();
         });
     },
 
