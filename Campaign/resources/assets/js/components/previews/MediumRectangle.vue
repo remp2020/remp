@@ -127,20 +127,8 @@
                 if (this.positionOptions[this.position]) {
                     var styles = this.positionOptions[this.position].style;
 
-                    if ('top' in styles && this.offsetVertical != null) {
-                        styles.top = this.offsetVertical + 'px';
-                    }
-
-                    if ('bottom' in styles && this.offsetVertical != null) {
-                        styles.bottom = this.offsetVertical + 'px';
-                    }
-
-                    if ('left' in styles && this.offsetHorizontal != null) {
-                        styles.left = this.offsetHorizontal + 'px';
-                    }
-
-                    if ('right' in styles && this.offsetHorizontal != null) {
-                        styles.right = this.offsetHorizontal + 'px';
+                    for (var ii in styles) {
+                        styles[ii] = (ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal
                     }
 
                     return styles;
