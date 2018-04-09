@@ -73,7 +73,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: altBannerId }">
                                     A/B test
                                 </a>
                             </h4>
@@ -114,7 +114,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingThree">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree" :class="{ green: highlightSegmentsCollapse }">
                                     Segments - who will see the banner?
                                 </a>
                             </h4>
@@ -202,7 +202,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFour">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour" :class="{ green: highlightBannerRulesCollapse }">
                                     Banner rules - how often to display?
                                 </a>
                             </h4>
@@ -227,7 +227,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFive">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive" :class="{ green: highlightCountriesCollapse }">
                                     Geo targeting - which countries?
                                 </a>
                             </h4>
@@ -282,7 +282,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingSix">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix" :class="{ green: highlightDevicesCollapse }">
                                     Devices targeting (mobile/desktop)
                                 </a>
                             </h4>
@@ -294,7 +294,7 @@
                                     <div class="checkbox" v-for="(device) in allDevices" :key="device">
                                     <label class="m-l-15 m-t-15">
                                         Show on {{ device }}
-                                        <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox">
+                                        <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox" @change="handleToggleSelectDevice(device)">
                                         <i class="input-helper"></i>
                                     </label>
                                     </div>
@@ -307,7 +307,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingSeven">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" :class="{ green: isScheduled }">
                                     When to launch
                                 </a>
                             </h4>
@@ -348,7 +348,7 @@
                                                                     <label for="new_schedule_start_time_frontend" class="fg-label">Start time</label>
                                                                     <input class="form-control date-time-picker" name="new_schedule_start_time_frontend" type="datetime" id="new_schedule_start_time_frontend">
                                                                 </div>
-                                                                <input name="new_schedule_start_time" type="hidden">
+                                                                <input name="new_schedule_start_time" type="hidden" v-model="startTime">
                                                             </div>
 
                                                             <div class="input-group">
@@ -357,7 +357,7 @@
                                                                     <label for="new_schedule_end_time_frontend" class="fg-label">End time</label>
                                                                     <input class="form-control date-time-picker" name="new_schedule_end_time_frontend" type="datetime" id="new_schedule_end_time_frontend">
                                                                 </div>
-                                                                <input name="new_schedule_end_time" type="hidden">
+                                                                <input name="new_schedule_end_time" type="hidden" v-model="endTime">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -379,22 +379,28 @@
             <div class="col-md-12 col-lg-8">
                 <div class="input-group m-t-20 m-b-30">
                     <div class="fg-line">
-                        <button class="btn btn-info waves-effect" type="submit" name="action" value="save">
+                        <input type="hidden" name="action" :value="submitAction">
+
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save'">
                             <i class="zmdi zmdi-check"></i> Save
                         </button>
-                        <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close">
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save_close'">
                             <i class="zmdi zmdi-mail-send"></i> Save and close
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+
+
+        <form-validator :url="validateUrl"></form-validator>
     </div>
 </template>
 
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect";
     import PageviewRules from "./templates/PageviewRules";
+    import FormValidator from "remp/js/components/FormValidator";
 
     let props = [
         "_name",
@@ -408,6 +414,7 @@
         "_countriesBlacklist",
         "_allDevices",
         "_selectedDevices",
+        "_validateUrl",
 
         "_banners",
         "_availableSegments",
@@ -425,10 +432,12 @@
     export default {
         components: {
             vSelect,
-            PageviewRules
+            PageviewRules,
+            FormValidator
         },
         created: function(){
             let self = this;
+
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
@@ -438,6 +447,7 @@
             var $startTime = $('input[name="new_schedule_start_time"]');
             var $endTimeFE = $("#new_schedule_end_time_frontend");
             var $endTime = $('input[name="new_schedule_end_time"]');
+            var self = this;
 
             $startTimeFE.on('dp.change', function() {
                 var st = $(this).data("DateTimePicker").date();
@@ -445,22 +455,17 @@
                 if (st && et && st.unix() > et.unix()) {
                     $endTimeFE.data("DateTimePicker").date(st);
                 }
+                self.startTime = st ? st.toISOString() : null;
             });
+
             $endTimeFE.on("dp.change", function (e) {
                 var st = $startTimeFE.data("DateTimePicker").date();
                 var et = $(this).data("DateTimePicker").date();
                 if (st && et && et.unix() < st.unix()) {
                     $startTimeFE.data("DateTimePicker").date(et);
                 }
+                self.endTime = et ? et.toISOString() : null;
             }).datetimepicker({useCurrent: false});
-
-            $('form').on('submit', function() {
-                var st = $startTimeFE.data("DateTimePicker").date();
-                $startTime.val(st ? st.toISOString() : null);
-                var et = $endTimeFE.data("DateTimePicker").date();
-                $endTime.val(et ? et.toISOString() : null);
-                return true;
-            })
         },
         props: props,
         data: function() {
@@ -476,6 +481,8 @@
                 "countriesBlacklist": null,
                 "allDevices": null,
                 "selectedDevices": null,
+                "validateUrl": null,
+                "submitAction": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -487,6 +494,8 @@
                 "availableCountries": null,
                 "countriesBlacklistOptions": null,
 
+                "startTime": null,
+                "endTime": null,
                 "activationMode": null,
                 "action": null
             }
@@ -517,9 +526,49 @@
                     {"label": "Only signed in", "value": true},
                     {"label": "Only anonymous ", "value": false},
                 ];
+            },
+            pageviewRulesNotDefault: function () {
+                if (this.pageviewRules.length && this.pageviewRules[0].rule) {
+                    return true;
+                }
+
+                return false;
+            },
+            isScheduled: function () {
+                if ((this.active && this.activationMode == 'activate-now') ||
+                    (this.startTime != null && this.endTime != null && this.activationMode == 'activate-schedule')
+                ) {
+                    return true;
+                }
+
+
+                return false;
+            },
+            highlightSegmentsCollapse: function () {
+                return (this.segments.length || this.signedIn);
+            },
+            highlightBannerRulesCollapse: function () {
+                return (this.pageviewRulesNotDefault || this.oncePerSession == true);
+            },
+            highlightCountriesCollapse: function () {
+                return (this.countries && this.countries.length);
+            },
+            highlightDevicesCollapse: function () {
+                return (this.selectedDevices.length < this.allDevices.length);
             }
+
         },
         methods: {
+            handleToggleSelectDevice: function (device) {
+                if (this.deviceSelected(device)) {
+                    this.selectedDevices.splice(
+                        this.selectedDevices.indexOf(device), 1
+                    );
+                    return;
+                }
+
+                this.selectedDevices.push(device);
+            },
             deviceSelected: function (device) {
                 if (this.selectedDevices.indexOf(device) != -1) {
                     return true;
