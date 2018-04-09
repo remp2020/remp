@@ -97,11 +97,18 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
 
+        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+
         return view('campaigns.create', [
+            'campaign' => $campaign,
+            'bannerId' => $bannerId,
+            'altBannerId' => $altBannerId,
+            'selectedCountries' => $selectedCountries,
+            'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
             'segments' => $this->getAllSegments($segmentAggregator)
-        ] + $this->processOldCampaign($campaign, old()));
+        ]);
     }
 
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
@@ -111,11 +118,18 @@ class CampaignController extends Controller
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
+        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign();
+
         return view('campaigns.create', [
+            'campaign' => $campaign,
+            'bannerId' => $bannerId,
+            'altBannerId' => $altBannerId,
+            'selectedCountries' => $selectedCountries,
+            'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
             'segments' => $this->getAllSegments($segmentAggregator)
-        ] + $this->processOldCampaign($campaign, old()));
+        ]);
     }
 
     /**
@@ -191,11 +205,19 @@ class CampaignController extends Controller
      */
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
+        // dd($this->processOldCampaign($campaign, old()));
+        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+
         return view('campaigns.edit', [
-            'availableCountries' => Country::all(),
+            'campaign' => $campaign,
+            'bannerId' => $bannerId,
+            'altBannerId' => $altBannerId,
+            'selectedCountries' => $selectedCountries,
+            'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
+            'availableCountries' => Country::all(),
             'segments' => $this->getAllSegments($segmentAggregator)
-        ] + $this->processOldCampaign($campaign, old()));
+        ]);
     }
 
     /**
@@ -710,11 +732,11 @@ class CampaignController extends Controller
         }
 
         return [
-            'campaign' => $campaign,
-            'bannerId' => $bannerId,
-            'altBannerId' => $altBannerId,
-            'selectedCountries' => $selectedCountries,
-            'countriesBlacklist' => isset($data['countries_blacklist'])
+            $campaign,
+            $bannerId,
+            $altBannerId,
+            $selectedCountries,
+            isset($data['countries_blacklist'])
                 ? $data['countries_blacklist']
                 : $blacklisted
         ];
