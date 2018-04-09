@@ -64,7 +64,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                                 <div class="fg-line">
                                     <label for="name" class="fg-label">Name</label>
-                                    <input v-model="name" class="form-control fg-input" name="name" id="name" type="text" required>
+                                    <input v-model="name" class="form-control fg-input" name="name" id="name" type="text">
                                 </div>
                             </div>
 
@@ -81,7 +81,6 @@
                                                     :name="'transition'"
                                                     :value="transition"
                                                     :options.sync="transitionOptions"
-                                                    :required="'required'"
                                             ></v-select>
                                         </div>
                                     </div>
@@ -92,7 +91,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
                                 <div class="fg-line">
                                     <label for="target_url" class="fg-label">Target URL</label>
-                                    <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url" required>
+                                    <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                                 </div>
                             </div>
                         </div>
@@ -265,6 +264,9 @@
         </div>
 
         <input type="hidden" name="display_type" v-bind:value="displayType" />
+
+
+        <form-validator :url="validateUrl"></form-validator>
     </div>
 </template>
 
@@ -276,6 +278,7 @@
     import ShortMessageTemplate from "./templates/ShortMessage";
     import BannerPreview from "./BannerPreview";
     import vSelect from "remp/js/components/vSelect";
+    import FormValidator from "remp/js/components/FormValidator";
 
     const props = [
         "_name",
@@ -300,6 +303,8 @@
         "_alignmentOptions",
         "_dimensionOptions",
         "_positionOptions",
+
+        "_validateUrl"
     ];
 
     export default {
@@ -310,6 +315,7 @@
             ShortMessageTemplate,
             BannerPreview,
             vSelect,
+            FormValidator
         },
         name: 'banner-form',
         props: props,
@@ -354,7 +360,9 @@
                 {"label": "Bounce", "value": "bounce"},
                 {"label": "Shake", "value": "shake"},
                 {"label": "Fade in down", "value": "fade-in-down"},
-            ]
+            ],
+
+            validateUrl: null
         })
     }
 </script>

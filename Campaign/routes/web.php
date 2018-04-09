@@ -30,6 +30,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
 
     Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
+    Route::post('banners/validate', 'BannerController@validateForm')->name('banners.validateForm');
 
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
