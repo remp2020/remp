@@ -118,7 +118,7 @@ class CampaignController extends Controller
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
-        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign();
+        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
@@ -205,7 +205,6 @@ class CampaignController extends Controller
      */
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
-        // dd($this->processOldCampaign($campaign, old()));
         list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.edit', [
