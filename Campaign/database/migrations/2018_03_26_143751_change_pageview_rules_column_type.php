@@ -14,21 +14,23 @@ class ChangePageviewRulesColumnType extends Migration
      */
     public function up()
     {
-        $pageviewRulesData = DB::table('campaigns')->select('id', 'pageview_rules')->get();
+        DB::transaction(function () {
+            $pageviewRulesData = DB::table('campaigns')->select('id', 'pageview_rules')->get();
 
-        Schema::table('campaigns', function (Blueprint $table) {
-            $table->dropColumn("pageview_rules");
+            Schema::table('campaigns', function (Blueprint $table) {
+                $table->dropColumn("pageview_rules");
+            });
+
+            Schema::table('campaigns', function (Blueprint $table) {
+                $table->json("pageview_rules")->nullable(true);
+            });
+
+            foreach($pageviewRulesData as $row) {
+                DB::table('campaigns')->where('id', $row->id)->update([
+                    'pageview_rules' => $row->pageview_rules
+                ]);
+            }
         });
-
-        Schema::table('campaigns', function (Blueprint $table) {
-            $table->json("pageview_rules")->nullable(true);
-        });
-
-        foreach($pageviewRulesData as $row) {
-            DB::table('campaigns')->where('id', $row->id)->update([
-                'pageview_rules' => $row->pageview_rules
-            ]);
-        }
     }
 
     /**
