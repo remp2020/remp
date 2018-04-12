@@ -134,7 +134,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
 
                                 <div class="fg-line">
-                                    <label for="offsetHorizontal" class="fg-label">Hortizontal offset</label>
+                                    <label for="offsetHorizontal" class="fg-label">Hortizontal offset (px)</label>
                                     <input v-model="offsetHorizontal" class="form-control fg-input" name="offset_horizontal" type="number" id="offsetHorizontal">
                                 </div>
                             </div><!-- .input-group -->
@@ -143,7 +143,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
 
                                 <div class="fg-line">
-                                    <label for="offsetVertical" class="fg-label">Vertical offset</label>
+                                    <label for="offsetVertical" class="fg-label">Vertical offset (px)</label>
                                     <input v-model="offsetVertical" class="form-control fg-input" name="offset_vertical" type="number" id="offsetVertical">
                                 </div>
                             </div><!-- .input-group -->

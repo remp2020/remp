@@ -68,10 +68,8 @@
             "show",
             "transition",
             "position",
-            "top",
-            "left",
-            "right",
-            "bottom",
+            "offsetVertical",
+            "offsetHorizontal",
             "targetUrl",
             "closeable",
             "displayType",
@@ -107,7 +105,7 @@
                     var styles = this.positionOptions[this.position].style;
 
                     for (var ii in styles) {
-                        styles[ii] = (ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal
+                        styles[ii] = ((ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
                     }
 
                     return styles;

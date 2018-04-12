@@ -86,15 +86,14 @@ class BannerController extends Controller
         $banner->template = $request->get('template');
         $banner->fill(old());
 
-        $defaultPositionKey = $this->positionMap->positions()->first()->key;
-        $defaultPositions = config('banners.positions.' . $defaultPositionKey . '.style');
+        $defaultPositions = $this->positionMap->positions()->first()->style;
 
         if (is_null($banner->offset_vertical)) {
-            $banner->offset_vertical = intval(isset($defaultPositions['top']) ? $defaultPositions['top'] : $defaultPositions['bottom']);
+            $banner->offset_vertical = isset($defaultPositions['top']) ? $defaultPositions['top'] : $defaultPositions['bottom'];
         }
 
         if (is_null($banner->offset_horizontal)) {
-            $banner->offset_horizontal = intval(isset($defaultPositions['left']) ? $defaultPositions['left'] : $defaultPositions['right']);
+            $banner->offset_horizontal = isset($defaultPositions['left']) ? $defaultPositions['left'] : $defaultPositions['right'];
         }
 
         return view('banners.create', [

@@ -122,7 +122,7 @@
                     var styles = this.positionOptions[this.position].style;
 
                     for (var ii in styles) {
-                        styles[ii] = (ii == 'top' || ii == 'bottom') ? this.offsetVertical + 'px' : this.offsetHorizontal + 'px'
+                        styles[ii] = ((ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
                     }
 
                     return styles;
