@@ -6,6 +6,14 @@ use Illuminate\Database\Migrations\Migration;
 
 class PreciseBannerPosition extends Migration
 {
+
+    private $positionMap;
+
+    public function __construct()
+    {
+        $this->positionMap = app(\App\Models\Position\Map::class);
+    }
+
     /**
      * Run the migrations.
      *
@@ -19,15 +27,15 @@ class PreciseBannerPosition extends Migration
         });
 
         foreach (DB::query()->from('banners')->get() as $banner) {
-            $pos = config('banners.positions.' . $banner->position);
+            $pos = $this->positionMap->positions()->first()->style;
 
             $query = DB::table('banners')->where([
                 'id' => $banner->id
             ]);
 
             $query->update([
-                'offset_vertical' => intval(isset($pos['style']['top']) ? $pos['style']['top'] : $pos['style']['bottom']),
-                'offset_horizontal' => intval(isset($pos['style']['left']) ? $pos['style']['left'] : $pos['style']['right']),
+                'offset_vertical' => intval(isset($pos['top']) ? $pos['top'] : $pos['bottom']),
+                'offset_horizontal' => intval(isset($pos['left']) ? $pos['left'] : $pos['right']),
             ]);
         }
 
