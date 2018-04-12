@@ -96,21 +96,18 @@ class CampaignController extends Controller
     public function create(SegmentAggregator $segmentAggregator)
     {
         $campaign = new Campaign();
-        $campaign->fill(old());
-        $selectedSegments = collect(old('segments'));
 
-        $segments = $segmentAggregator->list();
-        foreach ($segmentAggregator->getErrors() as $error) {
-            flash($error)->error();
-            Log::error($error);
-        }
+        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
+            'bannerId' => $bannerId,
+            'altBannerId' => $altBannerId,
+            'selectedCountries' => $selectedCountries,
+            'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
-            'segments' => $segments,
-            'selectedSegments' => $selectedSegments,
+            'segments' => $this->getAllSegments($segmentAggregator)
         ]);
     }
 
@@ -119,19 +116,19 @@ class CampaignController extends Controller
         $sourceCampaign->load('banner', 'altBanner', 'segments', 'countries');
         $campaign = $sourceCampaign->replicate();
 
-        $segments = $segmentAggregator->list();
-        foreach ($segmentAggregator->getErrors() as $error) {
-            flash($error)->error();
-            Log::error($error);
-        }
-
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
+
+        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
+            'bannerId' => $bannerId,
+            'altBannerId' => $altBannerId,
+            'selectedCountries' => $selectedCountries,
+            'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
-            'segments' => $segments,
+            'segments' => $this->getAllSegments($segmentAggregator)
         ]);
     }
 
@@ -156,23 +153,8 @@ class CampaignController extends Controller
     public function store(CampaignRequest $request)
     {
         $campaign = new Campaign();
-        $campaign->fill($request->all());
-        $campaign->save();
-        $campaign->banner_id = $request->get('banner_id');
-        $campaign->alt_banner_id = $request->get('alt_banner_id');
 
-        $campaign->countries()->sync($this->processCountries($request));
-
-        foreach ($request->get('segments', []) as $r) {
-            /** @var CampaignSegment $campaignSegment */
-            $campaignSegment = new CampaignSegment();
-            $campaignSegment->code = $r['code'];
-            $campaignSegment->provider = $r['provider'];
-            $campaignSegment->campaign_id = $campaign->id;
-            $campaignSegment->save();
-
-            dispatch(new CacheSegmentJob($campaignSegment));
-        }
+        $this->saveCampaign($campaign, $request->all());
 
         $message = ['success' => sprintf('Campaign [%s] was created', $campaign->name)];
 
@@ -223,21 +205,17 @@ class CampaignController extends Controller
      */
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
-        $campaign->fill(old());
-
-        try {
-            $segments = $segmentAggregator->list();
-        } catch (SegmentException $e) {
-            $segments = new Collection();
-            flash('Unable to fetch list of segments, please check the application configuration.')->error();
-            Log::error($e->getMessage());
-        }
+        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.edit', [
             'campaign' => $campaign,
-            'availableCountries' => Country::all(),
+            'bannerId' => $bannerId,
+            'altBannerId' => $altBannerId,
+            'selectedCountries' => $selectedCountries,
+            'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
-            'segments' => $segments,
+            'availableCountries' => Country::all(),
+            'segments' => $this->getAllSegments($segmentAggregator)
         ]);
     }
 
@@ -250,25 +228,7 @@ class CampaignController extends Controller
      */
     public function update(CampaignRequest $request, Campaign $campaign)
     {
-        $campaign->fill($request->all());
-        $campaign->save();
-        $campaign->banner_id = $request->get('banner_id');
-        $campaign->alt_banner_id = $request->get('alt_banner_id');
-
-        $campaign->countries()->sync($this->processCountries($request));
-
-        foreach ($request->get('segments', []) as $r) {
-            /** @var CampaignSegment $campaignSegment */
-            $campaignSegment = CampaignSegment::findOrNew($r['id']);
-            $campaignSegment->code = $r['code'];
-            $campaignSegment->provider = $r['provider'];
-            $campaignSegment->campaign_id = $campaign->id;
-            $campaignSegment->save();
-
-            dispatch(new CacheSegmentJob($campaignSegment));
-        }
-
-        CampaignSegment::destroy($request->get('removedSegments'));
+        $this->saveCampaign($campaign, $request->all());
 
         $message = ['success' => sprintf('Campaign [%s] was updated.', $campaign->name)];
 
@@ -429,19 +389,21 @@ class CampaignController extends Controller
     }
 
     /**
-     * Processes campaign $request and returns countries array ready to sync with campaign_country pivot table
+     * Returns countries array ready to sync with campaign_country pivot table
      *
-     * @param CampaignRequest $request
+     * @param array $countries
+     * @param bool $blacklist
      * @return array
      */
-    private function processCountries(CampaignRequest $request): array
+    private function processCountries(array $countries, bool $blacklist): array
     {
-        $blacklist = $request->get('countries_blacklist');
-        $countries = [];
-        foreach ($request->get('countries', []) as $cid) {
-            $countries[$cid] = ['blacklisted' => (bool) $blacklist];
+        $processed = [];
+
+        foreach ($countries as $cid) {
+            $processed[$cid] = ['blacklisted' => $blacklist];
         }
-        return $countries;
+
+        return $processed;
     }
 
     /**
@@ -687,8 +649,114 @@ class CampaignController extends Controller
                 'success' => true,
                 'errors' => [],
                 'data' => $displayedCampaigns,
-                'providerData' => $sa->getProviderData(),
+                'providerData' => $sa->getProviderData()
             ]);
+    }
+
+    public function saveCampaign(Campaign $campaign, array $data)
+    {
+        $campaign->fill($data);
+        $campaign->save();
+
+        $campaign->banner_id = $data['banner_id'];
+        $campaign->alt_banner_id = $data['alt_banner_id'];
+
+        if (isset($data['countries'])) {
+            $campaign->countries()->sync(
+                $this->processCountries(
+                    $data['countries'],
+                    (bool)$data['countries_blacklist']
+                )
+            );
+        }
+
+        $segments = $data['segments'] ?? [];
+
+        foreach ($segments as $r) {
+            /** @var CampaignSegment $campaignSegment */
+            $campaignSegment = CampaignSegment::findOrNew($r['id']);
+            $campaignSegment->code = $r['code'];
+            $campaignSegment->provider = $r['provider'];
+            $campaignSegment->campaign_id = $campaign->id;
+            $campaignSegment->save();
+        }
+
+        if (isset($data['removedSegments'])) {
+            CampaignSegment::destroy($data['removedSegments']);
+        }
+    }
+
+    public function processOldCampaign(Campaign $campaign, array $data)
+    {
+        $campaign->fill($data);
+
+        // parse old segments data
+        $segments = [];
+        $segmentsData = isset($data['segments']) ? $data['segments'] : $campaign->segments->toArray();
+        $removedSegments = isset($data['removedSegments']) ? $data['removedSegments'] : [];
+
+        foreach ($segmentsData as $segment) {
+            if (is_null($segment['id']) || !array_search($segment['id'], $removedSegments)) {
+                $segments[] = $campaign->segments()->make($segment);
+            }
+        }
+        $campaign->setRelation('segments', collect($segments));
+
+        // parse selected countries
+        $countries = $campaign->countries->toArray();
+        $selectedCountries = $data['countries'] ?? array_map(function ($country) {
+            return $country['iso_code'];
+        }, $countries);
+
+        // countries blacklist?
+        $blacklisted = 0;
+        foreach ($countries as $country) {
+            $blacklisted = (int)$country['pivot']['blacklisted'];
+        }
+
+        // banners
+        $bannerId = null;
+        $altBannerId = null;
+
+        if (array_key_exists('banner_id', $data)) {
+            $bannerId = $data['banner_id'];
+        } else {
+            $bannerId = $campaign->banner ? $campaign->banner->id : null;
+        }
+
+        if (array_key_exists('alt_banner_id', $data)) {
+            $altBannerId = $data['alt_banner_id'];
+        } else {
+            $altBannerId = $campaign->altBanner ? $campaign->altBanner->id : null;
+        }
+
+        return [
+            $campaign,
+            $bannerId,
+            $altBannerId,
+            $selectedCountries,
+            isset($data['countries_blacklist'])
+                ? $data['countries_blacklist']
+                : $blacklisted
+        ];
+    }
+
+    public function getAllSegments(SegmentAggregator $segmentAggregator)
+    {
+        try {
+            $segments = $segmentAggregator->list();
+        } catch (SegmentException $e) {
+            $segments = new Collection();
+            flash('Unable to fetch list of segments, please check the application configuration.')->error();
+            Log::error($e->getMessage());
+        }
+
+        foreach ($segmentAggregator->getErrors() as $error) {
+            flash($error)->error();
+            Log::error($error);
+        }
+
+        return $segments;
     }
 
     /**
