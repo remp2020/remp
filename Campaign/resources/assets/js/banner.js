@@ -18,8 +18,8 @@ window.remplib = window.remplib || {};
                 template: model['template'] || null,
                 // overlay
                 position: model['position'] || null,
-                offsetVertical: !isNaN(model['offset_vertical']) ? model['offset_vertical'] : null,
-                offsetHorizontal: !isNaN(model['offset_horizontal']) ? model['offset_horizontal'] : null,
+                offsetVertical: model['offset_vertical'] || 0,
+                offsetHorizontal: model['offset_horizontal'] || 0,
                 closeText: model['close_text'] || null,
                 closeable: model['closeable'] || null,
                 displayDelay: model['display_delay'] || 0,
