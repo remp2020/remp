@@ -16,7 +16,7 @@ class Position
         $this->name = $name;
         $this->style = $style;
 
-        foreach($this->style as $pos => $val) {
+        foreach ($this->style as $pos => $val) {
             $this->style[$pos] = intval($val);
         }
     }
