@@ -62,7 +62,9 @@ services:
     domainname: "campaign.remp.press"
     hostname: "campaign"
     volumes:
-      - ".:/var/www/html:rw"
+      - "./Campaign:/var/www/html/Campaign:rw"
+      - "./Composer:/var/www/html/Composer:rw"
+      - "./Package:/var/www/html/Package:rw"
     depends_on:
       - "nginx"
       - "mysql"
@@ -78,7 +80,9 @@ services:
       PHP_IDE_CONFIG: "serverName=mailer.remp.press"
     build: "./Docker/php"
     volumes:
-      - ".:/var/www/html:rw"
+      - "./Mailer:/var/www/html/Mailer:rw"
+      - "./Composer:/var/www/html/Composer:rw"
+      - "./Package:/var/www/html/Package:rw"      
     depends_on:
       - "nginx"
       - "mysql"
@@ -96,7 +100,9 @@ services:
     domainname: "sso.remp.press"
     hostname: "sso"
     volumes:
-      - ".:/var/www/html:rw"
+      - "./Sso:/var/www/html/Sso:rw"
+      - "./Composer:/var/www/html/Composer:rw"
+      - "./Package:/var/www/html/Package:rw"      
     depends_on:
       - "nginx"
       - "mysql"
@@ -112,7 +118,9 @@ services:
       APP_NAME: "Beam"
       PHP_IDE_CONFIG: "serverName=beam.remp.press"
     volumes:
-      - ".:/var/www/html:rw"
+      - "./Beam:/var/www/html/Beam:rw"
+      - "./Composer:/var/www/html/Composer:rw"
+      - "./Package:/var/www/html/Package:rw"      
     depends_on:
       - "nginx"
       - "mysql"
