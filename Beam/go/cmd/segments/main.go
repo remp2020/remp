@@ -107,8 +107,8 @@ func main() {
 	commerceStorage := &model.CommerceDB{
 		DB: influxDB,
 	}
-	pageviewStorage := &model.PageviewDB{
-		DB: influxDB,
+	pageviewStorage := &model.PageviewElastic{
+		DB: elasticDB,
 	}
 	segmentStorage := &model.SegmentDB{
 		MySQL:          mysqlDB,
