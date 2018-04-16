@@ -209,10 +209,12 @@
 
             <div class="input-group m-t-20">
                 <div class="fg-line">
-                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save">
+                    <input type="hidden" name="action" :value="submitAction">
+
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save" @click="submitAction = 'save'">
                         <i class="zmdi zmdi-check"></i> Save
                     </button>
-                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close">
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close" @click="submitAction = 'save_close'">
                         <i class="zmdi zmdi-mail-send"></i> Save and close
                     </button>
                 </div>
@@ -353,6 +355,8 @@
             dimensionOptions: [],
             positionOptions: [],
             show: true,
+
+            submitAction: null,
 
             transitionOptions: [
                 {"label": "None", "value": "none"},
