@@ -86,6 +86,16 @@ class BannerController extends Controller
         $banner->template = $request->get('template');
         $banner->fill(old());
 
+        $defaultPositions = $this->positionMap->positions()->first()->style;
+
+        if (is_null($banner->offset_vertical)) {
+            $banner->offset_vertical = isset($defaultPositions['top']) ? $defaultPositions['top'] : $defaultPositions['bottom'];
+        }
+
+        if (is_null($banner->offset_horizontal)) {
+            $banner->offset_horizontal = isset($defaultPositions['left']) ? $defaultPositions['left'] : $defaultPositions['right'];
+        }
+
         return view('banners.create', [
             'banner' => $banner,
             'positions' => $this->positionMap->positions(),
@@ -107,6 +117,17 @@ class BannerController extends Controller
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
         ]);
+    }
+
+    /**
+     * Ajax validate form method.
+     *
+     * @param BannerRequest|Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function validateForm(BannerRequest $request)
+    {
+        return response()->json(false);
     }
 
     /**

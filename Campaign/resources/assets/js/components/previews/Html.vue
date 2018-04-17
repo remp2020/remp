@@ -13,9 +13,10 @@
         font-family: Noto Sans, sans-serif;
         color: white;
         white-space: pre-line;
-        display: inline-block;
+        display: block;
         overflow: hidden;
-        position: relative
+        position: relative;
+        text-align: center;
     }
     .html-preview-text {
         vertical-align: middle;
@@ -23,6 +24,7 @@
         display: inline-block;
         box-sizing: border-box;
         height: 100%;
+        width: 100%;
         align-items: center;
     }
     .html-preview-close {
@@ -45,10 +47,9 @@
             <div class="html-preview-box" v-bind:style="[
                 boxStyles,
                 dimensionOptions[dimensions],
-                _textAlign,
                 customBoxStyles
             ]">
-                <a class="html-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
+                <a class="html-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles"><small>{{ closeText }}</small> &times;</a>
                 <div v-html="$parent.injectVars(text)" class="html-preview-text" v-bind:style="[_textAlign, textStyles]"></div>
             </div>
         </transition>
@@ -65,6 +66,8 @@
             "textAlign",
             "transition",
             "position",
+            "offsetVertical",
+            "offsetHorizontal",
             "dimensions",
             "show",
             "textColor",
@@ -72,7 +75,9 @@
             "backgroundColor",
             "targetUrl",
             "closeable",
+            "closeText",
             "text",
+            "css",
             "displayType",
             "forcedPosition",
             "uuid",
@@ -85,26 +90,34 @@
                 clickTracked: false,
             }
         },
-        methods: {
-            customPositioned: function() {
-                if (this.displayType === 'overlay') {
-                    return true;
-                }
-                if (this.forcedPosition !== undefined && this.forcedPosition === 'absolute') {
-                    return true;
-                }
-                return false;
-            },
+        mounted: function () {
+            var st = document.createElement('style'),
+                styles = this.css ? this.css.replace(/\r?\n|\r/gm," ") : '';
+
+            st.innerText = styles;
+
+            document.body.appendChild(st);
         },
         computed: {
             _textAlign: function() {
                 return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
             },
             _position: function() {
-                if (!this.customPositioned()) {
+                if (!this.$parent.customPositioned()) {
                     return {};
                 }
-                return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
+
+                if (this.positionOptions[this.position]) {
+                    var styles = this.positionOptions[this.position].style;
+
+                    for (var ii in styles) {
+                        styles[ii] = ((ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
+                    }
+
+                    return styles;
+                }
+
+                return {};
             },
             linkStyles: function() {
                 let position, zIndex;

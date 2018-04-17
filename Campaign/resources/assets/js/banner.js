@@ -18,6 +18,9 @@ window.remplib = window.remplib || {};
                 template: model['template'] || null,
                 // overlay
                 position: model['position'] || null,
+                offsetVertical: model['offset_vertical'] || 0,
+                offsetHorizontal: model['offset_horizontal'] || 0,
+                closeText: model['close_text'] || null,
                 closeable: model['closeable'] || null,
                 displayDelay: model['display_delay'] || 0,
                 closeTimeout: model['close_timeout'] || null,
@@ -57,6 +60,7 @@ window.remplib = window.remplib || {};
                     fontSize: model['html_template']['font_size'] || null,
                     textAlign: model['html_template']['text_align'] || null,
                     text: model['html_template']['text'] || null,
+                    css: model['html_template']['css'] || null,
                     dimensions: model['html_template']['dimensions'] || null,
                 }
             }

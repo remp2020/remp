@@ -9,6 +9,7 @@ class HtmlTemplate extends Model
     protected $fillable = [
         'dimensions',
         'text',
+        'css',
         'text_align',
         'font_size',
         'text_color',

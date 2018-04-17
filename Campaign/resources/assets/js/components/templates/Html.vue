@@ -41,16 +41,24 @@
                                     </div>
                                     <i class="cp-value"></i>
                                 </div>
-                            </div>
+                            </div><!-- .input-group -->
                         </div>
 
                         <div class="input-group fg-float m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
                             <div class="fg-line">
                                 <label for="html_text" class="fg-label">HTML Text</label>
-                                <textarea v-model="text" class="form-control fg-input" rows="3" name="text" cols="50" id="html_text"></textarea>
+                                <textarea v-model="text" class="form-control fg-input" rows="6" name="text" cols="50" id="html_text"></textarea>
                             </div>
-                        </div>
+                        </div><!-- .input-group -->
+
+                        <div class="input-group fg-float m-t-30">
+                            <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                            <div class="fg-line">
+                                <label for="css" class="fg-label">Custom CSS</label>
+                                <textarea v-model="css" class="form-control fg-input" rows="6" name="css" cols="50" id="css"></textarea>
+                            </div>
+                        </div><!-- .input-group -->
 
                         <div class="cp-container">
                             <div class="input-group fg-float m-t-30">
@@ -65,7 +73,7 @@
                                     <i class="cp-value"></i>
                                 </div>
                             </div>
-                        </div>
+                        </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-format-size"></i></span>
@@ -73,7 +81,7 @@
                                 <label for="font_size" class="fg-label">Font Size</label>
                                 <input v-model="fontSize" class="form-control fg-input" name="font_size" type="number" id="font_size">
                             </div>
-                        </div>
+                        </div><!-- .input-group -->
 
                         <div class="input-group m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-swap"></i></span>
@@ -83,15 +91,16 @@
                                         <label for="text_align" class="fg-label">Text Alignment</label>
                                     </div>
                                     <div class="col-md-12">
-                                        <select v-model="textAlign" class="selectpicker" name="text_align" id="text_align" title="Select alignment">
-                                            <option v-for="option in alignmentOptions" v-bind:value="option.key">
-                                                {{ option.name }}
-                                            </option>
-                                        </select>
+                                        <v-select v-model="textAlign"
+                                                  name="text_align"
+                                                  id="text_align"
+                                                  v-bind:value="textAlign"
+                                                  v-bind:options.sync="mappedTextAlignOptions"
+                                        ></v-select>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div><!-- .input-group -->
                     </div>
                 </div>
             </div>
@@ -107,6 +116,7 @@
     let props = [
         "_backgroundColor",
         "_text",
+        "_css",
         "_textColor",
         "_fontSize",
         "_textAlign",
@@ -128,6 +138,7 @@
         data: () => ({
             backgroundColor: null,
             text: null,
+            css: null,
             textColor: null,
             fontSize: null,
             textAlign: null,
@@ -142,6 +153,7 @@
                     {key: "htmlTemplate", val: {
                         backgroundColor: this.backgroundColor,
                         text: this.text,
+                        css: this.css,
                         textColor: this.textColor,
                         fontSize: this.fontSize,
                         textAlign: this.textAlign,
@@ -151,6 +163,18 @@
             }
         },
         computed: {
+            mappedTextAlignOptions: function () {
+                let opts = [];
+
+                for (let i in this.alignmentOptions) {
+                    opts.push({
+                        label: this.alignmentOptions[i].name,
+                        value: this.alignmentOptions[i].key,
+                    });
+                }
+
+                return opts;
+            },
             mappedDimensionOptions: function() {
                 let opts = [];
                 for (let i in this.dimensionOptions) {

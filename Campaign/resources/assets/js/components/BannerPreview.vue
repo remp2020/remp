@@ -19,10 +19,14 @@
                 :fontSize="htmlTemplate.fontSize"
                 :backgroundColor="htmlTemplate.backgroundColor"
                 :text="htmlTemplate.text"
+                :css="htmlTemplate.css"
 
                 :position="position"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
+                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></html-preview>
@@ -46,8 +50,11 @@
                 :buttonTextColor="mediumRectangleTemplate.buttonTextColor"
 
                 :position="position"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
+                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></medium-rectangle-preview>
@@ -68,29 +75,35 @@
                 :buttonTextColor="barTemplate.buttonTextColor"
 
                 :position="position"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
+                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></bar-preview>
 
         <short-message-preview v-if="template === 'short_message'"
-                 :alignmentOptions="alignmentOptions"
-                 :positionOptions="positionOptions"
-                 :show="visible"
-                 :uuid="uuid"
-                 :campaignUuid="campaignUuid"
-                 :forcedPosition="forcedPosition"
+                :alignmentOptions="alignmentOptions"
+                :positionOptions="positionOptions"
+                :show="visible"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
 
-                 :text="shortMessageTemplate.text"
-                 :backgroundColor="shortMessageTemplate.backgroundColor"
-                 :textColor="shortMessageTemplate.textColor"
+                :text="shortMessageTemplate.text"
+                :backgroundColor="shortMessageTemplate.backgroundColor"
+                :textColor="shortMessageTemplate.textColor"
 
-                 :position="position"
-                 :targetUrl="targetUrl"
-                 :closeable="closeable"
-                 :transition="transition"
-                 :displayType="displayType"
+                :position="position"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :closeText="closeText"
+                :transition="transition"
+                :displayType="displayType"
         ></short-message-preview>
     </div>
 </template>
@@ -106,8 +119,11 @@
         "name",
         "targetUrl",
         "position",
+        "offsetVertical",
+        "offsetHorizontal",
         "transition",
         "closeable",
+        "closeText",
         "displayDelay",
         "closeTimeout",
         "targetSelector",
@@ -235,6 +251,18 @@
                     return;
                 }
                 remplib.tracker.trackEvent(category, action, fields);
+            },
+            customPositioned: function() {
+                if (this.displayType === 'inline') {
+                    return false;
+                }
+                if (this.displayType === 'overlay') {
+                    return true;
+                }
+                if (this.forcedPosition !== undefined && this.forcedPosition === 'absolute') {
+                    return true;
+                }
+                return false;
             },
         }
     }

@@ -10,6 +10,7 @@
             <html-template v-if="template === 'html'"
                 v-bind:_backgroundColor="htmlTemplate.backgroundColor"
                 v-bind:_text="htmlTemplate.text"
+                v-bind:_css="htmlTemplate.css"
                 v-bind:_textColor="htmlTemplate.textColor"
                 v-bind:_fontSize="htmlTemplate.fontSize"
                 v-bind:_textAlign="htmlTemplate.textAlign"
@@ -63,7 +64,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                                 <div class="fg-line">
                                     <label for="name" class="fg-label">Name</label>
-                                    <input v-model="name" class="form-control fg-input" name="name" id="name" type="text" required>
+                                    <input v-model="name" class="form-control fg-input" name="name" id="name" type="text">
                                 </div>
                             </div>
 
@@ -80,7 +81,6 @@
                                                     :name="'transition'"
                                                     :value="transition"
                                                     :options.sync="transitionOptions"
-                                                    :required="'required'"
                                             ></v-select>
                                         </div>
                                     </div>
@@ -91,7 +91,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
                                 <div class="fg-line">
                                     <label for="target_url" class="fg-label">Target URL</label>
-                                    <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url" required>
+                                    <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                                 </div>
                             </div>
                         </div>
@@ -128,7 +128,25 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float">
+                                <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
+
+                                <div class="fg-line">
+                                    <label for="offsetHorizontal" class="fg-label">Hortizontal offset (px)</label>
+                                    <input v-model="offsetHorizontal" class="form-control fg-input" name="offset_horizontal" type="number" id="offsetHorizontal">
+                                </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float">
+                                <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
+
+                                <div class="fg-line">
+                                    <label for="offsetVertical" class="fg-label">Vertical offset (px)</label>
+                                    <input v-model="offsetVertical" class="form-control fg-input" name="offset_vertical" type="number" id="offsetVertical">
+                                </div>
+                            </div><!-- .input-group -->
 
                             <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
@@ -136,7 +154,7 @@
                                     <label for="display_delay" class="fg-label">Display delay (milliseconds)</label>
                                     <input v-model="displayDelay" class="form-control fg-input" name="display_delay" type="number" id="display_delay">
                                 </div>
-                            </div>
+                            </div><!-- .input-group -->
 
                             <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
@@ -144,7 +162,7 @@
                                     <label for="automatic_close" class="fg-label">Automatic close after (milliseconds)</label>
                                     <input v-model="closeTimeout" class="form-control fg-input" name="close_timeout" type="number" id="automatic_close">
                                 </div>
-                            </div>
+                            </div><!-- .input-group -->
 
                             <div class="input-group fg-float checkbox">
                                 <label class="m-l-15">
@@ -152,7 +170,17 @@
                                     <input v-model="closeable" value="1" name="closeable" type="checkbox">
                                     <i class="input-helper"></i>
                                 </label>
-                            </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float" v-if="closeable">
+                                <span class="input-group-addon"><i class="zmdi zmdi-close-circle-o"></i></span>
+                                <div class="fg-line">
+                                    <label for="close_text" class="fg-label">Close Text</label>
+                                    <input v-model="closeText" class="form-control fg-input" name="close_text" type="text" id="close_text">
+                                </div>
+                            </div><!-- .input-group -->
+
+
 
                         </div>
                     </div>
@@ -181,10 +209,12 @@
 
             <div class="input-group m-t-20">
                 <div class="fg-line">
-                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save">
+                    <input type="hidden" name="action" :value="submitAction">
+
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save" @click="submitAction = 'save'">
                         <i class="zmdi zmdi-check"></i> Save
                     </button>
-                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close">
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close" @click="submitAction = 'save_close'">
                         <i class="zmdi zmdi-mail-send"></i> Save and close
                     </button>
                 </div>
@@ -219,8 +249,11 @@
                                         :shortMessageTemplate="shortMessageTemplate"
 
                                         :position="position"
+                                        :offsetVertical="offsetVertical"
+                                        :offsetHorizontal="offsetHorizontal"
                                         :targetUrl="targetUrl"
                                         :closeable="closeable"
+                                        :closeText="closeText"
                                         :transition="transition"
                                         :displayType="displayType"
                                         :forcedPosition="'absolute'"
@@ -233,6 +266,9 @@
         </div>
 
         <input type="hidden" name="display_type" v-bind:value="displayType" />
+
+
+        <form-validator :url="validateUrl"></form-validator>
     </div>
 </template>
 
@@ -244,13 +280,17 @@
     import ShortMessageTemplate from "./templates/ShortMessage";
     import BannerPreview from "./BannerPreview";
     import vSelect from "remp/js/components/vSelect";
+    import FormValidator from "remp/js/components/FormValidator";
 
     const props = [
         "_name",
         "_targetUrl",
         "_position",
+        "_offsetVertical",
+        "_offsetHorizontal",
         "_transition",
         "_closeable",
+        "_closeText",
         "_displayDelay",
         "_closeTimeout",
         "_targetSelector",
@@ -265,6 +305,8 @@
         "_alignmentOptions",
         "_dimensionOptions",
         "_positionOptions",
+
+        "_validateUrl"
     ];
 
     export default {
@@ -275,6 +317,7 @@
             ShortMessageTemplate,
             BannerPreview,
             vSelect,
+            FormValidator
         },
         name: 'banner-form',
         props: props,
@@ -292,8 +335,11 @@
             name: null,
             targetUrl: null,
             position: null,
+            offsetVertical: null,
+            offsetHorizontal: null,
             transition: null,
             closeable: null,
+            closeText: null,
             displayDelay: null,
             closeTimeout: null,
             targetSelector: null,
@@ -310,13 +356,17 @@
             positionOptions: [],
             show: true,
 
+            submitAction: null,
+
             transitionOptions: [
                 {"label": "None", "value": "none"},
                 {"label": "Fade", "value": "fade"},
                 {"label": "Bounce", "value": "bounce"},
                 {"label": "Shake", "value": "shake"},
                 {"label": "Fade in down", "value": "fade-in-down"},
-            ]
-        }),
+            ],
+
+            validateUrl: null
+        })
     }
 </script>
