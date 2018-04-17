@@ -98,23 +98,12 @@
 
             document.body.appendChild(st);
         },
-        methods: {
-            customPositioned: function() {
-                if (this.displayType === 'overlay') {
-                    return true;
-                }
-                if (this.forcedPosition !== undefined && this.forcedPosition === 'absolute') {
-                    return true;
-                }
-                return false;
-            },
-        },
         computed: {
             _textAlign: function() {
                 return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
             },
             _position: function() {
-                if (!this.customPositioned() || this.displayType === 'inline') {
+                if (!this.$parent.customPositioned()) {
                     return {};
                 }
 

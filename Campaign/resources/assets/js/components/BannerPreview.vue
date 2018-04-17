@@ -252,6 +252,18 @@
                 }
                 remplib.tracker.trackEvent(category, action, fields);
             },
+            customPositioned: function() {
+                if (this.displayType === 'inline') {
+                    return false;
+                }
+                if (this.displayType === 'overlay') {
+                    return true;
+                }
+                if (this.forcedPosition !== undefined && this.forcedPosition === 'absolute') {
+                    return true;
+                }
+                return false;
+            },
         }
     }
 </script>
