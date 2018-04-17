@@ -127,7 +127,7 @@
         },
         computed: {
             _position: function() {
-                if (!this.customPositioned()) {
+                if (!this.customPositioned() || this.displayType === 'inline') {
                     return {};
                 }
 

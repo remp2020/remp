@@ -114,7 +114,7 @@
                 return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
             },
             _position: function() {
-                if (!this.customPositioned()) {
+                if (!this.customPositioned() || this.displayType === 'inline') {
                     return {};
                 }
 
