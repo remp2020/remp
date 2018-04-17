@@ -46,8 +46,60 @@ For application to function properly you need to add Laravel's schedule running 
 
 Laravel's scheduler currently includes:
 
-* *aggregate:pageview-load*: aggregates article-based pageview data
-* *aggregate:pageview-timespent*: aggregates article-based timespent data
+* *pageviews:aggregate-load*: Reads pageview/load data from journal and stores aggregated data
+* *pageviews:aggregate-timespent*: Reads pageview/timespent data from journal and stores aggregated data
+* *pageviews:loyal-visitors*: Determines number of articles read by top 10% of readers and creates segment based on it
+* *pageviews:process-sessions*: Reads and parses session referers tracked within Beam
+
+## Beam API
+
+The API provides endpoints to track data about articles and conversions.
+
+Authentication is done using Bearer API token, which can be generated in SSO Admin tool. Headers `Content-Type` and `Accept` are required to be set as following:
+
+```
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer API_TOKEN
+```
+
+Two important endpoints are:
+
+* `POST /api/articles/upsert` - stores data about articles (author, title, ...), that is later matched with tracked events data. Example:
+```json
+{
+  "articles": [
+    {
+      "external_id": "", // Article ID
+      "property_uuid": "", // Beam property token
+      "title": "Sample Article",
+      "url": "http://example.com/sample-article-1.html",
+      "authors": [
+        "Author 1"
+      ],
+      "sections": [
+        "Foreign News"
+      ],
+      "published_at": "2018-01-01 01:00:00"  
+    }
+  ]
+}
+```
+
+* `POST api/conversions/upsert` - stores data about article conversions. Example:
+```json
+{
+  "conversions": [
+    {
+      "article_external_id": "", // Article ID
+      "transaction_id": "", // Transaction ID
+      "amount": 10.0,
+      "currency": "EUR",
+      "paid_at": "2018-01-01 01:00:00"
+    }
+  ]
+}
+```
 
 ## [Tracker](go/cmd/tracker) (Go)
 
