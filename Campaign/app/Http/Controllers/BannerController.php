@@ -142,22 +142,13 @@ class BannerController extends Controller
         $banner->fill($request->all());
         $banner->save();
 
-        switch ($banner->template) {
-            case Banner::TEMPLATE_HTML:
-                $banner->htmlTemplate()->create($request->all());
-                break;
-            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
-                $banner->mediumRectangleTemplate()->create($request->all());
-                break;
-            case Banner::TEMPLATE_BAR:
-                $banner->barTemplate()->create($request->all());
-                break;
-            case Banner::TEMPLATE_SHORT_MESSAGE:
-                $banner->shortMessageTemplate()->create($request->all());
-                break;
-            default:
-                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
+        $templateRelationName = $banner->getTemplateRelationName();
+
+        if (!$templateRelationName) {
+            throw new BadRequestHttpException('unhandled template type: ' . $banner->template);
         }
+
+        $banner->{$templateRelationName}()->create($request->all());
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -219,23 +210,13 @@ class BannerController extends Controller
     public function update(BannerRequest $request, Banner $banner)
     {
         $banner->update($request->all());
+        $templateRelationName = $banner->getTemplateRelationName();
 
-        switch ($banner->template) {
-            case Banner::TEMPLATE_HTML:
-                $banner->htmlTemplate->update($request->all());
-                break;
-            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
-                $banner->mediumRectangleTemplate->update($request->all());
-                break;
-            case Banner::TEMPLATE_BAR:
-                $banner->barTemplate->update($request->all());
-                break;
-            case Banner::TEMPLATE_SHORT_MESSAGE:
-                $banner->shortMessageTemplate->update($request->all());
-                break;
-            default:
-                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
+        if (!$templateRelationName) {
+            throw new BadRequestHttpException('unhandled template type: ' . $banner->template);
         }
+
+        $banner->{$templateRelationName}->update($request->all());
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
