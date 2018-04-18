@@ -8,7 +8,7 @@ class AutologinTokens extends AbstractMigration
     {
         $this->table('autologin_tokens')
             ->addColumn('token', 'string')
-            ->addColumn('user_id', 'string')
+            ->addColumn('user_id', 'integer', ['null' => true])
             ->addColumn('email', 'string')
             ->addColumn('created_at', 'datetime')
             ->addColumn('valid_from', 'datetime')
