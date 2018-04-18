@@ -12,6 +12,12 @@ use Illuminate\Http\Request;
 
 class SegmentController extends Controller
 {
+
+    public function __construct(JournalContract $journalContract)
+    {
+        $this->journalContract = $journalContract;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -44,24 +50,13 @@ class SegmentController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param JournalContract $journalContract
      * @return \Illuminate\Http\Response
      */
-    public function create(JournalContract $journalContract)
+    public function create()
     {
-        $old = old();
         $segment = new Segment();
-        $segment->fill($old);
 
-        if (isset($old['rules'])) {
-            $rules = [];
-            foreach ($old['rules'] as $rule) {
-                $rules[] = $segment->rules()->make($rule);
-            }
-            $segment->setRelation('rules', collect($rules));
-        }
-
-        $categories = $journalContract->categories();
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
 
         return view('segments.create', [
             'segment' => $segment,
@@ -69,22 +64,13 @@ class SegmentController extends Controller
         ]);
     }
 
-    public function copy(Segment $sourceSegment, JournalContract $journalContract)
+    public function copy(Segment $sourceSegment)
     {
         $segment = new Segment();
         $segment->fill($sourceSegment->toArray());
-        $segment->fill(old());
 
-        // user submitted rules, otherwise use rules from source Segment
-        $sourceRules = old('rules', $sourceSegment->rules->toArray());
-        $rules = [];
-        foreach ($sourceRules as $rule) {
-            // make sure we only set fillable attributes (no IDs)
-            $rules[] = $segment->rules()->make($rule);
-        }
-        $segment->setRelation('rules', collect($rules));
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $sourceSegment->rules->toArray());
 
-        $categories = $journalContract->categories();
         flash(sprintf('Form has been pre-filled with data from segment "%s"', $sourceSegment->name))->info();
 
         return view('segments.create', [
@@ -102,16 +88,8 @@ class SegmentController extends Controller
     public function store(SegmentRequest $request)
     {
         $segment = new Segment();
-        $segment->fill($request->all());
-        $segment->save();
 
-        foreach ($request->get('rules', []) as $r) {
-            $rule = $segment->rules()->create($r);
-            $rule->fields = array_filter($rule->fields, function ($item) {
-                return !empty($item["key"]);
-            });
-            $rule->save();
-        }
+        $segment = $this->saveSegment($segment, $request->all(), $request->all('rules'));
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -140,13 +118,11 @@ class SegmentController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Segment $segment
-     * @param JournalContract $journalContract
      * @return \Illuminate\Http\Response
      */
-    public function edit(Segment $segment, JournalContract $journalContract)
+    public function edit(Segment $segment)
     {
-        $segment->fill(old());
-        $categories = $journalContract->categories();
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
 
         return view('segments.edit', [
             'segment' => $segment,
@@ -163,19 +139,7 @@ class SegmentController extends Controller
      */
     public function update(SegmentRequest $request, Segment $segment)
     {
-        $segment->fill($request->all());
-        $segment->save();
-
-        foreach ($request->get('rules', []) as $r) {
-            /** @var SegmentRule $rule */
-            $rule = $segment->rules()->findOrNew($r['id']);
-            $rule->fill($r);
-            $rule->fields = array_filter($rule->fields, function ($item) {
-                return !empty($item["key"]);
-            });
-            $rule->save();
-        }
-        SegmentRule::destroy($request->get('removedRules'));
+        $segment = $this->saveSegment($segment, $request->all(), $request->get('rules'));
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -198,6 +162,71 @@ class SegmentController extends Controller
     public function destroy(Segment $segment)
     {
         $segment->delete();
+
         return redirect(route('segments.index', $segment))->with('success', 'Segment removed');
+    }
+
+    /**
+     * process data from old not valid form
+     *
+     * @param Segment $segment
+     * @param array $old
+     * @param array $segmentRules
+     * @return array
+     */
+    public function processOldSegment(Segment $segment, array $old, array $segmentRules)
+    {
+        $segment->fill($old);
+        $rulesData = $old['rules'] ?? $segmentRules;
+
+        if ($rulesData) {
+            $rules = [];
+
+            foreach ($rulesData as $rule) {
+                $rules[] = $segment->rules()->make($rule);
+            }
+            $segment->setRelation('rules', collect($rules));
+        }
+
+        $categories = $this->journalContract->categories();
+
+        return [
+            $segment,
+            $categories
+        ];
+    }
+
+    /**
+     * save segment and relations
+     *
+     * @param Segment $segment
+     * @param array $data
+     * @param array $rules
+     * @return Segment
+     */
+    public function saveSegment(Segment $segment, array $data, array $rules)
+    {
+        $segment->fill($data);
+        $segment->save();
+
+
+        $rules = $rules ?? [];
+
+        foreach ($rules as $rule) {
+            $loadedRule = SegmentRule::findOrNew($rule['id']);
+            $loadedRule->segment_id = $segment->id;
+            $loadedRule->fill($rule);
+
+            $loadedRule->fields = array_filter($loadedRule->fields, function ($item) {
+                return !empty($item["key"]);
+            });
+            $loadedRule->save();
+        }
+
+        if (isset($data['removedRules'])) {
+            SegmentRule::destroy($data['removedRules']);
+        }
+
+        return $segment;
     }
 }
