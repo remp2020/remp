@@ -181,7 +181,6 @@ return [
         App\Providers\CrmSegmentServiceProvider::class,
         App\Providers\RempSegmentsServiceProvider::class,
         App\Providers\RempTrackerServiceProvider::class,
-        App\Providers\RempJournalServiceProvider::class,
 
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,
