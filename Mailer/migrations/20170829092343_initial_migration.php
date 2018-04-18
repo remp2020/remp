@@ -129,7 +129,7 @@ class InitialMigration extends AbstractMigration
 
         $this->table('mail_user_subscriptions')
             ->addColumn('user_id', 'integer')
-            ->addColumn('user_email', 'integer')
+            ->addColumn('user_email', 'string')
             ->addColumn('mail_type_id', 'integer')
             ->addColumn('subscribed', 'boolean')
             ->addColumn('mail_type_variant_id', 'integer', ['null' => true])
