@@ -29,7 +29,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="row">
@@ -78,7 +78,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="row">
@@ -104,7 +104,9 @@
                                             </div>
                                         </div><!-- .input-group -->
                                     </div>
-                                </div>
+                                </div><!-- .row -->
+
+                                <ab-testing></ab-testing>
                             </div><!-- .panel-body -->
 
 
@@ -401,6 +403,7 @@
     import vSelect from "remp/js/components/vSelect";
     import PageviewRules from "./templates/PageviewRules";
     import FormValidator from "remp/js/components/FormValidator";
+    import AbTesting from "./AbTesting";
 
     let props = [
         "_name",
@@ -432,8 +435,9 @@
     export default {
         components: {
             vSelect,
+            AbTesting,
+            FormValidator,
             PageviewRules,
-            FormValidator
         },
         created: function(){
             let self = this;
