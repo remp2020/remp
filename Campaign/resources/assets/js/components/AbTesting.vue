@@ -132,6 +132,7 @@
 
 .ab-testing-input {
     max-width: 40px;
+    text-align: center;
 }
 
 .ab-testing .color-0 {
