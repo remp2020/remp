@@ -1,7 +1,6 @@
 package model
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"reflect"
@@ -17,30 +16,39 @@ type EventElastic struct {
 }
 
 // Count returns number of events matching the filter defined by EventOptions.
-func (eDB *EventElastic) Count(o AggregateOptions) (CountRowCollection, bool, error) {
+func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bool, error) {
 	search := eDB.DB.Client.Search().
 		Index("events").
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search = eDB.DB.addFilters(search, o)
-
-	nestedAgg := elastic.NewCompositeAggregation()
-	for _, g := range o.GroupBy {
-		agg := elastic.NewCompositeAggregationTermsValuesSource(g).Field(g)
-		nestedAgg = nestedAgg.Sources(agg)
-	}
-	search = search.Aggregation("buckets", nestedAgg)
-
-	// get results
-	result, err := search.Do(context.Background())
+	search, err := eDB.DB.addFilters(search, "events", options)
 	if err != nil {
 		return nil, false, err
 	}
 
-	// extract results
-	aggResult, _ := result.Aggregations.Terms("buckets")
-	return eDB.DB.countRowCollectionFromBuckets(aggResult.Buckets)
+	search, err = eDB.DB.addGroupBy(search, "events", options)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// get results
+	result, err := search.Do(eDB.DB.Context)
+	if err != nil {
+		return nil, false, err
+	}
+
+	if len(options.GroupBy) == 0 {
+		// extract simplified results (no aggregation)
+		return CountRowCollection{
+			CountRow{
+				Count: int(result.Hits.TotalHits),
+			},
+		}, true, nil
+	}
+
+	// extract aggregate results
+	return eDB.DB.countRowCollectionFromBuckets(result.Aggregations, options)
 }
 
 // List returns list of all events based on given EventOptions.
@@ -62,7 +70,7 @@ func (eDB *EventElastic) Categories() ([]string, error) {
 	search = search.Aggregation("buckets", agg)
 
 	// get results
-	result, err := search.Do(context.Background())
+	result, err := search.Do(eDB.DB.Context)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +110,7 @@ func (eDB *EventElastic) Actions(category string) ([]string, error) {
 	search = search.Query(filters)
 
 	// get results
-	result, err := search.Do(context.Background())
+	result, err := search.Do(eDB.DB.Context)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +136,7 @@ func (eDB *EventElastic) Users() ([]string, error) {
 	search = search.Aggregation("buckets", agg)
 
 	// get results
-	result, err := search.Do(context.Background())
+	result, err := search.Do(eDB.DB.Context)
 	if err != nil {
 		return nil, err
 	}

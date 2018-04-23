@@ -42,6 +42,8 @@ func main() {
 	stop := make(chan os.Signal, 3)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
+	ctx, cancelCtx := context.WithCancel(context.Background())
+
 	service := goa.New("segments")
 
 	service.Use(middleware.RequestID())
@@ -94,10 +96,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(errors.Wrap(err, "unable to initialize elasticsearch client"))
 	}
-	elasticDB := &model.ElasticDB{
-		Client: ec,
-		Debug:  c.Debug,
-	}
+	elasticDB := model.NewElasticDB(ctx, ec, c.Debug)
 
 	countCache := cache.New(5*time.Minute, 10*time.Minute)
 
@@ -119,7 +118,6 @@ func main() {
 	// server cancellation
 
 	var wg sync.WaitGroup
-	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	// caching
 
