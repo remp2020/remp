@@ -15,6 +15,10 @@ type PageviewElastic struct {
 
 // Count returns number of Pageviews matching the filter defined by PageviewOptions.
 func (eDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection, bool, error) {
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
+	options.Action = ""
+
 	search := eDB.DB.Client.Search().
 		Index("pageviews").
 		Type("_doc").
@@ -25,7 +29,7 @@ func (eDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
-	search, err = eDB.DB.addGroupBy(search, "pageviews", options)
+	search, err = eDB.DB.addGroupBy(search, "pageviews", options, nil)
 	if err != nil {
 		return nil, false, err
 	}
@@ -50,18 +54,25 @@ func (eDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 }
 
 // Sum returns number of Pageviews matching the filter defined by AggregateOptions.
-func (eDB *PageviewElastic) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
+func (eDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, bool, error) {
+	extras := make(map[string]elastic.Aggregation)
+	extras[fmt.Sprintf("%s_sum", options.Action)] = elastic.NewSumAggregation().Field(options.Action)
+
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
+	options.Action = ""
+
 	search := eDB.DB.Client.Search().
 		Index("pageviews").
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search, err := eDB.DB.addFilters(search, "pageviews", o)
+	search, err := eDB.DB.addFilters(search, "pageviews", options)
 	if err != nil {
 		return nil, false, err
 	}
 
-	search, err = eDB.DB.addGroupBy(search, "pageviews", o)
+	search, err = eDB.DB.addGroupBy(search, "pageviews", options, extras)
 	if err != nil {
 		return nil, false, err
 	}

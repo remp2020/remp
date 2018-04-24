@@ -87,10 +87,11 @@ func (eDB *ElasticDB) addFilters(search *elastic.SearchService, index string, o 
 
 // addGroupBy creates a standard (wrapped) aggregation. The results are fetchable
 // via countRowCollectionFromBuckets or sumRowCollectionFromBuckets.
-func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o AggregateOptions) (*elastic.SearchService, error) {
+func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o AggregateOptions,
+	extras map[string]elastic.Aggregation) (*elastic.SearchService, error) {
 	if len(o.GroupBy) > 0 {
 		var err error
-		search, _, err = eDB.wrapAggregation(index, 0, o.GroupBy, search, nil)
+		search, _, err = eDB.wrapAggregation(index, o.GroupBy, search, extras, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -237,36 +238,50 @@ func (eDB *ElasticDB) resolveKeyword(index, field string) (string, error) {
 	return keyword, nil
 }
 
-// wrapAggregation recursivelly wraps aggregations based on provided groupBy fields
+// wrapAggregation recursivelly wraps aggregations based on provided groupBy fields.
+//
+// It includes any extra aggregations on the lowest level.
 //
 // Initially the implementation used ElasticDB::addCompositeGroupBy(), but it was a beta feature
 // and elastic didn't allow us to link sum aggregation to the results.
 //
 // Following is a standard wrapping via SubAggregation() endorsed by official docs.
-func (eDB *ElasticDB) wrapAggregation(index string, itemIdx int, groupBy []string, search *elastic.SearchService,
-	agg *elastic.TermsAggregation) (*elastic.SearchService, *elastic.TermsAggregation, error) {
+func (eDB *ElasticDB) wrapAggregation(index string, groupBy []string, search *elastic.SearchService,
+	extras map[string]elastic.Aggregation, agg *elastic.TermsAggregation) (*elastic.SearchService, *elastic.TermsAggregation, error) {
 
-	field := groupBy[itemIdx]
-	keyword, err := eDB.resolveKeyword(index, field)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32)
-	if len(groupBy) > itemIdx+1 {
-		search, termsAgg, err = eDB.wrapAggregation(index, itemIdx+1, groupBy, search, termsAgg)
+	for _, field := range groupBy {
+		keyword, err := eDB.resolveKeyword(index, field)
 		if err != nil {
 			return nil, nil, err
 		}
+
+		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32)
+
+		if len(groupBy) > 1 {
+			search, termsAgg, err = eDB.wrapAggregation(index, groupBy[1:], search, extras, termsAgg)
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+
+		if agg == nil {
+			// include external aggregation if necessary (e.g. sum)
+			for label, extraAgg := range extras {
+				search = search.Aggregation(label, extraAgg)
+			}
+			return search, nil, nil
+			// return search.Aggregation(field, termsAgg), nil, nil
+		} else {
+			// include external aggregation if necessary (e.g. sum)
+			for label, extraAgg := range extras {
+				agg = agg.SubAggregation(label, extraAgg)
+			}
+			return search, agg.SubAggregation(field, termsAgg), nil
+		}
+
 	}
 
-	if agg == nil {
-		return search.Aggregation(field, termsAgg), nil, nil
-	}
-
-	sumAgg := elastic.NewSumAggregation().Field("window_height")
-	agg = agg.SubAggregation("sum", sumAgg)
-	return search, agg.SubAggregation(field, termsAgg), nil
+	return search, nil, nil
 }
 
 // unwrapCallback represents final callback that should be called when all aggregations are unwrapped

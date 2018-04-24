@@ -27,7 +27,7 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 		return nil, false, err
 	}
 
-	search, err = eDB.DB.addGroupBy(search, "events", options)
+	search, err = eDB.DB.addGroupBy(search, "events", options, nil)
 	if err != nil {
 		return nil, false, err
 	}
