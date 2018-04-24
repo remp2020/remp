@@ -48,7 +48,7 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 	}
 
 	// extract aggregate results
-	return eDB.DB.countRowCollectionFromBuckets(result.Aggregations, options)
+	return eDB.DB.countRowCollectionFromAggregations(result.Aggregations, options)
 }
 
 // List returns list of all events based on given EventOptions.

@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/olivere/elastic"
 )
@@ -50,13 +49,14 @@ func (eDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 	}
 
 	// extract results
-	return eDB.DB.countRowCollectionFromBuckets(result.Aggregations, options)
+	return eDB.DB.countRowCollectionFromAggregations(result.Aggregations, options)
 }
 
 // Sum returns number of Pageviews matching the filter defined by AggregateOptions.
 func (eDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, bool, error) {
 	extras := make(map[string]elastic.Aggregation)
-	extras[fmt.Sprintf("%s_sum", options.Action)] = elastic.NewSumAggregation().Field(options.Action)
+	targetAgg := fmt.Sprintf("%s_sum", options.Action)
+	extras[targetAgg] = elastic.NewSumAggregation().Field(options.Action)
 
 	// action is not being tracked within separate measurements and we would get no records back
 	// removing it before applying filter
@@ -83,9 +83,7 @@ func (eDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
-	log.Println(result)
-
-	return SumRowCollection{}, true, nil
+	return eDB.DB.sumRowCollectionFromAggregations(result.Aggregations, options, targetAgg)
 }
 
 // List returns list of all Pageviews based on given PageviewOptions.

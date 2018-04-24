@@ -99,11 +99,11 @@ func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o 
 	return search, nil
 }
 
-func (eDB *ElasticDB) countRowCollectionFromBuckets(aggregations elastic.Aggregations, options AggregateOptions) (CountRowCollection, bool, error) {
-	crc := CountRowCollection{}
+func (eDB *ElasticDB) countRowCollectionFromAggregations(aggregations elastic.Aggregations, options AggregateOptions) (CountRowCollection, bool, error) {
+	var crc CountRowCollection
 	tags := make(map[string]string)
 
-	eDB.unwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int) {
+	eDB.unwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
 		crcTags := make(map[string]string)
 		// copy tags to avoid memory sharing
 		for key, val := range tags {
@@ -118,8 +118,36 @@ func (eDB *ElasticDB) countRowCollectionFromBuckets(aggregations elastic.Aggrega
 	return crc, true, nil
 }
 
-func (eDB *ElasticDB) sumRowCollectionFromBuckets(buckets []*elastic.AggregationBucketKeyItem) (SumRowCollection, bool, error) {
-	return SumRowCollection{}, true, nil
+func (eDB *ElasticDB) sumRowCollectionFromAggregations(aggregations elastic.Aggregations, options AggregateOptions, targetAgg string) (SumRowCollection, bool, error) {
+	var src SumRowCollection
+	dataPresent := true
+	tags := make(map[string]string)
+
+	eDB.unwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
+		sumAgg, ok := aggregations.Sum(targetAgg)
+		if !ok {
+			dataPresent = false
+			return
+		}
+
+		srcTags := make(map[string]string)
+		// copy tags to avoid memory sharing
+		for key, val := range tags {
+			srcTags[key] = val
+		}
+
+		var sum float64
+		if sumAgg.Value != nil {
+			sum = *sumAgg.Value
+		}
+
+		src = append(src, SumRow{
+			Tags: srcTags,
+			Sum:  sum,
+		})
+	})
+
+	return src, dataPresent, nil
 }
 
 // addCompositeGroupBy creates a composite aggregation. The results are fetchable
@@ -262,23 +290,22 @@ func (eDB *ElasticDB) wrapAggregation(index string, groupBy []string, search *el
 			if err != nil {
 				return nil, nil, err
 			}
-		}
-
-		if agg == nil {
-			// include external aggregation if necessary (e.g. sum)
-			for label, extraAgg := range extras {
-				search = search.Aggregation(label, extraAgg)
-			}
-			return search, nil, nil
-			// return search.Aggregation(field, termsAgg), nil, nil
 		} else {
 			// include external aggregation if necessary (e.g. sum)
 			for label, extraAgg := range extras {
-				agg = agg.SubAggregation(label, extraAgg)
+				termsAgg = termsAgg.SubAggregation(label, extraAgg)
 			}
-			return search, agg.SubAggregation(field, termsAgg), nil
 		}
 
+		if agg == nil {
+			return search.Aggregation(field, termsAgg), nil, nil
+		}
+
+		// include external aggregation if necessary (e.g. sum)
+		for label, extraAgg := range extras {
+			termsAgg = termsAgg.SubAggregation(label, extraAgg)
+		}
+		return search, agg.SubAggregation(field, termsAgg), nil
 	}
 
 	return search, nil, nil
@@ -286,7 +313,7 @@ func (eDB *ElasticDB) wrapAggregation(index string, groupBy []string, search *el
 
 // unwrapCallback represents final callback that should be called when all aggregations are unwrapped
 // and the final set of tags and count can be provided
-type unwrapCallback func(tags map[string]string, count int)
+type unwrapCallback func(tags map[string]string, count int, aggregations elastic.Aggregations)
 
 // unwrapAggregation traverses through all the aggregations and calls the provided callback on the lowest level
 // providing tags of the fields and resulting count.
@@ -311,7 +338,7 @@ func (eDB *ElasticDB) unwrapAggregation(aggregations elastic.Aggregations, group
 				return nil
 			}
 
-			cb(tags, int(bucket.DocCount))
+			cb(tags, int(bucket.DocCount), bucket.Aggregations)
 		}
 	}
 
