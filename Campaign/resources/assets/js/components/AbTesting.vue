@@ -17,48 +17,8 @@
                     </thead>
 
                     <tbody>
-                        <tr v-for="(variant, index) in variants" :key="variant.value">
 
-                            <!-- variant color box -->
-                            <td class="table-td-color" :class="['color-' + index]"><div></div></td>
-
-                            <!-- variant name -->
-                            <td class="table-td-name">
-                                <input type="text" :name="'variants[' + index + '][name]'" v-model="variant.name" :disabled="variant.control_group == 1">
-                            </td>
-
-                            <!-- variant select -->
-                            <td class="table-td-banner">
-                                <v-select id="variant_id"
-                                        :name="'variants[' + index + '][id]'"
-                                        :value="variant.id"
-                                        :title="'No alternative'"
-                                        :options.sync="variantOptions"
-                                        v-if="index != variants.length - 1 && index != 0"
-                                ></v-select>
-                                <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[variants[index].id].label }}</span>
-                            </td>
-
-                            <!-- proportion value -->
-                            <td style="text-align: right;">
-                                <input type="number" :class="['ab-testing-input', 'ab-testing-input-' + index]" name="asd" :value="variant.val" @change="handleInputUpdate(this.event, index)" id="">&nbsp;&nbsp;%
-                            </td>
-
-                            <!-- remove variant button -->
-                            <td class="table-td-button">
-                                <button @click="removeVariant($event, index)">
-                                    <i class="zmdi zmdi-minus-circle"></i>
-                                </button>
-                            </td>
-
-                            <!-- add variant button -->
-                            <td class="table-td-button">
-                                <button v-if="index == variants.length - 1" class="pull-right" @click="addEmptyVariant($event, index)">
-                                    <i class="zmdi zmdi-plus-circle"></i>
-                                </button>
-                            </td>
-
-                        </tr>
+                        <ab-testing-variant v-for="(variant, index) in variants" :index="index" :variant="variant" :key="variant.index"></ab-testing-variant>
                     </tbody>
                 </table>
 
@@ -69,11 +29,11 @@
 </template>
 
 <script type="text/javascript">
-    import vSelect from "remp/js/components/vSelect";
+    import AbTestingVariant from "./AbTestingVariant";
 
     export default {
         components: {
-            vSelect
+            AbTestingVariant
         },
         props: {
             variantOptions: null,
@@ -133,8 +93,6 @@
             handleSliderUpdate(values, handle) {
                 var sum = 0;
 
-                console.log(this.variants);
-
                 for (var ii = 0; ii < values.length; ii++) {
                     var val = parseInt(values[ii]);
 
@@ -192,13 +150,6 @@
                 let toRemove = this.variants[i]
                 this.variants.splice(i, 1);
                 this.removedVariants.push(toRemove.id);
-            }
-        },
-        watch: {
-            variants: {
-                proportion: function () {
-                    console.log('proportion changed')
-                }
             }
         }
     }
