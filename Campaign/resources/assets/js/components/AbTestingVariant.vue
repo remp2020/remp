@@ -29,7 +29,7 @@
 
         <!-- remove variant button -->
         <td class="table-td-button">
-            <button @click="removeVariant($event, index)">
+            <button @click="$parent.removeVariant($event, index)">
                 <i class="zmdi zmdi-minus-circle"></i>
             </button>
         </td>

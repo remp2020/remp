@@ -139,17 +139,19 @@
             addEmptyVariant: function (event, index) {
                 this.variants.splice(this.variants.length - 1, 0, {
                     'id': null,
-                    'name': "Variant" + index
+                    'name': "Variant" + index,
+                    'proportion': 10
                 });
 
                 if (event) {
                     event.preventDefault();
                 }
             },
-            removeVariant: function (i) {
+            removeVariant: function (event, i) {
                 let toRemove = this.variants[i]
                 this.variants.splice(i, 1);
-                this.removedVariants.push(toRemove.id);
+
+                event.preventDefault();
             }
         }
     }
