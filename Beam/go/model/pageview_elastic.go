@@ -1,9 +1,10 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	"strconv"
 
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
@@ -102,6 +103,9 @@ func (pDB *PageviewElastic) List(options ListOptions) (PageviewRowCollection, er
 		return nil, err
 	}
 
+	// prepare PageviewRow buckets
+	prBuckets := make(map[string]*PageviewRow)
+
 	// get results
 	for {
 		results, err := scroll.Do(pDB.DB.Context)
@@ -114,11 +118,60 @@ func (pDB *PageviewElastic) List(options ListOptions) (PageviewRowCollection, er
 
 		// Send the hits to the hits channel
 		for _, hit := range results.Hits.Hits {
-			log.Printf("#%v\n", hit)
-			// prc = append(prc, pr)
+			// populate pageview for collection
+			pv := &Pageview{}
+			if err := json.Unmarshal(*hit.Source, pv); err != nil {
+				return nil, errors.Wrap(err, "error reading pageview record from elastic")
+			}
 
-			// TODO: put the results into tags buckets manually, elastic returns list and aggregations separately
+			// extract raw pageview data to build tags map
+			rawPv := make(map[string]interface{})
+			if err := json.Unmarshal(*hit.Source, &rawPv); err != nil {
+				return nil, errors.Wrap(err, "error reading pageview record from elastic")
+			}
+
+			// we need to get string value for tags by type casting
+			tags := make(map[string]string)
+			key := ""
+			for _, field := range options.GroupBy {
+				var tagVal string
+				switch val := rawPv[field].(type) {
+				case nil:
+					tagVal = ""
+				case bool:
+					if val {
+						tagVal = "1"
+					} else {
+						tagVal = "0"
+					}
+				case string:
+					tagVal = val
+				case float64:
+					tagVal = strconv.FormatFloat(val, 'f', 0, 64)
+				case int64:
+					tagVal = strconv.FormatInt(val, 10)
+				default:
+					return nil, fmt.Errorf("unhandled tag type in pageview listing: %T", rawPv[field])
+				}
+
+				tags[field] = fmt.Sprintf("%s", tagVal)
+				key = fmt.Sprintf("%s%s=%s_", key, field, tagVal)
+			}
+
+			// place Pageview instance into proper PageviewRow based on tags (key)
+			pr, ok := prBuckets[key]
+			if !ok {
+				pr = &PageviewRow{
+					Tags: tags,
+				}
+				prBuckets[key] = pr
+			}
+			pr.Pageviews = append(pr.Pageviews, pv)
 		}
+	}
+
+	for _, pr := range prBuckets {
+		prc = append(prc, pr)
 	}
 
 	return prc, nil
