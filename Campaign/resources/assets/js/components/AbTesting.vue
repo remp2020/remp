@@ -18,31 +18,46 @@
 
                     <tbody>
                         <tr v-for="(variant, index) in variants" :key="variant.value">
+
+                            <!-- variant color box -->
                             <td class="table-td-color" :class="['color-' + index]"><div></div></td>
+
+                            <!-- variant name -->
                             <td class="table-td-name">
-                                <input type="text" :name="'variants[' + index + '][name]'" v-model="variant.name">
+                                <input type="text" :name="'variants[' + index + '][name]'" v-model="variant.name" :disabled="variant.control_group == 1">
                             </td>
+
+                            <!-- variant select -->
                             <td class="table-td-banner">
                                 <v-select id="variant_id"
                                         :name="'variants[' + index + '][id]'"
                                         :value="variant.id"
                                         :title="'No alternative'"
                                         :options.sync="variantOptions"
+                                        v-if="index != variants.length - 1 && index != 0"
                                 ></v-select>
+                                <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[variants[index].id].label }}</span>
                             </td>
+
+                            <!-- proportion value -->
                             <td style="text-align: right;">
-                                <input type="number" :class="['ab-testing-input', 'ab-testing-input-' + index]" name="asd" :value="variant.val" @change="handleInputUpdate(this.event, i)" id="">&nbsp;&nbsp;%
+                                <input type="number" :class="['ab-testing-input', 'ab-testing-input-' + index]" name="asd" :value="variant.val" @change="handleInputUpdate(this.event, index)" id="">&nbsp;&nbsp;%
                             </td>
+
+                            <!-- remove variant button -->
                             <td class="table-td-button">
                                 <button @click="removeVariant($event, index)">
                                     <i class="zmdi zmdi-minus-circle"></i>
                                 </button>
                             </td>
+
+                            <!-- add variant button -->
                             <td class="table-td-button">
                                 <button v-if="index == variants.length - 1" class="pull-right" @click="addEmptyVariant($event, index)">
                                     <i class="zmdi zmdi-plus-circle"></i>
                                 </button>
                             </td>
+
                         </tr>
                     </tbody>
                 </table>
@@ -92,10 +107,6 @@
                 starts.push(sum);
             }
 
-            console.log(this.variants)
-
-            console.log('starts', starts)
-
             // create slider
             this.sliderEl = document.getElementById('slider');
             noUiSlider.create(this.sliderEl, {
@@ -110,6 +121,7 @@
 
             // set slider connects color
             var connects = slider.querySelectorAll('.noUi-connect');
+
             for (var i = 0; i < connects.length; i++) {
                 connects[i].classList.add('color-' + i);
             }
@@ -121,19 +133,23 @@
             handleSliderUpdate(values, handle) {
                 var sum = 0;
 
+                console.log(this.variants);
+
                 for (var ii = 0; ii < values.length; ii++) {
                     var val = parseInt(values[ii]);
 
                     if (ii == 0) {
-                        this.variants[ii].val = val;
+                        this.variants[ii].proportion = val;
                         sum += val;
                     } else {
-                        this.variants[ii].val = parseInt(val-values[ii-1]);
+                        this.variants[ii].proportion = parseInt(val-values[ii-1]);
                         sum += parseInt(val-values[ii-1]);
                     }
                 }
 
-                this.variants[this.variants.length-1].val = 100-sum;
+                this.variants[this.variants.length-1].proportion = 100-sum;
+
+
             },
             handleInputUpdate(event, i) {
                 var a = Array(this.variants.length).fill(null),
@@ -177,11 +193,18 @@
                 this.variants.splice(i, 1);
                 this.removedVariants.push(toRemove.id);
             }
+        },
+        watch: {
+            variants: {
+                proportion: function () {
+                    console.log('proportion changed')
+                }
+            }
         }
     }
 </script>
 
-<style scoped>
+<style>
 .ab-testing {
     padding: 20px 40px;
 }
@@ -200,22 +223,27 @@
     height: 20px;
 }
 
+.noUi-connect.color-0,
 .table-td-color.color-0 > div {
     background: #E37B40;
 }
 
+.noUi-connect.color-1,
 .table-td-color.color-1 > div {
     background: #46B29D;
 }
 
+.noUi-connect.color-2,
 .table-td-color.color-2 > div {
     background: #DE5B49;
 }
 
+.noUi-connect.color-3,
 .table-td-color.color-3 > div {
     background: #324D5C;
 }
 
+.noUi-connect.color-4,
 .table-td-color.color-4 > div {
     background: #F0CA4D;
 }
@@ -236,6 +264,11 @@
 
 .table > tbody > tr:last-child > td, .table > tfoot > tr:last-child > td {
     padding-bottom: 15px;
+}
+
+html input[disabled] {
+    background: none;
+    border: none;
 }
 </style>
 

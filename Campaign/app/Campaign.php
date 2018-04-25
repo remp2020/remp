@@ -95,7 +95,7 @@ class Campaign extends Model
 
     public function getAllVariants()
     {
-        return DB::table('campaign_banners')->where('campaign_id', $this->id)->get();
+        return DB::table('campaign_banners')->where('campaign_id', $this->id)->orderBy('weight')->get();
     }
 
     public function setVariantsAttribute(array $variants)
