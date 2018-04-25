@@ -22,7 +22,7 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search, err := eDB.DB.addFilters(search, "events", options)
+	search, err := eDB.DB.addSearchFilters(search, "events", options)
 	if err != nil {
 		return nil, false, err
 	}

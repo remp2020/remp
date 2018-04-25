@@ -30,8 +30,24 @@ func NewElasticDB(ctx context.Context, client *elastic.Client, debug bool) *Elas
 	return edb
 }
 
-func (eDB *ElasticDB) addFilters(search *elastic.SearchService, index string, o AggregateOptions) (*elastic.SearchService, error) {
-	filters := elastic.NewBoolQuery()
+func (eDB *ElasticDB) addSearchFilters(search *elastic.SearchService, index string, o AggregateOptions) (*elastic.SearchService, error) {
+	bq, err := eDB.boolQueryFromOptions(index, o)
+	if err != nil {
+		return nil, err
+	}
+	return search.Query(bq), nil
+}
+
+func (eDB *ElasticDB) addScrollFilters(scroll *elastic.ScrollService, index string, o AggregateOptions) (*elastic.ScrollService, error) {
+	bq, err := eDB.boolQueryFromOptions(index, o)
+	if err != nil {
+		return nil, err
+	}
+	return scroll.Query(bq), nil
+}
+
+func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*elastic.BoolQuery, error) {
+	bq := elastic.NewBoolQuery()
 	for _, f := range o.FilterBy {
 		if len(f.Values) == 0 {
 			continue
@@ -47,7 +63,7 @@ func (eDB *ElasticDB) addFilters(search *elastic.SearchService, index string, o 
 		if err != nil {
 			return nil, err
 		}
-		filters = filters.Must(elastic.NewTermsQuery(field, interfaceSlice...))
+		bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
 	}
 
 	if o.Category != "" {
@@ -55,21 +71,21 @@ func (eDB *ElasticDB) addFilters(search *elastic.SearchService, index string, o 
 		if err != nil {
 			return nil, err
 		}
-		filters = filters.Must(elastic.NewTermQuery(field, o.Category))
+		bq = bq.Must(elastic.NewTermQuery(field, o.Category))
 	}
 	if o.Action != "" {
 		field, err := eDB.resolveKeyword(index, "action")
 		if err != nil {
 			return nil, err
 		}
-		filters = filters.Must(elastic.NewTermQuery(field, o.Action))
+		bq = bq.Must(elastic.NewTermQuery(field, o.Action))
 	}
 	if o.Step != "" {
 		field, err := eDB.resolveKeyword(index, "step")
 		if err != nil {
 			return nil, err
 		}
-		filters = filters.Must(elastic.NewTermQuery(field, o.Step))
+		bq = bq.Must(elastic.NewTermQuery(field, o.Step))
 	}
 	if !o.TimeAfter.IsZero() || !o.TimeBefore.IsZero() {
 		rq := elastic.NewRangeQuery("time")
@@ -79,10 +95,9 @@ func (eDB *ElasticDB) addFilters(search *elastic.SearchService, index string, o 
 		if !o.TimeBefore.IsZero() {
 			rq.Lt(o.TimeBefore)
 		}
-		filters = filters.Must(rq)
+		bq = bq.Must(rq)
 	}
-	search = search.Query(filters)
-	return search, nil
+	return bq, nil
 }
 
 // addGroupBy creates a standard (wrapped) aggregation. The results are fetchable
@@ -91,7 +106,7 @@ func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o 
 	extras map[string]elastic.Aggregation) (*elastic.SearchService, error) {
 	if len(o.GroupBy) > 0 {
 		var err error
-		search, _, err = eDB.wrapAggregation(index, o.GroupBy, search, extras, nil)
+		search, _, err = eDB.WrapAggregation(index, o.GroupBy, search, extras, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +118,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(aggregations elastic.Ag
 	var crc CountRowCollection
 	tags := make(map[string]string)
 
-	eDB.unwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
+	eDB.UnwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
 		crcTags := make(map[string]string)
 		// copy tags to avoid memory sharing
 		for key, val := range tags {
@@ -123,7 +138,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(aggregations elastic.Aggr
 	dataPresent := true
 	tags := make(map[string]string)
 
-	eDB.unwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
+	eDB.UnwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
 		sumAgg, ok := aggregations.Sum(targetAgg)
 		if !ok {
 			dataPresent = false
@@ -266,7 +281,7 @@ func (eDB *ElasticDB) resolveKeyword(index, field string) (string, error) {
 	return keyword, nil
 }
 
-// wrapAggregation recursivelly wraps aggregations based on provided groupBy fields.
+// WrapAggregation recursivelly wraps aggregations based on provided groupBy fields.
 //
 // It includes any extra aggregations on the lowest level.
 //
@@ -274,7 +289,7 @@ func (eDB *ElasticDB) resolveKeyword(index, field string) (string, error) {
 // and elastic didn't allow us to link sum aggregation to the results.
 //
 // Following is a standard wrapping via SubAggregation() endorsed by official docs.
-func (eDB *ElasticDB) wrapAggregation(index string, groupBy []string, search *elastic.SearchService,
+func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *elastic.SearchService,
 	extras map[string]elastic.Aggregation, agg *elastic.TermsAggregation) (*elastic.SearchService, *elastic.TermsAggregation, error) {
 
 	for _, field := range groupBy {
@@ -286,7 +301,7 @@ func (eDB *ElasticDB) wrapAggregation(index string, groupBy []string, search *el
 		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32)
 
 		if len(groupBy) > 1 {
-			search, termsAgg, err = eDB.wrapAggregation(index, groupBy[1:], search, extras, termsAgg)
+			search, termsAgg, err = eDB.WrapAggregation(index, groupBy[1:], search, extras, termsAgg)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -311,13 +326,13 @@ func (eDB *ElasticDB) wrapAggregation(index string, groupBy []string, search *el
 	return search, nil, nil
 }
 
-// unwrapCallback represents final callback that should be called when all aggregations are unwrapped
+// UnwrapCallback represents final callback that should be called when all aggregations are unwrapped
 // and the final set of tags and count can be provided
-type unwrapCallback func(tags map[string]string, count int, aggregations elastic.Aggregations)
+type UnwrapCallback func(tags map[string]string, count int, aggregations elastic.Aggregations)
 
-// unwrapAggregation traverses through all the aggregations and calls the provided callback on the lowest level
+// UnwrapAggregation traverses through all the aggregations and calls the provided callback on the lowest level
 // providing tags of the fields and resulting count.
-func (eDB *ElasticDB) unwrapAggregation(aggregations elastic.Aggregations, groupBy []string, tags map[string]string, cb unwrapCallback) error {
+func (eDB *ElasticDB) UnwrapAggregation(aggregations elastic.Aggregations, groupBy []string, tags map[string]string, cb UnwrapCallback) error {
 	for _, field := range groupBy {
 		agg, ok := aggregations.Terms(field)
 		if !ok {
@@ -334,7 +349,7 @@ func (eDB *ElasticDB) unwrapAggregation(aggregations elastic.Aggregations, group
 			}
 
 			if len(groupBy) > 1 {
-				eDB.unwrapAggregation(bucket.Aggregations, groupBy[1:], tags, cb)
+				eDB.UnwrapAggregation(bucket.Aggregations, groupBy[1:], tags, cb)
 				return nil
 			}
 
