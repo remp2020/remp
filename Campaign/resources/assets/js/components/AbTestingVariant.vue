@@ -36,7 +36,7 @@
 
         <!-- add variant button -->
         <td class="table-td-button">
-            <button v-if="index == $parent.variants.length - 1" class="pull-right" @click="addEmptyVariant($event, index)">
+            <button v-if="index == $parent.variants.length - 2" class="pull-right" @click="$parent.addEmptyVariant($event, index)">
                 <i class="zmdi zmdi-plus-circle"></i>
             </button>
         </td>

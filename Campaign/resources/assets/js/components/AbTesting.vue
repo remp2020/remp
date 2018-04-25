@@ -137,7 +137,7 @@
                 this.sliderEl.noUiSlider.set(a)
             },
             addEmptyVariant: function (event, index) {
-                this.variants.push({
+                this.variants.splice(this.variants.length - 1, 0, {
                     'id': null,
                     'name': "Variant" + index
                 });
