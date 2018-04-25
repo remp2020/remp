@@ -71,7 +71,7 @@
                         'banner' => [
                             'header' => 'Banner'
                         ],
-                        'alt_banner' => [
+                        'variants' => [
                             'header' => 'Banner B'
                         ],
                         'segments' => [

@@ -45,7 +45,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'altBanner', 'segments', 'countries'])
+            ->with(['banner', 'variants', 'segments', 'countries'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -61,12 +61,12 @@ class CampaignController extends Controller
             ->addColumn('banner', function (Campaign $campaign) {
                 return Html::linkRoute('banners.edit', $campaign->banner->name, $campaign->banner);
             })
-            ->addColumn('alt_banner', function (Campaign $campaign) {
-                if (!$campaign->altBanner) {
-                    return null;
-                }
-                return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
-            })
+            // ->addColumn('alt_banner', function (Campaign $campaign) {
+            //     if (!$campaign->altBanner) {
+            //         return null;
+            //     }
+            //     return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
+            // })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
             })
@@ -97,12 +97,12 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
 
-        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list($campaign, $bannerId, $variants, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
             'bannerId' => $bannerId,
-            'altBannerId' => $altBannerId,
+            'variants' => $variants,
             'selectedCountries' => $selectedCountries,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
@@ -113,17 +113,17 @@ class CampaignController extends Controller
 
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
     {
-        $sourceCampaign->load('banner', 'altBanner', 'segments', 'countries');
+        $sourceCampaign->load('banner', 'variants', 'segments', 'countries');
         $campaign = $sourceCampaign->replicate();
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
-        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list($campaign, $bannerId, $variants, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
             'bannerId' => $bannerId,
-            'altBannerId' => $altBannerId,
+            'variants' => $variants,
             'selectedCountries' => $selectedCountries,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
@@ -204,12 +204,18 @@ class CampaignController extends Controller
      */
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
-        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list(
+            $campaign,
+            $bannerId,
+            $variants,
+            $selectedCountries,
+            $countriesBlacklist
+        ) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.edit', [
             'campaign' => $campaign,
             'bannerId' => $bannerId,
-            'altBannerId' => $altBannerId,
+            'variants' => $variants,
             'selectedCountries' => $selectedCountries,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
@@ -422,8 +428,8 @@ class CampaignController extends Controller
         GeoIp2\Database\Reader $geoIPreader,
         DeviceDetector $dd
     ) {
-        // validation
 
+        // validation
         $data = \GuzzleHttp\json_decode($r->get('data'));
         $url = $data->url ?? null;
         if (!$url) {
@@ -658,7 +664,7 @@ class CampaignController extends Controller
         $campaign->save();
 
         $campaign->banner_id = $data['banner_id'];
-        $campaign->alt_banner_id = $data['alt_banner_id'];
+        $campaign->variants = $data['variants'];
 
         if (isset($data['countries'])) {
             $campaign->countries()->sync(
@@ -713,31 +719,48 @@ class CampaignController extends Controller
             $blacklisted = (int)$country['pivot']['blacklisted'];
         }
 
-        // banners
-        $bannerId = null;
-        $altBannerId = null;
-
+        // main banner
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
             $bannerId = $campaign->banner ? $campaign->banner->id : null;
         }
 
-        if (array_key_exists('alt_banner_id', $data)) {
-            $altBannerId = $data['alt_banner_id'];
+        // variants
+        if (array_key_exists('variants', $data)) {
+            $variants = $data['variants'];
         } else {
-            $altBannerId = $campaign->altBanner ? $campaign->altBanner->id : null;
+            $variants = $this->prepareVariants($campaign);
         }
 
         return [
             $campaign,
             $bannerId,
-            $altBannerId,
+            $variants,
             $selectedCountries,
             isset($data['countries_blacklist'])
                 ? $data['countries_blacklist']
                 : $blacklisted
         ];
+    }
+
+    public function prepareVariants(Campaign $campaign): Collection
+    {
+        $allVariants = $campaign->getAllVariants();
+        $variants = null;
+
+        if (!empty($allVariants)) {
+            $variants = $allVariants->map(function ($variant) {
+                return [
+                    'id' => $variant->banner_id,
+                    'name' => $variant->variant,
+                    'proportion' => $variant->proportion,
+                    'control_group' => $variant->control_group
+                ];
+            });
+        }
+
+        return $variants;
     }
 
     public function getAllSegments(SegmentAggregator $segmentAggregator)

@@ -1,48 +1,121 @@
 <template>
     <div class="ab-testing">
-        <div id="slider" class="m-b-25 m-t-25"></div>
+        <div class="row">
+            <div class="col-md-12">
 
-        <table class="table table-striped">
-            <tbody>
-                <tr v-for="(variant, i) in variants" :key="i">
-                    <td style="width: 43px;" :class="['color-' + i]">&nbsp;</td>
-                    <td>{{ variant.name }}</td>
-                    <td style="text-align: right;">
-                        <input type="text" :class="['ab-testing-input', 'ab-testing-input-' + i]" name="asd" :value="variant.val" @change="handleInputUpdate(this.event, i)" id="">&nbsp;&nbsp;%
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                <div id="slider" class="m-b-25 m-t-25"></div>
 
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Variant name</th>
+                            <th>Banner</th>
+                            <th>&nbsp;</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="(variant, index) in variants" :key="variant.value">
+                            <td class="table-td-color" :class="['color-' + index]"><div></div></td>
+                            <td class="table-td-name">
+                                <input type="text" :name="'variants[' + index + '][name]'" v-model="variant.name">
+                            </td>
+                            <td class="table-td-banner">
+                                <v-select id="variant_id"
+                                        :name="'variants[' + index + '][id]'"
+                                        :value="variant.id"
+                                        :title="'No alternative'"
+                                        :options.sync="variantOptions"
+                                ></v-select>
+                            </td>
+                            <td style="text-align: right;">
+                                <input type="number" :class="['ab-testing-input', 'ab-testing-input-' + index]" name="asd" :value="variant.val" @change="handleInputUpdate(this.event, i)" id="">&nbsp;&nbsp;%
+                            </td>
+                            <td class="table-td-button">
+                                <button @click="removeVariant($event, index)">
+                                    <i class="zmdi zmdi-minus-circle"></i>
+                                </button>
+                            </td>
+                            <td class="table-td-button">
+                                <button v-if="index == variants.length - 1" class="pull-right" @click="addEmptyVariant($event, index)">
+                                    <i class="zmdi zmdi-plus-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div><!-- .row -->
 
     </div>
 </template>
 
 <script type="text/javascript">
+    import vSelect from "remp/js/components/vSelect";
+
     export default {
-        data() {
-            return {
-                sliderEl: null,
-                dontRunSliderUpdate: true,
-                variants: [
-                    {
-                        name: "Variant A",
-                        val: 30
-                    },
+        components: {
+            vSelect
+        },
+        props: {
+            variantOptions: null,
+            variants: {
+                default: [
                     {
                         name: "Variant B",
                         val: 30
-                    },
-                    {
-                        name: "Variant C",
-                        val: 20
-                    },
-                    {
-                        name: "Control Group",
-                        val: 20
-                    },
+                    }
                 ]
+            }
+        },
+        data() {
+            return {
+                sliderEl: null,
+                dontRunSliderUpdate: true
             };
+        },
+        created() {
+            if (!this.variants.length) {
+                this.addEmptyVariant();
+            }
+        },
+        mounted() {
+            var starts  = [],
+                sum     = 0;
+
+            // create slider handle starts from variants data
+            for(var ii = 0; ii < this.variants.length - 1; ii++) {
+                sum += this.variants[ii].proportion;
+                starts.push(sum);
+            }
+
+            console.log(this.variants)
+
+            console.log('starts', starts)
+
+            // create slider
+            this.sliderEl = document.getElementById('slider');
+            noUiSlider.create(this.sliderEl, {
+                start: starts,
+                range: {
+                    min: 0,
+                    max: 100
+                },
+                step: 1,
+                connect: Array(this.variants.length).fill(true)
+            });
+
+            // set slider connects color
+            var connects = slider.querySelectorAll('.noUi-connect');
+            for (var i = 0; i < connects.length; i++) {
+                connects[i].classList.add('color-' + i);
+            }
+
+            // bind events
+            this.sliderEl.noUiSlider.on('update', this.handleSliderUpdate);
         },
         methods: {
             handleSliderUpdate(values, handle) {
@@ -88,45 +161,28 @@
                 }
 
                 this.sliderEl.noUiSlider.set(a)
+            },
+            addEmptyVariant: function (event, index) {
+                this.variants.push({
+                    'id': null,
+                    'name': "Variant" + index
+                });
+
+                if (event) {
+                    event.preventDefault();
+                }
+            },
+            removeVariant: function (i) {
+                let toRemove = this.variants[i]
+                this.variants.splice(i, 1);
+                this.removedVariants.push(toRemove.id);
             }
-        },
-        mounted() {
-            var starts  = [],
-                sum     = 0;
-
-            // create slider handle starts from variants data
-            for(var ii = 0; ii < this.variants.length - 1; ii++) {
-                sum += this.variants[ii].val;
-                starts.push(sum);
-            }
-
-            // create slider
-            this.sliderEl = document.getElementById('slider');
-            noUiSlider.create(this.sliderEl, {
-                start: starts,
-                range: {
-                    min: 0,
-                    max: 100
-                },
-                step: 1,
-                connect: Array(this.variants.length).fill(true)
-            });
-
-            // set slider connects color
-            var connects = slider.querySelectorAll('.noUi-connect');
-            for (var i = 0; i < connects.length; i++) {
-                connects[i].classList.add('color-' + i);
-            }
-
-            // bind events
-            this.sliderEl.noUiSlider.on('update', this.handleSliderUpdate);
         }
     }
 </script>
 
-<style>
+<style scoped>
 .ab-testing {
-    max-width: 600px;
     padding: 20px 40px;
 }
 
@@ -135,24 +191,51 @@
     text-align: center;
 }
 
-.ab-testing .color-0 {
+.table-td-color {
+    width: 20px;
+}
+
+.table-td-color > div {
+    width: 20px;
+    height: 20px;
+}
+
+.table-td-color.color-0 > div {
     background: #E37B40;
 }
 
-.ab-testing .color-1 {
+.table-td-color.color-1 > div {
     background: #46B29D;
 }
 
-.ab-testing .color-2 {
+.table-td-color.color-2 > div {
     background: #DE5B49;
 }
 
-.ab-testing .color-3 {
+.table-td-color.color-3 > div {
     background: #324D5C;
 }
 
-.ab-testing .color-4 {
+.table-td-color.color-4 > div {
     background: #F0CA4D;
+}
+
+
+.table-td-button {
+    width: 27px;
+}
+
+
+.table > tbody > tr > td:first-child {
+    padding-left: 20px;
+}
+
+.table > tbody > tr > td:last-child {
+    padding-right: 20px;
+}
+
+.table > tbody > tr:last-child > td, .table > tfoot > tr:last-child > td {
+    padding-bottom: 15px;
 }
 </style>
 

@@ -73,43 +73,18 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: altBannerId }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: false }">
                                     A/B test
                                 </a>
                             </h4>
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
-
-                                <div class="row">
-                                    <div class="col-md-6">
-
-                                        <div class="input-group m-t-20">
-                                            <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
-                                            <div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <label for="alt_banner_id" class="fg-label">Banner B alternative</label>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <v-select v-model="altBannerId"
-                                                                id="alt_banner_id"
-                                                                :name="'alt_banner_id'"
-                                                                :value="altBannerId"
-                                                                :title="'No alternative'"
-                                                                :options.sync="altBannerOptions"
-                                                        ></v-select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div><!-- .input-group -->
-                                    </div>
-                                </div><!-- .row -->
-
-                                <ab-testing></ab-testing>
+                                <ab-testing
+                                    :variants="variants"
+                                    :variantOptions="variantOptions"
+                                ></ab-testing>
                             </div><!-- .panel-body -->
-
-
                         </div>
                     </div><!-- .panel (a/b testing) -->
 
@@ -409,7 +384,7 @@
         "_name",
         "_segments",
         "_bannerId",
-        "_altBannerId",
+        "_variants",
         "_signedIn",
         "_oncePerSession",
         "_active",
@@ -477,7 +452,8 @@
                 "name": null,
                 "segments": [],
                 "bannerId": null,
-                "altBannerId": null,
+                "variants": null,
+                "removedVariants": null,
                 "signedIn": null,
                 "oncePerSession": null,
                 "active": null,
@@ -515,13 +491,14 @@
                 }
                 return result;
             },
-            altBannerOptions: function() {
+            variantOptions: function() {
                 //same as bannerOptions, just add null element (alternative banner is nullable)
                 let result = [];
                 result.push({
                     "label": "No alternative",
                     "value": null,
                 })
+
                 return result.concat(this.bannerOptions);
             },
             signedInOptions: function() {
@@ -544,7 +521,6 @@
                 ) {
                     return true;
                 }
-
 
                 return false;
             },

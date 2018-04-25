@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DB;
 use Cache;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
@@ -69,7 +70,8 @@ class Campaign extends Model
 
     public function banners()
     {
-        return $this->belongsToMany(Banner::class, 'campaign_banners')->withPivot('variant');
+        return $this->belongsToMany(Banner::class, 'campaign_banners')
+            ->withPivot('variant', 'proportion', 'control_group');
     }
 
     public function banner()
@@ -85,32 +87,28 @@ class Campaign extends Model
         return $this->banner()->first();
     }
 
-    public function altBanner()
-    {
-        return $this->banners()->wherePivot('variant', '=', 'B');
-    }
-
     public function setBannerIdAttribute($value)
     {
         $data = [$value => ['variant' => 'A']];
         $this->banner()->sync($data);
     }
 
-    public function getAltBannerAttribute()
+    public function getAllVariants()
     {
-        if ($this->relationLoaded('altBanner')) {
-            return $this->getRelation('altBanner')->first();
-        }
-        return $this->altBanner()->first();
+        return DB::table('campaign_banners')->where('campaign_id', $this->id)->get();
     }
 
-    public function setAltBannerIdAttribute($value)
+    public function setVariantsAttribute(array $variants)
     {
         $data = [];
-        if (!empty($value)) {
-            $data[$value] = ['variant' => 'B'];
+
+        foreach($variants as $variant) {
+            $data[$variant['id']] = [
+                'variant' => $variant['name']
+            ];
         }
-        $this->altBanner()->sync($data);
+
+        $this->variants()->sync($data);
     }
 
     public function countries()
@@ -169,11 +167,6 @@ class Campaign extends Model
             'banner.mediumRectangleTemplate',
             'banner.barTemplate',
             'banner.shortMessageTemplate',
-            'altBanner',
-            'altBanner.htmlTemplate',
-            'altBanner.mediumRectangleTemplate',
-            'altBanner.barTemplate',
-            'altBanner.shortMessageTemplate',
             'countries',
             'countriesWhitelist',
             'countriesBlacklist',
