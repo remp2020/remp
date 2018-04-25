@@ -5,4 +5,3 @@ require("./banner.js");
 require("./forms/bannerForm.js");
 require("./forms/campaignForm.js");
 
-global.Toggle = require("remp/js/components/Toggle.vue");
