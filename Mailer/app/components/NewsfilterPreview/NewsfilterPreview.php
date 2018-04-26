@@ -2,11 +2,9 @@
 
 namespace Remp\MailerModule\Components;
 
-use Kdyby\Autowired\AutowireComponentFactories;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Database\Connection;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
-use Remp\MailerModule\Form\Rendering\MaterialRenderer;
 use Remp\MailerModule\Forms\NewsfilterTemplateFormFactory;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
@@ -49,12 +47,9 @@ class NewsfilterPreview extends BaseControl
     public function createComponentNewsfilterTemplateForm(NewsfilterTemplateFormFactory $newsfilterTemplateFormFactory)
     {
         $form = $newsfilterTemplateFormFactory->create();
-        $newsfilterTemplateFormFactory->onSave = function ($withMailJob) {
-
-            if ($withMailJob) {
-                $this->getPresenter()->redirect(":Mail:MailJobsAdmin:Default");
-            }
-            $this->getPresenter()->redirect(":Mail:MailTemplatesAdmin:Default");
+        $newsfilterTemplateFormFactory->onSave = function () {
+            $this->getPresenter()->flashMessage("Newsfilter batches were created and run.");
+            $this->getPresenter()->redirect("Job:Default");
         };
 
         return $form;

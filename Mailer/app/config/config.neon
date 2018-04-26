@@ -185,7 +185,6 @@ services:
     - Remp\MailerModule\Repository\TemplatesRepository
     - Remp\MailerModule\Repository\JobsRepository
     - Remp\MailerModule\Repository\JobQueueRepository
-    - Remp\MailerModule\Repository\SegmentsRepository
     - Remp\MailerModule\Repository\BatchesRepository
     - Remp\MailerModule\Repository\BatchTemplatesRepository
     - Remp\MailerModule\Repository\AutoLoginTokensRepository
