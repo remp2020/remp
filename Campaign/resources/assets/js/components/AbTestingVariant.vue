@@ -49,11 +49,11 @@
 
     export default {
         components: {
-            vSelect
+            vSelect,
         },
         props: [
             "variant",
-            "index"
+            "index",
         ],
         mounted: function () {
             this.renderProportionInputValues();
@@ -64,6 +64,7 @@
 
                 for(var ii = 0; ii < parentVariants.length; ii++) {
                     var el = document.getElementById('ab-testing-input-' + ii);
+
                     el.setAttribute('value', parentVariants[ii].proportion);
                 }
             },

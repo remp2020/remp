@@ -8,17 +8,21 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>&nbsp;</th>
+                            <th></th>
                             <th>Variant name</th>
                             <th>Banner</th>
-                            <th>&nbsp;</th>
-                            <th>&nbsp;</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
 
                     <tbody>
-
-                        <ab-testing-variant v-for="(variant, index) in variants" :index="index" :variant="variant" :key="variant.index"></ab-testing-variant>
+                        <ab-testing-variant
+                            v-for="(variant, index) in variants"
+                            :index="index"
+                            :variant="variant"
+                            :key="variant.index"
+                        ></ab-testing-variant>
                     </tbody>
                 </table>
 

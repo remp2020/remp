@@ -71,9 +71,6 @@
                         'banner' => [
                             'header' => 'Banner'
                         ],
-                        'variants' => [
-                            'header' => 'Banner B'
-                        ],
                         'segments' => [
                             'header' => 'Segments'
                         ],

@@ -45,7 +45,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'variants', 'segments', 'countries'])
+            ->with(['banner', 'segments', 'countries'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -61,12 +61,6 @@ class CampaignController extends Controller
             ->addColumn('banner', function (Campaign $campaign) {
                 return Html::linkRoute('banners.edit', $campaign->banner->name, $campaign->banner);
             })
-            // ->addColumn('alt_banner', function (Campaign $campaign) {
-            //     if (!$campaign->altBanner) {
-            //         return null;
-            //     }
-            //     return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
-            // })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
             })
