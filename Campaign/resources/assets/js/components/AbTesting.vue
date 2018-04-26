@@ -202,8 +202,7 @@
         watch: {
             bannerId: {
                 handler: function (newValue) {
-                    console.log('banner id changed set to variant 1')
-                    this.variants[0].id = newValue;
+                    this.variants[0].banner_id = newValue;
                 },
                 deep: true,
             }
