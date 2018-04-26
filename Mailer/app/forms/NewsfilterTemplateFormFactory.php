@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\LayoutsRepository;
@@ -82,11 +83,21 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('with_jobs');
 
+        $layoutForNonPayers = $this->mailTemplatesRepository->getByCode('weekly_newsletter_290515');
+        if (!$layoutForNonPayers){
+            throw new \Exception("Missing email template with code 'weekly_newsletter_290515'");
+        }
+
+        $layoutForPayers = $this->mailTemplatesRepository->getByCode('weekly_newsletter_120615');
+        if (!$layoutForPayers){
+            throw new \Exception("Missing email template with code 'weekly_newsletter_120615'");
+        }
+
         $defaults = [
             'name' => 'Newsfilter ' . date('j.n.Y'),
             'code' => 'nwsf_' . date('dmY'),
-            'mail_layout_id' => 2, // newsfilter - platiaci,
-            'locked_mail_layout_id' => 1, // newsfilter - neplatiaci,
+            'mail_layout_id' => $layoutForNonPayers->id, // layout for payed subscribers
+            'locked_mail_layout_id' => $layoutForNonPayers->id, // layout for non-payers
             'mail_type_id' => 9, // newsfilter,
             'from' => 'Denník N <info@dennikn.sk>',
         ];
@@ -109,12 +120,12 @@ class NewsfilterTemplateFormFactory
         return $form;
     }
 
-    public function processWithJobs(\Nette\Forms\Controls\SubmitButton $button)
+    public function processWithJobs(SubmitButton $button)
     {
         $button->getForm()->getComponent('with_jobs')->setValue(true);
     }
 
-    public function processWithoutJobs(\Nette\Forms\Controls\SubmitButton $button)
+    public function processWithoutJobs(SubmitButton $button)
     {
         $button->getForm()->getComponent('with_jobs')->setValue(false);
     }
