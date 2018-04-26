@@ -110,7 +110,7 @@ class Campaign extends Model
 
     public function setVariantsAttribute(array $variants)
     {
-        foreach($variants as $variant) {
+        foreach ($variants as $variant) {
             $data = [
                 'id' => $variant['id'],
                 'campaign_id' => $this->id,
