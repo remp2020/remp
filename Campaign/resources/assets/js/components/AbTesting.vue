@@ -62,41 +62,60 @@
             }
         },
         mounted() {
-            var starts  = [],
-                sum     = 0;
+            // calculate slider starts
+            var starts = this.calculateStarts();
 
-            // create slider handle starts from variants data
-            for(var ii = 0; ii < this.variants.length - 1; ii++) {
-                sum += this.variants[ii].proportion;
-                starts.push(sum);
-            }
-
-            // create slider
+            // get slider element
             this.sliderEl = document.getElementById('slider');
-            noUiSlider.create(this.sliderEl, {
-                start: starts,
-                range: {
-                    min: 0,
-                    max: 100
-                },
-                step: 1,
-                connect: Array(this.variants.length).fill(true)
-            });
 
-            // set slider connects color
-            var connects = slider.querySelectorAll('.noUi-connect');
-
-            for (var i = 0; i < connects.length; i++) {
-                connects[i].classList.add('color-' + i);
-            }
-
-            // bind events
-            this.sliderEl.noUiSlider.on('update', this.handleSliderUpdate);
+            // render slider ui
+            this.renderSlider(starts);
         },
         methods: {
+            calculateStarts() {
+                var starts  = [],
+                    sum     = 0;
+
+                // calc slider handle starts from variants data
+                for(var ii = 0; ii < this.variants.length - 1; ii++) {
+                    sum += this.variants[ii].proportion;
+                    starts.push(sum);
+                }
+
+                return starts;
+            },
+            renderSlider(starts) {
+                // destroy slider if exists
+                if (this.sliderEl.noUiSlider) {
+                    this.sliderEl.noUiSlider.destroy();
+                }
+
+                // bind noUiSlider
+                noUiSlider.create(this.sliderEl, {
+                    start: starts,
+                    range: {
+                        min: 0,
+                        max: 100
+                    },
+                    step: 1,
+                    connect: Array(this.variants.length).fill(true)
+                });
+
+                // set slider connects color
+                var connects = slider.querySelectorAll('.noUi-connect');
+                for (var i = 0; i < connects.length; i++) {
+                    connects[i].classList.add('color-' + i);
+                }
+
+                this.$children[0].renderProportionInputValues()
+
+                // bind events
+                this.sliderEl.noUiSlider.on('update', this.handleSliderUpdate);
+            },
             handleSliderUpdate(values, handle) {
                 var sum = 0;
 
+                // update variants proportions
                 for (var ii = 0; ii < values.length; ii++) {
                     var val = parseInt(values[ii]);
 
@@ -109,9 +128,8 @@
                     }
                 }
 
+                // update control group proportion
                 this.variants[this.variants.length-1].proportion = 100-sum;
-
-
             },
             handleInputUpdate(event, i) {
                 var a = Array(this.variants.length).fill(null),
@@ -138,22 +156,38 @@
                     a[i] = prevInputsSum+parseInt(event.srcElement.value)
                 }
 
+                // set slider positions
                 this.sliderEl.noUiSlider.set(a)
             },
             addEmptyVariant: function (event, index) {
-                this.variants.splice(this.variants.length - 1, 0, {
+                var i = this.variants.length - 1;
+
+                // remove 10% from variant before adding
+                this.variants[i].proportion = this.variants[i].proportion-10;
+
+                // add empty variant before control group
+                this.variants.splice(i, 0, {
                     'id': null,
                     'name': "Variant" + index,
                     'proportion': 10
                 });
+
+                setTimeout(() => {
+                    this.renderSlider(this.calculateStarts());
+                }, 100);
 
                 if (event) {
                     event.preventDefault();
                 }
             },
             removeVariant: function (event, i) {
-                let toRemove = this.variants[i]
                 this.variants.splice(i, 1);
+
+
+
+                setTimeout(() => {
+                    this.renderSlider(this.calculateStarts());
+                }, 100);
 
                 event.preventDefault();
             }

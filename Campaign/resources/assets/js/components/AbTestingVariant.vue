@@ -63,9 +63,7 @@
                 var parentVariants = this.$parent.variants;
 
                 for(var ii = 0; ii < parentVariants.length; ii++) {
-                    var el = document.getElementById('ab-testing-input-' + ii);
-
-                    el.setAttribute('value', parentVariants[ii].proportion);
+                    $('#ab-testing-input-' + ii).val(parentVariants[ii].proportion)
                 }
             },
         },
