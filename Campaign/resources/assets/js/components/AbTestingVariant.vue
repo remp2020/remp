@@ -6,25 +6,28 @@
 
         <!-- variant name -->
         <td class="table-td-name">
+            <input type="hidden" :name="'variants[' + index + '][name]'" v-model="variant.name">
             <input type="text" :name="'variants[' + index + '][name]'" v-model="variant.name" :disabled="variant.control_group == 1">
         </td>
 
         <!-- variant select -->
         <td class="table-td-banner">
+            <input type="hidden" :name="'variants[' + index + '][banner_id]'" :value="variant.banner_id">
+
             <v-select id="variant_id"
-                    :name="'variants[' + index + '][id]'"
-                    :value="variant.id"
+                    :name="'variants[' + index + '][banner_id]'"
+                    :value="variant.banner_id"
                     :title="'No alternative'"
                     :options.sync="$parent.variantOptions"
                     v-if="index != $parent.variants.length - 1 && index != 0"
             ></v-select>
 
-            <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[$parent.variants[index].id].label }}</span>
+            <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[$parent.variants[index].banner_id].label }}</span>
         </td>
 
         <!-- proportion value -->
         <td style="text-align: right;">
-            <input type="number" :class="['ab-testing-input', 'ab-testing-input-' + index]" name="asd" :value="variant.val" @change="$parent.handleInputUpdate($event, index)" :id="'ab-testing-input-' + index">&nbsp;&nbsp;%
+            <input type="number" :class="['ab-testing-input', 'ab-testing-input-' + index]" :name="'variants[' + index + '][proportion]'" :value="variant.val" @change="$parent.handleInputUpdate($event, index)" :id="'ab-testing-input-' + index">&nbsp;&nbsp;%
         </td>
 
         <!-- remove variant button -->
@@ -36,6 +39,10 @@
 
         <!-- add variant button -->
         <td class="table-td-button">
+            <input type="hidden" :name="'variants[' + index + '][id]'" :value="variant.id">
+            <input type="hidden" :name="'variants[' + index + '][control_group]'" :value="variant.control_group">
+            <input type="hidden" :name="'variants[' + index + '][weight]'" :value="index + 1">
+
             <button v-if="index == $parent.variants.length - 2" class="pull-right" @click="$parent.addEmptyVariant($event, index)">
                 <i class="zmdi zmdi-plus-circle"></i>
             </button>
@@ -54,6 +61,7 @@
         props: [
             "variant",
             "index",
+            "banner_id",
         ],
         mounted: function () {
             this.renderProportionInputValues();
@@ -70,10 +78,12 @@
         watch: {
             variant: {
                 handler: function () {
-                    this.renderProportionInputValues();
+                    setTimeout(() => {
+                        this.renderProportionInputValues();
+                    }, 1);
                 },
                 deep: true,
-            }
+            },
         }
     }
 </script>

@@ -48,6 +48,9 @@
                         val: 30
                     }
                 ]
+            },
+            bannerId: {
+                default: null
             }
         },
         data() {
@@ -168,8 +171,10 @@
                 // add empty variant before control group
                 this.variants.splice(i, 0, {
                     'id': null,
-                    'name': "Variant" + index,
-                    'proportion': 10
+                    'name': "Variant " + index,
+                    'proportion': 10,
+                    'control_group': 0,
+                    'banner_id': null
                 });
 
                 setTimeout(() => {
@@ -190,6 +195,15 @@
                 }, 100);
 
                 event.preventDefault();
+            }
+        },
+        watch: {
+            bannerId: {
+                handler: function (newValue) {
+                    console.log('banner id changed set to variant 1')
+                    this.variants[0].id = newValue;
+                },
+                deep: true,
             }
         }
     }

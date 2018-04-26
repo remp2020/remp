@@ -83,6 +83,7 @@
                                 <ab-testing
                                     :variants="variants"
                                     :variantOptions="variantOptions"
+                                    :bannerId="bannerId"
                                 ></ab-testing>
                             </div><!-- .panel-body -->
                         </div>

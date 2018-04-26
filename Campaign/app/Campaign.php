@@ -103,12 +103,25 @@ class Campaign extends Model
         $data = [];
 
         foreach($variants as $variant) {
-            $data[$variant['id']] = [
-                'variant' => $variant['name']
+            $data = [
+                'id' => $variant['id'],
+                'campaign_id' => $this->id,
+                'variant' => $variant['name'],
+                'weight' => $variant['weight'],
+                'proportion' => $variant['proportion'],
+                'control_group' => $variant['control_group'],
+                'banner_id' => $variant['banner_id'] ?? null,
             ];
-        }
 
-        $this->variants()->sync($data);
+
+            if (isset($variant['id'])) {
+                // $exists = DB::table('campaign_banners')->where('id', $variant['id'])->get();
+
+                DB::table('campaign_banners')->where('id', $data['id'])->update($data);
+            } else {
+                DB::table('campaign_banners')->insert($data);
+            }
+        }
     }
 
     public function countries()

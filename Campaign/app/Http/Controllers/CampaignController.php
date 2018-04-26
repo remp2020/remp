@@ -746,8 +746,10 @@ class CampaignController extends Controller
         if (!empty($allVariants)) {
             $variants = $allVariants->map(function ($variant) {
                 return [
-                    'id' => $variant->banner_id,
+                    'id' => $variant->id,
+                    'banner_id' => $variant->banner_id,
                     'name' => $variant->variant,
+                    'weight' => $variant->weight,
                     'proportion' => $variant->proportion,
                     'control_group' => $variant->control_group
                 ];
