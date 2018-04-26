@@ -76,7 +76,7 @@ class Campaign extends Model
 
     public function banner()
     {
-        return $this->banners()->wherePivot('variant', '=', 'A');
+        return $this->banners()->orderBy('weight', 'ASC')->first()->get();
     }
 
     public function getBannerAttribute()
@@ -90,12 +90,22 @@ class Campaign extends Model
     public function setBannerIdAttribute($value)
     {
         $data = [$value => ['variant' => 'A']];
+
         $this->banner()->sync($data);
     }
 
     public function getAllVariants()
     {
-        return DB::table('campaign_banners')->where('campaign_id', $this->id)->orderBy('weight')->get();
+        return DB::table('campaign_banners')
+            ->where('campaign_id', $this->id)
+            ->orderBy('weight')->get();
+    }
+
+    public function removeVariants(array $variantIds)
+    {
+        return DB::table('campaign_banners')
+            ->where('id', 'in', $variantIds)
+            ->update(['deleted_at' => now()]);
     }
 
     public function setVariantsAttribute(array $variants)
@@ -113,10 +123,7 @@ class Campaign extends Model
                 'banner_id' => $variant['banner_id'] ?? null,
             ];
 
-
             if (isset($variant['id'])) {
-                // $exists = DB::table('campaign_banners')->where('id', $variant['id'])->get();
-
                 DB::table('campaign_banners')->where('id', $data['id'])->update($data);
             } else {
                 DB::table('campaign_banners')->insert($data);
