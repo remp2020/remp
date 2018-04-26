@@ -657,7 +657,8 @@ class CampaignController extends Controller
         $campaign->fill($data);
         $campaign->save();
 
-        $campaign->banner_id = $data['banner_id'];
+        $campaign->removeVariants($data['variants_to_remove']);
+
         $campaign->variants = $data['variants'];
 
         if (isset($data['countries'])) {
