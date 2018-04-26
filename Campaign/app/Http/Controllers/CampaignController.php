@@ -657,7 +657,9 @@ class CampaignController extends Controller
         $campaign->fill($data);
         $campaign->save();
 
-        $campaign->removeVariants($data['variants_to_remove']);
+        if (!empty($data['variants_to_remove'])) {
+            $campaign->removeVariants($data['variants_to_remove']);
+        }
 
         $campaign->variants = $data['variants'];
 
@@ -718,7 +720,7 @@ class CampaignController extends Controller
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
-            $bannerId = $campaign->banner ? $campaign->banner->id : null;
+            $bannerId = $campaign->getPrimaryBannerId();
         }
 
         // variants

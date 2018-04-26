@@ -26,6 +26,7 @@
                     </tbody>
                 </table>
 
+                <input type="hidden" v-for="variant in variantsToRemove" :value="variant.id" :key="variant.id" name="variants_to_remove[]">
             </div>
         </div><!-- .row -->
 
@@ -56,7 +57,8 @@
         data() {
             return {
                 sliderEl: null,
-                dontRunSliderUpdate: true
+                dontRunSliderUpdate: true,
+                variantsToRemove: [],
             };
         },
         created() {
@@ -185,10 +187,10 @@
                     event.preventDefault();
                 }
             },
-            removeVariant: function (event, i) {
+            removeVariant: function (event, i, id) {
                 this.variants.splice(i, 1);
 
-
+                this.variantsToRemove.push({id: id})
 
                 setTimeout(() => {
                     this.renderSlider(this.calculateStarts());

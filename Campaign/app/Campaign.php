@@ -71,12 +71,17 @@ class Campaign extends Model
     public function banners()
     {
         return $this->belongsToMany(Banner::class, 'campaign_banners')
-            ->withPivot('variant', 'proportion', 'control_group');
+            ->withPivot('variant', 'proportion', 'control_group', 'weight');
     }
 
-    public function banner()
+    public function getPrimaryBannerId()
     {
-        return $this->banners()->orderBy('weight', 'ASC')->first()->get();
+        return DB::table('campaign_banners')
+            ->where('campaign_id', $this->id)
+            ->whereNull('deleted_at')
+            ->orderBy('weight', 'ASC')
+            ->pluck('id')
+            ->first();
     }
 
     public function getBannerAttribute()
@@ -87,31 +92,24 @@ class Campaign extends Model
         return $this->banner()->first();
     }
 
-    public function setBannerIdAttribute($value)
-    {
-        $data = [$value => ['variant' => 'A']];
-
-        $this->banner()->sync($data);
-    }
-
     public function getAllVariants()
     {
         return DB::table('campaign_banners')
             ->where('campaign_id', $this->id)
-            ->orderBy('weight')->get();
+            ->whereNull('deleted_at')
+            ->orderBy('weight')
+            ->get();
     }
 
     public function removeVariants(array $variantIds)
     {
         return DB::table('campaign_banners')
-            ->where('id', 'in', $variantIds)
+            ->where('id', $variantIds)
             ->update(['deleted_at' => now()]);
     }
 
     public function setVariantsAttribute(array $variants)
     {
-        $data = [];
-
         foreach($variants as $variant) {
             $data = [
                 'id' => $variant['id'],
@@ -179,20 +177,20 @@ class Campaign extends Model
 
     public function cache()
     {
-        $activeCampaignIds = Schedule::applyScopes()->runningOrPlanned()->orderBy('start_time')->pluck('campaign_id')->unique()->toArray();
-        $campaign = $this->where(['id' => $this->id])->with([
-            'segments',
-            'banner',
-            'banner.htmlTemplate',
-            'banner.mediumRectangleTemplate',
-            'banner.barTemplate',
-            'banner.shortMessageTemplate',
-            'countries',
-            'countriesWhitelist',
-            'countriesBlacklist',
-            'schedules',
-        ])->first();
-        Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
-        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
+        // $activeCampaignIds = Schedule::applyScopes()->runningOrPlanned()->orderBy('start_time')->pluck('campaign_id')->unique()->toArray();
+        // $campaign = $this->where(['id' => $this->id])->with([
+        //     'segments',
+        //     'banner',
+        //     'banner.htmlTemplate',
+        //     'banner.mediumRectangleTemplate',
+        //     'banner.barTemplate',
+        //     'banner.shortMessageTemplate',
+        //     'countries',
+        //     'countriesWhitelist',
+        //     'countriesBlacklist',
+        //     'schedules',
+        // ])->first();
+        // Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
+        // Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
 }
