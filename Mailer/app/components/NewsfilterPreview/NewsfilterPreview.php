@@ -49,9 +49,6 @@ class NewsfilterPreview extends BaseControl
     public function createComponentNewsfilterTemplateForm(NewsfilterTemplateFormFactory $newsfilterTemplateFormFactory)
     {
         $form = $newsfilterTemplateFormFactory->create();
-        // TODO add renderer
-        $form->setRenderer(new MaterialRenderer());
-
         $newsfilterTemplateFormFactory->onSave = function ($withMailJob) {
 
             if ($withMailJob) {

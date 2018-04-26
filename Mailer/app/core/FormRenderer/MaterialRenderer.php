@@ -23,7 +23,7 @@ class MaterialRenderer extends DefaultFormRenderer
             'description' => 'p',
         ],
         'controls' => [
-            'container' => 'div',
+            'container' => 'div class="col-sm-6"',
         ],
         'pair' => [
             'container' => 'div class="form-group fg-float m-b-30"',

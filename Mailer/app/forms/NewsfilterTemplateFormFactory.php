@@ -32,8 +32,6 @@ class NewsfilterTemplateFormFactory
 
     public $onSave;
 
-    // TODO: how to inject $activeUsersSegment and $inactiveUsersSegment
-
     public function __construct(
         $activeUsersSegment,
         $inactiveUsersSegment,
@@ -57,15 +55,12 @@ class NewsfilterTemplateFormFactory
     public function create()
     {
         $form = new Form;
-        //$form->setTranslator($this->translator);
         $form->addProtection();
 
         $form->addText('name', 'Name')
-            //->setRequired('mail.data.mail_templates.required.name')
             ->setAttribute('placeholder', 'Newsfilter 25.4.2018');
 
         $form->addText('code', 'Identifier')
-            //->setRequired('mail.data.mail_templates.required.code')
             ->setAttribute('placeholder', 'mail.data.mail_templates.placeholder.code');
 
         $form->addSelect('mail_layout_id', 'Template', $this->mailLayoutsRepository->all()->fetchPairs('id', 'name'));
@@ -77,12 +72,9 @@ class NewsfilterTemplateFormFactory
         $form->addSelect('mail_type_id', 'Type', $mailTypes);
 
         $form->addText('from', 'Sender')
-            //->setRequired('mail.data.mail_templates.required.from')
             ->setAttribute('placeholder', 'e.g. info@domena.com');
 
         $form->addText('subject', 'Subject');
-            //->setRequired('mail.data.mail_templates.required.subject')
-            //->setAttribute('placeholder', 'napr. Newsfilter: Ak narazí Kaliňák na zákon, pravdu má Kaliňák');
 
         $form->addHidden('html_content');
         $form->addHidden('text_content');
@@ -90,7 +82,6 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('with_jobs');
 
-        // TODO enable defaults
         $defaults = [
             'name' => 'Newsfilter ' . date('j.n.Y'),
             'code' => 'nwsf_' . date('dmY'),

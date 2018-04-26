@@ -1,15 +1,8 @@
 {if $last}
 	{snippet mailFormWrapper}
-		{control mailGeneratorForm}
-
-        {*<div class="row">*}
-            {*<div class="col-md-9 col-md-offset-3">*}
-                {*<div id="spinner" style="margin-bottom: 10px; display: none">*}
-                    {*<img src="{$basePath}/layouts/default/images/spinner.gif" />*}
-                {*</div>*}
-            {*</div>*}
-        {*</div>*}
-
+        <div class="row">
+		    {control mailGeneratorForm}
+        </div>
 		{include onChangeCallback, input => source_template_id, link => sourceTemplateChange}
 	{/snippet}
 {else}
