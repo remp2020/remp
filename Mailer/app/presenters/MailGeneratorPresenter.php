@@ -2,7 +2,6 @@
 
 namespace Remp\MailerModule\Presenters;
 
-use Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget;
 use Remp\MailerModule\Components\IGeneratorWidgetsFactory;
 use Remp\MailerModule\Forms\MailGeneratorFormFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;

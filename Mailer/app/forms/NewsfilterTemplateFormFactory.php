@@ -59,7 +59,7 @@ class NewsfilterTemplateFormFactory
 
         $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
         
-        $form->addSelect('locked_mail_layout_id', 'Template for non-payers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
+        $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
         $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
 
