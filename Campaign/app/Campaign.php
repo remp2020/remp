@@ -108,13 +108,6 @@ class Campaign extends Model
             ->update(['deleted_at' => now()]);
     }
 
-    public function removeVariants(array $variantIds)
-    {
-        return DB::table('campaign_banners')
-            ->where('id', 'in', $variantIds)
-            ->update(['deleted_at' => now()]);
-    }
-
     public function setVariantsAttribute(array $variants)
     {
         foreach ($variants as $variant) {
