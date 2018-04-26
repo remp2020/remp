@@ -11,7 +11,7 @@ mix
         publicPath: publicPath,
         resourceRoot: "/assets/vendor/"
     })
-    .js("resources/js/app.js", "js/app.js")
+    .js("resources/js/app.js", "js/app.js", "resources/js/clipboard.js")
     .sass("resources/sass/vendor.scss", "css/vendor.css")
     .sass("resources/sass/app.scss", "css/app.css")
     .extract([
