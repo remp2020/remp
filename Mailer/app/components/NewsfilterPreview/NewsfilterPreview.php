@@ -118,8 +118,8 @@ class NewsfilterPreview extends BaseControl
             'generatedText' => $generatedText,
             'generatedLockedHtml' => $generatedLockedHtml,
             'generatedLockedText' => $generatedLockedText,
-            'templatePreviewLink' => $this->getPresenter()->link("MailGenerator:Preview", false),
-            'lockedTemplatePreviewLink' => $this->getPresenter()->link("MailGenerator:Preview", true)
+            //'templatePreviewLink' => $this->getPresenter()->link("MailGenerator:Preview", false),
+            //'lockedTemplatePreviewLink' => $this->getPresenter()->link("MailGenerator:Preview", true)
         ]);
         $this->getPresenter()->sendResponse($response);
     }
