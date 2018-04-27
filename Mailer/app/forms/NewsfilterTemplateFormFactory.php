@@ -95,25 +95,40 @@ class NewsfilterTemplateFormFactory
         return $form;
     }
 
+    private function getUniqueTemplateCode($code)
+    {
+        $storedCodes = $this->templatesRepository->getTable()
+            ->where('code LIKE ?', '%' . $code . '%')
+            ->select('code')->fetchAssoc('code');
+
+        if ($storedCodes) {
+            $max = 0;
+            if (is_array($storedCodes)) {
+                foreach ($storedCodes as $c) {
+                    $parts = explode('-', $c['code']);
+                    if (count($parts) > 1) {
+                        $max = max($max, (int) $parts[1]);
+                    }
+                }
+            }
+            $code .= '-' . ($max + 1);
+        }
+        return $code;
+    }
+
     public function formSucceeded(Form $form, $values)
     {
-        if ($this->templatesRepository->exists($values['code'])) {
-            $form->addError("Identifier '{$values['code']}' already exists");
-            return;
-        }
-
         $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values) {
             $mailTemplate = $this->templatesRepository->add(
-                $values['code'],
                 $values['name'],
+                $this->getUniqueTemplateCode($values['code']),
                 '',
                 $values['from'],
                 $values['subject'],
                 $textBody,
                 $htmlBody,
                 $mailLayoutId,
-                $values['mail_type_id'],
-                true
+                $values['mail_type_id']
             );
 
             $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS);

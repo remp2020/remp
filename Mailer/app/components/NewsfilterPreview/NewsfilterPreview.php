@@ -81,8 +81,8 @@ class NewsfilterPreview extends BaseControl
         $generate = function ($htmlContent, $textContent, $mailLayout) use ($request) {
             $this->connection->beginTransaction();
             $mailTemplate = $this->templatesRepository->add(
-                'tmp_' . microtime(true),
                 $request->getPost('name'),
+                'tmp_' . microtime(true),
                 '',
                 $request->getPost('from'),
                 $request->getPost('subject'),
