@@ -19,6 +19,9 @@
                 success: function(data) {
                     previewFrame('#newsfilter-preview-full-frame', data['generatedHtml']);
                     previewFrame('#newsfilter-preview-locked-frame', data['generatedLockedHtml']);
+
+                    document.getElementById("locked-template-preview-link").href = data['lockedTemplatePreviewLink'];
+                    document.getElementById("template-preview-link").href = data['templatePreviewLink'];
                 }
             });
         });
@@ -110,11 +113,13 @@
                 <div class="row">
                     <div class="col-md-6" style="max-width: 576px;">
                         <h4>For payers</h4>
+                        <a id="template-preview-link" target="_blank"><i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
                         <iframe id="newsfilter-preview-full-frame" frameBorder="0" style="width:90%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
                     </div>
 
                     <div class="col-md-6" style="max-width: 576px;">
                         <h4>For non-payers</h4>
+                        <a id="locked-template-preview-link" target="_blank"><i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
                         <iframe id="newsfilter-preview-locked-frame" frameBorder="0" style="width:90%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
                     </div>
                 </div>

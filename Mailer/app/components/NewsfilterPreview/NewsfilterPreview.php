@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Components;
 
 use Nette\Application\Responses\JsonResponse;
 use Nette\Database\Connection;
+use Nette\Http\Session;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\NewsfilterTemplateFormFactory;
 use Remp\MailerModule\Repository\LayoutsRepository;
@@ -11,23 +12,33 @@ use Remp\MailerModule\Repository\TemplatesRepository;
 
 class NewsfilterPreview extends BaseControl
 {
+    const SESSION_SECTION_NEWSFILTER_PREVIEW = "newsfilter_preview";
+
     private $templateName = 'newsfilter_preview.latte';
 
     private $connection;
 
-    private $mailLayoutsRepository;
+    private $layoutsRepository;
 
-    private $mailTemplatesRepository;
+    private $templatesRepository;
+
+    /**
+     * @var Session
+     */
+    private $session;
+
 
     public function __construct(
         Connection $connection,
-        LayoutsRepository $mailLayoutsRepository,
-        TemplatesRepository $mailTemplatesRepository
+        Session $session,
+        LayoutsRepository $layoutsRepository,
+        TemplatesRepository $templatesRepository
     ) {
         parent::__construct();
         $this->connection = $connection;
-        $this->mailLayoutsRepository = $mailLayoutsRepository;
-        $this->mailTemplatesRepository = $mailTemplatesRepository;
+        $this->layoutsRepository = $layoutsRepository;
+        $this->templatesRepository = $templatesRepository;
+        $this->session = $session;
     }
 
     public function render($params)
@@ -64,12 +75,12 @@ class NewsfilterPreview extends BaseControl
         $lockedHtmlContent = $request->getPost('locked_html_content');
         $lockedTextContent = $request->getPost('locked_text_content');
 
-        $mailLayout = $this->mailLayoutsRepository->find($_POST['mail_layout_id']);
-        $lockedMailLayout = $this->mailLayoutsRepository->find($_POST['locked_mail_layout_id']);
+        $mailLayout = $this->layoutsRepository->find($_POST['mail_layout_id']);
+        $lockedMailLayout = $this->layoutsRepository->find($_POST['locked_mail_layout_id']);
 
         $generate = function ($htmlContent, $textContent, $mailLayout) use ($request) {
             $this->connection->beginTransaction();
-            $mailTemplate = $this->mailTemplatesRepository->add(
+            $mailTemplate = $this->templatesRepository->add(
                 'tmp_' . microtime(true),
                 $request->getPost('name'),
                 '',
@@ -81,7 +92,6 @@ class NewsfilterPreview extends BaseControl
                 $request->getPost('mail_type_id')
             );
 
-            // TODO batchId - what it should be?
             $mailContentGenerator = new ContentGenerator($mailTemplate, $mailTemplate->layout, null);
             $generatedHtml = $mailContentGenerator->getHtmlBody([]);
             $generatedText = $mailContentGenerator->getTextBody([]);
@@ -98,11 +108,18 @@ class NewsfilterPreview extends BaseControl
         $this->template->generatedLockedHtml = $generatedLockedHtml;
         $this->template->generatedLockedText = $generatedLockedText;
 
+        // Store data in session for full-screen preview
+        $sessionSection = $this->session->getSection(self::SESSION_SECTION_NEWSFILTER_PREVIEW);
+        $sessionSection->generatedHtml = $generatedHtml;
+        $sessionSection->generatedLockedHtml = $generatedLockedHtml;
+
         $response = new JsonResponse([
             'generatedHtml' => $generatedHtml,
             'generatedText' => $generatedText,
             'generatedLockedHtml' => $generatedLockedHtml,
-            'generatedLockedText' => $generatedLockedText
+            'generatedLockedText' => $generatedLockedText,
+            'templatePreviewLink' => $this->getPresenter()->link("MailGenerator:Preview", false),
+            'lockedTemplatePreviewLink' => $this->getPresenter()->link("MailGenerator:Preview", true)
         ]);
         $this->getPresenter()->sendResponse($response);
     }

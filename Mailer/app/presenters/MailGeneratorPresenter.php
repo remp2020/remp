@@ -7,9 +7,11 @@ use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\INewsfilterPreviewFactory;
+use Remp\MailerModule\Components\NewsfilterPreview;
 use Remp\MailerModule\Forms\MailGeneratorFormFactory;
 use Remp\MailerModule\Forms\SourceTemplateFormFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
+use Remp\MailerModule\Repository\TemplatesRepository;
 
 final class MailGeneratorPresenter extends BasePresenter
 {
@@ -19,20 +21,31 @@ final class MailGeneratorPresenter extends BasePresenter
 
     private $newsfilterPreviewFactory;
 
+    private $templatesRepository;
+
+
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
         MailGeneratorFormFactory $mailGeneratorFormFactory,
-        INewsfilterPreviewFactory $newsfilterPreviewFactory
+        INewsfilterPreviewFactory $newsfilterPreviewFactory,
+        TemplatesRepository $templatesRepository
     ) {
         parent::__construct();
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->mailGeneratorFormFactory = $mailGeneratorFormFactory;
         $this->newsfilterPreviewFactory = $newsfilterPreviewFactory;
+        $this->templatesRepository = $templatesRepository;
     }
 
     public function renderDefault()
     {
         $this->template->last = $this->sourceTemplatesRepository->findLast()->fetch();
+    }
+
+    public function renderPreview($isLocked)
+    {
+        $section = $this->session->getSection(NewsfilterPreview::SESSION_SECTION_NEWSFILTER_PREVIEW);
+        $this->template->content = $isLocked ? $section->generatedLockedHtml : $section->generatedHtml;
     }
 
     protected function createComponentMailGeneratorForm()
