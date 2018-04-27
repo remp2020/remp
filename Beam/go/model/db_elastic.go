@@ -114,6 +114,7 @@ func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o 
 	return search, nil
 }
 
+// countRowCollectionFromAggregations generates CountRowCollection based on query result aggregations.
 func (eDB *ElasticDB) countRowCollectionFromAggregations(aggregations elastic.Aggregations, options AggregateOptions) (CountRowCollection, bool, error) {
 	var crc CountRowCollection
 	tags := make(map[string]string)
@@ -133,6 +134,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(aggregations elastic.Ag
 	return crc, true, nil
 }
 
+// sumRowCollectionFromAggregations generates SumRowCollection based on query result aggregations.
 func (eDB *ElasticDB) sumRowCollectionFromAggregations(aggregations elastic.Aggregations, options AggregateOptions, targetAgg string) (SumRowCollection, bool, error) {
 	var src SumRowCollection
 	dataPresent := true
@@ -350,10 +352,9 @@ func (eDB *ElasticDB) UnwrapAggregation(aggregations elastic.Aggregations, group
 
 			if len(groupBy) > 1 {
 				eDB.UnwrapAggregation(bucket.Aggregations, groupBy[1:], tags, cb)
-				return nil
+			} else {
+				cb(tags, int(bucket.DocCount), bucket.Aggregations)
 			}
-
-			cb(tags, int(bucket.DocCount), bucket.Aggregations)
 		}
 	}
 

@@ -86,13 +86,20 @@ func main() {
 		Debug:        c.Debug,
 	}
 
-	ec, err := elastic.NewClient(
-		elastic.SetURL("http://localhost:9200"),
+	eopts := []elastic.ClientOptionFunc{
+		elastic.SetURL(c.ElasticAddr),
 		elastic.SetSniff(false),
-		elastic.SetHealthcheckInterval(10*time.Second),
+		elastic.SetHealthcheckInterval(10 * time.Second),
 		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
-		elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
-		elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)))
+	}
+	if c.Debug {
+		eopts = append(
+			eopts,
+			elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
+			elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)),
+		)
+	}
+	ec, err := elastic.NewClient(eopts...)
 	if err != nil {
 		log.Fatalln(errors.Wrap(err, "unable to initialize elasticsearch client"))
 	}
@@ -103,8 +110,8 @@ func main() {
 	eventStorage := &model.EventElastic{
 		DB: elasticDB,
 	}
-	commerceStorage := &model.CommerceDB{
-		DB: influxDB,
+	commerceStorage := &model.CommerceElastic{
+		DB: elasticDB,
 	}
 	pageviewStorage := &model.PageviewElastic{
 		DB: elasticDB,
