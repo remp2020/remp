@@ -10,5 +10,3 @@ interface INewsfilterPreviewFactory
      */
     public function create();
 }
-
-

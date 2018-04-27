@@ -65,7 +65,8 @@ final class MailGeneratorPresenter extends BasePresenter
         return $form;
     }
 
-    protected function createComponentNewsfilterPreview(){
+    protected function createComponentNewsfilterPreview()
+    {
         return $this->newsfilterPreviewFactory->create();
     }
 

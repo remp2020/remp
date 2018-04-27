@@ -94,7 +94,7 @@ class MaterialRenderer extends DefaultFormRenderer
         $outer = $pair = $this->getWrapper('pair container');
 
         $isTextInput = $control instanceof Controls\TextInput;
-        if ($isTextInput){
+        if ($isTextInput) {
             $inner = $this->getWrapper('pair inner-container');
             $pair->addHtml($inner);
             $pair = $inner;
@@ -126,7 +126,6 @@ class MaterialRenderer extends DefaultFormRenderer
             if ($animatedLabel) {
                 $label->class('fg-label');
             }
-
         }
         return $this->getWrapper('label container')->setHtml($label);
     }
