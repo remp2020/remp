@@ -115,11 +115,12 @@ func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o 
 }
 
 // countRowCollectionFromAggregations generates CountRowCollection based on query result aggregations.
-func (eDB *ElasticDB) countRowCollectionFromAggregations(aggregations elastic.Aggregations, options AggregateOptions) (CountRowCollection, bool, error) {
+func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions) (CountRowCollection, bool, error) {
 	var crc CountRowCollection
 	tags := make(map[string]string)
 
-	eDB.UnwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
+	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) {
+		log.Println("within unwrap callback")
 		crcTags := make(map[string]string)
 		// copy tags to avoid memory sharing
 		for key, val := range tags {
@@ -127,7 +128,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(aggregations elastic.Ag
 		}
 		crc = append(crc, CountRow{
 			Tags:  crcTags,
-			Count: count,
+			Count: int(count),
 		})
 	})
 
@@ -135,12 +136,12 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(aggregations elastic.Ag
 }
 
 // sumRowCollectionFromAggregations generates SumRowCollection based on query result aggregations.
-func (eDB *ElasticDB) sumRowCollectionFromAggregations(aggregations elastic.Aggregations, options AggregateOptions, targetAgg string) (SumRowCollection, bool, error) {
+func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string) (SumRowCollection, bool, error) {
 	var src SumRowCollection
 	dataPresent := true
 	tags := make(map[string]string)
 
-	eDB.UnwrapAggregation(aggregations, options.GroupBy, tags, func(tags map[string]string, count int, aggregations elastic.Aggregations) {
+	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) {
 		sumAgg, ok := aggregations.Sum(targetAgg)
 		if !ok {
 			dataPresent = false
@@ -330,16 +331,27 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 
 // UnwrapCallback represents final callback that should be called when all aggregations are unwrapped
 // and the final set of tags and count can be provided
-type UnwrapCallback func(tags map[string]string, count int, aggregations elastic.Aggregations)
+type UnwrapCallback func(tags map[string]string, docCount int64, aggregations elastic.Aggregations)
 
 // UnwrapAggregation traverses through all the aggregations and calls the provided callback on the lowest level
 // providing tags of the fields and resulting count.
-func (eDB *ElasticDB) UnwrapAggregation(aggregations elastic.Aggregations, groupBy []string, tags map[string]string, cb UnwrapCallback) error {
+func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Aggregations, groupBy []string, tags map[string]string, cb UnwrapCallback) error {
 	for _, field := range groupBy {
 		agg, ok := aggregations.Terms(field)
 		if !ok {
 			return fmt.Errorf("result is missing data for term aggregation: %s", field)
 		}
+
+		// zero results before we got to the lowest unwrap level
+		if len(groupBy) > 0 && len(agg.Buckets) == 0 {
+			// we don't know the actual values for tags that got no records
+			// but we still want to return that we checked for that and found nothing, hence empty string
+			for _, f := range groupBy {
+				tags[f] = ""
+			}
+			cb(tags, docCount, nil)
+		}
+
 		for _, bucket := range agg.Buckets {
 			switch tag := bucket.Key.(type) {
 			case float64:
@@ -351,9 +363,9 @@ func (eDB *ElasticDB) UnwrapAggregation(aggregations elastic.Aggregations, group
 			}
 
 			if len(groupBy) > 1 {
-				eDB.UnwrapAggregation(bucket.Aggregations, groupBy[1:], tags, cb)
+				eDB.UnwrapAggregation(bucket.DocCount, bucket.Aggregations, groupBy[1:], tags, cb)
 			} else {
-				cb(tags, int(bucket.DocCount), bucket.Aggregations)
+				cb(tags, bucket.DocCount, bucket.Aggregations)
 			}
 		}
 	}

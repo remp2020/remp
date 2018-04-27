@@ -44,7 +44,7 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 	}
 
 	// extract results
-	return cDB.DB.countRowCollectionFromAggregations(result.Aggregations, options)
+	return cDB.DB.countRowCollectionFromAggregations(result, options)
 }
 
 // List returns list of all events based on given CommerceOptions.
@@ -79,7 +79,7 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
-	return cDB.DB.sumRowCollectionFromAggregations(result.Aggregations, options, targetAgg)
+	return cDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg)
 }
 
 // Categories lists all available categories.

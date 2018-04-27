@@ -53,7 +53,7 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 	}
 
 	// extract results
-	return pDB.DB.countRowCollectionFromAggregations(result.Aggregations, options)
+	return pDB.DB.countRowCollectionFromAggregations(result, options)
 }
 
 // Sum returns number of Pageviews matching the filter defined by AggregateOptions.
@@ -87,7 +87,7 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
-	return pDB.DB.sumRowCollectionFromAggregations(result.Aggregations, options, targetAgg)
+	return pDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg)
 }
 
 // List returns list of all Pageviews based on given PageviewOptions.
