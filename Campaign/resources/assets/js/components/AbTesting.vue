@@ -136,6 +136,10 @@
                 // update control group proportion
                 this.variants[this.variants.length-1].proportion = 100-sum;
             },
+            // noUiSlider needs exact position to set slider handle
+            // so we have to calculate it using our percentual variant proportions
+            // -> this means set handle to sum of all previous + this variant proporion
+            // control group doesn't have handle so its treated independently
             handleInputUpdate(event, i) {
                 var a = Array(this.variants.length).fill(null),
                     prevInputsSum = 0,
@@ -181,7 +185,7 @@
 
                 setTimeout(() => {
                     this.renderSlider(this.calculateStarts());
-                }, 100);
+                }, 50);
 
                 if (event) {
                     event.preventDefault();
@@ -194,7 +198,7 @@
 
                 setTimeout(() => {
                     this.renderSlider(this.calculateStarts());
-                }, 100);
+                }, 50);
 
                 event.preventDefault();
             }
@@ -218,6 +222,7 @@
 .ab-testing-input {
     max-width: 40px;
     text-align: center;
+    display: inline-block;
 }
 
 .table-td-color {
@@ -257,6 +262,12 @@
 
 .table-td-button {
     width: 27px;
+}
+
+.table-td-button > button {
+    width: 25px;
+    height: 25px;
+    padding: 0;
 }
 
 

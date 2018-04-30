@@ -7,7 +7,7 @@
         <!-- variant name -->
         <td class="table-td-name">
             <input type="hidden" :name="'variants[' + index + '][name]'" v-model="variant.name">
-            <input type="text" :name="'variants[' + index + '][name]'" v-model="variant.name" :disabled="variant.control_group == 1">
+            <input class="form-control" type="text" :name="'variants[' + index + '][name]'" v-model="variant.name" :disabled="variant.control_group == 1">
         </td>
 
         <!-- variant select -->
@@ -27,12 +27,12 @@
 
         <!-- proportion value -->
         <td style="text-align: right;">
-            <input type="number" :class="['ab-testing-input', 'ab-testing-input-' + index]" :name="'variants[' + index + '][proportion]'" :value="variant.val" @change="$parent.handleInputUpdate($event, index)" :id="'ab-testing-input-' + index">&nbsp;&nbsp;%
+            <input type="number" class="ab-testing-input form-control" :class="['ab-testing-input-' + index]" :name="'variants[' + index + '][proportion]'" :value="variant.val" @change="$parent.handleInputUpdate($event, index)" :id="'ab-testing-input-' + index">&nbsp;&nbsp;%
         </td>
 
         <!-- remove variant button -->
         <td class="table-td-button">
-            <button v-if="variant.control_group != 1" @click="$parent.removeVariant($event, index, variant.id)">
+            <button v-if="variant.control_group != 1" @click="$parent.removeVariant($event, index, variant.id)" class="btn btn-danger">
                 <i class="zmdi zmdi-minus-circle"></i>
             </button>
         </td>
@@ -43,7 +43,7 @@
             <input type="hidden" :name="'variants[' + index + '][control_group]'" :value="variant.control_group">
             <input type="hidden" :name="'variants[' + index + '][weight]'" :value="index + 1">
 
-            <button v-if="index == $parent.variants.length - 2" class="pull-right" @click="$parent.addEmptyVariant($event, index)">
+            <button v-if="index == $parent.variants.length - 2" class="btn btn-success pull-right" @click="$parent.addEmptyVariant($event, index)">
                 <i class="zmdi zmdi-plus-circle"></i>
             </button>
         </td>
