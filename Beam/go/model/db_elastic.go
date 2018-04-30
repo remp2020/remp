@@ -120,7 +120,6 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 	tags := make(map[string]string)
 
 	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) {
-		log.Println("within unwrap callback")
 		crcTags := make(map[string]string)
 		// copy tags to avoid memory sharing
 		for key, val := range tags {
