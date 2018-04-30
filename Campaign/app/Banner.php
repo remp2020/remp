@@ -51,24 +51,43 @@ class Banner extends Model
         return $this->template ? $this->fillTemplate($attributes) : $this;
     }
 
+    /**
+     * Fill banner's template relation
+     *
+     * If template relation doesn't exists it's using:
+     * string $this->getTemplateRelationName()
+     * to initialize relation.
+     *
+     * @param array $attributes
+     * @return $this
+     */
     public function fillTemplate(array $attributes)
     {
         $relationName = $this->getTemplateRelationName();
+        $relation = $this->getTemplateRelation();
 
-        if ($this[$relationName]) {
-            $this->{$relationName}->fill($attributes);
+        // fill existing related model
+        if ($relation && !is_null($this->id)) {
+            $relation->get()->first()->fill($attributes);
+
+        // create and fill relation
         } else {
-            $this->setRelation($relationName, $this->{$relationName}()->make($attributes));
+            $this->setRelation(
+                $relationName,
+                optional(
+                    $this->{$relationName}()
+                )->make($attributes)
+            );
         }
 
         return $this;
     }
 
-    public function withTemplate()
-    {
-        return $this->with($this->getTemplateRelationName());
-    }
-
+    /**
+     * load template
+     *
+     * @return $this
+     */
     public function loadTemplate()
     {
         return $this->load($this->getTemplateRelationName());
@@ -99,6 +118,11 @@ class Banner extends Model
         return $this->hasOne(ShortMessageTemplate::class);
     }
 
+    /**
+     * Returns name of the banner to template relation
+     *
+     * @return string $relationName
+     */
     public function getTemplateRelationName()
     {
         $relationName = null;
@@ -122,5 +146,32 @@ class Banner extends Model
         }
 
         return $relationName;
+    }
+
+    /**
+     * Returns banner template relation
+     *
+     * Using $this->getTemplateRelationName()
+     * to return template relation.
+     *
+     * @return void
+     */
+    public function getTemplateRelation()
+    {
+        $relationName = $this->getTemplateRelationName();
+
+        return $this->$relationName();
+    }
+
+    /**
+     * Returns banner template object
+     *
+     * @return void
+     */
+    public function getTemplate()
+    {
+        $this->getTemplateRelation()
+            ->first()
+            ->get();
     }
 }

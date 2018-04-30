@@ -142,13 +142,15 @@ class BannerController extends Controller
         $banner->fill($request->all());
         $banner->save();
 
-        $templateRelationName = $banner->getTemplateRelationName();
+        $templateRelation = $banner->getTemplateRelation();
 
-        if (!$templateRelationName) {
-            throw new BadRequestHttpException('unhandled template type: ' . $banner->template);
+        if (!$templateRelation) {
+            throw new BadRequestHttpException(
+                'unhandled banner template relation: ' . $banner->template
+            );
         }
 
-        $banner->{$templateRelationName}()->create($request->all());
+        $templateRelation->create($request->all());
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -190,6 +192,7 @@ class BannerController extends Controller
      */
     public function edit(Banner $banner)
     {
+        $banner->loadTemplate();
         $banner->fill(old());
 
         return view('banners.edit', [
@@ -210,13 +213,15 @@ class BannerController extends Controller
     public function update(BannerRequest $request, Banner $banner)
     {
         $banner->update($request->all());
-        $templateRelationName = $banner->getTemplateRelationName();
+        $templateRelation = $banner->getTemplateRelation();
 
-        if (!$templateRelationName) {
-            throw new BadRequestHttpException('unhandled template type: ' . $banner->template);
+        if (!$templateRelation) {
+            throw new BadRequestHttpException(
+                'unhandled banner template relation: ' . $banner->template
+            );
         }
 
-        $banner->{$templateRelationName}->update($request->all());
+        $templateRelation->update($request->all());
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
