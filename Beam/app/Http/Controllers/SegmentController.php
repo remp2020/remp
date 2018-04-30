@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 class SegmentController extends Controller
 {
+    private $journalContract;
 
     public function __construct(JournalContract $journalContract)
     {
@@ -179,6 +180,8 @@ class SegmentController extends Controller
         $segment->fill($old);
         $rulesData = $old['rules'] ?? $segmentRules;
 
+        $segment['removedRules'] = $old['removedRules'] ?? [];
+
         if ($rulesData) {
             $rules = [];
 
@@ -208,7 +211,6 @@ class SegmentController extends Controller
     {
         $segment->fill($data);
         $segment->save();
-
 
         $rules = $rules ?? [];
 

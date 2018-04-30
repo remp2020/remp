@@ -55,9 +55,7 @@
                 <span v-on:click="addRule" class="btn btn-info waves-effect"><i class="zmdi zmdi-plus-square"></i> Add rule</span>
             </h4>
 
-            <div v-for="(id,i) in removedRules">
-                <input type="hidden" name="removedRules[]" v-model="removedRules[i]" />
-            </div>
+            <input type="hidden" name="removedRules[]" v-for="(id,i) in removedRules" v-model="removedRules[i]" />
 
             <div class="row m-t-10">
                 <segment-rule v-for="(rule, index) in rules"
@@ -90,6 +88,7 @@
         "_rules",
         "_eventCategories",
         "_eventActions",
+        "_removedRules"
     ];
 
     export default {
