@@ -159,7 +159,7 @@ services:
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
     # Generator
     generator:
         class: Remp\MailerModule\Generators\GeneratorFactory

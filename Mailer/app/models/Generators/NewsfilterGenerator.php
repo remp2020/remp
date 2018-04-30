@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Generators;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
+use Tomaj\NetteApi\Params\InputParam;
 
 class NewsfilterGenerator implements IGenerator
 {
@@ -17,38 +18,16 @@ class NewsfilterGenerator implements IGenerator
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
     }
 
-    public function generate(Form $form)
+    public function apiParams()
     {
-        $form->addText('title', 'Title')
-            ->setRequired("Field 'Title' is required.");
-
-        $form->addText('url', 'Newsfilter URL')
-            ->addRule(Form::URL)
-            ->setRequired("Field 'Newsfilter URL' is required.");
-
-        $form->addText('editor', 'Editor')
-            ->setRequired("Field 'Editor' is required.");
-
-        $form->addTextArea('summary', 'Summary')
-            ->setAttribute('rows', 3)
-            ->setRequired("Field 'Summary' is required.");
-
-        $form->addTextArea('newsfilter_html', 'HTML')
-            ->setAttribute('rows', 20)
-            ->setAttribute('class', 'form-control html-editor')
-            ->getControlPrototype();
-
-        $form->addSubmit('send')
-            ->getControlPrototype()
-            ->setName('button')
-            ->setHtml('<i class="fa fa-magic"></i> ' . 'Generate');
-
-        $form->onSuccess[] = [$this, 'formSucceeded'];
-    }
-
-    public function onSubmit(callable $onSubmit)
-    {
-        $this->onSubmit = $onSubmit;
+        return [
+            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'newsfilter_html', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'editor', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'summary', InputParam::REQUIRED),
+        ];
     }
 
     public function getWidgets()
@@ -56,7 +35,7 @@ class NewsfilterGenerator implements IGenerator
         return [NewsfilterWidget::class];
     }
 
-    public function formSucceeded($form, $values)
+    public function process($values)
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
         $html = $values->newsfilter_html;
@@ -156,17 +135,60 @@ class NewsfilterGenerator implements IGenerator
             'text' => strip_tags($lockedText),
         ];
 
-        $htmlContent = $twig->render('html_template', $params);
-        $textContent = $twig->render('text_template', $params);
+        $output = [];
+        $output['htmlContent'] = $twig->render('html_template', $params);
+        $output['textContent'] = $twig->render('text_template', $params);
+        $output['lockedHtmlContent'] = $twig->render('html_template', $lockedParams);
+        $output['lockedTextContent'] = $twig->render('text_template', $lockedParams);
+        return $output;
+    }
+
+    public function formSucceeded($form, $values)
+    {
+        $output = $this->process($values);
 
         $addonParams = [
-            'lockedHtmlContent' => $twig->render('html_template', $lockedParams),
-            'lockedTextContent' => $twig->render('text_template', $lockedParams),
+            'lockedHtmlContent' => $output['lockedHtmlContent'],
+            'lockedTextContent' => $output['lockedTextContent'],
             'newsfilterTitle' => $values->title,
             'render' => true
         ];
 
-        $this->onSubmit->__invoke($htmlContent, $textContent, $addonParams);
+        $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
+    }
+
+    public function generateForm(Form $form)
+    {
+        $form->addText('title', 'Title')
+            ->setRequired();
+
+        $form->addText('url', 'Newsfilter URL')
+            ->addRule(Form::URL)
+            ->setRequired();
+
+        $form->addText('editor', 'Editor')
+            ->setRequired();
+
+        $form->addTextArea('summary', 'Summary')
+            ->setAttribute('rows', 3)
+            ->setRequired();
+
+        $form->addTextArea('newsfilter_html', 'HTML')
+            ->setAttribute('rows', 20)
+            ->setAttribute('class', 'form-control html-editor')
+            ->getControlPrototype();
+
+        $form->addSubmit('send')
+            ->getControlPrototype()
+            ->setName('button')
+            ->setHtml('<i class="fa fa-magic"></i> ' . 'Generate');
+
+        $form->onSuccess[] = [$this, 'formSucceeded'];
+    }
+
+    public function onSubmit(callable $onSubmit)
+    {
+        $this->onSubmit = $onSubmit;
     }
 
     private function getLockedHtml($fullHtml, $newsfilterLink)

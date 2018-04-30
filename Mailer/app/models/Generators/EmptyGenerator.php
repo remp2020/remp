@@ -6,7 +6,7 @@ use Nette\Application\UI\Form;
 
 class EmptyGenerator implements IGenerator
 {
-    public function generate(Form $form)
+    public function generateForm(Form $form)
     {
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
@@ -17,6 +17,16 @@ class EmptyGenerator implements IGenerator
     }
 
     public function getWidgets()
+    {
+        return [];
+    }
+
+    public function apiParams()
+    {
+        return [];
+    }
+
+    public function process($input)
     {
         return [];
     }

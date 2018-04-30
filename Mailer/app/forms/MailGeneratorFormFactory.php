@@ -56,7 +56,7 @@ class MailGeneratorFormFactory extends Object
 
         if ($generator && $template) {
             $formGenerator = $this->mailGeneratorFactory->get($generator);
-            $formGenerator->generate($form);
+            $formGenerator->generateForm($form);
             $formGenerator->onSubmit($onSubmit);
         }
 
