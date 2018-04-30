@@ -45,7 +45,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'segments', 'countries'])
+            ->with(['segments', 'countries'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -59,7 +59,18 @@ class CampaignController extends Controller
                 return Html::linkRoute('campaigns.edit', $campaign->name, $campaign);
             })
             ->addColumn('banner', function (Campaign $campaign) {
-                return Html::linkRoute('banners.edit', $campaign->banner->name, $campaign->banner);
+                $banner = $campaign->primaryBanner();
+
+                return Html::linkRoute('banners.edit', $banner->name, $banner);
+            })
+            ->addColumn('variants', function (Campaign $campaign) {
+                $names = $campaign->getAllVariants()
+                    ->pluck('variant')
+                    ->map(function ($name) {
+                        return $name;
+                    })->toArray();
+
+                return implode(', ', $names);
             })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
@@ -720,7 +731,7 @@ class CampaignController extends Controller
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
-            $bannerId = $campaign->getPrimaryBannerId();
+            $bannerId = $campaign->getPrimaryBanner()->id;
         }
 
         // variants

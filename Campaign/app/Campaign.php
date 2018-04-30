@@ -74,13 +74,18 @@ class Campaign extends Model
             ->withPivot('variant', 'proportion', 'control_group', 'weight');
     }
 
-    public function getPrimaryBannerId()
+    public function primaryBanner()
+    {
+        return $this->banners()->orderBy('weight')->first();
+    }
+
+    public function getPrimaryBanner()
     {
         return DB::table('campaign_banners')
             ->where('campaign_id', $this->id)
             ->whereNull('deleted_at')
+            ->join('banners', 'banners.id', '=', 'campaign_banners.banner_id')
             ->orderBy('weight', 'ASC')
-            ->pluck('id')
             ->first();
     }
 
