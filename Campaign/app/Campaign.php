@@ -74,19 +74,16 @@ class Campaign extends Model
             ->withPivot('variant', 'proportion', 'control_group', 'weight');
     }
 
-    public function primaryBanner()
+    public function campaignBanner()
     {
-        return $this->banners()->orderBy('weight')->first();
+        return $this->hasMany('App\CampaignBanner')->orderBy('weight');
     }
 
     public function getPrimaryBanner()
     {
-        return DB::table('campaign_banners')
-            ->where('campaign_id', $this->id)
-            ->whereNull('deleted_at')
-            ->join('banners', 'banners.id', '=', 'campaign_banners.banner_id')
-            ->orderBy('weight', 'ASC')
-            ->first();
+        return optional(
+            $this->campaignBanner()->with('banner')->first()
+        )->banner;
     }
 
     public function getBannerAttribute()
@@ -182,7 +179,17 @@ class Campaign extends Model
 
     public function cache()
     {
-        // $activeCampaignIds = Schedule::applyScopes()->runningOrPlanned()->orderBy('start_time')->pluck('campaign_id')->unique()->toArray();
+        $activeCampaignIds = Schedule::applyScopes()
+                                ->runningOrPlanned()
+                                ->orderBy('start_time')
+                                ->pluck('campaign_id')
+                                ->unique()
+                                ->toArray();
+
+        Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
+
+        dd($activeCampaignIds);
+
         // $campaign = $this->where(['id' => $this->id])->with([
         //     'segments',
         //     'banner',
@@ -195,7 +202,6 @@ class Campaign extends Model
         //     'countriesBlacklist',
         //     'schedules',
         // ])->first();
-        // Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
         // Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
 }

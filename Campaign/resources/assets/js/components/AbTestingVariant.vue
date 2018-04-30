@@ -6,8 +6,8 @@
 
         <!-- variant name -->
         <td class="table-td-name">
-            <input type="hidden" :name="'variants[' + index + '][name]'" v-model="variant.name">
-            <input class="form-control" type="text" :name="'variants[' + index + '][name]'" v-model="variant.name" :disabled="variant.control_group == 1">
+            <input type="hidden" :name="'variants[' + index + '][name]'" v-model="variant.variant">
+            <input class="form-control" type="text" :name="'variants[' + index + '][name]'" v-model="variant.variant" :disabled="variant.control_group == 1">
         </td>
 
         <!-- variant select -->

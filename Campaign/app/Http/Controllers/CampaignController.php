@@ -45,7 +45,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['segments', 'countries'])
+            ->with(['segments', 'countries', 'campaignBanner'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -59,18 +59,14 @@ class CampaignController extends Controller
                 return Html::linkRoute('campaigns.edit', $campaign->name, $campaign);
             })
             ->addColumn('banner', function (Campaign $campaign) {
-                $banner = $campaign->primaryBanner();
+                $banner = $campaign->getPrimaryBanner();
 
                 return Html::linkRoute('banners.edit', $banner->name, $banner);
             })
             ->addColumn('variants', function (Campaign $campaign) {
-                $names = $campaign->getAllVariants()
-                    ->pluck('variant')
-                    ->map(function ($name) {
-                        return $name;
-                    })->toArray();
+                $variants = $campaign->campaignBanner->pluck('variant')->toArray();
 
-                return implode(', ', $names);
+                return implode(', ', $variants);
             })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
@@ -102,7 +98,13 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
 
-        list($campaign, $bannerId, $variants, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list(
+            $campaign,
+            $bannerId,
+            $variants,
+            $selectedCountries,
+            $countriesBlacklist
+        ) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
@@ -123,7 +125,13 @@ class CampaignController extends Controller
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
-        list($campaign, $bannerId, $variants, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list(
+            $campaign,
+            $bannerId,
+            $variants,
+            $selectedCountries,
+            $countriesBlacklist
+        ) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
@@ -731,14 +739,16 @@ class CampaignController extends Controller
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
-            $bannerId = $campaign->getPrimaryBanner()->id;
+            $bannerId = $campaign->campaignBanner()->first()->id;
         }
 
         // variants
         if (array_key_exists('variants', $data)) {
             $variants = $data['variants'];
         } else {
-            $variants = $this->prepareVariants($campaign);
+            $variants = $campaign->campaignBanner()
+                            ->with('banner')
+                            ->get();
         }
 
         return [
@@ -750,27 +760,6 @@ class CampaignController extends Controller
                 ? $data['countries_blacklist']
                 : $blacklisted
         ];
-    }
-
-    public function prepareVariants(Campaign $campaign): Collection
-    {
-        $allVariants = $campaign->getAllVariants();
-        $variants = null;
-
-        if (!empty($allVariants)) {
-            $variants = $allVariants->map(function ($variant) {
-                return [
-                    'id' => $variant->id,
-                    'banner_id' => $variant->banner_id,
-                    'name' => $variant->variant,
-                    'weight' => $variant->weight,
-                    'proportion' => $variant->proportion,
-                    'control_group' => $variant->control_group
-                ];
-            });
-        }
-
-        return $variants;
     }
 
     public function getAllSegments(SegmentAggregator $segmentAggregator)
