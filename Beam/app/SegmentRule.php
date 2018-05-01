@@ -18,6 +18,7 @@ class SegmentRule extends Model
     ];
 
     protected $fillable = [
+        'id',
         'timespan',
         'count',
         'event_category',

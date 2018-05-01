@@ -10,10 +10,11 @@
         "code": '{!! $segment->code !!}' || null,
         "active": {!! @json($segment->active) !!} || null,
         "rules": {!! $segment->rules->toJson() !!},
-        "removedRules": [],
+        "removedRules": {!! @json($segment->removedRules) !!},
         "eventCategories": {!! $categories->toJson() !!},
         "eventActions": {},
     }
+
     remplib.segmentForm.bind("#segment-form", segment);
 </script>
 
