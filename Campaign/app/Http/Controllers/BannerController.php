@@ -143,13 +143,6 @@ class BannerController extends Controller
         $banner->save();
 
         $templateRelation = $banner->getTemplateRelation();
-
-        if (!$templateRelation) {
-            throw new BadRequestHttpException(
-                'unhandled banner template relation: ' . $banner->template
-            );
-        }
-
         $templateRelation->create($request->all());
 
         return response()->format([
@@ -213,15 +206,9 @@ class BannerController extends Controller
     public function update(BannerRequest $request, Banner $banner)
     {
         $banner->update($request->all());
-        $templateRelation = $banner->getTemplateRelation();
 
-        if (!$templateRelation) {
-            throw new BadRequestHttpException(
-                'unhandled banner template relation: ' . $banner->template
-            );
-        }
-
-        $templateRelation->update($request->all());
+        $template = $banner->getTemplate();
+        $template->update($request->all());
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(

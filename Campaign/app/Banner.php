@@ -64,19 +64,16 @@ class Banner extends Model
     public function fillTemplate(array $attributes)
     {
         $relationName = $this->getTemplateRelationName();
-        $relation = $this->getTemplateRelation();
 
         // fill existing related model
-        if ($relation && !is_null($this->id)) {
-            $relation->get()->first()->fill($attributes);
+        if (!is_null($this->id)) {
+            $this->getRelationValue($relationName)->fill($attributes);
 
         // create and fill relation
         } else {
             $this->setRelation(
                 $relationName,
-                optional(
-                    $this->{$relationName}()
-                )->make($attributes)
+                $this->getTemplateRelation($relationName)->make($attributes)
             );
         }
 
@@ -125,27 +122,19 @@ class Banner extends Model
      */
     public function getTemplateRelationName()
     {
-        $relationName = null;
-
         switch ($this->template) {
             case self::TEMPLATE_HTML:
-                $relationName = 'htmlTemplate';
-                break;
+                return 'htmlTemplate';
             case self::TEMPLATE_MEDIUM_RECTANGLE:
-                $relationName = 'mediumRectangleTemplate';
-                break;
+                return 'mediumRectangleTemplate';
             case self::TEMPLATE_BAR:
-                $relationName = 'barTemplate';
+                return 'barTemplate';
                 break;
             case self::TEMPLATE_SHORT_MESSAGE:
-                $relationName = 'shortMessageTemplate';
-                break;
+                return 'shortMessageTemplate';
             default:
-                throw new \Exception('Not existing template name: ' . $this->template);
-                break;
+                throw new \Exception('Unhandled banner template access: ' . $this->template);
         }
-
-        return $relationName;
     }
 
     /**
@@ -154,24 +143,24 @@ class Banner extends Model
      * Using $this->getTemplateRelationName()
      * to return template relation.
      *
-     * @return void
+     * @param string $relationName
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function getTemplateRelation()
+    public function getTemplateRelation($relationName = null)
     {
-        $relationName = $this->getTemplateRelationName();
-
+        if ($relationName === null) {
+            $relationName = $this->getTemplateRelationName();
+        }
         return $this->$relationName();
     }
 
     /**
      * Returns banner template object
      *
-     * @return void
+     * @return Model
      */
     public function getTemplate()
     {
-        $this->getTemplateRelation()
-            ->first()
-            ->get();
+        return $this->getRelationValue($this->getTemplateRelationName());
     }
 }
