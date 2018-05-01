@@ -33,7 +33,7 @@ php artisan db:seed
 ### Dependencies
 
 - PHP ^7.1
-- MySQL ^5.7
+- MySQL ^5.7.8
 - Redis ^3.2
 
 ### Schedule
