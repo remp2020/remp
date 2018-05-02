@@ -94,14 +94,6 @@ class Campaign extends Model
         return $this->banner()->first();
     }
 
-    public function getAllVariants()
-    {
-        return DB::table('campaign_banners')
-            ->where('campaign_id', $this->id)
-            ->orderBy('weight')
-            ->get();
-    }
-
     public function removeVariants(array $variantIds)
     {
         return DB::table('campaign_banners')
@@ -187,20 +179,21 @@ class Campaign extends Model
 
         Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
 
-        dd($activeCampaignIds);
+        $campaign = $this->where(['id' => $this->id])->with([
+            'segments',
+            'countries',
+            'countriesWhitelist',
+            'countriesBlacklist',
+            'schedules',
+        ])->first();
 
-        // $campaign = $this->where(['id' => $this->id])->with([
-        //     'segments',
-        //     'banner',
-        //     'banner.htmlTemplate',
-        //     'banner.mediumRectangleTemplate',
-        //     'banner.barTemplate',
-        //     'banner.shortMessageTemplate',
-        //     'countries',
-        //     'countriesWhitelist',
-        //     'countriesBlacklist',
-        //     'schedules',
-        // ])->first();
-        // Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
+        $banners = CampaignBanner::where('campaign_id', $this->id)
+                                ->with('banner')
+                                ->get();
+
+        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, [
+            'campaign' => $campaign,
+            'banners' => $banners
+        ]);
     }
 }
