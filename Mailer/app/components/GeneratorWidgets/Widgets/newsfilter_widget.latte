@@ -47,15 +47,15 @@
                     <div class="col-sm-6">
                         <div class="form-group fg-float m-b-30">
                             <div class="fg-line">
-								{input name, class => 'form-control fg-input'}
-								{label name, class => 'fg-label'}
+                                {input name, class => 'form-control fg-input'}
+                                {label name, class => 'fg-label'}
                             </div>
                         </div>
 
                         <div class="form-group fg-float m-b-30">
                             <div class="fg-line">
-								{input code, class => 'form-control fg-input'}
-								{label code, class => 'fg-label'}
+                                {input code, class => 'form-control fg-input'}
+                                {label code, class => 'fg-label'}
                             </div>
                         </div>
 
@@ -76,20 +76,20 @@
 
                         <div class="form-group fg-float m-b-30">
                             <div class="fg-line">
-								{input from, class => 'form-control fg-input'}
-								{label from, class => 'fg-label'}
+                                {input from, class => 'form-control fg-input'}
+                                {label from, class => 'fg-label'}
                             </div>
                         </div>
 
                         <div class="form-group fg-float m-b-30">
                             <div class="fg-line">
-								{input subject, class => 'form-control fg-input', value => 'Newsfilter: ' . $newsfilterTitle}
-								{label subject, class => 'fg-label' }
+                                {input subject, class => 'form-control fg-input', value => 'Newsfilter: ' . $newsfilterTitle}
+                                {label subject, class => 'fg-label' }
                             </div>
                         </div>
 
                         <div class="form-group fg-float m-b-30">
-							{input generate_emails_jobs, class => 'btn palette-Cyan bg waves-effect'}
+                            {input generate_emails_jobs, class => 'btn palette-Cyan bg waves-effect'}
                         </div>
                     </div>
 
@@ -104,22 +104,21 @@
         </div>
 
         <div role="tabpanel" class="tab-pane" id="newsfilter-preview">
-            <div class="row">&nbsp;</div>
-
+            <h4>Mobile preview</h4>
             {snippet newsfilterPreviewWrapper}
                 <div class="row">
-                    <div class="col-md-6" style="max-width: 576px;">
+                    <div class="col-md-6">
                         <h4>For payers</h4>
                         <a target="_blank" href="{plink MailGenerator:preview false}">
                             <i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
-                        <iframe id="newsfilter-preview-full-frame" frameBorder="0" style="width:90%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
+                        <iframe id="newsfilter-preview-full-frame" frameBorder="0" style="max-width: 576px; width:90%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
                     </div>
 
-                    <div class="col-md-6" style="max-width: 576px;">
+                    <div class="col-md-6">
                         <h4>For non-payers</h4>
                         <a target="_blank" href="{plink MailGenerator:preview true}">
                             <i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
-                        <iframe id="newsfilter-preview-locked-frame" frameBorder="0" style="width:90%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
+                        <iframe id="newsfilter-preview-locked-frame" frameBorder="0" style="max-width: 576px; width:90%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
                     </div>
                 </div>
             {/snippet}

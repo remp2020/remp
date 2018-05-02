@@ -6,10 +6,10 @@
     <h2>Generate emails</h2>
 </div>
 
-{ifset $addonParams['render']}
+{ifset $addonParams}
 <div class="card">
     <div class="card-header">
-        <h2>Newsfilter details<small></small></h2>
+        <h2>{$addonParams['addonHeader']}<small></small></h2>
     </div>
     <div class="card-body card-padding">
 		{snippetArea addons}
@@ -18,7 +18,7 @@
                 textContent => isset($textContent) ? $textContent,
                 addonParams => isset($addonParams) ? $addonParams,
               ]}
-			{control newsfilterPreview $params}
+			{control generatorWidgets $params}
 		{/snippetArea}
 
     </div>

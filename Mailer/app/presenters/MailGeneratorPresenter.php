@@ -2,39 +2,30 @@
 
 namespace Remp\MailerModule\Presenters;
 
-use Nette\Application\BadRequestException;
-use Nette\Database\Table\ActiveRow;
-use Nette\Utils\Json;
-use Remp\MailerModule\Components\IDataTableFactory;
-use Remp\MailerModule\Components\INewsfilterPreviewFactory;
-use Remp\MailerModule\Components\NewsfilterPreview;
+use Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget;
+use Remp\MailerModule\Components\IGeneratorWidgetsFactory;
 use Remp\MailerModule\Forms\MailGeneratorFormFactory;
-use Remp\MailerModule\Forms\SourceTemplateFormFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
-use Remp\MailerModule\Repository\TemplatesRepository;
 
 final class MailGeneratorPresenter extends BasePresenter
 {
+    const SESSION_SECTION_CONTENT_PREVIEW = "content_preview";
+
     private $sourceTemplatesRepository;
 
     private $mailGeneratorFormFactory;
 
-    private $newsfilterPreviewFactory;
-
-    private $templatesRepository;
-
+    private $generatorWidgetsFactory;
 
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
         MailGeneratorFormFactory $mailGeneratorFormFactory,
-        INewsfilterPreviewFactory $newsfilterPreviewFactory,
-        TemplatesRepository $templatesRepository
+        IGeneratorWidgetsFactory $generatorWidgetsFactory
     ) {
         parent::__construct();
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->mailGeneratorFormFactory = $mailGeneratorFormFactory;
-        $this->newsfilterPreviewFactory = $newsfilterPreviewFactory;
-        $this->templatesRepository = $templatesRepository;
+        $this->generatorWidgetsFactory = $generatorWidgetsFactory;
     }
 
     public function renderDefault()
@@ -44,16 +35,13 @@ final class MailGeneratorPresenter extends BasePresenter
 
     public function renderPreview($isLocked)
     {
-        $section = $this->session->getSection(NewsfilterPreview::SESSION_SECTION_NEWSFILTER_PREVIEW);
+        $section = $this->session->getSection(self::SESSION_SECTION_CONTENT_PREVIEW);
         $this->template->content = $isLocked ? $section->generatedLockedHtml : $section->generatedHtml;
     }
 
     protected function createComponentMailGeneratorForm()
     {
-        $sourceTemplateId = $this->request->getParameter('source_template_id');
-        if (!$sourceTemplateId) {
-            $sourceTemplateId = $this->request->getPost('source_template_id');
-        }
+        $sourceTemplateId = $this->getSourceTemplateIdParameter();
 
         $form = $this->mailGeneratorFormFactory->create($sourceTemplateId, function ($htmlContent, $textContent, $controlParams = []) {
             $this->template->htmlContent = $htmlContent;
@@ -65,9 +53,18 @@ final class MailGeneratorPresenter extends BasePresenter
         return $form;
     }
 
-    protected function createComponentNewsfilterPreview()
+    protected function createComponentGeneratorWidgets()
     {
-        return $this->newsfilterPreviewFactory->create();
+        return $this->generatorWidgetsFactory->create($this->getSourceTemplateIdParameter());
+    }
+
+    private function getSourceTemplateIdParameter()
+    {
+        $sourceTemplateId = $this->request->getParameter('source_template_id');
+        if (!$sourceTemplateId) {
+            $sourceTemplateId = $this->request->getPost('source_template_id');
+        }
+        return $sourceTemplateId;
     }
 
     public function handleSourceTemplateChange($sourceTemplateId)

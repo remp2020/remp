@@ -98,17 +98,15 @@ class NewsfilterTemplateFormFactory
     private function getUniqueTemplateCode($code)
     {
         $storedCodes = $this->templatesRepository->getTable()
-            ->where('code LIKE ?', '%' . $code . '%')
-            ->select('code')->fetchAssoc('code');
+            ->where('code LIKE ?', $code . '%')
+            ->select('code')->fetchAll();
 
         if ($storedCodes) {
             $max = 0;
-            if (is_array($storedCodes)) {
-                foreach ($storedCodes as $c) {
-                    $parts = explode('-', $c['code']);
-                    if (count($parts) > 1) {
-                        $max = max($max, (int) $parts[1]);
-                    }
+            foreach ($storedCodes as $c) {
+                $parts = explode('-', $c->code);
+                if (count($parts) > 1) {
+                    $max = max($max, (int) $parts[1]);
                 }
             }
             $code .= '-' . ($max + 1);

@@ -1,20 +1,20 @@
 <?php
 
-namespace Remp\MailerModule\Components;
+namespace Remp\MailerModule\Components\GeneratorWidgets\Widgets;
 
 use Nette\Application\Responses\JsonResponse;
 use Nette\Database\Connection;
 use Nette\Http\Session;
+use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\NewsfilterTemplateFormFactory;
+use Remp\MailerModule\Presenters\MailGeneratorPresenter;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class NewsfilterPreview extends BaseControl
+class NewsfilterWidget extends BaseControl implements IGeneratorWidget
 {
-    const SESSION_SECTION_NEWSFILTER_PREVIEW = "newsfilter_preview";
-
-    private $templateName = 'newsfilter_preview.latte';
+    private $templateName = 'newsfilter_widget.latte';
 
     private $connection;
 
@@ -26,7 +26,6 @@ class NewsfilterPreview extends BaseControl
      * @var Session
      */
     private $session;
-
 
     public function __construct(
         Connection $connection,
@@ -41,9 +40,14 @@ class NewsfilterPreview extends BaseControl
         $this->session = $session;
     }
 
+    public function identifier()
+    {
+        return "newsfilterwidget";
+    }
+
     public function render($params)
     {
-        if (!isset($params['addonParams']['render']) || !$params['addonParams']['render']) {
+        if (!isset($params['addonParams'])) {
             return;
         }
         foreach ($params['addonParams'] as $var => $param) {
@@ -109,7 +113,7 @@ class NewsfilterPreview extends BaseControl
         $this->template->generatedLockedText = $generatedLockedText;
 
         // Store data in session for full-screen preview
-        $sessionSection = $this->session->getSection(self::SESSION_SECTION_NEWSFILTER_PREVIEW);
+        $sessionSection = $this->session->getSection(MailGeneratorPresenter::SESSION_SECTION_CONTENT_PREVIEW);
         $sessionSection->generatedHtml = $generatedHtml;
         $sessionSection->generatedLockedHtml = $generatedLockedHtml;
 

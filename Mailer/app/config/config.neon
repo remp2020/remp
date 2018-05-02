@@ -193,7 +193,11 @@ services:
     # Factories
     - Remp\MailerModule\Components\IDataTableFactory
     - Remp\MailerModule\Components\ISendingStatsFactory
-    - Remp\MailerModule\Components\INewsfilterPreviewFactory
+    - Remp\MailerModule\Components\IGeneratorWidgetsFactory
+
+    # Generator Widgets
+    - Remp\MailerModule\Components\GeneratorWidgetsManager
+    - Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget
 
     # Forms
     - Remp\MailerModule\Forms\SignInFormFactory

@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
 class NewsfilterGenerator implements IGenerator
@@ -48,6 +49,11 @@ class NewsfilterGenerator implements IGenerator
     public function onSubmit(callable $onSubmit)
     {
         $this->onSubmit = $onSubmit;
+    }
+
+    public function getWidgets()
+    {
+        return [NewsfilterWidget::class];
     }
 
     public function formSucceeded($form, $values)
@@ -152,15 +158,15 @@ class NewsfilterGenerator implements IGenerator
 
         $htmlContent = $twig->render('html_template', $params);
         $textContent = $twig->render('text_template', $params);
-        $lockedHtmlContent = $twig->render('html_template', $lockedParams);
-        $lockedTextContent = $twig->render('text_template', $lockedParams);
 
-        $this->onSubmit->__invoke($htmlContent, $textContent, [
-            'lockedHtmlContent' => $lockedHtmlContent,
-            'lockedTextContent' => $lockedTextContent,
+        $addonParams = [
+            'lockedHtmlContent' => $twig->render('html_template', $lockedParams),
+            'lockedTextContent' => $twig->render('text_template', $lockedParams),
             'newsfilterTitle' => $values->title,
-            'render' => true,
-        ]);
+            'addonHeader' => "Newsfilter details"
+        ];
+
+        $this->onSubmit->__invoke($htmlContent, $textContent, $addonParams);
     }
 
     private function getLockedHtml($fullHtml, $newsfilterLink)
