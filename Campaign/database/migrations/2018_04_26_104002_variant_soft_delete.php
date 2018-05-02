@@ -14,7 +14,7 @@ class VariantSoftDelete extends Migration
     public function up()
     {
         Schema::table('campaign_banners', function (Blueprint $table) {
-            $table->timestamp('deleted_at')->nullable();
+            $table->softDeletes();
         });
     }
 
@@ -26,7 +26,7 @@ class VariantSoftDelete extends Migration
     public function down()
     {
         Schema::table('campaign_banners', function (Blueprint $table) {
-            $table->dropColumn('deleted_at');
+            $table->dropSoftDeletes();
         });
     }
 }

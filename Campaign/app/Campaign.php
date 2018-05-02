@@ -98,7 +98,6 @@ class Campaign extends Model
     {
         return DB::table('campaign_banners')
             ->where('campaign_id', $this->id)
-            ->whereNull('deleted_at')
             ->orderBy('weight')
             ->get();
     }
@@ -106,7 +105,7 @@ class Campaign extends Model
     public function removeVariants(array $variantIds)
     {
         return DB::table('campaign_banners')
-            ->where('id', $variantIds)
+            ->whereIn('id', $variantIds)
             ->update(['deleted_at' => now()]);
     }
 
