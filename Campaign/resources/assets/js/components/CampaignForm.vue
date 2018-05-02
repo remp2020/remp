@@ -33,7 +33,7 @@
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-9">
 
                                         <div class="input-group fg-float m-t-30">
                                             <span class="input-group-addon"><i class="zmdi zmdi-file-text"></i></span>
@@ -101,7 +101,7 @@
                             <div class="panel-body p-l-10 p-r-20">
 
                                 <div class="row">
-                                    <div class="col-md-7">
+                                    <div class="col-md-12">
                                         <p class="m-l-20">User needs to be member of all selected segments for campaign to be shown.</p>
 
                                         <div class="input-group m-t-30">
@@ -158,7 +158,7 @@
                                         </div>
 
                                         <div class="row m-t-10 m-l-30">
-                                            <div class="col-md-10">
+                                            <div class="col-md-12">
                                                 <div class="row m-b-10" v-for="(segment,i) in segments" style="line-height: 25px">
                                                     <div class="col-md-12 text-left">
                                                         {{ segmentMap[segment.code] }}
@@ -217,10 +217,10 @@
                                     <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
                                     <div>
                                         <div class="row">
-                                            <div class="col-md-8">
+                                            <div class="col-md-12">
                                                 <label for="countries_blacklist" class="fg-label">Whitelist / Blacklist</label>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-12">
                                                 <v-select v-model="countriesBlacklist"
                                                         id="countries_blacklist"
                                                         :name="'countries_blacklist'"
@@ -236,10 +236,10 @@
                                     <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
                                     <div>
                                         <div class="row">
-                                            <div class="col-md-8">
+                                            <div class="col-md-12">
                                                 <label for="countries" class="fg-label">Countries</label>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-12">
                                                 <v-select v-model="countries"
                                                         id="countries"
                                                         :name="'countries[]'"
@@ -295,7 +295,7 @@
 
                                 <div>
                                     <div class="row">
-                                        <div class="col-md-6 p-l-30">
+                                        <div class="col-md-12 p-l-30">
                                             <ul class="tab-nav" role="tablist" data-tab-color="teal">
                                                 <li v-on:click="activationMode='activate-now'" v-bind:class="{active: activationMode === 'activate-now'}">
                                                     <a href="#schedule-now" role="tab" data-toggle="tab" aria-expanded="true">Activate now</a>
@@ -318,7 +318,7 @@
                                                     </div>
 
                                                     <div role="tabpanel" v-bind:class="[{active: activationMode === 'activate-schedule'}, 'tab-pane']" id="schedule-schedule">
-                                                        <div class="form-group col-md-6">
+                                                        <div class="form-group col-md-9">
                                                             <small class="help-block">Planning new schedule activates campaign.</small>
                                                             <div class="input-group">
                                                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>

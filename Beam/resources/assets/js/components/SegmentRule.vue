@@ -290,15 +290,15 @@
                     timespanStr = "";
 
                 if (timespan.asDays()) {
-                    timespanStr += (timespan.asDays()) + "d ";
+                    timespanStr += parseInt(timespan.asDays()) + "d ";
                 }
 
                 if (timespan.hours()) {
-                    timespanStr += " " + timespan.hours() + "h ";
+                    timespanStr += " " + parseInt(timespan.hours()) + "h ";
                 }
 
                 if (timespan.minutes()) {
-                    timespanStr += " " + timespan.minutes() + "m ";
+                    timespanStr += " " + parseInt(timespan.minutes()) + "m ";
                 }
 
                 this.timespanUserFormatted = timespanStr.replace(/  +/g, ' ').trim();
