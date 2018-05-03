@@ -30,4 +30,8 @@ class EmptyGenerator implements IGenerator
     {
         return [];
     }
+
+    public function preprocessParameters($data)
+    {
+    }
 }

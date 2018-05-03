@@ -42,4 +42,13 @@ interface IGenerator
      * @return array
      */
     public function process($values);
+
+
+    /**
+     * Generates parameters for generator from arbitrary object (e.g. WP article dump)
+     * Each generator can define its own rules
+     *
+     * @return array
+     */
+    public function preprocessParameters($data);
 }

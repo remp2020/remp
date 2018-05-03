@@ -220,4 +220,21 @@ HTML;
         $newHtml .= $cacheHtml;
         return $newHtml;
     }
+
+
+    /**
+     * @param $data object containing WP article data
+     *
+     * @return object with data to fill the form with
+     */
+    public function preprocessParameters($data)
+    {
+        $output = new \stdClass();
+        $output->editor = $data->post_authors[0]->display_name;
+        $output->title = $data->post_title;
+        $output->url = $data->post_url;
+        $output->summary = $data->post_excerpt;
+        $output->newsfilter_html = $data->post_content;
+        return $output;
+    }
 }

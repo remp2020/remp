@@ -8,7 +8,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class MailGeneratorHandler extends BaseHandler
+class MailGeneratorPreprocessHandler extends BaseHandler
 {
     private $generatorFactory;
 
@@ -25,6 +25,7 @@ class MailGeneratorHandler extends BaseHandler
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'data', InputParam::REQUIRED),
         ];
     }
 
@@ -42,21 +43,9 @@ class MailGeneratorHandler extends BaseHandler
             return new JsonApiResponse(400, ['status' => 'error', 'message' => "Unregistered generator type {$template->generator}"]);
         }
 
-        $paramsProcessor = new GeneratorParamsProcessor($generator->apiParams());
-        $errors = $paramsProcessor->getErrors();
-        if (!empty($errors)) {
-            return $this->getMissingParamsResponse($errors);
-        }
+        $output = $generator->preprocessParameters(json_decode($params['data']));
 
-        $output = $generator->process((object) $paramsProcessor->getValues());
 
-        return new JsonApiResponse(200, ['status' => 'ok', 'data' => $output]);
-    }
-
-    private function getMissingParamsResponse(array $errors)
-    {
-        return new JsonApiResponse(400, [
-            'status' => 'error', 'message' => 'Some fields are invalid or missing', 'missingFields' => $errors
-        ]);
+        return new JsonApiResponse(200, ['status' => 'ok', 'data' => $output, 'generator_post_url'=>'http://something']);
     }
 }
