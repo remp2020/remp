@@ -24,24 +24,28 @@ class MailGeneratorHandler extends BaseHandler
     public function params()
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'generator', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
         ];
     }
 
     public function handle($params)
     {
         $generator = null;
+        $template = $this->sourceTemplatesRepository->find($params['source_template_id']);
+        if (!$template){
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => "No source template associated with id {$params['source_template_id']}"]);
+        }
+
         try {
-            $generator = $this->generatorFactory->get($params['generator']);
+            $generator = $this->generatorFactory->get($template->generator);
         } catch (\Exception $ex){
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Unknown generator type.']);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => "Unregistered generator type {$template->generator}"]);
         }
 
         $paramsProcessor = new GeneratorParamsProcessor($generator->apiParams());
         $errors = $paramsProcessor->getErrors();
         if (!empty($errors)) {
             return $this->getMissingParamsResponse($errors);
-
         }
 
         $output = $generator->process((object) $paramsProcessor->getValues());
