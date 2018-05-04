@@ -680,7 +680,7 @@ class CampaignController extends Controller
             $campaign->removeVariants($data['variants_to_remove']);
         }
 
-        $campaign->variants = $data['variants'];
+        $campaign->storeOrUpdateVariants($data['variants']);
 
         if (isset($data['countries'])) {
             $campaign->countries()->sync(

@@ -100,7 +100,7 @@ class Campaign extends Model
         return CampaignBanner::whereIn('id', $variantIds)->delete();
     }
 
-    public function setVariantsAttribute(array $variants)
+    public function storeOrUpdateVariants(array $variants)
     {
         foreach ($variants as $variant) {
             $data = [
@@ -113,11 +113,9 @@ class Campaign extends Model
                 'banner_id' => $variant['banner_id'] ?? null,
             ];
 
-            if (isset($variant['id'])) {
-                CampaignBanner::where('id', $data['id'])->update($data);
-            } else {
-                (new CampaignBanner($data))->save();
-            }
+            $campaignBanner = CampaignBanner::findOrNew($variant['id']);
+            $campaignBanner->fill($data);
+            $campaignBanner->save();
         }
     }
 
