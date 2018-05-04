@@ -11,7 +11,21 @@ class CampaignBanner extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'campaign_banners';
+
+    public $timestamps = false;
+
     protected $dates = ['deleted_at'];
+
+    protected $fillable = [
+        'id',
+        'campaign_id',
+        'variant',
+        'weight',
+        'proportion',
+        'control_group',
+        'banner_id'
+    ];
 
     public function banner()
     {

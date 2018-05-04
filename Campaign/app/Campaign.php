@@ -6,6 +6,7 @@ use DB;
 use Cache;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\CampaignBanner;
 use Ramsey\Uuid\Uuid;
 
 class Campaign extends Model
@@ -76,7 +77,7 @@ class Campaign extends Model
 
     public function campaignBanner()
     {
-        return $this->hasMany('App\CampaignBanner')->orderBy('weight');
+        return $this->hasMany(CampaignBanner::class)->orderBy('weight');
     }
 
     public function getPrimaryBanner()
@@ -96,9 +97,7 @@ class Campaign extends Model
 
     public function removeVariants(array $variantIds)
     {
-        return DB::table('campaign_banners')
-            ->whereIn('id', $variantIds)
-            ->update(['deleted_at' => now()]);
+        return CampaignBanner::whereIn('id', $variantIds)->delete();
     }
 
     public function setVariantsAttribute(array $variants)
@@ -115,9 +114,9 @@ class Campaign extends Model
             ];
 
             if (isset($variant['id'])) {
-                DB::table('campaign_banners')->where('id', $data['id'])->update($data);
+                CampaignBanner::where('id', $data['id'])->update($data);
             } else {
-                DB::table('campaign_banners')->insert($data);
+                (new CampaignBanner($data))->save();
             }
         }
     }
