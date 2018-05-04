@@ -6,21 +6,21 @@ use Illuminate\Console\Command;
 use App\Campaign;
 use Cache;
 
-class ClearCampaignsCache extends Command
+class CampaignsClearCache extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'campaign:cache-clear';
+    protected $signature = 'campaigns:clear-cache';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Clear campaign cache.';
+    protected $description = 'Clear campaigns cache.';
 
     /**
      * Create a new command instance.

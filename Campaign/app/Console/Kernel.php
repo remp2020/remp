@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\ClearCampaignsCache::class
+        Commands\CampaignsClearCache::class
     ];
 
     /**
