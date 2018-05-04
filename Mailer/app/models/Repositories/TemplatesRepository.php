@@ -17,9 +17,9 @@ class TemplatesRepository extends Repository
         return $this->getTable()->order('created_at DESC');
     }
 
-    public function pairs()
+    public function pairs($listId)
     {
-        return $this->all()->select('id, name')->fetchPairs('id', 'name');
+        return $this->all()->select('id, name')->where(['mail_type_id' => $listId])->fetchPairs('id', 'name');
     }
 
     public function triples()
