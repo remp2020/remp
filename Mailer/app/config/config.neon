@@ -142,6 +142,10 @@ services:
     security.userStorage:
         class: Remp\NetteSso\Security\UserStorage
 
+    # API authentication
+    apiTokenRepository:
+        class: Remp\MailerModule\Auth\SsoTokenRepository
+
     - Remp\MailerModule\Config\Config
     - Remp\MailerModule\Sender
     - Remp\MailerModule\Broker\ConsumerFactory(%kafka.broker%)

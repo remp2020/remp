@@ -81,6 +81,10 @@ class Client
         } catch (ClientException $e) {
             $response = $e->getResponse();
             $contents = $response->getBody()->getContents();
+            if ($response->getStatusCode() === 404){
+                return false;
+            }
+
             throw new SsoException($contents);
         }
 
