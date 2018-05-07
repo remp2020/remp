@@ -19,7 +19,6 @@ class GeneratorFactory
 
     public function __construct(
         Container $container,
-        SourceTemplatesRepository $sourceTemplateRepository,
         GeneratorWidgetsManager $generatorWidgetsManager
     ) {
     
