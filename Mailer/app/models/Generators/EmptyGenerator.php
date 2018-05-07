@@ -11,6 +11,11 @@ class EmptyGenerator implements IGenerator
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
+    public function formSucceeded($form, $values)
+    {
+
+    }
+
     public function onSubmit(callable $onSubmit)
     {
         $this->onSubmit = $onSubmit;
@@ -33,5 +38,6 @@ class EmptyGenerator implements IGenerator
 
     public function preprocessParameters($data)
     {
+        return [];
     }
 }

@@ -38,6 +38,7 @@ interface IGenerator
 
     /**
      * Generates output data from input values object
+     * Used by both Form POST and API call
      *
      * @return array
      */

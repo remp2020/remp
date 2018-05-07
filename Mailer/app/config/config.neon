@@ -167,12 +167,11 @@ services:
         class: Remp\MailerModule\Generators\GeneratorFactory
         setup:
             - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\NewsfilterGenerator())
-#            - registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\MinutaDigestGenerator())
-#            - registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\EmptyGenerator())
-#            - registerGenerator('minuta_medium', 'Minuta medium', Remp\MailerModule\Generators\EmptyGenerator())
-#            - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\EmptyGenerator())
-#            - registerGenerator('url_parser', 'Ulr parser', Remp\MailerModule\Generators\EmptyGenerator())
-
+            - registerGenerator('url_parser', 'URL parser', Remp\MailerModule\Generators\UrlParserGenerator())
+            - registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\MinutaDigestGenerator())
+            - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\MinutaAlertGenerator())
+            - registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\DailyNewsletterGenerator())
+            - registerGenerator('empty', 'Empty generator', Remp\MailerModule\Generators\EmptyGenerator())
 
     # Repositories
     - Remp\MailerModule\Repository\AuditLogRepository
