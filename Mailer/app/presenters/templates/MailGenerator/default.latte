@@ -6,23 +6,15 @@
     <h2>Generate emails</h2>
 </div>
 
-{ifset $addonParams}
-<div class="card">
-    <div class="card-header">
-        <h2>{$addonParams['addonHeader']}<small></small></h2>
-    </div>
-    <div class="card-body card-padding">
-		{snippetArea addons}
-			{var params = [
+{ifset $addonParams['render']}
+    {snippetArea addons}
+        {var params = [
                 htmlContent => isset($htmlContent) ? $htmlContent,
                 textContent => isset($textContent) ? $textContent,
                 addonParams => isset($addonParams) ? $addonParams,
               ]}
-			{control generatorWidgets $params}
-		{/snippetArea}
-
-    </div>
-</div>
+        {control generatorWidgets $params}
+    {/snippetArea}
 {/ifset}
 
 {if isset($htmlContent) || isset($textContent)}
@@ -31,7 +23,7 @@
         <h2>Generated content<small></small></h2>
     </div>
     <div class="card-body card-padding">
-		{ifset $htmlContent}
+        {ifset $htmlContent}
             <h4>
                 HTML content&nbsp;
                 <a href="#" data-t class="btn palette-Cyan bg waves-effect btn-sm" onclick="clipboard.copy($('#generatedhtmlcontent').text()); $.notify('Copied to clipboard', { allow_dismiss: false, delay:1000,type: 'inverse', placement : { from: 'bottom', align: 'right'}}); return false;"><i class="zmdi zmdi-copy"></i></a>
@@ -52,17 +44,17 @@
                 </div>
             </div>
 
-		{/ifset}
+        {/ifset}
 
         <div class="clearfix"></div>
 
-		{ifset $textContent}
+        {ifset $textContent}
             <h4>
                 Text content&nbsp;
                 <a href="#" class="btn palette-Cyan bg waves-effect btn-sm" onclick="clipboard.copy($('#generatedtextcontent').text()); $.notify('Copied to clipboard', { allow_dismiss: false, delay:1000, type: 'inverse', placement : { from: 'bottom', align: 'right'}}); return false;"><i class="zmdi zmdi-copy"></i></a>
             </h4>
             <pre id="generatedtextcontent">{$textContent}</pre>
-		{/ifset}
+        {/ifset}
     </div>
 </div>
 {/if}
@@ -72,8 +64,8 @@
         <h2 n:block="title">Generate emails<small></small></h2>
     </div>
     <div class="card-body card-padding">
-		{snippetArea wrapper}
-		    {include '@form.latte'}
-		{/snippetArea}
+        {snippetArea wrapper}
+            {include '@form.latte'}
+        {/snippetArea}
     </div>
 </div>

@@ -163,7 +163,7 @@ class NewsfilterGenerator implements IGenerator
             'lockedHtmlContent' => $twig->render('html_template', $lockedParams),
             'lockedTextContent' => $twig->render('text_template', $lockedParams),
             'newsfilterTitle' => $values->title,
-            'addonHeader' => "Newsfilter details"
+            'render' => true
         ];
 
         $this->onSubmit->__invoke($htmlContent, $textContent, $addonParams);
