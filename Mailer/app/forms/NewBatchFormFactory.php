@@ -62,7 +62,7 @@ class NewBatchFormFactory extends Object
             }
             $form->addSelect('segment_code', 'Segment', $segments)
                 ->setPrompt('Select segment')
-                ->setRequired('Segment is required');
+                ->setRequired("Field 'Segment' is required.");
         }
 
         $methods = [

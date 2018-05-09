@@ -35,7 +35,7 @@ class MailGeneratorFormFactory extends Object
             ->fetchPairs('id', 'title');
 
         $form->addSelect('source_template_id', 'Generator', $pairs)
-            ->setRequired();
+            ->setRequired("Field 'Generator' is required.");
 
         $generator = null;
         $template = null;

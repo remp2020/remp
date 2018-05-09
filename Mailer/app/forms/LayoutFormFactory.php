@@ -35,7 +35,7 @@ class LayoutFormFactory extends Object implements IFormFactory
         $form->addHidden('id', $id);
 
         $form->addText('name', 'Name')
-            ->setRequired('Required');
+            ->setRequired("Field 'Name' is required.");
 
         $form->addTextArea('layout_text', 'Text version')
             ->setAttribute('rows', 3);
