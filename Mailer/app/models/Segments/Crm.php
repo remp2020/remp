@@ -9,11 +9,11 @@ use Nette\Utils\JsonException;
 
 class Crm implements ISegment
 {
-    const PROVIDER_ALIAS = 'crm-segment';
+    const PROVIDER_ALIAS = 'api/v1/crm-segment';
 
-    const ENDPOINT_LIST = 'user-segments/list';
+    const ENDPOINT_LIST = 'api/v1/user-segments/list';
 
-    const ENDPOINT_USERS = 'user-segments/users';
+    const ENDPOINT_USERS = 'api/v1/user-segments/users';
 
     private $baseUrl;
 
