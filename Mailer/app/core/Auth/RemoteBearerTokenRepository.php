@@ -9,22 +9,21 @@ use Tomaj\NetteApi\Misc\BearerTokenRepositoryInterface;
 
 class RemoteBearerTokenRepository implements BearerTokenRepositoryInterface
 {
+    const ENDPOINT_CHECK_TOKEN = 'api/v1/token/check';
+
     private $client;
 
-    private $endpointCheckToken;
-
-    public function __construct($baseUrl, $endpointCheckToken)
+    public function __construct($baseUrl)
     {
         $this->client = new Client([
             'base_uri' => $baseUrl
         ]);
-        $this->endpointCheckToken = $endpointCheckToken;
     }
 
     public function validToken($token)
     {
         try {
-            $response = $this->client->request('GET', $this->endpointCheckToken, [
+            $response = $this->client->request('GET', self::ENDPOINT_CHECK_TOKEN, [
                 'headers' => [
                     'Authorization' => 'Bearer '.$token,
                 ]
