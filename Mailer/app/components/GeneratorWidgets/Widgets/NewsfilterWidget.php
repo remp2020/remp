@@ -10,6 +10,7 @@ use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\NewsfilterTemplateFormFactory;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
 use Remp\MailerModule\Repository\LayoutsRepository;
+use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
 class NewsfilterWidget extends BaseControl implements IGeneratorWidget
@@ -22,22 +23,23 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
 
     private $templatesRepository;
 
-    /**
-     * @var Session
-     */
     private $session;
+
+    private $listsRepository;
 
     public function __construct(
         Connection $connection,
         Session $session,
         LayoutsRepository $layoutsRepository,
-        TemplatesRepository $templatesRepository
+        TemplatesRepository $templatesRepository,
+        ListsRepository $listsRepository
     ) {
         parent::__construct();
         $this->connection = $connection;
         $this->layoutsRepository = $layoutsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->session = $session;
+        $this->listsRepository = $listsRepository;
     }
 
     public function identifier()
@@ -81,34 +83,36 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
 
         $mailLayout = $this->layoutsRepository->find($_POST['mail_layout_id']);
         $lockedMailLayout = $this->layoutsRepository->find($_POST['locked_mail_layout_id']);
+        $mailType = $this->listsRepository->find($_POST['mail_type_id']);
 
-        $generate = function ($htmlContent, $textContent, $mailLayout) use ($request) {
-            $this->connection->beginTransaction();
-            $mailTemplate = $this->templatesRepository->add(
-                $request->getPost('name'),
-                'tmp_' . microtime(true),
-                '',
-                $request->getPost('from'),
-                $request->getPost('subject'),
-                $textContent,
-                $htmlContent,
-                $mailLayout->id,
-                $request->getPost('mail_type_id')
-            );
+        $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
+            $mailTemplate = new DataRow([
+                'name' => $request->getPost('name'),
+                'code' => 'tmp_' . microtime(true),
+                'description' => '',
+                'from' => $request->getPost('from'),
+                'autologin' => true,
+                'subject' => $request->getPost('subject'),
+                'mail_body_text' => $textContent,
+                'mail_body_html' => $htmlContent,
+                'mail_layout_id' => $mailLayout->id,
+                'mail_layout' => $mailLayout,
+                'mail_type_id' => $request->getPost('mail_type_id'),
+                'mail_type' => $mailType
+            ]);
 
-            $mailContentGenerator = new ContentGenerator($mailTemplate, $mailTemplate->layout, null);
+            $mailContentGenerator = new ContentGenerator($mailTemplate, $mailLayout, null);
             $generatedHtml = $mailContentGenerator->getHtmlBody([]);
             $generatedText = $mailContentGenerator->getTextBody([]);
 
-            $this->connection->rollBack();
             return [$generatedHtml, $generatedText];
         };
 
-        list($generatedHtml, $generatedText) = $generate($htmlContent, $textContent, $mailLayout);
+        list($generatedHtml, $generatedText) = $generate($htmlContent, $textContent, $mailLayout, $mailType);
         $this->template->generatedHtml = $generatedHtml;
         $this->template->generatedText = $generatedText;
 
-        list($generatedLockedHtml, $generatedLockedText) = $generate($lockedHtmlContent, $lockedTextContent, $lockedMailLayout);
+        list($generatedLockedHtml, $generatedLockedText) = $generate($lockedHtmlContent, $lockedTextContent, $lockedMailLayout, $mailType);
         $this->template->generatedLockedHtml = $generatedLockedHtml;
         $this->template->generatedLockedText = $generatedLockedText;
 
