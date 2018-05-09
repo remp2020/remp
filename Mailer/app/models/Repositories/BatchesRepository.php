@@ -19,14 +19,16 @@ class BatchesRepository extends Repository
     const STATE_USER_STOP = 'user_stopped';
     const STATE_WORKER_STOP = 'worker_stopped';
 
+    const METHOD_RANDOM = 'random';
+
     protected $tableName = 'mail_job_batch';
 
-    public function add($jobId, $email_count = null, $startAt = null, $method = 'random')
+    public function add($jobId, $emailCount = null, $startAt = null, $method = 'random')
     {
         $result = $this->insert([
             'mail_job_id' => $jobId,
             'method' => $method,
-            'max_emails' => $email_count,
+            'max_emails' => $emailCount,
             'start_at' => new \DateTime($startAt),
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),
@@ -38,6 +40,18 @@ class BatchesRepository extends Repository
 
         return $result;
     }
+
+    public function addTemplate($batch, $template, $weight = 100)
+    {
+        $this->database->table('mail_job_batch_templates')->insert([
+            'mail_job_id' => $batch->mail_job_id,
+            'mail_job_batch_id' => $batch->id,
+            'mail_template_id' => $template->id,
+            'weight' => $weight,
+            'created_at' => new DateTime(),
+        ]);
+    }
+
 
     public function getBatchReady()
     {

@@ -12,9 +12,6 @@ class JobsRepository extends Repository
 {
     const STATUS_NEW = 'new';
 
-    /** @var SegmentsRepository */
-    protected $segmentsRepository;
-
     protected $tableName = 'mail_jobs';
 
     protected $dataTableSearchable = [
@@ -23,30 +20,21 @@ class JobsRepository extends Repository
 
     public function __construct(
         Context $database,
-        IStorage $cacheStorage = null,
-        SegmentsRepository $segmentsRepository
+        IStorage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
-
-        $this->segmentsRepository = $segmentsRepository;
     }
 
-    public function add($segment_code, $segment_provider, $context = null)
+    public function add($segmentCode, $segmentProvider, $context = null)
     {
         $data = [
-            'segment_code' => $segment_code,
-            'segment_provider' => $segment_provider,
+            'segment_code' => $segmentCode,
+            'segment_provider' => $segmentProvider,
             'context' => $context,
             'status' => static::STATUS_NEW,
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),
         ];
-
-        // remove segment_id after CRM and REMP separation
-        if ($segment_provider == Crm::PROVIDER_ALIAS) {
-            $segment = $this->segmentsRepository->findBy('code', $segment_code);
-            $data['segment_id'] = $segment->id;
-        }
 
         $result = $this->insert($data);
 

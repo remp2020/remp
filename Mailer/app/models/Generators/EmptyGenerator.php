@@ -15,4 +15,9 @@ class EmptyGenerator implements IGenerator
     {
         $this->onSubmit = $onSubmit;
     }
+
+    public function getWidgets()
+    {
+        return [];
+    }
 }

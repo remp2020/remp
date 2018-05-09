@@ -164,14 +164,12 @@ services:
     generator:
         class: Remp\MailerModule\Generators\GeneratorFactory
         setup:
-            - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\EmptyGenerator())
-            - registerGenerator('empty', 'Empty', Remp\MailerModule\Generators\EmptyGenerator())
-            - registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\EmptyGenerator())
-            - registerGenerator('minuta_medium', 'Minuta medium', Remp\MailerModule\Generators\EmptyGenerator())
-            - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\EmptyGenerator())
-            - registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\EmptyGenerator())
-            - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\EmptyGenerator())
-            - registerGenerator('url_parser', 'Ulr parser', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\NewsfilterGenerator())
+#            - registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\MinutaDigestGenerator())
+#            - registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\EmptyGenerator())
+#            - registerGenerator('minuta_medium', 'Minuta medium', Remp\MailerModule\Generators\EmptyGenerator())
+#            - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\EmptyGenerator())
+#            - registerGenerator('url_parser', 'Ulr parser', Remp\MailerModule\Generators\EmptyGenerator())
 
 
     # Repositories
@@ -187,7 +185,6 @@ services:
     - Remp\MailerModule\Repository\TemplatesRepository
     - Remp\MailerModule\Repository\JobsRepository
     - Remp\MailerModule\Repository\JobQueueRepository
-    - Remp\MailerModule\Repository\SegmentsRepository
     - Remp\MailerModule\Repository\BatchesRepository
     - Remp\MailerModule\Repository\BatchTemplatesRepository
     - Remp\MailerModule\Repository\AutoLoginTokensRepository
@@ -196,6 +193,11 @@ services:
     # Factories
     - Remp\MailerModule\Components\IDataTableFactory
     - Remp\MailerModule\Components\ISendingStatsFactory
+    - Remp\MailerModule\Components\IGeneratorWidgetsFactory
+
+    # Generator Widgets
+    - Remp\MailerModule\Components\GeneratorWidgetsManager
+    - Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget
 
     # Forms
     - Remp\MailerModule\Forms\SignInFormFactory
@@ -208,6 +210,8 @@ services:
     - Remp\MailerModule\Forms\EditBatchFormFactory
     - Remp\MailerModule\Forms\NewTemplateFormFactory
     - Remp\MailerModule\Forms\SourceTemplateFormFactory
+    - Remp\MailerModule\Forms\MailGeneratorFormFactory
+    - Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 
     # Commands
     - Remp\MailerModule\Commands\ProcessJobCommand

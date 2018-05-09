@@ -3,6 +3,8 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\DI\Container;
+use Remp\MailerModule\Components\GeneratorWidgetsManager;
 
 interface IGenerator
 {
@@ -20,4 +22,11 @@ interface IGenerator
      * @return void
      */
     public function onSubmit(callable $onSubmit);
+
+
+    /**
+     * Return widget classes
+     * @return string[]
+     */
+    public function getWidgets();
 }

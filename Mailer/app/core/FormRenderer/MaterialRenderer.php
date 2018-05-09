@@ -2,35 +2,38 @@
 namespace Remp\MailerModule\Form\Rendering;
 
 use Nette\Forms\Form;
+use Nette\Forms\IControl;
 use Nette\Forms\Rendering\DefaultFormRenderer;
 use Nette\Forms\Controls;
+use Nette\Utils\Html;
 
 class MaterialRenderer extends DefaultFormRenderer
 {
-    public $wrappers = array(
-        'form' => array(
+    public $wrappers = [
+        'form' => [
             'container' => null,
-        ),
-        'error' => array(
+        ],
+        'error' => [
             'container' => 'div class="alert alert-danger"',
             'item' => 'p',
-        ),
-        'group' => array(
+        ],
+        'group' => [
             'container' => 'fieldset',
             'label' => 'legend',
             'description' => 'p',
-        ),
-        'controls' => array(
-            'container' => 'div',
-        ),
-        'pair' => array(
+        ],
+        'controls' => [
+            'container' => 'div class="col-sm-6"',
+        ],
+        'pair' => [
             'container' => 'div class="form-group fg-float m-b-30"',
+            'inner-container' => 'div class="fg-line"',
             '.required' => 'required',
             '.optional' => null,
             '.odd' => null,
             '.error' => 'has-error',
-        ),
-        'control' => array(
+        ],
+        'control' => [
             'container' => 'div',
             '.odd' => null,
             'description' => 'span class=help-block',
@@ -44,16 +47,16 @@ class MaterialRenderer extends DefaultFormRenderer
             '.submit' => 'button',
             '.image' => 'imagebutton',
             '.button' => 'button',
-        ),
-        'label' => array(
-            'container' => 'div class=fg-label',
+        ],
+        'label' => [
+            'container' => null,
             'suffix' => null,
             'requiredsuffix' => '',
-        ),
-        'hidden' => array(
+        ],
+        'hidden' => [
             'container' => 'div',
-        ),
-    );
+        ],
+    ];
     /**
      * Provides complete form rendering.
      * @param  Form $form
@@ -66,7 +69,7 @@ class MaterialRenderer extends DefaultFormRenderer
         foreach ($form->getControls() as $control) {
             if ($control instanceof  Controls\Button) {
                 if (strpos($control->getControlPrototype()->getClass(), 'btn') === false) {
-                    $control->getControlPrototype()->addClass(empty($usedPrimary) ? 'btn btn-primary' : 'btn btn-default');
+                    $control->getControlPrototype()->addClass(empty($usedPrimary) ? 'btn btn-info' : 'btn btn-default');
                     $usedPrimary = true;
                 }
             } elseif ($control instanceof Controls\TextBase ||
@@ -80,5 +83,50 @@ class MaterialRenderer extends DefaultFormRenderer
             }
         }
         return parent::render($form, $mode);
+    }
+
+    /**
+     * Renders single visual row.
+     * @return string
+     */
+    public function renderPair(IControl $control)
+    {
+        $outer = $pair = $this->getWrapper('pair container');
+
+        $isTextInput = $control instanceof Controls\TextInput;
+        if ($isTextInput) {
+            $inner = $this->getWrapper('pair inner-container');
+            $pair->addHtml($inner);
+            $pair = $inner;
+        }
+
+        $pair->addHtml($this->renderMaterialLabel($control, $isTextInput));
+        $pair->addHtml($this->renderControl($control));
+        $pair->class($this->getValue($control->isRequired() ? 'pair .required' : 'pair .optional'), true);
+        $pair->class($control->hasErrors() ? $this->getValue('pair .error') : null, true);
+        $pair->class($control->getOption('class'), true);
+        if (++$this->counter % 2) {
+            $pair->class($this->getValue('pair .odd'), true);
+        }
+        $pair->id = $control->getOption('id');
+        return $outer->render(0);
+    }
+
+    /**
+     * Renders 'label' part of visual row of controls.
+     * @return Html
+     */
+    public function renderMaterialLabel(IControl $control, bool $animatedLabel)
+    {
+        $label = $control->getLabel();
+        if ($label instanceof Html) {
+            if ($control->isRequired()) {
+                $label->class($this->getValue('control .required'), true);
+            }
+            if ($animatedLabel) {
+                $label->class('fg-label');
+            }
+        }
+        return $this->getWrapper('label container')->setHtml($label);
     }
 }
