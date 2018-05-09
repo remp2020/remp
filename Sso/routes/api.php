@@ -19,4 +19,4 @@ Route::middleware('app.jwt.auth')->group(function() {
 
 Route::post('auth/refresh', 'AuthController@refresh')->name('auth.refresh');
 Route::post('auth/invalidate', 'AuthController@invalidate')->name('auth.invalidate');
-Route::get('auth/api-token', 'AuthController@apiToken')->name('auth.api-token');
+Route::get('auth/check-token', 'AuthController@apiToken')->name('auth.api-token');
