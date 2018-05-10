@@ -55,7 +55,7 @@ class UrlParserGenerator implements IGenerator
             $output = $this->process($values);
             $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
         } catch (\Exception $e) {
-            if ($e->getPrevious() instanceof RequestException){
+            if ($e->getPrevious() instanceof RequestException) {
                 $form->addError($e->getMessage());
             } else {
                 throw $e;

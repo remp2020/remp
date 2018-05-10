@@ -17,8 +17,9 @@ class MailGeneratorPreprocessHandler extends BaseHandler
     public function __construct(
         LinkGenerator $linkGenerator,
         GeneratorFactory $generatorFactory,
-        SourceTemplatesRepository $sourceTemplatesRepository)
-    {
+        SourceTemplatesRepository $sourceTemplatesRepository
+    ) {
+
         parent::__construct();
         $this->generatorFactory = $generatorFactory;
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
@@ -35,14 +36,14 @@ class MailGeneratorPreprocessHandler extends BaseHandler
 
         $data = json_decode($json);
 
-        if (!isset($data->source_template_id)){
+        if (!isset($data->source_template_id)) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing required json parameter \'source_template_id\'']);
         }
 
         $generator = null;
         $template = $this->sourceTemplatesRepository->find($data->source_template_id);
         if (!$template) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => "No source template associated with id {$params['source_template_id']}"]);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => "No source template associated with id {$data->source_template_id}"]);
         }
 
         try {

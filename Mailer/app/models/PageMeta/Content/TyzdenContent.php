@@ -2,7 +2,7 @@
 
 namespace Remp\MailerModule\PageMeta;
 
-class  TyzdenContent implements ContentInterface
+class TyzdenContent implements ContentInterface
 {
     public function parseMeta($content)
     {

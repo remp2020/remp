@@ -13,7 +13,6 @@ class EmptyGenerator implements IGenerator
 
     public function formSucceeded($form, $values)
     {
-
     }
 
     public function onSubmit(callable $onSubmit)
