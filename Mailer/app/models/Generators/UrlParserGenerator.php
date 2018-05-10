@@ -26,7 +26,7 @@ class UrlParserGenerator implements IGenerator
         $form->addTextArea('intro', 'Intro text')
             ->setAttribute('rows', 4)
             ->getControlPrototype()
-            ->addAttributes(['class' => 'ace', 'data-lang' => 'html']);
+            ->setAttribute('class', 'form-control html-editor');
 
         $form->addTextArea('articles', 'Article')
             ->setAttribute('rows', 7)

@@ -160,18 +160,18 @@ class NewsfilterGenerator implements IGenerator
     public function generateForm(Form $form)
     {
         $form->addText('title', 'Title')
-            ->setRequired();
+            ->setRequired("Field 'Title' is required.");
 
         $form->addText('url', 'Newsfilter URL')
             ->addRule(Form::URL)
-            ->setRequired();
+            ->setRequired("Field 'Newsfilter URL' is required.");
 
         $form->addText('editor', 'Editor')
-            ->setRequired();
+            ->setRequired("Field 'Editor' is required.");
 
         $form->addTextArea('summary', 'Summary')
             ->setAttribute('rows', 3)
-            ->setRequired();
+            ->setRequired("Field 'Summary' is required.");
 
         $form->addTextArea('newsfilter_html', 'HTML')
             ->setAttribute('rows', 20)
