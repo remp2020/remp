@@ -81,6 +81,7 @@
                         <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
                                 <ab-testing
+                                    v-if="showABTestingComponent"
                                     :variants="variants"
                                     :variantOptions="variantOptions"
                                     :bannerId="bannerId"
@@ -446,6 +447,10 @@
                 }
                 self.endTime = et ? et.toISOString() : null;
             }).datetimepicker({useCurrent: false});
+
+            if (this.bannerId) {
+                this.showABTestingComponent = true;
+            }
         },
         props: props,
         data: function() {
@@ -455,6 +460,7 @@
                 "bannerId": null,
                 "variants": null,
                 "removedVariants": null,
+                "showABTestingComponent": false,
                 "signedIn": null,
                 "oncePerSession": null,
                 "active": null,
@@ -540,7 +546,6 @@
             highlightABTestingCollapse: function () {
                 return (this.variants.length > 2);
             }
-
         },
         methods: {
             handleToggleSelectDevice: function (device) {
@@ -575,6 +580,11 @@
                 let toRemove = this.segments[index];
                 this.segments.splice(index, 1);
                 this.removedSegments.push(toRemove.id);
+            }
+        },
+        watch: {
+            bannerId: function () {
+                this.showABTestingComponent = true;
             }
         }
     }

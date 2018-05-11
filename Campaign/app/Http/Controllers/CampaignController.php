@@ -739,7 +739,7 @@ class CampaignController extends Controller
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
-            $bannerId = $campaign->campaignBanner()->first()->id;
+            $bannerId = optional($campaign->campaignBanner()->first())->id;
         }
 
         // variants

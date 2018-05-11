@@ -22,7 +22,7 @@
                     v-if="index != $parent.variants.length - 1 && index != 0"
             ></v-select>
 
-            <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[$parent.variants[index].banner_id].label }}</span>
+            <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[$parent.bannerId].label }}</span>
         </td>
 
         <!-- proportion value -->

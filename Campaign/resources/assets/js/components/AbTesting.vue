@@ -63,7 +63,21 @@
         },
         created() {
             if (!this.variants.length) {
-                this.addEmptyVariant();
+                this.variants.push({
+                    id: null,
+                    variant: "Primary banner",
+                    proportion: 50,
+                    control_group: 0,
+                    banner_id: this.bannerId
+                });
+
+                this.variants.push({
+                    id: null,
+                    variant: 'Control Group',
+                    proportion: 50,
+                    control_group: 1,
+                    banner_id: null
+                })
             }
         },
         mounted() {
@@ -176,11 +190,11 @@
 
                 // add empty variant before control group
                 this.variants.splice(i, 0, {
-                    'id': null,
-                    'name': "Variant " + index,
-                    'proportion': 10,
-                    'control_group': 0,
-                    'banner_id': null
+                    id: null,
+                    variant: "Variant " + index,
+                    proportion: 10,
+                    control_group: 0,
+                    banner_id: null
                 });
 
                 setTimeout(() => {
