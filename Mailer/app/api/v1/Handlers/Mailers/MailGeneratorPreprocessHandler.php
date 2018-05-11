@@ -39,6 +39,9 @@ class MailGeneratorPreprocessHandler extends BaseHandler
         if (!isset($data->source_template_id)) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing required json parameter \'source_template_id\'']);
         }
+        if (!isset($data->data)) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing required json parameter \'data\'']);
+        }
 
         $generator = null;
         $template = $this->sourceTemplatesRepository->find($data->source_template_id);
