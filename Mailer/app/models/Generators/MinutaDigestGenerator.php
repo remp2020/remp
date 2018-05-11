@@ -4,8 +4,7 @@ namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\Validators;
-use Remp\MailerModule\PageMeta\GuzzleTransport;
-use Remp\MailerModule\PageMeta\PageMeta;
+use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\PageMeta\TyzdenContent;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
@@ -26,20 +25,14 @@ class MinutaDigestGenerator implements IGenerator
         $this->onSubmit = $onSubmit;
     }
 
-    private function fetchUrl($url)
-    {
-        $pageMeta = new PageMeta(new GuzzleTransport(), new TyzdenContent());
-        $meta = $pageMeta->getPageMeta(Utils::removeRefUrlAttribute($url));
-        if ($meta) {
-            return $meta;
-        }
-        return false;
-    }
-
     public function formSucceeded($form, $values)
     {
-        $output = $this->process($values);
-        $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
+        try {
+            $output = $this->process($values);
+            $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
+        } catch (InvalidUrlException $e) {
+            $form->addError($e->getMessage());
+        }
     }
 
     public function apiParams()
@@ -58,7 +51,7 @@ class MinutaDigestGenerator implements IGenerator
         $urls = explode("\n", $values->posts);
         foreach ($urls as $url) {
             if (Validators::isUrl($url)) {
-                $posts[$url] = $this->fetchUrl($url);
+                $posts[$url] = Utils::fetchUrlMeta($url, new TyzdenContent());
             }
         }
 

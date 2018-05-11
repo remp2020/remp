@@ -2,11 +2,9 @@
 
 namespace Remp\MailerModule\Generators;
 
-use GuzzleHttp\Exception\RequestException;
 use Nette\Application\UI\Form;
+use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\PageMeta\DenniknContent;
-use Remp\MailerModule\PageMeta\GuzzleTransport;
-use Remp\MailerModule\PageMeta\PageMeta;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -54,12 +52,8 @@ class UrlParserGenerator implements IGenerator
         try {
             $output = $this->process($values);
             $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
-        } catch (\Exception $e) {
-            if ($e->getPrevious() instanceof RequestException) {
-                $form->addError($e->getMessage());
-            } else {
-                throw $e;
-            }
+        } catch (InvalidUrlException $e) {
+            $form->addError($e->getMessage());
         }
     }
 
@@ -81,16 +75,9 @@ class UrlParserGenerator implements IGenerator
         $items = [];
         $urls = explode("\n", trim($values->articles));
         foreach ($urls as $url) {
-            $url = Utils::removeRefUrlAttribute($url);
-
-            try {
-                $pageMeta = new PageMeta(new GuzzleTransport(), new DenniknContent());
-                $meta = $pageMeta->getPageMeta($url);
-                if ($meta) {
-                    $items[$url] = $meta;
-                }
-            } catch (RequestException $e) {
-                throw new \Exception(sprintf("%s: %s", 'Invalid URL', $url), 0, $e);
+            $meta = Utils::fetchUrlMeta($url, new DenniknContent());
+            if ($meta) {
+                $items[$url] = $meta;
             }
         }
 
