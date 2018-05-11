@@ -6,14 +6,14 @@ use Illuminate\Console\Command;
 use App\Campaign;
 use Cache;
 
-class CampaignsClearCache extends Command
+class CampaignsRefreshCache extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'campaigns:clear-cache';
+    protected $signature = 'campaigns:refresh-cache';
 
     /**
      * The console command description.
@@ -43,6 +43,8 @@ class CampaignsClearCache extends Command
 
         Campaign::all()->map(function ($campaign) {
             Cache::tags([Campaign::CAMPAIGN_TAG])->forget($campaign->id);
+
+            $campaign->cache();
         });
 
         $this->line('Campaigns cache cleared.');
