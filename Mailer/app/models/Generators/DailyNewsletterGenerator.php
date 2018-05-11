@@ -39,11 +39,8 @@ class DailyNewsletterGenerator implements IGenerator
 
     private function fetchUrl($url)
     {
-        // remove ref attribute
-        $url = preg_replace('/\\?ref=(.*)/', '', $url);
-
         $pageMeta = new PageMeta(new GuzzleTransport(), new TyzdenContent());
-        $meta = $pageMeta->getPageMeta($url);
+        $meta = $pageMeta->getPageMeta(Utils::removeRefUrlAttribute($url));
         if ($meta) {
             return $meta;
         }
