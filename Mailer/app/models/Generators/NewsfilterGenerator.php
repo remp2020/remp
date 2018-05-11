@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
@@ -229,15 +230,37 @@ HTML;
      * @param $data object containing WP article data
      *
      * @return object with data to fill the form with
+     * @throws \Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException
      */
     public function preprocessParameters($data)
     {
         $output = new \stdClass();
+
+        if (!isset($data->post_authors[0]->display_name)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
+        }
         $output->editor = $data->post_authors[0]->display_name;
+
+        if (!isset($data->post_title)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_title'");
+        }
         $output->title = $data->post_title;
+
+        if (!isset($data->post_url)) {
+            throw new PreprocessException("WP json object  does not contain required attribute 'post_url'");
+        }
         $output->url = $data->post_url;
+
+        if (!isset($data->post_excerpt)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_excerpt'");
+        }
         $output->summary = $data->post_excerpt;
+
+        if (!isset($data->post_content)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_content'");
+        }
         $output->newsfilter_html = $data->post_content;
+
         return $output;
     }
 }

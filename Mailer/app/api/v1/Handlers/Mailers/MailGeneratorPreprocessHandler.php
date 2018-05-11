@@ -55,13 +55,16 @@ class MailGeneratorPreprocessHandler extends BaseHandler
             return new JsonApiResponse(400, ['status' => 'error', 'message' => "Unregistered generator type {$template->generator}"]);
         }
 
-        $output = $generator->preprocessParameters($data->data);
-        $output->source_template_id = $data->source_template_id;
-
-        return new JsonApiResponse(200, [
-            'status' => 'ok',
-            'data' => $output,
-            'generator_post_url' => $this->linkGenerator->link('Mailer:MailGenerator:default')
-        ]);
+        try {
+            $output = $generator->preprocessParameters($data->data);
+            $output->source_template_id = $data->source_template_id;
+            return new JsonApiResponse(200, [
+                'status' => 'ok',
+                'data' => $output,
+                'generator_post_url' => $this->linkGenerator->link('Mailer:MailGenerator:default')
+            ]);
+        } catch (PreprocessException $e) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
 }
