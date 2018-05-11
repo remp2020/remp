@@ -86,6 +86,9 @@
                                     :variantOptions="variantOptions"
                                     :bannerId="bannerId"
                                 ></ab-testing>
+                                <div class="ab-testing-not-available" v-else>
+                                    To allow A/B testing you have to set primary banner in previous tab.
+                                </div>
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (a/b testing) -->
@@ -596,6 +599,12 @@
         font-size: 1.5em;
         line-height: 0.5;
         padding-bottom: 7px !important;
+    }
+
+    .ab-testing-not-available {
+        text-align: center;
+        font-size: 16px;
+        margin-top: 20px;
     }
 </style>
 
