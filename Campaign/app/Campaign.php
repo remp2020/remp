@@ -2,7 +2,6 @@
 
 namespace App;
 
-use DB;
 use Cache;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;

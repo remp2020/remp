@@ -73,7 +73,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: false }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: highlightABTestingCollapse }">
                                     A/B test
                                 </a>
                             </h4>
@@ -536,6 +536,9 @@
             },
             highlightDevicesCollapse: function () {
                 return (this.selectedDevices.length < this.allDevices.length);
+            },
+            highlightABTestingCollapse: function () {
+                return (this.variants.length > 2);
             }
 
         },
