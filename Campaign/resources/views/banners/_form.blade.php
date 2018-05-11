@@ -27,6 +27,8 @@
 
     remplib.bannerForm.bind("#banner-form", banner);
 
+    var clientSiteUrl = '{{ env('CLIENT_SITE_URL') }}';
+
 </script>
 
 @endpush
