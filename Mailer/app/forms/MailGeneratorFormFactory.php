@@ -27,8 +27,7 @@ class MailGeneratorFormFactory extends Object
     {
         $form = new Form;
         $form->setRenderer(new MaterialRenderer());
-        // CSRF is disabled because WP uses this endpoint to post mail generator data
-        //$form->addProtection();
+        $form->addProtection();
 
         $keys = $this->mailGeneratorFactory->keys();
         $pairs = $this->sourceTemplatesRepository->getTable()

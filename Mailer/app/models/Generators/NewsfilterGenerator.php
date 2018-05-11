@@ -159,6 +159,9 @@ class NewsfilterGenerator implements IGenerator
 
     public function generateForm(Form $form)
     {
+        // disable CSRF protection as external sources could post the params here
+        $form->offsetUnset(Form::PROTECTOR_ID);
+
         $form->addText('title', 'Title')
             ->setRequired("Field 'Title' is required.");
 
