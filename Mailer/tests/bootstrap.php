@@ -16,12 +16,7 @@ if ($environment !== "test") {
 }
 
 $configurator = new Nette\Configurator;
-if ($environment === 'local') {
-    $configurator->setDebugMode(true);
-} else {
-    $configurator->setDebugMode(false);
-}
-
+$configurator->setDebugMode(true);
 $configurator->setTimeZone(getenv('TIMEZONE'));
 $configurator->setTempDirectory(__DIR__ . '/../temp/tests');
 
