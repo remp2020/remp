@@ -59,7 +59,7 @@ class NewsfilterTemplateFormFactory
 
         $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
         
-        $form->addSelect('locked_mail_layout_id', 'Template for non-payers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
+        $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
         $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
 
@@ -78,8 +78,8 @@ class NewsfilterTemplateFormFactory
         $defaults = [
             'name' => 'Newsfilter ' . date('j.n.Y'),
             'code' => 'nwsf_' . date('dmY'),
-            'mail_layout_id' => 27, // layout for payers
-            'locked_mail_layout_id' => 21, // layout for non-payers
+            'mail_layout_id' => 27, // layout for subscribers
+            'locked_mail_layout_id' => 21, // layout for non-subscribers
             'mail_type_id' => 9, // newsfilter,
             'from' => 'Denník N <info@dennikn.sk>',
         ];
