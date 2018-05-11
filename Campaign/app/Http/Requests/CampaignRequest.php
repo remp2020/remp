@@ -25,18 +25,30 @@ class CampaignRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => 'required|max:255',
             'active' => 'boolean|required',
             'banner_id' => 'integer|required',
-            'alt_banner_id' => 'integer|nullable|different:banner_id',
             'signed_in' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
             'segments' => 'array',
             'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
             'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
-            'devices.0' => 'required'
+            'devices.0' => 'required',
+            'variants.*.variant' => 'string|required',
+            'variants.*.proportion' => 'integer|required',
+            'variants.*.control_group' => 'integer|required',
+            'variants.*.weight' => 'integer|required',
         ];
+
+
+        foreach ($this->variants as $index => $variant) {
+            if ($variant['control_group'] == 0) {
+                $rules['variants.' . $index . '.banner_id'] = 'integer|required';
+            }
+        }
+
+        return $rules;
     }
 
     public function all($keys = null)

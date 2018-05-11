@@ -105,7 +105,7 @@ class Campaign extends Model
             $data = [
                 'id' => $variant['id'],
                 'campaign_id' => $this->id,
-                'variant' => $variant['name'],
+                'variant' => $variant['variant'],
                 'weight' => $variant['weight'],
                 'proportion' => $variant['proportion'],
                 'control_group' => $variant['control_group'],
