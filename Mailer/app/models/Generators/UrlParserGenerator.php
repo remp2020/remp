@@ -81,8 +81,7 @@ class UrlParserGenerator implements IGenerator
         $items = [];
         $urls = explode("\n", trim($values->articles));
         foreach ($urls as $url) {
-            // remove ref attribute
-            $url = preg_replace('/\\?ref=(.*)/', '', $url);
+            $url = Utils::removeRefUrlAttribute($url);
 
             try {
                 $pageMeta = new PageMeta(new GuzzleTransport(), new DenniknContent());
