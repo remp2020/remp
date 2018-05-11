@@ -22,8 +22,6 @@ class DenniknContent implements ContentInterface
         // title
         $title = false;
         $matches = [];
-        // nastavil som to na og:title - nie su tam vyescapovane veci
-        // preg_match('/<h2 class=\"d-title\"\>(.+)[\<]\/h2\>/U', $content, $matches);
         preg_match('/<meta property=\"og:title\" content=\"(.+)\"\s*\/?/U', $content, $matches);
         if ($matches) {
             $title = $matches[1];
@@ -44,7 +42,6 @@ class DenniknContent implements ContentInterface
         if ($matches) {
             $image = $matches[1];
 
-            // vygenerujeme skaredo urlky na mensi obrazok
             $parts = explode('/', $image);
             $image = array_pop($parts);
             $info = pathinfo($image);
