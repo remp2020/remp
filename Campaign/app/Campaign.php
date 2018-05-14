@@ -162,7 +162,7 @@ class Campaign extends Model
         $proportions = [];
         $campaignBanners = $this->campaignBanner()->get();
 
-        foreach($campaignBanners as $campaignBanner) {
+        foreach ($campaignBanners as $campaignBanner) {
             $ids[] = $campaignBanner->id;
             $proportions[] = $campaignBanner->proportion;
         }

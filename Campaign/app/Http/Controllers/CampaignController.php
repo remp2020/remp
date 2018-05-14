@@ -27,7 +27,6 @@ use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\DeviceDetector;
-use App\CampaignBanner;
 
 class CampaignController extends Controller
 {
@@ -515,7 +514,9 @@ class CampaignController extends Controller
                 continue;
             }
 
-            $campaignBanners = $campaign->campaignBanner()->get()->keyBy('id');
+            $campaignBanners = $campaign->campaignBanner()
+                                        ->with('banner')
+                                        ->get();
 
             // banner
             if ($campaignBanners->count() == 0) {
@@ -524,11 +525,11 @@ class CampaignController extends Controller
             }
 
             $banner = null;
-            if ($campaignBanners->count() == 1) {
-                // only one variant of banner, so set it
-                $banner = $campaignBanners->first();
+            if ($campaignBanners->count() == 2) {
+                // only one variant of banner (other is always Control Group), so set it
+                $banner = Banner::find($campaignBanners->first()->banner_id);
             } else {
-                // there are more variants variants
+                // there are more variants
                 // find banner previously displayed to user
                 $bannerId = null;
                 $campaignsBanners = $data->campaignsBanners ?? false;
@@ -538,11 +539,12 @@ class CampaignController extends Controller
 
                 if ($bannerId !== null) {
                     // check if displayed banner is one of existing variants
-                    $campaignBanners->map(function (CampaignBanner $campaignBanner) use ($bannerId, $banner) {
-                        if ($campaignBanner->uuid == $bannerId) {
-                            $banner = $campaignBanner;
+                    foreach($campaignBanners as $campaignBanner) {
+                        if (optional($campaignBanner->banner)->uuid == $bannerId) {
+                            $banner = Banner::find($campaignBanner->banner_id);
+                            break;
                         }
-                    });
+                    }
                 }
 
                 // banner still not set, choose random variant
@@ -555,7 +557,7 @@ class CampaignController extends Controller
                     for ($i = 0; $i < count($proportions); $i++) {
                         $currPercent = $currPercent + $proportions[$i];
                         if ($currPercent >= $randVal) {
-                            $banner = $campaignBanners->get($ids[$i]);
+                            $banner = Banner::find($ids[$i]);
                             break;
                         }
                     }
@@ -664,7 +666,7 @@ class CampaignController extends Controller
 
             //render
             $displayedCampaigns[] = View::make('banners.preview', [
-                'banner' => $banner,
+                'banner' => $banner->loadTemplate(),
                 'campaign' => $campaign,
                 'positions' => $positions,
                 'dimensions' => $dimensions,
