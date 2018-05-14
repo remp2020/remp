@@ -39,14 +39,8 @@ class CampaignRequest extends FormRequest
             'variants.*.proportion' => 'integer|required',
             'variants.*.control_group' => 'integer|required',
             'variants.*.weight' => 'integer|required',
+            'variants.*.banner_id' => 'required_unless:variants.*.control_group,1',
         ];
-
-
-        foreach ($this->variants as $index => $variant) {
-            if ($variant['control_group'] == 0) {
-                $rules['variants.' . $index . '.banner_id'] = 'integer|required';
-            }
-        }
 
         return $rules;
     }
