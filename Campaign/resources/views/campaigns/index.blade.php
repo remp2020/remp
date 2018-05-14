@@ -70,6 +70,7 @@
                         'name',
                         'variants' => [
                             'header' => 'Variants',
+                            'orderable' => false
                         ],
                         'segments' => [
                             'header' => 'Segments'
