@@ -86,7 +86,7 @@
                                     :variantOptions="variantOptions"
                                     :bannerId="bannerId"
                                 ></ab-testing>
-                                <div class="ab-testing-not-available" v-else>
+                                <div v-else class="ab-testing-not-available">
                                     To allow A/B testing you have to set primary banner in previous tab.
                                 </div>
                             </div><!-- .panel-body -->
