@@ -33,7 +33,7 @@
 
         <!-- remove variant button -->
         <td class="table-td-button">
-            <button v-if="variant.control_group != 1" @click="$parent.removeVariant($event, index, variant.id)" class="btn btn-danger">
+            <button v-if="variant.control_group != 1  && index != 0" @click="$parent.removeVariant($event, index, variant.id)" class="btn btn-danger">
                 <i class="zmdi zmdi-minus-circle"></i>
             </button>
         </td>
