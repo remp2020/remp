@@ -65,7 +65,10 @@ class CampaignController extends Controller
 
                 foreach ($data as $variant) {
                     if ($variant['control_group'] == 0) {
-                        $str .= link_to(route('banners.edit', $variant['banner_id']), $variant['variant']) . ', ';
+                        $link = link_to(route('banners.edit', $variant['banner_id']), $variant['variant']);
+                        $proportion = $variant['proportion'];
+
+                        $str .= "{$link} ({$proportion}%), ";
                     } else {
                         $str .= $variant['variant'];
                     }
