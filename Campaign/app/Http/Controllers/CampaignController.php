@@ -27,6 +27,7 @@ use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\DeviceDetector;
+use App\CampaignBanner;
 
 class CampaignController extends Controller
 {
@@ -59,15 +60,22 @@ class CampaignController extends Controller
             ->addColumn('name', function (Campaign $campaign) {
                 return Html::linkRoute('campaigns.edit', $campaign->name, $campaign);
             })
-            ->addColumn('banner', function (Campaign $campaign) {
-                $banner = $campaign->getPrimaryBanner();
-
-                return Html::linkRoute('banners.edit', $banner->name, $banner);
-            })
             ->addColumn('variants', function (Campaign $campaign) {
-                $variants = $campaign->campaignBanner->pluck('variant')->toArray();
+                $data = $campaign->campaignBanner->all();
+                $str = '';
 
-                return implode(', ', $variants);
+                foreach ($data as $variant) {
+                    if ($variant['control_group'] == 0) {
+                        $link = link_to(route('banners.edit', $variant['banner_id']), $variant['variant']);
+                        $proportion = $variant['proportion'];
+
+                        $str .= "{$link} ({$proportion}%), ";
+                    } else {
+                        $str .= $variant['variant'];
+                    }
+                }
+
+                return $str;
             })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
@@ -84,7 +92,7 @@ class CampaignController extends Controller
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
-            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
+            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants'])
             ->setRowId('id')
             ->make(true);
     }
@@ -750,7 +758,7 @@ class CampaignController extends Controller
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
-            $bannerId = $campaign->campaignBanner()->first()->id;
+            $bannerId = optional($campaign->campaignBanner()->first())->banner_id;
         }
 
         // variants

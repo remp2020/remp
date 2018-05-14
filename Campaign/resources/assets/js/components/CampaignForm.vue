@@ -29,7 +29,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="row">
@@ -73,18 +73,22 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: false }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: highlightABTestingCollapse }">
                                     A/B test
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
                                 <ab-testing
+                                    v-if="showABTestingComponent"
                                     :variants="variants"
                                     :variantOptions="variantOptions"
                                     :bannerId="bannerId"
                                 ></ab-testing>
+                                <div v-else class="ab-testing-not-available">
+                                    To allow A/B testing you have to set primary banner in previous tab.
+                                </div>
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (a/b testing) -->
@@ -446,6 +450,10 @@
                 }
                 self.endTime = et ? et.toISOString() : null;
             }).datetimepicker({useCurrent: false});
+
+            if (this.bannerId) {
+                this.showABTestingComponent = true;
+            }
         },
         props: props,
         data: function() {
@@ -455,6 +463,7 @@
                 "bannerId": null,
                 "variants": null,
                 "removedVariants": null,
+                "showABTestingComponent": false,
                 "signedIn": null,
                 "oncePerSession": null,
                 "active": null,
@@ -536,8 +545,10 @@
             },
             highlightDevicesCollapse: function () {
                 return (this.selectedDevices.length < this.allDevices.length);
+            },
+            highlightABTestingCollapse: function () {
+                return (this.variants.length > 2);
             }
-
         },
         methods: {
             handleToggleSelectDevice: function (device) {
@@ -573,6 +584,11 @@
                 this.segments.splice(index, 1);
                 this.removedSegments.push(toRemove.id);
             }
+        },
+        watch: {
+            bannerId: function () {
+                this.showABTestingComponent = true;
+            }
         }
     }
 </script>
@@ -583,6 +599,12 @@
         font-size: 1.5em;
         line-height: 0.5;
         padding-bottom: 7px !important;
+    }
+
+    .ab-testing-not-available {
+        text-align: center;
+        font-size: 16px;
+        margin-top: 20px;
     }
 </style>
 
