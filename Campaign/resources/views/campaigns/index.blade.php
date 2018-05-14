@@ -68,11 +68,8 @@
                     {!! Widget::run('DataTable', [
                     'colSettings' => [
                         'name',
-                        'banner' => [
-                            'header' => 'Banner'
-                        ],
                         'variants' => [
-                            'header' => 'Variants'
+                            'header' => 'Variants',
                         ],
                         'segments' => [
                             'header' => 'Segments'
