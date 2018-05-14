@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\VariantsProportionSum;
 
 class CampaignRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class CampaignRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
+        return [
             'name' => 'required|max:255',
             'active' => 'boolean|required',
             'banner_id' => 'integer|required',
@@ -40,9 +41,8 @@ class CampaignRequest extends FormRequest
             'variants.*.control_group' => 'integer|required',
             'variants.*.weight' => 'integer|required',
             'variants.*.banner_id' => 'required_unless:variants.*.control_group,1',
+            'variants.0.proportion' => ['integer', 'required', new VariantsProportionSum]
         ];
-
-        return $rules;
     }
 
     public function all($keys = null)
