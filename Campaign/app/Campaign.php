@@ -87,14 +87,6 @@ class Campaign extends Model
         )->banner;
     }
 
-    public function getBannerAttribute()
-    {
-        if ($this->relationLoaded('banner')) {
-            return $this->getRelation('banner')->first();
-        }
-        return $this->banner()->first();
-    }
-
     public function removeVariants(array $variantIds)
     {
         return CampaignBanner::whereIn('id', $variantIds)->delete();
@@ -163,6 +155,20 @@ class Campaign extends Model
         }
 
         return false;
+    }
+
+    public function getVariantsProportionMapping()
+    {
+        $ids = [];
+        $proportions = [];
+        $campaignBanners = $this->campaignBanner()->get();
+
+        foreach($campaignBanners as $campaignBanner) {
+            $ids[] = $campaignBanner->id;
+            $proportions[] = $campaignBanner->proportion;
+        }
+
+        return [$ids, $proportions];
     }
 
     public function cache()

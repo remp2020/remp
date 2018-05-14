@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Banner;
 use App\Campaign;
+use App\CampaignBanner;
 use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
@@ -492,8 +493,10 @@ class CampaignController extends Controller
         $displayedCampaigns = [];
 
         foreach ($campaignIds as $campaignId) {
-            $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignId);
+            $campaignData = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignId);
+            $campaign = $campaignData['campaign'];
             $running = false;
+
             foreach ($campaign->schedules as $schedule) {
                 if ($schedule->isRunning()) {
                     $running = true;
@@ -504,20 +507,20 @@ class CampaignController extends Controller
                 continue;
             }
 
+            $campaignBanners = $campaign->campaignBanner()->get()->keyBy('id');
+
             // banner
-            $bannerVariantA = $campaign->banner ?? false;
-            if (!$bannerVariantA) {
+            if ($campaignBanners->count() == 0) {
                 Log::error("Active campaign [{$campaign->uuid}] has no banner set");
                 continue;
             }
 
             $banner = null;
-            $bannerVariantB = $campaign->altBanner ?? false;
-            if (!$bannerVariantB) {
+            if ($campaignBanners->count() == 1) {
                 // only one variant of banner, so set it
-                $banner = $bannerVariantA;
+                $banner = $campaignBanners->first();
             } else {
-                // there are two variants
+                // there are more variants variants
                 // find banner previously displayed to user
                 $bannerId = null;
                 $campaignsBanners = $data->campaignsBanners ?? false;
@@ -527,19 +530,27 @@ class CampaignController extends Controller
 
                 if ($bannerId !== null) {
                     // check if displayed banner is one of existing variants
-                    switch ($bannerId) {
-                        case $bannerVariantA->uuid:
-                            $banner = $bannerVariantA;
-                            break;
-                        case $bannerVariantB->uuid:
-                            $banner = $bannerVariantB;
-                            break;
-                    }
+                    $campaignBanners->map(function (CampaignBanner $campaignBanner) use ($bannerId, $banner) {
+                        if ($campaignBanner->uuid == $bannerId) {
+                            $banner = $campaignBanner;
+                        }
+                    });
                 }
 
                 // banner still not set, choose random variant
                 if ($banner === null) {
-                    $banner = rand(0, 1) ? $bannerVariantA : $bannerVariantB;
+                    list($ids, $proportions) = $campaign->getVariantsProportionMapping();
+
+                    $randVal = rand(0, 100);
+                    $currPercent = 0;
+
+                    for ($i = 0; $i < count($proportions); $i++) {
+                        $currPercent = $currPercent + $proportions[$i];
+                        if ($currPercent >= $randVal) {
+                            $banner = $campaignBanners->get($ids[$i]);
+                            break;
+                        }
+                    }
                 }
             }
 
