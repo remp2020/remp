@@ -59,6 +59,7 @@
                 sliderEl: null,
                 dontRunSliderUpdate: true,
                 variantsToRemove: [],
+                variantNumber: this.variants.length
             };
         },
         created() {
@@ -182,7 +183,7 @@
                 // set slider positions
                 this.sliderEl.noUiSlider.set(a)
             },
-            addEmptyVariant: function (event, index) {
+            addEmptyVariant: function (event) {
                 var i = this.variants.length - 1;
 
                 // remove 10% from variant before adding
@@ -191,11 +192,13 @@
                 // add empty variant before control group
                 this.variants.splice(i, 0, {
                     id: null,
-                    variant: "Variant " + index,
+                    variant: "Variant " + this.variantNumber,
                     proportion: 10,
                     control_group: 0,
                     banner_id: null
                 });
+
+                this.variantNumber++;
 
                 setTimeout(() => {
                     this.renderSlider(this.calculateStarts());
