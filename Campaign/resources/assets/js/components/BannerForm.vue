@@ -191,7 +191,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
                                 <div class="row">
                                     <div class="col-xs-10">
-                                        <div class="fg-line">
+                                        <div class="fg-line" :class="{'fg-toggled': targetSelector && targetSelector.length}">
                                             <label for="target_selector" class="fg-label">Target element selector</label>
                                             <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
                                         </div>
@@ -390,7 +390,6 @@
             receiveSelector(event) {
                 if (typeof event.data.selector !== 'undefined' && event.data.selector.length) {
                     this.targetSelector = event.data.selector;
-                    $('#target_selector').closest('.fg-line').addClass('fg-toggled');
                 }
             }
         }
