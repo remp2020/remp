@@ -456,8 +456,6 @@ import { select } from 'optimal-select';
     }
   };
 
-  window.RempBannerSelector.init();
-
   // private functions
   function initializeBannerSelector() {
     injectControlsMarkup();
@@ -846,3 +844,5 @@ import { select } from 'optimal-select';
     // }
   }
 })(window, document);
+
+window.RempBannerSelector.init();
