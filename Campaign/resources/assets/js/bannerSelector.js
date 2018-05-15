@@ -307,6 +307,7 @@ import { select } from 'optimal-select';
 
   // public functions
   window.remplib.campaign.bannerSelector = {
+    ...window.remplib.campaign.bannerSelector,
     init: function() {
       initializeBannerSelector();
     }
