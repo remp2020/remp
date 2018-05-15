@@ -96,7 +96,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.incrementPageviewCount();
 
             if (window.opener && window.location.hash === '#bannerPicker') {
-                remplib.loadScript('/assets/lib/js/bannerSelector.js');
+                remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
             }
         },
 
