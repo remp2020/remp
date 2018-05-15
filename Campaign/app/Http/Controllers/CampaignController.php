@@ -78,7 +78,6 @@ class CampaignController extends Controller
                         // handle control group
                         $variants[] = "{$variant['variant']} ({$proportion}%)";
                     }
-
                 }
 
                 return implode(', ', $variants);
