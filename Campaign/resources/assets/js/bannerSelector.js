@@ -6,17 +6,10 @@ import { select } from 'optimal-select';
     hoveredOverlayNameElement,
     selectedOverlayElement,
     selectedOverlayNameElement,
-    selectedMenuElement,
-    clearSelectionElement,
     generatedSelectorWrapperElement,
     selectorInputElement,
     generatedSelectorElement,
     matchingNumberElement,
-    injectBannerElement,
-    bannerInsertionSettingsModalElement,
-    bannerInsertionSettingsModalCancelElement,
-    bannerInsertionSettingsModalAcceptElement,
-    bannerInsertionSettingsSelectElement,
     cancelAndReturnToRempElement,
     saveAndReturnToRempElement;
 
@@ -32,16 +25,6 @@ import { select } from 'optimal-select';
       </div>
       <div id="selected-overlay" class="selected-overlay">
         <span class="selected-overlay__name" id="selected-overlay-name"></span>
-      </div>
-      <div id="selected-menu" class="selected-menu">
-        <div class="selected-menu__item" id="inject-banner">
-          <img src="${campaign.url}/assets/img/bannerSelector/insert-banner.svg" class="selected-menu__icon" alt="Insert Banner">
-          <span class="selected-menu__label">Inject Banner</span>
-        </div>
-        <div class="selected-menu__item" id="clear-selection">
-          <img src="${campaign.url}/assets/img/bannerSelector/delete.svg" class="selected-menu__icon" alt="Delete">
-          <span class="selected-menu__label">Clear selection</span>
-        </div>
       </div>
       <div class="remp-toolbar" id="remp-toolbar">
         <a href="" class="remp-toolbar__logo-wrapper">
@@ -62,23 +45,6 @@ import { select } from 'optimal-select';
         </div>
         <a href="#" class="remp-toolbar__cancel" id="cancelAndReturnToRemp">Cancel</a>
         <a href="#" class="remp-toolbar__confirm" id="saveAndReturnToRemp">Confirm</a>
-      </div>
-      <div class="remp-modal" id="banner-settings-modal">
-        <div class="remp-modal__content">
-          <div class="remp-modal__body">
-            <h3 class="remp-modal__title">How do you want to inject the banner?</h3>
-            <select class="remp-modal__select" id="banner-placement">
-              <option value="before">Inject before selected element</option>
-              <option value="after">Inject after selected element</option>
-              <option value="first">Inject inside as the first child</option>
-              <option value="last">Inject inside as the last child</option>
-            </select>
-          </div>
-          <div class="remp-modal__footer">
-            <a href="#" class="remp-modal__inject" id="banner-settings-modal-accept">Inject</a>
-            <a href="#" class="remp-modal__cancel" id="banner-settings-modal-cancel">Cancel</a>
-          </div>
-        </div>
       </div>
     </div>
   `;
@@ -135,35 +101,7 @@ import { select } from 'optimal-select';
     .selected-overlay__name {
       background-color: black;
     }
-  
-    .selected-menu {
-      z-index: 99999;
-      /* 5 */
-      background-color: white;
-      box-shadow: 1px 3px 17px 0 rgba(170, 171, 175, 0.55);
-      position: absolute;
-      display: none;
-    }
-  
-    .selected-menu__item {
-      padding: 10px 15px;
-      display: flex;
-    }
-  
-    .selected-menu__item:hover {
-      background-color: #02acc1;
-      background-color: rgb(240, 240, 240);
-      cursor: pointer;
-    }
-  
-    .selected-menu__icon {
-      height: 20px;
-    }
-  
-    .selected-menu__label {
-      margin-left: 10px;
-    }
-  
+     
     .remp-toolbar__logo-wrapper {
       width: 120px;
       height: 50px;
@@ -360,88 +298,7 @@ import { select } from 'optimal-select';
       cursor: crosshair !important;
     }
   
-    .remp-modal {
-      display: none;
-      position: fixed;
-      z-index: 9999999;
-      /* 7 */
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.7);
-      align-items: center;
-      justify-content: center;
-      cursor: auto !important;
-    }
-  
-    .remp-modal__content {
-      position: relative;
-      background-color: #fefefe;
-      margin: auto;
-      padding: 25px;
-      max-width: 350px;
-      width: 80%;
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-      /* box-shadow: 1px 3px 17px 0 rgba(170, 171, 175, 0.55); */
-      animation-name: animatetop;
-      animation-duration: 0.4s;
-      text-align: center;
-    }
-  
-    @keyframes animatetop {
-      from {
-        top: -50px;
-        opacity: 0;
-      }
-      to {
-        top: 0;
-        opacity: 1;
-      }
-    }
-  
-    .remp-modal__title {
-      font-weight: 500;
-      font-size: 17px;
-      margin-bottom: 20px;
-    }
-  
-    .remp-modal__select {
-      margin: 10px 0 30px 0;
-      -webkit-appearance: none;
-      border: 1px solid black;
-      background: white;
-      padding: 5px 40px;
-    }
-  
-    .remp-modal__inject {
-      color: white;
-      background-color: #00acc1;
-      padding: 10px 40px;
-      margin-right: 30px;
-      display: inline-block;
-    }
-  
-    .remp-modal__inject:hover,
-    .remp-modal__inject:focus {
-      text-decoration: none;
-      background-color: #019caf;
-      color: white;
-    }
-  
-    .remp-modal__cancel {
-      color: #878787;
-    }
-  
-    .remp-modal__cancel:hover,
-    .remp-modal__cancel:focus {
-      color: #666666;
-      text-decoration: none;
-    }
-  
     /* demo styles */
-  
     body {
       padding-top: 100px !important;
     }
@@ -467,35 +324,13 @@ import { select } from 'optimal-select';
 
     hoveredOverlayElement = document.getElementById('hovered-overlay');
     hoveredOverlayNameElement = document.getElementById('hovered-overlay-name');
-
     selectedOverlayElement = document.getElementById('selected-overlay');
-    selectedOverlayNameElement = document.getElementById(
-      'selected-overlay-name'
-    );
-    selectedMenuElement = document.getElementById('selected-menu');
-    clearSelectionElement = document.getElementById('clear-selection');
-    generatedSelectorWrapperElement = document.getElementById(
-      'generated-selector-wrapper'
-    );
+    selectedOverlayNameElement = document.getElementById('selected-overlay-name');
+    generatedSelectorWrapperElement = document.getElementById('generated-selector-wrapper');
     selectorInputElement = document.getElementById('selector-input');
     generatedSelectorElement = document.getElementById('generated-selector');
     matchingNumberElement = document.getElementById('matching-elements-number');
-    injectBannerElement = document.getElementById('inject-banner');
-    bannerInsertionSettingsModalElement = document.getElementById(
-      'banner-settings-modal'
-    );
-    bannerInsertionSettingsModalCancelElement = document.getElementById(
-      'banner-settings-modal-cancel'
-    );
-    bannerInsertionSettingsModalAcceptElement = document.getElementById(
-      'banner-settings-modal-accept'
-    );
-    bannerInsertionSettingsSelectElement = document.getElementById(
-      'banner-placement'
-    );
-    cancelAndReturnToRempElement = document.getElementById(
-      'cancelAndReturnToRemp'
-    );
+    cancelAndReturnToRempElement = document.getElementById('cancelAndReturnToRemp');
     saveAndReturnToRempElement = document.getElementById('saveAndReturnToRemp');
   }
 
@@ -504,27 +339,7 @@ import { select } from 'optimal-select';
   }
 
   function attachEventListeners() {
-    bannerInsertionSettingsModalAcceptElement.addEventListener(
-      'click',
-      injectBanner
-    );
-
-    injectBannerElement.addEventListener(
-      'click',
-      showBannerInsertionSettingsModal
-    );
-
-    bannerInsertionSettingsModalCancelElement.addEventListener(
-      'click',
-      hideBannerInsertionSettingsModal
-    );
-
     document.addEventListener('click', event => {
-      if (event.target == bannerInsertionSettingsModalElement) {
-        hideBannerInsertionSettingsModal();
-        return false;
-      }
-
       if (isPartOfREMPToolbar(event.target)) return false;
 
       event.stopPropagation();
@@ -551,17 +366,9 @@ import { select } from 'optimal-select';
         toggleParentsListVisibility();
       });
 
-    clearSelectionElement.addEventListener('click', clearSelection);
+    generatedSelectorWrapperElement.addEventListener('click', showSelectorInput);
 
-    generatedSelectorWrapperElement.addEventListener(
-      'click',
-      showSelectorInput
-    );
-
-    generatedSelectorWrapperElement.addEventListener(
-      'mouseleave',
-      hideSelectorInput
-    );
+    generatedSelectorWrapperElement.addEventListener('mouseleave', hideSelectorInput);
 
     selectorInputElement.addEventListener('keyup', function(event) {
       event.preventDefault();
@@ -578,18 +385,12 @@ import { select } from 'optimal-select';
         case 13:
           acceptSelectorInput();
           break;
-        default:
-          console.log(this.value);
       }
     });
 
     window.addEventListener('message', receiveKeepAliveMessage, false);
 
-    cancelAndReturnToRempElement.addEventListener(
-      'click',
-      cancelAndReturnToRemp
-    );
-
+    cancelAndReturnToRempElement.addEventListener('click', cancelAndReturnToRemp);
     saveAndReturnToRempElement.addEventListener('click', saveAndReturnToRemp);
   }
 
@@ -624,14 +425,6 @@ import { select } from 'optimal-select';
     rempParentWebsite = event.source;
   }
 
-  function showBannerInsertionSettingsModal() {
-    bannerInsertionSettingsModalElement.style.display = 'flex';
-  }
-
-  function hideBannerInsertionSettingsModal() {
-    bannerInsertionSettingsModalElement.style.display = 'none';
-  }
-
   function acceptSelectorInput() {
     var writtenSelector = selectorInputElement.value;
 
@@ -662,7 +455,6 @@ import { select } from 'optimal-select';
     writeToNumberOfSelectedElementsCount(0);
     listArrayOfParentsSelectors([]);
     clearSelectedOverlay();
-    hideSelectedMenu();
   }
 
   function handleSelectionOfElement(element, selector) {
@@ -689,10 +481,6 @@ import { select } from 'optimal-select';
     listArrayOfParentsSelectors(parentsSelectors);
 
     makeSelectedOverlay(element);
-
-    // This shows the context menu, which allows you to preview inject the banner
-    // We are not currently finishing this feature
-    // showSelectedMenu(element);
   }
 
   function writeToGeneratedSelectorBar(text) {
@@ -744,19 +532,6 @@ import { select } from 'optimal-select';
     selectedOverlayNameElement.innerText = '';
   }
 
-  function showSelectedMenu(element) {
-    var measurements = getElementsDimensionsAndPosition(element);
-
-    selectedMenuElement.style.left = measurements.left + 'px';
-    selectedMenuElement.style.top =
-      measurements.top + measurements.height + 'px';
-  }
-
-  function hideSelectedMenu() {
-    selectedMenuElement.style.left = -9999 + 'px';
-    selectedMenuElement.style.top = -9999 + 'px';
-  }
-
   function getElementsDimensionsAndPosition(element) {
     element = element.getBoundingClientRect();
     return {
@@ -766,6 +541,7 @@ import { select } from 'optimal-select';
       height: element.height
     };
   }
+
   function getParents(element) {
     var parents = [];
     for (; element && element !== document; element = element.parentNode) {
@@ -773,6 +549,7 @@ import { select } from 'optimal-select';
     }
     return parents;
   }
+
   function getUniqueSelectorsForElementArray(elements) {
     var selectors = [];
     elements.forEach(function(currentElement) {
@@ -780,6 +557,7 @@ import { select } from 'optimal-select';
     });
     return selectors;
   }
+
   function listArrayOfParentsSelectors(parents) {
     var parentsList = document.getElementById('parents-list');
     parentsList.innerHTML = '';
@@ -794,12 +572,15 @@ import { select } from 'optimal-select';
       parentsList.appendChild(parentItem);
     });
   }
+
   function isPartOfREMPToolbar(element) {
     return hasSomeParentTheClass(element, 'remp');
   }
+
   function toggleParentsListVisibility() {
     document.getElementById('toggle-parents-list').classList.toggle('active');
   }
+
   function hasSomeParentTheClass(element, classname) {
     if (
       element.className &&
@@ -810,38 +591,7 @@ import { select } from 'optimal-select';
       element.parentNode && hasSomeParentTheClass(element.parentNode, classname)
     );
   }
-  function injectBanner() {
-    hideBannerInsertionSettingsModal();
-    alert('TODO, insert markup');
-    var bannerMarkup =
-      '<div style="background-color: red; color: white; width: 200px; height: 200px;"><h1>Lorem</h1> <p>Bacon ipsum dolor amet tail kielbasa turkey pancetta short ribs ham hock salami landjaeger meatball bacon capicola drumstick tenderloin.</p></div>';
 
-    // TODO: refactor get generated selector and generated seelctor element in all file
-    // document
-    //   .querySelector(generatedSelectorElement.innerText)
-    //   .insertAdjacentHTML('beforebegin', bannerMarkup);
-
-    // https://stackoverflow.com/a/19316351
-
-    // style select
-
-    // hide highlighters
-
-    // disable banner highlighting
-
-    // after banner placement something like try again
-
-    // switch (bannerInsertionSettingsSelectElement.value) {
-    //   case 'before':
-    //     break;
-    //   case 'after':
-    //     break;
-    //   case 'first':
-    //     break;
-    //   case 'last':
-    //     break;
-    // }
-  }
 })(window, document, remplib.campaign);
 
 remplib.campaign.bannerSelector.init();
