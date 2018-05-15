@@ -450,7 +450,7 @@ import { select } from 'optimal-select';
   `;
 
   // public functions
-  window.RempBannerSelector = {
+  window.remplib.campaign.bannerSelector = {
     init: function() {
       initializeBannerSelector();
     }
@@ -845,4 +845,4 @@ import { select } from 'optimal-select';
   }
 })(window, document);
 
-window.RempBannerSelector.init();
+remplib.campaign.bannerSelector.init();
