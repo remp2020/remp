@@ -1,6 +1,6 @@
 import { select } from 'optimal-select';
 
-(function(window, document, undefined) {
+(function(window, document, campaign, undefined) {
   // initialize variables for elements that are about to be injected
   var hoveredOverlayElement,
     hoveredOverlayNameElement,
@@ -22,8 +22,7 @@ import { select } from 'optimal-select';
 
   // window reference from which this site was open
   var rempParentWebsite;
-  // TODO: move this to some sort of config file, or accept it during init?
-  var allowedOrigin = 'http://campaign.remp.press';
+  var allowedOrigin = campaign.url;
 
   // markup for injected toolbar
   var toolbarMarkup = `
@@ -843,6 +842,6 @@ import { select } from 'optimal-select';
     //     break;
     // }
   }
-})(window, document);
+})(window, document, remplib.campaign);
 
 remplib.campaign.bannerSelector.init();
