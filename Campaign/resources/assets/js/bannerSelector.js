@@ -297,6 +297,14 @@ import { select } from 'optimal-select';
     body:not(.remp-toolbar) {
       cursor: crosshair !important;
     }
+    
+    .banner-placeholder {
+      min-height: 200px;
+      background-color: #EFBD48; //yellow
+      // background-color: #4EB5D7; //lightblue
+      // background-color: #409388; //green
+      // background-color: #8F38AA; //purple
+    }
   
     /* demo styles */
     body {
@@ -318,6 +326,7 @@ import { select } from 'optimal-select';
     injectControlsMarkup();
     injectControlsStyles();
     attachEventListeners();
+    highlightAndAddMinimumHeightToBannerPlaceholders();
   }
 
   function injectControlsMarkup() {
@@ -393,6 +402,16 @@ import { select } from 'optimal-select';
 
     cancelAndReturnToRempElement.addEventListener('click', cancelAndReturnToRemp);
     saveAndReturnToRempElement.addEventListener('click', saveAndReturnToRemp);
+  }
+
+  function highlightAndAddMinimumHeightToBannerPlaceholders() {
+    var bannerPlaceholders = document.querySelectorAll(
+        campaign.bannerSelector.highlight ? campaign.bannerSelector.highlight : '.remp-banner'
+    );
+
+    bannerPlaceholders.forEach(bannerPlaceholder => {
+        bannerPlaceholder.classList.add('banner-placeholder');
+    });
   }
 
   function cancelAndReturnToRemp() {
