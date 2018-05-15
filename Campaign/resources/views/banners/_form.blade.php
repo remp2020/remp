@@ -27,7 +27,7 @@
 
     remplib.bannerForm.bind("#banner-form", banner);
 
-    var clientSiteUrl = '{{ env('CLIENT_SITE_URL') }}';
+    var clientSiteUrl = '{{ Config::get('app.client_site_url') }}';
 
 </script>
 
