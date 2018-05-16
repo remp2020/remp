@@ -38,10 +38,10 @@ class ConversionController extends Controller
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
         if ($request->input('conversion_from')) {
-            $conversions->where('paid_at', '>=', $request->input('conversion_from'));
+            $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from')));
         }
         if ($request->input('conversion_to')) {
-            $conversions->where('paid_at', '<=', $request->input('conversion_to'));
+            $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to')));
         }
 
         return $datatables->of($conversions)

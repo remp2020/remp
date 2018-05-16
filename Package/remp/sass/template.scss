@@ -13658,10 +13658,13 @@ select.chosen {
 .timepicker-picker table tbody tr + tr:not(:last-child) td {
   border-radius: 0;
 }
-.timepicker-picker .btn,
+.timepicker-picker .btn {
+  background: #fff !important;
+  color: #333 !important;
+}
 .timepicker-picker .btn:hover {
-  background: #fff;
-  color: #333;
+  background: #F0F0F0 !important;
+  color: #333 !important;
 }
 .datepicker.top {
   -webkit-transform-origin: 0 100% !important;
