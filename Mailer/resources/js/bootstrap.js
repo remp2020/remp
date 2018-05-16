@@ -10,6 +10,8 @@ global.moment = require('moment');
 
 require("./chart.js");
 
+global.clipboard = require("./clipboard.js");
+
 global.salvattore = require("salvattore");
 
 Nette.initOnLoad();
