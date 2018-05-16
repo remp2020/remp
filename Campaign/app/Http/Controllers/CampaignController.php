@@ -61,20 +61,26 @@ class CampaignController extends Controller
             })
             ->addColumn('variants', function (Campaign $campaign) {
                 $data = $campaign->campaignBanner->all();
-                $str = '';
+                $variants = [];
 
                 foreach ($data as $variant) {
-                    if ($variant['control_group'] == 0) {
-                        $link = link_to(route('banners.edit', $variant['banner_id']), $variant['variant']);
-                        $proportion = $variant['proportion'];
+                    $proportion = $variant['proportion'];
 
-                        $str .= "{$link} ({$proportion}%), ";
+                    if ($variant['control_group'] == 0) {
+                        // handle variants with banner
+                        $link = link_to(
+                            route('banners.edit', $variant['banner_id']),
+                            $variant['variant']
+                        );
+
+                        $variants[] = "{$link} ({$proportion}%)";
                     } else {
-                        $str .= $variant['variant'];
+                        // handle control group
+                        $variants[] = "{$variant['variant']} ({$proportion}%)";
                     }
                 }
 
-                return $str;
+                return implode(', ', $variants);
             })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());

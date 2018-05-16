@@ -44,7 +44,7 @@
             <input type="hidden" :name="'variants[' + index + '][control_group]'" :value="variant.control_group">
             <input type="hidden" :name="'variants[' + index + '][weight]'" :value="index + 1">
 
-            <button v-if="index == $parent.variants.length - 2" class="btn btn-success pull-right" @click="$parent.addEmptyVariant($event, index+2)">
+            <button v-if="index == $parent.variants.length - 2" class="btn btn-success pull-right" @click="$parent.addEmptyVariant($event)">
                 <i class="zmdi zmdi-plus-circle"></i>
             </button>
         </td>

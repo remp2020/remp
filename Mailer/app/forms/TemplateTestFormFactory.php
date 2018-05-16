@@ -30,7 +30,7 @@ class TemplateTestFormFactory extends Object
 
         $form->addText('email', 'Email')
             ->addRule(Form::EMAIL)
-            ->setRequired('Required');
+            ->setRequired("Field 'Email' is required.");
 
         $form->addSubmit('save', 'Send')
             ->getControlPrototype()

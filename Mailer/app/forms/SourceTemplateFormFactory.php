@@ -40,11 +40,11 @@ class SourceTemplateFormFactory implements IFormFactory
         $form->addHidden('id', $id);
 
         $form->addText('title', 'Title')
-            ->setRequired();
+            ->setRequired("Field 'Title' is required.");
 
         $items = $this->mailGeneratorFactory->pairs();
         $form->addSelect('generator', 'Generator', $items)
-            ->setRequired();
+            ->setRequired("Field 'Generator' is required.");
 
         $form->addTextArea('content_text', 'Text')
             ->setAttribute('rows', 20)
