@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Response;
 use App\Banner;
 use App\HtmlTemplate;
 use App\Http\Requests\BannerRequest;
@@ -17,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
+use App\CampaignBanner;
 
 class BannerController extends Controller
 {
@@ -258,5 +260,27 @@ class BannerController extends Controller
                 'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
             ])
             ->header('Content-Type', 'application/x-javascript');
+    }
+
+    public function mappingSearch()
+    {
+        $variants = CampaignBanner::all();
+        $list = [];
+        $lookup = [];
+
+        foreach ($variants as $variant) {
+            $list[] = $variant->uuid;
+            $lookup[$variant->uuid] = $variant->variant;
+        }
+
+        return response()->json([
+            'list' => $list,
+            'lookup' => $lookup,
+        ]);
+    }
+
+    public function mapping()
+    {
+        return Response::make("", 204);
     }
 }

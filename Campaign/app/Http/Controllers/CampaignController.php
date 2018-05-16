@@ -516,7 +516,9 @@ class CampaignController extends Controller
 
             $campaignBanners = $campaign->campaignBanner()
                                         ->with('banner')
-                                        ->get();
+                                        ->get()
+                                        ->keyBy('id');
+
 
             // banner
             if ($campaignBanners->count() == 0) {
@@ -525,9 +527,11 @@ class CampaignController extends Controller
             }
 
             $banner = null;
+            $variantId = null;
             if ($campaignBanners->count() == 2) {
                 // only one variant of banner (other is always Control Group), so set it
                 $banner = Banner::find($campaignBanners->first()->banner_id);
+                $variantId = $campaignBanners->first()->uuid;
             } else {
                 // there are more variants
                 // find banner previously displayed to user
@@ -535,6 +539,7 @@ class CampaignController extends Controller
                 $campaignsBanners = $data->campaignsBanners ?? false;
                 if ($campaignsBanners && isset($campaignsBanners->{$campaign->uuid})) {
                     $bannerId = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
+                    $variantId = $campaignsBanners->{$campaign->uuid}->variantId ?? null;
                 }
 
                 if ($bannerId !== null) {
@@ -542,6 +547,7 @@ class CampaignController extends Controller
                     foreach($campaignBanners as $campaignBanner) {
                         if (optional($campaignBanner->banner)->uuid == $bannerId) {
                             $banner = Banner::find($campaignBanner->banner_id);
+                            $variantId = $campaignBanner->uuid;
                             break;
                         }
                     }
@@ -558,6 +564,7 @@ class CampaignController extends Controller
                         $currPercent = $currPercent + $proportions[$i];
                         if ($currPercent >= $randVal) {
                             $banner = Banner::find($ids[$i]);
+                            $variantid = $campaignBanners->get($ids[$i])->uuid;
                             break;
                         }
                     }
@@ -664,14 +671,17 @@ class CampaignController extends Controller
                 }
             }
 
-            //render
-            $displayedCampaigns[] = View::make('banners.preview', [
-                'banner' => $banner->loadTemplate(),
-                'campaign' => $campaign,
-                'positions' => $positions,
-                'dimensions' => $dimensions,
-                'alignments' => $alignments,
-            ])->render();
+            // render (if its not Control Group)
+            if (!is_null($banner)) {
+                $displayedCampaigns[] = View::make('banners.preview', [
+                    'banner' => $banner->loadTemplate(),
+                    'variantId' => $variantId,
+                    'campaign' => $campaign,
+                    'positions' => $positions,
+                    'dimensions' => $dimensions,
+                    'alignments' => $alignments,
+                ])->render();
+            }
         }
 
         if (empty($displayedCampaigns)) {

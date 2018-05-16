@@ -4,6 +4,7 @@ namespace App;
 
 use App\Banner;
 use App\Campaign;
+use Ramsey\Uuid\Uuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -26,6 +27,15 @@ class CampaignBanner extends Model
         'control_group',
         'banner_id'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (CampaignBanner $variant) {
+            $variant->uuid = Uuid::uuid4()->toString();
+        });
+    }
 
     public function banner()
     {

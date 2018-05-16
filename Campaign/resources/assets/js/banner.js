@@ -25,7 +25,8 @@ window.remplib = window.remplib || {};
                 displayDelay: model['display_delay'] || 0,
                 closeTimeout: model['close_timeout'] || null,
                 // inline
-                targetSelector: model['target_selector'] || null
+                targetSelector: model['target_selector'] || null,
+                variant: model['variant_uuid']
             };
 
             if (banner.template === 'medium_rectangle') {

@@ -163,11 +163,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
 
         // store persistent campaign details
-        storeCampaigns: function(campaignId, bannerId) {
+        storeCampaigns: function(campaignId, bannerId, variantId) {
             const now = new Date();
             let campaigns = remplib.getFromStorage(this.campaignsStorageKey, true);
 
-            if (typeof campaigns === "undefined" || campaigns === null) {
+            if (typeof campaigns === "undefined" ||  campaigns === null) {
                 campaigns = {
                     "version": 1,
                     "createdAt": now,
@@ -183,6 +183,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (!(campaignId in campaigns.values)) {
                 campaigns.values[campaignId] = {
                     "bannerId": bannerId,
+                    "variantId": variantId,
                 };
             }
 
