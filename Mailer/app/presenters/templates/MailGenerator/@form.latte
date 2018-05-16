@@ -1,0 +1,33 @@
+{if $last}
+	{snippet mailFormWrapper}
+        <div class="row">
+		    {control mailGeneratorForm}
+        </div>
+		{include onChangeCallback, input => source_template_id, link => sourceTemplateChange}
+	{/snippet}
+{else}
+    <div class="well text-center text-muted">
+        <p>You have to create source template for generator.</p>
+    </div>
+{/if}
+
+{define onChangeCallback}
+    <script>
+        $('#' + {$control["mailGeneratorForm"][$input]->htmlId}).off('change').on('change', function () {
+            $('#' + {$control["mailGeneratorForm"]->getElementPrototype()->id}).find('input, select, textarea').each(function() {
+                if ($(this).attr('id') === {$control["mailGeneratorForm"][$input]->htmlId}) {
+                    return;
+                }
+                $(this).closest('.form-group').hide();
+            });
+            $('#spinner').show();
+            $.nette.ajax({
+                type: 'GET',
+                url: {link {$link}!},
+                data: {
+                    'source_template_id': $(this).val()
+                }
+            });
+        });
+    </script>
+{/define}

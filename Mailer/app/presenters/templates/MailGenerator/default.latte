@@ -1,0 +1,71 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Generate emails</h2>
+</div>
+
+{ifset $addonParams['render']}
+    {snippetArea addons}
+        {var params = [
+                htmlContent => isset($htmlContent) ? $htmlContent,
+                textContent => isset($textContent) ? $textContent,
+                addonParams => isset($addonParams) ? $addonParams,
+              ]}
+        {control generatorWidgets $params}
+    {/snippetArea}
+{/ifset}
+
+{if isset($htmlContent) || isset($textContent)}
+<div class="card">
+    <div class="card-header">
+        <h2>Generated content<small></small></h2>
+    </div>
+    <div class="card-body card-padding">
+        {ifset $htmlContent}
+            <h4>
+                HTML content&nbsp;
+                <a href="#" data-t class="btn palette-Cyan bg waves-effect btn-sm" onclick="clipboard.copy($('#generatedhtmlcontent').text()); $.notify('Copied to clipboard', { allow_dismiss: false, delay:1000,type: 'inverse', placement : { from: 'bottom', align: 'right'}}); return false;"><i class="zmdi zmdi-copy"></i></a>
+            </h4>
+
+            <div role="tabpanel">
+                <ul class="tab-nav" role="tablist">
+                    <li class="active"><a href="#html" aria-controls="html" role="tab" data-toggle="tab">Generated HTML</a></li>
+                    <li><a href="#html-preview" aria-controls="html-preview" role="tab" data-toggle="tab" onclick="$('#html-preview-frame').contents().find('html').html($('#generatedhtmlcontent').text());">Preview</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="html">
+                        <pre id="generatedhtmlcontent">{$htmlContent}</pre>
+                    </div>
+                    <div role="tabpanel" class="tab-pane text-center" id="html-preview">
+                        <iframe id="html-preview-frame" frameBorder="0" style="width:90%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
+                    </div>
+                </div>
+            </div>
+
+        {/ifset}
+
+        <div class="clearfix"></div>
+
+        {ifset $textContent}
+            <h4>
+                Text content&nbsp;
+                <a href="#" class="btn palette-Cyan bg waves-effect btn-sm" onclick="clipboard.copy($('#generatedtextcontent').text()); $.notify('Copied to clipboard', { allow_dismiss: false, delay:1000, type: 'inverse', placement : { from: 'bottom', align: 'right'}}); return false;"><i class="zmdi zmdi-copy"></i></a>
+            </h4>
+            <pre id="generatedtextcontent">{$textContent}</pre>
+        {/ifset}
+    </div>
+</div>
+{/if}
+
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">Generate emails<small></small></h2>
+    </div>
+    <div class="card-body card-padding">
+        {snippetArea wrapper}
+            {include '@form.latte'}
+        {/snippetArea}
+    </div>
+</div>

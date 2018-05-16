@@ -282,8 +282,22 @@ final class JobPresenter extends BasePresenter
             $this->flashMessage('Job was created');
             $this->redirect('Show', $job->id);
         };
-
         return $form;
+    }
+
+    public function handleTemplatesByListId($listId, $sourceForm, $sourceField, $targetField, $snippet = null)
+    {
+        $this[$sourceForm][$sourceField]
+            ->setDefaultValue($listId);
+        $this[$sourceForm][$targetField]
+            ->setItems($this->templatesRepository->pairs($listId));
+
+        if ($snippet) {
+            $this->redrawControl($snippet);
+        }
+        $this->redrawControl('wrapper');
+        $this->redrawControl('batchesWrapper');
+        $this->redrawControl('batches');
     }
 
     public function createComponentNewBatchForm()

@@ -15,23 +15,31 @@
 
     {input batch_id}
 
-    {input template_pairs}
-
     {input save, class => 'btn btn-info waves-effect'}
 
     {include onChangeCallback, input => mail_type_id, target => template_id, link => mailTypeChanged, variant => A}
 {/form}
 
 {define onChangeCallback}
+    {var $sourceForm = 'newTemplateForm-' . $batchId}
     <script>
-        var mailTemplates = JSON.parse($('#' + {$control['newTemplateForm-' . $batchId][template_pairs]->htmlId}).val());
         $('#' + {$control['newTemplateForm-' . $batchId][$input]->htmlId}).off('change').on('change', function () {
-            var $target = $('#' + {$control['newTemplateForm-' . $batchId][$target]->htmlId});
-            $target.empty();
-            $.each(mailTemplates[$(this).val()], function(idx, option) {
-                $target.append($("<option></option>").attr("value", option.value).text(option.label));
+            $.nette.ajax({
+                type: 'GET',
+                url: {link templatesByListId!},
+                data: {
+                    'sourceForm': {$sourceForm},
+                    'listId': $(this).val(),
+                    'sourceField': {$input},
+                    'targetField': {$target}
+                },
+                before: function() {
+                    $('#' + {$control['newTemplateForm-' . $batchId][$target]->htmlId}).empty();
+                },
+                complete: function() {
+                    $('#' + {$control['newTemplateForm-' . $batchId]->getElementPrototype()->id} + ' .selectpicker').selectpicker('refresh');
+                }
             });
-            $target.selectpicker('refresh');
         });
     </script>
 {/define}

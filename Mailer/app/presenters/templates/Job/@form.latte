@@ -26,7 +26,9 @@
                 </div>
                 <div class="col-sm-12">
                     {label template_id /}
+                    {snippet template_id}
                     {input template_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+                    {/snippet}
                 </div>
             </div>
 
@@ -37,7 +39,9 @@
                 </div>
                 <div class="col-sm-12">
                     {label b_template_id /}
+                    {snippet b_template_id}
                     {input b_template_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+                    {/snippet}
                 </div>
             </div>
 
@@ -71,8 +75,6 @@
         </div>
     </div>
 
-    {input template_pairs}
-
     {include jsCallback, form => $form}
     {include onChangeCallback, input => mail_type_id, target => template_id}
     {include onChangeCallback, input => b_mail_type_id, target => b_template_id}
@@ -100,14 +102,24 @@
 
 {define onChangeCallback}
     <script>
-        var mailTemplates = JSON.parse($('#' + {$control['newBatchForm'][template_pairs]->htmlId}).val());
         $('#' + {$control['newBatchForm'][$input]->htmlId}).off('change').on('change', function () {
-            var $target = $('#' + {$control['newBatchForm'][$target]->htmlId});
-            $target.empty();
-            $.each(mailTemplates[$(this).val()], function(idx, option) {
-                $target.append($("<option></option>").attr("value", option.value).text(option.label));
+            $.nette.ajax({
+                type: 'GET',
+                url: {link templatesByListId!},
+                data: {
+                    'sourceForm': 'newBatchForm',
+                    'listId': $(this).val(),
+                    'sourceField': {$input},
+                    'targetField': {$target},
+                    'snippet': {$target}
+                },
+                before: function() {
+                    $('#' + {$control['newBatchForm'][$target]->htmlId}).empty();
+                },
+                complete: function() {
+                    $('#' + {$control['newBatchForm']->getElementPrototype()->id} + ' .selectpicker').selectpicker('refresh');
+                }
             });
-            $target.selectpicker('refresh');
         });
     </script>
 {/define}
