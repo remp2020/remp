@@ -24,11 +24,9 @@
     banner.positionOptions = positions;
     banner.forcedPosition = 'absolute';
     banner.validateUrl = {!! @json(route('banners.validateForm')) !!};
+    banner.clientSiteUrl = '{{ Config::get('app.client_site_url') }}';
 
     remplib.bannerForm.bind("#banner-form", banner);
-
-    var clientSiteUrl = '{{ Config::get('app.client_site_url') }}';
-
 </script>
 
 @endpush
