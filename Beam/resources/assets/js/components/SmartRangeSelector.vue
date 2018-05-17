@@ -89,12 +89,8 @@
     ]
 
     let props = {
-        from: {
-            type: String
-        },
-        to: {
-            type: String
-        },
+        from: String,
+        to: String,
         header: String,
         callback: Function
     };

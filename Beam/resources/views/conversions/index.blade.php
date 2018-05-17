@@ -14,7 +14,8 @@
                 <div id="smart-range-selector">
                     {!! Form::hidden('conversion_from', $conversionFrom) !!}
                     {!! Form::hidden('conversion_to', $conversionTo) !!}
-                    <smart-range-selector header="Filter by conversion date" from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback"></smart-range-selector>
+                    <smart-range-selector header="Filter by conversion date" from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
+                    </smart-range-selector>
                 </div>
             </div>
         </div>
@@ -61,7 +62,8 @@
             },
             methods: {
                 callback: function (from, to) {
-                    $('[name="conversion_from"]').val(from).trigger("change");
+                    $('[name="conversion_from"]').val(from);
+                    // Avoid double loading of data table, therefore trigger change only on single input
                     $('[name="conversion_to"]').val(to).trigger("change");
                 }
             }
