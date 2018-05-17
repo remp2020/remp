@@ -54,8 +54,6 @@ var run = function() {
             "utm_content": banner.uuid,
             "variant": variantId
         })
-
-        console.log('banner event sent')
         banner.show = true;
         if (banner.closeTimeout) {
             setTimeout(function() {

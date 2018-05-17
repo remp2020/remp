@@ -569,8 +569,9 @@ class CampaignController extends Controller
                     for ($i = 0; $i < count($proportions); $i++) {
                         $currPercent = $currPercent + $proportions[$i];
                         if ($currPercent >= $randVal) {
-                            $banner = Banner::find($ids[$i]);
-                            $variantid = $campaignBanners->get($ids[$i])->uuid;
+                            $variant = $campaignBanners->get($ids[$i]);
+                            $variantid = $variant->uuid;
+                            $banner = Banner::find($variant->banner_id);
                             break;
                         }
                     }
@@ -704,7 +705,7 @@ class CampaignController extends Controller
                 'success' => true,
                 'errors' => [],
                 'data' => $displayedCampaigns,
-                'providerData' => $sa->getProviderData()
+                'providerData' => $sa->getProviderData(),
             ]);
     }
 
