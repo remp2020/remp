@@ -15,6 +15,8 @@ class CampaignSeeder extends Seeder
         $banner = factory(\App\Banner::class)->create([
             'name' => 'DEMO Medium Rectangle Banner',
             'template' => 'medium_rectangle',
+            'offset_horizontal' => 10,
+            'offset_vertical' => 10,
         ]);
         $banner->mediumRectangleTemplate()->save(
             factory(\App\MediumRectangleTemplate::class)->make()
@@ -24,6 +26,8 @@ class CampaignSeeder extends Seeder
         $altBanner = factory(\App\Banner::class)->create([
             'name' => 'DEMO Bar Banner',
             'template' => 'bar',
+            'offset_horizontal' => 10,
+            'offset_vertical' => 10,
         ]);
         $altBanner->barTemplate()->save(
             factory(\App\BarTemplate::class)->make()

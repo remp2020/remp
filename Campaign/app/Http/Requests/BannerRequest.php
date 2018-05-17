@@ -36,6 +36,8 @@ class BannerRequest extends FormRequest
             'closeable' => 'boolean',
             'target_selector' => 'nullable|string|required_if:display_type,inline',
             'template' => 'required|string',
+            'offset_vertical' => 'required|integer',
+            'offset_horizontal' => 'required|integer',
         ];
     }
 

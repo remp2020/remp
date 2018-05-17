@@ -54,6 +54,7 @@
     "require-dev": {
         "nette/tester": "^1.6",
         "friendsofphp/php-cs-fixer": "*",
-        "kwn/php-rdkafka-stubs": "^1.0"
+        "kwn/php-rdkafka-stubs": "^1.0",
+        "phpunit/phpunit": "^7.1"
     }
 }

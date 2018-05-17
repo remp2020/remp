@@ -23,6 +23,7 @@
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
     banner.forcedPosition = 'absolute';
+    banner.validateUrl = {!! @json(route('banners.validateForm')) !!};
 
     remplib.bannerForm.bind("#banner-form", banner);
 

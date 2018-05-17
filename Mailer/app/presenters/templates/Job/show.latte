@@ -28,7 +28,9 @@
         </ul>
     </div>
     <div class="card-body card-padding">
+        {snippetArea wrapper}
         {include '@form.latte'}
+        {/snippetArea}
     </div>
 </div>
 
@@ -62,6 +64,7 @@
     </div>
 </div>
 
+{snippetArea batchesWrapper}
 {foreach $job->related('mail_job_batch') as $batch}
     <div class="well">
         <div class="row">
@@ -105,6 +108,7 @@
             </div>
             <div class="col-md-8">
                 <div class="card collapse z-depth-1" id="new-template-form-batch-{$batch->id}">
+                    {snippet batches-$batch->id}
                     <div class="card-header">
                         <h2>Add Email</h2>
                         <ul class="actions">
@@ -116,6 +120,7 @@
                     <div class="card-body card-padding">
                         {include '@form_new_template.latte', batchId => $batch->id}
                     </div>
+                    {/snippet}
                 </div>
                 <div n:foreach="$batch->related('mail_job_batch_templates') as $email" class="card z-depth-1">
                     <div class="card-header">
@@ -140,3 +145,4 @@
     </div>
 
 {/foreach}
+{/snippetArea}

@@ -36,10 +36,12 @@
 
             <div class="input-group m-t-20">
                 <div class="fg-line">
-                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save">
+                    <input type="hidden" name="action" :value="submitAction">
+
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save" @click="submitAction = 'save'">
                         <i class="zmdi zmdi-check"></i> Save
                     </button>
-                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close">
+                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close" @click="submitAction = 'save_close'">
                         <i class="zmdi zmdi-mail-send"></i> Save and close
                     </button>
                 </div>
@@ -53,7 +55,7 @@
                 <span v-on:click="addRule" class="btn btn-info waves-effect"><i class="zmdi zmdi-plus-square"></i> Add rule</span>
             </h4>
 
-            <input v-model="removedRules" name="removedRules[]" type="hidden" required />
+            <input type="hidden" name="removedRules[]" v-for="(id,i) in removedRules" v-model="removedRules[i]" />
 
             <div class="row m-t-10">
                 <segment-rule v-for="(rule, index) in rules"
@@ -67,7 +69,7 @@
                     :eventAction="rule.event_action"
                     :operator="rule.operator"
                     :fields="rule.fields"
-                    :flags="rule.flags"   
+                    :flags="rule.flags"
                 >
                 </segment-rule>
             </div>
@@ -86,6 +88,7 @@
         "_rules",
         "_eventCategories",
         "_eventActions",
+        "_removedRules"
     ];
 
     export default {
@@ -115,6 +118,7 @@
             "name": null,
             "code": null,
             "active": null,
+            "submitAction": null,
             "rules": [],
             "removedRules": []
         }),

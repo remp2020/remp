@@ -2,26 +2,40 @@
 
 namespace Remp\MailerModule\Generators;
 
+use Nette\DI\Container;
+use Remp\MailerModule\Components\GeneratorWidgetsManager;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
 class GeneratorFactory
 {
-    private $sourceTemplateRepository;
-
     /** @var array(ExtensionInterface) */
     private $generators = [];
 
     private $pairs = [];
 
-    public function __construct(SourceTemplatesRepository $sourceTemplateRepository)
-    {
-        $this->sourceTemplateRepository = $sourceTemplateRepository;
+    private $generatorWidgetsManager;
+
+    private $container;
+
+    public function __construct(
+        Container $container,
+        GeneratorWidgetsManager $generatorWidgetsManager
+    ) {
+    
+        $this->generatorWidgetsManager = $generatorWidgetsManager;
+        $this->container = $container;
     }
 
     public function registerGenerator($type, $label, IGenerator $generator)
     {
         $this->generators[$type] = $generator;
         $this->pairs[$type] = $label;
+        $widgetClasses = $generator->getWidgets();
+
+        foreach ($widgetClasses as $class) {
+            $widget = $this->container->getByType($class);
+            $this->generatorWidgetsManager->registerWidget($type, $widget);
+        }
     }
 
     /**

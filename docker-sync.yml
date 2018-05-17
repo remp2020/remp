@@ -1,0 +1,17 @@
+version: "2"
+
+options:
+  verbose: true
+syncs:
+  campaign-sync:
+    src: './Campaign'
+    sync_excludes: ['.git', '.idea']
+  sso-sync:
+    src: './Sso'
+    sync_excludes: ['.git', '.idea']
+  beam-sync:
+    src: './Beam'
+    sync_excludes: ['.git', '.idea']
+  mailer-sync:
+    src: './Mailer'
+    sync_excludes: ['.git', '.idea']

@@ -22,15 +22,6 @@ $availableCountries = $availableCountries->map(function(\App\Country $country) {
    return ['value' => $country->iso_code, 'label' => $country->name];
 });
 
-$selectedCountries = $campaign->countries->map(function(\App\Country $country) {
-   return $country->iso_code;
-});
-
-$countriesBlacklist = 0;
-foreach ($campaign->countries as $country) {
-    $countriesBlacklist = (int) $country->pivot->blacklisted;
-}
-
 @endphp
 
 <div id="campaign-form">
@@ -44,16 +35,17 @@ foreach ($campaign->countries as $country) {
         "name": '{!! $campaign->name !!}' || null,
         "action": '{{ $action }}',
         "segments": {!! isset($selectedSegments) ? $selectedSegments->toJson(JSON_UNESCAPED_UNICODE) : $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
-        "bannerId": {!! @json($campaign->banner ? $campaign->banner->id : null) !!},
-        "altBannerId": {!! @json($campaign->altBanner ? $campaign->altBanner->id : null) !!},
+        "bannerId": {!! @json($bannerId) !!},
+        "altBannerId": {!! @json($altBannerId) !!},
         "signedIn": {!! @json($campaign->signed_in) !!},
         "oncePerSession": {!! @json($campaign->once_per_session) !!},
         "active": {!! @json($campaign->active) !!},
         "pageviewRules": {!! @json($campaign->pageview_rules) !!} || [],
-        "countries": {!! $selectedCountries->toJson(JSON_UNESCAPED_UNICODE) !!},
+        "countries": {!! @json($selectedCountries) !!},
         "countriesBlacklist": {!! @json($countriesBlacklist ?? 0) !!},
         "allDevices": {!! @json($campaign->getAllDevices()) !!},
         "selectedDevices": {!! @json($campaign->devices) !!} || [],
+        "validateUrl": {!! @json(route('campaigns.validateForm')) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

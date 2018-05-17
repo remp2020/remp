@@ -89,6 +89,8 @@
             "show",
             "transition",
             "position",
+            "offsetVertical",
+            "offsetHorizontal",
             "targetUrl",
             "closeable",
             "displayType",
@@ -103,23 +105,23 @@
                 clickTracked: false,
             }
         },
-        methods: {
-            customPositioned: function() {
-                if (this.displayType === 'overlay') {
-                    return true;
-                }
-                if (this.forcedPosition !== undefined && this.forcedPosition === 'absolute') {
-                    return true;
-                }
-                return false;
-            },
-        },
         computed: {
             _position: function() {
-                if (!this.customPositioned()) {
+                if (!this.$parent.customPositioned()) {
                     return {};
                 }
-                return this.positionOptions[this.position] ? this.positionOptions[this.position].style : {};
+
+                if (this.positionOptions[this.position]) {
+                    var styles = this.positionOptions[this.position].style;
+
+                    for (var ii in styles) {
+                        styles[ii] = ((ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
+                    }
+
+                    return styles;
+                }
+
+                return {};
             },
             _headerText: function() {
                 if (headerText !== null && headerText.length > 0) {

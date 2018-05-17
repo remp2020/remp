@@ -19,8 +19,11 @@ class Banner extends Model
         'name',
         'target_url',
         'position',
+        'offset_vertical',
+        'offset_horizontal',
         'transition',
         'closeable',
+        'close_text',
         'display_delay',
         'close_timeout',
         'display_type',
@@ -48,24 +51,40 @@ class Banner extends Model
         return $this->template ? $this->fillTemplate($attributes) : $this;
     }
 
+    /**
+     * Fill banner's template relation
+     *
+     * If template relation doesn't exists it's using:
+     * string $this->getTemplateRelationName()
+     * to initialize relation.
+     *
+     * @param array $attributes
+     * @return $this
+     */
     public function fillTemplate(array $attributes)
     {
         $relationName = $this->getTemplateRelationName();
 
-        if ($this[$relationName]) {
-            $this->{$relationName}->fill($attributes);
+        // fill existing related model
+        if (!is_null($this->id)) {
+            $this->getRelationValue($relationName)->fill($attributes);
+
+        // create and fill relation
         } else {
-            $this->setRelation($relationName, $this->{$relationName}()->make($attributes));
+            $this->setRelation(
+                $relationName,
+                $this->getTemplateRelation($relationName)->make($attributes)
+            );
         }
 
         return $this;
     }
 
-    public function withTemplate()
-    {
-        return $this->with($this->getTemplateRelationName());
-    }
-
+    /**
+     * load template
+     *
+     * @return $this
+     */
     public function loadTemplate()
     {
         return $this->load($this->getTemplateRelationName());
@@ -96,28 +115,52 @@ class Banner extends Model
         return $this->hasOne(ShortMessageTemplate::class);
     }
 
+    /**
+     * Returns name of the banner to template relation
+     *
+     * @return string $relationName
+     */
     public function getTemplateRelationName()
     {
-        $relationName = null;
-
         switch ($this->template) {
             case self::TEMPLATE_HTML:
-                $relationName = 'htmlTemplate';
-                break;
+                return 'htmlTemplate';
             case self::TEMPLATE_MEDIUM_RECTANGLE:
-                $relationName = 'mediumRectangleTemplate';
-                break;
+                return 'mediumRectangleTemplate';
             case self::TEMPLATE_BAR:
-                $relationName = 'barTemplate';
+                return 'barTemplate';
                 break;
             case self::TEMPLATE_SHORT_MESSAGE:
-                $relationName = 'shortMessageTemplate';
-                break;
+                return 'shortMessageTemplate';
             default:
-                throw new \Exception('Not existing template name: ' . $this->template);
-                break;
+                throw new \Exception('Unhandled banner template access: ' . $this->template);
         }
+    }
 
-        return $relationName;
+    /**
+     * Returns banner template relation
+     *
+     * Using $this->getTemplateRelationName()
+     * to return template relation.
+     *
+     * @param string $relationName
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function getTemplateRelation($relationName = null)
+    {
+        if ($relationName === null) {
+            $relationName = $this->getTemplateRelationName();
+        }
+        return $this->$relationName();
+    }
+
+    /**
+     * Returns banner template object
+     *
+     * @return Model
+     */
+    public function getTemplate()
+    {
+        return $this->getRelationValue($this->getTemplateRelationName());
     }
 }

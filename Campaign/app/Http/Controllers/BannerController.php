@@ -86,6 +86,16 @@ class BannerController extends Controller
         $banner->template = $request->get('template');
         $banner->fill(old());
 
+        $defaultPositions = $this->positionMap->positions()->first()->style;
+
+        if (is_null($banner->offset_vertical)) {
+            $banner->offset_vertical = isset($defaultPositions['top']) ? $defaultPositions['top'] : $defaultPositions['bottom'];
+        }
+
+        if (is_null($banner->offset_horizontal)) {
+            $banner->offset_horizontal = isset($defaultPositions['left']) ? $defaultPositions['left'] : $defaultPositions['right'];
+        }
+
         return view('banners.create', [
             'banner' => $banner,
             'positions' => $this->positionMap->positions(),
@@ -110,6 +120,17 @@ class BannerController extends Controller
     }
 
     /**
+     * Ajax validate form method.
+     *
+     * @param BannerRequest|Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function validateForm(BannerRequest $request)
+    {
+        return response()->json(false);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param BannerRequest|Request $request
@@ -121,22 +142,8 @@ class BannerController extends Controller
         $banner->fill($request->all());
         $banner->save();
 
-        switch ($banner->template) {
-            case Banner::TEMPLATE_HTML:
-                $banner->htmlTemplate()->create($request->all());
-                break;
-            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
-                $banner->mediumRectangleTemplate()->create($request->all());
-                break;
-            case Banner::TEMPLATE_BAR:
-                $banner->barTemplate()->create($request->all());
-                break;
-            case Banner::TEMPLATE_SHORT_MESSAGE:
-                $banner->shortMessageTemplate()->create($request->all());
-                break;
-            default:
-                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
-        }
+        $templateRelation = $banner->getTemplateRelation();
+        $templateRelation->create($request->all());
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -178,6 +185,7 @@ class BannerController extends Controller
      */
     public function edit(Banner $banner)
     {
+        $banner->loadTemplate();
         $banner->fill(old());
 
         return view('banners.edit', [
@@ -199,22 +207,8 @@ class BannerController extends Controller
     {
         $banner->update($request->all());
 
-        switch ($banner->template) {
-            case Banner::TEMPLATE_HTML:
-                $banner->htmlTemplate->update($request->all());
-                break;
-            case Banner::TEMPLATE_MEDIUM_RECTANGLE:
-                $banner->mediumRectangleTemplate->update($request->all());
-                break;
-            case Banner::TEMPLATE_BAR:
-                $banner->barTemplate->update($request->all());
-                break;
-            case Banner::TEMPLATE_SHORT_MESSAGE:
-                $banner->shortMessageTemplate->update($request->all());
-                break;
-            default:
-                throw new BadRequestHttpException('unhandled template type: '. $banner->template);
-        }
+        $template = $banner->getTemplate();
+        $template->update($request->all());
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(

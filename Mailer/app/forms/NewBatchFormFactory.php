@@ -62,7 +62,7 @@ class NewBatchFormFactory extends Object
             }
             $form->addSelect('segment_code', 'Segment', $segments)
                 ->setPrompt('Select segment')
-                ->setRequired('Segment is required');
+                ->setRequired("Field 'Segment' is required.");
         }
 
         $methods = [
@@ -72,19 +72,28 @@ class NewBatchFormFactory extends Object
         $form->addSelect('method', 'Method', $methods);
 
         $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
-        $templatePairs = $this->templatesRepository->pairs();
 
         $form->addSelect('mail_type_id', 'Email A alternative', $listPairs)
             ->setPrompt('Select newsletter list');
 
-        $form->addSelect('template_id', null, $templatePairs)
+        if (isset($_POST['mail_type_id'])) {
+            $templateList = $this->templatesRepository->pairs($_POST['mail_type_id']);
+        } else {
+            $templateList = null;
+        }
+        $form->addSelect('template_id', null, $templateList)
             ->setPrompt('Select email')
             ->setRequired('Email for A alternative is required');
 
         $form->addSelect('b_mail_type_id', 'Email B alternative (optional, can be added later)', $listPairs)
             ->setPrompt('Select newsletter list');
 
-        $form->addSelect('b_template_id', null, $templatePairs)
+        if (isset($_POST['b_mail_type_id'])) {
+            $templateList = $this->templatesRepository->pairs($_POST['b_mail_type_id']);
+        } else {
+            $templateList = null;
+        }
+        $form->addSelect('b_template_id', null, $templateList)
             ->setPrompt('Select alternative email');
 
         $form->addText('email_count', 'Number of emails');
@@ -92,8 +101,6 @@ class NewBatchFormFactory extends Object
         $form->addText('start_at', 'Start date');
 
         $form->addHidden('job_id', $jobId);
-
-        $form->addHidden('template_pairs', Json::encode($this->templatesRepository->triples()))->setHtmlId('template_pairs');
 
         $form->addSubmit('save', 'Save')
             ->getControlPrototype()
