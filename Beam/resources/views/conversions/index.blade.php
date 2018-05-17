@@ -11,10 +11,11 @@
     <div class="well">
         <div class="row">
             <div class="col-md-6">
+                <h4>Filter by conversion date</h4>
                 <div id="smart-range-selector">
                     {!! Form::hidden('conversion_from', $conversionFrom) !!}
                     {!! Form::hidden('conversion_to', $conversionTo) !!}
-                    <smart-range-selector header="Filter by conversion date" from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
+                    <smart-range-selector header="X" from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
                     </smart-range-selector>
                 </div>
             </div>

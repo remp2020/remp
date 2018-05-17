@@ -23,10 +23,10 @@
 
             datetime.on('dp.change', function() {
                 let t = $(this).data("DateTimePicker").date();
-                that.$emit('input', t ? moment(t).utc().format() : null)
+                that.$emit('input', t ? moment(t).format() : null)
             }).datetimepicker()
 
-            // default date changes DOM directly, therefore doing it in nextTick()
+            // defaultDate() changes DOM directly, therefore doing it in nextTick()
             Vue.nextTick()
                 .then(function(){
                     let timeToSet = that.value ? moment(that.value) : moment()
