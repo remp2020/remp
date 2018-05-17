@@ -197,7 +197,7 @@
                                         </div>
                                     </div>
                                     <div class="col-xs-2">
-                                        <button class="btn btn-primary waves-effect" type="button" @click="openClientSiteAndSendKeepAliveMessages()">
+                                        <button class="btn btn-primary waves-effect" :class="{'disabled': !clientSiteUrl}" type="button" @click="openClientSiteAndSendKeepAliveMessages()">
                                             <i class="zmdi zmdi-my-location"></i>
                                         </button>
                                     </div>
@@ -315,7 +315,8 @@
         "_dimensionOptions",
         "_positionOptions",
 
-        "_validateUrl"
+        "_validateUrl",
+        "_clientSiteUrl"
     ];
 
     export default {
@@ -376,15 +377,20 @@
                 {"label": "Fade in down", "value": "fade-in-down"},
             ],
 
-            validateUrl: null
+            validateUrl: null,
+            clientSiteUrl: null
         }),
         methods: {
             openClientSiteAndSendKeepAliveMessages() {
-                // clientSiteUrl is defined in resources/views/banners/_form.blade.php and assigned value from env 'CLIENT_SITE_URL'
-                var clientSiteInstance = window.open(clientSiteUrl + '#bannerPicker');
+                if(!this.clientSiteUrl.length) {
+                    alert('In order to use interactive selector, please specify a CLIENT_SITE_URL in your .env file');
+                    return;
+                }
 
-                setInterval(function() {
-                    clientSiteInstance.postMessage('Keep alive', clientSiteUrl);
+                var clientSiteInstance = window.open(this.clientSiteUrl + '#bannerPicker');
+
+                setInterval(() => {
+                    clientSiteInstance.postMessage('Keep alive', this.clientSiteUrl);
                 }, 300);
             },
             receiveSelector(event) {
