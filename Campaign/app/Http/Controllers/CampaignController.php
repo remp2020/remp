@@ -563,7 +563,7 @@ class CampaignController extends Controller
                 if ($banner === null) {
                     list($ids, $proportions) = $campaign->getVariantsProportionMapping();
 
-                    $randVal = rand(0, 100);
+                    $randVal = mt_rand(0, 100);
                     $currPercent = 0;
 
                     for ($i = 0; $i < count($proportions); $i++) {
