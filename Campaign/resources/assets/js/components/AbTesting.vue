@@ -59,7 +59,7 @@
                 sliderEl: null,
                 dontRunSliderUpdate: true,
                 variantsToRemove: [],
-                variantNumber: this.variants.length
+                variantNumber: 0
             };
         },
         created() {
@@ -80,6 +80,8 @@
                     banner_id: null
                 })
             }
+
+            this.variantNumber = this.variants.length;
         },
         mounted() {
             // calculate slider starts
