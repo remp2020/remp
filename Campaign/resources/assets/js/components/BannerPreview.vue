@@ -170,7 +170,7 @@
             });
         },
         data: () => ({
-            visible: true,
+            visible: false,
         }),
         watch: {
             'transition': function() {
