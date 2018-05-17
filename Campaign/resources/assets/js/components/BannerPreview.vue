@@ -145,7 +145,7 @@
         "dimensionOptions",
         "positionOptions",
 
-        "variant",
+        "variantUuid",
     ];
 
     export default {
@@ -168,6 +168,8 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
+
+            this.visible = this.show;
         },
         data: () => ({
             visible: false,
@@ -244,7 +246,7 @@
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
                     "utm_content": this.uuid,
-                    "variant": this.variant.uuid
+                    "variant": this.variantUuid
                 });
                 this.clickTracked = true;
                 return true;

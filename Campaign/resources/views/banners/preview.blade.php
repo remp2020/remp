@@ -1,7 +1,7 @@
 {{--<script type="text/javascript">--}}
 
 var bannerId = 'b-{{ $banner->uuid }}';
-var variantId = '{{ $variantId }}';
+var variantUuid = '{{ $variantId }}';
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {
     scripts.push('{{ asset(mix('/js/banner.js', '/assets/lib')) }}');
@@ -26,6 +26,7 @@ var run = function() {
 
     banner.uuid = "{{ $banner->uuid }}";
     banner.campaignUuid = "{{ $campaign->uuid }}";
+    banner.variantUuid = variantUuid;
 
     var d = document.createElement('div');
     d.id = bannerId;
@@ -52,7 +53,7 @@ var run = function() {
             "utm_medium": banner.displayType,
             "utm_campaign": banner.campaignUuid,
             "utm_content": banner.uuid,
-            "variant": variantId
+            "variant": variantUuid
         })
         banner.show = true;
         if (banner.closeTimeout) {
@@ -60,7 +61,7 @@ var run = function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
-        remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, variantId);
+        remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, variantUuid);
     }, banner.displayDelay);
 };
 
