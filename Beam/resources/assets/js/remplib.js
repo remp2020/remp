@@ -259,7 +259,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "action": action,
                 "tags": tags || {},
                 "fields": fields || {},
-                "value": value
+                "value": value,
+                "remp_event_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/event", params);
@@ -308,7 +309,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
                 "checkout": {
                     "funnel_id": funnelId
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -326,7 +328,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "currency": currency
                     },
                     "product_ids": productIds
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -344,7 +347,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "currency": currency
                     },
                     "product_ids": productIds
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -362,7 +366,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "currency": currency
                     },
                     "product_ids": productIds
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
