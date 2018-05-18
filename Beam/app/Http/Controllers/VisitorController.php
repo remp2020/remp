@@ -45,10 +45,10 @@ class VisitorController extends Controller
         ]))->groupBy('client_name', 'client_type');
 
         if ($request->input('visited_from')) {
-            $devices->where('time_from', '>=', $request->input('visited_from'));
+            $devices->where('time_from', '>=', Carbon::parse($request->input('visited_from'))->tz('UTC'));
         }
         if ($request->input('visited_to')) {
-            $devices->where('time_to', '<=', $request->input('visited_to'));
+            $devices->where('time_to', '<=', Carbon::parse($request->input('visited_to'))->tz('UTC'));
         }
         if ($request->input('subscriber') !== null) {
             $devices->where(['subscriber' => $request->input('subscriber')]);
@@ -80,10 +80,10 @@ class VisitorController extends Controller
         ]))->whereNotNull('model')->groupBy('model', 'brand', 'os_name');
 
         if ($request->input('visited_from')) {
-            $devices->where('time_from', '>=', $request->input('visited_from'));
+            $devices->where('time_from', '>=', Carbon::parse($request->input('visited_from'))->tz('UTC'));
         }
         if ($request->input('visited_to')) {
-            $devices->where('time_to', '<=', $request->input('visited_to'));
+            $devices->where('time_to', '<=', Carbon::parse($request->input('visited_to'))->tz('UTC'));
         }
         if ($request->input('subscriber') !== null) {
             $devices->where(['subscriber' => $request->input('subscriber')]);
@@ -114,10 +114,10 @@ class VisitorController extends Controller
         ]))->groupBy('medium', 'source');
 
         if ($request->input('visited_from')) {
-            $devices->where('time_from', '>=', $request->input('visited_from'));
+            $devices->where('time_from', '>=', Carbon::parse($request->input('visited_from'))->tz('UTC'));
         }
         if ($request->input('visited_to')) {
-            $devices->where('time_to', '<=', $request->input('visited_to'));
+            $devices->where('time_to', '<=', Carbon::parse($request->input('visited_to'))->tz('UTC'));
         }
         if ($request->input('subscriber') !== null) {
             $devices->where(['subscriber' => $request->input('subscriber')]);

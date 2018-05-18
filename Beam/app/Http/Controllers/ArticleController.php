@@ -73,19 +73,19 @@ class ArticleController extends Controller
 
         if ($request->input('published_from')) {
             $articles->where('published_at', '>=', $request->input('published_from'));
-            $conversionsQuery->where('published_at', '>=', $request->input('published_from'));
+            $conversionsQuery->where('published_at', '>=', Carbon::parse($request->input('published_from'))->tz('UTC'));
         }
         if ($request->input('published_to')) {
             $articles->where('published_at', '<=', $request->input('published_to'));
-            $conversionsQuery->where('published_at', '<=', $request->input('published_to'));
+            $conversionsQuery->where('published_at', '<=', Carbon::parse($request->input('published_to'))->tz('UTC'));
         }
         if ($request->input('conversion_from')) {
             $articles->where('paid_at', '>=', $request->input('conversion_from'));
-            $conversionsQuery->where('paid_at', '>=', $request->input('conversion_from'));
+            $conversionsQuery->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'))->tz('UTC'));
         }
         if ($request->input('conversion_to')) {
             $articles->where('paid_at', '<=', $request->input('conversion_to'));
-            $conversionsQuery->where('paid_at', '<=', $request->input('conversion_to'));
+            $conversionsQuery->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'))->tz('UTC'));
         }
 
         $conversionSums = [];
@@ -163,10 +163,10 @@ class ArticleController extends Controller
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
         if ($request->input('published_from')) {
-            $articles->where('published_at', '>=', $request->input('published_from'));
+            $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'))->tz('UTC'));
         }
         if ($request->input('published_to')) {
-            $articles->where('published_at', '<=', $request->input('published_to'));
+            $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'))->tz('UTC'));
         }
 
         return $datatables->of($articles)

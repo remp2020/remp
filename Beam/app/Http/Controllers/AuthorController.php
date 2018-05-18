@@ -117,10 +117,10 @@ class AuthorController extends Controller
             ->groupBy(['article_author.author_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
-            $conversionsQuery->where('published_at', '>=', $request->input('published_from'));
+            $conversionsQuery->where('published_at', '>=', Carbon::parse($request->input('published_from'))->tz('UTC'));
         }
         if ($request->input('published_to')) {
-            $conversionsQuery->where('published_at', '<=', $request->input('published_to'));
+            $conversionsQuery->where('published_at', '<=', Carbon::parse($request->input('published_to'))->tz('UTC'));
         }
 
         $conversions = [];

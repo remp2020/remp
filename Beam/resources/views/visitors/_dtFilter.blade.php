@@ -1,24 +1,12 @@
 <div class="well">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <h4>Filter by visit date</h4>
-            <div class="input-group m-b-10">
-                <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                <div class="dtp-container fg-line">
-                    {!! Form::datetime('visited_from', $visitedFrom, array_filter([
-                        'class' => 'form-control date-picker',
-                        'placeholder' => 'Visited from...'
-                    ])) !!}
-                </div>
-                <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                <div class="dtp-container fg-line">
-                    <div class="dtp-container fg-line">
-                        {!! Form::datetime('visited_to', $visitedTo, array_filter([
-                            'class' => 'form-control date-picker',
-                            'placeholder' => 'Visited to...'
-                        ])) !!}
-                    </div>
-                </div>
+            <div id="smart-range-selector">
+                {!! Form::hidden('visited_from', $visitedFrom) !!}
+                {!! Form::hidden('visited_to', $visitedTo) !!}
+                <smart-range-selector from="{{$visitedFrom}}" to="{{$visitedTo}}" :callback="callback">
+                </smart-range-selector>
             </div>
         </div>
 
@@ -48,3 +36,18 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    new Vue({
+        el: "#smart-range-selector",
+        components: {
+            SmartRangeSelector
+        },
+        methods: {
+            callback: function (from, to) {
+                $('[name="visited_from"]').val(from);
+                $('[name="visited_to"]').val(to).trigger("change");
+            }
+        }
+    });
+</script>

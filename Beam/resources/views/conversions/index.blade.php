@@ -64,7 +64,6 @@
             methods: {
                 callback: function (from, to) {
                     $('[name="conversion_from"]').val(from);
-                    // Avoid double loading of data table, therefore trigger change only on single input
                     $('[name="conversion_to"]').val(to).trigger("change");
                 }
             }

@@ -73,11 +73,6 @@
     .clickable {
         cursor: pointer;
     }
-    .activeSwitch {
-        background-color: #00acc1;
-        border-radius: 3px;
-        color: #fff;
-    }
     .underline {
         text-decoration: underline;
     }
