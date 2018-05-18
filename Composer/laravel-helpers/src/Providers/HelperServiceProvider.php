@@ -3,11 +3,9 @@
 namespace Remp\LaravelHelpers\Providers;
 
 use Blade;
-use Remp\LaravelHelpers\MySqlGrammarWithRfcTimezone;
 use Request;
 use Response;
 use Schema;
-use Illuminate\Database\MySqlConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,12 +15,6 @@ class HelperServiceProvider extends ServiceProvider
     {
         Carbon::setToStringFormat(DATE_RFC3339);
         Schema::defaultStringLength(191);
-
-        // Do not strip timezone information from Carbon/DateTimeInferface objects when quering MySQL DB
-        $connection = $this->app['db.connection'];
-        if ($connection instanceof MySqlConnection){
-            $connection->setQueryGrammar(new MySqlGrammarWithRfcTimezone());
-        }
 
         $this->responseMacros();
         $this->bladeDirectives();

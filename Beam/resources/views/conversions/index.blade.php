@@ -15,7 +15,7 @@
                 <div id="smart-range-selector">
                     {!! Form::hidden('conversion_from', $conversionFrom) !!}
                     {!! Form::hidden('conversion_to', $conversionTo) !!}
-                    <smart-range-selector header="X" from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
+                    <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
                     </smart-range-selector>
                 </div>
             </div>
