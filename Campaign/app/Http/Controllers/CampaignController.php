@@ -533,47 +533,43 @@ class CampaignController extends Controller
             }
 
             $banner = null;
-            $variantId = null;
-            if ($campaignBanners->count() == 2) {
-                // only one variant of banner (other is always Control Group), so set it
-                $banner = Banner::find($campaignBanners->first()->banner_id);
-                $variantId = $campaignBanners->first()->uuid;
-            } else {
-                // there are more variants
-                // find banner previously displayed to user
-                $bannerId = null;
-                $campaignsBanners = $data->campaignsBanners ?? false;
-                if ($campaignsBanners && isset($campaignsBanners->{$campaign->uuid})) {
-                    $bannerId = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
-                    $variantId = $campaignsBanners->{$campaign->uuid}->variantId ?? null;
-                }
+            $variantUuid = null;
 
-                if ($bannerId !== null) {
-                    // check if displayed banner is one of existing variants
-                    foreach($campaignBanners as $campaignBanner) {
-                        if (optional($campaignBanner->banner)->uuid == $bannerId) {
-                            $banner = Banner::find($campaignBanner->banner_id);
-                            $variantId = $campaignBanner->uuid;
-                            break;
-                        }
+            // find banner previously displayed to user
+            $bannerId = null;
+            $campaignsBanners = $data->campaignsBanners ?? false;
+            if ($campaignsBanners && isset($campaignsBanners->{$campaign->uuid})) {
+                $bannerId = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
+                $variantUuid = $campaignsBanners->{$campaign->uuid}->variantUuid ?? null;
+            }
+
+            if ($bannerId !== null) {
+                // check if displayed banner is one of existing variants
+                foreach($campaignBanners as $campaignBanner) {
+                    if (optional($campaignBanner->banner)->uuid == $bannerId) {
+                        $banner = Banner::find($campaignBanner->banner_id);
+                        $variantUuid = $campaignBanner->uuid;
+                        break;
                     }
                 }
+            }
 
-                // banner still not set, choose random variant
-                if ($banner === null) {
-                    list($ids, $proportions) = $campaign->getVariantsProportionMapping();
+            // banner still not set, choose random variant
+            if ($banner === null) {
+                list($ids, $proportions) = $campaign->getVariantsProportionMapping();
 
-                    $randVal = mt_rand(0, 100);
-                    $currPercent = 0;
+                $randVal = mt_rand(0, 100);
+                $currPercent = 0;
 
-                    for ($i = 0; $i < count($proportions); $i++) {
-                        $currPercent = $currPercent + $proportions[$i];
-                        if ($currPercent >= $randVal) {
-                            $variant = $campaignBanners->get($ids[$i]);
-                            $variantid = $variant->uuid;
+                for ($i = 0; $i < count($proportions); $i++) {
+                    $currPercent = $currPercent + $proportions[$i];
+                    if ($currPercent >= $randVal) {
+                        $variant = $campaignBanners->get($ids[$i]);
+                        $variantUuid = $variant->uuid;
+                        if ($variant->control_group == 0) {
                             $banner = Banner::find($variant->banner_id);
-                            break;
                         }
+                        break;
                     }
                 }
             }
@@ -678,17 +674,16 @@ class CampaignController extends Controller
                 }
             }
 
-            // render (if its not Control Group)
-            if (!is_null($banner)) {
-                $displayedCampaigns[] = View::make('banners.preview', [
-                    'banner' => $banner->loadTemplate(),
-                    'variantId' => $variantId,
-                    'campaign' => $campaign,
-                    'positions' => $positions,
-                    'dimensions' => $dimensions,
-                    'alignments' => $alignments,
-                ])->render();
-            }
+
+            $displayedCampaigns[] = View::make('banners.preview', [
+                'banner' => $banner ? $banner->loadTemplate() : null,
+                'variantUuid' => $variantUuid,
+                'campaign' => $campaign,
+                'positions' => $positions,
+                'dimensions' => $dimensions,
+                'alignments' => $alignments,
+                'controlGroup' => $variant->control_group
+            ])->render();
         }
 
         if (empty($displayedCampaigns)) {

@@ -1,7 +1,14 @@
 {{--<script type="text/javascript">--}}
 
-var bannerId = 'b-{{ $banner->uuid }}';
-var variantUuid = '{{ $variantId }}';
+@if(!is_null($banner))
+var bannerUuid = '{{ $banner->uuid }}';
+var bannerId = 'b-' + bannerUuid;
+var bannerJsonData = {!! $banner->toJson() !!};
+@endif
+
+var variantUuid = '{{ $variantUuid }}';
+var campaignUuid = '{{ $campaign->uuid }}';
+var isControlGroup = {{ $controlGroup }};
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {
     scripts.push('{{ asset(mix('/js/banner.js', '/assets/lib')) }}');
@@ -14,18 +21,30 @@ var run = function() {
     if (waiting) {
         return;
     }
+
+    if (isControlGroup) {
+        remplib.tracker.trackEvent("banner", "show", {
+            "utm_source": "remp_campaign",
+            "utm_medium": null,
+            "utm_campaign": campaignUuid,
+            "utm_content": null,
+            "variant": variantUuid
+        })
+        return true;
+    }
+
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
-    var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
+    var banner = remplib.banner.fromModel(bannerJsonData);
 
     banner.show = false;
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
 
-    banner.uuid = "{{ $banner->uuid }}";
-    banner.campaignUuid = "{{ $campaign->uuid }}";
+    banner.uuid = bannerUuid;
+    banner.campaignUuid = campaignUuid;
     banner.variantUuid = variantUuid;
 
     var d = document.createElement('div');
