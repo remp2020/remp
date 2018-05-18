@@ -1,14 +1,17 @@
 <template>
     <div style="position: relative" class="date-selector">
-
         <a class="toggle-link clickable" @click="isToggled = !isToggled">{{ toggleText }}</a>
 
         <transition name="fade">
-            <div v-if="isToggled" class="m-5 m-t-15">
-                <div>
-                    <a class="clickable f-14 p-5" :class="selectedTab == 1 ? 'activeSwitch' : ''" @click="switchTab(1)">Quick ranges</a>
-                    <a class="clickable f-14 p-5" :class="selectedTab == 2 ? 'activeSwitch' : ''" @click="switchTab(2)">Absolute range</a>
-                </div>
+            <div v-if="isToggled" class="m-l-5 m-b-5">
+                <ul class="tab-nav">
+                    <li :class="selectedTab == 1 ? 'active' : ''">
+                        <a @click="switchTab(1)" class="clickable">Quick ranges</a>
+                    </li>
+                    <li :class="selectedTab == 2 ? 'active' : ''">
+                        <a @click="switchTab(2)" class="clickable">Absolute range</a>
+                    </li>
+                </ul>
 
                 <div class="m-t-20">
                     <div v-if="selectedTab == 1" class="row">
@@ -35,6 +38,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </transition>
 
@@ -77,8 +81,11 @@
     .underline {
         text-decoration: underline;
     }
-    .fade-enter-active, .fade-leave-active {
+    .fade-enter-active {
         transition: opacity .5s;
+    }
+    .fade-leave-active {
+        transition: opacity 0s;
     }
     .fade-enter, .fade-leave-to {
         opacity: 0;
