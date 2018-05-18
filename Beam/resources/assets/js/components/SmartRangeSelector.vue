@@ -4,14 +4,14 @@
         <a class="toggle-link clickable" @click="isToggled = !isToggled">{{ toggleText }}</a>
 
         <transition name="fade">
-            <div class="m-5 m-t-15" v-if="isToggled">
+            <div v-if="isToggled" class="m-5 m-t-15">
                 <div>
                     <a class="clickable f-14 p-5" :class="selectedTab == 1 ? 'activeSwitch' : ''" @click="switchTab(1)">Quick ranges</a>
                     <a class="clickable f-14 p-5" :class="selectedTab == 2 ? 'activeSwitch' : ''" @click="switchTab(2)">Absolute range</a>
                 </div>
 
                 <div class="m-t-20">
-                    <div class="row" v-if="selectedTab == 1">
+                    <div v-if="selectedTab == 1" class="row">
                         <ul style="list-style: none;" class="pull-left p-l-15 p-r-15" v-for="innerSelection in quickSelection">
                             <li v-for="selection in innerSelection">
                                 <a :class="selection.selected ? 'underline' : ''" class="clickable" @click="(selectQuick(selection))">{{selection.name}}</a>
@@ -137,10 +137,18 @@
     }
 
     let props = {
-        from: String,
-        to: String,
-        header: String,
-        callback: Function,
+        from: {
+            type: String,
+            required: true
+        },
+        to: {
+            type: String,
+            required: true
+        },
+        callback: {
+            type: Function,
+            required: true
+        },
     };
 
     export default {
