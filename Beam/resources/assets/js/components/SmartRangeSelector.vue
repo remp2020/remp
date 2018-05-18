@@ -92,22 +92,33 @@
 
     const originalQuickSelection = [
         [
-            {name: 'Today', carbonFrom: 'today', carbonTo: 'tomorrow - 1 sec', selected: false},
-            {name: 'Today so far', carbonFrom: 'today', carbonTo: 'now', selected: false},
-            {name: 'This week', carbonFrom: 'monday', carbonTo: 'next monday - 1 sec', selected: false},
-            {name: 'This month', carbonFrom: 'first day of this month', carbonTo: 'first day of next month - 1 sec', selected: false},
-            {name: 'This year', carbonFrom: 'first day of january this year', carbonTo: 'first day of january next year - 1 sec', selected: false},
-            {name: 'Week to date', carbonFrom: 'now - 1 week', carbonTo: 'now', selected: false},
-            {name: 'Month to date', carbonFrom: 'now - 1 month', carbonTo: 'now', selected: false},
-            {name: 'Year to date', carbonFrom: 'now - 1 year', carbonTo: 'now', selected: false},
+            {name: 'Last 2 days', carbonFrom: 'now - 2 days', carbonTo: 'now', selected: false},
+            {name: 'Last 7 days', carbonFrom: 'now - 7 days', carbonTo: 'now', selected: false},
+            {name: 'Last 30 days', carbonFrom: 'now - 30 days', carbonTo: 'now', selected: false},
+            {name: 'Last 60 days', carbonFrom: 'now - 60 days', carbonTo: 'now', selected: false},
+            {name: 'Last 90 days', carbonFrom: 'now - 90 days', carbonTo: 'now', selected: false},
+            {name: 'Last 6 months', carbonFrom: 'now - 6 months', carbonTo: 'now', selected: false},
+            {name: 'Last 1 year', carbonFrom: 'now - 1 year', carbonTo: 'now', selected: false},
+            {name: 'Last 2 years', carbonFrom: 'now - 2 years', carbonTo: 'now', selected: false},
+
         ],
         [
             {name: 'Yesterday', carbonFrom: 'yesterday', carbonTo: 'today - 1 sec', selected: false},
             {name: 'Day before yesterday', carbonFrom: 'yesterday - 1 day', carbonTo: 'yesterday - 1 sec', selected: false},
             {name: 'This day last week', carbonFrom: 'today - 1 week', carbonTo: 'today - 6 days - 1 sec', selected: false},
-            {name: 'Previous week', carbonFrom: 'last monday - 1 week', carbonTo: 'last monday - 1 sec', selected: false},
+            {name: 'Previous week', carbonFrom: 'last week - 1 week', carbonTo: 'last week - 1 sec', selected: false},
             {name: 'Previous month', carbonFrom: 'first day of last month', carbonTo: 'first day of this month - 1 sec', selected: false},
             {name: 'Previous year', carbonFrom: 'first day of last year', carbonTo: 'first day of this year - 1 sec', selected: false},
+        ],
+        [
+            {name: 'Today', carbonFrom: 'today', carbonTo: 'tomorrow - 1 sec', selected: false},
+            {name: 'Today so far', carbonFrom: 'today', carbonTo: 'now', selected: false},
+            {name: 'This week', carbonFrom: 'this week', carbonTo: 'next week - 1 sec', selected: false},
+            {name: 'This week so far', carbonFrom: 'this week', carbonTo: 'now', selected: false},
+            {name: 'This month', carbonFrom: 'first day of this month', carbonTo: 'first day of next month - 1 sec', selected: false},
+            {name: 'This month so far', carbonFrom: 'first day of this month', carbonTo: 'now', selected: false},
+            {name: 'This year', carbonFrom: 'first day of january this year', carbonTo: 'first day of january next year - 1 sec', selected: false},
+            {name: 'This year so far', carbonFrom: 'first day of january this year', carbonTo: 'now', selected: false},
         ],
         [
             {name: 'Last 5 minutes', carbonFrom: 'now - 5 mins', carbonTo: 'now', selected: false},
@@ -119,15 +130,7 @@
             {name: 'Last 12 hours', carbonFrom: 'now - 12 hours', carbonTo: 'now', selected: false},
             {name: 'Last 24 hours', carbonFrom: 'now - 24 hours', carbonTo: 'now', selected: false},
         ],
-        [
-            {name: 'Last 30 days', carbonFrom: 'now - 30 days', carbonTo: 'now', selected: false},
-            {name: 'Last 60 days', carbonFrom: 'now - 60 days', carbonTo: 'now', selected: false},
-            {name: 'Last 90 days', carbonFrom: 'now - 90 days', carbonTo: 'now', selected: false},
-            {name: 'Last 6 months', carbonFrom: 'now - 6 months', carbonTo: 'now', selected: false},
-            {name: 'Last 1 year', carbonFrom: 'now - 1 year', carbonTo: 'now', selected: false},
-            {name: 'Last 2 years', carbonFrom: 'now - 2 years', carbonTo: 'now', selected: false},
-            {name: 'Last 5 years', carbonFrom: 'now - 5 years', carbonTo: 'now', selected: false},
-        ]
+
     ]
 
     function capitalizeFirstLetter(string) {

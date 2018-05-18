@@ -14,8 +14,8 @@ class VisitorController extends Controller
     public function devices(Request $request)
     {
         return response()->view('visitors.devices', [
-            'visitedFrom' => $request->input('visited_from', Carbon::now()->subMonth()),
-            'visitedTo' => $request->input('visited_to', Carbon::now()),
+            'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
+            'visitedTo' => $request->input('visited_to', 'now'),
             'subscriber' => $request->input('subscriber', "1"),
 
             'brands' => SessionDevice::distinct()->whereNotNull('brand')->pluck('brand', 'brand'),
@@ -27,8 +27,8 @@ class VisitorController extends Controller
     public function sources(Request $request)
     {
         return response()->view('visitors.sources', [
-            'visitedFrom' => $request->input('visited_from', Carbon::now()->subMonth()),
-            'visitedTo' => $request->input('visited_to', Carbon::now()),
+            'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
+            'visitedTo' => $request->input('visited_to', 'now'),
             'subscriber' => $request->input('subscriber', "1"),
 
             'mediums' => SessionReferer::distinct()->whereNotNull('medium')->pluck('medium', 'medium'),

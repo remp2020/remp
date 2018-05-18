@@ -39,10 +39,10 @@ class ArticleController extends Controller
             'html' => view('articles.conversions', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->input('published_from', Carbon::now()->subMonth()),
-                'publishedTo' => $request->input('published_to', Carbon::now()),
-                'conversionFrom' => $request->input('conversion_from', Carbon::now()->subMonth()),
-                'conversionTo' => $request->input('conversion_to', Carbon::now()),
+                'publishedFrom' => $request->input('published_from', 'now - 30 days'),
+                'publishedTo' => $request->input('published_to', 'now'),
+                'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
+                'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
             'json' => ArticleResource::collection(Article::paginate()),
         ]);
@@ -148,8 +148,8 @@ class ArticleController extends Controller
             'html' => view('articles.pageviews', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->input('published_from', Carbon::now()->subMonth()),
-                'publishedTo' => $request->input('published_to', Carbon::now()),
+                'publishedFrom' => $request->input('published_from', 'now - 30 days'),
+                'publishedTo' => $request->input('published_to', 'now'),
             ]),
             'json' => ArticleResource::collection(Article::paginate()),
         ]);

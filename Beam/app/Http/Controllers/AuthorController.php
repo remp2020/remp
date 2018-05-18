@@ -24,8 +24,8 @@ class AuthorController extends Controller
         return response()->format([
             'html' => view('authors.index', [
                 'authors' => Author::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->input('published_from', Carbon::now()->subMonth()),
-                'publishedTo' => $request->input('published_to', Carbon::now()),
+                'publishedFrom' => $request->input('published_from', 'now - 30 days'),
+                'publishedTo' => $request->input('published_to', 'now'),
             ]),
             'json' => AuthorResource::collection(Author::paginate()),
         ]);

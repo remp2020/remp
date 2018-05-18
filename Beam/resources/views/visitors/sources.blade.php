@@ -32,11 +32,11 @@
                     ],
                     'refreshTriggers' => [
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_from"]'
                         ],
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_to"]',
                         ],
                         [

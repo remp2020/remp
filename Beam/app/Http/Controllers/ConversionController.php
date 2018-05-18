@@ -22,8 +22,8 @@ class ConversionController extends Controller
             'html' => view('conversions.index', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
-                'conversionFrom' => $request->get('conversion_from', Carbon::now()->subMonth()),
-                'conversionTo' => $request->get('conversion_to', Carbon::now()),
+                'conversionFrom' => $request->get('conversion_from', 'now - 30 days'),
+                'conversionTo' => $request->get('conversion_to', 'now'),
             ]),
             'json' => ConversionResource::collection(Conversion::paginate()),
         ]);
