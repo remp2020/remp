@@ -20,7 +20,6 @@
                     :title="'No alternative'"
                     :options.sync="$parent.variantOptions"
                     v-if="index != $parent.variants.length - 1 && index != 0"
-                    :required="true"
             ></v-select>
 
             <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[$parent.bannerId].label }}</span>
