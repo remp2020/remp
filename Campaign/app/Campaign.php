@@ -158,16 +158,14 @@ class Campaign extends Model
 
     public function getVariantsProportionMapping()
     {
-        $ids = [];
-        $proportions = [];
+        $mapping = [];
         $campaignBanners = $this->campaignBanner()->get();
 
         foreach ($campaignBanners as $campaignBanner) {
-            $ids[] = $campaignBanner->id;
-            $proportions[] = $campaignBanner->proportion;
+            $mapping[$campaignBanner->id] = $campaignBanner->proportion;
         }
 
-        return [$ids, $proportions];
+        return $mapping;
     }
 
     public function cache()

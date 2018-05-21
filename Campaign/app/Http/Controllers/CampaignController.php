@@ -556,16 +556,19 @@ class CampaignController extends Controller
 
             // banner still not set, choose random variant
             if ($banner === null) {
-                list($ids, $proportions) = $campaign->getVariantsProportionMapping();
+                // list($ids, $proportions) = $campaign->getVariantsProportionMapping();
+                $variantsMapping = $campaign->getVariantsProportionMapping();
 
                 $randVal = mt_rand(0, 100);
                 $currPercent = 0;
 
-                for ($i = 0; $i < count($proportions); $i++) {
-                    $currPercent = $currPercent + $proportions[$i];
+                foreach ($variantsMapping as $variantId => $variantProportion) {
+                    $currPercent = $currPercent + $variantProportion;
+
                     if ($currPercent >= $randVal) {
-                        $variant = $campaignBanners->get($ids[$i]);
+                        $variant = $campaignBanners->get($variantId);
                         $variantUuid = $variant->uuid;
+
                         if ($variant->control_group == 0) {
                             $banner = Banner::find($variant->banner_id);
                         }
