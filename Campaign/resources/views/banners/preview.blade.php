@@ -28,7 +28,7 @@ var run = function() {
             "utm_medium": 'none',
             "utm_campaign": campaignUuid,
             "utm_content": null,
-            "variant": variantUuid
+            "banner_variant": variantUuid
         })
         return true;
     }
@@ -72,7 +72,7 @@ var run = function() {
             "utm_medium": banner.displayType,
             "utm_campaign": banner.campaignUuid,
             "utm_content": banner.uuid,
-            "variant": variantUuid
+            "banner_variant": variantUuid
         })
         banner.show = true;
         if (banner.closeTimeout) {

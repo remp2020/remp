@@ -68,7 +68,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1526643705981,
+  "iteration": 1526906292298,
   "links": [],
   "panels": [
     {
@@ -838,7 +838,7 @@
           "hide": false,
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") FROM events_v2 WHERE \"variant\" = '$variants_pretty_mysql' AND \"category\" = 'banner' AND \"action\" = 'show' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter GROUP BY time($interval) fill(null)",
+          "query": "SELECT count(\"token\") FROM events_v2 WHERE \"banner_variant\" = '$variants_pretty_mysql' AND \"category\" = 'banner' AND \"action\" = 'show' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter GROUP BY time($interval) fill(null)",
           "rawQuery": true,
           "rawSql": "SELECT\n  UNIX_TIMESTAMP(<time_column>) as time_sec,\n  <value column> as value,\n  <series name column> as metric\nFROM <table name>\nWHERE $__timeFilter(time_column)\nORDER BY <time_column> ASC\n",
           "refId": "A",
@@ -978,7 +978,7 @@
           "hide": false,
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") FROM events_v2 WHERE \"variant\" = '$variants_pretty_mysql' AND \"category\" = 'banner' AND \"action\" = 'show' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter fill(0)",
+          "query": "SELECT count(\"token\") FROM events_v2 WHERE \"banner_variant\" = '$variants_pretty_mysql' AND \"category\" = 'banner' AND \"action\" = 'show' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter fill(0)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1090,7 +1090,7 @@
           "hide": false,
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") * $proportion FROM events_v2 WHERE \"variant\" = '$variants_pretty_mysql' AND \"category\" = 'banner' AND \"action\" = 'show' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter",
+          "query": "SELECT count(\"token\") * $proportion FROM events_v2 WHERE \"banner_variant\" = '$variants_pretty_mysql' AND \"category\" = 'banner' AND \"action\" = 'show' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1204,7 +1204,7 @@
           "measurement": "events",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") FROM autogen.\"events_v2\" WHERE \"category\" = 'banner' AND \"action\" = 'click' AND variant = '$variants_pretty_mysql' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter",
+          "query": "SELECT count(\"token\") FROM autogen.\"events_v2\" WHERE \"category\" = 'banner' AND \"action\" = 'click' AND banner_variant = '$variants_pretty_mysql' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1336,7 +1336,7 @@
           "measurement": "events",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") * $proportion FROM autogen.\"events_v2\" WHERE \"category\" = 'banner' AND \"action\" = 'click' AND variant = '$variants_pretty_mysql' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter",
+          "query": "SELECT count(\"token\") * $proportion FROM autogen.\"events_v2\" WHERE \"category\" = 'banner' AND \"action\" = 'click' AND banner_variant = '$variants_pretty_mysql' AND (\"campaign_id\"::tag = '$campaign' OR \"utm_campaign\"::tag = '$campaign') AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1468,7 +1468,7 @@
           "measurement": "events",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND variant = '$variants' AND $timeFilter",
+          "query": "SELECT count(\"token\") FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND banner_variant = '$variants' AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1600,7 +1600,7 @@
           "measurement": "events",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") * $proportion FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND variant = '$variants' AND $timeFilter",
+          "query": "SELECT count(\"token\") * $proportion FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND banner_variant = '$variants' AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1719,7 +1719,7 @@
           "measurement": "commerce",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") FROM commerce WHERE \"step\" = 'payment' and \"utm_campaign\" = '$campaign' AND variant = '$variants'  AND $timeFilter",
+          "query": "SELECT count(\"token\") FROM commerce WHERE \"step\" = 'payment' and \"utm_campaign\" = '$campaign' AND banner_variant = '$variants'  AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1826,7 +1826,7 @@
           "measurement": "commerce",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"token\") * $proportion FROM commerce WHERE \"step\" = 'payment' and \"utm_campaign\" = '$campaign' AND variant = '$variants'  AND $timeFilter",
+          "query": "SELECT count(\"token\") * $proportion FROM commerce WHERE \"step\" = 'payment' and \"utm_campaign\" = '$campaign' AND banner_variant = '$variants'  AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1947,7 +1947,7 @@
           "measurement": "events",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"revenue\") FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND variant = '$variants'  AND $timeFilter",
+          "query": "SELECT sum(\"revenue\") FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND banner_variant = '$variants'  AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2080,7 +2080,7 @@
           "measurement": "events",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"revenue\") * $proportion FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND variant = '$variants'  AND $timeFilter",
+          "query": "SELECT sum(\"revenue\") * $proportion FROM commerce WHERE \"step\" = 'purchase' and \"utm_campaign\" = '$campaign' AND banner_variant = '$variants'  AND $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2356,8 +2356,8 @@
     ]
   },
   "time": {
-    "from": "2018-05-17T08:01:43.308Z",
-    "to": "2018-05-19T12:44:13.308Z"
+    "from": "now-3h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -2385,7 +2385,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "REMP Campaigns AB new",
+  "title": "REMP Campaigns AB 2",
   "uid": "gfy5Nfnmk",
-  "version": 39
+  "version": 41
 }
