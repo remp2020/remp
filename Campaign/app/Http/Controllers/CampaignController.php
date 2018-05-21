@@ -26,6 +26,7 @@ use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\DeviceDetector;
+use App\CampaignBanner;
 
 class CampaignController extends Controller
 {
@@ -45,7 +46,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['banner', 'altBanner', 'segments', 'countries'])
+            ->with(['segments', 'countries', 'campaignBanner'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -58,14 +59,28 @@ class CampaignController extends Controller
             ->addColumn('name', function (Campaign $campaign) {
                 return Html::linkRoute('campaigns.edit', $campaign->name, $campaign);
             })
-            ->addColumn('banner', function (Campaign $campaign) {
-                return Html::linkRoute('banners.edit', $campaign->banner->name, $campaign->banner);
-            })
-            ->addColumn('alt_banner', function (Campaign $campaign) {
-                if (!$campaign->altBanner) {
-                    return null;
+            ->addColumn('variants', function (Campaign $campaign) {
+                $data = $campaign->campaignBanner->all();
+                $variants = [];
+
+                foreach ($data as $variant) {
+                    $proportion = $variant['proportion'];
+
+                    if ($variant['control_group'] == 0) {
+                        // handle variants with banner
+                        $link = link_to(
+                            route('banners.edit', $variant['banner_id']),
+                            $variant['variant']
+                        );
+
+                        $variants[] = "{$link} ({$proportion}%)";
+                    } else {
+                        // handle control group
+                        $variants[] = "{$variant['variant']} ({$proportion}%)";
+                    }
                 }
-                return Html::linkRoute('banners.edit', $campaign->altBanner->name, $campaign->altBanner);
+
+                return implode(', ', $variants);
             })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
@@ -82,7 +97,7 @@ class CampaignController extends Controller
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
-            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session'])
+            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants'])
             ->setRowId('id')
             ->make(true);
     }
@@ -97,12 +112,18 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
 
-        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list(
+            $campaign,
+            $bannerId,
+            $variants,
+            $selectedCountries,
+            $countriesBlacklist
+        ) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
             'bannerId' => $bannerId,
-            'altBannerId' => $altBannerId,
+            'variants' => $variants,
             'selectedCountries' => $selectedCountries,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
@@ -113,17 +134,23 @@ class CampaignController extends Controller
 
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
     {
-        $sourceCampaign->load('banner', 'altBanner', 'segments', 'countries');
+        $sourceCampaign->load('banner', 'variants', 'segments', 'countries');
         $campaign = $sourceCampaign->replicate();
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
-        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list(
+            $campaign,
+            $bannerId,
+            $variants,
+            $selectedCountries,
+            $countriesBlacklist
+        ) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
             'bannerId' => $bannerId,
-            'altBannerId' => $altBannerId,
+            'variants' => $variants,
             'selectedCountries' => $selectedCountries,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
@@ -204,12 +231,18 @@ class CampaignController extends Controller
      */
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
-        list($campaign, $bannerId, $altBannerId, $selectedCountries, $countriesBlacklist) = $this->processOldCampaign($campaign, old());
+        list(
+            $campaign,
+            $bannerId,
+            $variants,
+            $selectedCountries,
+            $countriesBlacklist
+        ) = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.edit', [
             'campaign' => $campaign,
             'bannerId' => $bannerId,
-            'altBannerId' => $altBannerId,
+            'variants' => $variants,
             'selectedCountries' => $selectedCountries,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
@@ -422,8 +455,8 @@ class CampaignController extends Controller
         GeoIp2\Database\Reader $geoIPreader,
         DeviceDetector $dd
     ) {
-        // validation
 
+        // validation
         $data = \GuzzleHttp\json_decode($r->get('data'));
         $url = $data->url ?? null;
         if (!$url) {
@@ -657,8 +690,11 @@ class CampaignController extends Controller
         $campaign->fill($data);
         $campaign->save();
 
-        $campaign->banner_id = $data['banner_id'];
-        $campaign->alt_banner_id = $data['alt_banner_id'];
+        if (!empty($data['variants_to_remove'])) {
+            $campaign->removeVariants($data['variants_to_remove']);
+        }
+
+        $campaign->storeOrUpdateVariants($data['variants']);
 
         if (isset($data['countries'])) {
             $campaign->countries()->sync(
@@ -713,26 +749,26 @@ class CampaignController extends Controller
             $blacklisted = (int)$country['pivot']['blacklisted'];
         }
 
-        // banners
-        $bannerId = null;
-        $altBannerId = null;
-
+        // main banner
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
-            $bannerId = $campaign->banner ? $campaign->banner->id : null;
+            $bannerId = optional($campaign->campaignBanner()->first())->banner_id;
         }
 
-        if (array_key_exists('alt_banner_id', $data)) {
-            $altBannerId = $data['alt_banner_id'];
+        // variants
+        if (array_key_exists('variants', $data)) {
+            $variants = $data['variants'];
         } else {
-            $altBannerId = $campaign->altBanner ? $campaign->altBanner->id : null;
+            $variants = $campaign->campaignBanner()
+                            ->with('banner')
+                            ->get();
         }
 
         return [
             $campaign,
             $bannerId,
-            $altBannerId,
+            $variants,
             $selectedCountries,
             isset($data['countries_blacklist'])
                 ? $data['countries_blacklist']

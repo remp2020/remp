@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\VariantsProportionSum;
 
 class CampaignRequest extends FormRequest
 {
@@ -28,14 +29,19 @@ class CampaignRequest extends FormRequest
         return [
             'name' => 'required|max:255',
             'active' => 'boolean|required',
-            'banner_id' => 'integer|required',
-            'alt_banner_id' => 'integer|nullable|different:banner_id',
+            'banner_id' => 'required|integer',
             'signed_in' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
             'segments' => 'array',
             'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
             'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
-            'devices.0' => 'required'
+            'devices.0' => 'required',
+            'variants.*.variant' => 'string|required',
+            'variants.*.proportion' => 'integer|required|min:0|max:100',
+            'variants.*.control_group' => 'integer|required',
+            'variants.*.weight' => 'integer|required',
+            'variants.*.banner_id' => 'required_unless:variants.*.control_group,1',
+            'variants.0.proportion' => ['integer', 'required', new VariantsProportionSum]
         ];
     }
 

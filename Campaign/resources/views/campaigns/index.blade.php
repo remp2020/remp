@@ -68,11 +68,9 @@
                     {!! Widget::run('DataTable', [
                     'colSettings' => [
                         'name',
-                        'banner' => [
-                            'header' => 'Banner'
-                        ],
-                        'alt_banner' => [
-                            'header' => 'Banner B'
+                        'variants' => [
+                            'header' => 'Variants',
+                            'orderable' => false
                         ],
                         'segments' => [
                             'header' => 'Segments'
@@ -107,7 +105,7 @@
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                         ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
                     ],
-                    'order' => [9, 'desc'],
+                    'order' => [8, 'desc'],
                 ]) !!}
                 </div>
             </div>

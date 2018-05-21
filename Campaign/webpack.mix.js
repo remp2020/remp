@@ -40,6 +40,7 @@ if (process.env.REMP_TARGET === 'lib') {
             "moment",
             "node-waves",
             "bootstrap-notify",
+            "nouislider",
             "./resources/assets/js/farbtastic.js",
         ])
         .autoload({
@@ -47,6 +48,6 @@ if (process.env.REMP_TARGET === 'lib') {
             "node-waves": ["Waves", "window.Waves"],
             "autosize": ["autosize", "window.autosize"],
             "vue": ["Vue", "window.Vue"],
-            "moment": ["Moment", "window.Moment"],
+            "moment": ["Moment", "window.Moment"]
         });
 }
