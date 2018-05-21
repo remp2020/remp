@@ -29,7 +29,7 @@ class CampaignRequest extends FormRequest
         return [
             'name' => 'required|max:255',
             'active' => 'boolean|required',
-            'banner_id' => 'integer|required',
+            'banner_id' => 'required|integer',
             'signed_in' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
             'segments' => 'array',
