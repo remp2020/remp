@@ -27,7 +27,3 @@ Route::middleware('auth:api')->group(function() {
 
     Route::post('campaigns/toggle-active/{campaign}', 'CampaignController@toggleActive')->name('api.campaigns.toggle_active');
 });
-
-Route::post('grafana/banners-mapping', 'BannerController@mapping');
-Route::post('grafana/banners-mapping/search', 'BannerController@mappingSearch');
-
