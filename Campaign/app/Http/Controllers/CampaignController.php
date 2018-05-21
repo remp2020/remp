@@ -545,7 +545,7 @@ class CampaignController extends Controller
 
             if ($bannerId !== null) {
                 // check if displayed banner is one of existing variants
-                foreach($campaignBanners as $campaignBanner) {
+                foreach ($campaignBanners as $campaignBanner) {
                     if (optional($campaignBanner->banner)->uuid == $bannerId) {
                         $banner = Banner::find($campaignBanner->banner_id);
                         $variantUuid = $campaignBanner->uuid;
