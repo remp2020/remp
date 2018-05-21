@@ -25,7 +25,7 @@ var run = function() {
     if (isControlGroup) {
         remplib.tracker.trackEvent("banner", "show", {
             "utm_source": "remp_campaign",
-            "utm_medium": null,
+            "utm_medium": 'none',
             "utm_campaign": campaignUuid,
             "utm_content": null,
             "variant": variantUuid
