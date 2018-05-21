@@ -134,7 +134,7 @@ is set to `true` (default value), it automatically invalidates the old token.
 }
 ```
 
-### GET /auth/api-token
+### GET /auth/check-token
 
 API endpoint for services to validate provided API token. Endpoint simply returns whether token
 is usable or not and no additional info.
