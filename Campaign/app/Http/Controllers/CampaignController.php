@@ -533,11 +533,23 @@ class CampaignController extends Controller
             $variantUuid = null;
 
             // find variant previously displayed to user
-            $bannerId = null;
+            $bannerUuid = null;
             $campaignsBanners = $data->campaignsBanners ?? false;
             if ($campaignsBanners && isset($campaignsBanners->{$campaign->uuid})) {
-                $bannerId = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
+                $bannerUuid = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
                 $variantUuid = $campaignsBanners->{$campaign->uuid}->variantUuid ?? null;
+            }
+
+            // fallback for older version of campaigns local storage data
+            // where variantUuid wasnt saved because of changed param for decision making
+            if ($bannerUuid && !$variantUuid) {
+                foreach ($campaignBanners as $campaignBanner) {
+                    if (optional($campaignBanner->banner)->uuid == $bannerUuid) {
+                        $variant = $campaignBanner;
+                        $variantUuid = $variant->uuid;
+                        $banner = $campaignBanner->banner;
+                    }
+                }
             }
 
             if ($variantUuid !== null) {
