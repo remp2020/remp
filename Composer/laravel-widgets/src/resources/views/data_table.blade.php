@@ -92,7 +92,7 @@
                 @foreach ($colDefs as $def)
                 {
                     @foreach($def as $defKey => $defVal)
-                    "{{ $defKey }}": {{ $defVal }},
+                    "{{ $defKey }}": {{ @json($defVal) }},
                     @endforeach
                 },
                 @endforeach
