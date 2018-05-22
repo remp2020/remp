@@ -147,7 +147,6 @@
                         {name: 'Previous month', carbonFrom: 'first day of last month', carbonTo: 'first day of this month - 1 sec', selected: false},
                         {name: 'This year', carbonFrom: 'first day of january this year', carbonTo: 'first day of january next year - 1 sec', selected: false},
                         {name: 'Previous year', carbonFrom: 'first day of last year', carbonTo: 'first day of this year - 1 sec', selected: false},
-
                     ],
                     [
                         {name: 'Last 5 minutes', carbonFrom: 'now - 5 mins', carbonTo: 'now', selected: false},
@@ -189,9 +188,6 @@
                 this.selectedTab = 1
             }
             this.toggleText = text
-        },
-        created() {
-
         },
         methods: {
             selectQuick(selection) {
