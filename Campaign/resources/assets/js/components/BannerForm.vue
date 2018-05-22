@@ -325,6 +325,11 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
+
+            if (this.transition === null) {
+                this.transition = 'none';
+            }
+
             this.$on('values-changed', function(data) {
                 for (let item of data) {
                     this[item.key] = item.val;
