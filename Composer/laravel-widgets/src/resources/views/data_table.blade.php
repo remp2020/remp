@@ -59,6 +59,8 @@
 
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
+            @if($responsive)'responsive': true, @endif
+
             'columns': [
                     @foreach ($cols as $col)
                 {
@@ -85,6 +87,17 @@
                 },
                 @endif
             ],
+            @if(!empty($colDefs))
+            'columnDefs': [
+                @foreach ($colDefs as $def)
+                {
+                    @foreach($def as $defKey => $defVal)
+                    "{{ $defKey }}": {{ $defVal }},
+                    @endforeach
+                },
+                @endforeach
+            ],
+            @endif
             'autoWidth': false,
             'sDom': 'tr',
             'processing': true,

@@ -66,6 +66,7 @@
 
                 <div class="card-body">
                     {!! Widget::run('DataTable', [
+                    'responsive' => true,
                     'colSettings' => [
                         'name',
                         'banner' => [
@@ -97,6 +98,63 @@
                         'updated_at' => [
                             'header' => 'Updated at',
                             'render' => 'date',
+                        ],
+                    ],
+                    'columnDefs' => [
+                        // campaign name
+                        [
+                            'responsivePriority' => 1,
+                            'targets' => 0,
+                        ],
+                        // banner
+                        [
+                            'responsivePriority' => 9,
+                            'targets' => 1,
+                        ],
+                        // banner b
+                        [
+                            'responsivePriority' => 9,
+                            'targets' => 2,
+                        ],
+                        // segments
+                        [
+                            'responsivePriority' => 10,
+                            'targets' => 3,
+                        ],
+                        // countries
+                        [
+                            'responsivePriority' => 10,
+                            'targets' => 4,
+                        ],
+                        // is active
+                        [
+                            'responsivePriority' => 5,
+                            'targets' => 5,
+                        ],
+                        // signed in
+                        [
+                            'responsivePriority' => 10,
+                            'targets' => 6,
+                        ],
+                        // devices
+                        [
+                            'responsivePriority' => 10,
+                            'targets' => 7,
+                        ],
+                        // created at
+                        [
+                            'responsivePriority' => 9,
+                            'targets' => -3,
+                        ],
+                        // updated at
+                        [
+                            'responsivePriority' => 1,
+                            'targets' => -2,
+                        ],
+                        // actions
+                        [
+                            'responsivePriority' => 1,
+                            'targets' => -1,
                         ],
                     ],
                     'rowHighlights' => [
