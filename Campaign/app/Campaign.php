@@ -186,20 +186,13 @@ class Campaign extends Model
             'countriesBlacklist',
             'schedules',
             'campaignBanners',
+            'campaignBanners.banner',
         ])->first();
 
-        $variants = CampaignBanner::where('campaign_id', $this->id)
-                                ->with('banner')
-                                ->get()
-                                ->keyBy('id');
-
-        foreach ($variants as $variant) {
+        foreach ($campaign->campaignBanners as $variant) {
             optional($variant->banner)->loadTemplate();
         }
 
-        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, [
-            'campaign' => $campaign,
-            'variants' => $variants
-        ]);
+        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
 }

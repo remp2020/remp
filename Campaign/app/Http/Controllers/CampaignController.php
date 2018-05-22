@@ -506,8 +506,7 @@ class CampaignController extends Controller
         $displayedCampaigns = [];
 
         foreach ($campaignIds as $campaignId) {
-            $campaignData = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignId);
-            $campaign = $campaignData['campaign'];
+            $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignId);
             $running = false;
 
             foreach ($campaign->schedules as $schedule) {
@@ -520,7 +519,7 @@ class CampaignController extends Controller
                 continue;
             }
 
-            $campaignBanners = $campaignData['variants'];
+            $campaignBanners = $campaign->campaignBanners->keyBy('id');
 
             // banner
             if ($campaignBanners->count() == 0) {
@@ -530,10 +529,10 @@ class CampaignController extends Controller
 
             $banner = null;
             $variant = null;
+            $bannerUuid = null;
             $variantUuid = null;
 
             // find variant previously displayed to user
-            $bannerUuid = null;
             $campaignsBanners = $data->campaignsBanners ?? false;
             if ($campaignsBanners && isset($campaignsBanners->{$campaign->uuid})) {
                 $bannerUuid = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
@@ -557,7 +556,6 @@ class CampaignController extends Controller
                 foreach ($campaignBanners as $campaignBanner) {
                     if ($campaignBanner->uuid == $variantUuid) {
                         $banner = $campaignBanner->banner;
-                        $variantUuid = $campaignBanner->uuid;
                         break;
                     }
                 }
