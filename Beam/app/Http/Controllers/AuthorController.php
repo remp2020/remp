@@ -37,8 +37,8 @@ class AuthorController extends Controller
             'html' => view('authors.show', [
                 'author' => $author,
                 'sections' => Section::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->input('published_from', Carbon::now()->subMonth()),
-                'publishedTo' => $request->input('published_to', Carbon::now()),
+                'publishedFrom' => $request->input('published_from', 'now - 30 days'),
+                'publishedTo' => $request->input('published_to', 'now'),
             ]),
             'json' => new AuthorResource($author),
         ]);
@@ -222,12 +222,14 @@ class AuthorController extends Controller
             });
 
         if ($request->input('published_from')) {
-            $articles->where('published_at', '>=', $request->input('published_from'));
-            $conversionsQuery->where('published_at', '>=', $request->input('published_from'));
+            $publishedFrom = Carbon::parse($request->input('published_from'))->tz('UTC');
+            $articles->where('published_at', '>=', $publishedFrom);
+            $conversionsQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
-            $articles->where('published_at', '<=', $request->input('published_to'));
-            $conversionsQuery->where('published_at', '<=', $request->input('published_to'));
+            $publishedTo = Carbon::parse($request->input('published_to'))->tz('UTC');
+            $articles->where('published_at', '<=', $publishedTo);
+            $conversionsQuery->where('published_at', '<=', $publishedTo);
         }
 
         $conversions = [];
