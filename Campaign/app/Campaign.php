@@ -187,14 +187,18 @@ class Campaign extends Model
             'schedules',
         ])->first();
 
-        $banners = CampaignBanner::where('campaign_id', $this->id)
+        $variants = CampaignBanner::where('campaign_id', $this->id)
                                 ->with('banner')
                                 ->get()
                                 ->keyBy('id');
 
+        foreach ($variants as $variant) {
+            optional($variant->banner)->loadTemplate();
+        }
+
         Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, [
             'campaign' => $campaign,
-            'banners' => $banners
+            'variants' => $variants
         ]);
     }
 }

@@ -532,7 +532,7 @@ class CampaignController extends Controller
                     ->setStatusCode(400);
             }
 
-            $campaignBanners = $campaignBannersData['banners'];
+            $campaignBanners = $campaignBannersData['variants'];
 
             // banner
             if ($campaignBanners->count() == 0) {
@@ -687,7 +687,7 @@ class CampaignController extends Controller
 
 
             $displayedCampaigns[] = View::make('banners.preview', [
-                'banner' => $banner ? $banner->loadTemplate() : null,
+                'banner' => $banner ?? null,
                 'variantUuid' => $variantUuid,
                 'campaign' => $campaign,
                 'positions' => $positions,
