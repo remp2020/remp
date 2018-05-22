@@ -533,10 +533,10 @@ class CampaignController extends Controller
             $variantUuid = null;
 
             // find variant previously displayed to user
-            $campaignsBanners = $data->campaignsBanners ?? false;
-            if ($campaignsBanners && isset($campaignsBanners->{$campaign->uuid})) {
-                $bannerUuid = $campaignsBanners->{$campaign->uuid}->bannerId ?? null;
-                $variantUuid = $campaignsBanners->{$campaign->uuid}->variantUuid ?? null;
+            $seenCampaignsBanners = $data->campaignsBanners ?? false;
+            if ($seenCampaignsBanners && isset($seenCampaignsBanners->{$campaign->uuid})) {
+                $bannerUuid = $seenCampaignsBanners->{$campaign->uuid}->bannerId ?? null;
+                $variantUuid = $seenCampaignsBanners->{$campaign->uuid}->variantUuid ?? null;
             }
 
             // fallback for older version of campaigns local storage data
@@ -547,6 +547,7 @@ class CampaignController extends Controller
                         $variant = $campaignBanner;
                         $variantUuid = $variant->uuid;
                         $banner = $campaignBanner->banner;
+                        break;
                     }
                 }
             }
@@ -554,7 +555,7 @@ class CampaignController extends Controller
             if ($variantUuid !== null) {
                 // check if displayed banner is one of existing variants
                 foreach ($campaignBanners as $campaignBanner) {
-                    if ($campaignBanner->uuid == $variantUuid) {
+                    if ($campaignBanner->uuid === $variantUuid) {
                         $banner = $campaignBanner->banner;
                         break;
                     }
@@ -686,7 +687,7 @@ class CampaignController extends Controller
 
             $displayedCampaigns[] = View::make('banners.preview', [
                 'banner' => $banner ?? null,
-                'variantUuid' => $variantUuid,
+                'variantUuid' => $variant->uuid,
                 'campaign' => $campaign,
                 'positions' => $positions,
                 'dimensions' => $dimensions,
