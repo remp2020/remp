@@ -520,11 +520,19 @@ class CampaignController extends Controller
                 continue;
             }
 
-            $campaignBanners = $campaign->campaignBanner()
-                                        ->with('banner')
-                                        ->get()
-                                        ->keyBy('id');
+            $campaignBannersData = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaign->id);
 
+            if (!$campaignBannersData) {
+                return response()
+                    ->jsonp($r->get('callback'), [
+                        'success' => false,
+                        'errors' => ['variants for this campaign wasnt found in cache'],
+                        'campaign_id' => $campaignId
+                    ])
+                    ->setStatusCode(400);
+            }
+
+            $campaignBanners = $campaignBannersData['banners'];
 
             // banner
             if ($campaignBanners->count() == 0) {
@@ -570,7 +578,7 @@ class CampaignController extends Controller
                         $variantUuid = $variant->uuid;
 
                         if ($variant->control_group == 0) {
-                            $banner = Banner::find($variant->banner_id);
+                            $banner = $variant->banner;
                         }
                         break;
                     }

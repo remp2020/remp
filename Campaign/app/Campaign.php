@@ -189,7 +189,8 @@ class Campaign extends Model
 
         $banners = CampaignBanner::where('campaign_id', $this->id)
                                 ->with('banner')
-                                ->get();
+                                ->get()
+                                ->keyBy('id');
 
         Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, [
             'campaign' => $campaign,
