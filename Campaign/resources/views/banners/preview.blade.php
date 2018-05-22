@@ -1,6 +1,8 @@
 {{--<script type="text/javascript">--}}
 
-@if(!is_null($banner))
+@if(is_null($banner))
+var bannerUuid = null;
+@else
 var bannerUuid = '{{ $banner->uuid }}';
 var bannerId = 'b-' + bannerUuid;
 var bannerJsonData = {!! $banner->toJson() !!};
@@ -22,57 +24,55 @@ var run = function() {
         return;
     }
 
-    if (isControlGroup) {
-        remplib.tracker.trackEvent("banner", "show", {
-            "utm_source": "remp_campaign",
-            "utm_medium": 'none',
-            "utm_campaign": campaignUuid,
-            "utm_content": null,
-            "banner_variant": variantUuid
-        })
-        return true;
-    }
-
+    var banner = {};
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
-    var banner = remplib.banner.fromModel(bannerJsonData);
+
+    if (!isControlGroup) {
+        var banner = remplib.banner.fromModel(bannerJsonData);
+    }
 
     banner.show = false;
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
 
-    banner.uuid = bannerUuid;
     banner.campaignUuid = campaignUuid;
     banner.variantUuid = variantUuid;
+    banner.uuid = bannerUuid;
 
-    var d = document.createElement('div');
-    d.id = bannerId;
-    var bp = document.createElement('banner-preview');
-    d.appendChild(bp);
-
-    var target = null;
-    if (banner.displayType == 'inline') {
-        target = document.querySelector(banner.targetSelector);
-        if (target === null) {
-            console.warn("REMP: unable to display banner, selector not matched: " + banner.targetSelector);
-            return;
-        }
+    if (isControlGroup) {
+        banner.displayDelay = 0;
+        banner.displayType = 'none';
     } else {
-        target = document.getElementsByTagName('body')[0];
-    }
-    target.appendChild(d);
+        var d = document.createElement('div');
+        d.id = bannerId;
+        var bp = document.createElement('banner-preview');
+        d.appendChild(bp);
 
-    remplib.banner.bindPreview('#' + bannerId, banner);
+        var target = null;
+        if (banner.displayType == 'inline') {
+            target = document.querySelector(banner.targetSelector);
+            if (target === null) {
+                console.warn("REMP: unable to display banner, selector not matched: " + banner.targetSelector);
+                return;
+            }
+        } else {
+            target = document.getElementsByTagName('body')[0];
+        }
+        target.appendChild(d);
+
+        remplib.banner.bindPreview('#' + bannerId, banner);
+    }
 
     setTimeout(function() {
         remplib.tracker.trackEvent("banner", "show", {
             "utm_source": "remp_campaign",
             "utm_medium": banner.displayType,
-            "utm_campaign": campaignUuid,
-            "utm_content": bannerUuid,
-            "banner_variant": variantUuid
+            "utm_campaign": banner.campaignUuid,
+            "utm_content": banner.uuid,
+            "banner_variant": banner.variantUuid
         })
         banner.show = true;
         if (banner.closeTimeout) {
@@ -80,7 +80,7 @@ var run = function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
-        remplib.campaign.storeCampaignDetails(campaignUuid, bannerUuid, variantUuid);
+        remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, banner.variantUuid);
     }, banner.displayDelay);
 };
 
