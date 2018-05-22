@@ -159,7 +159,7 @@ class Campaign extends Model
     public function getVariantsProportionMapping()
     {
         $mapping = [];
-        $campaignBanners = $this->campaignBanner()->get();
+        $campaignBanners = $this->campaignBanner;
 
         foreach ($campaignBanners as $campaignBanner) {
             $mapping[$campaignBanner->id] = $campaignBanner->proportion;
@@ -185,6 +185,7 @@ class Campaign extends Model
             'countriesWhitelist',
             'countriesBlacklist',
             'schedules',
+            'campaignBanner'
         ])->first();
 
         $variants = CampaignBanner::where('campaign_id', $this->id)

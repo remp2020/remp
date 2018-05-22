@@ -520,19 +520,7 @@ class CampaignController extends Controller
                 continue;
             }
 
-            $campaignBannersData = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaign->id);
-
-            if (!$campaignBannersData) {
-                return response()
-                    ->jsonp($r->get('callback'), [
-                        'success' => false,
-                        'errors' => ['variants for this campaign wasnt found in cache'],
-                        'campaign_id' => $campaignId
-                    ])
-                    ->setStatusCode(400);
-            }
-
-            $campaignBanners = $campaignBannersData['variants'];
+            $campaignBanners = $campaignData['variants'];
 
             // banner
             if ($campaignBanners->count() == 0) {
@@ -541,9 +529,10 @@ class CampaignController extends Controller
             }
 
             $banner = null;
+            $variant = null;
             $variantUuid = null;
 
-            // find banner previously displayed to user
+            // find variant previously displayed to user
             $bannerId = null;
             $campaignsBanners = $data->campaignsBanners ?? false;
             if ($campaignsBanners && isset($campaignsBanners->{$campaign->uuid})) {
@@ -564,7 +553,6 @@ class CampaignController extends Controller
 
             // variant still not set, choose random variant
             if ($variantUuid === null) {
-                // list($ids, $proportions) = $campaign->getVariantsProportionMapping();
                 $variantsMapping = $campaign->getVariantsProportionMapping();
 
                 $randVal = mt_rand(0, 100);
