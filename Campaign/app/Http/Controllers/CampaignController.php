@@ -46,7 +46,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['segments', 'countries', 'campaignBanner'])
+            ->with(['segments', 'countries', 'campaignBanners'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -60,7 +60,7 @@ class CampaignController extends Controller
                 return Html::linkRoute('campaigns.edit', $campaign->name, $campaign);
             })
             ->addColumn('variants', function (Campaign $campaign) {
-                $data = $campaign->campaignBanner->all();
+                $data = $campaign->campaignBanners->all();
                 $variants = [];
 
                 foreach ($data as $variant) {
@@ -783,14 +783,14 @@ class CampaignController extends Controller
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
         } else {
-            $bannerId = optional($campaign->campaignBanner()->first())->banner_id;
+            $bannerId = optional($campaign->campaignBanners()->first())->banner_id;
         }
 
         // variants
         if (array_key_exists('variants', $data)) {
             $variants = $data['variants'];
         } else {
-            $variants = $campaign->campaignBanner()
+            $variants = $campaign->campaignBanners()
                             ->with('banner')
                             ->get();
         }

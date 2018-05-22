@@ -74,7 +74,7 @@ class Campaign extends Model
             ->withPivot('variant', 'proportion', 'control_group', 'weight');
     }
 
-    public function campaignBanner()
+    public function campaignBanners()
     {
         return $this->hasMany(CampaignBanner::class)->orderBy('weight');
     }
@@ -82,7 +82,7 @@ class Campaign extends Model
     public function getPrimaryBanner()
     {
         return optional(
-            $this->campaignBanner()->with('banner')->first()
+            $this->campaignBanners()->with('banner')->first()
         )->banner;
     }
 
@@ -159,7 +159,7 @@ class Campaign extends Model
     public function getVariantsProportionMapping()
     {
         $mapping = [];
-        $campaignBanners = $this->campaignBanner;
+        $campaignBanners = $this->campaignBanners;
 
         foreach ($campaignBanners as $campaignBanner) {
             $mapping[$campaignBanner->id] = $campaignBanner->proportion;
@@ -185,7 +185,7 @@ class Campaign extends Model
             'countriesWhitelist',
             'countriesBlacklist',
             'schedules',
-            'campaignBanner'
+            'campaignBanners',
         ])->first();
 
         $variants = CampaignBanner::where('campaign_id', $this->id)
