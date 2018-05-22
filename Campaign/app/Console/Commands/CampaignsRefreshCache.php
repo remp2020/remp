@@ -20,7 +20,7 @@ class CampaignsRefreshCache extends Command
      *
      * @var string
      */
-    protected $description = 'Clear campaigns cache.';
+    protected $description = 'Removes cached campaigns and cache the latest version immediatelly.';
 
     /**
      * Create a new command instance.
@@ -39,14 +39,14 @@ class CampaignsRefreshCache extends Command
      */
     public function handle()
     {
-        Cache::forget(Campaign::ACTIVE_CAMPAIGN_IDS);
+        $activeCampaignIds = Cache::get(Campaign::ACTIVE_CAMPAIGN_IDS);
 
-        Campaign::all()->map(function ($campaign) {
-            Cache::tags([Campaign::CAMPAIGN_TAG])->forget($campaign->id);
-
+        foreach (Campaign::where(['id' => $activeCampaignIds])->get() as $campaign) {
+            $this->line(sprintf('Refreshing campaign: <info>%s</info>', $campaign->name));
             $campaign->cache();
-        });
+        };
 
-        $this->line('Campaigns cache cleared.');
+        $this->line('Campaigns cache refreshed.');
+        return true;
     }
 }
