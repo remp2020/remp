@@ -551,19 +551,19 @@ class CampaignController extends Controller
                 $variantUuid = $campaignsBanners->{$campaign->uuid}->variantUuid ?? null;
             }
 
-            if ($bannerId !== null) {
+            if ($variantUuid !== null) {
                 // check if displayed banner is one of existing variants
                 foreach ($campaignBanners as $campaignBanner) {
-                    if (optional($campaignBanner->banner)->uuid == $bannerId) {
-                        $banner = Banner::find($campaignBanner->banner_id);
+                    if ($campaignBanner->uuid == $variantUuid) {
+                        $banner = $campaignBanner->banner;
                         $variantUuid = $campaignBanner->uuid;
                         break;
                     }
                 }
             }
 
-            // banner still not set, choose random variant
-            if ($banner === null) {
+            // variant still not set, choose random variant
+            if ($variantUuid === null) {
                 // list($ids, $proportions) = $campaign->getVariantsProportionMapping();
                 $variantsMapping = $campaign->getVariantsProportionMapping();
 

@@ -70,8 +70,8 @@ var run = function() {
         remplib.tracker.trackEvent("banner", "show", {
             "utm_source": "remp_campaign",
             "utm_medium": banner.displayType,
-            "utm_campaign": banner.campaignUuid,
-            "utm_content": banner.uuid,
+            "utm_campaign": campaignUuid,
+            "utm_content": bannerUuid,
             "banner_variant": variantUuid
         })
         banner.show = true;
@@ -80,7 +80,7 @@ var run = function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
-        remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, variantUuid);
+        remplib.campaign.storeCampaignDetails(campaignUuid, bannerUuid, variantUuid);
     }, banner.displayDelay);
 };
 

@@ -91,7 +91,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (typeof config.cookieDomain === 'string') {
                 remplib.cookieDomain = config.cookieDomain;
-            } 
+            }
 
             this.incrementPageviewCount();
         },
@@ -156,8 +156,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         // used to store campaign details, called from banner view
-        storeCampaignDetails: function(campaignId, bannerId) {
-            this.storeCampaigns(campaignId, bannerId);
+        storeCampaignDetails: function(campaignId, bannerId, variantId) {
+            this.storeCampaigns(campaignId, bannerId, variantId);
             this.storeCampaignsSession(campaignId);
         },
 
