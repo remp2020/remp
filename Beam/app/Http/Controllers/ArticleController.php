@@ -72,20 +72,24 @@ class ArticleController extends Controller
             ->groupBy(['article_author.article_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
-            $articles->where('published_at', '>=', $request->input('published_from'));
-            $conversionsQuery->where('published_at', '>=', Carbon::parse($request->input('published_from'))->tz('UTC'));
+            $publishedFrom = Carbon::parse($request->input('published_from'))->tz('UTC');
+            $articles->where('published_at', '>=', $publishedFrom);
+            $conversionsQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
-            $articles->where('published_at', '<=', $request->input('published_to'));
-            $conversionsQuery->where('published_at', '<=', Carbon::parse($request->input('published_to'))->tz('UTC'));
+            $publishedTo = Carbon::parse($request->input('published_to'))->tz('UTC');
+            $articles->where('published_at', '<=', $publishedTo);
+            $conversionsQuery->where('published_at', '<=', $publishedTo);
         }
         if ($request->input('conversion_from')) {
-            $articles->where('paid_at', '>=', $request->input('conversion_from'));
-            $conversionsQuery->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'))->tz('UTC'));
+            $conversionFrom = Carbon::parse($request->input('conversion_from'))->tz('UTC');
+            $articles->where('paid_at', '>=', $conversionFrom);
+            $conversionsQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
-            $articles->where('paid_at', '<=', $request->input('conversion_to'));
-            $conversionsQuery->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'))->tz('UTC'));
+            $conversionTo = Carbon::parse($request->input('conversion_to'))->tz('UTC');
+            $articles->where('paid_at', '<=', $conversionTo);
+            $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
 
         $conversionSums = [];

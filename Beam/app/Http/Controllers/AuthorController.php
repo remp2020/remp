@@ -92,15 +92,17 @@ class AuthorController extends Controller
             ->groupBy('author_id');
 
         if ($request->input('published_from')) {
-            $authorArticlesQuery->whereDate('published_at', '>=', $request->input('published_from'));
-            $conversionsQuery->whereDate('published_at', '>=', $request->input('published_from'));
-            $pageviewsQuery->whereDate('published_at', '>=', $request->input('published_from'));
+            $publishedFrom = Carbon::parse($request->input('published_from'))->tz('UTC');
+            $authorArticlesQuery->whereDate('published_at', '>=', $publishedFrom);
+            $conversionsQuery->whereDate('published_at', '>=', $publishedFrom);
+            $pageviewsQuery->whereDate('published_at', '>=', $publishedFrom);
         }
 
         if ($request->input('published_to')) {
-            $authorArticlesQuery->whereDate('published_at', '<=', $request->input('published_to'));
-            $conversionsQuery->whereDate('published_at', '<=', $request->input('published_to'));
-            $pageviewsQuery->whereDate('published_at', '<=', $request->input('published_to'));
+            $publishedTo = Carbon::parse($request->input('published_to'))->tz('UTC');
+            $authorArticlesQuery->whereDate('published_at', '<=', $publishedTo);
+            $conversionsQuery->whereDate('published_at', '<=', $publishedTo);
+            $pageviewsQuery->whereDate('published_at', '<=', $publishedTo);
         }
 
         $authors = Author::selectRaw(implode(",", $cols))
