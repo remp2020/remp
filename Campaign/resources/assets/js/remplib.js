@@ -180,12 +180,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 campaigns.values = {};
             }
 
-            if (!(campaignId in campaigns.values)) {
-                campaigns.values[campaignId] = {
-                    "bannerId": bannerId,
-                    "variantId": variantId,
-                };
-            }
+            // always set the new value in case user doesn't have all object properties cached
+            campaigns.values[campaignId] = {
+                "bannerId": bannerId,
+                "variantId": variantId,
+            };
 
             localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
         },

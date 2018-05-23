@@ -519,7 +519,8 @@ class CampaignController extends Controller
                 continue;
             }
 
-            $campaignBanners = $campaign->campaignBanners->keyBy('id');
+            /** @var Collection $campaignBanners */
+            $campaignBanners = $campaign->campaignBanners->keyBy('uuid');
 
             // banner
             if ($campaignBanners->count() == 0) {
@@ -527,8 +528,6 @@ class CampaignController extends Controller
                 continue;
             }
 
-            $banner = null;
-            $variant = null;
             $bannerUuid = null;
             $variantUuid = null;
 
@@ -536,27 +535,15 @@ class CampaignController extends Controller
             $seenCampaignsBanners = $data->campaignsBanners ?? false;
             if ($seenCampaignsBanners && isset($seenCampaignsBanners->{$campaign->uuid})) {
                 $bannerUuid = $seenCampaignsBanners->{$campaign->uuid}->bannerId ?? null;
-                $variantUuid = $seenCampaignsBanners->{$campaign->uuid}->variantUuid ?? null;
+                $variantUuid = $seenCampaignsBanners->{$campaign->uuid}->variantId ?? null;
             }
 
             // fallback for older version of campaigns local storage data
-            // where variantUuid wasnt saved because of changed param for decision making
+            // where decision was based on bannerUuid and not variantUuid (which was not present at all)
             if ($bannerUuid && !$variantUuid) {
                 foreach ($campaignBanners as $campaignBanner) {
-                    if (optional($campaignBanner->banner)->uuid == $bannerUuid) {
-                        $variant = $campaignBanner;
-                        $variantUuid = $variant->uuid;
-                        $banner = $campaignBanner->banner;
-                        break;
-                    }
-                }
-            }
-
-            if ($variantUuid !== null) {
-                // check if displayed banner is one of existing variants
-                foreach ($campaignBanners as $campaignBanner) {
-                    if ($campaignBanner->uuid === $variantUuid) {
-                        $banner = $campaignBanner->banner;
+                    if (optional($campaignBanner->banner)->uuid === $bannerUuid) {
+                        $variantUuid = $campaignBanner->uuid;
                         break;
                     }
                 }
@@ -569,19 +556,20 @@ class CampaignController extends Controller
                 $randVal = mt_rand(0, 100);
                 $currPercent = 0;
 
-                foreach ($variantsMapping as $variantId => $variantProportion) {
-                    $currPercent = $currPercent + $variantProportion;
-
+                foreach ($variantsMapping as $uuid => $proportion) {
+                    $currPercent = $currPercent + $proportion;
                     if ($currPercent >= $randVal) {
-                        $variant = $campaignBanners->get($variantId);
-                        $variantUuid = $variant->uuid;
-
-                        if ($variant->control_group == 0) {
-                            $banner = $variant->banner;
-                        }
+                        $variantUuid = $uuid;
                         break;
                     }
                 }
+            }
+
+            /** @var CampaignBanner $variant */
+            $variant = $campaignBanners->get($variantUuid);
+            if (!$variant) {
+                Log::error("Unable to get CampaignBanner [{$variantUuid}] for campaign [{$campaign->uuid}]");
+                continue;
             }
 
             // check if campaign is set to be seen only once per session
@@ -686,7 +674,7 @@ class CampaignController extends Controller
 
 
             $displayedCampaigns[] = View::make('banners.preview', [
-                'banner' => $banner ?? null,
+                'banner' => $variant->banner,
                 'variantUuid' => $variant->uuid,
                 'campaign' => $campaign,
                 'positions' => $positions,

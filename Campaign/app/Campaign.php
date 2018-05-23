@@ -162,7 +162,7 @@ class Campaign extends Model
         $campaignBanners = $this->campaignBanners;
 
         foreach ($campaignBanners as $campaignBanner) {
-            $mapping[$campaignBanner->id] = $campaignBanner->proportion;
+            $mapping[$campaignBanner->uuid] = $campaignBanner->proportion;
         }
 
         return $mapping;
