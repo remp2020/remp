@@ -159,13 +159,13 @@ services:
     apiDecider:
         class: Tomaj\NetteApi\ApiDecider
         setup:
-            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'preprocess-generator-parameters'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorPreprocessHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
-            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'generator-templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\GeneratorTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'preprocess-generator-parameters'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorPreprocessHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'generator-templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\GeneratorTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
     # Generator
     generator:
         class: Remp\MailerModule\Generators\GeneratorFactory
