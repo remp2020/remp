@@ -41,7 +41,7 @@
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on:click="$parent.clicked" v-if="isVisible" class="short-message-preview-link" v-bind:style="[
+    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible" class="short-message-preview-link" v-bind:style="[
         linkStyles,
         _position
     ]">
