@@ -19,9 +19,23 @@
 
                 {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'medium' => ['header' => 'medium', 'orderable' => false, 'filter' => $mediums],
-                        'source' => ['header' => 'source', 'orderable' => false, 'filter' => $sources],
-                        'visits_count' => ['header' => 'visits count', 'searchable' => false],
+                        'medium' => [
+                            'header' => 'medium',
+                            'orderable' => false,
+                            'filter' => $mediums,
+                            'priority' => 1,
+                        ],
+                        'source' => [
+                            'header' => 'source',
+                            'orderable' => false,
+                            'filter' => $sources,
+                            'priority' => 1,
+                        ],
+                        'visits_count' => [
+                            'header' => 'visits count',
+                            'searchable' => false,
+                            'priority' => 1,
+                        ],
                     ],
                     'dataSource' => route('visitors.dtReferers'),
                     'order' => [2, 'desc'],

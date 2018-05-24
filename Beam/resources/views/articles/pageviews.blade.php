@@ -42,16 +42,54 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'title' => ['orderable' => false],
-                'pageviews_all' => ['header' => 'all pageviews'],
-                'pageviews_signed_in' => ['header' => 'signed in pageviews'],
-                'pageviews_subscribers' => ['header' => 'subscriber pageviews'],
-                'avg_sum_all' => ['header' => 'avg time all', 'render' => 'duration'],
-                'avg_sum_signed_in' => ['header' => 'avg time signed in', 'render' => 'duration'],
-                'avg_sum_subscribers' => ['header' => 'avg time subscribers', 'render' => 'duration'],
-                'authors' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
-                'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                'published_at' => ['header' => 'published', 'render' => 'date'],
+                'title' => [
+                    'orderable' => false,
+                    'priority' => 1,
+                ],
+                'pageviews_all' => [
+                    'header' => 'all pageviews',
+                    'priority' => 2,
+                ],
+                'pageviews_signed_in' => [
+                    'header' => 'signed in pageviews',
+                    'priority' => 5,
+                ],
+                'pageviews_subscribers' => [
+                    'header' => 'subscriber pageviews',
+                    'priority' => 5,
+                ],
+                'avg_sum_all' => [
+                    'header' => 'avg time all',
+                    'render' => 'duration',
+                    'priority' => 2,
+                ],
+                'avg_sum_signed_in' => [
+                    'header' => 'avg time signed in',
+                    'render' => 'duration',
+                    'priority' => 5,
+                ],
+                'avg_sum_subscribers' => [
+                    'header' => 'avg time subscribers',
+                    'render' => 'duration',
+                    'priority' => 5,
+                ],
+                'authors' => [
+                    'header' => 'authors',
+                    'orderable' => false,
+                    'filter' => $authors,
+                    'priority' => 3,
+                ],
+                'sections[, ].name' => [
+                    'header' => 'sections',
+                    'orderable' => false,
+                    'filter' => $sections,
+                    'priority' => 4,
+                ],
+                'published_at' => [
+                    'header' => 'published',
+                    'render' => 'date',
+                    'priority' => 1,
+                ],
             ],
             'dataSource' => route('articles.dtPageviews'),
             'order' => [4, 'desc'],

@@ -63,13 +63,41 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'title' => ['orderable' => false],
-                'conversions_count' => ['header' => 'conversions'],
-                'amount' => ['header' => 'amount', 'render' => 'array'],
-                'average' => ['header' => 'average', 'render' => 'array'],
-                'authors' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
-                'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                'published_at' => ['header' => 'published', 'render' => 'date'],
+                'title' => [
+                    'orderable' => false,
+                    'priority' => 1,
+                ],
+                'conversions_count' => [
+                    'header' => 'conversions',
+                    'priority' => 2,
+                ],
+                'amount' => [
+                    'header' => 'amount',
+                    'render' => 'array',
+                    'priority' => 1,
+                ],
+                'average' => [
+                    'header' => 'average',
+                    'render' => 'array',
+                    'priority' => 2,
+                ],
+                'authors' => [
+                    'header' => 'authors',
+                    'orderable' => false,
+                    'filter' => $authors,
+                    'priority' => 2,
+                ],
+                'sections[, ].name' => [
+                    'header' => 'sections',
+                    'orderable' => false,
+                    'filter' => $sections,
+                    'priority' => 3,
+                ],
+                'published_at' => [
+                    'header' => 'published',
+                    'render' => 'date',
+                    'priority' => 3,
+                ],
             ],
             'dataSource' => route('articles.dtConversions'),
             'order' => [5, 'desc'],

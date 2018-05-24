@@ -42,18 +42,66 @@
 
             {!! Widget::run('DataTable', [
                 'colSettings' => [
-                    'title' => ['orderable' => false],
-                    'pageviews_all' => ['header' => 'all pageviews', 'render' => 'numberStat'],
-                    'pageviews_signed_in' => ['header' => 'signed in pageviews', 'render' => 'numberStat'],
-                    'pageviews_subscribers' => ['header' => 'subscriber pageviews', 'render' => 'numberStat'],
-                    'avg_timespent_all' => ['header' => 'avg time all', 'render' => 'durationStat'],
-                    'avg_timespent_signed_in' => ['header' => 'avg time signed in', 'render' => 'durationStat'],
-                    'avg_timespent_subscribers' => ['header' => 'avg time subscribers', 'render' => 'durationStat'],
-                    'conversions_count' => ['header' => 'conversions', 'render' => 'numberStat'],
-                    'conversions_sum' => ['header' => 'amount', 'render' => 'multiNumberStat'],
-                    'conversions_avg' => ['header' => 'avg amount', 'render' => 'multiNumberStat'],
-                    'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                    'published_at' => ['header' => 'published', 'render' => 'date'],
+                    'title' => [
+                        'orderable' => false,
+                        'priority' => 1,
+                    ],
+                    'pageviews_all' => [
+                        'header' => 'all pageviews',
+                        'render' => 'numberStat',
+                        'priority' => 2,
+                    ],
+                    'pageviews_signed_in' => [
+                        'header' => 'signed in pageviews',
+                        'render' => 'numberStat',
+                        'priority' => 3,
+                    ],
+                    'pageviews_subscribers' => [
+                        'header' => 'subscriber pageviews',
+                        'render' => 'numberStat',
+                        'priority' => 3,
+                    ],
+                    'avg_timespent_all' => [
+                        'header' => 'avg time all',
+                        'render' => 'durationStat',
+                        'priority' => 2,
+                    ],
+                    'avg_timespent_signed_in' => [
+                        'header' => 'avg time signed in',
+                        'render' => 'durationStat',
+                        'priority' => 3,
+                    ],
+                    'avg_timespent_subscribers' => [
+                        'header' => 'avg time subscribers',
+                        'render' => 'durationStat',
+                        'priority' => 3,
+                    ],
+                    'conversions_count' => [
+                        'header' => 'conversions',
+                        'render' => 'numberStat',
+                        'priority' => 2,
+                    ],
+                    'conversions_sum' => [
+                        'header' => 'amount',
+                        'render' => 'multiNumberStat',
+                        'priority' => 2,
+                    ],
+                    'conversions_avg' => [
+                        'header' => 'avg amount',
+                        'render' => 'multiNumberStat',
+                        'priority' => 3,
+                    ],
+                    'sections[, ].name' => [
+                        'header' => 'sections',
+                        'orderable' => false,
+                        'filter' => $sections,
+                        'priority' => 4,
+                    ],
+                    'published_at' => [
+                        'header' => 'published',
+                        'render' => 'date',
+                        'priority' => 5,
+                    ],
                 ],
                 'dataSource' => route('authors.dtArticles', $author),
                 'order' => [7, 'desc'],
