@@ -53,7 +53,6 @@ class DataTable extends AbstractWidget
         'responsive' => false,
         'dataSource' => '',
         'colSettings' => [],
-        'columnDefs' => [],
         'order' => [],
         'tableId' => '',
         'rowActions' => [],
@@ -70,6 +69,7 @@ class DataTable extends AbstractWidget
     public function run()
     {
         $cols = [];
+
         array_walk($this->config['colSettings'], function ($item, $key) use (&$cols) {
             if (!is_array($item)) {
                 $cols[] = [
@@ -88,10 +88,8 @@ class DataTable extends AbstractWidget
         ]));
 
         return view("widgets::data_table", [
-            'responsive' => $this->config['responsive'],
             'dataSource' => $this->config['dataSource'],
             'cols' => $cols,
-            'colDefs' => $this->config['columnDefs'],
             'tableId' => $tableId,
             'rowActions' => $this->config['rowActions'],
             'rowHighlights' => $this->config['rowHighlights'],

@@ -59,13 +59,13 @@
 
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
-            @if($responsive)'responsive': true, @endif
-
+            'responsive': true,
             'columns': [
                     @foreach ($cols as $col)
                 {
                     data: '{{ $col['name'] }}',
                     name: '{{ $col['name'] }}',
+                    responsivePriority: {{ $col['priority'] }},
                     @if (isset($col['orderable']))
                     orderable: false,
                     @endif
@@ -87,17 +87,6 @@
                 },
                 @endif
             ],
-            @if(!empty($colDefs))
-            'columnDefs': [
-                @foreach ($colDefs as $def)
-                {
-                    @foreach($def as $defKey => $defVal)
-                    "{{ $defKey }}": {{ @json($defVal) }},
-                    @endforeach
-                },
-                @endforeach
-            ],
-            @endif
             'autoWidth': false,
             'sDom': 'tr',
             'processing': true,

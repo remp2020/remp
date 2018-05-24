@@ -21,17 +21,21 @@
             'colSettings' => [
                 'campaign' => [
                     'header' => 'Campaign',
+                    'priority' => 1,
                 ],
                 'start_time' => [
                     'header' => 'Scheduled start date',
                     'render' => 'date',
+                    'priority' => 1,
                 ],
                 'end_time' => [
                     'header' => 'Scheduled end date',
                     'render' => 'date',
+                    'priority' => 1,
                 ],
                 'status' => [
                     'header' => 'Status',
+                    'priority' => 1,
                 ],
             ],
             'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
@@ -66,96 +70,52 @@
 
                 <div class="card-body">
                     {!! Widget::run('DataTable', [
-                    'responsive' => true,
                     'colSettings' => [
-                        'name',
+                        'name' => [
+                            'priority' => 1,
+                        ],
                         'banner' => [
-                            'header' => 'Banner'
+                            'header' => 'Banner',
+                            'priority' => 9,
                         ],
                         'alt_banner' => [
-                            'header' => 'Banner B'
+                            'header' => 'Banner B',
+                            'priority' => 9,
                         ],
                         'segments' => [
-                            'header' => 'Segments'
+                            'header' => 'Segments',
+                            'priority' => 10,
                         ],
                         'countries' => [
-                            'header' => 'Countries'
+                            'header' => 'Countries',
+                            'priority' => 10,
                         ],
                         'active' => [
-                            'header' => 'Is active'
+                            'header' => 'Is active',
+                            'priority' => 5,
                         ],
                         'signed_in' => [
                             'header' => 'Signed in',
                             'render' => 'boolean',
+                            'priority' => 10,
                         ],
                         'devices' => [
-                            'header' => 'Devices'
+                            'header' => 'Devices',
+                            'priority' => 10,
                         ],
                         'created_at' => [
                             'header' => 'Created at',
                             'render' => 'date',
+                            'priority' => 9,
                         ],
                         'updated_at' => [
                             'header' => 'Updated at',
                             'render' => 'date',
+                            'priority' => 1,
                         ],
-                    ],
-                    'columnDefs' => [
-                        // campaign name
-                        [
-                            'responsivePriority' => 1,
-                            'targets' => 0,
-                        ],
-                        // banner
-                        [
-                            'responsivePriority' => 9,
-                            'targets' => 1,
-                        ],
-                        // banner b
-                        [
-                            'responsivePriority' => 9,
-                            'targets' => 2,
-                        ],
-                        // segments
-                        [
-                            'responsivePriority' => 10,
-                            'targets' => 3,
-                        ],
-                        // countries
-                        [
-                            'responsivePriority' => 10,
-                            'targets' => 4,
-                        ],
-                        // is active
-                        [
-                            'responsivePriority' => 5,
-                            'targets' => 5,
-                        ],
-                        // signed in
-                        [
-                            'responsivePriority' => 10,
-                            'targets' => 6,
-                        ],
-                        // devices
-                        [
-                            'responsivePriority' => 10,
-                            'targets' => 7,
-                        ],
-                        // created at
-                        [
-                            'responsivePriority' => 9,
-                            'targets' => -3,
-                        ],
-                        // updated at
-                        [
-                            'responsivePriority' => 1,
-                            'targets' => -2,
-                        ],
-                        // actions
-                        [
-                            'responsivePriority' => 1,
-                            'targets' => -1,
-                        ],
+                        'actions' => [
+                            'priority' => 1,
+                        ]
                     ],
                     'rowHighlights' => [
                         'active' => true
