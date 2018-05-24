@@ -17,17 +17,27 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'name',
-                'template',
-                'display_type',
-                'position',
+                'name' => [
+                    'priority' => 10,
+                ],
+                'template' => [
+                    'priority' => 10,
+                ],
+                'display_type' => [
+                    'priority' => 10,
+                ],
+                'position' => [
+                    'priority' => 10,
+                ],
                 'created_at' => [
                     'header' => 'Created at',
                     'render' => 'date',
+                    'priority' => 10,
                 ],
                 'updated_at' => [
                     'header' => 'Updated at',
                     'render' => 'date',
+                    'priority' => 10,
                 ],
             ],
             'dataSource' => route('banners.json'),

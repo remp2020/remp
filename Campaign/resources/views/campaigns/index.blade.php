@@ -112,9 +112,6 @@
                             'header' => 'Updated at',
                             'render' => 'date',
                             'priority' => 1,
-                        ],
-                        'actions' => [
-                            'priority' => 1,
                         ]
                     ],
                     'rowHighlights' => [
