@@ -72,7 +72,7 @@ class DataTable extends AbstractWidget
 
         array_walk($this->config['colSettings'], function ($item, $key) use (&$cols) {
             if (!is_array($item)) {
-                throw new DataTableException('Missing configuration array for colum: "' . $key . '"');
+                throw new DataTableException('Missing configuration array for colum: "' . $item . '"');
             }
 
             if (!array_key_exists('priority', $item)) {
