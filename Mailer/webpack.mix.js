@@ -25,6 +25,7 @@ mix
         "bootstrap-select",
         "datatables.net",
         "datatables.net-rowgroup",
+        "datatables.net-responsive",
         "google-material-color",
         "jquery-placeholder",
         "malihu-custom-scrollbar-plugin",

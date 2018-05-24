@@ -19,7 +19,7 @@ final class LayoutPresenter extends BasePresenter
         LayoutsRepository $layoutsRepository,
         LayoutFormFactory $layoutFormFactory
     ) {
-    
+
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->layoutFormFactory = $layoutFormFactory;
@@ -29,8 +29,14 @@ final class LayoutPresenter extends BasePresenter
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('name')
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
+            ->setColSetting('name', [
+                'priority' => 1,
+            ])
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 2,
+            ])
             ->setRowAction('edit', 'palette-Cyan zmdi-edit');
 
         return $dataTable;

@@ -65,7 +65,6 @@
                 {
                     data: '{{ $col['name'] }}',
                     name: '{{ $col['name'] }}',
-                    responsivePriority: {{ $col['priority'] }},
                     @if (isset($col['orderable']))
                     orderable: false,
                     @endif
@@ -86,6 +85,18 @@
                     render: $.fn.dataTables.render.actions({!! @json($rowActions) !!})
                 },
                 @endif
+            ],
+            'columnDefs': [
+                @foreach ($cols as $col)
+                {
+                    responsivePriority: {{ $col['priority'] }},
+                    targets: {{ $col['colIndex'] }},
+                },
+                {
+                    responsivePriority: 1,
+                    targets: -1
+                },
+                @endforeach
             ],
             'autoWidth': false,
             'sDom': 'tr',

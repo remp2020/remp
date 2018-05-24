@@ -65,6 +65,7 @@
             });
 
         }).DataTable({
+            'responsive': true,
             'columns': [
                 {foreach $colSettings as $colName => $colSetting}
                 {
@@ -95,6 +96,14 @@
                     })
                 }
                 {/if}
+            ],
+            'columnDefs': [
+                {foreach $colSettings as $colName => $colSetting}
+                {
+                    responsivePriority: {$colSetting['priority']},
+                    targets: {$colSetting['colIndex']},
+                },
+                {/foreach}
             ],
             {ifset $tableSettings['rowGroup']}
             'rowGroup':  {

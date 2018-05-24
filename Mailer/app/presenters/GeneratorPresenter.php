@@ -28,9 +28,17 @@ final class GeneratorPresenter extends BasePresenter
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setColSetting('title')
-            ->setColSetting('generator')
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 2,
+            ])
+            ->setColSetting('title', [
+                'priority' => 1,
+            ])
+            ->setColSetting('generator', [
+                'priority' => 1,
+            ])
             ->setRowAction('edit', 'palette-Cyan zmdi-edit')
             ->setRowAction('generate', 'palette-Cyan zmdi-spellcheck')
             ->setTableSetting('sorting', Json::encode([[0, 'DESC']]));

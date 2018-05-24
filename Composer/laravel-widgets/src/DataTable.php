@@ -79,7 +79,12 @@ class DataTable extends AbstractWidget
                 throw new DataTableException('Missing "priority" item in DataTable configuration array for column: "' . $key . '"');
             }
 
-            $cols[] = array_merge(['name' => $key], $item);
+            $cols[] = array_merge([
+                'name' => $key,
+                'colIndex' => array_search($key,
+                    array_keys($this->config['colSettings'])
+                )
+            ], $item);
         });
 
         $tableId = md5(Json::encode([
