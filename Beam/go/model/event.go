@@ -31,15 +31,21 @@ type Event struct {
 	UserAgent string
 }
 
-// EventCollection is collection of events.
-type EventCollection []*Event
+// EventRow represents one row of grouped list.
+type EventRow struct {
+	Tags   map[string]string
+	Events []*Event
+}
+
+// EventRowCollection represents collection of rows of grouped list.
+type EventRowCollection []*EventRow
 
 // EventStorage is an interface to get generic event related data.
 type EventStorage interface {
 	// Count returns number of events matching the filter defined by EventOptions.
 	Count(o AggregateOptions) (CountRowCollection, bool, error)
 	// List returns list of all events based on given EventOptions.
-	List(o ListOptions) (EventCollection, error)
+	List(o ListOptions) (EventRowCollection, error)
 	// Categories lists all tracked categories.
 	Categories() ([]string, error)
 	// Flags lists all available flags.

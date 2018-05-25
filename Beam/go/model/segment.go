@@ -86,6 +86,7 @@ type Intersector func(userID string) bool
 type SegmentDB struct {
 	MySQL          *sqlx.DB
 	InfluxDB       *InfluxDB
+	ElasticDB      *ElasticDB
 	RuleCountCache *cache.Cache
 	Segments       map[string]*Segment
 }
@@ -185,56 +186,85 @@ func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time
 
 // getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
 func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue string, now time.Time, ro RuleOverrides) (int, error) {
-	// get count of events directly from influx
-	query := sDB.InfluxDB.QueryBuilder.
-		Select(`COUNT("token")`).
-		From(sr.tableName()).
-		Where(fmt.Sprintf(`("%s" = '%s')`, tagName, tagValue))
-	for _, cond := range sr.conditions(now, ro) {
-		query = query.Where(cond)
-	}
-	for _, cond := range sr.groups() {
-		query = query.GroupBy(cond)
-	}
 
-	response, err := sDB.InfluxDB.Exec(query.Build())
+	search := sDB.ElasticDB.Client.Search().
+		Index("events").
+		Type("_doc").
+		Size(0) // return no specific results
+
+	options := sr.options(now, ro)
+	options.FilterBy = append(options.FilterBy, &FilterBy{tagName, []string{tagValue}})
+	search, err := sDB.ElasticDB.addSearchFilters(search, "events", options)
 	if err != nil {
 		return 0, err
 	}
-	if err := response.Error(); err != nil {
-		return 0, err
-	}
 
-	crc, ok, err := sDB.InfluxDB.MultiGroupedCount(response)
+	search, err = sDB.ElasticDB.addGroupBy(search, "events", options, nil)
 	if err != nil {
 		return 0, err
 	}
-	if !ok {
-		return 0, nil
+
+	// get results
+	result, err := search.Do(sDB.ElasticDB.Context)
+	if err != nil {
+		return 0, err
 	}
 
-	flags := sr.flags()
-	matchGroupedCount := func(cr CountRow) bool {
-		for flag, flagVal := range flags {
-			tagVal, ok := cr.Tags[flag]
-			if !ok {
-				return false
-			}
-			if flagVal != tagVal {
-				return false
-			}
-		}
-		return true
-	}
+	log.Printf("%#v\n", result.Hits)
 
-	for _, cr := range crc {
-		if !matchGroupedCount(cr) {
-			continue
-		}
-		return cr.Count, nil
-	}
+	return int(result.Hits.TotalHits), nil
 
-	return 0, nil
+	//////////////////
+
+	// query := sDB.InfluxDB.QueryBuilder.
+	// 	Select(`COUNT("token")`).
+	// 	From(sr.tableName()).
+	// 	Where(fmt.Sprintf(`("%s" = '%s')`, tagName, tagValue))
+	// for _, cond := range sr.conditions(now, ro) {
+	// 	query = query.Where(cond)
+	// }
+	// for _, cond := range sr.groups() {
+	// 	query = query.GroupBy(cond)
+	// }
+
+	// response, err := sDB.InfluxDB.Exec(query.Build())
+	// if err != nil {
+	// 	return 0, err
+	// }
+	// if err := response.Error(); err != nil {
+	// 	return 0, err
+	// }
+
+	// crc, ok, err := sDB.InfluxDB.MultiGroupedCount(response)
+	// if err != nil {
+	// 	return 0, err
+	// }
+	// if !ok {
+	// 	return 0, nil
+	// }
+
+	// flags := sr.flags()
+	// matchGroupedCount := func(cr CountRow) bool {
+	// 	for flag, flagVal := range flags {
+	// 		tagVal, ok := cr.Tags[flag]
+	// 		if !ok {
+	// 			return false
+	// 		}
+	// 		if flagVal != tagVal {
+	// 			return false
+	// 		}
+	// 	}
+	// 	return true
+	// }
+
+	// for _, cr := range crc {
+	// 	if !matchGroupedCount(cr) {
+	// 		continue
+	// 	}
+	// 	return cr.Count, nil
+	// }
+
+	// return 0, nil
 }
 
 // Users return list of all users within segment.
@@ -267,46 +297,46 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) (
 
 // ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
 func (sDB *SegmentDB) ruleUsers(sr SegmentRule, now time.Time, o RuleOverrides, intersect Intersector) (UserSet, error) {
-	subquery := sDB.InfluxDB.QueryBuilder.
-		Select(`COUNT("token")`).
-		From(sr.tableName()).
-		GroupBy(`"user_id"`)
-	for _, cond := range sr.conditions(now, o) {
-		subquery = subquery.Where(cond)
-	}
+	// subquery := sDB.InfluxDB.QueryBuilder.
+	// 	Select(`COUNT("token")`).
+	// 	From(sr.tableName()).
+	// 	GroupBy(`"user_id"`)
+	// for _, cond := range sr.conditions(now, o) {
+	// 	subquery = subquery.Where(cond)
+	// }
 
-	query := sDB.InfluxDB.QueryBuilder.
-		Select(`"count", "user_id"`).
-		From(fmt.Sprintf("(%s)", subquery.Build())).
-		Where(fmt.Sprintf(`"count" < %d`, sr.Count))
+	// query := sDB.InfluxDB.QueryBuilder.
+	// 	Select(`"count", "user_id"`).
+	// 	From(fmt.Sprintf("(%s)", subquery.Build())).
+	// 	Where(fmt.Sprintf(`"count" < %d`, sr.Count))
 
-	response, err := sDB.InfluxDB.Exec(query.Build())
-	if err != nil {
-		return nil, err
-	}
-	if err := response.Error(); err != nil {
-		return nil, err
-	}
+	// response, err := sDB.InfluxDB.Exec(query.Build())
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if err := response.Error(); err != nil {
+	// 	return nil, err
+	// }
 
 	um := make(UserSet)
-	for _, serie := range response.Results[0].Series {
-		var index int
-		for i, col := range serie.Columns {
-			if col == "user_id" {
-				index = i
-				break
-			}
-		}
-		for _, val := range serie.Values {
-			userID, ok := val[index].(string)
-			if !ok {
-				return nil, errors.New("influx result is not string, cannot proceed")
-			}
-			if intersect(userID) {
-				um[userID] = true
-			}
-		}
-	}
+	// for _, serie := range response.Results[0].Series {
+	// 	var index int
+	// 	for i, col := range serie.Columns {
+	// 		if col == "user_id" {
+	// 			index = i
+	// 			break
+	// 		}
+	// 	}
+	// 	for _, val := range serie.Values {
+	// 		userID, ok := val[index].(string)
+	// 		if !ok {
+	// 			return nil, errors.New("influx result is not string, cannot proceed")
+	// 		}
+	// 		if intersect(userID) {
+	// 			um[userID] = true
+	// 		}
+	// 	}
+	// }
 
 	return um, nil
 }

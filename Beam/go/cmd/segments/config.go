@@ -16,5 +16,7 @@ type Config struct {
 	InfluxPasswd string `envconfig:"influx_passwd" required:"false"`
 	InfluxDBName string `envconfig:"influx_dbname" required:"false"`
 
-	ElasticAddr string `envconfig:"elastic_addr" required:"true"`
+	ElasticAddr   string `envconfig:"elastic_addr" required:"true"`
+	ElasticUser   string `envconfig:"elastic_user" required:"false"`
+	ElasticPasswd string `envconfig:"elastic_passwd" required:"false"`
 }

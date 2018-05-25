@@ -63,17 +63,17 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 
 // List runs the list action.
 func (c *EventController) List(ctx *app.ListEventsContext) error {
-	aggOptions := aggregateOptionsFromListOptions(ctx.Payload.Conditions)
+	aggOptions := aggregateOptionsFromEventsOptions(ctx.Payload.Conditions)
 	o := model.ListOptions{
 		AggregateOptions: aggOptions,
 		SelectFields:     ctx.Payload.SelectFields,
 	}
 
-	ec, err := c.EventStorage.List(o)
+	erc, err := c.EventStorage.List(o)
 	if err != nil {
 		return err
 	}
-	mt, err := EventCollection(ec).ToMediaType()
+	mt, err := EventRowCollection(erc).ToMediaType()
 	if err != nil {
 		return err
 	}
@@ -107,8 +107,8 @@ func (c *EventController) Users(ctx *app.UsersEventsContext) error {
 	return ctx.OK(users)
 }
 
-// aggregateOptionsFromPageviewOptions converts payload data to AggregateOptions.
-func aggregateOptionsFromListOptions(payload *app.EventOptionsPayload) model.AggregateOptions {
+// aggregateOptionsFromEventsOptions converts payload data to AggregateOptions.
+func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.AggregateOptions {
 	var o model.AggregateOptions
 
 	for _, val := range payload.FilterBy {

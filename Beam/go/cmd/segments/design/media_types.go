@@ -55,6 +55,32 @@ var Pageviews = MediaType("application/vnd.pageviews+json", func() {
 	Required("tags", "pageviews")
 })
 
+var Events = MediaType("application/vnd.events+json", func() {
+	Description("Events")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("events", CollectionOf(Event))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("events")
+	})
+	Required("tags", "events")
+})
+
+var Commerces = MediaType("application/vnd.commerces+json", func() {
+	Description("Commerce events")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("commerces", CollectionOf(Commerce))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("commerces")
+	})
+	Required("tags", "commerces")
+})
+
 var Segment = MediaType("application/vnd.segment+json", func() {
 	Description("Segment check")
 	Attributes(func() {

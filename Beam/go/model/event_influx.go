@@ -41,42 +41,9 @@ func (eDB *EventDB) Count(o AggregateOptions) (CountRowCollection, bool, error) 
 }
 
 // List returns list of all events based on given EventOptions.
-func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
-	builder := eDB.DB.QueryBuilder.Select("*").From(`"` + TableEvents + `"`)
-	builder = eDB.addQueryFilters(builder, o)
-
-	q := client.Query{
-		Command:  builder.Build(),
-		Database: eDB.DB.DBName,
-	}
-
-	response, err := eDB.DB.Client.Query(q)
-	if err != nil {
-		return nil, err
-	}
-	if response.Error() != nil {
-		return nil, response.Error()
-	}
-
-	ec := EventCollection{}
-
-	// no data returned
-	if len(response.Results[0].Series) == 0 {
-		return ec, nil
-	}
-
-	for _, s := range response.Results[0].Series {
-		for idx := range s.Values {
-			ir := influxquery.NewInfluxResult(s, idx)
-			e, err := eventFromInfluxResult(ir)
-			if err != nil {
-				return nil, err
-			}
-			ec = append(ec, e)
-		}
-	}
-
-	return ec, nil
+func (eDB *EventDB) List(o EventOptions) (EventRowCollection, error) {
+	// not implemented; the original implementation was non-functional
+	return EventRowCollection{}, nil
 }
 
 // Categories lists all tracked categories.

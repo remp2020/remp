@@ -1,11 +1,15 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"reflect"
+	"strconv"
 
 	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
 )
 
 // EventElastic is ElasticDB implementation of EventStorage.
@@ -52,9 +56,90 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 }
 
 // List returns list of all events based on given EventOptions.
-func (eDB *EventElastic) List(o EventOptions) (EventCollection, error) {
-	ec := EventCollection{}
-	return ec, nil
+func (eDB *EventElastic) List(options ListOptions) (EventRowCollection, error) {
+	var erc EventRowCollection
+
+	scroll := eDB.DB.Client.Scroll("events").
+		Type("_doc").
+		Size(1000)
+
+	scroll, err := eDB.DB.addScrollFilters(scroll, "events", options.AggregateOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	// prepare EventRow buckets
+	erBuckets := make(map[string]*EventRow)
+
+	// get results
+	for {
+		results, err := scroll.Do(eDB.DB.Context)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, errors.Wrap(err, "error while reading list data from elastic")
+		}
+
+		// Send the hits to the hits channel
+		for _, hit := range results.Hits.Hits {
+			// populate event for collection
+			event := &Event{}
+			if err := json.Unmarshal(*hit.Source, event); err != nil {
+				return nil, errors.Wrap(err, "error reading pageview record from elastic")
+			}
+
+			// extract raw event data to build tags map
+			rawEvent := make(map[string]interface{})
+			if err := json.Unmarshal(*hit.Source, &rawEvent); err != nil {
+				return nil, errors.Wrap(err, "error reading pageview record from elastic")
+			}
+
+			// we need to get string value for tags by type casting
+			tags := make(map[string]string)
+			key := ""
+			for _, field := range options.GroupBy {
+				var tagVal string
+				switch val := rawEvent[field].(type) {
+				case nil:
+					tagVal = ""
+				case bool:
+					if val {
+						tagVal = "1"
+					} else {
+						tagVal = "0"
+					}
+				case string:
+					tagVal = val
+				case float64:
+					tagVal = strconv.FormatFloat(val, 'f', 0, 64)
+				case int64:
+					tagVal = strconv.FormatInt(val, 10)
+				default:
+					return nil, fmt.Errorf("unhandled tag type in pageview listing: %T", rawEvent[field])
+				}
+
+				tags[field] = fmt.Sprintf("%s", tagVal)
+				key = fmt.Sprintf("%s%s=%s_", key, field, tagVal)
+			}
+
+			// place Event instance into proper EventRow based on tags (key)
+			er, ok := erBuckets[key]
+			if !ok {
+				er = &EventRow{
+					Tags: tags,
+				}
+				erBuckets[key] = er
+			}
+			er.Events = append(er.Events, event)
+		}
+	}
+
+	for _, er := range erBuckets {
+		erc = append(erc, er)
+	}
+
+	return erc, nil
 }
 
 // Categories lists all tracked categories.

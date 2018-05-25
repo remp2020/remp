@@ -40,42 +40,9 @@ func (cDB *CommerceDB) Count(o AggregateOptions) (CountRowCollection, bool, erro
 }
 
 // List returns list of all events based on given CommerceOptions.
-func (cDB *CommerceDB) List(o AggregateOptions) (CommerceCollection, error) {
-	builder := cDB.DB.QueryBuilder.Select("*").From(`"` + TableCommerce + `"`)
-	builder = addAggregateQueryFilters(builder, o)
-
-	q := client.Query{
-		Command:  builder.Build(),
-		Database: cDB.DB.DBName,
-	}
-
-	response, err := cDB.DB.Client.Query(q)
-	if err != nil {
-		return nil, err
-	}
-	if response.Error() != nil {
-		return nil, response.Error()
-	}
-
-	cc := CommerceCollection{}
-
-	// no data returned
-	if len(response.Results[0].Series) == 0 {
-		return cc, nil
-	}
-
-	for _, s := range response.Results[0].Series {
-		for idx := range s.Values {
-			ir := influxquery.NewInfluxResult(s, idx)
-			c, err := commerceFromInfluxResult(ir)
-			if err != nil {
-				return nil, err
-			}
-			cc = append(cc, c)
-		}
-	}
-
-	return cc, nil
+func (cDB *CommerceDB) List(o ListOptions) (CommerceRowCollection, error) {
+	// not implemented; the original implementation was non-functional
+	return CommerceRowCollection{}, nil
 }
 
 // Sum returns sum of events based on the provided filter options.

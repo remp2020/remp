@@ -32,8 +32,14 @@ type Commerce struct {
 	UserAgent string
 }
 
-// CommerceCollection is collection of commerce events.
-type CommerceCollection []*Commerce
+// CommerceRow represents one row of grouped list.
+type CommerceRow struct {
+	Commerces []*Commerce
+	Tags      map[string]string
+}
+
+// CommerceRowCollection represents collection of rows of grouped list.
+type CommerceRowCollection []*CommerceRow
 
 // CommerceStorage is an interface to get commerce event related data.
 type CommerceStorage interface {
@@ -42,7 +48,7 @@ type CommerceStorage interface {
 	// Sum returns sum of events based on the provided filter options.
 	Sum(o AggregateOptions) (SumRowCollection, bool, error)
 	// List returns list of all events based on given CommerceOptions.
-	List(o AggregateOptions) (CommerceCollection, error)
+	List(o ListOptions) (CommerceRowCollection, error)
 	// Categories lists all available categories.
 	Categories() []string
 	// Flags lists all available flags.

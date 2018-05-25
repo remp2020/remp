@@ -87,6 +87,7 @@ func main() {
 	}
 
 	eopts := []elastic.ClientOptionFunc{
+		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
 		elastic.SetURL(c.ElasticAddr),
 		elastic.SetSniff(false),
 		elastic.SetHealthcheckInterval(10 * time.Second),
@@ -119,6 +120,7 @@ func main() {
 	segmentStorage := &model.SegmentDB{
 		MySQL:          mysqlDB,
 		InfluxDB:       influxDB,
+		ElasticDB:      elasticDB,
 		RuleCountCache: countCache,
 	}
 
