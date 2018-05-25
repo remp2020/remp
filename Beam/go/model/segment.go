@@ -238,7 +238,7 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) (
 		users = filteredUsers
 	}
 
-	var uc []string
+	uc := []string{}
 	for userID := range users {
 		uc = append(uc, userID)
 	}
@@ -247,47 +247,45 @@ func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) (
 }
 
 // ruleUsers lists all users based on SegmentRule and filters them based on the provided Intersector.
-func (sDB *SegmentDB) ruleUsers(sr SegmentRule, now time.Time, o RuleOverrides, intersect Intersector) (UserSet, error) {
-	// subquery := sDB.InfluxDB.QueryBuilder.
-	// 	Select(`COUNT("token")`).
-	// 	From(sr.tableName()).
-	// 	GroupBy(`"user_id"`)
-	// for _, cond := range sr.conditions(now, o) {
-	// 	subquery = subquery.Where(cond)
-	// }
-
-	// query := sDB.InfluxDB.QueryBuilder.
-	// 	Select(`"count", "user_id"`).
-	// 	From(fmt.Sprintf("(%s)", subquery.Build())).
-	// 	Where(fmt.Sprintf(`"count" < %d`, sr.Count))
-
-	// response, err := sDB.InfluxDB.Exec(query.Build())
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// if err := response.Error(); err != nil {
-	// 	return nil, err
-	// }
+func (sDB *SegmentDB) ruleUsers(sr SegmentRule, now time.Time, ro RuleOverrides, intersect Intersector) (UserSet, error) {
+	options := sr.options(now, ro)
+	options.GroupBy = append(options.GroupBy, "user_id")
 
 	um := make(UserSet)
-	// for _, serie := range response.Results[0].Series {
-	// 	var index int
-	// 	for i, col := range serie.Columns {
-	// 		if col == "user_id" {
-	// 			index = i
-	// 			break
-	// 		}
-	// 	}
-	// 	for _, val := range serie.Values {
-	// 		userID, ok := val[index].(string)
-	// 		if !ok {
-	// 			return nil, errors.New("influx result is not string, cannot proceed")
-	// 		}
-	// 		if intersect(userID) {
-	// 			um[userID] = true
-	// 		}
-	// 	}
-	// }
+
+	var crc CountRowCollection
+	var ok bool
+	var err error
+
+	switch sr.EventCategory {
+	case CategoryPageview:
+		crc, ok, err = sDB.PageviewStorage.Count(options)
+	case CategoryCommerce:
+		crc, ok, err = sDB.CommerceStorage.Count(options)
+	default:
+		crc, ok, err = sDB.EventStorage.Count(options)
+	}
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get rule event count")
+	}
+	if !ok {
+		return um, nil
+	}
+
+	for _, cr := range crc {
+		evalResult, err := sr.Evaluate(cr.Count)
+		if err != nil {
+			return nil, err
+		}
+		if !evalResult {
+			continue
+		}
+		userID := cr.Tags["user_id"]
+		if intersect(userID) {
+			um[userID] = true
+		}
+	}
 
 	return um, nil
 }

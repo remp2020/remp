@@ -99,7 +99,6 @@ var _ = Resource("segments", func() {
 			})
 			Param("fields", String, FieldsParamDescription)
 		})
-		Payload(RuleOverrides)
 		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))
