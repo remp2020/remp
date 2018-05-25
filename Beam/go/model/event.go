@@ -20,15 +20,20 @@ type EventOptions struct {
 
 // Event represents event data.
 type Event struct {
-	Category  string
-	Action    string
-	Token     string
-	Time      time.Time
-	Host      string
-	IP        string
-	UserID    string
-	URL       string
-	UserAgent string
+	Category  string    `json:"category"`
+	Action    string    `json:"action"`
+	Token     string    `json:"token"`
+	Time      time.Time `json:"time"`
+	Host      string    `json:"host"`
+	IP        string    `json:"ip"`
+	UserID    string    `json:"user_id"`
+	URL       string    `json:"url"`
+	UserAgent string    `json:"user_agent"`
+
+	UtmSource   string `json:"utm_source"`
+	UtmCampaign string `json:"utm_campaign"`
+	UtmContent  string `json:"utm_content"`
+	UtmMedium   string `json:"utm_medium"`
 }
 
 // EventRow represents one row of grouped list.

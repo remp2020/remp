@@ -94,9 +94,11 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 func (pDB *PageviewElastic) List(options ListOptions) (PageviewRowCollection, error) {
 	var prc PageviewRowCollection
 
+	fsc := elastic.NewFetchSourceContext(true).Include(options.SelectFields...)
 	scroll := pDB.DB.Client.Scroll("pageviews").
 		Type("_doc").
-		Size(1000)
+		Size(1000).
+		FetchSourceContext(fsc)
 
 	scroll, err := pDB.DB.addScrollFilters(scroll, "pageviews", options.AggregateOptions)
 	if err != nil {

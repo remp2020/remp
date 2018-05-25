@@ -59,9 +59,11 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 func (eDB *EventElastic) List(options ListOptions) (EventRowCollection, error) {
 	var erc EventRowCollection
 
+	fsc := elastic.NewFetchSourceContext(true).Include(options.SelectFields...)
 	scroll := eDB.DB.Client.Scroll("events").
 		Type("_doc").
-		Size(1000)
+		Size(1000).
+		FetchSourceContext(fsc)
 
 	scroll, err := eDB.DB.addScrollFilters(scroll, "events", options.AggregateOptions)
 	if err != nil {

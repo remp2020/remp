@@ -55,9 +55,11 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 func (cDB *CommerceElastic) List(options ListOptions) (CommerceRowCollection, error) {
 	var crc CommerceRowCollection
 
+	fsc := elastic.NewFetchSourceContext(true).Include(options.SelectFields...)
 	scroll := cDB.DB.Client.Scroll("commerce").
 		Type("_doc").
-		Size(1000)
+		Size(1000).
+		FetchSourceContext(fsc)
 
 	scroll, err := cDB.DB.addScrollFilters(scroll, "commerce", options.AggregateOptions)
 	if err != nil {

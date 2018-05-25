@@ -97,6 +97,18 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 	if e.UserAgent != "" {
 		event.User.UserAgent = &e.UserAgent
 	}
+	if e.UtmSource != "" {
+		event.UtmSource = &e.UtmSource
+	}
+	if e.UtmCampaign != "" {
+		event.UtmCampaign = &e.UtmCampaign
+	}
+	if e.UtmMedium != "" {
+		event.UtmMedium = &e.UtmMedium
+	}
+	if e.UtmContent != "" {
+		event.UtmContent = &e.UtmContent
+	}
 	return event, nil
 }
 
