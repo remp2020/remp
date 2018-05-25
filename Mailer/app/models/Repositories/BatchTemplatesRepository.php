@@ -20,8 +20,8 @@ class BatchTemplatesRepository extends Repository
                 mail_job_batch.first_email_sent_at')
             ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
             ->where('mail_template.mail_type_id IS NOT NULL')
-            ->where('DATE(mail_job_batch.first_email_sent_at) > DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(mail_job_batch.first_email_sent_at) < DATE(?)', $to->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) >= DATE(?)', $from->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) <= DATE(?)', $to->format('Y-m-d'))
             ->group('
                 DATE(mail_job_batch.first_email_sent_at),
                 mail_template.mail_type_id,
@@ -39,8 +39,8 @@ class BatchTemplatesRepository extends Repository
                 mail_job_batch.first_email_sent_at
             ')
             ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
-            ->where('DATE(mail_job_batch.first_email_sent_at) > DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(mail_job_batch.first_email_sent_at) < DATE(?)', $to->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) >= DATE(?)', $from->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) <= DATE(?)', $to->format('Y-m-d'))
             ->group('DATE(mail_job_batch.first_email_sent_at)');
     }
 
@@ -54,8 +54,8 @@ class BatchTemplatesRepository extends Repository
                 mail_job_batch.first_email_sent_at')
             ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
             ->where('mail_template.mail_type_id = ?', $mailTypeId)
-            ->where('DATE(mail_job_batch.first_email_sent_at) > DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(mail_job_batch.first_email_sent_at) < DATE(?)', $to->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) >= DATE(?)', $from->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) <= DATE(?)', $to->format('Y-m-d'))
             ->group('
                 mail_template.mail_type_id,
                 DATE(mail_job_batch.first_email_sent_at),

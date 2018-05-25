@@ -50,11 +50,12 @@
         padding: 5px;
         word-wrap: break-word;
         font-size: 16px;
+        cursor: pointer;
     }
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on:click="$parent.clicked" v-if="isVisible" class="medium-rectangle-preview-link" v-bind:style="[
+    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible" class="medium-rectangle-preview-link" v-bind:style="[
         linkStyles,
         _position
     ]">
@@ -63,7 +64,7 @@
                 <a class="medium-rectangle-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
                 <div class="medium-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
                 <div class="medium-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
-                <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
+                <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
             </div>
         </transition>
     </a>

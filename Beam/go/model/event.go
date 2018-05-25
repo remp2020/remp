@@ -39,7 +39,7 @@ type EventStorage interface {
 	// Count returns number of events matching the filter defined by EventOptions.
 	Count(o AggregateOptions) (CountRowCollection, bool, error)
 	// List returns list of all events based on given EventOptions.
-	List(o EventOptions) (EventCollection, error)
+	List(o ListOptions) (EventCollection, error)
 	// Categories lists all tracked categories.
 	Categories() ([]string, error)
 	// Flags lists all available flags.

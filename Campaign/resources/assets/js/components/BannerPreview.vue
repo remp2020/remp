@@ -233,7 +233,7 @@
                 });
                 this.closeTracked = true;
             },
-            clicked: function() {
+            clicked: function(event, hideBanner = false) {
                 if (this.clickTracked) {
                     return true;
                 }
@@ -244,6 +244,9 @@
                     "utm_content": this.uuid
                 });
                 this.clickTracked = true;
+                if (hideBanner) {
+                    this.visible = false;
+                }
                 return true;
             },
             trackEvent: function(category, action, fields) {
