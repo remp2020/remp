@@ -63,21 +63,10 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 
 // List runs the list action.
 func (c *EventController) List(ctx *app.ListEventsContext) error {
-	o := model.EventOptions{}
-	if ctx.Action != nil {
-		o.Action = *ctx.Action
-	}
-	if ctx.Category != nil {
-		o.Category = *ctx.Category
-	}
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
-	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
-	}
-	if ctx.UserID != nil {
-		o.UserID = *ctx.UserID
+	aggOptions := aggregateOptionsFromListOptions(ctx.Payload.Conditions)
+	o := model.ListOptions{
+		AggregateOptions: aggOptions,
+		SelectFields:     ctx.Payload.SelectFields,
 	}
 
 	ec, err := c.EventStorage.List(o)
@@ -116,4 +105,27 @@ func (c *EventController) Users(ctx *app.UsersEventsContext) error {
 		return err
 	}
 	return ctx.OK(users)
+}
+
+// aggregateOptionsFromPageviewOptions converts payload data to AggregateOptions.
+func aggregateOptionsFromListOptions(payload *app.EventOptionsPayload) model.AggregateOptions {
+	var o model.AggregateOptions
+
+	for _, val := range payload.FilterBy {
+		fb := &model.FilterBy{
+			Tag:    val.Tag,
+			Values: val.Values,
+		}
+		o.FilterBy = append(o.FilterBy, fb)
+	}
+
+	o.GroupBy = payload.GroupBy
+	if payload.TimeAfter != nil {
+		o.TimeAfter = *payload.TimeAfter
+	}
+	if payload.TimeBefore != nil {
+		o.TimeBefore = *payload.TimeBefore
+	}
+
+	return o
 }

@@ -20,6 +20,15 @@ var SegmentRuleCache = Type("SegmentRuleCache", func() {
 	Required("s", "c")
 })
 
+var ListEventOptionsPayload = Type("ListEventOptionsPayload", func() {
+	Description("Parameters to filter events list")
+
+	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("conditions", EventOptionsPayload, "Condition definition")
+
+	Required("conditions")
+})
+
 var EventOptionsPayload = Type("EventOptionsPayload", func() {
 	Description("Parameters to filter event counts")
 

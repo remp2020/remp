@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
@@ -46,7 +47,7 @@ type EventStorage interface {
 	// Count returns number of events matching the filter defined by EventOptions.
 	Count(o AggregateOptions) (CountRowCollection, bool, error)
 	// List returns list of all events based on given EventOptions.
-	List(o EventOptions) (EventCollection, error)
+	List(o ListOptions) (EventCollection, error)
 	// Categories lists all tracked categories.
 	Categories() ([]string, error)
 	// Flags lists all available flags.
@@ -87,9 +88,17 @@ func (eDB *EventDB) Count(o AggregateOptions) (CountRowCollection, bool, error) 
 }
 
 // List returns list of all events based on given EventOptions.
-func (eDB *EventDB) List(o EventOptions) (EventCollection, error) {
-	builder := eDB.DB.QueryBuilder.Select("*").From(`"` + TableEvents + `"`)
-	builder = eDB.addQueryFilters(builder, o)
+func (eDB *EventDB) List(o ListOptions) (EventCollection, error) {
+	var selectFields string
+	if len(o.SelectFields) > 0 {
+		o.SelectFields = append(o.SelectFields, "token", "remp_pageview_id") // at least one value needs to be always selected
+		selectFields = strings.Join(o.SelectFields, ",")
+	} else {
+		selectFields = "*"
+	}
+
+	builder := eDB.DB.QueryBuilder.Select(selectFields).From(`"` + TableEvents + `"`)
+	builder = addAggregateQueryFilters(builder, o.AggregateOptions)
 
 	q := client.Query{
 		Command:  builder.Build(),
@@ -280,32 +289,27 @@ func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions)
 }
 
 func eventFromInfluxResult(ir *influxquery.Result) (*Event, error) {
+	event := &Event{}
+
 	category, ok := ir.StringValue("category")
-	if !ok {
-		return nil, errors.New("unable to map Category to influx result column")
+	if ok {
+		event.Category = category
 	}
 	action, ok := ir.StringValue("action")
-	if !ok {
-		return nil, errors.New("unable to map Action to influx result column")
+	if ok {
+		event.Action = action
 	}
 	token, ok := ir.StringValue("token")
-	if !ok {
-		return nil, errors.New("unable to map Token to influx result column")
+	if ok {
+		event.Token = token
 	}
 	t, ok, err := ir.TimeValue("time")
 	if err != nil {
 		return nil, err
 	}
-	if !ok {
-		return nil, errors.New("unable to map Time to influx result column")
+	if ok {
+		event.Time = t
 	}
-	event := &Event{
-		Category: category,
-		Action:   action,
-		Token:    token,
-		Time:     t,
-	}
-
 	host, ok := ir.StringValue("host")
 	if ok {
 		event.Host = host
