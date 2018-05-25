@@ -6,4 +6,3 @@ class DataTableException extends \Exception
 {
 
 }
-
