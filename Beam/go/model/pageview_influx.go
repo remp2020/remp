@@ -16,13 +16,13 @@ type queryBinding struct {
 	Field       string
 }
 
-// PageviewDB is Influx implementation of PageviewStorage.
-type PageviewDB struct {
+// PageviewInflux is Influx implementation of PageviewStorage.
+type PageviewInflux struct {
 	DB *InfluxDB
 }
 
 // Count returns count of pageviews based on the provided filter options.
-func (eDB *PageviewDB) Count(o AggregateOptions) (CountRowCollection, bool, error) {
+func (eDB *PageviewInflux) Count(o AggregateOptions) (CountRowCollection, bool, error) {
 	// pageview events are stored in multiple measurements which need to be resolved
 	binding, err := eDB.resolveQueryBindings(o.Action)
 	if err != nil {
@@ -57,7 +57,7 @@ func (eDB *PageviewDB) Count(o AggregateOptions) (CountRowCollection, bool, erro
 }
 
 // Sum returns sum of pageviews based on the provided filter options.
-func (eDB *PageviewDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
+func (eDB *PageviewInflux) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 	// pageview events are stored in multiple measurements which need to be resolved
 	binding, err := eDB.resolveQueryBindings(o.Action)
 	if err != nil {
@@ -92,7 +92,7 @@ func (eDB *PageviewDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 }
 
 // List returns list of all pageviews based on given PageviewOptions.
-func (eDB *PageviewDB) List(o ListOptions) (PageviewRowCollection, error) {
+func (eDB *PageviewInflux) List(o ListOptions) (PageviewRowCollection, error) {
 	var selectFields string
 	if len(o.SelectFields) > 0 {
 		o.SelectFields = append(o.SelectFields, "token", "remp_pageview_id") // at least one value needs to be always selected
@@ -144,21 +144,21 @@ func (eDB *PageviewDB) List(o ListOptions) (PageviewRowCollection, error) {
 }
 
 // Categories lists all tracked categories.
-func (eDB *PageviewDB) Categories() []string {
+func (eDB *PageviewInflux) Categories() []string {
 	return []string{
 		CategoryPageview,
 	}
 }
 
 // Flags lists all available flags.
-func (eDB *PageviewDB) Flags() []string {
+func (eDB *PageviewInflux) Flags() []string {
 	return []string{
 		FlagArticle,
 	}
 }
 
 // Actions lists all tracked actions under the given category.
-func (eDB *PageviewDB) Actions(category string) ([]string, error) {
+func (eDB *PageviewInflux) Actions(category string) ([]string, error) {
 	switch category {
 	case CategoryPageview:
 		return []string{
@@ -169,7 +169,7 @@ func (eDB *PageviewDB) Actions(category string) ([]string, error) {
 }
 
 // Users returns list of all tracked user IDs.
-func (eDB *PageviewDB) Users() ([]string, error) {
+func (eDB *PageviewInflux) Users() ([]string, error) {
 	q := client.Query{
 		Command:  `SHOW TAG VALUES FROM "` + TablePageviews + `" WITH KEY = "user_id"`,
 		Database: eDB.DB.DBName,
@@ -199,7 +199,7 @@ func (eDB *PageviewDB) Users() ([]string, error) {
 
 // resolveQueryBindings returns name of the table and field used within the aggregate function
 // based on the provided action.
-func (eDB *PageviewDB) resolveQueryBindings(action string) (queryBinding, error) {
+func (eDB *PageviewInflux) resolveQueryBindings(action string) (queryBinding, error) {
 	switch action {
 	case ActionPageviewLoad:
 		return queryBinding{

@@ -84,11 +84,12 @@ type Intersector func(userID string) bool
 
 // SegmentDB represents Segment's storage MySQL/InfluxDB implementation.
 type SegmentDB struct {
-	MySQL          *sqlx.DB
-	InfluxDB       *InfluxDB
-	ElasticDB      *ElasticDB
-	RuleCountCache *cache.Cache
-	Segments       map[string]*Segment
+	MySQL           *sqlx.DB
+	RuleCountCache  *cache.Cache
+	EventStorage    EventStorage
+	PageviewStorage PageviewStorage
+	CommerceStorage CommerceStorage
+	Segments        map[string]*Segment
 }
 
 // Get returns instance of Segment based on the given code.
@@ -186,85 +187,35 @@ func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time
 
 // getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
 func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue string, now time.Time, ro RuleOverrides) (int, error) {
-
-	search := sDB.ElasticDB.Client.Search().
-		Index("events").
-		Type("_doc").
-		Size(0) // return no specific results
-
 	options := sr.options(now, ro)
 	options.FilterBy = append(options.FilterBy, &FilterBy{tagName, []string{tagValue}})
-	search, err := sDB.ElasticDB.addSearchFilters(search, "events", options)
-	if err != nil {
-		return 0, err
+
+	var crc CountRowCollection
+	var ok bool
+	var err error
+
+	switch sr.EventCategory {
+	case CategoryPageview:
+		crc, ok, err = sDB.PageviewStorage.Count(options)
+	case CategoryCommerce:
+		crc, ok, err = sDB.CommerceStorage.Count(options)
+	default:
+		crc, ok, err = sDB.EventStorage.Count(options)
 	}
 
-	search, err = sDB.ElasticDB.addGroupBy(search, "events", options, nil)
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrap(err, "unable to get rule event count")
+	}
+	if !ok {
+		return 0, nil
 	}
 
-	// get results
-	result, err := search.Do(sDB.ElasticDB.Context)
-	if err != nil {
-		return 0, err
+	// result read
+	if len(crc) > 1 {
+		return 0, fmt.Errorf("unexpected result of CountRows returned: %d", len(crc))
 	}
 
-	log.Printf("%#v\n", result.Hits)
-
-	return int(result.Hits.TotalHits), nil
-
-	//////////////////
-
-	// query := sDB.InfluxDB.QueryBuilder.
-	// 	Select(`COUNT("token")`).
-	// 	From(sr.tableName()).
-	// 	Where(fmt.Sprintf(`("%s" = '%s')`, tagName, tagValue))
-	// for _, cond := range sr.conditions(now, ro) {
-	// 	query = query.Where(cond)
-	// }
-	// for _, cond := range sr.groups() {
-	// 	query = query.GroupBy(cond)
-	// }
-
-	// response, err := sDB.InfluxDB.Exec(query.Build())
-	// if err != nil {
-	// 	return 0, err
-	// }
-	// if err := response.Error(); err != nil {
-	// 	return 0, err
-	// }
-
-	// crc, ok, err := sDB.InfluxDB.MultiGroupedCount(response)
-	// if err != nil {
-	// 	return 0, err
-	// }
-	// if !ok {
-	// 	return 0, nil
-	// }
-
-	// flags := sr.flags()
-	// matchGroupedCount := func(cr CountRow) bool {
-	// 	for flag, flagVal := range flags {
-	// 		tagVal, ok := cr.Tags[flag]
-	// 		if !ok {
-	// 			return false
-	// 		}
-	// 		if flagVal != tagVal {
-	// 			return false
-	// 		}
-	// 	}
-	// 	return true
-	// }
-
-	// for _, cr := range crc {
-	// 	if !matchGroupedCount(cr) {
-	// 		continue
-	// 	}
-	// 	return cr.Count, nil
-	// }
-
-	// return 0, nil
+	return crc[0].Count, nil
 }
 
 // Users return list of all users within segment.

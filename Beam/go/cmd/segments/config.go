@@ -4,6 +4,7 @@ package main
 type Config struct {
 	SegmentsAddr string `envconfig:"addr" required:"true"`
 	Debug        bool   `envconfig:"debug" required:"false"`
+	EventStorage string `envconfig:"event_storage" required:"false"`
 
 	MysqlNet    string `envconfig:"mysql_net" required:"true"`
 	MysqlAddr   string `envconfig:"mysql_addr" required:"true"`

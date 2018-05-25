@@ -9,13 +9,13 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
-// CommerceDB is Influx implementation of CommerceStorage.
-type CommerceDB struct {
+// CommerceInflux is Influx implementation of CommerceStorage.
+type CommerceInflux struct {
 	DB *InfluxDB
 }
 
 // Count returns count of events based on the provided filter options.
-func (cDB *CommerceDB) Count(o AggregateOptions) (CountRowCollection, bool, error) {
+func (cDB *CommerceInflux) Count(o AggregateOptions) (CountRowCollection, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`count("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = addAggregateQueryFilters(builder, o)
 
@@ -40,13 +40,13 @@ func (cDB *CommerceDB) Count(o AggregateOptions) (CountRowCollection, bool, erro
 }
 
 // List returns list of all events based on given CommerceOptions.
-func (cDB *CommerceDB) List(o ListOptions) (CommerceRowCollection, error) {
+func (cDB *CommerceInflux) List(o ListOptions) (CommerceRowCollection, error) {
 	// not implemented; the original implementation was non-functional
 	return CommerceRowCollection{}, nil
 }
 
 // Sum returns sum of events based on the provided filter options.
-func (cDB *CommerceDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
+func (cDB *CommerceInflux) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 	builder := cDB.DB.QueryBuilder.Select(`sum("revenue")`).From(`"` + TableCommerce + `"`)
 	builder = addAggregateQueryFilters(builder, o)
 
@@ -71,19 +71,19 @@ func (cDB *CommerceDB) Sum(o AggregateOptions) (SumRowCollection, bool, error) {
 }
 
 // Categories lists all available categories.
-func (cDB *CommerceDB) Categories() []string {
+func (cDB *CommerceInflux) Categories() []string {
 	return []string{
 		CategoryCommerce,
 	}
 }
 
 // Flags lists all available flags.
-func (cDB *CommerceDB) Flags() []string {
+func (cDB *CommerceInflux) Flags() []string {
 	return []string{}
 }
 
 // Actions lists all available actions under the given category.
-func (cDB *CommerceDB) Actions(category string) ([]string, error) {
+func (cDB *CommerceInflux) Actions(category string) ([]string, error) {
 	switch category {
 	case CategoryCommerce:
 		return []string{

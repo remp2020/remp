@@ -11,13 +11,11 @@ import (
 	"sync"
 	"syscall"
 	"time"
-
+	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/olivere/elastic"
-
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
-	"github.com/influxdata/influxdb/client/v2"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -71,57 +69,29 @@ func main() {
 		log.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
 	}
 
-	ic, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr:     c.InfluxAddr,
-		Username: c.InfluxUser,
-		Password: c.InfluxPasswd,
-	})
-	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to initialize influx http client"))
-	}
-	influxDB := &model.InfluxDB{
-		DBName:       c.InfluxDBName,
-		Client:       ic,
-		QueryBuilder: influxquery.NewInfluxBuilder(),
-		Debug:        c.Debug,
-	}
+	var eventStorage model.EventStorage
+	var pageviewStorage model.PageviewStorage
+	var commerceStorage model.CommerceStorage
 
-	eopts := []elastic.ClientOptionFunc{
-		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
-		elastic.SetURL(c.ElasticAddr),
-		elastic.SetSniff(false),
-		elastic.SetHealthcheckInterval(10 * time.Second),
-		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
+	switch c.EventStorage {
+	case "elastic":
+		eventStorage, pageviewStorage, commerceStorage, err = initElasticEventStorages(ctx, c)
+	case "influx":
+		eventStorage, pageviewStorage, commerceStorage, err = initInfluxEventStorages(ctx, c)
+	default:
+		log.Fatalf("unrecognized storage: %s", c.EventStorage)
 	}
-	if c.Debug {
-		eopts = append(
-			eopts,
-			elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
-			elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)),
-		)
-	}
-	ec, err := elastic.NewClient(eopts...)
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to initialize elasticsearch client"))
+		log.Fatalln(err)
 	}
-	elasticDB := model.NewElasticDB(ctx, ec, c.Debug)
 
 	countCache := cache.New(5*time.Minute, 10*time.Minute)
-
-	eventStorage := &model.EventElastic{
-		DB: elasticDB,
-	}
-	commerceStorage := &model.CommerceElastic{
-		DB: elasticDB,
-	}
-	pageviewStorage := &model.PageviewElastic{
-		DB: elasticDB,
-	}
 	segmentStorage := &model.SegmentDB{
-		MySQL:          mysqlDB,
-		InfluxDB:       influxDB,
-		ElasticDB:      elasticDB,
-		RuleCountCache: countCache,
+		MySQL:           mysqlDB,
+		RuleCountCache:  countCache,
+		EventStorage:    eventStorage,
+		PageviewStorage: pageviewStorage,
+		CommerceStorage: commerceStorage,
 	}
 
 	// server cancellation
@@ -199,4 +169,68 @@ func main() {
 	cancelCtx()
 	wg.Wait()
 	service.LogInfo("bye bye")
+}
+
+func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
+	eopts := []elastic.ClientOptionFunc{
+		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
+		elastic.SetURL(c.ElasticAddr),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheckInterval(10 * time.Second),
+		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
+	}
+	if c.Debug {
+		eopts = append(
+			eopts,
+			elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
+			elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)),
+		)
+	}
+	ec, err := elastic.NewClient(eopts...)
+	if err != nil {
+		return nil, nil, nil, errors.Wrap(err, "unable to initialize elasticsearch client")
+	}
+	elasticDB := model.NewElasticDB(ctx, ec, c.Debug)
+
+	eventStorage := &model.EventElastic{
+		DB: elasticDB,
+	}
+	commerceStorage := &model.CommerceElastic{
+		DB: elasticDB,
+	}
+	pageviewStorage := &model.PageviewElastic{
+		DB: elasticDB,
+	}
+
+	return eventStorage, pageviewStorage, commerceStorage, nil
+}
+
+func initInfluxEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
+	ic, err := client.NewHTTPClient(client.HTTPConfig{
+		Addr:     c.InfluxAddr,
+		Username: c.InfluxUser,
+		Password: c.InfluxPasswd,
+	})
+	if err != nil {
+		log.Fatalln(errors.Wrap(err, "unable to initialize influx http client"))
+	}
+
+	influxDB := &model.InfluxDB{
+		DBName:       c.InfluxDBName,
+		Client:       ic,
+		QueryBuilder: influxquery.NewInfluxBuilder(),
+		Debug:        c.Debug,
+	}
+
+	eventStorage := &model.EventInflux{
+		DB: influxDB,
+	}
+	commerceStorage := &model.CommerceInflux{
+		DB: influxDB,
+	}
+	pageviewStorage := &model.PageviewInflux{
+		DB: influxDB,
+	}
+
+	return eventStorage, pageviewStorage, commerceStorage, nil
 }

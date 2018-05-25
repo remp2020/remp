@@ -10,15 +10,15 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
-// EventDB is Influx implementation of EventStorage.
-type EventDB struct {
+// EventInflux is Influx implementation of EventStorage.
+type EventInflux struct {
 	DB               *InfluxDB
 	categoriesCached []string
 	actionsCached    map[string][]string
 }
 
 // Count returns number of events matching the filter defined by EventOptions.
-func (eDB *EventDB) Count(o AggregateOptions) (CountRowCollection, bool, error) {
+func (eDB *EventInflux) Count(o AggregateOptions) (CountRowCollection, bool, error) {
 
 	builder := eDB.DB.QueryBuilder.Select("count(token)").From(`"` + TableEvents + `"`)
 	builder = addAggregateQueryFilters(builder, o)
@@ -41,13 +41,13 @@ func (eDB *EventDB) Count(o AggregateOptions) (CountRowCollection, bool, error) 
 }
 
 // List returns list of all events based on given EventOptions.
-func (eDB *EventDB) List(o EventOptions) (EventRowCollection, error) {
+func (eDB *EventInflux) List(o ListOptions) (EventRowCollection, error) {
 	// not implemented; the original implementation was non-functional
 	return EventRowCollection{}, nil
 }
 
 // Categories lists all tracked categories.
-func (eDB *EventDB) Categories() ([]string, error) {
+func (eDB *EventInflux) Categories() ([]string, error) {
 	// try to load from cache first
 	if ec := eDB.categoriesCached; len(ec) > 0 {
 		return ec, nil
@@ -81,12 +81,12 @@ func (eDB *EventDB) Categories() ([]string, error) {
 }
 
 // Flags lists all available flags.
-func (eDB *EventDB) Flags() []string {
+func (eDB *EventInflux) Flags() []string {
 	return []string{}
 }
 
 // Actions lists all tracked actions under the given category.
-func (eDB *EventDB) Actions(category string) ([]string, error) {
+func (eDB *EventInflux) Actions(category string) ([]string, error) {
 	// try to load from cache first
 	if ac, ok := eDB.actionsCached[category]; ok {
 		return ac, nil
@@ -120,7 +120,7 @@ func (eDB *EventDB) Actions(category string) ([]string, error) {
 }
 
 // Users lists all tracked users.
-func (eDB *EventDB) Users() ([]string, error) {
+func (eDB *EventInflux) Users() ([]string, error) {
 	q := client.Query{
 		Command:  `SHOW TAG VALUES FROM "` + TableEvents + `" WITH KEY = "user_id"`,
 		Database: eDB.DB.DBName,
@@ -149,7 +149,7 @@ func (eDB *EventDB) Users() ([]string, error) {
 }
 
 // Cache stores event categories and activities in memory.
-func (eDB *EventDB) Cache() error {
+func (eDB *EventInflux) Cache() error {
 	// cache categories
 	oldc := eDB.categoriesCached
 	eDB.categoriesCached = []string{} // cache niled so Categories() loads categories from DB
@@ -181,7 +181,7 @@ func (eDB *EventDB) Cache() error {
 	return nil
 }
 
-func (eDB *EventDB) addQueryFilters(builder influxquery.Builder, o EventOptions) influxquery.Builder {
+func (eDB *EventInflux) addQueryFilters(builder influxquery.Builder, o EventOptions) influxquery.Builder {
 	if o.UserID != "" {
 		builder = builder.Where(fmt.Sprintf("user_id = '%s'", o.UserID))
 	}

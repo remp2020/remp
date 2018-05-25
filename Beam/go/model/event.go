@@ -59,4 +59,6 @@ type EventStorage interface {
 	Actions(category string) ([]string, error)
 	// Users lists all tracked users.
 	Users() ([]string, error)
+	// Cache creates internal cache of available categories and actions so they're not polled repeatedly.
+	Cache() error
 }
