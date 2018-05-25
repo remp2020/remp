@@ -104,6 +104,12 @@
                     targets: {$colSetting['colIndex']},
                 },
                 {/foreach}
+                {if !empty($rowActions)}
+                {
+                    responsivePriority: 1,
+                    targets: -1,
+                },
+                {/if}
             ],
             {ifset $tableSettings['rowGroup']}
             'rowGroup':  {

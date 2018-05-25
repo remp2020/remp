@@ -18,26 +18,26 @@
         {!! Widget::run('DataTable', [
             'colSettings' => [
                 'name' => [
-                    'priority' => 10,
+                    'priority' => 1,
                 ],
                 'template' => [
-                    'priority' => 10,
+                    'priority' => 2,
                 ],
                 'display_type' => [
-                    'priority' => 10,
+                    'priority' => 2,
                 ],
                 'position' => [
-                    'priority' => 10,
+                    'priority' => 2,
                 ],
                 'created_at' => [
                     'header' => 'Created at',
                     'render' => 'date',
-                    'priority' => 10,
+                    'priority' => 3,
                 ],
                 'updated_at' => [
                     'header' => 'Updated at',
                     'render' => 'date',
-                    'priority' => 10,
+                    'priority' => 4,
                 ],
             ],
             'dataSource' => route('banners.json'),

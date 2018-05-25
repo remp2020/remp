@@ -92,11 +92,13 @@
                     responsivePriority: {{ $col['priority'] }},
                     targets: {{ $col['colIndex'] }},
                 },
+                @endforeach
+                @if (!empty($rowActions))
                 {
                     responsivePriority: 1,
                     targets: -1
                 },
-                @endforeach
+                @endif
             ],
             'autoWidth': false,
             'sDom': 'tr',

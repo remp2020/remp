@@ -26,12 +26,12 @@
                 'start_time' => [
                     'header' => 'Scheduled start date',
                     'render' => 'date',
-                    'priority' => 1,
+                    'priority' => 2,
                 ],
                 'end_time' => [
                     'header' => 'Scheduled end date',
                     'render' => 'date',
-                    'priority' => 1,
+                    'priority' => 2,
                 ],
                 'status' => [
                     'header' => 'Status',
