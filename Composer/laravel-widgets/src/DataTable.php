@@ -11,7 +11,6 @@ use Psy\Util\Json;
  * Usage example
  *
  *  {!! Widget::run('DataTable', [
- *      'responsive' => true,
  *      'colSettings' => [
  *          'title',
  *          'pageview_sum' => ['header' => 'pageviews'],
@@ -50,7 +49,6 @@ class DataTable extends AbstractWidget
      * @var array
      */
     protected $config = [
-        'responsive' => false,
         'dataSource' => '',
         'colSettings' => [],
         'order' => [],
