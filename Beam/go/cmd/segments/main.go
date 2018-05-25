@@ -75,7 +75,7 @@ func main() {
 	var commerceStorage model.CommerceStorage
 
 	switch c.EventStorage {
-	case "elastic":
+	case "", "elastic":
 		eventStorage, pageviewStorage, commerceStorage, err = initElasticEventStorages(ctx, c)
 	case "influx":
 		eventStorage, pageviewStorage, commerceStorage, err = initInfluxEventStorages(ctx, c)
