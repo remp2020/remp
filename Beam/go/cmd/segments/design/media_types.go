@@ -21,10 +21,12 @@ var Count = MediaType("application/vnd.count+json", func() {
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("count", Integer)
+		Attribute("time_histogram", EventOptionsTimeHistogram)
 	})
 	View("default", func() {
 		Attribute("tags")
 		Attribute("count")
+		Attribute("time_histogram")
 	})
 	Required("tags", "count")
 })
