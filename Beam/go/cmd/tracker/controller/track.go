@@ -50,6 +50,10 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 	tags := map[string]string{
 		"step": ctx.Payload.Step,
 	}
+	if ctx.Payload.RempCommerceID != nil {
+		tags["remp_commerce_id"] = *ctx.Payload.RempCommerceID
+	}
+
 	values := map[string]interface{}{}
 
 	if ctx.Payload.Article != nil {
@@ -120,6 +124,9 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	tags := map[string]string{
 		"category": ctx.Payload.Category,
 		"action":   ctx.Payload.Action,
+	}
+	if ctx.Payload.RempEventID != nil {
+		tags["remp_event_id"] = *ctx.Payload.RempEventID
 	}
 	fields := map[string]interface{}{}
 	if ctx.Payload.Value != nil {

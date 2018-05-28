@@ -14,7 +14,7 @@ final class LogPresenter extends BasePresenter
     public function __construct(
         LogsRepository $logsRepository
     ) {
-    
+
         parent::__construct();
         $this->logsRepository = $logsRepository;
     }
@@ -23,12 +23,34 @@ final class LogPresenter extends BasePresenter
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
-            ->setColSetting('email')
-            ->setColSetting('subject')
-            ->setColSetting('mail_template_id', ['header' => 'template code', 'render' => 'link', 'orderable' => false])
-            ->setColSetting('attachment_size', ['header' => 'attachment', 'render' => 'bytes', 'class' => 'text-right'])
-            ->setColSetting('events', ['render' => 'badge', 'orderable' => false])
+            ->setColSetting('created_at', [
+                'header' => 'sent at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('email', [
+                'priority' => 1,
+            ])
+            ->setColSetting('subject', [
+                'priority' => 1,
+            ])
+            ->setColSetting('mail_template_id', [
+                'header' => 'template code',
+                'render' => 'link',
+                'orderable' => false,
+                'priority' => 2,
+            ])
+            ->setColSetting('attachment_size', [
+                'header' => 'attachment',
+                'render' => 'bytes',
+                'class' => 'text-right',
+                'priority' => 2,
+            ])
+            ->setColSetting('events', [
+                'render' => 'badge',
+                'orderable' => false,
+                'priority' => 3,
+            ])
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;

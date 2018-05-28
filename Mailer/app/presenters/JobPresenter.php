@@ -99,13 +99,40 @@ final class JobPresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('defaultJsonData'))
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setColSetting('segment', ['orderable' => false])
-            ->setColSetting('batches', ['orderable' => false, 'filter' => $mailTypePairs])
-            ->setColSetting('sent_count', ['header' => 'sent', 'orderable' => false])
-            ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
-            ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
-            ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('segment', [
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('batches', [
+                'orderable' => false,
+                'filter' => $mailTypePairs,
+                'priority' => 2,
+            ])
+            ->setColSetting('sent_count', [
+                'header' => 'sent',
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('opened_count', [
+                'header' => 'opened',
+                'orderable' => false,
+                'priority' => 3,
+            ])
+            ->setColSetting('clicked_count', [
+                'header' => 'clicked',
+                'orderable' => false,
+                'priority' => 3,
+            ])
+            ->setColSetting('unsubscribed_count', [
+                'header' => 'unsubscribed',
+                'orderable' => false,
+                'priority' => 3,
+            ])
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 

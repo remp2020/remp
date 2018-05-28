@@ -99,7 +99,6 @@ var _ = Resource("segments", func() {
 			})
 			Param("fields", String, FieldsParamDescription)
 		})
-		Payload(RuleOverrides)
 		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))
@@ -142,16 +141,10 @@ var _ = Resource("events", func() {
 	})
 	Action("list", func() {
 		Description("Returns full list of events")
-		Routing(GET("/list"))
-		Params(func() {
-			Param("user_id", String, "Identification of user")
-			Param("action", String, "Event action")
-			Param("category", String, "Event category")
-			Param("time_after", DateTime, "Include all events that happened after specified RFC3339 datetime")
-			Param("time_before", DateTime, "Include all events that happened before specified RFC3339 datetime")
-		})
+		Routing(POST("/list"))
+		Payload(ListEventOptionsPayload)
 		Response(OK, func() {
-			Media(CollectionOf(Event, func() {
+			Media(CollectionOf(Events, func() {
 				View("default")
 			}))
 		})
@@ -226,9 +219,9 @@ var _ = Resource("commerce", func() {
 				Enum("checkout", "payment", "purchase", "refund")
 			})
 		})
-		Payload(CommerceOptionsPayload)
+		Payload(ListCommerceOptionsPayload)
 		Response(OK, func() {
-			Media(CollectionOf(Commerce, func() {
+			Media(CollectionOf(Commerces, func() {
 				View("default")
 			}))
 		})

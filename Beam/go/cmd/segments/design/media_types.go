@@ -55,6 +55,32 @@ var Pageviews = MediaType("application/vnd.pageviews+json", func() {
 	Required("tags", "pageviews")
 })
 
+var Events = MediaType("application/vnd.events+json", func() {
+	Description("Events")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("events", CollectionOf(Event))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("events")
+	})
+	Required("tags", "events")
+})
+
+var Commerces = MediaType("application/vnd.commerces+json", func() {
+	Description("Commerce events")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("commerces", CollectionOf(Commerce))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("commerces")
+	})
+	Required("tags", "commerces")
+})
+
 var Segment = MediaType("application/vnd.segment+json", func() {
 	Description("Segment check")
 	Attributes(func() {
@@ -111,12 +137,20 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("action", String)
 		Attribute("system", System)
 		Attribute("user", User)
+		Attribute("utm_source", String)
+		Attribute("utm_campaign", String)
+		Attribute("utm_medium", String)
+		Attribute("utm_content", String)
 	})
 	View("default", func() {
 		Attribute("category")
 		Attribute("action")
 		Attribute("system")
 		Attribute("user")
+		Attribute("utm_source")
+		Attribute("utm_campaign")
+		Attribute("utm_medium")
+		Attribute("utm_content")
 	})
 	Required("system", "category", "action")
 })

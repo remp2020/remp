@@ -56,6 +56,7 @@ var Commerce = Type("Commerce", func() {
 	Attribute("step", String, func() {
 		Enum("checkout", "payment", "purchase", "refund")
 	})
+	Attribute("remp_commerce_id", String, "ID of event")
 	Attribute("checkout", CommerceCheckout, "Used when user enters the checkout process (reviews the cart)")
 	Attribute("payment", CommercePayment, "Used when user confirmed checkout and was redirected to the payment processor")
 	Attribute("purchase", CommercePayment, "Used when payment processor confirms the payment")
@@ -75,6 +76,7 @@ var Event = Type("Event", func() {
 	Attribute("value", Number, "Numeric value of event (read 60 seconds, paused after 200 seconds, 3rd comment")
 	Attribute("tags", HashOf(String, String), "Custom filtering tags")
 	Attribute("fields", HashOf(String, Any), "Additinal key-value data")
+	Attribute("remp_event_id", String, "ID of event")
 
 	Required("system", "category", "action")
 })

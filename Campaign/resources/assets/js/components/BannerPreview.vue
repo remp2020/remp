@@ -186,7 +186,7 @@
         },
         computed: {
             url: function() {
-                if (this.targetUrl === null) {
+                if (this.targetUrl === undefined) {
                     return null;
                 }
                 let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
@@ -237,7 +237,7 @@
                 });
                 this.closeTracked = true;
             },
-            clicked: function() {
+            clicked: function(event, hideBanner = false) {
                 if (this.clickTracked) {
                     return true;
                 }
@@ -249,6 +249,9 @@
                     "variant": this.variantUuid
                 });
                 this.clickTracked = true;
+                if (hideBanner) {
+                    this.visible = false;
+                }
                 return true;
             },
             trackEvent: function(category, action, fields) {

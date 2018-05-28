@@ -47,6 +47,7 @@
         word-wrap: break-word;
         font-size: 14px;
         text-align: center;
+        cursor: pointer;
     }
 
     @media (max-width: 640px) {
@@ -65,7 +66,7 @@
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on:click="$parent.clicked" v-if="isVisible" class="bar-preview-link" v-bind:style="[
+    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible" class="bar-preview-link" v-bind:style="[
         linkStyles,
         _position
     ]">
@@ -73,7 +74,7 @@
             <div class="bar-preview-box" v-bind:style="[boxStyles]">
                 <a class="bar-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
                 <div class="bar-main" v-html="$parent.injectVars(mainText)"></div>
-                <div class="bar-button" v-if="buttonText.length > 0" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
+                <div class="bar-button" v-if="buttonText.length > 0" v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
             </div>
         </transition>
     </a>
@@ -120,10 +121,13 @@
                 }
 
                 if (this.positionOptions[this.position]) {
-                    var styles = this.positionOptions[this.position].style;
+                    let styles = this.positionOptions[this.position].style;
 
-                    for (var ii in styles) {
-                        styles[ii] = ((ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
+                    for (let pos in styles) {
+                        if (!styles.hasOwnProperty(pos)) {
+                            continue;
+                        }
+                        styles[pos] = ((pos === 'top' || pos === 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
                     }
 
                     return styles;

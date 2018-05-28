@@ -122,9 +122,30 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/mailru/easyjson"
+  packages = [
+    ".",
+    "buffer",
+    "jlexer",
+    "jwriter"
+  ]
+  revision = "8b799c424f57fa123fc63a99d6383bc6e4c02578"
+
+[[projects]]
+  branch = "master"
   name = "github.com/manveru/faker"
   packages = ["."]
   revision = "717f7cf83fb78669bfab612749c2e8ff63d5be11"
+
+[[projects]]
+  name = "github.com/olivere/elastic"
+  packages = [
+    ".",
+    "config",
+    "uritemplates"
+  ]
+  revision = "d6362604399c7af560b54f048b4fcfbdd6eff293"
+  version = "v6.1.14"
 
 [[projects]]
   name = "github.com/patrickmn/go-cache"
@@ -216,6 +237,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "13e77e52105dadd85a255f35c92dc2357d17ce34dc121f3cf8ccc48cd0350059"
+  inputs-digest = "2ea618e6e3b82b614cf8e6b235570dae446cf641ed2eccd6abee7501ca73d747"
   solver-name = "gps-cdcl"
   solver-version = 1

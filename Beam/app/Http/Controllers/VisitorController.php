@@ -14,8 +14,8 @@ class VisitorController extends Controller
     public function devices(Request $request)
     {
         return response()->view('visitors.devices', [
-            'visitedFrom' => $request->input('visited_from', Carbon::now()->subMonth()),
-            'visitedTo' => $request->input('visited_to', Carbon::now()),
+            'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
+            'visitedTo' => $request->input('visited_to', 'now'),
             'subscriber' => $request->input('subscriber', "1"),
 
             'brands' => SessionDevice::distinct()->whereNotNull('brand')->pluck('brand', 'brand'),
@@ -27,8 +27,8 @@ class VisitorController extends Controller
     public function sources(Request $request)
     {
         return response()->view('visitors.sources', [
-            'visitedFrom' => $request->input('visited_from', Carbon::now()->subMonth()),
-            'visitedTo' => $request->input('visited_to', Carbon::now()),
+            'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
+            'visitedTo' => $request->input('visited_to', 'now'),
             'subscriber' => $request->input('subscriber', "1"),
 
             'mediums' => SessionReferer::distinct()->whereNotNull('medium')->pluck('medium', 'medium'),
@@ -45,10 +45,10 @@ class VisitorController extends Controller
         ]))->groupBy('client_name', 'client_type');
 
         if ($request->input('visited_from')) {
-            $devices->where('time_from', '>=', $request->input('visited_from'));
+            $devices->where('time_from', '>=', Carbon::parse($request->input('visited_from'))->tz('UTC'));
         }
         if ($request->input('visited_to')) {
-            $devices->where('time_to', '<=', $request->input('visited_to'));
+            $devices->where('time_to', '<=', Carbon::parse($request->input('visited_to'))->tz('UTC'));
         }
         if ($request->input('subscriber') !== null) {
             $devices->where(['subscriber' => $request->input('subscriber')]);
@@ -80,10 +80,10 @@ class VisitorController extends Controller
         ]))->whereNotNull('model')->groupBy('model', 'brand', 'os_name');
 
         if ($request->input('visited_from')) {
-            $devices->where('time_from', '>=', $request->input('visited_from'));
+            $devices->where('time_from', '>=', Carbon::parse($request->input('visited_from'))->tz('UTC'));
         }
         if ($request->input('visited_to')) {
-            $devices->where('time_to', '<=', $request->input('visited_to'));
+            $devices->where('time_to', '<=', Carbon::parse($request->input('visited_to'))->tz('UTC'));
         }
         if ($request->input('subscriber') !== null) {
             $devices->where(['subscriber' => $request->input('subscriber')]);
@@ -114,10 +114,10 @@ class VisitorController extends Controller
         ]))->groupBy('medium', 'source');
 
         if ($request->input('visited_from')) {
-            $devices->where('time_from', '>=', $request->input('visited_from'));
+            $devices->where('time_from', '>=', Carbon::parse($request->input('visited_from'))->tz('UTC'));
         }
         if ($request->input('visited_to')) {
-            $devices->where('time_to', '<=', $request->input('visited_to'));
+            $devices->where('time_to', '<=', Carbon::parse($request->input('visited_to'))->tz('UTC'));
         }
         if ($request->input('subscriber') !== null) {
             $devices->where(['subscriber' => $request->input('subscriber')]);

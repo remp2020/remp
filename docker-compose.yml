@@ -22,6 +22,7 @@ services:
           - "segments.beam.remp.press"
           - "grafana.beam.remp.press"
           - "mailhog.remp.press"
+          - "kibana.beam.remp.press"
 
   mysql:
     image: "mysql:5.7" # minimal 5.7.8
@@ -155,6 +156,7 @@ services:
     depends_on:
       - "influxdb"
       - "kafka"
+      - "elasticsearch"
     restart: "unless-stopped"
 
   grafana:
@@ -162,6 +164,15 @@ services:
     volumes:
       - "grafana-data:/var/lib/grafana"
     restart: "unless-stopped"
+
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:6.2.2"
+    volumes:
+      - "./Docker/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+      - "elastic-data:/usr/share/elasticsearch/data"
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:6.2.2"
 
   beam_tracker:
     build: "./Beam/go/cmd/tracker"
@@ -189,6 +200,8 @@ volumes:
   redis-data:
     driver: "local"
   grafana-data:
+    driver: "local"
+  elastic-data:
     driver: "local"
 
 networks:

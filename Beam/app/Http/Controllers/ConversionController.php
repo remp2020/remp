@@ -22,8 +22,8 @@ class ConversionController extends Controller
             'html' => view('conversions.index', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
-                'conversionFrom' => $request->get('conversion_from', Carbon::now()->subMonth()),
-                'conversionTo' => $request->get('conversion_to', Carbon::now()),
+                'conversionFrom' => $request->get('conversion_from', 'now - 30 days'),
+                'conversionTo' => $request->get('conversion_to', 'now'),
             ]),
             'json' => ConversionResource::collection(Conversion::paginate()),
         ]);
@@ -38,10 +38,10 @@ class ConversionController extends Controller
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
         if ($request->input('conversion_from')) {
-            $conversions->where('paid_at', '>=', $request->input('conversion_from'));
+            $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'))->tz('UTC'));
         }
         if ($request->input('conversion_to')) {
-            $conversions->where('paid_at', '<=', $request->input('conversion_to'));
+            $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'))->tz('UTC'));
         }
 
         return $datatables->of($conversions)

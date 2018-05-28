@@ -23,23 +23,29 @@
                     'colSettings' => [
                         'campaign' => [
                             'header' => 'Campaign',
+                            'priority' => 1,
                         ],
                         'banners' => [
                             'header' => 'Banners',
+                            'priority' => 2,
                         ],
                         'start_time' => [
                             'header' => 'Scheduled start date',
                             'render' => 'date',
+                            'priority' => 2,
                         ],
                         'end_time' => [
                             'header' => 'Scheduled end date',
                             'render' => 'date',
+                            'priority' => 1,
                         ],
                         'status' => [
                             'header' => 'Status',
+                            'priority' => 1,
                         ],
                         'updated_at' => [
                             'header' => 'Updated at',
+                            'priority' => 3,
                         ],
                     ],
                     'dataSource' => route('schedule.json'),
