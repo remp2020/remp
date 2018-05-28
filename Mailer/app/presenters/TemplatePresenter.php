@@ -37,7 +37,7 @@ final class TemplatePresenter extends BasePresenter
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository
     ) {
-    
+
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
         $this->logsRepository = $logsRepository;
@@ -53,12 +53,28 @@ final class TemplatePresenter extends BasePresenter
 
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setColSetting('code')
-            ->setColSetting('subject')
-            ->setColSetting('type', ['orderable' => false, 'filter' => $mailTypePairs])
-            ->setColSetting('opened')
-            ->setColSetting('clicked')
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('code', [
+                'priority' => 2,
+            ])
+            ->setColSetting('subject', [
+                'priority' => 1,
+            ])
+            ->setColSetting('type', [
+                'orderable' => false,
+                'filter' => $mailTypePairs,
+                'priority' => 2,
+            ])
+            ->setColSetting('opened', [
+                'priority' => 3,
+            ])
+            ->setColSetting('clicked', [
+                'priority' => 3,
+            ])
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setRowAction('edit', 'palette-Cyan zmdi-edit')
             ->setRowAction('duplicate', 'palette-Cyan zmdi-copy')
@@ -131,10 +147,24 @@ final class TemplatePresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('logJsonData'))
-            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
-            ->setColSetting('email', ['orderable' => false])
-            ->setColSetting('subject', ['orderable' => false])
-            ->setColSetting('events', ['render' => 'badge', 'orderable' => false])
+            ->setColSetting('created_at', [
+                'header' => 'sent at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('email', [
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('subject', [
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('events', [
+                'render' => 'badge',
+                'orderable' => false,
+                'priority' => 2,
+            ])
             ->setTableSetting('remove-search')
             ->setTableSetting('order', Json::encode([[2, 'DESC']]))
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]));

@@ -41,16 +41,54 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'name' => ['header' => 'author', 'orderable' => false, 'filter' => $authors],
-                'articles_count' => ['header' => 'articles'],
-                'conversions_count' => ['header' => 'conversions'],
-                'conversions_amount' => ['header' => 'amount', 'render' => 'array'],
-                'pageviews_all' => ['header' => 'all pageviews'],
-                'pageviews_signed_in' => ['header' => 'signed in pageviews', 'render' => 'numberStat'],
-                'pageviews_subscribers' => ['header' => 'subscriber pageviews', 'render' => 'numberStat'],
-                'avg_timespent_all' => ['header' => 'avg time all', 'render' => 'duration'],
-                'avg_timespent_signed_in' => ['header' => 'avg time signed in', 'render' => 'duration'],
-                'avg_timespent_subscribers' => ['header' => 'avg time subscribers', 'render' => 'duration'],
+                'name' => [
+                    'header' => 'author',
+                    'orderable' => false,
+                    'filter' => $authors,
+                    'priority' => 1,
+                ],
+                'articles_count' => [
+                    'header' => 'articles',
+                    'priority' => 3,
+                ],
+                'conversions_count' => [
+                    'header' => 'conversions',
+                    'priority' => 2,
+                ],
+                'conversions_amount' => [
+                    'header' => 'amount',
+                    'render' => 'array',
+                    'priority' => 2,
+                ],
+                'pageviews_all' => [
+                    'header' => 'all pageviews',
+                    'priority' => 2,
+                ],
+                'pageviews_signed_in' => [
+                    'header' => 'signed in pageviews',
+                    'render' => 'numberStat',
+                    'priority' => 5,
+                ],
+                'pageviews_subscribers' => [
+                    'header' => 'subscriber pageviews',
+                    'render' => 'numberStat',
+                    'priority' => 5,
+                ],
+                'avg_timespent_all' => [
+                    'header' => 'avg time all',
+                    'render' => 'duration',
+                    'priority' => 2,
+                ],
+                'avg_timespent_signed_in' => [
+                    'header' => 'avg time signed in',
+                    'render' => 'duration',
+                    'priority' => 5,
+                ],
+                'avg_timespent_subscribers' => [
+                    'header' => 'avg time subscribers',
+                    'render' => 'duration',
+                    'priority' => 5,
+                ],
             ],
             'dataSource' => route('authors.dtAuthors'),
             'order' => [3, 'desc'],

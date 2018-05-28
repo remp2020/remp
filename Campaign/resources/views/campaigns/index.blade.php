@@ -21,17 +21,21 @@
             'colSettings' => [
                 'campaign' => [
                     'header' => 'Campaign',
+                    'priority' => 1,
                 ],
                 'start_time' => [
                     'header' => 'Scheduled start date',
                     'render' => 'date',
+                    'priority' => 2,
                 ],
                 'end_time' => [
                     'header' => 'Scheduled end date',
                     'render' => 'date',
+                    'priority' => 2,
                 ],
                 'status' => [
                     'header' => 'Status',
+                    'priority' => 1,
                 ],
             ],
             'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
@@ -67,37 +71,48 @@
                 <div class="card-body">
                     {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'name',
+                        'name' => [
+                            'priority' => 1,
+                        ],
                         'banner' => [
-                            'header' => 'Banner'
+                            'header' => 'Banner',
+                            'priority' => 9,
                         ],
                         'alt_banner' => [
-                            'header' => 'Banner B'
+                            'header' => 'Banner B',
+                            'priority' => 9,
                         ],
                         'segments' => [
-                            'header' => 'Segments'
+                            'header' => 'Segments',
+                            'priority' => 10,
                         ],
                         'countries' => [
-                            'header' => 'Countries'
+                            'header' => 'Countries',
+                            'priority' => 10,
                         ],
                         'active' => [
-                            'header' => 'Is active'
+                            'header' => 'Is active',
+                            'priority' => 5,
                         ],
                         'signed_in' => [
                             'header' => 'Signed in',
                             'render' => 'boolean',
+                            'priority' => 10,
                         ],
                         'devices' => [
-                            'header' => 'Devices'
+                            'header' => 'Devices',
+                            'priority' => 10,
                         ],
                         'created_at' => [
                             'header' => 'Created at',
                             'render' => 'date',
+                            'priority' => 9,
                         ],
                         'updated_at' => [
                             'header' => 'Updated at',
                             'render' => 'date',
-                        ],
+                            'priority' => 1,
+                        ]
                     ],
                     'rowHighlights' => [
                         'active' => true

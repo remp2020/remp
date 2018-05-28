@@ -19,9 +19,21 @@
 
                 {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'client_name' => ['header' => 'client name', 'orderable' => false],
-                        'client_type' => ['header' => 'client type', 'orderable' => false],
-                        'visits_count' => ['header' => 'visits count', 'searchable' => false],
+                        'client_name' => [
+                            'header' => 'client name',
+                            'orderable' => false,
+                            'priority' => 1,
+                        ],
+                        'client_type' => [
+                            'header' => 'client type',
+                            'orderable' => false,
+                            'priority' => 1,
+                        ],
+                        'visits_count' => [
+                            'header' => 'visits count',
+                            'searchable' => false,
+                            'priority' => 1,
+                        ],
                     ],
                     'dataSource' => route('visitors.dtBrowsers'),
                     'order' => [2, 'desc'],
@@ -57,10 +69,29 @@
 
                 {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'brand' => ['header' => 'brand', 'orderable' => false, 'filter' => $brands],
-                        'model' => ['header' => 'model', 'orderable' => false, 'filter' => $models],
-                        'os_name' => ['header' => 'OS', 'orderable' => false, 'filter' => $osNames],
-                        'visits_count' => ['header' => 'visits count', 'searchable' => false],
+                        'brand' => [
+                            'header' => 'brand',
+                            'orderable' => false,
+                            'filter' => $brands,
+                            'priority' => 1
+                        ],
+                        'model' => [
+                            'header' => 'model',
+                            'orderable' => false,
+                            'filter' => $models,
+                            'priority' => 1
+                        ],
+                        'os_name' => [
+                            'header' => 'OS',
+                            'orderable' => false,
+                            'filter' => $osNames,
+                            'priority' => 1
+                        ],
+                        'visits_count' => [
+                            'header' => 'visits count',
+                            'searchable' => false,
+                            'priority' => 1
+                        ],
                     ],
                     'dataSource' => route('visitors.dtDevices'),
                     'order' => [3, 'desc'],

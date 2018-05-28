@@ -23,11 +23,27 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'name',
-                'code',
-                'active' => ['render' => 'boolean', 'header' => 'Is active'],
-                'created_at' => ['render' => 'date', 'header' => 'Created at'],
-                'updated_at' => ['render' => 'date', 'header' => 'Updated at'],
+                'name' => [
+                    'priority' => 1,
+                ],
+                'code' => [
+                    'priority' => 2,
+                ],
+                'active' => [
+                    'render' => 'boolean',
+                    'header' => 'Is active',
+                    'priority' => 2,
+                ],
+                'created_at' => [
+                    'render' => 'date',
+                    'header' => 'Created at',
+                    'priority' => 3,
+                ],
+                'updated_at' => [
+                    'render' => 'date',
+                    'header' => 'Updated at',
+                    'priority' => 1,
+                ],
             ],
             'dataSource' => route('segments.json'),
             'rowActions' => [

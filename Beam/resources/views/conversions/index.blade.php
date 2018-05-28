@@ -41,12 +41,37 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'article.title' => ['header' => 'article', 'orderable' => false],
-                'article.authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
-                'article.sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                'amount' => ['header' => 'amount'],
-                'currency' => ['header' => 'currency', 'orderable' => false],
-                'paid_at' => ['header' => 'paid at', 'render' => 'date'],
+                'article.title' => [
+                    'header' => 'article',
+                    'orderable' => false,
+                    'priority' => 1,
+                ],
+                'article.authors[, ].name' => [
+                    'header' => 'authors',
+                    'orderable' => false,
+                    'filter' => $authors,
+                    'priority' => 2,
+                ],
+                'article.sections[, ].name' => [
+                    'header' => 'sections',
+                    'orderable' => false,
+                    'filter' => $sections,
+                    'priority' => 4,
+                ],
+                'amount' => [
+                    'header' => 'amount',
+                    'priority' => 1,
+                ],
+                'currency' => [
+                    'header' => 'currency',
+                    'orderable' => false,
+                    'priority' => 3,
+                ],
+                'paid_at' => [
+                    'header' => 'paid at',
+                    'render' => 'date',
+                    'priority' => 2,
+                ],
             ],
             'dataSource' => route('conversions.json'),
             'order' => [5, 'desc'],

@@ -59,6 +59,7 @@
 
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
+            'responsive': true,
             'columns': [
                     @foreach ($cols as $col)
                 {
@@ -82,6 +83,20 @@
                     orderable: false,
                     searchable: false,
                     render: $.fn.dataTables.render.actions({!! @json($rowActions) !!})
+                },
+                @endif
+            ],
+            'columnDefs': [
+                @foreach ($cols as $col)
+                {
+                    responsivePriority: {{ $col['priority'] }},
+                    targets: {{ $col['colIndex'] }},
+                },
+                @endforeach
+                @if (!empty($rowActions))
+                {
+                    responsivePriority: 1,
+                    targets: -1
                 },
                 @endif
             ],

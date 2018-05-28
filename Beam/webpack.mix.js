@@ -39,6 +39,7 @@ if (process.env.REMP_TARGET === 'iota') {
             "bootstrap-select",
             "datatables.net",
             "datatables.net-rowgroup",
+            "datatables.net-responsive",
             "google-material-color",
             "jquery",
             "jquery-placeholder",

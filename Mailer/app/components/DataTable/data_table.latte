@@ -34,14 +34,14 @@
         </tr>
         </thead>
 
-        <tfoot>
+        <tbody>
         <tr>
             <td n:foreach="$colSettings as $colName => $colSetting"></td>
         </tr>
-        </tfoot>
-
-        <tbody>
         </tbody>
+
+        <tfoot>
+        </tfoot>
     </table>
 </div>
 
@@ -65,6 +65,7 @@
             });
 
         }).DataTable({
+            'responsive': true,
             'columns': [
                 {foreach $colSettings as $colName => $colSetting}
                 {
@@ -94,6 +95,20 @@
                         "tableId": {$tableId},
                     })
                 }
+                {/if}
+            ],
+            'columnDefs': [
+                {foreach $colSettings as $colName => $colSetting}
+                {
+                    responsivePriority: {$colSetting['priority']},
+                    targets: {$colSetting['colIndex']},
+                },
+                {/foreach}
+                {if !empty($rowActions)}
+                {
+                    responsivePriority: 1,
+                    targets: -1,
+                },
                 {/if}
             ],
             {ifset $tableSettings['rowGroup']}

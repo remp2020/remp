@@ -23,8 +23,14 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'name',
-                'created_at' => ['header' => 'created at', 'render' => 'date'],
+                'name' => [
+                    'priority' => 1,
+                ],
+                'created_at' => [
+                    'header' => 'created at',
+                    'render' => 'date',
+                    'priority' => 1,
+                ],
             ],
             'dataSource' => action('AccountController@json'),
             'rowActions' => [
