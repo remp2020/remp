@@ -292,7 +292,7 @@
             type: String,
             default: 'none'
         },
-        _closeable: Number,
+        _closeable: Boolean,
         _closeText: String,
         _displayDelay: Number,
         _closeTimeout: Number,
