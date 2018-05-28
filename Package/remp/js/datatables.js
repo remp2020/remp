@@ -243,7 +243,7 @@ $.fn.dataTables = {
                     return '0s';
                 }
                 let d = moment.duration(duration, 'seconds');
-                let durationString = ""
+                let durationString = "";
                 if (d.asHours() >= 1) {
                     durationString += Math.floor(d.asHours()) + "h&nbsp;"
                 }
@@ -258,6 +258,9 @@ $.fn.dataTables = {
         },
         numberStat: function() {
             return function (data) {
+                if (!data) {
+                    return "";
+                }
                 if (data.length === 1) {
                     return data[0];
                 }
@@ -287,6 +290,9 @@ $.fn.dataTables = {
         },
         durationStat: function() {
             return function (data) {
+                if (!data) {
+                    return "";
+                }
                 if (data.length === 1) {
                     return data[0];
                 }
