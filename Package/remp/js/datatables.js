@@ -113,6 +113,7 @@ $.fn.dataTables = {
         if (!value) {
             value = "";
         }
+        value = encodeURIComponent(value);
         let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
         let separator = url.indexOf('?') !== -1 ? "&" : "?";
         if (url.match(re)) {

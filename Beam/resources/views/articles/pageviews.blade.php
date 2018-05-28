@@ -10,25 +10,13 @@
 
     <div class="well">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <h4>Filter by publish date</h4>
-                <div class="input-group m-b-10">
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        {!! Form::datetime('published_from', $publishedFrom, array_filter([
-                            'class' => 'form-control date-picker',
-                            'placeholder' => 'Published from...'
-                        ])) !!}
-                    </div>
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        <div class="dtp-container fg-line">
-                            {!! Form::datetime('published_to', $publishedTo, array_filter([
-                                'class' => 'form-control date-picker',
-                                'placeholder' => 'Published to...'
-                            ])) !!}
-                        </div>
-                    </div>
+                <div id="smart-range-selector">
+                    {!! Form::hidden('published_from', $publishedFrom) !!}
+                    {!! Form::hidden('published_to', $publishedTo) !!}
+                    <smart-range-selector from="{{$publishedFrom}}" to="{{$publishedTo}}" :callback="callback">
+                    </smart-range-selector>
                 </div>
             </div>
         </div>
@@ -94,21 +82,36 @@
             'dataSource' => route('articles.dtPageviews'),
             'order' => [4, 'desc'],
             'requestParams' => [
-                'published_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"published_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                'published_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"published_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
+                'published_from' => '$(\'[name="published_from"]\').val()',
+                'published_to' => '$(\'[name="published_to"]\').val()'
             ],
             'refreshTriggers' => [
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="published_from"]'
                 ],
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="published_to"]',
                 ],
             ],
         ]) !!}
 
     </div>
+
+    <script type="text/javascript">
+        new Vue({
+            el: "#smart-range-selector",
+            components: {
+                SmartRangeSelector
+            },
+            methods: {
+                callback: function (from, to) {
+                    $('[name="published_from"]').val(from);
+                    $('[name="published_to"]').val(to).trigger("change");
+                }
+            }
+        });
+    </script>
 
 @endsection

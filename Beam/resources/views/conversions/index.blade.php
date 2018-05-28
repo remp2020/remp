@@ -10,25 +10,13 @@
 
     <div class="well">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <h4>Filter by conversion date</h4>
-                <div class="input-group m-b-10">
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        {!! Form::datetime('conversion_from', $conversionFrom, array_filter([
-                            'class' => 'form-control date-picker',
-                            'placeholder' => 'Conversion from...'
-                        ])) !!}
-                    </div>
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        <div class="dtp-container fg-line">
-                            {!! Form::datetime('conversion_to', $conversionTo, array_filter([
-                                'class' => 'form-control date-picker',
-                                'placeholder' => 'Conversion to...'
-                            ])) !!}
-                        </div>
-                    </div>
+                <div id="smart-range-selector">
+                    {!! Form::hidden('conversion_from', $conversionFrom) !!}
+                    {!! Form::hidden('conversion_to', $conversionTo) !!}
+                    <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
+                    </smart-range-selector>
                 </div>
             </div>
         </div>
@@ -76,21 +64,35 @@
             'dataSource' => route('conversions.json'),
             'order' => [5, 'desc'],
             'requestParams' => [
-                'conversion_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                'conversion_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
+                'conversion_from' => '$(\'[name="conversion_from"]\').val()',
+                'conversion_to' => '$(\'[name="conversion_to"]\').val()'
             ],
             'refreshTriggers' => [
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="conversion_from"]'
                 ],
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="conversion_to"]',
                 ],
             ],
         ]) !!}
-
     </div>
+
+    <script type="text/javascript">
+        new Vue({
+            el: "#smart-range-selector",
+            components: {
+                SmartRangeSelector
+            },
+            methods: {
+                callback: function (from, to) {
+                    $('[name="conversion_from"]').val(from);
+                    $('[name="conversion_to"]').val(to).trigger("change");
+                }
+            }
+        });
+    </script>
 
 @endsection

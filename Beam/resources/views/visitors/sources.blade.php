@@ -40,17 +40,17 @@
                     'dataSource' => route('visitors.dtReferers'),
                     'order' => [2, 'desc'],
                     'requestParams' => [
-                        'visited_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"visited_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                        'visited_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"visited_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
+                        'visited_from' => '$(\'[name="visited_from"]\').val()',
+                        'visited_to' => '$(\'[name="visited_to"]\').val()',
                         'subscriber' => '$("[name=\"subscriber\"]:checked").val()',
                     ],
                     'refreshTriggers' => [
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_from"]'
                         ],
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_to"]',
                         ],
                         [
