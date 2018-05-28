@@ -4,6 +4,7 @@ package main
 type Config struct {
 	SegmentsAddr string `envconfig:"addr" required:"true"`
 	Debug        bool   `envconfig:"debug" required:"false"`
+	EventStorage string `envconfig:"event_storage" required:"false"`
 
 	MysqlNet    string `envconfig:"mysql_net" required:"true"`
 	MysqlAddr   string `envconfig:"mysql_addr" required:"true"`
@@ -11,8 +12,12 @@ type Config struct {
 	MysqlPasswd string `envconfig:"mysql_passwd" required:"true"`
 	MysqlDBName string `envconfig:"mysql_dbname" required:"true"`
 
-	InfluxAddr   string `envconfig:"influx_addr" required:"true"`
-	InfluxUser   string `envconfig:"influx_user" required:"true"`
-	InfluxPasswd string `envconfig:"influx_passwd" required:"true"`
-	InfluxDBName string `envconfig:"influx_dbname" required:"true"`
+	InfluxAddr   string `envconfig:"influx_addr" required:"false"`
+	InfluxUser   string `envconfig:"influx_user" required:"false"`
+	InfluxPasswd string `envconfig:"influx_passwd" required:"false"`
+	InfluxDBName string `envconfig:"influx_dbname" required:"false"`
+
+	ElasticAddr   string `envconfig:"elastic_addr" required:"true"`
+	ElasticUser   string `envconfig:"elastic_user" required:"false"`
+	ElasticPasswd string `envconfig:"elastic_passwd" required:"false"`
 }

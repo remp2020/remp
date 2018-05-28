@@ -74,6 +74,15 @@ var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
 	Required("tag", "values")
 })
 
+var ListCommerceOptionsPayload = Type("ListCommerceOptionsPayload", func() {
+	Description("Parameters to filter pageview list")
+
+	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("conditions", CommerceOptionsPayload, "Condition definition")
+
+	Required("conditions")
+})
+
 var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Description("Parameters to filter commerce counts")
 

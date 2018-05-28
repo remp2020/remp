@@ -30,7 +30,7 @@ class AggregatePageviewLoadJob extends Command
 
         $records = $journalContract->count($request);
 
-        if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
+        if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process, exiting."));
             return;
         }

@@ -99,7 +99,6 @@ var _ = Resource("segments", func() {
 			})
 			Param("fields", String, FieldsParamDescription)
 		})
-		Payload(RuleOverrides)
 		Response(NotFound)
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))
@@ -145,7 +144,7 @@ var _ = Resource("events", func() {
 		Routing(POST("/list"))
 		Payload(ListEventOptionsPayload)
 		Response(OK, func() {
-			Media(CollectionOf(Event, func() {
+			Media(CollectionOf(Events, func() {
 				View("default")
 			}))
 		})
@@ -220,9 +219,9 @@ var _ = Resource("commerce", func() {
 				Enum("checkout", "payment", "purchase", "refund")
 			})
 		})
-		Payload(CommerceOptionsPayload)
+		Payload(ListCommerceOptionsPayload)
 		Response(OK, func() {
-			Media(CollectionOf(Commerce, func() {
+			Media(CollectionOf(Commerces, func() {
 				View("default")
 			}))
 		})

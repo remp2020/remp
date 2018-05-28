@@ -16,14 +16,14 @@ type SegmentCollection model.SegmentCollection
 // Event represent tracked generic events data.
 type Event model.Event
 
-// EventCollection is the collection of Events.
-type EventCollection model.EventCollection
+// EventRowCollection is the collection of Events bucketed by tags.
+type EventRowCollection model.EventRowCollection
 
 // Commerce represent tracked commerce events data.
 type Commerce model.Commerce
 
-// CommerceCollection is the collection of Commerce events.
-type CommerceCollection model.CommerceCollection
+// CommerceRowCollection is the collection of Commerce events bucketed by tags.
+type CommerceRowCollection model.CommerceRowCollection
 
 // Pageview represent tracked Pageview events data.
 type Pageview model.Pageview
@@ -97,18 +97,36 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 	if e.UserAgent != "" {
 		event.User.UserAgent = &e.UserAgent
 	}
+	if e.UtmSource != "" {
+		event.UtmSource = &e.UtmSource
+	}
+	if e.UtmCampaign != "" {
+		event.UtmCampaign = &e.UtmCampaign
+	}
+	if e.UtmMedium != "" {
+		event.UtmMedium = &e.UtmMedium
+	}
+	if e.UtmContent != "" {
+		event.UtmContent = &e.UtmContent
+	}
 	return event, nil
 }
 
 // ToMediaType converts internal EventCollection representation to application one.
-func (ec EventCollection) ToMediaType() (app.EventCollection, error) {
-	mt := app.EventCollection{}
-	for _, e := range ec {
-		event, err := (*Event)(e).ToMediaType()
-		if err != nil {
-			return nil, err
+func (erc EventRowCollection) ToMediaType() (app.EventsCollection, error) {
+	mt := app.EventsCollection{}
+	for _, er := range erc {
+		events := &app.Events{
+			Tags: er.Tags,
 		}
-		mt = append(mt, event)
+		for _, p := range er.Events {
+			event, err := (*Event)(p).ToMediaType()
+			if err != nil {
+				return nil, err
+			}
+			events.Events = append(events.Events, event)
+		}
+		mt = append(mt, events)
 	}
 	return mt, nil
 }
@@ -143,14 +161,20 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 }
 
 // ToMediaType converts internal CommerceCollection representation to application one.
-func (cc CommerceCollection) ToMediaType() (app.CommerceCollection, error) {
-	mt := app.CommerceCollection{}
-	for _, c := range cc {
-		event, err := (*Commerce)(c).ToMediaType()
-		if err != nil {
-			return nil, err
+func (crc CommerceRowCollection) ToMediaType() (app.CommercesCollection, error) {
+	mt := app.CommercesCollection{}
+	for _, cr := range crc {
+		commerces := &app.Commerces{
+			Tags: cr.Tags,
 		}
-		mt = append(mt, event)
+		for _, p := range cr.Commerces {
+			commerce, err := (*Commerce)(p).ToMediaType()
+			if err != nil {
+				return nil, err
+			}
+			commerces.Commerces = append(commerces.Commerces, commerce)
+		}
+		mt = append(mt, commerces)
 	}
 	return mt, nil
 }

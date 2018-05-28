@@ -61,14 +61,17 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 
 // List runs the list action.
 func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
-	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
-	o.Step = ctx.Step
+	aggOptions := aggregateOptionsFromCommerceOptions(ctx.Payload.Conditions)
+	o := model.ListOptions{
+		AggregateOptions: aggOptions,
+		SelectFields:     ctx.Payload.SelectFields,
+	}
 
-	cc, err := c.CommerceStorage.List(o)
+	crc, err := c.CommerceStorage.List(o)
 	if err != nil {
 		return err
 	}
-	mt, err := CommerceCollection(cc).ToMediaType()
+	mt, err := CommerceRowCollection(crc).ToMediaType()
 	if err != nil {
 		return err
 	}
