@@ -282,32 +282,35 @@
     import vSelect from "remp/js/components/vSelect";
     import FormValidator from "remp/js/components/FormValidator";
 
-    const props = [
-        "_name",
-        "_targetUrl",
-        "_position",
-        "_offsetVertical",
-        "_offsetHorizontal",
-        "_transition",
-        "_closeable",
-        "_closeText",
-        "_displayDelay",
-        "_closeTimeout",
-        "_targetSelector",
-        "_displayType",
-        "_template",
+    const props = {
+        _name: String,
+        _targetUrl: String,
+        _position: String,
+        _offsetVertical: Number,
+        _offsetHorizontal: Number,
+        _transition: {
+            type: String,
+            default: 'none'
+        },
+        _closeable: Number,
+        _closeText: String,
+        _displayDelay: Number,
+        _closeTimeout: Number,
+        _targetSelector: String,
+        _displayType: String,
+        _template: String,
 
-        "_mediumRectangleTemplate",
-        "_barTemplate",
-        "_htmlTemplate",
-        "_shortMessageTemplate",
+        _mediumRectangleTemplate: Object,
+        _barTemplate: Object,
+        _htmlTemplate: Object,
+        _shortMessageTemplate: Object,
 
-        "_alignmentOptions",
-        "_dimensionOptions",
-        "_positionOptions",
+        _alignmentOptions: Object,
+        _dimensionOptions: Object,
+        _positionOptions: Object,
 
-        "_validateUrl"
-    ];
+        _validateUrl: String
+    };
 
     export default {
         components: {
@@ -321,13 +324,9 @@
         },
         name: 'banner-form',
         props: props,
-        created: function(){
-            props.forEach((prop) => {
-                this[prop.slice(1)] = this[prop];
-            });
-
-            if (this.transition === null) {
-                this.transition = 'none';
+        created: function() {
+            for (var key in props) {
+                this[key.slice(1)] = this.$props[key];
             }
 
             this.$on('values-changed', function(data) {

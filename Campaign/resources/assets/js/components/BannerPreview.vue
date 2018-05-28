@@ -182,7 +182,7 @@
         },
         computed: {
             url: function() {
-                if (this.targetUrl === null) {
+                if (this.targetUrl === undefined) {
                     return null;
                 }
                 let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
