@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"log"
 	"math"
 	"strconv"
 
@@ -118,6 +119,16 @@ func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o 
 func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions) (CountRowCollection, bool, error) {
 	var crc CountRowCollection
 	tags := make(map[string]string)
+
+	log.Printf("majne result")
+	m, _ := result.Aggregations.Children("date_time_histogram")
+	log.Printf("%#v\n", m)
+
+	// m := json.Marshal(result.Aggregations)
+
+	// log.Printf("%#v\n", string(result.Aggregations))
+
+	// json.Marshal(result.Aggregations)
 
 	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) {
 		crcTags := make(map[string]string)

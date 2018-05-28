@@ -21,6 +21,7 @@ type EventElastic struct {
 
 // Count returns number of events matching the filter defined by EventOptions.
 func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bool, error) {
+	extras := make(map[string]elastic.Aggregation)
 	search := eDB.DB.Client.Search().
 		Index("events").
 		Type("_doc").
@@ -31,7 +32,15 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 		return nil, false, err
 	}
 
-	search, err = eDB.DB.addGroupBy(search, "events", options, nil)
+	if options.TimeHistogram != nil {
+		extras["date_time_histogram"] = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = eDB.DB.addGroupBy(search, "events", options, extras)
 	if err != nil {
 		return nil, false, err
 	}
