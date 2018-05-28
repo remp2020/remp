@@ -300,7 +300,7 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 			return nil, nil, err
 		}
 
-		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32)
+		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32).Missing("")
 
 		if len(groupBy) > 1 {
 			search, termsAgg, err = eDB.WrapAggregation(index, groupBy[1:], search, extras, termsAgg)
