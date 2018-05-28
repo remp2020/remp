@@ -13,6 +13,8 @@ class Client
 
     const ENDPOINT_REFRESH = 'api/auth/refresh';
 
+    const ENDPOINT_CHECK_TOKEN = 'api/auth/check-token';
+
     private $request;
 
     private $client;
@@ -58,6 +60,35 @@ class Client
 
         $user = Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
         return $user;
+    }
+
+    /**
+     * Return true if token is valid, otherwise return false
+     *
+     * @param $token string
+     * @return bool
+     * @throws \Remp\NetteSso\Security\SsoException
+     * @throws \RuntimeException
+     */
+    public function validToken($token)
+    {
+        try {
+            $response = $this->client->request('GET', self::ENDPOINT_CHECK_TOKEN, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$token,
+                ]
+            ]);
+        } catch (ClientException $e) {
+            $response = $e->getResponse();
+            $contents = $response->getBody()->getContents();
+            if ($response->getStatusCode() === 404){
+                return false;
+            }
+
+            throw new SsoException($contents);
+        }
+
+        return $response->getStatusCode() === 200;
     }
 
     public function refresh($token)

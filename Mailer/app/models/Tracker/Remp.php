@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Tracker;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Ramsey\Uuid\Uuid;
 use Tracy\Debugger;
 use Tracy\Logger;
 
@@ -37,6 +38,7 @@ class Remp implements ITracker
             'action' => $action,
             'fields' => $options->getFields(),
             'value' => $options->getValue(),
+            'remp_event_id' => Uuid::uuid4(),
         ]);
 
         try {
