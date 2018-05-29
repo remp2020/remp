@@ -291,8 +291,8 @@ func (cr HistogramItem) ToMediaType() *app.TimeHistogram {
 	c := int(cr.Count)
 
 	hi := &app.TimeHistogram{
-		Time:  &cr.Time,
-		Count: &c,
+		Time:  cr.Time,
+		Count: c,
 	}
 
 	return hi
