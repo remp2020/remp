@@ -36,10 +36,10 @@ var EventOptionsPayload = Type("EventOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
-	Attribute("time_histogram", EventOptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
 })
 
-var EventOptionsTimeHistogram = Type("EventOptionsTimeHistogram", func() {
+var OptionsTimeHistogram = Type("OptionsTimeHistogram", func() {
 	Description("Values used to split results in time buckets")
 
 	Attribute("interval", String, "Interval of buckets")
@@ -73,6 +73,7 @@ var PageviewOptionsPayload = Type("PageviewOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
 })
 
 var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
@@ -100,6 +101,7 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
 })
 
 var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
