@@ -21,6 +21,12 @@ class BatchesRepository extends Repository
 
     const METHOD_RANDOM = 'random';
 
+    const EDITABLE_STATUSES = [
+        BatchesRepository::STATE_CREATED,
+        BatchesRepository::STATE_UPDATED,
+        BatchesRepository::STATE_READY,
+    ];
+
     protected $tableName = 'mail_job_batch';
 
     public function add($jobId, $emailCount = null, $startAt = null, $method = 'random')
@@ -115,5 +121,14 @@ class BatchesRepository extends Repository
             ->group('mail_job_batch.id')
             ->order('mail_job_batch.last_email_sent_at DESC')
             ->limit($limit);
+    }
+
+    public function notEditableBatches($jobId)
+    {
+        return $this->getTable()
+            ->select('*')
+            ->where(['mail_job_id' => $jobId])
+            ->where(['status NOT IN' => self::EDITABLE_STATUSES])
+            ;
     }
 }
