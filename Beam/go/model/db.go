@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"time"
 )
 
 var fts = map[string]string{
@@ -26,10 +27,16 @@ func (gt FilterType) column() string {
 	return fts[string(gt)]
 }
 
+type HistogramItem struct {
+	Time  time.Time
+	Count int64
+}
+
 // CountRow represents one row of grouped count.
 type CountRow struct {
-	Tags  map[string]string
-	Count int
+	Tags      map[string]string
+	Count     int
+	Histogram []HistogramItem
 }
 
 // CountRowCollection represents collection of rows of grouped count.

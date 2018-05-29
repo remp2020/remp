@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
@@ -120,25 +121,38 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 	var crc CountRowCollection
 	tags := make(map[string]string)
 
-	log.Printf("majne result")
-	m, _ := result.Aggregations.Children("date_time_histogram")
-	log.Printf("%#v\n", m)
-
-	// m := json.Marshal(result.Aggregations)
-
-	// log.Printf("%#v\n", string(result.Aggregations))
-
-	// json.Marshal(result.Aggregations)
-
 	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) {
 		crcTags := make(map[string]string)
+
+		var histogram []HistogramItem
+		histogramData, err := aggregations.DateHistogram("date_time_histogram")
+
+		if err != true {
+			log.Fatal("konec sveta 1")
+		}
+
+		for _, histogramItem := range histogramData.Buckets {
+			time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
+
+			if err != nil {
+				log.Fatal("konec sveta 2")
+			}
+
+			histogram = append(histogram, HistogramItem{
+				Time:  time,
+				Count: histogramItem.DocCount,
+			})
+		}
+
 		// copy tags to avoid memory sharing
 		for key, val := range tags {
 			crcTags[key] = val
 		}
+
 		crc = append(crc, CountRow{
-			Tags:  crcTags,
-			Count: int(count),
+			Tags:      crcTags,
+			Count:     int(count),
+			Histogram: histogram,
 		})
 	})
 
