@@ -55,6 +55,13 @@ func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
 	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
 	o.Action = ctx.Action
 
+	if ctx.Payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: ctx.Payload.TimeHistogram.Interval,
+			Offset:   ctx.Payload.TimeHistogram.Offset,
+		}
+	}
+
 	src, ok, err := c.PageviewStorage.Sum(o)
 	if err != nil {
 		return err

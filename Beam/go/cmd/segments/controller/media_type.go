@@ -328,9 +328,17 @@ func (crc CountRowCollection) ToMediaType() app.CountCollection {
 
 // ToMediaType converts internal SumRow representation to application one.
 func (sr SumRow) ToMediaType() *app.Sum {
+	coll := app.TimeHistogramCollection{}
+
+	for _, c := range sr.Histogram {
+		hi := (HistogramItem)(c).ToMediaType()
+		coll = append(coll, hi)
+	}
+
 	mt := &app.Sum{
-		Sum:  sr.Sum,
-		Tags: sr.Tags,
+		Sum:           sr.Sum,
+		Tags:          sr.Tags,
+		TimeHistogram: coll,
 	}
 	return mt
 }

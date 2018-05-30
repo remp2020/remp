@@ -36,10 +36,12 @@ var Sum = MediaType("application/vnd.sum+json", func() {
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("sum", Number)
+		Attribute("time_histogram", CollectionOf(TimeHistogram))
 	})
 	View("default", func() {
 		Attribute("tags")
 		Attribute("sum")
+		Attribute("time_histogram")
 	})
 	Required("tags", "sum")
 })

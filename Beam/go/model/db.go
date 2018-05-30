@@ -44,8 +44,9 @@ type CountRowCollection []CountRow
 
 // SumRow represents one row of grouped sum.
 type SumRow struct {
-	Tags map[string]string
-	Sum  float64
+	Tags      map[string]string
+	Sum       float64
+	Histogram []HistogramItem
 }
 
 // SumRowCollection represents collection of rows of grouped sum.
