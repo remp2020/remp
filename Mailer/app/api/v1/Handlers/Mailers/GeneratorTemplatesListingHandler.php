@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 use Remp\MailerModule\Generators\GeneratorFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
+use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class GeneratorTemplatesListingHandler extends BaseHandler
@@ -20,11 +21,21 @@ class GeneratorTemplatesListingHandler extends BaseHandler
         $this->generatorFactory = $generatorFactory;
     }
 
+    public function params()
+    {
+        return [
+            new InputParam(InputParam::TYPE_GET, 'generator'),
+        ];
+    }
+
     public function handle($params)
     {
-        $keys = $this->generatorFactory->keys();
+        $generator = $params['generator'];
+        if (!$generator) {
+            $generator = $this->generatorFactory->keys();
+        }
         $results = $this->sourceTemplatesRepository->getTable()
-            ->where(['generator' => $keys])
+            ->where(['generator' => $generator])
             ->select('id,title')->fetchAll();
 
         $output = [];
