@@ -44,18 +44,18 @@ class ProcessJobCommand extends Command
         $pid = $process->pid();
 
         while ($batch = $this->batchesRepository->getBatchReady()) {
-            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_PROCESSING]);
+            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_PROCESSING]);
             $output->writeln("Processing mail batch <info>#{$batch->id}</info>");
 
             if ($batch->related('mail_job_batch_templates')->count('*') == 0) {
                 $output->writeln("<error>Batch #{$batch->id} has no templates</error>");
-                $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_CREATED]);
+                $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_CREATED]);
                 continue;
             }
 
             $this->batchEmailGenerator->generate($batch);
             $this->batchesRepository->update($batch, [
-                'status' => BatchesRepository::STATE_PROCESSED,
+                'status' => BatchesRepository::STATUS_PROCESSED,
                 'pid' => $pid,
             ]);
         }

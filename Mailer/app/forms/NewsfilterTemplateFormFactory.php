@@ -132,7 +132,7 @@ class NewsfilterTemplateFormFactory
             $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS);
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
-            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_READY]);
+            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
         };
 
         $generate(

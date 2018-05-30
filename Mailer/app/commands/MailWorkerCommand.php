@@ -112,12 +112,12 @@ class MailWorkerCommand extends Command
             if (!$this->mailCache->hasJobs($batch->id)) {
                 $output->writeln("Queue <info>{$batch->id}</info> has no more jobs, cleaning up...");
                 $this->mailCache->removeQueue($batch->id);
-                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_DONE]);
+                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATUS_DONE]);
                 continue;
             }
 
-            if ($batch->status == BatchesRepository::STATE_PROCESSED) {
-                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
+            if ($batch->status == BatchesRepository::STATUS_PROCESSED) {
+                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATUS_SENDING]);
             }
 
             $output->writeln("Sending batch <info>{$batch->id}</info>...");
@@ -204,7 +204,7 @@ class MailWorkerCommand extends Command
 
                         if ($this->smtpErrors >= 10) {
                             $this->mailCache->pauseQueue($batch->id);
-                            $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_WORKER_STOP]);
+                            $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATUS_WORKER_STOP]);
                             break;
                         }
                         sleep(10);

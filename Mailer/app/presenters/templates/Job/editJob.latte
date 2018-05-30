@@ -1,0 +1,17 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Jobs</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2>Edit job <span class="text-muted">#{$job->id}</span> <small></small></h2>
+    </div>
+    <div class="card-body card-padding">
+        <div class="row">
+            {control editJobForm}
+        </div>
+    </div>
+</div>
