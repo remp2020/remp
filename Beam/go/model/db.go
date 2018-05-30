@@ -27,6 +27,7 @@ func (gt FilterType) column() string {
 	return fts[string(gt)]
 }
 
+// HistogramItem represents one row of histogram results.
 type HistogramItem struct {
 	Time  time.Time
 	Count int64

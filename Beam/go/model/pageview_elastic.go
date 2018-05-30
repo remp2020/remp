@@ -10,6 +10,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// queryBinding represents information about where and how the data should be fetched.
+type elasticQueryBinding struct {
+	Index string
+	Field string
+}
+
 // PageviewElastic is ElasticDB implementation of PageviewStorage.
 type PageviewElastic struct {
 	DB            *ElasticDB
@@ -18,17 +24,24 @@ type PageviewElastic struct {
 
 // Count returns number of Pageviews matching the filter defined by PageviewOptions.
 func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection, bool, error) {
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := pDB.resolveQueryBindings(options.Action)
+	if err != nil {
+		return nil, false, err
+	}
+
 	// action is not being tracked within separate measurements and we would get no records back
 	// removing it before applying filter
 	options.Action = ""
+
 	extras := make(map[string]elastic.Aggregation)
 
 	search := pDB.DB.Client.Search().
-		Index("pageviews").
+		Index(binding.Index).
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search, err := pDB.DB.addSearchFilters(search, "pageviews", options)
+	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -41,7 +54,7 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, "pageviews", options, extras)
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras)
 	if err != nil {
 		return nil, false, err
 	}
@@ -67,20 +80,26 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 
 // Sum returns number of Pageviews matching the filter defined by AggregateOptions.
 func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, bool, error) {
-	extras := make(map[string]elastic.Aggregation)
-	targetAgg := fmt.Sprintf("%s_sum", options.Action)
-	extras[targetAgg] = elastic.NewSumAggregation().Field(options.Action)
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := pDB.resolveQueryBindings(options.Action)
+	if err != nil {
+		return nil, false, err
+	}
 
 	// action is not being tracked within separate measurements and we would get no records back
 	// removing it before applying filter
 	options.Action = ""
 
+	extras := make(map[string]elastic.Aggregation)
+	targetAgg := fmt.Sprintf("%s_sum", binding.Field)
+	extras[targetAgg] = elastic.NewSumAggregation().Field(binding.Field)
+
 	search := pDB.DB.Client.Search().
-		Index("pageviews").
+		Index(binding.Index).
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search, err := pDB.DB.addSearchFilters(search, "pageviews", options)
+	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -93,7 +112,7 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, "pageviews", options, extras)
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras)
 	if err != nil {
 		return nil, false, err
 	}
@@ -245,4 +264,22 @@ func (pDB *PageviewElastic) Users() ([]string, error) {
 	}
 
 	return users, nil
+}
+
+// resolveQueryBindings returns name of the table and field used within the aggregate function
+// based on the provided action.
+func (pDB *PageviewElastic) resolveQueryBindings(action string) (elasticQueryBinding, error) {
+	switch action {
+	case ActionPageviewLoad:
+		return elasticQueryBinding{
+			Index: TablePageviews,
+			Field: "token",
+		}, nil
+	case ActionPageviewTimespent:
+		return elasticQueryBinding{
+			Index: TableTimespent,
+			Field: "sum",
+		}, nil
+	}
+	return elasticQueryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
 }
