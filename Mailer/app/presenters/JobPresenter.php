@@ -271,7 +271,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchReady($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_READY]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -282,7 +282,7 @@ final class JobPresenter extends BasePresenter
         $batch = $this->batchesRepository->find($id);
         $priority = $this->batchesRepository->getBatchPriority($batch);
         $this->mailCache->restartQueue($batch->id, $priority);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_SENDING]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -292,7 +292,7 @@ final class JobPresenter extends BasePresenter
     {
         $batch = $this->batchesRepository->find($id);
         $this->mailCache->pauseQueue($batch->id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_USER_STOP]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_USER_STOP]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -301,7 +301,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchCreated($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_CREATED]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_CREATED]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
