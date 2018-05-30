@@ -18,8 +18,14 @@ class SegmentsListingHandler extends BaseHandler
 
     public function handle($params)
     {
-        $output = $this->aggregator->list();
-
+        $output = [];
+        foreach ($this->aggregator->list() as $segment) {
+            $item = [];
+            $item['name'] = $segment['name'];
+            $item['code'] = $segment['code'];
+            $item['provider'] = $segment['provider'];
+            $output[] = $item;
+        }
         return new JsonApiResponse(200, ['status' => 'ok', 'data' => $output]);
     }
 }
