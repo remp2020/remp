@@ -278,7 +278,7 @@ func (pDB *PageviewElastic) resolveQueryBindings(action string) (elasticQueryBin
 	case ActionPageviewTimespent:
 		return elasticQueryBinding{
 			Index: TableTimespent,
-			Field: "sum",
+			Field: "timespent",
 		}, nil
 	}
 	return elasticQueryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
