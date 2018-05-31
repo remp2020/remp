@@ -46,15 +46,16 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
+	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
-		extras["date_time_histogram"] = elastic.NewDateHistogramAggregation().
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
 			TimeZone("UTC").
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras)
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
 	}
@@ -104,15 +105,16 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
+	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
-		extras["date_time_histogram"] = elastic.NewDateHistogramAggregation().
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
 			TimeZone("UTC").
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras)
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
 	}

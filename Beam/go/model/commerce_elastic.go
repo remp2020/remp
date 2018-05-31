@@ -27,7 +27,16 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
-	search, err = cDB.DB.addGroupBy(search, "commerce", options, nil)
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+	if options.TimeHistogram != nil {
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = cDB.DB.addGroupBy(search, "commerce", options, nil, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
 	}
@@ -156,7 +165,16 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
-	search, err = cDB.DB.addGroupBy(search, "commerce", options, extras)
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+	if options.TimeHistogram != nil {
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = cDB.DB.addGroupBy(search, "commerce", options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
 	}

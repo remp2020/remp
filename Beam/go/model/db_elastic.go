@@ -104,11 +104,11 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 // addGroupBy creates a standard (wrapped) aggregation. The results are fetchable
 // via countRowCollectionFromBuckets or sumRowCollectionFromBuckets.
 func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o AggregateOptions,
-	extras map[string]elastic.Aggregation) (*elastic.SearchService, error) {
+	extras map[string]elastic.Aggregation, dateHistogramAgg *elastic.DateHistogramAggregation) (*elastic.SearchService, error) {
 
-	if len(o.GroupBy) > 0 || len(extras) > 0 {
+	if len(o.GroupBy) > 0 || len(extras) > 0 || dateHistogramAgg != nil {
 		var err error
-		search, _, err = eDB.WrapAggregation(index, o.GroupBy, search, extras, nil)
+		search, _, err = eDB.WrapAggregation(index, o.GroupBy, search, extras, dateHistogramAgg, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -171,13 +171,9 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 	tags := make(map[string]string)
 
 	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
-		sumAgg, ok := aggregations.Sum(targetAgg)
-		if !ok {
-			dataPresent = false
-			return nil
-		}
 
 		var histogram []HistogramItem
+		var sumValue float64
 
 		if options.TimeHistogram != nil {
 			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
@@ -187,8 +183,13 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 			}
 
 			for _, histogramItem := range histogramData.Buckets {
-				time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
 
+				agg, ok := histogramItem.Aggregations.Sum("timespent_sum")
+				if !ok {
+					errors.New("cant find timespent_sum sub agg in date histogram agg")
+				}
+
+				time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
 				if err != nil {
 					errors.New("cant parse time from elastic search with RFC3339 layout")
 				}
@@ -196,7 +197,19 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 				histogram = append(histogram, HistogramItem{
 					Time:  time,
 					Count: histogramItem.DocCount,
+					Sum:   *agg.Value,
 				})
+			}
+		} else {
+			sumAgg, ok := aggregations.Sum(targetAgg)
+
+			if sumAgg.Value != nil {
+				sumValue = *sumAgg.Value
+			}
+
+			if !ok {
+				dataPresent = false
+				return nil
 			}
 		}
 
@@ -206,14 +219,9 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 			srcTags[key] = val
 		}
 
-		var sum float64
-		if sumAgg.Value != nil {
-			sum = *sumAgg.Value
-		}
-
 		src = append(src, SumRow{
 			Tags:      srcTags,
-			Sum:       sum,
+			Sum:       sumValue,
 			Histogram: histogram,
 		})
 
@@ -352,12 +360,20 @@ func (eDB *ElasticDB) resolveKeyword(index, field string) (string, error) {
 //
 // Following is a standard wrapping via SubAggregation() endorsed by official docs.
 func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *elastic.SearchService,
-	extras map[string]elastic.Aggregation, agg *elastic.TermsAggregation) (*elastic.SearchService, *elastic.TermsAggregation, error) {
+	extras map[string]elastic.Aggregation, dateHistogramAgg *elastic.DateHistogramAggregation, agg *elastic.TermsAggregation) (*elastic.SearchService, *elastic.TermsAggregation, error) {
 
 	// if there is no group by - add only extras aggs
 	if len(groupBy) == 0 {
-		for label, extraAgg := range extras {
-			search.Aggregation(label, extraAgg)
+		if dateHistogramAgg != nil {
+			for label, extraAgg := range extras {
+				dateHistogramAgg.SubAggregation(label, extraAgg)
+			}
+
+			search = search.Aggregation("date_time_histogram", dateHistogramAgg)
+		} else {
+			for label, extraAgg := range extras {
+				search = search.Aggregation(label, extraAgg)
+			}
 		}
 
 		return search, nil, nil
@@ -372,14 +388,22 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32)
 
 		if len(groupBy) > 1 {
-			search, termsAgg, err = eDB.WrapAggregation(index, groupBy[1:], search, extras, termsAgg)
+			search, termsAgg, err = eDB.WrapAggregation(index, groupBy[1:], search, extras, dateHistogramAgg, termsAgg)
 			if err != nil {
 				return nil, nil, err
 			}
 		} else {
-			// include external aggregation if necessary (e.g. sum)
-			for label, extraAgg := range extras {
-				termsAgg = termsAgg.SubAggregation(label, extraAgg)
+			if dateHistogramAgg != nil {
+				for label, extraAgg := range extras {
+					dateHistogramAgg = dateHistogramAgg.SubAggregation(label, extraAgg)
+				}
+
+				termsAgg = termsAgg.SubAggregation("date_time_histogram", dateHistogramAgg)
+			} else {
+				// include external aggregation if necessary (e.g. sum)
+				for label, extraAgg := range extras {
+					termsAgg = termsAgg.SubAggregation(label, extraAgg)
+				}
 			}
 		}
 
@@ -387,10 +411,6 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 			return search.Aggregation(field, termsAgg), nil, nil
 		}
 
-		// include external aggregation if necessary (e.g. sum)
-		for label, extraAgg := range extras {
-			termsAgg = termsAgg.SubAggregation(label, extraAgg)
-		}
 		return search, agg.SubAggregation(field, termsAgg), nil
 	}
 
@@ -410,7 +430,6 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 			return err
 		}
 		return nil
-
 	}
 
 	for _, field := range groupBy {
@@ -443,10 +462,11 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 
 			if len(groupBy) > 1 {
 				eDB.UnwrapAggregation(bucket.DocCount, bucket.Aggregations, groupBy[1:], tags, cb)
-			} else {
-				if err := cb(tags, bucket.DocCount, bucket.Aggregations); err != nil {
-					return err
-				}
+				return nil
+			}
+
+			if err := cb(tags, bucket.DocCount, bucket.Aggregations); err != nil {
+				return err
 			}
 		}
 	}

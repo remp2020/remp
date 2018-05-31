@@ -33,15 +33,17 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 		return nil, false, err
 	}
 
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+
 	if options.TimeHistogram != nil {
-		extras["date_time_histogram"] = elastic.NewDateHistogramAggregation().
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
 			TimeZone("UTC").
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = eDB.DB.addGroupBy(search, "events", options, extras)
+	search, err = eDB.DB.addGroupBy(search, "events", options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
 	}

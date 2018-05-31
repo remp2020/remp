@@ -31,6 +31,7 @@ func (gt FilterType) column() string {
 type HistogramItem struct {
 	Time  time.Time
 	Count int64
+	Sum   float64
 }
 
 // CountRow represents one row of grouped count.

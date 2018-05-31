@@ -164,10 +164,12 @@ var TimeHistogram = MediaType("application/vnd.time-histogram+json", func() {
 	Attributes(func() {
 		Attribute("time", DateTime)
 		Attribute("count", Integer)
+		Attribute("sum", Number)
 	})
 	View("default", func() {
 		Attribute("time")
 		Attribute("count")
+		Attribute("sum")
 	})
 	Required("time", "count")
 })
