@@ -177,6 +177,10 @@ services:
             - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\MinutaAlertGenerator())
             - registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\DailyNewsletterGenerator())
             - registerGenerator('empty', 'Empty generator', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('best_performing_articles', 'Best performing articles', \Remp\MailerModule\Generators\GenericBestPerformingArticlesGenerator())
+
+    transporter:
+        class: Remp\MailerModule\PageMeta\GuzzleTransport
 
     # Repositories
     - Remp\MailerModule\Repository\AuditLogRepository
