@@ -142,7 +142,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 
 				histogram = append(histogram, HistogramItem{
 					Time:  time,
-					Count: histogramItem.DocCount,
+					Value: int(histogramItem.DocCount),
 				})
 			}
 		}
@@ -196,8 +196,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 
 				histogram = append(histogram, HistogramItem{
 					Time:  time,
-					Count: histogramItem.DocCount,
-					Sum:   *agg.Value,
+					Value: int(*agg.Value),
 				})
 			}
 		} else {

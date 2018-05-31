@@ -163,15 +163,13 @@ var TimeHistogram = MediaType("application/vnd.time-histogram+json", func() {
 	Description("Time histogram data")
 	Attributes(func() {
 		Attribute("time", DateTime)
-		Attribute("count", Integer)
-		Attribute("sum", Number)
+		Attribute("value", Integer)
 	})
 	View("default", func() {
 		Attribute("time")
-		Attribute("count")
-		Attribute("sum")
+		Attribute("value")
 	})
-	Required("time", "count")
+	Required("time", "value")
 })
 
 var Commerce = MediaType("application/vnd.commerce+json", func() {

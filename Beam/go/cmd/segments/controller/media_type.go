@@ -287,16 +287,12 @@ func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 }
 
 // ToMediaType converts internal HistogramItem representation to application one.
-func (cr HistogramItem) ToMediaType(includeSum bool) *app.TimeHistogram {
-	c := int(cr.Count)
+func (cr HistogramItem) ToMediaType() *app.TimeHistogram {
+	c := int(cr.Value)
 
 	hi := &app.TimeHistogram{
 		Time:  cr.Time,
-		Count: c,
-	}
-
-	if includeSum {
-		hi.Sum = &cr.Sum
+		Value: c,
 	}
 
 	return hi
@@ -307,7 +303,7 @@ func (cr CountRow) ToMediaType() *app.Count {
 	coll := app.TimeHistogramCollection{}
 
 	for _, c := range cr.Histogram {
-		hi := (HistogramItem)(c).ToMediaType(false)
+		hi := (HistogramItem)(c).ToMediaType()
 		coll = append(coll, hi)
 	}
 
@@ -335,7 +331,7 @@ func (sr SumRow) ToMediaType() *app.Sum {
 	coll := app.TimeHistogramCollection{}
 
 	for _, c := range sr.Histogram {
-		hi := (HistogramItem)(c).ToMediaType(true)
+		hi := (HistogramItem)(c).ToMediaType()
 		coll = append(coll, hi)
 	}
 
