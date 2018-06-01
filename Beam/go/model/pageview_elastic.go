@@ -125,7 +125,7 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
-	return pDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg)
+	return pDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg, binding)
 }
 
 // List returns list of all Pageviews based on given PageviewOptions.

@@ -128,21 +128,19 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 
 		if options.TimeHistogram != nil {
 			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
-
 			if !ok {
 				errors.New("missing expected histogram aggregation data")
 			}
 
 			for _, histogramItem := range histogramData.Buckets {
 				time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
-
 				if err != nil {
 					errors.New("cant parse time from elastic search with RFC3339 layout")
 				}
 
 				histogram = append(histogram, HistogramItem{
 					Time:  time,
-					Value: int(histogramItem.DocCount),
+					Value: float64(histogramItem.DocCount),
 				})
 			}
 		}
@@ -165,7 +163,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 }
 
 // sumRowCollectionFromAggregations generates SumRowCollection based on query result aggregations.
-func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string) (SumRowCollection, bool, error) {
+func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, binding elasticQueryBinding) (SumRowCollection, bool, error) {
 	var src SumRowCollection
 	dataPresent := true
 	tags := make(map[string]string)
@@ -177,38 +175,35 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 
 		if options.TimeHistogram != nil {
 			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
-
 			if !ok {
 				return errors.New("missing expected histogram aggregation data")
 			}
 
+			sumValue = 0
 			for _, histogramItem := range histogramData.Buckets {
-
-				agg, ok := histogramItem.Aggregations.Sum("timespent_sum")
+				sumAggLabel := fmt.Sprintf("%s_sum", binding.Field)
+				agg, ok := histogramItem.Aggregations.Sum(sumAggLabel)
 				if !ok {
-					errors.New("cant find timespent_sum sub agg in date histogram agg")
+					return errors.New("cant find timespent_sum sub agg in date histogram agg")
 				}
 
-				time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
-				if err != nil {
-					errors.New("cant parse time from elastic search with RFC3339 layout")
-				}
-
+				time := time.Unix(int64(histogramItem.Key)/1000, 0).UTC()
 				histogram = append(histogram, HistogramItem{
 					Time:  time,
-					Value: int(*agg.Value),
+					Value: float64(*agg.Value),
 				})
+
+				sumValue += float64(*agg.Value)
 			}
 		} else {
 			sumAgg, ok := aggregations.Sum(targetAgg)
-
-			if sumAgg.Value != nil {
-				sumValue = *sumAgg.Value
-			}
-
 			if !ok {
 				dataPresent = false
 				return nil
+			}
+
+			if sumAgg.Value != nil {
+				sumValue = *sumAgg.Value
 			}
 		}
 
@@ -439,7 +434,7 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 
 		// zero results before we got to the lowest unwrap level
 		if len(groupBy) > 0 && len(agg.Buckets) == 0 {
-			// we don't know Fiel the actual values for tags that got no records
+			// we don't know the actual values for tags that got no records
 			// but we still want to return that we checked for that and found nothing, hence empty string
 			for _, f := range groupBy {
 				tags[f] = ""

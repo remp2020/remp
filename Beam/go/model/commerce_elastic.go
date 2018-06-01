@@ -151,6 +151,12 @@ func (cDB *CommerceElastic) List(options ListOptions) (CommerceRowCollection, er
 
 // Sum returns sum of events based on the provided filter options.
 func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, bool, error) {
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := cDB.resolveQueryBindings(options.Action)
+	if err != nil {
+		return nil, false, err
+	}
+
 	extras := make(map[string]elastic.Aggregation)
 	targetAgg := "revenue_sum"
 	extras[targetAgg] = elastic.NewSumAggregation().Field("revenue")
@@ -160,7 +166,7 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search, err := cDB.DB.addSearchFilters(search, "commerce", options)
+	search, err = cDB.DB.addSearchFilters(search, "commerce", options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -185,7 +191,7 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
-	return cDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg)
+	return cDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg, binding)
 }
 
 // Categories lists all available categories.
@@ -212,4 +218,22 @@ func (cDB *CommerceElastic) Actions(category string) ([]string, error) {
 		}, nil
 	}
 	return nil, fmt.Errorf("unknown commerce category: %s", category)
+}
+
+// resolveQueryBindings returns name of the table and field used within the aggregate function
+// based on the provided action.
+func (cDB *CommerceElastic) resolveQueryBindings(action string) (elasticQueryBinding, error) {
+	switch action {
+	case ActionPageviewLoad:
+		return elasticQueryBinding{
+			Index: TableCommerce,
+			Field: "revenue",
+		}, nil
+	case ActionPageviewTimespent:
+		return elasticQueryBinding{
+			Index: TableCommerce,
+			Field: "revenue",
+		}, nil
+	}
+	return elasticQueryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
 }

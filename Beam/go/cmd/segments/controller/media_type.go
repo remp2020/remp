@@ -37,7 +37,7 @@ type PageviewRowCollection model.PageviewRowCollection
 // SegmentCache represent cache object for count of events of SegmentRules.
 type SegmentCache model.SegmentCache
 
-// HistogramItem represent row with date time histogram data
+// HistogramItem represent row with date time histogram data.
 type HistogramItem model.HistogramItem
 
 // CountRow represent row with count result.
@@ -287,15 +287,15 @@ func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 }
 
 // ToMediaType converts internal HistogramItem representation to application one.
-func (cr HistogramItem) ToMediaType() *app.TimeHistogram {
-	c := int(cr.Value)
+func (hi HistogramItem) ToMediaType() *app.TimeHistogram {
+	c := float64(hi.Value)
 
-	hi := &app.TimeHistogram{
-		Time:  cr.Time,
+	th := &app.TimeHistogram{
+		Time:  hi.Time,
 		Value: c,
 	}
 
-	return hi
+	return th
 }
 
 // ToMediaType converts internal CountRow representation to application one.

@@ -159,11 +159,11 @@ var Event = MediaType("application/vnd.event+json", func() {
 	Required("system", "category", "action")
 })
 
-var TimeHistogram = MediaType("application/vnd.time-histogram+json", func() {
+var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
 	Description("Time histogram data")
 	Attributes(func() {
 		Attribute("time", DateTime)
-		Attribute("value", Integer)
+		Attribute("value", Number)
 	})
 	View("default", func() {
 		Attribute("time")
