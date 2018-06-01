@@ -186,7 +186,7 @@
     $(document).ready(function() {
         var delay = 0;
         {foreach $flashes as $flash}
-        delay += 250;
+        delay += 500;
         window.setTimeout(function() {
             $.notify({
                 message: {$flash->message}

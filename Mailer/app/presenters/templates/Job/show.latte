@@ -9,6 +9,9 @@
     <div class="card-header">
         <h2 n:block="title">Job <span class="text-muted">#{$job->id}</span><small></small></h2>
         <div class="actions">
+            <a n:if="$jobIsEditable" n:href="Job:EditJob $job->id" class="btn palette-Cyan bg waves-effect">
+                <i class="zmdi zmdi-edit"></i> Edit job
+            </a>
             <a href="#new-batch-form" data-toggle="collapse">
                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-plus-circle"></i> Add batch</button>
             </a>
