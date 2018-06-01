@@ -144,8 +144,7 @@
                         ],
                         "group_by": [
                             "article_id",
-                            "social",
-                        ].concat(variantTypes),
+                        ].concat(variantTypes).concat(["social"]),
                     };
 
                     Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', variantPayload)

@@ -9,49 +9,21 @@
     </div>
 
     <div class="well">
-        <div class="row">
-            <div class="col-md-3">
+        <div id="smart-range-selectors" class="row">
+            <div class="col-md-4">
                 <h4>Filter by article publish date</h4>
-                <div class="input-group m-b-10">
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        {!! Form::datetime('published_from', $publishedFrom, array_filter([
-                            'class' => 'form-control date-picker',
-                            'placeholder' => 'Published from...'
-                        ])) !!}
-                    </div>
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        <div class="dtp-container fg-line">
-                            {!! Form::datetime('published_to', $publishedTo, array_filter([
-                                'class' => 'form-control date-picker',
-                                'placeholder' => 'Published to...'
-                            ])) !!}
-                        </div>
-                    </div>
-                </div>
+                {!! Form::hidden('published_from', $publishedFrom) !!}
+                {!! Form::hidden('published_to', $publishedTo) !!}
+                <smart-range-selector from="{{$publishedFrom}}" to="{{$publishedTo}}" :callback="callbackPublished">
+                </smart-range-selector>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <h4>Filter by conversion date</h4>
-                <div class="input-group m-b-10">
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        {!! Form::datetime('conversion_from', $conversionFrom, array_filter([
-                            'class' => 'form-control date-picker',
-                            'placeholder' => 'Conversion from...'
-                        ])) !!}
-                    </div>
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        <div class="dtp-container fg-line">
-                            {!! Form::datetime('conversion_to', $conversionTo, array_filter([
-                                'class' => 'form-control date-picker',
-                                'placeholder' => 'Conversion to...'
-                            ])) !!}
-                        </div>
-                    </div>
-                </div>
+                {!! Form::hidden('conversion_from', $conversionFrom) !!}
+                {!! Form::hidden('conversion_to', $conversionTo) !!}
+                <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callbackConversion">
+                </smart-range-selector>
             </div>
         </div>
     </div>
@@ -63,42 +35,89 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'title' => ['orderable' => false],
-                'conversions_count' => ['header' => 'conversions'],
-                'amount' => ['header' => 'amount', 'render' => 'array'],
-                'average' => ['header' => 'average', 'render' => 'array'],
-                'authors' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
-                'sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                'published_at' => ['header' => 'published', 'render' => 'date'],
+                'title' => [
+                    'orderable' => false,
+                    'priority' => 1,
+                ],
+                'conversions_count' => [
+                    'header' => 'conversions',
+                    'priority' => 2,
+                ],
+                'amount' => [
+                    'header' => 'amount',
+                    'render' => 'array',
+                    'priority' => 1,
+                ],
+                'average' => [
+                    'header' => 'average',
+                    'render' => 'array',
+                    'priority' => 2,
+                ],
+                'authors' => [
+                    'header' => 'authors',
+                    'orderable' => false,
+                    'filter' => $authors,
+                    'priority' => 2,
+                ],
+                'sections[, ].name' => [
+                    'header' => 'sections',
+                    'orderable' => false,
+                    'filter' => $sections,
+                    'priority' => 3,
+                ],
+                'published_at' => [
+                    'header' => 'published',
+                    'render' => 'date',
+                    'priority' => 3,
+                ],
             ],
             'dataSource' => route('articles.dtConversions'),
             'order' => [5, 'desc'],
             'requestParams' => [
-                'published_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"published_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                'published_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"published_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
-                'conversion_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                'conversion_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
+                'published_from' => '$(\'[name="published_from"]\').val()',
+                'published_to' => '$(\'[name="published_to"]\').val()',
+                'conversion_from' => '$(\'[name="conversion_from"]\').val()',
+                'conversion_to' => '$(\'[name="conversion_to"]\').val()'
             ],
             'refreshTriggers' => [
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="published_from"]'
                 ],
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="published_to"]',
                 ],
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="conversion_from"]'
                 ],
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="conversion_to"]',
                 ],
             ],
         ]) !!}
 
     </div>
+
+    <script type="text/javascript">
+        new Vue({
+            el: "#smart-range-selectors",
+            components: {
+                SmartRangeSelector
+            },
+            methods: {
+                callbackPublished: function (from, to) {
+                    $('[name="published_from"]').val(from);
+                    $('[name="published_to"]').val(to).trigger("change");
+                },
+                callbackConversion: function (from, to) {
+                    $('[name="conversion_from"]').val(from);
+                    $('[name="conversion_to"]').val(to).trigger("change");
+                }
+            }
+        });
+    </script>
 
 @endsection

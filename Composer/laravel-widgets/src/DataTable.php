@@ -67,15 +67,22 @@ class DataTable extends AbstractWidget
     public function run()
     {
         $cols = [];
+
         array_walk($this->config['colSettings'], function ($item, $key) use (&$cols) {
             if (!is_array($item)) {
-                $cols[] = [
-                    'name' => $item,
-                    'header' => $item,
-                ];
-            } else {
-                $cols[] = array_merge(['name' => $key], $item);
+                throw new DataTableException('Missing configuration array for colum: "' . $item . '"');
             }
+
+            if (!array_key_exists('priority', $item)) {
+                throw new DataTableException('Missing "priority" item in DataTable configuration array for column: "' . $key . '"');
+            }
+
+            $cols[] = array_merge([
+                'name' => $key,
+                'colIndex' => array_search($key,
+                    array_keys($this->config['colSettings'])
+                )
+            ], $item);
         });
 
         $tableId = md5(Json::encode([

@@ -27,7 +27,7 @@ class BannerRequest extends FormRequest
     {
         return [
             'name' => 'required|max:255',
-            'target_url' => 'required|url',
+            'target_url' => 'nullable|url',
             'position' => 'required|in:top_left,top_right,bottom_left,bottom_right,middle_left,middle_right',
             'transition' => 'required|string',
             'display_type' => 'string|required|in:overlay,inline',

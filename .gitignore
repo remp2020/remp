@@ -1,5 +1,6 @@
 .idea
 .vscode
+.history
 .env
 *.sublime-project
 *.sublime-workspace

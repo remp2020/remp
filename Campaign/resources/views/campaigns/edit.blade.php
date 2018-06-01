@@ -28,17 +28,21 @@
                         'colSettings' => [
                             'campaign' => [
                                 'header' => 'Campaign',
+                                'priority' => 1,
                             ],
                             'start_time' => [
                                 'header' => 'Scheduled start date',
                                 'render' => 'date',
+                                'priority' => 2,
                             ],
                             'end_time' => [
                                 'header' => 'Scheduled end date',
                                 'render' => 'date',
+                                'priority' => 2,
                             ],
                             'status' => [
                                 'header' => 'Status',
+                                'priority' => 1,
                             ],
                         ],
                         'dataSource' => route('campaign.schedule.json', ['campaign' => $campaign]),

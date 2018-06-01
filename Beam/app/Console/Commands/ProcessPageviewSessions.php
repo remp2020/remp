@@ -30,7 +30,7 @@ class ProcessPageviewSessions extends Command
         $timeAfter = (clone $timeBefore)->subHour();
 
         // select first pageview of each session
-        $request->addSelect("first(token)", "referer", "url", "ref_source", "social", "user_agent");
+        $request->addSelect("token", "referer", "url", "ref_source", "social", "user_agent");
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup("remp_session_id", "subscriber");
@@ -63,45 +63,49 @@ class ProcessPageviewSessions extends Command
         $bar->setMessage('Detecting devices and sources');
 
         foreach ($pageviews as $record) {
-            foreach ($record->pageviews as $pageview) {
-                $deviceDetector->setUserAgent($pageview->user->user_agent);
-                $deviceDetector->parse();
-
-                $client = $deviceDetector->getClient();
-                $os = $deviceDetector->getOs();
-
-                $deviceData['subscriber'] = boolval($record->tags->subscriber);
-                $deviceData['os_name'] = $os['name'] ?? null;
-                $deviceData['os_version'] = $os['version'] ?? null;
-                $deviceData['client_type'] = $client['type'] ?? null;
-                $deviceData['client_name'] = $client['name'] ?? null;
-                $deviceData['client_version'] = $client['version'] ?? null;
-                $deviceData['model'] = $deviceDetector->getModel();
-                $deviceData['brand'] = $deviceDetector->getBrandName();
-                $deviceData['type'] = $deviceDetector->getDeviceName();
-
-                $deviceAggregate = $this->increment($deviceAggregate, $deviceData);
-
-                $refererData = $refererBlueprint;
-                if (isset($pageview->user->referer)) {
-                    $referer = $refererParser->parse($pageview->user->referer, $pageview->user->url);
-                    $refererData['medium'] = $referer->getMedium();
-                    $refererData['source'] = $referer->getSource();
-                } else {
-                    $refererData['medium'] = 'direct';
-                }
-                if ($refererData['medium'] === 'invalid') {
-                    continue;
-                }
-                if ($refererData['medium'] === 'unknown') {
-                    $uri = $uriParser($pageview->user->referer);
-                    $refererData['medium'] = 'external';
-                    $refererData['source'] = $uri['host'];
-                }
-
-                $refererData['subscriber'] = boolval($record->tags->subscriber);
-                $refererAggregate = $this->increment($refererAggregate, $refererData);
+            if (empty($record->pageviews)) {
+                continue;
             }
+            $pageview = $record->pageviews[0];
+            
+            $deviceDetector->setUserAgent($pageview->user->user_agent);
+            $deviceDetector->parse();
+
+            $client = $deviceDetector->getClient();
+            $os = $deviceDetector->getOs();
+
+            $deviceData['subscriber'] = boolval($record->tags->subscriber);
+            $deviceData['os_name'] = $os['name'] ?? null;
+            $deviceData['os_version'] = $os['version'] ?? null;
+            $deviceData['client_type'] = $client['type'] ?? null;
+            $deviceData['client_name'] = $client['name'] ?? null;
+            $deviceData['client_version'] = $client['version'] ?? null;
+            $deviceData['model'] = $deviceDetector->getModel();
+            $deviceData['brand'] = $deviceDetector->getBrandName();
+            $deviceData['type'] = $deviceDetector->getDeviceName();
+
+            $deviceAggregate = $this->increment($deviceAggregate, $deviceData);
+
+            $refererData = $refererBlueprint;
+            if (isset($pageview->user->referer)) {
+                $referer = $refererParser->parse($pageview->user->referer, $pageview->user->url);
+                $refererData['medium'] = $referer->getMedium();
+                $refererData['source'] = $referer->getSource();
+            } else {
+                $refererData['medium'] = 'direct';
+            }
+            if ($refererData['medium'] === 'invalid') {
+                continue;
+            }
+            if ($refererData['medium'] === 'unknown') {
+                $uri = $uriParser($pageview->user->referer);
+                $refererData['medium'] = 'external';
+                $refererData['source'] = $uri['host'];
+            }
+
+            $refererData['subscriber'] = boolval($record->tags->subscriber);
+            $refererAggregate = $this->increment($refererAggregate, $refererData);
+
             $bar->advance();
         }
         $bar->finish();
@@ -135,7 +139,7 @@ class ProcessPageviewSessions extends Command
         if (count($refererConditionsAndCounts) > 0) {
             $bar = $this->output->createProgressBar(count($refererConditionsAndCounts));
             $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
-            $bar->setMessage('Storing device data');
+            $bar->setMessage('Storing referer data');
 
             foreach ($refererConditionsAndCounts as $referer) {
                 $attributes = $referer['conditions'];

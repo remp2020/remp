@@ -90,7 +90,7 @@ class SegmentController extends Controller
     {
         $segment = new Segment();
 
-        $segment = $this->saveSegment($segment, $request->all(), $request->all('rules'));
+        $segment = $this->saveSegment($segment, $request->all(), $request->get('rules'));
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(

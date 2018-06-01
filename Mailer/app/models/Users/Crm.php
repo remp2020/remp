@@ -11,7 +11,7 @@ use Tracy\Debugger;
 
 class Crm implements IUser
 {
-    const ENDPOINT_LIST = 'users/list';
+    const ENDPOINT_LIST = 'api/v1/users/list';
 
     private $client;
 

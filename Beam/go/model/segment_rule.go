@@ -134,39 +134,31 @@ func (sr SegmentRule) applyOverrides(o RuleOverrides) *SegmentRule {
 }
 
 // conditions returns list of influx conditions for current SegmentRule.
-func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
-	var conds []string
+func (sr *SegmentRule) options(now time.Time, o RuleOverrides) AggregateOptions {
+	options := AggregateOptions{}
+
 	switch sr.EventCategory {
 	case CategoryPageview:
 		// no condition needed yet, pageview-load event is implicit
 	case CategoryCommerce:
-		conds = append(
-			conds,
-			fmt.Sprintf(`"step" = '%s'`, sr.EventAction),
-		)
+		options.Step = sr.EventAction
 	default:
-		conds = append(
-			conds,
-			fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
-			fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
-		)
+		options.Category = sr.EventCategory
+		options.Action = sr.EventAction
 	}
 
 	for _, def := range sr.Fields {
 		if def["key"] == "" || def["value"] == "" {
 			continue
 		}
-		conds = append(
-			conds,
-			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
-		)
+		options.FilterBy = append(options.FilterBy, &FilterBy{Tag: def["key"], Values: []string{def["value"]}})
 	}
 
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
-		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
+		options.TimeAfter = t
 	}
-	return conds
+	return options
 }
 
 func (sr *SegmentRule) groups() []string {

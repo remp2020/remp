@@ -11,6 +11,7 @@ use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\Forms\EditBatchFormFactory;
 use Remp\MailerModule\Forms\IFormFactory;
+use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
 use Remp\MailerModule\Job\MailCache;
@@ -28,6 +29,8 @@ use Remp\MailerModule\Segment\SegmentException;
 final class JobPresenter extends BasePresenter
 {
     private $jobsRepository;
+
+    private $jobFormFactory;
 
     private $batchesRepository;
 
@@ -59,6 +62,7 @@ final class JobPresenter extends BasePresenter
 
     public function __construct(
         JobsRepository $jobsRepository,
+        JobFormFactory $jobFormFactory,
         BatchesRepository $batchesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         TemplatesRepository $templatesRepository,
@@ -76,6 +80,7 @@ final class JobPresenter extends BasePresenter
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
+        $this->jobFormFactory = $jobFormFactory;
         $this->batchesRepository = $batchesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->templatesRepository = $templatesRepository;
@@ -99,13 +104,40 @@ final class JobPresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('defaultJsonData'))
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setColSetting('segment', ['orderable' => false])
-            ->setColSetting('batches', ['orderable' => false, 'filter' => $mailTypePairs])
-            ->setColSetting('sent_count', ['header' => 'sent', 'orderable' => false])
-            ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
-            ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
-            ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('segment', [
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('batches', [
+                'orderable' => false,
+                'filter' => $mailTypePairs,
+                'priority' => 2,
+            ])
+            ->setColSetting('sent_count', [
+                'header' => 'sent',
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('opened_count', [
+                'header' => 'opened',
+                'orderable' => false,
+                'priority' => 3,
+            ])
+            ->setColSetting('clicked_count', [
+                'header' => 'clicked',
+                'orderable' => false,
+                'priority' => 3,
+            ])
+            ->setColSetting('unsubscribed_count', [
+                'header' => 'unsubscribed',
+                'orderable' => false,
+                'priority' => 3,
+            ])
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
@@ -198,6 +230,27 @@ final class JobPresenter extends BasePresenter
 
         $this->template->job = $job;
         $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
+        $this->template->jobIsEditable = $this->jobsRepository->isEditable($job->id);
+    }
+
+    public function renderEditJob($id)
+    {
+        $this->template->job = $this->jobsRepository->find($id);
+    }
+
+    public function createComponentEditJobForm()
+    {
+        $jobId = $this->params['id'] ?? null;
+        $form = $this->jobFormFactory->create($jobId);
+        $this->jobFormFactory->onSuccess = function ($job) {
+            $this->flashMessage('Job was updated');
+            $this->redirect('Show', $job->id);
+        };
+        $this->jobFormFactory->onError = function ($job, $message) {
+            $this->flashMessage($message, 'danger');
+            $this->redirect('Show', $job->id);
+        };
+        return $form;
     }
 
     public function renderEditBatch($id)
@@ -218,7 +271,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchReady($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_READY]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -229,7 +282,7 @@ final class JobPresenter extends BasePresenter
         $batch = $this->batchesRepository->find($id);
         $priority = $this->batchesRepository->getBatchPriority($batch);
         $this->mailCache->restartQueue($batch->id, $priority);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_SENDING]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -239,7 +292,7 @@ final class JobPresenter extends BasePresenter
     {
         $batch = $this->batchesRepository->find($id);
         $this->mailCache->pauseQueue($batch->id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_USER_STOP]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_USER_STOP]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -248,7 +301,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchCreated($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_CREATED]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_CREATED]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -273,16 +326,6 @@ final class JobPresenter extends BasePresenter
 
         $this->flashMessage('Batch was removed.');
         $this->redirect('Show', $batch->job_id);
-    }
-
-    public function createComponentJobForm()
-    {
-        $form = $this->newBatchFormFactory->create();
-        $this->newBatchFormFactory->onSuccess = function ($job) {
-            $this->flashMessage('Job was created');
-            $this->redirect('Show', $job->id);
-        };
-        return $form;
     }
 
     public function handleTemplatesByListId($listId, $sourceForm, $sourceField, $targetField, $snippet = null)

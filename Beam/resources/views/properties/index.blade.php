@@ -24,7 +24,20 @@
             </div>
 
             {!! Widget::run('DataTable', [
-                'colSettings' => ['name', 'uuid' => ['header' => 'token'], 'created_at' => ['header' => 'created at', 'render' => 'date']],
+                'colSettings' => [
+                    'name' => [
+                        'priority' => 1,
+                    ],
+                    'uuid' => [
+                        'header' => 'token',
+                        'priority' => 1,
+                    ],
+                    'created_at' => [
+                        'header' => 'created at',
+                        'render' => 'date',
+                        'priority' => 2,
+                    ]
+                ],
                 'dataSource' => route('accounts.properties.json', $account),
                 'rowActions' => [
                     ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],

@@ -44,13 +44,34 @@ final class ListPresenter extends BasePresenter
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('category', ['visible' => false])
-            ->setColSetting('title')
-            ->setColSetting('code')
-            ->setColSetting('subscribed', ['render' => 'number'])
-            ->setColSetting('auto_subscribe', ['header' => 'auto subscribe', 'render' => 'boolean'])
-            ->setColSetting('locked', ['render' => 'boolean'])
-            ->setColSetting('is_public', ['header' => 'public', 'render' => 'boolean'])
+            ->setColSetting('category', [
+                'visible' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('title', [
+                'priority' => 1,
+            ])
+            ->setColSetting('code', [
+                'priority' => 2,
+            ])
+            ->setColSetting('subscribed', [
+                'render' => 'number',
+                'priority' => 2,
+            ])
+            ->setColSetting('auto_subscribe', [
+                'header' => 'auto subscribe',
+                'render' => 'boolean',
+                'priority' => 3,
+            ])
+            ->setColSetting('locked', [
+                'render' => 'boolean',
+                'priority' => 2,
+            ])
+            ->setColSetting('is_public', [
+                'header' => 'public',
+                'render' => 'boolean',
+                'priority' => 3,
+            ])
             ->setAllColSetting('orderable', false)
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('displayNavigation', false)
@@ -109,10 +130,20 @@ final class ListPresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('templateJsonData'))
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setColSetting('subject')
-            ->setColSetting('opened')
-            ->setColSetting('clicked')
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('subject', [
+                'priority' => 1,
+            ])
+            ->setColSetting('opened', [
+                'priority' => 2,
+            ])
+            ->setColSetting('clicked', [
+                'priority' => 2,
+            ])
             ->setRowAction('show', 'palette-Cyan zmdi-eye')
             ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));

@@ -15,10 +15,11 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
-	"github.com/influxdata/influxdb/client/v2"
+	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/olivere/elastic"
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
@@ -39,6 +40,8 @@ func main() {
 
 	stop := make(chan os.Signal, 3)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
+	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	service := goa.New("segments")
 
@@ -67,42 +70,34 @@ func main() {
 		log.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
 	}
 
-	ic, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr:     c.InfluxAddr,
-		Username: c.InfluxUser,
-		Password: c.InfluxPasswd,
-	})
-	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to initialize influx http client"))
+	var eventStorage model.EventStorage
+	var pageviewStorage model.PageviewStorage
+	var commerceStorage model.CommerceStorage
+
+	switch c.EventStorage {
+	case "", "elastic":
+		eventStorage, pageviewStorage, commerceStorage, err = initElasticEventStorages(ctx, c)
+	case "influx":
+		eventStorage, pageviewStorage, commerceStorage, err = initInfluxEventStorages(ctx, c)
+	default:
+		log.Fatalf("unrecognized storage: %s", c.EventStorage)
 	}
-	influxDB := &model.InfluxDB{
-		DBName:       c.InfluxDBName,
-		Client:       ic,
-		QueryBuilder: influxquery.NewInfluxBuilder(),
-		Debug:        c.Debug,
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	countCache := cache.New(5*time.Minute, 10*time.Minute)
-
-	eventDB := &model.EventDB{
-		DB: influxDB,
-	}
-	commerceDB := &model.CommerceDB{
-		DB: influxDB,
-	}
-	pageviewDB := &model.PageviewDB{
-		DB: influxDB,
-	}
-	segmentDB := &model.SegmentDB{
-		MySQL:          mysqlDB,
-		InfluxDB:       influxDB,
-		RuleCountCache: countCache,
+	segmentStorage := &model.SegmentDB{
+		MySQL:           mysqlDB,
+		RuleCountCache:  countCache,
+		EventStorage:    eventStorage,
+		PageviewStorage: pageviewStorage,
+		CommerceStorage: commerceStorage,
 	}
 
 	// server cancellation
 
 	var wg sync.WaitGroup
-	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	// caching
 
@@ -113,12 +108,12 @@ func main() {
 	defer ticker1h.Stop()
 
 	cacheSegmentDB := func() {
-		if err := segmentDB.Cache(); err != nil {
+		if err := segmentStorage.Cache(); err != nil {
 			service.LogError("unable to cache segments", "err", err)
 		}
 	}
 	cacheEventDB := func() {
-		if err := eventDB.Cache(); err != nil {
+		if err := eventStorage.Cache(); err != nil {
 			service.LogError("unable to cache events", "err", err)
 		}
 	}
@@ -144,11 +139,11 @@ func main() {
 
 	// controllers init
 
-	app.MountJournalController(service, controller.NewJournalController(service, eventDB, commerceDB, pageviewDB))
-	app.MountEventsController(service, controller.NewEventController(service, eventDB))
-	app.MountCommerceController(service, controller.NewCommerceController(service, commerceDB))
-	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewDB))
-	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentDB))
+	app.MountJournalController(service, controller.NewJournalController(service, eventStorage, commerceStorage, pageviewStorage))
+	app.MountEventsController(service, controller.NewEventController(service, eventStorage))
+	app.MountCommerceController(service, controller.NewCommerceController(service, commerceStorage))
+	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewStorage))
+	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage))
 
 	// server init
 
@@ -175,4 +170,68 @@ func main() {
 	cancelCtx()
 	wg.Wait()
 	service.LogInfo("bye bye")
+}
+
+func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
+	eopts := []elastic.ClientOptionFunc{
+		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
+		elastic.SetURL(c.ElasticAddr),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheckInterval(10 * time.Second),
+		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
+	}
+	if c.Debug {
+		eopts = append(
+			eopts,
+			elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
+			elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)),
+		)
+	}
+	ec, err := elastic.NewClient(eopts...)
+	if err != nil {
+		return nil, nil, nil, errors.Wrap(err, "unable to initialize elasticsearch client")
+	}
+	elasticDB := model.NewElasticDB(ctx, ec, c.Debug)
+
+	eventStorage := &model.EventElastic{
+		DB: elasticDB,
+	}
+	commerceStorage := &model.CommerceElastic{
+		DB: elasticDB,
+	}
+	pageviewStorage := &model.PageviewElastic{
+		DB: elasticDB,
+	}
+
+	return eventStorage, pageviewStorage, commerceStorage, nil
+}
+
+func initInfluxEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
+	ic, err := client.NewHTTPClient(client.HTTPConfig{
+		Addr:     c.InfluxAddr,
+		Username: c.InfluxUser,
+		Password: c.InfluxPasswd,
+	})
+	if err != nil {
+		log.Fatalln(errors.Wrap(err, "unable to initialize influx http client"))
+	}
+
+	influxDB := &model.InfluxDB{
+		DBName:       c.InfluxDBName,
+		Client:       ic,
+		QueryBuilder: influxquery.NewInfluxBuilder(),
+		Debug:        c.Debug,
+	}
+
+	eventStorage := &model.EventInflux{
+		DB: influxDB,
+	}
+	commerceStorage := &model.CommerceInflux{
+		DB: influxDB,
+	}
+	pageviewStorage := &model.PageviewInflux{
+		DB: influxDB,
+	}
+
+	return eventStorage, pageviewStorage, commerceStorage, nil
 }

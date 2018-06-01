@@ -20,6 +20,15 @@ var SegmentRuleCache = Type("SegmentRuleCache", func() {
 	Required("s", "c")
 })
 
+var ListEventOptionsPayload = Type("ListEventOptionsPayload", func() {
+	Description("Parameters to filter events list")
+
+	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("conditions", EventOptionsPayload, "Condition definition")
+
+	Required("conditions")
+})
+
 var EventOptionsPayload = Type("EventOptionsPayload", func() {
 	Description("Parameters to filter event counts")
 
@@ -63,6 +72,15 @@ var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
 	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
 
 	Required("tag", "values")
+})
+
+var ListCommerceOptionsPayload = Type("ListCommerceOptionsPayload", func() {
+	Description("Parameters to filter pageview list")
+
+	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("conditions", CommerceOptionsPayload, "Condition definition")
+
+	Required("conditions")
 })
 
 var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
