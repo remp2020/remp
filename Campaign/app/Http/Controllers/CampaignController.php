@@ -658,7 +658,7 @@ class CampaignController extends Controller
         $campaign->save();
 
         $campaign->banner_id = $data['banner_id'];
-        $campaign->alt_banner_id = $data['alt_banner_id'];
+        $campaign->alt_banner_id = $data['alt_banner_id'] ?? null;
 
         if (isset($data['countries'])) {
             $campaign->countries()->sync(
