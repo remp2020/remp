@@ -16,7 +16,7 @@ type ElasticDB struct {
 	Debug   bool
 	Context context.Context
 
-	fieldsCache map[string]map[string]bool // fields cache represents list of all index (map key) fields (map values)
+	fieldsCache map[string]map[string]string // fields cache represents list of all index (map key) fields (map values)
 }
 
 // NewElasticDB returns new instance of ElasticSearch DB implementation
@@ -26,7 +26,7 @@ func NewElasticDB(ctx context.Context, client *elastic.Client, debug bool) *Elas
 		Debug:   debug,
 		Context: ctx,
 	}
-	edb.fieldsCache = make(map[string]map[string]bool)
+	edb.fieldsCache = make(map[string]map[string]string)
 	return edb
 }
 
@@ -246,32 +246,14 @@ func (eDB *ElasticDB) sumRowCollectionFromCompositeBuckets(buckets []*elastic.Ag
 // resolveKeyword checks, whether the index contains ".keyword" field (for exact indexed search) and uses that if possible.
 func (eDB *ElasticDB) resolveKeyword(index, field string) (string, error) {
 	fields, ok := eDB.fieldsCache[index]
+	var err error
 
 	// populate cache for given index if it's empty
 	if !ok {
-		result, err := eDB.Client.GetFieldMapping().Index(index).Type("_doc").Do(eDB.Context)
+		fields, err = eDB.cacheFieldMapping(index)
 		if err != nil {
-			return "", errors.Wrap(err, "unable to get field mappings for pageviews index")
+			return "", err
 		}
-
-		root, ok := result[index].(map[string]interface{})
-		if !ok {
-			return "", fmt.Errorf("invalid index provided, no mapping data available: %s", index)
-		}
-		mappings, ok := root["mappings"].(map[string]interface{})
-		if !ok {
-			return "", fmt.Errorf("\"mappings\" field not present within field mapping response")
-		}
-		doc, ok := mappings["_doc"].(map[string]interface{})
-		if !ok {
-			return "", fmt.Errorf("invalid document provided, no mapping data available for document: _doc")
-		}
-
-		fields = make(map[string]bool)
-		for f := range doc {
-			fields[f] = true
-		}
-		eDB.fieldsCache[index] = fields
 	}
 
 	// check if keyword is present among fields
@@ -281,6 +263,85 @@ func (eDB *ElasticDB) resolveKeyword(index, field string) (string, error) {
 		return field, nil
 	}
 	return keyword, nil
+}
+
+// resolveKeyword checks, whether the index contains ".keyword" field (for exact indexed search) and uses that if possible.
+func (eDB *ElasticDB) resolveZeroValue(index, field string) (interface{}, error) {
+	fields, ok := eDB.fieldsCache[index]
+	var err error
+
+	// populate cache for given index if it's empty
+	if !ok {
+		fields, err = eDB.cacheFieldMapping(index)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// check fields data type
+	def, ok := fields[field]
+	if !ok {
+		// no such field present in index, we can return zero value of interface{}
+		return nil, nil
+	}
+
+	switch def {
+	case "text":
+		return "", nil
+	case "boolean", "date":
+		return nil, nil
+	case "long":
+		return 0, nil
+	}
+
+	return nil, nil
+}
+
+// cacheFieldMapping downloads and caches field mappings for specified index
+func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error) {
+	result, err := eDB.Client.GetMapping().Index(index).Type("_doc").Do(eDB.Context)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get field mappings for pageviews index")
+	}
+
+	root, ok := result[index].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("invalid index provided, no mapping data available: %s", index)
+	}
+	mappings, ok := root["mappings"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("\"mappings\" field not present within field mapping response")
+	}
+	doc, ok := mappings["_doc"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("invalid document provided, no mapping data available for document: _doc")
+	}
+	properties, ok := doc["properties"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("\"properties\" field not present within field mapping response for document: _doc")
+	}
+
+	fields := make(map[string]string)
+	for f, rawField := range properties {
+		field, ok := rawField.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("unexpected type of field property, expected map[string]interface{}: %T", rawField)
+		}
+		typ, ok := field["type"].(string)
+		if !ok {
+			return nil, fmt.Errorf("non-string field property mapping type received: %T", field["type"])
+		}
+		fields[f] = typ
+
+		subfields, ok := field["fields"].(map[string]interface{})
+		if ok {
+			if _, ok := subfields["keyword"]; ok {
+				fields[fmt.Sprintf("%s.keyword", f)] = "keyword"
+			}
+		}
+	}
+	eDB.fieldsCache[index] = fields
+	return fields, nil
 }
 
 // WrapAggregation recursivelly wraps aggregations based on provided groupBy fields.
@@ -299,8 +360,12 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 		if err != nil {
 			return nil, nil, err
 		}
+		zeroVal, err := eDB.resolveZeroValue(index, field)
+		if err != nil {
+			return nil, nil, err
+		}
 
-		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32)
+		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32).Missing(zeroVal)
 
 		if len(groupBy) > 1 {
 			search, termsAgg, err = eDB.WrapAggregation(index, groupBy[1:], search, extras, termsAgg)
