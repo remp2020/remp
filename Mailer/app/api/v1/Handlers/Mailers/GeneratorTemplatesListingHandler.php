@@ -40,7 +40,10 @@ class GeneratorTemplatesListingHandler extends BaseHandler
 
         $output = [];
         foreach ($results as $row) {
-            $output[] = $row->toArray();
+            $item = new \stdClass();
+            $item->id = $row->id;
+            $item->title = $row->title;
+            $output[] = $item;
         }
 
         return new JsonApiResponse(200, ['status' => 'ok', 'data' => $output]);

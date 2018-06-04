@@ -11,15 +11,11 @@ use Remp\MailerModule\PageMeta\TransportInterface;
 
 class Utils
 {
-    public static function fetchUrlMeta($url, ContentInterface $content, TransportInterface $transportInterface = null)
+    public static function fetchUrlMeta($url, ContentInterface $content, TransportInterface $transport)
     {
-        if ($transportInterface == null) {
-            $transportInterface = new GuzzleTransport();
-        }
-
         $url = preg_replace('/\\?ref=(.*)/', '', $url);
         try {
-            $pageMeta = new PageMeta($transportInterface, $content);
+            $pageMeta = new PageMeta($transport, $content);
             $meta = $pageMeta->getPageMeta($url);
             if ($meta) {
                 return $meta;
