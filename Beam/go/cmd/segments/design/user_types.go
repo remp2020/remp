@@ -36,6 +36,16 @@ var EventOptionsPayload = Type("EventOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+})
+
+var OptionsTimeHistogram = Type("OptionsTimeHistogram", func() {
+	Description("Values used to split results in time buckets")
+
+	Attribute("interval", String, "Interval of buckets")
+	Attribute("offset", String, "Offset of buckets")
+
+	Required("interval", "offset")
 })
 
 var EventOptionsFilterBy = Type("EventOptionsFilterBy", func() {
@@ -63,6 +73,7 @@ var PageviewOptionsPayload = Type("PageviewOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
 })
 
 var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
@@ -90,6 +101,7 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
 })
 
 var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {

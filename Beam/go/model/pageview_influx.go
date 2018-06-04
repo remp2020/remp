@@ -10,8 +10,8 @@ import (
 	"gitlab.com/remp/remp/Beam/go/influxquery"
 )
 
-// queryBinding represents information about where and how the data should be fetched.
-type queryBinding struct {
+// influxQueryBinding represents information about where and how the data should be fetched.
+type influxQueryBinding struct {
 	Measurement string
 	Field       string
 }
@@ -199,20 +199,20 @@ func (eDB *PageviewInflux) Users() ([]string, error) {
 
 // resolveQueryBindings returns name of the table and field used within the aggregate function
 // based on the provided action.
-func (eDB *PageviewInflux) resolveQueryBindings(action string) (queryBinding, error) {
+func (eDB *PageviewInflux) resolveQueryBindings(action string) (influxQueryBinding, error) {
 	switch action {
 	case ActionPageviewLoad:
-		return queryBinding{
+		return influxQueryBinding{
 			Measurement: TablePageviews,
 			Field:       "token",
 		}, nil
 	case ActionPageviewTimespent:
-		return queryBinding{
+		return influxQueryBinding{
 			Measurement: TableTimespentAggregated,
 			Field:       "sum",
 		}, nil
 	}
-	return queryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
+	return influxQueryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
 }
 
 func pageviewFromInfluxResult(ir *influxquery.Result) (*Pageview, error) {
