@@ -322,7 +322,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 				tags["utm_content"] = *user.Source.UtmContent
 			}
 			if user.Source.BannerVariant != nil {
-				tags["variant"] = *user.Source.BannerVariant
+				tags["banner_variant"] = *user.Source.BannerVariant
 			}
 		}
 	} else {
