@@ -74,7 +74,7 @@ class Campaign extends Model
             ->withPivot('variant', 'proportion', 'control_group', 'weight');
     }
 
-    public function campaignBanner()
+    public function campaignBanners()
     {
         return $this->hasMany(CampaignBanner::class)->orderBy('weight');
     }
@@ -82,16 +82,8 @@ class Campaign extends Model
     public function getPrimaryBanner()
     {
         return optional(
-            $this->campaignBanner()->with('banner')->first()
+            $this->campaignBanners()->with('banner')->first()
         )->banner;
-    }
-
-    public function getBannerAttribute()
-    {
-        if ($this->relationLoaded('banner')) {
-            return $this->getRelation('banner')->first();
-        }
-        return $this->banner()->first();
     }
 
     public function removeVariants(array $variantIds)
@@ -164,6 +156,18 @@ class Campaign extends Model
         return false;
     }
 
+    public function getVariantsProportionMapping()
+    {
+        $mapping = [];
+        $campaignBanners = $this->campaignBanners;
+
+        foreach ($campaignBanners as $campaignBanner) {
+            $mapping[$campaignBanner->uuid] = $campaignBanner->proportion;
+        }
+
+        return $mapping;
+    }
+
     public function cache()
     {
         $activeCampaignIds = Schedule::applyScopes()
@@ -181,15 +185,14 @@ class Campaign extends Model
             'countriesWhitelist',
             'countriesBlacklist',
             'schedules',
+            'campaignBanners',
+            'campaignBanners.banner',
         ])->first();
 
-        $banners = CampaignBanner::where('campaign_id', $this->id)
-                                ->with('banner')
-                                ->get();
+        foreach ($campaign->campaignBanners as $variant) {
+            optional($variant->banner)->loadTemplate();
+        }
 
-        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, [
-            'campaign' => $campaign,
-            'banners' => $banners
-        ]);
+        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
 }

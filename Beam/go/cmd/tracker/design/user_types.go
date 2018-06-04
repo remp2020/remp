@@ -110,6 +110,7 @@ var Source = Type("source", func() {
 	Attribute("utm_medium", String, "Medium through which the came (e.g. overlay, inline)")
 	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
+	Attribute("banner_variant", String, "Reference to specific banner variant (e.g. variant ID)")
 	Attribute("social", String, "Social source if available")
 	Attribute("ref", String, "Direct referrer source if available")
 })
