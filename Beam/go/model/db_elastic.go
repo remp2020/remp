@@ -179,7 +179,6 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 				return errors.New("missing expected histogram aggregation data")
 			}
 
-			sumValue = 0
 			for _, histogramItem := range histogramData.Buckets {
 				sumAggLabel := fmt.Sprintf("%s_sum", binding.Field)
 				agg, ok := histogramItem.Aggregations.Sum(sumAggLabel)
@@ -187,7 +186,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 					return errors.New("cant find timespent_sum sub agg in date histogram agg")
 				}
 
-				time := time.Unix(int64(histogramItem.Key)/1000, 0).UTC()
+				time := time.Unix(0, int64(histogramItem.Key*1000000)).UTC()
 				histogram = append(histogram, HistogramItem{
 					Time:  time,
 					Value: float64(*agg.Value),
