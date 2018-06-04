@@ -186,7 +186,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 					return errors.New("cant find timespent_sum sub agg in date histogram agg")
 				}
 
-				time := time.Unix(0, int64(histogramItem.Key*1000000)).UTC()
+				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
 				histogram = append(histogram, HistogramItem{
 					Time:  time,
 					Value: float64(*agg.Value),
