@@ -182,6 +182,8 @@ return [
         App\Providers\RempSegmentsServiceProvider::class,
         App\Providers\RempTrackerServiceProvider::class,
 
+        App\Providers\StatsServiceProvider::class,
+
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,

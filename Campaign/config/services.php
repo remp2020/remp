@@ -49,6 +49,7 @@ return [
             'tracker_addr' => env('REMP_TRACKER_ADDR'),
             'tracker_property_token' => env('REMP_TRACKER_ADDR'),
             'segments_addr' => env('REMP_SEGMENTS_ADDR'),
+            'stats_addr' => env('REMP_STATS_ADDR'),
         ],
         'mailer' => [
             'web_addr' => env('REMP_MAILER_ADDR'),

@@ -27,6 +27,7 @@ use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\DeviceDetector;
+use App\Contracts\Remp\Stats;
 
 class CampaignController extends Controller
 {
@@ -809,6 +810,22 @@ class CampaignController extends Controller
         }
 
         return $segments;
+    }
+
+    public function stats(
+        Campaign $campaign,
+        Stats $stats
+    ) {
+
+        $result = $stats->count($campaign);
+
+        $result = $stats->events('banner', 'show')
+                        ->groupBy(["action", "browser_id"])
+                        ->timeHistogram("15m")
+                        ->count()
+                        ->get();
+
+        dd($result);
     }
 
     /**

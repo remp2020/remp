@@ -32,6 +32,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
     Route::post('banners/validate', 'BannerController@validateForm')->name('banners.validateForm');
 
+    Route::get('campaigns/{campaign}/stats', 'CampaignController@stats')->name('campaigns.stats');
+
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
     Route::resource('banners', 'BannerController');
