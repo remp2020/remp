@@ -163,7 +163,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 }
 
 // sumRowCollectionFromAggregations generates SumRowCollection based on query result aggregations.
-func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, binding elasticQueryBinding) (SumRowCollection, bool, error) {
+func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, sumField string) (SumRowCollection, bool, error) {
 	var src SumRowCollection
 	dataPresent := true
 	tags := make(map[string]string)
@@ -180,7 +180,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 			}
 
 			for _, histogramItem := range histogramData.Buckets {
-				sumAggLabel := fmt.Sprintf("%s_sum", binding.Field)
+				sumAggLabel := fmt.Sprintf("%s_sum", sumField)
 				agg, ok := histogramItem.Aggregations.Sum(sumAggLabel)
 				if !ok {
 					return errors.New("cant find timespent_sum sub agg in date histogram agg")
