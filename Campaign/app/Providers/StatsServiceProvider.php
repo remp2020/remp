@@ -32,7 +32,7 @@ class StatsServiceProvider extends ServiceProvider
                 'timeout' => 1,
                 'connect_timeout' => 1,
             ]);
-            return new Stats($client, 0);
+            return new Stats($client, "0");
         });
     }
 }

@@ -18,7 +18,7 @@ interface StatsContract
 
     public function to(\DateTime $to): StatsRequest;
 
-    public function commerce(): StatsRequest;
+    public function commerce(string $step): StatsRequest;
 
     public function timeHistogram(string $interval): StatsRequest;
 

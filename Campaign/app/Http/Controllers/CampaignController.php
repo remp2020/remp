@@ -816,16 +816,13 @@ class CampaignController extends Controller
         Campaign $campaign,
         Stats $stats
     ) {
-
-        $result = $stats->count($campaign);
-
-        $result = $stats->events('banner', 'show')
-                        ->groupBy(["action", "browser_id"])
+        $result = $stats->count()
+                        ->events('banner', 'show')
+                        ->groupBy(["browser_id"])
                         ->timeHistogram("15m")
-                        ->count()
                         ->get();
 
-        dd($result);
+        return view('campaigns.stats', compact('campaign'));
     }
 
     /**

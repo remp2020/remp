@@ -6,5 +6,3 @@ class StatsException extends \Exception
 {
 
 }
-
-

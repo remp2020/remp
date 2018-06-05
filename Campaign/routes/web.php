@@ -36,6 +36,12 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
+    Route::get('campaigns/{campaign}/stats/clicks', 'StatsController@campaignClicks');
+    Route::get('campaigns/{campaign}/stats/payments/started', 'StatsController@campaignStartedPayments');
+    Route::get('campaigns/{campaign}/stats/payments/finished', 'StatsController@campaignFinishedPayments');
+    Route::get('campaigns/{campaign}/stats/earned', 'StatsController@campaignEarned');
+    Route::get('campaigns/{campaign}/stats/histogram/{interval}', 'StatsController@campaignShowHistogram');
+
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');
     Route::resource('schedule', 'ScheduleController');

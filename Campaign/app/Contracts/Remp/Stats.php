@@ -41,9 +41,9 @@ class Stats implements StatsContract
         return (new StatsRequest($this->client, $this->timeOffset))->to($to);
     }
 
-    public function commerce(): StatsRequest
+    public function commerce(string $step): StatsRequest
     {
-        return (new StatsRequest($this->client, $this->timeOffset))->commerce();
+        return (new StatsRequest($this->client, $this->timeOffset))->commerce($step);
     }
 
     public function timeHistogram(string $interval): StatsRequest
