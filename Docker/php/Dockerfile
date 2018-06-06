@@ -4,7 +4,7 @@ ENV LIBRDKAFKA_VERSION v0.9.5
 
 ENV BUILD_DEPS libzip-dev zlib1g-dev g++ build-essential libsasl2-dev libssl-dev python-minimal
 
-ENV RUN_DEPS libicu-dev git wget vim curl less
+ENV RUN_DEPS libicu-dev git wget vim curl less gnupg
 
 # INIT (single command so the intermediates are not stored)
 # librdkafka is built manually because packages contain only v0.8.5
