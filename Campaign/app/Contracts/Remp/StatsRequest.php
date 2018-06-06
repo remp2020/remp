@@ -36,6 +36,12 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
+    public function forVariant($variantId)
+    {
+        $this->filterBy("banner_variant", [$variantId]);
+        return $this;
+    }
+
     public function events(string $categoryArg, string $actionArg) : StatsRequest
     {
         $this->args['categories'] = $categoryArg;

@@ -4,4 +4,8 @@ require("remp/js/datatables.js");
 require("./banner.js");
 require("./forms/bannerForm.js");
 require("./forms/campaignForm.js");
+require("./campaignStats.js");
+require("./chart.js")
+
+
 

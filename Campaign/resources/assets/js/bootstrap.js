@@ -3,3 +3,7 @@ global.Vue = require('vue');
 global.moment = require('moment');
 global.Toggle = require("remp/js/components/Toggle.vue");
 global.noUiSlider = require("nouislider/distribute/nouislider.js")
+
+require("./chart.js");
+
+global.salvattore = require("salvattore");

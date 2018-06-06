@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Campaign;
 use App\Contracts\Remp\Stats;
+use App\CampaignBanner;
 
 class StatsController extends Controller
 {
@@ -12,6 +13,44 @@ class StatsController extends Controller
         $result = $stats->count()
                         ->events('banner', 'click')
                         ->forCampaign($campaign->uuid)
+                        ->get();
+
+        return response()->json($result);
+    }
+
+    public function campaignClicksHistogram(Campaign $campaign, $interval, Stats $stats)
+    {
+        $result = $stats->count()
+                ->events('banner', 'click')
+                ->forCampaign($campaign->uuid)
+                ->timeHistogram($interval)
+                ->get();
+
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
+
+        $histogramData = $result['data'][0];
+        $data = $this->parseHistogramData($histogramData);
+
+        return response()->json($data);
+    }
+
+    public function variantClicks(CampaignBanner $variant, Stats $stats)
+    {
+        $result = $stats->count()
+                        ->events('banner', 'click')
+                        ->forVariant($variant->uuid)
+                        ->get();
+
+        return response()->json($result);
+    }
+
+    public function variantShows(CampaignBanner $variant, Stats $stats)
+    {
+        $result = $stats->count()
+                        ->events('banner', 'show')
+                        ->forVariant($variant->uuid)
                         ->get();
 
         return response()->json($result);
@@ -47,7 +86,7 @@ class StatsController extends Controller
         return response()->json($result);
     }
 
-    public function campaignShowHistogram(Campaign $campaign, $interval, Stats $stats)
+    public function campaignShowsHistogram(Campaign $campaign, $interval, Stats $stats)
     {
         $result = $stats->count()
                         ->events('banner', 'show')
@@ -55,6 +94,30 @@ class StatsController extends Controller
                         ->timeHistogram($interval)
                         ->get();
 
-        return response()->json($result);
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
+
+        $histogramData = $result['data'][0];
+        $data = $this->parseHistogramData($histogramData);
+
+        return response()->json($data);
+    }
+
+    public function parseHistogramData($histogramData)
+    {
+        $parsedData = [
+            'labels' => [],
+            'data' => []
+        ];
+
+        foreach ($histogramData->time_histogram as $histogramRow) {
+            $date = new \DateTime($histogramRow->time);
+
+            $parsedData['labels'][] = $date->format('d. m. Y');
+            $parsedData['data'][] = $histogramRow->value;
+        }
+
+        return $parsedData;
     }
 }
