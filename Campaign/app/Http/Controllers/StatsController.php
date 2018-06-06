@@ -3,96 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Campaign;
-use App\Contracts\Remp\Stats;
 use App\CampaignBanner;
+use Illuminate\Http\Request;
+use App\Contracts\Remp\Stats;
 
 class StatsController extends Controller
 {
-    public function campaignClicks(Campaign $campaign, Stats $stats)
+
+    public function campaignStatsCount(Campaign $campaign, Stats $stats, Request $request)
     {
         $result = $stats->count()
-                        ->events('banner', 'click')
+                        ->events('banner', $request->get('type'))
                         ->forCampaign($campaign->uuid)
                         ->get();
 
         return response()->json($result);
     }
 
-    public function campaignClicksHistogram(Campaign $campaign, $interval, Stats $stats)
+    public function campaignStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
     {
         $result = $stats->count()
-                ->events('banner', 'click')
-                ->forCampaign($campaign->uuid)
-                ->timeHistogram($interval)
-                ->get();
+                        ->events('banner', $request->get('type'))
+                        ->forCampaign($campaign->uuid)
+                        ->timeHistogram($request->get('interval'))
+                        ->get();
 
         if ($result["success"] != true) {
             return response()->json($result);
         }
 
         $histogramData = $result['data'][0];
+
         $data = $this->parseHistogramData($histogramData);
 
         return response()->json($data);
     }
 
-    public function variantClicks(CampaignBanner $variant, Stats $stats)
+    public function campaignPaymentStatsCount(Campaign $campaign, Stats $stats, Request $request)
     {
         $result = $stats->count()
-                        ->events('banner', 'click')
-                        ->forVariant($variant->uuid)
-                        ->get();
-
-        return response()->json($result);
-    }
-
-    public function variantShows(CampaignBanner $variant, Stats $stats)
-    {
-        $result = $stats->count()
-                        ->events('banner', 'show')
-                        ->forVariant($variant->uuid)
-                        ->get();
-
-        return response()->json($result);
-    }
-
-    public function campaignStartedPayments(Campaign $campaign, Stats $stats)
-    {
-        $result = $stats->count()
-                        ->commerce('payment')
-                        ->forCampaign($campaign->uuid)
-                        ->get();
-
-        return response()->json($result);
-    }
-
-    public function campaignFinishedPayments(Campaign $campaign, Stats $stats)
-    {
-        $result = $stats->count()
-                        ->commerce('purchase')
-                        ->forCampaign($campaign->uuid)
-                        ->get();
-
-        return response()->json($result);
-    }
-
-    public function campaignEarned(Campaign $campaign, Stats $stats)
-    {
-        $result = $stats->sum()
-            ->commerce('purchase')
+            ->commerce($request->get('type'))
             ->forCampaign($campaign->uuid)
             ->get();
 
         return response()->json($result);
     }
 
-    public function campaignShowsHistogram(Campaign $campaign, $interval, Stats $stats)
+    public function campaignPaymentStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
     {
         $result = $stats->count()
-                        ->events('banner', 'show')
-                        ->forCampaign($campaign->uuid)
-                        ->timeHistogram($interval)
-                        ->get();
+            ->commerce($request->get('type'))
+            ->forCampaign($campaign->uuid)
+            ->get();
 
         if ($result["success"] != true) {
             return response()->json($result);
@@ -103,6 +65,70 @@ class StatsController extends Controller
 
         return response()->json($data);
     }
+
+    public function variantStatsCount(CampaignBanner $variant, Stats $stats, Request $request)
+    {
+        $result = $stats->count()
+                        ->events('banner', $request->get('type'))
+                        ->forVariant($variant->uuid)
+                        ->get();
+
+        return response()->json($result);
+    }
+
+    public function variantStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
+    {
+        $result = $stats->count()
+            ->events('banner', $request->get('type'))
+            ->forCampaign($campaign->uuid)
+            ->timeHistogram($request->get('interval'))
+            ->get();
+
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
+
+        $histogramData = $result['data'][0];
+        $data = $this->parseHistogramData($histogramData);
+
+        return response()->json($data);
+    }
+
+
+
+
+
+
+    // public function campaignStartedPayments(Campaign $campaign, Stats $stats)
+    // {
+    //     $result = $stats->count()
+    //                     ->commerce('payment')
+    //                     ->forCampaign($campaign->uuid)
+    //                     ->get();
+
+    //     return response()->json($result);
+    // }
+
+    // public function campaignFinishedPayments(Campaign $campaign, Stats $stats)
+    // {
+    //     $result = $stats->count()
+    //                     ->commerce('purchase')
+    //                     ->forCampaign($campaign->uuid)
+    //                     ->get();
+
+    //     return response()->json($result);
+    // }
+
+    // public function campaignEarned(Campaign $campaign, Stats $stats)
+    // {
+    //     $result = $stats->sum()
+    //         ->commerce('purchase')
+    //         ->forCampaign($campaign->uuid)
+    //         ->get();
+
+    //     return response()->json($result);
+    // }
+
 
     public function parseHistogramData($histogramData)
     {

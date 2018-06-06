@@ -38,9 +38,14 @@
                 var vm = this;
 
                 $.ajax({
-                    method: 'get',
-                    url: '/campaigns/stats/' + vm.variant.id + '/' + vm.type,
-                    dataType: 'json',
+                    method: 'POST',
+
+                    url: '/campaigns/stats/variant/' + vm.variant.id + '/count',
+                    data: {
+                        type: vm.type,
+                        _token: document.head.querySelector("[name=csrf-token]").content
+                    },
+                    dataType: 'JSON',
                     success(data, stats) {
                         vm.loaded = true;
 

@@ -33,6 +33,10 @@
             type: String,
             required: true
         },
+        interval: {
+            type: String,
+            required: true
+        },
         type: {
             type: String,
             required: true
@@ -67,9 +71,14 @@
                 var vm = this;
 
                 $.ajax({
-                    method: 'get',
-                    url: '/campaigns/1/stats/' + this.type + '/histogram/1h',
-                    dataType: 'json',
+                    method: 'POST',
+                    url: '/campaigns/' + vm.id + '/stats/histogram',
+                    data: {
+                        type: vm.type,
+                        interval: vm.interval,
+                        _token: document.head.querySelector("[name=csrf-token]").content
+                    },
+                    dataType: 'JSON',
                     success(data, stats) {
                         vm.loaded = true;
 

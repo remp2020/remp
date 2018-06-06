@@ -36,15 +36,10 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
-    Route::get('campaigns/stats/{variant}/shows', 'StatsController@variantShows');
-    Route::get('campaigns/stats/{variant}/clicks', 'StatsController@variantClicks');
-
-    Route::get('campaigns/{campaign}/stats/clicks', 'StatsController@campaignClicks');
-    Route::get('campaigns/{campaign}/stats/clicks/histogram/{interval}', 'StatsController@campaignClicksHistogram');
-    Route::get('campaigns/{campaign}/stats/payments/started', 'StatsController@campaignStartedPayments');
-    Route::get('campaigns/{campaign}/stats/payments/finished', 'StatsController@campaignFinishedPayments');
-    Route::get('campaigns/{campaign}/stats/earned', 'StatsController@campaignEarned');
-    Route::get('campaigns/{campaign}/stats/shows/histogram/{interval}', 'StatsController@campaignShowsHistogram');
+    Route::post('campaigns/{campaign}/stats/count', 'StatsController@campaignStatsCount');
+    Route::post('campaigns/{campaign}/stats/histogram', 'StatsController@campaignStatsHistogram');
+    Route::post('campaigns/stats/variant/{variant}/count', 'StatsController@variantStatsCount');
+    Route::post('campaigns/stats/variant/{variant}/histogram', 'StatsController@variantStatsHistogram');
 
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');
