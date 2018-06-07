@@ -2,11 +2,12 @@
 
 namespace App\Contracts\Remp;
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use App\Contracts\StatsContract;
-use GuzzleHttp\Exception\ClientException;
 use App\Contracts\StatsException;
+use GuzzleHttp\Exception\ClientException;
 
 class StatsRequest implements StatsContract
 {
@@ -63,15 +64,15 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
-    public function from(\DateTime $from): StatsRequest
+    public function from(Carbon $from): StatsRequest
     {
-        $this->from = $from;
+        $this->from = $from->setTimezone('UTC')->toRfc3339String();
         return $this;
     }
 
-    public function to(\DateTime $to): StatsRequest
+    public function to(Carbon $to): StatsRequest
     {
-        $this->to = $to;
+        $this->to = $to->setTimezone('UTC')->toRfc3339String();
         return $this;
     }
 
@@ -146,19 +147,19 @@ class StatsRequest implements StatsContract
         ];
 
         if ($this->from) {
-            $payload['form'] = $this->from;
+            $payload['time_after'] = $this->from;
         }
 
         if ($this->to) {
-            $payload['to'] = $this->to;
+            $payload['time_before'] = $this->to;
         }
 
         if ($this->timeHistogram) {
             $payload['time_histogram'] = $this->timeHistogram;
         }
 
-        // dump($this->url());
-        // dd(json_encode($payload));
+        // dump(json_encode($payload));
+        // dd($this->url());
 
         try {
             $result = $this->client->post($this->url(), [
@@ -186,9 +187,11 @@ class StatsRequest implements StatsContract
             throw new StatsException('cannot decode json response', 400, $e);
         }
 
+        // dd($data);
+
         return array_merge([
             'success' => true,
-            'data' => $data
+            'data' => $data[0]
         ]);
     }
 }

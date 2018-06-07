@@ -2,6 +2,7 @@
 
 namespace App\Contracts;
 
+use Carbon\Carbon;
 use App\Contracts\Remp\StatsRequest;
 
 interface StatsContract
@@ -14,9 +15,9 @@ interface StatsContract
 
     public function timespent(): StatsRequest;
 
-    public function from(\DateTime $from): StatsRequest;
+    public function from(Carbon $from): StatsRequest;
 
-    public function to(\DateTime $to): StatsRequest;
+    public function to(Carbon $to): StatsRequest;
 
     public function commerce(string $step): StatsRequest;
 

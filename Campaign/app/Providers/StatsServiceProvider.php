@@ -32,7 +32,10 @@ class StatsServiceProvider extends ServiceProvider
                 'timeout' => 1,
                 'connect_timeout' => 1,
             ]);
-            return new Stats($client, "0");
+
+            $offsetInHours = (new \DateTimeZone(config("app.timezone")))->getOffset(new \DateTime) / 3600;
+
+            return new Stats($client, $offsetInHours . "h");
         });
     }
 }

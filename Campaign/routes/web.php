@@ -38,8 +38,10 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::post('campaigns/{campaign}/stats/count', 'StatsController@campaignStatsCount');
     Route::post('campaigns/{campaign}/stats/histogram', 'StatsController@campaignStatsHistogram');
+    // Route::get('campaigns/{campaign}/stats/histogram', 'StatsController@campaignStatsHistogram');
     Route::post('campaigns/stats/variant/{variant}/count', 'StatsController@variantStatsCount');
     Route::post('campaigns/stats/variant/{variant}/histogram', 'StatsController@variantStatsHistogram');
+    Route::get('campaigns/stats/calcLabels/{from}/{to}', 'StatsController@calcLabels');
 
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');

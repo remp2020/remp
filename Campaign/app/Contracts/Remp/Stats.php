@@ -4,6 +4,7 @@ namespace App\Contracts\Remp;
 
 use GuzzleHttp\Client;
 use App\Contracts\StatsContract;
+use Carbon\Carbon;
 
 class Stats implements StatsContract
 {
@@ -31,12 +32,12 @@ class Stats implements StatsContract
         return (new StatsRequest($this->client, $this->timeOffset))->timespent();
     }
 
-    public function from(\DateTime $from): StatsRequest
+    public function from(Carbon $from): StatsRequest
     {
         return (new StatsRequest($this->client, $this->timeOffset))->from($from);
     }
 
-    public function to(\DateTime $to): StatsRequest
+    public function to(Carbon $to): StatsRequest
     {
         return (new StatsRequest($this->client, $this->timeOffset))->to($to);
     }

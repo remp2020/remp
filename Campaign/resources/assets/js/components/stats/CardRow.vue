@@ -39,7 +39,6 @@
 
                 $.ajax({
                     method: 'POST',
-
                     url: '/campaigns/stats/variant/' + vm.variant.id + '/count',
                     data: {
                         type: vm.type,

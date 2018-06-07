@@ -82,23 +82,18 @@
                     success(data, stats) {
                         vm.loaded = true;
 
-                        vm.init(data.labels, data.data)
+                        vm.init(data.dataSets)
                     }
                 })
             },
-            init(labels, data) {
+            init(dataSets) {
                 var ctx = document.getElementById(this.name).getContext('2d');
 
                 console.log('init graph')
 
                 var myLineChart = new Chart(ctx, {
                     type: "line",
-                    data: {
-                        "labels": labels,
-                        "datasets": [{
-                            data: data
-                        }]
-                    },
+                    data: dataSets,
                     options: {
                         elements: {
                             point: {

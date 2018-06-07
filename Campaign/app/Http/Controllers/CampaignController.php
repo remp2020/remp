@@ -814,9 +814,16 @@ class CampaignController extends Controller
 
     public function stats(
         Campaign $campaign,
+        $from = null,
+        $to = null,
+        Request $request,
         Stats $stats
     ) {
-        return view('campaigns.stats', compact('campaign'));
+        return view('campaigns.stats', [
+            'campaign' => $campaign,
+            'publishedFrom' => $request->input('published_from', 'now - 30 days'),
+            'publishedTo' => $request->input('published_to', 'now'),
+        ]);
     }
 
     /**
