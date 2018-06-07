@@ -1,17 +1,24 @@
 <template>
     <div class="dtp-container fg-line">
-        <label :for="labelId" class="fg-label">{{ label }}</label>
-        <input class="form-control date-time-picker" :name="labelId" :id="labelId" type="datetime">
+        <label v-if="label" :for="labelId" class="fg-label">{{ label }}</label>
+        <input :disabled="isDisabled" class="form-control date-time-picker" :name="labelId" :id="labelId" type="datetime">
     </div>
 </template>
 
 <script type="text/javascript">
     export default {
         name: "DateTimePicker",
-        props: ['label', 'value'],
+        props: {
+            label: String,
+            value: String,
+            isDisabled: {
+                type: Boolean,
+                default: false
+            }
+        },
         data() {
             return {
-                labelId: null
+                labelId: null,
             }
         },
         created() {

@@ -45,8 +45,12 @@ return [
         'campaign' => [
             'web_addr' => env('REMP_CAMPAIGN_ADDR'),
         ],
+        'mailer' => [
+            'web_addr' => env('REMP_MAILER_ADDR'),
+        ],
         'sso' => [
             'web_addr' => env('REMP_SSO_ADDR'),
+            'api_token' => env('REMP_SSO_API_TOKEN')
         ],
         'linked' => [
             'beam' => [

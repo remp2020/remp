@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Resources\ArticleResource;
@@ -17,6 +18,13 @@ use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
+    private $mailer;
+
+    public function __construct(MailerContract $mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -287,5 +295,43 @@ class ArticleController extends Controller
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
             'json' => new JsonResource([]),
         ]);
+    }
+
+    public function newsletter(Request $request)
+    {
+        // WE HAVE TO LOAD:
+        // Ako casto sa ma email posielat
+
+        $segments = $this->mailer->segments()->mapToGroups(function ($item) {
+            return [$item->provider => [$item->code => $item->name]];
+        })->mapWithKeys(function($item, $key) {
+            return [$key => $item->collapse()];
+        })->toArray();
+
+        $generators = $this->mailer->generatorTemplates('best_performing_articles')
+            ->mapWithKeys(function($item){
+                return [$item->id => $item->title];
+            });
+
+        $criteria = [
+            'pageviews' => 'Page views',
+            'timespent' => 'Time spent',
+            'conversion' => 'Conversions',
+            'average_payment' => 'Average payment'
+        ];
+
+        $startDate = Carbon::now()->addHour(1);
+        $recurrenceString = 'TODO';
+
+        return response()->format([
+            'html' => view('articles.newsletters',
+                compact(['segments', 'generators', 'criteria', 'startDate', 'recurrenceString'])),
+            'json' => [],
+        ]);
+    }
+
+    public function saveNewsletter(Request $request)
+    {
+        dd('TODO: here we are saving newsletter');
     }
 }

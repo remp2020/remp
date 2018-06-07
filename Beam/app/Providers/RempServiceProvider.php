@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Contracts\JournalContract;
+use App\Contracts\Mailer\Mailer;
+use App\Contracts\Mailer\MailerContract;
 use App\Contracts\Remp\Journal;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
-class RempJournalServiceProvider extends ServiceProvider
+class RempServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -32,10 +34,17 @@ class RempJournalServiceProvider extends ServiceProvider
             ]);
             return new Journal($client);
         });
+
+        $this->app->bind(MailerContract::class, function ($app) {
+            $client = new Client([
+                'base_uri' => $app['config']->get('services.remp.mailer.web_addr'),
+            ]);
+            return new Mailer($client);
+        });
     }
 
     public function provides()
     {
-        return [JournalContract::class];
+        return [JournalContract::class, MailerContract::class];
     }
 }
