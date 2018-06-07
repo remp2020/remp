@@ -98,7 +98,7 @@ class Sender
         return $this;
     }
 
-    public function setParams($params)
+    public function setParams(array $params)
     {
         $this->params = $params;
 
@@ -193,6 +193,7 @@ class Sender
 
         $autologinTokens = $this->autoLogin->createTokens($subscribedEmails);
 
+        $transformedParams = [];
         foreach ($this->recipients as $recipient) {
             if (!isset($subscribedEmails[$recipient['email']]) || !$subscribedEmails[$recipient['email']]) {
                 continue;
