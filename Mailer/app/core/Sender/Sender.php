@@ -246,7 +246,7 @@ class Sender
         $mailer->send($message);
         $this->reset();
 
-        return $subscribedEmails;
+        return count($subscribedEmails);
     }
 
     private function setMessageAttachments(Message $message): ?int
