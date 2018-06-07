@@ -189,15 +189,11 @@ class MailWorkerCommand extends Command
                             $sentCount = $email->send();
                         }
 
-                        if ($sentCount !== null) {
-                            foreach ($jobs as $i => $job) {
-                                $this->mailJobQueueRepository->delete($queueJobs[$i]);
-                                $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
-                            }
-                        } else {
-                            $this->mailJobBatchRepository->update($batch, ['errors_count+=' => count($jobs)]);
-                            $this->mailJobQueueRepository->update($queueJob, ['status' => JobQueueRepository::STATUS_ERROR]);
+                        foreach ($jobs as $i => $job) {
+                            $this->mailJobQueueRepository->delete($queueJobs[$i]);
+                            $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
                         }
+
                         $this->smtpErrors = 0;
                     } catch (SmtpException | Sender\MailerBatchException $exception) {
                         $this->smtpErrors++;
