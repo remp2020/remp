@@ -46,14 +46,11 @@ class StatsController extends Controller
     {
         $from = Carbon::parse($request->get('from'));
         $to = Carbon::parse($request->get('to'));
-        $onlyType = $request->get('type');
         $parsedData = [];
 
         $interval = $this->calcInterval($from, $to);
 
         foreach ($this->statTypes as $title => $type) {
-            if ($onlyType && $onlyType !== $type) continue;
-
             $parsedData[$type] = [];
 
             $result = $stats->count()
@@ -65,7 +62,7 @@ class StatsController extends Controller
                             ->get();
 
 
-            if ($result["success"] != true || $result['data']->count === 0) {
+            if ($result["success"] != true) {
                 return response()->json($result);
             }
 
@@ -160,38 +157,48 @@ class StatsController extends Controller
 
     public function variantStatsHistogram(CampaignBanner $variant, Stats $stats, Request $request)
     {
-        $onlyType = $request->get('type');
+        $from = Carbon::parse($request->get('from'));
+        $to = Carbon::parse($request->get('to'));
         $parsedData = [];
-        $labels = [];
+
+        $interval = $this->calcInterval($from, $to);
 
         foreach ($this->statTypes as $title => $type) {
-            if ($onlyType && $onlyType !== $type) continue;
-
             $parsedData[$type] = [];
 
             $result = $stats->count()
                             ->events('banner', $type)
                             ->forCampaign($variant->campaign->uuid)
                             ->forVariant($variant->uuid)
-                            ->timeHistogram($request->get('interval'))
+                            ->timeHistogram($interval)
+                            ->from($from)
+                            ->to($to)
                             ->get();
 
-            if ($result["success"] != true || $result['data']->count === 0) {
+            if ($result["success"] != true) {
                 return response()->json($result);
             }
 
             $histogramData = $result['data'];
 
             foreach ($histogramData->time_histogram as $histogramRow) {
-                $date = (new \DateTime($histogramRow->time))->format(self::DATE_FORMAT);
+                $date = Carbon::parse($histogramRow->time)->format(self::DATE_FORMAT);
 
                 $parsedData[$type][$date] = $histogramRow->value;
+
+                $labels[] = $date;
             }
         }
 
-        dd($parsedData);
-
         $labels = array_unique($labels);
+
+        usort($labels, function ($a, $b) {
+            $a = \DateTime::createFromFormat(self::DATE_FORMAT, $a);
+            $b = \DateTime::createFromFormat(self::DATE_FORMAT, $b);
+
+            return $a > $b;
+        });
+
         $dataSets = $this->formatDataForChart($parsedData, $labels);
 
         return response()->json([

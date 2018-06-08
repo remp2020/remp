@@ -10,7 +10,7 @@
                 :to="to"
             ></chart>
 
-            <!--chart
+            <chart
                 v-for="variant in variants"
                 :key="variant.id"
                 :name="'variant-stats-chart-' + variant.id"
@@ -18,7 +18,7 @@
                 :title="'Variant: ' + variant.variant"
                 :from="from"
                 :to="to"
-            ></chart-->
+            ></chart>
 
 
 
@@ -47,7 +47,6 @@
 </template>
 
 <script>
-    import SingleValue from './stats/SingleValue'
     import Chart from './stats/Chart'
     import Card from './stats/Card'
 
@@ -76,7 +75,6 @@
 
     export default {
         components: {
-            SingleValue,
             Card,
             Chart
         },
