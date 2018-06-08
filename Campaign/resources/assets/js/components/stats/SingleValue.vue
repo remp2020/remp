@@ -118,6 +118,7 @@
                 var vm = this;
 
                 $(this.$el).find('.preloader-wrapper').show();
+                $(vm.$el).find('.stats-error').hide();
 
                 $.ajax({
                     method: 'POST',
@@ -136,7 +137,6 @@
                         $(vm.$el).find('.preloader-wrapper').fadeOut();
 
                         if (data.success) {
-                            $(vm.$el).find('.stats-error').hide();
                             vm.count = data.data.count
                         } else {
                             $(vm.$el).find('.stats-error').show().attr('title', data.message);

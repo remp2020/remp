@@ -113,6 +113,7 @@
                 var vm = this;
 
                 $(this.$el).find('.preloader-wrapper').show();
+                $(vm.$el).find('.stats-error').hide();
 
                 $.ajax({
                     method: 'POST',
@@ -129,7 +130,11 @@
 
                         $(vm.$el).find('.preloader-wrapper').fadeOut();
 
-                        vm.init(data.dataSets, data.labels)
+                        if (data.success) {
+                            vm.init(data.dataSets, data.labels)
+                        } else {
+                            $(vm.$el).find('.stats-error').show().attr('title', data.message);
+                        }
                     }
                 })
             },
