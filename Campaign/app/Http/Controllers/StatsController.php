@@ -33,6 +33,10 @@ class StatsController extends Controller
                         ->to(Carbon::parse($request->get('to')))
                         ->get();
 
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
+
         return response()->json($result);
     }
 
@@ -44,6 +48,10 @@ class StatsController extends Controller
                         ->from(Carbon::parse($request->get('from')))
                         ->to(Carbon::parse($request->get('to')))
                         ->get();
+
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
 
         if ($request->get('normalized') === "true") {
             $count = $result['data']->count;
@@ -152,6 +160,10 @@ class StatsController extends Controller
                         ->forCampaign($campaign->uuid)
                         ->get();
 
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
+
         return response()->json($result);
     }
 
@@ -161,6 +173,10 @@ class StatsController extends Controller
                         ->commerce($step)
                         ->forVariant($variant->uuid)
                         ->get();
+
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
 
         if ($request->get('normalized') === "true") {
             $count = $result['data']->count;
@@ -178,6 +194,10 @@ class StatsController extends Controller
                         ->forCampaign($campaign->uuid)
                         ->get();
 
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
+
         return response()->json($result);
     }
 
@@ -187,6 +207,10 @@ class StatsController extends Controller
                         ->commerce($step)
                         ->forVariant($variant->uuid)
                         ->get();
+
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
 
         if ($request->get('normalized') === "true") {
             $count = $result['data']->count;

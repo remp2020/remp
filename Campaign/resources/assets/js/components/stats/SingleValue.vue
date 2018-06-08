@@ -17,11 +17,48 @@
     .card-body {
         font-size: 20px;
     }
+
+    .stats-error {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: red;
+        color: #fff;
+        display: none;
+    }
+
+    .preloader-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+    }
+
+    .preloader-wrapper .preloader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -20px;
+        margin-top: -20px;
+    }
 </style>
 
 
 <template>
     <div class="card">
+        <div class="preloader-wrapper">
+            <div class="preloader">
+                <svg class="pl-circular" viewBox="25 25 50 50">
+                    <circle class="plc-path" cx="50" cy="50" r="20" />
+                </svg>
+            </div>
+        </div>
+        <div class="stats-error">!</div>
         <h4>{{ title }}</h4>
         <strong>&nbsp;{{ subtitle }}&nbsp;</strong>
 
@@ -80,6 +117,8 @@
             load() {
                 var vm = this;
 
+                $(this.$el).find('.preloader-wrapper').show();
+
                 $.ajax({
                     method: 'POST',
                     url: vm.url,
@@ -93,8 +132,14 @@
                     dataType: 'JSON',
                     success(data, stats) {
                         vm.loaded = true;
+
+                        $(vm.$el).find('.preloader-wrapper').fadeOut();
+
                         if (data.success) {
+                            $(vm.$el).find('.stats-error').hide();
                             vm.count = data.data.count
+                        } else {
+                            $(vm.$el).find('.stats-error').show().attr('title', data.message);
                         }
                     }
                 })

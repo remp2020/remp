@@ -10,10 +10,47 @@
     canvas {
         width: 100%;
     }
+
+    .stats-error {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: red;
+        color: #fff;
+        display: none;
+    }
+
+    .preloader-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+    }
+
+    .preloader-wrapper .preloader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -20px;
+        margin-top: -20px;
+    }
 </style>
 
 <template>
     <div class="card">
+        <div class="preloader-wrapper">
+            <div class="preloader pl-xxl">
+                <svg class="pl-circular" viewBox="25 25 50 50">
+                    <circle class="plc-path" cx="50" cy="50" r="20" />
+                </svg>
+            </div>
+        </div>
+        <div class="stats-error">!</div>
         <h3>{{ title }}</h3>
 
         <div class="card-body">
@@ -75,6 +112,8 @@
             load() {
                 var vm = this;
 
+                $(this.$el).find('.preloader-wrapper').show();
+
                 $.ajax({
                     method: 'POST',
                     url: vm.url,
@@ -87,6 +126,8 @@
                     dataType: 'JSON',
                     success(data, stats) {
                         vm.loaded = true;
+
+                        $(vm.$el).find('.preloader-wrapper').fadeOut();
 
                         vm.init(data.dataSets, data.labels)
                     }
