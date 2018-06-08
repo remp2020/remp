@@ -1,15 +1,21 @@
 <style scoped>
     .card {
         text-align: center;
-        padding: 15px 0;
+        padding: 10px 0;
     }
 
     h4 {
         margin-top: 0;
+        margin-bottom: 0;
+        font-size: 14px;
+    }
+
+    strong {
+        font-size: 12px;
     }
 
     .card-body {
-        font-size: 25px;
+        font-size: 20px;
     }
 </style>
 
@@ -17,6 +23,7 @@
 <template>
     <div class="card">
         <h4>{{ title }}</h4>
+        <strong>&nbsp;{{ subtitle }}&nbsp;</strong>
 
         <div class="card-body">
             {{ count }}
@@ -35,6 +42,10 @@
                 type: String,
                 required: true
             },
+            subtitle: {
+                type: String,
+                required: false
+            },
             from: {
                 type: String,
                 required: true
@@ -42,6 +53,11 @@
             to: {
                 type: String,
                 required: true
+            },
+            normalized: {
+                type: Boolean,
+                required: false,
+                default: false
             }
         },
         data() {
@@ -70,6 +86,7 @@
                     data: {
                         from: vm.from,
                         to: vm.to,
+                        normalized: vm.normalized,
                         chartWidth: $('#' + this.name).width(),
                         _token: document.head.querySelector("[name=csrf-token]").content
                     },

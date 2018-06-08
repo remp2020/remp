@@ -45,6 +45,12 @@ class StatsController extends Controller
                         ->to(Carbon::parse($request->get('to')))
                         ->get();
 
+        if ($request->get('normalized') === "true") {
+            $count = $result['data']->count;
+
+            $result['data']->count = $count*($variant->proportion/100);
+        }
+
         return response()->json($result);
     }
 
@@ -149,12 +155,44 @@ class StatsController extends Controller
         return response()->json($result);
     }
 
+    public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request)
+    {
+        $result = $stats->count()
+                        ->commerce($step)
+                        ->forVariant($variant->uuid)
+                        ->get();
+
+        if ($request->get('normalized') === "true") {
+            $count = $result['data']->count;
+
+            $result['data']->count = $count * ($variant->proportion / 100);
+        }
+
+        return response()->json($result);
+    }
+
     public function campaignPaymentStatsSum(Campaign $campaign, $step, Stats $stats, Request $request)
     {
         $result = $stats->sum()
                         ->commerce($step)
                         ->forCampaign($campaign->uuid)
                         ->get();
+
+        return response()->json($result);
+    }
+
+    public function variantPaymentStatsSum(CampaignBanner $variant, $step, Stats $stats, Request $request)
+    {
+        $result = $stats->sum()
+                        ->commerce($step)
+                        ->forVariant($variant->uuid)
+                        ->get();
+
+        if ($request->get('normalized') === "true") {
+            $count = $result['data']->count;
+
+            $result['data']->count = $count * ($variant->proportion / 100);
+        }
 
         return response()->json($result);
     }
