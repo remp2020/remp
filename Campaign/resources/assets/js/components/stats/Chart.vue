@@ -60,6 +60,14 @@
         mounted() {
             this.load()
         },
+        watch: {
+            from() {
+                this.load();
+            },
+            to() {
+                this.load();
+            }
+        },
         methods: {
             load() {
                 var vm = this;

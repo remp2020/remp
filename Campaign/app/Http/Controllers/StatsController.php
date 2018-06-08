@@ -39,7 +39,7 @@ class StatsController extends Controller
         $diff = $to->diffInSeconds($from);
         $interval = $diff / $chartWidth;
 
-        return $interval . "s";
+        return intval($interval) . "s";
     }
 
     public function campaignStatsHistogram(Campaign $campaign, Stats $stats, Request $request)

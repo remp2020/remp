@@ -22,8 +22,8 @@
             :id="{{ $campaign->id }}"
             :name="'{!! $campaign->name !!}'"
             :variants="variants"
-            :from="'{!! $publishedFrom !!}'"
-            :to="'{!! $publishedTo !!}'"
+            :from="from"
+            :to="to"
         ></campaign-stats>
     </div>
 
@@ -35,7 +35,7 @@
             },
             methods: {
                 callback: function (from, to) {
-                    $('[name="published_from"]').val(from);
+                    $('[name="published_from"]').val(from).trigger("change");
                     $('[name="published_to"]').val(to).trigger("change");
                 }
             }
@@ -46,9 +46,22 @@
             components: {
                 CampaignStats
             },
+            mounted: function() {
+                var vm = this;
+
+                $('[name="published_from"]').on('change', function () {
+                    vm.from = $('[name="published_from"]').val();
+                });
+
+                $('[name="published_to"]').on('change', function () {
+                    vm.to = $('[name="published_to"]').val();
+                });
+            },
             data() {
                 return {
-                    variants: {!! @json($campaign->campaignBanners) !!}
+                    variants: {!! @json($campaign->campaignBanners) !!},
+                    from: '{!! $publishedFrom !!}',
+                    to: '{!! $publishedTo !!}'
                 }
             }
         })
