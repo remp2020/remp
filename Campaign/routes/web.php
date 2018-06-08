@@ -36,12 +36,25 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
-    Route::post('campaigns/{campaign}/stats/count', 'StatsController@campaignStatsCount');
+    // campaign count + histogram
+    Route::post('campaigns/{campaign}/stats/{type}/count', 'StatsController@campaignStatsCount');
     Route::post('campaigns/{campaign}/stats/histogram', 'StatsController@campaignStatsHistogram');
-    // Route::get('campaigns/{campaign}/stats/histogram', 'StatsController@campaignStatsHistogram');
-    Route::post('campaigns/stats/variant/{variant}/count', 'StatsController@variantStatsCount');
+
+    // variant count + histogram
     Route::post('campaigns/stats/variant/{variant}/histogram', 'StatsController@variantStatsHistogram');
-    Route::get('campaigns/stats/calcLabels/{from}/{to}', 'StatsController@calcLabels');
+    Route::post('campaigns/stats/variant/{variant}/{type}/count', 'StatsController@variantStatsCount');
+
+    // campaign payments
+    Route::post('campaigns/{campaign}/payment/stats/step/{step}/count', 'StatsController@campaignPaymentStatsCount');
+    Route::post('campaigns/{campaign}/payment/stats/step/{step}/sum', 'StatsController@campaignPaymentStatsSum');
+
+    // variant payments
+    Route::post('campaigns/stats/variant/{variant}/payment/step/{step}/count', 'StatsController@variantPaymentStatsCount');
+    Route::post('campaigns/stats/variant/{variant}/payment/step/{step}/sum', 'StatsController@variantPaymentStatsSum');
+
+
+
+
 
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');

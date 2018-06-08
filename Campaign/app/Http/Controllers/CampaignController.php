@@ -814,8 +814,6 @@ class CampaignController extends Controller
 
     public function stats(
         Campaign $campaign,
-        $from = null,
-        $to = null,
         Request $request,
         Stats $stats
     ) {

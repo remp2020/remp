@@ -1,67 +1,56 @@
 <style scoped>
     .card {
-        padding: 30px;
+        text-align: center;
+        padding: 15px 0;
     }
 
-    h3 {
+    h4 {
         margin-top: 0;
     }
 
-    canvas {
-        width: 100%;
+    .card-body {
+        font-size: 25px;
     }
 </style>
 
+
 <template>
     <div class="card">
-        <h3>{{ title }}</h3>
+        <h4>{{ title }}</h4>
 
         <div class="card-body">
-            <canvas :id="name" :height="height"></canvas>
+            {{ count }}
         </div>
-
-    </div><!-- .card -->
+    </div>
 </template>
 
 <script>
-    let props = {
-        url: {
-            type: String,
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        },
-        title: {
-            type: String,
-            required: true
-        },
-        from: {
-            type: String,
-            required: true
-        },
-        to: {
-            type: String,
-            required: true
-        },
-        height: {
-            type: Number,
-            required: true
-        }
-    }
-
     export default {
-        props: props,
+        props: {
+            url: {
+                type: String,
+                required: true
+            },
+            title: {
+                type: String,
+                required: true
+            },
+            from: {
+                type: String,
+                required: true
+            },
+            to: {
+                type: String,
+                required: true
+            }
+        },
         data() {
             return {
-                loaded: false,
-                labels: null,
-                data: null
+                count: 0
             }
         },
         mounted() {
-            this.load()
+            this.load();
         },
         watch: {
             from() {
@@ -87,8 +76,9 @@
                     dataType: 'JSON',
                     success(data, stats) {
                         vm.loaded = true;
-
-                        vm.init(data.dataSets, data.labels)
+                        if (data.success) {
+                            vm.count = data.data.count
+                        }
                     }
                 })
             },

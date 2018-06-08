@@ -14,15 +14,35 @@ class StatsController extends Controller
     const DATE_FORMAT = "d/m h:i";
 
     public $statTypes = [
-        'Shows' => 'show',
-        'Clicks' => 'click',
+        "show" => [
+            "label" => "Shows",
+            "backgroundColor" => "rgb(255, 99, 132)"
+        ],
+        "click" => [
+            "label" => "Clicks",
+            "backgroundColor" => "rgb(255, 205, 86)"
+        ]
     ];
 
-    public function campaignStatsCount(Campaign $campaign, Stats $stats, Request $request)
+    public function campaignStatsCount(Campaign $campaign, $type, Stats $stats, Request $request)
     {
         $result = $stats->count()
-                        ->events('banner', $request->get('type'))
+                        ->events('banner', $type)
                         ->forCampaign($campaign->uuid)
+                        ->from(Carbon::parse($request->get('from')))
+                        ->to(Carbon::parse($request->get('to')))
+                        ->get();
+
+        return response()->json($result);
+    }
+
+    public function variantStatsCount(CampaignBanner $variant, $type, Stats $stats, Request $request)
+    {
+        $result = $stats->count()
+                        ->events('banner', $type)
+                        ->forVariant($variant->uuid)
+                        ->from(Carbon::parse($request->get('from')))
+                        ->to(Carbon::parse($request->get('to')))
                         ->get();
 
         return response()->json($result);
@@ -50,7 +70,7 @@ class StatsController extends Controller
 
         $interval = $this->calcInterval($from, $to);
 
-        foreach ($this->statTypes as $title => $type) {
+        foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
 
             $result = $stats->count()
@@ -100,8 +120,9 @@ class StatsController extends Controller
 
         foreach ($typesData as $type => $data) {
             $dataSet = [
-                'label' => $type,
+                'label' => $this->statTypes[$type]['label'],
                 'data' => [],
+                'backgroundColor' => $this->statTypes[$type]['backgroundColor']
             ];
 
             foreach ($labels as $label) {
@@ -118,38 +139,21 @@ class StatsController extends Controller
         return $dataSets;
     }
 
-    public function campaignPaymentStatsCount(Campaign $campaign, Stats $stats, Request $request)
+    public function campaignPaymentStatsCount(Campaign $campaign, $step, Stats $stats, Request $request)
     {
         $result = $stats->count()
-            ->commerce($request->get('type'))
-            ->forCampaign($campaign->uuid)
-            ->get();
+                        ->commerce($step)
+                        ->forCampaign($campaign->uuid)
+                        ->get();
 
         return response()->json($result);
     }
 
-    public function campaignPaymentStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
+    public function campaignPaymentStatsSum(Campaign $campaign, $step, Stats $stats, Request $request)
     {
-        $result = $stats->count()
-            ->commerce($request->get('type'))
-            ->forCampaign($campaign->uuid)
-            ->get();
-
-        if ($result["success"] != true) {
-            return response()->json($result);
-        }
-
-        $histogramData = $result['data'];
-        $data = $this->parseHistogramData($histogramData);
-
-        return response()->json($data);
-    }
-
-    public function variantStatsCount(CampaignBanner $variant, Stats $stats, Request $request)
-    {
-        $result = $stats->count()
-                        ->events('banner', $request->get('type'))
-                        ->forVariant($variant->uuid)
+        $result = $stats->sum()
+                        ->commerce($step)
+                        ->forCampaign($campaign->uuid)
                         ->get();
 
         return response()->json($result);
@@ -163,7 +167,7 @@ class StatsController extends Controller
 
         $interval = $this->calcInterval($from, $to);
 
-        foreach ($this->statTypes as $title => $type) {
+        foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
 
             $result = $stats->count()
