@@ -11,7 +11,6 @@ use App\Contracts\Remp\Stats;
 
 class StatsController extends Controller
 {
-    const DATE_FORMAT = "d/m/y h:i";
 
     public $statTypes = [
         "show" => [
@@ -172,7 +171,7 @@ class StatsController extends Controller
             $histogramData = $result['data'];
 
             foreach ($histogramData->time_histogram as $histogramRow) {
-                $date = Carbon::parse($histogramRow->time)->format(self::DATE_FORMAT);
+                $date = Carbon::parse($histogramRow->time)->toRfc3339String();
 
                 $parsedData[$type][$date] = $histogramRow->value;
 
@@ -183,8 +182,8 @@ class StatsController extends Controller
         $labels = array_unique($labels);
 
         usort($labels, function ($a, $b) {
-            $a = \DateTime::createFromFormat(self::DATE_FORMAT, $a);
-            $b = \DateTime::createFromFormat(self::DATE_FORMAT, $b);
+            $a = \DateTime::createFromFormat(Carbon::RFC3339, $a);
+            $b = \DateTime::createFromFormat(Carbon::RFC3339, $b);
 
             return $a > $b;
         });
