@@ -11,17 +11,34 @@ use GuzzleHttp\Exception\ClientException;
 
 class StatsRequest implements StatsContract
 {
+    /** @var GuzzleHttp\Client guzzle http client */
     private $client;
+
+    /** @var string timezone offset */
     private $timeOffset;
 
+    /** @var string action */
     private $action;
+
+    /** @var string table */
     private $table;
+
+    /** @var string url arguments */
     private $args = [];
 
+    /** @var Carbon\Carbon from date object */
     private $from;
+
+    /** @var Carbon\Carbon to date object */
     private $to;
+
+    /** @var array group by fields */
     private $groupBy = [];
+
+    /** @var array filter by fields */
     private $filterBy = [];
+
+    /** @var array time histogram options */
     private $timeHistogram = [];
 
     public function __construct(Client $client, $timeOffset)
@@ -31,13 +48,13 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
-    public function forCampaign($campaignId)
+    public function forCampaign($campaignId) : StatsRequest
     {
         $this->filterBy("utm_campaign", [$campaignId]);
         return $this;
     }
 
-    public function forVariant($variantId)
+    public function forVariant($variantId) : StatsRequest
     {
         $this->filterBy("banner_variant", [$variantId]);
         return $this;
@@ -158,9 +175,6 @@ class StatsRequest implements StatsContract
             $payload['time_histogram'] = $this->timeHistogram;
         }
 
-        // dump(json_encode($payload));
-        // dd($this->url());
-
         try {
             $result = $this->client->post($this->url(), [
                 RequestOptions::JSON => $payload,
@@ -178,16 +192,11 @@ class StatsRequest implements StatsContract
 
         $stream = $result->getBody();
 
-        // dd($stream);
-        // dd(json_decode($stream->getContents()));
-
         try {
             $data = json_decode($stream->getContents());
         } catch (\Exception $e) {
             throw new StatsException('cannot decode json response', 400, $e);
         }
-
-        // dd($data);
 
         return array_merge([
             'success' => true,

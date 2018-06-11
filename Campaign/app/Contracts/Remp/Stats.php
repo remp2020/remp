@@ -17,6 +17,16 @@ class Stats implements StatsContract
         $this->timeOffset = $timeOffset;
     }
 
+    public function forCampaign($campaignId) : StatsRequest
+    {
+        return (new StatsRequest($this->client, $this->timeOffset))->forCampaign($campaignId);
+    }
+
+    public function forVariant($variantId) : StatsRequest
+    {
+        return (new StatsRequest($this->client, $this->timeOffset))->events($variantId);
+    }
+
     public function events(string $categoryArg, string $actionArg): StatsRequest
     {
         return (new StatsRequest($this->client, $this->timeOffset))->events($categoryArg, $actionArg);
@@ -70,10 +80,5 @@ class Stats implements StatsContract
     public function groupBy($field): StatsRequest
     {
         return (new StatsRequest($this->client, $this->timeOffset))->groupBy($field);
-    }
-
-    public function get()
-    {
-        return (new StatsRequest($this->client, $this->timeOffset))->get();
     }
 }
