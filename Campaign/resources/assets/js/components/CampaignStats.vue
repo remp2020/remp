@@ -58,7 +58,7 @@
 
 
             <div class="row" v-for="variant in variants" :key="variant.id">
-                <div class="col-sm-8">
+                <div class="col-sm-12 col-md-8">
                     <chart
                         :variant="variant"
                         :url="'/campaigns/stats/variant/' + variant.id + '/histogram'"
@@ -69,7 +69,7 @@
                         :to="to"
                     ></chart>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-12 col-md-4">
                     <div id="variant-stats-grid" class="clearfix" data-columns>
 
                         <single-value

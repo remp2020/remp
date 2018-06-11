@@ -141,6 +141,10 @@
                         } else {
                             $(vm.$el).find('.stats-error').show().attr('title', data.message);
                         }
+                    },
+                    error(xhr, status, error) {
+                        $(vm.$el).find('.stats-error').show().attr('title',error);
+                        $(vm.$el).find('.preloader-wrapper').fadeOut();
                     }
                 })
             },
