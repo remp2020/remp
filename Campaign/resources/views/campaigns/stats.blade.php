@@ -6,7 +6,7 @@
     <div class="well">
         <div class="row">
             <div class="col-md-6">
-                <h4>Filter by publish date</h4>
+                <h4>Filter by date and time</h4>
                 <div id="smart-range-selector">
                     {!! Form::hidden('published_from', $publishedFrom) !!}
                     {!! Form::hidden('published_to', $publishedTo) !!}

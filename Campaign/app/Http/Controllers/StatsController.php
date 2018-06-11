@@ -123,6 +123,7 @@ class StatsController extends Controller
         $dataSets = $this->formatDataForChart($parsedData, $labels);
 
         return response()->json([
+            'success' => true,
             'dataSets' => $dataSets,
             'labels' => $labels,
         ]);
@@ -268,6 +269,7 @@ class StatsController extends Controller
         $dataSets = $this->formatDataForChart($parsedData, $labels);
 
         return response()->json([
+            'success' => true,
             'dataSets' => $dataSets,
             'labels' => $labels,
         ]);

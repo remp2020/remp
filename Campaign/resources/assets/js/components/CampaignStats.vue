@@ -51,7 +51,7 @@
                 :url="'/campaigns/' + id + '/stats/histogram'"
                 :name="'campaign-stats-chart'"
                 :title="'Campaign'"
-                :height="350"
+                :height="450"
                 :from="from"
                 :to="to"
             ></chart>

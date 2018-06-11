@@ -20,6 +20,7 @@
         background: red;
         color: #fff;
         display: none;
+        text-align: center;
     }
 
     .preloader-wrapper {
@@ -148,6 +149,7 @@
                         datasets: dataSets
                     },
                     options: {
+                        responsive: true,
                         maintainAspectRatio: true,
                         elements: {
                             point: {
