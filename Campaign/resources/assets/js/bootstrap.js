@@ -8,6 +8,4 @@ global.SmartRangeSelector = require("./components/SmartRangeSelector.vue");
 
 global.CampaignStats = require("./components/CampaignStats.vue");
 
-require("./chart.js");
-
 global.salvattore = require("salvattore");
