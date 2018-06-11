@@ -70,89 +70,91 @@
                     ></chart>
                 </div>
                 <div class="col-sm-12 col-md-4">
-                    <div id="variant-stats-grid" class="clearfix" data-columns>
+                    <div class="row">
+                        <div id="variant-stats-grid" class="clearfix" data-columns>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/click/count'"
-                            :title="'Clicks'"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/click/count'"
+                                :title="'Clicks'"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/click/count'"
-                            :title="'Clicks'"
-                            :subtitle="'normalized'"
-                            :normalized="true"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/click/count'"
+                                :title="'Clicks'"
+                                :subtitle="'normalized'"
+                                :normalized="true"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/show/count'"
-                            :title="'Shows'"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/show/count'"
+                                :title="'Shows'"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/show/count'"
-                            :title="'Shows'"
-                            :subtitle="'normalized'"
-                            :normalized="true"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/show/count'"
+                                :title="'Shows'"
+                                :subtitle="'normalized'"
+                                :normalized="true"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/payment/count'"
-                            :title="'Started payments'"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/payment/count'"
+                                :title="'Started payments'"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/payment/count'"
-                            :title="'Started payments'"
-                            :subtitle="'normalized'"
-                            :normalized="true"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/payment/count'"
+                                :title="'Started payments'"
+                                :subtitle="'normalized'"
+                                :normalized="true"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/count'"
-                            :title="'Finished payments'"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/count'"
+                                :title="'Finished payments'"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/count'"
-                            :title="'Finished payments'"
-                            :subtitle="'normalized'"
-                            :normalized="true"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/count'"
+                                :title="'Finished payments'"
+                                :subtitle="'normalized'"
+                                :normalized="true"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/sum'"
-                            :title="'Earned'"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/sum'"
+                                :title="'Earned'"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
-                        <single-value
-                            :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/sum'"
-                            :title="'Earned'"
-                            :subtitle="'normalized'"
-                            :normalized="true"
-                            :from="from"
-                            :to="to"
-                        ></single-value>
+                            <single-value
+                                :url="'/campaigns/stats/variant/' + variant.id + '/payment/step/purchase/sum'"
+                                :title="'Earned'"
+                                :subtitle="'normalized'"
+                                :normalized="true"
+                                :from="from"
+                                :to="to"
+                            ></single-value>
 
 
+                        </div>
                     </div>
                 </div>
             </div>

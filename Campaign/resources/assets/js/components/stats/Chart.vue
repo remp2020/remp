@@ -95,7 +95,8 @@
             return {
                 loaded: false,
                 labels: null,
-                data: null
+                data: null,
+                chart: null
             }
         },
         mounted() {
@@ -144,9 +145,18 @@
                 })
             },
             init(dataSets, labels) {
+                if (this.chart != null) {
+                    this.chart.config.data = {
+                        labels: labels,
+                        datasets: dataSets
+                    }
+                    this.chart.update();
+                    return;
+                }
+
                 var ctx = document.getElementById(this.name).getContext('2d');
 
-                var myLineChart = new Chart(ctx, {
+                this.chart = new Chart(ctx, {
                     type: "bar",
                     data: {
                         labels: labels,

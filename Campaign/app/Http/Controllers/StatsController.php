@@ -11,7 +11,7 @@ use App\Contracts\Remp\Stats;
 
 class StatsController extends Controller
 {
-    const DATE_FORMAT = "d/m h:i";
+    const DATE_FORMAT = "d/m/y h:i";
 
     public $statTypes = [
         "show" => [
