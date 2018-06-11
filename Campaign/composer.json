@@ -43,7 +43,6 @@
         "laravelcollective/html": "~5.5.0",
         "league/uri": "^5.0",
         "madewithlove/illuminate-psr-cache-bridge": "^1.0",
-        "nesbot/carbon": "^1.29",
         "php-amqplib/php-amqplib": "^2.7",
         "piwik/device-detector": "^3.10",
         "predis/predis": " ~1.0",

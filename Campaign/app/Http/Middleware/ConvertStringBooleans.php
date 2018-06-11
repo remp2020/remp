@@ -8,11 +8,11 @@ class ConvertStringBooleans extends TransformsRequest
 {
     protected function transform($key, $value)
     {
-        if($value === 'true' || $value === 'TRUE') {
+        if ($value === 'true' || $value === 'TRUE') {
             return true;
         }
 
-        if($value === 'false' || $value === 'FALSE') {
+        if ($value === 'false' || $value === 'FALSE') {
             return false;
         }
 
