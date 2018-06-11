@@ -144,9 +144,10 @@ class StatsController extends Controller
     {
         $from = Carbon::parse($request->get('from'));
         $to = Carbon::parse($request->get('to'));
+        $chartWidth = $request->get('chartWidth');
         $parsedData = [];
 
-        $interval = $this->calcInterval($from, $to);
+        $interval = $this->calcInterval($from, $to, $chartWidth);
 
         foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
@@ -222,10 +223,10 @@ class StatsController extends Controller
         return $dataSets;
     }
 
-    protected function calcInterval(Carbon $from, Carbon $to)
+    protected function calcInterval(Carbon $from, Carbon $to, $chartWidth)
     {
         $labels = [];
-        $numOfCols = 50;
+        $numOfCols = intval($chartWidth / 20);
 
         $fromTimestamp = $from->timestamp;
         $toTimestamp = $to->timestamp;
