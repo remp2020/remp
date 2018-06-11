@@ -53,7 +53,7 @@ class StatsController extends Controller
             return response()->json($result);
         }
 
-        if ($request->get('normalized') === "true") {
+        if ($request->get('normalized') === true) {
             $count = $result['data']->count;
 
             $result['data']->count = $count*($variant->proportion/100);
@@ -106,7 +106,7 @@ class StatsController extends Controller
             return response()->json($result);
         }
 
-        if ($request->get('normalized') === "true") {
+        if ($request->get('normalized') === true) {
             $count = $result['data']->count;
 
             $result['data']->count = $count * ($variant->proportion / 100);
@@ -126,7 +126,7 @@ class StatsController extends Controller
             return response()->json($result);
         }
 
-        if ($request->get('normalized') === "true") {
+        if ($request->get('normalized') === true) {
             $count = $result['data']->count;
 
             $result['data']->count = $count * ($variant->proportion / 100);
