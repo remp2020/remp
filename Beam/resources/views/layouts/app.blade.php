@@ -114,7 +114,7 @@
                 <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-accounts-list-alt"></i> Segments</a>
             </li>
             <li class="m-b-15"></li>
-            <li {!! route_active(['articles.conversions', 'articles.pageviews', 'articles.newsletter'], 'sub-menu', 'toggled') !!}>
+            <li {!! route_active(['articles.conversions', 'articles.pageviews'], 'sub-menu', 'toggled') !!}>
                 <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-library"></i> Articles</a>
                 <ul>
                     <li {!! route_active(['articles.conversions']) !!}>
@@ -123,10 +123,10 @@
                     <li {!! route_active(['articles.pageviews']) !!}>
                         <a href="{{ route('articles.pageviews') }}" ><i class="zmdi zmdi-chart"></i> Pageview stats</a>
                     </li>
-                    <li {!! route_active(['articles.newsletter']) !!}>
-                        <a href="{{ route('articles.newsletter') }}" ><i class="zmdi zmdi-chart"></i> Create newsletter</a>
-                    </li>
                 </ul>
+            </li>
+            <li {!! route_active(['newsletters']) !!}>
+                <a href="{{ route('newsletters.index') }}" ><i class="zmdi zmdi-email"></i> Newsletters</a>
             </li>
             <li {!! route_active(['conversions']) !!}>
                 <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
