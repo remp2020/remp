@@ -103,13 +103,13 @@ interface StatsContract
      * @param array $values array of values
      * @return StatsRequest
      */
-    public function filterBy(string $field, array $values): StatsRequest;
+    public function filterBy(string $field, ...$values): StatsRequest;
 
     /**
      * group results by one or more fields
      *
-     * @param string|array $field
+     * @param array $fields
      * @return StatsRequest
      */
-    public function groupBy($field): StatsRequest;
+    public function groupBy(...$fields): StatsRequest;
 }

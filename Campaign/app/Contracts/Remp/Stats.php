@@ -72,13 +72,13 @@ class Stats implements StatsContract
         return (new StatsRequest($this->client, $this->timeOffset))->sum();
     }
 
-    public function filterBy(string $field, array $values): StatsRequest
+    public function filterBy(string $field, ...$values): StatsRequest
     {
         return (new StatsRequest($this->client, $this->timeOffset))->filterBy($field, $values);
     }
 
-    public function groupBy($field): StatsRequest
+    public function groupBy(...$fields): StatsRequest
     {
-        return (new StatsRequest($this->client, $this->timeOffset))->groupBy($field);
+        return (new StatsRequest($this->client, $this->timeOffset))->groupBy($fields);
     }
 }

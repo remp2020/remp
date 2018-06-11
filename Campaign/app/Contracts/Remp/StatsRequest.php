@@ -121,36 +121,33 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
-    public function filterBy(string $field, array $values) : StatsRequest
+    public function filterBy(string $field, ...$values) : StatsRequest
     {
         $this->filterBy[] = [
             'tag' => $field,
             'values' => $values
         ];
+
         return $this;
     }
 
-    public function groupBy($field) : StatsRequest
+    public function groupBy(...$fields) : StatsRequest
     {
-        if (is_string($field)) {
-            $this->groupBy[] = $field;
-        } else {
-            $this->groupBy = array_merge($this->groupBy, $field);
-        }
+        $this->groupBy = array_merge($this->groupBy, $field);
 
         return $this;
     }
 
     private function url() : string
     {
-        $url = 'journal' . DIRECTORY_SEPARATOR . $this->table;
+        $url = 'journal/' . $this->table;
 
         foreach ($this->args as $arg => $val) {
-            $url .= DIRECTORY_SEPARATOR . $arg . DIRECTORY_SEPARATOR . $val;
+            $url .= '/' . $arg . '/' . $val;
         }
 
         if ($this->action) {
-            $url .= DIRECTORY_SEPARATOR . $this->action;
+            $url .= '/' . $this->action;
         }
 
         return $url;
