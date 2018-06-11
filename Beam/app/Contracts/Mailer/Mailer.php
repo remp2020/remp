@@ -14,20 +14,15 @@ class Mailer implements MailerContract
 
     private $client;
 
-    private $apiToken;
-
     public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->apiToken = config('services.remp.sso.api_token');
     }
 
     public function segments(): Collection
     {
         try {
-            $response = $this->client->get(self::ENDPOINT_SEGMENTS, [
-                'headers' => ['Authorization' => 'Bearer ' . $this->apiToken]
-            ]);
+            $response = $this->client->get(self::ENDPOINT_SEGMENTS);
         } catch (ConnectException $e) {
             throw new MailerException("Could not connect to Mailer endpoint: {$e->getMessage()}");
         }
@@ -37,14 +32,11 @@ class Mailer implements MailerContract
 
     public function generatorTemplates($generator = null): Collection
     {
-        $params = [
-            'headers' => ['Authorization' => 'Bearer ' . $this->apiToken]
-        ];
+        $params = [];
         if ($generator) {
             $params['query'] = ['generator' => $generator];
         }
         try {
-
             $response = $this->client->get(self::ENDPOINT_GENERATOR_TEMPLATES, $params);
         } catch (ConnectException $e) {
             throw new MailerException("Could not connect to Mailer endpoint: {$e->getMessage()}");

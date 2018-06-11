@@ -26,7 +26,7 @@ class NewsletterController extends Controller
         return $datatables->of($newsletters)
             ->addColumn('actions', function (Newsletter $newsletter) {
                 return [
-                    'edit' => route('newsletter.edit', $newsletter)
+                    'edit' => route('newsletters.edit', $newsletter)
                 ];
             })
             //->addColumn('name', function (newsletter $segment) {
@@ -45,17 +45,17 @@ class NewsletterController extends Controller
     {
         $segments = $this->mailer->segments()->mapToGroups(function ($item) {
             return [$item->provider => [$item->code => $item->name]];
-        })->mapWithKeys(function($item, $key) {
+        })->mapWithKeys(function ($item, $key) {
             return [$key => $item->collapse()];
         })->toArray();
 
         $generators = $this->mailer->generatorTemplates('best_performing_articles')
-            ->mapWithKeys(function($item){
+            ->mapWithKeys(function ($item) {
                 return [$item->id => $item->title];
             });
 
         $criteria = [
-            'pageviews' => 'Page views',
+            'pageviews' => 'Pageviews',
             'timespent' => 'Time spent',
             'conversion' => 'Conversions',
             'average_payment' => 'Average payment'
@@ -65,8 +65,10 @@ class NewsletterController extends Controller
         $recurrenceRule = null;
 
         return response()->format([
-            'html' => view('newsletters.create',
-                compact(['segments', 'generators', 'criteria', 'startsAt', 'recurrenceRule'])),
+            'html' => view(
+                'newsletters.create',
+                compact(['segments', 'generators', 'criteria', 'startsAt', 'recurrenceRule'])
+            ),
             'json' => [],
         ]);
     }

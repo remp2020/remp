@@ -47,10 +47,10 @@ return [
         ],
         'mailer' => [
             'web_addr' => env('REMP_MAILER_ADDR'),
+            'api_token' => env('REMP_MAILER_API_TOKEN')
         ],
         'sso' => [
-            'web_addr' => env('REMP_SSO_ADDR'),
-            'api_token' => env('REMP_SSO_API_TOKEN')
+            'web_addr' => env('REMP_SSO_ADDR')
         ],
         'linked' => [
             'beam' => [

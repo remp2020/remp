@@ -52,10 +52,11 @@ Route::middleware('auth.jwt')->group(function () {
         'only' => ['store'],
     ]);
 
-    Route::resource('newsletters', 'NewsletterController', [
-        'only' => ['index', 'create', 'store']
-    ]);
     Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');
+
+    Route::resource('newsletters', 'NewsletterController', [
+        'only' => ['index', 'create', 'store', 'show', 'edit', 'update']
+    ]);
 
     Route::resource('conversions', 'ConversionController', [
         'only' => ['index', 'store']

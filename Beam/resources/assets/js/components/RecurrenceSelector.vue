@@ -133,7 +133,7 @@
 </style>
 
 <script type="text/javascript">
-    import dateTimePicker from './DateTimePickerWrapper.vue';
+    import DateTimePicker from './DateTimePickerWrapper.vue';
     import RRule from 'rrule'
 
     function repeatEveryToRRuleFreq(val) {
@@ -177,7 +177,7 @@
     export default {
         name: "RecurrenceSelector",
         components: {
-            dateTimePicker
+            DateTimePicker
         },
         props: {
             startDate: {
