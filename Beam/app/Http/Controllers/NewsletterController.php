@@ -124,7 +124,7 @@ class NewsletterController extends Controller
                 $request->get('action'),
                 [
                     self::FORM_ACTION_SAVE_CLOSE => 'newsletters.index',
-                    self::FORM_ACTION_SAVE => 'newslettters.edit',
+                    self::FORM_ACTION_SAVE => 'newsletters.edit',
                 ],
                 $newsletter
             )->with('success', sprintf('Newsletter [%s] was updated', $newsletter->name)),
