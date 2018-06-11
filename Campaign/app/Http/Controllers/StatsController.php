@@ -92,55 +92,7 @@ class StatsController extends Controller
 
     public function campaignStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
     {
-        $from = Carbon::parse($request->get('from'));
-        $to = Carbon::parse($request->get('to'));
-        $parsedData = [];
-
-        $interval = $this->calcInterval($from, $to);
-
-        foreach ($this->statTypes as $type => $typeData) {
-            $parsedData[$type] = [];
-
-            $result = $stats->count()
-                            ->events('banner', $type)
-                            ->forCampaign($campaign->uuid)
-                            ->timeHistogram($interval)
-                            ->from($from)
-                            ->to($to)
-                            ->get();
-
-
-            if ($result["success"] != true) {
-                return response()->json($result);
-            }
-
-            $histogramData = $result['data'];
-
-            foreach ($histogramData->time_histogram as $histogramRow) {
-                $date = Carbon::parse($histogramRow->time)->format(self::DATE_FORMAT);
-
-                $parsedData[$type][$date] = $histogramRow->value;
-
-                $labels[] = $date;
-            }
-        }
-
-        $labels = array_unique($labels);
-
-        usort($labels, function ($a, $b) {
-            $a = \DateTime::createFromFormat(self::DATE_FORMAT, $a);
-            $b = \DateTime::createFromFormat(self::DATE_FORMAT, $b);
-
-            return $a > $b;
-        });
-
-        $dataSets = $this->formatDataForChart($parsedData, $labels);
-
-        return response()->json([
-            'success' => true,
-            'dataSets' => $dataSets,
-            'labels' => $labels,
-        ]);
+        return $this->getHistogramData($stats, $request , $campaign->uuid);
     }
 
     public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request)
@@ -185,6 +137,11 @@ class StatsController extends Controller
 
     public function variantStatsHistogram(CampaignBanner $variant, Stats $stats, Request $request)
     {
+        return $this->getHistogramData($stats, $request, $variant->campaign->uuid, $variant->uuid);
+    }
+
+    protected function getHistogramData(Stats $stats, Request $request, $campaignUuid, $variantUuid = null)
+    {
         $from = Carbon::parse($request->get('from'));
         $to = Carbon::parse($request->get('to'));
         $parsedData = [];
@@ -194,14 +151,18 @@ class StatsController extends Controller
         foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
 
-            $result = $stats->count()
-                            ->events('banner', $type)
-                            ->forCampaign($variant->campaign->uuid)
-                            ->forVariant($variant->uuid)
-                            ->timeHistogram($interval)
-                            ->from($from)
-                            ->to($to)
-                            ->get();
+            $stats = $stats->count()
+                        ->events('banner', $type)
+                        ->forCampaign($campaignUuid)
+                        ->timeHistogram($interval)
+                        ->from($from)
+                        ->to($to);
+
+            if ($variantUuid) {
+                $stats->forVariant($variantUuid);
+            }
+
+            $result = $stats->get();
 
             if ($result["success"] != true) {
                 return response()->json($result);
@@ -236,7 +197,7 @@ class StatsController extends Controller
         ]);
     }
 
-    public function formatDataForChart($typesData, $labels)
+    protected function formatDataForChart($typesData, $labels)
     {
         $dataSets = [];
 
@@ -261,7 +222,7 @@ class StatsController extends Controller
         return $dataSets;
     }
 
-    public function calcInterval(Carbon $from, Carbon $to)
+    protected function calcInterval(Carbon $from, Carbon $to)
     {
         $labels = [];
         $numOfCols = 50;
