@@ -8,9 +8,9 @@
             <div class="col-md-6">
                 <h4>Filter by date and time</h4>
                 <div id="smart-range-selector">
-                    {!! Form::hidden('published_from', $publishedFrom) !!}
-                    {!! Form::hidden('published_to', $publishedTo) !!}
-                    <smart-range-selector from="{{$publishedFrom}}" to="{{$publishedTo}}" :callback="callback">
+                    {!! Form::hidden('from', $from) !!}
+                    {!! Form::hidden('to', $to) !!}
+                    <smart-range-selector from="{{$from}}" to="{{$to}}" :callback="callback">
                     </smart-range-selector>
                 </div>
             </div>
@@ -35,8 +35,8 @@
             },
             methods: {
                 callback: function (from, to) {
-                    $('[name="published_from"]').val(from).trigger("change");
-                    $('[name="published_to"]').val(to).trigger("change");
+                    $('[name="from"]').val(from).trigger("change");
+                    $('[name="to"]').val(to).trigger("change");
                 }
             }
         });
@@ -49,19 +49,19 @@
             mounted: function() {
                 var vm = this;
 
-                $('[name="published_from"]').on('change', function () {
-                    vm.from = $('[name="published_from"]').val();
+                $('[name="from"]').on('change', function () {
+                    vm.from = $('[name="from"]').val();
                 });
 
-                $('[name="published_to"]').on('change', function () {
-                    vm.to = $('[name="published_to"]').val();
+                $('[name="to"]').on('change', function () {
+                    vm.to = $('[name="to"]').val();
                 });
             },
             data() {
                 return {
                     variants: {!! @json($campaign->campaignBanners) !!},
-                    from: '{!! $publishedFrom !!}',
-                    to: '{!! $publishedTo !!}'
+                    from: '{!! $from !!}',
+                    to: '{!! $to !!}'
                 }
             }
         })

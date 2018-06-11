@@ -820,8 +820,8 @@ class CampaignController extends Controller
     ) {
         return view('campaigns.stats', [
             'campaign' => $campaign,
-            'publishedFrom' => $request->input('published_from', 'now - 30 days'),
-            'publishedTo' => $request->input('published_to', 'now'),
+            'from' => $request->input('from', 'now - 30 days'),
+            'to' => $request->input('to', 'now'),
         ]);
     }
 
