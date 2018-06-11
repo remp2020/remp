@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Create newsletter')
+@section('title', 'Edit newsletter')
 
 @section('content')
 
@@ -10,12 +10,12 @@
 
     <div class="card">
         <div class="card-header">
-            <h2>Create new newsletter <small></small></h2>
+            <h2>Edit newsletter <small></small></h2>
         </div>
 
         <div class="card-body card-padding">
             @include('flash::message')
-            {!! Form::model($newsletter, ['route' => 'newsletters.store']) !!}
+            {!! Form::model($newsletter, ['route' => ['newsletters.update', $newsletter], 'method' => 'PATCH']) !!}
             @include('newsletters._form')
             {!! Form::close() !!}
         </div>

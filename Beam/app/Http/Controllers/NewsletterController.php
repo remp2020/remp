@@ -29,9 +29,6 @@ class NewsletterController extends Controller
                     'edit' => route('newsletters.edit', $newsletter)
                 ];
             })
-            //->addColumn('name', function (newsletter $segment) {
-            //    return HTML::linkRoute('segments.edit', $segment->name, $segment);
-            //})
             ->rawColumns(['actions'])
             ->make(true);
     }
@@ -43,34 +40,60 @@ class NewsletterController extends Controller
 
     public function create()
     {
-        $segments = $this->mailer->segments()->mapToGroups(function ($item) {
-            return [$item->provider => [$item->code => $item->name]];
-        })->mapWithKeys(function ($item, $key) {
-            return [$key => $item->collapse()];
-        })->toArray();
+        $segments = $this->loadSegments();
+        $generators = $this->loadGenerators();
+        $criteria = $this->loadCriteria();
+        $newsletter = new Newsletter();
+        $newsletter->starts_at = Carbon::now()->addHour(1);
+        $newsletter->articles_count = 1;
 
-        $generators = $this->mailer->generatorTemplates('best_performing_articles')
-            ->mapWithKeys(function ($item) {
-                return [$item->id => $item->title];
-            });
+        return response()->format([
+            'html' => view(
+                'newsletters.create',
+                compact(['newsletter', 'segments', 'generators', 'criteria'])
+            ),
+            'json' => [],
+        ]);
+    }
 
-        $criteria = [
+    public function edit($id)
+    {
+        $newsletter = Newsletter::find($id);
+        $segments = $this->loadSegments();
+        $generators = $this->loadGenerators();
+        $criteria = $this->loadCriteria();
+
+        return response()->format([
+            'html' => view(
+                'newsletters.edit',
+                compact(['newsletter', 'segments', 'generators', 'criteria'])
+            ),
+            'json' => [],
+        ]);
+    }
+
+    private function loadCriteria() {
+        return [
             'pageviews' => 'Pageviews',
             'timespent' => 'Time spent',
             'conversion' => 'Conversions',
             'average_payment' => 'Average payment'
         ];
+    }
 
-        $startsAt = Carbon::now()->addHour(1);
-        $recurrenceRule = null;
+    private function loadGenerators() {
+        return $this->mailer->generatorTemplates('best_performing_articles')
+            ->mapWithKeys(function ($item) {
+                return [$item->id => $item->title];
+            });
+    }
 
-        return response()->format([
-            'html' => view(
-                'newsletters.create',
-                compact(['segments', 'generators', 'criteria', 'startsAt', 'recurrenceRule'])
-            ),
-            'json' => [],
-        ]);
+    private function loadSegments() {
+        return $this->mailer->segments()->mapToGroups(function ($item) {
+            return [$item->provider => [$item->code => $item->name]];
+        })->mapWithKeys(function ($item, $key) {
+            return [$key => $item->collapse()];
+        })->toArray();
     }
 
     public function store(NewsletterRequest $request)
@@ -91,38 +114,21 @@ class NewsletterController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function update(NewsletterRequest $request, Newsletter $newsletter)
     {
-        //
-    }
+        $newsletter->fill($request->all());
+        $newsletter->save();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+        return response()->format([
+            'html' => $this->getRouteBasedOnAction(
+                $request->get('action'),
+                [
+                    self::FORM_ACTION_SAVE_CLOSE => 'newsletters.index',
+                    self::FORM_ACTION_SAVE => 'newslettters.edit',
+                ],
+                $newsletter
+            )->with('success', sprintf('Newsletter [%s] was updated', $newsletter->name)),
+        ]);
     }
 
     /**

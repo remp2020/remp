@@ -20,7 +20,7 @@ class CreateNewslettersTable extends Migration
             $table->string('segment_code');
             $table->string('criteria');
             $table->integer('articles_count')->unsigned();
-            $table->text('reccurrence_rule')->nullable();
+            $table->text('recurrence_rule')->nullable();
             $table->timestamp('starts_at')->nullable();
             $table->timestamps();
         });

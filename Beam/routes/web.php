@@ -55,7 +55,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');
 
     Route::resource('newsletters', 'NewsletterController', [
-        'only' => ['index', 'create', 'store', 'show', 'edit', 'update']
+        'except' => ['show', 'destroy']
     ]);
 
     Route::resource('conversions', 'ConversionController', [

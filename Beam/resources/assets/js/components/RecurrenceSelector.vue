@@ -61,18 +61,6 @@
                 </div>
             </div>
 
-            <!--<div v-show="repeatEvery == 'month'" id="month-repeat-options" class="row">-->
-                <!--<div class="col-xs-6">-->
-                    <!--<div v-model="monthRepeatType" class="fg-line form-group">-->
-                        <!--<select class="selectpicker">-->
-                            <!--<option v-for="option in monthRepeatOptions" v-bind:value="option.value">-->
-                                <!--{{ option.text }}-->
-                            <!--</option>-->
-                        <!--</select>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-
             <div>
                 <div class="fg-line">
                     <label class="fg-label">Ends</label>
@@ -135,44 +123,38 @@
 <script type="text/javascript">
     import DateTimePicker from './DateTimePickerWrapper.vue';
     import RRule from 'rrule'
+    var rrulestr = require('rrule').rrulestr
+
+    let repeat2freq = {
+        'day': RRule.DAILY,
+        'week': RRule.WEEKLY,
+        'month': RRule.MONTHLY,
+        'year': RRule.YEARLY
+    }
+
+    let freq2repeat = {}
+    freq2repeat[RRule.DAILY] = 'day'
+    freq2repeat[RRule.WEEKLY] = 'week'
+    freq2repeat[RRule.MONTHLY] = 'month'
+    freq2repeat[RRule.YEARLY] = 'year'
 
     function repeatEveryToRRuleFreq(val) {
-        switch(val) {
-            case 'day':
-                return RRule.DAILY
-            case 'week':
-                return RRule.WEEKLY
-            case 'month':
-                return RRule.MONTHLY
-            case 'year':
-                return RRule.YEARLY
-            default:
-                console.error("Unable to convert '" + val + "' to RRule frequency")
-                break
+        if (repeat2freq.hasOwnProperty(val)){
+            return repeat2freq[val]
+        } else {
+            console.error("Unable to convert '" + val + "' to RRule frequency")
         }
     }
-    
-    function dayNumberToRRuleWeekDay(dayNumber) {
-        switch (dayNumber) {
-            case 0:
-                return RRule.MO
-            case 1:
-                return RRule.TU
-            case 2:
-                return RRule.WE
-            case 3:
-                return RRule.TH
-            case 4:
-                return RRule.FR
-            case 5:
-                return RRule.SA
-            case 6:
-                return RRule.SU
-            default:
-                console.error("Unable to convert '" + dayNumber + "' to RRule day")
-                break
+
+    function rRuleFreqToRepeatEvery(val) {
+        if (freq2repeat.hasOwnProperty(val)){
+            return freq2repeat[val]
+        } else {
+            console.error("Unable to convert '" + val + "' to repeat type")
         }
     }
+
+    let rRuleWeekDays = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA, RRule.SU]
 
     export default {
         name: "RecurrenceSelector",
@@ -186,7 +168,7 @@
             },
             recurrence: {
                 type: String,
-                required: true
+                default: null
             },
             callback: {
                 type: Function,
@@ -216,48 +198,66 @@
                     { text: 'week', value: 'week' },
                     { text: 'month', value: 'month' },
                     { text: 'year', value: 'year' }
-                ],
-                rrule: null
-            }
-        },
-        watch: {
-            allPropertiesWatchable: function() {
-                let ruleProps = {
-                    dtstart: new Date(this.start)
-                }
-
-                if (!this.repeat) {
-                    ruleProps.count = 1
-                    ruleProps.freq = RRule.DAILY
-                } else {
-                    ruleProps.freq = repeatEveryToRRuleFreq(this.repeatEvery)
-                    ruleProps.interval = this.repeatInterval
-                    if (this.repeatEvery === 'week') {
-                        let weekDays = []
-                        for (let i=0; i < this.weekRecurrence.length; i++) {
-                            if (this.weekRecurrence[i]){
-                                weekDays.push(dayNumberToRRuleWeekDay(i))
-                            }
-                        }
-                        ruleProps.byweekday = weekDays
-                    }
-                    if (this.endsOn === 'on') {
-                        ruleProps.until = new Date(this.endsOnDate)
-
-                    } else if (this.endsOn === 'after') {
-                        ruleProps.count = this.repeatCount
-                    }
-                }
-
-                this.rrule = new RRule(ruleProps)
-                this.callback(this.start, this.rrule.toString())
-            },
-            start: function(val) {
-                this.turnOnWeekDays(val)
+                ]
             }
         },
         created() {
             this.turnOnWeekDays(this.startDate)
+            if (this.recurrence !== null) {
+                this.repeat = true
+
+                let rule = rrulestr(this.recurrence)
+                console.log(this.recurrence)
+                console.log(rule.options)
+
+                this.repeatInterval = rule.options.interval
+                this.repeatEvery = rRuleFreqToRepeatEvery(rule.options.freq)
+
+                if (rule.options.count !== null) {
+                    this.repeatCount = rule.options.count
+                    this.endsOn = 'after'
+                }
+                else if (rule.options.until !== null){
+                    this.endsOnDate = rule.options.until
+                    this.endsOn = 'on'
+                }
+            }
+        },
+        watch: {
+            allPropertiesWatchable: function() {
+                if (!this.repeat) {
+                    this.callback(this.start, null)
+                    return
+                }
+
+                let ruleProps = {
+                    dtstart: new Date(this.start),
+                    freq: repeatEveryToRRuleFreq(this.repeatEvery),
+                    interval: this.repeatInterval
+                }
+
+                if (this.repeatEvery === 'week') {
+                    let weekDays = []
+                    for (let i=0; i < this.weekRecurrence.length; i++) {
+                        if (this.weekRecurrence[i]){
+                            weekDays.push(rRuleWeekDays[i])
+                        }
+                    }
+                    ruleProps.byweekday = weekDays
+                }
+                if (this.endsOn === 'on') {
+                    ruleProps.until = new Date(this.endsOnDate)
+
+                } else if (this.endsOn === 'after') {
+                    ruleProps.count = this.repeatCount
+                }
+
+                let rule = new RRule(ruleProps)
+                this.callback(this.start, rule.toString())
+            },
+            start: function(val) {
+                this.turnOnWeekDays(val)
+            }
         },
         computed: {
             endsOnIsOn: function () {

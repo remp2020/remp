@@ -17,7 +17,7 @@ class Newsletter extends Model
         'segment_code',
         'criteria',
         'articles_count',
-        'reccurrence_rule',
+        'recurrence_rule',
         'starts_at',
     ];
 }

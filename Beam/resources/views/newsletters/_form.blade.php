@@ -5,8 +5,8 @@
         <div class="input-group fg-float m-t-10">
             <span class="input-group-addon"><i class="zmdi zmdi-label"></i></span>
             <div class="fg-line">
-                {!! Form::text('name', null, ['class' => 'form-control fg-input']) !!}
                 {!! Form::label('Name', null, ['class' => 'fg-label']) !!}
+                {!! Form::text('name', $newsletter->name, ['class' => 'form-control fg-input']) !!}
             </div>
         </div>
 
@@ -18,7 +18,7 @@
                     {!! Form::select(
                        'segment_code',
                        $segments,
-                       null,
+                       $newsletter->segment_code,
                        [
                         'class' => 'selectpicker',
                        'data-live-search' => 'true',
@@ -37,7 +37,7 @@
                     {!! Form::select(
                        'mailer_generator_id',
                        $generators,
-                       null,
+                       $newsletter->mailer_generator_id,
                        ['class' => 'selectpicker',
                        'data-live-search' => 'true',
                        'placeholder' => 'Please select...']
@@ -54,7 +54,7 @@
                     {!! Form::select(
                        'criteria',
                        $criteria,
-                       null,
+                       $newsletter->criteria,
                        ['class' => 'selectpicker',
                        'placeholder' => 'Please select...']
                    ) !!}
@@ -65,8 +65,8 @@
         <div class="input-group fg-float m-t-15">
             <span class="input-group-addon"><i class="zmdi zmdi-file-text"></i></span>
             <div class="fg-line">
-                <label for="articles_count" class="fg-label">How many articles</label>
-                <input class="form-control fg-input" name="articles_count" id="articles_count" type="number" value="1" min="1">
+                {!! Form::label('How many articles', null, ['class' => 'fg-label']) !!}
+                {!! Form::number('articles_count', $newsletter->articles_count, ['class' => 'form-control fg-input', 'min' => 1, 'max' => 100]) !!}
             </div>
         </div>
     </div>
@@ -75,14 +75,15 @@
 <div id="recurrence-selector" class="row">
     <div class="col-md-6 form-group">
         <h5>Start date and recurrence</h5>
-
         <div class="m-t-20">
-            {!! Form::hidden('starts_at') !!}
-            {!! Form::hidden('reccurrence_rule') !!}
-            <recurrence-selector start-date="{{$startsAt}}" recurrence="{{$recurrenceRule}}" :callback="callback">
+            {!! Form::hidden('starts_at', $newsletter->starts_at) !!}
+            {!! Form::hidden('recurrence_rule', $newsletter->recurrence_rule) !!}
+            <recurrence-selector
+                    start-date="{{$newsletter->starts_at}}"
+                    :recurrence="{{$newsletter->recurrence_rule ? "'{$newsletter->recurrence_rule}'" : 'null'}}"
+                    :callback="callback">
             </recurrence-selector>
         </div>
-
     </div>
 
     <div class="col-md-6">
@@ -120,14 +121,15 @@
         },
         data() {
             return {
-                rrule: null
+                rrule: null,
+                submitAction: null
             }
         },
         methods: {
-            callback: function (startsAt, reccurrenceRule) {
-                this.rrule = reccurrenceRule
-                $('[name="starts_at"]').val(formatDateUtc(new Date(startsAt)).toUTCString());
-                $('[name="reccurrence_rule"]').val(reccurrenceRule);
+            callback: function (startsAt, recurrenceRule) {
+                this.rrule = recurrenceRule
+                $('[name="starts_at"]').val(formatDateUtc(new Date(startsAt)));
+                $('[name="recurrence_rule"]').val(recurrenceRule);
             }
         }
     });

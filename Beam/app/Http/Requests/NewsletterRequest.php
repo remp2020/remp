@@ -30,7 +30,7 @@ class NewsletterRequest extends FormRequest
             'criteria' => 'required|string|in:pageviews,timespent,conversion,average_payment',
             'articles_count' => 'required|integer|min:1|max:100',
             'starts_at' => 'required|date',
-            //'reccurrence_rule' => 'string',
+            'recurrence_rule' => 'string',
         ];
     }
 }
