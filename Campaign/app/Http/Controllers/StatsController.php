@@ -62,18 +62,32 @@ class StatsController extends Controller
         return response()->json($result);
     }
 
-    public function calcInterval(Carbon $from, Carbon $to)
+    public function campaignPaymentStatsCount(Campaign $campaign, $step, Stats $stats, Request $request)
     {
-        $labels = [];
-        $chartWidth = 50;
+        $result = $stats->count()
+                        ->commerce($step)
+                        ->forCampaign($campaign->uuid)
+                        ->get();
 
-        $fromTimestamp = $from->timestamp;
-        $toTimestamp = $to->timestamp;
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
 
-        $diff = $to->diffInSeconds($from);
-        $interval = $diff / $chartWidth;
+        return response()->json($result);
+    }
 
-        return intval($interval) . "s";
+    public function campaignPaymentStatsSum(Campaign $campaign, $step, Stats $stats, Request $request)
+    {
+        $result = $stats->sum()
+                        ->commerce($step)
+                        ->forCampaign($campaign->uuid)
+                        ->get();
+
+        if ($result["success"] != true) {
+            return response()->json($result);
+        }
+
+        return response()->json($result);
     }
 
     public function campaignStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
@@ -129,51 +143,12 @@ class StatsController extends Controller
         ]);
     }
 
-    public function formatDataForChart($typesData, $labels)
-    {
-        $dataSets = [];
-
-        foreach ($typesData as $type => $data) {
-            $dataSet = [
-                'label' => $this->statTypes[$type]['label'],
-                'data' => [],
-                'backgroundColor' => $this->statTypes[$type]['backgroundColor']
-            ];
-
-            foreach ($labels as $label) {
-                if (array_key_exists($label, $data)) {
-                    $dataSet['data'][] = $data[$label];
-                } else {
-                    $dataSet['data'][] = 0;
-                }
-            }
-
-            $dataSets[] = $dataSet;
-        }
-
-        return $dataSets;
-    }
-
-    public function campaignPaymentStatsCount(Campaign $campaign, $step, Stats $stats, Request $request)
-    {
-        $result = $stats->count()
-                        ->commerce($step)
-                        ->forCampaign($campaign->uuid)
-                        ->get();
-
-        if ($result["success"] != true) {
-            return response()->json($result);
-        }
-
-        return response()->json($result);
-    }
-
     public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request)
     {
         $result = $stats->count()
-                        ->commerce($step)
-                        ->forVariant($variant->uuid)
-                        ->get();
+            ->commerce($step)
+            ->forVariant($variant->uuid)
+            ->get();
 
         if ($result["success"] != true) {
             return response()->json($result);
@@ -183,20 +158,6 @@ class StatsController extends Controller
             $count = $result['data']->count;
 
             $result['data']->count = $count * ($variant->proportion / 100);
-        }
-
-        return response()->json($result);
-    }
-
-    public function campaignPaymentStatsSum(Campaign $campaign, $step, Stats $stats, Request $request)
-    {
-        $result = $stats->sum()
-                        ->commerce($step)
-                        ->forCampaign($campaign->uuid)
-                        ->get();
-
-        if ($result["success"] != true) {
-            return response()->json($result);
         }
 
         return response()->json($result);
@@ -273,5 +234,44 @@ class StatsController extends Controller
             'dataSets' => $dataSets,
             'labels' => $labels,
         ]);
+    }
+
+    public function formatDataForChart($typesData, $labels)
+    {
+        $dataSets = [];
+
+        foreach ($typesData as $type => $data) {
+            $dataSet = [
+                'label' => $this->statTypes[$type]['label'],
+                'data' => [],
+                'backgroundColor' => $this->statTypes[$type]['backgroundColor']
+            ];
+
+            foreach ($labels as $label) {
+                if (array_key_exists($label, $data)) {
+                    $dataSet['data'][] = $data[$label];
+                } else {
+                    $dataSet['data'][] = 0;
+                }
+            }
+
+            $dataSets[] = $dataSet;
+        }
+
+        return $dataSets;
+    }
+
+    public function calcInterval(Carbon $from, Carbon $to)
+    {
+        $labels = [];
+        $numOfCols = 50;
+
+        $fromTimestamp = $from->timestamp;
+        $toTimestamp = $to->timestamp;
+
+        $diff = $to->diffInSeconds($from);
+        $interval = $diff / $numOfCols;
+
+        return intval($interval) . "s";
     }
 }
