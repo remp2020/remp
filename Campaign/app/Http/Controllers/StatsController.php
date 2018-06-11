@@ -92,7 +92,7 @@ class StatsController extends Controller
 
     public function campaignStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
     {
-        return $this->getHistogramData($stats, $request , $campaign->uuid);
+        return $this->getHistogramData($stats, $request, $campaign->uuid);
     }
 
     public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request)
