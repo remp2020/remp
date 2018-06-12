@@ -114,9 +114,9 @@ class StatsController extends Controller
         }
 
         if ($normalized) {
-            $count = $result['data']->count;
+            $sum = $result['data']->sum;
 
-            $result['data']->count = $count * ($variant->proportion / 100);
+            $result['data']->sum = $sum * ($variant->proportion / 100);
         }
 
         return $result;
