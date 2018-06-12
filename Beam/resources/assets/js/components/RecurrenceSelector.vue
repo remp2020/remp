@@ -180,7 +180,7 @@
                 repeat: false,
                 repeatInterval: 1,
                 repeatCount: 1,
-                endsOnDate: null,
+                endsOnDate: moment().toISOString(),
                 repeatEvery: 'day',
                 endsOn: 'never',
                 weekRecurrence: [
@@ -201,7 +201,7 @@
             }
         },
         created() {
-            this.turnOnWeekDays(this.startDate)
+            this.turnOnDefaultWeekDay(this.startDate)
 
             if (this.recurrence !== null) {
                 this.repeat = true
@@ -257,9 +257,6 @@
 
                 let rule = new RRule(ruleProps)
                 this.callback(this.start, rule.toString())
-            },
-            start: function(val) {
-                this.turnOnWeekDays(val)
             }
         },
         computed: {
@@ -268,6 +265,7 @@
             },
             allProperties() {
                 return [
+                    this.start,
                     this.repeat,
                     this.repeatEvery,
                     this.repeatInterval,
@@ -283,10 +281,10 @@
                 this.weekRecurrence.splice(dayNumber, 1, !this.weekRecurrence[dayNumber])
                 let atLeastOneTrue = this.weekRecurrence.reduce((acc, val) => acc || val)
                 if (!atLeastOneTrue) {
-                    this.turnOnWeekDays(this.start)
+                    this.turnOnDefaultWeekDay(this.start)
                 }
             },
-            turnOnWeekDays(date) {
+            turnOnDefaultWeekDay(date) {
                 let d = moment(date)
                 for (let i = 0; i < 7; i++) {
                     this.weekRecurrence.splice(i, 1, i === (d.isoWeekday() - 1))

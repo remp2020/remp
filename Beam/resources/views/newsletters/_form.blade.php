@@ -87,7 +87,7 @@
     </div>
 
     <div class="col-md-6">
-        <h5 style="margin-top: 44px">Next few recurrences (up to 10):</h5>
+        <h5 v-show="rrule" style="margin-top: 14px">Next few recurrences (up to 10):</h5>
         <rule-ocurrences :rrule='rrule'></rule-ocurrences>
     </div>
 
