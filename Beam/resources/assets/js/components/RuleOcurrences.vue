@@ -8,7 +8,7 @@
     import RRule from 'rrule'
 
     export default {
-        name: "RuleOccurrences",
+        name: "RuleOcurrences",
         props: {
             rrule: {
                 type: String
@@ -23,7 +23,7 @@
                 // Max 10 occurrences
                 return rule.between(new Date(), new Date(2099, 1, 1), true, (d, index) => {
                     return index <= 10
-                }).map(item => item.toString())
+                }).map(item => moment(item).format('LLLL'))
             }
         },
     }

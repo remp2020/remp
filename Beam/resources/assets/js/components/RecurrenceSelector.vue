@@ -104,8 +104,7 @@
                     <div class="col-md-9">
                         <div class="">
                             <input :disabled="endsOn != 'after'" style="display: inline; width:36px;" v-model="repeatCount" class="p-l-5 m-r-10 form-control input-sm" type="number" min="1" />
-                            <span v-if="repeatCount>1">occurences</span>
-                            <span v-else>occurence</span>
+                            {{repeatCount | pluralize('occurrence', 'occurrences')}}
                         </div>
                     </div>
                 </div>
@@ -203,28 +202,33 @@
         },
         created() {
             this.turnOnWeekDays(this.startDate)
+
             if (this.recurrence !== null) {
                 this.repeat = true
 
                 let rule = rrulestr(this.recurrence)
-                console.log(this.recurrence)
-                console.log(rule.options)
 
                 this.repeatInterval = rule.options.interval
                 this.repeatEvery = rRuleFreqToRepeatEvery(rule.options.freq)
+
+                if (rule.options.byweekday !== null) {
+                    for (let i = 0; i < 7; i++) {
+                        this.weekRecurrence[i] = rule.options.byweekday.includes(i)
+                    }
+                }
 
                 if (rule.options.count !== null) {
                     this.repeatCount = rule.options.count
                     this.endsOn = 'after'
                 }
                 else if (rule.options.until !== null){
-                    this.endsOnDate = rule.options.until
+                    this.endsOnDate = moment(rule.options.until).toISOString()
                     this.endsOn = 'on'
                 }
             }
         },
         watch: {
-            allPropertiesWatchable: function() {
+            allProperties: function() {
                 if (!this.repeat) {
                     this.callback(this.start, null)
                     return
@@ -247,7 +251,6 @@
                 }
                 if (this.endsOn === 'on') {
                     ruleProps.until = new Date(this.endsOnDate)
-
                 } else if (this.endsOn === 'after') {
                     ruleProps.count = this.repeatCount
                 }
@@ -263,7 +266,7 @@
             endsOnIsOn: function () {
                 return this.endsOn === 'on'
             },
-            allPropertiesWatchable() {
+            allProperties() {
                 return [
                     this.repeat,
                     this.repeatEvery,

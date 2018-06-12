@@ -4778,6 +4778,10 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
+pluralize@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
+
 pngquant-bin@^3.0.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/pngquant-bin/-/pngquant-bin-3.1.1.tgz#d124d98a75a9487f40c1640b4dbfcbb2bd5a1fd1"
@@ -6617,6 +6621,10 @@ vue-template-compiler@^2.0.0:
 vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
+
+vue2-filters@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/vue2-filters/-/vue2-filters-0.3.0.tgz#3d6b71169fb14b32a2ddbfa45f94d9a0fdee1094"
 
 vue@^2.4.2:
   version "2.5.9"

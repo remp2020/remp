@@ -88,7 +88,7 @@
 
     <div class="col-md-6">
         <h5 style="margin-top: 44px">Next few recurrences (up to 10):</h5>
-        <rule-occurrences :rrule='rrule'></rule-occurrences>
+        <rule-ocurrences :rrule='rrule'></rule-ocurrences>
     </div>
 
     <div class="col-md-12">
@@ -117,7 +117,7 @@
     new Vue({
         el: "#recurrence-selector",
         components: {
-            RecurrenceSelector, RuleOccurrences
+            RecurrenceSelector, RuleOcurrences
         },
         data() {
             return {

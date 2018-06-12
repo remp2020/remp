@@ -27,17 +27,17 @@
         mounted() {
             let datetime = $("#" + this.labelId)
             let that = this
-
-            datetime.on('dp.change', function() {
-                let t = $(this).data("DateTimePicker").date();
-                that.$emit('input', t ? moment(t).format() : null)
-            }).datetimepicker()
+            datetime.datetimepicker()
 
             // defaultDate() changes DOM directly, therefore doing it in nextTick()
             Vue.nextTick()
                 .then(function(){
                     let timeToSet = that.value ? moment(that.value) : moment()
                     datetime.data("DateTimePicker").defaultDate(timeToSet)
+                    datetime.on('dp.change', function(val) {
+                        let t = $(this).data("DateTimePicker").date();
+                        that.$emit('input', t ? moment(t).utc().format() : null)
+                    })
                 })
         }
     }
