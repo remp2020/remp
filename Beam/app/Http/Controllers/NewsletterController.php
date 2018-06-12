@@ -72,7 +72,8 @@ class NewsletterController extends Controller
         ]);
     }
 
-    private function loadCriteria() {
+    private function loadCriteria()
+    {
         return [
             'pageviews' => 'Pageviews',
             'timespent' => 'Time spent',
@@ -81,14 +82,16 @@ class NewsletterController extends Controller
         ];
     }
 
-    private function loadGenerators() {
+    private function loadGenerators()
+    {
         return $this->mailer->generatorTemplates('best_performing_articles')
             ->mapWithKeys(function ($item) {
                 return [$item->id => $item->title];
             });
     }
 
-    private function loadSegments() {
+    private function loadSegments()
+    {
         return $this->mailer->segments()->mapToGroups(function ($item) {
             return [$item->provider => [$item->code => $item->name]];
         })->mapWithKeys(function ($item, $key) {
