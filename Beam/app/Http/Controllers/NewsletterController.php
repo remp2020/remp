@@ -20,7 +20,7 @@ class NewsletterController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
-        $columns = ['id', 'name', 'segment_code', 'mailer_generator_id', 'created_at', 'updated_at'];
+        $columns = ['id', 'name', 'segment_code', 'mailer_generator_id', 'created_at', 'updated_at', 'starts_at'];
         $newsletters = Newsletter::select($columns);
 
         return $datatables->of($newsletters)
