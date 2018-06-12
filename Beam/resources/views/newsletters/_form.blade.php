@@ -78,9 +78,13 @@
         <div class="m-t-20">
             {!! Form::hidden('starts_at', $newsletter->starts_at) !!}
             {!! Form::hidden('recurrence_rule', $newsletter->recurrence_rule) !!}
+            @php
+                $recurrence = old('recurrence_rule', $newsletter->recurrence_rule);
+                $recurrence = $recurrence !== null ? "'{$recurrence}'" : 'null';
+            @endphp
             <recurrence-selector
-                    start-date="{{$newsletter->starts_at}}"
-                    :recurrence="{{$newsletter->recurrence_rule ? "'{$newsletter->recurrence_rule}'" : 'null'}}"
+                    start-date="{{ old('starts_at', $newsletter->starts_at) }}"
+                    :recurrence="{{ $recurrence }}"
                     :callback="callback">
             </recurrence-selector>
         </div>
