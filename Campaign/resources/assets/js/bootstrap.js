@@ -6,6 +6,6 @@ global.noUiSlider = require("nouislider/distribute/nouislider.js")
 
 global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue");
 
-global.CampaignStats = require("./components/CampaignStats.vue");
+global.CampaignStatsRoot = require("./components/CampaignStatsRoot.vue");
 
 global.salvattore = require("salvattore");

@@ -18,13 +18,13 @@
     </div>
 
     <div id="stats-app">
-        <campaign-stats
+        <campaign-stats-root
             :id="{{ $campaign->id }}"
             :name="'{!! $campaign->name !!}'"
             :variants="variants"
             :from="from"
             :to="to"
-        ></campaign-stats>
+        ></campaign-stats-root>
     </div>
 
     <script type="text/javascript">
@@ -44,7 +44,7 @@
         new Vue({
             el: "#stats-app",
             components: {
-                CampaignStats
+                CampaignStatsRoot
             },
             mounted: function() {
                 var vm = this;

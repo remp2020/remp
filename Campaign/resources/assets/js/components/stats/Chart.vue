@@ -44,14 +44,14 @@
 
 <template>
     <div class="card">
-        <div class="preloader-wrapper">
+        <div v-if="loading" class="preloader-wrapper">
             <div class="preloader pl-xxl">
                 <svg class="pl-circular" viewBox="25 25 50 50">
                     <circle class="plc-path" cx="50" cy="50" r="20" />
                 </svg>
             </div>
         </div>
-        <div class="stats-error">!</div>
+        <div v-if="error" class="stats-error" :title="errorText">!</div>
         <h3>{{ title }}</h3>
 
         <div class="card-body">
@@ -63,10 +63,6 @@
 
 <script>
     let props = {
-        url: {
-            type: String,
-            required: true
-        },
         name: {
             type: String,
             required: true
@@ -75,76 +71,36 @@
             type: String,
             required: true
         },
-        from: {
-            type: String,
-            required: true
-        },
-        to: {
-            type: String,
-            required: true
-        },
         height: {
             type: Number,
             required: true
+        },
+        loading: {
+            type: Boolean,
+            default: true
         }
     }
-
     export default {
         props: props,
         data() {
             return {
-                loaded: false,
-                labels: null,
-                data: null,
-                chart: null
-            }
-        },
-        mounted() {
-            this.load()
-        },
-        watch: {
-            from() {
-                this.load();
-            },
-            to() {
-                this.load();
+                error: false,
+                errorText: ""
             }
         },
         methods: {
-            load() {
-                var vm = this;
+            handleResult(result) {
+                this.error = false;
+                this.errorText = "";
 
-                $(this.$el).find('.preloader-wrapper').show();
-                $(vm.$el).find('.stats-error').hide();
-
-                $.ajax({
-                    method: 'POST',
-                    url: vm.url,
-                    data: {
-                        from: vm.from,
-                        to: vm.to,
-                        chartWidth: $('#' + this.name).width(),
-                        _token: document.head.querySelector("[name=csrf-token]").content
-                    },
-                    dataType: 'JSON',
-                    success(data, stats) {
-                        vm.loaded = true;
-
-                        $(vm.$el).find('.preloader-wrapper').fadeOut();
-
-                        if (data.success) {
-                            vm.init(data.dataSets, data.labels)
-                        } else {
-                            $(vm.$el).find('.stats-error').show().attr('title', data.message);
-                        }
-                    },
-                    error(xhr, status, error) {
-                        $(vm.$el).find('.stats-error').show().attr('title',error);
-                        $(vm.$el).find('.preloader-wrapper').fadeOut();
-                    }
-                })
+                if (result.success === true) {
+                    this.setChartData(result.dataSets, result.labels);
+                } else {
+                    this.error = true;
+                    this.errorText = result.message;
+                }
             },
-            init(dataSets, labels) {
+            setChartData(dataSets, labels) {
                 for(var ii = 0; ii < labels.length; ii++) {
                     if (ii % 2 !== 0 && ii+1 !== labels.length) {
                         labels[ii] = "";
@@ -152,7 +108,6 @@
                         labels[ii] = moment(labels[ii]).format('D.M. h:mm');
                     }
                 }
-
 
                 if (this.chart != null) {
                     this.chart.config.data = {
