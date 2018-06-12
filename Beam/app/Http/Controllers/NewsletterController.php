@@ -130,15 +130,4 @@ class NewsletterController extends Controller
             )->with('success', sprintf('Newsletter [%s] was updated', $newsletter->name)),
         ]);
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
