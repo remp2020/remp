@@ -173,11 +173,14 @@
                 for (const variantType of variantTypes) {
                     switch (variantType) {
                         case "title_variant":
-                            return this.updateVariants(this.titleVariantRanges, this.titleVariants, this.titleVariantStats, range, counts[variantType]);
+                            this.updateVariants(this.titleVariantRanges, this.titleVariants, this.titleVariantStats, range, counts[variantType]);
+                            break;
                         case "image_variant":
-                            return this.updateVariants(this.imageVariantRanges, this.imageVariants, this.imageVariantStats, range, counts[variantType]);
+                            this.updateVariants(this.imageVariantRanges, this.imageVariants, this.imageVariantStats, range, counts[variantType]);
+                            break;
                         case "lock_variant":
-                            return this.updateVariants(this.lockVariantRanges, this.lockVariants, this.lockVariantStats, range, counts[variantType]);
+                            this.updateVariants(this.lockVariantRanges, this.lockVariants, this.lockVariantStats, range, counts[variantType]);
+                            break;
                     }
                 }
             },
