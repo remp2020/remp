@@ -17,7 +17,11 @@ class Dummy implements ISegment
                 'name' => 'Dummy segment',
                 'provider' => static::PROVIDER_ALIAS,
                 'code' => 'dummy-segment',
-                'group' => 'dummy',
+                'group' => [
+                    'id' => 0,
+                    'name' => 'dummy',
+                    'sorting' => 1
+                ]
             ],
         ];
     }

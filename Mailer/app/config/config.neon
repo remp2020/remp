@@ -166,6 +166,7 @@ services:
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'preprocess-generator-parameters'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorPreprocessHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'generator-templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\GeneratorTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'segments', 'list'), \Remp\MailerModule\Api\v1\Handlers\Segments\SegmentsListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
     # Generator
     generator:
         class: Remp\MailerModule\Generators\GeneratorFactory
@@ -176,6 +177,10 @@ services:
             - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\MinutaAlertGenerator())
             - registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\DailyNewsletterGenerator())
             - registerGenerator('empty', 'Empty generator', Remp\MailerModule\Generators\EmptyGenerator())
+            - registerGenerator('best_performing_articles', 'Best performing articles', \Remp\MailerModule\Generators\GenericBestPerformingArticlesGenerator())
+
+    transporter:
+        class: Remp\MailerModule\PageMeta\GuzzleTransport
 
     # Repositories
     - Remp\MailerModule\Repository\AuditLogRepository

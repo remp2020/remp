@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Generators;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\PageMeta\DenniknContent;
+use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -14,9 +15,12 @@ class UrlParserGenerator implements IGenerator
 
     public $onSubmit;
 
-    public function __construct(SourceTemplatesRepository $sourceTemplatesRepository)
+    private $transport;
+
+    public function __construct(SourceTemplatesRepository $sourceTemplatesRepository, TransportInterface $transport)
     {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
+        $this->transport = $transport;
     }
 
     public function generateForm(Form $form)
@@ -75,7 +79,7 @@ class UrlParserGenerator implements IGenerator
         $items = [];
         $urls = explode("\n", trim($values->articles));
         foreach ($urls as $url) {
-            $meta = Utils::fetchUrlMeta($url, new DenniknContent());
+            $meta = Utils::fetchUrlMeta($url, new DenniknContent(), $this->transport);
             if ($meta) {
                 $items[$url] = $meta;
             }

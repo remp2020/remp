@@ -3,13 +3,12 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
-use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
+use Remp\MailerModule\PageMeta\GenericPageContent;
 use Remp\MailerModule\PageMeta\TransportInterface;
-use Remp\MailerModule\PageMeta\TyzdenContent;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
-class MinutaAlertGenerator implements IGenerator
+class GenericBestPerformingArticlesGenerator implements IGenerator
 {
     protected $sourceTemplatesRepository;
 
@@ -17,7 +16,7 @@ class MinutaAlertGenerator implements IGenerator
 
     private $transport;
 
-    public function __construct(SourceTemplatesRepository $sourceTemplatesRepository, TransportInterface $transport)
+    public function __construct(TransportInterface $transport, SourceTemplatesRepository $sourceTemplatesRepository)
     {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->transport = $transport;
@@ -25,17 +24,13 @@ class MinutaAlertGenerator implements IGenerator
 
     public function generateForm(Form $form)
     {
-        $form->addText('post', 'Url of post');
+        $form->addTextArea('articles', 'List of articles')
+            ->setAttribute('rows', 4)
+            ->setOption('description', 'Insert Url of every article - each on separate line')
+            ->getControlPrototype()
+            ->setAttribute('class', 'form-control html-editor');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
-    }
-
-    public function apiParams()
-    {
-        return [
-            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'post', InputParam::REQUIRED)
-        ];
     }
 
     public function onSubmit(callable $onSubmit)
@@ -43,37 +38,40 @@ class MinutaAlertGenerator implements IGenerator
         $this->onSubmit = $onSubmit;
     }
 
-    public function formSucceeded($form, $values)
-    {
-        try {
-            $output = $this->process($values);
-            $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
-        } catch (InvalidUrlException $e) {
-            $form->addError($e->getMessage());
-        }
-    }
-
     public function getWidgets()
     {
         return [];
+    }
+
+    public function apiParams()
+    {
+        return [
+            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'articles', InputParam::REQUIRED),
+        ];
     }
 
     public function process($values)
     {
         $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
 
-        $post = Utils::fetchUrlMeta($values->post, new TyzdenContent(), $this->transport);
-
-        $params = [
-            'post' => $post,
-            'autologin' => '{{ autologin }}',
-        ];
+        $items = [];
+        $urls = explode("\n", trim($values->articles));
+        foreach ($urls as $url) {
+            $meta = Utils::fetchUrlMeta($url, new GenericPageContent(), $this->transport);
+            if ($meta) {
+                $items[$url] = $meta;
+            }
+        }
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
             'text_template' => $sourceTemplate->content_text,
         ]);
         $twig = new \Twig_Environment($loader);
+        $params = [
+            'items' => $items,
+        ];
 
         $output = [];
         $output['htmlContent'] = $twig->render('html_template', $params);
