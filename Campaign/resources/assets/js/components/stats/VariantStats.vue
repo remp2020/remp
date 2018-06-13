@@ -5,8 +5,9 @@
                 :name="'variant-stats-chart-' + variant.id"
                 :title="'Variant: ' + variant.variant"
                 :height="430"
-
-                ref="histogram"
+                :loading="loading"
+                :error="error"
+                :chartData="histogramData"
             ></chart>
         </div>
         <div class="col-sm-12 col-md-4">
@@ -16,76 +17,76 @@
                     <single-value
                         :title="'Clicks'"
                         :loading="loading"
-
-                        ref="clickCount"
+                        :error="error"
+                        :count="clickCount"
                     ></single-value>
 
                     <single-value
                         :title="'Clicks'"
                         :subtitle="'normalized'"
                         :loading="loading"
-
-                        ref="clickCountNormalized"
+                        :error="error"
+                        :count="clickCountNormalized"
                     ></single-value>
 
                     <single-value
                         :title="'Shows'"
                         :loading="loading"
-
-                        ref="showCount"
+                        :error="error"
+                        :count="showsCount"
                     ></single-value>
 
                     <single-value
                         :title="'Shows'"
                         :subtitle="'normalized'"
                         :loading="loading"
-
-                        ref="showCountNormalized"
+                        :error="error"
+                        :count="showsCountNormalized"
                     ></single-value>
 
                     <single-value
                         :title="'Started payments'"
                         :loading="loading"
-
-                        ref="startedPayments"
+                        :error="error"
+                        :count="startedPaymentsCount"
                     ></single-value>
 
                     <single-value
                         :title="'Started payments'"
                         :subtitle="'normalized'"
                         :loading="loading"
-
-                        ref="startedPaymentsNormalized"
+                        :error="error"
+                        :count="startedPaymentsCountNormalized"
                     ></single-value>
 
                     <single-value
                         :title="'Finished payments'"
                         :loading="loading"
-
-                        ref="finishedPayments"
+                        :error="error"
+                        :count="finishedPaymentsCount"
                     ></single-value>
 
                     <single-value
                         :title="'Finished payments'"
                         :subtitle="'normalized'"
                         :loading="loading"
-
-                        ref="finishedPaymentsNormalized"
+                        :error="error"
+                        :count="finishedPaymentsCountNormalized"
                     ></single-value>
 
                     <single-value
                         :title="'Earned'"
                         :loading="loading"
-
-                        ref="earned"
+                        :error="error"
+                        :count="earnedSum"
                     ></single-value>
 
                     <single-value
                         :title="'Earned'"
                         :subtitle="'normalized'"
                         :loading="loading"
-
-                        ref="earnedNormalized"
+                        :error="error"
+                        :count="earnedSumNormalized"
                     ></single-value>
 
 
@@ -124,7 +125,20 @@
         },
         data() {
             return {
-                loading: false
+                loading: false,
+                error: "",
+
+                clickCount: 0,
+                clickCountNormalized: 0,
+                showsCount: 0,
+                showsCountNormalized: 0,
+                startedPaymentsCount: 0,
+                startedPaymentsCountNormalized: 0,
+                finishedPaymentsCount: 0,
+                finishedPaymentsCountNormalized: 0,
+                earnedSum: 0,
+                earnedSumNormalized: 0,
+                histogramData: {}
             }
         },
         mounted() {
@@ -133,6 +147,7 @@
         methods: {
             load() {
                 var vm = this;
+                vm.error = "";
                 vm.loading = true;
 
                 $.ajax({
@@ -147,22 +162,23 @@
                     dataType: 'JSON',
                     success(resp, status) {
 
-                        vm.$refs.histogram.handleResult(resp.histogram)
-                        vm.$refs.clickCount.handleResult(resp.click_count)
-                        vm.$refs.clickCountNormalized.handleResult(resp.click_count_normalized)
-                        vm.$refs.showCount.handleResult(resp.show_count)
-                        vm.$refs.showCountNormalized.handleResult(resp.show_count_normalized)
-                        vm.$refs.startedPayments.handleResult(resp.payment_count)
-                        vm.$refs.startedPaymentsNormalized.handleResult(resp.payment_count_normalized)
-                        vm.$refs.finishedPayments.handleResult(resp.purchase_count)
-                        vm.$refs.finishedPaymentsNormalized.handleResult(resp.purchase_count_normalized)
-                        vm.$refs.earned.handleResult(resp.purchase_sum)
-                        vm.$refs.earnedNormalized.handleResult(resp.purchase_sum_normalized)
+                        vm.clickCount = resp.click_count.count;
+                        vm.clickCountNormalized = resp.click_count_normalized.count;
+                        vm.showsCount = resp.show_count.count;
+                        vm.showsCountNormalized = resp.show_count_normalized.count;
+                        vm.startedPaymentsCount = resp.payment_count.count;
+                        vm.startedPaymentsCountNormalized = resp.payment_count_normalized.count;
+                        vm.finishedPaymentsCount = resp.purchase_count.count;
+                        vm.finishedPaymentsCountNormalized = resp.purchase_count_normalized.count;
+                        vm.earnedSum = resp.purchase_sum.sum;
+                        vm.earnedSumNormalized = resp.purchase_sum_normalized.sum;
+                        vm.histogramData = resp.histogram;
 
                         vm.loading = false;
                     },
                     error(xhr, status, error) {
                         vm.loading = false;
+                        vm.error = error;
                     }
                 })
             }

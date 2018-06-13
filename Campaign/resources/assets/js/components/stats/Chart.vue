@@ -51,7 +51,7 @@
                 </svg>
             </div>
         </div>
-        <div v-if="error" class="stats-error" :title="errorText">!</div>
+        <div v-if="error" class="stats-error" :title="error">!</div>
         <h3>{{ title }}</h3>
 
         <div class="card-body">
@@ -78,28 +78,28 @@
         loading: {
             type: Boolean,
             default: true
+        },
+        error: {
+            type: String
+        },
+        chartData: {
+            type: Object,
+            required: true
         }
     }
     export default {
         props: props,
-        data() {
-            return {
-                error: false,
-                errorText: ""
+        watch: {
+            chartData(newChartData) {
+                this.setChartData(newChartData.dataSets, newChartData.labels)
+            }
+        },
+        mounted() {
+            if (this.chartData.hasOwnProperty("dataSets")) {
+                this.setChartData(this.chartData.dataSets, this.chartData.labels)
             }
         },
         methods: {
-            handleResult(result) {
-                this.error = false;
-                this.errorText = "";
-
-                if (result.success === true) {
-                    this.setChartData(result.dataSets, result.labels);
-                } else {
-                    this.error = true;
-                    this.errorText = result.message;
-                }
-            },
             setChartData(dataSets, labels) {
                 for(var ii = 0; ii < labels.length; ii++) {
                     if (ii % 2 !== 0 && ii+1 !== labels.length) {

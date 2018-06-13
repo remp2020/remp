@@ -5,29 +5,29 @@
                 <single-value
                     :title="'Clicks'"
                     :loading="loading"
-
-                    ref="clickCount"
+                    :error="error"
+                    :count="clickCount"
                 ></single-value>
 
                 <single-value
                     :title="'Started payments'"
                     :loading="loading"
-
-                    ref="paymentCount"
+                    :error="error"
+                    :count="startedPayments"
                 ></single-value>
 
                 <single-value
                     :title="'Finished payments'"
                     :loading="loading"
-
-                    ref="purchaseCount"
+                    :error="error"
+                    :count="finishedPayments"
                 ></single-value>
 
                 <single-value
                     :title="'Earned'"
                     :loading="loading"
-
-                    ref="purchaseSum"
+                    :error="error"
+                    :count="earned"
                 ></single-value>
             </div>
         </div>
@@ -37,8 +37,8 @@
             :title="'Campaign'"
             :height="450"
             :loading="loading"
-
-            ref="histogram"
+            :error="error"
+            :chartData="histogramData"
         ></chart>
     </div>
 </template>
@@ -68,7 +68,14 @@
         },
         data() {
             return {
-                loading: false
+                loading: false,
+                error: "",
+
+                clickCount: 0,
+                startedPayments: 0,
+                finishedPayments: 0,
+                earned: 0,
+                histogramData: {}
             }
         },
         mounted() {
@@ -85,6 +92,7 @@
         methods: {
             load() {
                 var vm = this;
+                vm.error = "";
                 vm.loading = true;
 
                 $.ajax({
@@ -98,16 +106,17 @@
                     },
                     dataType: 'JSON',
                     success(resp, status) {
-                        vm.$refs.clickCount.handleResult(resp.click_count);
-                        vm.$refs.paymentCount.handleResult(resp.payment_count);
-                        vm.$refs.purchaseCount.handleResult(resp.purchase_count);
-                        vm.$refs.purchaseSum.handleResult(resp.purchase_sum);
-                        vm.$refs.histogram.handleResult(resp.histogram);
+                        vm.clickCount = resp.click_count.count;
+                        vm.startedPayments = resp.payment_count.count;
+                        vm.finishedPayments = resp.purchase_count.count;
+                        vm.earned = resp.purchase_sum.sum;
+                        vm.histogramData = resp.histogram;
 
                         vm.loading = false;
                     },
                     error(xhr, status, error) {
                         vm.loading = false;
+                        vm.error = error;
                     }
                 })
             }

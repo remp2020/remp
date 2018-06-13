@@ -32,7 +32,7 @@ class StatsController extends Controller
                         ->to(Carbon::parse($request->get('to')))
                         ->get();
 
-        return $result;
+        return $result[0];
     }
 
     public function variantStatsCount(CampaignBanner $variant, $type, Stats $stats, Request $request, $normalized = false)
@@ -44,14 +44,12 @@ class StatsController extends Controller
                         ->to(Carbon::parse($request->get('to')))
                         ->get();
 
-        if ($result["success"] != true) {
-            return $result;
-        }
+        $result = $result[0];
 
         if ($normalized) {
-            $count = $result['data']->count;
+            $count = $result->count;
 
-            $result['data']->count = $count*($variant->proportion/100);
+            $result->count = $count*($variant->proportion/100);
         }
 
         return $result;
@@ -64,7 +62,7 @@ class StatsController extends Controller
                         ->forCampaign($campaign->uuid)
                         ->get();
 
-        return $result;
+        return $result[0];
     }
 
     public function campaignPaymentStatsSum(Campaign $campaign, $step, Stats $stats, Request $request)
@@ -74,7 +72,7 @@ class StatsController extends Controller
                         ->forCampaign($campaign->uuid)
                         ->get();
 
-        return $result;
+        return $result[0];
     }
 
     public function campaignStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
@@ -85,18 +83,16 @@ class StatsController extends Controller
     public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request, $normalized = false)
     {
         $result = $stats->count()
-            ->commerce($step)
-            ->forVariant($variant->uuid)
-            ->get();
+                        ->commerce($step)
+                        ->forVariant($variant->uuid)
+                        ->get();
 
-        if ($result["success"] != true) {
-            return $result;
-        }
+        $result = $result[0];
 
         if ($normalized) {
-            $count = $result['data']->count;
+            $count = $result->count;
 
-            $result['data']->count = $count * ($variant->proportion / 100);
+            $result->count = $count * ($variant->proportion / 100);
         }
 
         return $result;
@@ -109,14 +105,12 @@ class StatsController extends Controller
                         ->forVariant($variant->uuid)
                         ->get();
 
-        if ($result["success"] != true) {
-            return $result;
-        }
+        $result = $result[0];
 
         if ($normalized) {
-            $sum = $result['data']->sum;
+            $sum = $result->sum;
 
-            $result['data']->sum = $sum * ($variant->proportion / 100);
+            $result->sum = $sum * ($variant->proportion / 100);
         }
 
         return $result;
@@ -152,11 +146,7 @@ class StatsController extends Controller
 
             $result = $stats->get();
 
-            if ($result["success"] != true) {
-                return $result;
-            }
-
-            $histogramData = $result['data'];
+            $histogramData = $result[0];
 
             foreach ($histogramData->time_histogram as $histogramRow) {
                 $date = Carbon::parse($histogramRow->time)->toRfc3339String();
@@ -179,7 +169,6 @@ class StatsController extends Controller
         $dataSets = $this->formatDataForChart($parsedData, $labels);
 
         return [
-            'success' => true,
             'dataSets' => $dataSets,
             'labels' => $labels,
         ];

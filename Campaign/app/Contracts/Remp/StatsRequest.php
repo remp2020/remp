@@ -125,7 +125,7 @@ class StatsRequest implements StatsContract
     {
         $this->filterBy[] = [
             'tag' => $field,
-            'values' => $values
+            'values' => $values,
         ];
 
         return $this;
@@ -181,10 +181,7 @@ class StatsRequest implements StatsContract
                 ]
             ]);
         } catch (ClientException $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
+            throw new StatsException('bad request', 400, $e);
         }
 
         $stream = $result->getBody();
@@ -195,9 +192,6 @@ class StatsRequest implements StatsContract
             throw new StatsException('cannot decode json response', 400, $e);
         }
 
-        return array_merge([
-            'success' => true,
-            'data' => $data[0]
-        ]);
+        return $data;
     }
 }

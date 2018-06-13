@@ -55,7 +55,7 @@
                 </svg>
             </div>
         </div>
-        <div v-if="error" class="stats-error" :title="errorText">!</div>
+        <div v-if="error" class="stats-error" :title="error">!</div>
         <h4>{{ title }}</h4>
         <strong>&nbsp;{{ subtitle }}&nbsp;</strong>
 
@@ -79,26 +79,13 @@
             loading: {
                 type: Boolean,
                 default: true
-            }
-        },
-        data() {
-            return {
-                error: false,
-                errorText: "",
-                count: 0
-            }
-        },
-        methods: {
-            handleResult(result) {
-                this.error = false;
-                this.errorText = "";
-
-                if (result.success === true) {
-                    this.count = result.data.count;
-                } else {
-                    this.error = true;
-                    this.errorText = result.message;
-                }
+            },
+            count: {
+                type: Number,
+                required: true
+            },
+            error: {
+                type: String
             }
         }
     }
