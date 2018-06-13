@@ -127,6 +127,7 @@ class StatsController extends Controller
         $to = Carbon::parse($request->get('to'));
         $chartWidth = $request->get('chartWidth');
         $parsedData = [];
+        $labels = [];
 
         $interval = $this->calcInterval($from, $to, $chartWidth);
 
@@ -149,9 +150,9 @@ class StatsController extends Controller
             $histogramData = $result[0];
 
             foreach ($histogramData->time_histogram as $histogramRow) {
-                $date = Carbon::parse($histogramRow->time)->toRfc3339String();
+                $date = Carbon::parse($histogramRow->time);
 
-                $parsedData[$type][$date] = $histogramRow->value;
+                $parsedData[$type][$date->toRfc3339String()] = $histogramRow->value;
 
                 $labels[] = $date;
             }
@@ -160,17 +161,14 @@ class StatsController extends Controller
         $labels = array_unique($labels);
 
         usort($labels, function ($a, $b) {
-            $a = \DateTime::createFromFormat(Carbon::RFC3339, $a);
-            $b = \DateTime::createFromFormat(Carbon::RFC3339, $b);
-
             return $a > $b;
         });
 
-        $dataSets = $this->formatDataForChart($parsedData, $labels);
+        list($dataSets, $formattedLabels) = $this->formatDataForChart($parsedData, $labels);
 
         return [
             'dataSets' => $dataSets,
-            'labels' => $labels,
+            'labels' => $formattedLabels,
         ];
     }
 
@@ -213,27 +211,31 @@ class StatsController extends Controller
                 'backgroundColor' => $this->statTypes[$type]['backgroundColor']
             ];
 
-            foreach ($labels as $label) {
-                if (array_key_exists($label, $data)) {
-                    $dataSet['data'][] = $data[$label];
+            foreach ($labels as $i => $label) {
+                $labelStr = is_string($label) ? $label : $label->toRfc3339String();
+
+                if (array_key_exists($labelStr, $data)) {
+                    $dataSet['data'][] = $data[$labelStr];
                 } else {
                     $dataSet['data'][] = 0;
                 }
+
+                $labels[$i] = $labelStr;
             }
 
             $dataSets[] = $dataSet;
         }
 
-        return $dataSets;
+        return [
+            $dataSets,
+            $labels,
+        ];
     }
 
     protected function calcInterval(Carbon $from, Carbon $to, $chartWidth)
     {
         $labels = [];
         $numOfCols = intval($chartWidth / 20);
-
-        $fromTimestamp = $from->timestamp;
-        $toTimestamp = $to->timestamp;
 
         $diff = $to->diffInSeconds($from);
         $interval = $diff / $numOfCols;
