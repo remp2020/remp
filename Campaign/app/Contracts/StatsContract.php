@@ -67,9 +67,9 @@ interface StatsContract
     public function to(Carbon $to): StatsRequest;
 
     /**
-     * filter results by end date
+     * get results from commerce table
      *
-     * @param Carbon $to
+     * @param string $step
      * @return StatsRequest
      */
     public function commerce(string $step): StatsRequest;

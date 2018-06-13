@@ -47,9 +47,7 @@ class StatsController extends Controller
         $result = $result[0];
 
         if ($normalized) {
-            $count = $result->count;
-
-            $result->count = $count*($variant->proportion/100);
+            $result->count = $this->normalizeValue($result->count, $variant->proportion);
         }
 
         return $result;
@@ -90,9 +88,7 @@ class StatsController extends Controller
         $result = $result[0];
 
         if ($normalized) {
-            $count = $result->count;
-
-            $result->count = $count * ($variant->proportion / 100);
+            $result->count = $this->normalizeValue($result->count, $variant->proportion);
         }
 
         return $result;
@@ -108,9 +104,7 @@ class StatsController extends Controller
         $result = $result[0];
 
         if ($normalized) {
-            $sum = $result->sum;
-
-            $result->sum = $sum * ($variant->proportion / 100);
+            $result->sum = $this->normalizeValue($result->sum, $variant->proportion);
         }
 
         return $result;
@@ -241,5 +235,10 @@ class StatsController extends Controller
         $interval = $diff / $numOfCols;
 
         return intval($interval) . "s";
+    }
+
+    protected function normalizeValue($value, $proportion)
+    {
+        return round($value * ($proportion / 100));
     }
 }
