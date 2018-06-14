@@ -47,7 +47,9 @@ class StatsController extends Controller
         $result = $result[0];
 
         if ($normalized) {
-            $result->count = $this->normalizeValue($result->count, $variant->proportion);
+            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)->count();
+
+            $result->count = $this->normalizeValue($result->count, $variant->proportion, $variantsCount);
         }
 
         return $result;
@@ -88,7 +90,9 @@ class StatsController extends Controller
         $result = $result[0];
 
         if ($normalized) {
-            $result->count = $this->normalizeValue($result->count, $variant->proportion);
+            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)->count();
+
+            $result->count = $this->normalizeValue($result->count, $variant->proportion, $variantsCount);
         }
 
         return $result;
@@ -104,7 +108,9 @@ class StatsController extends Controller
         $result = $result[0];
 
         if ($normalized) {
-            $result->sum = $this->normalizeValue($result->sum, $variant->proportion);
+            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)->count();
+
+            $result->sum = $this->normalizeValue($result->sum, $variant->proportion, $variantsCount);
         }
 
         return $result;
@@ -237,8 +243,10 @@ class StatsController extends Controller
         return intval($interval) . "s";
     }
 
-    protected function normalizeValue($value, $proportion)
+    protected function normalizeValue($value, $proportion, $variantCount)
     {
-        return round($value * ($proportion / 100));
+        return round(
+            $value / (($proportion / 100) * $variantCount)
+        );
     }
 }

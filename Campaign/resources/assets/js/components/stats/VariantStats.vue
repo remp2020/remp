@@ -3,7 +3,7 @@
         <div class="col-sm-12 col-md-8 variant-chart-wrap">
             <chart
                 :name="'variant-stats-chart-' + variant.id"
-                :title="'Variant: ' + variant.variant"
+                :title="'Variant: ' + variant.variant + ' (' + variant.proportion + '%)'"
                 :height="430"
                 :loading="loading"
                 :error="error"
