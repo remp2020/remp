@@ -15,11 +15,11 @@ class StatsController extends Controller
     public $statTypes = [
         "show" => [
             "label" => "Shows",
-            "backgroundColor" => "rgb(255, 99, 132)"
+            "backgroundColor" => "#2196f3"
         ],
         "click" => [
             "label" => "Clicks",
-            "backgroundColor" => "rgb(255, 205, 86)"
+            "backgroundColor" => "#009688"
         ]
     ];
 

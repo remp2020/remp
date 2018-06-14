@@ -15,7 +15,7 @@
         <div class="container">
 
             <campaign-stats
-                :url="'/campaigns/' + id + '/stats'"
+                :url="'/campaigns/' + id + '/stats/data'"
                 :from="from"
                 :to="to"
             ></campaign-stats>
@@ -25,7 +25,7 @@
                 :key="variant.id"
 
                 :variant="variant"
-                :url="'/campaigns/variant/' + variant.id + '/stats'"
+                :url="'/campaigns/variant/' + variant.id + '/stats/data'"
                 :from="from"
                 :to="to"
             ></variant-stats>

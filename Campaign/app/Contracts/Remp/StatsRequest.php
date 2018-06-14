@@ -187,7 +187,7 @@ class StatsRequest implements StatsContract
         $stream = $result->getBody();
 
         try {
-            $data = json_decode($stream->getContents());
+            $data = \GuzzleHttp\json_decode($stream->getContents());
         } catch (\Exception $e) {
             throw new StatsException('cannot decode json response', 400, $e);
         }
