@@ -101,14 +101,6 @@
         },
         methods: {
             setChartData(dataSets, labels) {
-                for(var ii = 0; ii < labels.length; ii++) {
-                    if (ii % 2 !== 0 && ii+1 !== labels.length) {
-                        labels[ii] = "";
-                    } else {
-                        labels[ii] = moment(labels[ii]).format('D.M. h:mm');
-                    }
-                }
-
                 if (this.chart != null) {
                     this.chart.config.data = {
                         labels: labels,
@@ -147,9 +139,17 @@
                                 }
                             }],
                             xAxes: [{
+                                type: 'time',
+                                distribution: 'series',
+                                time: {
+                                    displayFormats: {
+                                        minute: 'HH:mm',
+                                        hour: 'HH:mm',
+                                    }
+                                },
                                 ticks: {
                                     maxRotation: 0,
-                                    minRotation: 0
+                                    minRotation: 0,
                                 }
                             }]
                         }
