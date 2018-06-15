@@ -15,6 +15,7 @@
         <div class="container">
 
             <campaign-stats
+                :name="name"
                 :url="'/campaigns/' + id + '/stats/data'"
                 :from="from"
                 :to="to"

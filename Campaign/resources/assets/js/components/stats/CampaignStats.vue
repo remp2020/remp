@@ -34,7 +34,7 @@
 
         <chart
             :name="'campaign-stats-chart'"
-            :title="'Campaign'"
+            :title="name"
             :height="450"
             :loading="loading"
             :error="error"
@@ -53,6 +53,10 @@
             Chart
         },
         props: {
+            name: {
+                type: String,
+                required: true
+            },
             url: {
                 type: String,
                 required: true
@@ -116,7 +120,8 @@
                     },
                     error(xhr, status, error) {
                         vm.loading = false;
-                        vm.error = error;
+                        var body = JSON.parse(xhr.responseText);
+                        vm.error = body.message;
                     }
                 })
             }

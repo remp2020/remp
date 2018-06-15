@@ -245,6 +245,10 @@ class StatsController extends Controller
 
     protected function normalizeValue($value, $proportion, $variantCount)
     {
+        if ($value === 0) {
+            return 0;
+        }
+
         return round(
             $value / (($proportion / 100) * $variantCount)
         );

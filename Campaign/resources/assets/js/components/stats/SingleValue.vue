@@ -44,10 +44,19 @@
         margin-left: -20px;
         margin-top: -20px;
     }
+
+    .info-text {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+
 </style>
 
 <template>
     <div class="card">
+        <i v-if="infoText" :title="infoText" class="zmdi zmdi-info-outline info-text"></i>
+
         <div v-if="loading" class="preloader-wrapper">
             <div class="preloader">
                 <svg class="pl-circular" viewBox="25 25 50 50">
@@ -85,6 +94,9 @@
                 required: true
             },
             error: {
+                type: String
+            },
+            infoText: {
                 type: String
             }
         }

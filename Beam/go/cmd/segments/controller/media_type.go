@@ -307,6 +307,10 @@ func (cr CountRow) ToMediaType() *app.Count {
 		coll = append(coll, hi)
 	}
 
+	if len(cr.Tags) == 0 {
+		cr.Tags = nil
+	}
+
 	mt := &app.Count{
 		Count:         cr.Count,
 		Tags:          cr.Tags,
@@ -333,6 +337,10 @@ func (sr SumRow) ToMediaType() *app.Sum {
 	for _, c := range sr.Histogram {
 		hi := (HistogramItem)(c).ToMediaType()
 		coll = append(coll, hi)
+	}
+
+	if len(sr.Tags) == 0 {
+		sr.Tags = nil
 	}
 
 	mt := &app.Sum{

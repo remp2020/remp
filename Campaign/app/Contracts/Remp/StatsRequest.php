@@ -133,7 +133,7 @@ class StatsRequest implements StatsContract
 
     public function groupBy(...$fields) : StatsRequest
     {
-        $this->groupBy = array_merge($this->groupBy, $field);
+        $this->groupBy = array_merge($this->groupBy, $fields);
 
         return $this;
     }

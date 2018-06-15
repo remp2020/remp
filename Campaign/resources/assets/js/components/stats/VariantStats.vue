@@ -27,6 +27,7 @@
                         :loading="loading"
                         :error="error"
                         :count="clickCountNormalized"
+                        :infoText="normalizedValueInfo"
                     ></single-value>
 
                     <single-value
@@ -42,6 +43,7 @@
                         :loading="loading"
                         :error="error"
                         :count="showsCountNormalized"
+                        :infoText="normalizedValueInfo"
                     ></single-value>
 
                     <single-value
@@ -57,6 +59,7 @@
                         :loading="loading"
                         :error="error"
                         :count="startedPaymentsCountNormalized"
+                        :infoText="normalizedValueInfo"
                     ></single-value>
 
                     <single-value
@@ -72,6 +75,7 @@
                         :loading="loading"
                         :error="error"
                         :count="finishedPaymentsCountNormalized"
+                        :infoText="normalizedValueInfo"
                     ></single-value>
 
                     <single-value
@@ -87,6 +91,7 @@
                         :loading="loading"
                         :error="error"
                         :count="earnedSumNormalized"
+                        :infoText="normalizedValueInfo"
                     ></single-value>
 
 
@@ -138,11 +143,21 @@
                 finishedPaymentsCountNormalized: 0,
                 earnedSum: 0,
                 earnedSumNormalized: 0,
-                histogramData: {}
+                histogramData: {},
+
+                normalizedValueInfo: "This value was calculated from: original value, proportion and variants count."
             }
         },
         mounted() {
             this.load()
+        },
+        watch: {
+            from() {
+                this.load()
+            },
+            to() {
+                this.load()
+            }
         },
         methods: {
             load() {
@@ -178,7 +193,8 @@
                     },
                     error(xhr, status, error) {
                         vm.loading = false;
-                        vm.error = error;
+                        var body = JSON.parse(xhr.responseText);
+                        vm.error = body.message;
                     }
                 })
             }
