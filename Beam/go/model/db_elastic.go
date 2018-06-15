@@ -362,7 +362,7 @@ func (eDB *ElasticDB) resolveZeroValue(index, field string) (interface{}, error)
 func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error) {
 	result, err := eDB.Client.GetMapping().Index(index).Type("_doc").Do(eDB.Context)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get field mappings for pageviews index")
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to get field mappings for index: %s", index))
 	}
 
 	root, ok := result[index].(map[string]interface{})
