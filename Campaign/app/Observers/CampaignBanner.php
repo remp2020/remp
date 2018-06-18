@@ -9,7 +9,7 @@ class CampaignBanner
         $campaignBanner->campaign->cache();
     }
 
-    public function updated(\app\CampaignBanner $campaignBanner)
+    public function deleted(\app\CampaignBanner $campaignBanner)
     {
         $campaignBanner->campaign->cache();
     }
