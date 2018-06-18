@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,14 +16,12 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
-	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/controller"
-	"gitlab.com/remp/remp/Beam/go/influxquery"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
 
@@ -77,11 +74,6 @@ func main() {
 
 	propertyDB := &model.PropertyDB{
 		MySQL: mysqlDB,
-	}
-
-	err = influxDBpreparation(c)
-	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to prepare InfluxDB"))
 	}
 
 	// server cancellation
@@ -172,53 +164,4 @@ func newProducer(brokerList []string) (sarama.AsyncProducer, error) {
 	}()
 
 	return producer, nil
-}
-
-// influxDBpreparation prepares InfluxDB to be used by tracker.
-//
-// Adds required:
-//  - retention policies
-//  - continuous queries
-func influxDBpreparation(c Config) error {
-	ic, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr:     c.InfluxAddr,
-		Username: c.InfluxUser,
-		Password: c.InfluxPasswd,
-	})
-	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to initialize influx http client"))
-	}
-	influxDB := &model.InfluxDB{
-		DBName:       c.InfluxDBName,
-		Client:       ic,
-		QueryBuilder: influxquery.NewInfluxBuilder(),
-		Debug:        c.Debug,
-	}
-
-	ok, err := influxDB.RetentionPolicy(model.TableTimespentRP, "2d")
-	if err != nil {
-		return err
-	}
-	if !ok {
-		err = influxDB.AlterRetentionPolicy(model.TableTimespentRP, "2d")
-		if err != nil {
-			return err
-		}
-	}
-
-	query := fmt.Sprintf(`SELECT SUM("timespent")
-	INTO "%s"
-	FROM "%s"."%s"
-	GROUP BY time(1h), "user_id", "browser_id", "_article", "article_id", "remp_pageview_id", "social", "ref_source"`, model.TableTimespentAggregated, model.TableTimespentRP, model.TableTimespent)
-
-	ok, err = influxDB.ContinuousQuery(model.TableTimespentAggregated, "15m", query)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		//TODO: decide how to handle if continuous query exists (needs to be DROPed and CREATEd againg)
-		log.Printf("continuous query was not altered")
-	}
-
-	return nil
 }

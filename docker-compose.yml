@@ -138,17 +138,6 @@ services:
     volumes:
       - "kafka-data:/data"
 
-  influxdb:
-    image: "influxdb:1.4"
-    volumes:
-      - "influxdb-data:/var/lib/influxdb"
-    environment:
-      INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0
-      INFLUXDB_DATA_MAX_SERIES_PER_DATABASE: 0
-    ports:
-      - "8098:8086"
-    restart: "unless-stopped"
-
   telegraf:
     build: "./Docker/telegraf"
     volumes:
@@ -157,12 +146,6 @@ services:
       - "influxdb"
       - "kafka"
       - "elasticsearch"
-    restart: "unless-stopped"
-
-  grafana:
-    image: "grafana/grafana"
-    volumes:
-      - "grafana-data:/var/lib/grafana"
     restart: "unless-stopped"
 
   elasticsearch:
@@ -191,15 +174,11 @@ services:
     restart: "unless-stopped"
 
 volumes:
-  influxdb-data:
-    driver: "local"
   kafka-data:
     driver: "local"
   mysql-data:
     driver: "local"
   redis-data:
-    driver: "local"
-  grafana-data:
     driver: "local"
   elastic-data:
     driver: "local"
