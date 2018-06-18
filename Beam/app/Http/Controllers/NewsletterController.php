@@ -85,7 +85,7 @@ class NewsletterController extends Controller
 
     public static function allCriteriaConcatenated($glue = ',')
     {
-        return implode($glue,[
+        return implode($glue, [
             self::CRITERIA_PAGEVIEWS_ALL,
             self::CRITERIA_PAGEVIEWS_SIGNED_IN,
             self::CRITERIA_PAGEVIEWS_SUBSCRIBERS,

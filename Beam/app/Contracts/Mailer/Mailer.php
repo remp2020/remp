@@ -91,8 +91,8 @@ class Mailer implements MailerContract
         $templateText,
         $templateHtml,
         $mailTypeCode
-    ): int
-    {
+    ): int {
+    
         $multipart = [
             [
                 'name' => 'name',

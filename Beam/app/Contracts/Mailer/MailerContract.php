@@ -14,8 +14,16 @@ interface MailerContract
 
     public function generateEmail($sourceTemplateId, array $generatorParameters): Collection;
 
-    public function createTemplate($name, $code, $description, $from,
-        $subject, $templateText, $templateHtml, $mailTypeCode): int;
+    public function createTemplate(
+        $name,
+        $code,
+        $description,
+        $from,
+        $subject,
+        $templateText,
+        $templateHtml,
+        $mailTypeCode
+    ): int;
 
     public function createJob($segmentCode, $segmentProvider, $templateId): int;
 }
