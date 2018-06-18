@@ -120,7 +120,6 @@
 </style>
 
 <script type="text/javascript">
-    import DateTimePicker from './DateTimePickerWrapper.vue';
     import RRule from 'rrule'
     let rrulestr = require('rrule').rrulestr
 
