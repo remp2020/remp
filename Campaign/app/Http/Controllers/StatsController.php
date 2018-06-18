@@ -245,7 +245,7 @@ class StatsController extends Controller
 
     protected function normalizeValue($value, $proportion, $variantCount)
     {
-        if ($value === 0) {
+        if ($value === 0 || $proportion === 0) {
             return 0;
         }
 
