@@ -27,6 +27,7 @@ use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\DeviceDetector;
+use App\Contracts\Remp\Stats;
 
 class CampaignController extends Controller
 {
@@ -54,6 +55,7 @@ class CampaignController extends Controller
                 return [
                     'edit' => route('campaigns.edit', $campaign),
                     'copy' => route('campaigns.copy', $campaign),
+                    'stats' => route('campaigns.stats', $campaign),
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
@@ -809,6 +811,18 @@ class CampaignController extends Controller
         }
 
         return $segments;
+    }
+
+    public function stats(
+        Campaign $campaign,
+        Request $request,
+        Stats $stats
+    ) {
+        return view('campaigns.stats', [
+            'campaign' => $campaign,
+            'from' => $request->input('from', 'now - 2 days'),
+            'to' => $request->input('to', 'now'),
+        ]);
     }
 
     /**

@@ -40,7 +40,9 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
 			TimeZone("UTC").
-			Offset(options.TimeHistogram.Offset)
+			Offset(options.TimeHistogram.Offset).
+			MinDocCount(0).
+			ExtendedBounds(options.TimeAfter, options.TimeBefore)
 	}
 
 	search, err = eDB.DB.addGroupBy(search, "events", options, extras, dateHistogramAgg)

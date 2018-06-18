@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -181,6 +181,8 @@ return [
         App\Providers\CrmSegmentServiceProvider::class,
         App\Providers\RempSegmentsServiceProvider::class,
         App\Providers\RempTrackerServiceProvider::class,
+
+        App\Providers\StatsServiceProvider::class,
 
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,

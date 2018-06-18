@@ -115,6 +115,7 @@
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                         ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
+                        ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart'],
                     ],
                     'order' => [8, 'desc'],
                 ]) !!}

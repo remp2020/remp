@@ -107,9 +107,7 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
 	Description("Tags and values used to filter results")
 
-	Attribute("tag", String, "Tag used to filter results", func() {
-		Enum("user_id", "article_id", "author_id")
-	})
+	Attribute("tag", String, "Tag used to filter results")
 	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
 
 	Required("tag", "values")
