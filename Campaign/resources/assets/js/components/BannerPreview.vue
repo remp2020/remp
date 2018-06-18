@@ -233,7 +233,8 @@
                     "utm_source": "remp_campaign",
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
-                    "utm_content": this.uuid
+                    "utm_content": this.uuid,
+                    "banner_variant": this.variantUuid
                 });
                 this.closeTracked = true;
             },
@@ -246,7 +247,7 @@
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
                     "utm_content": this.uuid,
-                    "variant": this.variantUuid
+                    "banner_variant": this.variantUuid
                 });
                 this.clickTracked = true;
                 if (hideBanner) {

@@ -71,10 +71,13 @@
                 <div class="card-body">
                     {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'name',
+                        'name' => [
+                            'priority' => 1,
+                        ],
                         'variants' => [
                             'header' => 'Variants',
-                            'orderable' => false
+                            'orderable' => false,
+                            'priority' => 3,
                         ],
                         'segments' => [
                             'header' => 'Segments',
