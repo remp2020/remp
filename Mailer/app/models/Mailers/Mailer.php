@@ -69,7 +69,7 @@ abstract class Mailer
      *
      * @return mixed
      */
-    public function transformTemplateParams($params)
+    public function transformTemplateParams(array $params)
     {
         return [$params, $params];
     }

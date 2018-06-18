@@ -179,23 +179,21 @@ class MailWorkerCommand extends Command
                         $email->setContext($job->context);
                     }
 
+                    $sentCount = 0;
+
                     try {
                         $email = $email->setTemplate($template);
                         if ($sendAsBatch && $email->supportsBatch()) {
-                            $result = $email->sendBatch();
+                            $sentCount = $email->sendBatch();
                         } else {
-                            $result = $email->send();
+                            $sentCount = $email->send();
                         }
 
-                        if ($result) {
-                            foreach ($jobs as $i => $job) {
-                                $this->mailJobQueueRepository->delete($queueJobs[$i]);
-                                $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
-                            }
-                        } else {
-                            $this->mailJobBatchRepository->update($batch, ['errors_count+=' => count($jobs)]);
-                            $this->mailJobQueueRepository->update($queueJob, ['status' => JobQueueRepository::STATUS_ERROR]);
+                        foreach ($jobs as $i => $job) {
+                            $this->mailJobQueueRepository->delete($queueJobs[$i]);
+                            $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
                         }
+
                         $this->smtpErrors = 0;
                     } catch (SmtpException | Sender\MailerBatchException $exception) {
                         $this->smtpErrors++;
@@ -216,7 +214,7 @@ class MailWorkerCommand extends Command
                     $this->mailJobBatchRepository->update($batch, [
                         'first_email_sent_at' => $first_email,
                         'last_email_sent_at' => $now,
-                        'sent_emails+=' => count($jobs),
+                        'sent_emails+=' => intval($sentCount),
                         'last_ping' => $now
                     ]);
 
