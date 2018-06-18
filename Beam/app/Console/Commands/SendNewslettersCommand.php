@@ -143,7 +143,7 @@ class SendNewslettersCommand extends Command
         $articleIds = null;
 
         switch ($criteria) {
-            case NewsletterController::CRITERIA_TIMESPENT_ALL: {
+            case NewsletterController::CRITERIA_TIMESPENT_ALL:
                 $articleIds = ArticleTimespent::where('time_from', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('count(sum) as total_sum')])
@@ -151,8 +151,7 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
-            case NewsletterController::CRITERIA_TIMESPENT_SUBSCRIBERS: {
+            case NewsletterController::CRITERIA_TIMESPENT_SUBSCRIBERS:
                 $articleIds = ArticleTimespent::where('time_from', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('count(subscribers) as total_sum')])
@@ -160,8 +159,7 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
-            case NewsletterController::CRITERIA_TIMESPENT_SIGNED_IN: {
+            case NewsletterController::CRITERIA_TIMESPENT_SIGNED_IN:
                 $articleIds = ArticleTimespent::where('time_from', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('count(signed_in) as total_sum')])
@@ -169,8 +167,7 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
-            case NewsletterController::CRITERIA_PAGEVIEWS_ALL: {
+            case NewsletterController::CRITERIA_PAGEVIEWS_ALL:
                 $articleIds = ArticlePageviews::where('time_from', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('count(sum) as total_sum')])
@@ -178,8 +175,7 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
-            case NewsletterController::CRITERIA_PAGEVIEWS_SIGNED_IN: {
+            case NewsletterController::CRITERIA_PAGEVIEWS_SIGNED_IN:
                 $articleIds = ArticlePageviews::where('time_from', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('count(signed_in) as total_sum')])
@@ -187,8 +183,7 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
-            case NewsletterController::CRITERIA_PAGEVIEWS_SUBSCRIBERS: {
+            case NewsletterController::CRITERIA_PAGEVIEWS_SUBSCRIBERS:
                 $articleIds = ArticlePageviews::where('time_from', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('count(subscribers) as total_sum')])
@@ -196,8 +191,7 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
-            case NewsletterController::CRITERIA_CONVERSIONS: {
+            case NewsletterController::CRITERIA_CONVERSIONS:
                 $articleIds = Conversion::where('paid_at', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('count(amount) as total_sum')])
@@ -205,8 +199,7 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
-            case NewsletterController::CRITERIA_AVERAGE_PAYMENT: {
+            case NewsletterController::CRITERIA_AVERAGE_PAYMENT:
                 $articleIds = Conversion::where('paid_at', '>=', $start)
                     ->groupBy('article_id')
                     ->select(['article_id', DB::raw('avg(amount) as average')])
@@ -214,7 +207,6 @@ class SendNewslettersCommand extends Command
                     ->limit($articlesCount)
                     ->get()->pluck('article_id');
                 break;
-            }
             default:
                 throw new Exception('unknown article criteria ' . $criteria);
         }
