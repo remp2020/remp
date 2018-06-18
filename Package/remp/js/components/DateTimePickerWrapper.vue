@@ -27,7 +27,9 @@
         mounted() {
             let datetime = $("#" + this.labelId)
             let that = this
-            datetime.datetimepicker()
+            datetime.datetimepicker({
+                'locale': moment.locale()
+            })
 
             // defaultDate() changes DOM directly, therefore doing it in nextTick()
             Vue.nextTick()
