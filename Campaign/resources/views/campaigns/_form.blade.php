@@ -36,7 +36,7 @@ $availableCountries = $availableCountries->map(function(\App\Country $country) {
         "action": '{{ $action }}',
         "segments": {!! isset($selectedSegments) ? $selectedSegments->toJson(JSON_UNESCAPED_UNICODE) : $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
         "bannerId": {!! @json($bannerId) !!},
-        "altBannerId": {!! @json($altBannerId) !!},
+        "variants": {!! @json($variants) !!},
         "signedIn": {!! @json($campaign->signed_in) !!},
         "oncePerSession": {!! @json($campaign->once_per_session) !!},
         "active": {!! @json($campaign->active) !!},

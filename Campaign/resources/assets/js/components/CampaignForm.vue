@@ -73,41 +73,23 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: altBannerId }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: highlightABTestingCollapse }">
                                     A/B test
                                 </a>
                             </h4>
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
-
-                                <div class="row">
-                                    <div class="col-md-9">
-
-                                        <div class="input-group m-t-20">
-                                            <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
-                                            <div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <label for="alt_banner_id" class="fg-label">Banner B alternative</label>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <v-select v-model="altBannerId"
-                                                                id="alt_banner_id"
-                                                                :name="'alt_banner_id'"
-                                                                :value="altBannerId"
-                                                                :title="'No alternative'"
-                                                                :options.sync="altBannerOptions"
-                                                        ></v-select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div><!-- .input-group -->
-                                    </div>
+                                <ab-testing
+                                    v-if="showABTestingComponent"
+                                    :variants="variants"
+                                    :variantOptions="variantOptions"
+                                    :bannerId="bannerId"
+                                ></ab-testing>
+                                <div v-else class="ab-testing-not-available">
+                                    To allow A/B testing you have to set primary banner in previous tab.
                                 </div>
                             </div><!-- .panel-body -->
-
-
                         </div>
                     </div><!-- .panel (a/b testing) -->
 
@@ -401,12 +383,13 @@
     import vSelect from "remp/js/components/vSelect";
     import PageviewRules from "./templates/PageviewRules";
     import FormValidator from "remp/js/components/FormValidator";
+    import AbTesting from "./AbTesting";
 
     let props = [
         "_name",
         "_segments",
         "_bannerId",
-        "_altBannerId",
+        "_variants",
         "_signedIn",
         "_oncePerSession",
         "_active",
@@ -432,8 +415,9 @@
     export default {
         components: {
             vSelect,
+            AbTesting,
+            FormValidator,
             PageviewRules,
-            FormValidator
         },
         created: function(){
             let self = this;
@@ -466,6 +450,10 @@
                 }
                 self.endTime = et ? et.toISOString() : null;
             }).datetimepicker({useCurrent: false});
+
+            if (this.bannerId) {
+                this.showABTestingComponent = true;
+            }
         },
         props: props,
         data: function() {
@@ -473,7 +461,9 @@
                 "name": null,
                 "segments": [],
                 "bannerId": null,
-                "altBannerId": null,
+                "variants": null,
+                "removedVariants": null,
+                "showABTestingComponent": false,
                 "signedIn": null,
                 "oncePerSession": null,
                 "active": null,
@@ -511,13 +501,14 @@
                 }
                 return result;
             },
-            altBannerOptions: function() {
+            variantOptions: function() {
                 //same as bannerOptions, just add null element (alternative banner is nullable)
                 let result = [];
                 result.push({
                     "label": "No alternative",
                     "value": null,
                 })
+
                 return result.concat(this.bannerOptions);
             },
             signedInOptions: function() {
@@ -541,7 +532,6 @@
                     return true;
                 }
 
-
                 return false;
             },
             highlightSegmentsCollapse: function () {
@@ -555,8 +545,10 @@
             },
             highlightDevicesCollapse: function () {
                 return (this.selectedDevices.length < this.allDevices.length);
+            },
+            highlightABTestingCollapse: function () {
+                return (this.variants.length > 2);
             }
-
         },
         methods: {
             handleToggleSelectDevice: function (device) {
@@ -592,6 +584,11 @@
                 this.segments.splice(index, 1);
                 this.removedSegments.push(toRemove.id);
             }
+        },
+        watch: {
+            bannerId: function () {
+                this.showABTestingComponent = true;
+            }
         }
     }
 </script>
@@ -602,6 +599,12 @@
         font-size: 1.5em;
         line-height: 0.5;
         padding-bottom: 7px !important;
+    }
+
+    .ab-testing-not-available {
+        text-align: center;
+        font-size: 16px;
+        margin-top: 20px;
     }
 </style>
 

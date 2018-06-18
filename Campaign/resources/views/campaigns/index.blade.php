@@ -74,13 +74,10 @@
                         'name' => [
                             'priority' => 1,
                         ],
-                        'banner' => [
-                            'header' => 'Banner',
-                            'priority' => 9,
-                        ],
-                        'alt_banner' => [
-                            'header' => 'Banner B',
-                            'priority' => 9,
+                        'variants' => [
+                            'header' => 'Variants',
+                            'orderable' => false,
+                            'priority' => 3,
                         ],
                         'segments' => [
                             'header' => 'Segments',
@@ -121,8 +118,9 @@
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
                         ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
+                        ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart'],
                     ],
-                    'order' => [9, 'desc'],
+                    'order' => [8, 'desc'],
                 ]) !!}
                 </div>
             </div>

@@ -55,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Banner::observe(\App\Observers\Banner::class);
         \App\Campaign::observe(\App\Observers\Campaign::class);
+        \App\CampaignBanner::observe(\App\Observers\CampaignBanner::class);
         \App\CampaignSegment::observe(\App\Observers\CampaignSegment::class);
         \App\Schedule::observe(\App\Observers\Schedule::class);
     }

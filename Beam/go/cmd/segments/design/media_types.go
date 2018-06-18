@@ -21,10 +21,12 @@ var Count = MediaType("application/vnd.count+json", func() {
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("count", Integer)
+		Attribute("time_histogram", CollectionOf(TimeHistogram))
 	})
 	View("default", func() {
 		Attribute("tags")
 		Attribute("count")
+		Attribute("time_histogram")
 	})
 	Required("tags", "count")
 })
@@ -34,10 +36,12 @@ var Sum = MediaType("application/vnd.sum+json", func() {
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("sum", Number)
+		Attribute("time_histogram", CollectionOf(TimeHistogram))
 	})
 	View("default", func() {
 		Attribute("tags")
 		Attribute("sum")
+		Attribute("time_histogram")
 	})
 	Required("tags", "sum")
 })
@@ -153,6 +157,19 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("utm_content")
 	})
 	Required("system", "category", "action")
+})
+
+var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
+	Description("Time histogram data")
+	Attributes(func() {
+		Attribute("time", DateTime)
+		Attribute("value", Number)
+	})
+	View("default", func() {
+		Attribute("time")
+		Attribute("value")
+	})
+	Required("time", "value")
 })
 
 var Commerce = MediaType("application/vnd.commerce+json", func() {
