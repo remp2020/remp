@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\NewsletterRequest;
+use App\Http\Resources\NewsletterResource;
 use App\Newsletter;
 use Carbon\Carbon;
 use Yajra\Datatables\Datatables;
@@ -44,7 +45,10 @@ class NewsletterController extends Controller
 
     public function index()
     {
-        return view('newsletters.index');
+        return response()->format([
+            'html' => view('newsletters.index'),
+            'json' => NewsletterResource::collection(Newsletter::paginate()),
+        ]);
     }
 
     public function create()
@@ -152,6 +156,7 @@ class NewsletterController extends Controller
                 ],
                 $newsletter
             )->with('success', sprintf('Newsletter [%s] was created', $newsletter->name)),
+            'json' => new NewsletterResource($newsletter)
         ]);
     }
 
@@ -169,6 +174,7 @@ class NewsletterController extends Controller
                 ],
                 $newsletter
             )->with('success', sprintf('Newsletter [%s] was updated', $newsletter->name)),
+            'json' => new NewsletterResource($newsletter)
         ]);
     }
 }
