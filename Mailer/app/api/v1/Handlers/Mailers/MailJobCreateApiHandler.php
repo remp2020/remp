@@ -47,7 +47,7 @@ class MailJobCreateApiHandler extends BaseHandler
         $templateId = $params['template_id'];
         $template = $this->templatesRepository->find($templateId);
         if (!$template) {
-            return new JsonApiResponse(400,['status' => 'error', 'message' => 'No such template with id:' . $template->id]);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'No such template with id:' . $template->id]);
         }
 
         $segmentCode = $params['segment_code'];
@@ -60,7 +60,7 @@ class MailJobCreateApiHandler extends BaseHandler
             }
         }
         if (!$segmentFound) {
-            return new JsonApiResponse(400,['status' => 'error', 'message' => 'No such segment was found']);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'No such segment was found']);
         }
 
         $mailJob = $this->jobsRepository->add($segmentCode, $segmentProvider);
