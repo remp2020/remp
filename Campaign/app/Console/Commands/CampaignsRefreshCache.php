@@ -41,7 +41,7 @@ class CampaignsRefreshCache extends Command
     {
         $activeCampaignIds = Cache::get(Campaign::ACTIVE_CAMPAIGN_IDS);
 
-        foreach (Campaign::where(['id' => $activeCampaignIds])->get() as $campaign) {
+        foreach (Campaign::whereIn('id', $activeCampaignIds)->get() as $campaign) {
             $this->line(sprintf('Refreshing campaign: <info>%s</info>', $campaign->name));
             $campaign->cache();
         };
