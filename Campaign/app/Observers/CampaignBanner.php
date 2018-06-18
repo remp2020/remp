@@ -8,4 +8,9 @@ class CampaignBanner
     {
         $campaignBanner->campaign->cache();
     }
+
+    public function updated(\app\CampaignBanner $campaignBanner)
+    {
+        $campaignBanner->campaign->cache();
+    }
 }
