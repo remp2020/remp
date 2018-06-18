@@ -122,7 +122,7 @@
 <script type="text/javascript">
     import DateTimePicker from './DateTimePickerWrapper.vue';
     import RRule from 'rrule'
-    var rrulestr = require('rrule').rrulestr
+    let rrulestr = require('rrule').rrulestr
 
     let repeat2freq = {
         'day': RRule.DAILY,

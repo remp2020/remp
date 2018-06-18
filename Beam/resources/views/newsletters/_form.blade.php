@@ -16,9 +16,9 @@
                 <div class="col-md-12 form-group">
                     {!! Form::label('Segment', null, ['class' => 'fg-label']) !!}
                     {!! Form::select(
-                       'segment_code',
+                       'segment',
                        $segments,
-                       $newsletter->segment_code,
+                       $newsletter->segment,
                        [
                         'class' => 'selectpicker',
                        'data-live-search' => 'true',
@@ -47,6 +47,23 @@
         </div>
 
         <div class="input-group m-t-10">
+            <span class="input-group-addon"><i class="zmdi zmdi-settings"></i></span>
+            <div class="row">
+                <div class="col-md-12 form-group">
+                    {!! Form::label('Mail Type', null, ['class' => 'fg-label']) !!}
+                    {!! Form::select(
+                       'mail_type_code',
+                       $mailTypes,
+                       $newsletter->mail_type_code,
+                       ['class' => 'selectpicker',
+                       'data-live-search' => 'true',
+                       'placeholder' => 'Please select...']
+                   ) !!}
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group m-t-10">
             <span class="input-group-addon"><i class="zmdi zmdi-key"></i></span>
             <div class="row">
                 <div class="col-md-12 form-group">
@@ -62,11 +79,39 @@
             </div>
         </div>
 
-        <div class="input-group fg-float m-t-15">
+        <div class="input-group m-t-10">
+            <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
+            <div class="fg-line">
+                <label class="fg-label">Timespan of data in days</label>
+                {!! Form::number('timespan',
+                $newsletter->timespan,
+                ['class' => 'form-control fg-input', 'min' => 1, 'placeholder' => "How old data (conversions, pageviews, ...) is included", 'required' => 'required']) !!}
+            </div>
+        </div>
+
+        <div class="input-group m-t-15">
             <span class="input-group-addon"><i class="zmdi zmdi-file-text"></i></span>
             <div class="fg-line">
                 {!! Form::label('How many articles', null, ['class' => 'fg-label']) !!}
                 {!! Form::number('articles_count', $newsletter->articles_count, ['class' => 'form-control fg-input', 'min' => 1, 'max' => 100]) !!}
+            </div>
+        </div>
+
+        <h5 class="m-t-30">Email parameters</h5>
+
+        <div class="input-group m-t-20">
+            <span class="input-group-addon"><i class="zmdi zmdi-email"></i></span>
+            <div class="fg-line">
+                {!! Form::label('Email subject', null, ['class' => 'fg-label']) !!}
+                {!! Form::text('email_subject', $newsletter->email_subject, ['class' => 'form-control fg-input', 'placeholder' => 'e.g. "Top 10 articles this week"']) !!}
+            </div>
+        </div>
+
+        <div class="input-group m-t-10">
+            <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
+            <div class="fg-line">
+                {!! Form::label('Email from', null, ['class' => 'fg-label']) !!}
+                {!! Form::text('email_from', $newsletter->email_from, ['class' => 'form-control fg-input', 'placeholder' => 'e.g. REMP <info@remp2020.com>']) !!}
             </div>
         </div>
     </div>
@@ -123,7 +168,7 @@
         components: {
             RecurrenceSelector, RuleOcurrences
         },
-        data() {
+        data: function() {
             return {
                 rrule: null,
                 submitAction: null

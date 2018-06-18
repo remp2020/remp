@@ -17,10 +17,16 @@ class CreateNewslettersTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('mailer_generator_id')->unsigned();
-            $table->string('segment_code');
+            $table->string('segment');
+            $table->string('mail_type_code');
             $table->string('criteria');
             $table->integer('articles_count')->unsigned();
             $table->text('recurrence_rule')->nullable();
+            $table->integer('timespan')->unsigned();
+            $table->string('state');
+            $table->string('email_subject');
+            $table->string('email_from');
+            $table->timestamp('last_sent_at')->nullable();
             $table->timestamp('starts_at')->nullable();
             $table->timestamps();
         });

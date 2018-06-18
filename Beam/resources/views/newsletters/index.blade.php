@@ -20,8 +20,9 @@
                 'name' => [
                     'priority' => 1,
                 ],
-                'segment_code' => [
+                'segment' => [
                     'priority' => 2,
+                    'render' => 'segmentCode'
                 ],
                 'starts_at' => [
                     'render' => 'date',
@@ -47,5 +48,13 @@
             'order' => [4, 'desc'],
         ]) !!}
     </div>
+
+    <script>
+        $.fn.dataTables.render.segmentCode = function () {
+            return function (data) {
+                return data.split("::")[1];
+            }
+        }
+    </script>
 
 @endsection
