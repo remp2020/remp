@@ -1,9 +1,4 @@
 <style scoped>
-    .card {
-        text-align: center;
-        padding: 10px 0;
-    }
-
     h4 {
         margin-top: 0;
         margin-bottom: 0;
@@ -14,8 +9,13 @@
         font-size: 12px;
     }
 
+    .card-header {
+        padding-top: 10px;
+        padding-bottom: 0;
+    }
+
     .card-body {
-        font-size: 20px;
+        font-size: 22px;
     }
 
     .stats-error {
@@ -65,10 +65,12 @@
             </div>
         </div>
         <div v-if="error" class="stats-error" :title="error">!</div>
-        <h4>{{ title }}</h4>
-        <strong>&nbsp;{{ subtitle }}&nbsp;</strong>
 
-        <div class="card-body">
+        <div class="card-header text-center">
+            {{ title }}<br/><small>&nbsp;{{ subtitle }}&nbsp;</small>
+        </div>
+
+        <div class="card-body card-padding-sm text-center">
             {{ count }}
         </div>
     </div>

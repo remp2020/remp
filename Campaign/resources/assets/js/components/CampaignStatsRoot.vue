@@ -2,7 +2,7 @@
     .size-1of4 { width: 25%; }
 
     #campaign-singles-grid[data-columns]::before {
-        content: '4 .column.size-1of4';
+        content: '4 .column.size-1of1';
     }
 
     #variant-stats-grid[data-columns]::before {

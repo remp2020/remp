@@ -1,8 +1,4 @@
 <style scoped>
-    .card {
-        padding: 30px;
-    }
-
     h3 {
         margin-top: 0;
     }
@@ -52,9 +48,12 @@
             </div>
         </div>
         <div v-if="error" class="stats-error" :title="error">!</div>
-        <h3>{{ title }}</h3>
 
-        <div class="card-body">
+        <div class="card-header">
+            <h3 v-html="title"></h3>
+        </div>
+
+        <div class="card-body card-padding">
             <canvas :id="name" :height="height"></canvas>
         </div>
 
@@ -86,7 +85,7 @@
             type: Object,
             required: true
         }
-    }
+    };
     export default {
         props: props,
         watch: {
@@ -105,12 +104,12 @@
                     this.chart.config.data = {
                         labels: labels,
                         datasets: dataSets
-                    }
+                    };
                     this.chart.update();
                     return;
                 }
 
-                var ctx = document.getElementById(this.name).getContext('2d');
+                let ctx = document.getElementById(this.name).getContext('2d');
 
                 this.chart = new Chart(ctx, {
                     type: "bar",
@@ -152,6 +151,13 @@
                                     minRotation: 0,
                                 }
                             }]
+                        },
+                        tooltips: {
+                            callbacks: {
+                                title: function(tooltipItem, chartData) {
+                                    return moment.utc(tooltipItem.xLabel).format('LLL');
+                                }
+                            }
                         }
                     }
                 });

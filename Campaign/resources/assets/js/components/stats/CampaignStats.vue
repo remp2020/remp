@@ -1,45 +1,49 @@
 <template>
-    <div id="campaign-stats-wrap">
+    <div id="campaign-stats-wrap" class="well">
         <div class="row">
-            <div id="campaign-singles-grid" class="clearfix" data-columns>
-                <single-value
-                    :title="'Clicks'"
-                    :loading="loading"
-                    :error="error"
-                    :count="clickCount"
-                ></single-value>
+            <div class="col-md-10">
+                <chart
+                        :name="'campaign-stats-chart'"
+                        :title="name"
+                        :height="450"
+                        :loading="loading"
+                        :error="error"
+                        :chartData="histogramData"
+                ></chart>
+            </div>
 
-                <single-value
-                    :title="'Started payments'"
-                    :loading="loading"
-                    :error="error"
-                    :count="startedPayments"
-                ></single-value>
+            <div class="col-md-2">
+                <div id="campaign-singles-grid" class="clearfix" data-columns>
+                    <single-value
+                            :title="'Clicks'"
+                            :loading="loading"
+                            :error="error"
+                            :count="clickCount"
+                    ></single-value>
 
-                <single-value
-                    :title="'Finished payments'"
-                    :loading="loading"
-                    :error="error"
-                    :count="finishedPayments"
-                ></single-value>
+                    <single-value
+                            :title="'Started payments'"
+                            :loading="loading"
+                            :error="error"
+                            :count="startedPayments"
+                    ></single-value>
 
-                <single-value
-                    :title="'Earned'"
-                    :loading="loading"
-                    :error="error"
-                    :count="earned"
-                ></single-value>
+                    <single-value
+                            :title="'Finished payments'"
+                            :loading="loading"
+                            :error="error"
+                            :count="finishedPayments"
+                    ></single-value>
+
+                    <single-value
+                            :title="'Earned'"
+                            :loading="loading"
+                            :error="error"
+                            :count="earned"
+                    ></single-value>
+                </div>
             </div>
         </div>
-
-        <chart
-            :name="'campaign-stats-chart'"
-            :title="name"
-            :height="450"
-            :loading="loading"
-            :error="error"
-            :chartData="histogramData"
-        ></chart>
     </div>
 </template>
 

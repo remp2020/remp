@@ -1,100 +1,101 @@
 <template>
-    <div class="row">
-        <div class="col-sm-12 col-md-8 variant-chart-wrap">
-            <chart
-                :name="'variant-stats-chart-' + variant.id"
-                :title="'Variant: ' + variant.variant + ' (' + variant.proportion + '%)'"
-                :height="430"
-                :loading="loading"
-                :error="error"
-                :chartData="histogramData"
-            ></chart>
-        </div>
-        <div class="col-sm-12 col-md-4">
-            <div class="row">
-                <div id="variant-stats-grid" class="clearfix" data-columns>
+    <div class="variant-stats well">
+        <div class="row">
+            <div class="col-sm-12 col-md-8 variant-chart-wrap">
+                <chart
+                    :name="'variant-stats-chart-' + variant.id"
+                    :title="'Variant: ' + variant.variant + ' <small>(' + variant.proportion + '%)</small>'"
+                    :height="430"
+                    :loading="loading"
+                    :error="error"
+                    :chartData="histogramData"
+                ></chart>
+            </div>
+            <div class="col-sm-12 col-md-4">
+                <div class="row">
+                    <div id="variant-stats-grid" class="clearfix" data-columns>
 
-                    <single-value
-                        :title="'Clicks'"
-                        :loading="loading"
-                        :error="error"
-                        :count="clickCount"
-                    ></single-value>
+                        <single-value
+                                :title="'Shows'"
+                                :loading="loading"
+                                :error="error"
+                                :count="showsCount"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Clicks'"
-                        :subtitle="'normalized'"
-                        :loading="loading"
-                        :error="error"
-                        :count="clickCountNormalized"
-                        :infoText="normalizedValueInfo"
-                    ></single-value>
+                        <single-value
+                                :title="'Shows'"
+                                :subtitle="'normalized'"
+                                :loading="loading"
+                                :error="error"
+                                :count="showsCountNormalized"
+                                :infoText="normalizedValueInfo"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Shows'"
-                        :loading="loading"
-                        :error="error"
-                        :count="showsCount"
-                    ></single-value>
+                        <single-value
+                            :title="'Clicks'"
+                            :loading="loading"
+                            :error="error"
+                            :count="clickCount"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Shows'"
-                        :subtitle="'normalized'"
-                        :loading="loading"
-                        :error="error"
-                        :count="showsCountNormalized"
-                        :infoText="normalizedValueInfo"
-                    ></single-value>
+                        <single-value
+                            :title="'Clicks'"
+                            :subtitle="'normalized'"
+                            :loading="loading"
+                            :error="error"
+                            :count="clickCountNormalized"
+                            :infoText="normalizedValueInfo"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Started payments'"
-                        :loading="loading"
-                        :error="error"
-                        :count="startedPaymentsCount"
-                    ></single-value>
+                        <single-value
+                            :title="'Started payments'"
+                            :loading="loading"
+                            :error="error"
+                            :count="startedPaymentsCount"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Started payments'"
-                        :subtitle="'normalized'"
-                        :loading="loading"
-                        :error="error"
-                        :count="startedPaymentsCountNormalized"
-                        :infoText="normalizedValueInfo"
-                    ></single-value>
+                        <single-value
+                            :title="'Started payments'"
+                            :subtitle="'normalized'"
+                            :loading="loading"
+                            :error="error"
+                            :count="startedPaymentsCountNormalized"
+                            :infoText="normalizedValueInfo"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Finished payments'"
-                        :loading="loading"
-                        :error="error"
-                        :count="finishedPaymentsCount"
-                    ></single-value>
+                        <single-value
+                            :title="'Finished payments'"
+                            :loading="loading"
+                            :error="error"
+                            :count="finishedPaymentsCount"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Finished payments'"
-                        :subtitle="'normalized'"
-                        :loading="loading"
-                        :error="error"
-                        :count="finishedPaymentsCountNormalized"
-                        :infoText="normalizedValueInfo"
-                    ></single-value>
+                        <single-value
+                            :title="'Finished payments'"
+                            :subtitle="'normalized'"
+                            :loading="loading"
+                            :error="error"
+                            :count="finishedPaymentsCountNormalized"
+                            :infoText="normalizedValueInfo"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Earned'"
-                        :loading="loading"
-                        :error="error"
-                        :count="earnedSum"
-                    ></single-value>
+                        <single-value
+                            :title="'Earned'"
+                            :loading="loading"
+                            :error="error"
+                            :count="earnedSum"
+                        ></single-value>
 
-                    <single-value
-                        :title="'Earned'"
-                        :subtitle="'normalized'"
-                        :loading="loading"
-                        :error="error"
-                        :count="earnedSumNormalized"
-                        :infoText="normalizedValueInfo"
-                    ></single-value>
+                        <single-value
+                            :title="'Earned'"
+                            :subtitle="'normalized'"
+                            :loading="loading"
+                            :error="error"
+                            :count="earnedSumNormalized"
+                            :infoText="normalizedValueInfo"
+                        ></single-value>
 
-
+                    </div>
                 </div>
             </div>
         </div>
@@ -161,7 +162,7 @@
         },
         methods: {
             load() {
-                var vm = this;
+                let vm = this;
                 vm.error = "";
                 vm.loading = true;
 
@@ -193,7 +194,7 @@
                     },
                     error(xhr, status, error) {
                         vm.loading = false;
-                        var body = JSON.parse(xhr.responseText);
+                        let body = JSON.parse(xhr.responseText);
                         vm.error = body.message;
                     }
                 })
