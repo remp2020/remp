@@ -4,9 +4,9 @@ namespace Remp\MailerModule\Repository;
 
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
+use Nette\Database\Table\IRow;
 use Nette\Database\Table\Selection;
 use Remp\MailerModule\Repository;
-use Remp\MailerModule\Segment\Crm;
 
 class JobsRepository extends Repository
 {
@@ -18,11 +18,16 @@ class JobsRepository extends Repository
         ':mail_job_batch_templates.mail_template.name',
     ];
 
+    private $batchesRepository;
+
     public function __construct(
         Context $database,
-        IStorage $cacheStorage = null
+        IStorage $cacheStorage = null,
+        BatchesRepository $batchesRepository
     ) {
         parent::__construct($database, $cacheStorage);
+
+        $this->batchesRepository = $batchesRepository;
     }
 
     public function add($segmentCode, $segmentProvider, $context = null)
@@ -78,5 +83,28 @@ class JobsRepository extends Repository
         }
 
         return $selection;
+    }
+
+    public function update(IRow &$row, $data)
+    {
+        $this->getDatabase()->beginTransaction();
+
+        if (!$this->isEditable($row->id)) {
+            $this->getDatabase()->rollBack();
+            throw new \Exception("Job can't be updated. One or more Mail Job Batches were already started.");
+        }
+
+        $result = parent::update($row, $data);
+
+        $this->getDatabase()->commit();
+        return $result;
+    }
+
+    public function isEditable($jobId)
+    {
+        if ($this->batchesRepository->notEditableBatches($jobId)->count() > 0) {
+            return false;
+        }
+        return true;
     }
 }

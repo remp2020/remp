@@ -321,6 +321,9 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			if user.Source.UtmContent != nil {
 				tags["utm_content"] = *user.Source.UtmContent
 			}
+			if user.Source.BannerVariant != nil {
+				tags["banner_variant"] = *user.Source.BannerVariant
+			}
 		}
 	} else {
 		tags["signed_in"] = "0"

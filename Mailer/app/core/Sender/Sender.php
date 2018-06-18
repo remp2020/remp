@@ -98,7 +98,7 @@ class Sender
         return $this;
     }
 
-    public function setParams($params)
+    public function setParams(array $params)
     {
         $this->params = $params;
 
@@ -112,7 +112,7 @@ class Sender
         return $this;
     }
 
-    public function send($checkEmailSubscribed = true)
+    public function send($checkEmailSubscribed = true): int
     {
         if (count($this->recipients) > 1) {
             throw new MailerBatchException(sprintf("attempted to send batch via send() method: please use single recipient: %s", Json::encode($this->recipients)));
@@ -120,7 +120,7 @@ class Sender
         $recipient = reset($this->recipients);
 
         if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($recipient['email'], $this->template->mail_type->id)) {
-            return false;
+            return 0;
         }
 
         $tokens = $this->autoLogin->createTokens([$recipient['email']]);
@@ -167,10 +167,10 @@ class Sender
         $mailer->send($message);
         $this->reset();
 
-        return true;
+        return 1;
     }
 
-    public function sendBatch()
+    public function sendBatch(): int
     {
         $mailer = $this->mailerFactory->getMailer();
         if (!$mailer->supportsBatch()) {
@@ -193,6 +193,7 @@ class Sender
 
         $autologinTokens = $this->autoLogin->createTokens($subscribedEmails);
 
+        $transformedParams = [];
         foreach ($this->recipients as $recipient) {
             if (!isset($subscribedEmails[$recipient['email']]) || !$subscribedEmails[$recipient['email']]) {
                 continue;
@@ -245,7 +246,7 @@ class Sender
         $mailer->send($message);
         $this->reset();
 
-        return true;
+        return count($subscribedEmails);
     }
 
     private function setMessageAttachments(Message $message): ?int

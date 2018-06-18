@@ -90,7 +90,7 @@ class MailgunMailer extends Mailer implements IMailer
         return isset($this->options[$key]) ? $this->options[$key] : null;
     }
 
-    public function transformTemplateParams($params)
+    public function transformTemplateParams(array $params)
     {
         $transformed = [];
         foreach ($params as $key => $value) {

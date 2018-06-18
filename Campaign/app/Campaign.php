@@ -5,6 +5,7 @@ namespace App;
 use Cache;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
+use App\CampaignBanner;
 use Ramsey\Uuid\Uuid;
 
 class Campaign extends Model
@@ -69,48 +70,44 @@ class Campaign extends Model
 
     public function banners()
     {
-        return $this->belongsToMany(Banner::class, 'campaign_banners')->withPivot('variant');
+        return $this->belongsToMany(Banner::class, 'campaign_banners')
+            ->withPivot('variant', 'proportion', 'control_group', 'weight');
     }
 
-    public function banner()
+    public function campaignBanners()
     {
-        return $this->banners()->wherePivot('variant', '=', 'A');
+        return $this->hasMany(CampaignBanner::class)->orderBy('weight');
     }
 
-    public function getBannerAttribute()
+    public function getPrimaryBanner()
     {
-        if ($this->relationLoaded('banner')) {
-            return $this->getRelation('banner')->first();
+        return optional(
+            $this->campaignBanners()->with('banner')->first()
+        )->banner;
+    }
+
+    public function removeVariants(array $variantIds)
+    {
+        return CampaignBanner::whereIn('id', $variantIds)->delete();
+    }
+
+    public function storeOrUpdateVariants(array $variants)
+    {
+        foreach ($variants as $variant) {
+            $data = [
+                'id' => $variant['id'],
+                'campaign_id' => $this->id,
+                'variant' => $variant['variant'],
+                'weight' => $variant['weight'],
+                'proportion' => $variant['proportion'],
+                'control_group' => $variant['control_group'],
+                'banner_id' => $variant['banner_id'] ?? null,
+            ];
+
+            $campaignBanner = CampaignBanner::findOrNew($variant['id']);
+            $campaignBanner->fill($data);
+            $campaignBanner->save();
         }
-        return $this->banner()->first();
-    }
-
-    public function altBanner()
-    {
-        return $this->banners()->wherePivot('variant', '=', 'B');
-    }
-
-    public function setBannerIdAttribute($value)
-    {
-        $data = [$value => ['variant' => 'A']];
-        $this->banner()->sync($data);
-    }
-
-    public function getAltBannerAttribute()
-    {
-        if ($this->relationLoaded('altBanner')) {
-            return $this->getRelation('altBanner')->first();
-        }
-        return $this->altBanner()->first();
-    }
-
-    public function setAltBannerIdAttribute($value)
-    {
-        $data = [];
-        if (!empty($value)) {
-            $data[$value] = ['variant' => 'B'];
-        }
-        $this->altBanner()->sync($data);
     }
 
     public function countries()
@@ -159,27 +156,43 @@ class Campaign extends Model
         return false;
     }
 
+    public function getVariantsProportionMapping()
+    {
+        $mapping = [];
+        $campaignBanners = $this->campaignBanners;
+
+        foreach ($campaignBanners as $campaignBanner) {
+            $mapping[$campaignBanner->uuid] = $campaignBanner->proportion;
+        }
+
+        return $mapping;
+    }
+
     public function cache()
     {
-        $activeCampaignIds = Schedule::applyScopes()->runningOrPlanned()->orderBy('start_time')->pluck('campaign_id')->unique()->toArray();
+        $activeCampaignIds = Schedule::applyScopes()
+                                ->runningOrPlanned()
+                                ->orderBy('start_time')
+                                ->pluck('campaign_id')
+                                ->unique()
+                                ->toArray();
+
+        Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
+
         $campaign = $this->where(['id' => $this->id])->with([
             'segments',
-            'banner',
-            'banner.htmlTemplate',
-            'banner.mediumRectangleTemplate',
-            'banner.barTemplate',
-            'banner.shortMessageTemplate',
-            'altBanner',
-            'altBanner.htmlTemplate',
-            'altBanner.mediumRectangleTemplate',
-            'altBanner.barTemplate',
-            'altBanner.shortMessageTemplate',
             'countries',
             'countriesWhitelist',
             'countriesBlacklist',
             'schedules',
+            'campaignBanners',
+            'campaignBanners.banner',
         ])->first();
-        Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
+
+        foreach ($campaign->campaignBanners as $variant) {
+            optional($variant->banner)->loadTemplate();
+        }
+
         Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
 }

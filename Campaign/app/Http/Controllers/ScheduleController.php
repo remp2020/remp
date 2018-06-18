@@ -40,7 +40,7 @@ class ScheduleController extends Controller
     public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
     {
         $scheduleSelect = Schedule::select()
-            ->with(['campaign', 'campaign.banner'])
+            ->with(['campaign'])
             ->orderBy('start_time', 'ASC')
             ->orderBy('end_time', 'ASC');
 
@@ -74,15 +74,6 @@ class ScheduleController extends Controller
             })
             ->addColumn('campaign', function (Schedule $schedule) {
                 return Html::linkRoute('campaigns.edit', $schedule->campaign->name, $schedule->campaign);
-            })
-            ->addColumn('banners', function (Schedule $schedule) {
-                $links = [
-                    Html::linkRoute('banners.edit', $schedule->campaign->banner->name, $schedule->campaign->banner),
-                ];
-                if ($schedule->campaign->altBanner) {
-                    $links[] = Html::linkRoute('banners.edit', $schedule->campaign->altBanner->name, $schedule->campaign->altBanner);
-                }
-                return implode('<br/>', $links);
             })
             ->addColumn('action_methods', [
                 'start' => 'POST',

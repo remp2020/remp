@@ -42,6 +42,13 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 		o.TimeBefore = *ctx.Payload.TimeBefore
 	}
 
+	if ctx.Payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: ctx.Payload.TimeHistogram.Interval,
+			Offset:   ctx.Payload.TimeHistogram.Offset,
+		}
+	}
+
 	crc, ok, err := c.CommerceStorage.Count(o)
 	if err != nil {
 		return err

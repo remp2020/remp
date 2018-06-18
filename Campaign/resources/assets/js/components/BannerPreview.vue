@@ -144,6 +144,8 @@
         "alignmentOptions",
         "dimensionOptions",
         "positionOptions",
+
+        "variantUuid",
     ];
 
     export default {
@@ -166,9 +168,11 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
+
+            this.visible = this.show;
         },
         data: () => ({
-            visible: true,
+            visible: false,
         }),
         watch: {
             'transition': function() {
@@ -182,7 +186,7 @@
         },
         computed: {
             url: function() {
-                if (this.targetUrl === undefined) {
+                if (!this.targetUrl) {
                     return null;
                 }
                 let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
@@ -229,7 +233,8 @@
                     "utm_source": "remp_campaign",
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
-                    "utm_content": this.uuid
+                    "utm_content": this.uuid,
+                    "banner_variant": this.variantUuid
                 });
                 this.closeTracked = true;
             },
@@ -241,7 +246,8 @@
                     "utm_source": "remp_campaign",
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
-                    "utm_content": this.uuid
+                    "utm_content": this.uuid,
+                    "banner_variant": this.variantUuid
                 });
                 this.clickTracked = true;
                 if (hideBanner) {

@@ -37,6 +37,9 @@ type PageviewRowCollection model.PageviewRowCollection
 // SegmentCache represent cache object for count of events of SegmentRules.
 type SegmentCache model.SegmentCache
 
+// HistogramItem represent row with date time histogram data.
+type HistogramItem model.HistogramItem
+
 // CountRow represent row with count result.
 type CountRow model.CountRow
 
@@ -283,12 +286,37 @@ func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 	return mt
 }
 
+// ToMediaType converts internal HistogramItem representation to application one.
+func (hi HistogramItem) ToMediaType() *app.TimeHistogram {
+	c := float64(hi.Value)
+
+	th := &app.TimeHistogram{
+		Time:  hi.Time,
+		Value: c,
+	}
+
+	return th
+}
+
 // ToMediaType converts internal CountRow representation to application one.
 func (cr CountRow) ToMediaType() *app.Count {
-	mt := &app.Count{
-		Count: cr.Count,
-		Tags:  cr.Tags,
+	coll := app.TimeHistogramCollection{}
+
+	for _, c := range cr.Histogram {
+		hi := (HistogramItem)(c).ToMediaType()
+		coll = append(coll, hi)
 	}
+
+	if len(cr.Tags) == 0 {
+		cr.Tags = nil
+	}
+
+	mt := &app.Count{
+		Count:         cr.Count,
+		Tags:          cr.Tags,
+		TimeHistogram: coll,
+	}
+
 	return mt
 }
 
@@ -304,9 +332,21 @@ func (crc CountRowCollection) ToMediaType() app.CountCollection {
 
 // ToMediaType converts internal SumRow representation to application one.
 func (sr SumRow) ToMediaType() *app.Sum {
+	coll := app.TimeHistogramCollection{}
+
+	for _, c := range sr.Histogram {
+		hi := (HistogramItem)(c).ToMediaType()
+		coll = append(coll, hi)
+	}
+
+	if len(sr.Tags) == 0 {
+		sr.Tags = nil
+	}
+
 	mt := &app.Sum{
-		Sum:  sr.Sum,
-		Tags: sr.Tags,
+		Sum:           sr.Sum,
+		Tags:          sr.Tags,
+		TimeHistogram: coll,
 	}
 	return mt
 }

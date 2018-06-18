@@ -44,6 +44,13 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 		o.TimeBefore = *ctx.Payload.TimeBefore
 	}
 
+	if ctx.Payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: ctx.Payload.TimeHistogram.Interval,
+			Offset:   ctx.Payload.TimeHistogram.Offset,
+		}
+	}
+
 	crc, ok, err := c.EventStorage.Count(o)
 	if err != nil {
 		return err
