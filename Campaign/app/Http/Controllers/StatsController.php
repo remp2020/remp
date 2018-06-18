@@ -240,8 +240,7 @@ class StatsController extends Controller
 
     protected function calcInterval(Carbon $from, Carbon $to, $chartWidth)
     {
-        $labels = [];
-        $numOfCols = intval($chartWidth / 20);
+        $numOfCols = intval($chartWidth / 40);
 
         $diff = $to->diffInSeconds($from);
         $interval = $diff / $numOfCols;

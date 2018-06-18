@@ -155,7 +155,8 @@
                         tooltips: {
                             callbacks: {
                                 title: function(tooltipItem, chartData) {
-                                    return moment.utc(tooltipItem.xLabel).format('LLL');
+                                    // we have only on x axis, we can use zero item directly
+                                    return moment(tooltipItem[0].xLabel).format('LLL');
                                 }
                             }
                         }

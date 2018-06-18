@@ -79,10 +79,10 @@ func main() {
 		MySQL: mysqlDB,
 	}
 
-	err = influxDBpreparation(c)
-	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to prepare InfluxDB"))
-	}
+	// err = influxDBpreparation(c)
+	// if err != nil {
+	// log.Fatalln(errors.Wrap(err, "unable to prepare InfluxDB"))
+	// }
 
 	// server cancellation
 
