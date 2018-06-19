@@ -17,7 +17,7 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'name' => [
+                'newsletter' => [
                     'priority' => 1,
                 ],
                 'segment' => [
@@ -34,17 +34,18 @@
                     'header' => 'Created at',
                     'priority' => 3,
                 ],
-                'updated_at' => [
-                    'render' => 'date',
-                    'header' => 'Updated at',
-                    'priority' => 2,
+                'state' => [
+                    'header' => 'State',
+                    'priority' => 1,
                 ],
             ],
             'dataSource' => route('newsletters.json'),
             'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit']
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play'],
+                ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause'],
+                ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
             ],
-            'rowActionLink' => 'edit',
             'order' => [4, 'desc'],
         ]) !!}
     </div>

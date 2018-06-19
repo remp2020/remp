@@ -54,10 +54,9 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');
     Route::post('newsletters/validate', 'NewsletterController@validateForm')->name('newsletters.validateForm');
-
-    Route::resource('newsletters', 'NewsletterController', [
-        'except' => ['show', 'destroy']
-    ]);
+    Route::post('newsletters/{newsletter}/start', 'NewsletterController@start')->name('newsletters.start');
+    Route::post('newsletters/{newsletter}/pause', 'NewsletterController@pause')->name('newsletters.pause');
+    Route::resource('newsletters', 'NewsletterController', ['except' => ['show']]);
 
     Route::resource('conversions', 'ConversionController', [
         'only' => ['index', 'store']

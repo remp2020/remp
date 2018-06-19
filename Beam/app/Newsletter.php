@@ -54,4 +54,16 @@ class Newsletter extends Model
     {
         return explode('::', $this->segment)[0];
     }
+
+    public function isFinished() {
+        return $this->state === self::STATE_FINISHED;
+    }
+
+    public function isStarted() {
+        return $this->state === self::STATE_STARTED;
+    }
+
+    public function isPaused() {
+        return $this->state === self::STATE_PAUSED;
+    }
 }

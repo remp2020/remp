@@ -7,6 +7,9 @@ use App\Http\Requests\NewsletterRequest;
 use App\Http\Resources\NewsletterResource;
 use App\Newsletter;
 use Carbon\Carbon;
+use Html;
+use Remp\LaravelHelpers\Resources\JsonResource;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 
@@ -30,16 +33,27 @@ class NewsletterController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
-        $columns = ['id', 'name', 'segment', 'mailer_generator_id', 'created_at', 'updated_at', 'starts_at'];
+        $columns = ['id', 'name', 'segment', 'state', 'mailer_generator_id', 'created_at', 'updated_at', 'starts_at'];
         $newsletters = Newsletter::select($columns);
 
         return $datatables->of($newsletters)
-            ->addColumn('actions', function (Newsletter $newsletter) {
+            ->addColumn('newsletter', function (Newsletter $newsletter) {
+                return Html::linkRoute('newsletters.edit', $newsletter->name, $newsletter);
+            })
+            ->addColumn('action_methods', [
+                'start' => 'POST',
+                'pause' => 'POST',
+                'destroy' => 'DELETE',
+            ])
+            ->addColumn('actions', function (Newsletter $n) {
                 return [
-                    'edit' => route('newsletters.edit', $newsletter)
+                    'edit' => route('newsletters.edit', $n),
+                    'start' => $n->isPaused() ? route('newsletters.start', $n) : null,
+                    'pause' => $n->isStarted() ? route('newsletters.pause', $n) : null,
+                    'destroy' => route('newsletters.destroy', $n),
                 ];
             })
-            ->rawColumns(['actions'])
+            ->rawColumns(['actions', 'action_methods', 'newsletter'])
             ->make(true);
     }
 
@@ -89,6 +103,19 @@ class NewsletterController extends Controller
                 compact(['newsletter', 'segments', 'generators', 'criteria', 'mailTypes'])
             ),
             'json' => [],
+        ]);
+    }
+
+    public function destroy(Newsletter $newsletter)
+    {
+        $newsletter->delete();
+
+        return response()->format([
+            'html' => redirect(route('newsletters.index'))->with('success', sprintf(
+                "Newsletter %s was removed",
+                $newsletter->name
+            )),
+            'json' => new NewsletterResource([]),
         ]);
     }
 
@@ -180,6 +207,54 @@ class NewsletterController extends Controller
                 $newsletter
             )->with('success', sprintf('Newsletter [%s] was updated', $newsletter->name)),
             'json' => new NewsletterResource($newsletter)
+        ]);
+    }
+
+    public function start(Newsletter $newsletter)
+    {
+        if ($newsletter->isFinished()) {
+            return response()->format([
+                'html' => redirect(route('newsletters.index'))->with('success', sprintf(
+                    'Newsletter %s was already finished, cannot start it again.',
+                    $newsletter->name
+                )),
+                'json' => new JsonResource(new BadRequestHttpException('cannot start already finished newsletter')),
+            ]);
+        }
+
+        $newsletter->state = Newsletter::STATE_STARTED;
+        $newsletter->save();
+
+        return response()->format([
+            'html' => redirect(route('newsletters.index'))->with('success', sprintf(
+                'Newsletter %s was started manually',
+                $newsletter->name
+            )),
+            'json' => new NewsletterResource([]),
+        ]);
+    }
+
+    public function pause(Newsletter $newsletter)
+    {
+        if ($newsletter->isFinished()) {
+            return response()->format([
+                'html' => redirect(route('newsletters.index'))->with('success', sprintf(
+                    'Newsletter %s was already finished, cannot be paused.',
+                    $newsletter->name
+                )),
+                'json' => new JsonResource(new BadRequestHttpException('cannot pause already finished newsletter')),
+            ]);
+        }
+
+        $newsletter->state = Newsletter::STATE_PAUSED;
+        $newsletter->save();
+
+        return response()->format([
+            'html' => redirect(route('newsletters.index'))->with('success', sprintf(
+                'Newsletter %s was paused manually',
+                $newsletter->name
+            )),
+            'json' => new NewsletterResource([]),
         ]);
     }
 }
