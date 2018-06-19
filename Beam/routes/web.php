@@ -53,6 +53,7 @@ Route::middleware('auth.jwt')->group(function () {
     ]);
 
     Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');
+    Route::post('newsletters/validate', 'NewsletterController@validateForm')->name('newsletters.validateForm');
 
     Route::resource('newsletters', 'NewsletterController', [
         'except' => ['show', 'destroy']

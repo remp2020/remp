@@ -11,3 +11,4 @@ global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue")
 global.DateTimePicker = require("remp/js/components/DateTimePickerWrapper.vue");
 global.RecurrenceSelector = require("./components/RecurrenceSelector.vue");
 global.RuleOcurrences = require("./components/RuleOcurrences.vue");
+global.FormValidator = require("remp/js/components/FormValidator");

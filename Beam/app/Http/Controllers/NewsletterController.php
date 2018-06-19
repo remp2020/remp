@@ -43,6 +43,11 @@ class NewsletterController extends Controller
             ->make(true);
     }
 
+    public function validateForm(NewsletterRequest $request)
+    {
+        return response()->json(false);
+    }
+
     public function index()
     {
         return response()->format([
