@@ -54,7 +54,6 @@ class SendNewslettersCommand extends Command
         }
 
         foreach ($newsletters as $newsletter) {
-            $this->info(sprintf("Processing newsletter: %s", $newsletter->name));
             $nextSending = $newsletter->starts_at;
             $hasMore = false;
 
@@ -68,6 +67,7 @@ class SendNewslettersCommand extends Command
                     continue;
                 }
 
+                $this->line(sprintf("Processing newsletter: %s", $newsletter->name));
                 $this->sendNewsletter($newsletter);
                 $newsletter->last_sent_at = $nextSending;
 
@@ -110,7 +110,7 @@ class SendNewslettersCommand extends Command
     private function createJob($newsletter, $templateId)
     {
         $jobId = $this->mailer->createJob($newsletter->segment_code, $newsletter->segment_provider, $templateId);
-        $this->info(sprintf("Mailer job successfully created (id: %s)", $jobId));
+        $this->line(sprintf("Mailer job successfully created (id: %s)", $jobId));
     }
 
     private function createTemplate($newsletter, $htmlContent, $textContent): int

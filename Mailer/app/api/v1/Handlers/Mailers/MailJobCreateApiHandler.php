@@ -66,7 +66,7 @@ class MailJobCreateApiHandler extends BaseHandler
         $mailJob = $this->jobsRepository->add($segmentCode, $segmentProvider);
         $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_READY]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
 
         return new JsonApiResponse(200, ['status' => 'ok', 'id' => $mailJob->id]);
     }
