@@ -83,7 +83,7 @@ services:
     volumes:
       - "./Mailer:/var/www/html/Mailer:rw"
       - "./Composer:/var/www/html/Composer:rw"
-      - "./Package:/var/www/html/Package:rw"      
+      - "./Package:/var/www/html/Package:rw"
     depends_on:
       - "nginx"
       - "mysql"
@@ -103,7 +103,7 @@ services:
     volumes:
       - "./Sso:/var/www/html/Sso:rw"
       - "./Composer:/var/www/html/Composer:rw"
-      - "./Package:/var/www/html/Package:rw"      
+      - "./Package:/var/www/html/Package:rw"
     depends_on:
       - "nginx"
       - "mysql"
@@ -121,7 +121,7 @@ services:
     volumes:
       - "./Beam:/var/www/html/Beam:rw"
       - "./Composer:/var/www/html/Composer:rw"
-      - "./Package:/var/www/html/Package:rw"      
+      - "./Package:/var/www/html/Package:rw"
     depends_on:
       - "nginx"
       - "mysql"
@@ -166,7 +166,9 @@ services:
     restart: "unless-stopped"
 
   elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:6.2.2"
+    build: "./Docker/elasticsearch"
+    ports:
+      - "9200:9200"
     volumes:
       - "./Docker/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
       - "elastic-data:/usr/share/elasticsearch/data"
