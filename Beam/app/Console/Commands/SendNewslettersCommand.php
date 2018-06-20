@@ -140,76 +140,25 @@ class SendNewslettersCommand extends Command
     {
         $start = Carbon::now()->subDays($daysSpan);
 
-        $articleIds = null;
-
         switch ($criteria) {
             case NewsletterController::CRITERIA_TIMESPENT_ALL:
-                $articleIds = ArticleTimespent::where('time_from', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('count(sum) as total_sum')])
-                    ->orderByDesc('total_sum')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return ArticleTimespent::getMostReadArticles($start, 'sum', $articlesCount);
             case NewsletterController::CRITERIA_TIMESPENT_SUBSCRIBERS:
-                $articleIds = ArticleTimespent::where('time_from', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('count(subscribers) as total_sum')])
-                    ->orderByDesc('total_sum')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return ArticleTimespent::getMostReadArticles($start, 'subscribers', $articlesCount);
             case NewsletterController::CRITERIA_TIMESPENT_SIGNED_IN:
-                $articleIds = ArticleTimespent::where('time_from', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('count(signed_in) as total_sum')])
-                    ->orderByDesc('total_sum')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return ArticleTimespent::getMostReadArticles($start, 'signed_in', $articlesCount);
             case NewsletterController::CRITERIA_PAGEVIEWS_ALL:
-                $articleIds = ArticlePageviews::where('time_from', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('count(sum) as total_sum')])
-                    ->orderByDesc('total_sum')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return ArticlePageviews::getMostReadArticles($start, 'sum', $articlesCount);
             case NewsletterController::CRITERIA_PAGEVIEWS_SIGNED_IN:
-                $articleIds = ArticlePageviews::where('time_from', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('count(signed_in) as total_sum')])
-                    ->orderByDesc('total_sum')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return ArticlePageviews::getMostReadArticles($start, 'signed_in', $articlesCount);
             case NewsletterController::CRITERIA_PAGEVIEWS_SUBSCRIBERS:
-                $articleIds = ArticlePageviews::where('time_from', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('count(subscribers) as total_sum')])
-                    ->orderByDesc('total_sum')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return ArticlePageviews::getMostReadArticles($start, 'subscribers', $articlesCount);
             case NewsletterController::CRITERIA_CONVERSIONS:
-                $articleIds = Conversion::where('paid_at', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('count(amount) as total_sum')])
-                    ->orderByDesc('total_sum')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return Conversion::getMostReadArticlesByTotalPayment($start, $articlesCount);
             case NewsletterController::CRITERIA_AVERAGE_PAYMENT:
-                $articleIds = Conversion::where('paid_at', '>=', $start)
-                    ->groupBy('article_id')
-                    ->select(['article_id', DB::raw('avg(amount) as average')])
-                    ->orderByDesc('average')
-                    ->limit($articlesCount)
-                    ->get()->pluck('article_id');
-                break;
+                return Conversion::getMostReadArticlesByAveragePayment($start, $articlesCount);
             default:
                 throw new Exception('unknown article criteria ' . $criteria);
         }
-        return Article::findMany($articleIds);
     }
 }
