@@ -167,8 +167,6 @@ services:
 
   elasticsearch:
     build: "./Docker/elasticsearch"
-    ports:
-      - "9200:9200"
     volumes:
       - "./Docker/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
       - "elastic-data:/usr/share/elasticsearch/data"
