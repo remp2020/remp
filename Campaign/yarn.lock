@@ -4550,6 +4550,10 @@ opn@^5.1.0:
   dependencies:
     is-wsl "^1.1.0"
 
+optimal-select@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/optimal-select/-/optimal-select-4.0.1.tgz#47de7da7a39bb0949fd9af54c6f03571548f04c9"
+
 optipng-bin@^3.0.0:
   version "3.1.4"
   resolved "https://registry.yarnpkg.com/optipng-bin/-/optipng-bin-3.1.4.tgz#95d34f2c488704f6fd70606bfea0c659f1d95d84"
