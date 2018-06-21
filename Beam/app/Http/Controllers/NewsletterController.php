@@ -176,7 +176,7 @@ class NewsletterController extends Controller
     {
         $newsletter = new Newsletter();
         $newsletter->fill($request->all());
-        $newsletter->state = Newsletter::STATE_STARTED;
+        $newsletter->state = Newsletter::STATE_PAUSED;
         $newsletter->save();
 
         return response()->format([
