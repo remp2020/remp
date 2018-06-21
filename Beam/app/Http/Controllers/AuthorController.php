@@ -92,14 +92,14 @@ class AuthorController extends Controller
             ->groupBy('author_id');
 
         if ($request->input('published_from')) {
-            $publishedFrom = Carbon::parse($request->input('published_from'))->tz('UTC');
+            $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
             $authorArticlesQuery->whereDate('published_at', '>=', $publishedFrom);
             $conversionsQuery->whereDate('published_at', '>=', $publishedFrom);
             $pageviewsQuery->whereDate('published_at', '>=', $publishedFrom);
         }
 
         if ($request->input('published_to')) {
-            $publishedTo = Carbon::parse($request->input('published_to'))->tz('UTC');
+            $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
             $authorArticlesQuery->whereDate('published_at', '<=', $publishedTo);
             $conversionsQuery->whereDate('published_at', '<=', $publishedTo);
             $pageviewsQuery->whereDate('published_at', '<=', $publishedTo);
@@ -119,10 +119,10 @@ class AuthorController extends Controller
             ->groupBy(['article_author.author_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
-            $conversionsQuery->where('published_at', '>=', Carbon::parse($request->input('published_from'))->tz('UTC'));
+            $conversionsQuery->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
         }
         if ($request->input('published_to')) {
-            $conversionsQuery->where('published_at', '<=', Carbon::parse($request->input('published_to'))->tz('UTC'));
+            $conversionsQuery->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
         }
 
         $conversions = [];
@@ -222,12 +222,12 @@ class AuthorController extends Controller
             });
 
         if ($request->input('published_from')) {
-            $publishedFrom = Carbon::parse($request->input('published_from'))->tz('UTC');
+            $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
             $articles->where('published_at', '>=', $publishedFrom);
             $conversionsQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
-            $publishedTo = Carbon::parse($request->input('published_to'))->tz('UTC');
+            $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
             $articles->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
         }

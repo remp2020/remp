@@ -83,7 +83,8 @@
             'order' => [4, 'desc'],
             'requestParams' => [
                 'published_from' => '$(\'[name="published_from"]\').val()',
-                'published_to' => '$(\'[name="published_to"]\').val()'
+                'published_to' => '$(\'[name="published_to"]\').val()',
+                'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
                 [

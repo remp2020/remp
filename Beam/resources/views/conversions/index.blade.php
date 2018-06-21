@@ -65,7 +65,8 @@
             'order' => [5, 'desc'],
             'requestParams' => [
                 'conversion_from' => '$(\'[name="conversion_from"]\').val()',
-                'conversion_to' => '$(\'[name="conversion_to"]\').val()'
+                'conversion_to' => '$(\'[name="conversion_to"]\').val()',
+                'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
                 [
@@ -88,6 +89,8 @@
             },
             methods: {
                 callback: function (from, to) {
+                    console.log('from: ' + from)
+                    console.log('to: ' + to)
                     $('[name="conversion_from"]').val(from);
                     $('[name="conversion_to"]').val(to).trigger("change");
                 }
