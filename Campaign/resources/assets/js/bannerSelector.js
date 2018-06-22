@@ -299,7 +299,7 @@ import { select } from 'optimal-select';
     }
     
     .banner-placeholder {
-      min-height: 200px;
+      min-height: 60px;
       background-color: #EFBD48; //yellow
       // background-color: #4EB5D7; //lightblue
       // background-color: #409388; //green
