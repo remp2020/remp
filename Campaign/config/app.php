@@ -245,4 +245,15 @@ return [
         'AsyncWidget' => Arrilot\Widgets\AsyncFacade::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Client Site Url
+    |--------------------------------------------------------------------------
+    |
+    | Url of the site, where remplib.js is implemented
+    |
+    */
+    
+    'client_site_url' => env('CLIENT_SITE_URL'),
 ];
