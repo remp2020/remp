@@ -367,7 +367,7 @@ final class JobPresenter extends BasePresenter
             if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE) {
                 $this->redirect('Show', $batch->job->id);
             } else {
-                $this->redirect('EditBatch', $batch->job->id);
+                $this->redirect('EditBatch', $batch->id);
             }
         };
 

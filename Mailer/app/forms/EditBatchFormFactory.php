@@ -83,7 +83,7 @@ class EditBatchFormFactory extends Object implements IFormFactory
     {
         $batch = $this->batchesRepository->find($values['id']);
 
-        if (!in_array($batch->status, [BatchesRepository::EDITABLE_STATUSES])) {
+        if (!in_array($batch->status, BatchesRepository::EDITABLE_STATUSES)) {
             $form->addError("Unable to edit batch, already in non-editable status: {$batch->status}");
             return;
         }
