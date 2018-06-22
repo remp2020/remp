@@ -86,7 +86,7 @@ class DatabaseSeedCommand extends Command
     <tr>
         <td>{{ item.title }}</td>
         <td>{{ item.description }}</td>
-        <td><img src="{{item.image}}"></td>
+        <td><img style="width: 50px; height: 50px;" src="{{item.image}}"></td>
         <td>{{ url }}</td>
     </tr>
 {% endfor %}

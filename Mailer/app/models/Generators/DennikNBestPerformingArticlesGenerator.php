@@ -44,6 +44,12 @@ class DennikNBestPerformingArticlesGenerator implements IGenerator
         return [];
     }
 
+    public function formSucceeded($form, $values)
+    {
+        $output = $this->process($values);
+        $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
+    }
+
     public function apiParams()
     {
         return [
