@@ -8,7 +8,7 @@ all: clean gen build
 build: gen build-only
 
 build-only:
-	go build
+	go build -o segments
 
 clean:
 	@rm -rf app
@@ -24,9 +24,6 @@ gen:
 	$(GOAGEN_DIR)/goagen swagger -d $(DESIGN_PKG)
 	rm $(GOAGEN_DIR)/goagen
 	rm -fr goagen*
-
-build: gen
-	go build -o segments
 
 build-static: gen
 	CGO_ENABLED=0 go build -a -installsuffix cgo -o segments

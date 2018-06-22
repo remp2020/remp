@@ -121,7 +121,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 	var crc CountRowCollection
 	tags := make(map[string]string)
 
-	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 		crcTags := make(map[string]string)
 
 		var histogram []HistogramItem
@@ -158,6 +158,9 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 
 		return nil
 	})
+	if err != nil {
+		return nil, false, err
+	}
 
 	return crc, true, nil
 }
@@ -493,7 +496,11 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 	for _, field := range groupBy {
 		agg, ok := aggregations.Terms(field)
 		if !ok {
-			return fmt.Errorf("result is missing data for term aggregation: %s", field)
+			// no result means there was no data for requested aggregation; lets use empty value for remaining tags as a default
+			for _, f := range groupBy {
+				tags[f] = ""
+			}
+			return nil
 		}
 
 		// zero results before we got to the lowest unwrap level
@@ -519,8 +526,11 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 			}
 
 			if len(groupBy) > 1 {
-				eDB.UnwrapAggregation(bucket.DocCount, bucket.Aggregations, groupBy[1:], tags, cb)
-				return nil
+				err := eDB.UnwrapAggregation(bucket.DocCount, bucket.Aggregations, groupBy[1:], tags, cb)
+				if err != nil {
+					return err
+				}
+				continue
 			}
 
 			if err := cb(tags, bucket.DocCount, bucket.Aggregations); err != nil {
