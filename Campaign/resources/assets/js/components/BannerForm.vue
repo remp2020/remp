@@ -192,7 +192,7 @@
                                 <div class="row">
                                     <div class="col-xs-10">
                                         <div class="fg-line" :class="{'fg-toggled': targetSelector && targetSelector.length}">
-                                            <label for="target_selector" class="fg-label">Target element selector</label>
+                                            <label for="target_selector" class="fg-label">Choose position</label>
                                             <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
                                         </div>
                                     </div>
