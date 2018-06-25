@@ -50,7 +50,7 @@
             let now = new Date();
             this.fetchCommerceStats(now);
             this.fetchPageviewStats(now);
-            this.fetchVariantStats(now, ["title_variant", "image_variant", "lock_variant"]);
+            this.fetchVariantStats(now, ["title_variant", "image_variant"]);
         },
         methods: {
             fetchCommerceStats: function(now) {

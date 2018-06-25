@@ -68,18 +68,6 @@
                     </div>
                 </div>
             </div>
-
-            <div v-if="sortedLockVariants.length > 0" class="ri_box_line">
-                <div v-for="variant in sortedLockVariants" class="ri_box_item">
-                    <div class="ri_box_title">Lock {{ variant }} (direct)</div>
-                    <div v-for="range in sortedLockVariantRanges">
-                        <div class="ri_box_key">{{ range.label }}</div>
-                        <div class="ri_box_value">
-                            {{ lockVariantStats[variant][range.minutes] || 0 }}&nbsp;
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -101,17 +89,14 @@
             pageviewStats: {},
             titleVariantStats: {},
             imageVariantStats: {},
-            lockVariantStats: {},
 
             revenueRanges: {},
             pageviewRanges: {},
             titleVariantRanges: {},
             imageVariantRanges: {},
-            lockVariantRanges: {},
 
             titleVariants: [],
             imageVariants: [],
-            lockVariants: [],
         }),
         created: function() {
             EventHub.$on("content-conversions-revenue-changed", this.updateRevenueStats);
@@ -132,17 +117,11 @@
             sortedImageVariantRanges: function() {
                 return Object.values(this.imageVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
             },
-            sortedLockVariantRanges: function() {
-                return Object.values(this.lockVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
-            },
             sortedTitleVariants: function() {
                 return this.titleVariants.slice().sort((a, b) => a - b);
             },
             sortedImageVariants: function() {
                 return this.imageVariants.slice().sort((a, b) => a - b);
-            },
-            sortedLockVariants: function() {
-                return this.lockVariants.slice().sort((a, b) => a - b);
             },
         },
         methods: {
@@ -177,9 +156,6 @@
                             break;
                         case "image_variant":
                             this.updateVariants(this.imageVariantRanges, this.imageVariants, this.imageVariantStats, range, counts[variantType]);
-                            break;
-                        case "lock_variant":
-                            this.updateVariants(this.lockVariantRanges, this.lockVariants, this.lockVariantStats, range, counts[variantType]);
                             break;
                     }
                 }
