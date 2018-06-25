@@ -71,7 +71,7 @@
 
             <div v-if="sortedLockVariants.length > 0" class="ri_box_line">
                 <div v-for="variant in sortedLockVariants" class="ri_box_item">
-                    <div class="ri_box_title">Image {{ variant }} (direct)</div>
+                    <div class="ri_box_title">Lock {{ variant }} (direct)</div>
                     <div v-for="range in sortedLockVariantRanges">
                         <div class="ri_box_key">{{ range.label }}</div>
                         <div class="ri_box_value">
