@@ -48,6 +48,9 @@ class MediaBriefingGenerator implements IGenerator
         // remove grayboxes
         $post = preg_replace('/\[greybox\].*?\[\/greybox\]/is', '', $post);
 
+        // replace em-s
+        $post = preg_replace('/<em.*?>(.*?)<\/em>/is', '<i>$1</i>', $post);
+
         // replace captions
         $post = preg_replace('/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/is', $captionTemplate, $post);
 
@@ -79,8 +82,16 @@ class MediaBriefingGenerator implements IGenerator
             // parse embedd links
             if (preg_match('/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/i', $line)) {
                 $html .= $this->parseEmbedd(trim($line));
-            // dont wrap h2, img, table in paragraphs
-            } else if (preg_match('/^\s*?<table/is', $line) || preg_match('/^\s*?<img.*?>\s*?$/i', $line) || preg_match('/^\s*?<h2.*?\/h2>\s*?$/mi', $line) || preg_match('/^\s*?<h3.*?\/h3>\s*?$/mi', $line)) {
+
+            // wrap line in paragraphs <p> if:
+            } else if (
+                // not in table
+                preg_match('/^\s*?<table/is', $line) ||
+                // skip lines where is only image tag
+                preg_match('/^\s*?<img.*?>\s*?$/i', $line) ||
+                // skip lines where is only h2/h3 tag
+                preg_match('/^\s*?<(h2|h3).*?\/(h2|h3)>\s*?$/mi', $line)
+            ) {
                 $html .= $line;
 
             // wrap text in paragraphs
