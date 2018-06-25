@@ -168,7 +168,6 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 // sumRowCollectionFromAggregations generates SumRowCollection based on query result aggregations.
 func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, sumField string) (SumRowCollection, bool, error) {
 	var src SumRowCollection
-	dataPresent := true
 	tags := make(map[string]string)
 
 	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
@@ -200,7 +199,6 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 		} else {
 			sumAgg, ok := aggregations.Sum(targetAgg)
 			if !ok {
-				dataPresent = false
 				return nil
 			}
 
@@ -228,7 +226,8 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 		return nil, false, err
 	}
 
-	return src, dataPresent, nil
+	ok := len(src) > 0
+	return src, ok, nil
 }
 
 // addCompositeGroupBy creates a composite aggregation. The results are fetchable
