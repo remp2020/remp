@@ -7,6 +7,7 @@ use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
+use GuzzleHttp\Client;
 
 class MediaBriefingGenerator implements IGenerator
 {
@@ -42,36 +43,7 @@ class MediaBriefingGenerator implements IGenerator
 
         $post = $values->mediabriefing_html;
 
-        $captionTemplate = <<< HTML
-    <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
-    <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
-        <small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$2</small>
-    </p>
-HTML;
-
-        $liTemplate = <<< HTML
-    <tr style="padding:0;vertical-align:top;text-align:left;">
-        <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">&#8226;</td>
-        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important;">
-            <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>
-        </td>
-    </tr>
-HTML;
-
-        $pTemplate = <<< HTML
-    <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>
-
-HTML;
-
-        $hr = <<< HTML
-    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;">
-        <tr style="padding:0;vertical-align:top;text-align:left;">
-            <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 30px 0 0 0; border-top:1px solid #E2E2E2;"></td>
-        </tr>
-    </table>
-
-HTML;
-
+        list($captionTemplate, $liTemplate, $hrTemplate) = $this->getTemplates();
 
         // remove grayboxes
         $post = preg_replace('/\[greybox\].*?\[\/greybox\]/is', '', $post);
@@ -96,16 +68,22 @@ HTML;
         // replace li
         $post = preg_replace('/<li>(.*?)<\/li>/is', $liTemplate, $post);
         // hr
-        $post = preg_replace('(<hr>|<hr />)', $hr, $post);
+        $post = preg_replace('(<hr>|<hr />)', $hrTemplate, $post);
 
-
+        // loop through lines and wrap or parse individually
         foreach (preg_split("#\n\s*\n#Uis", $post) as $line) {
             if (empty($line)) {
                 continue;
             }
 
-            if (preg_match('/^\s*?<table/is', $line) || preg_match('/^\s*?<img.*?>\s*?$/i', $line) || preg_match('/^\s*?<h2.*?\/h2>\s*?$/mi', $line)) {
+            // parse embedd links
+            if (preg_match('/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/i', $line)) {
+                $html .= $this->parseEmbedd(trim($line));
+            // dont wrap h2, img, table in paragraphs
+            } else if (preg_match('/^\s*?<table/is', $line) || preg_match('/^\s*?<img.*?>\s*?$/i', $line) || preg_match('/^\s*?<h2.*?\/h2>\s*?$/mi', $line) || preg_match('/^\s*?<h3.*?\/h3>\s*?$/mi', $line)) {
                 $html .= $line;
+
+            // wrap text in paragraphs
             } else {
                 $html .= '<p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">';
                 $html .= $line;
@@ -244,5 +222,53 @@ HTML;
         $output->mediabriefing_html = $data->post_content;
 
         return $output;
+    }
+
+    public function parseEmbedd($link)
+    {
+        if (preg_match('/youtube/', $link)) {
+            $result = (new Client())->get('https://www.youtube.com/oembed?url=' . $link . '&format=json')->getBody()->getContents();
+            $result = json_decode($result);
+            $thumbLink = $result->thumbnail_url;
+
+            return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>";
+        }
+
+        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$link</a><br><br>";
+    }
+
+    public function getTemplates()
+    {
+
+        $captionTemplate = <<< HTML
+    <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
+    <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
+        <small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$2</small>
+    </p>
+HTML;
+
+        $liTemplate = <<< HTML
+    <tr style="padding:0;vertical-align:top;text-align:left;">
+        <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">&#8226;</td>
+        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important;">
+            <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>
+        </td>
+    </tr>
+HTML;
+
+        $hrTemplate = <<< HTML
+    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;">
+        <tr style="padding:0;vertical-align:top;text-align:left;">
+            <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 30px 0 0 0; border-top:1px solid #E2E2E2;"></td>
+        </tr>
+    </table>
+
+HTML;
+
+        return [
+            $captionTemplate,
+            $liTemplate,
+            $hrTemplate,
+        ];
     }
 }
