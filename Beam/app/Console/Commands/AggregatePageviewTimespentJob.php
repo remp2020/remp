@@ -56,12 +56,12 @@ class AggregatePageviewTimespentJob extends Command
             $signedIn[$articleId] = $signedIn[$articleId] ?? 0;
             $subscribers[$articleId] = $subscribers[$articleId] ?? 0;
 
-            $all[$articleId] += $record->count;
+            $all[$articleId] += $record->sum;
             if ($record->tags->signed_in === '1') {
-                $signedIn[$articleId] += $record->count;
+                $signedIn[$articleId] += $record->sum;
             }
             if ($record->tags->subscriber === '1') {
-                $subscribers[$articleId] += $record->count;
+                $subscribers[$articleId] += $record->sum;
             }
 
             $bar->advance();
