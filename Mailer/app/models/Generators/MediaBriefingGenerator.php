@@ -48,8 +48,11 @@ class MediaBriefingGenerator implements IGenerator
         // remove grayboxes
         $post = preg_replace('/\[greybox\].*?\[\/greybox\]/is', '', $post);
 
+        // wrap em blocks in p
+        $post = preg_replace('/(<em.*?>(.*?)<\/em>(?:(?!\s*?<em)|\s*?\n\n))/is', '<p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>', $post);
+
         // replace em-s
-        $post = preg_replace('/<em.*?>(.*?)<\/em>/is', '<i>$1</i>', $post);
+        $post = preg_replace('/<em.*?>(.*?)<\/em>/is', '<i style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</i><br>', $post);
 
         // replace captions
         $post = preg_replace('/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/is', $captionTemplate, $post);
