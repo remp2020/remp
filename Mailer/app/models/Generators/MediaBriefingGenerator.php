@@ -53,9 +53,6 @@ class MediaBriefingGenerator implements IGenerator
         // remove paragraphs
         $post = preg_replace('/<p.*?>(.*?)<\/p>/is', "$1", $post);
 
-        // wrap em blocks in p
-        $post = preg_replace('/(<em.*?>(.*?)<\/em>(?:(?!\s*?<em)|\s*?\n\n))/is', '<p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>', $post);
-
         // replace em-s
         $post = preg_replace('/<em.*?>(.*?)<\/em>/is', '<i style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</i><br>', $post);
 
@@ -78,37 +75,17 @@ class MediaBriefingGenerator implements IGenerator
 
         // replace li
         $post = preg_replace('/<li>(.*?)<\/li>/is', $liTemplate, $post);
+
         // hr
         $post = preg_replace('(<hr>|<hr />)', $hrTemplate, $post);
 
-        // loop through lines and wrap or parse individually
-        foreach (preg_split("#\n\s*\n#Uis", $post) as $line) {
-            if (empty($line)) {
-                continue;
-            }
+        // parse embedds
+        $post = preg_replace_callback('/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/i', array($this, "parseEmbedd"), $post);
 
-            // parse embedd links
-            if (preg_match('/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/i', $line)) {
-                $html .= $this->parseEmbedd(trim($line));
-            } else if (// dont wrap line in paragraphs <p> if:
-                // not in table
-                preg_match('/^\s*?<table/i', $line) ||
-                // not in p
-                preg_match('/^\s*?<p/i', $line) ||
-                // skip lines where is only image tag
-                preg_match('/^\s*?<img.*?>\s*?$/i', $line) ||
-                // skip lines where is only h2/h3 tag
-                preg_match('/^\s*?<(h2|h3).*?\/(h2|h3)>\s*?$/i', $line)
-            ) {
-                $html .= $line;
+        // wrap text in paragraphs
+        $post = $helpers->wpautop($post);
 
-            // wrap line in paragraph
-            } else {
-                $html .= '<p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">';
-                $html .= $line;
-                $html .= '</p>';
-            }
-        }
+        $post = str_replace('<p>', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", $post);
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
@@ -120,8 +97,8 @@ class MediaBriefingGenerator implements IGenerator
             'title' => $values->title,
             'sub_title' => $values->sub_title,
             'url' => $values->url,
-            'html' => $html,
-            'text' => strip_tags($html),
+            'html' => $post,
+            'text' => strip_tags($post),
         ];
 
         $output = [];

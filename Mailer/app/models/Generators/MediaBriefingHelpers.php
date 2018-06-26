@@ -102,7 +102,9 @@ class MediaBriefingHelpers
         // Optionally insert line breaks.
         if ($br) {
                 // Replace newlines that shouldn't be touched with a placeholder.
-            $pee = preg_replace_callback('/<(script|style).*?<\/\\1>/s', '_autop_newline_preservation_helper', $pee);
+            $pee = preg_replace_callback('/<(script|style).*?<\/\\1>/s', function ($matches) {
+                return str_replace("\n", "<WPPreserveNewline />", $matches[0]);
+            }, $pee);
                 // Normalize <br>
             $pee = str_replace(array('<br>', '<br/>'), '<br />', $pee);
                 // Replace any new line characters that aren't preceded by a <br /> with a <br />.
@@ -128,7 +130,7 @@ class MediaBriefingHelpers
     public function wpReplaceInHTMLTags($haystack, $replace_pairs)
     {
         // Find all elements.
-        $textarr = wp_html_split($haystack);
+        $textarr = $this->wpHTMLSplit($haystack);
         $changed = false;
         // Optimize when searching for one item.
         if (1 === count($replace_pairs)) {
@@ -162,5 +164,57 @@ class MediaBriefingHelpers
             $haystack = implode($textarr);
         }
         return $haystack;
+    }
+
+    function wpHTMLSplit($input)
+    {
+        return preg_split($this->getHTMLSplitRegex(), $input, -1, PREG_SPLIT_DELIM_CAPTURE);
+    }
+
+    function getHTMLSplitRegex() {
+        static $regex;
+
+        if ( ! isset( $regex ) ) {
+            $comments =
+                '!'           // Start of comment, after the <.
+                . '(?:'         // Unroll the loop: Consume everything until --> is found.
+                .     '-(?!->)' // Dash not followed by end of comment.
+                .     '[^\-]*+' // Consume non-dashes.
+                . ')*+'         // Loop possessively.
+                . '(?:-->)?';   // End of comment. If not found, match all input.
+
+            $cdata =
+                '!\[CDATA\['  // Start of comment, after the <.
+                . '[^\]]*+'     // Consume non-].
+                . '(?:'         // Unroll the loop: Consume everything until ]]> is found.
+                .     '](?!]>)' // One ] not followed by end of comment.
+                .     '[^\]]*+' // Consume non-].
+                . ')*+'         // Loop possessively.
+                . '(?:]]>)?';   // End of comment. If not found, match all input.
+
+            $escaped =
+                '(?='           // Is the element escaped?
+                .    '!--'
+                . '|'
+                .    '!\[CDATA\['
+                . ')'
+                . '(?(?=!-)'      // If yes, which type?
+                .     $comments
+                . '|'
+                .     $cdata
+                . ')';
+
+            $regex =
+                '/('              // Capture the entire match.
+                .     '<'           // Find start of element.
+                .     '(?'          // Conditional expression follows.
+                .         $escaped  // Find end of escaped element.
+                .     '|'           // ... else ...
+                .         '[^>]*>?' // Find end of normal element.
+                .     ')'
+                . ')/';
+        }
+
+        return $regex;
     }
 }
