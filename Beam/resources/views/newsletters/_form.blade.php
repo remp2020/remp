@@ -67,7 +67,9 @@
                 </div>
             </div>
 
-            <div class="input-group m-t-10">
+            <h5>Articles selection</h5>
+
+            <div class="input-group m-t-20">
                 <span class="input-group-addon"><i class="zmdi zmdi-key"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
