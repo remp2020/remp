@@ -32,6 +32,10 @@ class Kernel extends ConsoleKernel
          $schedule->command('aggregate:pageview-load')
              ->hourlyAt(5)
              ->withoutOverlapping();
+
+        $schedule->command('aggregate:pageview-timespent')
+            ->hourlyAt(5)
+            ->withoutOverlapping();
     }
 
     /**
