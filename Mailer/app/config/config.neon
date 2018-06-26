@@ -237,3 +237,6 @@ services:
     - Remp\MailerModule\Commands\DemoSeedCommand
     - Remp\MailerModule\Commands\ProcessJobStatsCommand
     - Remp\MailerModule\Commands\MailgunEventsCommand
+
+    # Helpers
+    - Remp\MailerModule\Generators\MediaBriefingHelpers

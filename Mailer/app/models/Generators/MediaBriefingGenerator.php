@@ -8,6 +8,7 @@ use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 use GuzzleHttp\Client;
+use Remp\MailerModule\Generators\MediaBriefingHelpers;
 
 class MediaBriefingGenerator implements IGenerator
 {
@@ -38,6 +39,7 @@ class MediaBriefingGenerator implements IGenerator
 
     public function process($values)
     {
+        $helpers = new MediaBriefingHelpers;
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
         $html = '';
 
@@ -47,6 +49,9 @@ class MediaBriefingGenerator implements IGenerator
 
         // remove grayboxes
         $post = preg_replace('/\[greybox\].*?\[\/greybox\]/is', '', $post);
+
+        // remove paragraphs
+        $post = preg_replace('/<p.*?>(.*?)<\/p>/is', "$1", $post);
 
         // wrap em blocks in p
         $post = preg_replace('/(<em.*?>(.*?)<\/em>(?:(?!\s*?<em)|\s*?\n\n))/is', '<p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>', $post);
@@ -85,19 +90,19 @@ class MediaBriefingGenerator implements IGenerator
             // parse embedd links
             if (preg_match('/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/i', $line)) {
                 $html .= $this->parseEmbedd(trim($line));
-
-            // wrap line in paragraphs <p> if:
-            } else if (
+            } else if (// dont wrap line in paragraphs <p> if:
                 // not in table
-                preg_match('/^\s*?<table/is', $line) ||
+                preg_match('/^\s*?<table/i', $line) ||
+                // not in p
+                preg_match('/^\s*?<p/i', $line) ||
                 // skip lines where is only image tag
                 preg_match('/^\s*?<img.*?>\s*?$/i', $line) ||
                 // skip lines where is only h2/h3 tag
-                preg_match('/^\s*?<(h2|h3).*?\/(h2|h3)>\s*?$/mi', $line)
+                preg_match('/^\s*?<(h2|h3).*?\/(h2|h3)>\s*?$/i', $line)
             ) {
                 $html .= $line;
 
-            // wrap text in paragraphs
+            // wrap line in paragraph
             } else {
                 $html .= '<p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">';
                 $html .= $line;
@@ -245,7 +250,7 @@ HTML;
             $result = json_decode($result);
             $thumbLink = $result->thumbnail_url;
 
-            return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>";
+            return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
         }
 
         return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$link</a><br><br>";
@@ -253,7 +258,6 @@ HTML;
 
     public function getTemplates()
     {
-
         $captionTemplate = <<< HTML
     <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
     <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
