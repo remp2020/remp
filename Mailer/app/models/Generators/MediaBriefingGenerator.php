@@ -72,7 +72,7 @@ class MediaBriefingGenerator implements IGenerator
         $post = preg_replace('/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im', $captionTemplate, $post);
 
         // replace links
-        $post = preg_replace('/\[articlelink.*?id="(.*?)"/is', '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a><br><br>', $post);
+        $post = preg_replace('/\[articlelink.*?id="(.*?)"/is', '<a href="https://dennikn.sk/$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a><br><br>', $post);
 
         // replace hrefs
         $post = preg_replace('/<a.*?href="(.*?)".*?>(.*?)<\/a>/is', '<a href="$1" title="$2" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a>', $post);
