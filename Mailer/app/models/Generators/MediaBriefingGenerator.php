@@ -45,10 +45,16 @@ class MediaBriefingGenerator implements IGenerator
 
         $post = $values->mediabriefing_html;
 
-        list($captionTemplate, $liTemplate, $hrTemplate) = $this->getTemplates();
+        list($captionTemplate, $captionWithLinkTemplate, $liTemplate, $hrTemplate) = $this->getTemplates();
 
-        // remove grayboxes
+        // remove shortcodes
         $post = preg_replace('/\[greybox\].*?\[\/greybox\]/is', '', $post);
+        $post = preg_replace('/\[pullboth.*?\/pullboth\]/is', '', $post);
+        $post = preg_replace('/<script.*?\/script>/is', '', $post);
+        $post = preg_replace('/\[iframe.*?\]/is', '', $post);
+
+        // remove iframes
+        $post = preg_replace('/<iframe.*?\/iframe>/is', '', $post);
 
         // remove paragraphs
         $post = preg_replace('/<p.*?>(.*?)<\/p>/is', "$1", $post);
@@ -56,8 +62,17 @@ class MediaBriefingGenerator implements IGenerator
         // replace em-s
         $post = preg_replace('/<em.*?>(.*?)<\/em>/is', '<i style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</i><br>', $post);
 
+        // remove new lines from inside caption shortcode
+        $post = preg_replace_callback('/\[caption.*?\/caption\]/is', function ($matches) {
+            return str_replace(array("\n\r", "\n", "\r"), '', $matches[0]);
+        }, $post);
+
         // replace captions
-        $post = preg_replace('/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/is', $captionTemplate, $post);
+        $post = preg_replace('/\[caption.*?\].*?href="(.*?)".*?src="(.*?)".*?\/a>(.*?)\[\/caption\]/im', $captionWithLinkTemplate, $post);
+        $post = preg_replace('/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im', $captionTemplate, $post);
+
+        // replace links
+        $post = preg_replace('/\[articlelink.*?id="(.*?)"/is', '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a><br><br>', $post);
 
         // replace hrefs
         $post = preg_replace('/<a.*?href="(.*?)".*?>(.*?)<\/a>/is', '<a href="$1" title="$2" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a>', $post);
@@ -92,23 +107,28 @@ class MediaBriefingGenerator implements IGenerator
             return str_replace('<br />', '', $matches[0]);
         }, $post);
 
+
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
             'text_template' => $sourceTemplate->content_text,
         ]);
         $twig = new \Twig_Environment($loader);
 
+        $text = str_replace("<br />", "\r\n", $post);
+        $text = strip_tags($text);
+        $text = preg_replace('/(\r\n|\r|\n)+/', "\n", $text);
+
         $params = [
             'title' => $values->title,
             'sub_title' => $values->sub_title,
             'url' => $values->url,
             'html' => $post,
-            'text' => strip_tags($post),
+            'text' => $text,
         ];
 
         $output = [];
         $output['htmlContent'] = $twig->render('html_template', $params);
-        $output['textContent'] = $twig->render('text_template', $params);
+        $output['textContent'] = strip_tags($twig->render('text_template', $params));
         return $output;
     }
 
@@ -158,37 +178,6 @@ class MediaBriefingGenerator implements IGenerator
         $this->onSubmit = $onSubmit;
     }
 
-    private function getLockedHtml($fullHtml, $mediabriefingLink)
-    {
-        $newHtml = '';
-        $cacheHtml = '';
-        $quit = false;
-        foreach (explode("\n", $fullHtml) as $line) {
-            $cacheHtml .= $line . "\n";
-            if (strpos($line, '<h2') !== false) {
-                $newHtml .= $cacheHtml;
-                $cacheHtml = '';
-
-                if ($quit) {
-                    $newHtml .= <<<HTML
-<p><a
-    style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #249fdc;"
-    href="{$mediafilterLink}/{{ autologin }}">
-    Pokračovanie MediaBrífingu - kliknite sem
-</a></p>
-HTML;
-                    return $newHtml;
-                }
-            }
-            if (strpos($line, '[lock]') !== false) {
-                $quit = true;
-            }
-        }
-        $newHtml .= $cacheHtml;
-        return $newHtml;
-    }
-
-
     /**
      * @param $data object containing WP article data
      *
@@ -227,15 +216,17 @@ HTML;
 
     public function parseEmbedd($matches)
     {
-        if (preg_match('/youtube/', $matches[0])) {
-            $result = (new Client())->get('https://www.youtube.com/oembed?url=' . $matches[0] . '&format=json')->getBody()->getContents();
+        $link = trim($matches[0]);
+
+        if (preg_match('/youtu/', $link)) {
+            $result = (new Client())->get('https://www.youtube.com/oembed?url=' . $link . '&format=json')->getBody()->getContents();
             $result = json_decode($result);
             $thumbLink = $result->thumbnail_url;
 
-            return "<a href=\"{$matches[0]}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
+            return "<br><a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
         }
 
-        return "<a href=\"{$matches[0]}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$matches[0]</a><br><br>";
+        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$link</a><br><br>";
     }
 
     public function getTemplates()
@@ -244,6 +235,15 @@ HTML;
     <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
     <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
         <small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$2</small>
+    </p>
+HTML;
+
+        $captionWithLinkTemplate = <<< HTML
+    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:#F26755;text-decoration:none;">
+    <img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border:none;">
+</a>
+    <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
+        <small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$3</small>
     </p>
 HTML;
 
@@ -267,6 +267,7 @@ HTML;
 
         return [
             $captionTemplate,
+            $captionWithLinkTemplate,
             $liTemplate,
             $hrTemplate,
         ];
