@@ -172,7 +172,7 @@ services:
         class: Remp\MailerModule\Generators\GeneratorFactory
         setup:
             - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\NewsfilterGenerator())
-            - registerGenerator('mediabriefing', 'MediaB\riefing', Remp\MailerModule\Generators\MediaBriefingGenerator())
+            - registerGenerator('mediabriefing', 'MediaBriefing', Remp\MailerModule\Generators\MediaBriefingGenerator())
             - registerGenerator('url_parser', 'URL parser', Remp\MailerModule\Generators\UrlParserGenerator())
             - registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\MinutaDigestGenerator())
             - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\MinutaAlertGenerator())

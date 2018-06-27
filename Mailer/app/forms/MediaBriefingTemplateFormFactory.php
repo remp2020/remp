@@ -53,9 +53,11 @@ class MediaBriefingTemplateFormFactory
         $form = new Form;
         $form->addProtection();
 
-        $form->addText('name', 'Name');
+        $form->addText('name', 'Name')
+            ->setRequired("Field 'Name' is required.");
 
-        $form->addText('code', 'Identifier');
+        $form->addText('code', 'Identifier')
+            ->setRequired("Field 'Identifier' is required.");
 
         $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
@@ -63,12 +65,15 @@ class MediaBriefingTemplateFormFactory
 
         $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
 
-        $form->addSelect('mail_type_id', 'Type', $mailTypes);
+        $form->addSelect('mail_type_id', 'Type', $mailTypes)
+            ->setRequired("Field 'Type' is required.");
 
         $form->addText('from', 'Sender')
-            ->setAttribute('placeholder', 'e.g. info@domain.com');
+            ->setAttribute('placeholder', 'e.g. info@domain.com')
+            ->setRequired("Field 'Sender' is required.");
 
-        $form->addText('subject', 'Subject');
+        $form->addText('subject', 'Subject')
+            ->setRequired("Field 'Subject' is required.");
 
         $form->addHidden('html_content');
         $form->addHidden('text_content');
@@ -78,9 +83,9 @@ class MediaBriefingTemplateFormFactory
         $defaults = [
             'name' => 'MediaBrifing ' . date('j.n.Y'),
             'code' => 'nwsf_' . date('dmY'),
-            'mail_layout_id' => 2, // layout for subscribers
-            'locked_mail_layout_id' => 2, // layout for non-subscribers
-            'mail_type_id' => 1, // Demo,
+            'mail_layout_id' => 33, // layout for subscribers
+            'locked_mail_layout_id' => 33, // layout for non-subscribers
+            'mail_type_id' => 14, // Follow tem,
             'from' => 'Denník N <info@dennikn.sk>',
         ];
 

@@ -7,14 +7,18 @@
                 data: {
                     'html_content': {$htmlContent},
                     'text_content': {$textContent},
+                    'locked_html_content': {$lockedHtmlContent},
+                    'locked_text_content': {$lockedTextContent},
                     'name': $('#' + {$control["mediaBriefingTemplateForm"]['name']->htmlId}).val(),
                     'mail_layout_id': $('#' + {$control["mediaBriefingTemplateForm"]['mail_layout_id']->htmlId}).val(),
+                    'locked_mail_layout_id': $('#' + {$control["mediaBriefingTemplateForm"]['locked_mail_layout_id']->htmlId}).val(),
                     'mail_type_id': $('#' + {$control["mediaBriefingTemplateForm"]['mail_type_id']->htmlId}).val(),
                     'from': $('#' + {$control["mediaBriefingTemplateForm"]['from']->htmlId}).val(),
                     'subject': $('#' + {$control["mediaBriefingTemplateForm"]['subject']->htmlId}).val()
                 },
                 success: function(data) {
                     previewFrame('#mediabriefing-preview-full-frame', data['generatedHtml']);
+                    previewFrame('#mediabriefing-preview-locked-frame', data['generatedLockedHtml']);
                 }
             });
         });
@@ -36,8 +40,8 @@
     <div class="card-body card-padding">
         <div role="tabpanel">
             <ul class="tab-nav" role="tablist">
-                <li role="tab" class="active"><a href="#mediaBriefing-form" aria-controls="mediaBriefing-form" role="tab" data-toggle="tab">Emails info</a></li>
-                <li role="tab"><a href="#mediaBriefing-preview" aria-controls="mediaBriefing-preview" role="tab" data-toggle="tab">Final previews</a></li>
+                <li role="tab" class="active"><a href="#mediabriefing-form" aria-controls="mediabriefing-form" role="tab" data-toggle="tab">Emails info</a></li>
+                <li role="tab"><a href="#mediabriefing-preview" aria-controls="mediabriefing-preview" role="tab" data-toggle="tab">Final previews</a></li>
             </ul>
 
             <div class="tab-content">
@@ -62,12 +66,17 @@
 
                             <div class="form-group fg-float m-b-30">
                                 {label mail_layout_id /}
-                                {input mail_layout_id, class => 'form-control'}
+                                {input mail_layout_id, class => 'form-control selectpicker', data-live-search => 'true'}
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {label locked_mail_layout_id /}
+                                {input locked_mail_layout_id, class => 'form-control selectpicker', data-live-search => 'true'}
                             </div>
 
                             <div class="form-group fg-float m-b-30">
                                 {label mail_type_id /}
-                                {input mail_type_id, class => 'form-control'}
+                                {input mail_type_id, class => 'form-control selectpicker', data-live-search => 'true'}
                             </div>
 
                             <div class="form-group fg-float m-b-30">
@@ -90,9 +99,10 @@
                         </div>
 
                         <div class="row">
-
                             {input html_content, value => $htmlContent}
                             {input text_content, value => $textContent}
+                            {input locked_html_content, value => $lockedHtmlContent}
+                            {input locked_text_content, value => $lockedTextContent}
                         </div>
                     {/form}
                 </div>
@@ -118,6 +128,16 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body card-padding">
+        <h4>
+            HTML content of email for non-subscribers
+            <a href="#" class="btn palette-Cyan bg waves-effect btn-sm" onclick="clipboard.copy($('#generatedhtmlcontent-nonsubscribers').text()); $.notify('Copied to clipboard', { allow_dismiss: false, delay:1000, type: 'inverse', placement : { from: 'bottom', align: 'right'}}); return false;"><i class="zmdi zmdi-copy"></i></a>
+        </h4>
+        <pre id="generatedhtmlcontent-nonsubscribers">{$lockedHtmlContent}</pre>
     </div>
 </div>
 

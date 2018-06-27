@@ -3,7 +3,6 @@
 namespace Remp\MailerModule\Components\GeneratorWidgets\Widgets;
 
 use Nette\Application\Responses\JsonResponse;
-use Nette\Database\Connection;
 use Nette\Http\Session;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
@@ -17,8 +16,6 @@ class MediaBriefingWidget extends BaseControl implements IGeneratorWidget
 {
     private $templateName = 'mediabriefing_widget.latte';
 
-    private $connection;
-
     private $layoutsRepository;
 
     private $templatesRepository;
@@ -28,14 +25,12 @@ class MediaBriefingWidget extends BaseControl implements IGeneratorWidget
     private $listsRepository;
 
     public function __construct(
-        Connection $connection,
         Session $session,
         LayoutsRepository $layoutsRepository,
         TemplatesRepository $templatesRepository,
         ListsRepository $listsRepository
     ) {
         parent::__construct();
-        $this->connection = $connection;
         $this->layoutsRepository = $layoutsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->session = $session;

@@ -166,15 +166,16 @@ class MediaBriefingHelpers
         return $haystack;
     }
 
-    function wpHTMLSplit($input)
+    public function wpHTMLSplit($input)
     {
         return preg_split($this->getHTMLSplitRegex(), $input, -1, PREG_SPLIT_DELIM_CAPTURE);
     }
 
-    function getHTMLSplitRegex() {
+    public function getHTMLSplitRegex()
+    {
         static $regex;
 
-        if ( ! isset( $regex ) ) {
+        if (!isset($regex)) {
             $comments =
                 '!'           // Start of comment, after the <.
                 . '(?:'         // Unroll the loop: Consume everything until --> is found.
