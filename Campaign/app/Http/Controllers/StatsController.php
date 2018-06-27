@@ -61,6 +61,8 @@ class StatsController extends Controller
     {
         $result = $stats->count()
                         ->commerce($step)
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz'))->tz('UTC'))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz'))->tz('UTC'))
                         ->forCampaign($campaign->uuid)
                         ->get();
 
@@ -88,6 +90,8 @@ class StatsController extends Controller
     {
         $result = $stats->count()
                         ->commerce($step)
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz'))->tz('UTC'))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz'))->tz('UTC'))
                         ->forVariant($variant->uuid)
                         ->get();
 
