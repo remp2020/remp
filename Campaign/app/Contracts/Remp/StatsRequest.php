@@ -41,7 +41,7 @@ class StatsRequest implements StatsContract
     /** @var array time histogram options */
     private $timeHistogram = [];
 
-    public function __construct(Client $client, $timeOffset)
+    public function __construct(Client $client, $timeOffset = null)
     {
         $this->timeOffset = $timeOffset;
         $this->client = $client;
@@ -104,8 +104,9 @@ class StatsRequest implements StatsContract
     {
         $this->timeHistogram = [
             'interval' => $interval,
-            'offset' => $this->timeOffset,
+            'offset' => is_null($this->timeOffset) ? "0h" : $this->timeOffset
         ];
+
         return $this;
     }
 
