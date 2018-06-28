@@ -72,7 +72,7 @@
         </div>
 
         <div class="card-body card-padding-sm text-center">
-            {{ count }}
+            {{ count | round }}
         </div>
     </div>
 </template>
