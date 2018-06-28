@@ -144,9 +144,6 @@
                                     displayFormats: {
                                         minute: 'HH:mm',
                                         hour: 'HH:mm',
-                                    },
-                                    parser(date) {
-                                        return moment.utc(date).local();
                                     }
                                 },
                                 ticks: {
