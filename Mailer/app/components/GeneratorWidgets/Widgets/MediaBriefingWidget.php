@@ -6,15 +6,15 @@ use Nette\Application\Responses\JsonResponse;
 use Nette\Http\Session;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
-use Remp\MailerModule\Forms\NewsfilterTemplateFormFactory;
+use Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class NewsfilterWidget extends BaseControl implements IGeneratorWidget
+class MediaBriefingWidget extends BaseControl implements IGeneratorWidget
 {
-    private $templateName = 'newsfilter_widget.latte';
+    private $templateName = 'mediabriefing_widget.latte';
 
     private $layoutsRepository;
 
@@ -39,7 +39,7 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
 
     public function identifier()
     {
-        return "newsfilterwidget";
+        return "mediabriefingwidget";
     }
 
     public function render($params)
@@ -56,18 +56,18 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentNewsfilterTemplateForm(NewsfilterTemplateFormFactory $newsfilterTemplateFormFactory)
+    public function createComponentMediaBriefingTemplateForm(MediaBriefingTemplateFormFactory $mediaBriefingTemplateFormFactory)
     {
-        $form = $newsfilterTemplateFormFactory->create();
-        $newsfilterTemplateFormFactory->onSave = function () {
-            $this->getPresenter()->flashMessage("Newsfilter batches were created and run.");
+        $form = $mediaBriefingTemplateFormFactory->create();
+        $mediaBriefingTemplateFormFactory->onSave = function () {
+            $this->getPresenter()->flashMessage("MediaBriefing batches were created and run.");
             $this->getPresenter()->redirect("Job:Default");
         };
 
         return $form;
     }
 
-    public function handleNewsfilterPreview()
+    public function handleMediaBriefingPreview()
     {
         $request = $this->getPresenter()->getRequest();
 

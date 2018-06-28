@@ -10,7 +10,7 @@ use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Segment\Crm;
 
-class NewsfilterTemplateFormFactory
+class MediaBriefingTemplateFormFactory
 {
     private $activeUsersSegment;
 
@@ -63,7 +63,7 @@ class NewsfilterTemplateFormFactory
 
         $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
-        $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
+        $mailTypes = $this->listsRepository->getTable()->order('sorting ASC')->fetchPairs('id', 'code');
 
         $form->addSelect('mail_type_id', 'Type', $mailTypes)
             ->setRequired("Field 'Type' is required.");
@@ -81,11 +81,11 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
 
         $defaults = [
-            'name' => 'Newsfilter ' . date('j.n.Y'),
+            'name' => 'MediaBrifing ' . date('j.n.Y'),
             'code' => 'nwsf_' . date('dmY'),
-            'mail_layout_id' => 27, // layout for subscribers
-            'locked_mail_layout_id' => 21, // layout for non-subscribers
-            'mail_type_id' => 9, // newsfilter,
+            'mail_layout_id' => 33, // layout for subscribers
+            'locked_mail_layout_id' => 33, // layout for non-subscribers
+            'mail_type_id' => 14, // Follow tem,
             'from' => 'Denník N <info@dennikn.sk>',
         ];
 
