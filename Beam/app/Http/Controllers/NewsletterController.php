@@ -112,7 +112,7 @@ class NewsletterController extends Controller
 
         return response()->format([
             'html' => redirect(route('newsletters.index'))->with('success', sprintf(
-                "Newsletter %s was removed",
+                "Newsletter [%s] was removed",
                 $newsletter->name
             )),
             'json' => new NewsletterResource([]),
@@ -215,7 +215,7 @@ class NewsletterController extends Controller
         if ($newsletter->isFinished()) {
             return response()->format([
                 'html' => redirect(route('newsletters.index'))->with('success', sprintf(
-                    'Newsletter %s was already finished, cannot start it again.',
+                    'Newsletter [%s] was already finished, cannot start it again.',
                     $newsletter->name
                 )),
                 'json' => new JsonResource(new BadRequestHttpException('cannot start already finished newsletter')),
@@ -227,7 +227,7 @@ class NewsletterController extends Controller
 
         return response()->format([
             'html' => redirect(route('newsletters.index'))->with('success', sprintf(
-                'Newsletter %s was started manually',
+                'Newsletter [%s] was started manually',
                 $newsletter->name
             )),
             'json' => new NewsletterResource([]),
@@ -239,7 +239,7 @@ class NewsletterController extends Controller
         if ($newsletter->isFinished()) {
             return response()->format([
                 'html' => redirect(route('newsletters.index'))->with('success', sprintf(
-                    'Newsletter %s was already finished, cannot be paused.',
+                    'Newsletter [%s] was already finished, cannot be paused.',
                     $newsletter->name
                 )),
                 'json' => new JsonResource(new BadRequestHttpException('cannot pause already finished newsletter')),
@@ -251,7 +251,7 @@ class NewsletterController extends Controller
 
         return response()->format([
             'html' => redirect(route('newsletters.index'))->with('success', sprintf(
-                'Newsletter %s was paused manually',
+                'Newsletter [%s] was paused manually',
                 $newsletter->name
             )),
             'json' => new NewsletterResource([]),
