@@ -183,8 +183,8 @@
                 text = formatAbsoluteToggleText(this.from, this.to)
                 this.selectedTab = 2
             }  else {
-                this.absoluteFrom = null
-                this.absoluteTo = null
+                this.absoluteFrom = moment().utc().format()
+                this.absoluteTo = moment().utc().format()
                 this.selectedTab = 1
             }
             this.toggleText = text

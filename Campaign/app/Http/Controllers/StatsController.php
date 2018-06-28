@@ -28,8 +28,8 @@ class StatsController extends Controller
         $result = $stats->count()
                         ->events('banner', $type)
                         ->forCampaign($campaign->uuid)
-                        ->from(Carbon::parse($request->get('from')))
-                        ->to(Carbon::parse($request->get('to')))
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz')))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->get();
 
         return $result[0];
@@ -40,8 +40,8 @@ class StatsController extends Controller
         $result = $stats->count()
                         ->events('banner', $type)
                         ->forVariant($variant->uuid)
-                        ->from(Carbon::parse($request->get('from')))
-                        ->to(Carbon::parse($request->get('to')))
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz')))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->get();
 
         $result = $result[0];
@@ -61,6 +61,8 @@ class StatsController extends Controller
     {
         $result = $stats->count()
                         ->commerce($step)
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz')))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->forCampaign($campaign->uuid)
                         ->get();
 
@@ -71,6 +73,8 @@ class StatsController extends Controller
     {
         $result = $stats->sum()
                         ->commerce($step)
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz')))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->forCampaign($campaign->uuid)
                         ->get();
 
@@ -86,6 +90,8 @@ class StatsController extends Controller
     {
         $result = $stats->count()
                         ->commerce($step)
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz')))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->forVariant($variant->uuid)
                         ->get();
 
@@ -106,6 +112,8 @@ class StatsController extends Controller
     {
         $result = $stats->sum()
                         ->commerce($step)
+                        ->from(Carbon::parse($request->get('from'), $request->input('tz')))
+                        ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->forVariant($variant->uuid)
                         ->get();
 
@@ -129,8 +137,8 @@ class StatsController extends Controller
 
     protected function getHistogramData(Stats $stats, Request $request, $campaignUuid, $variantUuid = null)
     {
-        $from = Carbon::parse($request->get('from'));
-        $to = Carbon::parse($request->get('to'));
+        $from = Carbon::parse($request->get('from'), $request->input('tz'));
+        $to = Carbon::parse($request->get('to'), $request->input('tz'));
         $chartWidth = $request->get('chartWidth');
         $parsedData = [];
         $labels = [];

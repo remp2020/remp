@@ -33,6 +33,12 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
+    public function formSucceeded($form, $values)
+    {
+        $output = $this->process($values);
+        $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
+    }
+
     public function onSubmit(callable $onSubmit)
     {
         $this->onSubmit = $onSubmit;

@@ -43,8 +43,11 @@
     "material-design-iconic-font": "^2.2.0",
     "moment": "^2.20.1",
     "node-waves": "^0.7.5",
+    "pluralize": "^7.0.0",
     "remp": "file:../Package/remp",
-    "vue": "^2.4.2"
+    "rrule": "^2.2.9",
+    "vue": "^2.4.2",
+    "vue2-filters": "^0.3.0"
   },
   "devDependencies": {
     "bootstrap-sass": "^3.3.7",

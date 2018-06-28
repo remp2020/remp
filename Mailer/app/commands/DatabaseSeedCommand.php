@@ -81,13 +81,23 @@ class DatabaseSeedCommand extends Command
 
         $output->writeln('Generator templates:');
         $bestPerformingArticleHtml = <<<HTML
-<table>        
+<table cellpadding="10">        
 {% for url,item in items %}
     <tr>
-        <td>{{ item.title }}</td>
-        <td>{{ item.description }}</td>
-        <td><img src="{{item.image}}"></td>
-        <td>{{ url }}</td>
+        <td>
+            <table cellpadding="10" style="border-bottom: 2px solid #efe5e5;">
+                <tr>
+                    <td colspan="2"><strong>{{ item.title }}</strong></td>
+                </tr>
+                <tr>
+                    <td><img style="max-height: 100px;" src="{{item.image}}"></td>
+                    <td>{{ item.description }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><a href="{{ url }}">{{ url }}</a></td>
+                </tr>
+            </table>
+        </td>
     </tr>
 {% endfor %}
 </table>

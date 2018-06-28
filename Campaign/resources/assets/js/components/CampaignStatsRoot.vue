@@ -19,6 +19,7 @@
                 :url="'/campaigns/' + id + '/stats/data'"
                 :from="from"
                 :to="to"
+                :timezone="timezone"
             ></campaign-stats>
 
             <variant-stats
@@ -29,6 +30,7 @@
                 :url="'/campaigns/variant/' + variant.id + '/stats/data'"
                 :from="from"
                 :to="to"
+                :timezone="timezone"
             ></variant-stats>
 
         </div>
@@ -61,6 +63,10 @@
             required: true
         },
         to: {
+            type: String,
+            required: true
+        },
+        timezone: {
             type: String,
             required: true
         }

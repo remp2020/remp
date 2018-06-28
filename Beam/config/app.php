@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
@@ -180,6 +180,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
+        App\Providers\RempMailerServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
