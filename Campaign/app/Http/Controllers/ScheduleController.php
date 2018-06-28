@@ -253,7 +253,7 @@ class ScheduleController extends Controller
      */
     public function stop(Schedule $schedule)
     {
-        if (!$schedule->isRunnable()) {
+        if (!$schedule->isRunning()) {
             return response()->format([
                 'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                     "Schedule for campaign %s was not running, stop request ignored",
