@@ -11,7 +11,6 @@ use App\Contracts\Remp\Stats;
 
 class StatsController extends Controller
 {
-
     public $statTypes = [
         "show" => [
             "label" => "Shows",
@@ -35,7 +34,7 @@ class StatsController extends Controller
         return $result[0];
     }
 
-    public function variantStatsCount(CampaignBanner $variant, $type, Stats $stats, Request $request, $normalized = false)
+    public function variantStatsCount(CampaignBanner $variant, $type, Stats $stats, Request $request)
     {
         $result = $stats->count()
                         ->events('banner', $type)
@@ -45,14 +44,6 @@ class StatsController extends Controller
                         ->get();
 
         $result = $result[0];
-
-        if ($normalized) {
-            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)
-                ->where('proportion', '!=', 0)
-                ->count();
-
-            $result->count = $this->normalizeValue($result->count, $variant->proportion, $variantsCount);
-        }
 
         return $result;
     }
@@ -82,7 +73,7 @@ class StatsController extends Controller
         return $this->getHistogramData($stats, $request, $campaign->uuid);
     }
 
-    public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request, $normalized = false)
+    public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request)
     {
         $result = $stats->count()
                         ->commerce($step)
@@ -91,18 +82,10 @@ class StatsController extends Controller
 
         $result = $result[0];
 
-        if ($normalized) {
-            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)
-                ->where('proportion', '!=', 0)
-                ->count();
-
-            $result->count = $this->normalizeValue($result->count, $variant->proportion, $variantsCount);
-        }
-
         return $result;
     }
 
-    public function variantPaymentStatsSum(CampaignBanner $variant, $step, Stats $stats, Request $request, $normalized = false)
+    public function variantPaymentStatsSum(CampaignBanner $variant, $step, Stats $stats, Request $request)
     {
         $result = $stats->sum()
                         ->commerce($step)
@@ -110,14 +93,6 @@ class StatsController extends Controller
                         ->get();
 
         $result = $result[0];
-
-        if ($normalized) {
-            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)
-                ->where('proportion', '!=', 0)
-                ->count();
-
-            $result->sum = $this->normalizeValue($result->sum, $variant->proportion, $variantsCount);
-        }
 
         return $result;
     }
@@ -193,15 +168,10 @@ class StatsController extends Controller
     {
         return [
             'click_count' => $this->variantStatsCount($variant, 'click', $stats, $request),
-            'click_count_normalized' => $this->variantStatsCount($variant, 'click', $stats, $request, true),
             'show_count' => $this->variantStatsCount($variant, 'show', $stats, $request),
-            'show_count_normalized' => $this->variantStatsCount($variant, 'show', $stats, $request, true),
             'payment_count' => $this->variantPaymentStatsCount($variant, 'payment', $stats, $request),
-            'payment_count_normalized' => $this->variantPaymentStatsCount($variant, 'payment', $stats, $request, true),
             'purchase_count' => $this->variantPaymentStatsCount($variant, 'purchase', $stats, $request),
-            'purchase_count_normalized' => $this->variantPaymentStatsCount($variant, 'purchase', $stats, $request, true),
             'purchase_sum' => $this->variantPaymentStatsSum($variant, 'purchase', $stats, $request),
-            'purchase_sum_normalized' => $this->variantPaymentStatsSum($variant, 'purchase', $stats, $request, true),
             'histogram' => $this->variantStatsHistogram($variant, $stats, $request),
         ];
     }
@@ -246,16 +216,5 @@ class StatsController extends Controller
         $interval = $diff / $numOfCols;
 
         return intval($interval) . "s";
-    }
-
-    protected function normalizeValue($value, $proportion, $variantsCount)
-    {
-        if ($value === 0 || $proportion === 0) {
-            return 0;
-        }
-
-        return round(
-            $value / (($proportion / 100) * $variantsCount)
-        );
     }
 }

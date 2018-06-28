@@ -26,6 +26,7 @@
         height: 20px;
         background: red;
         color: #fff;
+        text-align: center;
     }
 
     .preloader-wrapper {
@@ -52,10 +53,13 @@
         z-index: 5;
     }
 
+    .title {
+        margin-bottom: 7px;
+    }
 </style>
 
 <template>
-    <div class="card">
+    <div class="card" :data-single-value-id="title | slugify">
         <i v-if="infoText" :title="infoText" class="zmdi zmdi-info-outline info-text"></i>
 
         <div v-if="loading" class="preloader-wrapper">
@@ -67,12 +71,12 @@
         </div>
         <div v-if="error" class="stats-error" :title="error">!</div>
 
-        <div class="card-header text-center">
-            {{ title }}<br/><small>&nbsp;{{ subtitle }}&nbsp;</small>
+        <div class="card-header text-center title">
+            {{ title }}
         </div>
 
         <div class="card-body card-padding-sm text-center">
-            {{ count | round }}
+            {{ value | round(2) }}{{ unit }}
         </div>
     </div>
 </template>
@@ -84,7 +88,7 @@
                 type: String,
                 required: true
             },
-            subtitle: {
+            unit: {
                 type: String,
                 required: false
             },
@@ -92,7 +96,7 @@
                 type: Boolean,
                 default: true
             },
-            count: {
+            value: {
                 type: Number,
                 required: true
             },

@@ -18,28 +18,28 @@
                             :title="'Clicks'"
                             :loading="loading"
                             :error="error"
-                            :count="clickCount"
+                            :value="clickCount"
                     ></single-value>
 
                     <single-value
                             :title="'Started payments'"
                             :loading="loading"
                             :error="error"
-                            :count="startedPayments"
+                            :value="startedPayments"
                     ></single-value>
 
                     <single-value
                             :title="'Finished payments'"
                             :loading="loading"
                             :error="error"
-                            :count="finishedPayments"
+                            :value="finishedPayments"
                     ></single-value>
 
                     <single-value
                             :title="'Earned'"
                             :loading="loading"
                             :error="error"
-                            :count="earned"
+                            :value="earned"
                     ></single-value>
                 </div>
             </div>
