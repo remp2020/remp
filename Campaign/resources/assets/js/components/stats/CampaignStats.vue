@@ -72,6 +72,10 @@
             to: {
                 type: String,
                 required: true
+            },
+            timezone: {
+                type: String,
+                required: true
             }
         },
         data() {
@@ -109,6 +113,7 @@
                     data: {
                         from: vm.from,
                         to: vm.to,
+                        tz: vm.timezone,
                         chartWidth: $('#campaign-stats-wrap').width(),
                         _token: document.head.querySelector("[name=csrf-token]").content
                     },

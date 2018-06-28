@@ -24,6 +24,7 @@
             :variants="variants"
             :from="from"
             :to="to"
+            :timezone="timezone"
         ></campaign-stats-root>
     </div>
 
@@ -61,7 +62,8 @@
                 return {
                     variants: {!! @json($campaign->campaignBanners) !!},
                     from: '{!! $from !!}',
-                    to: '{!! $to !!}'
+                    to: '{!! $to !!}',
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 }
             }
         })
