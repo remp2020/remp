@@ -60,6 +60,8 @@ class MediaBriefingGenerator implements IGenerator
             "/<script.*?\/script>/is" => "",
             "/\[iframe.*?\]/is" => "",
             '/\[\/?lock\]/i' => "",
+            '/\[lock newsletter\]/' => "",
+            '/\[lock\]/' => "",
 
             // remove iframes
             "/<iframe.*?\/iframe>/is" => "",
@@ -89,7 +91,7 @@ class MediaBriefingGenerator implements IGenerator
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
 
             // replace images
-            '/<img.*?src="(.*?)".*?\/>/is' => '<img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">',
+            '/<img.*?src="(.*?)".*?>/is' => '<img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">',
 
             // replace ul & /ul
             '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
@@ -256,6 +258,7 @@ class MediaBriefingGenerator implements IGenerator
     public function getLockedHtml($html, $link)
     {
         $lockedHtml = '';
+        $lock = null;
 
         list(
             $captionTemplate,
@@ -265,8 +268,14 @@ class MediaBriefingGenerator implements IGenerator
             $spacerTemplate
         ) = $this->getTemplates();
 
-        if (strpos($html, '[lock]')) {
-            $parts = explode('[lock]', $html);
+        if (strpos($html, '[lock newsletter]')) {
+            $lock = '[lock newsletter]';
+        } else if (strpos($html, '[lock]')) {
+            $lock = '[lock]';
+        }
+
+        if (!is_null($lock)) {
+            $parts = explode($lock, $html);
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
