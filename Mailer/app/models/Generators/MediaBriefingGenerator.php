@@ -60,8 +60,8 @@ class MediaBriefingGenerator implements IGenerator
             "/<script.*?\/script>/is" => "",
             "/\[iframe.*?\]/is" => "",
             '/\[\/?lock\]/i' => "",
-            '/\[lock newsletter\]/' => "",
-            '/\[lock\]/' => "",
+            '/\[lock newsletter\]/i' => "",
+            '/\[lock\]/i' => "",
 
             // remove iframes
             "/<iframe.*?\/iframe>/is" => "",
@@ -268,9 +268,9 @@ class MediaBriefingGenerator implements IGenerator
             $spacerTemplate
         ) = $this->getTemplates();
 
-        if (strpos($html, '[lock newsletter]')) {
+        if (stripos($html, '[lock newsletter]')) {
             $lock = '[lock newsletter]';
-        } else if (strpos($html, '[lock]')) {
+        } else if (stripos($html, '[lock]')) {
             $lock = '[lock]';
         }
 
