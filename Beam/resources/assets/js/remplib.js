@@ -445,7 +445,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "utm_source": this.getParam("utm_source"),
                     "utm_medium": this.getParam("utm_medium"),
                     "utm_campaign": this.getParam("utm_campaign"),
-                    "utm_content": this.getParam("utm_content")
+                    "utm_content": this.getParam("utm_content"),
+                    "banner_variant": this.getParam("banner_variant")
                 }
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
