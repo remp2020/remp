@@ -12,7 +12,6 @@ use App\Country;
 use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
-use App\Jobs\CacheSegmentJob;
 use App\Schedule;
 use Cache;
 use Carbon\Carbon;
@@ -136,8 +135,8 @@ class CampaignController extends Controller
 
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
     {
-        $sourceCampaign->load('banner', 'variants', 'segments', 'countries');
-        $campaign = $sourceCampaign->replicate();
+        $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries');
+        $campaign = $this->replicateCampaign($sourceCampaign);
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
@@ -740,6 +739,20 @@ class CampaignController extends Controller
         }
     }
 
+    public function replicateCampaign(Campaign $sourceCampaign)
+    {
+        $campaign = $sourceCampaign->replicate();
+        $variants = [];
+
+        foreach ($sourceCampaign->campaignBanners as $variant) {
+            $variants[] = $variant->getClone();
+        }
+
+        $campaign->setRelation('campaignBanners', collect($variants));
+
+        return $campaign;
+    }
+
     public function processOldCampaign(Campaign $campaign, array $data)
     {
         $campaign->fill($data);
@@ -771,6 +784,8 @@ class CampaignController extends Controller
         // main banner
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
+        } else if (!$campaign->campaignBanners->isEmpty()) {
+            $bannerId = optional($campaign->campaignBanners[0])->banner_id;
         } else {
             $bannerId = optional($campaign->campaignBanners()->first())->banner_id;
         }
@@ -778,10 +793,12 @@ class CampaignController extends Controller
         // variants
         if (array_key_exists('variants', $data)) {
             $variants = $data['variants'];
+        } else if (!$campaign->campaignBanners->isEmpty()) {
+            $variants = $campaign->campaignBanners;
         } else {
             $variants = $campaign->campaignBanners()
-                            ->with('banner')
-                            ->get();
+                                ->with('banner')
+                                ->get();
         }
 
         return [

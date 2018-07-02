@@ -46,4 +46,15 @@ class CampaignBanner extends Model
     {
         return $this->belongsTo(Campaign::class);
     }
+
+    public function getClone()
+    {
+        return new CampaignBanner([
+            "variant" => $this["variant"],
+            "control_group" => $this["control_group"],
+            "proportion" => $this["proportion"],
+            "weight" => $this["weight"],
+            "banner_id" => $this['banner_id'],
+        ]);
+    }
 }
