@@ -40,6 +40,7 @@
                             :loading="loading"
                             :error="error"
                             :value="earned"
+                            :unit="'€'"
                     ></single-value>
                 </div>
             </div>

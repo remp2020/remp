@@ -2,6 +2,9 @@
     [data-single-value-id="click-through-rate-ctr"] .card-body {
         font-weight: bold;
     }
+    [data-single-value-id="conversions"] .card-body {
+        font-weight: bold;
+    }
 </style>
 
 <template>
@@ -27,6 +30,15 @@
                             :loading="loading"
                             :error="error"
                             :value="ctr"
+                        ></single-value>
+
+                        <single-value
+                            :title="'Conversions'"
+                            :unit="'%'"
+                            :loading="loading"
+                            :error="error"
+                            :value="conversions"
+                            :infoText="'Number of purchases.'"
                         ></single-value>
 
                         <single-value
@@ -62,6 +74,7 @@
                             :loading="loading"
                             :error="error"
                             :value="earnedSum"
+                            :unit="'€'"
                         ></single-value>
 
                     </div>
@@ -109,6 +122,7 @@
                 finishedPaymentsCount: 0,
                 earnedSum: 0,
                 ctr: 0,
+                conversions: 0,
                 histogramData: {},
             }
         },
@@ -149,6 +163,10 @@
 
                         if (vm.clickCount !== 0 && vm.showsCount !== 0) {
                             vm.ctr = (vm.clickCount / vm.showsCount) * 100;
+                        }
+
+                        if (vm.finishedPaymentsCount !== 0 && vm.showsCount !== 0) {
+                            vm.conversions = (vm.finishedPaymentsCount / vm.showsCount) * 100;
                         }
 
                         vm.loading = false;
