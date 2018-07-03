@@ -30,7 +30,7 @@ class ProcessPageviewSessions extends Command
         $timeAfter = (clone $timeBefore)->subHour();
 
         // select first pageview of each session
-        $request->addSelect("token", "referer", "url", "ref_source", "social", "user_agent");
+        $request->addSelect("token", "referer", "url", "ref_source", "social", "user_agent", "remp_session_id", "subscriber");
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup("remp_session_id", "subscriber");
