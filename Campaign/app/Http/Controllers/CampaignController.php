@@ -136,7 +136,7 @@ class CampaignController extends Controller
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
     {
         $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries');
-        $campaign = $this->replicateCampaign($sourceCampaign);
+        $campaign = $sourceCampaign->replicate();
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
@@ -737,20 +737,6 @@ class CampaignController extends Controller
         if (isset($data['removedSegments'])) {
             CampaignSegment::destroy($data['removedSegments']);
         }
-    }
-
-    public function replicateCampaign(Campaign $sourceCampaign)
-    {
-        $campaign = $sourceCampaign->replicate();
-        $variants = [];
-
-        foreach ($sourceCampaign->campaignBanners as $variant) {
-            $variants[] = $variant->getClone();
-        }
-
-        $campaign->setRelation('campaignBanners', collect($variants));
-
-        return $campaign;
     }
 
     public function processOldCampaign(Campaign $campaign, array $data)

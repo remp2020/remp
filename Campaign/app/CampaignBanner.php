@@ -47,14 +47,20 @@ class CampaignBanner extends Model
         return $this->belongsTo(Campaign::class);
     }
 
-    public function getClone()
+    /**
+     * This method overrides Laravel's default replicate method
+     * it's removing unique & constraint attributes (uuid, campaign_id)
+     *
+     * @param array|null $except
+     * @return CampaignBanner
+     */
+    public function replicate(array $except = null)
     {
-        return new CampaignBanner([
-            "variant" => $this["variant"],
-            "control_group" => $this["control_group"],
-            "proportion" => $this["proportion"],
-            "weight" => $this["weight"],
-            "banner_id" => $this['banner_id'],
-        ]);
+        $replica = parent::replicate($except);
+
+        unset($replica['uuid']);
+        unset($replica['campaign_id']);
+
+        return $replica;
     }
 }
