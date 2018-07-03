@@ -22,6 +22,7 @@
     <link rel="manifest" href="/assets/img/favicon/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/assets/img/favicon/ms-icon-144x144.png">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="{{ asset(mix('/css/vendor.css', '/assets/vendor')) }}" rel="stylesheet">
     <link href="{{ asset(mix('/css/app.css', '/assets/vendor')) }}" rel="stylesheet">
@@ -125,6 +126,9 @@
                     </li>
                 </ul>
             </li>
+            <li {!! route_active(['newsletters']) !!}>
+                <a href="{{ route('newsletters.index') }}" ><i class="zmdi zmdi-email"></i> Newsletters</a>
+            </li>
             <li {!! route_active(['conversions']) !!}>
                 <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
             </li>
@@ -225,6 +229,30 @@
         })(delay);
         delay += 250;
         @endforeach
+        @if (session('warning'))
+        $.notify({
+            message: '{{ session('warning') }}'
+        }, {
+            allow_dismiss: false,
+            type: 'warning',
+            placement: {
+                from: "bottom",
+                align: "left"
+            }
+        });
+        @endif
+        @if (session('success'))
+        $.notify({
+            message: '{{ session('success') }}'
+        }, {
+            allow_dismiss: false,
+            type: 'info',
+            placement: {
+                from: "bottom",
+                align: "left"
+            }
+        });
+        @endif
     });
 </script>
 

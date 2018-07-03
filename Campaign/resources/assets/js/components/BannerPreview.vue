@@ -198,6 +198,9 @@
                 if (this.uuid) {
                     url += "&utm_content=" + encodeURIComponent(this.uuid);
                 }
+                if (this.variantUuid) {
+                    url += "&banner_variant=" + encodeURIComponent(this.variantUuid);
+                }
                 return url;
             },
         },

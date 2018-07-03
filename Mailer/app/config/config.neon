@@ -166,12 +166,16 @@ services:
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'preprocess-generator-parameters'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorPreprocessHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'generator-templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\GeneratorTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailCreateTemplateHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'jobs'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'segments', 'list'), \Remp\MailerModule\Api\v1\Handlers\Segments\SegmentsListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
     # Generator
     generator:
         class: Remp\MailerModule\Generators\GeneratorFactory
         setup:
             - registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\NewsfilterGenerator())
+            - registerGenerator('mediabriefing', 'MediaBriefing', Remp\MailerModule\Generators\MediaBriefingGenerator())
             - registerGenerator('url_parser', 'URL parser', Remp\MailerModule\Generators\UrlParserGenerator())
             - registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\MinutaDigestGenerator())
             - registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\MinutaAlertGenerator())
@@ -208,6 +212,7 @@ services:
     # Generator Widgets
     - Remp\MailerModule\Components\GeneratorWidgetsManager
     - Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget
+    - Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget
 
     # Forms
     - Remp\MailerModule\Forms\SignInFormFactory
@@ -223,6 +228,7 @@ services:
     - Remp\MailerModule\Forms\SourceTemplateFormFactory
     - Remp\MailerModule\Forms\MailGeneratorFormFactory
     - Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+    - Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 
     # Commands
     - Remp\MailerModule\Commands\ProcessJobCommand
@@ -234,3 +240,6 @@ services:
     - Remp\MailerModule\Commands\DemoSeedCommand
     - Remp\MailerModule\Commands\ProcessJobStatsCommand
     - Remp\MailerModule\Commands\MailgunEventsCommand
+
+    # Helpers
+    - Remp\MailerModule\Generators\MediaBriefingHelpers

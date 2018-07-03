@@ -587,7 +587,11 @@
         },
         watch: {
             bannerId: function () {
-                this.showABTestingComponent = true;
+                if (this.bannerId) {
+                    this.showABTestingComponent = true;
+                } else {
+                    this.showABTestingComponent = false;
+                }
             }
         }
     }

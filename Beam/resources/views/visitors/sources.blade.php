@@ -42,6 +42,7 @@
                     'requestParams' => [
                         'visited_from' => '$(\'[name="visited_from"]\').val()',
                         'visited_to' => '$(\'[name="visited_to"]\').val()',
+                        'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone',
                         'subscriber' => '$("[name=\"subscriber\"]:checked").val()',
                     ],
                     'refreshTriggers' => [

@@ -53,22 +53,27 @@ class NewsfilterTemplateFormFactory
         $form = new Form;
         $form->addProtection();
 
-        $form->addText('name', 'Name');
+        $form->addText('name', 'Name')
+            ->setRequired("Field 'Name' is required.");
 
-        $form->addText('code', 'Identifier');
+        $form->addText('code', 'Identifier')
+            ->setRequired("Field 'Identifier' is required.");
 
         $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
-        
+
         $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
         $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
 
-        $form->addSelect('mail_type_id', 'Type', $mailTypes);
+        $form->addSelect('mail_type_id', 'Type', $mailTypes)
+            ->setRequired("Field 'Type' is required.");
 
         $form->addText('from', 'Sender')
-            ->setAttribute('placeholder', 'e.g. info@domain.com');
+            ->setAttribute('placeholder', 'e.g. info@domain.com')
+            ->setRequired("Field 'Sender' is required.");
 
-        $form->addText('subject', 'Subject');
+        $form->addText('subject', 'Subject')
+            ->setRequired("Field 'Subject' is required.");
 
         $form->addHidden('html_content');
         $form->addHidden('text_content');

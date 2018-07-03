@@ -11,7 +11,7 @@ class Stats implements StatsContract
     private $client;
     private $timeOffset;
 
-    public function __construct(Client $client, $timeOffset)
+    public function __construct(Client $client, $timeOffset = null)
     {
         $this->client = $client;
         $this->timeOffset = $timeOffset;

@@ -15,7 +15,7 @@ class DenniknContent implements ContentInterface
 
         if ($matches) {
             foreach ($matches[1] as $author) {
-                $denniknAuthors[] = Strings::upper($author);
+                $denniknAuthors[] = Strings::upper(html_entity_decode($author));
             }
         }
 
@@ -24,15 +24,15 @@ class DenniknContent implements ContentInterface
         $matches = [];
         preg_match('/<meta property=\"og:title\" content=\"(.+)\"\s*\/?/U', $content, $matches);
         if ($matches) {
-            $title = $matches[1];
+            $title = html_entity_decode($matches[1]);
         }
 
         // description
         $description = false;
         $matches = [];
-        preg_match('/<meta property=\"og:description\" content=\"(.+)\"\s*\/?/U', $content, $matches);
+        preg_match('/<meta property=\"og:description\" content=\"(.*)\"\s*\/?/U', $content, $matches);
         if ($matches) {
-            $description = $matches[1];
+            $description = html_entity_decode($matches[1]);
         }
 
         // image

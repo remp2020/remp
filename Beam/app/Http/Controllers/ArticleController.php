@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Resources\ArticleResource;
@@ -72,22 +73,22 @@ class ArticleController extends Controller
             ->groupBy(['article_author.article_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
-            $publishedFrom = Carbon::parse($request->input('published_from'))->tz('UTC');
+            $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
             $articles->where('published_at', '>=', $publishedFrom);
             $conversionsQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
-            $publishedTo = Carbon::parse($request->input('published_to'))->tz('UTC');
+            $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
             $articles->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
         }
         if ($request->input('conversion_from')) {
-            $conversionFrom = Carbon::parse($request->input('conversion_from'))->tz('UTC');
+            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
             $articles->where('paid_at', '>=', $conversionFrom);
             $conversionsQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
-            $conversionTo = Carbon::parse($request->input('conversion_to'))->tz('UTC');
+            $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
             $articles->where('paid_at', '<=', $conversionTo);
             $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
@@ -167,10 +168,10 @@ class ArticleController extends Controller
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
         if ($request->input('published_from')) {
-            $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'))->tz('UTC'));
+            $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
         }
         if ($request->input('published_to')) {
-            $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'))->tz('UTC'));
+            $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
         }
 
         return $datatables->of($articles)

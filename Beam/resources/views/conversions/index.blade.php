@@ -65,7 +65,8 @@
             'order' => [5, 'desc'],
             'requestParams' => [
                 'conversion_from' => '$(\'[name="conversion_from"]\').val()',
-                'conversion_to' => '$(\'[name="conversion_to"]\').val()'
+                'conversion_to' => '$(\'[name="conversion_to"]\').val()',
+                'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
                 [
