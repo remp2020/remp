@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 
 class Article extends Model
@@ -63,5 +64,33 @@ class Article extends Model
             return;
         }
         $this->attributes['published_at'] = new Carbon($value);
+    }
+
+    /**
+     * Check if Illuminate\Database\QueryException is Duplicate Entry Exception.
+     */
+    protected function isDuplicateEntryException(QueryException $e): bool
+    {
+        $errorCode  = $e->errorInfo[1];
+        if ($errorCode === 1062) { // Duplicate Entry error code
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get the first record matching the attributes or create it.
+     */
+    public static function firstOrCreate(array $attributes, array $values = []): Article
+    {
+        try {
+            $static = (new static);
+            return $static->create($attributes + $values);
+        } catch (QueryException $e){
+            if ($static->isDuplicateEntryException($e)) {
+                return $static->where($attributes)->first();
+            }
+            throw $e;
+        }
     }
 }
