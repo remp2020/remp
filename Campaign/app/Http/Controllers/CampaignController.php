@@ -595,15 +595,19 @@ class CampaignController extends Controller
             }
 
             // device rules
-            $dd->setUserAgent($data->userAgent);
-            $dd->parse();
+            if (!isset($data->userAgent)) {
+                Log::error("Unable to load user agent for userId [{$userId}]");
+            } else {
+                $dd->setUserAgent($data->userAgent);
+                $dd->parse();
 
-            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $dd->isMobile()) {
-                continue;
-            }
+                if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $dd->isMobile()) {
+                    continue;
+                }
 
-            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $dd->isDesktop()) {
-                continue;
+                if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $dd->isDesktop()) {
+                    continue;
+                }
             }
 
             // country rules
