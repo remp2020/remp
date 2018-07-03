@@ -86,7 +86,7 @@ class Article extends Model
         try {
             $static = (new static);
             return $static->create($attributes + $values);
-        } catch (QueryException $e){
+        } catch (QueryException $e) {
             if ($static->isDuplicateEntryException($e)) {
                 return $static->where($attributes)->first();
             }
