@@ -54,6 +54,7 @@ class Crm implements ISegment
         foreach ($response['users'] as $user) {
             $userIds[] = $user['id'];
         }
+        $response = null;
         return $userIds;
     }
 

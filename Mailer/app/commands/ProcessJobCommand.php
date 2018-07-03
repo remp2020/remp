@@ -36,6 +36,8 @@ class ProcessJobCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        ini_set('memory_limit', '256M');
+        
         $output->writeln('');
         $output->writeln('<info>***** EMAIL JOB *****</info>');
         $output->writeln('');
