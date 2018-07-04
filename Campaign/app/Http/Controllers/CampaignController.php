@@ -12,7 +12,6 @@ use App\Country;
 use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
-use App\Jobs\CacheSegmentJob;
 use App\Schedule;
 use Cache;
 use Carbon\Carbon;
@@ -136,7 +135,7 @@ class CampaignController extends Controller
 
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
     {
-        $sourceCampaign->load('banner', 'variants', 'segments', 'countries');
+        $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries');
         $campaign = $sourceCampaign->replicate();
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
@@ -596,15 +595,19 @@ class CampaignController extends Controller
             }
 
             // device rules
-            $dd->setUserAgent($data->userAgent);
-            $dd->parse();
+            if (!isset($data->userAgent)) {
+                Log::error("Unable to load user agent for userId [{$userId}]");
+            } else {
+                $dd->setUserAgent($data->userAgent);
+                $dd->parse();
 
-            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $dd->isMobile()) {
-                continue;
-            }
+                if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $dd->isMobile()) {
+                    continue;
+                }
 
-            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $dd->isDesktop()) {
-                continue;
+                if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $dd->isDesktop()) {
+                    continue;
+                }
             }
 
             // country rules
@@ -771,6 +774,8 @@ class CampaignController extends Controller
         // main banner
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
+        } else if (!$campaign->campaignBanners->isEmpty()) {
+            $bannerId = optional($campaign->campaignBanners[0])->banner_id;
         } else {
             $bannerId = optional($campaign->campaignBanners()->first())->banner_id;
         }
@@ -778,10 +783,12 @@ class CampaignController extends Controller
         // variants
         if (array_key_exists('variants', $data)) {
             $variants = $data['variants'];
+        } else if (!$campaign->campaignBanners->isEmpty()) {
+            $variants = $campaign->campaignBanners;
         } else {
             $variants = $campaign->campaignBanners()
-                            ->with('banner')
-                            ->get();
+                                ->with('banner')
+                                ->get();
         }
 
         return [

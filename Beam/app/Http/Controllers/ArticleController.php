@@ -258,12 +258,11 @@ class ArticleController extends Controller
 
     public function upsert(ArticleUpsertRequest $request)
     {
+        $articles = [];
         foreach ($request->get('articles', []) as $a) {
-            $article = Article::firstOrNew([
+            $article = Article::firstOrCreate([
                 'external_id' => $a['external_id'],
-            ]);
-            $article->fill($a);
-            $article->save();
+            ], $a);
 
             $article->sections()->detach();
             foreach ($a['sections'] as $sectionName) {
@@ -282,11 +281,12 @@ class ArticleController extends Controller
             }
 
             $article->load(['authors', 'sections']);
+            $articles[] = $article;
         }
 
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
-            'json' => new JsonResource([]),
+            'json' => ArticleResource::collection(collect($articles)),
         ]);
     }
 }

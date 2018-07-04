@@ -168,6 +168,28 @@ class Campaign extends Model
         return $mapping;
     }
 
+    /**
+     * This method overrides Laravel's default replicate method
+     * it loads CampaignBanner (variant) replicas to relation
+     *
+     * @param array|null $except
+     * @return Model
+     */
+    public function replicate(array $except = null)
+    {
+        $replica = parent::replicate($except);
+
+        $variants = [];
+
+        foreach ($this->campaignBanners as $variant) {
+            $variants[] = $variant->replicate();
+        }
+
+        $replica->setRelation('campaignBanners', collect($variants));
+
+        return $replica;
+    }
+
     public function cache()
     {
         $activeCampaignIds = Schedule::applyScopes()
