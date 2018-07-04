@@ -13,7 +13,7 @@
             </div>
             <div class="col-sm-12 col-md-4">
                 <div class="row">
-                    <div id="variant-singles-grid" data-columns>
+                    <div id="variant-singles-grid" class="clearfix" data-columns>
 
                         <single-value
                             :title="'CTR'"

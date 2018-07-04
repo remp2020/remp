@@ -10,9 +10,9 @@
             ></campaign-stats>
 
             <campaign-stats-results
-                    v-if="!error && loaded"
-                    :variants="variants"
-                    :data="variantsData"
+                v-if="!error && loaded"
+                :variants="variants"
+                :data="variantsData"
             ></campaign-stats-results>
 
             <variant-stats
@@ -58,7 +58,7 @@
         },
         timezone: {
             type: String,
-            required: true,
+            required: true
         }
     };
 
