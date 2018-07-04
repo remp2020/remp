@@ -19,8 +19,8 @@
 
     <div id="stats-app">
         <campaign-stats-root
-            :id="{{ $campaign->id }}"
-            :name="'{!! $campaign->name !!}'"
+            :url="url"
+            :name="name"
             :variants="variants"
             :from="from"
             :to="to"
@@ -60,6 +60,8 @@
             },
             data() {
                 return {
+                    name: "{{ $campaign->name }}",
+                    url: "{!! route('campaigns.stats.data', $campaign->id) !!}",
                     variants: {!! @json($campaign->campaignBanners) !!},
                     from: '{!! $from !!}',
                     to: '{!! $to !!}',

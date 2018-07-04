@@ -161,20 +161,40 @@ class StatsController extends Controller
         ];
     }
 
+    public function getStats(Campaign $campaign, Request $request, Stats $stats)
+    {
+        $campaignData = $this->campaignStats($campaign, $request, $stats);
+
+        $variantsData = [];
+        foreach ($campaign->campaignBanners as $variant) {
+            $variantsData[$variant->id] = $this->variantStats($variant, $request, $stats);
+        }
+
+        return [
+            'campaign' => $campaignData,
+            'variants' => $variantsData,
+        ];
+    }
+
     public function campaignStats(Campaign $campaign, Request $request, Stats $stats)
     {
-        return [
+        $data = [
             'click_count' => $this->campaignStatsCount($campaign, 'click', $stats, $request),
+            'show_count' => $this->campaignStatsCount($campaign, 'show', $stats, $request),
             'payment_count' => $this->campaignPaymentStatsCount($campaign, 'payment', $stats, $request),
             'purchase_count' => $this->campaignPaymentStatsCount($campaign, 'purchase', $stats, $request),
             'purchase_sum' => $this->campaignPaymentStatsSum($campaign, 'purchase', $stats, $request),
             'histogram' => $this->campaignStatsHistogram($campaign, $stats, $request),
+            'ctr' => 0,
+            'conversions' => 0,
         ];
+
+        return $this->addCalculatedValues($data);
     }
 
     public function variantStats(CampaignBanner $variant, Request $request, Stats $stats)
     {
-        return [
+        $data = [
             'click_count' => $this->variantStatsCount($variant, 'click', $stats, $request),
             'show_count' => $this->variantStatsCount($variant, 'show', $stats, $request),
             'payment_count' => $this->variantPaymentStatsCount($variant, 'payment', $stats, $request),
@@ -182,6 +202,27 @@ class StatsController extends Controller
             'purchase_sum' => $this->variantPaymentStatsSum($variant, 'purchase', $stats, $request),
             'histogram' => $this->variantStatsHistogram($variant, $stats, $request),
         ];
+
+        return $this->addCalculatedValues($data);
+    }
+
+    public function addCalculatedValues($data)
+    {
+        $data['ctr'] = 0;
+        $data['conversions'] = 0;
+
+        // calculate ctr & conversions
+        if ($data['show_count']->count) {
+            if ($data['click_count']->count) {
+                $data['ctr'] = ($data['click_count']->count / $data['show_count']->count) * 100;
+            }
+
+            if ($data['purchase_count']->count) {
+                $data['conversions'] = ($data['purchase_count']->count / $data['show_count']->count) * 100;
+            }
+        }
+
+        return $data;
     }
 
     protected function formatDataForChart($typesData, $labels)

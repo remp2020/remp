@@ -1,36 +1,28 @@
-<style>
-    .size-1of4 { width: 25%; }
-
-    #campaign-singles-grid[data-columns]::before {
-        content: '4 .column.size-1of1';
-    }
-
-    #variant-stats-grid[data-columns]::before {
-        content: '2 .column.size-1of2';
-    }
-</style>
-
 <template>
     <section id="content">
         <div class="container">
 
             <campaign-stats
                 :name="name"
-                :url="'/campaigns/' + id + '/stats/data'"
-                :from="from"
-                :to="to"
-                :timezone="timezone"
+                :data="campaignData"
+                :error="error"
+                :loading="loading"
             ></campaign-stats>
+
+            <campaign-stats-results
+                    v-if="!error && loaded"
+                    :variants="variants"
+                    :data="variantsData"
+            ></campaign-stats-results>
 
             <variant-stats
                 v-for="variant in variants"
                 :key="variant.id"
 
                 :variant="variant"
-                :url="'/campaigns/variant/' + variant.id + '/stats/data'"
-                :from="from"
-                :to="to"
-                :timezone="timezone"
+                :data="variantsData[variant.id]"
+                :error="error"
+                :loading="loading"
             ></variant-stats>
 
         </div>
@@ -41,13 +33,11 @@
 <script>
     import CampaignStats from './stats/CampaignStats'
     import VariantStats from './stats/VariantStats'
-    import SingleValue from './stats/SingleValue'
-    import Chart from './stats/Chart'
-    import Card from './stats/Card'
+    import CampaignStatsResults from './stats/CampaignStatsResults'
 
     let props = {
-        id: {
-            type: Number,
+        url: {
+            type: String,
             required: true
         },
         name: {
@@ -68,17 +58,95 @@
         },
         timezone: {
             type: String,
-            required: true
+            required: true,
         }
     };
 
     export default {
         components: {
             CampaignStats,
-            VariantStats
+            VariantStats,
+            CampaignStatsResults
         },
-        props: props
+        props: props,
+        data() {
+            return {
+                campaignData: {},
+                variantsData: {},
+                loading: true,
+                loaded: false,
+                error: ""
+            }
+        },
+        mounted() {
+            this.loadData();
+        },
+        watch: {
+            from() {
+                this.loadData()
+            },
+            to() {
+                this.loadData()
+            }
+        },
+        methods: {
+            loadData() {
+                let vm = this;
+                vm.error = "";
+                vm.loading = true;
+
+                $.ajax({
+                    method: 'POST',
+                    url: vm.url,
+                    data: {
+                        from: vm.from,
+                        to: vm.to,
+                        tz: vm.timezone,
+                        chartWidth: $('.variant-chart-wrap').first().width(),
+                        _token: document.head.querySelector("[name=csrf-token]").content
+                    },
+                    dataType: 'JSON',
+                    success(resp) {
+                        vm.variantsData = resp.variants;
+                        vm.campaignData = resp.campaign;
+
+                        vm.loading = false;
+                        vm.loaded = true;
+                    },
+                    error(xhr, status, error) {
+                        vm.loading = false;
+                        let body = JSON.parse(xhr.responseText);
+                        vm.error = body.message;
+                    }
+                })
+            }
+        }
     }
 </script>
 
+<style>
+    .size-1of4 {
+        width: 25%;
+    }
 
+    #campaign-singles-grid[data-columns]::before {
+        content: '1 .column.size-1of1';
+    }
+
+    #variant-singles-grid[data-columns]::before {
+        content: '2 .column.size-1of2';
+    }
+
+    [data-single-value-id="ctr"] .card-body,
+    [data-single-value-id="ctr"] .card-header {
+        font-weight: bold;
+    }
+    [data-single-value-id="conversions"] .card-body,
+    [data-single-value-id="conversions"] .card-header {
+        font-weight: bold;
+    }
+    [data-single-value-id="earned"] .card-body,
+    [data-single-value-id="earned"] .card-header {
+        font-weight: bold;
+    }
+</style>
