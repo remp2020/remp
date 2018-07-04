@@ -43,9 +43,7 @@ class StatsController extends Controller
                         ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->get();
 
-        $result = $result[0];
-
-        return $result;
+        return $result[0];
     }
 
     public function campaignPaymentStatsCount(Campaign $campaign, $step, Stats $stats, Request $request)
@@ -86,9 +84,7 @@ class StatsController extends Controller
                         ->forVariant($variant->uuid)
                         ->get();
 
-        $result = $result[0];
-
-        return $result;
+        return $result[0];
     }
 
     public function variantPaymentStatsSum(CampaignBanner $variant, $step, Stats $stats, Request $request)
@@ -100,9 +96,7 @@ class StatsController extends Controller
                         ->forVariant($variant->uuid)
                         ->get();
 
-        $result = $result[0];
-
-        return $result;
+        return $result[0];
     }
 
     public function variantStatsHistogram(CampaignBanner $variant, Stats $stats, Request $request)
@@ -185,8 +179,6 @@ class StatsController extends Controller
             'purchase_count' => $this->campaignPaymentStatsCount($campaign, 'purchase', $stats, $request),
             'purchase_sum' => $this->campaignPaymentStatsSum($campaign, 'purchase', $stats, $request),
             'histogram' => $this->campaignStatsHistogram($campaign, $stats, $request),
-            'ctr' => 0,
-            'conversions' => 0,
         ];
 
         return $this->addCalculatedValues($data);

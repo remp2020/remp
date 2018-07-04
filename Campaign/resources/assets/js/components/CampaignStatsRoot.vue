@@ -137,16 +137,16 @@
         content: '2 .column.size-1of2';
     }
 
-    [data-single-value-id="ctr"] .card-body,
-    [data-single-value-id="ctr"] .card-header {
+    .card-ctr .card-body,
+    .card-ctr .card-header {
         font-weight: bold;
     }
-    [data-single-value-id="conversions"] .card-body,
-    [data-single-value-id="conversions"] .card-header {
+    .card-conversions .card-body,
+    .card-conversions .card-header {
         font-weight: bold;
     }
-    [data-single-value-id="earned"] .card-body,
-    [data-single-value-id="earned"] .card-header {
+    .card-earned .card-body,
+    .card-earned .card-header {
         font-weight: bold;
     }
 </style>

@@ -18,7 +18,7 @@
         font-size: 22px;
     }
 
-    .stats-error {
+    .error {
         position: absolute;
         top: 0;
         right: 0;
@@ -59,7 +59,7 @@
 </style>
 
 <template>
-    <div class="card" :data-single-value-id="title | slugify">
+    <div class="card" :class="'card-' + title | slugify">
         <i v-if="infoText" :title="infoText" class="zmdi zmdi-info-outline info-text"></i>
 
         <div v-if="loading" class="preloader-wrapper">
@@ -69,7 +69,7 @@
                 </svg>
             </div>
         </div>
-        <div v-if="error" class="stats-error" :title="error">!</div>
+        <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header text-center title">
             {{ title }}

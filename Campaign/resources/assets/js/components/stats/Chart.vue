@@ -7,7 +7,7 @@
                 </svg>
             </div>
         </div>
-        <div v-if="error" class="stats-error" :title="error">!</div>
+        <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header">
             <h3 v-html="title"></h3>
@@ -136,7 +136,7 @@
         width: 100%;
     }
 
-    .stats-error {
+    .error {
         position: absolute;
         top: 0;
         right: 0;
