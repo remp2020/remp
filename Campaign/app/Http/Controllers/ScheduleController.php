@@ -75,6 +75,29 @@ class ScheduleController extends Controller
             ->addColumn('campaign', function (Schedule $schedule) {
                 return Html::linkRoute('campaigns.edit', $schedule->campaign->name, $schedule->campaign);
             })
+            ->addColumn('variants', function (Schedule $schedule) {
+                $data = $schedule->campaign->campaignBanners->all();
+                $variants = [];
+
+                foreach ($data as $variant) {
+                    $proportion = $variant['proportion'];
+
+                    if ($variant['control_group'] == 0) {
+                        // handle variants with banner
+                        $link = link_to(
+                            route('banners.edit', $variant['banner_id']),
+                            $variant['variant']
+                        );
+
+                        $variants[] = "{$link} ({$proportion}%)";
+                    } else {
+                        // handle control group
+                        $variants[] = "{$variant['variant']} ({$proportion}%)";
+                    }
+                }
+
+                return implode(', ', $variants);
+            })
             ->addColumn('action_methods', [
                 'start' => 'POST',
                 'pause' => 'POST',
@@ -99,7 +122,7 @@ class ScheduleController extends Controller
                 }
                 throw new \Exception('unhandled schedule status');
             })
-            ->rawColumns(['actions', 'action_methods', 'status', 'banners', 'campaign'])
+            ->rawColumns(['actions', 'variants', 'action_methods', 'status', 'campaign'])
             ->setRowId('id')
             ->make(true);
     }

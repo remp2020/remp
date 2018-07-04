@@ -25,9 +25,10 @@
                             'header' => 'Campaign',
                             'priority' => 1,
                         ],
-                        'banners' => [
-                            'header' => 'Banners',
-                            'priority' => 2,
+                        'variants' => [
+                            'header' => 'Variants',
+                            'orderable' => false,
+                            'priority' => 3,
                         ],
                         'start_time' => [
                             'header' => 'Scheduled start date',
