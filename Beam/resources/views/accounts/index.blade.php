@@ -34,7 +34,7 @@
             ],
             'dataSource' => action('AccountController@json'),
             'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit account'],
             ],
         ]) !!}
 

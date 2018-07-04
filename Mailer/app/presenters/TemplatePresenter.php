@@ -75,9 +75,9 @@ final class TemplatePresenter extends BasePresenter
             ->setColSetting('clicked', [
                 'priority' => 3,
             ])
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit')
-            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show template')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit template')
+            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy', 'Duplicate template')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;

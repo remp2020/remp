@@ -40,11 +40,11 @@
             ],
             'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
             'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
-                ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play'],
-                ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause'],
-                ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
-                ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit schedule'],
+                ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play', 'title' => 'Start schedule'],
+                ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause', 'title' => 'Pause schedule'],
+                ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop', 'title' => 'Stop schedule'],
+                ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete', 'title' => 'Delete schedule'],
             ],
             'displaySearchAndPaging' => false,
             'refreshTriggers' => [
@@ -116,9 +116,9 @@
                     ],
                     'dataSource' => route('campaigns.json'),
                     'rowActions' => [
-                        ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
-                        ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
-                        ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart'],
+                        ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit campaign'],
+                        ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy', 'title' => 'Copy campaign'],
+                        ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart', 'title' => 'Campaign stats'],
                     ],
                     'order' => [8, 'desc'],
                 ]) !!}

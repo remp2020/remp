@@ -92,7 +92,8 @@ class CampaignController extends Controller
             ->addColumn('active', function (Campaign $campaign) {
                 return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
-                    'active' => $campaign->active
+                    'active' => $campaign->active,
+                    'title' => $campaign->active ? 'Deactivate campaign' : 'Activate campaign'
                 ])->render();
             })
             ->addColumn('devices', function (Campaign $campaign) {

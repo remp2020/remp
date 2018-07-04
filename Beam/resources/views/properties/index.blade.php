@@ -40,7 +40,7 @@
                 ],
                 'dataSource' => route('accounts.properties.json', $account),
                 'rowActions' => [
-                    ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                    ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit property'],
                 ],
             ]) !!}
         </div>

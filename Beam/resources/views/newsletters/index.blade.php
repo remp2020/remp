@@ -41,10 +41,10 @@
             ],
             'dataSource' => route('newsletters.json'),
             'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
-                ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play'],
-                ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause'],
-                ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit newsletter'],
+                ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play', 'title' => 'Start newsletter'],
+                ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause', 'title' => 'Pause newsletter'],
+                ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete', 'title' => 'Delete newsletter'],
             ],
             'order' => [4, 'desc'],
         ]) !!}

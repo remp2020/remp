@@ -39,8 +39,8 @@ final class GeneratorPresenter extends BasePresenter
             ->setColSetting('generator', [
                 'priority' => 1,
             ])
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit')
-            ->setRowAction('generate', 'palette-Cyan zmdi-spellcheck')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit generator')
+            ->setRowAction('generate', 'palette-Cyan zmdi-spellcheck', 'Generate emails')
             ->setTableSetting('sorting', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
@@ -96,7 +96,7 @@ final class GeneratorPresenter extends BasePresenter
 
     public function renderGenerate($id)
     {
-        throw new \Exception('TODO');
+        $this->redirect("MailGenerator:default", ['source_template_id' => $id]);
     }
 
     public function createComponentMailSourceTemplateForm()
