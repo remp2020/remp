@@ -11,7 +11,7 @@ use GuzzleHttp\Exception\ClientException;
 
 class StatsRequest implements StatsContract
 {
-    /** @var GuzzleHttp\Client guzzle http client */
+    /** @var Client guzzle http client */
     private $client;
 
     /** @var string timezone offset */
@@ -23,13 +23,13 @@ class StatsRequest implements StatsContract
     /** @var string table */
     private $table;
 
-    /** @var string url arguments */
+    /** @var array url arguments */
     private $args = [];
 
-    /** @var Carbon\Carbon from date object */
+    /** @var Carbon from date object */
     private $from;
 
-    /** @var Carbon\Carbon to date object */
+    /** @var Carbon to date object */
     private $to;
 
     /** @var array group by fields */

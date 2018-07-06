@@ -11,7 +11,6 @@ use App\Contracts\Remp\Stats;
 
 class StatsController extends Controller
 {
-
     public $statTypes = [
         "show" => [
             "label" => "Shows",
@@ -35,7 +34,7 @@ class StatsController extends Controller
         return $result[0];
     }
 
-    public function variantStatsCount(CampaignBanner $variant, $type, Stats $stats, Request $request, $normalized = false)
+    public function variantStatsCount(CampaignBanner $variant, $type, Stats $stats, Request $request)
     {
         $result = $stats->count()
                         ->events('banner', $type)
@@ -44,17 +43,7 @@ class StatsController extends Controller
                         ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->get();
 
-        $result = $result[0];
-
-        if ($normalized) {
-            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)
-                ->where('proportion', '!=', 0)
-                ->count();
-
-            $result->count = $this->normalizeValue($result->count, $variant->proportion, $variantsCount);
-        }
-
-        return $result;
+        return $result[0];
     }
 
     public function campaignPaymentStatsCount(Campaign $campaign, $step, Stats $stats, Request $request)
@@ -86,7 +75,7 @@ class StatsController extends Controller
         return $this->getHistogramData($stats, $request, $campaign->uuid);
     }
 
-    public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request, $normalized = false)
+    public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request)
     {
         $result = $stats->count()
                         ->commerce($step)
@@ -95,20 +84,10 @@ class StatsController extends Controller
                         ->forVariant($variant->uuid)
                         ->get();
 
-        $result = $result[0];
-
-        if ($normalized) {
-            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)
-                ->where('proportion', '!=', 0)
-                ->count();
-
-            $result->count = $this->normalizeValue($result->count, $variant->proportion, $variantsCount);
-        }
-
-        return $result;
+        return $result[0];
     }
 
-    public function variantPaymentStatsSum(CampaignBanner $variant, $step, Stats $stats, Request $request, $normalized = false)
+    public function variantPaymentStatsSum(CampaignBanner $variant, $step, Stats $stats, Request $request)
     {
         $result = $stats->sum()
                         ->commerce($step)
@@ -117,17 +96,7 @@ class StatsController extends Controller
                         ->forVariant($variant->uuid)
                         ->get();
 
-        $result = $result[0];
-
-        if ($normalized) {
-            $variantsCount = CampaignBanner::where('campaign_id', $variant->campaign_id)
-                ->where('proportion', '!=', 0)
-                ->count();
-
-            $result->sum = $this->normalizeValue($result->sum, $variant->proportion, $variantsCount);
-        }
-
-        return $result;
+        return $result[0];
     }
 
     public function variantStatsHistogram(CampaignBanner $variant, Stats $stats, Request $request)
@@ -186,32 +155,66 @@ class StatsController extends Controller
         ];
     }
 
+    public function getStats(Campaign $campaign, Request $request, Stats $stats)
+    {
+        $campaignData = $this->campaignStats($campaign, $request, $stats);
+
+        $variantsData = [];
+        foreach ($campaign->campaignBanners as $variant) {
+            $variantsData[$variant->id] = $this->variantStats($variant, $request, $stats);
+        }
+
+        return [
+            'campaign' => $campaignData,
+            'variants' => $variantsData,
+        ];
+    }
+
     public function campaignStats(Campaign $campaign, Request $request, Stats $stats)
     {
-        return [
+        $data = [
             'click_count' => $this->campaignStatsCount($campaign, 'click', $stats, $request),
+            'show_count' => $this->campaignStatsCount($campaign, 'show', $stats, $request),
             'payment_count' => $this->campaignPaymentStatsCount($campaign, 'payment', $stats, $request),
             'purchase_count' => $this->campaignPaymentStatsCount($campaign, 'purchase', $stats, $request),
             'purchase_sum' => $this->campaignPaymentStatsSum($campaign, 'purchase', $stats, $request),
             'histogram' => $this->campaignStatsHistogram($campaign, $stats, $request),
         ];
+
+        return $this->addCalculatedValues($data);
     }
 
     public function variantStats(CampaignBanner $variant, Request $request, Stats $stats)
     {
-        return [
+        $data = [
             'click_count' => $this->variantStatsCount($variant, 'click', $stats, $request),
-            'click_count_normalized' => $this->variantStatsCount($variant, 'click', $stats, $request, true),
             'show_count' => $this->variantStatsCount($variant, 'show', $stats, $request),
-            'show_count_normalized' => $this->variantStatsCount($variant, 'show', $stats, $request, true),
             'payment_count' => $this->variantPaymentStatsCount($variant, 'payment', $stats, $request),
-            'payment_count_normalized' => $this->variantPaymentStatsCount($variant, 'payment', $stats, $request, true),
             'purchase_count' => $this->variantPaymentStatsCount($variant, 'purchase', $stats, $request),
-            'purchase_count_normalized' => $this->variantPaymentStatsCount($variant, 'purchase', $stats, $request, true),
             'purchase_sum' => $this->variantPaymentStatsSum($variant, 'purchase', $stats, $request),
-            'purchase_sum_normalized' => $this->variantPaymentStatsSum($variant, 'purchase', $stats, $request, true),
             'histogram' => $this->variantStatsHistogram($variant, $stats, $request),
         ];
+
+        return $this->addCalculatedValues($data);
+    }
+
+    public function addCalculatedValues($data)
+    {
+        $data['ctr'] = 0;
+        $data['conversions'] = 0;
+
+        // calculate ctr & conversions
+        if ($data['show_count']->count) {
+            if ($data['click_count']->count) {
+                $data['ctr'] = ($data['click_count']->count / $data['show_count']->count) * 100;
+            }
+
+            if ($data['purchase_count']->count) {
+                $data['conversions'] = ($data['purchase_count']->count / $data['show_count']->count) * 100;
+            }
+        }
+
+        return $data;
     }
 
     protected function formatDataForChart($typesData, $labels)
@@ -254,16 +257,5 @@ class StatsController extends Controller
         $interval = $diff / $numOfCols;
 
         return intval($interval) . "s";
-    }
-
-    protected function normalizeValue($value, $proportion, $variantsCount)
-    {
-        if ($value === 0 || $proportion === 0) {
-            return 0;
-        }
-
-        return round(
-            $value / (($proportion / 100) * $variantsCount)
-        );
     }
 }

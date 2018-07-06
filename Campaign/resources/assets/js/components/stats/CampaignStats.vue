@@ -1,50 +1,73 @@
 <template>
-    <div id="campaign-stats-wrap" class="well">
+    <div class="well">
         <div class="row">
             <div class="col-md-10">
                 <chart
-                        :name="'campaign-stats-chart'"
-                        :title="name"
-                        :height="450"
-                        :loading="loading"
-                        :error="error"
-                        :chartData="histogramData"
+                    :name="'campaign-stats-chart'"
+                    :title="name"
+                    :height="500"
+                    :loading="loading"
+                    :error="error"
+                    :chartData="histogramData"
                 ></chart>
             </div>
 
             <div class="col-md-2">
-                <div id="campaign-singles-grid" class="clearfix" data-columns>
-                    <single-value
+                <div class="row">
+                    <div id="campaign-singles-grid" class="clearfix" data-columns>
+
+                        <single-value
                             :title="'Clicks'"
                             :loading="loading"
                             :error="error"
-                            :count="clickCount"
-                    ></single-value>
+                            :value="clickCount"
+                        ></single-value>
 
-                    <single-value
+                        <single-value
+                            :title="'CTR'"
+                            :unit="'%'"
+                            :loading="loading"
+                            :error="error"
+                            :value="ctr"
+                            :infoText="'Click-through rate'"
+                        ></single-value>
+
+                        <single-value
+                            :title="'Conversions'"
+                            :unit="'%'"
+                            :loading="loading"
+                            :error="error"
+                            :value="conversions"
+                            :infoText="'Number of purchases / shows.'"
+                        ></single-value>
+
+                        <single-value
                             :title="'Started payments'"
                             :loading="loading"
                             :error="error"
-                            :count="startedPayments"
-                    ></single-value>
+                            :value="startedPayments"
+                        ></single-value>
 
-                    <single-value
+                        <single-value
                             :title="'Finished payments'"
                             :loading="loading"
                             :error="error"
-                            :count="finishedPayments"
-                    ></single-value>
+                            :value="finishedPayments"
+                        ></single-value>
 
-                    <single-value
+                        <single-value
                             :title="'Earned'"
                             :loading="loading"
                             :error="error"
-                            :count="earned"
-                    ></single-value>
-                </div>
-            </div>
-        </div>
-    </div>
+                            :value="earned"
+                            :unit="'€'"
+                        ></single-value>
+
+                    </div>
+                </div><!-- .row -->
+            </div><!-- .col -->
+        </div><!-- .row -->
+    </div><!-- .well -->
 </template>
 
 <script>
@@ -61,80 +84,41 @@
                 type: String,
                 required: true
             },
-            url: {
-                type: String,
+            data: {
+                type: Object,
                 required: true
             },
-            from: {
-                type: String,
+            loading: {
+                type: Boolean,
                 required: true
             },
-            to: {
+            error: {
                 type: String,
-                required: true
-            },
-            timezone: {
-                type: String,
-                required: true
+                required: true,
+                default: ""
             }
         },
         data() {
             return {
-                loading: false,
-                error: "",
-
                 clickCount: 0,
                 startedPayments: 0,
                 finishedPayments: 0,
                 earned: 0,
-                histogramData: {}
+                histogramData: {},
+                ctr: 0,
+                conversions: 0,
             }
-        },
-        mounted() {
-            this.load()
         },
         watch: {
-            from() {
-                this.load()
-            },
-            to() {
-                this.load()
-            }
-        },
-        methods: {
-            load() {
-                var vm = this;
-                vm.error = "";
-                vm.loading = true;
-
-                $.ajax({
-                    method: 'POST',
-                    url: vm.url,
-                    data: {
-                        from: vm.from,
-                        to: vm.to,
-                        tz: vm.timezone,
-                        chartWidth: $('#campaign-stats-wrap').width(),
-                        _token: document.head.querySelector("[name=csrf-token]").content
-                    },
-                    dataType: 'JSON',
-                    success(resp, status) {
-                        vm.clickCount = resp.click_count.count;
-                        vm.startedPayments = resp.payment_count.count;
-                        vm.finishedPayments = resp.purchase_count.count;
-                        vm.earned = resp.purchase_sum.sum;
-                        vm.histogramData = resp.histogram;
-
-                        vm.loading = false;
-                    },
-                    error(xhr, status, error) {
-                        vm.loading = false;
-                        var body = JSON.parse(xhr.responseText);
-                        vm.error = body.message;
-                    }
-                })
+            data(data) {
+                this.clickCount = data.click_count.count;
+                this.startedPayments = data.payment_count.count;
+                this.finishedPayments = data.purchase_count.count;
+                this.earned = data.purchase_sum.sum;
+                this.histogramData = data.histogram;
+                this.ctr = data.ctr;
+                this.conversions = data.conversions;
             }
         }
-
     }
 </script>

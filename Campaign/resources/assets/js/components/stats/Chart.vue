@@ -1,45 +1,5 @@
-<style scoped>
-    h3 {
-        margin-top: 0;
-    }
-
-    canvas {
-        width: 100%;
-    }
-
-    .stats-error {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 20px;
-        height: 20px;
-        background: red;
-        color: #fff;
-        display: none;
-        text-align: center;
-    }
-
-    .preloader-wrapper {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.8);
-        display: none;
-    }
-
-    .preloader-wrapper .preloader {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-left: -20px;
-        margin-top: -20px;
-    }
-</style>
-
 <template>
-    <div class="card">
+    <div class="card card-chart">
         <div v-if="loading" class="preloader-wrapper">
             <div class="preloader pl-xxl">
                 <svg class="pl-circular" viewBox="25 25 50 50">
@@ -47,7 +7,7 @@
                 </svg>
             </div>
         </div>
-        <div v-if="error" class="stats-error" :title="error">!</div>
+        <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header">
             <h3 v-html="title"></h3>
@@ -166,3 +126,43 @@
         }
     }
 </script>
+
+<style scoped>
+    h3 {
+        margin-top: 0;
+    }
+
+    canvas {
+        width: 100%;
+    }
+
+    .error {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: red;
+        color: #fff;
+        display: none;
+        text-align: center;
+    }
+
+    .preloader-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+    }
+
+    .preloader-wrapper .preloader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -20px;
+        margin-top: -20px;
+    }
+</style>
