@@ -18,10 +18,6 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
     return [$item->code => $item->name];
 });
 
-$availableCountries = $availableCountries->map(function(\App\Country $country) {
-   return ['value' => $country->iso_code, 'label' => $country->name];
-});
-
 @endphp
 
 <div id="campaign-form">

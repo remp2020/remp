@@ -247,7 +247,7 @@ class CampaignController extends Controller
             'selectedCountries' => $selectedCountries,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
-            'availableCountries' => Country::all(),
+            'availableCountries' => Country::all()->keyBy("iso_code"),
             'segments' => $this->getAllSegments($segmentAggregator)
         ]);
     }
@@ -718,14 +718,12 @@ class CampaignController extends Controller
 
         $campaign->storeOrUpdateVariants($data['variants']);
 
-        if (isset($data['countries'])) {
-            $campaign->countries()->sync(
-                $this->processCountries(
-                    $data['countries'],
-                    (bool)$data['countries_blacklist']
-                )
-            );
-        }
+        $campaign->countries()->sync(
+            $this->processCountries(
+                $data['countries'] ?? [],
+                (bool)$data['countries_blacklist']
+            )
+        );
 
         $segments = $data['segments'] ?? [];
 
