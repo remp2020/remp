@@ -73,7 +73,7 @@ final class ListPresenter extends BasePresenter
                 'priority' => 3,
             ])
             ->setAllColSetting('orderable', false)
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show list')
             ->setTableSetting('displayNavigation', false)
             ->setTableSetting('rowGroup', 0);
 
@@ -144,7 +144,7 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('clicked', [
                 'priority' => 2,
             ])
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show template')
             ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 

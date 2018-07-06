@@ -42,9 +42,9 @@
             ],
             'dataSource' => route('banners.json'),
             'rowActions' => [
-                ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye'],
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
-                ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
+                ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-eye', 'title' => 'Show banner'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit banner'],
+                ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy', 'title' => 'Copy banner'],
             ],
             'rowHighlights' => [
                 'active' => true

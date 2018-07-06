@@ -138,7 +138,7 @@ final class JobPresenter extends BasePresenter
                 'orderable' => false,
                 'priority' => 3,
             ])
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show job')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;

@@ -37,7 +37,7 @@ final class LayoutPresenter extends BasePresenter
                 'render' => 'date',
                 'priority' => 2,
             ])
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit');
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit layout');
 
         return $dataTable;
     }

@@ -47,8 +47,8 @@
             ],
             'dataSource' => route('segments.json'),
             'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
-                ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit segment'],
+                ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy', 'title' => 'Copy segment'],
             ],
             'rowActionLink' => 'edit',
             'order' => [4, 'desc'],
