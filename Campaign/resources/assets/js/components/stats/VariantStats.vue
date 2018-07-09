@@ -4,7 +4,7 @@
             <div class="col-sm-12 col-md-8 variant-chart-wrap">
                 <chart
                     :name="'variant-stats-chart-' + variant.id"
-                    :title="'Variant: ' + variant.variant + ' <small>(' + variant.proportion + '%)</small>'"
+                    :title="'Variant: ' + variantName + ' <small>(' + variant.proportion + '%)</small>'"
                     :height="400"
                     :loading="loading"
                     :error="error"
@@ -117,6 +117,15 @@
                 ctr: 0,
                 conversions: 0,
                 histogramData: {},
+            }
+        },
+        computed: {
+            variantName() {
+                if (this.variant.banner !== null) {
+                    return this.variant.banner.name;
+                }
+
+                return 'Control Group'
             }
         },
         watch: {

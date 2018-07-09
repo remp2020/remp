@@ -823,8 +823,7 @@ class CampaignController extends Controller
 
     public function stats(
         Campaign $campaign,
-        Request $request,
-        Stats $stats
+        Request $request
     ) {
         return view('campaigns.stats', [
             'campaign' => $campaign,

@@ -62,7 +62,7 @@
                 return {
                     name: "{{ $campaign->name }}",
                     url: "{!! route('campaigns.stats.data', $campaign->id) !!}",
-                    variants: {!! @json($campaign->campaignBanners) !!},
+                    variants: {!! @json($campaign->campaignBanners()->with("banner")->get()) !!},
                     from: '{!! $from !!}',
                     to: '{!! $to !!}',
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
