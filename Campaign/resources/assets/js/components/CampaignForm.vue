@@ -134,7 +134,7 @@
                                             <div>
                                                 <div class="row">
                                                     <div class="col-md-10">
-                                                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true">
+                                                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true" data-max-options="1">
                                                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
                                                                 <option v-for="(obj,code) in list" v-bind:value="obj">
                                                                     {{ obj.name }}
@@ -146,7 +146,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row m-t-20 m-l-30">
+                                        <div class="row m-t-20 m-l-30" v-if="segments.length">
                                             <div class="col-md-10">
                                                 <small>Active user segments</small>
                                             </div>
@@ -241,17 +241,35 @@
                                     <div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <label for="countries" class="fg-label">Countries</label>
+                                                <select v-model="addedCountry" title="Select countries" v-on:change="selectCountry" class="selectpicker" data-live-search="true" data-max-options="1">
+                                                    <option v-for="(obj,iso_code) in availableCountries" :value="obj">
+                                                        {{ obj.name }}
+                                                    </option>
+                                                </select>
                                             </div>
-                                            <div class="col-md-12">
-                                                <v-select v-model="countries"
-                                                        id="countries"
-                                                        :name="'countries[]'"
-                                                        :value="countries"
-                                                        :options.sync="availableCountries"
-                                                        multiple
-                                                >
-                                                </v-select>
+                                        </div><!-- .row -->
+
+                                    </div>
+                                </div>
+
+                                <div class="row m-t-20 m-l-30" v-if="countries.length">
+                                    <div class="col-md-10">
+                                        <small>Selected countries</small>
+                                    </div>
+                                </div>
+
+                                <div v-for="country in countries">
+                                    <input type="hidden" name="countries[]" v-model="country.iso_code" />
+                                </div>
+
+                                <div class="row m-t-10 m-l-30">
+                                    <div class="col-md-12">
+                                        <div class="row m-b-10" v-for="(country,i) in countries" style="line-height: 25px">
+                                            <div class="col-md-12 text-left">
+                                                {{ country.name }}
+                                                <div class="pull-left m-r-20">
+                                                    <span v-on:click="removeCountry(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment">&times;</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -454,6 +472,10 @@
             if (this.bannerId) {
                 this.showABTestingComponent = true;
             }
+
+            for (let ii = 0; ii < this.countries.length; ii++) {
+                this.countries[ii] = this.availableCountries[this.countries[ii]];
+            }
         },
         props: props,
         data: function() {
@@ -468,6 +490,7 @@
                 "oncePerSession": null,
                 "active": null,
                 "countries": [],
+                "addedCountry": null,
                 "countriesBlacklist": null,
                 "allDevices": null,
                 "selectedDevices": null,
@@ -583,6 +606,20 @@
                 let toRemove = this.segments[index];
                 this.segments.splice(index, 1);
                 this.removedSegments.push(toRemove.id);
+            },
+            selectCountry: function() {
+                if (typeof this.addedCountry === 'undefined') {
+                    return;
+                }
+                for (let i in this.countries) {
+                    if (this.countries[i].iso_code === this.addedCountry.iso_code) {
+                        return;
+                    }
+                }
+                this.countries.push(this.addedCountry);
+            },
+            removeCountry: function(index) {
+                this.countries.splice(index, 1);
             }
         },
         watch: {
