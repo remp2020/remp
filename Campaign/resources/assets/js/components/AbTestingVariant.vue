@@ -1,26 +1,21 @@
 <template>
     <tr>
-
         <!-- variant color box -->
         <td class="table-td-color" :class="['color-' + index]"><div></div></td>
-
-        <!-- variant name -->
-        <td class="table-td-name">
-            <input type="hidden" :name="'variants[' + index + '][variant]'" v-model="variant.variant">
-            <input class="form-control" type="text" :name="'variants[' + index + '][variant]'" v-model="variant.variant" :disabled="variant.control_group == 1">
-        </td>
 
         <!-- variant select -->
         <td class="table-td-banner">
             <input type="hidden" :name="'variants[' + index + '][banner_id]'" :value="variant.banner_id">
 
             <v-select id="variant_id"
-                    :name="'variants[' + index + '][banner_id]'"
-                    :value="variant.banner_id"
-                    :title="'No alternative'"
-                    :options.sync="$parent.variantOptions"
-                    v-if="index != $parent.variants.length - 1 && index != 0"
+                :name="'variants[' + index + '][banner_id]'"
+                :value="variant.banner_id"
+                :title="'No alternative'"
+                :options.sync="$parent.variantOptions"
+                v-if="index != $parent.variants.length - 1 && index != 0"
             ></v-select>
+
+            <div v-if="index == $parent.variants.length -1">Control Group</div>
 
             <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[$parent.bannerId].label }}</span>
         </td>
@@ -68,9 +63,9 @@
         },
         methods: {
             renderProportionInputValues: function () {
-                var parentVariants = this.$parent.variants;
+                let parentVariants = this.$parent.variants;
 
-                for(var ii = 0; ii < parentVariants.length; ii++) {
+                for(let ii = 0; ii < parentVariants.length; ii++) {
                     $('#ab-testing-input-' + ii).val(parentVariants[ii].proportion)
                 }
             },
