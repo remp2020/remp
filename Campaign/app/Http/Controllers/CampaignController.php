@@ -71,17 +71,17 @@ class CampaignController extends Controller
                         // handle variants with banner
                         $link = link_to(
                             route('banners.edit', $variant['banner_id']),
-                            $variant['variant']
+                            $variant->banner->name
                         );
 
-                        $variants[] = "{$link} ({$proportion}%)";
+                        $variants[] = "{$link}&nbsp;({$proportion}%)";
                     } else {
                         // handle control group
-                        $variants[] = "{$variant['variant']} ({$proportion}%)";
+                        $variants[] = "Control Group&nbsp;({$proportion}%)";
                     }
                 }
 
-                return implode(', ', $variants);
+                return implode('<br>', $variants);
             })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
