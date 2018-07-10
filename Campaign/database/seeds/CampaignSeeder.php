@@ -35,13 +35,25 @@ class CampaignSeeder extends Seeder
 
         /** @var \App\Campaign $campaign */
         $campaign = factory(\App\Campaign::class)->create();
-        $campaign->fill([
-            'banner_id' => $banner->id,
-            'alt_banner_id' => $altBanner->id,
-        ]);
 
         $campaign->segments()->save(
             factory(\App\CampaignSegment::class)->make()
         );
+
+        $campaignBanner = factory(\App\CampaignBanner::class)->create([
+            'banner_id' => $banner->id,
+        ]);
+
+        $altCampaignBanner = factory(\App\CampaignBanner::class)->create([
+            'banner_id' => $altBanner->id,
+            'weight' => 2,
+        ]);
+
+        $controlGroup = factory(\App\CampaignBanner::class)->create([
+            'banner_id' => null,
+            'weight' => 3,
+            'control_group' => 1,
+            'proportion' => 0,
+        ]);
     }
 }

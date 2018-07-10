@@ -63,3 +63,13 @@ $factory->define(App\CampaignSegment::class, function (Faker\Generator $faker) {
         'provider' => 'remp_segment',
     ];
 });
+
+$factory->define(App\CampaignBanner::class, function (Faker\Generator $faker) {
+    return [
+        'campaign_id' => 1,
+        'control_group' => 0,
+        'proportion' => 50,
+        'weight' => 1,
+        'uuid' => $faker->uuid,
+    ];
+});

@@ -36,7 +36,6 @@ class CampaignRequest extends FormRequest
             'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
             'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
             'devices.0' => 'required',
-            'variants.*.variant' => 'string|required',
             'variants.*.proportion' => 'integer|required|min:0|max:100',
             'variants.*.control_group' => 'integer|required',
             'variants.*.weight' => 'integer|required',
