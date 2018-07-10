@@ -90,7 +90,7 @@
                     let data = this.data[this.variants[ii].id];
 
                     let prepared = {
-                        name: this.variants[ii].variant,
+                        name: "Control Group",
                         proportion: this.variants[ii].proportion,
                         clicks: data.click_count.count,
                         shows: data.show_count.count,
@@ -98,6 +98,10 @@
                         ctr: data.ctr,
                         conversions: data.conversions,
                     };
+
+                    if (this.variants[ii].banner !==  null) {
+                        prepared.name = this.variants[ii].banner.name;
+                    }
 
                     this.variantsData.push(prepared);
                 }

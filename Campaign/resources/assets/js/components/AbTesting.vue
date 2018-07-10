@@ -9,7 +9,6 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Variant name</th>
                             <th>Banner</th>
                             <th></th>
                             <th></th>
