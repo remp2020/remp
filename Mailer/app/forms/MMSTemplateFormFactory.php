@@ -83,7 +83,7 @@ class MMSTemplateFormFactory
 
         $defaults = [
             'name' => 'Odkaz MMS ' . date('j.n.Y'),
-            'code' => 'nwsf_' . date('dmY'),
+            'code' => 'odkaz_mms_' . date('dmY'),
             'mail_layout_id' => 33, // layout for subscribers
             'locked_mail_layout_id' => 33, // layout for non-subscribers
             'mail_type_id' => 14, // Follow tem,
