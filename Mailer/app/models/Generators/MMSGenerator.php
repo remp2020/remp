@@ -192,18 +192,15 @@ class MMSGenerator implements IGenerator
         $form->offsetUnset(Form::PROTECTOR_ID);
 
         $form->addText('title', 'Title')
-            ->setRequired("Field 'Title' is required.")
-            ->setDefaultValue("Odkaz MMŠ: O poznaní ľudskej povahy, ktoré sa dá získať iba v takých extrémnych podmienkach, aké panovali v sovietskom gulagu");
+            ->setRequired("Field 'Title' is required.");
         $form->offsetUnset(Form::PROTECTOR_ID);
 
         $form->addText('sub_title', 'Sub title')
-            ->setRequired("Field 'Sub title' is required.")
-            ->setDefaultValue("nejaky subtitlee");
+            ->setRequired("Field 'Sub title' is required.");
 
         $form->addText('url', 'Odkaz MMS URL')
             ->addRule(Form::URL)
-            ->setRequired("Field 'Odkaz MMS URL' is required.")
-            ->setDefaultValue("https://dennikn.sk/1166332/odkaz-mms-o-poznani-ludskej-povahy-ktore-sa-da-ziskat-iba-v-takych-extremnych-podmienkach-ake-panovali-v-sovietskom-gulagu/?ref=list");
+            ->setRequired("Field 'Odkaz MMS URL' is required.");
 
         $form->addTextArea('mms_html', 'HTML')
             ->setAttribute('rows', 20)
