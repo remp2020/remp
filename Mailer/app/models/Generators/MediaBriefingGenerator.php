@@ -239,13 +239,14 @@ class MediaBriefingGenerator implements IGenerator
         $output->title = $data->post_title;
 
         if (!isset($data->post_url)) {
-            throw new PreprocessException("WP json object  does not contain required attribute 'post_url'");
+            throw new PreprocessException("WP json object does not contain required attribute 'post_url'");
         }
         $output->url = $data->post_url;
 
         if (!isset($data->post_excerpt)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_excerpt'");
         }
+        $output->sub_title = $data->post_excerpt;
 
         if (!isset($data->post_content)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_content'");

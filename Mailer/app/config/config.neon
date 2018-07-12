@@ -76,16 +76,6 @@ services:
     console:
         class: Remp\MailerModule\Console\Application
         setup:
-            - announce(Remp\MailerModule\Commands\ProcessJobCommand)
-            - announce(Remp\MailerModule\Commands\MailWorkerCommand)
-            - announce(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand)
-            - announce(Remp\MailerModule\Commands\SubscribeWorkerCommand)
-            - announce(Remp\MailerModule\Commands\EmailChangedWorkerCommand)
-            - announce(Remp\MailerModule\Commands\DatabaseSeedCommand)
-            - announce(Remp\MailerModule\Commands\DemoSeedCommand)
-            - announce(Remp\MailerModule\Commands\HermesWorkerCommand)
-            - announce(Remp\MailerModule\Commands\ProcessJobStatsCommand)
-            - announce(Remp\MailerModule\Commands\MailgunEventsCommand)
             - setCatchExceptions(true)
 
     dateFormatterFactory:
@@ -230,17 +220,6 @@ services:
     - Remp\MailerModule\Forms\MailGeneratorFormFactory
     - Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
     - Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-
-    # Commands
-    - Remp\MailerModule\Commands\ProcessJobCommand
-    - Remp\MailerModule\Commands\MailWorkerCommand
-    - Remp\MailerModule\Commands\SyncUserSubscriptionsCommand
-    - Remp\MailerModule\Commands\SubscribeWorkerCommand
-    - Remp\MailerModule\Commands\EmailChangedWorkerCommand
-    - Remp\MailerModule\Commands\DatabaseSeedCommand
-    - Remp\MailerModule\Commands\DemoSeedCommand
-    - Remp\MailerModule\Commands\ProcessJobStatsCommand
-    - Remp\MailerModule\Commands\MailgunEventsCommand
 
     # Helpers
     - Remp\MailerModule\Generators\MediaBriefingHelpers

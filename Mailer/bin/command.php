@@ -12,7 +12,7 @@ $application = $container->getByType('Remp\MailerModule\Console\Application');
 $phinxRegistrator = new PhinxRegistrator($application, $container->getByType('Remp\MailerModule\EnvironmentConfig'));
 
 try {
-    $application->registerAnnounced();
+    $application->registerConfiguredCommands();
 } catch (DriverException $driverException) {
     echo "INFO: Looks like the new fresh install.\n";
 } catch (InvalidArgumentException $invalidArgument) {
