@@ -43,7 +43,7 @@ class MediaBriefingGenerator implements IGenerator
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
 
         $post = $values->mediabriefing_html;
-        $lockedPost = $this->getLockedHtml($post, $values->url);
+        $lockedPost = $this->getLockedHtml($post);
 
         list(
             $captionTemplate,
@@ -256,7 +256,7 @@ class MediaBriefingGenerator implements IGenerator
         return $output;
     }
 
-    public function getLockedHtml($html, $link)
+    public function getLockedHtml($html)
     {
         $lockedHtml = '';
         $lock = null;
@@ -280,7 +280,7 @@ class MediaBriefingGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= "<p><a href=\"{$link}/{{ autologin }}\">Pokračovanie MediaBrífingu - kliknite sem</a><p>";
+            $lockedHtml .= '<p>Tento newsletter môžete dostávať na e-mail celý, stačí byť predplatiteľom Denníka N. <a href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}">Pozrite si ponuku predplatného.</a><p>';
 
             return $lockedHtml;
         }
