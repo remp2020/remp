@@ -21,6 +21,7 @@ services:
     segmentAgreggator:
         setup:
             - register(Remp\MailerModule\Segment\Dummy())
+#            - register(Remp\MailerModule\Segment\Remp(%remp.beam.segments_addr%))
 
 # local_configs override DBs configs records.
 local_configs:
