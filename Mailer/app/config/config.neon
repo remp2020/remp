@@ -102,8 +102,6 @@ services:
 
     eventEmitter:
         class: League\Event\Emitter
-        setup:
-            - addListener(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentHandler())
 
     segmentAgreggator:
         class: Remp\MailerModule\Segment\Aggregator
