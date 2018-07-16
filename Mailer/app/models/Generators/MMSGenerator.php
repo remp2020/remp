@@ -28,7 +28,7 @@ class MMSGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'mms_html', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
         ];
     }
 
@@ -195,8 +195,7 @@ class MMSGenerator implements IGenerator
             ->setRequired("Field 'Title' is required.");
         $form->offsetUnset(Form::PROTECTOR_ID);
 
-        $form->addText('sub_title', 'Sub title')
-            ->setRequired("Field 'Sub title' is required.");
+        $form->addText('sub_title', 'Sub title');
 
         $form->addText('url', 'Odkaz MMS URL')
             ->addRule(Form::URL)
