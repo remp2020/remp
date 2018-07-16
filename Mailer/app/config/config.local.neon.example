@@ -23,6 +23,8 @@ services:
             - register(Remp\MailerModule\Segment\Dummy())
 #            - register(Remp\MailerModule\Segment\Remp(%remp.beam.segments_addr%))
 
+    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
+
 # local_configs override DBs configs records.
 local_configs:
 

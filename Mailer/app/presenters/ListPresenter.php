@@ -98,7 +98,7 @@ final class ListPresenter extends BasePresenter
                 'actions' => [
                     'show' => $showUrl,
                 ],
-                $list->type_category->title,
+                $list->type_category ? $list->type_category->title : null,
                 "<a href='{$showUrl}'>{$list->title}</a>",
                 $list->code,
                 $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),

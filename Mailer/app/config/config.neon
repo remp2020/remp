@@ -108,8 +108,6 @@ services:
     segmentAgreggator:
         class: Remp\MailerModule\Segment\Aggregator
 
-    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
-
     mailFactory:
         class: Remp\MailerModule\Sender\MailerFactory
         setup:
