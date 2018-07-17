@@ -29,6 +29,8 @@ class MediaBriefingGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
         ];
     }
 
@@ -50,7 +52,8 @@ class MediaBriefingGenerator implements IGenerator
             $captionWithLinkTemplate,
             $liTemplate,
             $hrTemplate,
-            $spacerTemplate
+            $spacerTemplate,
+            $imageTemplate
         ) = $this->getTemplates();
 
         $rules = [
@@ -91,7 +94,7 @@ class MediaBriefingGenerator implements IGenerator
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
 
             // replace images
-            '/<img.*?src="(.*?)".*?>/is' => '<img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">',
+            '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
 
             // replace ul & /ul
             '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
@@ -130,6 +133,18 @@ class MediaBriefingGenerator implements IGenerator
 
         // fix pees
         list($post, $lockedPost) = preg_replace('/<p>/is', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", [$post, $lockedPost]);
+
+        $imageHtml = '';
+
+        if (isset($values->image_title) && isset($values->image_url)) {
+            $imageHtml = str_replace('$1', $values->image_url, $captionTemplate);
+            $imageHtml = str_replace('$2', $values->image_title, $imageHtml);
+        } else if (isset($values->image_url)) {
+            $imageHtml = str_replace('$1', $values->image_url, $imageTemplate);
+        }
+
+        $post = $imageHtml . $post;
+        $lockedPost = $imageHtml . $lockedPost;
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
@@ -247,6 +262,14 @@ class MediaBriefingGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'post_excerpt'");
         }
 
+        if (isset($data->post_image->image_sizes->medium_large->file)) {
+            $output->image_url = $data->post_image->image_sizes->medium_large->file;
+        }
+
+        if (isset($data->post_image->image_title)) {
+            $output->image_title = $data->post_image->image_title;
+        }
+
         if (!isset($data->post_content)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_content'");
         }
@@ -348,12 +371,17 @@ HTML;
         </table>
 HTML;
 
+        $imageTemplate = <<< HTML
+        <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
+HTML;
+
         return [
             $captionTemplate,
             $captionWithLinkTemplate,
             $liTemplate,
             $hrTemplate,
             $spacerTemplate,
+            $imageTemplate,
         ];
     }
 }
