@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Segment extends Model
 {
+    const TYPE_RULE = 'rule';
+    const TYPE_EXPLICIT = 'explicit';
+
     protected $casts = [
         'active' => 'boolean',
     ];
@@ -18,10 +21,16 @@ class Segment extends Model
         'name',
         'code',
         'active',
+        'type',
     ];
 
     public function rules()
     {
         return $this->hasMany(SegmentRule::class);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(SegmentUser::class);
     }
 }

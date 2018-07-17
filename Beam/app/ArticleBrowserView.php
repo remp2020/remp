@@ -11,6 +11,11 @@ class ArticleBrowserView extends Model
 {
     public $timestamps = false;
 
+    protected $casts = [
+        'pageviews' => 'integer',
+        'timespent' => 'integer',
+    ];
+
     protected $fillable = [
         'article_id',
         'browser_id',

@@ -25,7 +25,6 @@ class AggregateUserArticlesJob extends Command
         parent::__construct();
         $this->journalContract = $journalContract;
         $this->pageviews = [];
-
     }
 
     public function handle()
@@ -53,6 +52,7 @@ class AggregateUserArticlesJob extends Command
         $request->addGroup('article_id', 'browser_id');
 
         $records = $this->journalContract->sum($request);
+
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process."));
             return;
@@ -71,7 +71,7 @@ class AggregateUserArticlesJob extends Command
             $browserId = $record->tags->browser_id;
             $sum = $record->sum;
 
-            if (!isset($this->pageviews[$browserId][$articleId])){
+            if (!isset($this->pageviews[$browserId][$articleId])) {
                 // do not store timespent data if not a single pageview is recorded
                 continue;
             }
