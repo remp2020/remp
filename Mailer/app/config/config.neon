@@ -76,16 +76,6 @@ services:
     console:
         class: Remp\MailerModule\Console\Application
         setup:
-            - announce(Remp\MailerModule\Commands\ProcessJobCommand)
-            - announce(Remp\MailerModule\Commands\MailWorkerCommand)
-            - announce(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand)
-            - announce(Remp\MailerModule\Commands\SubscribeWorkerCommand)
-            - announce(Remp\MailerModule\Commands\EmailChangedWorkerCommand)
-            - announce(Remp\MailerModule\Commands\DatabaseSeedCommand)
-            - announce(Remp\MailerModule\Commands\DemoSeedCommand)
-            - announce(Remp\MailerModule\Commands\HermesWorkerCommand)
-            - announce(Remp\MailerModule\Commands\ProcessJobStatsCommand)
-            - announce(Remp\MailerModule\Commands\MailgunEventsCommand)
             - setCatchExceptions(true)
 
     dateFormatterFactory:
@@ -112,15 +102,9 @@ services:
 
     eventEmitter:
         class: League\Event\Emitter
-        setup:
-            - addListener(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentHandler())
 
     segmentAgreggator:
         class: Remp\MailerModule\Segment\Aggregator
-        setup:
-            - register(Remp\MailerModule\Segment\Remp(%remp.beam.segments_addr%))
-
-    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
 
     mailFactory:
         class: Remp\MailerModule\Sender\MailerFactory
@@ -159,6 +143,7 @@ services:
     apiDecider:
         class: Tomaj\NetteApi\ApiDecider
         setup:
+            - enableGlobalPreflight()
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
@@ -170,6 +155,7 @@ services:
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'jobs'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
             - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'segments', 'list'), \Remp\MailerModule\Api\v1\Handlers\Segments\SegmentsListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+            - addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 2, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
     # Generator
     generator:
         class: Remp\MailerModule\Generators\GeneratorFactory
@@ -232,17 +218,6 @@ services:
     - Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
     - Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
     - Remp\MailerModule\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-
-    # Commands
-    - Remp\MailerModule\Commands\ProcessJobCommand
-    - Remp\MailerModule\Commands\MailWorkerCommand
-    - Remp\MailerModule\Commands\SyncUserSubscriptionsCommand
-    - Remp\MailerModule\Commands\SubscribeWorkerCommand
-    - Remp\MailerModule\Commands\EmailChangedWorkerCommand
-    - Remp\MailerModule\Commands\DatabaseSeedCommand
-    - Remp\MailerModule\Commands\DemoSeedCommand
-    - Remp\MailerModule\Commands\ProcessJobStatsCommand
-    - Remp\MailerModule\Commands\MailgunEventsCommand
 
     # Helpers
     - Remp\MailerModule\Generators\WordpressHelpers

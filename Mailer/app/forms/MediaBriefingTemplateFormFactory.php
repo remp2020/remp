@@ -82,10 +82,10 @@ class MediaBriefingTemplateFormFactory
 
         $defaults = [
             'name' => 'MediaBrifing ' . date('j.n.Y'),
-            'code' => 'mediabriefing_' . date('dmY'),
+            'code' => 'mbrf_' . date('dmY'),
             'mail_layout_id' => 33, // layout for subscribers
             'locked_mail_layout_id' => 33, // layout for non-subscribers
-            'mail_type_id' => 14, // Follow tem,
+            'mail_type_id' => 16, // mediabrifing
             'from' => 'Denník N <info@dennikn.sk>',
         ];
 

@@ -1,4 +1,17 @@
 services:
+    # All console commands you need to use should be registered here
+    # This is a set that we recommend to use
+    console:
+        setup:
+            - register(Remp\MailerModule\Commands\ProcessJobCommand())
+            - register(Remp\MailerModule\Commands\MailWorkerCommand())
+            - register(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
+            - register(Remp\MailerModule\Commands\DatabaseSeedCommand())
+            - register(Remp\MailerModule\Commands\DemoSeedCommand())
+            - register(@hermesWorker)
+            - register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
+            - register(Remp\MailerModule\Commands\MailgunEventsCommand())
+
     # This is a reference IUser implementation.
     # You should make your own implementation against your CRM system and register it here.
     - Remp\MailerModule\User\Dummy
@@ -8,6 +21,13 @@ services:
     segmentAgreggator:
         setup:
             - register(Remp\MailerModule\Segment\Dummy())
+#            - register(Remp\MailerModule\Segment\Remp(%remp.beam.segments_addr%))
+
+#    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
+#    eventEmitter:
+#        class: League\Event\Emitter
+#        setup:
+#            - addListener(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentHandler())
 
 # local_configs override DBs configs records.
 local_configs:
