@@ -67,7 +67,7 @@ class MailgunEventsHandler extends BaseHandler
         }
 
         $this->emitter->emit(new HermesMessage('mailgun-event', [
-            'mail_sender_id' => $params['event-data']['mail_sender_id'],
+            'mail_sender_id' => $params['event-data']['user-variables']['mail_sender_id'],
             'timestamp' => $params['event-data']['timestamp'],
             'event' => $params['event-data']['event'],
         ]));
