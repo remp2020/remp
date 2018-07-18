@@ -139,7 +139,7 @@ class MediaBriefingGenerator implements IGenerator
         if (isset($values->image_title) && isset($values->image_url)) {
             $imageHtml = str_replace('$1', $values->image_url, $captionTemplate);
             $imageHtml = str_replace('$2', $values->image_title, $imageHtml);
-        } else if (isset($values->image_url)) {
+        } elseif (isset($values->image_url)) {
             $imageHtml = str_replace('$1', $values->image_url, $imageTemplate);
         }
 
@@ -294,7 +294,7 @@ class MediaBriefingGenerator implements IGenerator
 
         if (stripos($html, '[lock newsletter]')) {
             $lock = '[lock newsletter]';
-        } else if (stripos($html, '[lock]')) {
+        } elseif (stripos($html, '[lock]')) {
             $lock = '[lock]';
         }
 

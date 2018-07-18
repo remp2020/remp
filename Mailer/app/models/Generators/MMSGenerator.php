@@ -261,6 +261,7 @@ class MMSGenerator implements IGenerator
         if (!isset($data->post_excerpt)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_excerpt'");
         }
+        $output->sub_title = $data->post_excerpt;
 
         if (isset($data->post_image->image_sizes->medium_large->file)) {
             $output->image_url = $data->post_image->image_sizes->medium_large->file;
