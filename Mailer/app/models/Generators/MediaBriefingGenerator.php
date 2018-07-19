@@ -280,7 +280,7 @@ class MediaBriefingGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= '<p>Tento newsletter môžete dostávať na e-mail celý, stačí byť predplatiteľom Denníka N. <a href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}">Pozrite si ponuku predplatného.</a><p>';
+            $lockedHtml .= '<p>Dostávajte tento newsletter na e-mail celý. Využite špeciálnu akciu len pre čitateľov MediaBrífingu - <a href="https://predplatne.dennikn.sk/99centb/{{ autologin }}">dva mesiace za 99 centov</a>.<p>';
 
             return $lockedHtml;
         }
