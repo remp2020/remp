@@ -22,6 +22,10 @@ class AddTypeToSegmentsTable extends Migration
         Schema::table('segments', function (Blueprint $table) {
             $table->string('type')->default(null)->change();
         });
+
+        Schema::table('segments', function (Blueprint $table) {
+            $table->boolean('public')->default(true)->after('type');
+        });
     }
 
     /**

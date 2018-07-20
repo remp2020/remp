@@ -11,6 +11,7 @@ class Segment extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'public' => 'boolean',
     ];
 
     protected $attributes = [
@@ -22,6 +23,7 @@ class Segment extends Model
         'code',
         'active',
         'type',
+        'public',
     ];
 
     public function rules()
