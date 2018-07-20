@@ -23,7 +23,8 @@ class CreateAuthorsSegments extends Command
 
         $queryItems = DB::table('article_user_views')
             ->select(
-                DB::raw('user_id, author_id, sum(pageviews) as total_pageviews'))
+                DB::raw('user_id, author_id, sum(pageviews) as total_pageviews')
+            )
             ->join('article_author', 'article_author.article_id', '=', 'article_user_views.article_id')
             ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
             ->groupBy(['user_id', 'author_id'])
@@ -40,7 +41,8 @@ class CreateAuthorsSegments extends Command
 
         $queryItems2 = DB::table('article_user_views')
             ->select(
-                DB::raw('user_id, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent'))
+                DB::raw('user_id, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent')
+            )
             ->join('article_author', 'article_author.article_id', '=', 'article_user_views.article_id')
             ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
             ->groupBy(['user_id', 'author_id'])
@@ -65,7 +67,7 @@ class CreateAuthorsSegments extends Command
 
         foreach ($authorSegments as $authorId => $users) {
             $segment = Segment::where(['code' => "author-$authorId" ])->first();
-            $toInsert = collect($users)->map(function ($userId) use ($segment){
+            $toInsert = collect($users)->map(function ($userId) use ($segment) {
                 return [
                     'segment_id' => $segment->id,
                     'user_id' => $userId,
