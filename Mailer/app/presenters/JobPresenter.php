@@ -330,10 +330,18 @@ final class JobPresenter extends BasePresenter
 
     public function handleTemplatesByListId($listId, $sourceForm, $sourceField, $targetField, $snippet = null)
     {
-        $this[$sourceForm][$sourceField]
-            ->setDefaultValue($listId);
-        $this[$sourceForm][$targetField]
-            ->setItems($this->templatesRepository->pairs($listId));
+        $emptyValue = empty($listId);
+        if (!empty($listId)) {
+            $this[$sourceForm][$sourceField]
+                ->setDefaultValue($listId);
+            $this[$sourceForm][$targetField]
+                ->setItems($this->templatesRepository->pairs($listId));
+        } else {
+            $this[$sourceForm][$sourceField]
+                ->setDefaultValue(null);
+            $this[$sourceForm][$targetField]
+                ->setItems([]);
+        }
 
         if ($snippet) {
             $this->redrawControl($snippet);
