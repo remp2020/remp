@@ -46,14 +46,15 @@ type SegmentCache map[int]*SegmentRuleCache
 
 // Segment structure.
 type Segment struct {
-	ID        int
-	Code      string
-	Name      string
-	Active    bool
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID             int
+	Code           string
+	Name           string
+	Active         bool
+	CreatedAt      time.Time `db:"created_at"`
+	UpdatedAt      time.Time `db:"updated_at"`
+	SegmentGroupID int       `db:"segment_group_id"`
 
-	Group *SegmentGroup
+	Group SegmentGroup  `db:"segment_groups"`
 	Rules []SegmentRule `db:"segment_rules"`
 }
 
@@ -62,9 +63,13 @@ type SegmentCollection []*Segment
 
 // SegmentGroup represents metadata about group, in which Segments can be placed in.
 type SegmentGroup struct {
-	ID      int
-	Name    string
-	Sorting int
+	ID        int
+	Name      string
+	Code      string
+	Type      string
+	Sorting   int
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 // User represents information about User in Segment.
@@ -84,12 +89,13 @@ type Intersector func(userID string) bool
 
 // SegmentDB represents Segment's storage MySQL/InfluxDB implementation.
 type SegmentDB struct {
-	MySQL           *sqlx.DB
-	RuleCountCache  *cache.Cache
-	EventStorage    EventStorage
-	PageviewStorage PageviewStorage
-	CommerceStorage CommerceStorage
-	Segments        map[string]*Segment
+	MySQL                 *sqlx.DB
+	RuleCountCache        *cache.Cache
+	EventStorage          EventStorage
+	PageviewStorage       PageviewStorage
+	CommerceStorage       CommerceStorage
+	Segments              map[string]*Segment
+	ExplicitSegmentsUsers map[string]UserSet
 }
 
 // Get returns instance of Segment based on the given code.
@@ -220,6 +226,14 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue strin
 
 // Users return list of all users within segment.
 func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error) {
+	if segment.Group.Type == "explicit" {
+		uc := []string{}
+		for userID := range sDB.ExplicitSegmentsUsers[segment.Code] {
+			uc = append(uc, userID)
+		}
+		return uc, nil
+	}
+
 	users := make(UserSet)
 
 	for i, sr := range segment.Rules {
@@ -312,6 +326,15 @@ func (sDB *SegmentDB) Cache() error {
 		s.Rules = src
 	}
 
+	for _, s := range sc {
+		src := SegmentGroup{}
+		err = sDB.MySQL.Get(&src, "SELECT * FROM segment_groups WHERE id = ?", s.SegmentGroupID)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("unable to get related segment group for segment [%d]", s.ID))
+		}
+		s.Group = src
+	}
+
 	old := sDB.Segments
 	for _, s := range sc {
 		sm[s.Code] = s
@@ -321,6 +344,36 @@ func (sDB *SegmentDB) Cache() error {
 	if !reflect.DeepEqual(old, sm) {
 		log.Println("segment cache reloaded")
 	}
+	return nil
+}
+
+// CacheUsers caches explicit segments' users in memory
+func (sDB *SegmentDB) CacheUsers() error {
+	su := make(map[string]UserSet)
+
+	for code, s := range sDB.Segments {
+		if s.Group.Type == "explicit" {
+
+			rows, err := sDB.MySQL.Query("SELECT user_id FROM segment_users WHERE segment_id = ?", s.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					continue
+				}
+				return errors.Wrap(err, "unable to get segment users from MySQL")
+			}
+			users := make(UserSet)
+			for rows.Next() {
+				var userID string
+				err = rows.Scan(&userID)
+				if err != nil {
+					return errors.Wrap(err, "unable to load user ID from result row")
+				}
+				users[userID] = true
+			}
+			su[code] = users
+		}
+	}
+	sDB.ExplicitSegmentsUsers = su
 	return nil
 }
 

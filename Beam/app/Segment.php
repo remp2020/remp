@@ -6,12 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Segment extends Model
 {
-    const TYPE_RULE = 'rule';
-    const TYPE_EXPLICIT = 'explicit';
-
     protected $casts = [
         'active' => 'boolean',
-        'public' => 'boolean',
     ];
 
     protected $attributes = [
@@ -22,8 +18,7 @@ class Segment extends Model
         'name',
         'code',
         'active',
-        'type',
-        'public',
+        'segment_group_id'
     ];
 
     public function rules()
@@ -34,5 +29,10 @@ class Segment extends Model
     public function users()
     {
         return $this->hasMany(SegmentUser::class);
+    }
+
+    public function segmentGroup()
+    {
+        return $this->belongsTo(SegmentGroup::class);
     }
 }

@@ -104,12 +104,20 @@ func main() {
 	ticker10s := time.NewTicker(10 * time.Second)
 	defer ticker10s.Stop()
 
+	ticker1m := time.NewTicker(time.Minute)
+	defer ticker1m.Stop()
+
 	ticker1h := time.NewTicker(time.Hour)
 	defer ticker1h.Stop()
 
 	cacheSegmentDB := func() {
 		if err := segmentStorage.Cache(); err != nil {
 			service.LogError("unable to cache segments", "err", err)
+		}
+	}
+	cacheSegmentUsers := func() {
+		if err := segmentStorage.CacheUsers(); err != nil {
+			service.LogError("unable to cache segment users", "err", err)
 		}
 	}
 	cacheEventDB := func() {
@@ -120,6 +128,7 @@ func main() {
 
 	wg.Add(1)
 	cacheSegmentDB()
+	cacheSegmentUsers()
 	cacheEventDB()
 	go func() {
 		defer wg.Done()
@@ -128,6 +137,8 @@ func main() {
 			select {
 			case <-ticker10s.C:
 				cacheSegmentDB()
+			case <-ticker1m.C:
+				cacheSegmentUsers()
 			case <-ticker1h.C:
 				cacheEventDB()
 			case <-ctx.Done():

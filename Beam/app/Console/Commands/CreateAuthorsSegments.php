@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Author;
 use App\Segment;
+use App\SegmentGroup;
 use App\SegmentUser;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -81,15 +82,16 @@ class CreateAuthorsSegments extends Command
 
     private function createUserSegments()
     {
-        Author::chunk(200, function ($authors) {
+        $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_AUTHORS_SEGMENTS])->first();
+
+        Author::chunk(200, function ($authors) use ($segmentGroup) {
             foreach ($authors as $author) {
                 Segment::updateOrCreate([
                     'code' => 'author-' . $author->id
                 ], [
                     'name' => 'Author ' . $author->name,
                     'active' => true,
-                    'type' => Segment::TYPE_EXPLICIT,
-                    'public' => false
+                    'segment_group_id' => $segmentGroup->id,
                 ]);
             }
         });

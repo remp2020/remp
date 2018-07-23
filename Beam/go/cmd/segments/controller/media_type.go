@@ -58,8 +58,8 @@ func (s *Segment) ToMediaType() *app.Segment {
 		Code: s.Code,
 		Name: s.Name,
 		Group: &app.SegmentGroup{
-			Name:    "REMP segments",
-			Sorting: 100,
+			Name:    s.Group.Name,
+			Sorting: s.Group.Sorting,
 		},
 	}
 }
