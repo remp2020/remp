@@ -106,7 +106,7 @@ services:
 			- add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
 			- add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventHandler())
 			- add('heartbeat', Remp\MailerModule\Hermes\PingMysql())
-#            - add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
+#			- add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
 
 	eventEmitter:
 		class: League\Event\Emitter
@@ -121,11 +121,11 @@ services:
 			- addMailer(Remp\MailerModule\Mailer\SmtpMailer())
 			- addMailer(Remp\MailerModule\Mailer\MailgunMailer())
 
-#    	# Internal CRM system. For more details contact Tomas Bella.
-#    	authenticator:
-#        	class: Remp\MailerModule\Auth\Authenticator
-#    	authStorage:
-#        	class: Remp\MailerModule\Auth\RemoteUser(%sso_host%)
+#	# Internal CRM system. For more details contact Tomas Bella.
+#	authenticator:
+#		class: Remp\MailerModule\Auth\Authenticator
+#	authStorage:
+#		class: Remp\MailerModule\Auth\RemoteUser(%sso_host%)
 
 	# SSO authentication
 	- Remp\NetteSso\Security\Client(%sso_addr%)
