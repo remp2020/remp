@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateArticleUserViewsTable extends Migration
+class CreateArticleAggregatedViewsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ class CreateArticleUserViewsTable extends Migration
      */
     public function up()
     {
-        Schema::create('article_user_views', function (Blueprint $table) {
+        Schema::create('article_aggregated_views', function (Blueprint $table) {
             $table->integer('article_id')->unsigned();
-            $table->integer('user_id')->unsigned();
+            $table->string('user_id');
+            $table->string('browser_id');
             $table->date('date');
             $table->integer('pageviews')->default(0);
             $table->integer('timespent')->default(0);
 
-            $table->primary(['article_id', 'user_id', 'date']);
+            $table->primary(['article_id', 'user_id', 'browser_id', 'date'], 'primary_index');
             $table->foreign('article_id')->references('id')->on('articles');
         });
     }
@@ -32,6 +33,6 @@ class CreateArticleUserViewsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('article_browser_views');
+        Schema::dropIfExists('article_aggregated_views');
     }
 }

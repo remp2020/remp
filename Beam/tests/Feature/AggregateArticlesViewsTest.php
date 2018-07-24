@@ -4,7 +4,8 @@ namespace Tests\Feature;
 
 use App\Account;
 use App\Article;
-use App\ArticleUserView;
+use App\ArticleAggregatedView;
+use App\Console\Commands\AggregateArticlesViews;
 use App\Contracts\JournalContract;
 use App\Contracts\Remp\Journal;
 use App\Property;
@@ -12,7 +13,7 @@ use Mockery;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class AggregateUserArticlesTest extends TestCase
+class AggregateArticlesViewsTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,14 +25,16 @@ class AggregateUserArticlesTest extends TestCase
         "count": 8,
         "tags": {
             "article_id": "2148518",
-            "user_id": "1234"
+            "user_id": "1234",
+            "browser_id": "abcd"
         }
     },
     {
         "count": 3,
         "tags": {
             "article_id": "1148518",
-            "user_id": "1234"
+            "user_id": "1234",
+            "browser_id": "abcd"
         }
     }
 ]
@@ -42,7 +45,8 @@ JSON;
         "count": 3,
         "tags": {
             "article_id": "1148518",
-            "user_id": "1234"
+            "user_id": "1234",
+            "browser_id": "abcd"
         }
     }
 ]
@@ -55,7 +59,8 @@ JSON;
         "sum": 10,
         "tags": {
             "article_id": "2148518",
-            "user_id": "1234"
+            "user_id": "1234",
+            "browser_id": "abcd"
         }
     }
 ]
@@ -66,7 +71,8 @@ JSON;
         "sum": 25,
         "tags": {
             "article_id": "2148518",
-            "user_id": "1234"
+            "user_id": "1234",
+            "browser_id": "abcd"
         }
     }
 ]
@@ -101,9 +107,9 @@ JSON;
         );
 
         $this->app->instance(JournalContract::class, $journalMock);
-        $this->artisan('pageviews:aggregate-user-articles');
+        $this->artisan(AggregateArticlesViews::COMMAND);
 
-        $articleView2148518 = ArticleUserView::where([
+        $articleView2148518 = ArticleAggregatedView::where([
             'article_id' => $article2148518->id,
             'user_id' => '1234'
         ])->first();
@@ -111,7 +117,7 @@ JSON;
         $this->assertEquals(8, $articleView2148518->pageviews);
         $this->assertEquals(35, $articleView2148518->timespent);
 
-        $articleView1148518 = ArticleUserView::where([
+        $articleView1148518 = ArticleAggregatedView::where([
             'article_id' => $article1148518->id,
             'user_id' => '1234'
         ])->first();

@@ -6,7 +6,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Yadakhov\InsertOnDuplicateKey;
 
-class ArticleUserView extends Model
+class ArticleAggregatedView extends Model
 {
     use InsertOnDuplicateKey;
 
@@ -20,6 +20,7 @@ class ArticleUserView extends Model
     protected $fillable = [
         'article_id',
         'user_id',
+        'browser_id',
         'date',
         'pageviews',
         'timespent',
