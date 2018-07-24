@@ -31,6 +31,9 @@ class AggregateArticlesViews extends Command
 
     public function handle()
     {
+        // aggregating one full day may exceed default memory limit, therefore increase memory limit 2x
+        ini_set('memory_limit', '256M');
+
         // First delete data older than 30 days
         $dateThreshold = Carbon::today()->subDays(30)->toDateString();
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
@@ -55,7 +58,7 @@ class AggregateArticlesViews extends Command
         $request = new JournalAggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
-        $request->addGroup('article_id', 'user_id');
+        $request->addGroup('article_id', 'user_id', 'browser_id');
 
         $records = $this->journalContract->sum($request);
 
@@ -98,7 +101,7 @@ class AggregateArticlesViews extends Command
         $request = new JournalAggregateRequest('pageviews', 'load');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
-        $request->addGroup('article_id', 'user_id');
+        $request->addGroup('article_id', 'user_id', 'browser_id');
 
         $records = $this->journalContract->count($request);
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
