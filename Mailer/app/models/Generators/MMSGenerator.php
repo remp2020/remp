@@ -4,13 +4,13 @@ namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
-use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget;
+use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 use GuzzleHttp\Client;
-use Remp\MailerModule\Generators\MediaBriefingHelpers;
+use Remp\MailerModule\Generators\WordpressHelpers;
 
-class MediaBriefingGenerator implements IGenerator
+class MMSGenerator implements IGenerator
 {
     protected $mailSourceTemplateRepository;
 
@@ -25,10 +25,10 @@ class MediaBriefingGenerator implements IGenerator
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'mediabriefing_html', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'mms_html', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
         ];
@@ -36,16 +36,16 @@ class MediaBriefingGenerator implements IGenerator
 
     public function getWidgets()
     {
-        return [MediaBriefingWidget::class];
+        return [MMSWidget::class];
     }
 
     public function process($values)
     {
-        $helpers = new MediaBriefingHelpers;
+        $helpers = new WordpressHelpers;
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
 
-        $post = $values->mediabriefing_html;
-        $lockedPost = $this->getLockedHtml($post);
+        $post = $values->mms_html;
+        $lockedPost = $this->getLockedHtml($post, $values->url);
 
         list(
             $captionTemplate,
@@ -71,6 +71,7 @@ class MediaBriefingGenerator implements IGenerator
 
             // remove paragraphs
             '/<p.*?>(.*?)<\/p>/is' => "$1",
+            '/<span.*?>(.*?)<\/span>/is' => "$1",
 
             // replace em-s
             "/<em.*?>(.*?)<\/em>/is" => "<i style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;\">$1</i><br>",
@@ -85,10 +86,10 @@ class MediaBriefingGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)"/is' => "<a href=\"https://dennikn.sk/$1\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$2</a><br><br>",
+            '/\[articlelink.*?id="(.*?)"/is' => "<a href=\"https://dennikn.sk/$1\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;\">$2</a><br><br>",
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" title="$2" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a>',
+            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" title="$2" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;">$2</a>',
 
             // replace h2
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
@@ -139,7 +140,7 @@ class MediaBriefingGenerator implements IGenerator
         if (isset($values->image_title) && isset($values->image_url)) {
             $imageHtml = str_replace('$1', $values->image_url, $captionTemplate);
             $imageHtml = str_replace('$2', $values->image_title, $imageHtml);
-        } elseif (isset($values->image_url)) {
+        } else if (isset($values->image_url)) {
             $imageHtml = str_replace('$1', $values->image_url, $imageTemplate);
         }
 
@@ -193,7 +194,7 @@ class MediaBriefingGenerator implements IGenerator
         $addonParams = [
             'lockedHtmlContent' => $output['lockedHtmlContent'],
             'lockedTextContent' => $output['lockedTextContent'],
-            'mediaBriefingTitle' => $values->title,
+            'mmsTitle' => $values->title,
             'render' => true
         ];
 
@@ -209,14 +210,13 @@ class MediaBriefingGenerator implements IGenerator
             ->setRequired("Field 'Title' is required.");
         $form->offsetUnset(Form::PROTECTOR_ID);
 
-        $form->addText('sub_title', 'Sub title')
-            ->setRequired("Field 'Sub title' is required.");
+        $form->addText('sub_title', 'Sub title');
 
-        $form->addText('url', 'Media Briefing URL')
+        $form->addText('url', 'Odkaz MMS URL')
             ->addRule(Form::URL)
-            ->setRequired("Field 'Media Briefing URL' is required.");
+            ->setRequired("Field 'Odkaz MMS URL' is required.");
 
-        $form->addTextArea('mediabriefing_html', 'HTML')
+        $form->addTextArea('mms_html', 'HTML')
             ->setAttribute('rows', 20)
             ->setAttribute('class', 'form-control html-editor')
             ->getControlPrototype();
@@ -254,7 +254,7 @@ class MediaBriefingGenerator implements IGenerator
         $output->title = $data->post_title;
 
         if (!isset($data->post_url)) {
-            throw new PreprocessException("WP json object does not contain required attribute 'post_url'");
+            throw new PreprocessException("WP json object  does not contain required attribute 'post_url'");
         }
         $output->url = $data->post_url;
 
@@ -274,12 +274,12 @@ class MediaBriefingGenerator implements IGenerator
         if (!isset($data->post_content)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_content'");
         }
-        $output->mediabriefing_html = $data->post_content;
+        $output->mms_html = $data->post_content;
 
         return $output;
     }
 
-    public function getLockedHtml($html)
+    public function getLockedHtml($html, $link)
     {
         $lockedHtml = '';
         $lock = null;
@@ -294,7 +294,7 @@ class MediaBriefingGenerator implements IGenerator
 
         if (stripos($html, '[lock newsletter]')) {
             $lock = '[lock newsletter]';
-        } elseif (stripos($html, '[lock]')) {
+        } else if (stripos($html, '[lock]')) {
             $lock = '[lock]';
         }
 
@@ -303,7 +303,7 @@ class MediaBriefingGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= '<p>Dostávajte tento newsletter na e-mail celý. Využite špeciálnu akciu len pre čitateľov MediaBrífingu - <a href="https://predplatne.dennikn.sk/99centb/{{ autologin }}">dva mesiace za 99 centov</a>.<p>';
+            $lockedHtml .= "<p><a href=\"{$link}/{{ autologin }}\">Pokračovanie odkaz MMS - kliknite sem</a><p>";
 
             return $lockedHtml;
         }
@@ -320,10 +320,10 @@ class MediaBriefingGenerator implements IGenerator
             $result = json_decode($result);
             $thumbLink = $result->thumbnail_url;
 
-            return "<br><a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
+            return "<br><a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
         }
 
-        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$link</a><br><br>";
+        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;\">$link</a><br><br>";
     }
 
     public function getTemplates()
@@ -336,7 +336,7 @@ class MediaBriefingGenerator implements IGenerator
 HTML;
 
         $captionWithLinkTemplate = <<< HTML
-    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:#F26755;text-decoration:none;">
+    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:#5050f4;text-decoration:none;">
     <img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border:none;">
 </a>
     <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
