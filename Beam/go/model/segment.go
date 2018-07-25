@@ -54,7 +54,7 @@ type Segment struct {
 	UpdatedAt      time.Time `db:"updated_at"`
 	SegmentGroupID int       `db:"segment_group_id"`
 
-	Group SegmentGroup  `db:"segment_groups"`
+	Group SegmentGroup  `db:"segment_group"`
 	Rules []SegmentRule `db:"segment_rules"`
 }
 
@@ -133,7 +133,13 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 // List returns all available segments configured via Beam admin.
 func (sDB *SegmentDB) List() (SegmentCollection, error) {
 	sc := SegmentCollection{}
-	err := sDB.MySQL.Select(&sc, "SELECT name, code FROM segments")
+	err := sDB.MySQL.Select(&sc, "SELECT segments.name, segments.code, segments.segment_group_id, "+
+		"segment_groups.id AS 'segment_group.id', "+
+		"segment_groups.name AS 'segment_group.name', "+
+		"segment_groups.code AS 'segment_group.code', "+
+		"segment_groups.type AS 'segment_group.type', "+
+		"segment_groups.sorting AS 'segment_group.sorting' "+
+		"FROM segments JOIN segment_groups ON segments.segment_group_id = segment_groups.id")
 	if err != nil {
 		return nil, err
 	}
