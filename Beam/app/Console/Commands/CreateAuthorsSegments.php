@@ -23,26 +23,22 @@ class CreateAuthorsSegments extends Command
 
     public function handle()
     {
-        $this->createAuthorSegments();
         $this->recomputeUsersForAuthorSegments();
         $this->recomputeBrowsersForAuthorSegments();
     }
 
-    private function createAuthorSegments()
+    private function getOrCreateAuthorSegment($authorId)
     {
         $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_AUTHORS_SEGMENTS])->first();
+        $author = Author::find($authorId);
 
-        Author::chunk(200, function ($authors) use ($segmentGroup) {
-            foreach ($authors as $author) {
-                Segment::updateOrCreate([
-                    'code' => 'author-' . $author->id
-                ], [
-                    'name' => 'Author ' . $author->name,
-                    'active' => true,
-                    'segment_group_id' => $segmentGroup->id,
-                ]);
-            }
-        });
+        return Segment::updateOrCreate([
+            'code' => 'author-' . $author->id
+        ], [
+            'name' => 'Author ' . $author->name,
+            'active' => true,
+            'segment_group_id' => $segmentGroup->id,
+        ]);
     }
 
     private function recomputeUsersForAuthorSegments()
@@ -52,7 +48,7 @@ class CreateAuthorsSegments extends Command
         SegmentUser::truncate();
 
         foreach ($authorUsers as $authorId => $users) {
-            $segment = Segment::where(['code' => "author-$authorId" ])->first();
+            $segment = $this->getOrCreateAuthorSegment($authorId);
             $toInsert = collect($users)->map(function ($userId) use ($segment) {
                 return [
                     'segment_id' => $segment->id,
@@ -65,7 +61,6 @@ class CreateAuthorsSegments extends Command
         }
     }
 
-
     private function recomputeBrowsersForAuthorSegments()
     {
         $authorBrowsers = $this->groupDataFor('browser_id');
@@ -73,7 +68,7 @@ class CreateAuthorsSegments extends Command
         SegmentBrowser::truncate();
 
         foreach ($authorBrowsers as $authorId => $browsers) {
-            $segment = Segment::where(['code' => "author-$authorId" ])->first();
+            $segment = $this->getOrCreateAuthorSegment($authorId);
             $toInsert = collect($browsers)->map(function ($browserId) use ($segment) {
                 return [
                     'segment_id' => $segment->id,
