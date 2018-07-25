@@ -31,8 +31,9 @@ class AggregateArticlesViews extends Command
 
     public function handle()
     {
-        // aggregating one full day may exceed default memory limit, therefore increase memory limit 2x
-        ini_set('memory_limit', '256M');
+        // aggregating one full day may exceed default memory limit, therefore increase memory limit
+        // typical memory usage for 1day aggregation ~130MB
+        ini_set('memory_limit', '512M');
 
         // First delete data older than 30 days
         $dateThreshold = Carbon::today()->subDays(30)->toDateString();

@@ -12,6 +12,11 @@ class SegmentGroup extends Model
     const TYPE_RULE = 'rule';
     const TYPE_EXPLICIT = 'explicit';
 
+    public static function getByCode($code)
+    {
+        return SegmentGroup::where('code', $code)->first();
+    }
+
     protected $fillable = [
         'name',
         'code',

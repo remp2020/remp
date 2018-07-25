@@ -115,9 +115,9 @@ func main() {
 			service.LogError("unable to cache segments", "err", err)
 		}
 	}
-	cacheSegmentUsers := func() {
-		if err := segmentStorage.CacheUsers(); err != nil {
-			service.LogError("unable to cache segment users", "err", err)
+	cacheExplicitSegments := func() {
+		if err := segmentStorage.CacheExplicitSegments(); err != nil {
+			service.LogError("unable to cache explicit segment", "err", err)
 		}
 	}
 	cacheEventDB := func() {
@@ -128,7 +128,7 @@ func main() {
 
 	wg.Add(1)
 	cacheSegmentDB()
-	cacheSegmentUsers()
+	cacheExplicitSegments()
 	cacheEventDB()
 	go func() {
 		defer wg.Done()
@@ -138,7 +138,7 @@ func main() {
 			case <-ticker10s.C:
 				cacheSegmentDB()
 			case <-ticker1m.C:
-				cacheSegmentUsers()
+				cacheExplicitSegments()
 			case <-ticker1h.C:
 				cacheEventDB()
 			case <-ctx.Done():
