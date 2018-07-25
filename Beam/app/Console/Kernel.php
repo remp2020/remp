@@ -42,7 +42,7 @@ class Kernel extends ConsoleKernel
         $schedule->command(AggregateArticlesViews::COMMAND)
             ->dailyAt('00:10')
             ->withoutOverlapping()
-            ->after(function() {
+            ->after(function () {
                 $this->artisan->run(CreateAuthorsSegments::COMMAND);
             });
     }
