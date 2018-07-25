@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AggregateArticlesViews;
+use App\Console\Commands\CreateAuthorsSegments;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Schema;
@@ -36,6 +38,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('aggregate:pageview-timespent')
             ->hourlyAt(5)
             ->withoutOverlapping();
+
+        $schedule->command(AggregateArticlesViews::COMMAND)
+            ->dailyAt('00:10')
+            ->withoutOverlapping()
+            ->after(function() {
+                $this->artisan->run(CreateAuthorsSegments::COMMAND);
+            });
     }
 
     /**
