@@ -2,107 +2,65 @@
 
 namespace Tests\Feature;
 
-use App\ArticleBrowserView;
-use App\Contracts\JournalContract;
-use App\Contracts\Remp\Journal;
-use Mockery;
+use App\Account;
+use App\Article;
+use App\ArticleAggregatedView;
+use App\Author;
+use App\Console\Commands\CreateAuthorsSegments;
+use App\Property;
+use App\Segment;
+use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class AggregateUserArticlesJobTest extends TestCase
+class CreateAuthorsSegmentsTest extends TestCase
 {
     use RefreshDatabase;
 
     public function testJob()
     {
-        $pageviews1 = <<<JSON
-[
-    {
-        "count": 8,
-        "tags": {
-            "article_id": "2148518",
-            "browser_id": "3f4e02bc-b140-4908-9971-6e4a686cb584"
-        }
-    },
-    {
-        "count": 3,
-        "tags": {
-            "article_id": "1148518",
-            "browser_id": "3f4e02bc-b140-4908-9971-6e4a686cb584"
-        }
-    }
-]
-JSON;
-        $pageviews2 = <<<JSON
-[
-    {
-        "count": 3,
-        "tags": {
-            "article_id": "1148518",
-            "browser_id": "3f4e02bc-b140-4908-9971-6e4a686cb584"
-        }
-    }
-]
-JSON;
-        $pageviews3 = '[]';
+        $account = factory(Account::class)->create();
+        $property = factory(Property::class)->create(['account_id' => $account->id]);
+        $article = factory(Article::class)->create([
+            'external_id' => 1,
+            'property_uuid' => $property->uuid,
+        ]);
+        $author = factory(Author::class)->create();
+        $article->authors()->save($author);
 
-        $timespent1 = <<<JSON
-[
-    {
-        "sum": 10,
-        "tags": {
-            "article_id": "2148518",
-            "browser_id": "3f4e02bc-b140-4908-9971-6e4a686cb584"
-        }
-    }
-]
-JSON;
-        $timespent2 = <<<JSON
-[
-    {
-        "sum": 25,
-        "tags": {
-            "article_id": "2148518",
-            "browser_id": "3f4e02bc-b140-4908-9971-6e4a686cb584"
-        }
-    }
-]
-JSON;
-        $timespent3 = '[]';
+        $date = Carbon::today()->toDateString();
 
-        // Mock Journal data
-        // job aggregates pageviews day data in 24 1-hour windows
-        $journalMock = Mockery::mock(Journal::class);
-        $journalMock->shouldReceive('count')->andReturn(
-            collect(json_decode($pageviews1)),
-            collect(json_decode($pageviews2)),
-            collect(json_decode($pageviews3))
-        );
+        // First we need aggregated data
+        // These pageviews/timespent data are above defined author segments critera,
+        // see job implementation for details
+        $items = [
+            [
+                'article_id' => $article->id,
+                'user_id' => '',
+                'browser_id' => 'XYZ',
+                'date' => $date,
+                'pageviews' => 10,
+                'timespent' => 1800 // 30 min
+            ],
+            [
+                'article_id' => $article->id,
+                'user_id' => '9',
+                'browser_id' => 'ABC',
+                'date' => $date,
+                'pageviews' => 10,
+                'timespent' => 1800 // 30 min
+            ]
+        ];
+        ArticleAggregatedView::insert($items);
 
-        // job aggregates timespent day data in 24 1-hour windows
-        $journalMock->shouldReceive('sum')->andReturn(
-            collect(json_decode($timespent1)),
-            collect(json_decode($timespent2)),
-            collect(json_decode($timespent3))
-        );
+        $this->artisan(CreateAuthorsSegments::COMMAND);
 
-        $this->app->instance(JournalContract::class, $journalMock);
-        $this->artisan('pageviews:aggregate-user-articles');
+        $segment = Segment::where('code', 'author-' . $author->id)->first();
+        $segmentBrowserIds = $segment->browsers->pluck('browser_id');
+        $segmentUserIds = $segment->users->pluck('user_id');
 
-        $articleView2148518 = ArticleBrowserView::where([
-            'article_id' => '2148518',
-            'browser_id' => '3f4e02bc-b140-4908-9971-6e4a686cb584'
-        ])->first();
-
-        $this->assertEquals(8, $articleView2148518->pageviews);
-        $this->assertEquals(35, $articleView2148518->timespent);
-
-        $articleView1148518 = ArticleBrowserView::where([
-            'article_id' => '1148518',
-            'browser_id' => '3f4e02bc-b140-4908-9971-6e4a686cb584'
-        ])->first();
-
-        $this->assertEquals(6, $articleView1148518->pageviews);
-        $this->assertEquals(0, $articleView1148518->timespent);
+        $this->assertContains('ABC', $segmentBrowserIds);
+        $this->assertContains('XYZ', $segmentBrowserIds);
+        $this->assertContains('9', $segmentUserIds);
     }
 }
