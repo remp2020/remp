@@ -153,8 +153,15 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 // CheckUser verifies presence of user within provided segment.
 func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
 	if segment.Group.Type == explicitSegmentType {
-		segmentUsers := sDB.ExplicitSegmentsUsers[segment.Code]
-		_, ok := segmentUsers[userID]
+		if _, ok := sDB.ExplicitSegmentsUsers[segment.Code]; !ok {
+			// if segment is not present in the cache, reload
+			sDB.CacheExplicitSegments()
+		}
+		segmentUsers, ok := sDB.ExplicitSegmentsUsers[segment.Code]
+		if !ok {
+			return cache, false, nil
+		}
+		_, ok = segmentUsers[userID]
 		return cache, ok, nil
 	}
 	return sDB.check(segment, "user_id", userID, now, cache, ro)
@@ -163,8 +170,15 @@ func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, 
 // CheckBrowser verifies presence of browser within provided segment.
 func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
 	if segment.Group.Type == explicitSegmentType {
-		segmentBrowsers := sDB.ExplicitSegmentsBrowsers[segment.Code]
-		_, ok := segmentBrowsers[browserID]
+		if _, ok := sDB.ExplicitSegmentsBrowsers[segment.Code]; !ok {
+			// if segment is not present in the cache, reload
+			sDB.CacheExplicitSegments()
+		}
+		segmentBrowsers, ok := sDB.ExplicitSegmentsBrowsers[segment.Code]
+		if !ok {
+			return cache, false, nil
+		}
+		_, ok = segmentBrowsers[browserID]
 		return cache, ok, nil
 	}
 	return sDB.check(segment, "browser_id", browserID, now, cache, ro)
