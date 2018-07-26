@@ -30,6 +30,7 @@ class MediaBriefingGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
         ];
     }
 
@@ -245,6 +246,15 @@ class MediaBriefingGenerator implements IGenerator
 
         if (!isset($data->post_authors[0]->display_name)) {
             throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
+        }
+
+        $output->from = "Denník N <info@dennikn.sk>";
+        foreach ($data->post_authors as $author) {
+            if ($author->user_email === "editori@dennikn.sk") {
+                continue;
+            }
+            $output->from = $author->display_name . ' <' . $author->user_email . '>';
+            break;
         }
 
         if (!isset($data->post_title)) {
