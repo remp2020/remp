@@ -12,6 +12,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	explicitSegmentType = "explicit"
+)
+
 // SegmentStorage represents interface to get segment related data.
 type SegmentStorage interface {
 	// Get returns instance of Segment based on the given code.
@@ -148,7 +152,7 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 
 // CheckUser verifies presence of user within provided segment.
 func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
-	if segment.Group.Type == "explicit" {
+	if segment.Group.Type == explicitSegmentType {
 		segmentUsers := sDB.ExplicitSegmentsUsers[segment.Code]
 		_, ok := segmentUsers[userID]
 		return cache, ok, nil
@@ -158,8 +162,7 @@ func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, 
 
 // CheckBrowser verifies presence of browser within provided segment.
 func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
-	if segment.Group.Type == "explicit" {
-		log.Printf("checkin browser %s", browserID)
+	if segment.Group.Type == explicitSegmentType {
 		segmentBrowsers := sDB.ExplicitSegmentsBrowsers[segment.Code]
 		_, ok := segmentBrowsers[browserID]
 		return cache, ok, nil
@@ -247,7 +250,7 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue strin
 
 // Users return list of all users within segment.
 func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error) {
-	if segment.Group.Type == "explicit" {
+	if segment.Group.Type == explicitSegmentType {
 		uc := []string{}
 		for userID := range sDB.ExplicitSegmentsUsers[segment.Code] {
 			uc = append(uc, userID)
@@ -374,14 +377,14 @@ func (sDB *SegmentDB) CacheExplicitSegments() error {
 	browsersSet := make(map[string]BrowserSet)
 
 	for code, s := range sDB.Segments {
-		if s.Group.Type == "explicit" {
+		if s.Group.Type == explicitSegmentType {
 			// load users
 			rows, err := sDB.MySQL.Query("SELECT user_id FROM segment_users WHERE segment_id = ?", s.ID)
 			if err != nil {
 				if err == sql.ErrNoRows {
 					continue
 				}
-				return errors.Wrap(err, "unable to get segment users from MySQL")
+				return errors.Wrap(err, fmt.Sprintf("unable to get segment users from MySQL [%d]", s.ID))
 			}
 			users := make(UserSet)
 			for rows.Next() {
@@ -400,7 +403,7 @@ func (sDB *SegmentDB) CacheExplicitSegments() error {
 				if err == sql.ErrNoRows {
 					continue
 				}
-				return errors.Wrap(err, "unable to get segment browsers from MySQL")
+				return errors.Wrap(err, fmt.Sprintf("unable to get segment browsers from MySQL [%d]", s.ID))
 			}
 			browsers := make(BrowserSet)
 			for rows.Next() {
