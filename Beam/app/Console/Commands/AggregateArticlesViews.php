@@ -146,6 +146,10 @@ class AggregateArticlesViews extends Command
 
     private function storeData($date)
     {
+        if (empty($this->data)) {
+            $this->line(' <info>No data to store.</info>');
+            return;
+        }
         $bar = $this->output->createProgressBar(count($this->data));
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
