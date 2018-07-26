@@ -40,7 +40,7 @@ class AggregateArticlesViews extends Command
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
 
         // Aggregate last day pageviews in 1-hour windows
-        $startDate = $this->hasOption('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
+        $startDate = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
         $timeAfter = $startDate;
         $timeBefore = (clone $timeAfter)->addHour()->subSecond();
         $date = $timeAfter->toDateString();
