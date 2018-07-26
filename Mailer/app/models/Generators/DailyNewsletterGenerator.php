@@ -5,8 +5,8 @@ namespace Remp\MailerModule\Generators;
 use Nette\Application\UI\Form;
 use Nette\Utils\Validators;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
+use Remp\MailerModule\PageMeta\DenniknContent;
 use Remp\MailerModule\PageMeta\TransportInterface;
-use Remp\MailerModule\PageMeta\TyzdenContent;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -58,7 +58,7 @@ class DailyNewsletterGenerator implements IGenerator
         $urls = explode("\n", $values->posts);
         foreach ($urls as $url) {
             if (Validators::isUrl($url)) {
-                $posts[$url] = Utils::fetchUrlMeta($url, new TyzdenContent(), $this->transport);
+                $posts[$url] = Utils::fetchUrlMeta($url, new DenniknContent(), $this->transport);
             }
         }
 

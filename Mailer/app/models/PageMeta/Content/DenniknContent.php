@@ -46,10 +46,10 @@ class DenniknContent implements ContentInterface
             $image = array_pop($parts);
             $info = pathinfo($image);
             if (preg_match('/-([0-9]+)x([0-9]+)$/i', $info['filename'])) {
-                $newImageFileName = preg_replace('/-([0-9]+)x([0-9]+)$/', '-200x120', $info['filename']);
+                $newImageFileName = preg_replace('/-([0-9]+)x([0-9]+)$/', '-558x270', $info['filename']);
                 $image = $newImageFileName . '.' . $info['extension'];
             } else {
-                $image = $info['filename'] . '-200x120.' . $info['extension'];
+                $image = $info['filename'] . '-558x270.' . $info['extension'];
             }
             $parts[] = $image;
             $image = implode('/', $parts);
