@@ -6,6 +6,7 @@ use App\Article;
 use App\ArticleAggregatedView;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
+use DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 
@@ -20,21 +21,14 @@ class AggregateArticlesViews extends Command
 
     private $journalContract;
 
-    private $data;
-
     public function __construct(JournalContract $journalContract)
     {
         parent::__construct();
         $this->journalContract = $journalContract;
-        $this->data = [];
     }
 
     public function handle()
     {
-        // aggregating one full day may exceed default memory limit, therefore increase memory limit
-        // typical memory usage for 1day aggregation ~130MB
-        ini_set('memory_limit', '512M');
-
         // First delete data older than 30 days
         $dateThreshold = Carbon::today()->subDays(30)->toDateString();
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
@@ -45,17 +39,29 @@ class AggregateArticlesViews extends Command
         $timeBefore = (clone $timeAfter)->addHour()->subSecond();
         $date = $timeAfter->toDateString();
         for ($i = 0; $i < 24; $i++) {
-            $this->aggregatePageviews($timeAfter, $timeBefore);
-            $this->aggregateTimespent($timeAfter, $timeBefore);
+            list($data, $articleIds) = $this->aggregatePageviews([], [], $timeAfter, $timeBefore);
+            list($data, $articleIds) = $this->aggregateTimespent($data, $articleIds, $timeAfter, $timeBefore);
+            $this->storeData($data, $articleIds, $date);
+
             $timeAfter = $timeAfter->addHour();
             $timeBefore = $timeBefore->addHour();
         }
-        $this->storeData($date);
     }
 
-    private function aggregateTimespent($timeAfter, $timeBefore)
+    /**
+     * @param array $data
+     * @param array $articleIds
+     * @param $timeAfter
+     * @param $timeBefore
+     * @return array {
+     *   @type array $data parsed data appended to provided $data param
+     *   @type array $articleIds list of touched articleIds appended to provided $articleIds param
+     * }
+     *
+     */
+    private function aggregateTimespent(array $data, array $articleIds, $timeAfter, $timeBefore): array
     {
-        $this->line(sprintf("Fetching aggregated timespent data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
+        $this->line(sprintf("Fetching aggregated <info>timespent</info> data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
         $request = new JournalAggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
@@ -65,7 +71,7 @@ class AggregateArticlesViews extends Command
 
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process."));
-            return;
+            return [];
         }
 
         $bar = $this->output->createProgressBar(count($records));
@@ -84,21 +90,35 @@ class AggregateArticlesViews extends Command
             $sum = $record->sum;
             $key = $browserId . self::KEY_SEPARATOR . $userId;
 
-            if (!isset($this->data[$key][$articleId])) {
+            if (!isset($data[$key][$articleId])) {
                 // do not store timespent data if not a single pageview is recorded
                 continue;
             }
 
-            $this->data[$key][$articleId]['timespent'] += $sum;
+            $data[$key][$articleId]['timespent'] += $sum;
+            $articleIds[$articleId] = true;
             $bar->advance();
         }
         $bar->finish();
         $this->line(' <info>OK!</info>');
+
+        return [$data, $articleIds];
     }
 
-    private function aggregatePageviews($timeAfter, $timeBefore)
+    /**
+     * @param array $data
+     * @param array $articleIds
+     * @param $timeAfter
+     * @param $timeBefore
+     * @return array {
+     *   @type array $data parsed data appended to provided $data param
+     *   @type array $articleIds list of touched articleIds appended to provided $articleIds param
+     * }
+     *
+     */
+    private function aggregatePageviews(array $data, array $articleIds, $timeAfter, $timeBefore): array
     {
-        $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
+        $this->line(sprintf("Fetching aggregated <info>pageviews</info> data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
         $request = new JournalAggregateRequest('pageviews', 'load');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
@@ -107,7 +127,7 @@ class AggregateArticlesViews extends Command
         $records = $this->journalContract->count($request);
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process."));
-            return;
+            return [];
         }
 
         $bar = $this->output->createProgressBar(count($records));
@@ -127,59 +147,47 @@ class AggregateArticlesViews extends Command
 
             $count = $record->count;
 
-            if (!array_key_exists($key, $this->data)) {
-                $this->data[$key] = [];
+            if (!array_key_exists($key, $data)) {
+                $data[$key] = [];
             }
-            if (!array_key_exists($articleId, $this->data[$key])) {
-                $this->data[$key][$articleId] = [
+            if (!array_key_exists($articleId, $data[$key])) {
+                $data[$key][$articleId] = [
                     'pageviews' => 0,
                     'timespent' => 0
                 ];
             }
 
-            $this->data[$key][$articleId]['pageviews'] += $count;
+            $data[$key][$articleId]['pageviews'] += $count;
+            $articleIds[$articleId] = true;
             $bar->advance();
         }
         $bar->finish();
         $this->line(' <info>OK!</info>');
+
+        return [$data, $articleIds];
     }
 
-    private function storeData($date)
+    private function storeData(array $data, array $articleIds, string $date)
     {
-        if (empty($this->data)) {
-            $this->line(' <info>No data to store.</info>');
+        if (empty($data)) {
             return;
         }
-        $bar = $this->output->createProgressBar(count($this->data));
+
+        $bar = $this->output->createProgressBar(count($data));
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
-        $articleIdMap = [];
+        $articleIdMap = Article::whereIn('external_id', array_keys($articleIds))->pluck('id', 'external_id');
 
-        foreach ($this->data as $key => $articlesData) {
-            $items = [];
-
+        foreach ($data as $key => $articlesData) {
             list($browserId, $userId) = explode(self::KEY_SEPARATOR, $key, 2);
 
             foreach ($articlesData as $externalArticleId => $record) {
-                $articleId = null;
-                if (array_key_exists($externalArticleId, $articleIdMap)) {
-                    $articleId = $articleIdMap[$externalArticleId];
-                } else {
-                    $article = Article::select()->where([
-                        'external_id' => $externalArticleId,
-                    ])->first();
-
-                    if (!$article) {
-                        continue;
-                    }
-
-                    $articleId = $article->id;
-                    $articleIdMap[$externalArticleId] = $articleId;
+                if (!isset($articleIdMap[$externalArticleId])) {
+                    continue;
                 }
-
                 $items[] = [
-                    'article_id' => $articleId,
+                    'article_id' => $articleIdMap[$externalArticleId],
                     'browser_id' => $browserId,
                     'user_id' => $userId,
                     'date' => $date,
@@ -187,9 +195,12 @@ class AggregateArticlesViews extends Command
                     'timespent' => $record['timespent']
                 ];
             }
-            ArticleAggregatedView::insertOnDuplicateKey($items, ['pageviews', 'timespent']);
             $bar->advance();
         }
+        ArticleAggregatedView::insertOnDuplicateKey($items, [
+            'pageviews' => DB::raw('pageviews + ' . $record['pageviews']),
+            'timespent' => DB::raw('timespent + ' . $record['timespent']),
+        ]);
         $bar->finish();
         $this->line(' <info>OK!</info>');
     }
