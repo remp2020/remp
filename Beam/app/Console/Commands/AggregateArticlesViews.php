@@ -42,7 +42,7 @@ class AggregateArticlesViews extends Command
         // Aggregate last day pageviews in 1-hour windows
         $startDate = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
         $timeAfter = $startDate;
-        $timeBefore = (clone $timeAfter)->addHour()->subSecond();
+        $timeBefore = (clone $timeAfter)->addHour();
         $date = $timeAfter->toDateString();
         for ($i = 0; $i < 24; $i++) {
             $this->aggregatePageviews($timeAfter, $timeBefore);
