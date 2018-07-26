@@ -8,7 +8,6 @@ use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 use GuzzleHttp\Client;
-use Remp\MailerModule\Generators\MediaBriefingHelpers;
 
 class MediaBriefingGenerator implements IGenerator
 {
@@ -41,7 +40,7 @@ class MediaBriefingGenerator implements IGenerator
 
     public function process($values)
     {
-        $helpers = new MediaBriefingHelpers;
+        $helpers = new WordpressHelpers();
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
 
         $post = $values->mediabriefing_html;

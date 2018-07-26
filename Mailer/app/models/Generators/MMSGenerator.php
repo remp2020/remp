@@ -8,7 +8,6 @@ use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 use GuzzleHttp\Client;
-use Remp\MailerModule\Generators\WordpressHelpers;
 
 class MMSGenerator implements IGenerator
 {
@@ -41,7 +40,7 @@ class MMSGenerator implements IGenerator
 
     public function process($values)
     {
-        $helpers = new WordpressHelpers;
+        $helpers = new WordpressHelpers();
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
 
         $post = $values->mms_html;
