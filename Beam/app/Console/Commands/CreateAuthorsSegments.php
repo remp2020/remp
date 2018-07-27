@@ -86,8 +86,8 @@ class CreateAuthorsSegments extends Command
     {
         $results = [];
         $queryItems =  ArticleAggregatedView::select(
-                DB::raw("$groupParameter, sum(pageviews) as total_pageviews")
-            )
+            DB::raw("$groupParameter, sum(pageviews) as total_pageviews")
+        )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
             ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
             ->whereRaw("$groupParameter <> ''")
@@ -105,8 +105,8 @@ class CreateAuthorsSegments extends Command
         $totalPageviews = $this->aggregatedPageviewsFor($groupParameter);
 
         $queryItems =  ArticleAggregatedView::select(
-                DB::raw("$groupParameter, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent")
-            )
+            DB::raw("$groupParameter, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent")
+        )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
             ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
             ->whereRaw("$groupParameter <> ''")
