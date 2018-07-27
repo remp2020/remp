@@ -71,7 +71,7 @@ class AggregateArticlesViews extends Command
 
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process."));
-            return [];
+            return [$data, $articleIds];
         }
 
         $bar = $this->output->createProgressBar(count($records));
@@ -90,9 +90,14 @@ class AggregateArticlesViews extends Command
             $sum = $record->sum;
             $key = $browserId . self::KEY_SEPARATOR . $userId;
 
-            if (!isset($data[$key][$articleId])) {
-                // do not store timespent data if not a single pageview is recorded
-                continue;
+            if (!array_key_exists($key, $data)) {
+                $data[$key] = [];
+            }
+            if (!array_key_exists($articleId, $data[$key])) {
+                $data[$key][$articleId] = [
+                    'pageviews' => 0,
+                    'timespent' => 0
+                ];
             }
 
             $data[$key][$articleId]['timespent'] += $sum;
@@ -127,7 +132,7 @@ class AggregateArticlesViews extends Command
         $records = $this->journalContract->count($request);
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process."));
-            return [];
+            return [$data, $articleIds];
         }
 
         $bar = $this->output->createProgressBar(count($records));
@@ -198,8 +203,8 @@ class AggregateArticlesViews extends Command
             $bar->advance();
         }
         ArticleAggregatedView::insertOnDuplicateKey($items, [
-            'pageviews' => DB::raw('pageviews + ' . $record['pageviews']),
-            'timespent' => DB::raw('timespent + ' . $record['timespent']),
+            'pageviews' => DB::raw('pageviews + VALUES(pageviews)'),
+            'timespent' => DB::raw('timespent + VALUES(timespent)'),
         ]);
         $bar->finish();
         $this->line(' <info>OK!</info>');
