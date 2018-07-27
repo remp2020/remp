@@ -110,8 +110,14 @@ HTML;
 {% endfor %}
 TEXT;
         $generatorTemplates = [
-            ['title' => 'Best performing articles', 'generator' => 'best_performing_articles', 'sorting' => 100,
-             'html' => $bestPerformingArticleHtml, 'text' => $bestPerformingArticleText]
+            [
+                'title' => 'Best performing articles',
+                'code' => 'best-performing-articles',
+                'generator' => 'best_performing_articles',
+                'sorting' => 100,
+                'html' => $bestPerformingArticleHtml,
+                'text' => $bestPerformingArticleText
+            ]
         ];
         foreach ($generatorTemplates as $template) {
             if ($this->sourceTemplatesRepository->getTable()->where(['title' => $template['title']])->count('*') > 0) {
@@ -120,6 +126,7 @@ TEXT;
             }
             $this->sourceTemplatesRepository->add(
                 $template['title'],
+                $template['code'],
                 $template['generator'],
                 $template['html'],
                 $template['text'],
