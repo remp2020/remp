@@ -184,6 +184,7 @@ class AggregateArticlesViews extends Command
 
         $articleIdMap = Article::whereIn('external_id', array_keys($articleIds))->pluck('id', 'external_id');
 
+        $items = [];
         foreach ($data as $key => $articlesData) {
             list($browserId, $userId) = explode(self::KEY_SEPARATOR, $key, 2);
 
