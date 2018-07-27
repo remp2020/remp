@@ -246,6 +246,7 @@ HTML;
             if ($author->user_email === "editori@dennikn.sk") {
                 continue;
             }
+            $output->editor = $author->display_name;
             $output->from = $author->display_name . ' <' . $author->user_email . '>';
             break;
         }
