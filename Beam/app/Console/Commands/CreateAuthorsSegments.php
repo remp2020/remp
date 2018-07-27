@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\ArticleAggregatedView;
 use App\Author;
 use App\Segment;
 use App\SegmentBrowser;
@@ -84,8 +85,7 @@ class CreateAuthorsSegments extends Command
     private function aggregatedPageviewsFor($groupParameter)
     {
         $results = [];
-        $queryItems = DB::table('article_aggregated_views')
-            ->select(
+        $queryItems =  ArticleAggregatedView::select(
                 DB::raw("$groupParameter, sum(pageviews) as total_pageviews")
             )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
@@ -104,22 +104,29 @@ class CreateAuthorsSegments extends Command
     {
         $totalPageviews = $this->aggregatedPageviewsFor($groupParameter);
 
-        $queryItems =  DB::table('article_aggregated_views')
-            ->select(
+        $queryItems =  ArticleAggregatedView::select(
                 DB::raw("$groupParameter, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent")
             )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
             ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
             ->whereRaw("$groupParameter <> ''")
             ->groupBy([$groupParameter, 'author_id'])
+            // Conditions to select members of particular author segment
+            // are empirically defined.
+            // TODO Improve/describe this after further analysis is done
             ->havingRaw('avg(timespent) >= ?', ['120'])
             ->cursor();
 
         $segments = [];
 
         foreach ($queryItems as $item) {
-            $ratio = (int) $item->total_pageviews / (float) $totalPageviews[$item->$groupParameter];
-            // TODO specify conditions according to expert criteria
+            if ($totalPageviews[$item->$groupParameter] === 0) {
+                continue;
+            }
+            $ratio = (int) $item->total_pageviews / $totalPageviews[$item->$groupParameter];
+            // Conditions to select members of particular author segment
+            // are empirically defined.
+            // TODO Improve/describe this after further analysis is done
             if ($ratio >= 0.25 && $item->total_pageviews >= 5) {
                 if (!array_key_exists($item->author_id, $segments)) {
                     $segments[$item->author_id] = [];
