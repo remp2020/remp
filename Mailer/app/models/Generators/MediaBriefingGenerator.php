@@ -209,8 +209,7 @@ class MediaBriefingGenerator implements IGenerator
             ->setRequired("Field 'Title' is required.");
         $form->offsetUnset(Form::PROTECTOR_ID);
 
-        $form->addText('sub_title', 'Sub title')
-            ->setRequired("Field 'Sub title' is required.");
+        $form->addText('sub_title', 'Sub title');
 
         $form->addText('url', 'Media Briefing URL')
             ->addRule(Form::URL)
