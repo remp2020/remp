@@ -78,7 +78,7 @@
                     </li>
                     @endif
 
-                    @if($campaign->countriesWhitelist)
+                    @if($campaign->countriesWhitelist->count())
                         <li class="list-group-item">
                             <strong>Countries whitelist:</strong>
                             <ul>
@@ -87,7 +87,7 @@
                             @endforeach
                             </ul>
                         </li>
-                    @elseif($campaign->countriesBlacklist)
+                    @elseif($campaign->countriesBlacklist->count())
                         <li class="list-group-item">
                             <strong>Countries blacklist:</strong>
                             <ul>
