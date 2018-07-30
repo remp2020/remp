@@ -211,6 +211,8 @@ class MediaBriefingGenerator implements IGenerator
 
         $form->addText('sub_title', 'Sub title');
 
+        $form->addText('from', 'Sender');
+
         $form->addText('url', 'Media Briefing URL')
             ->addRule(Form::URL)
             ->setRequired("Field 'Media Briefing URL' is required.");

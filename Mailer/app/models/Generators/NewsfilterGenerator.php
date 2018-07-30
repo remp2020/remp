@@ -171,6 +171,8 @@ class NewsfilterGenerator implements IGenerator
             ->addRule(Form::URL)
             ->setRequired("Field 'Newsfilter URL' is required.");
 
+        $form->addText('from', 'Sender');
+
         $form->addText('editor', 'Editor')
             ->setRequired("Field 'Editor' is required.");
 

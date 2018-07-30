@@ -212,6 +212,8 @@ class MMSGenerator implements IGenerator
 
         $form->addText('sub_title', 'Sub title');
 
+        $form->addText('from', 'Sender');
+
         $form->addText('url', 'Odkaz MMS URL')
             ->addRule(Form::URL)
             ->setRequired("Field 'Odkaz MMS URL' is required.");
