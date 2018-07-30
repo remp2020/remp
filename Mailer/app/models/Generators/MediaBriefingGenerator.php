@@ -27,7 +27,7 @@ class MediaBriefingGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'mediabriefing_html', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
