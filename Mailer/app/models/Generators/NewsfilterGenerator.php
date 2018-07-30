@@ -28,6 +28,7 @@ class NewsfilterGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'editor', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'summary', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
         ];
     }
 
@@ -240,6 +241,15 @@ HTML;
             throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
         }
         $output->editor = $data->post_authors[0]->display_name;
+        $output->from = "Denník N <info@dennikn.sk>";
+        foreach ($data->post_authors as $author) {
+            if ($author->user_email === "editori@dennikn.sk") {
+                continue;
+            }
+            $output->editor = $author->display_name;
+            $output->from = $author->display_name . ' <' . $author->user_email . '>';
+            break;
+        }
 
         if (!isset($data->post_title)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_title'");
