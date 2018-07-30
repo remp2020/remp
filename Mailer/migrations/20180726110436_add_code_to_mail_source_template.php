@@ -18,6 +18,7 @@ class AddCodeToMailSourceTemplate extends AbstractMigration
         }
 
         $this->table('mail_source_template')
-            ->changeColumn('code', 'string', ['null' => false]);
+            ->changeColumn('code', 'string', ['null' => false])
+            ->update();
     }
 }
