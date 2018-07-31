@@ -58,7 +58,7 @@ class CampaignController extends Controller
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
-                return Html::linkRoute('campaigns.edit', $campaign->name, $campaign);
+                return Html::linkRoute('campaigns.show', $campaign->name, $campaign);
             })
             ->addColumn('variants', function (Campaign $campaign) {
                 $data = $campaign->campaignBanners->all();
