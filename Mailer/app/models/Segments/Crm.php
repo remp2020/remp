@@ -2,10 +2,8 @@
 namespace Remp\MailerModule\Segment;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Nette\Utils\Json;
-use Nette\Utils\JsonException;
 
 class Crm implements ISegment
 {
