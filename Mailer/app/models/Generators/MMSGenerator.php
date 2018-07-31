@@ -195,6 +195,7 @@ class MMSGenerator implements IGenerator
             'lockedHtmlContent' => $output['lockedHtmlContent'],
             'lockedTextContent' => $output['lockedTextContent'],
             'mmsTitle' => $values->title,
+            'from' => $values->from,
             'render' => true
         ];
 

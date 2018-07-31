@@ -153,6 +153,7 @@ class NewsfilterGenerator implements IGenerator
             'lockedHtmlContent' => $output['lockedHtmlContent'],
             'lockedTextContent' => $output['lockedTextContent'],
             'newsfilterTitle' => $values->title,
+            'from' => $values->from,
             'render' => true
         ];
 
