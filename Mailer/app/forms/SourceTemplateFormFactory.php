@@ -42,7 +42,8 @@ class SourceTemplateFormFactory implements IFormFactory
         $form->addText('title', 'Title')
             ->setRequired("Field 'Title' is required.");
 
-        $form->addText('code', 'Code');
+        $form->addText('code', 'Code')
+            ->setRequired("Field 'Code' is required.");
 
         $items = $this->mailGeneratorFactory->pairs();
         $form->addSelect('generator', 'Generator', $items)
