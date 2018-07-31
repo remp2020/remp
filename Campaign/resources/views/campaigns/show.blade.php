@@ -101,11 +101,7 @@
                     @foreach(['desktop', 'mobile'] as $device)
                         <li class="list-group-item">
                             <strong>Show on {{ ucfirst($device) }}:</strong>
-                            @if(in_array($device, $campaign->devices))
-                                Yes
-                            @else
-                                No
-                            @endif
+                            {{ @yesno(in_array($device, $campaign->devices)) }}
                         </li>
                     @endforeach
 
