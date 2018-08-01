@@ -43,7 +43,8 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:10')
             ->withoutOverlapping()
             ->after(function () {
-                $this->artisan->run(CreateAuthorsSegments::COMMAND);
+                // TODO enable this after author segments conditions are specified
+                //$this->artisan->run(CreateAuthorsSegments::COMMAND);
             });
     }
 

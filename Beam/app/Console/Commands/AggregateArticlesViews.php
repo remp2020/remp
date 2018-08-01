@@ -6,9 +6,9 @@ use App\Article;
 use App\ArticleAggregatedView;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
-use DB;
+use App\ViewsPerBrowserMv;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AggregateArticlesViews extends Command
 {
@@ -46,7 +46,22 @@ class AggregateArticlesViews extends Command
             $timeAfter = $timeAfter->addHour();
             $timeBefore = $timeBefore->addHour();
         }
+
+        // Update 'materialized view' to test author segments conditions
+        // See CreateAuthorSegments task
+        // TODO only temporary, remove this after conditions are finalized
+        $this->updateViewPerBrowserMv();
     }
+
+    public function updateViewPerBrowserMv()
+    {
+        ViewsPerBrowserMv::truncate();
+        DB::insert('insert into views_per_browser_mv (browser_id, total_views) 
+select browser_id, sum(pageviews) from article_aggregated_views
+join article_author on article_author.article_id = article_aggregated_views.article_id
+where timespent <= 3600 group by browser_id');
+    }
+
 
     /**
      * @param array $data
