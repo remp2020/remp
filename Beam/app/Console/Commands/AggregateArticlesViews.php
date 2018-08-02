@@ -31,8 +31,9 @@ class AggregateArticlesViews extends Command
 
     public function handle()
     {
-        // First delete data older than 30 days
-        $dateThreshold = Carbon::today()->subDays(30)->toDateString();
+        // TODO set this up depending finalized conditions
+        // First delete data older than 90 days
+        $dateThreshold = Carbon::today()->subDays(90)->toDateString();
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
 
         // Aggregate last day pageviews in 1-hour windows
