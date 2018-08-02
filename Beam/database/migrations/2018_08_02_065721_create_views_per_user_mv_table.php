@@ -4,6 +4,11 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
+/**
+ * Class CreateViewsPerUserMvTable
+ * Temporary migration, this table works as materialized view
+ * TODO: this will go away after conditions in remp#253 issue are specified
+ */
 class CreateViewsPerUserMvTable extends Migration
 {
     /**

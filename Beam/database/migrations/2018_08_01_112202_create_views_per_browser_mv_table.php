@@ -7,6 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 /**
  * Class CreateViewsPerBrowserMvTable
  * Temporary migration, this table works as materialized view
+ * TODO: this will go away after conditions in remp#253 issue are specified
  */
 class CreateViewsPerBrowserMvTable extends Migration
 {
