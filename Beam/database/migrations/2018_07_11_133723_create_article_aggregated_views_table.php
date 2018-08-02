@@ -15,7 +15,7 @@ class CreateArticleAggregatedViewsTable extends Migration
     {
         Schema::create('article_aggregated_views', function (Blueprint $table) {
             $table->integer('article_id')->unsigned();
-            $table->string('user_id')->nullable();
+            $table->string('user_id');
             $table->string('browser_id');
             $table->date('date');
             $table->integer('pageviews')->default(0);
