@@ -36,7 +36,6 @@ class TestController extends Controller
 (select browser_id, author_id, sum(pageviews) as author_browser_views, avg(timespent) as average_timespent 
 from article_aggregated_views C join article_author A on A.article_id = C.article_id
 where timespent <= 3600 
-and browser_id <> ''
 and date >= ?
 group by browser_id, author_id
 having 
