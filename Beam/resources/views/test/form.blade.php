@@ -9,6 +9,10 @@
 
 <body>
 
+
+
+<h3>Konfiguracia autorskych segmentov</h3>
+
 <pre>
 Pri prepocte uzivatelov autorskych segmentov uvazujeme data za obdobie poslednych 30 dni.
 Momentalne su do segmentu daneho autora zaradeni uzivatelia ktori (priklad nastaveni):
@@ -24,7 +28,42 @@ Nizsie mozem experimentovat s tymito hodnotami:
 
 <form method="post" action="{{ route('test.show-results') }}">
     {{ csrf_field() }}
+
     <table>
+        <tr>
+            <td>Pocet dni dozadu za ktore pocitam segmenty:</td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>
+                {{ Form::radio('history', '30', true) }}
+                <label for="days_30">30 dni</label>
+            </td>
+            <td>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                {{ Form::radio('history', '60') }}
+                <label for="days_60">60 dni</label>
+            </td>
+            <td>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                {{ Form::radio('history', '90') }}
+                <label for="days_90">90 dni</label>
+            </td>
+            <td>
+
+            </td>
+        </tr>
+
         <tr>
             <td>
                 <label for="min_ratio">Min. pomer precitanych clankov daneho autora ku vsetkym ostatnym (0 az 1.0)</label>
@@ -63,17 +102,18 @@ Nizsie mozem experimentovat s tymito hodnotami:
     <br />
     <table>
         <tr>
-            <th>Author</th>
-            <th>Number of browsers in segment</th>
+            <th>Author Segment</th>
+            <th>#browsers</th>
+            <th>#users </th>
         </tr>
         @foreach ($results as $row)
             <tr>
                 <td>{{$row->name}}</td>
                 <td>{{$row->browser_count}}</td>
+                <td>{{$row->user_count}}</td>
             </tr>
         @endforeach
     </table>
-
 @endif
 
 </body>

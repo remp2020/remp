@@ -7,6 +7,8 @@ use App\ArticleAggregatedView;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\ViewsPerBrowserMv;
+use App\ViewsPerUserMv;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -50,18 +52,42 @@ class AggregateArticlesViews extends Command
         // Update 'materialized view' to test author segments conditions
         // See CreateAuthorSegments task
         // TODO only temporary, remove this after conditions are finalized
-        $this->updateViewPerBrowserMv();
+        $this->createTemporaryAggregations();
     }
 
-    public function updateViewPerBrowserMv()
+    private function createTemporaryAggregations()
     {
+        $days30ago = Carbon::now()->subDays(30)->toDateString();
+        $days60ago = Carbon::now()->subDays(60)->toDateString();
+        $days90ago = Carbon::now()->subDays(90)->toDateString();
+
         ViewsPerBrowserMv::truncate();
-        DB::insert('insert into views_per_browser_mv (browser_id, total_views) 
-select browser_id, sum(pageviews) from article_aggregated_views
-join article_author on article_author.article_id = article_aggregated_views.article_id
-where timespent <= 3600 group by browser_id');
+        $this->aggregateViewsPer('browser', 'total_views_last_30_days', $days30ago);
+        $this->aggregateViewsPer('browser', 'total_views_last_60_days', $days60ago);
+        $this->aggregateViewsPer('browser', 'total_views_last_90_days', $days90ago);
+
+        ViewsPerUserMv::truncate();
+        $this->aggregateViewsPer('user', 'total_views_last_30_days', $days30ago);
+        $this->aggregateViewsPer('user', 'total_views_last_60_days', $days60ago);
+        $this->aggregateViewsPer('user', 'total_views_last_90_days', $days90ago);
     }
 
+    private function aggregateViewsPer($groupBy, $daysColumn, $daysAgo)
+    {
+        if ($groupBy === 'browser') {
+            $tableToUpdate = 'views_per_browser_mv';
+            $groupParameter = 'browser_id';
+        } else {
+            $tableToUpdate = 'views_per_user_mv';
+            $groupParameter = 'user_id';
+        }
+
+        DB::insert("insert into $tableToUpdate ($groupParameter, $daysColumn) 
+select $groupParameter, sum(pageviews) from article_aggregated_views
+join article_author on article_author.article_id = article_aggregated_views.article_id
+where timespent <= 3600 and date >= ? " . ($groupBy === 'user' ? "and user_id <> ''" : '') . " group by $groupParameter
+ON DUPLICATE KEY UPDATE $daysColumn = VALUES(`$daysColumn`)", [$daysAgo]);
+    }
 
     /**
      * @param array $data
