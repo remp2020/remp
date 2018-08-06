@@ -17,7 +17,7 @@ class AggregatePageviewLoadJob extends Command
 
     public function handle(JournalContract $journalContract)
     {
-        $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+        $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
