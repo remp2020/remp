@@ -36,18 +36,20 @@ class AggregateArticlesViews extends Command
         $dateThreshold = Carbon::today()->subDays(90)->toDateString();
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
 
-        // Aggregate last day pageviews in 1-hour windows
+        // Aggregate pageviews and timespent data in time windows
+        $timeWindowMinutes = 30; // in minutes
+        $timeWindowsCount = 1440 / $timeWindowMinutes; // 1440 - number of minutes in day
         $startDate = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
         $timeAfter = $startDate;
-        $timeBefore = (clone $timeAfter)->addHour();
+        $timeBefore = (clone $timeAfter)->addMinutes($timeWindowMinutes);
         $date = $timeAfter->toDateString();
-        for ($i = 0; $i < 24; $i++) {
+        for ($i = 0; $i < $timeWindowsCount; $i++) {
             list($data, $articleIds) = $this->aggregatePageviews([], [], $timeAfter, $timeBefore);
             list($data, $articleIds) = $this->aggregateTimespent($data, $articleIds, $timeAfter, $timeBefore);
             $this->storeData($data, $articleIds, $date);
 
-            $timeAfter = $timeAfter->addHour();
-            $timeBefore = $timeBefore->addHour();
+            $timeAfter = $timeAfter->addMinutes($timeWindowMinutes);
+            $timeBefore = $timeBefore->addMinutes($timeWindowMinutes);
         }
 
         // Update 'materialized view' to test author segments conditions
@@ -91,8 +93,6 @@ class AggregateArticlesViews extends Command
         while ($startDate->lessThan($today)) {
             $end = (clone $startDate)->addDays($daysWindow - 1)->toDateString();
             $start = $startDate->toDateString();
-
-            $this->line('computing temporary table from: ' . $start . ' to ' . $end);
 
             DB::insert("insert into $tableToUpdate ($groupParameter, $daysColumn) 
 select $groupParameter, sum(pageviews) from article_aggregated_views

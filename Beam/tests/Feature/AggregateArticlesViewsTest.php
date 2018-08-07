@@ -91,7 +91,7 @@ JSON;
         ]);
 
         // Mock Journal data
-        // job aggregates pageviews day data in 24 1-hour windows
+        // job aggregates pageviews day data in time windows (currently 30 mins)
         $journalMock = Mockery::mock(Journal::class);
         $journalMock->shouldReceive('count')->andReturn(
             collect(json_decode($pageviews1)),
@@ -99,7 +99,7 @@ JSON;
             collect(json_decode($pageviews3))
         );
 
-        // job aggregates timespent day data in 24 1-hour windows
+        // job aggregates timespent day data in time windows (currently 30 mins)
         $journalMock->shouldReceive('sum')->andReturn(
             collect(json_decode($timespent1)),
             collect(json_decode($timespent2)),
