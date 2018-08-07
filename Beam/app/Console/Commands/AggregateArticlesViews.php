@@ -246,7 +246,7 @@ ON DUPLICATE KEY UPDATE $daysColumn = VALUES(`$daysColumn`)", [$daysAgo]);
             $bar->advance();
         }
 
-        foreach (array_chunk($items, 5000) as $itemsChunk) {
+        foreach (array_chunk($items, 500) as $itemsChunk) {
             ArticleAggregatedView::insertOnDuplicateKey($itemsChunk, [
                 'pageviews' => DB::raw('pageviews + VALUES(pageviews)'),
                 'timespent' => DB::raw('timespent + VALUES(timespent)'),
