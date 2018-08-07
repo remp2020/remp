@@ -58,9 +58,9 @@ class AggregateArticlesViews extends Command
 
     private function createTemporaryAggregations()
     {
-        $days30ago = Carbon::now()->subDays(30)->toDateString();
-        $days60ago = Carbon::now()->subDays(60)->toDateString();
-        $days90ago = Carbon::now()->subDays(90)->toDateString();
+        $days30ago = Carbon::today()->subDays(30);
+        $days60ago = Carbon::today()->subDays(60);
+        $days90ago = Carbon::today()->subDays(90);
 
         ViewsPerBrowserMv::truncate();
         $this->aggregateViewsPer('browser', 'total_views_last_30_days', $days30ago);
@@ -73,7 +73,7 @@ class AggregateArticlesViews extends Command
         $this->aggregateViewsPer('user', 'total_views_last_90_days', $days90ago);
     }
 
-    private function aggregateViewsPer($groupBy, $daysColumn, $daysAgo)
+    private function aggregateViewsPer($groupBy, $daysColumn, Carbon $daysAgo)
     {
         if ($groupBy === 'browser') {
             $tableToUpdate = 'views_per_browser_mv';
@@ -83,11 +83,25 @@ class AggregateArticlesViews extends Command
             $groupParameter = 'user_id';
         }
 
-        DB::insert("insert into $tableToUpdate ($groupParameter, $daysColumn) 
+        $today = Carbon::today();
+        // aggregate values in 14-days windows to avoid filling all the RAM while querying DB
+        $daysWindow = 14;
+
+        $startDate = clone $daysAgo;
+        while ($startDate->lessThan($today)) {
+            $end = (clone $startDate)->addDays($daysWindow - 1)->toDateString();
+            $start = $startDate->toDateString();
+
+            $this->line('computing temporary table from: ' . $start . ' to ' . $end);
+
+            DB::insert("insert into $tableToUpdate ($groupParameter, $daysColumn) 
 select $groupParameter, sum(pageviews) from article_aggregated_views
 join article_author on article_author.article_id = article_aggregated_views.article_id
-where timespent <= 3600 and date >= ? " . ($groupBy === 'user' ? "and user_id <> ''" : '') . " group by $groupParameter
-ON DUPLICATE KEY UPDATE $daysColumn = VALUES(`$daysColumn`)", [$daysAgo]);
+where timespent <= 3600 and date >= ? and date <= ? " . ($groupBy === 'user' ? "and user_id <> ''" : '') . " group by $groupParameter
+ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$start, $end]);
+
+            $startDate->addDays($daysWindow);
+        }
     }
 
     /**
