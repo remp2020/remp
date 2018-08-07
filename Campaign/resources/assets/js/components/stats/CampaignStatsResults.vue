@@ -39,7 +39,7 @@
                             </td>
                             <td>
                                 <strong>
-                                    {{ variant.conversions | round(2) }}%
+                                    {{ variant.conversions | round(4) }}%
                                 </strong>
                             </td>
                             <td>

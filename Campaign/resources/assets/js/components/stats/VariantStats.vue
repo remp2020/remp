@@ -30,6 +30,7 @@
                             :loading="loading"
                             :error="error"
                             :value="conversions"
+                            :precision="4"
                             :infoText="'Number of purchases / shows.'"
                         ></single-value>
 
