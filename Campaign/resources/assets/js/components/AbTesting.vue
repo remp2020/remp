@@ -66,7 +66,7 @@
                 this.variants.push({
                     id: null,
                     variant: "Primary banner",
-                    proportion: 50,
+                    proportion: 100,
                     control_group: 0,
                     banner_id: this.bannerId
                 });
@@ -74,7 +74,7 @@
                 this.variants.push({
                     id: null,
                     variant: 'Control Group',
-                    proportion: 50,
+                    proportion: 0,
                     control_group: 1,
                     banner_id: null
                 })
