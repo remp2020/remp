@@ -219,6 +219,15 @@
                 }, 50);
 
                 event.preventDefault();
+            },
+            getVariantOptionByValue: function (id) {
+                for (let ii = this.variantOptions.length - 1; ii >= 0; ii--) {
+                    if (this.variantOptions[ii].value == id) {
+                        return this.variantOptions[ii];
+                    }
+                }
+
+                return null;
             }
         },
         watch: {
