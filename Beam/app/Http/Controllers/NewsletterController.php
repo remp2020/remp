@@ -80,6 +80,16 @@ class NewsletterController extends Controller
         $newsletter->starts_at = Carbon::now()->addHour(1);
         $newsletter->articles_count = 1;
 
+        if ($generators->isEmpty()) {
+            flash('No source templates using best_performing_articles generator were configured on Mailer', 'danger');
+        }
+        if ($mailTypes->isEmpty()) {
+            flash('No mail types are available on Mailer, please configure them first', 'danger');
+        }
+        if (empty($segments)) {
+            flash('No segments are available on Mailer, please configure them first', 'danger');
+        }
+
         return response()->format([
             'html' => view(
                 'newsletters.create',

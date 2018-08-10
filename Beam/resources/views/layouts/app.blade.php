@@ -126,9 +126,11 @@
                     </li>
                 </ul>
             </li>
+            @if (config('services.remp.mailer.api_token'))
             <li {!! route_active(['newsletters']) !!}>
                 <a href="{{ route('newsletters.index') }}" ><i class="zmdi zmdi-email"></i> Newsletters</a>
             </li>
+            @endif
             <li {!! route_active(['conversions']) !!}>
                 <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
             </li>

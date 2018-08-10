@@ -15,18 +15,41 @@
             </div>
 
             <div class="input-group">
-                <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
+                <?php $disabled = empty($segments); ?>
+                <span class="input-group-addon"><i class="zmdi <?= $disabled ? 'zmdi-close-circle palette-Red text' : 'zmdi-wallpaper' ?>"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
                         {!! Form::label('Segment', null, ['class' => 'fg-label']) !!}
                         {!! Form::select(
-                           'segment',
-                           $segments,
-                           $newsletter->segment,
-                           [
-                            'class' => 'selectpicker',
-                           'data-live-search' => 'true',
-                           'placeholder' => 'Please select...'
+                            'segment',
+                            $segments,
+                            $newsletter->segment,
+                            [
+                                'class' => 'selectpicker',
+                                'data-live-search' => 'true',
+                                'placeholder' => !$disabled ? 'Please select...' : 'No segments are available on Mailer, please configure them first',
+                                'disabled' => $disabled ? 'disabled' : ''
+                            ]
+                       ) !!}
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group m-t-10">
+                <?php $disabled = $generators->isEmpty(); ?>
+                <span class="input-group-addon"><i class="zmdi <?= $disabled ? 'zmdi-close-circle palette-Red text' : 'zmdi-settings' ?>"></i></span>
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        {!! Form::label('Generator', null, ['class' => 'fg-label']) !!}
+                        {!! Form::select(
+                            'mailer_generator_id',
+                            $generators,
+                            $newsletter->mailer_generator_id,
+                            [
+                                'class' => 'selectpicker',
+                                'data-live-search' => 'true',
+                                'placeholder' => !$disabled ? 'Please select...' : 'No source templates using best_performing_articles generator were configured on Mailer',
+                                'disabled' => $disabled ? 'disabled' : '',
                            ]
                        ) !!}
                     </div>
@@ -34,34 +57,21 @@
             </div>
 
             <div class="input-group m-t-10">
-                <span class="input-group-addon"><i class="zmdi zmdi-settings"></i></span>
-                <div class="row">
-                    <div class="col-md-12 form-group">
-                        {!! Form::label('Generator', null, ['class' => 'fg-label']) !!}
-                        {!! Form::select(
-                           'mailer_generator_id',
-                           $generators,
-                           $newsletter->mailer_generator_id,
-                           ['class' => 'selectpicker',
-                           'data-live-search' => 'true',
-                           'placeholder' => 'Please select...']
-                       ) !!}
-                    </div>
-                </div>
-            </div>
-
-            <div class="input-group m-t-10">
-                <span class="input-group-addon"><i class="zmdi zmdi-settings"></i></span>
+                <?php $disabled = $mailTypes->isEmpty(); ?>
+                <span class="input-group-addon"><i class="zmdi <?= $disabled ? 'zmdi-close-circle palette-Red text' : 'zmdi-settings' ?>"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
                         {!! Form::label('Mail Type', null, ['class' => 'fg-label']) !!}
                         {!! Form::select(
-                           'mail_type_code',
-                           $mailTypes,
-                           $newsletter->mail_type_code,
-                           ['class' => 'selectpicker',
-                           'data-live-search' => 'true',
-                           'placeholder' => 'Please select...']
+                            'mail_type_code',
+                            $mailTypes,
+                            $newsletter->mail_type_code,
+                            [
+                                'class' => 'selectpicker',
+                                'data-live-search' => 'true',
+                                'placeholder' => !$disabled ? 'Please select...' : 'No mail types are available on Mailer, please configure them first',
+                                'disabled' => $disabled ? 'disabled' : '',
+                            ]
                        ) !!}
                     </div>
                 </div>
