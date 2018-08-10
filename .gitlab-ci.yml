@@ -115,7 +115,7 @@ deploy:mailer:novydenik:
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
-      -F "variables[STAGE]=novydenik.cz/mailer"
+      -F "variables[STAGE]=novydenik/mailer"
       -F "variables[URL]=https://mailer.novydenik.cz"
       https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
