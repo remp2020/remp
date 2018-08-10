@@ -116,7 +116,7 @@ deploy:mailer:novydenik:
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=novydenik.cz/mailer"
-      -F "variables[URL]=https://mailer.novydenik.cz
+      -F "variables[URL]=https://mailer.novydenik.cz"
       https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
