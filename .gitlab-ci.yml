@@ -107,10 +107,10 @@ deploy:sso:admin:
     - master
   dependencies: []
 
-deploy:mailer:test:
+deploy:mailer:novydenik:
   stage: deploy
   script:
-    - curl --request POST --form "token=$CI_JOB_TOKEN" --form ref=$CI_COMMIT_SHA https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+    - curl --request POST --form "token=$CI_JOB_TOKEN" --form "ref=master" --form "variables[REF]=$CI_COMMIT_SHA" --form "variables[STAGE]=novydenik.cz/mailer" https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
     - remp2020
