@@ -113,7 +113,6 @@ group by author_id order by user_count desc", [$fromDay, $minimalViews, $minimal
         Mail::to($emailDest)->send(
             new AuthorSegmentsResult($results, $minimalViews, $minimalAverageTimespent, $minimalRatio, $historyDays)
         );
-
     }
 
     private function getOrCreateAuthorSegment($authorId)
