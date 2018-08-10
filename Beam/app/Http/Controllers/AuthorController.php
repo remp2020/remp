@@ -49,18 +49,18 @@ class AuthorController extends Controller
         $cols = [
             'authors.id',
             'authors.name',
-            'articles_count',
-            'conversions_count',
-            'conversions_amount',
-            'pageviews_all',
-            'pageviews_signed_in',
-            'pageviews_subscribers',
-            'timespent_all',
-            'timespent_signed_in',
-            'timespent_subscribers',
-            'timespent_all / pageviews_all as avg_timespent_all',
-            'timespent_signed_in / pageviews_signed_in as avg_timespent_signed_in',
-            'timespent_subscribers / pageviews_subscribers as avg_timespent_subscribers',
+            'COALESCE(articles_count, 0) AS articles_count',
+            'COALESCE(conversions_count, 0) AS conversions_count',
+            'COALESCE(conversions_amount, 0) AS conversions_amount',
+            'COALESCE(pageviews_all, 0) AS pageviews_all',
+            'COALESCE(pageviews_signed_in, 0) AS pageviews_signed_in',
+            'COALESCE(pageviews_subscribers, 0) AS pageviews_subscribers',
+            'COALESCE(timespent_all, 0) AS timespent_all',
+            'COALESCE(timespent_signed_in, 0) AS timespent_signed_in',
+            'COALESCE(timespent_subscribers, 0) AS timespent_subscribers',
+            'COALESCE(timespent_all / pageviews_all, 0) AS avg_timespent_all',
+            'COALESCE(timespent_signed_in / pageviews_signed_in, 0) AS avg_timespent_signed_in',
+            'COALESCE(timespent_subscribers / pageviews_subscribers, 0) AS avg_timespent_subscribers',
         ];
 
         $authorArticlesQuery = ArticleAuthor::selectRaw(implode(',', [
@@ -81,12 +81,12 @@ class AuthorController extends Controller
 
         $pageviewsQuery = Article::selectRaw(implode(',', [
             'author_id',
-            'COALESCE(SUM(pageviews_all), 0) as pageviews_all',
-            'COALESCE(SUM(pageviews_signed_in), 0) as pageviews_signed_in',
-            'COALESCE(SUM(pageviews_subscribers), 0) as pageviews_subscribers',
-            'COALESCE(SUM(timespent_all), 0) as timespent_all',
-            'COALESCE(SUM(timespent_signed_in), 0) as timespent_signed_in',
-            'COALESCE(SUM(timespent_subscribers), 0) as timespent_subscribers',
+            'COALESCE(SUM(pageviews_all), 0) AS pageviews_all',
+            'COALESCE(SUM(pageviews_signed_in), 0) AS pageviews_signed_in',
+            'COALESCE(SUM(pageviews_subscribers), 0) AS pageviews_subscribers',
+            'COALESCE(SUM(timespent_all), 0) AS timespent_all',
+            'COALESCE(SUM(timespent_signed_in), 0) AS timespent_signed_in',
+            'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
         ]))
             ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
             ->groupBy('author_id');
