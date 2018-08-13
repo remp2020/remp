@@ -10,10 +10,10 @@
 
 <h2>Nastavenia</h2>
 <p>
-Pocet dni dozadu za ktore pocitam segmenty: {{$historyDays}} <br />
-Min. pomer precitanych clankov daneho autora ku vsetkym ostatnym (0 az 1.0): {{$minimalRatio}} <br />
-Min. pocet pageviews clankov daneho autora: {{$minimalViews}} <br />
-Min. priemerny cas straveny na clanku (v sekundach): {{$minimalAverageTimespent}} <br />
+Pocet dni dozadu za ktore pocitam segmenty: {{$history_days}} <br />
+Min. pomer precitanych clankov daneho autora ku vsetkym ostatnym (0 az 1.0): {{$minimal_ratio}} <br />
+Min. pocet pageviews clankov daneho autora: {{$minimal_views}} <br />
+Min. priemerny cas straveny na clanku (v sekundach): {{$minimal_average_timespent}} <br />
 </p>
 
 <h2>Vysledky</h2>

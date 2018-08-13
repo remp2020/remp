@@ -23,7 +23,6 @@ class AuthorSegmentsResult extends Mailable
 
     public function __construct($results, $minimalViews, $minimalAverageTimespent, $minimalRatio, $historyDays)
     {
-        //
         $this->results = $results;
         $this->minimalViews = $minimalViews;
         $this->minimalAverageTimespent = $minimalAverageTimespent;
@@ -33,6 +32,13 @@ class AuthorSegmentsResult extends Mailable
 
     public function build()
     {
-        return $this->view('test.results_email');
+        return $this->view('test.results_email')
+            ->with([
+                'results' => $this->results,
+                'minimal_views' => $this->minimalViews,
+                'minimal_average_timespent' => $this->minimalAverageTimespent,
+                'minimal_ratio' => $this->minimalRatio,
+                'history_days' => $this->historyDays
+            ]);
     }
 }
