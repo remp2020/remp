@@ -23,26 +23,23 @@ test:sniffer:
   script:
     - make sniff
 
-deploy:mailer:admin:
+deploy:mailer:dennikn:
   stage: deploy
   script:
-    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
-    - cd Mailer/
-    - ln -s ~/.env.mailer .env
-    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run production
-    - rm -fr ./node_modules
-    - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
-  environment:
-    name: production/remp2020/mailer
-    url: https://mailer.remp2020.com
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=dennikn/mailer"
+    -F "variables[URL]=https://mailer.remp2020.com"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
     - remp2020
     - deploy
   only:
     - master
-  dependencies: []
 
 deploy:campaign:admin:
   stage: deploy
