@@ -23,6 +23,7 @@
     "all-production": "node_modules/npm-run-all/bin/npm-run-all/index.js production lib-production iota-production"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^17.2.0",
     "animate.css": "^3.5.2",
     "autosize": "^4.0.0",
     "axios": "^0.18.0",

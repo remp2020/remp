@@ -22,7 +22,11 @@
                                 </thead>
                                 <tbody name="table-row" is="transition-group">
                                     <tr v-for="article in articles" v-bind:key="article.article_id">
-                                        <td><span class="concurrents-count">{{article.count}}</span></td>
+                                        <td><span class="concurrents-count">
+                                            <animated-integer :value="article.count"></animated-integer>
+                                            <!--{{article.count}}-->
+                                            </span>
+                                        </td>
                                         <td>
                                             <span class="c-black">{{article.title}}</span>
                                             <br />
@@ -54,6 +58,7 @@
 </style>
 
 <script>
+    import AnimatedInteger from './AnimatedInteger.vue'
     import axios from 'axios'
 
     let props = {
@@ -65,7 +70,7 @@
 
     export default {
         name: "dashboard-root",
-        components: {  },
+        components: { AnimatedInteger },
         props: props,
         created() {
             this.loadData()
