@@ -11,6 +11,7 @@ use App\ViewsPerUserMv;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AggregateArticlesViews extends Command
 {
@@ -31,6 +32,8 @@ class AggregateArticlesViews extends Command
 
     public function handle()
     {
+        Log::debug('AggregateArticlesViews job STARTED');
+
         // TODO set this up depending finalized conditions
         // First delete data older than 90 days
         $dateThreshold = Carbon::today()->subDays(90)->toDateString();
@@ -56,6 +59,8 @@ class AggregateArticlesViews extends Command
         // See CreateAuthorSegments task
         // TODO only temporary, remove this after conditions are finalized
         $this->createTemporaryAggregations();
+
+        Log::debug('AggregateArticlesViews job FINISHED');
     }
 
     private function createTemporaryAggregations()

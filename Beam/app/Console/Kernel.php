@@ -41,11 +41,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(AggregateArticlesViews::COMMAND)
             ->dailyAt('00:10')
-            ->withoutOverlapping()
-            ->after(function () {
-                // TODO enable this after author segments conditions are specified
-                //$this->artisan->run(CreateAuthorsSegments::COMMAND);
-            });
+            ->withoutOverlapping();
     }
 
     /**

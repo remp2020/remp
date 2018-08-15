@@ -25,6 +25,14 @@ class TestController extends Controller
 
     public function showResults(Request $request)
     {
+        $request->validate([
+            'min_views' => 'required|numeric',
+            'min_average_timespent' => 'required|numeric',
+            'min_ratio' => 'required|numeric',
+            'email' => 'required|email',
+            'history' => 'required|in:30,60,90',
+        ]);
+
         $minimalViews = $request->get('min_views');
         $minimalAverageTimespent = $request->get('min_average_timespent');
         $minimalRatio = $request->get('min_ratio');

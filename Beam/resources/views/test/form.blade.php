@@ -26,6 +26,17 @@ Nizsie mozem experimentovat s tymito hodnotami:
 </pre>
 
 
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+
 <form method="post" action="{{ route('test.show-results') }}">
     {{ csrf_field() }}
 
@@ -98,7 +109,7 @@ Nizsie mozem experimentovat s tymito hodnotami:
             </td>
 
             <td>
-                <input id="email"  value="{{ $email ?? '' }}" placeholder="" name="email" type="text" />
+                <input id="email" value="{{ $email ?? '' }}" placeholder="" name="email" type="email" required />
             </td>
         </tr>
 
