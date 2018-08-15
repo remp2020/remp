@@ -18,7 +18,8 @@ class AggregateArticlesViews extends Command
     const KEY_SEPARATOR = '||||';
     const COMMAND = 'pageviews:aggregate-articles-views';
 
-    protected $signature = self::COMMAND . ' {--date=}';
+    // TODO remove skip-temp-aggregation after temp aggregation tables are no longer used
+    protected $signature = self::COMMAND . ' {--date=} {--skip-temp-aggregation}';
 
     protected $description = 'Aggregate pageviews and time spent data for each user and article for yesterday';
 
@@ -58,7 +59,10 @@ class AggregateArticlesViews extends Command
         // Update 'materialized view' to test author segments conditions
         // See CreateAuthorSegments task
         // TODO only temporary, remove this after conditions are finalized
-        $this->createTemporaryAggregations();
+
+        if (!$this->option('skip-temp-aggregation')) {
+            $this->createTemporaryAggregations();
+        }
 
         Log::debug('AggregateArticlesViews job FINISHED');
     }
