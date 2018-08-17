@@ -58,18 +58,24 @@ class CreateAuthorsSegments extends Command
 
         $this->line("running browsers query");
 
-        $resultsBrowsers = DB::select("select T.author_id, authors.name, count(*) as browser_count from
-(select browser_id, author_id, sum(pageviews) as author_browser_views, avg(timespent) as average_timespent
-from article_aggregated_views C join article_author A on A.article_id = C.article_id
-where timespent <= 3600
-and date >= ?
-group by browser_id, author_id
-having
-author_browser_views >= ? and
-average_timespent >= ? and
-author_browser_views/(select $columnDays from views_per_browser_mv where browser_id = C.browser_id) >= ?
-) T join authors on authors.id = T.author_id
-group by author_id order by browser_count desc", [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
+        $browsersSql = <<<SQL
+    SELECT T.author_id, authors.name, count(*) AS browser_count 
+    FROM
+      (SELECT browser_id, author_id, sum(pageviews) AS author_browser_views, avg(timespent) AS average_timespent
+      FROM article_aggregated_views C JOIN article_author A ON A.article_id = C.article_id
+      WHERE timespent <= 3600
+      AND date >= ?
+      GROUP BY browser_id, author_id
+      HAVING
+      author_browser_views >= ? AND
+      average_timespent >= ? AND
+      author_browser_views/(SELECT $columnDays FROM views_per_browser_mv WHERE browser_id = C.browser_id) >= ?
+      ) T 
+    JOIN authors ON authors.id = T.author_id
+    GROUP BY author_id 
+    ORDER BY browser_count DESC
+SQL;
+        $resultsBrowsers = DB::select($browsersSql, [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
 
         foreach ($resultsBrowsers as $item) {
             $obj = new \stdClass();
@@ -82,19 +88,25 @@ group by author_id order by browser_count desc", [$fromDay, $minimalViews, $mini
 
         $this->line("running users query");
 
-        $resultsUsers = DB::select("select T.author_id, authors.name, count(*) as user_count from
-(select user_id, author_id, sum(pageviews) as author_user_views, avg(timespent) as average_timespent
-from article_aggregated_views C join article_author A on A.article_id = C.article_id
-where timespent <= 3600
-and user_id <> ''
-and date >= ?
-group by user_id, author_id
-having
-author_user_views >= ? and
-average_timespent >= ? and
-author_user_views/(select $columnDays from views_per_user_mv where user_id = C.user_id) >= ?
-) T join authors on authors.id = T.author_id
-group by author_id order by user_count desc", [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
+        $usersSql = <<<SQL
+    SELECT T.author_id, authors.name, count(*) AS user_count 
+    FROM
+        (SELECT user_id, author_id, sum(pageviews) AS author_user_views, avg(timespent) AS average_timespent
+        FROM article_aggregated_views C JOIN article_author A ON A.article_id = C.article_id
+        WHERE timespent <= 3600
+        AND user_id <> ''
+        AND date >= ?
+        GROUP BY user_id, author_id
+        HAVING
+        author_user_views >= ? AND
+        average_timespent >= ? AND
+        author_user_views/(SELECT $columnDays FROM views_per_user_mv WHERE user_id = C.user_id) >= ?
+        ) T JOIN authors ON authors.id = T.author_id
+    GROUP BY author_id ORDER BY user_count DESC
+SQL;
+
+
+        $resultsUsers = DB::select("", [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
 
         foreach ($resultsUsers as $item) {
             if (!array_key_exists($item->author_id, $results)) {

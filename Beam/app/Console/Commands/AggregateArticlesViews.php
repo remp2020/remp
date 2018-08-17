@@ -103,10 +103,15 @@ class AggregateArticlesViews extends Command
             $end = (clone $startDate)->addDays($daysWindow - 1)->toDateString();
             $start = $startDate->toDateString();
 
-            DB::insert("insert into $tableToUpdate ($groupParameter, $daysColumn) 
-select $groupParameter, sum(pageviews) from article_aggregated_views
-join article_author on article_author.article_id = article_aggregated_views.article_id
-where timespent <= 3600 and date >= ? and date <= ? " . ($groupBy === 'user' ? "and user_id <> ''" : '') . " group by $groupParameter
+            $sql = <<<SQL
+    INSERT INTO $tableToUpdate ($groupParameter, $daysColumn) 
+    SELECT $groupParameter, sum(pageviews) 
+    FROM article_aggregated_views
+    JOIN article_author ON article_author.article_id = article_aggregated_views.article_id
+    WHERE timespent <= 3600 AND date >= ? and date <= ? 
+SQL;
+
+            DB::insert($sql . ($groupBy === 'user' ? "and user_id <> ''" : '') . " group by $groupParameter
 ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$start, $end]);
 
             $startDate->addDays($daysWindow);
