@@ -26,6 +26,17 @@ Nizsie mozem experimentovat s tymito hodnotami:
 </pre>
 
 
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+
 <form method="post" action="{{ route('test.show-results') }}">
     {{ csrf_field() }}
 
@@ -92,28 +103,23 @@ Nizsie mozem experimentovat s tymito hodnotami:
             </td>
         </tr>
 
+        <tr>
+            <td>
+                <label for="email">Email na zaslanie vysledkov</label>
+            </td>
+
+            <td>
+                <input id="email" value="{{ $email ?? '' }}" placeholder="" name="email" type="email" required />
+            </td>
+        </tr>
+
     </table>
 
     <input type="submit" value="Prepocitaj pocty browserov v segmente" />
 </form>
 
 @if(isset($results))
-    <br />
-    <br />
-    <table>
-        <tr>
-            <th>Author Segment</th>
-            <th>#browsers</th>
-            <th>#users </th>
-        </tr>
-        @foreach ($results as $row)
-            <tr>
-                <td>{{$row->name}}</td>
-                <td>{{$row->browser_count}}</td>
-                <td>{{$row->user_count}}</td>
-            </tr>
-        @endforeach
-    </table>
+    Prepocitavam... vysledky budu zaslane na email.
 @endif
 
 </body>

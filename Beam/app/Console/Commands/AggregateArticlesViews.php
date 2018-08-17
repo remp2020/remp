@@ -11,13 +11,15 @@ use App\ViewsPerUserMv;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AggregateArticlesViews extends Command
 {
     const KEY_SEPARATOR = '||||';
     const COMMAND = 'pageviews:aggregate-articles-views';
 
-    protected $signature = self::COMMAND . ' {--date=}';
+    // TODO remove skip-temp-aggregation after temp aggregation tables are no longer used
+    protected $signature = self::COMMAND . ' {--date=} {--skip-temp-aggregation}';
 
     protected $description = 'Aggregate pageviews and time spent data for each user and article for yesterday';
 
@@ -31,6 +33,8 @@ class AggregateArticlesViews extends Command
 
     public function handle()
     {
+        Log::debug('AggregateArticlesViews job STARTED');
+
         // TODO set this up depending finalized conditions
         // First delete data older than 90 days
         $dateThreshold = Carbon::today()->subDays(90)->toDateString();
@@ -55,7 +59,12 @@ class AggregateArticlesViews extends Command
         // Update 'materialized view' to test author segments conditions
         // See CreateAuthorSegments task
         // TODO only temporary, remove this after conditions are finalized
-        $this->createTemporaryAggregations();
+
+        if (!$this->option('skip-temp-aggregation')) {
+            $this->createTemporaryAggregations();
+        }
+
+        Log::debug('AggregateArticlesViews job FINISHED');
     }
 
     private function createTemporaryAggregations()
