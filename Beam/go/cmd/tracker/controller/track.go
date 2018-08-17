@@ -259,6 +259,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			fields["derived_browser"] = strings.TrimPrefix(ua.Browser.Name.String(), "Browser")
 			fields["derived_browser_version"] = fmt.Sprintf("%d.%d", ua.Browser.Version.Major, ua.Browser.Version.Minor)
 		}
+
 		if user.Referer != nil {
 			fields["referer"] = *user.Referer
 			parsedRef := refererparser.Parse(*user.Referer)
@@ -267,7 +268,17 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			}
 			tags["derived_referer_medium"] = parsedRef.Medium
 			tags["derived_referer_source"] = parsedRef.Referer
+		} else {
+			tags["derived_referer_medium"] = "direct"
 		}
+
+		if tags["derived_referer_medium"] == "unknown" {
+			tags["derived_referer_medium"] = "external"
+			if user.URL != nil {
+				tags["derived_referer_source"] = *user.URL
+			}
+		}
+
 		if user.Adblock != nil {
 			if *user.Adblock {
 				tags["adblock"] = "1"
