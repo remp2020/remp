@@ -228,7 +228,9 @@ class WordpressHelpers
 
         $page = (new Client())->get($url)->getBody()->getContents();
 
-        if (!$page) return '';
+        if (!$page) {
+            return '';
+        }
 
         $matches = array();
 
