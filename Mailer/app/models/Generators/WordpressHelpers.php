@@ -2,6 +2,8 @@
 
 namespace Remp\MailerModule\Generators;
 
+use GuzzleHttp\Client;
+
 class WordpressHelpers
 {
     public function wpautop($pee, $br = true)
@@ -217,5 +219,24 @@ class WordpressHelpers
         }
 
         return $regex;
+    }
+
+    public function parseArticleLink($matches)
+    {
+        $id = $matches[1];
+        $url = "https://dennikn.sk/{$id}";
+
+        $page = (new Client())->get($url)->getBody()->getContents();
+
+        if (!$page) return '';
+
+        $matches = array();
+
+        if (preg_match('/<title>(.*?)<\/title>/', $page, $matches)) {
+            $title = $matches[1];
+            return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $title . '</a>';
+        }
+
+        return '';
     }
 }

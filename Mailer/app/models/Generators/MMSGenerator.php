@@ -86,7 +86,7 @@ class MMSGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)"/is' => "<a href=\"https://dennikn.sk/$1\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;\">$2</a><br><br>",
+            '/\[articlelink.*?id="(.*?)".*?]/is' => array($helpers, "parseArticleLink"),
 
             // replace hrefs
             '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;">$2</a>',
