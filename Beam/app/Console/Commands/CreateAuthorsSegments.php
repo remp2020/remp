@@ -12,6 +12,7 @@ use App\SegmentUser;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CreateAuthorsSegments extends Command
@@ -39,7 +40,7 @@ class CreateAuthorsSegments extends Command
         //$this->recomputeBrowsersForAuthorSegments();
         //$this->recomputeUsersForAuthorSegments();
 
-        Log::debug('CreateAuthorsSegments job STARTED');
+        Log::debug('CreateAuthorsSegments job FINISHED');
     }
 
     /**
