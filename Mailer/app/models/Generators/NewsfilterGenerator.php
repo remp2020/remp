@@ -15,9 +15,15 @@ class NewsfilterGenerator implements IGenerator
 
     public $onSubmit;
 
-    public function __construct(SourceTemplatesRepository $mailSourceTemplateRepository)
+    public $helpers;
+
+    public function __construct(
+        SourceTemplatesRepository $mailSourceTemplateRepository,
+        WordpressHelpers $helpers
+    )
     {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
+        $this->helpers = $helpers;
     }
 
     public function apiParams()
@@ -40,7 +46,6 @@ class NewsfilterGenerator implements IGenerator
 
     public function process($values)
     {
-        $helpers = new WordpressHelpers();
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
 
         $post = $values->newsfilter_html;
@@ -87,7 +92,7 @@ class NewsfilterGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => array($helpers, "parseArticleLink"),
+            '/\[articlelink.*?id="(.*?)".*?]/is' => array($this->helpers, "parseArticleLink"),
 
             // replace hrefs
             '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a>',
@@ -128,8 +133,8 @@ class NewsfilterGenerator implements IGenerator
             }
         }
         // wrap text in paragraphs
-        $post = $helpers->wpautop($post);
-        $lockedPost = $helpers->wpautop($lockedPost);
+        $post = $this->helpers->wpautop($post);
+        $lockedPost = $this->helpers->wpautop($lockedPost);
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,

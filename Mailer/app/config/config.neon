@@ -229,3 +229,5 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
+	- Remp\MailerModule\PageMeta\DenniknContent
+	- Remp\MailerModule\PageMeta\PageMeta
