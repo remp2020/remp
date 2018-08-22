@@ -20,8 +20,7 @@ class NewsfilterGenerator implements IGenerator
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers
-    )
-    {
+    ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
     }
