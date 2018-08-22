@@ -108,7 +108,7 @@ class MediaBriefingGenerator implements IGenerator
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
             // parse embedds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this, "parseEmbedd"),
+            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this, "parseEmbed"),
 
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
@@ -322,7 +322,7 @@ class MediaBriefingGenerator implements IGenerator
         return $html;
     }
 
-    public function parseEmbedd($matches)
+    public function parseEmbed($matches)
     {
         $link = trim($matches[0]);
 
