@@ -105,9 +105,8 @@ SQL;
         ) T JOIN authors ON authors.id = T.author_id
     GROUP BY author_id ORDER BY user_count DESC
 SQL;
-
-
-        $resultsUsers = DB::select("", [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
+        
+        $resultsUsers = DB::select($usersSql, [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
 
         foreach ($resultsUsers as $item) {
             if (!array_key_exists($item->author_id, $results)) {
