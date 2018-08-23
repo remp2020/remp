@@ -13,11 +13,10 @@
 
 Route::get('/error', 'AuthController@error')->name('sso.error');
 
-
-
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard.index');
     Route::get('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
+    Route::get('dashboard/timeHistogramJson', 'DashboardController@todayTimeHistogram')->name('dashboard.timeHistogram.json');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
 
     Route::get('accounts/json', 'AccountController@json');

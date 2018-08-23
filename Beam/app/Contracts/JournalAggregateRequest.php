@@ -16,6 +16,8 @@ class JournalAggregateRequest
 
     protected $timeAfter;
 
+    protected $timeHistogram = [];
+
     public function __construct($category, $action)
     {
         $this->category = $category;
@@ -36,6 +38,15 @@ class JournalAggregateRequest
     public function addGroup(string ...$tags)
     {
         $this->groupBy = array_merge($this->groupBy, $tags);
+    }
+
+    public function setTimeHistogram(string $interval, string $offset) : JournalAggregateRequest
+    {
+        $this->timeHistogram = [
+            'interval' => $interval,
+            'offset' => $offset
+        ];
+        return $this;
     }
 
     public function setTimeBefore(\DateTime $timeBefore)
@@ -72,4 +83,10 @@ class JournalAggregateRequest
     {
         return $this->timeAfter;
     }
+
+    public function getTimeHistogram(): array
+    {
+        return $this->timeHistogram;
+    }
+
 }

@@ -82,13 +82,20 @@ class Journal implements JournalContract
     public function count(JournalAggregateRequest $request): Collection
     {
         try {
+
+            $json = [
+                'filter_by' => $request->getFilterBy(),
+                'group_by' => $request->getGroupBy(),
+                'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+            ];
+
+            if ($request->getTimeHistogram()) {
+                $json['time_histogram'] = $request->getTimeHistogram();
+            }
+
             $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_COUNT), [
-                'json' => [
-                    'filter_by' => $request->getFilterBy(),
-                    'group_by' => $request->getGroupBy(),
-                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
-                ],
+                'json' => $json,
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:Count endpoint: {$e->getMessage()}");
@@ -104,13 +111,19 @@ class Journal implements JournalContract
     public function sum(JournalAggregateRequest $request): Collection
     {
         try {
+            $json = [
+                'filter_by' => $request->getFilterBy(),
+                'group_by' => $request->getGroupBy(),
+                'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+            ];
+
+            if ($request->getTimeHistogram()) {
+                $json['time_histogram'] = $request->getTimeHistogram();
+            }
+
             $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_SUM), [
-                'json' => [
-                    'filter_by' => $request->getFilterBy(),
-                    'group_by' => $request->getGroupBy(),
-                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
-                ],
+                'json' => $json,
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:Sum endpoint: {$e->getMessage()}");

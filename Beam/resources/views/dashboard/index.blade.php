@@ -5,7 +5,7 @@
 @section('content')
 
     <div id="dashboard">
-        <dashboard-root :articles-url="articlesUrl">
+        <dashboard-root :articles-url="articlesUrl" :time-histogram-url="timeHistogramUrl">
         </dashboard-root>
     </div>
 
@@ -17,7 +17,8 @@
             },
             data: function() {
                 return {
-                    articlesUrl: "{!! route('dashboard.articles.json') !!}"
+                    articlesUrl: "{!! route('dashboard.articles.json') !!}",
+                    timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}"
                 }
             }
         })
