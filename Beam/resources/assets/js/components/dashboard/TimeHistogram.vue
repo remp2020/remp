@@ -10,11 +10,20 @@
         <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header">
-            <h4>Concurrents by Traffic Source</h4>
+            <h4>Page Loads by Traffic Source</h4>
         </div>
 
         <div class="card-body card-padding">
-            <chart style="width: 100%; height:300px" :auto-resize="true" :options="chartOptions"></chart>
+            <div class="btn-group btn-group-xs" role="group">
+                <button v-for="option in intervalOptions"
+                        type="button"
+                        class="btn"
+                        :class="[option.selected ? 'btn-info' : 'btn-default']"
+                        @click="setSelectedInterval(option)">
+                    {{option.text}}
+                </button>
+            </div>
+            <chart style="width: 100%; height:240px" :auto-resize="true" :options="chartOptions"></chart>
         </div>
 
     </div>
@@ -151,9 +160,10 @@
                     saveAsImage: {}
                 }
             },
+            padding: 0,
             grid: {
-                left: '1%',
-                right: '1%',
+                left: '0%',
+                right: '0%',
                 bottom: '1%',
                 containLabel: true
             },
@@ -175,6 +185,8 @@
         }
     }
 
+    let loadDataTimer = null
+
     export default {
         components: {
             'chart': ECharts
@@ -182,28 +194,59 @@
         props: props,
         data() {
             return {
-                chart: null,
-                chartData: null,
                 loading: true,
                 error: null,
-                chartOptions: null
+                chartOptions: null,
+                intervalOptions: [
+                    {
+                        text: 'Today',
+                        value: 'today',
+                        selected: true
+                    },
+                    {
+                        text: '7 days',
+                        value: '7days',
+                        selected: false
+                    },
+                    {
+                        text: '30 days',
+                        value: '30days',
+                        selected: false
+                    }
+                ],
+                interval: '7days'
+            }
+        },
+        watch: {
+            interval(value) {
+                clearInterval(loadDataTimer)
+                this.loadData()
+                // every 5 minutes
+                loadDataTimer = setInterval(this.loadData, 5*60*1000)
             }
         },
         created() {
             this.loadData()
             // every 5 minutes
-            setInterval(this.loadData, 5*60*1000)
+            loadDataTimer = setInterval(this.loadData, 5*60*1000)
         },
         destroyed() {
-            clearInterval(this.loadData)
+            clearInterval(loadDataTimer)
         },
         methods: {
+            setSelectedInterval(option) {
+                this.intervalOptions.forEach(function (item) {
+                    item.selected = option.value === item.value
+                })
+                this.interval = option.value
+            },
             loadData() {
                 this.loading = true
                 axios
                     .get(this.url, {
                         params: {
-                            'tz': Intl.DateTimeFormat().resolvedOptions().timeZone
+                            'tz': Intl.DateTimeFormat().resolvedOptions().timeZone,
+                            'interval': this.interval,
                         }
                     })
                     .then(response => {
