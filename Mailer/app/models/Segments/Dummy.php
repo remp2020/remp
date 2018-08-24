@@ -5,9 +5,9 @@ class Dummy implements ISegment
 {
     const PROVIDER_ALIAS = 'dummy-segment';
 
-    public function provider()
+    public function provider(): string
     {
-        return [static::PROVIDER_ALIAS => $this];
+        return static::PROVIDER_ALIAS;
     }
 
     public function list()

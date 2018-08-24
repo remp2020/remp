@@ -12,6 +12,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	explicitSegmentType = "explicit"
+)
+
 // SegmentStorage represents interface to get segment related data.
 type SegmentStorage interface {
 	// Get returns instance of Segment based on the given code.
@@ -46,14 +50,15 @@ type SegmentCache map[int]*SegmentRuleCache
 
 // Segment structure.
 type Segment struct {
-	ID        int
-	Code      string
-	Name      string
-	Active    bool
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID             int
+	Code           string
+	Name           string
+	Active         bool
+	CreatedAt      time.Time `db:"created_at"`
+	UpdatedAt      time.Time `db:"updated_at"`
+	SegmentGroupID int       `db:"segment_group_id"`
 
-	Group *SegmentGroup
+	Group SegmentGroup  `db:"segment_group"`
 	Rules []SegmentRule `db:"segment_rules"`
 }
 
@@ -62,9 +67,13 @@ type SegmentCollection []*Segment
 
 // SegmentGroup represents metadata about group, in which Segments can be placed in.
 type SegmentGroup struct {
-	ID      int
-	Name    string
-	Sorting int
+	ID        int
+	Name      string
+	Code      string
+	Type      string
+	Sorting   int
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 // User represents information about User in Segment.
@@ -79,17 +88,22 @@ type UserCollection []*User
 // UserSet is set of Users keyed by userID.
 type UserSet map[string]bool
 
+// BrowserSet is set of Browser keyed by browserID.
+type BrowserSet map[string]bool
+
 // Intersector responds to ability to intersect provided userID with some other collection structure.
 type Intersector func(userID string) bool
 
 // SegmentDB represents Segment's storage MySQL/InfluxDB implementation.
 type SegmentDB struct {
-	MySQL           *sqlx.DB
-	RuleCountCache  *cache.Cache
-	EventStorage    EventStorage
-	PageviewStorage PageviewStorage
-	CommerceStorage CommerceStorage
-	Segments        map[string]*Segment
+	MySQL                    *sqlx.DB
+	RuleCountCache           *cache.Cache
+	EventStorage             EventStorage
+	PageviewStorage          PageviewStorage
+	CommerceStorage          CommerceStorage
+	Segments                 map[string]*Segment
+	ExplicitSegmentsUsers    map[string]UserSet
+	ExplicitSegmentsBrowsers map[string]BrowserSet
 }
 
 // Get returns instance of Segment based on the given code.
@@ -123,7 +137,13 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 // List returns all available segments configured via Beam admin.
 func (sDB *SegmentDB) List() (SegmentCollection, error) {
 	sc := SegmentCollection{}
-	err := sDB.MySQL.Select(&sc, "SELECT name, code FROM segments")
+	err := sDB.MySQL.Select(&sc, "SELECT segments.name, segments.code, segments.segment_group_id, "+
+		"segment_groups.id AS 'segment_group.id', "+
+		"segment_groups.name AS 'segment_group.name', "+
+		"segment_groups.code AS 'segment_group.code', "+
+		"segment_groups.type AS 'segment_group.type', "+
+		"segment_groups.sorting AS 'segment_group.sorting' "+
+		"FROM segments JOIN segment_groups ON segments.segment_group_id = segment_groups.id")
 	if err != nil {
 		return nil, err
 	}
@@ -132,11 +152,35 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 
 // CheckUser verifies presence of user within provided segment.
 func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
+	if segment.Group.Type == explicitSegmentType {
+		if _, ok := sDB.ExplicitSegmentsUsers[segment.Code]; !ok {
+			// if segment is not present in the cache, reload
+			sDB.CacheExplicitSegments()
+		}
+		segmentUsers, ok := sDB.ExplicitSegmentsUsers[segment.Code]
+		if !ok {
+			return cache, false, nil
+		}
+		_, ok = segmentUsers[userID]
+		return cache, ok, nil
+	}
 	return sDB.check(segment, "user_id", userID, now, cache, ro)
 }
 
 // CheckBrowser verifies presence of browser within provided segment.
 func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
+	if segment.Group.Type == explicitSegmentType {
+		if _, ok := sDB.ExplicitSegmentsBrowsers[segment.Code]; !ok {
+			// if segment is not present in the cache, reload
+			sDB.CacheExplicitSegments()
+		}
+		segmentBrowsers, ok := sDB.ExplicitSegmentsBrowsers[segment.Code]
+		if !ok {
+			return cache, false, nil
+		}
+		_, ok = segmentBrowsers[browserID]
+		return cache, ok, nil
+	}
 	return sDB.check(segment, "browser_id", browserID, now, cache, ro)
 }
 
@@ -220,6 +264,14 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue strin
 
 // Users return list of all users within segment.
 func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error) {
+	if segment.Group.Type == explicitSegmentType {
+		uc := []string{}
+		for userID := range sDB.ExplicitSegmentsUsers[segment.Code] {
+			uc = append(uc, userID)
+		}
+		return uc, nil
+	}
+
 	users := make(UserSet)
 
 	for i, sr := range segment.Rules {
@@ -312,6 +364,15 @@ func (sDB *SegmentDB) Cache() error {
 		s.Rules = src
 	}
 
+	for _, s := range sc {
+		src := SegmentGroup{}
+		err = sDB.MySQL.Get(&src, "SELECT * FROM segment_groups WHERE id = ?", s.SegmentGroupID)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("unable to get related segment group for segment [%d]", s.ID))
+		}
+		s.Group = src
+	}
+
 	old := sDB.Segments
 	for _, s := range sc {
 		sm[s.Code] = s
@@ -321,6 +382,57 @@ func (sDB *SegmentDB) Cache() error {
 	if !reflect.DeepEqual(old, sm) {
 		log.Println("segment cache reloaded")
 	}
+	return nil
+}
+
+// CacheExplicitSegments caches segments data in memory
+func (sDB *SegmentDB) CacheExplicitSegments() error {
+	usersSet := make(map[string]UserSet)
+	browsersSet := make(map[string]BrowserSet)
+
+	for code, s := range sDB.Segments {
+		if s.Group.Type == explicitSegmentType {
+			// load users
+			rows, err := sDB.MySQL.Query("SELECT user_id FROM segment_users WHERE segment_id = ?", s.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					continue
+				}
+				return errors.Wrap(err, fmt.Sprintf("unable to get segment users from MySQL [%d]", s.ID))
+			}
+			users := make(UserSet)
+			for rows.Next() {
+				var userID string
+				err = rows.Scan(&userID)
+				if err != nil {
+					return errors.Wrap(err, "unable to load user ID from result row")
+				}
+				users[userID] = true
+			}
+			usersSet[code] = users
+
+			// load browsers
+			rows, err = sDB.MySQL.Query("SELECT browser_id FROM segment_browsers WHERE segment_id = ?", s.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					continue
+				}
+				return errors.Wrap(err, fmt.Sprintf("unable to get segment browsers from MySQL [%d]", s.ID))
+			}
+			browsers := make(BrowserSet)
+			for rows.Next() {
+				var browserID string
+				err = rows.Scan(&browserID)
+				if err != nil {
+					return errors.Wrap(err, "unable to load browser ID from result row")
+				}
+				browsers[browserID] = true
+			}
+			browsersSet[code] = browsers
+		}
+	}
+	sDB.ExplicitSegmentsUsers = usersSet
+	sDB.ExplicitSegmentsBrowsers = browsersSet
 	return nil
 }
 

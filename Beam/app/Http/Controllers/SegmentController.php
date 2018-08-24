@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\JournalContract;
 use App\Http\Requests\SegmentRequest;
 use App\Segment;
+use App\SegmentGroup;
 use App\SegmentRule;
 use HTML;
 use Yajra\Datatables\Datatables;
@@ -32,7 +33,8 @@ class SegmentController extends Controller
     public function json(Request $request, Datatables $datatables)
     {
         $columns = ['id', 'name', 'active', 'code', 'created_at', 'updated_at'];
-        $segments = Segment::select($columns);
+        $segments = Segment::select($columns)
+            ->where('segment_group_id', SegmentGroup::getByCode(SegmentGroup::CODE_REMP_SEGMENTS)->id);
 
         return $datatables->of($segments)
             ->addColumn('actions', function (Segment $segment) {
@@ -209,6 +211,10 @@ class SegmentController extends Controller
      */
     public function saveSegment(Segment $segment, array $data, array $rules)
     {
+        if (!array_key_exists('segment_group_id', $data)) {
+            $data['segment_group_id'] = SegmentGroup::getByCode(SegmentGroup::CODE_REMP_SEGMENTS)->id;
+        }
+
         $segment->fill($data);
         $segment->save();
 

@@ -49,7 +49,7 @@ as an service within your your [`config.local.neon`](./app/config/config_local.n
 You can check our reference implementation against our user base in
 [`Remp\MailerModule\User\Crm`](./app/models/Users/Crm.php) and against our segment API in
 [`Remp\MailerModule\Segment\Crm`](./app/models/Segments/Crm.php) or
-[`Remp\MailerModule\Segment\Remp`](./app/models/Segments/Remp.php). 
+[`Remp\MailerModule\Segment\Remp`](app/models/Segments/Beam.php). 
 
 ### Mailers
 

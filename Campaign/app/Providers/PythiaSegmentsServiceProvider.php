@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
-use App\Contracts\Remp\Segment;
+use App\Contracts\Pythia\Segment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
-class RempSegmentsServiceProvider extends ServiceProvider
+class PythiaSegmentsServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -30,13 +30,15 @@ class RempSegmentsServiceProvider extends ServiceProvider
     {
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
+                'base_uri' => config('services.remp.pythia.segments_addr'),
                 'timeout' => 1,
                 'connect_timeout' => 1,
             ]);
             return new Segment($client);
         });
-        $this->app->tag(Segment::class, SegmentAggregator::TAG);
+        if (config('services.remp.pythia.segments_addr')) {
+            $this->app->tag(Segment::class, [SegmentAggregator::TAG]);
+        }
     }
 
     public function provides()

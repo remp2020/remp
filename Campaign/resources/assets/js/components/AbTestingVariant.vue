@@ -17,7 +17,7 @@
 
             <div v-if="index == $parent.variants.length -1">Control Group</div>
 
-            <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.variantOptions[$parent.bannerId].label }}</span>
+            <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.getVariantOptionByValue($parent.bannerId).label }}</span>
         </td>
 
         <!-- proportion value -->

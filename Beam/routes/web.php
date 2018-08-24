@@ -66,4 +66,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::resource('authors', 'AuthorController', [
         'only' => ['index', 'show']
     ]);
+
+    // TODO: temporary, delete after test is over
+    Route::get('tests/author-segments-test', 'TestController@authorSegmentsTest')->name('test.author-segments-test');
+    Route::post('tests/author-segments-test', 'TestController@showResults')->name('test.show-results');
 });

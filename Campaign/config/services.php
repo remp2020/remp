@@ -57,6 +57,9 @@ return [
             'web_addr' => env('REMP_SSO_ADDR'),
             'api_token' => env('REMP_SSO_API_TOKEN')
         ],
+        'pythia' => [
+            'segments_addr' => env('REMP_PYTHIA_SEGMENTS_ADDR'),
+        ],
         'linked' => [
             'beam' => [
                 'url' => env('REMP_BEAM_ADDR'),

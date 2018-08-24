@@ -435,8 +435,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
                 "adblock": remplib.tracker.usingAdblock,
-                "window_height": window.outerHeight,
-                "window_width": window.outerWidth,
+                "window_height": window.outerHeight || document.documentElement.clientHeight,
+                "window_width": window.outerWidth || document.documentElement.clientWidth,
                 "cookies": remplib.tracker.cookiesEnabled,
                 "websockets": remplib.tracker.websocketsSupported,
                 "source": {

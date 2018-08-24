@@ -170,17 +170,14 @@ return [
         /*
          * Application Service Providers...
          */
-        Remp\LaravelSso\Providers\SsoServiceProvider::class,
-        Remp\Widgets\Providers\WidgetServiceProvider::class,
-        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
-        Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\CrmSegmentServiceProvider::class,
-        App\Providers\RempSegmentsServiceProvider::class,
-        App\Providers\RempTrackerServiceProvider::class,
+        App\Providers\BeamSegmentsServiceProvider::class,
+        App\Providers\BeamTrackerServiceProvider::class,
+        App\Providers\PythiaSegmentsServiceProvider::class,
 
         App\Providers\StatsServiceProvider::class,
 

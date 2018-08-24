@@ -36,6 +36,9 @@ final class GeneratorPresenter extends BasePresenter
             ->setColSetting('title', [
                 'priority' => 1,
             ])
+            ->setColSetting('code', [
+                'priority' => 1,
+            ])
             ->setColSetting('generator', [
                 'priority' => 1,
             ])
@@ -75,6 +78,7 @@ final class GeneratorPresenter extends BasePresenter
                 ],
                 $sourceTemplate->created_at,
                 "<a href='{$editUrl}'>{$sourceTemplate->title}</a>",
+                "<code>{$sourceTemplate->code}</code>",
                 "<code>{$sourceTemplate->generator}</code>",
             ];
         }

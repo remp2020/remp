@@ -36,47 +36,47 @@
                     ],
                     'pageviews_all' => [
                         'header' => 'all pageviews',
-                        'render' => 'numberStat',
+                        'render' => 'number',
                         'priority' => 2,
                     ],
                     'pageviews_signed_in' => [
                         'header' => 'signed in pageviews',
-                        'render' => 'numberStat',
+                        'render' => 'number',
                         'priority' => 3,
                     ],
                     'pageviews_subscribers' => [
                         'header' => 'subscriber pageviews',
-                        'render' => 'numberStat',
+                        'render' => 'number',
                         'priority' => 3,
                     ],
                     'avg_timespent_all' => [
                         'header' => 'avg time all',
-                        'render' => 'durationStat',
+                        'render' => 'duration',
                         'priority' => 2,
                     ],
                     'avg_timespent_signed_in' => [
                         'header' => 'avg time signed in',
-                        'render' => 'durationStat',
+                        'render' => 'duration',
                         'priority' => 3,
                     ],
                     'avg_timespent_subscribers' => [
                         'header' => 'avg time subscribers',
-                        'render' => 'durationStat',
+                        'render' => 'duration',
                         'priority' => 3,
                     ],
                     'conversions_count' => [
                         'header' => 'conversions',
-                        'render' => 'numberStat',
+                        'render' => 'number',
                         'priority' => 2,
                     ],
                     'conversions_sum' => [
                         'header' => 'amount',
-                        'render' => 'multiNumberStat',
+                        'render' => 'array',
                         'priority' => 2,
                     ],
                     'conversions_avg' => [
                         'header' => 'avg amount',
-                        'render' => 'multiNumberStat',
+                        'render' => 'array',
                         'priority' => 3,
                     ],
                     'sections[, ].name' => [

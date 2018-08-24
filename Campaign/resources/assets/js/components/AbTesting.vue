@@ -66,7 +66,7 @@
                 this.variants.push({
                     id: null,
                     variant: "Primary banner",
-                    proportion: 50,
+                    proportion: 100,
                     control_group: 0,
                     banner_id: this.bannerId
                 });
@@ -74,7 +74,7 @@
                 this.variants.push({
                     id: null,
                     variant: 'Control Group',
-                    proportion: 50,
+                    proportion: 0,
                     control_group: 1,
                     banner_id: null
                 })
@@ -219,6 +219,15 @@
                 }, 50);
 
                 event.preventDefault();
+            },
+            getVariantOptionByValue: function (id) {
+                for (let ii = this.variantOptions.length - 1; ii >= 0; ii--) {
+                    if (this.variantOptions[ii].value == id) {
+                        return this.variantOptions[ii];
+                    }
+                }
+
+                return null;
             }
         },
         watch: {

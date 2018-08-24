@@ -15,9 +15,14 @@ class MMSGenerator implements IGenerator
 
     public $onSubmit;
 
-    public function __construct(SourceTemplatesRepository $mailSourceTemplateRepository)
-    {
+    public $helpers;
+
+    public function __construct(
+        SourceTemplatesRepository $mailSourceTemplateRepository,
+        WordpressHelpers $helpers
+    ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
+        $this->helpers = $helpers;
     }
 
     public function apiParams()
@@ -30,6 +35,7 @@ class MMSGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
         ];
     }
 
@@ -40,7 +46,6 @@ class MMSGenerator implements IGenerator
 
     public function process($values)
     {
-        $helpers = new WordpressHelpers();
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
 
         $post = $values->mms_html;
@@ -85,10 +90,10 @@ class MMSGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)"/is' => "<a href=\"https://dennikn.sk/$1\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;\">$2</a><br><br>",
+            '/\[articlelink.*?id="(.*?)".*?]/is' => array($this->helpers, "parseArticleLink"),
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" title="$2" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;">$2</a>',
+            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;">$2</a>',
 
             // replace h2
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
@@ -108,7 +113,7 @@ class MMSGenerator implements IGenerator
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
             // parse embedds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this, "parseEmbedd"),
+            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this, "parseEmbed"),
 
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
@@ -128,8 +133,8 @@ class MMSGenerator implements IGenerator
         }
 
         // wrap text in paragraphs
-        $post = $helpers->wpautop($post);
-        $lockedPost = $helpers->wpautop($lockedPost);
+        $post = $this->helpers->wpautop($post);
+        $lockedPost = $this->helpers->wpautop($lockedPost);
 
         // fix pees
         list($post, $lockedPost) = preg_replace('/<p>/is', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", [$post, $lockedPost]);
@@ -194,6 +199,7 @@ class MMSGenerator implements IGenerator
             'lockedHtmlContent' => $output['lockedHtmlContent'],
             'lockedTextContent' => $output['lockedTextContent'],
             'mmsTitle' => $values->title,
+            'from' => $values->from,
             'render' => true
         ];
 
@@ -210,6 +216,8 @@ class MMSGenerator implements IGenerator
         $form->offsetUnset(Form::PROTECTOR_ID);
 
         $form->addText('sub_title', 'Sub title');
+
+        $form->addText('from', 'Sender');
 
         $form->addText('url', 'Odkaz MMS URL')
             ->addRule(Form::URL)
@@ -245,6 +253,14 @@ class MMSGenerator implements IGenerator
 
         if (!isset($data->post_authors[0]->display_name)) {
             throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
+        }
+        $output->from = "Denník N <info@dennikn.sk>";
+        foreach ($data->post_authors as $author) {
+            if ($author->user_email === "editori@dennikn.sk") {
+                continue;
+            }
+            $output->from = $author->display_name . ' <' . $author->user_email . '>';
+            break;
         }
 
         if (!isset($data->post_title)) {
@@ -310,7 +326,7 @@ class MMSGenerator implements IGenerator
         return $html;
     }
 
-    public function parseEmbedd($matches)
+    public function parseEmbed($matches)
     {
         $link = trim($matches[0]);
 

@@ -7,7 +7,7 @@ use App\Contracts\TrackerContract;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
-class RempTrackerServiceProvider extends ServiceProvider
+class BeamTrackerServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.

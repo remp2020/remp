@@ -50,16 +50,17 @@
                 ],
                 'pageviews_all' => [
                     'header' => 'all pageviews',
+                    'render' => 'number',
                     'priority' => 2,
                 ],
                 'pageviews_signed_in' => [
                     'header' => 'signed in pageviews',
-                    'render' => 'numberStat',
+                    'render' => 'number',
                     'priority' => 5,
                 ],
                 'pageviews_subscribers' => [
                     'header' => 'subscriber pageviews',
-                    'render' => 'numberStat',
+                    'render' => 'number',
                     'priority' => 5,
                 ],
                 'avg_timespent_all' => [

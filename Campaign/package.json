@@ -5,7 +5,8 @@
     "watch": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "watch-poll": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "hot": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "production": "node_modules/npm-run-all/bin/npm-run-all/index.js web-production lib-production",
+    "web-production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "lib-dev": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "lib-watch": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "lib-watch-poll": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -14,8 +15,7 @@
     "all-dev": "node_modules/npm-run-all/bin/npm-run-all/index.js dev lib-dev",
     "all-watch": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch",
     "all-watch-poll": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch-poll lib-watch-poll",
-    "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch",
-    "all-production": "node_modules/npm-run-all/bin/npm-run-all/index.js production lib-production"
+    "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch"
   },
   "dependencies": {
     "animate.css": "^3.5.2",

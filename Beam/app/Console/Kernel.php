@@ -2,6 +2,9 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AggregateArticlesViews;
+use App\Console\Commands\AggregatePageviewLoadJob;
+use App\Console\Commands\AggregatePageviewTimespentJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Schema;
@@ -29,12 +32,16 @@ class Kernel extends ConsoleKernel
             return;
         }
 
-         $schedule->command('aggregate:pageview-load')
+        $schedule->command(AggregatePageviewLoadJob::COMMAND)
              ->hourlyAt(5)
              ->withoutOverlapping();
 
-        $schedule->command('aggregate:pageview-timespent')
+        $schedule->command(AggregatePageviewTimespentJob::COMMAND)
             ->hourlyAt(5)
+            ->withoutOverlapping();
+
+        $schedule->command(AggregateArticlesViews::COMMAND)
+            ->dailyAt('00:10')
             ->withoutOverlapping();
     }
 

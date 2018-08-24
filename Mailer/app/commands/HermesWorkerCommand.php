@@ -22,7 +22,11 @@ class HermesWorkerCommand extends Command
 
     public function add($type, HandlerInterface $handler)
     {
-        $this->handlers[$type] = get_class($handler);
+        // we store the handlers too so we can print list of them later; dispatcher doesn't provide a list method
+        if (!isset($this->handlers[$type])) {
+            $this->handlers[$type] = [];
+        }
+        $this->handlers[$type][] = get_class($handler);
         $this->dispatcher->registerHandler($type, $handler);
     }
 
@@ -39,8 +43,10 @@ class HermesWorkerCommand extends Command
         $output->writeln('');
         $output->writeln('Listening to:');
 
-        foreach ($this->handlers as $type => $handler) {
-            $output->writeln(sprintf('  - <info>%s</info>: %s', $type, $handler));
+        foreach ($this->handlers as $type => $handlers) {
+            foreach ($handlers as $handler) {
+                $output->writeln(sprintf('  - <info>%s</info>: %s', $type, $handler));
+            }
         }
         $output->writeln('');
 

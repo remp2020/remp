@@ -4,7 +4,7 @@
 .env
 *.sublime-project
 *.sublime-workspace
-.history
+.metadata
 
 docker-compose.override.yml
 .yarn-error.log

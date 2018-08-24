@@ -17,6 +17,8 @@ parameters:
 			tracker_addr: @environmentConfig::get('REMP_BEAM_TRACKER_ADDR')
 			tracker_property_token: @environmentConfig::get('REMP_BEAM_TRACKER_PROPERTY_TOKEN')
 			segments_addr: @environmentConfig::get('REMP_BEAM_SEGMENTS_ADDR')
+		pythia:
+			segments_addr: @environmentConfig::get('REMP_PYTHIA_SEGMENTS_ADDR')
 		campaign:
 			web_addr: @environmentConfig::get('REMP_CAMPAIGN_ADDR')
 	errbit:
@@ -229,3 +231,5 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
+	- Remp\MailerModule\PageMeta\DenniknContent
+	- Remp\MailerModule\PageMeta\PageMeta

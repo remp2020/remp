@@ -15,7 +15,8 @@ services:
     segmentAgreggator:
         setup:
             - register(Remp\MailerModule\Segment\Dummy())
-#            - register(Remp\MailerModule\Segment\Remp(%remp.beam.segments_addr%))
+#            - register(Remp\MailerModule\Segment\Beam(%remp.beam.segments_addr%))
+#            - register(Remp\MailerModule\Segment\Pythia(%remp.pythia.segments_addr%))
 
 #    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
 #    eventEmitter:
