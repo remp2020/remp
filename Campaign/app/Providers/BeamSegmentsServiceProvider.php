@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
-use App\Contracts\Crm\Segment;
+use App\Contracts\Remp\Segment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
-class CrmSegmentServiceProvider extends ServiceProvider
+class BeamSegmentsServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -30,10 +30,9 @@ class CrmSegmentServiceProvider extends ServiceProvider
     {
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.crm_segment.base_url'),
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $app['config']->get('services.crm_segment.token'),
-                ],
+                'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
+                'timeout' => 1,
+                'connect_timeout' => 1,
             ]);
             return new Segment($client);
         });
