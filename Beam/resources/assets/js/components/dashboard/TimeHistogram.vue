@@ -1,12 +1,5 @@
 <template>
     <div class="card card-chart">
-        <div v-if="loading" class="preloader-wrapper">
-            <div class="preloader pl-xxl">
-                <svg class="pl-circular" viewBox="25 25 50 50">
-                    <circle class="plc-path" cx="50" cy="50" r="20"/>
-                </svg>
-            </div>
-        </div>
         <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header">
