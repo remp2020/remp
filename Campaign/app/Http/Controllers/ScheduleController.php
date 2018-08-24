@@ -66,7 +66,7 @@ class ScheduleController extends Controller
         return $dataTables->of($schedule)
             ->addColumn('actions', function (Schedule $s) {
                 return [
-                    'edit' => route('schedule.edit', $s),
+                    'edit' => !$s->isStopped() ? route('schedule.edit', $s) : null,
                     'start' => $s->isRunnable() ? route('schedule.start', $s) : null,
                     'pause' => $s->isRunning() ? route('schedule.pause', $s) : null,
                     'stop' => $s->isRunning() ? route('schedule.stop', $s) : null,
