@@ -30,14 +30,16 @@ class CrmSegmentServiceProvider extends ServiceProvider
     {
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.crm_segment.base_url'),
+                'base_uri' => config('services.crm_segment.base_url'),
                 'headers' => [
                     'Authorization' => 'Bearer ' . $app['config']->get('services.crm_segment.token'),
                 ],
             ]);
             return new Segment($client);
         });
-        $this->app->tag(Segment::class, [SegmentAggregator::TAG]);
+        if (config('services.crm_segment.base_url')) {
+            $this->app->tag(Segment::class, [SegmentAggregator::TAG]);
+        }
     }
 
     public function provides()

@@ -24,6 +24,7 @@ class LogsRepository extends Repository
         'opened' => 'opened_at',
         'complained' => 'spam_complained_at',
         'bounced' => 'hard_bounced_at',
+        'failed' => 'dropped_at',
         'dropped' => 'dropped_at',
     ];
 

@@ -30,13 +30,15 @@ class BeamSegmentsServiceProvider extends ServiceProvider
     {
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
+                'base_uri' => config('services.remp.beam.segments_addr'),
                 'timeout' => 1,
                 'connect_timeout' => 1,
             ]);
             return new Segment($client);
         });
-        $this->app->tag(Segment::class, [SegmentAggregator::TAG]);
+        if (config('services.remp.beam.segments_addr')) {
+            $this->app->tag(Segment::class, [SegmentAggregator::TAG]);
+        }
     }
 
     public function provides()
