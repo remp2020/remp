@@ -71,7 +71,13 @@ class DashboardController extends Controller
         $timeIterator = clone $timeAfter;
         while ($timeIterator->lessThan($timeBefore)) {
             $endTime = (clone $timeIterator)->addMinutes($intervalMinutes);
-            $labels[] = $timeIterator->format('H:i') . ' - ' . $endTime->format('H:i');
+            if ($interval === 'today') {
+                $labels[] = $timeIterator->format('H:i') . ' - ' . $endTime->format('H:i');
+            } else if ($interval === '7days') {
+                $labels[] = $timeIterator->format('l H:i') . ' - ' . $endTime->format('l H:i');
+            } else {
+                $labels[] = $timeIterator->format('d.m H:i') . ' - ' . $endTime->format('d.m. H:i');
+            }
             $timeIterator->addMinutes($intervalMinutes);
         }
 

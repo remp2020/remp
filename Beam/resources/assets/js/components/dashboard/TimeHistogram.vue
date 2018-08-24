@@ -23,7 +23,7 @@
                 </svg>
             </div>
 
-            <chart  style="width: 100%; height:240px;"
+            <chart  style="width: 100%; height:220px;"
                     :class="{hiddenChart: loading}"
                     :auto-resize="true"
                     :options="chartOptions"></chart>
@@ -231,8 +231,8 @@
             grid: {
                 left: '0%',
                 right: '0%',
-                bottom: '1%',
-                containLabel: true
+                bottom: '10%',
+                containLabel: false
             },
             xAxis: [
                 {
