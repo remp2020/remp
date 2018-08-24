@@ -13,7 +13,7 @@
             <h4>Page Loads by Traffic Source</h4>
         </div>
 
-        <div class="card-body card-padding">
+        <div id="chartContainer" class="card-body card-padding">
             <div class="btn-group btn-group-xs" role="group">
                 <button v-for="option in intervalOptions"
                         type="button"
@@ -23,11 +23,85 @@
                     {{option.text}}
                 </button>
             </div>
-            <chart style="width: 100%; height:240px" :auto-resize="true" :options="chartOptions"></chart>
+
+            <div v-if="loading" class="preloader pls-purple">
+                <svg class="pl-circular" viewBox="25 25 50 50">
+                    <circle class="plc-path" cx="50" cy="50" r="20"></circle>
+                </svg>
+            </div>
+
+            <chart  style="width: 100%; height:240px;"
+                    :class="{hiddenChart: loading}"
+                    :auto-resize="true"
+                    :options="chartOptions"></chart>
         </div>
 
     </div>
 </template>
+
+<style>
+    .histogram-tooltip {
+        width: 100%;
+        background-color: transparent;
+        border-spacing: 4px;
+        border-collapse: separate;
+    }
+
+    .histogram-tooltip td, th {
+        text-align: right;
+    }
+</style>
+
+<style scoped>
+    #chartContainer {
+        position: relative;
+    }
+
+    #chartContainer .preloader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%)
+    }
+
+    .hiddenChart {
+        visibility: hidden;
+    }
+
+    .browser text {
+        text-anchor: end;
+    }
+
+    .error {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: red;
+        color: #fff;
+        display: none;
+        text-align: center;
+    }
+
+    .preloader-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+    }
+
+    .preloader-wrapper .preloader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -20px;
+        margin-top: -20px;
+    }
+</style>
 
 <script>
     import axios from 'axios'
@@ -214,7 +288,7 @@
                         selected: false
                     }
                 ],
-                interval: '7days'
+                interval: 'today'
             }
         },
         watch: {
@@ -264,62 +338,3 @@
         }
     }
 </script>
-
-<style>
-    .histogram-tooltip {
-        width: 100%;
-        background-color: transparent;
-        border-spacing: 4px;
-        border-collapse: separate;
-    }
-
-    .histogram-tooltip td, th {
-        text-align: right;
-    }
-</style>
-
-<style scoped>
-    h3 {
-        margin-top: 0;
-    }
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: #000;
-        shape-rendering: crispEdges;
-    }
-
-    .browser text {
-        text-anchor: end;
-    }
-
-    .error {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 20px;
-        height: 20px;
-        background: red;
-        color: #fff;
-        display: none;
-        text-align: center;
-    }
-
-    .preloader-wrapper {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.8);
-        display: none;
-    }
-
-    .preloader-wrapper .preloader {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-left: -20px;
-        margin-top: -20px;
-    }
-</style>

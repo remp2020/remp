@@ -76,6 +76,44 @@ class DashboardController extends Controller
         }
 
         $series = [];
+
+        // What part of today we should draw (omit 0 values)
+        $numberOfCurrentValues = (int) floor((Carbon::now($tz)->getTimestamp() - $timeAfter->getTimestamp()) / ($intervalMinutes * 60));
+
+        // TODO: change grouping to 'derived_referer_medium'
+        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
+        $journalRequest->setTimeAfter($timeAfter);
+        $journalRequest->setTimeBefore($timeBefore);
+        $journalRequest->setTimeHistogram($intervalElastic, '0h');
+        $journalRequest->addGroup('social');
+        $currentRecords = $this->journal->count($journalRequest);
+
+        $i = 0;
+        foreach ($currentRecords as $currentRecord) {
+            $label = $currentRecord->tags->social;
+            $currentValues = collect($currentRecord->time_histogram)->pluck('value')->take($numberOfCurrentValues);
+
+            // Preparing data for echarts
+            $series[] = [
+                'name' => 'current_' . ucfirst($label),
+                'type' => 'line',
+                'stack' => 'current',
+                'symbol' => 'none',
+                'data' => $currentValues,
+                'areaStyle' => [
+                    'color' => $colorStack[$i],
+                    'opacity' => '1'
+
+                ],
+                'lineStyle' => [
+                    'color' => $colorStack[$i],
+                    'width' => 1,
+                    'opacity' => '1'
+                ]
+            ];
+            $i++;
+        }
+
         // Compute shadow values from previous week for today/7-days intervals
         if ($interval !== '30days') {
             $timeBeforePrevious = (clone $timeBefore)->subWeek();
@@ -115,41 +153,7 @@ class DashboardController extends Controller
             }
         }
 
-        // What part of today we should draw (omit 0 values)
-        $numberOfCurrentValues = (int) floor((Carbon::now($tz)->getTimestamp() - $timeAfter->getTimestamp()) / ($intervalMinutes * 60));
 
-        // TODO: change grouping to 'derived_referer_medium'
-        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
-        $journalRequest->setTimeAfter($timeAfter);
-        $journalRequest->setTimeBefore($timeBefore);
-        $journalRequest->setTimeHistogram($intervalElastic, '0h');
-        $journalRequest->addGroup('social');
-        $currentRecords = $this->journal->count($journalRequest);
-
-        $i = 0;
-        foreach ($currentRecords as $currentRecord) {
-            $label = $currentRecord->tags->social;
-            $currentValues = collect($currentRecord->time_histogram)->pluck('value')->take($numberOfCurrentValues);
-
-            // Preparing data for echarts
-            $series[] = [
-                'name' => 'current_' . ucfirst($label),
-                'type' => 'line',
-                'stack' => 'current',
-                'symbol' => 'none',
-                'data' => $currentValues,
-                'areaStyle' => [
-                    'color' => $colorStack[$i],
-                    'opacity' => '0.9'
-
-                ],
-                'lineStyle' => [
-                    'color' => $colorStack[$i],
-                    'width' => 1
-                ]
-            ];
-            $i++;
-        }
 
         $data = [
             'series' => $series,
