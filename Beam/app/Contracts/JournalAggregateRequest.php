@@ -88,5 +88,4 @@ class JournalAggregateRequest
     {
         return $this->timeHistogram;
     }
-
 }

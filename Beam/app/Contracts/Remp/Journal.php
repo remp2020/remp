@@ -82,7 +82,6 @@ class Journal implements JournalContract
     public function count(JournalAggregateRequest $request): Collection
     {
         try {
-
             $json = [
                 'filter_by' => $request->getFilterBy(),
                 'group_by' => $request->getGroupBy(),
