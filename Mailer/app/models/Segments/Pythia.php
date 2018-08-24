@@ -5,9 +5,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Nette\Utils\Json;
 
-class Remp implements ISegment
+class Pythia implements ISegment
 {
-    const PROVIDER_ALIAS = 'remp-segment';
+    const PROVIDER_ALIAS = 'pythia-segment';
 
     const ENDPOINT_LIST = 'segments';
 
@@ -20,9 +20,9 @@ class Remp implements ISegment
         $this->baseUrl = $baseUrl;
     }
 
-    public function provider()
+    public function provider(): string
     {
-        return [static::PROVIDER_ALIAS => $this];
+        return static::PROVIDER_ALIAS;
     }
 
     public function list()

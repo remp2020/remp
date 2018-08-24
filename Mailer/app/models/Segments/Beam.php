@@ -5,22 +5,19 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Nette\Utils\Json;
 
-class Crm implements ISegment
+class Beam implements ISegment
 {
-    const PROVIDER_ALIAS = 'crm-segment';
+    const PROVIDER_ALIAS = 'remp-segment';
 
-    const ENDPOINT_LIST = 'api/v1/user-segments/list';
+    const ENDPOINT_LIST = 'segments';
 
-    const ENDPOINT_USERS = 'api/v1/user-segments/users';
+    const ENDPOINT_USERS = 'segments/%s/users';
 
     private $baseUrl;
 
-    private $token;
-
-    public function __construct($baseUrl, $token)
+    public function __construct($baseUrl)
     {
         $this->baseUrl = $baseUrl;
-        $this->token = $token;
     }
 
     public function provider(): string
@@ -33,7 +30,7 @@ class Crm implements ISegment
         $response = $this->request(static::ENDPOINT_LIST);
         $segments = [];
 
-        foreach ($response['segments'] as $segment) {
+        foreach ($response as $segment) {
             $segments[] = [
                 'name' => $segment['name'],
                 'provider' => static::PROVIDER_ALIAS,
@@ -47,22 +44,14 @@ class Crm implements ISegment
 
     public function users($segment)
     {
-        $response = $this->request(static::ENDPOINT_USERS, ['code' => $segment['code']]);
-        $userIds = [];
-        foreach ($response['users'] as $user) {
-            $userIds[] = $user['id'];
-        }
-        $response = null;
-        return $userIds;
+        $response = $this->request(sprintf(static::ENDPOINT_USERS, $segment['code']));
+        return $response;
     }
 
     private function request($url, $query = [])
     {
         $client = new Client([
-            'base_uri' => $this->baseUrl,
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->token,
-            ]
+            'base_uri' => $this->baseUrl
         ]);
 
         try {
