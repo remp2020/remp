@@ -282,6 +282,24 @@ var _ = Resource("pageviews", func() {
 			}))
 		})
 	})
+	Action("avg", func() {
+		Description("Returns avg of amounts within events")
+		Payload(PageviewOptionsPayload)
+		Routing(POST("/actions/:action/avg"))
+		Params(func() {
+			Param("action", String, "Identification of pageview action", func() {
+				Enum("timespent")
+			})
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Avg, func() {
+				View("default")
+			}))
+		})
+	})
 	Action("list", func() {
 		Description("Returns full list of pageviews")
 		Routing(POST("/list"))
@@ -309,7 +327,7 @@ var _ = Resource("pageviews", func() {
 
 var _ = Resource("concurrents", func() {
 	Description("Show recent concurrent connections")
-	BasePath("/concurrents")
+	BasePath("/journal/concurrents")
 	NoSecurity()
 
 	Action("count", func() {

@@ -91,6 +91,11 @@ func (eDB *PageviewInflux) Sum(o AggregateOptions) (SumRowCollection, bool, erro
 	return eDB.DB.GroupedSum(response)
 }
 
+// Avg is not implemented as Influx will be removed in the future
+func (eDB *PageviewInflux) Avg(o AggregateOptions) (AvgRowCollection, bool, error) {
+	return nil, false, errors.New("avg method not implemented")
+}
+
 // List returns list of all pageviews based on given PageviewOptions.
 func (eDB *PageviewInflux) List(o ListOptions) (PageviewRowCollection, error) {
 	var selectFields string
