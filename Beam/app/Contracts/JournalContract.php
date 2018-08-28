@@ -16,5 +16,9 @@ interface JournalContract
 
     public function sum(JournalAggregateRequest $request): Collection;
 
+    public function avg(JournalAggregateRequest $request): Collection;
+
     public function list(JournalListRequest $request): Collection;
+
+    public function concurrents(JournalConcurrentsRequest $request): Collection;
 }
