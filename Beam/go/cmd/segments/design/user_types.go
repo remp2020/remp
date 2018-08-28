@@ -85,6 +85,15 @@ var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
 	Required("tag", "values")
 })
 
+var ConcurrentsOptionsPayload = Type("ConcurrentsOptionsPayload", func() {
+	Description("Parameters to filter concurrent views")
+
+	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
+	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("filter_by", ArrayOf(PageviewOptionsFilterBy), "Selection of data filtering type")
+	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
+})
+
 var ListCommerceOptionsPayload = Type("ListCommerceOptionsPayload", func() {
 	Description("Parameters to filter pageview list")
 

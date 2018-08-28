@@ -306,3 +306,20 @@ var _ = Resource("pageviews", func() {
 		Response(OK, ArrayOf(String))
 	})
 })
+
+var _ = Resource("concurrents", func() {
+	Description("Show recent concurrent connections")
+	BasePath("/concurrents")
+	NoSecurity()
+
+	Action("count", func() {
+		Description("Returns recent concurrent connections identified by browser id")
+		Payload(ConcurrentsOptionsPayload)
+		Routing(POST("/count"))
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
+})
