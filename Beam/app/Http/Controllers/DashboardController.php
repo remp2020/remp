@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Contracts\JournalAggregateRequest;
+use App\Contracts\JournalConcurrentsRequest;
 use App\Contracts\JournalContract;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -173,16 +174,17 @@ class DashboardController extends Controller
     public function mostReadArticles()
     {
         $timeBefore = Carbon::now();
-        $timeAfter = (clone $timeBefore)->subSeconds(300);
+        $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
 
-        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
-        $journalRequest->setTimeAfter($timeAfter);
-        $journalRequest->setTimeBefore($timeBefore);
-        $journalRequest->addGroup('article_id');
+        $timespentRequest = new JournalConcurrentsRequest();
+        $timespentRequest->setTimeAfter($timeAfter);
+        $timespentRequest->setTimeBefore($timeBefore);
+        $timespentRequest->addGroup('article_id');
 
         // records are already sorted
-        $records = $this->journal->count($journalRequest);
+        $records = $this->journal->concurrents($timespentRequest);
 
+        // Load articles details
         $top20 = [];
         $i = 0;
         foreach ($records as $record) {
@@ -208,6 +210,31 @@ class DashboardController extends Controller
             }
             $top20[] = $obj;
             $i++;
+        }
+
+        // Load timespent
+        $timespentRequest = new JournalAggregateRequest('pageviews', 'timespent');
+        // TODO: how to specify time after here? should we count records that are in the past?
+        $timespentRequest->setTimeAfter((clone $timeAfter)->subHours(2));
+        $timespentRequest->setTimeBefore($timeBefore);
+        $timespentRequest->addGroup('article_id');
+
+        $articleIds = collect($top20)->filter(function ($item){
+            return !empty($item->article_id);
+        })->pluck('article_id');
+
+        $timespentRequest->addFilter('article_id',  ...$articleIds);
+        $articleIdToTimespent = $this->journal->avg($timespentRequest)->mapWithKeys(function($item){
+            return [$item->tags->article_id => $item->avg];
+        });
+
+        foreach ($top20 as $item) {
+            if ($item->article_id) {
+                $secondsTimespent = $articleIdToTimespent[$item->article_id];
+                $item->avg_timespent_string = $secondsTimespent >= 3600 ?
+                    gmdate('H:i:s', $secondsTimespent) :
+                    gmdate('i:s', $secondsTimespent);
+            }
         }
 
         return response()->json($top20);

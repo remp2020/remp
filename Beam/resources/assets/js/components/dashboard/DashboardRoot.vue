@@ -13,7 +13,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h2>Most read articles</h2>
@@ -23,7 +23,8 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 40px">Concurrents</th>
-                                        <th>Article</th>
+                                        <th style="text-align: left">Article</th>
+                                        <th style="width: 40px">Engaged Time</th>
                                     </tr>
                                 </thead>
                                 <tbody name="table-row" is="transition-group">
@@ -40,6 +41,9 @@
                                             <template v-else>
                                                 <small>{{ article.published_at | relativeDate }}</small>
                                             </template>
+                                        </td>
+                                        <td>
+                                            {{ article.avg_timespent_string || '-' }}
                                         </td>
                                     </tr>
                                 </tbody>
