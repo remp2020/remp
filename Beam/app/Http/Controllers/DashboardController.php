@@ -219,12 +219,12 @@ class DashboardController extends Controller
         $timespentRequest->setTimeBefore($timeBefore);
         $timespentRequest->addGroup('article_id');
 
-        $articleIds = collect($top20)->filter(function ($item){
+        $articleIds = collect($top20)->filter(function ($item) {
             return !empty($item->article_id);
         })->pluck('article_id');
 
-        $timespentRequest->addFilter('article_id',  ...$articleIds);
-        $articleIdToTimespent = $this->journal->avg($timespentRequest)->mapWithKeys(function($item){
+        $timespentRequest->addFilter('article_id', ...$articleIds);
+        $articleIdToTimespent = $this->journal->avg($timespentRequest)->mapWithKeys(function ($item) {
             return [$item->tags->article_id => $item->avg];
         });
 
