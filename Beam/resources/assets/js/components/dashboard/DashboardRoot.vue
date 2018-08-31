@@ -25,6 +25,8 @@
                                         <th style="width: 40px">Concurrents</th>
                                         <th style="text-align: left">Article</th>
                                         <th style="width: 40px">Engaged Time</th>
+                                        <th style="width: 40px">Conversion rate</th>
+
                                     </tr>
                                 </thead>
                                 <tbody name="table-row" is="transition-group">
@@ -43,7 +45,10 @@
                                             </template>
                                         </td>
                                         <td>
-                                            {{ article.avg_timespent_string || '-' }}
+                                            {{ article.avg_timespent_string || '' }}
+                                        </td>
+                                        <td>
+                                            {{ article.conversion_rate || '' }}
                                         </td>
                                     </tr>
                                 </tbody>

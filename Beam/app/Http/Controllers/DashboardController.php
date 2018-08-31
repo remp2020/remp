@@ -160,8 +160,6 @@ class DashboardController extends Controller
             }
         }
 
-
-
         $data = [
             'series' => $series,
             'xaxis' => $labels,
@@ -184,6 +182,8 @@ class DashboardController extends Controller
         // records are already sorted
         $records = $this->journal->concurrents($timespentRequest);
 
+        $minimalPublishedTime = Carbon::now();
+
         // Load articles details
         $top20 = [];
         $i = 0;
@@ -204,9 +204,13 @@ class DashboardController extends Controller
                 if (!$article) {
                     continue;
                 }
+                if ($minimalPublishedTime->gt($article->published_at)) {
+                    $minimalPublishedTime = $article->published_at;
+                }
                 $obj->landing_page = false;
                 $obj->title = $article->title;
                 $obj->published_at = $article->published_at->toAtomString();
+                $obj->conversions_count = $article->conversions->count();
             }
             $top20[] = $obj;
             $i++;
@@ -228,12 +232,24 @@ class DashboardController extends Controller
             return [$item->tags->article_id => $item->avg];
         });
 
+        // Load unique pageloads
+        $uniqueRequest = new JournalAggregateRequest('pageviews', 'browsers');
+        $uniqueRequest->setTimeAfter(($minimalPublishedTime);
+        $uniqueRequest->setTimeBefore($timeBefore);
+        $uniqueRequest->addGroup('article_id');
+        $uniqueRequest->addFilter('article_id', ...$articleIds);
+        $articleIdToUniqueBrowsersCount = $this->journal->unique($uniqueRequest)->mapWithKeys(function ($item) {
+            return [$item->tags->article_id => $item->count];
+        });
+
         foreach ($top20 as $item) {
             if ($item->article_id) {
                 $secondsTimespent = $articleIdToTimespent[$item->article_id];
                 $item->avg_timespent_string = $secondsTimespent >= 3600 ?
                     gmdate('H:i:s', $secondsTimespent) :
                     gmdate('i:s', $secondsTimespent);
+                $item->unique_browsers_count = $articleIdToUniqueBrowsersCount[$item->article_id];
+                $item->conversion_rate = $item->conversions_count / $item->unique_browsers_count;
             }
         }
 
