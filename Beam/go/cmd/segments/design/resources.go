@@ -300,6 +300,24 @@ var _ = Resource("pageviews", func() {
 			}))
 		})
 	})
+	Action("unique", func() {
+		Description("Returns unique count of amounts within events")
+		Payload(PageviewOptionsPayload)
+		Routing(POST("/actions/:action/unique"))
+		Params(func() {
+			Param("action", String, "Identification of pageview action", func() {
+				Enum("browsers")
+			})
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
 	Action("list", func() {
 		Description("Returns full list of pageviews")
 		Routing(POST("/list"))

@@ -230,7 +230,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 	return src, ok, nil
 }
 
-// avgRowCollectionFromAggregations generates SumRowCollection based on query result aggregations.
+// avgRowCollectionFromAggregations generates AvgRowCollection based on query result aggregations.
 func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, avgField string) (AvgRowCollection, bool, error) {
 	var src AvgRowCollection
 	tags := make(map[string]string)
@@ -280,6 +280,70 @@ func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchRes
 		src = append(src, AvgRow{
 			Tags:      srcTags,
 			Avg:       avgValue,
+			Histogram: histogram,
+		})
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	ok := len(src) > 0
+	return src, ok, nil
+}
+
+// uniqueRowCollectionFromAggregations generates CountRowCollection based on query result aggregations.
+func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, uniqueField string) (CountRowCollection, bool, error) {
+	var src CountRowCollection
+	tags := make(map[string]string)
+
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+
+		var histogram []HistogramItem
+		// in case of histogram, total count will be 0 since we cannot compute distinc values from histogram buckets
+		var countValue float64
+
+		if options.TimeHistogram != nil {
+			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
+			if !ok {
+				return errors.New("missing expected histogram aggregation data")
+			}
+
+			for _, histogramItem := range histogramData.Buckets {
+				uniqueAggLabel := fmt.Sprintf("%s_unique", uniqueField)
+				agg, ok := histogramItem.Aggregations.Cardinality(uniqueAggLabel)
+				if !ok {
+					return errors.New("cant find timespent_unique sub agg in date histogram agg")
+				}
+
+				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+				histogram = append(histogram, HistogramItem{
+					Time:  time,
+					Value: float64(*agg.Value),
+				})
+			}
+		} else {
+			avgAgg, ok := aggregations.Cardinality(targetAgg)
+			if !ok {
+				return nil
+			}
+
+			if avgAgg.Value != nil {
+				countValue = *avgAgg.Value
+			}
+		}
+
+		srcTags := make(map[string]string)
+		// copy tags to avoid memory sharing
+		for key, val := range tags {
+			srcTags[key] = val
+		}
+
+		src = append(src, CountRow{
+			Tags:      srcTags,
+			Count:     int(countValue),
 			Histogram: histogram,
 		})
 

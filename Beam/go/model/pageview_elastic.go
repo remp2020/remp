@@ -177,6 +177,55 @@ func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, boo
 	return pDB.DB.avgRowCollectionFromAggregations(result, options, targetAgg, binding.Field)
 }
 
+// Unique is not implemented as Influx will be removed in the future
+func (pDB *PageviewElastic) Unique(options AggregateOptions) (CountRowCollection, bool, error) {
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := pDB.resolveQueryBindings(options.Action)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
+	options.Action = ""
+
+	extras := make(map[string]elastic.Aggregation)
+	targetAgg := fmt.Sprintf("%s_unique", binding.Field)
+	extras[targetAgg] = elastic.NewCardinalityAggregation().Field(binding.Field)
+
+	search := pDB.DB.Client.Search().
+		Index(binding.Index).
+		Type("_doc").
+		Size(0) // return no specific results
+
+	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
+	if err != nil {
+		return nil, false, err
+	}
+
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+	if options.TimeHistogram != nil {
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// get results
+	result, err := search.Do(pDB.DB.Context)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return pDB.DB.uniqueRowCollectionFromAggregations(result, options, targetAgg, binding.Field)
+}
+
 // List returns list of all Pageviews based on given PageviewOptions.
 func (pDB *PageviewElastic) List(options ListOptions) (PageviewRowCollection, error) {
 	var prc PageviewRowCollection
@@ -321,6 +370,11 @@ func (pDB *PageviewElastic) Users() ([]string, error) {
 // based on the provided action.
 func (pDB *PageviewElastic) resolveQueryBindings(action string) (elasticQueryBinding, error) {
 	switch action {
+	case ActionPageviewBrowsers:
+		return elasticQueryBinding{
+			Index: TablePageviews,
+			Field: "browser_id.keyword",
+		}, nil
 	case ActionPageviewLoad:
 		return elasticQueryBinding{
 			Index: TablePageviews,

@@ -8,6 +8,7 @@ import (
 const (
 	CategoryPageview         = "pageview"
 	ActionPageviewLoad       = "load"
+	ActionPageviewBrowsers   = "browsers"
 	ActionPageviewTimespent  = "timespent"
 	TablePageviews           = "pageviews"
 	TableTimespent           = "pageviews_time_spent"
@@ -73,6 +74,8 @@ type PageviewStorage interface {
 	Sum(o AggregateOptions) (SumRowCollection, bool, error)
 	// Avg returns average of pageviews based on the provided filter options.
 	Avg(o AggregateOptions) (AvgRowCollection, bool, error)
+	// Unique returns distinct count of pageviews based on the provided filter options.
+	Unique(o AggregateOptions) (CountRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o ListOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.

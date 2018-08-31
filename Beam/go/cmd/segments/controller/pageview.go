@@ -110,6 +110,36 @@ func (c *PageviewController) Avg(ctx *app.AvgPageviewsContext) error {
 	return ctx.OK(asrc)
 }
 
+// Unique runs the cardinality count action.
+func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
+	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o.Action = ctx.Action
+
+	if ctx.Payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: ctx.Payload.TimeHistogram.Interval,
+			Offset:   ctx.Payload.TimeHistogram.Offset,
+		}
+	}
+
+	src, ok, err := c.PageviewStorage.Unique(o)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		sr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
+		}
+		src = model.CountRowCollection{}
+		src = append(src, sr)
+	}
+
+	asrc := CountRowCollection(src).ToMediaType()
+	return ctx.OK(asrc)
+}
+
 // List runs the list action.
 func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 	aggOptions := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)

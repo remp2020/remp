@@ -96,6 +96,11 @@ func (eDB *PageviewInflux) Avg(o AggregateOptions) (AvgRowCollection, bool, erro
 	return nil, false, errors.New("avg method not implemented")
 }
 
+// Unique is not implemented as Influx will be removed in the future
+func (eDB *PageviewInflux) Unique(o AggregateOptions) (CountRowCollection, bool, error) {
+	return nil, false, errors.New("unique method not implemented")
+}
+
 // List returns list of all pageviews based on given PageviewOptions.
 func (eDB *PageviewInflux) List(o ListOptions) (PageviewRowCollection, error) {
 	var selectFields string
