@@ -30,6 +30,8 @@ class Journal implements JournalContract
 
     const ENDPOINT_GENERIC_AVG = 'journal/%s/actions/%s/avg';
 
+    const ENDPOINT_GENERIC_UNIQUE = 'journal/%s/actions/%s/unique';
+
     const ENDPOINT_GENERIC_LIST = 'journal/%s/list';
 
     const ENDPOINT_CONCURRENTS_COUNT = 'journal/concurrents/count';
@@ -97,6 +99,11 @@ class Journal implements JournalContract
     public function avg(JournalAggregateRequest $request): Collection
     {
         return $this->aggregateCall($request, self::ENDPOINT_GENERIC_AVG);
+    }
+
+    public function unique(JournalAggregateRequest $request): Collection
+    {
+        return $this->aggregateCall($request, self::ENDPOINT_GENERIC_UNIQUE);
     }
 
     private function aggregateCall(JournalAggregateRequest $request, string $urlTemplate): Collection
