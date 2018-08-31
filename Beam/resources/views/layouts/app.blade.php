@@ -148,6 +148,9 @@
                     </li>
                 </ul>
             </li>
+            <li {!! route_active(['entities']) !!}>
+                <a href="{{ route('entities.index') }}" ><i class="zmdi zmdi-crop-free"></i> Entities</a>
+            </li>
         </ul>
     </aside>
 

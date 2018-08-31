@@ -114,6 +114,9 @@ return [
     |
     */
 
-    'attributes' => [],
-
+    'attributes' => [
+        'parent_id' => 'parent',
+        'properties.*.name' => 'property name',
+        'properties.*.type' => 'property type',
+    ],
 ];
