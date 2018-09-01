@@ -232,13 +232,7 @@ class NewsfilterGenerator implements IGenerator
 
                 if ($quit) {
                     $newHtml .= <<<HTML
-<p>
-Predplatitelia dostávajú na e-mail celý Newsfilter. Pozrite si
-<a 
-    style="text-decoration: none; font-weight: bold; color: #ffffff; background: #249fdc;" 
-    href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}">
-    ponuku predplatného Denníka N.
-</a></p>
+<p> Predplatitelia dostávajú na e-mail celý Newsfilter. Pozrite si <a style="display: inline; text-decoration: none; font-weight: bold; color: #ffffff; background: #249fdc;" href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}"> ponuku predplatného Denníka N.</a></p>
 HTML;
                     return $newHtml;
                 }
