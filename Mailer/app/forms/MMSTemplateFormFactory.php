@@ -97,6 +97,11 @@ class MMSTemplateFormFactory
             ->setName('button')
             ->setHtml('Generate newsletter batch and start sending');
 
+        $withJobsCreated = $form->addSubmit('generate_emails_jobs_created', 'system.save');
+        $withJobsCreated->getControlPrototype()
+            ->setName('button')
+            ->setHtml('Generate newsletter batch');
+
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
     }
@@ -122,7 +127,7 @@ class MMSTemplateFormFactory
 
     public function formSucceeded(Form $form, $values)
     {
-        $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values) {
+        $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values, $form) {
             $mailTemplate = $this->templatesRepository->add(
                 $values['name'],
                 $this->getUniqueTemplateCode($values['code']),
@@ -138,7 +143,13 @@ class MMSTemplateFormFactory
             $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS);
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
-            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
+
+            $batchStatus = BatchesRepository::STATUS_READY;
+            if ($form['generate_emails_jobs_created']->isSubmittedBy()) {
+                $batchStatus = BatchesRepository::STATUS_CREATED;
+            }
+
+            $this->batchesRepository->update($batch, ['status' => $batchStatus]);
         };
 
         $generate(
