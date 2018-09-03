@@ -25,8 +25,8 @@
                                         <th style="width: 40px">Concurrents</th>
                                         <th style="text-align: left">Article</th>
                                         <th style="width: 40px">Engaged Time</th>
-                                        <th style="width: 40px">Conversion rate</th>
-
+                                        <th style="width: 40px">Conversions</th>
+                                        <th style="width: 40px">Unique browsers</th>
                                     </tr>
                                 </thead>
                                 <tbody name="table-row" is="transition-group">
@@ -48,7 +48,10 @@
                                             {{ article.avg_timespent_string || '' }}
                                         </td>
                                         <td>
-                                            {{ article.conversion_rate || '' }}
+                                            {{ article.conversions_count}}
+                                        </td>
+                                        <td>
+                                            {{ article.unique_browsers_count}}
                                         </td>
                                     </tr>
                                 </tbody>
