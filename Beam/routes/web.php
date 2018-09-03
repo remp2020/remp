@@ -54,6 +54,10 @@ Route::middleware('auth.jwt')->group(function () {
         'only' => ['store'],
     ]);
 
+    Route::resource('articles', 'ArticleDetailsController', [
+        'only' => ['show'],
+    ]);
+
     Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');
     Route::post('newsletters/validate', 'NewsletterController@validateForm')->name('newsletters.validateForm');
     Route::post('newsletters/{newsletter}/start', 'NewsletterController@start')->name('newsletters.start');

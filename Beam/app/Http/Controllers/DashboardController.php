@@ -249,6 +249,7 @@ class DashboardController extends Controller
                     gmdate('i:s', $secondsTimespent);
                 $item->unique_browsers_count = $articleIdToUniqueBrowsersCount[$item->external_article_id];
                 $item->conversion_rate = $item->conversions_count / $item->unique_browsers_count;
+                $item->url = route('articles.show', ['article' => $item->article->id]);
             }
         }
 

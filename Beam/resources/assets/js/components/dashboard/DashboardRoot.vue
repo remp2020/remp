@@ -36,11 +36,12 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="c-black">{{article.title}}</span>
-                                            <br />
                                             <template v-if="article.landing_page">
+                                                <span class="c-black">{{article.title}}</span>
                                             </template>
                                             <template v-else>
+                                                <a class="c-black" :href="article.url">{{article.title}}</a>
+                                                <br />
                                                 <small>{{ article.published_at | relativeDate }}</small>
                                             </template>
                                         </td>
