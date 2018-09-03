@@ -86,7 +86,7 @@ class MMSTemplateFormFactory
             'code' => 'mms_' . date('dmY'),
             'mail_layout_id' => 33, // layout for subscribers
             'locked_mail_layout_id' => 33, // layout for non-subscribers
-            'mail_type_id' => 14, // Follow tem,
+            'mail_type_id' => 17, // Follow tem,
             'from' => 'Denník N <info@dennikn.sk>',
         ];
 
