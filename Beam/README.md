@@ -95,7 +95,8 @@ Two important endpoints are:
       "transaction_id": "", // Transaction ID
       "amount": 10.0,
       "currency": "EUR",
-      "paid_at": "2018-01-01 01:00:00"
+      "paid_at": "2018-01-01 01:00:00",
+      "user_id": "" // User ID
     }
   ]
 }
