@@ -75,7 +75,7 @@
 
             <div class="pmb-block">
                 <div class="pmbb-header">
-                    <h2><i class="zmdi zmdi-equalizer m-r-5"></i> Conversions</h2>
+                    <h2><i class="zmdi zmdi-money m-r-5"></i> Conversions</h2>
                 </div>
                 <div class="pmbb-body p-l-30">
                     <div class="pmbb-view">
@@ -100,6 +100,30 @@
                     </div>
                 </div>
             </div>
+
+            <div class="pmb-block">
+                <div class="pmbb-header">
+                    <h2><i class="zmdi zmdi-equalizer m-r-5"></i> Retention</h2>
+                </div>
+                <div class="pmbb-body p-l-30">
+                    <div class="pmbb-view">
+                        <dl class="dl-horizontal">
+                            <dt>Pageviews subscribers</dt>
+                            <dd>{{$article->pageviews_subscribers}} (<b>{{number_format($pageviewsSubscribersToAllRatio, 2)}}%</b> of all views)</dd>
+                        </dl>
+
+                        <dl class="dl-horizontal">
+                            <dt>Pageviews signed-in</dt>
+                            <dd>{{$article->pageviews_signed_in}}</dd>
+                        </dl>
+
+                        <dl class="dl-horizontal">
+                            <dt>Pageviews all</dt>
+                            <dd>{{$article->pageviews_all}}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -117,15 +141,13 @@
         </div>
     </div>
 
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h2>Show article
-                    <small>{{ $article->title }}</small>
-                </h2>
-            </div>
-
+    <div class="card">
+        <div class="card-header">
+            <h2>Show article
+                <small>{{ $article->title }}</small>
+            </h2>
         </div>
+
     </div>
 
     <script type="text/javascript">

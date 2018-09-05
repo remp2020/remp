@@ -58,9 +58,12 @@ SQL;
 SQL;
         $renewSubscriptionsCount = DB::select($renewSubscriptionsCountSql, [$article->id])[0]->subscriptions_count;
 
+        $pageviewsSubscribersToAllRatio = ($article->pageviews_subscribers / $article->pageviews_all) * 100;
+
         return response()->format([
             'html' => view('articles.show', [
                 'article' => $article,
+                'pageviewsSubscribersToAllRatio' => $pageviewsSubscribersToAllRatio,
                 'conversionRate' => $conversionRate,
                 'uniqueBrowsersCount' => $uniqueBrowsersCount,
                 'newSubscriptionsCount' => $newSubscriptionsCount,
