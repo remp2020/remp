@@ -15,6 +15,8 @@ class AddUserIdToConversionsTable extends Migration
     {
         Schema::table('conversions', function (Blueprint $table) {
             $table->string('user_id')->after('article_id')->nullable();
+
+            $table->index(['user_id']);
         });
     }
 
