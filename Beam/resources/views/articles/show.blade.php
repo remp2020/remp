@@ -127,42 +127,32 @@
         </div>
     </div>
 
-    <div class="well">
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Filter by date</h4>
-                <div id="smart-range-selector">
-                    {!! Form::hidden('data_from', $dataFrom) !!}
-                    {!! Form::hidden('data_to', $dataTo) !!}
-                    <smart-range-selector from="{{$dataFrom}}" to="{{$dataTo}}" :callback="callback">
-                    </smart-range-selector>
-                </div>
+    <div class="card card-chart">
+
+        <div class="card-header">
+            <h2>Article Traffic
+            </h2>
+        </div>
+        <div class="card-body card-padding">
+            <div id="article-graph">
+                <article-histogram :url="url">
+                </article-histogram>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h2>Show article
-                <small>{{ $article->title }}</small>
-            </h2>
-        </div>
-
-    </div>
-
     <script type="text/javascript">
         new Vue({
-            el: "#smart-range-selector",
+            el: "#article-graph",
             components: {
-                SmartRangeSelector
+                ArticleHistogram
             },
-            methods: {
-                callback: function (from, to) {
-                    $('[name="data_from"]').val(from);
-                    $('[name="data_to"]').val(to).trigger("change");
+            data: function() {
+                return {
+                    url: "{!! route('articles.timeHistogram.json', $article->id) !!}"
                 }
             }
-        });
+        })
     </script>
 
 @endsection
