@@ -268,15 +268,16 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			}
 			tags["derived_referer_medium"] = parsedRef.Medium
 			tags["derived_referer_source"] = parsedRef.Referer
+
+			if tags["derived_referer_medium"] == "unknown" {
+				tags["derived_referer_medium"] = "external"
+				if user.URL != nil {
+					tags["derived_referer_source"] = *user.URL
+				}
+			}
+
 		} else {
 			tags["derived_referer_medium"] = "direct"
-		}
-
-		if tags["derived_referer_medium"] == "unknown" {
-			tags["derived_referer_medium"] = "external"
-			if user.URL != nil {
-				tags["derived_referer_source"] = *user.URL
-			}
 		}
 
 		if user.Adblock != nil {
