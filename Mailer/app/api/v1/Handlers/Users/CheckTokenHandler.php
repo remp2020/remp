@@ -53,6 +53,6 @@ class CheckTokenHandler extends BaseHandler
 
         $this->autoLogin->useToken($token);
 
-        return new JsonApiResponse(200, ['status' => 'ok', 'email' => $token->user->email]);
+        return new JsonApiResponse(200, ['status' => 'ok', 'email' => $token->email]);
     }
 }
