@@ -115,28 +115,28 @@ class ArticleDetailsController extends Controller
 
         $conversionRate = ($article->conversions()->count() / $uniqueBrowsersCount) * 100;
 
-//        $newSubscriptionsCountSql = <<<SQL
-//        select count(*) as subscriptions_count from (
-//            select c1.* from conversions c1
-//            left join conversions c2
-//            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at
-//            where c2.id is Null
-//            and c1.article_id = ?
-//        ) t
-//SQL;
-//        $newSubscriptionsCount = DB::select($newSubscriptionsCountSql, [$article->id])[0]->subscriptions_count;
-//
-//        $renewSubscriptionsCountSql = <<<SQL
-//        select count(*) as subscriptions_count from (
-//            select c1.user_id from conversions c1
-//            left join conversions c2
-//            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at and c2.id != c1.id
-//            where c2.id is not Null
-//            and c1.article_id = ?
-//            group by user_id
-//        ) t
-//SQL;
-//        $renewSubscriptionsCount = DB::select($renewSubscriptionsCountSql, [$article->id])[0]->subscriptions_count;
+        $newSubscriptionsCountSql = <<<SQL
+        select count(*) as subscriptions_count from (
+            select c1.* from conversions c1
+            left join conversions c2
+            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at
+            where c2.id is Null
+            and c1.article_id = ?
+        ) t
+SQL;
+        $newSubscriptionsCount = DB::select($newSubscriptionsCountSql, [$article->id])[0]->subscriptions_count;
+
+        $renewSubscriptionsCountSql = <<<SQL
+        select count(*) as subscriptions_count from (
+            select c1.user_id from conversions c1
+            left join conversions c2
+            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at and c2.id != c1.id
+            where c2.id is not Null
+            and c1.article_id = ?
+            group by user_id
+        ) t
+SQL;
+        $renewSubscriptionsCount = DB::select($renewSubscriptionsCountSql, [$article->id])[0]->subscriptions_count;
 
         $pageviewsSubscribersToAllRatio = ($article->pageviews_subscribers / $article->pageviews_all) * 100;
 
@@ -146,8 +146,8 @@ class ArticleDetailsController extends Controller
                 'pageviewsSubscribersToAllRatio' => $pageviewsSubscribersToAllRatio,
                 'conversionRate' => $conversionRate,
                 'uniqueBrowsersCount' => $uniqueBrowsersCount,
-                'newSubscriptionsCount' => 0,//$newSubscriptionsCount,
-                'renewSubscriptionsCount' => 0,//$renewSubscriptionsCount,
+                'newSubscriptionsCount' => $newSubscriptionsCount,
+                'renewSubscriptionsCount' => $renewSubscriptionsCount,
                 'dataFrom' => $request->input('data_from', 'now - 30 days'),
                 'dataTo' => $request->input('data_to', 'now'),
             ]),
