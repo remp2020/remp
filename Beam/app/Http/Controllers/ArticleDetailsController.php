@@ -75,7 +75,7 @@ class ArticleDetailsController extends Controller
             //$endTime = (clone $timeIterator)->addMinutes($intervalMinutes);
 
             $zuluDate = $timeIterator->toIso8601ZuluString();
-            $results[$zuluDate] = collect($tags)->mapWithKeys(function ($item){
+            $results[$zuluDate] = collect($tags)->mapWithKeys(function ($item) {
                 return [$item => 0];
             });
             $results[$zuluDate]['Date'] = $zuluDate;
