@@ -30,6 +30,12 @@
         }
     }
 
+    let svg, x,y = null
+
+    function stackMax(layer) {
+        return d3.max(layer, function (d) { return d[1]; });
+    }
+
     export default {
         name: 'article-chart',
         props: props,
@@ -41,51 +47,23 @@
         },
         watch: {
             data(val) {
-                this.calc(val.results, val.tags)
+                this.fillData(val.results, val.tags)
             }
         },
         mounted() {
+            this.createGraph()
             this.loadData()
+            setInterval(this.loadData, 20000)
         },
         methods: {
-            calc(results, tags) {
-                console.log(results)
-                console.log(tags)
-
-                let svg = d3.select(this.$refs.svg),
-                    margin = {top: 20, right: 20, bottom: 30, left: 50},
+            createGraph(){
+                svg = d3.select(this.$refs.svg)
+                let margin = {top: 20, right: 20, bottom: 30, left: 50},
                     width = svg.attr("width") - margin.left - margin.right,
                     height = svg.attr("height") - margin.top - margin.bottom
 
-                // Convert string values to date, numbers
-                let parsedData = results.map(function (d) {
-                    let dataObject = {
-                        date: d3.isoParse(d.Date)
-                    };
-                    tags.forEach(function (s) {
-                        dataObject[s] = +d[s];
-                    })
-                    return dataObject;
-                });
-
-
-                let stack = d3.stack()
-                    .keys(tags)
-                    .offset(d3.stackOffsetNone)
-
-                let layers = stack(parsedData);
-
-                function getDate(d) {
-                    return d.date;
-                }
-
-                let x = d3.scaleTime()
-                    .domain([parsedData[0].date, parsedData[parsedData.length - 1].date])
-                    .range([0, width]);
-
-                let y = d3.scaleLinear()
-                    .domain([0, d3.max(layers, stackMax)])
-                    .range([height, 0]);
+                x = d3.scaleTime().range([0, width]);
+                y = d3.scaleLinear().range([height, 0]);
 
                 let xAxis = d3.axisBottom(x),
                     yAxis = d3.axisLeft(y);
@@ -100,7 +78,30 @@
                 let gY = svg.append("g")
                     .attr("class", "axis axis--y")
                     .call(yAxis)
+            },
+            fillData(results, tags) {
+                // Prepare data
+                let parsedData = results.map(function (d) {
+                    let dataObject = {
+                        date: d3.isoParse(d.Date)
+                    };
+                    tags.forEach(function (s) {
+                        dataObject[s] = +d[s];
+                    })
+                    return dataObject;
+                });
 
+                let stack = d3.stack()
+                    .keys(tags)
+                    .offset(d3.stackOffsetNone)
+
+                let layers = stack(parsedData);
+
+                // Scale the range of the data
+                x.domain([parsedData[0].date, parsedData[parsedData.length - 1].date])
+                y.domain([0, d3.max(layers, stackMax)])
+
+                // Tags
                 let colors = tags.map(function (d, i) {
                     return d3.interpolateWarm(i / tags.length);
                 });
@@ -109,30 +110,28 @@
                     .domain(tags)
                     .range(colors);
 
-                let area = d3.area()
-                    .x(function (d, i) { return x(d.data.date) })
-                    .y0(function (d) { return y(d[0]); })
-                    .y1(function (d) { return y(d[1]); })
+                // Remove original data if present
+                svg.selectAll(".layer").remove();
 
+                // Update data
                 let layerGroups = svg.selectAll(".layer")
                     .data(layers)
                     .enter().append("g")
                     .attr("class", "layer");
+
+                // Draw data
+                let area = d3.area()
+                    .x(function (d, i) { return x(d.data.date) })
+                    .y0(function (d) { return y(d[0]); })
+                    .y1(function (d) { return y(d[1]); })
 
                 layerGroups.append("path")
                     .attr("d", area)
                     .attr("fill", function (d, i) {
                         return colors[i];
                     });
-
-                function stackMax(layer) {
-                    return d3.max(layer, function (d) { return d[1]; });
-                }
-
             },
             loadData() {
-                console.log('loading data')
-                this.loading = true
                 axios
                     .get(this.url, {
                         params: {
