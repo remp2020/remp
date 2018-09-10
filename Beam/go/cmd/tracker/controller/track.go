@@ -252,12 +252,12 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			fields["user_agent"] = *user.UserAgent
 
 			ua := uasurfer.Parse(*user.UserAgent)
-			fields["derived_device"] = strings.TrimPrefix(ua.DeviceType.String(), "Device")
-			fields["derived_os"] = strings.TrimPrefix(ua.OS.Name.String(), "OS")
-			fields["derived_os_version"] = fmt.Sprintf("%d.%d", ua.OS.Version.Major, ua.OS.Version.Minor)
-			fields["derived_platform"] = strings.TrimPrefix(ua.OS.Platform.String(), "Platform")
-			fields["derived_browser"] = strings.TrimPrefix(ua.Browser.Name.String(), "Browser")
-			fields["derived_browser_version"] = fmt.Sprintf("%d.%d", ua.Browser.Version.Major, ua.Browser.Version.Minor)
+			fields["derived_ua_device"] = strings.TrimPrefix(ua.DeviceType.String(), "Device")
+			fields["derived_ua_os"] = strings.TrimPrefix(ua.OS.Name.String(), "OS")
+			fields["derived_ua_os_version"] = fmt.Sprintf("%d.%d", ua.OS.Version.Major, ua.OS.Version.Minor)
+			fields["derived_ua_platform"] = strings.TrimPrefix(ua.OS.Platform.String(), "Platform")
+			fields["derived_ua_browser"] = strings.TrimPrefix(ua.Browser.Name.String(), "Browser")
+			fields["derived_ua_browser_version"] = fmt.Sprintf("%d.%d", ua.Browser.Version.Major, ua.Browser.Version.Minor)
 		}
 
 		if user.Referer != nil {
