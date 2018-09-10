@@ -1,14 +1,6 @@
 <template>
-    <div class="article-chart">
-
-        <!--<svg width="960" height="500">-->
-        <!--<g style="transform: translate(0, 10px)">-->
-        <!--&lt;!&ndash;<path :d="line" />&ndash;&gt;-->
-        <!--</g>-->
-        <!--</svg>-->
-
-        <svg ref="svg" width="960" height="300"></svg>
-
+    <div id="article-chart">
+        <svg ref="svg" width="950" height="300"></svg>
     </div>
 </template>
 
@@ -30,7 +22,7 @@
         }
     }
 
-    let svg, x,y = null
+    let svg, x,y, xAxis, yAxis = null
 
     function stackMax(layer) {
         return d3.max(layer, function (d) { return d[1]; });
@@ -53,7 +45,7 @@
         mounted() {
             this.createGraph()
             this.loadData()
-            setInterval(this.loadData, 20000)
+            setInterval(this.loadData, 5000)
         },
         methods: {
             createGraph(){
@@ -62,24 +54,19 @@
                     width = svg.attr("width") - margin.left - margin.right,
                     height = svg.attr("height") - margin.top - margin.bottom
 
-                x = d3.scaleTime().range([0, width]);
-                y = d3.scaleLinear().range([height, 0]);
+                x = d3.scaleTime().range([0, width])
+                y = d3.scaleLinear().range([height, 0])
 
-                let xAxis = d3.axisBottom(x),
-                    yAxis = d3.axisLeft(y);
+                xAxis = d3.axisBottom(x)
+                yAxis = d3.axisLeft(y)
 
                 let gX = svg.append("g")
                     .attr("transform", "translate(0," + height + ")")
                     .attr("class", "axis axis--x")
                     .call(xAxis)
-                    .select(".domain")
-                    .remove();
-
-                let gY = svg.append("g")
-                    .attr("class", "axis axis--y")
-                    .call(yAxis)
             },
             fillData(results, tags) {
+                console.log('filling data')
                 // Prepare data
                 let parsedData = results.map(function (d) {
                     let dataObject = {
@@ -130,6 +117,9 @@
                     .attr("fill", function (d, i) {
                         return colors[i];
                     });
+
+                // Update axis
+                svg.select('.axis--x').call(xAxis)
             },
             loadData() {
                 axios
