@@ -23,7 +23,7 @@
     }
 
     let container, svg, x,y, xAxis,
-        margin = {top: 20, right: 20, bottom: 30, left: 50}
+        margin = {top: 20, right: 30, bottom: 20, left: 30}
 
     function stackMax(layer) {
         return d3.max(layer, function (d) { return d[1]; });
@@ -79,7 +79,7 @@
                 x = d3.scaleTime().range([0, width])
                 y = d3.scaleLinear().range([height, 0])
 
-                xAxis = d3.axisBottom(x)
+                xAxis = d3.axisBottom(x).ticks(5)
 
                 let gX = svg.append("g")
                     .attr("transform", "translate(0," + height + ")")

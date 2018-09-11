@@ -21,11 +21,43 @@ class ArticleDetailsController extends Controller
         $this->journal = $journal;
     }
 
+    private function getIntervalDependingOnArticlePublishedDate(Article $article): array
+    {
+        $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
+        if ($articleAgeInMins <= 60) { // 1 hour
+            return ["1m", 1];
+        } else if ($articleAgeInMins <= 60*24) { // 1 day
+            return ["20m", 20];
+        } else if ($articleAgeInMins <= 7*60*24) { // 7 days
+            return ["1h", 60];
+        } else if ($articleAgeInMins <= 30*60*24) { // 30 days
+            return ["2h", 120];
+        } else if ($articleAgeInMins <= 90*60*24) { // 90 days
+            return ["3h", 180];
+        } else if ($articleAgeInMins <= 180*60*24) { // 180 days
+            return ["4h", 240];
+        } else if ($articleAgeInMins <= 365*60*24) { // 1 year
+            return ["6h", 360];
+        } else { // 1+ year
+            return ["8h", 480];
+        }
+    }
+
+    private function getElasticTimeIterator(Carbon $timeAfter, int $intervalMinutes): Carbon
+    {
+        // iterator has to be the earliest start of the interval (of $intervalMinutes) that includes $timeAfter
+        $timeIterator = (clone $timeAfter)->startOfDay();
+        while ($timeIterator->lessThanOrEqualTo($timeAfter)) {
+            $timeIterator->addMinutes($intervalMinutes);
+        }
+        return $timeIterator->subMinutes($intervalMinutes);
+    }
+
     public function timeHistogram(Article $article, Request $request)
     {
         $request->validate([
             'tz' => 'timezone',
-            'interval' => 'required|in:today,7days,30days',
+            'interval' => 'required|in:today,7days,30days,all',
         ]);
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
@@ -50,6 +82,11 @@ class ArticleDetailsController extends Controller
                 $intervalElastic = '2h';
                 $intervalMinutes = 120;
                 break;
+            case 'all':
+                $timeBefore = Carbon::now($tz);
+                $timeAfter = (clone $article->published_at)->tz($tz);
+                [$intervalElastic, $intervalMinutes] = $this->getIntervalDependingOnArticlePublishedDate($article);
+                break;
             default:
                 throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days] values, instead '$interval' provided");
         }
@@ -70,10 +107,9 @@ class ArticleDetailsController extends Controller
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
         $results = [];
-        $timeIterator = clone $timeAfter;
+        //$timeIterator = clone $timeAfter;
+        $timeIterator = $this->getElasticTimeIterator($timeAfter, $intervalMinutes);
         while ($timeIterator->lessThan($timeBefore)) {
-            //$endTime = (clone $timeIterator)->addMinutes($intervalMinutes);
-
             $zuluDate = $timeIterator->toIso8601ZuluString();
             $results[$zuluDate] = collect($tags)->mapWithKeys(function ($item) {
                 return [$item => 0];
@@ -85,7 +121,11 @@ class ArticleDetailsController extends Controller
 
         // Save results
         foreach ($currentRecords as $records) {
+            if (!isset($records->time_histogram)){
+                continue;
+            }
             $currentTag = $records->tags->social;
+
             foreach ($records->time_histogram as $timeValue) {
                 // take 4 and less as 0 (Elastic might return approximate results)
                 $results[$timeValue->time][$currentTag] = $timeValue->value < 5 ? 0 : $timeValue->value;
@@ -94,7 +134,8 @@ class ArticleDetailsController extends Controller
         $results = array_values($results);
 
         return response()->json([
-            'x' => $currentRecords,
+            'published_at' => $article->published_at->toIso8601ZuluString(),
+            'interval_minutes' => $intervalMinutes,
             'results' => $results,
             'tags' => $tags
         ]);
