@@ -7,15 +7,12 @@
         </div>
 
         <div id="chartContainer" class="card-body card-padding">
-            <div class="btn-group btn-group-xs" role="group">
-                <button v-for="option in intervalOptions"
-                        type="button"
-                        class="btn"
-                        :class="[option.selected ? 'btn-info' : 'btn-default']"
-                        @click="setSelectedInterval(option)">
-                    {{option.text}}
-                </button>
-            </div>
+            <button-switcher :options="[
+                {text: 'Today', value: 'today'},
+                {text: '7 days', value: '7days'},
+                {text: '30 days', value: '30days'}]"
+                             v-model="interval">
+            </button-switcher>
 
             <div v-if="loading" class="preloader pls-purple">
                 <svg class="pl-circular" viewBox="25 25 50 50">
@@ -98,6 +95,7 @@
 
 <script>
     import axios from 'axios'
+    import ButtonSwitcher from './ButtonSwitcher.vue'
     import ECharts from 'vue-echarts/components/ECharts'
     import 'echarts/lib/chart/line'
     import 'echarts/lib/component/tooltip'
@@ -256,7 +254,9 @@
 
     export default {
         components: {
-            'chart': ECharts
+            ButtonSwitcher,
+            'chart': ECharts,
+            'button-switcher': ButtonSwitcher
         },
         props: props,
         data() {
@@ -264,23 +264,6 @@
                 loading: true,
                 error: null,
                 chartOptions: null,
-                intervalOptions: [
-                    {
-                        text: 'Today',
-                        value: 'today',
-                        selected: true
-                    },
-                    {
-                        text: '7 days',
-                        value: '7days',
-                        selected: false
-                    },
-                    {
-                        text: '30 days',
-                        value: '30days',
-                        selected: false
-                    }
-                ],
                 interval: 'today'
             }
         },
@@ -301,12 +284,6 @@
             clearInterval(loadDataTimer)
         },
         methods: {
-            setSelectedInterval(option) {
-                this.intervalOptions.forEach(function (item) {
-                    item.selected = option.value === item.value
-                })
-                this.interval = option.value
-            },
             loadData() {
                 this.loading = true
                 axios
