@@ -109,7 +109,7 @@
                     <div class="pmbb-view">
                         <dl class="dl-horizontal">
                             <dt>Pageviews subscribers</dt>
-                            <dd>{{$article->pageviews_subscribers}} (<b>{{number_format($pageviewsSubscribersToAllRatio, 2)}}%</b> of all views)</dd>
+                            <dd>{{$article->pageviews_subscribers}} (<b>{{number_format($pageviewsSubscribersToAllRatio, 4)}}%</b> of all views)</dd>
                         </dl>
 
                         <dl class="dl-horizontal">
