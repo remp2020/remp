@@ -132,16 +132,18 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 				errors.New("missing expected histogram aggregation data")
 			}
 
-			for _, histogramItem := range histogramData.Buckets {
-				time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
-				if err != nil {
-					errors.New("cant parse time from elastic search with RFC3339 layout")
-				}
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
+					if err != nil {
+						errors.New("cant parse time from elastic search with RFC3339 layout")
+					}
 
-				histogram = append(histogram, HistogramItem{
-					Time:  time,
-					Value: float64(histogramItem.DocCount),
-				})
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(histogramItem.DocCount),
+					})
+				}
 			}
 		}
 
