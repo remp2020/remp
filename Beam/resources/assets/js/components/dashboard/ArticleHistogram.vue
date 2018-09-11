@@ -1,6 +1,6 @@
 <template>
-    <div id="article-chart">
-        <svg ref="svg" width="950" height="300"></svg>
+    <div ref="svg-container" style="height: 200px;" id="article-chart">
+        <svg ref="svg"></svg>
     </div>
 </template>
 
@@ -22,10 +22,22 @@
         }
     }
 
-    let svg, x,y, xAxis, yAxis = null
+    let container, svg, x,y, xAxis,
+        margin = {top: 20, right: 20, bottom: 30, left: 50}
 
     function stackMax(layer) {
         return d3.max(layer, function (d) { return d[1]; });
+    }
+
+    const debounce = (fn, time) => {
+        let timeout;
+
+        return function() {
+            const functionCall = () => fn.apply(this, arguments);
+
+            clearTimeout(timeout);
+            timeout = setTimeout(functionCall, time);
+        }
     }
 
     export default {
@@ -39,34 +51,55 @@
         },
         watch: {
             data(val) {
-                this.fillData(val.results, val.tags)
+                this.fillData()
             }
         },
         mounted() {
             this.createGraph()
             this.loadData()
-            setInterval(this.loadData, 5000)
+            setInterval(this.loadData, 15000)
+            window.addEventListener('resize', debounce((e) => {
+                this.fillData()
+            }, 100));
         },
         methods: {
             createGraph(){
-                svg = d3.select(this.$refs.svg)
-                let margin = {top: 20, right: 20, bottom: 30, left: 50},
-                    width = svg.attr("width") - margin.left - margin.right,
-                    height = svg.attr("height") - margin.top - margin.bottom
+                container = this.$refs["svg-container"]
+                let outerWidth = container.clientWidth,
+                    outerHeight = container.clientHeight,
+                    width = outerWidth - margin.left - margin.right,
+                    height = outerHeight - margin.top - margin.bottom
+
+                svg = d3.select(this.$refs["svg"])
+                    .attr("width", outerWidth)
+                    .attr("height", outerHeight)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                 x = d3.scaleTime().range([0, width])
                 y = d3.scaleLinear().range([height, 0])
 
                 xAxis = d3.axisBottom(x)
-                yAxis = d3.axisLeft(y)
 
                 let gX = svg.append("g")
                     .attr("transform", "translate(0," + height + ")")
                     .attr("class", "axis axis--x")
                     .call(xAxis)
             },
-            fillData(results, tags) {
-                console.log('filling data')
+            fillData() {
+                if (this.data === null){
+                    return
+                }
+                let results = this.data.results, tags = this.data.tags
+
+                let outerWidth = container.clientWidth,
+                    outerHeight = container.clientHeight,
+                    width = outerWidth - margin.left - margin.right,
+                    height = outerHeight - margin.top - margin.bottom
+
+                svg.attr("width", outerWidth)
+                    .attr("height", outerHeight)
+
                 // Prepare data
                 let parsedData = results.map(function (d) {
                     let dataObject = {
@@ -84,9 +117,10 @@
 
                 let layers = stack(parsedData);
 
-                // Scale the range of the data
                 x.domain([parsedData[0].date, parsedData[parsedData.length - 1].date])
+                    .range([0, width])
                 y.domain([0, d3.max(layers, stackMax)])
+                    .range([height, 0])
 
                 // Tags
                 let colors = tags.map(function (d, i) {
@@ -119,14 +153,14 @@
                     });
 
                 // Update axis
-                svg.select('.axis--x').call(xAxis)
+                svg.select('.axis--x').transition().call(xAxis)
             },
             loadData() {
                 axios
                     .get(this.url, {
                         params: {
                             'tz': Intl.DateTimeFormat().resolvedOptions().timeZone,
-                            'interval': 'today',
+                            'interval': '7days',
                         }
                     })
                     .then(response => {
