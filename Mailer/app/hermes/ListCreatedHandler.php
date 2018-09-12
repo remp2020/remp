@@ -51,7 +51,6 @@ class ListCreatedHandler implements HandlerInterface
                 } else {
                     $this->userSubscriptionsRepository->unsubscribeUser($list, $user['id'], $user['email']);
                 }
-
             }
             $page++;
         }
