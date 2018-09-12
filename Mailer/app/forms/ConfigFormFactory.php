@@ -54,7 +54,7 @@ class ConfigFormFactory extends Object
                     ->setAttribute('rows', 15)
                     ->getControlPrototype()->addAttributes(['class' => 'html-editor']);
             } else {
-                throw new \Exception();
+                throw new \Exception('unhandled config type: ' . $config->type);
             }
 
             $item->setDefaultValue($config->value);

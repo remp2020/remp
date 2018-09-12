@@ -38,12 +38,20 @@ class ListCreatedHandler implements HandlerInterface
         }
 
         $list = $this->listsRepository->find($payload['list_id']);
+        if (!$list->auto_subscribe) {
+            return true;
+        }
 
         $page = 1;
         while ($users = $this->userProvider->list([], $page)) {
             foreach ($users as $user) {
                 $this->logger->log(LogLevel::INFO, sprintf("Subscribing user: %s (%s).", $user['email'], $user['id']));
-                $this->userSubscriptionsRepository->autoSubscribe($list, $user['id'], $user['email']);
+                if ($list->auto_subscribe) {
+                    $this->userSubscriptionsRepository->subscribeUser($list, $user['id'], $user['email']);
+                } else {
+                    $this->userSubscriptionsRepository->unsubscribeUser($list, $user['id'], $user['email']);
+                }
+
             }
             $page++;
         }
