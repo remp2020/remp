@@ -254,7 +254,6 @@
 
     export default {
         components: {
-            ButtonSwitcher,
             'chart': ECharts,
             'button-switcher': ButtonSwitcher
         },

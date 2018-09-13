@@ -8,7 +8,6 @@ use App\Contracts\JournalContract;
 use App\Http\Resources\ArticleResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class ArticleDetailsController extends Controller
@@ -17,7 +16,6 @@ class ArticleDetailsController extends Controller
 
     public function __construct(JournalContract $journal)
     {
-
         $this->journal = $journal;
     }
 
@@ -107,7 +105,6 @@ class ArticleDetailsController extends Controller
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
         $results = [];
-        //$timeIterator = clone $timeAfter;
         $timeIterator = $this->getElasticTimeIterator($timeAfter, $intervalMinutes);
         while ($timeIterator->lessThan($timeBefore)) {
             $zuluDate = $timeIterator->toIso8601ZuluString();
