@@ -66,7 +66,6 @@ class MinutaAlertGenerator implements IGenerator
 
         $params = [
             'post' => $post,
-            'autologin' => '{{ autologin }}',
         ];
 
         $loader = new \Twig_Loader_Array([
