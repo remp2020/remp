@@ -130,7 +130,7 @@
     <div class="card card-chart">
 
         <div class="card-header">
-            <h2>Article Traffic
+            <h2>Article Page Loads
             </h2>
         </div>
         <div class="card-body card-padding">
