@@ -94,6 +94,7 @@ class ArticleDetailsController extends Controller
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($intervalElastic, '0h');
+        // TODO: change grouping value to derived-referer-medium
         $journalRequest->addGroup('social');
         $currentRecords = $this->journal->count($journalRequest);
 
