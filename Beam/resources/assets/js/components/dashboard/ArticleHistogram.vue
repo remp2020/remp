@@ -188,7 +188,6 @@
                             const xDate = x.invert(mouse[0])
                             let rowIndex = bisectDate(that.data.results, xDate);
 
-
                             let rowRight = that.data.results[rowIndex]
                             let rowLeft = that.data.results[rowIndex - 1]
                             let row = rowRight
