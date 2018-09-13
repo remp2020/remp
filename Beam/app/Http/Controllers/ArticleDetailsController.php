@@ -119,7 +119,7 @@ class ArticleDetailsController extends Controller
 
         // Save results
         foreach ($currentRecords as $records) {
-            if (!isset($records->time_histogram)){
+            if (!isset($records->time_histogram)) {
                 continue;
             }
             $currentTag = $records->tags->social;
