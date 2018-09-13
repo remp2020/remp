@@ -14,6 +14,7 @@ class Config
     const TYPE_PASSWORD = 'password';
     const TYPE_HTML = 'html';
     const TYPE_SELECT = 'select';
+    const TYPE_BOOLEAN = 'boolean';
 
     private $loaded = false;
 
