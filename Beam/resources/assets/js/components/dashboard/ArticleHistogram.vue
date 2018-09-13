@@ -49,6 +49,7 @@
         left: 0;
         opacity: 0.8;
         color: #fff;
+        padding: 4px;
         background-color: #b6b6b6;
         border-radius: 2px;
         border: 2px solid #b6b6b6;
