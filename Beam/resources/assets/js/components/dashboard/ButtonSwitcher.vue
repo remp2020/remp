@@ -36,7 +36,6 @@
             }
         },
         created() {
-            console.log("this is value: " + this.value)
             let that = this
             this.options.forEach(function (item){
                 that.intervalOptions.push({
