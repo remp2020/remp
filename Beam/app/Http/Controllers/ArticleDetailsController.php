@@ -8,6 +8,7 @@ use App\Contracts\JournalContract;
 use App\Http\Resources\ArticleResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class ArticleDetailsController extends Controller
@@ -94,14 +95,13 @@ class ArticleDetailsController extends Controller
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($intervalElastic, '0h');
-        // TODO: change grouping value to derived-referer-medium
-        $journalRequest->addGroup('social');
+        $journalRequest->addGroup('derived_referer_medium');
         $currentRecords = $this->journal->count($journalRequest);
 
         // Get all tags
         $tags = [];
         foreach ($currentRecords as $records) {
-            $tags[] = $records->tags->social;
+            $tags[] = $records->tags->derived_referer_medium;
         }
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
@@ -122,7 +122,7 @@ class ArticleDetailsController extends Controller
             if (!isset($records->time_histogram)) {
                 continue;
             }
-            $currentTag = $records->tags->social;
+            $currentTag = $records->tags->derived_referer_medium;
 
             foreach ($records->time_histogram as $timeValue) {
                 // take 4 and less as 0 (Elastic might return approximate results)
