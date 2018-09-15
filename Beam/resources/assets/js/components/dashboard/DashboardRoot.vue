@@ -48,10 +48,10 @@
                                             {{ article.avg_timespent_string || '' }}
                                         </td>
                                         <td>
-                                            {{ article.conversions_count}}
+                                            {{ article.conversions_count }}
                                         </td>
                                         <td>
-                                            {{ article.unique_browsers_count}}
+                                            {{ article.unique_browsers_count }}
                                         </td>
                                     </tr>
                                 </tbody>
