@@ -172,13 +172,13 @@ class DashboardController extends Controller
         $timeBefore = Carbon::now();
         $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
 
-        $timespentRequest = new JournalConcurrentsRequest();
-        $timespentRequest->setTimeAfter($timeAfter);
-        $timespentRequest->setTimeBefore($timeBefore);
-        $timespentRequest->addGroup('article_id');
+        $concurrentsRequest = new JournalConcurrentsRequest();
+        $concurrentsRequest->setTimeAfter($timeAfter);
+        $concurrentsRequest->setTimeBefore($timeBefore);
+        $concurrentsRequest->addGroup('article_id');
 
         // records are already sorted
-        $records = $this->journal->concurrents($timespentRequest);
+        $records = $this->journal->concurrents($concurrentsRequest);
 
         $minimalPublishedTime = Carbon::now();
 
@@ -217,7 +217,7 @@ class DashboardController extends Controller
 
         // Load timespent
         $timespentRequest = new JournalAggregateRequest('pageviews', 'timespent');
-        // TODO: how to specify time after here? should we count records that are in the past?
+        // we compute average spent time of most read articles as average of last 2 hours
         $timespentRequest->setTimeAfter((clone $timeAfter)->subHours(2));
         $timespentRequest->setTimeBefore($timeBefore);
         $timespentRequest->addGroup('article_id');
