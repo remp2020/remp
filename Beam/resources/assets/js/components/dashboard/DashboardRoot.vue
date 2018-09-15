@@ -30,7 +30,7 @@
                                     </tr>
                                 </thead>
                                 <tbody name="table-row" is="transition-group">
-                                    <tr v-for="article in articles" v-bind:key="article.article_id">
+                                    <tr v-for="article in articles" v-bind:key="article.external_article_id">
                                         <td><span class="concurrents-count">
                                                 <animated-integer :value="article.count"></animated-integer>
                                             </span>

@@ -194,7 +194,7 @@ class DashboardController extends Controller
 
             $obj = new \stdClass();
             $obj->count = $record->count;
-            $obj->article_id = $record->tags->article_id;
+            $obj->external_article_id = $record->tags->article_id;
 
             if (!$record->tags->article_id) {
                 $obj->title = 'Landing page';
@@ -211,6 +211,7 @@ class DashboardController extends Controller
                 $obj->title = $article->title;
                 $obj->published_at = $article->published_at->toAtomString();
                 $obj->conversions_count = $article->conversions->count();
+                $obj->article = $article;
             }
             $top20[] = $obj;
             $i++;
@@ -223,11 +224,11 @@ class DashboardController extends Controller
         $timespentRequest->setTimeBefore($timeBefore);
         $timespentRequest->addGroup('article_id');
 
-        $articleIds = collect($top20)->filter(function ($item) {
-            return !empty($item->article_id);
-        })->pluck('article_id');
+        $externalArticleIds = collect($top20)->filter(function ($item) {
+            return !empty($item->external_article_id);
+        })->pluck('external_article_id');
 
-        $timespentRequest->addFilter('article_id', ...$articleIds);
+        $timespentRequest->addFilter('article_id', ...$externalArticleIds);
         $articleIdToTimespent = $this->journal->avg($timespentRequest)->mapWithKeys(function ($item) {
             return [$item->tags->article_id => $item->avg];
         });
@@ -237,18 +238,18 @@ class DashboardController extends Controller
         $uniqueRequest->setTimeAfter($minimalPublishedTime);
         $uniqueRequest->setTimeBefore($timeBefore);
         $uniqueRequest->addGroup('article_id');
-        $uniqueRequest->addFilter('article_id', ...$articleIds);
+        $uniqueRequest->addFilter('article_id', ...$externalArticleIds);
         $articleIdToUniqueBrowsersCount = $this->journal->unique($uniqueRequest)->mapWithKeys(function ($item) {
             return [$item->tags->article_id => $item->count];
         });
 
         foreach ($top20 as $item) {
-            if ($item->article_id) {
-                $secondsTimespent = $articleIdToTimespent->get($item->article_id, 0);
+            if ($item->external_article_id) {
+                $secondsTimespent = $articleIdToTimespent->get($item->external_article_id, 0);
                 $item->avg_timespent_string = $secondsTimespent >= 3600 ?
                     gmdate('H:i:s', $secondsTimespent) :
                     gmdate('i:s', $secondsTimespent);
-                $item->unique_browsers_count = $articleIdToUniqueBrowsersCount[$item->article_id];
+                $item->unique_browsers_count = $articleIdToUniqueBrowsersCount[$item->external_article_id];
                 $item->conversion_rate = $item->conversions_count / $item->unique_browsers_count;
             }
         }
