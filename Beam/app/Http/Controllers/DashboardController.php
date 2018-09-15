@@ -87,17 +87,16 @@ class DashboardController extends Controller
         // What part of today we should draw (omit 0 values)
         $numberOfCurrentValues = (int) floor((Carbon::now($tz)->getTimestamp() - $timeAfter->getTimestamp()) / ($intervalMinutes * 60));
 
-        // TODO: change grouping to 'derived_referer_medium'
         $journalRequest = new JournalAggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($intervalElastic, '0h');
-        $journalRequest->addGroup('social');
+        $journalRequest->addGroup('derived_referer_medium');
         $currentRecords = $this->journal->count($journalRequest);
 
         $i = 0;
         foreach ($currentRecords as $currentRecord) {
-            $label = $currentRecord->tags->social;
+            $label = $currentRecord->tags->derived_referer_medium;
             $currentValues = collect($currentRecord->time_histogram)->pluck('value')->take($numberOfCurrentValues);
 
             // Preparing data for echarts
@@ -126,17 +125,16 @@ class DashboardController extends Controller
             $timeBeforePrevious = (clone $timeBefore)->subWeek();
             $timeAfterPrevious = (clone $timeAfter)->subWeek();
 
-            // TODO: change grouping to 'derived_referer_medium'
             $journalRequest = new JournalAggregateRequest('pageviews', 'load');
             $journalRequest->setTimeAfter($timeAfterPrevious);
             $journalRequest->setTimeBefore($timeBeforePrevious);
             $journalRequest->setTimeHistogram($intervalElastic, '0h');
-            $journalRequest->addGroup('social');
+            $journalRequest->addGroup('derived_referer_medium');
             $previousRecords = $this->journal->count($journalRequest);
 
             $i = 0;
             foreach ($previousRecords as $previousRecord) {
-                $label = $previousRecord->tags->social;
+                $label = $previousRecord->tags->derived_referer_medium;
                 $previousHistogram = collect($previousRecord->time_histogram);
                 $previousValues = $previousHistogram->pluck('value');
 
