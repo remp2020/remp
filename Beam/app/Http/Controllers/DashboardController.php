@@ -243,8 +243,8 @@ class DashboardController extends Controller
         });
 
         foreach ($top20 as $item) {
-            if ($item->external_article_id) {
-                $secondsTimespent = $articleIdToTimespent->get($item->external_article_id, 0);
+            if ($item->article_id) {
+                $secondsTimespent = $articleIdToTimespent->get($item->article_id, 0);
                 $item->avg_timespent_string = $secondsTimespent >= 3600 ?
                     gmdate('H:i:s', $secondsTimespent) :
                     gmdate('i:s', $secondsTimespent);
