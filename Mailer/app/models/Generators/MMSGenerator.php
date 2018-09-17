@@ -318,7 +318,9 @@ class MMSGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= "<p><a href=\"{$link}/{{ autologin }}\">Pokračovanie odkaz MMS - kliknite sem</a><p>";
+            $lockedHtml .= <<<HTML
+<p>Predplatitelia Denníka N môžu dočítať celý odkaz MMŠ v e-maili. <a href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}" style="display: inline; text-decoration: none;">Pozrite si ponuku predplatného.</a><p>
+HTML;
 
             return $lockedHtml;
         }
