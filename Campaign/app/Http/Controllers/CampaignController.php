@@ -93,9 +93,6 @@ class CampaignController extends Controller
             ->addColumn('countries', function (Campaign $campaign) {
                 return implode(' ', $campaign->countries->pluck('name')->toArray());
             })
-            ->addColumn('is_active', function (Campaign $campaign) {
-                return $campaign->active;
-            })
             ->addColumn('active', function (Campaign $campaign) {
                 return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
@@ -103,10 +100,18 @@ class CampaignController extends Controller
                     'title' => $campaign->active ? 'Deactivate campaign' : 'Activate campaign'
                 ])->render();
             })
+            ->addColumn('is_running', function (Campaign $campaign) {
+                foreach ($campaign->schedules as $schedule) {
+                    if ($schedule->isRunning()) {
+                        return true;
+                    }
+                }
+                return false;
+            })
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
-            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'is_active'])
+            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants', 'is_running'])
             ->setRowId('id')
             ->make(true);
     }

@@ -114,7 +114,7 @@
                         ]
                     ],
                     'rowHighlights' => [
-                        'is_active' => true
+                        'is_running' => true
                     ],
                     'dataSource' => route('campaigns.json'),
                     'rowActions' => [
