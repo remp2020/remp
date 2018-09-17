@@ -115,3 +115,60 @@ mailer/novydenik:
   only:
     - master
   dependencies: []
+
+campaign/novydenik:
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=novydenik/campaign"
+    -F "variables[URL]=https://campaign.novydenik.cz"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
+
+beam/novydenik:
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=novydenik/beam"
+    -F "variables[URL]=https://beam.novydenik.cz"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
+
+sso/novydenik:
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=novydenik/sso"
+    -F "variables[URL]=https://sso.novydenik.cz"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
