@@ -170,13 +170,6 @@ services:
 	generator:
 		class: Remp\MailerModule\Generators\GeneratorFactory
 		setup:
-			- registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\NewsfilterGenerator())
-			- registerGenerator('mediabriefing', 'MediaBriefing', Remp\MailerModule\Generators\MediaBriefingGenerator())
-			- registerGenerator('odkaz_mms', 'Odkaz MMS', Remp\MailerModule\Generators\MMSGenerator())
-			- registerGenerator('url_parser', 'URL parser', Remp\MailerModule\Generators\UrlParserGenerator())
-			- registerGenerator('minuta_digest', 'Minuta digest', Remp\MailerModule\Generators\MinutaDigestGenerator())
-			- registerGenerator('minuta_alert', 'Minuta alert', Remp\MailerModule\Generators\MinutaAlertGenerator())
-			- registerGenerator('daily_newsletter', 'Daily newsletter', Remp\MailerModule\Generators\DailyNewsletterGenerator())
 			- registerGenerator('empty', 'Empty generator', Remp\MailerModule\Generators\EmptyGenerator())
 			- registerGenerator('best_performing_articles', 'Best performing articles', \Remp\MailerModule\Generators\GenericBestPerformingArticlesGenerator())
 
@@ -210,6 +203,7 @@ services:
 	# Generator Widgets
 	- Remp\MailerModule\Components\GeneratorWidgetsManager
 	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget
 	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget
 	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget
 
@@ -226,6 +220,7 @@ services:
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
 	- Remp\MailerModule\Forms\SourceTemplateFormFactory
 	- Remp\MailerModule\Forms\MailGeneratorFormFactory
+	- Remp\MailerModule\Forms\NovydenikNewsfilterTemplateFormFactory('all_users')
 	- Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\MailerModule\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')

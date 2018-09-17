@@ -4,7 +4,6 @@ namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
 use Remp\MailerModule\PageMeta\DenniknContent;
-use Remp\MailerModule\PageMeta\GenericPageContent;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;

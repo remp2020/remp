@@ -1,0 +1,118 @@
+{define previewCallback}
+    <script type="text/javascript">
+        $('[aria-controls="newsfilter-preview"]').on('shown.bs.tab', function () {
+            $.nette.ajax({
+                type: 'POST',
+                url: {link newsfilterPreview!},
+                data: {
+                    'html_content': {$htmlContent},
+                    'text_content': {$textContent},
+                    'name': $('#' + {$control["newsfilterTemplateForm"]['name']->htmlId}).val(),
+                    'mail_layout_id': $('#' + {$control["newsfilterTemplateForm"]['mail_layout_id']->htmlId}).val(),
+                    'mail_type_id': $('#' + {$control["newsfilterTemplateForm"]['mail_type_id']->htmlId}).val(),
+                    'subject': $('#' + {$control["newsfilterTemplateForm"]['subject']->htmlId}).val()
+                },
+                success: function(data) {
+                    previewFrame('#newsfilter-preview-full-frame', data['generatedHtml']);
+                }
+            });
+        });
+
+        function previewFrame(id, html) {
+            var iframe = $(id);
+            var idoc = iframe[0].contentDocument;
+            idoc.open();
+            idoc.write(html);
+            idoc.close();
+        }
+    </script>
+{/define}
+
+<div class="card">
+    <div class="card-header">
+        <h2>Newsfilter details<small></small></h2>
+    </div>
+    <div class="card-body card-padding">
+        <div role="tabpanel">
+            <ul class="tab-nav" role="tablist">
+                <li role="tab" class="active"><a href="#newsfilter-form" aria-controls="newsfilter-form" role="tab" data-toggle="tab">Email info</a></li>
+                <li role="tab"><a href="#newsfilter-preview" aria-controls="newsfilter-preview" role="tab" data-toggle="tab">Final previews</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="newsfilter-form">
+
+                    {form newsfilterTemplateForm, class => form-horizontal}
+
+                        <div class="col-sm-6">
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input name, class => 'form-control fg-input'}
+                                    {label name, class => 'fg-label'}
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input code, class => 'form-control fg-input'}
+                                    {label code, class => 'fg-label'}
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {label mail_layout_id /}
+                                {input mail_layout_id, class => 'form-control'}
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {label mail_type_id /}
+                                {input mail_type_id, class => 'form-control'}
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input from, class => 'form-control fg-input'}
+                                    {label from, class => 'fg-label'}
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input subject, class => 'form-control fg-input', value => $newsfilterTitle}
+                                    {label subject, class => 'fg-label' }
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {input generate_emails_jobs_created, class => 'btn palette-Cyan bg waves-effect'}
+
+                                {input generate_emails_jobs, class => 'btn palette-Cyan bg waves-effect'}
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            {input html_content, value => $htmlContent}
+                            {input text_content, value => $textContent}
+                        </div>
+                    {/form}
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="newsfilter-preview">
+                    {snippet newsfilterPreviewWrapper}
+                        <div class="row">
+                            <div class="col-md-6 text-center">
+                                <h4>Mobile preview
+                                    <a target="_blank" style="font-size: 12px" href="{plink MailGenerator:preview false}"><i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
+                                </h4>
+                                <iframe id="newsfilter-preview-full-frame" frameBorder="0" style="max-width: 576px; width:100%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
+                            </div>
+                        </div>
+                    {/snippet}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include previewCallback}
