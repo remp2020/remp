@@ -664,7 +664,8 @@ class CampaignController extends Controller
             }
 
             // pageview rules
-            if ($campaign->pageview_rules !== null) {
+            $pageviewCount = $data->pageviewCount ?? null;
+            if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
                 foreach ($campaign->pageview_rules as $rule) {
                     if (!$rule['num'] || !$rule['rule']) {
                         continue;
@@ -672,17 +673,17 @@ class CampaignController extends Controller
 
                     switch ($rule['rule']) {
                         case Campaign::PAGEVIEW_RULE_EVERY:
-                            if ($data->pageviewCount % $rule['num'] !== 0) {
+                            if ($pageviewCount % $rule['num'] !== 0) {
                                 continue 3;
                             }
                             break;
                         case Campaign::PAGEVIEW_RULE_SINCE:
-                            if ($data->pageviewCount < $rule['num']) {
+                            if ($pageviewCount < $rule['num']) {
                                 continue 3;
                             }
                             break;
                         case Campaign::PAGEVIEW_RULE_BEFORE:
-                            if ($data->pageviewCount >= $rule['num']) {
+                            if ($pageviewCount >= $rule['num']) {
                                 continue 3;
                             }
                             break;
