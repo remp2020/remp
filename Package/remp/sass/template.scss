@@ -5247,6 +5247,48 @@ a.label:focus {
 .badge:empty {
   display: none;
 }
+.badge-default {
+  background-color: #777777;
+}
+.badge-default[href]:hover,
+.badge-default[href]:focus {
+  background-color: #5e5e5e;
+}
+.badge-primary {
+  background-color: #2196f3;
+}
+.badge-primary[href]:hover,
+.badge-primary[href]:focus {
+  background-color: #0c7cd5;
+}
+.badge-success {
+  background-color: #4caf50;
+}
+.badge-success[href]:hover,
+.badge-success[href]:focus {
+  background-color: #3d8b40;
+}
+.badge-info {
+  background-color: #00bcd4;
+}
+.badge-info[href]:hover,
+.badge-info[href]:focus {
+  background-color: #008fa1;
+}
+.badge-warning {
+  background-color: #ff9800;
+}
+.badge-warning[href]:hover,
+.badge-warning[href]:focus {
+  background-color: #cc7a00;
+}
+.badge-danger {
+  background-color: #f44336;
+}
+.badge-danger[href]:hover,
+.badge-danger[href]:focus {
+  background-color: #ea1c0d;
+}
 .btn .badge {
   position: relative;
   top: -1px;
