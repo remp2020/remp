@@ -7,6 +7,7 @@ use App\Entity;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\Http\Requests\EntityRequest;
+use App\Http\Resources\EntityResource;
 
 class EntitiesController extends Controller
 {
@@ -129,12 +130,18 @@ class EntitiesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  Entity  $entity
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy(Entity $entity)
     {
-        //
+        $entity->delete();
+
+        return response()->format([
+            'html' => redirect(route('entities.index'))->with('success', 'Entity removed'),
+            'json' => new EntityResource([]),
+        ]);
     }
 
     /**

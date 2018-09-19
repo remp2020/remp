@@ -15,7 +15,6 @@ class CreateSegmentEntitiesTable extends Migration
         Schema::create('entities', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('parent_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('segment_entities');
             $table->string('name');
             $table->json('schema');
             $table->timestamps();
