@@ -227,18 +227,4 @@ class WordpressHelpers
 
         return $regex;
     }
-
-    public function parseArticleLink($matches)
-    {
-        $id = $matches[1];
-        $url = "https://dennikn.sk/{$id}";
-
-        $meta = $this->pageMeta->getPageMeta($url);
-
-        if (!$meta || !$meta->getTitle()) {
-            return '';
-        }
-
-        return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
-    }
 }

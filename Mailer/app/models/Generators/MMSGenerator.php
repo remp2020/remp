@@ -5,24 +5,34 @@ namespace Remp\MailerModule\Generators;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget;
+use Remp\MailerModule\PageMeta\ContentInterface;
+use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 use GuzzleHttp\Client;
 
 class MMSGenerator implements IGenerator
 {
-    protected $mailSourceTemplateRepository;
-
     public $onSubmit;
 
-    public $helpers;
+    private $mailSourceTemplateRepository;
+
+    private $helpers;
+
+    private $content;
+
+    private $transport;
 
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
-        WordpressHelpers $helpers
+        WordpressHelpers $helpers,
+        ContentInterface $content,
+        TransportInterface $transport
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
+        $this->content = $content;
+        $this->transport = $transport;
     }
 
     public function apiParams()
@@ -47,6 +57,8 @@ class MMSGenerator implements IGenerator
     public function process($values)
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
+        $content = $this->content;
+        $transport = $this->transport;
 
         $post = $values->mms_html;
         $lockedPost = $this->getLockedHtml($post, $values->url);
@@ -90,7 +102,11 @@ class MMSGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => array($this->helpers, "parseArticleLink"),
+            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
+                $url = "https://dennikn.sk/{$matches[1]}";
+                $meta = Utils::fetchUrlMeta($url, $content, $transport);
+                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
+            },
 
             // replace hrefs
             '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;">$2</a>',
@@ -318,7 +334,9 @@ class MMSGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= "<p><a href=\"{$link}/{{ autologin }}\">Pokračovanie odkaz MMS - kliknite sem</a><p>";
+            $lockedHtml .= <<<HTML
+<p>Predplatitelia Denníka N môžu dočítať celý odkaz MMŠ v e-maili. <a href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}" style="display: inline; text-decoration: none;">Pozrite si ponuku predplatného.</a><p>
+HTML;
 
             return $lockedHtml;
         }

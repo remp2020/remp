@@ -39,6 +39,6 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');
-    Route::resource('schedule', 'ScheduleController');
+    Route::resource('schedule', 'ScheduleController')->only(['index', 'create', 'edit', 'update', 'destroy']);
     Route::resource('campaigns.schedule', 'ScheduleController');
 });

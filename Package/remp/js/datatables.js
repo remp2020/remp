@@ -193,11 +193,13 @@ $.fn.dataTables = {
             return function(data) {
                 var result = '';
                 for (var i=0; i<data.length; i++) {
+                    let text;
                     if (column === null) {
-                        result += data[i] + '<br/>';
+                        text = $("<textarea/>").html(data[i]).text();
                     } else {
-                        result += data[i][column] + '<br/>';
+                        text = $("<textarea/>").html(data[i][column][i]).text();
                     }
+                    result += text + '<br/>';
                 }
                 return result;
             }

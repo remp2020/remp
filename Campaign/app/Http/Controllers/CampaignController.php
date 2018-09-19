@@ -66,22 +66,26 @@ class CampaignController extends Controller
 
                 foreach ($data as $variant) {
                     $proportion = $variant['proportion'];
+                    if ($proportion === 0) {
+                        continue;
+                    }
 
-                    if ($variant['control_group'] == 0) {
-                        // handle variants with banner
-                        $link = link_to(
-                            route('banners.edit', $variant['banner_id']),
-                            $variant->banner->name
-                        );
-
-                        $variants[] = "{$link}&nbsp;({$proportion}%)";
-                    } else {
+                    if ($variant['control_group'] === 1) {
                         // handle control group
                         $variants[] = "Control Group&nbsp;({$proportion}%)";
+                        continue;
                     }
+
+                    // handle variants with banner
+                    $link = link_to(
+                        route('banners.edit', $variant['banner_id']),
+                        $variant->banner->name
+                    );
+
+                    $variants[] = "{$link}&nbsp;({$proportion}%)";
                 }
 
-                return implode('<br>', $variants);
+                return $variants;
             })
             ->addColumn('segments', function (Campaign $campaign) {
                 return implode(' ', $campaign->segments->pluck('code')->toArray());
@@ -96,10 +100,18 @@ class CampaignController extends Controller
                     'title' => $campaign->active ? 'Deactivate campaign' : 'Activate campaign'
                 ])->render();
             })
+            ->addColumn('is_running', function (Campaign $campaign) {
+                foreach ($campaign->schedules as $schedule) {
+                    if ($schedule->isRunning()) {
+                        return true;
+                    }
+                }
+                return false;
+            })
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
-            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants'])
+            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants', 'is_running'])
             ->setRowId('id')
             ->make(true);
     }
@@ -652,7 +664,8 @@ class CampaignController extends Controller
             }
 
             // pageview rules
-            if ($campaign->pageview_rules !== null) {
+            $pageviewCount = $data->pageviewCount ?? null;
+            if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
                 foreach ($campaign->pageview_rules as $rule) {
                     if (!$rule['num'] || !$rule['rule']) {
                         continue;
@@ -660,17 +673,17 @@ class CampaignController extends Controller
 
                     switch ($rule['rule']) {
                         case Campaign::PAGEVIEW_RULE_EVERY:
-                            if ($data->pageviewCount % $rule['num'] !== 0) {
+                            if ($pageviewCount % $rule['num'] !== 0) {
                                 continue 3;
                             }
                             break;
                         case Campaign::PAGEVIEW_RULE_SINCE:
-                            if ($data->pageviewCount < $rule['num']) {
+                            if ($pageviewCount < $rule['num']) {
                                 continue 3;
                             }
                             break;
                         case Campaign::PAGEVIEW_RULE_BEFORE:
-                            if ($data->pageviewCount >= $rule['num']) {
+                            if ($pageviewCount >= $rule['num']) {
                                 continue 3;
                             }
                             break;

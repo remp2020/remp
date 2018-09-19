@@ -341,7 +341,7 @@
 
                                                     <div role="tabpanel" v-bind:class="[{active: activationMode === 'activate-schedule'}, 'tab-pane']" id="schedule-schedule">
                                                         <div class="form-group col-md-9">
-                                                            <small class="help-block">Planning new schedule activates campaign.</small>
+                                                            <small class="help-block">Schedule new campaign run. This does not affect existing schedules.</small>
                                                             <div class="input-group">
                                                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
                                                                 <div class="dtp-container fg-line">
@@ -445,15 +445,13 @@
             });
         },
         mounted: function() {
-            var $startTimeFE = $("#new_schedule_start_time_frontend");
-            var $startTime = $('input[name="new_schedule_start_time"]');
-            var $endTimeFE = $("#new_schedule_end_time_frontend");
-            var $endTime = $('input[name="new_schedule_end_time"]');
-            var self = this;
+            let $startTimeFE = $("#new_schedule_start_time_frontend");
+            let $endTimeFE = $("#new_schedule_end_time_frontend");
+            let self = this;
 
             $startTimeFE.on('dp.change', function() {
-                var st = $(this).data("DateTimePicker").date();
-                var et = $endTimeFE.data("DateTimePicker").date();
+                let st = $(this).data("DateTimePicker").date();
+                let et = $endTimeFE.data("DateTimePicker").date();
                 if (st && et && st.unix() > et.unix()) {
                     $endTimeFE.data("DateTimePicker").date(st);
                 }
@@ -461,8 +459,8 @@
             });
 
             $endTimeFE.on("dp.change", function (e) {
-                var st = $startTimeFE.data("DateTimePicker").date();
-                var et = $(this).data("DateTimePicker").date();
+                let st = $startTimeFE.data("DateTimePicker").date();
+                let et = $(this).data("DateTimePicker").date();
                 if (st && et && et.unix() < st.unix()) {
                     $startTimeFE.data("DateTimePicker").date(et);
                 }
@@ -530,7 +528,7 @@
                 result.push({
                     "label": "No alternative",
                     "value": null,
-                })
+                });
 
                 return result.concat(this.bannerOptions);
             },
@@ -549,8 +547,8 @@
                 return false;
             },
             isScheduled: function () {
-                if ((this.active && this.activationMode == 'activate-now') ||
-                    (this.startTime != null && this.endTime != null && this.activationMode == 'activate-schedule')
+                if ((this.active && this.activationMode === 'activate-now') ||
+                    (this.startTime != null && this.endTime != null && this.activationMode === 'activate-schedule')
                 ) {
                     return true;
                 }
@@ -561,7 +559,7 @@
                 return (this.segments.length || this.signedIn);
             },
             highlightBannerRulesCollapse: function () {
-                return (this.pageviewRulesNotDefault || this.oncePerSession == true);
+                return (this.pageviewRulesNotDefault || this.oncePerSession === true);
             },
             highlightCountriesCollapse: function () {
                 return (this.countries && this.countries.length);
@@ -585,7 +583,7 @@
                 this.selectedDevices.push(device);
             },
             deviceSelected: function (device) {
-                if (this.selectedDevices.indexOf(device) != -1) {
+                if (this.selectedDevices.indexOf(device) !== -1) {
                     return true;
                 }
 

@@ -6,23 +6,33 @@ use GuzzleHttp\Client;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget;
+use Remp\MailerModule\PageMeta\ContentInterface;
+use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
 class NewsfilterGenerator implements IGenerator
 {
-    protected $mailSourceTemplateRepository;
-
     public $onSubmit;
 
-    public $helpers;
+    private $mailSourceTemplateRepository;
+
+    private $helpers;
+
+    private $content;
+
+    private $transport;
 
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
-        WordpressHelpers $helpers
+        WordpressHelpers $helpers,
+        ContentInterface $content,
+        TransportInterface $transport
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
+        $this->content = $content;
+        $this->transport = $transport;
     }
 
     public function apiParams()
@@ -46,6 +56,8 @@ class NewsfilterGenerator implements IGenerator
     public function process($values)
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
+        $content = $this->content;
+        $transport = $this->transport;
 
         $post = $values->newsfilter_html;
         $lockedPost = $this->getLockedHtml($values->newsfilter_html, $values->url);
@@ -91,10 +103,14 @@ class NewsfilterGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => array($this->helpers, "parseArticleLink"),
+            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
+                $url = "https://dennikn.sk/{$matches[1]}";
+                $meta = Utils::fetchUrlMeta($url, $content, $transport);
+                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
+            },
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;">$2</a>',
+            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#b00c28;text-decoration:none;">$2</a>',
 
             // replace h2
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
@@ -134,6 +150,9 @@ class NewsfilterGenerator implements IGenerator
         // wrap text in paragraphs
         $post = $this->helpers->wpautop($post);
         $lockedPost = $this->helpers->wpautop($lockedPost);
+
+        $post = str_replace('<p>', '<p style="font-weight: normal;">', $post);
+        $lockedPost = str_replace('<p>', '<p style="font-weight: normal;">', $lockedPost);
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
@@ -232,13 +251,7 @@ class NewsfilterGenerator implements IGenerator
 
                 if ($quit) {
                     $newHtml .= <<<HTML
-<p>
-Predplatitelia dostávajú na e-mail celý Newsfilter. Pozrite si
-<a 
-    style="text-decoration: none; font-weight: bold; color: #ffffff; background: #249fdc;" 
-    href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}">
-    ponuku predplatného Denníka N.
-</a></p>
+<p> Predplatitelia dostávajú na e-mail celý Newsfilter. Pozrite si <a style="display: inline; text-decoration: none; font-weight: bold; color: #ffffff; background: #249fdc;" href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}"> ponuku predplatného Denníka N.</a></p>
 HTML;
                     return $newHtml;
                 }
@@ -308,10 +321,10 @@ HTML;
             $result = json_decode($result);
             $thumbLink = $result->thumbnail_url;
 
-            return "<br><a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
+            return "<br><a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#b00c28;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
         }
 
-        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$link</a><br><br>";
+        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#b00c28;text-decoration:none;\">$link</a><br><br>";
     }
 
     public function getTemplates()
@@ -324,7 +337,7 @@ HTML;
 HTML;
 
         $captionWithLinkTemplate = <<< HTML
-    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:#F26755;text-decoration:none;">
+    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:#b00c28;text-decoration:none;">
     <img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border:none;">
 </a>
     <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">

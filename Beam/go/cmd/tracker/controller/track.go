@@ -6,9 +6,11 @@ import (
 	"strings"
 
 	"github.com/Shopify/sarama"
+	"github.com/avct/uasurfer"
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
+	"github.com/snowplow/referer-parser/go"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -248,10 +250,36 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		}
 		if user.UserAgent != nil {
 			fields["user_agent"] = *user.UserAgent
+
+			ua := uasurfer.Parse(*user.UserAgent)
+			fields["derived_ua_device"] = strings.TrimPrefix(ua.DeviceType.String(), "Device")
+			fields["derived_ua_os"] = strings.TrimPrefix(ua.OS.Name.String(), "OS")
+			fields["derived_ua_os_version"] = fmt.Sprintf("%d.%d", ua.OS.Version.Major, ua.OS.Version.Minor)
+			fields["derived_ua_platform"] = strings.TrimPrefix(ua.OS.Platform.String(), "Platform")
+			fields["derived_ua_browser"] = strings.TrimPrefix(ua.Browser.Name.String(), "Browser")
+			fields["derived_ua_browser_version"] = fmt.Sprintf("%d.%d", ua.Browser.Version.Major, ua.Browser.Version.Minor)
 		}
+
 		if user.Referer != nil {
 			fields["referer"] = *user.Referer
+			parsedRef := refererparser.Parse(*user.Referer)
+			if user.URL != nil {
+				parsedRef.SetCurrent(*user.URL)
+			}
+			tags["derived_referer_medium"] = parsedRef.Medium
+			tags["derived_referer_source"] = parsedRef.Referer
+
+			if tags["derived_referer_medium"] == "unknown" {
+				tags["derived_referer_medium"] = "external"
+				if user.URL != nil {
+					tags["derived_referer_source"] = *user.URL
+				}
+			}
+
+		} else {
+			tags["derived_referer_medium"] = "direct"
 		}
+
 		if user.Adblock != nil {
 			if *user.Adblock {
 				tags["adblock"] = "1"
