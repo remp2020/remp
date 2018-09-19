@@ -23,6 +23,7 @@
     "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch iota-watch"
   },
   "dependencies": {
+    "@johmun/vue-tags-input": "^1.5.5",
     "animate.css": "^3.5.2",
     "autosize": "^4.0.0",
     "axios": "^0.17.1",

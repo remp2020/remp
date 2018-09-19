@@ -46,6 +46,23 @@
                     </div>
                 </div>
 
+                <div class="input-group m-t-10">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="fg-label">Enum</label>
+                        </div>
+                        <div class="col-md-12">
+                            <vue-tags-input
+                                v-model="enumOption"
+                                :tags="enumOptions"
+                                @tags-changed="newTags => enumOptions = newTags"
+                            />
+
+                            <input v-for="val in enumOptions" type="hidden" :name="'properties[' + index + '][enum][]'" :value="val.text">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="input-group" v-if="type === 'string'">
                     <div class="row">
                         <div class="col-md-12">
@@ -84,10 +101,12 @@
 
 <script>
     import vSelect from "remp/js/components/vSelect";
+    import VueTagsInput from '@johmun/vue-tags-input';
 
     export default {
         components: {
-            vSelect
+            vSelect,
+            VueTagsInput
         },
         props: {
             prop: Object,
@@ -97,12 +116,21 @@
             this.type = this.prop.type;
             this.format = this.prop.format;
             this.name = this.prop.name;
+            this.enumOptions = [];
+
+            for (let ii = 0; ii < this.prop.enum.length; ii++) {
+                this.enumOptions.push({
+                    text: this.prop.enum[ii]
+                })
+            } 
         },
         data() {
             return {
                 name: null,
                 type: null,
                 format: null,
+                enumOption: '',
+                enumOptions: []
             }
         }
     }
