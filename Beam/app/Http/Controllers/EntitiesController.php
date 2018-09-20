@@ -167,7 +167,7 @@ class EntitiesController extends Controller
         $entity->fill($request->only(['name', 'parent_id']));
 
         $props = $request->get("properties");
-        $required = $request->get("required_properties");
+        $required = $request->get("required_properties") ?? [];
         $schema = [
             'type' => 'object',
             'title' => $request->get('name'),
