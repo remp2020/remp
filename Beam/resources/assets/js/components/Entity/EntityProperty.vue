@@ -55,6 +55,7 @@
                             <vue-tags-input
                                 v-model="enumOption"
                                 :tags="enumOptions"
+                                :placeholder="'Add option'"
                                 @tags-changed="newTags => enumOptions = newTags"
                             />
 
@@ -156,5 +157,16 @@
     .enum-input-wrapper >>> .input {
         border: none;
         border-bottom: 1px solid #e0e0e0 !important;
+        padding: 0;
+    }
+
+    .enum-input-wrapper >>> .new-tag-input-wrapper {
+        margin-left: 0;
+        margin-right: 0;
+        padding-right: 0;
+    }
+
+    .enum-input-wrapper >>> .new-tag-input-wrapper > input::placeholder {
+        color: #999;
     }
 </style>
