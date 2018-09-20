@@ -98,8 +98,8 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'properties' => [
+            'required' => 'You have to specify at least one property.',
         ],
     ],
 

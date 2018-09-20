@@ -15,6 +15,8 @@ class EntitySeeder extends Seeder
 
         $userEntity->name = "user";
         $userEntity->schema = json_encode([
+            "type" => "object",
+            "title" => "User",
             "properties" => [
                 "id" => [
                     "type" => "String"

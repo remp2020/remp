@@ -29,6 +29,7 @@ class EntityRequest extends FormRequest
             'name' => "required|string|unique:entities,name,{$id}|max:255",
             'parent_id' => 'required|integer',
 
+            'properties' => 'required|array',
             'properties.*.name' => 'required|string',
             'properties.*.type' => 'required|string',
         ];
