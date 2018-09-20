@@ -51,7 +51,7 @@
                         <div class="col-md-12">
                             <label class="fg-label">Enum</label>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-12 enum-input-wrapper">
                             <vue-tags-input
                                 v-model="enumOption"
                                 :tags="enumOptions"
@@ -139,5 +139,22 @@
 <style scoped>
     .input-group {
         width: 100%;
+    }
+
+    .enum-input-wrapper >>> .new-tag-input {
+        font-size: 13px;
+    }
+
+    .enum-input-wrapper >>> .tag {
+        background-color: #00bcd4;
+    }
+    
+    .enum-input-wrapper >>> .tag > .content {
+        font-size: 13px;
+    }
+
+    .enum-input-wrapper >>> .input {
+        border: none;
+        border-bottom: 1px solid #e0e0e0 !important;
     }
 </style>
