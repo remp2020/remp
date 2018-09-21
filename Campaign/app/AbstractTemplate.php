@@ -19,5 +19,5 @@ abstract class AbstractTemplate extends Model
      * Text should return textual representation of the banner's main text in the cleanest possible form.
      * @return mixed
      */
-    public abstract function text();
+    abstract public function text();
 }
