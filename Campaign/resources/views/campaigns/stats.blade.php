@@ -22,6 +22,7 @@
             :url="url"
             :name="name"
             :variants="variants"
+            :variant-banner-links="variantBannerLinks"
             :from="from"
             :to="to"
             :timezone="timezone"
@@ -60,9 +61,10 @@
             },
             data() {
                 return {
-                    name: "{{ $campaign->name }}",
+                    name: "<a href=\"{!! route('campaigns.show', ['campaign' => $campaign]) !!}\">{{ $campaign->name }}</a>",
                     url: "{!! route('campaigns.stats.data', $campaign->id) !!}",
-                    variants: {!! @json($campaign->campaignBanners()->with("banner")->get()) !!},
+                    variants: {!! @json($variants) !!},
+                    variantBannerLinks: {!! @json($variantBannerLinks) !!},
                     from: '{!! $from !!}',
                     to: '{!! $to !!}',
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone

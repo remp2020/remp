@@ -21,7 +21,8 @@
                         <tbody>
                             <tr v-for="variant in variantsData" :key="variant.id">
                             <td>
-                                {{ variant.name }}
+                                <a v-if="variant.link" :href="variant.link">{{ variant.name }}</a>
+                                <span v-else>{{ variant.name }}</span>
                             </td>
                             <td>
                                 {{ variant.proportion }}%
@@ -62,11 +63,15 @@
         props: {
             variants: {
                 type: Array,
-                required: true
+                required: true,
+            },
+            variantBannerLinks: {
+                type: Object,
+                required: true,
             },
             data: {
                 type: Object,
-                required: true
+                required: true,
             }
         },
         data() {
@@ -87,11 +92,12 @@
                 this.variantsData = [];
 
                 for (let ii = 0; ii < this.variants.length; ii++) {
-                    let data = this.data[this.variants[ii].id];
+                    let variant = this.variants[ii];
+                    let data = this.data[variant.id];
 
                     let prepared = {
                         name: "Control Group",
-                        proportion: this.variants[ii].proportion,
+                        proportion: variant.proportion,
                         clicks: data.click_count.count,
                         shows: data.show_count.count,
                         earned: data.purchase_sum.sum,
@@ -99,8 +105,9 @@
                         conversions: data.conversions,
                     };
 
-                    if (this.variants[ii].banner !==  null) {
-                        prepared.name = this.variants[ii].banner.name;
+                    if (variant.banner !==  null) {
+                        prepared.name = variant.banner.name;
+                        prepared.link = this.variantBannerLinks[variant.id] || null;
                     }
 
                     this.variantsData.push(prepared);

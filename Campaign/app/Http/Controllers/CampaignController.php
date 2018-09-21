@@ -836,10 +836,24 @@ class CampaignController extends Controller
         Campaign $campaign,
         Request $request
     ) {
+        $variants = $campaign->campaignBanners()->with("banner")->get();
+        $from = $request->input('from', 'now - 2 days');
+        $to = $request->input('to', 'now');
+
+        $variantBannerLinks = [];
+        foreach ($variants as $variant) {
+            if (!$variant->banner) {
+                continue;
+            }
+            $variantBannerLinks[$variant->id] = route('banners.show', ['banner' => $variant->banner]);
+        }
+
         return view('campaigns.stats', [
             'campaign' => $campaign,
-            'from' => $request->input('from', 'now - 2 days'),
-            'to' => $request->input('to', 'now'),
+            'variants' => $variants,
+            'variantBannerLinks' => $variantBannerLinks,
+            'from' => $from,
+            'to' => $to,
         ]);
     }
 
