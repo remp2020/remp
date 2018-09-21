@@ -75,7 +75,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             // remove shortcodes
             "/\[greybox\]/is" => "",
             "/\[\/greybox\]/is" => "",
-            "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
+            "/https:\/\/novydenik\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
             "/\[pullboth.*?\/pullboth\]/is" => "",
             "/<script.*?\/script>/is" => "",
             "/\[iframe.*?\]/is" => "",
@@ -103,22 +103,22 @@ class NovydenikNewsfilterGenerator implements IGenerator
 
             // replace link shortcodes
             '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
-                $url = "https://dennikn.sk/{$matches[1]}";
+                $url = "https://novydenik.cz/{$matches[1]}";
                 $meta = Utils::fetchUrlMeta($url, $content, $transport);
-                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
+                return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#b00c28;text-decoration:none;">$2</a>',
+            '/<a(?!.*skipregex).*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:#b00c28;text-decoration:none;">$2</a>',
 
             // replace h2
-            '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
+            '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
 
             // replace images
             '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
 
             // replace ul & /ul
-            '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
+            '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
 
             '/<\/ul>/is' => '</tbody></table>' . PHP_EOL,
 
@@ -232,23 +232,17 @@ class NovydenikNewsfilterGenerator implements IGenerator
     {
         $newHtml = '';
         $cacheHtml = '';
-        $quit = false;
+        $promoButton = true;
         foreach (explode("\n", $fullHtml) as $line) {
-            $cacheHtml .= $line . "\n";
             if (strpos($line, '<h3') !== false) {
-                $newHtml .= $cacheHtml;
-                $cacheHtml = '';
-
-//                if ($quit) {
-                    $newHtml .= <<<HTML
-<p><a style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href=https://www.novydenik.cz>Staňte se předplatiteli a podpořte Nový deník</a></p>
+                if ($promoButton) {
+                    $cacheHtml .= <<<HTML
+<p><a data-skipregex="1" style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href="https://www.novydenik.cz">Staňte se předplatiteli a podpořte Nový deník</a></p>
 HTML;
-                    return $newHtml;
-//                }
+                    $promoButton = false;
+                }
             }
-            if (strpos($line, '[lock]') !== false) {
-                $quit = true;
-            }
+            $cacheHtml .= $line . "\n";
         }
         $newHtml .= $cacheHtml;
         return $newHtml;
