@@ -234,17 +234,18 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $cacheHtml = '';
         $quit = false;
         foreach (explode("\n", $fullHtml) as $line) {
+            $cachePreviousHtml = $cacheHtml;
             $cacheHtml .= $line . "\n";
             if (strpos($line, '<h3') !== false) {
-                $newHtml .= $cacheHtml;
-                $cacheHtml = '';
+                $newHtml .= $cachePreviousHtml;
+//                $cacheHtml = '';
 
-                if ($quit) {
+//                if ($quit) {
                     $newHtml .= <<<HTML
 <p><a style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href=https://www.novydenik.cz>Staňte se předplatiteli a podpořte Nový deník</a></p>
 HTML;
                     return $newHtml;
-                }
+//                }
             }
             if (strpos($line, '[lock]') !== false) {
                 $quit = true;
