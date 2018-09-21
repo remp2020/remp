@@ -59,6 +59,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $transport = $this->transport;
 
         $post = $values->newsfilter_html;
+        $lockedPost = $this->getLockedHtml($values->newsfilter_html);
 
         list(
             $captionTemplate,
@@ -139,14 +140,18 @@ class NovydenikNewsfilterGenerator implements IGenerator
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
                 $post = preg_replace_callback($rule, $replace, $post);
+                $lockedPost = preg_replace_callback($rule, $replace, $lockedPost);
             } else {
                 $post = preg_replace($rule, $replace, $post);
+                $lockedPost = preg_replace($rule, $replace, $lockedPost);
             }
         }
         // wrap text in paragraphs
         $post = $this->helpers->wpautop($post);
+        $lockedPost = $this->helpers->wpautop($lockedPost);
 
         $post = str_replace('<p>', '<p style="font-weight: normal;">', $post);
+        $lockedPost = str_replace('<p>', '<p style="font-weight: normal;">', $lockedPost);
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
@@ -160,10 +165,19 @@ class NovydenikNewsfilterGenerator implements IGenerator
             'html' => $post,
             'text' => strip_tags($post),
         ];
+        $lockedParams = [
+            'title' => $values->title,
+            'editor' => $values->editor,
+            'summary' => $values->summary,
+            'html' => $lockedPost,
+            'text' => strip_tags($lockedPost),
+        ];
 
         $output = [];
         $output['htmlContent'] = $twig->render('html_template', $params);
         $output['textContent'] = $twig->render('text_template', $params);
+        $output['lockedHtmlContent'] = $twig->render('html_template', $lockedParams);
+        $output['lockedTextContent'] = $twig->render('text_template', $lockedParams);
         return $output;
     }
 
@@ -172,6 +186,8 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $output = $this->process($values);
 
         $addonParams = [
+            'lockedHtmlContent' => $output['lockedHtmlContent'],
+            'lockedTextContent' => $output['lockedTextContent'],
             'newsfilterTitle' => $values->title,
             'render' => true
         ];
@@ -210,6 +226,32 @@ class NovydenikNewsfilterGenerator implements IGenerator
     public function onSubmit(callable $onSubmit)
     {
         $this->onSubmit = $onSubmit;
+    }
+
+    private function getLockedHtml($fullHtml)
+    {
+        $newHtml = '';
+        $cacheHtml = '';
+        $quit = false;
+        foreach (explode("\n", $fullHtml) as $line) {
+            $cacheHtml .= $line . "\n";
+            if (strpos($line, '<h3') !== false) {
+                $newHtml .= $cacheHtml;
+                $cacheHtml = '';
+
+                if ($quit) {
+                    $newHtml .= <<<HTML
+<p><a style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href=https://www.novydenik.cz>Staňte se předplatiteli a podpořte Nový deník</a></p>
+HTML;
+                    return $newHtml;
+                }
+            }
+            if (strpos($line, '[lock]') !== false) {
+                $quit = true;
+            }
+        }
+        $newHtml .= $cacheHtml;
+        return $newHtml;
     }
 
 
