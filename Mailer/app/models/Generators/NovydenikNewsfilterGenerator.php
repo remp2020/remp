@@ -234,11 +234,10 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $cacheHtml = '';
         $quit = false;
         foreach (explode("\n", $fullHtml) as $line) {
-            $cachePreviousHtml = $cacheHtml;
             $cacheHtml .= $line . "\n";
             if (strpos($line, '<h3') !== false) {
-                $newHtml .= $cachePreviousHtml;
-//                $cacheHtml = '';
+                $newHtml .= $cacheHtml;
+                $cacheHtml = '';
 
 //                if ($quit) {
                     $newHtml .= <<<HTML
