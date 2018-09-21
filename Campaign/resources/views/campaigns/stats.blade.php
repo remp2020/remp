@@ -23,6 +23,7 @@
             :name="name"
             :variants="variants"
             :variant-banner-links="variantBannerLinks"
+            :variant-banner-texts="variantBannerTexts"
             :from="from"
             :to="to"
             :timezone="timezone"
@@ -65,6 +66,7 @@
                     url: "{!! route('campaigns.stats.data', $campaign->id) !!}",
                     variants: {!! @json($variants) !!},
                     variantBannerLinks: {!! @json($variantBannerLinks) !!},
+                    variantBannerTexts: {!! @json($variantBannerTexts) !!},
                     from: '{!! $from !!}',
                     to: '{!! $to !!}',
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone

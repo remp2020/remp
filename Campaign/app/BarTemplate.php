@@ -2,9 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-
-class BarTemplate extends Model
+class BarTemplate extends AbstractTemplate
 {
     protected $fillable = [
         'main_text',
@@ -15,12 +13,12 @@ class BarTemplate extends Model
         'button_text_color',
     ];
 
-    protected $touches = [
-        'banner',
-    ];
-
-    public function banner()
+    /**
+     * Text should return textual representation of the banner's main text in the cleanest possible form.
+     * @return mixed
+     */
+    public function text()
     {
-        return $this->belongsTo(Banner::class);
+        return strip_tags("{$this->main_text} -- {$this->button_text}");
     }
 }

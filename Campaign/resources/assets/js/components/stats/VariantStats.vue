@@ -91,6 +91,10 @@
                 type: String,
                 required: false
             },
+            variantBannerText: {
+                type: String,
+                required: false
+            },
             data: {
                 type: Object,
                 required: true,
@@ -134,7 +138,11 @@
             },
             chartTitle() {
                 if (this.variantBannerLink) {
-                    return "Variant: <a href=\"" + this.variantBannerLink + "\">" + this.variantName + "</a> <small>(\"" + this.variant.proportion + "\"%)</small>";
+                    let title = "Variant: <a href=\"" + this.variantBannerLink + "\">" + this.variantName + "</a> <small>(" + this.variant.proportion + "%)</small>";
+                    if (this.variantBannerText) {
+                        title += "<br/><small><em>" + this.variantBannerText + "</em></small>";
+                    }
+                    return title;
                 }
                 return "Variant: " + this.variantName + " <small>(" + this.variant.proportion + "%)</small>";
             },

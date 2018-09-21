@@ -22,6 +22,7 @@
 
                 :variant="variant"
                 :variant-banner-link="variantBannerLinks[variant.id] || null"
+                :variant-banner-text="variantBannerTexts[variant.id] || null"
                 :data="variantsData[variant.id]"
                 :error="error"
                 :loading="loading"
@@ -51,6 +52,10 @@
             required: true
         },
         variantBannerLinks: {
+            type: Object,
+            required: true
+        },
+        variantBannerTexts: {
             type: Object,
             required: true
         },

@@ -841,17 +841,20 @@ class CampaignController extends Controller
         $to = $request->input('to', 'now');
 
         $variantBannerLinks = [];
+        $variantBannerTexts = [];
         foreach ($variants as $variant) {
             if (!$variant->banner) {
                 continue;
             }
             $variantBannerLinks[$variant->id] = route('banners.show', ['banner' => $variant->banner]);
+            $variantBannerTexts[$variant->id] = $variant->banner->getTemplate()->text();
         }
 
         return view('campaigns.stats', [
             'campaign' => $campaign,
             'variants' => $variants,
             'variantBannerLinks' => $variantBannerLinks,
+            'variantBannerTexts' => $variantBannerTexts,
             'from' => $from,
             'to' => $to,
         ]);
