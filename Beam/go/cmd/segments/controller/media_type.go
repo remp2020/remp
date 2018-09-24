@@ -389,9 +389,9 @@ func (ar AvgRow) ToMediaType() *app.Avg {
 }
 
 // ToMediaType converts internal AvgRowCollection representation to application one.
-func (src AvgRowCollection) ToMediaType() app.AvgCollection {
+func (arc AvgRowCollection) ToMediaType() app.AvgCollection {
 	mt := app.AvgCollection{}
-	for _, c := range src {
+	for _, c := range arc {
 		mtc := (AvgRow)(c).ToMediaType()
 		mt = append(mt, mtc)
 	}
