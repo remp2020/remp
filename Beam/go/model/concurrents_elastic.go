@@ -10,7 +10,7 @@ type ConcurrentElastic struct {
 	actionsCached map[string][]string
 }
 
-// Count returns number of Pageviews matching the filter defined by PageviewOptions.
+// Count returns number of Concurrents matching the filter defined by AggregateOptions.
 func (pDB *ConcurrentElastic) Count(options AggregateOptions) (CountRowCollection, bool, error) {
 	extras := make(map[string]elastic.Aggregation)
 
