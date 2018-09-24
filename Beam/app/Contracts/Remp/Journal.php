@@ -127,7 +127,7 @@ class Journal implements JournalContract
                 'json' => $json,
             ]);
         } catch (ConnectException $e) {
-            throw new JournalException("Could not connect to Journal endpoint: {$e->getMessage()}");
+            throw new JournalException("Could not connect to Journal endpoint {$url}: {$e->getMessage()}");
         } catch (ClientException $e) {
             \Log::error($e->getResponse()->getBody()->getContents());
             throw $e;
