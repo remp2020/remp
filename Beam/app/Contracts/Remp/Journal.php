@@ -104,7 +104,8 @@ class Journal implements JournalContract
     public function unique(JournalAggregateRequest $request): Collection
     {
         // Unique page views are distinguished by different browsers
-        return $this->aggregateCall($request,
+        return $this->aggregateCall(
+            $request,
             $request->buildUrlWithItem(self::ENDPOINT_GENERIC_UNIQUE, 'browsers')
         );
     }
