@@ -303,9 +303,12 @@ var _ = Resource("pageviews", func() {
 	Action("unique", func() {
 		Description("Returns unique count of amounts within events")
 		Payload(PageviewOptionsPayload)
-		Routing(POST("/actions/:action/unique"))
+		Routing(POST("/actions/:action/unique/:item"))
 		Params(func() {
 			Param("action", String, "Identification of pageview action", func() {
+				Enum("timespent")
+			})
+			Param("item", String, "Identification of queried unique items", func() {
 				Enum("browsers")
 			})
 		})

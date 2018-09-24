@@ -30,7 +30,7 @@ class Journal implements JournalContract
 
     const ENDPOINT_GENERIC_AVG = 'journal/%s/actions/%s/avg';
 
-    const ENDPOINT_GENERIC_UNIQUE = 'journal/%s/actions/%s/unique';
+    const ENDPOINT_GENERIC_UNIQUE = 'journal/%s/actions/%s/unique/%s';
 
     const ENDPOINT_GENERIC_LIST = 'journal/%s/list';
 
@@ -88,25 +88,28 @@ class Journal implements JournalContract
 
     public function count(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, self::ENDPOINT_GENERIC_COUNT);
+        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_COUNT));
     }
 
     public function sum(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, self::ENDPOINT_GENERIC_SUM);
+        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_SUM));
     }
 
     public function avg(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, self::ENDPOINT_GENERIC_AVG);
+        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_AVG));
     }
 
     public function unique(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, self::ENDPOINT_GENERIC_UNIQUE);
+        // Unique page views are distinguished by different browsers
+        return $this->aggregateCall($request,
+            $request->buildUrlWithItem(self::ENDPOINT_GENERIC_UNIQUE, 'browsers')
+        );
     }
 
-    private function aggregateCall(JournalAggregateRequest $request, string $urlTemplate): Collection
+    private function aggregateCall(JournalAggregateRequest $request, string $url): Collection
     {
         try {
             $json = [
@@ -120,7 +123,7 @@ class Journal implements JournalContract
                 $json['time_histogram'] = $request->getTimeHistogram();
             }
 
-            $response = $this->client->post($request->buildUrl($urlTemplate), [
+            $response = $this->client->post($url, [
                 'json' => $json,
             ]);
         } catch (ConnectException $e) {

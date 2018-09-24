@@ -64,6 +64,11 @@ class JournalAggregateRequest
         return sprintf($template, $this->category, $this->action);
     }
 
+    public function buildUrlWithItem($template, $item): string
+    {
+        return sprintf($template, $this->category, $this->action, $item);
+    }
+
     public function getFilterBy(): array
     {
         return $this->filterBy;

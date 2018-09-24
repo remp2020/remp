@@ -177,12 +177,17 @@ func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, boo
 	return pDB.DB.avgRowCollectionFromAggregations(result, options, targetAgg, binding.Field)
 }
 
-// Unique is not implemented as Influx will be removed in the future
-func (pDB *PageviewElastic) Unique(options AggregateOptions) (CountRowCollection, bool, error) {
-	// pageview events are stored in multiple measurements which need to be resolved
-	binding, err := pDB.resolveQueryBindings(options.Action)
-	if err != nil {
-		return nil, false, err
+// Unique returns unique count of Pageviews records matching the filter defined by AggregateOptions.
+func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (CountRowCollection, bool, error) {
+	var binding elasticQueryBinding
+	switch item {
+	case UniqueCountBrowsers:
+		binding = elasticQueryBinding{
+			Index: TablePageviews,
+			Field: "browser_id.keyword",
+		}
+	default:
+		return nil, false, fmt.Errorf("unable to count uniques for item [%s] ", item)
 	}
 
 	// action is not being tracked within separate measurements and we would get no records back
@@ -198,7 +203,7 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions) (CountRowCollection
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
+	search, err := pDB.DB.addSearchFilters(search, binding.Index, options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -370,11 +375,6 @@ func (pDB *PageviewElastic) Users() ([]string, error) {
 // based on the provided action.
 func (pDB *PageviewElastic) resolveQueryBindings(action string) (elasticQueryBinding, error) {
 	switch action {
-	case ActionPageviewBrowsers:
-		return elasticQueryBinding{
-			Index: TablePageviews,
-			Field: "browser_id.keyword",
-		}, nil
 	case ActionPageviewLoad:
 		return elasticQueryBinding{
 			Index: TablePageviews,
