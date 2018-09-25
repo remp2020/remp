@@ -30,12 +30,19 @@
                     <span>{{highlightedRow.startDate | formatDate}}</span>
                     <table>
                         <tr>
-                            <th>Source</th>
-                            <th>Value</th>
+                            <th></th>
+                            <th v-if="highlightedRow.hasCurrent">Current</th>
+                            <th v-if="highlightedRow.hasPrevious">Week ago</th>
                         </tr>
-                        <tr v-for="item in highlightedRow.values">
-                            <td><span style="font-weight: bold" v-bind:style="{color: item.color}">&#9679;</span>&nbsp;{{item.tag}}</td>
-                            <td>{{item.value}}</td>
+                        <tr v-for="(item, tag) in highlightedRow.values">
+                            <td>
+                                <span v-if="highlightedRow.hasCurrent"
+                                      style="font-weight: bold"
+                                      v-bind:style="{color: item.color}">&#9679;</span>&nbsp;
+                                {{tag}}
+                            </td>
+                            <td v-if="highlightedRow.hasCurrent">{{item.current}}</td>
+                            <td v-if="highlightedRow.hasPrevious">{{item.previous}}</td>
                         </tr>
                     </table>
                 </div>
@@ -52,6 +59,7 @@
 
     #legend-wrapper {
         position: relative;
+        overflow: visible;
         height:0;
     }
     #article-graph-legend table {
@@ -62,6 +70,7 @@
     }
     #article-graph-legend {
         position:absolute;
+        z-index: 1000;
         top:0;
         left: 0;
         opacity: 0.8;
@@ -230,9 +239,9 @@
 
                 vertical = mouseG.append("path")
                     .attr("class", "mouse-line")
-                    .style("stroke", "black")
-                    .style("stroke-width", "1px")
-                    .style("opacity", "0");
+                    .attr("opacity", 0.1)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", "1px")
 
                 let that = this
                 // append a rect to catch mouse movements on canvas
@@ -292,19 +301,25 @@
                     rowIndex = bisectDate(this.data.results, xDate);
                 }
 
-                let verticalX, selectedDate, currentValues, previousValues
+                let verticalX, selectedDate, hasCurrent = false, hasPrevious = false, values = {}
+
+                this.data.tags.forEach(function(tag) {
+                    values[tag] = {
+                        current: undefined,
+                        previous: undefined,
+                        color: undefined
+                    }
+                })
 
                 if (rowIndex !== undefined) {
                     let currentRow = getSelectedRow(rowIndex, this.data.results)
                     verticalX = x(currentRow.date)
                     selectedDate = currentRow.date
+                    hasCurrent = true
 
-                    currentValues = this.data.tags.map(function (tag) {
-                        return {
-                            tag: tag,
-                            value: currentRow[tag],
-                            color: d3.color(colorScale(tag)).hex()
-                        }
+                    this.data.tags.forEach(function(tag) {
+                        values[tag].current = currentRow[tag]
+                        values[tag].color = d3.color(colorScale(tag)).hex()
                     })
                 }
 
@@ -312,12 +327,10 @@
                     let previousRow = getSelectedRow(rowIndexPrevious, this.data.previousResults)
                     verticalX = x(previousRow.date)
                     selectedDate = previousRow.date
+                    hasPrevious = true
 
-                    previousValues = this.data.tags.map(function (tag) {
-                        return {
-                            tag: tag,
-                            value: previousRow[tag],
-                        }
+                    this.data.tags.forEach(function(tag) {
+                        values[tag].previous = previousRow[tag]
                     })
                 }
 
@@ -331,9 +344,11 @@
 
                 this.highlightedRow = {
                     startDate: selectedDate,
-                    currentValues: currentValues,
-                    previousValues: previousValues
+                    values: values,
+                    hasCurrent: hasCurrent,
+                    hasPrevious: hasPrevious
                 }
+
             },
             fillData() {
                 if (this.data === null){
