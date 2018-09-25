@@ -23,35 +23,53 @@
             <div ref="svg-container" style="height: 200px" id="article-chart">
                 <svg style="z-index: 10" ref="svg"></svg>
             </div>
-            <!--<div id="legend-wrapper">-->
-                <!--<div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">-->
 
-                    <!--<span>{{highlightedRow.startDate | formatDate}}</span>-->
-                    <!--<table>-->
-                        <!--<tr>-->
-                            <!--<th>Source</th>-->
-                            <!--<th>Value</th>-->
-                        <!--</tr>-->
-                        <!--<tr v-for="item in highlightedRow.values">-->
-                            <!--<td><span style="font-weight: bold" v-bind:style="{color: item.color}">&#9679;</span>&nbsp;{{item.tag}}</td>-->
-                            <!--<td>{{item.value}}</td>-->
-                        <!--</tr>-->
-                    <!--</table>-->
-                <!--</div>-->
-            <!--</div>-->
+            <div id="legend-wrapper">
+                <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">
 
-            <!--<chart  style="width: 100%; height:220px;"-->
-                    <!--:class="{hiddenChart: loading}"-->
-                    <!--:auto-resize="true"-->
-                    <!--:options="chartOptions"></chart>-->
+                    <span>{{highlightedRow.startDate | formatDate}}</span>
+                    <table>
+                        <tr>
+                            <th>Source</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr v-for="item in highlightedRow.values">
+                            <td><span style="font-weight: bold" v-bind:style="{color: item.color}">&#9679;</span>&nbsp;{{item.tag}}</td>
+                            <td>{{item.value}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
         </div>
-
     </div>
 </template>
 
 <style scoped>
     #chartContainer {
         position: relative;
+    }
+
+    #legend-wrapper {
+        position: relative;
+        height:0;
+    }
+    #article-graph-legend table {
+        width: 100%;
+        background-color: transparent;
+        border-spacing: 4px;
+        border-collapse: separate;
+    }
+    #article-graph-legend {
+        position:absolute;
+        top:0;
+        left: 0;
+        opacity: 0.8;
+        color: #fff;
+        padding: 2px;
+        background-color: #b6b6b6;
+        border-radius: 2px;
+        border: 2px solid #b6b6b6;
     }
 
     /*#chartContainer .preloader {*/
@@ -132,8 +150,6 @@
             timeout = setTimeout(functionCall, time);
         }
     }
-    const bisectDate = d3.bisector(d => d.date).left;
-
     const REFRESH_DATA_TIMEOUT_MS = 30000
 
     let container, svg, dataG, oldDataG, oldDataLineG, x,y, colorScale, xAxis, vertical, mouseRect,
@@ -155,6 +171,11 @@
                 highlightedRow: null,
                 legendLeft: "100px"
             };
+        },
+        computed: {
+            hasPrevious() {
+                return this.data !== null && this.data.previousResultsSummed.length > 0
+            }
         },
         watch: {
             data(val) {
@@ -203,79 +224,116 @@
                     .attr("class", "axis axis--x")
                     .call(xAxis)
 
-//                // Mouse events
-//                let mouseG = svg.append("g")
-//                    .attr("class", "mouse-over-effects");
-//
-//                vertical = mouseG.append("path")
-//                    .attr("class", "mouse-line")
-//                    .style("stroke", "black")
-//                    .style("stroke-width", "1px")
-//                    .style("opacity", "0");
+                // Mouse events
+                let mouseG = svg.append("g")
+                    .attr("class", "mouse-over-effects");
 
-//                let that = this
-//                // append a rect to catch mouse movements on canvas
-//                mouseRect = mouseG.append('svg:rect')
-//                    .attr('width', width)
-//                    .attr('height', height)
-//                    .attr('fill', 'none')
-//                    .attr('pointer-events', 'all')
-//                    .on('mouseout', function() {
-//                        that.legendVisible = false
-//                        vertical
-//                            .style("opacity", "0");
-//                    })
-//                    .on('mouseover', function() {
-//                        that.legendVisible = true
-//                        vertical
-//                            .style("opacity", "1");
-//                    })
-//                    .on('mousemove', function() {
-//                        if (that.data !== null) {
-//                            let mouse = d3.mouse(this);
-//                            const xDate = x.invert(mouse[0])
-//                            let rowIndex = bisectDate(that.data.results, xDate);
-//
-//                            let rowRight = that.data.results[rowIndex]
-//                            let rowLeft = that.data.results[rowIndex - 1]
-//                            let row = rowRight
-//
-//                            // Find out which value is closer
-//                            if (rowLeft !== undefined) {
-//                                const xDateMillis = moment(xDate).valueOf()
-//                                const leftDateMillis = moment(rowLeft.date).valueOf()
-//                                const rightDateMillis = moment(rowRight.date).valueOf()
-//
-//                                if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)){
-//                                    row = rowLeft
-//                                }
-//                            }
-//
-//                            let verticalX = x(row.date)
-//
-//                            vertical
-//                                .attr("d", function() {
-//                                    let d = "M" + verticalX + "," + height;
-//                                    d += " " + verticalX + "," + 0;
-//                                    return d;
-//                                })
-//
-//                            let values = that.data.tags.map(function (tag) {
-//                                return {
-//                                    tag: tag,
-//                                    value: row[tag],
-//                                    color: d3.color(colorScale(tag)).hex()
-//                                }
-//                            })
-//
-//                            that.highlightedRow = {
-//                                startDate: row.date,
-//                                values: values
-//                            }
-//
-//                            that.legendLeft = Math.round(x(xDate)) + "px"
-//                        }
-//                    })
+                vertical = mouseG.append("path")
+                    .attr("class", "mouse-line")
+                    .style("stroke", "black")
+                    .style("stroke-width", "1px")
+                    .style("opacity", "0");
+
+                let that = this
+                // append a rect to catch mouse movements on canvas
+                mouseRect = mouseG.append('svg:rect')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('fill', 'none')
+                    .attr('pointer-events', 'all')
+                    .on('mouseout', function() {
+                        that.legendVisible = false
+                        vertical
+                            .style("opacity", "0");
+                    })
+                    .on('mouseover', function() {
+                        that.legendVisible = true
+                        vertical
+                            .style("opacity", "1");
+                    })
+                    .on('mousemove', function() {
+                        if (that.data !== null) {
+                            let mouse = d3.mouse(this);
+                            const xDate = x.invert(mouse[0])
+                            that.highlightRows(xDate, height)
+                        }
+                    })
+            },
+            highlightRows(xDate, height) {
+                const bisectDate = d3.bisector(d => d.date).left;
+                const xDateMillis = moment(xDate).valueOf()
+
+                function getSelectedRow(rowIndex, data) {
+                    let rowRight = data[rowIndex]
+                    let rowLeft = data[rowIndex - 1]
+                    let row = rowRight
+
+                    // Find out which value is closer
+                    if (rowLeft !== undefined) {
+                        const leftDateMillis = moment(rowLeft.date).valueOf()
+                        const rightDateMillis = moment(rowRight.date).valueOf()
+                        if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)){
+                            row = rowLeft
+                        }
+                    }
+                    return row
+                }
+
+                let rowIndex, rowIndexPrevious
+
+                // Get row indexes depending on type of graph being shown
+                if (this.hasPrevious) {
+                    const lastCurrentDateMillis = moment(this.data.results[this.data.results.length - 1].date).valueOf()
+                    if (lastCurrentDateMillis >= xDateMillis) {
+                        rowIndex = bisectDate(this.data.results, xDate);
+                    }
+                    rowIndexPrevious = bisectDate(this.data.previousResults, xDate);
+                } else {
+                    rowIndex = bisectDate(this.data.results, xDate);
+                }
+
+                let verticalX, selectedDate, currentValues, previousValues
+
+                if (rowIndex !== undefined) {
+                    let currentRow = getSelectedRow(rowIndex, this.data.results)
+                    verticalX = x(currentRow.date)
+                    selectedDate = currentRow.date
+
+                    currentValues = this.data.tags.map(function (tag) {
+                        return {
+                            tag: tag,
+                            value: currentRow[tag],
+                            color: d3.color(colorScale(tag)).hex()
+                        }
+                    })
+                }
+
+                if (rowIndexPrevious !== undefined) {
+                    let previousRow = getSelectedRow(rowIndexPrevious, this.data.previousResults)
+                    verticalX = x(previousRow.date)
+                    selectedDate = previousRow.date
+
+                    previousValues = this.data.tags.map(function (tag) {
+                        return {
+                            tag: tag,
+                            value: previousRow[tag],
+                        }
+                    })
+                }
+
+                // After rows are selected, draw line and legend
+                vertical.attr("d", function() {
+                        let d = "M" + verticalX + "," + height;
+                        d += " " + verticalX + "," + 0;
+                        return d;
+                    })
+                this.legendLeft = Math.round(verticalX) + "px"
+
+                this.highlightedRow = {
+                    startDate: selectedDate,
+                    currentValues: currentValues,
+                    previousValues: previousValues
+                }
             },
             fillData() {
                 if (this.data === null){
@@ -283,8 +341,7 @@
                 }
                 let results = this.data.results,
                     previousResults = this.data.previousResultsSummed,
-                    tags = this.data.tags,
-                    hasPrevious = previousResults.length !== 0
+                    tags = this.data.tags
 
                 let outerWidth = container.clientWidth,
                     outerHeight = container.clientHeight,
@@ -294,8 +351,8 @@
                 svg.attr("width", outerWidth)
                     .attr("height", outerHeight)
 
-//                mouseRect.attr("width", width)
-//                    .attr("height", height)
+                mouseRect.attr("width", width)
+                    .attr("height", height)
 
                 let stack = d3.stack()
                     .keys(tags)
@@ -306,7 +363,7 @@
                 let maxDate =  results[results.length - 1].date
                 let yMax = d3.max(layers, stackMax)
 
-                if (hasPrevious) {
+                if (this.hasPrevious) {
                     maxDate = previousResults[previousResults.length - 1].date
                     yMax = Math.max(d3.max(previousResults, (d) => (d.value)), yMax)
                 }
@@ -358,7 +415,7 @@
                         return colors[i];
                     })
 
-                if (hasPrevious) {
+                if (this.hasPrevious) {
                     oldDataG.append("path")
                         .datum(previousResults)
                         .attr("fill", "#f4f4f4")
