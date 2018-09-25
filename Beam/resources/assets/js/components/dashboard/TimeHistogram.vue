@@ -1,6 +1,6 @@
 <template>
     <div class="card card-chart">
-        <!--<div v-if="error" class="error" :title="error">!</div>-->
+        <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header">
             <h4>Page Loads by Traffic Source</h4>
@@ -14,11 +14,11 @@
                              v-model="interval">
             </button-switcher>
 
-            <!--<div v-if="loading" class="preloader pls-purple">-->
-                <!--<svg class="pl-circular" viewBox="25 25 50 50">-->
-                    <!--<circle class="plc-path" cx="50" cy="50" r="20"></circle>-->
-                <!--</svg>-->
-            <!--</div>-->
+            <div v-if="loading" class="preloader pls-purple">
+                <svg class="pl-circular" viewBox="25 25 50 50">
+                    <circle class="plc-path" cx="50" cy="50" r="20"></circle>
+                </svg>
+            </div>
 
             <div ref="svg-container" style="height: 200px" id="article-chart">
                 <svg style="z-index: 10" ref="svg"></svg>
@@ -81,50 +81,12 @@
         border: 2px solid #b6b6b6;
     }
 
-    /*#chartContainer .preloader {*/
-        /*position: absolute;*/
-        /*top: 50%;*/
-        /*left: 50%;*/
-        /*transform: translate(-50%, -50%)*/
-    /*}*/
-
-    /*.hiddenChart {*/
-        /*visibility: hidden;*/
-    /*}*/
-
-    /*.browser text {*/
-        /*text-anchor: end;*/
-    /*}*/
-
-    /*.error {*/
-        /*position: absolute;*/
-        /*top: 0;*/
-        /*right: 0;*/
-        /*width: 20px;*/
-        /*height: 20px;*/
-        /*background: red;*/
-        /*color: #fff;*/
-        /*display: none;*/
-        /*text-align: center;*/
-    /*}*/
-
-    /*.preloader-wrapper {*/
-        /*position: absolute;*/
-        /*top: 0;*/
-        /*left: 0;*/
-        /*width: 100%;*/
-        /*height: 100%;*/
-        /*background: rgba(255, 255, 255, 0.8);*/
-        /*display: none;*/
-    /*}*/
-
-    /*.preloader-wrapper .preloader {*/
-        /*position: absolute;*/
-        /*top: 50%;*/
-        /*left: 50%;*/
-        /*margin-left: -20px;*/
-        /*margin-top: -20px;*/
-    /*}*/
+    #chartContainer .preloader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%)
+    }
 </style>
 
 <script>
@@ -446,6 +408,7 @@
                 }
             },
             loadData() {
+                this.loading = true
                 axios
                     .get(this.url, {
                         params: {
