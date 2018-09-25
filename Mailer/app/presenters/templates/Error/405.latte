@@ -1,6 +1,20 @@
-{block content}
-<h1 n:block=title>Method Not Allowed</h1>
+{layout '../@layout.latte'}
 
-<p>The requested method is not allowed for the URL.</p>
+{block #content}
 
-<p><small>error 405</small></p>
+<div class="c-header">
+    <h2>Error</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-lg-4">
+                <h2 n:block="title">405 Method Not Allowed
+                    <small>
+                        The requested method is not allowed for the URL.
+                    </small>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>

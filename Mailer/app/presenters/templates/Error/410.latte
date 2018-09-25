@@ -1,6 +1,20 @@
-{block content}
-<h1 n:block=title>Page Not Found</h1>
+{layout '../@layout.latte'}
 
-<p>The page you requested has been taken off the site. We apologize for the inconvenience.</p>
+{block #content}
 
-<p><small>error 410</small></p>
+<div class="c-header">
+    <h2>Error</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-lg-4">
+                <h2 n:block="title">410 Page Not Found
+                    <small>
+                        The page you requested has been taken off the site. We apologize for the inconvenience.
+                    </small>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
