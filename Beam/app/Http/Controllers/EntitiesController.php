@@ -77,9 +77,8 @@ class EntitiesController extends Controller
      */
     public function store(EntityRequest $request)
     {
-        $entity = new Entity();
-
-        $entity = $this->saveEntity($entity, $request);
+        $entity = new Entity($request->all());
+        $entity->save();
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -117,7 +116,8 @@ class EntitiesController extends Controller
      */
     public function update(Entity $entity, EntityRequest $request)
     {
-        $entity = $this->saveEntity($entity, $request);
+        $entity->fill($request->all());
+        $entity->save();
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -157,45 +157,5 @@ class EntitiesController extends Controller
     public function validateForm(EntityRequest $request, Entity $entity = null)
     {
         return response()->json(false);
-    }
-
-    /**
-     * Build JSON Schema from request and store entity.
-     *
-     * @param Entity $entity
-     * @param EntityRequest $request
-     * @return Entity
-     */
-    public function saveEntity(Entity $entity, EntityRequest $request)
-    {
-        $entity->fill($request->only(['name', 'parent_id']));
-
-        $params = $request->get("params");
-        $requiredParams = $request->get("required_params") ?? [];
-        $schema = [
-            'type' => 'object',
-            'title' => $request->get('name'),
-            'properties' => [],
-            'required' => []
-        ];
-
-        foreach ($params as $param) {
-            $param = array_filter($param);
-            $name = $param['name'];
-
-            unset($param['name']);
-
-            $schema['properties'][$name] = $param;
-
-            if (in_array($name, $requiredParams)) {
-                $schema['required'][] = $name;
-            }
-        }
-
-        $entity->schema = json_encode($schema);
-
-        $entity->save();
-
-        return $entity;
     }
 }

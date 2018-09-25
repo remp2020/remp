@@ -29,9 +29,9 @@ class EntityRequest extends FormRequest
             'name' => "required|string|unique:entities,name,{$id}|max:255",
             'parent_id' => 'required|integer',
 
-            'params' => 'required|array',
-            'params.*.name' => 'required|string',
-            'params.*.type' => 'required|string',
+            'schema' => 'required|array',
+            'schema.*.name' => 'required|string',
+            'schema.*.type' => 'required|string',
         ];
     }
 }

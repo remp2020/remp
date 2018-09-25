@@ -98,7 +98,7 @@ return [
     */
 
     'custom' => [
-        'params' => [
+        'schema' => [
             'required' => 'You have to specify at least one property.',
         ],
     ],
@@ -116,7 +116,7 @@ return [
 
     'attributes' => [
         'parent_id' => 'parent',
-        'params.*.name' => 'param name',
-        'params.*.type' => 'param type',
+        'schema.*.name' => 'param name',
+        'schema.*.type' => 'param type',
     ],
 ];

@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Exceptions\EntitySchemaException;
+use App\Http\Requests\EntityRequest;
 
 class EntitySchema implements \JsonSerializable
 {
@@ -35,20 +36,7 @@ class EntitySchema implements \JsonSerializable
     ];
 
     // params (json schema properties) of the Entity
-    private $params = [];
-
-    /**
-     * @param string $json
-     * @throws EntitySchemaException
-     */
-    public function __construct(string $json = null)
-    {
-        $schema = json_decode($json, true);
-
-        if (!empty($json)) {
-            $this->params = $this->parseJsonSchemaProperties($schema["properties"]);
-        }
-    }
+    protected $params = [];
 
     /**
      * @param $props
@@ -104,49 +92,26 @@ class EntitySchema implements \JsonSerializable
     /**
      * @return array
      */
-    public function jsonSerialize()
-    {
-        $props = [];
-
-        foreach ($this->params as $paramName => $param) {
-            $prop = $param;
-
-            if ($param["type"] === self::TYPE_DATETIME) {
-                $prop["type"] = self::JSON_SCHEMA_TYPE_STRING;
-                $prop["format"] = self::JSON_SCHEMA_FORMAT_DATETIME;
-            } elseif (in_array($param["type"], [self::TYPE_STRING_ARRAY, self::TYPE_NUMBER_ARRAY])) {
-                $prop["type"] = self::JSON_SCHEMA_TYPE_ARRAY;
-                $prop["contains"] = [
-                    "type" => $param["type"] === self::TYPE_STRING_ARRAY
-                                    ? self::JSON_SCHEMA_TYPE_STRING
-                                    : self::JSON_SCHEMA_TYPE_NUMBER,
-                    "enum" => $prop["enum"] ?? null
-                ];
-                unset($prop["enum"]);
-            }
-
-            $props[$paramName] = $prop;
-        }
-
-        return [
-            "type" => self::JSON_SCHEMA_TYPE_OBJECT,
-            "properties" => $props,
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return json_encode($this);
-    }
-
     public function getParams()
     {
         return $this->params;
     }
 
+    /**
+     * @param array $params
+     * @return self
+     */
+    public function setParams(array $params)
+    {
+        $this->params = $params;
+        return $this;
+    }
+
+    /**
+     * Return all available parameter types.
+     *
+     * @return array
+     */
     public function getAllTypes()
     {
         return [
@@ -157,5 +122,95 @@ class EntitySchema implements \JsonSerializable
             self::TYPE_BOOLEAN => __("entities.types." . self::TYPE_BOOLEAN),
             self::TYPE_DATETIME => __("entities.types." . self::TYPE_DATETIME),
         ];
+    }
+
+    /**
+     * Create and return EntitySchema parsed from JSON string.
+     *
+     * @param string $json
+     * @return EntitySchema
+     * @throws EntitySchemaException
+     */
+    public static function createFromJsonSchema(string $json)
+    {
+        $data = \GuzzleHttp\json_decode($json, true);
+        $schema = new EntitySchema();
+        $params = [];
+
+        $props = $schema->parseJsonSchemaProperties($data["properties"]);
+
+        foreach ($props as $propName => $propDesc) {
+            $params[$propName] = array_merge(
+                ["name" => $propName],
+                $propDesc
+            );
+        }
+
+        $schema->setParams($params);
+        return $schema;
+    }
+
+    /**
+     * Create and return EntitySchema filled with params from request.
+     *
+     * @param EntityRequest $request
+     * @return EntitySchema
+     */
+    public static function createFromRequest(EntityRequest $request)
+    {
+        $params = $request->get("params");
+
+        $schema = new EntitySchema();
+        $schema->setParams($params);
+
+        return $schema;
+    }
+
+    /**
+     * Encoding to JSON.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        $props = [];
+
+        foreach ($this->params as $paramName => $param) {
+            $prop = $param;
+
+            $propName = $prop["name"];
+            unset($prop["name"]);
+
+            if ($param["type"] === self::TYPE_DATETIME) {
+                $prop["type"] = self::JSON_SCHEMA_TYPE_STRING;
+                $prop["format"] = self::JSON_SCHEMA_FORMAT_DATETIME;
+            } elseif (in_array($param["type"], [self::TYPE_STRING_ARRAY, self::TYPE_NUMBER_ARRAY])) {
+                $prop["type"] = self::JSON_SCHEMA_TYPE_ARRAY;
+                $prop["contains"] = [
+                    "type" => $param["type"] === self::TYPE_STRING_ARRAY
+                        ? self::JSON_SCHEMA_TYPE_STRING
+                        : self::JSON_SCHEMA_TYPE_NUMBER,
+                    "enum" => $prop["enum"] ?? null
+                ];
+                unset($prop["enum"]);
+            }
+
+            $props[$propName] = $prop;
+        }
+
+        return [
+            "type" => self::JSON_SCHEMA_TYPE_OBJECT,
+            "properties" => $props,
+        ];
+    }
+
+    /**
+     * Returns Json Schema representation.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return json_encode($this);
     }
 }

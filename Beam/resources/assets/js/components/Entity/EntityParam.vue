@@ -1,13 +1,13 @@
 <template>
     <tr>
         <td>
-            <input type="text" class="form-control" :name="'params[' + index + '][name]'" v-model="name">
+            <input type="text" class="form-control" :name="'schema[' + index + '][name]'" v-model="name">
         </td><!-- name -->
 
         <td class="table-td-type">
             <v-select
                 id="param_type"
-                :name="'params[' + index + '][type]'"
+                :name="'schema[' + index + '][type]'"
                 v-model="type"
                 :options.sync="$parent.paramTypes"
             ></v-select>
@@ -21,7 +21,7 @@
                 @tags-changed="newTags => enumOptions = newTags"
             />
 
-            <input v-for="val in enumOptions" type="hidden" :name="'params[' + index + '][enum][]'" :value="val.text">
+            <input v-for="val in enumOptions" type="hidden" :name="'schema[' + index + '][enum][]'" :value="val.text">
         </td><!-- enum -->
 
         <td class="table-td-button">
