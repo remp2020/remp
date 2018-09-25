@@ -12,10 +12,6 @@ class Entity extends Model
         'schema',
     ];
 
-    protected $casts = [
-        'schema' => 'json'
-    ];
-
     /**
      * @return EntitySchema
      * @throws Exceptions\EntitySchemaException

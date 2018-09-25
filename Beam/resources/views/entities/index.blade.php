@@ -27,6 +27,12 @@
                     'orderable' => true,
                     'priority' => 1,
                 ],
+                'params' => [
+                    'header' => 'Params',
+                    'orderable' => false,
+                    'priority' => 2,
+                    'render' => 'array',
+                ]
             ],
             'dataSource' => route('entities.json'),
             'rowActions' => [

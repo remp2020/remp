@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\EntitySchema;
 use Html;
 use App\Entity;
 use Illuminate\Http\Request;
@@ -24,12 +23,24 @@ class EntitiesController extends Controller
 
     public function json(Request $request, DataTables $datatables)
     {
-        $columns = ['id', 'name'];
+        $columns = ['id', 'schema', 'name'];
         $entities = Entity::select($columns)->whereNotNull('parent_id');
 
         return $datatables->of($entities)
             ->addColumn('name', function (Entity $entity) {
                 return Html::linkRoute('entities.edit', $entity->name, $entity);
+            })
+            ->addColumn('params', function (Entity $entity) {
+                $params = [];
+
+                foreach ($entity->schema->getParams() as $param) {
+                    $type = __("entities.types." . $param["type"]);
+                    $name = $param["name"];
+
+                    $params[] = "<strong>{$type}</strong>&nbsp;{$name}";
+                }
+
+                return $params;
             })
             ->addColumn('actions', function (Entity $entity) {
                 return [

@@ -10,7 +10,7 @@
         "name": '{!! $entity->name !!}',
         "params": {!! @json(array_values($entity->schema->getParams())) !!},
         "types": {!! @json($entity->schema->getAllTypes()) !!},
-        "rootEntities": {!! $rootEntities !!} || null,
+        "rootEntities": {!! @json($rootEntities) !!} || null,
         "validateUrl": {!! @json(route('entities.validateForm', ['entity' => $entity])) !!}
     };
 
