@@ -20,7 +20,7 @@
     "all-dev": "node_modules/npm-run-all/bin/npm-run-all/index.js dev lib-dev iota-dev",
     "all-watch": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel hot lib-hot iota-hot",
     "all-watch-poll": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch-poll lib-watch-poll iota-watch-poll",
-    "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch iota-watch ",
+    "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch iota-watch",
     "all-production": "node_modules/npm-run-all/bin/npm-run-all/index.js production lib-production iota-production"
   },
   "dependencies": {
