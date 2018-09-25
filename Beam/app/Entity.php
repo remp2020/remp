@@ -11,4 +11,21 @@ class Entity extends Model
         'parent_id',
         'schema',
     ];
+
+    protected $casts = [
+        'schema' => 'json'
+    ];
+
+    /**
+     * @return EntitySchema
+     * @throws Exceptions\EntitySchemaException
+     */
+    public function getSchemaAttribute()
+    {
+        if (!isset($this->attributes["schema"])) {
+            return new EntitySchema();
+        }
+
+        return new EntitySchema($this->attributes["schema"]);
+    }
 }

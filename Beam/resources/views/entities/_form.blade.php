@@ -8,8 +8,9 @@
     let entity = {
         "parent_id": '{!! $entity->parent_id !!}' || null,
         "name": '{!! $entity->name !!}',
-        "schema": @if($entity->schema){!! $entity->schema !!} @else { "type": "object", "required": [], "properties": {} }@endif,
-        "entities": {!! $entities !!} || null,
+        "params": {!! @json(array_values($entity->schema->getParams())) !!},
+        "types": {!! @json($entity->schema->getAllTypes()) !!},
+        "rootEntities": {!! $rootEntities !!} || null,
         "validateUrl": {!! @json(route('entities.validateForm', ['entity' => $entity])) !!}
     };
 

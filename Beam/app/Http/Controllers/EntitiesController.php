@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\EntitySchema;
 use Html;
 use App\Entity;
 use Illuminate\Http\Request;
@@ -48,9 +49,12 @@ class EntitiesController extends Controller
     {
         $entity = new Entity();
 
-        return view('entities.create', [
-            'entity' => $entity,
-            'entities' => Entity::where('parent_id', null)->get()
+        return response()->format([
+            'html' => view('entities.create', [
+                'entity' => $entity,
+                'rootEntities' => Entity::where('parent_id', null)->get()
+            ]),
+            'json' => new EntityResource($entity)
         ]);
     }
 
@@ -79,17 +83,6 @@ class EntitiesController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  Entity  $entity
@@ -99,7 +92,7 @@ class EntitiesController extends Controller
     {
         return view('entities.edit', [
             'entity' => $entity,
-            'entities' => Entity::where('parent_id', null)->get()
+            'rootEntities' => Entity::where('parent_id', null)->get()
         ]);
     }
 
@@ -166,8 +159,8 @@ class EntitiesController extends Controller
     {
         $entity->fill($request->only(['name', 'parent_id']));
 
-        $props = $request->get("properties");
-        $required = $request->get("required_properties") ?? [];
+        $params = $request->get("params");
+        $requiredParams = $request->get("required_params") ?? [];
         $schema = [
             'type' => 'object',
             'title' => $request->get('name'),
@@ -175,15 +168,15 @@ class EntitiesController extends Controller
             'required' => []
         ];
 
-        foreach ($props as $prop) {
-            $prop = array_filter($prop);
-            $name = $prop['name'];
+        foreach ($params as $param) {
+            $param = array_filter($param);
+            $name = $param['name'];
 
-            unset($prop['name']);
+            unset($param['name']);
 
-            $schema['properties'][$name] = $prop;
+            $schema['properties'][$name] = $param;
 
-            if (in_array($name, $required)) {
+            if (in_array($name, $requiredParams)) {
                 $schema['required'][] = $name;
             }
         }
