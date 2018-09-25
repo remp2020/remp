@@ -25,7 +25,31 @@ class DashboardController extends Controller
         return view('dashboard.index');
     }
 
-    public function todayTimeHistogram(Request $request)
+    private function getTimeIterator(Carbon $timeAfter, int $intervalMinutes): Carbon
+    {
+        // iterator has to be the earliest start of the interval (of $intervalMinutes) that includes $timeAfter
+        $timeIterator = (clone $timeAfter)->startOfDay();
+        while ($timeIterator->lessThanOrEqualTo($timeAfter)) {
+            $timeIterator->addMinutes($intervalMinutes);
+        }
+        return $timeIterator->subMinutes($intervalMinutes);
+    }
+
+    private function getJournalParameters($interval, $tz)
+    {
+        switch ($interval) {
+            case 'today':
+                return [Carbon::tomorrow($tz), Carbon::today($tz), '20m', 20];
+            case '7days':
+                return [Carbon::tomorrow($tz), Carbon::today($tz)->subDays(6), '1h', 60];
+            case '30days':
+                return [Carbon::tomorrow($tz), Carbon::today($tz)->subDays(29), '2h', 120];
+            default:
+                throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days] values, instead '$interval' provided");
+        }
+    }
+
+    public function timeHistogram(Request $request)
     {
         $request->validate([
             'tz' => 'timezone',
@@ -33,138 +57,107 @@ class DashboardController extends Controller
         ]);
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
-
         $interval = $request->get('interval');
-        switch ($interval) {
-            case 'today':
-                $timeBefore = Carbon::tomorrow($tz);
-                $timeAfter = Carbon::today($tz);
-                $intervalElastic = '20m';
-                $intervalMinutes = 20;
-                break;
-            case '7days':
-                $timeBefore = Carbon::tomorrow($tz);
-                $timeAfter = Carbon::today($tz)->subDays(6);
-                $intervalElastic = '1h';
-                $intervalMinutes = 60;
-                break;
-            case '30days':
-                $timeBefore = Carbon::tomorrow($tz);
-                $timeAfter = Carbon::today($tz)->subDays(29);
-                $intervalElastic = '2h';
-                $intervalMinutes = 120;
-                break;
-            default:
-                throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days] values, instead '$interval' provided");
-        }
-
-        $colorStack = [
-            '#EED0BC',
-            '#EB8459',
-            '#D49BC4',
-            '#50C8C8',
-            '#4C91B8',
-            '#FF9A21'
-            ];
-
-        // Compute labels
-        $labels = [];
-        $timeIterator = clone $timeAfter;
-        while ($timeIterator->lessThan($timeBefore)) {
-            $endTime = (clone $timeIterator)->addMinutes($intervalMinutes);
-            if ($interval === 'today') {
-                $labels[] = $timeIterator->format('H:i') . ' - ' . $endTime->format('H:i');
-            } else if ($interval === '7days') {
-                $labels[] = $timeIterator->format('l H:i') . ' - ' . $endTime->format('l H:i');
-            } else {
-                $labels[] = $timeIterator->format('d.m H:i') . ' - ' . $endTime->format('d.m. H:i');
-            }
-            $timeIterator->addMinutes($intervalMinutes);
-        }
-
-        $series = [];
-
-        // What part of today we should draw (omit 0 values)
-        $numberOfCurrentValues = (int) floor((Carbon::now($tz)->getTimestamp() - $timeAfter->getTimestamp()) / ($intervalMinutes * 60));
+        [$timeBefore, $timeAfter, $intervalText, $intervalMinutes] = $this->getJournalParameters($interval, $tz);
 
         $journalRequest = new JournalAggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
-        $journalRequest->setTimeHistogram($intervalElastic, '0h');
+        $journalRequest->setTimeHistogram($intervalText, '0h');
         $journalRequest->addGroup('derived_referer_medium');
         $currentRecords = $this->journal->count($journalRequest);
 
-        $i = 0;
-        foreach ($currentRecords as $currentRecord) {
-            $label = $currentRecord->tags->derived_referer_medium;
-            $currentValues = collect($currentRecord->time_histogram)->pluck('value')->take($numberOfCurrentValues);
-
-            // Preparing data for echarts
-            $series[] = [
-                'name' => 'current_' . ucfirst($label),
-                'type' => 'line',
-                'stack' => 'current',
-                'symbol' => 'none',
-                'data' => $currentValues,
-                'areaStyle' => [
-                    'color' => $colorStack[$i],
-                    'opacity' => '1'
-
-                ],
-                'lineStyle' => [
-                    'color' => $colorStack[$i],
-                    'width' => 1,
-                    'opacity' => '1'
-                ]
-            ];
-            $i++;
+        // Get all tags
+        $tags = [];
+        foreach ($currentRecords as $records) {
+            $tags[$records->tags->derived_referer_medium] = true;
         }
 
-        // Compute shadow values from previous week for today/7-days intervals
+        // Compute shadow values from previous week for today and 7-days intervals
+        $previousRecords = collect();
         if ($interval !== '30days') {
-            $timeBeforePrevious = (clone $timeBefore)->subWeek();
-            $timeAfterPrevious = (clone $timeAfter)->subWeek();
-
             $journalRequest = new JournalAggregateRequest('pageviews', 'load');
-            $journalRequest->setTimeAfter($timeAfterPrevious);
-            $journalRequest->setTimeBefore($timeBeforePrevious);
-            $journalRequest->setTimeHistogram($intervalElastic, '0h');
+            $journalRequest->setTimeAfter((clone $timeAfter)->subWeek());
+            $journalRequest->setTimeBefore((clone $timeBefore)->subWeek());
+            $journalRequest->setTimeHistogram($intervalText, '0h');
             $journalRequest->addGroup('derived_referer_medium');
             $previousRecords = $this->journal->count($journalRequest);
 
-            $i = 0;
-            foreach ($previousRecords as $previousRecord) {
-                $label = $previousRecord->tags->derived_referer_medium;
-                $previousHistogram = collect($previousRecord->time_histogram);
-                $previousValues = $previousHistogram->pluck('value');
-
-                $series[] = [
-                    'name' => 'previous_' . ucfirst($label),
-                    'type' => 'line',
-                    'stack' => 'previous',
-                    'symbol' => 'none',
-                    'data' => $previousValues,
-                    'areaStyle' => [
-                        'color' => '#e1e1e1',
-                        'opacity' => '0.5'
-                    ],
-                    'lineStyle' => [
-                        'width' => 1,
-                        'color' => '#e1e1e1',
-                        'opacity' => $i === 0 ? 0 : 1
-                    ]
-                ];
-                $i++;
+            // update tags
+            foreach ($previousRecords as $records) {
+                $tags[$records->tags->derived_referer_medium] = true;
             }
         }
 
-        $data = [
-            'series' => $series,
-            'xaxis' => $labels,
-            'colors' => $colorStack,
-        ];
+        $tags = array_keys($tags);
 
-        return response()->json($data);
+        // Values might be missing in time histogram, therefore fill all tags with 0s by default
+        $results = [];
+        $previousResults = [];
+        $previousResultsSummed = [];
+        $timeIterator = $this->getTimeIterator($timeAfter, $intervalMinutes);
+
+        $emptyValues = collect($tags)->mapWithKeys(function ($item) {
+            return [$item => 0];
+        })->toArray();
+
+        while ($timeIterator->lessThan($timeBefore)) {
+            $zuluDate = $timeIterator->toIso8601ZuluString();
+
+            $results[$zuluDate] = $previousResults[$zuluDate] = $emptyValues;
+            $results[$zuluDate]['Date'] = $previousResults[$zuluDate]['Date'] = $zuluDate;
+
+            $timeIterator->addMinutes($intervalMinutes);
+        }
+
+        if ($previousRecords->isEmpty()) {
+            $previousResults = [];
+        }
+
+        // Save current results
+        foreach ($currentRecords as $records) {
+            if (!isset($records->time_histogram)) {
+                continue;
+            }
+            $currentTag = $records->tags->derived_referer_medium;
+
+            foreach ($records->time_histogram as $timeValue) {
+                $results[$timeValue->time][$currentTag] = $timeValue->value;
+            }
+        }
+
+        // Save previous results
+        foreach ($previousRecords as $records) {
+            if (!isset($records->time_histogram)) {
+                continue;
+            }
+            $currentTag = $records->tags->derived_referer_medium;
+
+            foreach ($records->time_histogram as $timeValue) {
+                // we want to plot previous results on same points as current ones,
+                // therefore add week which was subtracted before when data was queried
+                $correctedDate = Carbon::parse($timeValue->time)->addWeek()->toIso8601ZuluString();
+
+                $previousResults[$correctedDate][$currentTag] = $timeValue->value;
+                if (!array_key_exists($correctedDate, $previousResultsSummed)){
+                    $previousResultsSummed[$correctedDate]['value'] = 0;
+                    $previousResultsSummed[$correctedDate]['Date'] = $correctedDate;
+                }
+                $previousResultsSummed[$correctedDate]['value'] += (int) $timeValue->value;
+            }
+        }
+
+        // What part of current results we should draw (omit 0 values)
+        $numberOfCurrentValues = (int) floor((Carbon::now($tz)->getTimestamp() - $timeAfter->getTimestamp()) / ($intervalMinutes * 60));
+        $results = collect(array_values($results))->take($numberOfCurrentValues);
+
+        return response()->json([
+            'intervalMinutes' => $intervalMinutes,
+            'results' => $results,
+            'previousResults' => array_values($previousResults),
+            'previousResultsSummed' => array_values($previousResultsSummed),
+            'tags' => $tags
+        ]);
     }
 
     public function mostReadArticles()
