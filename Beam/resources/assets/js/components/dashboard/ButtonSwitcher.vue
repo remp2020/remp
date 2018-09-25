@@ -1,5 +1,5 @@
 <template>
-    <div class="btn-group btn-group-xs" role="group">
+    <div class="btn-group btn-group-sm" role="group">
         <button v-for="option in intervalOptions"
                 type="button"
                 class="btn"
