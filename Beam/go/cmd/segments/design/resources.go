@@ -306,7 +306,7 @@ var _ = Resource("pageviews", func() {
 		Routing(POST("/actions/:action/unique/:item"))
 		Params(func() {
 			Param("action", String, "Identification of pageview action", func() {
-				Enum("timespent")
+				Enum("load")
 			})
 			Param("item", String, "Identification of queried unique items", func() {
 				Enum("browsers")

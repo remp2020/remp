@@ -223,7 +223,7 @@ class DashboardController extends Controller
         });
 
         // Load unique pageloads
-        $uniqueRequest = new JournalAggregateRequest('pageviews', 'browsers');
+        $uniqueRequest = new JournalAggregateRequest('pageviews', 'load');
         $uniqueRequest->setTimeAfter($minimalPublishedTime);
         $uniqueRequest->setTimeBefore($timeBefore);
         $uniqueRequest->addGroup('article_id');
