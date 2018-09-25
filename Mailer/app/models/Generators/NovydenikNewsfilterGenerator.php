@@ -102,7 +102,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
+            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use ($content, $transport) {
                 $url = "https://novydenik.cz/{$matches[1]}";
                 $meta = Utils::fetchUrlMeta($url, $content, $transport);
                 return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
