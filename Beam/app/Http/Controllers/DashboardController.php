@@ -104,14 +104,16 @@ class DashboardController extends Controller
         while ($timeIterator->lessThan($timeBefore)) {
             $zuluDate = $timeIterator->toIso8601ZuluString();
 
-            $results[$zuluDate] = $previousResults[$zuluDate] = $emptyValues;
-            $results[$zuluDate]['Date'] = $previousResults[$zuluDate]['Date'] = $zuluDate;
+            $results[$zuluDate] = $emptyValues;
+            $results[$zuluDate]['Date'] = $zuluDate;
+
+            if ($previousRecords->isNotEmpty()) {
+                $previousResults[$zuluDate] = $emptyValues;
+                $previousResults[$zuluDate]['Date'] = $previousResultsSummed[$zuluDate]['Date'] = $zuluDate;
+                $previousResultsSummed[$zuluDate]['value'] = 0;
+            }
 
             $timeIterator->addMinutes($intervalMinutes);
-        }
-
-        if ($previousRecords->isEmpty()) {
-            $previousResults = [];
         }
 
         // Save current results
@@ -139,15 +141,11 @@ class DashboardController extends Controller
                 $correctedDate = Carbon::parse($timeValue->time)->addWeek()->toIso8601ZuluString();
 
                 $previousResults[$correctedDate][$currentTag] = $timeValue->value;
-                if (!array_key_exists($correctedDate, $previousResultsSummed)){
-                    $previousResultsSummed[$correctedDate]['value'] = 0;
-                    $previousResultsSummed[$correctedDate]['Date'] = $correctedDate;
-                }
                 $previousResultsSummed[$correctedDate]['value'] += (int) $timeValue->value;
             }
         }
 
-        // What part of current results we should draw (omit 0 values)
+        // What part of current results we should draw (omit future 0 values)
         $numberOfCurrentValues = (int) floor((Carbon::now($tz)->getTimestamp() - $timeAfter->getTimestamp()) / ($intervalMinutes * 60));
         $results = collect(array_values($results))->take($numberOfCurrentValues);
 

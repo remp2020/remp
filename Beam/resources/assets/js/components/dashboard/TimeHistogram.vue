@@ -134,7 +134,7 @@
     }
     const bisectDate = d3.bisector(d => d.date).left;
 
-    const REFRESH_DATA_TIMEOUT_MS = 5000
+    const REFRESH_DATA_TIMEOUT_MS = 30000
 
     let container, svg, dataG, oldDataG, oldDataLineG, x,y, colorScale, xAxis, vertical, mouseRect,
         margin = {top: 20, right: 20, bottom: 20, left: 20},
@@ -303,15 +303,15 @@
 
                 let layers = stack(results);
 
-                let maxDateItem =  results[results.length - 1]
+                let maxDate =  results[results.length - 1].date
                 let yMax = d3.max(layers, stackMax)
 
                 if (hasPrevious) {
-                    maxDateItem = previousResults[previousResults.length - 1]
+                    maxDate = previousResults[previousResults.length - 1].date
                     yMax = Math.max(d3.max(previousResults, (d) => (d.value)), yMax)
                 }
 
-                x.domain([results[0].date, maxDateItem.date])
+                x.domain([results[0].date, maxDate])
                     .range([0, width])
                 y.domain([0, yMax])
                     .range([height, 0])
