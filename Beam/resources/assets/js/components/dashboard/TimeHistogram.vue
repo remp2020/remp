@@ -136,6 +136,7 @@
         data() {
             return {
                 data: null,
+                error: null,
                 loading: false,
                 interval: 'today',
                 legendVisible: false,
