@@ -127,6 +127,15 @@
         margin = {top: 20, right: 20, bottom: 20, left: 20},
         loadDataTimer = null
 
+    let colors = [
+        "#eed075",
+        "#eb8459",
+        "#50c8c8",
+        "#d49bc4",
+        "#4c91b8",
+        "#3DF16D"
+    ]
+
     export default {
         components: {
             ButtonSwitcher
@@ -202,7 +211,6 @@
 
                 vertical = mouseG.append("path")
                     .attr("class", "mouse-line")
-                    .attr("opacity", 0.1)
                     .attr("stroke", "black")
                     .attr("stroke-width", "1px")
 
@@ -351,16 +359,13 @@
                 y.domain([0, yMax])
                     .range([height, 0])
 
-                let colors = [
-                    "#eed075", "#eb8459", "#d49bc4", "#50c8c8", "#4c91b8", "#3DF16D"
-                ]
-
                 colorScale = d3.scaleOrdinal()
                     .domain(tags)
                     .range(colors);
 
                 // Remove original data if present
                 dataG.selectAll(".layer").remove();
+                dataG.selectAll(".layer-line").remove();
                 oldDataG.selectAll("path").remove();
                 oldDataLineG.selectAll("path").remove();
 
@@ -372,12 +377,16 @@
                     .y0((d) => y(d[0]))
                     .y1((d) => y(d[1]))
 
+                let areaStroke = d3.line()
+                    .x((d, i) => x(d.data.date))
+                    .y((d) => y(d[1]))
+
                 let areaSimple = d3.area()
                     .x((d) => x(d.date))
                     .y0(y(0))
                     .y1((d) => y(d.value))
 
-                let lineSimple = d3.line()
+                let areaSimpleStroke = d3.line()
                     .x((d) => x(d.date))
                     .y((d) => y(d.value))
 
@@ -385,13 +394,21 @@
                 let layerGroups = dataG.selectAll(".layer")
                     .data(layers)
                     .enter().append("g")
-                    .attr("class", "layer");
-
-                layerGroups.append("path")
+                    .attr("class", "layer")
+                    .append("path")
                     .attr("d", area)
-                    .attr("fill", function (d, i) {
-                        return colors[i];
-                    })
+                    .attr("fill", (d, i) => colors[i])
+
+                let linesGroup = dataG.selectAll(".layer-line")
+                    .data(layers)
+                    .enter().append("g")
+                    .attr("class", "layer-line")
+                    .append("path")
+                    .attr("d", areaStroke)
+                    .attr("stroke", "#626262")
+                    .attr("opacity", 0.5)
+                    .attr("shape-rendering", "geometricPrecision")
+                    .attr("fill", "none")
 
                 if (this.hasPrevious) {
                     oldDataG.append("path")
@@ -405,7 +422,7 @@
                         .attr("stroke", "#dedede")
                         .attr("opacity", 0.75)
                         .attr("fill", "none")
-                        .attr("d", lineSimple);
+                        .attr("d", areaSimpleStroke);
                 }
             },
             loadData() {
