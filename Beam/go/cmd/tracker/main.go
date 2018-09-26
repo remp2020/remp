@@ -114,6 +114,35 @@ func main() {
 		}
 	}()
 
+	schemaDB := &model.EntitySchemaDB{
+		MySQL: mysqlDB,
+	}
+
+	schemaTicker := time.NewTicker(10 * time.Second)
+	defer schemaTicker.Stop()
+
+	cacheEntitySchemas := func(service *goa.Service) {
+		if err := schemaDB.Cache(service); err != nil {
+			service.LogError("unable to cache entity schemas", "err", err)
+		}
+	}
+
+	wg.Add(1)
+	cacheEntitySchemas(service)
+	go func() {
+		defer wg.Done()
+		service.LogInfo("starting entity schemas caching")
+		for {
+			select {
+			case <-schemaTicker.C:
+				cacheEntitySchemas(service)
+			case <-ctx.Done():
+				service.LogInfo("entity schemas caching stopped")
+				return
+			}
+		}
+	}()
+
 	// controllers init
 
 	app.MountSwaggerController(service, service.NewController("swagger"))
