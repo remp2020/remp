@@ -3,7 +3,7 @@
         <div class="container">
 
             <div class="c-header">
-                <h2>Dashboard XYZ</h2>
+                <h2>Dashboard</h2>
             </div>
 
             <div class="row">

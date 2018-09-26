@@ -368,30 +368,30 @@ func (src SumRowCollection) ToMediaType() app.SumCollection {
 }
 
 // ToMediaType converts internal AvgRow representation to application one.
-func (sr AvgRow) ToMediaType() *app.Avg {
+func (ar AvgRow) ToMediaType() *app.Avg {
 	thc := app.TimeHistogramCollection{}
 
-	for _, c := range sr.Histogram {
+	for _, c := range ar.Histogram {
 		hi := (HistogramItem)(c).ToMediaType()
 		thc = append(thc, hi)
 	}
 
-	if len(sr.Tags) == 0 {
-		sr.Tags = nil
+	if len(ar.Tags) == 0 {
+		ar.Tags = nil
 	}
 
 	mt := &app.Avg{
-		Avg:           sr.Avg,
-		Tags:          sr.Tags,
+		Avg:           ar.Avg,
+		Tags:          ar.Tags,
 		TimeHistogram: thc,
 	}
 	return mt
 }
 
 // ToMediaType converts internal AvgRowCollection representation to application one.
-func (src AvgRowCollection) ToMediaType() app.AvgCollection {
+func (arc AvgRowCollection) ToMediaType() app.AvgCollection {
 	mt := app.AvgCollection{}
-	for _, c := range src {
+	for _, c := range arc {
 		mtc := (AvgRow)(c).ToMediaType()
 		mt = append(mt, mtc)
 	}

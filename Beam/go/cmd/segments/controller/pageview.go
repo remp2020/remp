@@ -122,7 +122,7 @@ func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
 		}
 	}
 
-	src, ok, err := c.PageviewStorage.Unique(o)
+	src, ok, err := c.PageviewStorage.Unique(o, ctx.Item)
 	if err != nil {
 		return err
 	}

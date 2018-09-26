@@ -97,7 +97,7 @@ func (eDB *PageviewInflux) Avg(o AggregateOptions) (AvgRowCollection, bool, erro
 }
 
 // Unique is not implemented as Influx will be removed in the future
-func (eDB *PageviewInflux) Unique(o AggregateOptions) (CountRowCollection, bool, error) {
+func (eDB *PageviewInflux) Unique(o AggregateOptions, item string) (CountRowCollection, bool, error) {
 	return nil, false, errors.New("unique method not implemented")
 }
 
