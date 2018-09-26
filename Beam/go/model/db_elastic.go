@@ -251,7 +251,7 @@ func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchRes
 				avgAggLabel := fmt.Sprintf("%s_avg", avgField)
 				agg, ok := histogramItem.Aggregations.Avg(avgAggLabel)
 				if !ok {
-					return errors.New("cant find timespent_avg sub agg in date histogram agg")
+					return errors.New("unable to retrieve average value from histogram data")
 				}
 
 				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
@@ -315,7 +315,7 @@ func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.Search
 				uniqueAggLabel := fmt.Sprintf("%s_unique", uniqueField)
 				agg, ok := histogramItem.Aggregations.Cardinality(uniqueAggLabel)
 				if !ok {
-					return errors.New("cant find timespent_unique sub agg in date histogram agg")
+					return errors.New("Unable to retrieve cardinality value from histogram data")
 				}
 
 				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
