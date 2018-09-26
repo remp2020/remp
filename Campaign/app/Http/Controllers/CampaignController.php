@@ -46,7 +46,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['segments', 'countries', 'campaignBanners'])
+            ->with(['segments', 'countries', 'campaignBanners', 'campaignBanners.banner', 'schedules'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -94,10 +94,11 @@ class CampaignController extends Controller
                 return implode(' ', $campaign->countries->pluck('name')->toArray());
             })
             ->addColumn('active', function (Campaign $campaign) {
+                $active = $campaign->active;
                 return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
-                    'active' => $campaign->active,
-                    'title' => $campaign->active ? 'Deactivate campaign' : 'Activate campaign'
+                    'active' => $active,
+                    'title' => $active ? 'Deactivate campaign' : 'Activate campaign'
                 ])->render();
             })
             ->addColumn('is_running', function (Campaign $campaign) {
