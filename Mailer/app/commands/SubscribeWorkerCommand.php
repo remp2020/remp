@@ -83,7 +83,11 @@ class SubscribeWorkerCommand extends Command
 
             /** @var ActiveRow $list */
             foreach ($lists as $list) {
-                $this->userSubscriptionsRepository->subscribeUser($list, $userId, $userInfo['email']);
+                if ($list->auto_subscribe) {
+                    $this->userSubscriptionsRepository->subscribeUser($list, $userId, $userInfo['email']);
+                } else {
+                    $this->userSubscriptionsRepository->unsubscribeUser($list, $userId, $userInfo['email']);
+                }
             }
             $output->writeln('<info>OK!</info>');
         }
