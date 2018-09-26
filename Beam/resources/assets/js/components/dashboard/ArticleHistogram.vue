@@ -13,7 +13,7 @@
         <div id="legend-wrapper">
             <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">
 
-                <span>{{highlightedRow.startDate | formatDate}}</span>
+                <span>{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</span>
                 <table>
                     <tr>
                         <th>Source</th>
@@ -22,6 +22,10 @@
                     <tr v-for="item in highlightedRow.values">
                         <td><span style="font-weight: bold" v-bind:style="{color: item.color}">&#9679;</span>&nbsp;{{item.tag}}</td>
                         <td>{{item.value}}</td>
+                    </tr>
+                    <tr style="border-top: 1px solid #d1d1d1">
+                        <td><b>Total</b></td>
+                        <td><b>{{highlightedRow.sum}}</b></td>
                     </tr>
                 </table>
             </div>
@@ -40,24 +44,30 @@
     #article-graph-legend table {
         width: 100%;
         background-color: transparent;
-        border-spacing: 4px;
-        border-collapse: separate;
+        border-collapse: collapse;
+    }
+    #article-graph-legend table td, th {
+        padding: 3px 6px
     }
     #article-graph-legend {
         position:absolute;
+        z-index: 1000;
         top:0;
         left: 0;
-        opacity: 0.8;
+        opacity: 0.85;
         color: #fff;
         padding: 2px;
-        background-color: #b6b6b6;
+        background-color: #494949;
         border-radius: 2px;
-        border: 2px solid #b6b6b6;
+        border: 2px solid #494949;
+        transform: translate(-50%, 0px)
     }
 </style>
 
 <script>
     import ButtonSwitcher from './ButtonSwitcher.vue'
+    import * as constants from './constants'
+    import {debounce, formatInterval} from './constants'
     import axios from 'axios'
     import * as d3 from 'd3'
 
@@ -68,29 +78,13 @@
         }
     }
 
-    Vue.filter('formatDate', function(value) {
-        if (value) {
-            return moment(value).format('YYYY-MM-DD HH:mm')
-        }
-    })
+    Vue.filter('formatDate', formatInterval)
 
     function stackMax(layer) {
         return d3.max(layer, function (d) { return d[1]; });
     }
 
-    const debounce = (fn, time) => {
-        let timeout;
-
-        return function() {
-            const functionCall = () => fn.apply(this, arguments);
-
-            clearTimeout(timeout);
-            timeout = setTimeout(functionCall, time);
-        }
-    }
     const bisectDate = d3.bisector(d => d.date).left;
-
-    const REFRESH_DATA_TIMEOUT_MS = 15000
 
     let container, svg, dataG, x,y, colorScale, xAxis, vertical, mouseRect,
         margin = {top: 20, right: 20, bottom: 20, left: 20},
@@ -109,7 +103,7 @@
                 interval: 'today',
                 legendVisible: false,
                 highlightedRow: null,
-                legendLeft: "100px"
+                legendLeft: "0px"
             };
         },
         watch: {
@@ -119,13 +113,13 @@
             interval(value) {
                 clearInterval(loadDataTimer)
                 this.loadData()
-                loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
+                loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
             }
         },
         mounted() {
             this.createGraph()
             this.loadData()
-            loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
+            loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
             window.addEventListener('resize', debounce((e) => {
                 this.fillData()
             }, 100));
@@ -213,7 +207,10 @@
                                     return d;
                                 })
 
+                            let valuesSum = 0
+
                             let values = that.data.tags.map(function (tag) {
+                                valuesSum += row[tag]
                                 return {
                                     tag: tag,
                                     value: row[tag],
@@ -223,10 +220,11 @@
 
                             that.highlightedRow = {
                                 startDate: row.date,
-                                values: values
+                                values: values,
+                                sum: valuesSum
                             }
 
-                            that.legendLeft = Math.round(x(xDate)) + "px"
+                            that.legendLeft = (Math.round(x(row.date)) + margin.left) + "px"
                         }
                     })
             },
@@ -258,9 +256,7 @@
                 y.domain([0, d3.max(layers, stackMax)])
                     .range([height, 0])
 
-                let colors = tags.map(function (d, i) {
-                    return d3.interpolateWarm(i / tags.length);
-                });
+                let colors = constants.GRAPH_COLORS
 
                 colorScale = d3.scaleOrdinal()
                     .domain(tags)
@@ -268,29 +264,42 @@
 
                 // Remove original data if present
                 dataG.selectAll(".layer").remove();
+                dataG.selectAll(".layer-line").remove();
 
-                // Update data
-                let layerGroups = dataG.selectAll(".layer")
-                    .data(layers)
-                    .enter().append("g")
-                    .attr("class", "layer");
-
-                // Draw data
                 let area = d3.area()
                     .x(function (d, i) { return x(d.data.date) })
                     .y0(function (d) { return y(d[0]); })
                     .y1(function (d) { return y(d[1]); })
 
-                layerGroups.append("path")
+                let areaStroke = d3.line()
+                    .x((d, i) => x(d.data.date))
+                    .y((d) => y(d[1]))
+
+                // Update data
+                dataG.selectAll(".layer")
+                    .data(layers)
+                    .enter().append("g")
+                    .attr("class", "layer")
+                    .append("path")
                     .attr("d", area)
-                    .attr("fill", function (d, i) {
-                        return colors[i];
-                    });
+                    .attr("fill", (d, i) => colors[i])
+
+                dataG.selectAll(".layer-line")
+                    .data(layers)
+                    .enter().append("g")
+                    .attr("class", "layer-line")
+                    .append("path")
+                    .attr("d", areaStroke)
+                    .attr("stroke", "#626262")
+                    .attr("opacity", 0.25)
+                    .attr("shape-rendering", "geometricPrecision")
+                    .attr("fill", "none")
 
                 // Update axis
                 svg.select('.axis--x').transition().call(xAxis)
             },
             loadData() {
+                this.loading = true
                 axios
                     .get(this.url, {
                         params: {
@@ -315,7 +324,8 @@
 
                         this.data = {
                             results: parsedData,
-                            tags: tags
+                            tags: tags,
+                            intervalMinutes: response.data.intervalMinutes
                         }
                     })
                     .catch(error => {

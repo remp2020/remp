@@ -132,8 +132,8 @@ class ArticleDetailsController extends Controller
         $results = array_values($results);
 
         return response()->json([
-            'published_at' => $article->published_at->toIso8601ZuluString(),
-            'interval_minutes' => $intervalMinutes,
+            'publishedAt' => $article->published_at->toIso8601ZuluString(),
+            'intervalMinutes' => $intervalMinutes,
             'results' => $results,
             'tags' => $tags
         ]);
