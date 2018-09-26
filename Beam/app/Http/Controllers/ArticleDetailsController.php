@@ -144,7 +144,7 @@ class ArticleDetailsController extends Controller
         $timeBefore = Carbon::now();
         $timeAfter = $article->published_at;
 
-        $uniqueRequest = new JournalAggregateRequest('pageviews', 'browsers');
+        $uniqueRequest = new JournalAggregateRequest('pageviews', 'load');
         $uniqueRequest->setTimeAfter($timeAfter);
         $uniqueRequest->setTimeBefore($timeBefore);
         $uniqueRequest->addGroup('article_id');
