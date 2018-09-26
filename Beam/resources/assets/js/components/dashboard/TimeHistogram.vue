@@ -351,9 +351,9 @@
                 y.domain([0, yMax])
                     .range([height, 0])
 
-                let colors = tags.map(function (d, i) {
-                    return d3.interpolateWarm(i / tags.length);
-                });
+                let colors = [
+                    "#eed075", "#eb8459", "#d49bc4", "#50c8c8", "#4c91b8", "#3DF16D"
+                ]
 
                 colorScale = d3.scaleOrdinal()
                     .domain(tags)
