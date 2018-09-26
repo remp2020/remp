@@ -34,11 +34,11 @@ class ArticleDetailsController extends Controller
         } else if ($articleAgeInMins <= 90*60*24) { // 90 days
             return ["3h", 180];
         } else if ($articleAgeInMins <= 180*60*24) { // 180 days
-            return ["4h", 240];
-        } else if ($articleAgeInMins <= 365*60*24) { // 1 year
             return ["6h", 360];
+        } else if ($articleAgeInMins <= 365*60*24) { // 1 year
+            return ["12h", 720];
         } else { // 1+ year
-            return ["8h", 480];
+            return ["24h", 1440];
         }
     }
 
