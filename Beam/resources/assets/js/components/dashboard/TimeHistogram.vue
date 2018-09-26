@@ -27,22 +27,26 @@
             <div id="legend-wrapper">
                 <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">
 
-                    <span>{{highlightedRow.startDate | formatDate}}</span>
+                    <div class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
                     <table>
                         <tr>
                             <th></th>
                             <th v-if="highlightedRow.hasCurrent">Current</th>
-                            <th v-if="highlightedRow.hasPrevious">Week ago</th>
+                            <th v-if="highlightedRow.hasPrevious">Week&nbsp;ago</th>
                         </tr>
                         <tr v-for="(item, tag) in highlightedRow.values">
                             <td>
                                 <span v-if="highlightedRow.hasCurrent"
-                                      style="font-weight: bold"
-                                      v-bind:style="{color: item.color}">&#9679;</span>&nbsp;
-                                {{tag}}
+                                             style="font-weight: bold"
+                                             v-bind:style="{color: item.color}">&#9679;</span> {{tag}}
                             </td>
                             <td v-if="highlightedRow.hasCurrent">{{item.current}}</td>
                             <td v-if="highlightedRow.hasPrevious">{{item.previous}}</td>
+                        </tr>
+                        <tr style="border-top: 1px solid #d1d1d1">
+                            <td><b>Total</b></td>
+                            <td v-if="highlightedRow.hasCurrent"><b>{{highlightedRow.currentSum}}</b></td>
+                            <td v-if="highlightedRow.hasPrevious"><b>{{highlightedRow.previousSum}}</b></td>
                         </tr>
                     </table>
                 </div>
@@ -65,20 +69,28 @@
     #article-graph-legend table {
         width: 100%;
         background-color: transparent;
-        border-spacing: 4px;
-        border-collapse: separate;
+        border-collapse: collapse;
+    }
+    #article-graph-legend table td, th {
+        padding: 3px 6px
     }
     #article-graph-legend {
         position:absolute;
         z-index: 1000;
         top:0;
         left: 0;
-        opacity: 0.8;
+        opacity: 0.85;
         color: #fff;
         padding: 2px;
-        background-color: #b6b6b6;
+        background-color: #494949;
         border-radius: 2px;
-        border: 2px solid #b6b6b6;
+        border: 2px solid #494949;
+        transform: translate(-50%, 0px)
+    }
+
+    .legend-title {
+        text-align: center;
+        font-size: 14px;
     }
 
     #chartContainer .preloader {
@@ -101,9 +113,11 @@
         }
     };
 
-    Vue.filter('formatDate', function(value) {
+    Vue.filter('formatDate', function(value, intervalMinutes) {
         if (value) {
-            return moment(value).format('YYYY-MM-DD HH:mm')
+            let start = moment(value)
+            let end = start.clone().add(intervalMinutes, 'm')
+            return start.format('YYYY-MM-DD HH:mm') + " - " + end.format('HH:mm')
         }
     })
 
@@ -150,7 +164,7 @@
                 interval: 'today',
                 legendVisible: false,
                 highlightedRow: null,
-                legendLeft: "100px"
+                legendLeft: "0px"
             };
         },
         computed: {
@@ -282,6 +296,8 @@
                     }
                 })
 
+                let currentSum = 0, previousSum = 0
+
                 if (rowIndex !== undefined) {
                     let currentRow = getSelectedRow(rowIndex, this.data.results)
                     verticalX = x(currentRow.date)
@@ -291,6 +307,7 @@
                     this.data.tags.forEach(function(tag) {
                         values[tag].current = currentRow[tag]
                         values[tag].color = d3.color(colorScale(tag)).hex()
+                        currentSum += currentRow[tag]
                     })
                 }
 
@@ -302,6 +319,7 @@
 
                     this.data.tags.forEach(function(tag) {
                         values[tag].previous = previousRow[tag]
+                        previousSum += previousRow[tag]
                     })
                 }
 
@@ -311,13 +329,15 @@
                         d += " " + verticalX + "," + 0;
                         return d;
                     })
-                this.legendLeft = Math.round(verticalX) + "px"
+                this.legendLeft = Math.round(verticalX) + 20 + "px"
 
                 this.highlightedRow = {
                     startDate: selectedDate,
                     values: values,
                     hasCurrent: hasCurrent,
-                    hasPrevious: hasPrevious
+                    hasPrevious: hasPrevious,
+                    currentSum: currentSum,
+                    previousSum: previousSum
                 }
 
             },
@@ -452,6 +472,7 @@
                         }
 
                         this.data = {
+                            intervalMinutes: response.data.intervalMinutes,
                             results: results.map(parseDate),
                             previousResults: previousResults.map(parseDate),
                             previousResultsSummed: previousResultsSummed.map((d) => (
