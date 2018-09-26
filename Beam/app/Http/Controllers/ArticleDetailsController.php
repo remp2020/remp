@@ -24,7 +24,7 @@ class ArticleDetailsController extends Controller
     {
         $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
         if ($articleAgeInMins <= 60) { // 1 hour
-            return ["1m", 1];
+            return ["5m", 5];
         } else if ($articleAgeInMins <= 60*24) { // 1 day
             return ["20m", 20];
         } else if ($articleAgeInMins <= 7*60*24) { // 7 days
