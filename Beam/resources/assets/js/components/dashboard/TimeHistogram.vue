@@ -433,7 +433,7 @@
                 if (this.hasPrevious) {
                     oldDataG.append("path")
                         .datum(previousResults)
-                        .attr("fill", "#f4f4f4")
+                        .attr("fill", "#f2f2f2")
                         .attr("d", areaSimple)
 
                     oldDataLineG.append("path")
