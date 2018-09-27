@@ -52,3 +52,13 @@ type SumRow struct {
 
 // SumRowCollection represents collection of rows of grouped sum.
 type SumRowCollection []SumRow
+
+// AvgRow represents one row of grouped sum.
+type AvgRow struct {
+	Tags      map[string]string
+	Avg       float64
+	Histogram []HistogramItem
+}
+
+// AvgRowCollection represents collection of rows of grouped sum.
+type AvgRowCollection []AvgRow

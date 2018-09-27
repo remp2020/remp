@@ -46,7 +46,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables)
     {
         $campaigns = Campaign::select()
-            ->with(['segments', 'countries', 'campaignBanners'])
+            ->with(['segments', 'countries', 'campaignBanners', 'campaignBanners.banner', 'schedules'])
             ->get();
 
         return $dataTables->of($campaigns)
@@ -94,10 +94,11 @@ class CampaignController extends Controller
                 return implode(' ', $campaign->countries->pluck('name')->toArray());
             })
             ->addColumn('active', function (Campaign $campaign) {
+                $active = $campaign->active;
                 return view('campaigns.partials.activeToggle', [
                     'id' => $campaign->id,
-                    'active' => $campaign->active,
-                    'title' => $campaign->active ? 'Deactivate campaign' : 'Activate campaign'
+                    'active' => $active,
+                    'title' => $active ? 'Deactivate campaign' : 'Activate campaign'
                 ])->render();
             })
             ->addColumn('is_running', function (Campaign $campaign) {
@@ -836,10 +837,27 @@ class CampaignController extends Controller
         Campaign $campaign,
         Request $request
     ) {
+        $variants = $campaign->campaignBanners()->with("banner")->get();
+        $from = $request->input('from', 'now - 2 days');
+        $to = $request->input('to', 'now');
+
+        $variantBannerLinks = [];
+        $variantBannerTexts = [];
+        foreach ($variants as $variant) {
+            if (!$variant->banner) {
+                continue;
+            }
+            $variantBannerLinks[$variant->id] = route('banners.show', ['banner' => $variant->banner]);
+            $variantBannerTexts[$variant->id] = $variant->banner->getTemplate()->text();
+        }
+
         return view('campaigns.stats', [
             'campaign' => $campaign,
-            'from' => $request->input('from', 'now - 2 days'),
-            'to' => $request->input('to', 'now'),
+            'variants' => $variants,
+            'variantBannerLinks' => $variantBannerLinks,
+            'variantBannerTexts' => $variantBannerTexts,
+            'from' => $from,
+            'to' => $to,
         ]);
     }
 

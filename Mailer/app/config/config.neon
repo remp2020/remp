@@ -220,7 +220,7 @@ services:
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
 	- Remp\MailerModule\Forms\SourceTemplateFormFactory
 	- Remp\MailerModule\Forms\MailGeneratorFormFactory
-	- Remp\MailerModule\Forms\NovydenikNewsfilterTemplateFormFactory('all_users')
+	- Remp\MailerModule\Forms\NovydenikNewsfilterTemplateFormFactory('users_with_any_subscriptions', 'users-without-subscription')
 	- Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\MailerModule\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')

@@ -9,6 +9,7 @@ const (
 	CategoryPageview         = "pageview"
 	ActionPageviewLoad       = "load"
 	ActionPageviewTimespent  = "timespent"
+	UniqueCountBrowsers      = "browsers"
 	TablePageviews           = "pageviews"
 	TableTimespent           = "pageviews_time_spent"
 	TableTimespentAggregated = "pageviews_time_spent_hourly"
@@ -71,6 +72,10 @@ type PageviewStorage interface {
 	Count(o AggregateOptions) (CountRowCollection, bool, error)
 	// Sum returns sum of pageviews based on the provided filter options.
 	Sum(o AggregateOptions) (SumRowCollection, bool, error)
+	// Avg returns average of pageviews based on the provided filter options.
+	Avg(o AggregateOptions) (AvgRowCollection, bool, error)
+	// Unique returns unique count of given item based on the provided filter options.
+	Unique(o AggregateOptions, item string) (CountRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o ListOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.

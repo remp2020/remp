@@ -12,7 +12,9 @@ use Remp\MailerModule\Segment\Crm;
 
 class NovydenikNewsfilterTemplateFormFactory
 {
-    private $usersSegment;
+    private $activeUsersSegment;
+
+    private $inactiveUsersSegment;
 
     private $templatesRepository;
 
@@ -29,14 +31,16 @@ class NovydenikNewsfilterTemplateFormFactory
     public $onSave;
 
     public function __construct(
-        $usersSegment,
+        $activeUsersSegment,
+        $inactiveUsersSegment,
         TemplatesRepository $templatesRepository,
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository,
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository
     ) {
-        $this->usersSegment = $usersSegment;
+        $this->activeUsersSegment = $activeUsersSegment;
+        $this->inactiveUsersSegment = $inactiveUsersSegment;
         $this->templatesRepository = $templatesRepository;
         $this->layoutsRepository = $layoutsRepository;
         $this->listsRepository = $listsRepository;
@@ -57,6 +61,8 @@ class NovydenikNewsfilterTemplateFormFactory
 
         $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
+        $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
+
         $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
 
         $form->addSelect('mail_type_id', 'Type', $mailTypes)
@@ -71,11 +77,14 @@ class NovydenikNewsfilterTemplateFormFactory
 
         $form->addHidden('html_content');
         $form->addHidden('text_content');
+        $form->addHidden('locked_html_content');
+        $form->addHidden('locked_text_content');
 
         $defaults = [
             'name' => 'Newsfilter ' . date('j.n.Y'),
             'code' => 'nwsf_' . date('dmY'),
             'mail_layout_id' => 2, // empty layout
+            'locked_mail_layout_id' => 2, // empty layout
             'mail_type_id' => 6, // newsfilter,
             'from' => 'Nový deník <info@novydenik.cz>',
         ];
@@ -143,10 +152,16 @@ class NovydenikNewsfilterTemplateFormFactory
         };
 
         $generate(
+            $values['locked_html_content'],
+            $values['locked_text_content'],
+            $values['locked_mail_layout_id'],
+            $this->inactiveUsersSegment
+        );
+        $generate(
             $values['html_content'],
             $values['text_content'],
             $values['mail_layout_id'],
-            $this->usersSegment
+            $this->activeUsersSegment
         );
 
         $this->onSave->__invoke();

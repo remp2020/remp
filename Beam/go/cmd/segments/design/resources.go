@@ -282,6 +282,45 @@ var _ = Resource("pageviews", func() {
 			}))
 		})
 	})
+	Action("avg", func() {
+		Description("Returns avg of amounts within events")
+		Payload(PageviewOptionsPayload)
+		Routing(POST("/actions/:action/avg"))
+		Params(func() {
+			Param("action", String, "Identification of pageview action", func() {
+				Enum("timespent")
+			})
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Avg, func() {
+				View("default")
+			}))
+		})
+	})
+	Action("unique", func() {
+		Description("Returns unique count of amounts within events")
+		Payload(PageviewOptionsPayload)
+		Routing(POST("/actions/:action/unique/:item"))
+		Params(func() {
+			Param("action", String, "Identification of pageview action", func() {
+				Enum("load")
+			})
+			Param("item", String, "Identification of queried unique items", func() {
+				Enum("browsers")
+			})
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
 	Action("list", func() {
 		Description("Returns full list of pageviews")
 		Routing(POST("/list"))
@@ -304,5 +343,22 @@ var _ = Resource("pageviews", func() {
 			Param("category", String, "Category under which the actions were tracked")
 		})
 		Response(OK, ArrayOf(String))
+	})
+})
+
+var _ = Resource("concurrents", func() {
+	Description("Show recent concurrent connections")
+	BasePath("/journal/concurrents")
+	NoSecurity()
+
+	Action("count", func() {
+		Description("Returns recent concurrent connections identified by browser id")
+		Payload(ConcurrentsOptionsPayload)
+		Routing(POST("/count"))
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
 	})
 })

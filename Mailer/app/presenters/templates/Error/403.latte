@@ -1,7 +1,21 @@
-{block content}
-<h1 n:block=title>Access Denied</h1>
+{layout '../@layout.latte'}
 
-<p>You do not have permission to view this page. Please try contact the web
-site administrator if you believe you should be able to view this page.</p>
+{block #content}
 
-<p><small>error 403</small></p>
+<div class="c-header">
+    <h2>Error</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-lg-4">
+                <h2 n:block="title">403 Access Denied
+                    <small>
+                        You do not have permission to view this page. Please try contact the web
+                        site administrator if you believe you should be able to view this page.
+                    </small>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>

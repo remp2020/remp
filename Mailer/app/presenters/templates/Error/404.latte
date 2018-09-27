@@ -1,8 +1,22 @@
-{block content}
-<h1 n:block=title>Page Not Found</h1>
+{layout '../@layout.latte'}
 
-<p>The page you requested could not be found. It is possible that the address is
-incorrect, or that the page no longer exists. Please use a search engine to find
-what you are looking for.</p>
+{block #content}
 
-<p><small>error 404</small></p>
+<div class="c-header">
+    <h2>Error</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-lg-4">
+                <h2 n:block="title">404 Page Not Found
+                    <small>
+                        The page you requested could not be found. It is possible that the address is
+                        incorrect, or that the page no longer exists. Please use a search engine to find
+                        what you are looking for.
+                    </small>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
