@@ -230,6 +230,134 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 	return src, ok, nil
 }
 
+// avgRowCollectionFromAggregations generates AvgRowCollection based on query result aggregations.
+func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, avgField string) (AvgRowCollection, bool, error) {
+	var src AvgRowCollection
+	tags := make(map[string]string)
+
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+
+		var histogram []HistogramItem
+		// in case of histogram, total avg value is 0 since it cannot be simply computed as average of averages
+		var avgValue float64
+
+		if options.TimeHistogram != nil {
+			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
+			if !ok {
+				return errors.New("missing expected histogram aggregation data")
+			}
+
+			for _, histogramItem := range histogramData.Buckets {
+				avgAggLabel := fmt.Sprintf("%s_avg", avgField)
+				agg, ok := histogramItem.Aggregations.Avg(avgAggLabel)
+				if !ok {
+					return errors.New("unable to retrieve average value from histogram data")
+				}
+
+				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+				histogram = append(histogram, HistogramItem{
+					Time:  time,
+					Value: float64(*agg.Value),
+				})
+			}
+		} else {
+			avgAgg, ok := aggregations.Avg(targetAgg)
+			if !ok {
+				return nil
+			}
+
+			if avgAgg.Value != nil {
+				avgValue = *avgAgg.Value
+			}
+		}
+
+		srcTags := make(map[string]string)
+		// copy tags to avoid memory sharing
+		for key, val := range tags {
+			srcTags[key] = val
+		}
+
+		src = append(src, AvgRow{
+			Tags:      srcTags,
+			Avg:       avgValue,
+			Histogram: histogram,
+		})
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	ok := len(src) > 0
+	return src, ok, nil
+}
+
+// uniqueRowCollectionFromAggregations generates CountRowCollection based on query result aggregations.
+func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, uniqueField string) (CountRowCollection, bool, error) {
+	var src CountRowCollection
+	tags := make(map[string]string)
+
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+
+		var histogram []HistogramItem
+		// in case of histogram, total count will be 0 since we cannot compute distinc values from histogram buckets
+		var countValue float64
+
+		if options.TimeHistogram != nil {
+			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
+			if !ok {
+				return errors.New("missing expected histogram aggregation data")
+			}
+
+			for _, histogramItem := range histogramData.Buckets {
+				uniqueAggLabel := fmt.Sprintf("%s_unique", uniqueField)
+				agg, ok := histogramItem.Aggregations.Cardinality(uniqueAggLabel)
+				if !ok {
+					return errors.New("Unable to retrieve cardinality value from histogram data")
+				}
+
+				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+				histogram = append(histogram, HistogramItem{
+					Time:  time,
+					Value: float64(*agg.Value),
+				})
+			}
+		} else {
+			avgAgg, ok := aggregations.Cardinality(targetAgg)
+			if !ok {
+				return nil
+			}
+
+			if avgAgg.Value != nil {
+				countValue = *avgAgg.Value
+			}
+		}
+
+		srcTags := make(map[string]string)
+		// copy tags to avoid memory sharing
+		for key, val := range tags {
+			srcTags[key] = val
+		}
+
+		src = append(src, CountRow{
+			Tags:      srcTags,
+			Count:     int(countValue),
+			Histogram: histogram,
+		})
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	ok := len(src) > 0
+	return src, ok, nil
+}
+
 // addCompositeGroupBy creates a composite aggregation. The results are fetchable
 // via countRowCollectionFromCompositeBuckets or sumRowCollectionFromCompositeBuckets.
 func (eDB *ElasticDB) addCompositeGroupBy(search *elastic.SearchService, index string, o AggregateOptions) (*elastic.SearchService, error) {

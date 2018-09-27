@@ -2,12 +2,8 @@
 
 namespace App\Contracts;
 
-class JournalAggregateRequest
+class JournalConcurrentsRequest
 {
-    protected $category;
-
-    protected $action;
-
     protected $filterBy = [];
 
     protected $groupBy = [];
@@ -15,14 +11,6 @@ class JournalAggregateRequest
     protected $timeBefore;
 
     protected $timeAfter;
-
-    protected $timeHistogram = [];
-
-    public function __construct($category, $action)
-    {
-        $this->category = $category;
-        $this->action = $action;
-    }
 
     public function addFilter(string $tag, string ...$values)
     {
@@ -40,15 +28,6 @@ class JournalAggregateRequest
         $this->groupBy = array_merge($this->groupBy, $tags);
     }
 
-    public function setTimeHistogram(string $interval, string $offset) : JournalAggregateRequest
-    {
-        $this->timeHistogram = [
-            'interval' => $interval,
-            'offset' => $offset
-        ];
-        return $this;
-    }
-
     public function setTimeBefore(\DateTime $timeBefore)
     {
         $this->timeBefore = $timeBefore;
@@ -57,16 +36,6 @@ class JournalAggregateRequest
     public function setTimeAfter(\DateTime $timeAfter)
     {
         $this->timeAfter = $timeAfter;
-    }
-
-    public function buildUrl($template): string
-    {
-        return sprintf($template, $this->category, $this->action);
-    }
-
-    public function buildUrlWithItem($template, $item): string
-    {
-        return sprintf($template, $this->category, $this->action, $item);
     }
 
     public function getFilterBy(): array
@@ -87,10 +56,5 @@ class JournalAggregateRequest
     public function getTimeAfter(): ?\DateTime
     {
         return $this->timeAfter;
-    }
-
-    public function getTimeHistogram(): array
-    {
-        return $this->timeHistogram;
     }
 }

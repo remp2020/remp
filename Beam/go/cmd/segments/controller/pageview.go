@@ -25,13 +25,6 @@ func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
 	o.Action = ctx.Action
 
-	if ctx.Payload.TimeHistogram != nil {
-		o.TimeHistogram = &model.TimeHistogram{
-			Interval: ctx.Payload.TimeHistogram.Interval,
-			Offset:   ctx.Payload.TimeHistogram.Offset,
-		}
-	}
-
 	crc, ok, err := c.PageviewStorage.Count(o)
 	if err != nil {
 		return err
@@ -55,13 +48,6 @@ func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
 	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
 	o.Action = ctx.Action
 
-	if ctx.Payload.TimeHistogram != nil {
-		o.TimeHistogram = &model.TimeHistogram{
-			Interval: ctx.Payload.TimeHistogram.Interval,
-			Offset:   ctx.Payload.TimeHistogram.Offset,
-		}
-	}
-
 	src, ok, err := c.PageviewStorage.Sum(o)
 	if err != nil {
 		return err
@@ -77,6 +63,52 @@ func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
 	}
 
 	asrc := SumRowCollection(src).ToMediaType()
+	return ctx.OK(asrc)
+}
+
+// Avg runs the avg action.
+func (c *PageviewController) Avg(ctx *app.AvgPageviewsContext) error {
+	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o.Action = ctx.Action
+
+	src, ok, err := c.PageviewStorage.Avg(o)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		sr := model.AvgRow{
+			Tags: make(map[string]string),
+			Avg:  0,
+		}
+		src = model.AvgRowCollection{}
+		src = append(src, sr)
+	}
+
+	asrc := AvgRowCollection(src).ToMediaType()
+	return ctx.OK(asrc)
+}
+
+// Unique runs the cardinality count action.
+func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
+	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o.Action = ctx.Action
+
+	src, ok, err := c.PageviewStorage.Unique(o, ctx.Item)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		sr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
+		}
+		src = model.CountRowCollection{}
+		src = append(src, sr)
+	}
+
+	asrc := CountRowCollection(src).ToMediaType()
 	return ctx.OK(asrc)
 }
 
@@ -132,6 +164,13 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) mo
 	}
 	if payload.TimeBefore != nil {
 		o.TimeBefore = *payload.TimeBefore
+	}
+
+	if payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: payload.TimeHistogram.Interval,
+			Offset:   payload.TimeHistogram.Offset,
+		}
 	}
 
 	return o

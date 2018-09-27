@@ -73,10 +73,11 @@ func main() {
 	var eventStorage model.EventStorage
 	var pageviewStorage model.PageviewStorage
 	var commerceStorage model.CommerceStorage
+	var concurrentsStorage model.ConcurrentsStorage
 
 	switch c.EventStorage {
 	case "", "elastic":
-		eventStorage, pageviewStorage, commerceStorage, err = initElasticEventStorages(ctx, c)
+		eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c)
 	case "influx":
 		eventStorage, pageviewStorage, commerceStorage, err = initInfluxEventStorages(ctx, c)
 	default:
@@ -155,6 +156,7 @@ func main() {
 	app.MountCommerceController(service, controller.NewCommerceController(service, commerceStorage))
 	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewStorage))
 	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage))
+	app.MountConcurrentsController(service, controller.NewConcurrentsController(service, concurrentsStorage))
 
 	// server init
 
@@ -183,7 +185,7 @@ func main() {
 	service.LogInfo("bye bye")
 }
 
-func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
+func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
 	eopts := []elastic.ClientOptionFunc{
 		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
 		elastic.SetURL(c.ElasticAddr),
@@ -200,7 +202,7 @@ func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage
 	}
 	ec, err := elastic.NewClient(eopts...)
 	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "unable to initialize elasticsearch client")
+		return nil, nil, nil, nil, errors.Wrap(err, "unable to initialize elasticsearch client")
 	}
 	elasticDB := model.NewElasticDB(ctx, ec, c.Debug)
 
@@ -213,8 +215,11 @@ func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage
 	pageviewStorage := &model.PageviewElastic{
 		DB: elasticDB,
 	}
+	concurrentsStorage := &model.ConcurrentElastic{
+		DB: elasticDB,
+	}
 
-	return eventStorage, pageviewStorage, commerceStorage, nil
+	return eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, nil
 }
 
 func initInfluxEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
