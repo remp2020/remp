@@ -117,7 +117,7 @@
         if (value) {
             let start = moment(value)
             let end = start.clone().add(intervalMinutes, 'm')
-            return start.format('YYYY-MM-DD HH:mm') + " - " + end.format('HH:mm')
+            return start.format('ll HH:mm') + " - " + end.format('HH:mm')
         }
     })
 
