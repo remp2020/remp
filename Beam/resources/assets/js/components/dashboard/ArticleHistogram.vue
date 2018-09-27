@@ -20,7 +20,11 @@
                         <th>Value</th>
                     </tr>
                     <tr v-for="item in highlightedRow.values">
-                        <td><span style="font-weight: bold" v-bind:style="{color: item.color}">&#9679;</span>&nbsp;{{item.tag}}</td>
+                        <td>
+                            <span style="font-weight: bold" v-bind:style="{color: item.color}">&#9679;</span>&nbsp;
+                            <span v-if="item.tag==''">Uncategorized</span>
+                            <span v-else style="text-transform: capitalize">{{item.tag}}</span>
+                        </td>
                         <td>{{item.value}}</td>
                     </tr>
                     <tr style="border-top: 1px solid #d1d1d1">
