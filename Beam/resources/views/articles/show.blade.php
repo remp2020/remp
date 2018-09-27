@@ -90,12 +90,12 @@
                             <dd>{{number_format($conversionRate, 2)}} %</dd>
                         </dl>
                         <dl class="dl-horizontal">
-                            <dt>New subscriptions</dt>
-                            <dd>{{$newSubscriptionsCount}}</dd>
+                            <dt>New conversions</dt>
+                            <dd>{{$newConversionsCount}}</dd>
                         </dl>
                         <dl class="dl-horizontal">
-                            <dt><span data-toggle="tooltip" data-placement="top" title="" data-original-title="Users who already had a subscription in the past">Renewed subscriptions</span></dt>
-                            <dd>{{$renewSubscriptionsCount}}</dd>
+                            <dt><span data-toggle="tooltip" data-placement="top" title="" data-original-title="Users who already had a subscription in the past">Renewed conversions</span></dt>
+                            <dd>{{$renewedConversionsCount}}</dd>
                         </dl>
                     </div>
                 </div>
