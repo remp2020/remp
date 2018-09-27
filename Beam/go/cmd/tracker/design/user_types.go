@@ -136,3 +136,12 @@ var Revenue = Type("Revenue", func() {
 
 	Required("amount", "currency")
 })
+
+var Entity = Type("Entity", func() {
+	Attribute("system", System)
+	Attribute("entity", func() {
+		Attribute("id", String)
+		Attribute("name", String)
+		Attribute("data", HashOf(String, Any))
+	})
+})

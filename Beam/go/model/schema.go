@@ -6,14 +6,13 @@ import (
 	"reflect"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/goadesign/goa"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
 // SchemaStorage represents schemas storage interaface.
 type SchemaStorage interface {
-	Get(entityName string) *EntitySchema
+	Get(entityName string) (*EntitySchema, bool, error)
 }
 
 // EntitySchema structure
@@ -55,7 +54,7 @@ func (esDB *EntitySchemaDB) Get(Name string) (*EntitySchema, bool, error) {
 }
 
 // Cache stores the schemas in memory.
-func (esDB *EntitySchemaDB) Cache(service *goa.Service) error {
+func (esDB *EntitySchemaDB) Cache() error {
 	esm := make(map[string]*EntitySchema)
 	esc := EntitySchemaCollection{}
 
@@ -71,10 +70,6 @@ func (esDB *EntitySchemaDB) Cache(service *goa.Service) error {
 	}
 	if !reflect.DeepEqual(esDB.EntitySchemas, esm) {
 		log.Println("property cache reloaded")
-	}
-
-	for _, sch := range esm {
-		service.LogInfo("cache ent sch", sch.Name, sch.Schema)
 	}
 
 	esDB.EntitySchemas = esm
