@@ -38,7 +38,9 @@
                             <td>
                                 <span v-if="highlightedRow.hasCurrent"
                                              style="font-weight: bold"
-                                             v-bind:style="{color: item.color}">&#9679;</span> {{tag}}
+                                             v-bind:style="{color: item.color}">&#9679;</span>
+                                <span v-if="tag==''">Uncategorized</span>
+                                <span v-else style="text-transform: capitalize">{{tag}}</span>
                             </td>
                             <td v-if="highlightedRow.hasCurrent">{{item.current}}</td>
                             <td v-if="highlightedRow.hasPrevious">{{item.previous}}</td>
