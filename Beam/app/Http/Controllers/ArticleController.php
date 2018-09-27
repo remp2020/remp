@@ -102,7 +102,7 @@ class ArticleController extends Controller
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::link($article->url, $article->title);
+                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
@@ -176,7 +176,7 @@ class ArticleController extends Controller
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::link($article->url, $article->title);
+                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->addColumn('avg_sum_all', function (Article $article) {
                 if (!$article->timespent_all || !$article->pageviews_all) {
