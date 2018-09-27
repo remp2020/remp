@@ -183,20 +183,22 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 				return errors.New("missing expected histogram aggregation data")
 			}
 
-			for _, histogramItem := range histogramData.Buckets {
-				sumAggLabel := fmt.Sprintf("%s_sum", sumField)
-				agg, ok := histogramItem.Aggregations.Sum(sumAggLabel)
-				if !ok {
-					return errors.New("cant find timespent_sum sub agg in date histogram agg")
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					sumAggLabel := fmt.Sprintf("%s_sum", sumField)
+					agg, ok := histogramItem.Aggregations.Sum(sumAggLabel)
+					if !ok {
+						return errors.New("cant find timespent_sum sub agg in date histogram agg")
+					}
+
+					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(*agg.Value),
+					})
+
+					sumValue += float64(*agg.Value)
 				}
-
-				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
-				histogram = append(histogram, HistogramItem{
-					Time:  time,
-					Value: float64(*agg.Value),
-				})
-
-				sumValue += float64(*agg.Value)
 			}
 		} else {
 			sumAgg, ok := aggregations.Sum(targetAgg)
@@ -249,18 +251,20 @@ func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchRes
 				return errors.New("missing expected histogram aggregation data")
 			}
 
-			for _, histogramItem := range histogramData.Buckets {
-				avgAggLabel := fmt.Sprintf("%s_avg", avgField)
-				agg, ok := histogramItem.Aggregations.Avg(avgAggLabel)
-				if !ok {
-					return errors.New("unable to retrieve average value from histogram data")
-				}
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					avgAggLabel := fmt.Sprintf("%s_avg", avgField)
+					agg, ok := histogramItem.Aggregations.Avg(avgAggLabel)
+					if !ok {
+						return errors.New("unable to retrieve average value from histogram data")
+					}
 
-				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
-				histogram = append(histogram, HistogramItem{
-					Time:  time,
-					Value: float64(*agg.Value),
-				})
+					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(*agg.Value),
+					})
+				}
 			}
 		} else {
 			avgAgg, ok := aggregations.Avg(targetAgg)
@@ -313,18 +317,20 @@ func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.Search
 				return errors.New("missing expected histogram aggregation data")
 			}
 
-			for _, histogramItem := range histogramData.Buckets {
-				uniqueAggLabel := fmt.Sprintf("%s_unique", uniqueField)
-				agg, ok := histogramItem.Aggregations.Cardinality(uniqueAggLabel)
-				if !ok {
-					return errors.New("Unable to retrieve cardinality value from histogram data")
-				}
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					uniqueAggLabel := fmt.Sprintf("%s_unique", uniqueField)
+					agg, ok := histogramItem.Aggregations.Cardinality(uniqueAggLabel)
+					if !ok {
+						return errors.New("Unable to retrieve cardinality value from histogram data")
+					}
 
-				time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
-				histogram = append(histogram, HistogramItem{
-					Time:  time,
-					Value: float64(*agg.Value),
-				})
+					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(*agg.Value),
+					})
+				}
 			}
 		} else {
 			avgAgg, ok := aggregations.Cardinality(targetAgg)
