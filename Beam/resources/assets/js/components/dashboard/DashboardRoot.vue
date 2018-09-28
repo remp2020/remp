@@ -97,7 +97,7 @@
         props: props,
         created() {
             this.loadData()
-            setInterval(this.loadData, 20000)
+            setInterval(this.loadData, 10000)
         },
         destroyed() {
             clearInterval(this.loadData)
