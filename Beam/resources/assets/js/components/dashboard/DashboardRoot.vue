@@ -25,7 +25,7 @@
                                         <th style="width: 40px">Concurrents</th>
                                         <th style="text-align: left">Article</th>
                                         <th style="width: 40px">Engaged Time</th>
-                                        <th style="width: 40px">Conversions</th>
+                                        <th style="">Conversions rate</th>
                                         <th style="width: 40px">Unique browsers</th>
                                     </tr>
                                 </thead>
@@ -49,7 +49,10 @@
                                             {{ article.avg_timespent_string || '' }}
                                         </td>
                                         <td>
-                                            {{ article.conversions_count }}
+                                            <template v-if="!article.landing_page">
+                                                {{ article.conversion_rate }}
+                                                <br /><small>({{ article.conversions_count }} total)</small>
+                                            </template>
                                         </td>
                                         <td>
                                             {{ article.unique_browsers_count }}
