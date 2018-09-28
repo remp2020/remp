@@ -1,6 +1,6 @@
 <template>
     <div class="card card-chart">
-        <div v-if="error" class="error" :title="error">!</div>
+        <div v-if="error" class="error" :title="error"></div>
 
         <div class="card-header">
             <h4>Page Loads by Traffic Source</h4>
