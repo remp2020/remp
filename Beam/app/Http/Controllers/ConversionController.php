@@ -47,7 +47,7 @@ class ConversionController extends Controller
 
         return $datatables->of($conversions)
             ->addColumn('article.title', function (Conversion $conversion) {
-                return \HTML::link($conversion->article->url, $conversion->article->title);
+                return \HTML::link(route('articles.show', ['article' => $conversion->article->id]), $conversion->article->title);
             })
             ->filterColumn('article.authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
