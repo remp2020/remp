@@ -6,6 +6,7 @@ use App\Article;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalConcurrentsRequest;
 use App\Contracts\JournalContract;
+use App\Contracts\JournalHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -23,16 +24,6 @@ class DashboardController extends Controller
     public function index()
     {
         return view('dashboard.index');
-    }
-
-    private function getTimeIterator(Carbon $timeAfter, int $intervalMinutes): Carbon
-    {
-        // iterator has to be the earliest start of the interval (of $intervalMinutes) that includes $timeAfter
-        $timeIterator = (clone $timeAfter)->startOfDay();
-        while ($timeIterator->lessThanOrEqualTo($timeAfter)) {
-            $timeIterator->addMinutes($intervalMinutes);
-        }
-        return $timeIterator->subMinutes($intervalMinutes);
     }
 
     private function getJournalParameters($interval, $tz)
@@ -95,7 +86,7 @@ class DashboardController extends Controller
         $results = [];
         $previousResults = [];
         $previousResultsSummed = [];
-        $timeIterator = $this->getTimeIterator($timeAfter, $intervalMinutes);
+        $timeIterator = JournalHelpers::getTimeIterator($timeAfter, $intervalMinutes);
 
         $emptyValues = collect($tags)->mapWithKeys(function ($item) {
             return [$item => 0];

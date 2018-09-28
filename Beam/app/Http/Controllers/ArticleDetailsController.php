@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
+use App\Contracts\JournalHelpers;
 use App\Http\Resources\ArticleResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -40,16 +41,6 @@ class ArticleDetailsController extends Controller
         } else { // 1+ year
             return ["24h", 1440];
         }
-    }
-
-    private function getElasticTimeIterator(Carbon $timeAfter, int $intervalMinutes): Carbon
-    {
-        // iterator has to be the earliest start of the interval (of $intervalMinutes) that includes $timeAfter
-        $timeIterator = (clone $timeAfter)->startOfDay();
-        while ($timeIterator->lessThanOrEqualTo($timeAfter)) {
-            $timeIterator->addMinutes($intervalMinutes);
-        }
-        return $timeIterator->subMinutes($intervalMinutes);
     }
 
     public function timeHistogram(Article $article, Request $request)
@@ -106,7 +97,8 @@ class ArticleDetailsController extends Controller
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
         $results = [];
-        $timeIterator = $this->getElasticTimeIterator($timeAfter, $intervalMinutes);
+        $timeIterator = JournalHelpers::getTimeIterator($timeAfter, $intervalMinutes);
+
         while ($timeIterator->lessThan($timeBefore)) {
             $zuluDate = $timeIterator->toIso8601ZuluString();
             $results[$zuluDate] = collect($tags)->mapWithKeys(function ($item) {
@@ -125,8 +117,7 @@ class ArticleDetailsController extends Controller
             $currentTag = $records->tags->derived_referer_medium;
 
             foreach ($records->time_histogram as $timeValue) {
-                // take 4 and less as 0 (Elastic might return approximate results)
-                $results[$timeValue->time][$currentTag] = $timeValue->value < 5 ? 0 : $timeValue->value;
+                $results[$timeValue->time][$currentTag] = $timeValue->value;
             }
         }
         $results = array_values($results);
