@@ -4,7 +4,7 @@
             <div class="col-sm-12 col-md-8 variant-chart-wrap">
                 <chart
                     :name="'variant-stats-chart-' + variant.id"
-                    :title="'Variant: ' + variantName + ' <small>(' + variant.proportion + '%)</small>'"
+                    :title="chartTitle"
                     :height="400"
                     :loading="loading"
                     :error="error"
@@ -87,6 +87,14 @@
                 type: Object,
                 required: true
             },
+            variantBannerLink: {
+                type: String,
+                required: false
+            },
+            variantBannerText: {
+                type: String,
+                required: false
+            },
             data: {
                 type: Object,
                 required: true,
@@ -127,7 +135,17 @@
                 }
 
                 return 'Control Group'
-            }
+            },
+            chartTitle() {
+                if (this.variantBannerLink) {
+                    let title = "Variant: <a href=\"" + this.variantBannerLink + "\">" + this.variantName + "</a> <small>(" + this.variant.proportion + "%)</small>";
+                    if (this.variantBannerText) {
+                        title += "<br/><small><em>" + this.variantBannerText + "</em></small>";
+                    }
+                    return title;
+                }
+                return "Variant: " + this.variantName + " <small>(" + this.variant.proportion + "%)</small>";
+            },
         },
         watch: {
             data(data) {

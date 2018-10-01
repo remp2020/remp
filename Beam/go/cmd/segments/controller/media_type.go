@@ -52,6 +52,12 @@ type SumRow model.SumRow
 // SumRowCollection is the collection of sum rows.
 type SumRowCollection model.SumRowCollection
 
+// AvgRow represent row with sum result.
+type AvgRow model.AvgRow
+
+// AvgRowCollection is the collection of sum rows.
+type AvgRowCollection model.AvgRowCollection
+
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() *app.Segment {
 	return &app.Segment{
@@ -356,6 +362,37 @@ func (src SumRowCollection) ToMediaType() app.SumCollection {
 	mt := app.SumCollection{}
 	for _, c := range src {
 		mtc := (SumRow)(c).ToMediaType()
+		mt = append(mt, mtc)
+	}
+	return mt
+}
+
+// ToMediaType converts internal AvgRow representation to application one.
+func (ar AvgRow) ToMediaType() *app.Avg {
+	thc := app.TimeHistogramCollection{}
+
+	for _, c := range ar.Histogram {
+		hi := (HistogramItem)(c).ToMediaType()
+		thc = append(thc, hi)
+	}
+
+	if len(ar.Tags) == 0 {
+		ar.Tags = nil
+	}
+
+	mt := &app.Avg{
+		Avg:           ar.Avg,
+		Tags:          ar.Tags,
+		TimeHistogram: thc,
+	}
+	return mt
+}
+
+// ToMediaType converts internal AvgRowCollection representation to application one.
+func (arc AvgRowCollection) ToMediaType() app.AvgCollection {
+	mt := app.AvgCollection{}
+	for _, c := range arc {
+		mtc := (AvgRow)(c).ToMediaType()
 		mt = append(mt, mtc)
 	}
 	return mt

@@ -59,6 +59,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $transport = $this->transport;
 
         $post = $values->newsfilter_html;
+        $lockedPost = $this->getLockedHtml($values->newsfilter_html);
 
         list(
             $captionTemplate,
@@ -74,7 +75,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             // remove shortcodes
             "/\[greybox\]/is" => "",
             "/\[\/greybox\]/is" => "",
-            "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
+            "/https:\/\/novydenik\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
             "/\[pullboth.*?\/pullboth\]/is" => "",
             "/<script.*?\/script>/is" => "",
             "/\[iframe.*?\]/is" => "",
@@ -101,23 +102,23 @@ class NovydenikNewsfilterGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
-                $url = "https://dennikn.sk/{$matches[1]}";
+            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use ($content, $transport) {
+                $url = "https://novydenik.cz/{$matches[1]}";
                 $meta = Utils::fetchUrlMeta($url, $content, $transport);
-                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
+                return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#b00c28;text-decoration:none;">$2</a>',
+            '/<a(?!.*skipregex).*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:#b00c28;text-decoration:none;">$2</a>',
 
             // replace h2
-            '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
+            '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
 
             // replace images
             '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
 
             // replace ul & /ul
-            '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
+            '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
 
             '/<\/ul>/is' => '</tbody></table>' . PHP_EOL,
 
@@ -139,14 +140,18 @@ class NovydenikNewsfilterGenerator implements IGenerator
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
                 $post = preg_replace_callback($rule, $replace, $post);
+                $lockedPost = preg_replace_callback($rule, $replace, $lockedPost);
             } else {
                 $post = preg_replace($rule, $replace, $post);
+                $lockedPost = preg_replace($rule, $replace, $lockedPost);
             }
         }
         // wrap text in paragraphs
         $post = $this->helpers->wpautop($post);
+        $lockedPost = $this->helpers->wpautop($lockedPost);
 
         $post = str_replace('<p>', '<p style="font-weight: normal;">', $post);
+        $lockedPost = str_replace('<p>', '<p style="font-weight: normal;">', $lockedPost);
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
@@ -160,10 +165,19 @@ class NovydenikNewsfilterGenerator implements IGenerator
             'html' => $post,
             'text' => strip_tags($post),
         ];
+        $lockedParams = [
+            'title' => $values->title,
+            'editor' => $values->editor,
+            'summary' => $values->summary,
+            'html' => $lockedPost,
+            'text' => strip_tags($lockedPost),
+        ];
 
         $output = [];
         $output['htmlContent'] = $twig->render('html_template', $params);
         $output['textContent'] = $twig->render('text_template', $params);
+        $output['lockedHtmlContent'] = $twig->render('html_template', $lockedParams);
+        $output['lockedTextContent'] = $twig->render('text_template', $lockedParams);
         return $output;
     }
 
@@ -172,6 +186,8 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $output = $this->process($values);
 
         $addonParams = [
+            'lockedHtmlContent' => $output['lockedHtmlContent'],
+            'lockedTextContent' => $output['lockedTextContent'],
             'newsfilterTitle' => $values->title,
             'render' => true
         ];
@@ -210,6 +226,26 @@ class NovydenikNewsfilterGenerator implements IGenerator
     public function onSubmit(callable $onSubmit)
     {
         $this->onSubmit = $onSubmit;
+    }
+
+    private function getLockedHtml($fullHtml)
+    {
+        $newHtml = '';
+        $cacheHtml = '';
+        $promoButton = true;
+        foreach (explode("\n", $fullHtml) as $line) {
+            if (strpos($line, '<h3') !== false) {
+                if ($promoButton) {
+                    $cacheHtml .= <<<HTML
+<p><a data-skipregex="1" style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href="https://www.novydenik.cz">Staňte se předplatiteli a podpořte Nový deník</a></p>
+HTML;
+                    $promoButton = false;
+                }
+            }
+            $cacheHtml .= $line . "\n";
+        }
+        $newHtml .= $cacheHtml;
+        return $newHtml;
     }
 
 

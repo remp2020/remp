@@ -46,6 +46,21 @@ var Sum = MediaType("application/vnd.sum+json", func() {
 	Required("tags", "sum")
 })
 
+var Avg = MediaType("application/vnd.avg+json", func() {
+	Description("Avg")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("avg", Number)
+		Attribute("time_histogram", CollectionOf(TimeHistogram))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("avg")
+		Attribute("time_histogram")
+	})
+	Required("tags", "avg")
+})
+
 var Pageviews = MediaType("application/vnd.pageviews+json", func() {
 	Description("Pageviews")
 	Attributes(func() {

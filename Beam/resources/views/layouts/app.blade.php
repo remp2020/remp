@@ -99,6 +99,9 @@
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
         <ul class="main-menu">
+            <li {!! route_active(['dashboard']) !!}>
+                <a href="{{ route('dashboard.index') }}" ><i class="zmdi zmdi-chart"></i> Dashboard</a>
+            </li>
             <li {!! route_active(['accounts']) !!}>
                 <a href="{{ route('accounts.index') }}" ><i class="zmdi zmdi-cloud-box"></i> Accounts</a>
             </li>

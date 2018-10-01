@@ -73,8 +73,11 @@ class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
 
         $htmlContent = $request->getPost('html_content');
         $textContent = $request->getPost('text_content');
+        $lockedHtmlContent = $request->getPost('locked_html_content');
+        $lockedTextContent = $request->getPost('locked_text_content');
 
         $mailLayout = $this->layoutsRepository->find($_POST['mail_layout_id']);
+        $lockedMailLayout = $this->layoutsRepository->find($_POST['locked_mail_layout_id']);
         $mailType = $this->listsRepository->find($_POST['mail_type_id']);
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
@@ -104,13 +107,20 @@ class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
         $this->template->generatedHtml = $generatedHtml;
         $this->template->generatedText = $generatedText;
 
+        list($generatedLockedHtml, $generatedLockedText) = $generate($lockedHtmlContent, $lockedTextContent, $lockedMailLayout, $mailType);
+        $this->template->generatedLockedHtml = $generatedLockedHtml;
+        $this->template->generatedLockedText = $generatedLockedText;
+
         // Store data in session for full-screen preview
         $sessionSection = $this->session->getSection(MailGeneratorPresenter::SESSION_SECTION_CONTENT_PREVIEW);
         $sessionSection->generatedHtml = $generatedHtml;
+        $sessionSection->generatedLockedHtml = $generatedLockedHtml;
 
         $response = new JsonResponse([
             'generatedHtml' => $generatedHtml,
             'generatedText' => $generatedText,
+            'generatedLockedHtml' => $generatedLockedHtml,
+            'generatedLockedText' => $generatedLockedText,
         ]);
         $this->getPresenter()->sendResponse($response);
     }

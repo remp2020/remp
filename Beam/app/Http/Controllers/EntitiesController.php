@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\EntityParam;
 use Html;
 use App\Entity;
 use Illuminate\Http\Request;
@@ -23,8 +24,8 @@ class EntitiesController extends Controller
 
     public function json(Request $request, DataTables $datatables)
     {
-        $columns = ['id', 'schema', 'name'];
-        $entities = Entity::select($columns)->whereNotNull('parent_id');
+        $columns = ['id', 'name'];
+        $entities = Entity::select($columns)->with("params")->whereNotNull('parent_id');
 
         return $datatables->of($entities)
             ->addColumn('name', function (Entity $entity) {
@@ -33,11 +34,9 @@ class EntitiesController extends Controller
             ->addColumn('params', function (Entity $entity) {
                 $params = [];
 
-                foreach ($entity->schema->getParams() as $param) {
-                    $type = __("entities.types." . $param["type"]);
-                    $name = $param["name"];
-
-                    $params[] = "<strong>{$type}</strong>&nbsp;{$name}";
+                foreach ($entity->params as $param) {
+                    $type = __("entities.types." . $param->type);
+                    $params[] = "<strong>{$type}</strong>&nbsp;{$param->name}";
                 }
 
                 return $params;
@@ -74,11 +73,12 @@ class EntitiesController extends Controller
      *
      * @param  EntityRequest  $request
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function store(EntityRequest $request)
     {
-        $entity = new Entity($request->all());
-        $entity->save();
+        $entity = new Entity();
+        $entity = $this->saveEntity($entity, $request);
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -100,6 +100,10 @@ class EntitiesController extends Controller
      */
     public function edit(Entity $entity)
     {
+        if ($entity->isRootEntity()) {
+            return response('Forbidden', 403);
+        }
+
         return view('entities.edit', [
             'entity' => $entity,
             'rootEntities' => Entity::where('parent_id', null)->get()
@@ -113,11 +117,11 @@ class EntitiesController extends Controller
      * @param  EntityRequest $request
      *
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function update(Entity $entity, EntityRequest $request)
     {
-        $entity->fill($request->all());
-        $entity->save();
+        $entity = $this->saveEntity($entity, $request);
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -157,5 +161,30 @@ class EntitiesController extends Controller
     public function validateForm(EntityRequest $request, Entity $entity = null)
     {
         return response()->json(false);
+    }
+
+    /**
+     * @param Entity $entity
+     * @param EntityRequest $request
+     * @return Entity
+     * @throws \Exception
+     */
+    public function saveEntity(Entity $entity, EntityRequest $request)
+    {
+        $entity->fill($request->all());
+        $entity->save();
+
+        $paramsToDelete = $request->get("params_to_delete") ?? [];
+        EntityParam::whereIn("id", $paramsToDelete)->delete();
+
+        $paramsData = $request->get("params") ?? [];
+        foreach ($paramsData as $paramData) {
+            $param = EntityParam::findOrNew($paramData["id"]);
+            $param->fill($paramData);
+            $param->entity()->associate($entity);
+            $param->save();
+        }
+
+        return $entity;
     }
 }

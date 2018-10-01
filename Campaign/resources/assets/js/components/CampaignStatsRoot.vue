@@ -12,6 +12,7 @@
             <campaign-stats-results
                 v-if="!error && loaded"
                 :variants="variants"
+                :variant-banner-links="variantBannerLinks"
                 :data="variantsData"
             ></campaign-stats-results>
 
@@ -20,6 +21,8 @@
                 :key="variant.id"
 
                 :variant="variant"
+                :variant-banner-link="variantBannerLinks[variant.id] || null"
+                :variant-banner-text="variantBannerTexts[variant.id] || null"
                 :data="variantsData[variant.id]"
                 :error="error"
                 :loading="loading"
@@ -46,6 +49,14 @@
         },
         variants: {
             type: Array,
+            required: true
+        },
+        variantBannerLinks: {
+            type: Object,
+            required: true
+        },
+        variantBannerTexts: {
+            type: Object,
             required: true
         },
         from: {

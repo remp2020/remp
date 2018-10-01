@@ -8,8 +8,8 @@
     let entity = {
         "parent_id": '{!! $entity->parent_id !!}' || null,
         "name": '{!! $entity->name !!}',
-        "params": {!! @json(array_values($entity->schema->getParams())) !!},
-        "types": {!! @json($entity->schema->getAllTypes()) !!},
+        "params": {!! @json($entity->params) !!},
+        "types": {!! @json(\App\EntityParam::getAllTypes()) !!},
         "rootEntities": {!! @json($rootEntities) !!} || null,
         "validateUrl": {!! @json(route('entities.validateForm', ['entity' => $entity])) !!}
     };
