@@ -8,10 +8,10 @@
                         <div class="card-header">
                             <h2 class="m-t-0">
                                 <div v-if="action == 'edit'">
-                                    Edit campaign
+                                    Edit entity
                                 </div>
                                 <div v-else>
-                                    Create campaign
+                                    Create entity
                                 </div>
 
                                 <small v-if="name">{{ name }}</small>
@@ -63,8 +63,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div><!-- #collapseOne -->
-                    </div><!-- .panel -->
+                        </div>
+                    </div>
 
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
@@ -87,10 +87,6 @@
                                             <th>
                                                 Type
                                             </th>
-                                            <th>
-                                                Enum
-                                            </th>
-                                            <th>&nbsp;</th>
                                             <th>&nbsp;</th>
                                         </tr>
                                     </thead>
@@ -104,14 +100,17 @@
                                         ></entity-param>
                                     </tbody>
                                 </table>
+                                <span class="btn btn-sm palette-Green bg waves-effect pull-right m-t-20" @click="addNewParam()">
+                                    <i class="zmdi zmdi-plus-square"></i>&nbsp;
+                                    Add Param
+                                </span>
                             </div>
-                        </div><!-- .collapse -->
-                    </div><!-- .panel -->
-                </div><!-- .panel-group -->
+                        </div>
+                    </div>
+                </div>
 
-            </div><!-- .col-md-12 -->
-        </div><!-- .row -->
-
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-md-4">
@@ -128,11 +127,12 @@
                     </div>
                 </div>
             </div>
-        </div><!-- .row -->
+        </div>
 
+        <input v-for="id in params_to_delete" type="hidden" name="params_to_delete[]" :value="id">
 
         <form-validator v-if="validateUrl" :url="validateUrl"></form-validator>
-    </div><!-- .container -->
+    </div>
 </template>
 
 <script>
@@ -177,6 +177,7 @@
                 "parent_id": null,
                 "name": null,
                 "params": {},
+                "params_to_delete": [],
                 "types": null,
                 "rootEntities": null,
                 "validateUrl": null,
@@ -216,15 +217,13 @@
             }
         },
         methods: {
-            removeParam(event, index) {
-                this.params.splice(index, 1);
-                event.preventDefault();
-            },
             addNewParam() {
                 this.params.push({
+                    id: null,
                     name: null,
                     type: null,
-                    uid: this.generateUid()
+                    uid: this.generateUid(),
+                    deleted_at: null
                 });
             },
             generateUid() {
@@ -240,14 +239,20 @@
     }
 
     .table-td-button {
-        width: 30px;
-    }
-
-    .table-td-enum-input {
-        width: 300px;
+        width: 71px;
     }
 
     .table-td-type {
-        width: 150px;
+        width: 200px;
+    }
+
+    .deleted-param {
+        -webkit-opacity: 0.4;
+        -moz-opacity: 0.4;
+        -ms-opacity: 0.4;
+        -o-opacity: 0.4;
+        -khtml-opacity: 0.4;
+        opacity: 0.4;
+        cursor: not-allowed;
     }
 </style>

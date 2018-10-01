@@ -1,40 +1,29 @@
 <template>
-    <tr>
+    <tr class="entity-param-row" :class="{ 'deleted-param': isDeleted }" :title="isDeleted ? 'Deleted' : ''">
         <td>
-            <input type="text" class="form-control" :name="'schema[' + index + '][name]'" v-model="name">
-        </td><!-- name -->
+            <input type="text" class="form-control" :name="'params[' + index + '][name]'" v-model="name" :disabled="isDeleted">
+
+            <input v-if="!isDeleted" type="hidden" :name="'params[' + index + '][id]'" :value="id">
+        </td>
 
         <td class="table-td-type">
             <v-select
                 id="param_type"
-                :name="'schema[' + index + '][type]'"
+                :name="'params[' + index + '][type]'"
                 v-model="type"
                 :options.sync="$parent.paramTypes"
+                :disabled="isDeleted"
             ></v-select>
-        </td><!-- type -->
-
-        <td class="table-td-enum-input">
-            <vue-tags-input
-                v-model="enumOption"
-                :tags="enumOptions"
-                :placeholder="'Add option'"
-                @tags-changed="newTags => enumOptions = newTags"
-            />
-
-            <input v-for="val in enumOptions" type="hidden" :name="'schema[' + index + '][enum][]'" :value="val.text">
-        </td><!-- enum -->
+        </td>
 
         <td class="table-td-button">
-            <span class="btn btn-sm palette-Red bg waves-effect m-t-10" @click="$parent.removeParam($event, index, name)">
+            <span v-if="$parent.params.length > 1"
+                  class="btn btn-sm palette-Red bg waves-effect"
+                  :class="{ hidden: isDeleted }"
+                  @click="removeParam($event, index)">
                 <i class="zmdi zmdi-minus-square"></i>
             </span>
-        </td><!-- remove -->
-
-        <td class="table-td-button">
-            <span class="btn btn-sm palette-Green bg waves-effect m-t-10" @click="$parent.addNewParam()" v-if="index == $parent.params.length - 1" >
-                <i class="zmdi zmdi-plus-square"></i>
-            </span>
-        </td><!-- remove -->
+        </td>
     </tr>
 </template>
 
@@ -52,25 +41,33 @@
             index: Number
         },
         mounted() {
+            this.id = this.param.id;
             this.type = this.param.type;
             this.name = this.param.name;
-            this.enumOptions = [];
-
-            if (this.param.enum) {
-                for (let ii = 0; ii < this.param.enum.length; ii++) {
-                    this.enumOptions.push({
-                        text: this.param.enum[ii]
-                    })
-                }
-            }
+            this.isDeleted = this.param.deleted_at !== null;
         },
         data() {
             return {
+                id: null,
                 name: null,
                 type: null,
-                enumOption: '',
-                enumOptions: []
+                isDeleted: false
             }
+        },
+        methods: {
+            removeParam(event, index) {
+                event.preventDefault();
+
+                // remove not existing param
+                if (this.id === null) {
+                    this.$parent.params.splice(index, 1);
+                    return;
+                }
+
+                // remove existing (saved) param
+                this.$parent.params_to_delete.push(this.id);
+                this.isDeleted = true;
+            },
         }
     }
 </script>
@@ -88,37 +85,7 @@
         width: 100%;
     }
 
-    .table-td-enum-input >>> .vue-tags-input {
-        background: none;
-    }
-
-    .table-td-enum-input >>> .new-tag-input {
-        font-size: 13px;
-        background: none;
-    }
-
-    .table-td-enum-input >>> .tag {
-        background-color: #00bcd4;
-    }
-    
-    .table-td-enum-input >>> .tag > .content {
-        font-size: 13px;
-    }
-
-    .table-td-enum-input >>> .input {
-        border: none;
-        border-bottom: 1px solid #e0e0e0 !important;
-        padding: 0;
-        background: none;
-    }
-
-    .table-td-enum-input >>> .new-tag-input-wrapper {
-        margin-left: 0;
-        margin-right: 0;
-        padding-right: 0;
-    }
-
-    .table-td-enum-input >>> .new-tag-input-wrapper > input::placeholder {
-        color: #999;
+    .entity-param-row > td {
+        min-height: 62px;
     }
 </style>
