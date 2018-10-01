@@ -29,12 +29,10 @@
 
 <script>
     import vSelect from "remp/js/components/vSelect";
-    import VueTagsInput from '@johmun/vue-tags-input';
 
     export default {
         components: {
-            vSelect,
-            VueTagsInput
+            vSelect
         },
         props: {
             param: Object,
