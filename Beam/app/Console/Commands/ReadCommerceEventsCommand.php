@@ -59,6 +59,7 @@ class ReadCommerceEventsCommand extends Command
                 'currency' => $message->purchase->revenue->currency,
                 'paid_at' => new Carbon($message->system->time),
                 'article_external_id' => $message->article->id,
+                'user_id' => $message->user->id,
             ]);
         }
     }

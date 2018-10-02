@@ -25,7 +25,7 @@
                                         <th style="width: 40px">Concurrents</th>
                                         <th style="text-align: left">Article</th>
                                         <th style="width: 40px">Engaged Time</th>
-                                        <th style="width: 40px">Conversions</th>
+                                        <th style="">Conversions rate</th>
                                         <th style="width: 40px">Unique browsers</th>
                                     </tr>
                                 </thead>
@@ -36,11 +36,12 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="c-black">{{article.title}}</span>
-                                            <br />
                                             <template v-if="article.landing_page">
+                                                <span class="c-black">{{article.title}}</span>
                                             </template>
                                             <template v-else>
+                                                <a class="c-black" :href="article.url">{{article.title}}</a>
+                                                <br />
                                                 <small>{{ article.published_at | relativeDate }}</small>
                                             </template>
                                         </td>
@@ -48,7 +49,10 @@
                                             {{ article.avg_timespent_string || '' }}
                                         </td>
                                         <td>
-                                            {{ article.conversions_count }}
+                                            <template v-if="!article.landing_page">
+                                                {{ article.conversion_rate }}
+                                                <br /><small>({{ article.conversions_count }} total)</small>
+                                            </template>
                                         </td>
                                         <td>
                                             {{ article.unique_browsers_count }}
@@ -96,7 +100,7 @@
         props: props,
         created() {
             this.loadData()
-            setInterval(this.loadData, 20000)
+            setInterval(this.loadData, 10000)
         },
         destroyed() {
             clearInterval(this.loadData)

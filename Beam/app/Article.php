@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class Article extends Model
 {
@@ -65,6 +66,36 @@ class Article extends Model
         }
         $this->attributes['published_at'] = new Carbon($value);
     }
+
+    public function loadNewConversionsCount()
+    {
+        $newSubscriptionsCountSql = <<<SQL
+        select count(*) as subscriptions_count from (
+            select c1.* from conversions c1
+            left join conversions c2
+            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at
+            where c2.id is Null
+            and c1.article_id = ?
+        ) t
+SQL;
+        return DB::select($newSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
+    }
+
+    public function loadRenewedConversionsCount()
+    {
+        $renewSubscriptionsCountSql = <<<SQL
+        select count(*) as subscriptions_count from (
+            select c1.user_id from conversions c1
+            left join conversions c2
+            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at and c2.id != c1.id
+            where c2.id is not Null
+            and c1.article_id = ?
+            group by user_id
+        ) t
+SQL;
+        return DB::select($renewSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
+    }
+
 
     /**
      * Check if Illuminate\Database\QueryException is Duplicate Entry Exception.

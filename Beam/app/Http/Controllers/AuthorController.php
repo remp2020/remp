@@ -208,7 +208,7 @@ class AuthorController extends Controller
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::link($article->url, $article->title);
+                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->addColumn('conversions_sum', function (Article $article) use ($conversions) {
                 if (!isset($conversions[$article->id])) {
