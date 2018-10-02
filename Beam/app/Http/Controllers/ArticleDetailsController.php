@@ -143,7 +143,7 @@ class ArticleDetailsController extends Controller
         $results = $this->journal->unique($uniqueRequest);
         $uniqueBrowsersCount = $results[0]->count;
 
-        $conversionRate = ($article->conversions()->count() / $uniqueBrowsersCount) * 100;
+        $conversionRate = $uniqueBrowsersCount == 0 ? 0 : ($article->conversions()->count() / $uniqueBrowsersCount) * 100;
 
         $newConversionsCount = $article->loadNewConversionsCount();
         $renewedConversionsCount = $article->loadRenewedConversionsCount();
