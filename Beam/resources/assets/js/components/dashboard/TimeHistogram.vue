@@ -167,7 +167,6 @@
         },
         methods: {
             reload() {
-                console.log('time-histogram reload')
                 clearInterval(loadDataTimer)
                 this.loadData()
                 loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
