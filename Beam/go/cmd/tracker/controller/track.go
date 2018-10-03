@@ -11,7 +11,6 @@ import (
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
 	"github.com/snowplow/referer-parser/go"
-	"github.com/xeipuuv/gojsonschema"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -21,7 +20,7 @@ type TrackController struct {
 	*goa.Controller
 	EventProducer   sarama.AsyncProducer
 	PropertyStorage model.PropertyStorage
-	SchemaStorage   model.SchemaStorage
+	Entities        model.Entities
 }
 
 // Event represents Influx event structure
@@ -33,12 +32,12 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ss model.SchemaStorage) *TrackController {
+func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, e model.Entities) *TrackController {
 	return &TrackController{
 		Controller:      service.NewController("TrackController"),
 		EventProducer:   ep,
 		PropertyStorage: ps,
-		SchemaStorage:   ss,
+		Entities:        e,
 	}
 }
 
@@ -224,37 +223,30 @@ func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
 
 	// try to get entity schema
 	entityName := *ctx.Payload.Entity.Name
-	schema, ok, err := c.SchemaStorage.Get(entityName)
+	schema, ok, err := c.Entities.Get(entityName)
 	if err != nil {
 		return err
 	}
-
 	if !ok {
 		return ctx.BadRequest(fmt.Errorf("can't find entity schema for entity '%v'", entityName))
 	}
 
-	// load payload json data
-	data := ctx.Payload.Entity.Data
-	dataLoader := gojsonschema.NewGoLoader(data)
-	schemaLoader := gojsonschema.NewStringLoader(schema.Schema)
-
-	result, err := gojsonschema.Validate(schemaLoader, dataLoader)
+	err = c.Entities.Validate(schema, ctx.Payload)
 	if err != nil {
 		return err
 	}
 
-	// send bad request response if json schema validation didnt pass
-	if !result.Valid() {
-		validationError := goa.ErrBadRequest(result.Errors()[0].String())
-		return ctx.BadRequest(validationError)
-	}
-
+	data := ctx.Payload.Entity.Data
 	tags := map[string]string{}
 
 	tags["remp_entity_id"] = *ctx.Payload.Entity.ID
 
 	// create point
 	p, err := influxClient.NewPoint("entities", tags, data)
+	if err != nil {
+		return err
+	}
+
 	c.EventProducer.Input() <- &sarama.ProducerMessage{
 		Topic: "beam_events",
 		Value: sarama.StringEncoder(p.String()),

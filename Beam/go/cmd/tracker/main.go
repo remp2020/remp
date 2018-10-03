@@ -114,28 +114,29 @@ func main() {
 		}
 	}()
 
-	schemaDB := &model.EntitySchemaDB{
+	entitySchemaDB := &model.EntitySchemaDB{
 		MySQL: mysqlDB,
 	}
 
+	// schemaTicker := time.NewTicker(5 * time.Minute)
 	schemaTicker := time.NewTicker(10 * time.Second)
 	defer schemaTicker.Stop()
 
-	cacheEntitySchemas := func() {
-		if err := schemaDB.Cache(); err != nil {
+	cacheEntities := func() {
+		if err := entitySchemaDB.Cache(); err != nil {
 			service.LogError("unable to cache entity schemas", "err", err)
 		}
 	}
 
 	wg.Add(1)
-	cacheEntitySchemas()
+	cacheEntities()
 	go func() {
 		defer wg.Done()
 		service.LogInfo("starting entity schemas caching")
 		for {
 			select {
 			case <-schemaTicker.C:
-				cacheEntitySchemas()
+				cacheEntities()
 			case <-ctx.Done():
 				service.LogInfo("entity schemas caching stopped")
 				return
@@ -150,7 +151,7 @@ func main() {
 		service,
 		eventProducer,
 		propertyDB,
-		schemaDB,
+		entitySchemaDB,
 	))
 
 	// server init
