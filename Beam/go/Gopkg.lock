@@ -209,24 +209,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/xeipuuv/gojsonpointer"
-  packages = ["."]
-  revision = "4e3ac2762d5f479393488629ee9370b50873b3a6"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/xeipuuv/gojsonreference"
-  packages = ["."]
-  revision = "bd5ef7bd5415a7ac448318e64f11a24cd21e594b"
-
-[[projects]]
-  name = "github.com/xeipuuv/gojsonschema"
-  packages = ["."]
-  revision = "da425ebb7609ba06a0f395fc8a254d1c303364a0"
-  version = "v1.0"
-
-[[projects]]
-  branch = "master"
   name = "github.com/zach-klippenstein/goregen"
   packages = ["."]
   revision = "795b5e3961ea1912fde60af417ad85e86acc0d6a"
@@ -267,6 +249,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b6dd3d07c85c6176f6cbf660f6cb1cd7480cecf363641c18ca6b1c8c387926af"
+  inputs-digest = "baffd6b585ab5f34f1d85bfe0bff79e856ecfabdd23995574326efe2fa98965d"
   solver-name = "gps-cdcl"
   solver-version = 1
