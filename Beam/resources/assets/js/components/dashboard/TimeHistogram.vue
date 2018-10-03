@@ -154,9 +154,7 @@
                 this.fillData()
             },
             interval(value) {
-                clearInterval(loadDataTimer)
-                this.loadData()
-                loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
+                this.reload()
             }
         },
         mounted() {
@@ -168,6 +166,12 @@
             }, 100));
         },
         methods: {
+            reload() {
+                console.log('time-histogram reload')
+                clearInterval(loadDataTimer)
+                this.loadData()
+                loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
+            },
             createGraph(){
                 container = this.$refs["svg-container"]
                 let outerWidth = container.clientWidth,
