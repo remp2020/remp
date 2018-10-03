@@ -1,10 +1,10 @@
 export const GRAPH_COLORS = [
-    "#eed075",
-    "#eb8459",
-    "#50c8c8",
-    "#d49bc4",
-    "#4c91b8",
-    "#3DF16D"
+    "#E63952",
+    "#00C7DF",
+    "#FFC34A",
+    "#DEDEDE",
+    "#CDE092",
+    "#3B40b6",
 ]
 
 export const REFRESH_DATA_TIMEOUT_MS = 30000
