@@ -44,6 +44,7 @@
                     'priority' => 2,
                 ],
                 'conversions_rate' => [
+                    'orderable' => false,
                     'header' => 'conversions rate',
                     'priority' => 2,
                 ],
