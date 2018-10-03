@@ -200,8 +200,10 @@ class DashboardController extends Controller
         })->pluck('article');
 
         // Timespent is computed as average of timespent values 2 hours in the past
-        $externalIdsToTimespent = $this->journalHelper->timespentForArticles($topArticles,
-            (clone $timeAfter)->subHours(2));
+        $externalIdsToTimespent = $this->journalHelper->timespentForArticles(
+            $topArticles,
+            (clone $timeAfter)->subHours(2)
+        );
 
         $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($topArticles);
 

@@ -120,7 +120,7 @@ class ArticleController extends Controller
                 return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
-            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount){
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount) {
                 $uniqueCount = $externalIdsToUniqueUsersCount->get($article->external_id, 0);
                 if ($uniqueCount === 0) {
                     return '';
