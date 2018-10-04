@@ -30,7 +30,7 @@
                                                 Conversions rate
                                             </abbr>
                                         </th>
-                                        <th style="width: 40px">Unique browsers</th>
+                                        <th style="width: 40px; text-align: right">Unique browsers</th>
                                     </tr>
                                 </thead>
                                 <tbody name="table-row" is="transition-group">
@@ -58,8 +58,8 @@
                                                 <br /><small>({{ article.conversions_count }} total)</small>
                                             </template>
                                         </td>
-                                        <td>
-                                            {{ article.unique_browsers_count }}
+                                        <td style="text-align: right">
+                                            {{ article.unique_browsers_count | formatNumber }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -68,7 +68,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
 </template>
@@ -147,6 +146,10 @@
             relativeDate(value) {
                 if (!value) return ''
                 return moment(value).locale('en').fromNow()
+            },
+            formatNumber(value) {
+                if (!value) return ''
+                return Number.parseInt(value).toLocaleString('en')
             }
         }
     }
