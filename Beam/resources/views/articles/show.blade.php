@@ -134,7 +134,7 @@
                 </h2>
             </div>
             <div class="card-body card-padding">
-                <article-histogram :url="url">
+                <article-histogram ref="histogram" :url="url">
                 </article-histogram>
             </div>
         </div>
@@ -144,6 +144,19 @@
             el: "#article-vue-wrapper",
             components: {
                 ArticleHistogram, DateFormatter
+            },
+            created: function() {
+                document.addEventListener('visibilitychange', this.visibilityChanged)
+            },
+            beforeDestroy: function() {
+                document.removeEventListener('visibilitychange', this.visibilityChanged)
+            },
+            methods: {
+                visibilityChanged: function() {
+                    if (document.visibilityState === 'visible') {
+                        this.$refs["histogram"].reload()
+                    }
+                }
             },
             data: function() {
                 return {

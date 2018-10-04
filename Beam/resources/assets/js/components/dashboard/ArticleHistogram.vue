@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="chartContainer">
         <button-switcher :options="[
                     {text: 'Today', value: 'today'},
                     {text: '7 days', value: '7days'},
@@ -7,9 +7,17 @@
                     {text: 'Since publishing', value: 'all'}]"
                          v-model="interval">
         </button-switcher>
+
+        <div v-if="loading" class="preloader pls-purple">
+            <svg class="pl-circular" viewBox="25 25 50 50">
+                <circle class="plc-path" cx="50" cy="50" r="20"></circle>
+            </svg>
+        </div>
+
         <div ref="svg-container" style="height: 200px" id="article-chart">
             <svg style="z-index: 10" ref="svg"></svg>
         </div>
+
         <div id="legend-wrapper">
             <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">
 
@@ -41,6 +49,10 @@
 </style>
 
 <style scoped>
+    #chartContainer {
+        position: relative;
+    }
+
     #legend-wrapper {
         position: relative;
         height:0;
@@ -65,6 +77,13 @@
         border-radius: 2px;
         border: 2px solid #494949;
         transform: translate(-50%, 0px)
+    }
+
+    #chartContainer .preloader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%)
     }
 </style>
 
@@ -115,9 +134,7 @@
                 this.fillData()
             },
             interval(value) {
-                clearInterval(loadDataTimer)
-                this.loadData()
-                loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
+                this.reload()
             }
         },
         mounted() {
@@ -129,7 +146,12 @@
             }, 100));
         },
         methods: {
-            createGraph(){
+            reload() {
+                clearInterval(loadDataTimer)
+                this.loadData()
+                loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
+            },
+            createGraph() {
                 container = this.$refs["svg-container"]
                 let outerWidth = container.clientWidth,
                     outerHeight = container.clientHeight,
