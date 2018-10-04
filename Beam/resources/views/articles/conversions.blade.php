@@ -43,6 +43,11 @@
                     'header' => 'conversions',
                     'priority' => 2,
                 ],
+                'conversions_rate' => [
+                    'orderable' => false,
+                    'header' => 'conversions rate',
+                    'priority' => 2,
+                ],
                 'amount' => [
                     'header' => 'amount',
                     'render' => 'array',

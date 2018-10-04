@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Contracts\JournalContract;
+use App\Contracts\JournalHelpers;
 use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
@@ -18,6 +20,13 @@ use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
+    private $journalHelper;
+
+    public function __construct(JournalContract $journal)
+    {
+        $this->journalHelper = new JournalHelpers($journal);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -53,6 +62,7 @@ class ArticleController extends Controller
     {
         $articles = Article::selectRaw(implode(',', [
                 "articles.id",
+                "articles.external_id",
                 "articles.title",
                 "articles.url",
                 "articles.published_at",
@@ -100,11 +110,24 @@ class ArticleController extends Controller
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
         }
 
-        return $datatables->of($articles)
+        $dt = $datatables->of($articles);
+        $articles = $dt->results();
+
+        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($articles);
+
+        return $dt
             ->addColumn('title', function (Article $article) {
                 return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount) {
+                $uniqueCount = $externalIdsToUniqueUsersCount->get($article->external_id, 0);
+                if ($uniqueCount === 0) {
+                    return '';
+                }
+
+                return number_format(($article->conversions_count / $uniqueCount) * 10000, 2);
+            })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {
                     return [0];

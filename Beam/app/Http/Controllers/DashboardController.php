@@ -15,10 +15,12 @@ class DashboardController extends Controller
 {
     private $journal;
 
+    private $journalHelper;
+
     public function __construct(JournalContract $journal)
     {
-
         $this->journal = $journal;
+        $this->journalHelper = new JournalHelpers($journal);
     }
 
     public function index()
@@ -162,9 +164,6 @@ class DashboardController extends Controller
         // records are already sorted
         $records = $this->journal->concurrents($concurrentsRequest);
 
-        $minimalPublishedTime = Carbon::now();
-
-        // Load articles details
         $top20 = [];
         $i = 0;
         foreach ($records as $record) {
@@ -184,9 +183,7 @@ class DashboardController extends Controller
                 if (!$article) {
                     continue;
                 }
-                if ($minimalPublishedTime->gt($article->published_at)) {
-                    $minimalPublishedTime = $article->published_at;
-                }
+
                 $obj->landing_page = false;
                 $obj->title = $article->title;
                 $obj->published_at = $article->published_at->toAtomString();
@@ -197,40 +194,33 @@ class DashboardController extends Controller
             $i++;
         }
 
-        // Load timespent
-        $timespentRequest = new JournalAggregateRequest('pageviews', 'timespent');
-        // we compute average spent time of most read articles as average of last 2 hours
-        $timespentRequest->setTimeAfter((clone $timeAfter)->subHours(2));
-        $timespentRequest->setTimeBefore($timeBefore);
-        $timespentRequest->addGroup('article_id');
-
-        $externalArticleIds = collect($top20)->filter(function ($item) {
+        // Top articles without landing page(s)
+        $topArticles = collect($top20)->filter(function ($item) {
             return !empty($item->external_article_id);
-        })->pluck('external_article_id');
+        })->pluck('article');
 
-        $timespentRequest->addFilter('article_id', ...$externalArticleIds);
-        $articleIdToTimespent = $this->journal->avg($timespentRequest)->mapWithKeys(function ($item) {
-            return [$item->tags->article_id => $item->avg];
-        });
+        // Timespent is computed as average of timespent values 2 hours in the past
+        $externalIdsToTimespent = $this->journalHelper->timespentForArticles(
+            $topArticles,
+            (clone $timeAfter)->subHours(2)
+        );
 
-        // Load unique pageloads
-        $uniqueRequest = new JournalAggregateRequest('pageviews', 'load');
-        $uniqueRequest->setTimeAfter($minimalPublishedTime);
-        $uniqueRequest->setTimeBefore($timeBefore);
-        $uniqueRequest->addGroup('article_id');
-        $uniqueRequest->addFilter('article_id', ...$externalArticleIds);
-        $articleIdToUniqueBrowsersCount = $this->journal->unique($uniqueRequest)->mapWithKeys(function ($item) {
-            return [$item->tags->article_id => $item->count];
-        });
+        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($topArticles);
 
         foreach ($top20 as $item) {
             if ($item->external_article_id) {
-                $secondsTimespent = $articleIdToTimespent->get($item->external_article_id, 0);
+                $secondsTimespent = $externalIdsToTimespent->get($item->external_article_id, 0);
                 $item->avg_timespent_string = $secondsTimespent >= 3600 ?
                     gmdate('H:i:s', $secondsTimespent) :
                     gmdate('i:s', $secondsTimespent);
-                $item->unique_browsers_count = $articleIdToUniqueBrowsersCount[$item->external_article_id];
-                $item->conversion_rate = number_format($item->conversions_count / $item->unique_browsers_count, 4);
+                $item->unique_browsers_count = $externalIdsToUniqueUsersCount[$item->external_article_id];
+                // artificially increased 10000x so conversion rate is more readable
+                if ($item->conversions_count !== 0) {
+                    $item->conversion_rate = number_format(($item->conversions_count / $item->unique_browsers_count) * 10000, 2);
+                } else {
+                    $item->conversions_count = null;
+                }
+
                 $item->url = route('articles.show', ['article' => $item->article->id]);
             }
         }
