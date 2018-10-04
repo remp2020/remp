@@ -146,7 +146,7 @@
         filters: {
             relativeDate(value) {
                 if (!value) return ''
-                return moment.utc(value).locale('en').fromNow()
+                return moment(value).locale('en').fromNow()
             }
         }
     }
