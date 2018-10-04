@@ -1,5 +1,5 @@
 import Vue2Filters from 'vue2-filters'
-
+import "./filters"
 
 global.$ = global.jQuery = require('jquery');
 

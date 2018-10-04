@@ -146,10 +146,6 @@
             relativeDate(value) {
                 if (!value) return ''
                 return moment(value).locale('en').fromNow()
-            },
-            formatNumber(value) {
-                if (!value) return ''
-                return Number.parseInt(value).toLocaleString('en')
             }
         }
     }
