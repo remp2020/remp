@@ -3,12 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Yadakhov\InsertOnDuplicateKey;
 
 class Article extends Model
 {
+    use InsertOnDuplicateKey;
+
     protected $fillable = [
         'property_uuid',
         'external_id',
@@ -96,32 +98,14 @@ SQL;
         return DB::select($renewSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
     }
 
-
     /**
-     * Check if Illuminate\Database\QueryException is Duplicate Entry Exception.
+     * Update or create the record if it doesn't exist.
      */
-    protected function isDuplicateEntryException(QueryException $e): bool
+    public static function upsert(array $values): Article
     {
-        $errorCode  = $e->errorInfo[1];
-        if ($errorCode === 1062) { // Duplicate Entry error code
-            return true;
-        }
-        return false;
-    }
+        $attributes = (new static($values))->attributesToArray();
+        static::insertOnDuplicateKey($attributes);
 
-    /**
-     * Get the first record matching the attributes or create it.
-     */
-    public static function firstOrCreate(array $attributes, array $values = []): Article
-    {
-        try {
-            $static = (new static);
-            return $static->create($attributes + $values);
-        } catch (QueryException $e) {
-            if ($static->isDuplicateEntryException($e)) {
-                return $static->where($attributes)->first();
-            }
-            throw $e;
-        }
+        return static::where('external_id', $values['external_id'])->first();
     }
 }
