@@ -283,9 +283,7 @@ class ArticleController extends Controller
     {
         $articles = [];
         foreach ($request->get('articles', []) as $a) {
-            $article = Article::firstOrCreate([
-                'external_id' => $a['external_id'],
-            ], $a);
+            $article = Article::upsert($a);
 
             $article->sections()->detach();
             foreach ($a['sections'] as $sectionName) {
