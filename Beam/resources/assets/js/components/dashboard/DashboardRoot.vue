@@ -30,6 +30,7 @@
                                                 Conversions rate
                                             </abbr>
                                         </th>
+                                        <th>Total conversions</th>
                                         <th style="width: 40px; text-align: right">Unique browsers</th>
                                     </tr>
                                 </thead>
@@ -52,12 +53,16 @@
                                         <td>
                                             {{ article.avg_timespent_string || '' }}
                                         </td>
-                                        <td>
-                                            <template v-if="!article.landing_page && article.conversion_rate">
-                                                {{ article.conversion_rate }}
-                                                <br /><small>({{ article.conversions_count }} total)</small>
-                                            </template>
+                                        <td v-if="!article.landing_page && article.conversion_rate"
+                                            :class="article.conversion_rate_color">
+                                            {{ article.conversion_rate }}
                                         </td>
+                                        <td v-else></td>
+                                        <td v-if="!article.landing_page && article.conversions_count"
+                                            :class="article.conversions_count_color">
+                                            {{ article.conversions_count | formatNumber }}
+                                        </td>
+                                        <td v-else></td>
                                         <td style="text-align: right">
                                             {{ article.unique_browsers_count | formatNumber }}
                                         </td>
@@ -83,6 +88,22 @@
     abbr {
         border: none;
     }
+
+    td.low-color {
+        background-color: #EEFBF3;
+    }
+
+    td.medium-color {
+        background-color: #D3F4E0;
+    }
+
+    td.high-color {
+        background-color: #9BE6BA;
+    }
+
+    td.no-color {
+        background-color: #fff;
+    }
 </style>
 
 <script>
@@ -103,6 +124,34 @@
 
     const REFRESH_DATA_TIMEOUT_MS = 7000
     let loadDataTimer = null
+
+    // empirically defined values
+    function conversionsCountColor(count) {
+        count = parseInt(count)
+        if (count > 19) {
+            return 'high-color'
+        } else if (count > 10) {
+            return 'medium-color'
+        } else if (count > 4) {
+            return 'low-color'
+        } else {
+            return 'no-color'
+        }
+    }
+
+    // empirically defined values
+    function conversionRateColor(rate) {
+        rate = parseFloat(rate)
+        if (rate > 7.0) {
+            return 'high-color'
+        } else if (rate > 5.0) {
+            return 'medium-color'
+        } else if (rate > 3.0) {
+            return 'low-color'
+        } else {
+            return 'no-color'
+        }
+    }
 
     export default {
         name: "dashboard-root",
@@ -139,7 +188,11 @@
             loadData() {
                 axios
                     .get(this.articlesUrl)
-                    .then(response => (this.articles = response.data))
+                    .then(response => (this.articles = response.data.map(function(item){
+                        item.conversion_rate_color = conversionRateColor(item.conversion_rate)
+                        item.conversions_count_color = conversionsCountColor(item.conversions_count)
+                        return item
+                    })))
             }
         },
         filters: {
