@@ -13,6 +13,8 @@ use InvalidArgumentException;
 
 class DashboardController extends Controller
 {
+    private const NUMBER_OF_ARTICLES = 30;
+
     private $journal;
 
     private $journalHelper;
@@ -169,14 +171,13 @@ class DashboardController extends Controller
         // records are already sorted
         $records = $this->journal->concurrents($concurrentsRequest);
 
-        $top20 = [];
+        $topPages = [];
         $i = 0;
         $totalConcurrents = 0;
         foreach ($records as $record) {
             $totalConcurrents += $record->count;
 
-            if ($i >= 20) {
-                // Only count concurrents sum if we already get top 20 articles
+            if ($i >= self::NUMBER_OF_ARTICLES) {
                 continue;
             }
 
@@ -199,12 +200,12 @@ class DashboardController extends Controller
                 $obj->conversions_count = $article->conversions->count();
                 $obj->article = $article;
             }
-            $top20[] = $obj;
+            $topPages[] = $obj;
             $i++;
         }
 
         // Top articles without landing page(s)
-        $topArticles = collect($top20)->filter(function ($item) {
+        $topArticles = collect($topPages)->filter(function ($item) {
             return !empty($item->external_article_id);
         })->pluck('article');
 
@@ -216,7 +217,7 @@ class DashboardController extends Controller
 
         $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($topArticles);
 
-        foreach ($top20 as $item) {
+        foreach ($topPages as $item) {
             if ($item->external_article_id) {
                 $secondsTimespent = $externalIdsToTimespent->get($item->external_article_id, 0);
                 $item->avg_timespent_string = $secondsTimespent >= 3600 ?
@@ -235,7 +236,7 @@ class DashboardController extends Controller
         }
 
         return response()->json([
-            'top20' => $top20,
+            'articles' => $topPages,
             'totalConcurrents' => $totalConcurrents
         ]);
     }

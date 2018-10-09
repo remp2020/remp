@@ -188,7 +188,7 @@
                 axios
                     .get(this.articlesUrl)
                     .then(function(response){
-                        that.articles = response.data.top20.map(function(item){
+                        that.articles = response.data.articles.map(function(item){
                             item.conversion_rate_color = conversionRateColor(item.conversion_rate)
                             item.conversions_count_color = conversionsCountColor(item.conversions_count)
                             return item
