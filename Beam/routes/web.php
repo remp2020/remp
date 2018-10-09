@@ -16,7 +16,7 @@ Route::get('/error', 'AuthController@error')->name('sso.error');
 // Temporarily use basic auth for public dashboard
 // TODO: remove once authentication layer is done
 Route::middleware('auth.basic.dashboard')->group(function () {
-    Route::get('dashboard/public', 'DashboardController@public')->name('dashboard.public');
+    Route::get('public', 'DashboardController@public')->name('dashboard.public');
     Route::get('dashboard/public/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.public.articles.json');
     Route::get('dashboard/public/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.public.timeHistogram.json');
 });
