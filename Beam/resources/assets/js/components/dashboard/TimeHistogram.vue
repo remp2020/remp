@@ -3,17 +3,23 @@
         <div v-if="error" class="error" :title="error"></div>
 
         <div class="card-header">
-            <h4>Page Loads by Traffic Source</h4>
-        </div>
-
-        <div id="chartContainer" class="card-body card-padding">
-            <button-switcher :options="[
+            <div class="row">
+                <div class="col-sm-6">
+                    <h4>Concurrents: <animated-integer :value="concurrents"></animated-integer></h4>
+                </div>
+                <div class="col-sm-6">
+                    <button-switcher :options="[
                 {text: 'Today', value: 'today'},
                 {text: '7 days', value: '7days'},
                 {text: '30 days', value: '30days'}]"
-                             v-model="interval">
-            </button-switcher>
+                                     :classes="['pull-right']"
+                                     v-model="interval">
+                    </button-switcher>
+                </div>
+            </div>
+        </div>
 
+        <div id="chartContainer" class="card-body card-padding">
             <div v-if="loading" class="preloader pls-purple">
                 <svg class="pl-circular" viewBox="25 25 50 50">
                     <circle class="plc-path" cx="50" cy="50" r="20"></circle>
@@ -104,6 +110,7 @@
 </style>
 
 <script>
+    import AnimatedInteger from './AnimatedInteger.vue'
     import ButtonSwitcher from './ButtonSwitcher.vue'
     import * as constants from './constants'
     import {debounce, formatInterval} from './constants'
@@ -113,6 +120,10 @@
     let props = {
         url: {
             type: String,
+            required: true
+        },
+        concurrents: {
+            type: Number,
             required: true
         }
     };
@@ -129,7 +140,7 @@
 
     export default {
         components: {
-            ButtonSwitcher
+            ButtonSwitcher, AnimatedInteger
         },
         name: 'article-chart',
         props: props,
@@ -141,7 +152,7 @@
                 interval: 'today',
                 legendVisible: false,
                 highlightedRow: null,
-                legendLeft: "0px"
+                legendLeft: "0px",
             };
         },
         computed: {
