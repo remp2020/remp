@@ -1,22 +1,19 @@
 <template>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <time-histogram ref="histogram"
-                                :url="timeHistogramUrl"
-                                :concurrents="totalConcurrents"
-                ></time-histogram>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <time-histogram ref="histogram"
+                                    :url="timeHistogramUrl"
+                                    :concurrents="totalConcurrents"
+                    ></time-histogram>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Most read articles</h2>
-                    </div>
-                    <div class="card-body table-responsive">
-                        <table class="table">
+            <div class="row" style="padding-top: 10px">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="concurrents-table table">
                             <thead>
                                 <tr>
                                     <th style="width: 40px">Concurrents</th>
@@ -99,6 +96,10 @@
 
     td.no-color {
         background-color: #fff;
+    }
+
+    .concurrents-table td, .concurrents-table th {
+        padding: 6px;
     }
 </style>
 

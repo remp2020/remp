@@ -1,25 +1,23 @@
 <template>
-    <div class="card card-chart">
+    <div>
         <div v-if="error" class="error" :title="error"></div>
 
-        <div class="card-header">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h4>Concurrents: <animated-integer :value="concurrents"></animated-integer></h4>
-                </div>
-                <div class="col-sm-6">
-                    <button-switcher :options="[
-                {text: 'Today', value: 'today'},
-                {text: '7 days', value: '7days'},
-                {text: '30 days', value: '30days'}]"
-                                     :classes="['pull-right']"
-                                     v-model="interval">
-                    </button-switcher>
-                </div>
+        <div id="chartContainerHeader" class="row">
+            <div class="col-sm-6">
+                <h4>Concurrents: <animated-integer :value="concurrents"></animated-integer></h4>
+            </div>
+            <div class="col-sm-6">
+                <button-switcher :options="[
+            {text: 'Today', value: 'today'},
+            {text: '7 days', value: '7days'},
+            {text: '30 days', value: '30days'}]"
+                                 :classes="['pull-right']"
+                                 v-model="interval">
+                </button-switcher>
             </div>
         </div>
 
-        <div id="chartContainer" class="card-body card-padding">
+        <div id="chartContainer">
             <div v-if="loading" class="preloader pls-purple">
                 <svg class="pl-circular" viewBox="25 25 50 50">
                     <circle class="plc-path" cx="50" cy="50" r="20"></circle>
@@ -67,6 +65,11 @@
 <style scoped>
     #chartContainer {
         position: relative;
+        padding: 0 20px;
+    }
+
+    #chartContainerHeader {
+        padding: 20px 30px 0px 30px;
     }
 
     #legend-wrapper {
@@ -87,7 +90,7 @@
         z-index: 1000;
         top:0;
         left: 0;
-        opacity: 0.85;
+        opacity: 0.95;
         color: #fff;
         padding: 2px;
         background-color: #494949;
