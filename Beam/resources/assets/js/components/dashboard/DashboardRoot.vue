@@ -1,83 +1,76 @@
 <template>
-    <section id="content">
-        <div class="container">
-
-            <div class="c-header">
-                <h2>Dashboard</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <time-histogram ref="histogram"
+                                :url="timeHistogramUrl"
+                                :concurrents="totalConcurrents"
+                ></time-histogram>
             </div>
+        </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <time-histogram ref="histogram"
-                                    :url="timeHistogramUrl"
-                                    :concurrents="totalConcurrents"
-                    ></time-histogram>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Most read articles</h2>
-                        </div>
-                        <div class="card-body table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px">Concurrents</th>
-                                        <th style="text-align: left">Article</th>
-                                        <th style="width: 40px">Engaged Time</th>
-                                        <th style="">
-                                            <abbr title="(Conversions/Unique visitors) x 10000">
-                                                Conversions rate
-                                            </abbr>
-                                        </th>
-                                        <th>Total conversions</th>
-                                        <th style="width: 40px; text-align: right">Unique browsers</th>
-                                    </tr>
-                                </thead>
-                                <tbody name="table-row" is="transition-group">
-                                    <tr v-for="article in articles" v-bind:key="article.external_article_id">
-                                        <td><span class="concurrents-count">
-                                                <animated-integer :value="article.count"></animated-integer>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <template v-if="article.landing_page">
-                                                <span class="c-black">{{article.title}}</span>
-                                            </template>
-                                            <template v-else>
-                                                <a class="c-black" :href="article.url">{{article.title}}</a>
-                                                <br />
-                                                <small>{{ article.published_at | relativeDate }}</small>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            {{ article.avg_timespent_string || '' }}
-                                        </td>
-                                        <td v-if="!article.landing_page && article.conversion_rate"
-                                            :class="article.conversion_rate_color">
-                                            {{ article.conversion_rate }}
-                                        </td>
-                                        <td v-else></td>
-                                        <td v-if="!article.landing_page && article.conversions_count"
-                                            :class="article.conversions_count_color">
-                                            {{ article.conversions_count | formatNumber }}
-                                        </td>
-                                        <td v-else></td>
-                                        <td style="text-align: right">
-                                            {{ article.unique_browsers_count | formatNumber }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Most read articles</h2>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px">Concurrents</th>
+                                    <th style="text-align: left">Article</th>
+                                    <th style="width: 40px">Engaged Time</th>
+                                    <th style="">
+                                        <abbr title="(Conversions/Unique visitors) x 10000">
+                                            Conversions rate
+                                        </abbr>
+                                    </th>
+                                    <th>Total conversions</th>
+                                    <th style="width: 40px; text-align: right">Unique browsers</th>
+                                </tr>
+                            </thead>
+                            <tbody name="table-row" is="transition-group">
+                                <tr v-for="article in articles" v-bind:key="article.external_article_id">
+                                    <td><span class="concurrents-count">
+                                            <animated-integer :value="article.count"></animated-integer>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <template v-if="article.landing_page">
+                                            <span class="c-black">{{article.title}}</span>
+                                        </template>
+                                        <template v-else>
+                                            <a class="c-black" :href="article.url">{{article.title}}</a>
+                                            <br />
+                                            <small>{{ article.published_at | relativeDate }}</small>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        {{ article.avg_timespent_string || '' }}
+                                    </td>
+                                    <td v-if="!article.landing_page && article.conversion_rate"
+                                        :class="article.conversion_rate_color">
+                                        {{ article.conversion_rate }}
+                                    </td>
+                                    <td v-else></td>
+                                    <td v-if="!article.landing_page && article.conversions_count"
+                                        :class="article.conversions_count_color">
+                                        {{ article.conversions_count | formatNumber }}
+                                    </td>
+                                    <td v-else></td>
+                                    <td style="text-align: right">
+                                        {{ article.unique_browsers_count | formatNumber }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </template>
 
 <style scoped type="text/css">

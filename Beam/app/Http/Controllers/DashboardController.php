@@ -28,6 +28,11 @@ class DashboardController extends Controller
         return view('dashboard.index');
     }
 
+    public function public()
+    {
+        return view('dashboard.public');
+    }
+
     private function getJournalParameters($interval, $tz)
     {
         switch ($interval) {

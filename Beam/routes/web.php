@@ -13,10 +13,14 @@
 
 Route::get('/error', 'AuthController@error')->name('sso.error');
 
+// Temporarily make public dashboard page
+// TODO: remove once authentication layer is done
+Route::get('dashboard/public', 'DashboardController@public')->name('dashboard.public');
+Route::get('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
+Route::get('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
+
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard.index');
-    Route::get('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
-    Route::get('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
 
     Route::get('accounts/json', 'AccountController@json');
