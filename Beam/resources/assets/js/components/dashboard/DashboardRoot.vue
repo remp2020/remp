@@ -8,7 +8,10 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <time-histogram ref="histogram" :url="timeHistogramUrl"></time-histogram>
+                    <time-histogram ref="histogram"
+                                    :url="timeHistogramUrl"
+                                    :concurrents="totalConcurrents"
+                    ></time-histogram>
                 </div>
             </div>
 
@@ -170,7 +173,8 @@
         },
         data() {
             return {
-                articles: null
+                articles: null,
+                totalConcurrents: 0
             }
         },
         methods: {
@@ -186,13 +190,17 @@
                 loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
             },
             loadData() {
+                let that = this
                 axios
                     .get(this.articlesUrl)
-                    .then(response => (this.articles = response.data.map(function(item){
-                        item.conversion_rate_color = conversionRateColor(item.conversion_rate)
-                        item.conversions_count_color = conversionsCountColor(item.conversions_count)
-                        return item
-                    })))
+                    .then(function(response){
+                        that.articles = response.data.top20.map(function(item){
+                            item.conversion_rate_color = conversionRateColor(item.conversion_rate)
+                            item.conversions_count_color = conversionsCountColor(item.conversions_count)
+                            return item
+                        })
+                        that.totalConcurrents = response.data.totalConcurrents
+                    })
             }
         },
         filters: {

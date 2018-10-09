@@ -1,5 +1,5 @@
 <template>
-    <div class="btn-group btn-group-sm" role="group">
+    <div class="btn-group btn-group-sm" :class="cssClass" role="group">
         <button v-for="option in intervalOptions"
                 type="button"
                 class="btn"
@@ -25,6 +25,10 @@
             type: String,
             required: true
         },
+        classes: {
+            type: Array,
+            default: []
+        }
     };
 
     export default {
@@ -32,7 +36,8 @@
         props: props,
         data() {
             return {
-                intervalOptions: []
+                intervalOptions: [],
+                cssClass: this.classes.join(" ")
             }
         },
         created() {

@@ -166,9 +166,13 @@ class DashboardController extends Controller
 
         $top20 = [];
         $i = 0;
+        $totalConcurrents = 0;
         foreach ($records as $record) {
+            $totalConcurrents += $record->count;
+
             if ($i >= 20) {
-                break;
+                // Only count concurrents sum if we already get top 20 articles
+                continue;
             }
 
             $obj = new \stdClass();
@@ -225,6 +229,9 @@ class DashboardController extends Controller
             }
         }
 
-        return response()->json($top20);
+        return response()->json([
+            'top20' => $top20,
+            'totalConcurrents' => $totalConcurrents
+        ]);
     }
 }
