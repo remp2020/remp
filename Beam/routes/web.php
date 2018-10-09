@@ -13,15 +13,19 @@
 
 Route::get('/error', 'AuthController@error')->name('sso.error');
 
-// Temporarily make public dashboard page
+// Temporarily use basic auth for public dashboard
 // TODO: remove once authentication layer is done
-Route::get('dashboard/public', 'DashboardController@public')->name('dashboard.public');
-Route::get('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
-Route::get('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
+Route::middleware('auth.basic.dashboard')->group(function () {
+    Route::get('dashboard/public', 'DashboardController@public')->name('dashboard.public');
+    Route::get('dashboard/public/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.public.articles.json');
+    Route::get('dashboard/public/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.public.timeHistogram.json');
+});
 
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard.index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
+    Route::get('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
+    Route::get('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
 
     Route::get('accounts/json', 'AccountController@json');
     Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');

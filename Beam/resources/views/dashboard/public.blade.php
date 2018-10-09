@@ -17,8 +17,8 @@
             },
             data: function() {
                 return {
-                    articlesUrl: "{!! route('dashboard.articles.json') !!}",
-                    timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}"
+                    articlesUrl: "{!! route('dashboard.public.articles.json') !!}",
+                    timeHistogramUrl: "{!! route('dashboard.public.timeHistogram.json') !!}"
                 }
             }
         })
