@@ -17,8 +17,8 @@ Route::get('/error', 'AuthController@error')->name('sso.error');
 // TODO: remove once authentication layer is done
 Route::middleware('auth.basic.dashboard')->group(function () {
     Route::get('public', 'DashboardController@public')->name('dashboard.public');
-    Route::get('dashboard/public/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.public.articles.json');
-    Route::get('dashboard/public/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.public.timeHistogram.json');
+    Route::get('public/articlesJson', 'DashboardController@mostReadArticles')->name('public.articles.json');
+    Route::get('public/timeHistogramJson', 'DashboardController@timeHistogram')->name('public.timeHistogram.json');
 });
 
 Route::middleware('auth.jwt')->group(function () {
