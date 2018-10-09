@@ -124,11 +124,11 @@
     // empirically defined values
     function conversionsCountColor(count) {
         count = parseInt(count)
-        if (count > 19) {
+        if (count > 13) {
             return 'high-color'
-        } else if (count > 10) {
+        } else if (count > 8) {
             return 'medium-color'
-        } else if (count > 4) {
+        } else if (count > 3) {
             return 'low-color'
         } else {
             return 'no-color'
