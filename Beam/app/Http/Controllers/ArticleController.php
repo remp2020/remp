@@ -283,6 +283,9 @@ class ArticleController extends Controller
     {
         $articles = [];
         foreach ($request->get('articles', []) as $a) {
+            // When saving to DB, Eloquent strips timezone information,
+            // therefore convert to UTC
+            $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
             $article = Article::upsert($a);
 
             $article->sections()->detach();

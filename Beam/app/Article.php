@@ -99,12 +99,16 @@ SQL;
     }
 
     /**
-     * Update or create the record if it doesn't exist.
+     * Update or create record in case it doesn't exist.
      */
     public static function upsert(array $values): Article
     {
         $attributes = (new static($values))->attributesToArray();
-        static::insertOnDuplicateKey($attributes);
+        $updateKeys = array_keys($attributes);
+        $updateKeys[] = 'updated_at';
+        // Timestamp values are not inserted automatically
+        $attributes['updated_at'] = $attributes['created_at'] = Carbon::now()->toDateTimeString();
+        static::insertOnDuplicateKey($attributes, $updateKeys);
 
         return static::where('external_id', $values['external_id'])->first();
     }
