@@ -2,8 +2,10 @@ version: "3"
 
 services:
   nginx:
+    environment:
+      NGINX_PORT: "8000"
     ports:
-    - "80:80"
+      - "8000:80"
 
   campaign:
     environment:
