@@ -18,11 +18,14 @@ class DashboardBasicAuth
      */
     public function handle($request, Closure $next)
     {
-        $requiredUsername = config('dashboard.username');
-        $requiredPassword = config('dashboard.password');
+        // temporarily support 2 passwords
+        $credentials = [
+            config('dashboard.username') => config('dashboard.password'),
+            config('dashboard.username2') => config('dashboard.password2'),
+        ];
 
-        if ($request->getUser() === $requiredUsername
-            && $request->getPassword() === $requiredPassword) {
+        if (array_key_exists($request->getUser(), $credentials)
+            && $credentials[$request->getUser()] === $request->getPassword()) {
             return $next($request);
         }
         throw new UnauthorizedHttpException('Basic', 'Invalid credentials.');
