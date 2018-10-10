@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  nginx:
+    ports:
+    - "80:80"
+
+  campaign:
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+
+    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    #volumes:
+    #  - "/home/user/.cache/composer:/composer:rw"
+    #  - "/home/user/.cache/yarn:/yarn:rw"
+
+  mailer:
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+
+    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    #volumes:
+    #  - "/home/user/.cache/composer:/composer:rw"
+    #  - "/home/user/.cache/yarn:/yarn:rw"
+
+  beam:
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+
+    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    #volumes:
+    #  - "/home/user/.cache/composer:/composer:rw"
+    #  - "/home/user/.cache/yarn:/yarn:rw"
+
+  sso:
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+
+    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    #volumes:
+    #  - "/home/user/.cache/composer:/composer:rw"
+    #  - "/home/user/.cache/yarn:/yarn:rw"
