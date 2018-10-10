@@ -148,7 +148,8 @@ class ArticleDetailsController extends Controller
         $newConversionsCount = $article->loadNewConversionsCount();
         $renewedConversionsCount = $article->loadRenewedConversionsCount();
 
-        $pageviewsSubscribersToAllRatio = ($article->pageviews_subscribers / $article->pageviews_all) * 100;
+        $pageviewsSubscribersToAllRatio =
+            $article->pageviews_all == 0 ? 0 : ($article->pageviews_subscribers / $article->pageviews_all) * 100;
 
         return response()->format([
             'html' => view('articles.show', [
