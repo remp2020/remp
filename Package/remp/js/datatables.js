@@ -155,6 +155,12 @@ $.fn.dataTables = {
                 return data.toLocaleString();
             }
         },
+        percentage: function () {
+            return function(data) {
+                // http://www.jacklmoore.com/notes/rounding-in-javascript/
+                return Number(Math.round(data+'e2')+'e-2').toFixed(2) + "%";
+            }
+        },
         boolean: function () {
             return function(data) {
                 if (data === 1 || data === true) {

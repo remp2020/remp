@@ -44,6 +44,11 @@
                 ],
                 'pageviews_subscribers' => [
                     'header' => 'subscriber pageviews',
+                    'priority' => 5
+                ],
+                'pageviews_subscribers_ratio' => [
+                    'header' => 'pageviews subscribers %',
+                    'render' => 'percentage',
                     'priority' => 5,
                 ],
                 'avg_sum_all' => [
