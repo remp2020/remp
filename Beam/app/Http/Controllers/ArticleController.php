@@ -115,14 +115,16 @@ class ArticleController extends Controller
 
         $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($articles);
 
+        $threeMonthsAgo = Carbon::now()->subMonths(3);
+
         return $dt
             ->addColumn('title', function (Article $article) {
                 return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
-            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount) {
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount, $threeMonthsAgo) {
                 $uniqueCount = $externalIdsToUniqueUsersCount->get($article->external_id, 0);
-                if ($uniqueCount === 0) {
+                if ($uniqueCount === 0 || $article->published_at->lt($threeMonthsAgo)) {
                     return '';
                 }
 

@@ -217,6 +217,8 @@ class DashboardController extends Controller
 
         $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($topArticles);
 
+        $threeMonthsAgo = Carbon::now()->subMonths(3);
+
         foreach ($topPages as $item) {
             if ($item->external_article_id) {
                 $secondsTimespent = $externalIdsToTimespent->get($item->external_article_id, 0);
@@ -224,11 +226,10 @@ class DashboardController extends Controller
                     gmdate('H:i:s', $secondsTimespent) :
                     gmdate('i:s', $secondsTimespent);
                 $item->unique_browsers_count = $externalIdsToUniqueUsersCount[$item->external_article_id];
-                // artificially increased 10000x so conversion rate is more readable
-                if ($item->conversions_count !== 0) {
+                // Show conversion rate only for articles published in last 3 months
+                if ($item->conversions_count !== 0 && $item->article->published_at->gte($threeMonthsAgo)) {
+                    // Artificially increased 10000x so conversion rate is more readable
                     $item->conversion_rate = number_format(($item->conversions_count / $item->unique_browsers_count) * 10000, 2);
-                } else {
-                    $item->conversions_count = null;
                 }
 
                 $item->url = route('articles.show', ['article' => $item->article->id]);
