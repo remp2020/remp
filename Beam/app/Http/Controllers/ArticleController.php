@@ -187,7 +187,8 @@ class ArticleController extends Controller
 
     public function dtPageviews(Request $request, Datatables $datatables)
     {
-        $articles = Article::selectRaw("articles.*")
+        $articles = Article::selectRaw('articles.*,' .
+            'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
             ->with(['authors', 'sections'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
