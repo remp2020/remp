@@ -47,7 +47,7 @@
                     'priority' => 5
                 ],
                 'pageviews_subscribers_ratio' => [
-                    'header' => 'pageviews subscribers %',
+                    'header' => 'subscriber pageviews ratio',
                     'render' => 'percentage',
                     'priority' => 5,
                 ],
