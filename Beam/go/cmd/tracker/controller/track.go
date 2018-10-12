@@ -281,11 +281,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		}
 
 		if user.Adblock != nil {
-			if *user.Adblock {
-				tags["adblock"] = "1"
-			} else {
-				tags["adblock"] = "0"
-			}
+			fields["adblock"] = *user.Adblock
 		}
 		if user.WindowHeight != nil {
 			fields["window_height"] = *user.WindowHeight
@@ -294,24 +290,16 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			fields["window_width"] = *user.WindowWidth
 		}
 		if user.Cookies != nil {
-			if *user.Cookies {
-				tags["cookies"] = "1"
-			} else {
-				tags["cookies"] = "0"
-			}
+			fields["cookies"] = *user.Cookies
 		}
 		if user.Websockets != nil {
-			if *user.Websockets {
-				tags["websockets"] = "1"
-			} else {
-				tags["websockets"] = "0"
-			}
+			fields["websockets"] = *user.Websockets
 		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID
-			tags["signed_in"] = "1"
+			fields["signed_in"] = true
 		} else {
-			tags["signed_in"] = "0"
+			fields["signed_in"] = false
 		}
 		if user.BrowserID != nil {
 			tags["browser_id"] = *user.BrowserID
@@ -323,11 +311,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			tags["remp_pageview_id"] = *user.RempPageviewID
 		}
 		if user.Subscriber != nil {
-			if *user.Subscriber {
-				tags["subscriber"] = "1"
-			} else {
-				tags["subscriber"] = "0"
-			}
+			fields["subscriber"] = *user.Subscriber
 		}
 
 		if user.Source != nil {
@@ -354,10 +338,24 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			}
 		}
 	} else {
-		tags["signed_in"] = "0"
+		fields["signed_in"] = false
 	}
 
-	p, err := influxClient.NewPoint(measurement, tags, fields, system.Time)
+	collected := make(map[string]interface{})
+	for key, tag := range tags {
+		collected[key] = tag
+	}
+	for key, field := range fields {
+		collected[key] = field
+	}
+	json, err := json.Marshal(collected)
+	if err != nil {
+		return err
+	}
+	data := make(map[string]interface{})
+	data["_json"] = string(json)
+
+	p, err := influxClient.NewPoint(measurement, nil, data, system.Time)
 	if err != nil {
 		return err
 	}
