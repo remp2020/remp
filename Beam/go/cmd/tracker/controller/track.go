@@ -183,9 +183,9 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		measurement = model.TableTimespent
 		if ctx.Payload.Timespent != nil {
 			values["timespent"] = ctx.Payload.Timespent.Seconds
-			tags["unload"] = "0"
+			values["unload"] = false
 			if ctx.Payload.Timespent.Unload != nil && *ctx.Payload.Timespent.Unload {
-				tags["unload"] = "1"
+				values["unload"] = true
 			}
 		}
 	default:
@@ -193,7 +193,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	}
 
 	if ctx.Payload.Article != nil {
-		tags[model.FlagArticle] = "1"
+		values[model.FlagArticle] = true
 		at, av := articleValues(ctx.Payload.Article)
 		for key, tag := range at {
 			tags[key] = tag
@@ -202,7 +202,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 			values[key] = val
 		}
 	} else {
-		tags[model.FlagArticle] = "0"
+		values[model.FlagArticle] = false
 	}
 
 	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, measurement, tags, values); err != nil {
@@ -231,18 +231,28 @@ func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
 		return ctx.BadRequest(fmt.Errorf("can't find entity schema for entity '%v'", entityName))
 	}
 
+	// validate entity schema
 	err = c.Entities.Validate(schema, ctx.Payload)
 	if err != nil {
 		return err
 	}
 
 	data := ctx.Payload.Entity.Data
-	tags := map[string]string{}
+	data["remp_entity_id"] = ctx.Payload.Entity.ID
 
+	json, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	fields := make(map[string]interface{})
+	fields["_json"] = string(json)
+
+	tags := make(map[string]string)
 	tags["remp_entity_id"] = *ctx.Payload.Entity.ID
 
 	// create point
-	p, err := influxClient.NewPoint("entities", tags, data)
+	p, err := influxClient.NewPoint("entities", tags, fields)
 	if err != nil {
 		return err
 	}
@@ -268,9 +278,9 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	}
 	if article.Locked != nil {
 		if *article.Locked {
-			tags["locked"] = "1"
+			values["locked"] = true
 		} else {
-			tags["locked"] = "0"
+			values["locked"] = false
 		}
 	}
 	for key, variant := range article.Variants {
