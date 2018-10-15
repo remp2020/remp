@@ -143,5 +143,6 @@ var Entity = Type("Entity", func() {
 		Attribute("id", String)
 		Attribute("name", String)
 		Attribute("data", HashOf(String, Any))
+		Required("id")
 	})
 })

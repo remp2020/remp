@@ -61,7 +61,7 @@ var _ = Resource("track", func() {
 		Payload(Entity)
 		Routing(POST("/entity"))
 		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
+			Description("Returned when request does not comply with Swagger specification or entity data does not pass validation")
 		})
 		Response(NotFound, func() {
 			Description("Returned when property_token was not found")

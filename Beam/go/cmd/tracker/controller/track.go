@@ -249,7 +249,7 @@ func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
 	fields["_json"] = string(json)
 
 	tags := make(map[string]string)
-	tags["remp_entity_id"] = *ctx.Payload.Entity.ID
+	tags["remp_entity_id"] = ctx.Payload.Entity.ID
 
 	// create point
 	p, err := influxClient.NewPoint("entities", tags, fields)

@@ -118,8 +118,7 @@ func main() {
 		MySQL: mysqlDB,
 	}
 
-	// schemaTicker := time.NewTicker(5 * time.Minute)
-	schemaTicker := time.NewTicker(10 * time.Second)
+	schemaTicker := time.NewTicker(5 * time.Minute)
 	defer schemaTicker.Stop()
 
 	cacheEntities := func() {
