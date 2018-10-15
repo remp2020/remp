@@ -80,6 +80,11 @@ Route::middleware('auth.jwt')->group(function () {
         'only' => ['index', 'show']
     ]);
 
+    Route::post('entities/validate/{entity?}', 'EntitiesController@validateForm')->name('entities.validateForm');
+    Route::get('entities/json', 'EntitiesController@json')->name('entities.json');
+    Route::resource('entities', 'EntitiesController');
+
+
     // TODO: temporary, delete after test is over
     Route::get('tests/author-segments-test', 'TestController@authorSegmentsTest')->name('test.author-segments-test');
     Route::post('tests/author-segments-test', 'TestController@showResults')->name('test.show-results');
