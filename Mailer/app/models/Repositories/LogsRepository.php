@@ -93,6 +93,26 @@ class LogsRepository extends Repository
             ->fetch();
     }
 
+    public function getNonBatchTemplateStats($templateIds)
+    {
+        $columns = [
+            'COUNT(created_at) AS sent',
+            'COUNT(delivered_at) AS delivered',
+            'COUNT(dropped_at) AS dropped',
+            'COUNT(spam_complained_at) AS spam_complained',
+            'COUNT(hard_bounced_at) AS hard_bounced',
+            'COUNT(clicked_at) AS clicked',
+            'COUNT(opened_at) AS opened',
+        ];
+        return $this->getTable()
+            ->select(implode(',', $columns))
+            ->where([
+                'mail_template_id' => $templateIds,
+            ])
+            ->limit(1)
+            ->fetch();
+    }
+
     public function getStatsRate($mailTemplates, $field, $startTime = null, $endTime = null)
     {
         $ids = [];
