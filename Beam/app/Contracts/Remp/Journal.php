@@ -11,6 +11,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
+use Psy\Util\Json;
 
 class Journal implements JournalContract
 {
@@ -130,7 +131,11 @@ class Journal implements JournalContract
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal endpoint {$url}: {$e->getMessage()}");
         } catch (ClientException $e) {
-            \Log::error($e->getResponse()->getBody()->getContents());
+            \Log::error(Json::encode([
+                'url' => $url,
+                'payload' => $json,
+                'message' => $e->getResponse()->getBody()->getContents(),
+            ]));
             throw $e;
         }
 

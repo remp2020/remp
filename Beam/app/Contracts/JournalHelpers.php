@@ -39,6 +39,9 @@ class JournalHelpers
         $request->addGroup('article_id');
         $request->addFilter('article_id', ...$externalArticleIds);
         return $this->journal->unique($request)->mapWithKeys(function ($item) {
+            if (!$item->tags) {
+                return [];
+            }
             return [$item->tags->article_id => $item->count];
         });
     }
@@ -62,6 +65,9 @@ class JournalHelpers
 
         $request->addFilter('article_id', ...$externalArticleIds);
         return $this->journal->avg($request)->mapWithKeys(function ($item) {
+            if (!$item->tags) {
+                return [];
+            }
             return [$item->tags->article_id => $item->avg];
         });
     }
