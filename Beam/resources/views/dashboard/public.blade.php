@@ -1,13 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.simple')
 
-@section('title', 'Dashboard')
+@section('title', 'Public dashboard')
 
 @section('content')
-    <div id="dashboard">
-        <div class="c-header">
-            <h2>Dashboard</h2>
-        </div>
 
+    <div id="dashboard">
         <dashboard-root :articles-url="articlesUrl" :time-histogram-url="timeHistogramUrl">
         </dashboard-root>
     </div>
@@ -20,8 +17,8 @@
             },
             data: function() {
                 return {
-                    articlesUrl: "{!! route('dashboard.articles.json') !!}",
-                    timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}"
+                    articlesUrl: "{!! route('public.articles.json') !!}",
+                    timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}"
                 }
             }
         })

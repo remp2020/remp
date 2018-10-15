@@ -8077,7 +8077,7 @@ pre {
 .container.c-boxed {
   max-width: 1200px;
 }
-#main {
+#main, #main-simple {
   position: relative;
 }
 @media (min-width: 1200px) {
@@ -8085,15 +8085,25 @@ pre {
     padding: 0 40px 30px 270px;
     min-height: calc(100vh - 159px);
   }
+  #main-simple {
+    padding: 20px 40px 30px 40px;
+    min-height: calc(100vh - 159px);
+  }
 }
 @media (max-width: 1199px) and (min-width: 768px) {
   #main {
     padding: 0 40px 30px;
   }
+  #main-simple {
+    padding: 10px 40px 30px;
+  }
 }
 @media (max-width: 767px) {
   #main {
     padding: 0 15px 30px;
+  }
+  #main-simple {
+    padding: 10px 15px 30px;
   }
 }
 .clist {

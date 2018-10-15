@@ -13,11 +13,19 @@
 
 Route::get('/error', 'AuthController@error')->name('sso.error');
 
+// Temporarily use basic auth for public dashboard
+// TODO: remove once authentication layer is done
+Route::middleware('auth.basic.dashboard')->group(function () {
+    Route::get('public', 'DashboardController@public')->name('dashboard.public');
+    Route::get('public/articlesJson', 'DashboardController@mostReadArticles')->name('public.articles.json');
+    Route::get('public/timeHistogramJson', 'DashboardController@timeHistogram')->name('public.timeHistogram.json');
+});
+
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard.index');
+    Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
     Route::get('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
     Route::get('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
-    Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
 
     Route::get('accounts/json', 'AccountController@json');
     Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');
@@ -50,8 +58,13 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::resource('segments', 'SegmentController');
 
+    Route::get('articles/{article}/histogramJson', 'ArticleDetailsController@timeHistogram')->name('articles.timeHistogram.json');
     Route::resource('articles', 'ArticleController', [
         'only' => ['store'],
+    ]);
+
+    Route::resource('articles', 'ArticleDetailsController', [
+        'only' => ['show'],
     ]);
 
     Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');

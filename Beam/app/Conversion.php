@@ -23,6 +23,7 @@ class Conversion extends Model
         'amount',
         'currency',
         'paid_at',
+        'user_id',
     ];
 
     protected $dates = [

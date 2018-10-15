@@ -1,19 +1,23 @@
 <template>
-    <div class="card card-chart">
-        <div v-if="error" class="error" :title="error">!</div>
+    <div>
+        <div v-if="error" class="error" :title="error"></div>
 
-        <div class="card-header">
-            <h4>Page Loads by Traffic Source</h4>
+        <div id="chartContainerHeader" class="row">
+            <div class="col-sm-6">
+                <h4>Concurrents: <animated-integer :value="concurrents"></animated-integer></h4>
+            </div>
+            <div class="col-sm-6">
+                <button-switcher :options="[
+            {text: 'Today', value: 'today'},
+            {text: '7 days', value: '7days'},
+            {text: '30 days', value: '30days'}]"
+                                 :classes="['pull-right']"
+                                 v-model="interval">
+                </button-switcher>
+            </div>
         </div>
 
-        <div id="chartContainer" class="card-body card-padding">
-            <button-switcher :options="[
-                {text: 'Today', value: 'today'},
-                {text: '7 days', value: '7days'},
-                {text: '30 days', value: '30days'}]"
-                             v-model="interval">
-            </button-switcher>
-
+        <div id="chartContainer">
             <div v-if="loading" class="preloader pls-purple">
                 <svg class="pl-circular" viewBox="25 25 50 50">
                     <circle class="plc-path" cx="50" cy="50" r="20"></circle>
@@ -61,6 +65,11 @@
 <style scoped>
     #chartContainer {
         position: relative;
+        padding: 0 20px;
+    }
+
+    #chartContainerHeader {
+        padding: 20px 30px 0px 30px;
     }
 
     #legend-wrapper {
@@ -81,7 +90,7 @@
         z-index: 1000;
         top:0;
         left: 0;
-        opacity: 0.85;
+        opacity: 0.95;
         color: #fff;
         padding: 2px;
         background-color: #494949;
@@ -104,7 +113,10 @@
 </style>
 
 <script>
+    import AnimatedInteger from './AnimatedInteger.vue'
     import ButtonSwitcher from './ButtonSwitcher.vue'
+    import * as constants from './constants'
+    import {debounce, formatInterval} from './constants'
     import axios from 'axios'
     import * as d3 from 'd3'
 
@@ -112,49 +124,26 @@
         url: {
             type: String,
             required: true
+        },
+        concurrents: {
+            type: Number,
+            required: true
         }
     };
 
-    Vue.filter('formatDate', function(value, intervalMinutes) {
-        if (value) {
-            let start = moment(value)
-            let end = start.clone().add(intervalMinutes, 'm')
-            return start.format('ll HH:mm') + " - " + end.format('HH:mm')
-        }
-    })
+    Vue.filter('formatDate', formatInterval)
 
     function stackMax(layer) {
         return d3.max(layer, function (d) { return d[1]; });
     }
 
-    const debounce = (fn, time) => {
-        let timeout;
-
-        return function() {
-            const functionCall = () => fn.apply(this, arguments);
-
-            clearTimeout(timeout);
-            timeout = setTimeout(functionCall, time);
-        }
-    }
-    const REFRESH_DATA_TIMEOUT_MS = 30000
-
     let container, svg, dataG, oldDataG, oldDataLineG, x,y, colorScale, xAxis, vertical, mouseRect,
         margin = {top: 20, right: 20, bottom: 20, left: 20},
         loadDataTimer = null
 
-    let colors = [
-        "#eed075",
-        "#eb8459",
-        "#50c8c8",
-        "#d49bc4",
-        "#4c91b8",
-        "#3DF16D"
-    ]
-
     export default {
         components: {
-            ButtonSwitcher
+            ButtonSwitcher, AnimatedInteger
         },
         name: 'article-chart',
         props: props,
@@ -166,7 +155,7 @@
                 interval: 'today',
                 legendVisible: false,
                 highlightedRow: null,
-                legendLeft: "0px"
+                legendLeft: "0px",
             };
         },
         computed: {
@@ -179,20 +168,23 @@
                 this.fillData()
             },
             interval(value) {
-                clearInterval(loadDataTimer)
-                this.loadData()
-                loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
+                this.reload()
             }
         },
         mounted() {
             this.createGraph()
             this.loadData()
-            loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
+            loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
             window.addEventListener('resize', debounce((e) => {
                 this.fillData()
             }, 100));
         },
         methods: {
+            reload() {
+                clearInterval(loadDataTimer)
+                this.loadData()
+                loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
+            },
             createGraph(){
                 container = this.$refs["svg-container"]
                 let outerWidth = container.clientWidth,
@@ -381,6 +373,8 @@
                 y.domain([0, yMax])
                     .range([height, 0])
 
+                let colors = constants.GRAPH_COLORS
+
                 colorScale = d3.scaleOrdinal()
                     .domain(tags)
                     .range(colors);
@@ -413,7 +407,7 @@
                     .y((d) => y(d.value))
 
                 // Update data
-                let layerGroups = dataG.selectAll(".layer")
+                dataG.selectAll(".layer")
                     .data(layers)
                     .enter().append("g")
                     .attr("class", "layer")
@@ -421,7 +415,7 @@
                     .attr("d", area)
                     .attr("fill", (d, i) => colors[i])
 
-                let linesGroup = dataG.selectAll(".layer-line")
+                dataG.selectAll(".layer-line")
                     .data(layers)
                     .enter().append("g")
                     .attr("class", "layer-line")

@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/Shopify/sarama"
@@ -316,7 +317,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			fields["derived_ua_browser_version"] = fmt.Sprintf("%d.%d", ua.Browser.Version.Major, ua.Browser.Version.Minor)
 		}
 
-		if user.Referer != nil {
+		if user.Referer != nil && len(*user.Referer) > 0 {
 			fields["referer"] = *user.Referer
 			parsedRef := refererparser.Parse(*user.Referer)
 			if user.URL != nil {
@@ -327,11 +328,12 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 
 			if tags["derived_referer_medium"] == "unknown" {
 				tags["derived_referer_medium"] = "external"
-				if user.URL != nil {
-					tags["derived_referer_source"] = *user.URL
-				}
 			}
 
+			parsedURL, err := url.Parse(*user.Referer)
+			if err == nil {
+				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Path)
+			}
 		} else {
 			tags["derived_referer_medium"] = "direct"
 		}

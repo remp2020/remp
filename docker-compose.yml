@@ -5,11 +5,11 @@ version: "3"
 services:
   nginx:
     image: "nginx:stable"
+    environment:
+      NGINX_PORT: "[::]:80"
     volumes:
       - ".:/var/www/html:rw"
-      - "./Docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
-    ports:
-      - "80:80"
+      - "./Docker/nginx/nginx.conf:/etc/nginx/conf.d/default.template:ro"
     restart: "unless-stopped"
     networks:
       default:
@@ -23,6 +23,7 @@ services:
           - "grafana.beam.remp.press"
           - "mailhog.remp.press"
           - "kibana.beam.remp.press"
+    command: /bin/bash -c "envsubst '$$NGINX_PORT' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
 
   mysql:
     image: "mysql:5.7" # minimal 5.7.8
@@ -133,8 +134,6 @@ services:
       ADVERTISED_HOST: "kafka"
       ADVERTISED_PORT: "9092"
       CREATE_TOPICS: "beam_events:1:1"
-    ports:
-      - "9092:9092"
     volumes:
       - "kafka-data:/data"
 
@@ -145,8 +144,6 @@ services:
     environment:
       INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0
       INFLUXDB_DATA_MAX_SERIES_PER_DATABASE: 0
-    ports:
-      - "8098:8086"
     restart: "unless-stopped"
 
   telegraf:
@@ -178,16 +175,12 @@ services:
     build: "./Beam/go/cmd/tracker"
     depends_on:
       - "kafka"
-    ports:
-      - "8091:8081"
     restart: "unless-stopped"
 
   beam_segments:
     build: "./Beam/go/cmd/segments"
     depends_on:
       - "influxdb"
-    ports:
-      - "8092:8082"
     restart: "unless-stopped"
 
 volumes:

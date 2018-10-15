@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Contracts\JournalContract;
+use App\Contracts\JournalHelpers;
 use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
@@ -18,6 +20,13 @@ use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
+    private $journalHelper;
+
+    public function __construct(JournalContract $journal)
+    {
+        $this->journalHelper = new JournalHelpers($journal);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -53,6 +62,7 @@ class ArticleController extends Controller
     {
         $articles = Article::selectRaw(implode(',', [
                 "articles.id",
+                "articles.external_id",
                 "articles.title",
                 "articles.url",
                 "articles.published_at",
@@ -100,11 +110,26 @@ class ArticleController extends Controller
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
         }
 
-        return $datatables->of($articles)
+        $dt = $datatables->of($articles);
+        $articles = $dt->results();
+
+        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($articles);
+
+        $threeMonthsAgo = Carbon::now()->subMonths(3);
+
+        return $dt
             ->addColumn('title', function (Article $article) {
-                return HTML::link($article->url, $article->title);
+                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount, $threeMonthsAgo) {
+                $uniqueCount = $externalIdsToUniqueUsersCount->get($article->external_id, 0);
+                if ($uniqueCount === 0 || $article->published_at->lt($threeMonthsAgo)) {
+                    return '';
+                }
+
+                return number_format(($article->conversions_count / $uniqueCount) * 10000, 2);
+            })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {
                     return [0];
@@ -162,7 +187,8 @@ class ArticleController extends Controller
 
     public function dtPageviews(Request $request, Datatables $datatables)
     {
-        $articles = Article::selectRaw("articles.*")
+        $articles = Article::selectRaw('articles.*,' .
+            'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
             ->with(['authors', 'sections'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
@@ -176,7 +202,7 @@ class ArticleController extends Controller
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::link($article->url, $article->title);
+                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->addColumn('avg_sum_all', function (Article $article) {
                 if (!$article->timespent_all || !$article->pageviews_all) {
@@ -260,9 +286,10 @@ class ArticleController extends Controller
     {
         $articles = [];
         foreach ($request->get('articles', []) as $a) {
-            $article = Article::firstOrCreate([
-                'external_id' => $a['external_id'],
-            ], $a);
+            // When saving to DB, Eloquent strips timezone information,
+            // therefore convert to UTC
+            $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
+            $article = Article::upsert($a);
 
             $article->sections()->detach();
             foreach ($a['sections'] as $sectionName) {

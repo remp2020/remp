@@ -83,6 +83,7 @@ class SendingStats extends Control
             'spam_complained' => ['value' => 0, 'per' => 0],
             'unsubscribed' => ['value' => 0, 'per' => 0],
         ];
+
         foreach ($this->jobBatchTemplates as $jobBatchTemplate) {
             $total += $jobBatchTemplate->sent;
             $stats['delivered']['value'] += $jobBatchTemplate->delivered;
@@ -98,6 +99,17 @@ class SendingStats extends Control
                 ])
                 ->count('*');
         }
+
+        $nonBatchTemplateStat = $this->logsRepository->getNonBatchTemplateStats($this->templateIds);
+        if ($nonBatchTemplateStat) {
+            $total += $nonBatchTemplateStat->sent;
+            $stats['delivered']['value'] += $nonBatchTemplateStat->delivered;
+            $stats['opened']['value'] += $nonBatchTemplateStat->opened;
+            $stats['clicked']['value'] += $nonBatchTemplateStat->clicked;
+            $stats['dropped']['value'] += $nonBatchTemplateStat->dropped;
+            $stats['spam_complained']['value'] += $nonBatchTemplateStat->spam_complained;
+        }
+
         foreach ($stats as $key => $stat) {
             $stats[$key]['per'] = $total ? ($stat['value'] / $total * 100) : 0;
         }
