@@ -276,7 +276,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 
 			parsedURL, err := url.Parse(*user.Referer)
 			if err == nil {
-				tags["derived_referer_host_with_path"] = join(parsedURL.Scheme, "://", parsedURL.Host, "/", parsedURL.Path)
+				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Path)
 			}
 		} else {
 			tags["derived_referer_medium"] = "direct"
@@ -375,12 +375,4 @@ func (c *TrackController) pushPublic(topic string, value []byte) {
 		Topic: topic,
 		Value: sarama.ByteEncoder(value),
 	}
-}
-
-func join(strs ...string) string {
-	var sb strings.Builder
-	for _, str := range strs {
-		sb.WriteString(str)
-	}
-	return sb.String()
 }
