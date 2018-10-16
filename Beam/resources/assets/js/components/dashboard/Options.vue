@@ -1,10 +1,16 @@
 <template>
     <div>
         <h4 class="m-t-25">Dashboard Configuration</h4>
-        <a href="#chart-options" class="btn btn-sm btn-info waves-effect" data-toggle="modal">
+        <button class="btn btn-sm btn-info waves-effect" @click="showModal=true">
             <i class="zmdi zmdi-settings"></i> More options
-        </a>
-        <options-modal name="chart-options"></options-modal>
+        </button>
+
+        <div v-if="showModal">
+            <transition name="modal">
+                <options-modal v-on:close="showModal=false"></options-modal>
+            </transition>
+        </div>
+
     </div>
 </template>
 
@@ -14,21 +20,18 @@
 <script>
     import OptionsModal from './OptionsModal.vue'
 
-    let props = {
-    };
-
     export default {
         components: { OptionsModal },
         name: 'options',
-        props: props,
         data() {
             return {
+                showModal: false,
             }
         },
         computed: {
             settings() {
                 return this.$store.state.settings
             }
-        }
+        },
     }
 </script>
