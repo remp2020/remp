@@ -172,3 +172,79 @@ sso/novydenik:
   only:
   - master
   dependencies: []
+
+"🇨🇿 mailer/denikncz":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=denikncz/mailer"
+      -F "variables[URL]=https://mailer.denikn.cz"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+  dependencies: []
+
+"🇨🇿 campaign/denikncz":
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=denikncz/campaign"
+    -F "variables[URL]=https://campaign.denikn.cz"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
+
+"🇨🇿 beam/denikncz":
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=denikncz/beam"
+    -F "variables[URL]=https://beam.denikn.cz"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
+
+"🇨🇿 sso/denikncz":
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=denikncz/sso"
+    -F "variables[URL]=https://sso.denikn.cz"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
