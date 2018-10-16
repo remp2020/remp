@@ -54,7 +54,10 @@ class DashboardController extends Controller
         $request->validate([
             'tz' => 'timezone',
             'interval' => 'required|in:today,7days,30days',
+            'settings.compareWith' => 'required|in:last_week,average'
         ]);
+
+        $settings = $request->get('settings');
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $interval = $request->get('interval');
@@ -73,19 +76,38 @@ class DashboardController extends Controller
             $tags[$records->tags->derived_referer_medium] = true;
         }
 
-        // Compute shadow values from previous week for today and 7-days intervals
-        $previousRecords = collect();
+        // Compute shadow values for today and 7-days intervals
+        $shadowRecords = [];
         if ($interval !== '30days') {
-            $journalRequest = new JournalAggregateRequest('pageviews', 'load');
-            $journalRequest->setTimeAfter((clone $timeAfter)->subWeek());
-            $journalRequest->setTimeBefore((clone $timeBefore)->subWeek());
-            $journalRequest->setTimeHistogram($intervalText, '0h');
-            $journalRequest->addGroup('derived_referer_medium');
-            $previousRecords = $this->journal->count($journalRequest);
+            $numberOfAveragedWeeks = $settings['compareWith'] === 'average' ? 4 : 1;
 
-            // update tags
-            foreach ($previousRecords as $records) {
-                $tags[$records->tags->derived_referer_medium] = true;
+            for ($i = 1; $i <= $numberOfAveragedWeeks; $i++) {
+                $from = (clone $timeBefore)->subWeeks($i);
+                $to = (clone $timeAfter)->subWeeks($i);
+
+                foreach ($this->pageviewRecordsBasedOnRefererMedium($from, $to, $intervalText) as $records) {
+                    $currentTag = $records->tags->derived_referer_medium;
+                    // update tags
+                    $tags[$currentTag] = true;
+
+                    if (!isset($records->time_histogram)) {
+                        continue;
+                    }
+
+                    foreach ($records->time_histogram as $timeValue) {
+                        // we want to plot previous results on same points as current ones,
+                        // therefore add week which was subtracted before when data was queried
+                        $correctedDate = Carbon::parse($timeValue->time)->addWeeks($i)->toIso8601ZuluString();
+
+                        if (!array_key_exists($correctedDate, $shadowRecords)) {
+                            $shadowRecords[$correctedDate] = [];
+                        }
+                        if (!array_key_exists($currentTag, $shadowRecords[$correctedDate])) {
+                            $shadowRecords[$correctedDate][$currentTag] = collect();
+                        }
+                        $shadowRecords[$correctedDate][$currentTag]->push($timeValue->value);
+                    }
+                }
             }
         }
 
@@ -93,8 +115,8 @@ class DashboardController extends Controller
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
         $results = [];
-        $previousResults = [];
-        $previousResultsSummed = [];
+        $shadowResults = [];
+        $shadowResultsSummed = [];
         $timeIterator = JournalHelpers::getTimeIterator($timeAfter, $intervalMinutes);
 
         $emptyValues = collect($tags)->mapWithKeys(function ($item) {
@@ -107,10 +129,10 @@ class DashboardController extends Controller
             $results[$zuluDate] = $emptyValues;
             $results[$zuluDate]['Date'] = $zuluDate;
 
-            if ($previousRecords->isNotEmpty()) {
-                $previousResults[$zuluDate] = $emptyValues;
-                $previousResults[$zuluDate]['Date'] = $previousResultsSummed[$zuluDate]['Date'] = $zuluDate;
-                $previousResultsSummed[$zuluDate]['value'] = 0;
+            if (count($shadowRecords) > 0) {
+                $shadowResults[$zuluDate] = $emptyValues;
+                $shadowResults[$zuluDate]['Date'] = $shadowResultsSummed[$zuluDate]['Date'] = $zuluDate;
+                $shadowResultsSummed[$zuluDate]['value'] = 0;
             }
 
             $timeIterator->addMinutes($intervalMinutes);
@@ -128,20 +150,13 @@ class DashboardController extends Controller
             }
         }
 
-        // Save previous results
-        foreach ($previousRecords as $records) {
-            if (!isset($records->time_histogram)) {
-                continue;
-            }
-            $currentTag = $records->tags->derived_referer_medium;
+        // Save shadow results
+        foreach ($shadowRecords as $date => $tagsAndValues) {
+            foreach ($tagsAndValues as $tag => $values) {
+                $avg = (int) round($values->avg());
 
-            foreach ($records->time_histogram as $timeValue) {
-                // we want to plot previous results on same points as current ones,
-                // therefore add week which was subtracted before when data was queried
-                $correctedDate = Carbon::parse($timeValue->time)->addWeek()->toIso8601ZuluString();
-
-                $previousResults[$correctedDate][$currentTag] = $timeValue->value;
-                $previousResultsSummed[$correctedDate]['value'] += (int) $timeValue->value;
+                $shadowResults[$date][$tag] = $avg;
+                $shadowResultsSummed[$date]['value'] += $avg;
             }
         }
 
@@ -152,10 +167,20 @@ class DashboardController extends Controller
         return response()->json([
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
-            'previousResults' => array_values($previousResults),
-            'previousResultsSummed' => array_values($previousResultsSummed),
+            'previousResults' => array_values($shadowResults),
+            'previousResultsSummed' => array_values($shadowResultsSummed),
             'tags' => $tags
         ]);
+    }
+
+    private function pageviewRecordsBasedOnRefererMedium(Carbon $timeBefore, Carbon $timeAfter, string $interval)
+    {
+        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
+        $journalRequest->setTimeAfter($timeAfter);
+        $journalRequest->setTimeBefore($timeBefore);
+        $journalRequest->setTimeHistogram($interval, '0h');
+        $journalRequest->addGroup('derived_referer_medium');
+        return $this->journal->count($journalRequest);
     }
 
     public function mostReadArticles()
