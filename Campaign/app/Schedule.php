@@ -96,6 +96,11 @@ class Schedule extends Model
         return $this->status === self::STATUS_STOPPED || ($this->end_time !== null && $this->end_time < Carbon::now());
     }
 
+    public function isPaused()
+    {
+        return $this->status === self::STATUS_PAUSED;
+    }
+
     public function endsInFuture()
     {
         return !$this->end_time || $this->end_time > Carbon::now();
