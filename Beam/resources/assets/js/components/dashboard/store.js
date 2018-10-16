@@ -1,4 +1,5 @@
 import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate'
 
 export default new Vuex.Store({
     state: {
@@ -10,5 +11,6 @@ export default new Vuex.Store({
         changeSettings(state, newSettings) {
             state.settings = Object.assign({}, state.settings, newSettings)
         }
-    }
+    },
+    plugins: [createPersistedState()],
 })
