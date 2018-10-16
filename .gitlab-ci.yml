@@ -173,7 +173,7 @@ sso/novydenik:
   - master
   dependencies: []
 
-"🇨🇿 mailer/denikncz":
+"mailer/denikncz 🇨🇿":
   stage: deploy
   script:
     - >
@@ -192,7 +192,7 @@ sso/novydenik:
     - master
   dependencies: []
 
-"🇨🇿 campaign/denikncz":
+"campaign/denikncz 🇨🇿":
   stage: deploy
   script:
   - >
@@ -211,7 +211,7 @@ sso/novydenik:
   - master
   dependencies: []
 
-"🇨🇿 beam/denikncz":
+"beam/denikncz 🇨🇿":
   stage: deploy
   script:
   - >
@@ -230,7 +230,7 @@ sso/novydenik:
   - master
   dependencies: []
 
-"🇨🇿 sso/denikncz":
+"sso/denikncz 🇨🇿":
   stage: deploy
   script:
   - >
