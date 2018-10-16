@@ -18,14 +18,14 @@ Route::get('/error', 'AuthController@error')->name('sso.error');
 Route::middleware('auth.basic.dashboard')->group(function () {
     Route::get('public', 'DashboardController@public')->name('dashboard.public');
     Route::get('public/articlesJson', 'DashboardController@mostReadArticles')->name('public.articles.json');
-    Route::get('public/timeHistogramJson', 'DashboardController@timeHistogram')->name('public.timeHistogram.json');
+    Route::post('public/timeHistogramJson', 'DashboardController@timeHistogram')->name('public.timeHistogram.json');
 });
 
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard.index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
     Route::get('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
-    Route::get('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
+    Route::post('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
 
     Route::get('accounts/json', 'AccountController@json');
     Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');

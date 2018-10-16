@@ -2,11 +2,14 @@
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-9">
                     <time-histogram ref="histogram"
                                     :url="timeHistogramUrl"
                                     :concurrents="totalConcurrents"
                     ></time-histogram>
+                </div>
+                <div class="col-md-3">
+                    <options></options>
                 </div>
             </div>
 
@@ -19,7 +22,7 @@
                                     <th style="width: 40px">Concurrents</th>
                                     <th style="text-align: left">Article</th>
                                     <th style="width: 40px">Engaged Time</th>
-                                    <th style="">
+                                    <th>
                                         <abbr title="(Conversions/Unique visitors) x 10000">
                                             Conversions rate
                                         </abbr>
@@ -106,6 +109,7 @@
 <script>
     import AnimatedInteger from './AnimatedInteger.vue'
     import TimeHistogram from './TimeHistogram.vue'
+    import Options from './Options.vue'
     import axios from 'axios'
 
     let props = {
@@ -152,7 +156,7 @@
 
     export default {
         name: "dashboard-root",
-        components: { AnimatedInteger, TimeHistogram },
+        components: { AnimatedInteger, TimeHistogram, Options },
         props: props,
         created() {
             document.addEventListener('visibilitychange', this.visibilityChanged)
@@ -169,6 +173,11 @@
             return {
                 articles: null,
                 totalConcurrents: 0
+            }
+        },
+        computed: {
+            settings() {
+                return this.$store.state.settings
             }
         },
         methods: {

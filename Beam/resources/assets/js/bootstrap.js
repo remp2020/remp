@@ -1,10 +1,12 @@
 import Vue2Filters from 'vue2-filters'
+import Vuex from 'vuex'
 import "./filters"
 
 global.$ = global.jQuery = require('jquery');
 
 global.Vue = require('vue');
 Vue.use(Vue2Filters)
+Vue.use(Vuex)
 
 global.moment = require('moment');
 
@@ -16,3 +18,4 @@ global.RuleOcurrences = require("./components/RuleOcurrences.vue");
 global.FormValidator = require("remp/js/components/FormValidator");
 global.DashboardRoot = require("./components/dashboard/DashboardRoot.vue");
 global.ArticleHistogram = require("./components/dashboard/ArticleHistogram.vue");
+global.DashboardStore = require("./components/dashboard/store.js").default
