@@ -1,17 +1,10 @@
 <template>
     <div class="card">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-9">
-                    <time-histogram ref="histogram"
-                                    :url="timeHistogramUrl"
-                                    :concurrents="totalConcurrents"
-                    ></time-histogram>
-                </div>
-                <div class="col-md-3">
-                    <options></options>
-                </div>
-            </div>
+            <time-histogram ref="histogram"
+                            :url="timeHistogramUrl"
+                            :concurrents="totalConcurrents">
+            </time-histogram>
 
             <div class="row" style="padding-top: 10px">
                 <div class="col-md-12">
