@@ -183,12 +183,22 @@ class DashboardController extends Controller
         return $this->journal->count($journalRequest);
     }
 
-    public function mostReadArticles()
+    public function mostReadArticles(Request $request)
     {
+        $request->validate([
+            'settings.onlyTrafficFromFrontPage' => 'required|boolean'
+        ]);
+
+        $settings = $request->get('settings');
+
         $timeBefore = Carbon::now();
         $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
 
         $concurrentsRequest = new JournalConcurrentsRequest();
+
+        if ($settings['onlyTrafficFromFrontPage']) {
+            $concurrentsRequest->addFilter('derived_referer_host_with_path', config('dashboard.frontpage_referrer'));
+        }
         $concurrentsRequest->setTimeAfter($timeAfter);
         $concurrentsRequest->setTimeBefore($timeBefore);
         $concurrentsRequest->addGroup('article_id');
