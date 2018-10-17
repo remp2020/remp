@@ -34,7 +34,7 @@
                                     <label>
                                         <input v-model="onlyTrafficFromFrontPage" type="checkbox">
                                         <i class="input-helper"></i>
-                                        Only traffic from front page
+                                        Only traffic from front-page
                                     </label>
                                 </div>
 
