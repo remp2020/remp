@@ -108,6 +108,7 @@ class LogsRepository extends Repository
             ->select(implode(',', $columns))
             ->where([
                 'mail_template_id' => $templateIds,
+                'mail_job_batch_id IS NULL',
             ])
             ->limit(1)
             ->fetch();
