@@ -69,7 +69,7 @@ class ScheduleController extends Controller
                     'edit' => !$s->isStopped() ? route('schedule.edit', $s) : null,
                     'start' => $s->isRunnable() ? route('schedule.start', $s) : null,
                     'pause' => $s->isRunning() ? route('schedule.pause', $s) : null,
-                    'stop' => $s->isRunning() ? route('schedule.stop', $s) : null,
+                    'stop' => $s->isRunning() || $s->isPaused() ? route('schedule.stop', $s) : null,
                     'destroy' => $s->isEditable() ? route('schedule.destroy', $s) : null,
                 ];
             })
@@ -259,7 +259,7 @@ class ScheduleController extends Controller
      */
     public function stop(Schedule $schedule)
     {
-        if (!$schedule->isRunning()) {
+        if (!$schedule->isRunning() && !$schedule->isPaused()) {
             return response()->format([
                 'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                     "Schedule for campaign %s was not running, stop request ignored",

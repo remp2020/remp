@@ -227,7 +227,7 @@ $.fn.dataTables = {
                 var actions = '<span class="actions">';
                 $.each(actionSettings, function (key, action) {
                     if (row.actions[action['name']] === null) {
-                        actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" disabled="disabled" title="' + action['title'] + '" href=""><i class="zmdi ' + action['class'] + '"></i></a>\n';
+                        actions += '<a class="btn btn-sm palette-Cyan bg waves-effect"  disabled="disabled" title="' + action['title'] + '" href="javascript:void(0)"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                         return;
                     }
                     if (row.action_methods && row.action_methods[action['name']]) {
