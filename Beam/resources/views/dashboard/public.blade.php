@@ -15,6 +15,7 @@
             components: {
                 DashboardRoot
             },
+            store: DashboardStore,
             data: function() {
                 return {
                     articlesUrl: "{!! route('public.articles.json') !!}",

@@ -3,61 +3,68 @@
         <div v-if="error" class="error" :title="error"></div>
 
         <div id="chartContainerHeader" class="row">
-            <div class="col-sm-6">
+            <div class="col-md-6">
                 <h4>Concurrents: <animated-integer :value="concurrents"></animated-integer></h4>
             </div>
-            <div class="col-sm-6">
+            <div class="col-md-6">
+
+                <options :classes="['pull-right']"></options>
+
                 <button-switcher :options="[
             {text: 'Today', value: 'today'},
             {text: '7 days', value: '7days'},
             {text: '30 days', value: '30days'}]"
-                                 :classes="['pull-right']"
+                                 :classes="['pull-right', 'm-r-15']"
                                  v-model="interval">
                 </button-switcher>
             </div>
         </div>
-
-        <div id="chartContainer">
-            <div v-if="loading" class="preloader pls-purple">
-                <svg class="pl-circular" viewBox="25 25 50 50">
-                    <circle class="plc-path" cx="50" cy="50" r="20"></circle>
-                </svg>
-            </div>
-
-            <div ref="svg-container" style="height: 200px" id="article-chart">
-                <svg style="z-index: 10" ref="svg"></svg>
-            </div>
-
-            <div id="legend-wrapper">
-                <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">
-
-                    <div class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
-                    <table>
-                        <tr>
-                            <th></th>
-                            <th v-if="highlightedRow.hasCurrent">Current</th>
-                            <th v-if="highlightedRow.hasPrevious">Week&nbsp;ago</th>
-                        </tr>
-                        <tr v-for="(item, tag) in highlightedRow.values">
-                            <td>
-                                <span v-if="highlightedRow.hasCurrent"
-                                             style="font-weight: bold"
-                                             v-bind:style="{color: item.color}">&#9679;</span>
-                                <span v-if="tag==''">Uncategorized</span>
-                                <span v-else style="text-transform: capitalize">{{tag}}</span>
-                            </td>
-                            <td v-if="highlightedRow.hasCurrent">{{item.current}}</td>
-                            <td v-if="highlightedRow.hasPrevious">{{item.previous}}</td>
-                        </tr>
-                        <tr style="border-top: 1px solid #d1d1d1">
-                            <td><b>Total</b></td>
-                            <td v-if="highlightedRow.hasCurrent"><b>{{highlightedRow.currentSum}}</b></td>
-                            <td v-if="highlightedRow.hasPrevious"><b>{{highlightedRow.previousSum}}</b></td>
-                        </tr>
-                    </table>
+        <div class="col-md-12">
+            <div id="chartContainer">
+                <div v-if="loading" class="preloader pls-purple">
+                    <svg class="pl-circular" viewBox="25 25 50 50">
+                        <circle class="plc-path" cx="50" cy="50" r="20"></circle>
+                    </svg>
                 </div>
-            </div>
 
+                <div ref="svg-container" style="height: 200px" id="article-chart">
+                    <svg style="z-index: 10" ref="svg"></svg>
+                </div>
+
+                <div id="legend-wrapper">
+                    <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">
+
+                        <div class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
+                        <table>
+                            <tr>
+                                <th></th>
+                                <th v-if="highlightedRow.hasCurrent">Current</th>
+                                <th v-if="highlightedRow.hasPrevious">
+                                    <template v-if="settings.compareWith=='average'">Average</template>
+                                    <template v-else>Week&nbsp;ago</template>
+                                </th>
+                            </tr>
+                            <tr v-for="(item, tag) in highlightedRow.values">
+                                <td>
+                                <span v-if="highlightedRow.hasCurrent"
+                                      style="font-weight: bold"
+                                      v-bind:style="{color: item.color}">&#9679;</span>
+                                    <span v-if="tag==''">Uncategorized</span>
+                                    <span v-else style="text-transform: capitalize">{{tag}}</span>
+                                </td>
+                                <td v-if="highlightedRow.hasCurrent">{{item.current}}</td>
+                                <td v-if="highlightedRow.hasPrevious">{{item.previous}}</td>
+                            </tr>
+                            <tr style="border-top: 1px solid #d1d1d1">
+                                <td><b>Total</b></td>
+                                <td v-if="highlightedRow.hasCurrent"><b>{{highlightedRow.currentSum}}</b></td>
+                                <td v-if="highlightedRow.hasPrevious"><b>{{highlightedRow.previousSum}}</b></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </template>
@@ -65,7 +72,6 @@
 <style scoped>
     #chartContainer {
         position: relative;
-        padding: 0 20px;
     }
 
     #chartContainerHeader {
@@ -115,6 +121,7 @@
 <script>
     import AnimatedInteger from './AnimatedInteger.vue'
     import ButtonSwitcher from './ButtonSwitcher.vue'
+    import Options from './Options.vue'
     import * as constants from './constants'
     import {debounce, formatInterval} from './constants'
     import axios from 'axios'
@@ -143,7 +150,7 @@
 
     export default {
         components: {
-            ButtonSwitcher, AnimatedInteger
+            ButtonSwitcher, AnimatedInteger, Options
         },
         name: 'article-chart',
         props: props,
@@ -155,12 +162,15 @@
                 interval: 'today',
                 legendVisible: false,
                 highlightedRow: null,
-                legendLeft: "0px",
+                legendLeft: '0px',
             };
         },
         computed: {
             hasPrevious() {
                 return this.data !== null && this.data.previousResultsSummed.length > 0
+            },
+            settings() {
+                return this.$store.state.settings
             }
         },
         watch: {
@@ -168,6 +178,9 @@
                 this.fillData()
             },
             interval(value) {
+                this.reload()
+            },
+            settings(value) {
                 this.reload()
             }
         },
@@ -260,7 +273,7 @@
                     if (rowLeft !== undefined) {
                         const leftDateMillis = moment(rowLeft.date).valueOf()
                         const rightDateMillis = moment(rowRight.date).valueOf()
-                        if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)){
+                        if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)) {
                             row = rowLeft
                         }
                     }
@@ -319,10 +332,10 @@
 
                 // After rows are selected, draw line and legend
                 vertical.attr("d", function() {
-                        let d = "M" + verticalX + "," + height;
-                        d += " " + verticalX + "," + 0;
-                        return d;
-                    })
+                    let d = "M" + verticalX + "," + height;
+                    d += " " + verticalX + "," + 0;
+                    return d;
+                })
                 this.legendLeft = Math.round(verticalX) + 20 + "px"
 
                 this.highlightedRow = {
@@ -444,11 +457,10 @@
             loadData() {
                 this.loading = true
                 axios
-                    .get(this.url, {
-                        params: {
-                            tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                            interval: this.interval,
-                        }
+                    .post(this.url, {
+                        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        interval: this.interval,
+                        settings: this.settings
                     })
                     .then(response => {
                         this.loading = false

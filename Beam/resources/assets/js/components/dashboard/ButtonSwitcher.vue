@@ -29,7 +29,7 @@
             type: Array,
             default: []
         }
-    };
+    }
 
     export default {
         name: "ButtonSwitcher",
