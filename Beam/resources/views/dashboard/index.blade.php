@@ -18,12 +18,16 @@
             components: {
                 DashboardRoot
             },
-            store: DashboardStore,
-            data: function() {
+            provide: function() {
                 return {
-                    articlesUrl: "{!! route('dashboard.articles.json') !!}",
-                    timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}"
+                    enableFrontpageFiltering: this.enableFrontpageFiltering
                 }
+            },
+            store: DashboardStore,
+            data: {
+                articlesUrl: "{!! route('dashboard.articles.json') !!}",
+                timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}",
+                enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }}
             }
         })
     </script>

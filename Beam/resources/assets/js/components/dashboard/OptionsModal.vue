@@ -32,9 +32,17 @@
 
                                 <div class="checkbox m-b-15">
                                     <label>
-                                        <input v-model="onlyTrafficFromFrontPage" type="checkbox">
+                                        <input
+                                                :disabled="!enableFrontpageFiltering"
+                                                v-model="onlyTrafficFromFrontPage"
+                                                type="checkbox">
                                         <i class="input-helper"></i>
-                                        Only traffic from front-page
+                                        <template v-if="enableFrontpageFiltering">
+                                            Only traffic from front-page
+                                        </template>
+                                        <template v-else>
+                                            <strike title="Front-page URL is not specified in the configuration, please add it to Beam environmental variables.">Only traffic from front-page</strike>
+                                        </template>
                                     </label>
                                 </div>
 
@@ -74,10 +82,11 @@
 <script>
     export default {
         name: 'options-modal',
+        inject: ['enableFrontpageFiltering'],
         data() {
             return {
                 compareWith: this.$store.state.settings.compareWith,
-                onlyTrafficFromFrontPage: this.$store.state.settings.onlyTrafficFromFrontPage
+                onlyTrafficFromFrontPage: this.$store.state.settings.onlyTrafficFromFrontPage,
             }
         },
         methods: {

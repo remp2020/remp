@@ -27,12 +27,19 @@ class DashboardController extends Controller
 
     public function index()
     {
-        return view('dashboard.index');
+        return $this->dashboardView('dashboard.index');
     }
 
     public function public()
     {
-        return view('dashboard.public');
+        return $this->dashboardView('dashboard.public');
+    }
+
+    private function dashboardView($template)
+    {
+        return view($template, [
+            'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null
+        ]);
     }
 
     private function getJournalParameters($interval, $tz)
@@ -196,8 +203,9 @@ class DashboardController extends Controller
 
         $concurrentsRequest = new JournalConcurrentsRequest();
 
-        if ($settings['onlyTrafficFromFrontPage']) {
-            $concurrentsRequest->addFilter('derived_referer_host_with_path', config('dashboard.frontpage_referer'));
+        $frontpageReferer = config('dashboard.frontpage_referer');
+        if ($frontpageReferer && $settings['onlyTrafficFromFrontPage']) {
+            $concurrentsRequest->addFilter('derived_referer_host_with_path', $frontpageReferer);
         }
         $concurrentsRequest->setTimeAfter($timeAfter);
         $concurrentsRequest->setTimeBefore($timeBefore);
