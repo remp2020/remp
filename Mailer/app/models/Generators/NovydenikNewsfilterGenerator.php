@@ -75,7 +75,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             // remove shortcodes
             "/\[greybox\]/is" => "",
             "/\[\/greybox\]/is" => "",
-            "/https:\/\/novydenik\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
+            "/https:\/\/denikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
             "/\[pullboth.*?\/pullboth\]/is" => "",
             "/<script.*?\/script>/is" => "",
             "/\[iframe.*?\]/is" => "",
@@ -103,7 +103,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
 
             // replace link shortcodes
             '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use ($content, $transport) {
-                $url = "https://novydenik.cz/{$matches[1]}";
+                $url = "https://denikn.cz/{$matches[1]}";
                 $meta = Utils::fetchUrlMeta($url, $content, $transport);
                 return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
@@ -237,7 +237,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             if (strpos($line, '<h3') !== false) {
                 if ($promoButton) {
                     $cacheHtml .= <<<HTML
-<p><a data-skipregex="1" style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href="https://www.novydenik.cz">Staňte se předplatiteli a podpořte Nový deník</a></p>
+<p><a data-skipregex="1" style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href="https://predplatne.denikn.cz">Staňte se předplatiteli a podpořte Nový deník</a></p>
 HTML;
                     $promoButton = false;
                 }
