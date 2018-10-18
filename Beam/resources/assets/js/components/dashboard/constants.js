@@ -7,6 +7,20 @@ export const GRAPH_COLORS = [
     "#3B40b6",
 ]
 
+// empirically defined values
+export const CONVERSIONS_COLORING_THRESHOLD = {
+    low: 3,
+    medium: 8,
+    high: 13
+}
+
+// empirically defined values
+export const CONVERSION_RATE_COLORING_THRESHOLD = {
+    low: 3.0,
+    medium: 5.0,
+    high: 7.0
+}
+
 export const REFRESH_DATA_TIMEOUT_MS = 30000
 
 export const debounce = (fn, time) => {

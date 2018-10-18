@@ -9,16 +9,6 @@
                 type: Array,
                 required: true,
             },
-            conversionMinuteRanges: {
-                type: Array,
-                default: function() {
-                    return [
-                        {"minutes": 60, "label": "1h"},
-                        {"minutes": 60*6, "label": "6h"},
-                        {"minutes": 60*24, "label": "24h"},
-                    ];
-                },
-            },
             pageviewMinuteRanges: {
                 type: Array,
                 default: function() {
@@ -54,47 +44,29 @@
         },
         methods: {
             fetchCommerceStats: function(now) {
-                for (let range of this.conversionMinuteRanges) {
-                    let d = new Date(now.getTime());
-                    d.setMinutes(d.getMinutes() - range.minutes);
+                const payload = {
+                    "filter_by": [
+                        {
+                            "tag": "article_id",
+                            "values": this.articleIds,
+                        },
+                    ],
+                    "group_by": [
+                        "article_id",
+                    ],
+                };
 
-                    const payload = {
-                        "time_after": d.toISOString(),
-                        "filter_by": [
-                            {
-                                "tag": "article_id",
-                                "values": this.articleIds,
-                            },
-                        ],
-                        "group_by": [
-                            "article_id",
-                        ],
-                    };
-
-                    Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/sum', payload)
-                        .then(function (response) {
-                            let sums = {}
-                            for (const group of response.data) {
-                                sums[group["tags"]["article_id"]] = group["sum"]
-                            }
-                            EventHub.$emit('content-conversions-revenue-changed', range, sums)
-                        })
-                        .catch(function (error) {
-                            console.warn(error);
-                        });
-
-                    Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/count', payload)
-                        .then(function (response) {
-                            let counts = {}
-                            for (const group of response.data) {
-                                counts[group["tags"]["article_id"]] = group["count"]
-                            }
-                            EventHub.$emit('content-conversions-counts-changed', range, counts)
-                        })
-                        .catch(function (error) {
-                            console.warn(error);
-                        });
-                }
+                Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/count', payload)
+                    .then(function (response) {
+                        let counts = {}
+                        for (const group of response.data) {
+                            counts[group["tags"]["article_id"]] = group["count"]
+                        }
+                        EventHub.$emit('content-conversions-counts-changed', counts)
+                    })
+                    .catch(function (error) {
+                        console.warn(error);
+                    });
             },
 
             fetchPageviewStats: function(now) {
