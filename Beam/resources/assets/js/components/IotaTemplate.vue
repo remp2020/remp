@@ -36,15 +36,15 @@
                 <div class="ri_box_item">{{ conversionRate }}</div>
             </div>
 
-            <!--<div v-if="sortedPageviewRanges.length > 0" class="ri_box_line">-->
-                <!--<div class="ri_box_title">Pageviews</div>-->
-                <!--<div v-for="range in sortedPageviewRanges" class="ri_box_item">-->
-                    <!--<div class="ri_box_key">{{ range.label }}</div>-->
-                    <!--<div class="ri_box_value">-->
-                        <!--{{ pageviewStats[range.minutes] }}&nbsp;-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
+            <div v-if="sortedPageviewRanges.length > 0" class="ri_box_line">
+                <div class="ri_box_title">Readers: </div>
+                <div v-for="range in sortedPageviewRanges" class="ri_box_item">
+                    <div class="ri_box_key">{{ range.label }}</div>
+                    <div class="ri_box_value">
+                        {{ pageviewStats[range.label] }}&nbsp;
+                    </div>
+                </div>
+            </div>
 
             <div v-if="sortedTitleVariants.length > 0" class="ri_box_line">
                 <div v-for="variant in sortedTitleVariants" class="ri_box_item">
@@ -133,7 +133,7 @@
                 return colorThresholdToClass(CONVERSION_RATE_COLORING_THRESHOLD, this.conversionRate)
             },
             sortedPageviewRanges() {
-                return Object.values(this.pageviewRanges).slice().sort((a, b) => a.minutes - b.minutes);
+                return Object.values(this.pageviewRanges).slice().sort((a, b) => a.order - b.order);
             },
             sortedTitleVariantRanges() {
                 return Object.values(this.titleVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
@@ -157,12 +157,12 @@
                 this.conversions = counts[this.articleId]
             },
             updatePageviewStats(range, counts) {
-                this.$set(this.pageviewRanges, range.minutes, range);
+                this.$set(this.pageviewRanges, range.label, range);
                 if (counts === null || !counts[this.articleId]) {
                     this.$set(this.pageviewStats, range.minutes, 0);
                     return;
                 }
-                this.$set(this.pageviewStats, range.minutes, counts[this.articleId]);
+                this.$set(this.pageviewStats, range.label, counts[this.articleId]);
 
                 // Assuming there is 'Total' label
                 if (range.label === 'Total') {
