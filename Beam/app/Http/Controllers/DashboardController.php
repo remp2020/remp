@@ -197,7 +197,7 @@ class DashboardController extends Controller
         $concurrentsRequest = new JournalConcurrentsRequest();
 
         if ($settings['onlyTrafficFromFrontPage']) {
-            $concurrentsRequest->addFilter('derived_referer_host_with_path', config('dashboard.frontpage_referrer'));
+            $concurrentsRequest->addFilter('derived_referer_host_with_path', config('dashboard.frontpage_referer'));
         }
         $concurrentsRequest->setTimeAfter($timeAfter);
         $concurrentsRequest->setTimeBefore($timeBefore);
