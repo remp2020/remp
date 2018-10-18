@@ -14,8 +14,7 @@
                 default: function() {
                     return [
                         {"minutes": 15, "label": "15m"},
-                        {"minutes": 60, "label": "1h"},
-                        {"minutes": 60*4, "label": "4h"},
+                        {"minutes": undefined, "label": "Total"},
                     ];
                 },
             },
@@ -38,12 +37,12 @@
             Axios.defaults.headers.common['Content-Type'] = 'application/json';
 
             let now = new Date();
-            this.fetchCommerceStats(now);
+            this.fetchCommerceStats();
             this.fetchPageviewStats(now);
             this.fetchVariantStats(now, ["title_variant", "image_variant"]);
         },
         methods: {
-            fetchCommerceStats: function(now) {
+            fetchCommerceStats: function() {
                 const payload = {
                     "filter_by": [
                         {
@@ -71,11 +70,7 @@
 
             fetchPageviewStats: function(now) {
                 for (let range of this.pageviewMinuteRanges) {
-                    let d = new Date(now.getTime());
-                    d.setMinutes(d.getMinutes() - range.minutes);
-
                     const payload = {
-                        "time_after": d.toISOString(),
                         "filter_by": [
                             {
                                 "tag": "article_id",
@@ -87,7 +82,13 @@
                         ],
                     };
 
-                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', payload)
+                    if (range.minutes !== undefined) {
+                        let d = new Date(now.getTime());
+                        d.setMinutes(d.getMinutes() - range.minutes);
+                        payload["time_after"] = d.toISOString()
+                    }
+
+                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/unique/browsers', payload)
                         .then(function (response) {
                             let counts = {}
                             for (const group of response.data) {
@@ -103,11 +104,8 @@
 
             fetchVariantStats: function(now, variantTypes) {
                 for (let range of this.pageviewMinuteRanges) {
-                    let d = new Date(now.getTime());
-                    d.setMinutes(d.getMinutes() - range.minutes);
 
                     const variantPayload = {
-                        "time_after": d.toISOString(),
                         "filter_by": [
                             {
                                 "tag": "article_id",
@@ -118,6 +116,12 @@
                             "article_id",
                         ].concat(variantTypes).concat(["social"]),
                     };
+
+                    if (range.minutes !== undefined) {
+                        let d = new Date(now.getTime());
+                        d.setMinutes(d.getMinutes() - range.minutes);
+                        variantPayload["time_after"] = d.toISOString()
+                    }
 
                     Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', variantPayload)
                         .then(function (response) {

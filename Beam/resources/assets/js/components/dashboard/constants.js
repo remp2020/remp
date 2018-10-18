@@ -34,6 +34,11 @@ export const debounce = (fn, time) => {
     }
 }
 
+// http://www.jacklmoore.com/notes/rounding-in-javascript/
+export const rounding = function (value, decimalNumbers) {
+    return Number(Math.round(value+'e2')+'e-2').toFixed(decimalNumbers);
+}
+
 export const formatInterval = function(value, intervalMinutes) {
     if (value) {
         let start = moment(value)
@@ -41,3 +46,4 @@ export const formatInterval = function(value, intervalMinutes) {
         return start.format('ll HH:mm') + " - " + end.format('HH:mm')
     }
 }
+

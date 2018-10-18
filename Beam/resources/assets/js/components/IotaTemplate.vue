@@ -31,15 +31,20 @@
                 <div class="ri_box_item">{{ conversions }}</div>
             </div>
 
-            <div v-if="sortedPageviewRanges.length > 0" class="ri_box_line">
-                <div class="ri_box_title">Pageviews</div>
-                <div v-for="range in sortedPageviewRanges" class="ri_box_item">
-                    <div class="ri_box_key">{{ range.label }}</div>
-                    <div class="ri_box_value">
-                        {{ pageviewStats[range.minutes] }}&nbsp;
-                    </div>
-                </div>
+            <div class="ri_box_line" :class="conversionRateColorClass">
+                <div class="ri_box_title">Conversion rate: </div>
+                <div class="ri_box_item">{{ conversionRate }}</div>
             </div>
+
+            <!--<div v-if="sortedPageviewRanges.length > 0" class="ri_box_line">-->
+                <!--<div class="ri_box_title">Pageviews</div>-->
+                <!--<div v-for="range in sortedPageviewRanges" class="ri_box_item">-->
+                    <!--<div class="ri_box_key">{{ range.label }}</div>-->
+                    <!--<div class="ri_box_value">-->
+                        <!--{{ pageviewStats[range.minutes] }}&nbsp;-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
 
             <div v-if="sortedTitleVariants.length > 0" class="ri_box_line">
                 <div v-for="variant in sortedTitleVariants" class="ri_box_item">
@@ -70,7 +75,7 @@
 
 <script type="text/javascript">
     import EventHub from "./EventHub"
-    import { CONVERSIONS_COLORING_THRESHOLD, CONVERSION_RATE_COLORING_THRESHOLD } from './dashboard/constants.js'
+    import { rounding, CONVERSIONS_COLORING_THRESHOLD, CONVERSION_RATE_COLORING_THRESHOLD } from './dashboard/constants.js'
 
     function colorThresholdToClass(threshold, value) {
         if (value > threshold.high) {
@@ -94,6 +99,7 @@
         },
         data: () => ({
             conversions: 0,
+            totalPageviews: 0,
 
             pageviewStats: {},
             titleVariantStats: {},
@@ -107,13 +113,24 @@
             imageVariants: [],
         }),
         created: function() {
-            EventHub.$on("content-conversions-counts-changed", this.updateCountStats);
+            EventHub.$on("content-conversions-counts-changed", this.updateConversions);
             EventHub.$on("content-pageviews-changed", this.updatePageviewStats);
             EventHub.$on("content-variants-changed", this.updateVariantStats);
         },
         computed: {
             conversionsColorClass() {
                 return colorThresholdToClass(CONVERSIONS_COLORING_THRESHOLD, this.conversions)
+            },
+            conversionRate() {
+                if (this.totalPageviews === 0) {
+                    return 0.0
+                }
+
+                // Artificially increased 10000x so conversion rate is more readable
+                return rounding((this.conversions/this.totalPageviews) * 10000, 2);
+            },
+            conversionRateColorClass() {
+                return colorThresholdToClass(CONVERSION_RATE_COLORING_THRESHOLD, this.conversionRate)
             },
             sortedPageviewRanges() {
                 return Object.values(this.pageviewRanges).slice().sort((a, b) => a.minutes - b.minutes);
@@ -132,22 +149,27 @@
             },
         },
         methods: {
-            updateCountStats: function(counts) {
+            updateConversions(counts) {
                 if (counts === null || !counts[this.articleId]) {
                     this.conversions = 0
                     return;
                 }
                 this.conversions = counts[this.articleId]
             },
-            updatePageviewStats: function(range, counts) {
+            updatePageviewStats(range, counts) {
                 this.$set(this.pageviewRanges, range.minutes, range);
                 if (counts === null || !counts[this.articleId]) {
                     this.$set(this.pageviewStats, range.minutes, 0);
                     return;
                 }
                 this.$set(this.pageviewStats, range.minutes, counts[this.articleId]);
+
+                // Assuming there is 'Total' label
+                if (range.label === 'Total') {
+                    this.totalPageviews = counts[this.articleId]
+                }
             },
-            updateVariantStats: function(variantTypes, range, counts) {
+            updateVariantStats(variantTypes, range, counts) {
                 for (const variantType of variantTypes) {
                     switch (variantType) {
                         case "title_variant":
@@ -159,7 +181,7 @@
                     }
                 }
             },
-            updateVariants: function(variantRanges, variants, variantStats, range, counts) {
+            updateVariants(variantRanges, variants, variantStats, range, counts) {
                 this.$set(variantRanges, range.minutes, range);
 
                 for (let variant in counts[this.articleId]) {
