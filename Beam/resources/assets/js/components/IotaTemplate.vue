@@ -46,25 +46,13 @@
                 </div>
             </div>
 
-            <div v-if="sortedTitleVariants.length > 0" class="ri_box_line">
+            <div v-if="sortedTitleVariants.length > 1" class="ri_box_line">
                 <div v-for="variant in sortedTitleVariants" class="ri_box_item">
                     <div class="ri_box_title">Title {{ variant }} (direct)</div>
                     <div v-for="range in sortedTitleVariantRanges">
                         <div class="ri_box_key">{{ range.label }}</div>
                         <div class="ri_box_value">
-                            {{ titleVariantStats[variant][range.minutes] || 0 }}&nbsp;
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="sortedImageVariants.length > 0" class="ri_box_line">
-                <div v-for="variant in sortedImageVariants" class="ri_box_item">
-                    <div class="ri_box_title">Image {{ variant }} (direct)</div>
-                    <div v-for="range in sortedImageVariantRanges">
-                        <div class="ri_box_key">{{ range.label }}</div>
-                        <div class="ri_box_value">
-                            {{ imageVariantStats[variant][range.minutes] || 0 }}&nbsp;
+                            {{ titleVariantStats[variant][range.label] || 0 }}&nbsp;
                         </div>
                     </div>
                 </div>
@@ -103,11 +91,9 @@
 
             pageviewStats: {},
             titleVariantStats: {},
-            imageVariantStats: {},
 
             pageviewRanges: {},
             titleVariantRanges: {},
-            imageVariantRanges: {},
 
             titleVariants: [],
             imageVariants: [],
@@ -118,34 +104,27 @@
             EventHub.$on("content-variants-changed", this.updateVariantStats);
         },
         computed: {
-            conversionsColorClass() {
-                return colorThresholdToClass(CONVERSIONS_COLORING_THRESHOLD, this.conversions)
-            },
             conversionRate() {
                 if (this.totalPageviews === 0) {
                     return 0.0
                 }
-
                 // Artificially increased 10000x so conversion rate is more readable
                 return rounding((this.conversions/this.totalPageviews) * 10000, 2);
             },
             conversionRateColorClass() {
                 return colorThresholdToClass(CONVERSION_RATE_COLORING_THRESHOLD, this.conversionRate)
             },
+            conversionsColorClass() {
+                return colorThresholdToClass(CONVERSIONS_COLORING_THRESHOLD, this.conversions)
+            },
             sortedPageviewRanges() {
                 return Object.values(this.pageviewRanges).slice().sort((a, b) => a.order - b.order);
             },
             sortedTitleVariantRanges() {
-                return Object.values(this.titleVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
-            },
-            sortedImageVariantRanges() {
-                return Object.values(this.imageVariantRanges).slice().sort((a, b) => a.minutes - b.minutes);
+                return Object.values(this.titleVariantRanges).slice().sort((a, b) => a.order - b.order);
             },
             sortedTitleVariants() {
                 return this.titleVariants.slice().sort((a, b) => a - b);
-            },
-            sortedImageVariants() {
-                return this.imageVariants.slice().sort((a, b) => a - b);
             },
         },
         methods: {
@@ -159,12 +138,12 @@
             updatePageviewStats(range, counts) {
                 this.$set(this.pageviewRanges, range.label, range);
                 if (counts === null || !counts[this.articleId]) {
-                    this.$set(this.pageviewStats, range.minutes, 0);
+                    this.$set(this.pageviewStats, range.label, 0);
                     return;
                 }
                 this.$set(this.pageviewStats, range.label, counts[this.articleId]);
 
-                // Assuming there is 'Total' label
+                // Assuming 'Total' label exists
                 if (range.label === 'Total') {
                     this.totalPageviews = counts[this.articleId]
                 }
@@ -175,14 +154,11 @@
                         case "title_variant":
                             this.updateVariants(this.titleVariantRanges, this.titleVariants, this.titleVariantStats, range, counts[variantType]);
                             break;
-                        case "image_variant":
-                            this.updateVariants(this.imageVariantRanges, this.imageVariants, this.imageVariantStats, range, counts[variantType]);
-                            break;
                     }
                 }
             },
             updateVariants(variantRanges, variants, variantStats, range, counts) {
-                this.$set(variantRanges, range.minutes, range);
+                this.$set(variantRanges, range.label, range);
 
                 for (let variant in counts[this.articleId]) {
                     if (!counts[this.articleId].hasOwnProperty(variant)) {
@@ -194,9 +170,9 @@
 
                     let val = variantStats[variant] || {};
                     if (counts === null || !counts[this.articleId][variant]) {
-                        val[range.minutes] = 0
+                        val[range.label] = 0
                     } else {
-                        val[range.minutes] = counts[this.articleId][variant]
+                        val[range.label] = counts[this.articleId][variant]
                     }
                     variantStats[variant] = val;
                 }

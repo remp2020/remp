@@ -18,6 +18,14 @@
                     ];
                 },
             },
+            variantsMinuteRanges: {
+                type: Array,
+                default: function() {
+                    return [
+                        {minutes: undefined, label: "Total", order: 0},
+                    ];
+                },
+            },
             baseUrl: {
                 type: String,
                 required: true,
@@ -39,7 +47,7 @@
             let now = new Date();
             this.fetchCommerceStats();
             this.fetchPageviewStats(now);
-            this.fetchVariantStats(now, ["title_variant", "image_variant"]);
+            this.fetchVariantStats(now, ["title_variant"]);
         },
         methods: {
             fetchCommerceStats: function() {
@@ -103,7 +111,7 @@
             },
 
             fetchVariantStats: function(now, variantTypes) {
-                for (let range of this.pageviewMinuteRanges) {
+                for (let range of this.variantsMinuteRanges) {
 
                     const variantPayload = {
                         "filter_by": [
@@ -123,7 +131,7 @@
                         variantPayload["time_after"] = d.toISOString()
                     }
 
-                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', variantPayload)
+                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/unique/browsers', variantPayload)
                         .then(function (response) {
                             let counts = {};
                             for (const group of response.data) {
