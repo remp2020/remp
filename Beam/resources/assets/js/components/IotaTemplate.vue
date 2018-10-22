@@ -57,6 +57,18 @@
                     </div>
                 </div>
             </div>
+
+            <div v-if="sortedImageVariants.length > 1" class="ri_box_line">
+                <div v-for="variant in sortedImageVariants" class="ri_box_item">
+                    <div class="ri_box_title">Image {{ variant }} (direct)</div>
+                    <div v-for="range in sortedImageVariantRanges">
+                        <div class="ri_box_key">{{ range.label }}</div>
+                        <div class="ri_box_value">
+                            {{ imageVariantStats[variant][range.label] || 0 }}&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -91,9 +103,11 @@
 
             pageviewStats: {},
             titleVariantStats: {},
+            imageVariantStats: {},
 
             pageviewRanges: {},
             titleVariantRanges: {},
+            imageVariantRanges: {},
 
             titleVariants: [],
             imageVariants: [],
@@ -123,8 +137,14 @@
             sortedTitleVariantRanges() {
                 return Object.values(this.titleVariantRanges).slice().sort((a, b) => a.order - b.order);
             },
+            sortedImageVariantRanges() {
+                return Object.values(this.imageVariantRanges).slice().sort((a, b) => a.order - b.order);
+            },
             sortedTitleVariants() {
                 return this.titleVariants.slice().sort((a, b) => a - b);
+            },
+            sortedImageVariants() {
+                return this.imageVariants.slice().sort((a, b) => a - b);
             },
         },
         methods: {
@@ -153,6 +173,9 @@
                     switch (variantType) {
                         case "title_variant":
                             this.updateVariants(this.titleVariantRanges, this.titleVariants, this.titleVariantStats, range, counts[variantType]);
+                            break;
+                        case "image_variant":
+                            this.updateVariants(this.imageVariantRanges, this.imageVariants, this.imageVariantStats, range, counts[variantType]);
                             break;
                     }
                 }

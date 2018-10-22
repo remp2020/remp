@@ -47,7 +47,7 @@
             let now = new Date();
             this.fetchCommerceStats();
             this.fetchPageviewStats(now);
-            this.fetchVariantStats(now, ["title_variant"]);
+            this.fetchVariantStats(now, ["title_variant", "image_variant"]);
         },
         methods: {
             fetchCommerceStats: function() {
