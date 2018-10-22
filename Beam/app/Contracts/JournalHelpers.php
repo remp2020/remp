@@ -39,12 +39,12 @@ class JournalHelpers
         $request->addGroup('article_id');
         $request->addFilter('article_id', ...$externalArticleIds);
         return $this->journal->unique($request)
-            ->filter(function($item) {
+            ->filter(function ($item) {
                 return $item->tags !== null;
             })
             ->mapWithKeys(function ($item) {
-            return [$item->tags->article_id => $item->count];
-        });
+                return [$item->tags->article_id => $item->count];
+            });
     }
 
     /**
@@ -66,12 +66,12 @@ class JournalHelpers
 
         $request->addFilter('article_id', ...$externalArticleIds);
         return $this->journal->avg($request)
-            ->filter(function($item) {
+            ->filter(function ($item) {
                 return $item->tags !== null;
             })
             ->mapWithKeys(function ($item) {
-            return [$item->tags->article_id => $item->avg];
-        });
+                return [$item->tags->article_id => $item->avg];
+            });
     }
 
     /**
