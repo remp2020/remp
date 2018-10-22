@@ -173,6 +173,11 @@
                 return this.$store.state.settings
             }
         },
+        watch: {
+            settings(value) {
+                this.reload()
+            }
+        },
         methods: {
             visibilityChanged(event) {
                 if (document.visibilityState === 'visible') {
@@ -188,7 +193,9 @@
             loadData() {
                 let that = this
                 axios
-                    .get(this.articlesUrl)
+                    .post(this.articlesUrl, {
+                        settings: this.settings
+                    })
                     .then(function(response){
                         that.articles = response.data.articles.map(function(item){
                             item.conversion_rate_color = conversionRateColor(item.conversion_rate)

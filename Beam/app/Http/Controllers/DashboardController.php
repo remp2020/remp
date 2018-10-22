@@ -27,12 +27,19 @@ class DashboardController extends Controller
 
     public function index()
     {
-        return view('dashboard.index');
+        return $this->dashboardView('dashboard.index');
     }
 
     public function public()
     {
-        return view('dashboard.public');
+        return $this->dashboardView('dashboard.public');
+    }
+
+    private function dashboardView($template)
+    {
+        return view($template, [
+            'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null
+        ]);
     }
 
     private function getJournalParameters($interval, $tz)
@@ -183,12 +190,23 @@ class DashboardController extends Controller
         return $this->journal->count($journalRequest);
     }
 
-    public function mostReadArticles()
+    public function mostReadArticles(Request $request)
     {
+        $request->validate([
+            'settings.onlyTrafficFromFrontPage' => 'required|boolean'
+        ]);
+
+        $settings = $request->get('settings');
+
         $timeBefore = Carbon::now();
         $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
 
         $concurrentsRequest = new JournalConcurrentsRequest();
+
+        $frontpageReferer = config('dashboard.frontpage_referer');
+        if ($frontpageReferer && $settings['onlyTrafficFromFrontPage']) {
+            $concurrentsRequest->addFilter('derived_referer_host_with_path', $frontpageReferer);
+        }
         $concurrentsRequest->setTimeAfter($timeAfter);
         $concurrentsRequest->setTimeBefore($timeBefore);
         $concurrentsRequest->addGroup('article_id');

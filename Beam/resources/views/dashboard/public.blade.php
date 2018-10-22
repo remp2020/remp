@@ -15,12 +15,16 @@
             components: {
                 DashboardRoot
             },
-            store: DashboardStore,
-            data: function() {
+            provide: function() {
                 return {
-                    articlesUrl: "{!! route('public.articles.json') !!}",
-                    timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}"
+                    enableFrontpageFiltering: this.enableFrontpageFiltering
                 }
+            },
+            store: DashboardStore,
+            data: {
+                articlesUrl: "{!! route('public.articles.json') !!}",
+                timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}",
+                enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }}
             }
         })
     </script>

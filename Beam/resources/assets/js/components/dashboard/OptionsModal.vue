@@ -5,16 +5,47 @@
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Graph options</h4>
+                        <h4 class="modal-title">Dashboard options</h4>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <p class="c-black f-500 m-b-5">Compare graph data with:</p>
-                                <input type="radio" id="average" value="average" v-model="compareWith">
-                                <label for="average">Average of last 4 weeks</label> <br />
-                                <input type="radio" id="last_week" value="last_week" v-model="compareWith">
-                                <label for="last_week">Previous week</label><br />
+                                <p class="c-black f-500">Compare graph data with:</p>
+
+                                <div class="radio m-b-15">
+                                    <label>
+                                        <input value="average" type="radio" v-model="compareWith">
+                                        <i class="input-helper"></i>
+                                        Average of last 4 weeks
+                                    </label>
+                                </div>
+
+                                <div class="radio m-b-15">
+                                    <label>
+                                        <input value="last_week" type="radio" v-model="compareWith">
+                                        <i class="input-helper"></i>
+                                        Previous week
+                                    </label>
+                                </div>
+
+                                <br />
+
+                                <div class="checkbox m-b-15">
+                                    <label>
+                                        <input
+                                                :disabled="!enableFrontpageFiltering"
+                                                v-model="onlyTrafficFromFrontPage"
+                                                type="checkbox">
+                                        <i class="input-helper"></i>
+                                        <template v-if="enableFrontpageFiltering">
+                                            Only traffic from front-page
+                                        </template>
+                                        <template v-else>
+                                            <strike title="Front-page URL is not specified in the configuration, please add it to Beam environmental variables.">Only traffic from front-page</strike>
+                                        </template>
+                                    </label>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -51,15 +82,18 @@
 <script>
     export default {
         name: 'options-modal',
+        inject: ['enableFrontpageFiltering'],
         data() {
             return {
-                compareWith: this.$store.state.settings.compareWith
+                compareWith: this.$store.state.settings.compareWith,
+                onlyTrafficFromFrontPage: this.$store.state.settings.onlyTrafficFromFrontPage,
             }
         },
         methods: {
             save() {
                 this.$store.commit('changeSettings', {
-                    compareWith: this.compareWith
+                    compareWith: this.compareWith,
+                    onlyTrafficFromFrontPage: this.onlyTrafficFromFrontPage
                 })
                 this.$emit('close')
             },
