@@ -105,23 +105,23 @@
                             <div class="panel-body p-l-10 p-r-20">
 
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-8">
                                         <p class="m-l-20">User needs to be member of all selected segments for campaign to be shown.</p>
 
                                         <div class="input-group m-t-30">
                                             <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                                             <div>
                                                 <div class="row">
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-12">
                                                         <label for="signed_in" class="fg-label">User signed-in state</label>
                                                     </div>
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-12">
                                                         <v-select v-model="signedIn"
-                                                                id="signed_in"
-                                                                :name="'signed_in'"
-                                                                :value="signedIn"
-                                                                :options.sync="signedInOptions"
-                                                                :title="'Everyone'"
+                                                                  id="signed_in"
+                                                                  :name="'signed_in'"
+                                                                  :value="signedIn"
+                                                                  :options.sync="signedInOptions"
+                                                                  :title="'Everyone'"
                                                         ></v-select>
                                                         <small class="help-block">To use this filter, you have to be setting <code>signedIn: Boolean</code> within your REMP tracking code.</small>
                                                     </div>
@@ -133,7 +133,7 @@
                                             <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
                                             <div>
                                                 <div class="row">
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-12">
                                                         <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true" data-max-options="1">
                                                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
                                                                 <option v-for="(obj,code) in list" v-bind:value="obj">
@@ -147,7 +147,7 @@
                                         </div>
 
                                         <div class="row m-t-20 m-l-30" v-if="segments.length">
-                                            <div class="col-md-10">
+                                            <div class="col-md-12">
                                                 <small>Active user segments</small>
                                             </div>
                                         </div>
@@ -174,6 +174,17 @@
                                             </div>
                                         </div>
 
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="input-group fg-float m-t-30 checkbox">
+                                            <label class="m-l-15">
+                                                Include users with active ad blocking
+                                                <input type="hidden" name="adblock" value="0">
+                                                <input v-model="adblock" value="1" name="adblock" type="checkbox">
+                                                <i class="input-helper"></i>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -409,6 +420,7 @@
         "_bannerId",
         "_variants",
         "_signedIn",
+        "_adblock",
         "_oncePerSession",
         "_active",
         "_countries",
@@ -485,6 +497,7 @@
                 "removedVariants": null,
                 "showABTestingComponent": false,
                 "signedIn": null,
+                "adblock": null,
                 "oncePerSession": null,
                 "active": null,
                 "countries": [],

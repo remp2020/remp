@@ -34,6 +34,7 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "bannerId": {!! @json($bannerId) !!},
         "variants": {!! @json($variants) !!},
         "signedIn": {!! @json($campaign->signed_in) !!},
+        "adblock": {!! @json($campaign->adblock) !!},
         "oncePerSession": {!! @json($campaign->once_per_session) !!},
         "active": {!! @json($campaign->active) !!},
         "pageviewRules": {!! @json($campaign->pageview_rules) !!} || [],
