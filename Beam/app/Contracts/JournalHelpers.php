@@ -38,7 +38,11 @@ class JournalHelpers
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id');
         $request->addFilter('article_id', ...$externalArticleIds);
-        return $this->journal->unique($request)->mapWithKeys(function ($item) {
+        return $this->journal->unique($request)
+            ->filter(function($item) {
+                return $item->tags !== null;
+            })
+            ->mapWithKeys(function ($item) {
             return [$item->tags->article_id => $item->count];
         });
     }
@@ -61,7 +65,11 @@ class JournalHelpers
         $request->addGroup('article_id');
 
         $request->addFilter('article_id', ...$externalArticleIds);
-        return $this->journal->avg($request)->mapWithKeys(function ($item) {
+        return $this->journal->avg($request)
+            ->filter(function($item) {
+                return $item->tags !== null;
+            })
+            ->mapWithKeys(function ($item) {
             return [$item->tags->article_id => $item->avg];
         });
     }
