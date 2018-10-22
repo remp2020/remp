@@ -86,7 +86,7 @@ class NovydenikNewsfilterTemplateFormFactory
             'mail_layout_id' => 2, // empty layout
             'locked_mail_layout_id' => 2, // empty layout
             'mail_type_id' => 6, // newsfilter,
-            'from' => 'Nový deník <info@novydenik.cz>',
+            'from' => 'Deník N <info@denikn.cz>',
         ];
 
         $form->setDefaults($defaults);

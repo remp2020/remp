@@ -22,7 +22,7 @@ sniffer:
   script:
     - make sniff
 
-mailer/dennikn:
+mailer/🇸🇰:
   stage: deploy
   script:
   - >
@@ -40,7 +40,7 @@ mailer/dennikn:
   only:
     - master
 
-campaign/dennikn:
+campaign/🇸🇰:
   stage: deploy
   script:
   - >
@@ -59,7 +59,7 @@ campaign/dennikn:
     - master
   dependencies: []
 
-beam/dennikn:
+beam/🇸🇰:
   stage: deploy
   script:
   - >
@@ -78,7 +78,7 @@ beam/dennikn:
     - master
   dependencies: []
 
-sso/dennikn:
+sso/🇸🇰:
   stage: deploy
   script:
   - >
@@ -97,7 +97,7 @@ sso/dennikn:
     - master
   dependencies: []
 
-mailer/novydenik:
+"mailer/🇨🇿":
   stage: deploy
   script:
     - >
@@ -105,8 +105,8 @@ mailer/novydenik:
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
-      -F "variables[STAGE]=novydenik/mailer"
-      -F "variables[URL]=https://mailer.novydenik.cz"
+      -F "variables[STAGE]=denikncz/mailer"
+      -F "variables[URL]=https://mailer.denikn.cz"
       https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
@@ -116,7 +116,7 @@ mailer/novydenik:
     - master
   dependencies: []
 
-campaign/novydenik:
+"campaign/🇨🇿":
   stage: deploy
   script:
   - >
@@ -124,8 +124,8 @@ campaign/novydenik:
     -F "token=$CI_JOB_TOKEN"
     -F "ref=master"
     -F "variables[REF]=$CI_COMMIT_SHA"
-    -F "variables[STAGE]=novydenik/campaign"
-    -F "variables[URL]=https://campaign.novydenik.cz"
+    -F "variables[STAGE]=denikncz/campaign"
+    -F "variables[URL]=https://campaign.denikn.cz"
     https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
@@ -135,7 +135,7 @@ campaign/novydenik:
   - master
   dependencies: []
 
-beam/novydenik:
+"beam/🇨🇿":
   stage: deploy
   script:
   - >
@@ -143,8 +143,8 @@ beam/novydenik:
     -F "token=$CI_JOB_TOKEN"
     -F "ref=master"
     -F "variables[REF]=$CI_COMMIT_SHA"
-    -F "variables[STAGE]=novydenik/beam"
-    -F "variables[URL]=https://beam.novydenik.cz"
+    -F "variables[STAGE]=denikncz/beam"
+    -F "variables[URL]=https://beam.denikn.cz"
     https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
@@ -154,7 +154,7 @@ beam/novydenik:
   - master
   dependencies: []
 
-sso/novydenik:
+"sso/🇨🇿":
   stage: deploy
   script:
   - >
@@ -162,8 +162,8 @@ sso/novydenik:
     -F "token=$CI_JOB_TOKEN"
     -F "ref=master"
     -F "variables[REF]=$CI_COMMIT_SHA"
-    -F "variables[STAGE]=novydenik/sso"
-    -F "variables[URL]=https://sso.novydenik.cz"
+    -F "variables[STAGE]=denikncz/sso"
+    -F "variables[URL]=https://sso.denikn.cz"
     https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
