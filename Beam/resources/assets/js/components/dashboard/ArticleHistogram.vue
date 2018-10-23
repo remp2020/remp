@@ -293,11 +293,13 @@
                 dataG.selectAll(".layer-line").remove();
 
                 let area = d3.area()
+                    .curve(d3.curveMonotoneX)
                     .x(function (d, i) { return x(d.data.date) })
                     .y0(function (d) { return y(d[0]); })
                     .y1(function (d) { return y(d[1]); })
 
                 let areaStroke = d3.line()
+                    .curve(d3.curveMonotoneX)
                     .x((d, i) => x(d.data.date))
                     .y((d) => y(d[1]))
 

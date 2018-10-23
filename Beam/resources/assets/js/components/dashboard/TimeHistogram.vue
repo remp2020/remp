@@ -402,20 +402,24 @@
                 svg.select('.axis--x').transition().call(xAxis)
 
                 let area = d3.area()
+                    .curve(d3.curveMonotoneX)
                     .x((d, i) => x(d.data.date))
                     .y0((d) => y(d[0]))
                     .y1((d) => y(d[1]))
 
                 let areaStroke = d3.line()
+                    .curve(d3.curveMonotoneX)
                     .x((d, i) => x(d.data.date))
                     .y((d) => y(d[1]))
 
                 let areaSimple = d3.area()
+                    .curve(d3.curveMonotoneX)
                     .x((d) => x(d.date))
                     .y0(y(0))
                     .y1((d) => y(d.value))
 
                 let areaSimpleStroke = d3.line()
+                    .curve(d3.curveMonotoneX)
                     .x((d) => x(d.date))
                     .y((d) => y(d.value))
 
