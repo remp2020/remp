@@ -22,6 +22,7 @@
                 type: Array,
                 default: function() {
                     return [
+                        {minutes: 15, label: "15m", order: 0},
                         {minutes: undefined, label: "Total", order: 0},
                     ];
                 },
