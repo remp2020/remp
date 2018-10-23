@@ -256,26 +256,32 @@
                         if (that.data !== null) {
                             let mouse = d3.mouse(this);
                             const xDate = x.invert(mouse[0])
-                            that.highlightRows(xDate, height)
+                            that.highlightRow(xDate, height)
                         }
                     })
             },
-            highlightRows(xDate, height) {
+            highlightRow(xDate, height) {
                 const bisectDate = d3.bisector(d => d.date).left;
                 const xDateMillis = moment(xDate).valueOf()
 
                 function getSelectedRow(rowIndex, data) {
                     let rowRight = data[rowIndex]
                     let rowLeft = data[rowIndex - 1]
-                    let row = rowRight
+                    let row
 
                     // Find out which value is closer
-                    if (rowLeft !== undefined) {
+                    if (rowLeft !== undefined && rowRight !== undefined) {
                         const leftDateMillis = moment(rowLeft.date).valueOf()
                         const rightDateMillis = moment(rowRight.date).valueOf()
                         if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)) {
                             row = rowLeft
+                        } else {
+                            row = rowRight
                         }
+                    } else if (rowLeft !== undefined) {
+                        row = rowLeft
+                    } else if (rowRight !== undefined) {
+                        row = rowRight
                     }
                     return row
                 }
@@ -284,18 +290,17 @@
 
                 // Get row indexes depending on type of graph being shown
                 if (this.hasPrevious) {
-                    let lastItem = this.data.results[this.data.results.length - 1]
-                    if (lastItem['_unfinished']) {
-                        lastItem = this.data.results[this.data.results.length - 2]
-                    }
+                    let lastItem = this.data.resultsForSearch[this.data.resultsForSearch.length - 1]
 
                     const lastCurrentDateMillis = moment(lastItem.date).valueOf()
-                    if (lastCurrentDateMillis >= xDateMillis) {
-                        rowIndex = bisectDate(this.data.results, xDate);
+                    let thresholdNotShowingCurrent = lastCurrentDateMillis + (this.data.intervalMinutes * 60 * 1000)/2
+                    if (thresholdNotShowingCurrent >= xDateMillis) {
+                        rowIndex = bisectDate(this.data.resultsForSearch, xDate);
                     }
+
                     rowIndexPrevious = bisectDate(this.data.previousResults, xDate);
                 } else {
-                    rowIndex = bisectDate(this.data.results, xDate);
+                    rowIndex = bisectDate(this.data.resultsForSearch, xDate);
                 }
 
                 let verticalX, selectedDate, hasCurrent = false, hasPrevious = false, values = {}
@@ -311,9 +316,8 @@
                 let currentSum = 0, previousSum = 0
 
                 if (rowIndex !== undefined) {
-                    let currentRow = getSelectedRow(rowIndex, this.data.results)
-                    // show only finished row
-                    if (!currentRow['_unfinished']) {
+                    let currentRow = getSelectedRow(rowIndex, this.data.resultsForSearch)
+                    if (currentRow !== undefined ) {
                         verticalX = x(currentRow.date)
                         selectedDate = currentRow.date
                         hasCurrent = true
@@ -328,14 +332,17 @@
 
                 if (rowIndexPrevious !== undefined) {
                     let previousRow = getSelectedRow(rowIndexPrevious, this.data.previousResults)
-                    verticalX = x(previousRow.date)
-                    selectedDate = previousRow.date
-                    hasPrevious = true
+                    if (previousRow !== undefined) {
+                        verticalX = x(previousRow.date)
+                        selectedDate = previousRow.date
+                        hasPrevious = true
 
-                    this.data.tags.forEach(function(tag) {
-                        values[tag].previous = previousRow[tag]
-                        previousSum += previousRow[tag]
-                    })
+                        this.data.tags.forEach(function(tag) {
+                            values[tag].previous = previousRow[tag]
+                            previousSum += previousRow[tag]
+                        })
+                    }
+
                 }
 
                 // After rows are selected, draw line and legend
@@ -488,13 +495,13 @@
                             tags.forEach(function (s) {
                                 dataObject[s] = +d[s];
                             })
-                            dataObject['_unfinished'] = d.hasOwnProperty('_unfinished')
                             return dataObject;
                         }
 
                         this.data = {
                             intervalMinutes: response.data.intervalMinutes,
                             results: results.map(parseDate),
+                            resultsForSearch: results.filter(item => !item.hasOwnProperty('_unfinished')).map(parseDate),
                             previousResults: previousResults.map(parseDate),
                             previousResultsSummed: previousResultsSummed.map((d) => (
                                 {

@@ -27,7 +27,7 @@
         },
         classes: {
             type: Array,
-            default: []
+            default: () => []
         }
     }
 
