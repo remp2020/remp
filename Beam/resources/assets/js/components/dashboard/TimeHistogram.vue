@@ -336,7 +336,7 @@
                     d += " " + verticalX + "," + 0;
                     return d;
                 })
-                this.legendLeft = Math.round(verticalX) + 20 + "px"
+                this.legendLeft = (Math.round(verticalX) + margin.left) + "px"
 
                 this.highlightedRow = {
                     startDate: selectedDate,
