@@ -284,7 +284,12 @@
 
                 // Get row indexes depending on type of graph being shown
                 if (this.hasPrevious) {
-                    const lastCurrentDateMillis = moment(this.data.results[this.data.results.length - 1].date).valueOf()
+                    let lastItem = this.data.results[this.data.results.length - 1]
+                    if (lastItem['_unfinished']) {
+                        lastItem = this.data.results[this.data.results.length - 2]
+                    }
+
+                    const lastCurrentDateMillis = moment(lastItem.date).valueOf()
                     if (lastCurrentDateMillis >= xDateMillis) {
                         rowIndex = bisectDate(this.data.results, xDate);
                     }
@@ -307,15 +312,18 @@
 
                 if (rowIndex !== undefined) {
                     let currentRow = getSelectedRow(rowIndex, this.data.results)
-                    verticalX = x(currentRow.date)
-                    selectedDate = currentRow.date
-                    hasCurrent = true
+                    // show only finished row
+                    if (!currentRow['_unfinished']) {
+                        verticalX = x(currentRow.date)
+                        selectedDate = currentRow.date
+                        hasCurrent = true
 
-                    this.data.tags.forEach(function(tag) {
-                        values[tag].current = currentRow[tag]
-                        values[tag].color = d3.color(colorScale(tag)).hex()
-                        currentSum += currentRow[tag]
-                    })
+                        this.data.tags.forEach(function(tag) {
+                            values[tag].current = currentRow[tag]
+                            values[tag].color = d3.color(colorScale(tag)).hex()
+                            currentSum += currentRow[tag]
+                        })
+                    }
                 }
 
                 if (rowIndexPrevious !== undefined) {
@@ -480,6 +488,7 @@
                             tags.forEach(function (s) {
                                 dataObject[s] = +d[s];
                             })
+                            dataObject['_unfinished'] = d.hasOwnProperty('_unfinished')
                             return dataObject;
                         }
 
