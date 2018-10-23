@@ -178,8 +178,9 @@ class DashboardController extends Controller
 
             $current = Carbon::now();
 
-            // if recent interval is bigger than 60 seconds, recompute its values and add it back to results
-            if ((clone $current)->subSeconds(60)->gt($unfinishedDate)) {
+            // if recent interval is bigger than 120 seconds, recompute its values and add it back to results
+            // smaller intervals do not create good approximation
+            if ((clone $current)->subSeconds(120)->gt($unfinishedDate)) {
 
                 $increaseRate = ($intervalMinutes * 60) / ($current->getTimestamp() - $unfinishedDate->getTimestamp());
                 foreach ($tags as $tag) {
