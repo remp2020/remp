@@ -19,9 +19,9 @@ import (
 // TrackController implements the track resource.
 type TrackController struct {
 	*goa.Controller
-	EventProducer   sarama.AsyncProducer
-	PropertyStorage model.PropertyStorage
-	Entities        model.Entities
+	EventProducer       sarama.AsyncProducer
+	PropertyStorage     model.PropertyStorage
+	EntitySchemaStorage model.EntitySchemaStorage
 }
 
 // Event represents Influx event structure
@@ -33,12 +33,12 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, e model.Entities) *TrackController {
+func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage) *TrackController {
 	return &TrackController{
-		Controller:      service.NewController("TrackController"),
-		EventProducer:   ep,
-		PropertyStorage: ps,
-		Entities:        e,
+		Controller:          service.NewController("TrackController"),
+		EventProducer:       ep,
+		PropertyStorage:     ps,
+		EntitySchemaStorage: ess,
 	}
 }
 
@@ -224,7 +224,7 @@ func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
 
 	// try to get entity schema
 	entityName := *ctx.Payload.Entity.Name
-	schema, ok, err := c.Entities.Get(entityName)
+	schema, ok, err := c.EntitySchemaStorage.Get(entityName)
 	if err != nil {
 		return err
 	}
@@ -233,7 +233,7 @@ func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
 	}
 
 	// validate entity schema
-	err = c.Entities.Validate(schema, ctx.Payload)
+	err = (*EntitySchema)(schema).Validate(ctx.Payload)
 	if err != nil {
 		return err
 	}
