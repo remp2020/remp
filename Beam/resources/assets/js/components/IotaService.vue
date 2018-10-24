@@ -9,23 +9,21 @@
                 type: Array,
                 required: true,
             },
-            conversionMinuteRanges: {
-                type: Array,
-                default: function() {
-                    return [
-                        {"minutes": 60, "label": "1h"},
-                        {"minutes": 60*6, "label": "6h"},
-                        {"minutes": 60*24, "label": "24h"},
-                    ];
-                },
-            },
             pageviewMinuteRanges: {
                 type: Array,
                 default: function() {
                     return [
-                        {"minutes": 15, "label": "15m"},
-                        {"minutes": 60, "label": "1h"},
-                        {"minutes": 60*4, "label": "4h"},
+                        {minutes: 15, label: "15m", order: 0},
+                        {minutes: undefined, label: "Total", order: 1},
+                    ];
+                },
+            },
+            variantsMinuteRanges: {
+                type: Array,
+                default: function() {
+                    return [
+                        {minutes: 15, label: "15m", order: 0},
+                        {minutes: undefined, label: "Total", order: 0},
                     ];
                 },
             },
@@ -48,62 +46,40 @@
             Axios.defaults.headers.common['Content-Type'] = 'application/json';
 
             let now = new Date();
-            this.fetchCommerceStats(now);
+            this.fetchCommerceStats();
             this.fetchPageviewStats(now);
             this.fetchVariantStats(now, ["title_variant", "image_variant"]);
         },
         methods: {
-            fetchCommerceStats: function(now) {
-                for (let range of this.conversionMinuteRanges) {
-                    let d = new Date(now.getTime());
-                    d.setMinutes(d.getMinutes() - range.minutes);
+            fetchCommerceStats: function() {
+                const payload = {
+                    "filter_by": [
+                        {
+                            "tag": "article_id",
+                            "values": this.articleIds,
+                        },
+                    ],
+                    "group_by": [
+                        "article_id",
+                    ],
+                };
 
-                    const payload = {
-                        "time_after": d.toISOString(),
-                        "filter_by": [
-                            {
-                                "tag": "article_id",
-                                "values": this.articleIds,
-                            },
-                        ],
-                        "group_by": [
-                            "article_id",
-                        ],
-                    };
-
-                    Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/sum', payload)
-                        .then(function (response) {
-                            let sums = {}
-                            for (const group of response.data) {
-                                sums[group["tags"]["article_id"]] = group["sum"]
-                            }
-                            EventHub.$emit('content-conversions-revenue-changed', range, sums)
-                        })
-                        .catch(function (error) {
-                            console.warn(error);
-                        });
-
-                    Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/count', payload)
-                        .then(function (response) {
-                            let counts = {}
-                            for (const group of response.data) {
-                                counts[group["tags"]["article_id"]] = group["count"]
-                            }
-                            EventHub.$emit('content-conversions-counts-changed', range, counts)
-                        })
-                        .catch(function (error) {
-                            console.warn(error);
-                        });
-                }
+                Axios.post(this.baseUrl + '/journal/commerce/steps/purchase/count', payload)
+                    .then(function (response) {
+                        let counts = {}
+                        for (const group of response.data) {
+                            counts[group["tags"]["article_id"]] = group["count"]
+                        }
+                        EventHub.$emit('content-conversions-counts-changed', counts)
+                    })
+                    .catch(function (error) {
+                        console.warn(error);
+                    });
             },
 
             fetchPageviewStats: function(now) {
                 for (let range of this.pageviewMinuteRanges) {
-                    let d = new Date(now.getTime());
-                    d.setMinutes(d.getMinutes() - range.minutes);
-
                     const payload = {
-                        "time_after": d.toISOString(),
                         "filter_by": [
                             {
                                 "tag": "article_id",
@@ -115,7 +91,13 @@
                         ],
                     };
 
-                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', payload)
+                    if (range.minutes !== undefined) {
+                        let d = new Date(now.getTime());
+                        d.setMinutes(d.getMinutes() - range.minutes);
+                        payload["time_after"] = d.toISOString()
+                    }
+
+                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/unique/browsers', payload)
                         .then(function (response) {
                             let counts = {}
                             for (const group of response.data) {
@@ -130,12 +112,9 @@
             },
 
             fetchVariantStats: function(now, variantTypes) {
-                for (let range of this.pageviewMinuteRanges) {
-                    let d = new Date(now.getTime());
-                    d.setMinutes(d.getMinutes() - range.minutes);
+                for (let range of this.variantsMinuteRanges) {
 
                     const variantPayload = {
-                        "time_after": d.toISOString(),
                         "filter_by": [
                             {
                                 "tag": "article_id",
@@ -147,7 +126,13 @@
                         ].concat(variantTypes).concat(["social"]),
                     };
 
-                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/count', variantPayload)
+                    if (range.minutes !== undefined) {
+                        let d = new Date(now.getTime());
+                        d.setMinutes(d.getMinutes() - range.minutes);
+                        variantPayload["time_after"] = d.toISOString()
+                    }
+
+                    Axios.post(this.baseUrl + '/journal/pageviews/actions/load/unique/browsers', variantPayload)
                         .then(function (response) {
                             let counts = {};
                             for (const group of response.data) {

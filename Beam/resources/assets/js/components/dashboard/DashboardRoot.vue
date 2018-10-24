@@ -104,6 +104,7 @@
     import TimeHistogram from './TimeHistogram.vue'
     import Options from './Options.vue'
     import axios from 'axios'
+    import { CONVERSIONS_COLORING_THRESHOLD, CONVERSION_RATE_COLORING_THRESHOLD } from './constants.js'
 
     let props = {
         articlesUrl: {
@@ -119,28 +120,26 @@
     const REFRESH_DATA_TIMEOUT_MS = 7000
     let loadDataTimer = null
 
-    // empirically defined values
     function conversionsCountColor(count) {
         count = parseInt(count)
-        if (count > 13) {
+        if (count > CONVERSIONS_COLORING_THRESHOLD.high) {
             return 'high-color'
-        } else if (count > 8) {
+        } else if (count > CONVERSIONS_COLORING_THRESHOLD.medium) {
             return 'medium-color'
-        } else if (count > 3) {
+        } else if (count > CONVERSIONS_COLORING_THRESHOLD.low) {
             return 'low-color'
         } else {
             return 'no-color'
         }
     }
 
-    // empirically defined values
     function conversionRateColor(rate) {
         rate = parseFloat(rate)
-        if (rate > 7.0) {
+        if (rate > CONVERSION_RATE_COLORING_THRESHOLD.high) {
             return 'high-color'
-        } else if (rate > 5.0) {
+        } else if (rate > CONVERSION_RATE_COLORING_THRESHOLD.medium) {
             return 'medium-color'
-        } else if (rate > 3.0) {
+        } else if (rate > CONVERSION_RATE_COLORING_THRESHOLD.low) {
             return 'low-color'
         } else {
             return 'no-color'

@@ -7,6 +7,20 @@ export const GRAPH_COLORS = [
     "#3B40b6",
 ]
 
+// empirically defined values
+export const CONVERSIONS_COLORING_THRESHOLD = {
+    low: 3,
+    medium: 8,
+    high: 13
+}
+
+// empirically defined values
+export const CONVERSION_RATE_COLORING_THRESHOLD = {
+    low: 3.0,
+    medium: 5.0,
+    high: 7.0
+}
+
 export const REFRESH_DATA_TIMEOUT_MS = 30000
 
 export const debounce = (fn, time) => {
@@ -20,6 +34,11 @@ export const debounce = (fn, time) => {
     }
 }
 
+// http://www.jacklmoore.com/notes/rounding-in-javascript/
+export const rounding = function (value, decimalNumbers) {
+    return Number(Math.round(value+'e2')+'e-2').toFixed(decimalNumbers);
+}
+
 export const formatInterval = function(value, intervalMinutes) {
     if (value) {
         let start = moment(value)
@@ -27,3 +46,4 @@ export const formatInterval = function(value, intervalMinutes) {
         return start.format('ll HH:mm') + " - " + end.format('HH:mm')
     }
 }
+
