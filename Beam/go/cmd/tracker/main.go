@@ -79,6 +79,10 @@ func main() {
 		MySQL: mysqlDB,
 	}
 
+	entitySchemaDB := &model.EntitySchemaDB{
+		MySQL: mysqlDB,
+	}
+
 	// err = influxDBpreparation(c)
 	// if err != nil {
 	// log.Fatalln(errors.Wrap(err, "unable to prepare InfluxDB"))
@@ -99,6 +103,14 @@ func main() {
 	}
 
 	wg.Add(1)
+
+	cacheEntities := func() {
+		if err := entitySchemaDB.Cache(); err != nil {
+			service.LogError("unable to cache entity schemas", "err", err)
+		}
+	}
+	wg.Add(1)
+
 	cacheProperties()
 	go func() {
 		defer wg.Done()
@@ -114,6 +126,21 @@ func main() {
 		}
 	}()
 
+	cacheEntities()
+	go func() {
+		defer wg.Done()
+		service.LogInfo("starting entity schemas caching")
+		for {
+			select {
+			case <-ticker.C:
+				cacheEntities()
+			case <-ctx.Done():
+				service.LogInfo("entity schemas caching stopped")
+				return
+			}
+		}
+	}()
+
 	// controllers init
 
 	app.MountSwaggerController(service, service.NewController("swagger"))
@@ -121,6 +148,7 @@ func main() {
 		service,
 		eventProducer,
 		propertyDB,
+		entitySchemaDB,
 	))
 
 	// server init
