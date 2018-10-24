@@ -15,43 +15,43 @@ type EntitySchema model.EntitySchema
 
 // Validate validates provided entity against provided schema.
 func (es *EntitySchema) Validate(payload *app.Entity) error {
-	for i, r := range payload.Entity.Data {
-		p := es.Params[i]
+	for name, val := range payload.EntityDef.Data {
+		paramDef := es.Params[name]
 
-		if p == nil {
-			return fmt.Errorf("not allowed parameter: '%v'", i)
+		if paramDef == nil {
+			return fmt.Errorf("parameter not allowed: %s", name)
 		}
 
-		switch v := r.(type) {
+		switch v := val.(type) {
 		case string:
-			if p.Type == "datetime" {
+			if paramDef.Type == "datetime" {
 				_, err := time.Parse(time.RFC3339, v)
 				if err != nil {
-					return errors.Wrap(err, fmt.Sprintf("param: '%v' should be valid RFC3339 date", i))
+					return errors.Wrap(err, fmt.Sprintf("invalid type of param, RFC3339 datetime expected: %s", name))
 				}
 
-			} else if p.Type != "string" {
-				return fmt.Errorf("param: '%v' should be type of '%v'", i, p.Type)
+			} else if paramDef.Type != "string" {
+				return fmt.Errorf("invalid type of param, %s expected: %s", paramDef.Type, name)
 			}
 		case float64:
-			if p.Type != "number" {
-				return fmt.Errorf("param: '%v' should be type of '%v'", i, p.Type)
+			if paramDef.Type != "number" {
+				return fmt.Errorf("invalid type of param, %s expected: %s", paramDef.Type, name)
 			}
 		case bool:
-			if p.Type != "boolean" {
-				return fmt.Errorf("param: '%v' should be type of '%v'", i, p.Type)
+			if paramDef.Type != "boolean" {
+				return fmt.Errorf("invalid type of param, %s expected: %s", paramDef.Type, name)
 			}
 		case []interface{}:
 			if reflect.TypeOf(v).Kind() != reflect.Slice {
-				return fmt.Errorf("param: '%v' should be type of '%v'", i, p.Type)
+				return fmt.Errorf("invalid type of param, %s expected: %s", paramDef.Type, name)
 			}
 
 			for _, val := range v {
-				if p.Type == "string_array" && reflect.TypeOf(val).Kind() != reflect.String {
-					return fmt.Errorf("param: '%v' should be type of '%v'", i, p.Type)
+				if paramDef.Type == "string_array" && reflect.TypeOf(val).Kind() != reflect.String {
+					return fmt.Errorf("invalid type of param, string array expected: %s", name)
 				}
-				if p.Type == "number_array" && reflect.TypeOf(val).Kind() != reflect.Float64 {
-					return fmt.Errorf("param: '%v' should be type of '%v'", i, p.Type)
+				if paramDef.Type == "number_array" && reflect.TypeOf(val).Kind() != reflect.Float64 {
+					return fmt.Errorf("invalid type of param, number array expected: %s", name)
 				}
 			}
 		}

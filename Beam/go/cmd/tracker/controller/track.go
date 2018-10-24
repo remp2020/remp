@@ -229,23 +229,22 @@ func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
 	}
 
 	// try to get entity schema
-	entityName := *ctx.Payload.Entity.Name
-	schema, ok, err := c.EntitySchemaStorage.Get(entityName)
+	schema, ok, err := c.EntitySchemaStorage.Get(ctx.Payload.EntityDef.Name)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return ctx.BadRequest(fmt.Errorf("can't find entity schema for entity '%v'", entityName))
+		return ctx.BadRequest(goa.ErrBadRequest(fmt.Errorf("can't find entity schema for entity: %s", ctx.Payload.EntityDef.Name)))
 	}
 
 	// validate entity schema
 	err = (*EntitySchema)(schema).Validate(ctx.Payload)
 	if err != nil {
-		return errors.Wrap(err, "schema validation failed")
+		return ctx.BadRequest(goa.ErrBadRequest(errors.Wrap(err, "schema validation failed")))
 	}
 
-	fields := ctx.Payload.Entity.Data
-	fields["remp_entity_id"] = ctx.Payload.Entity.ID
+	fields := ctx.Payload.EntityDef.Data
+	fields["remp_entity_id"] = ctx.Payload.EntityDef.ID
 
 	if err := c.pushInternal(model.TableEntities, ctx.Payload.System.Time, nil, fields); err != nil {
 		return err
