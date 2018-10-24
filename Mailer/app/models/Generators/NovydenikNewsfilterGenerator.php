@@ -59,7 +59,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $transport = $this->transport;
 
         $post = $values->newsfilter_html;
-        $lockedPost = $this->getLockedHtml($values->newsfilter_html);
+        $lockedPost = $this->getLockedHtml($values->newsfilter_html, $values->url);
 
         list(
             $captionTemplate,
@@ -162,6 +162,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             'title' => $values->title,
             'editor' => $values->editor,
             'summary' => $values->summary,
+            'url' => $values->url,
             'html' => $post,
             'text' => strip_tags($post),
         ];
@@ -169,6 +170,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             'title' => $values->title,
             'editor' => $values->editor,
             'summary' => $values->summary,
+            'url' => $values->url,
             'html' => $lockedPost,
             'text' => strip_tags($lockedPost),
         ];
@@ -203,6 +205,10 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $form->addText('title', 'Title')
             ->setRequired("Field 'Title' is required.");
 
+        $form->addText('url', 'Newsfilter URL')
+            ->addRule(Form::URL)
+            ->setRequired("Field 'Newsfilter URL' is required.");
+
         $form->addText('editor', 'Editor')
             ->setRequired("Field 'Editor' is required.");
 
@@ -228,21 +234,28 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $this->onSubmit = $onSubmit;
     }
 
-    private function getLockedHtml($fullHtml)
+    private function getLockedHtml($fullHtml, $newsfilterLink)
     {
         $newHtml = '';
         $cacheHtml = '';
-        $promoButton = true;
+        $quit = false;
         foreach (explode("\n", $fullHtml) as $line) {
+            $cacheHtml .= $line . "\n";
             if (strpos($line, '<h3') !== false) {
-                if ($promoButton) {
-                    $cacheHtml .= <<<HTML
-<p><a data-skipregex="1" style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href="https://predplatne.denikn.cz">Staňte se předplatiteli a podpořte Nový deník</a></p>
+                $newHtml .= $cacheHtml;
+                $cacheHtml = '';
+
+                if ($quit) {
+                    $newHtml .= <<<HTML
+<h3>Notes v plné verzi posíláme pouze předplatitelům Deníku N.</h3>
+<p><a data-skipregex="1" style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href="https://denikn.cz">Přidejte se k předplatitelům</a></p>
 HTML;
-                    $promoButton = false;
+                    return $newHtml;
                 }
             }
-            $cacheHtml .= $line . "\n";
+            if (strpos($line, '[lock]') !== false) {
+                $quit = true;
+            }
         }
         $newHtml .= $cacheHtml;
         return $newHtml;
