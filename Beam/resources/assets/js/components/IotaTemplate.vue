@@ -46,33 +46,29 @@
                 </div>
             </div>
 
-            <template v-if="sortedTitleVariants.length > 1">
-                <div v-for="variant in sortedTitleVariants" class="ri_box_line">
-                    <div class="ri_box_item">
-                        <div class="ri_box_title">Title {{ variant }} (direct)</div>
-                        <div v-for="range in sortedTitleVariantRanges">
-                            <div class="ri_box_key">{{ range.label }}</div>
-                            <div class="ri_box_value">
-                                {{ titleVariantStats[variant][range.label] || 0 }}&nbsp;
-                            </div>
+            <div v-if="sortedTitleVariants.length > 1" v-for="variant in sortedTitleVariants" class="ri_box_line">
+                <div class="ri_box_item">
+                    <div class="ri_box_title">Title {{ variant }} (direct)</div>
+                    <div v-for="range in sortedTitleVariantRanges">
+                        <div class="ri_box_key">{{ range.label }}</div>
+                        <div class="ri_box_value">
+                            {{ titleVariantStats[variant][range.label] || 0 }}&nbsp;
                         </div>
                     </div>
                 </div>
-            </template>
+            </div>
 
-            <template v-if="sortedImageVariants.length > 1">
-                <div v-for="variant in sortedImageVariants" class="ri_box_line">
-                    <div class="ri_box_item">
-                        <div class="ri_box_title">Image {{ variant }} (direct)</div>
-                        <div v-for="range in sortedImageVariantRanges">
-                            <div class="ri_box_key">{{ range.label }}</div>
-                            <div class="ri_box_value">
-                                {{ imageVariantStats[variant][range.label] || 0 }}&nbsp;
-                            </div>
+            <div v-if="sortedImageVariants.length > 1" v-for="variant in sortedImageVariants" class="ri_box_line">
+                <div class="ri_box_item">
+                    <div class="ri_box_title">Image {{ variant }} (direct)</div>
+                    <div v-for="range in sortedImageVariantRanges">
+                        <div class="ri_box_key">{{ range.label }}</div>
+                        <div class="ri_box_value">
+                            {{ imageVariantStats[variant][range.label] || 0 }}&nbsp;
                         </div>
                     </div>
                 </div>
-            </template>
+            </div>
         </div>
     </div>
 </template>
