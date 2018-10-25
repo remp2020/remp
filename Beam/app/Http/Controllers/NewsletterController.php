@@ -79,6 +79,7 @@ class NewsletterController extends Controller
         $newsletter = new Newsletter();
         $newsletter->starts_at = Carbon::now()->addHour(1);
         $newsletter->articles_count = 1;
+        $newsletter->personalized_content = false;
 
         if ($generators->isEmpty()) {
             flash('No source templates using best_performing_articles generator were configured on Mailer', 'danger');
@@ -186,6 +187,7 @@ class NewsletterController extends Controller
     {
         $newsletter = new Newsletter();
         $newsletter->fill($request->all());
+        $newsletter->personalized_content = $request->input('personalized_content', 0);
         $newsletter->state = Newsletter::STATE_PAUSED;
         $newsletter->save();
 
@@ -205,6 +207,7 @@ class NewsletterController extends Controller
     public function update(NewsletterRequest $request, Newsletter $newsletter)
     {
         $newsletter->fill($request->all());
+        $newsletter->personalized_content = $request->input('personalized_content', false);
         $newsletter->save();
 
         return response()->format([

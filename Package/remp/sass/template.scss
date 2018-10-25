@@ -6391,12 +6391,15 @@ button.close {
   padding: 0 5px;
 }
 .tooltip-inner {
-  max-width: 200px;
+  max-width: 350px;
   padding: 3px 8px;
   color: #ffffff;
-  text-align: center;
+  text-align: left;
   background-color: #737373;
   border-radius: 2px;
+}
+.large-tooltip .tooltip-inner {
+  width: 300px;
 }
 .tooltip-arrow {
   position: absolute;

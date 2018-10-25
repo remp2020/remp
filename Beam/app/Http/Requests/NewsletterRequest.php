@@ -31,6 +31,7 @@ class NewsletterRequest extends FormRequest
             'mailer_generator_id' => 'required|integer',
             'criteria' => 'required|string|in:' . NewsletterController::allCriteriaConcatenated(),
             'articles_count' => 'required|integer|min:1|max:100',
+            'personalized_content' => 'boolean',
             'starts_at' => 'required|date',
             'timespan' => 'required|integer',
             'email_subject' => 'required|string',
