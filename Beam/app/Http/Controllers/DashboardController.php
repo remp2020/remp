@@ -169,7 +169,31 @@ class DashboardController extends Controller
 
         // What part of current results we should draw (omit future 0 values)
         $numberOfCurrentValues = (int) floor((Carbon::now($tz)->getTimestamp() - $timeAfter->getTimestamp()) / ($intervalMinutes * 60));
-        $results = collect(array_values($results))->take($numberOfCurrentValues);
+        if ($interval === 'today') {
+            // recompute last interval - it's not fully loaded, yet we want at least partial results
+            // to see the current traffic
+            $results = collect(array_values($results))->take($numberOfCurrentValues + 1);
+            $unfinished = $results->pop();
+            $unfinishedDate = Carbon::parse($unfinished['Date']);
+
+            $current = Carbon::now();
+
+            // if recent interval is bigger than 120 seconds, recompute its values and add it back to results
+            // smaller intervals do not create good approximation
+            if ((clone $current)->subSeconds(120)->gt($unfinishedDate)) {
+                $increaseRate = ($intervalMinutes * 60) / ($current->getTimestamp() - $unfinishedDate->getTimestamp());
+                foreach ($tags as $tag) {
+                    $unfinished[$tag] = (int)($unfinished[$tag] * $increaseRate);
+                }
+                $unfinished['Date'] = $current->subMinutes($intervalMinutes)->toIso8601ZuluString();
+                $unfinished['_unfinished'] = true;
+
+                $results->push($unfinished);
+            }
+        } else {
+            $results = collect(array_values($results))->take($numberOfCurrentValues);
+        }
+
 
         return response()->json([
             'intervalMinutes' => $intervalMinutes,

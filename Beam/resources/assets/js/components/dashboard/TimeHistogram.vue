@@ -256,26 +256,32 @@
                         if (that.data !== null) {
                             let mouse = d3.mouse(this);
                             const xDate = x.invert(mouse[0])
-                            that.highlightRows(xDate, height)
+                            that.highlightRow(xDate, height)
                         }
                     })
             },
-            highlightRows(xDate, height) {
+            highlightRow(xDate, height) {
                 const bisectDate = d3.bisector(d => d.date).left;
                 const xDateMillis = moment(xDate).valueOf()
 
                 function getSelectedRow(rowIndex, data) {
                     let rowRight = data[rowIndex]
                     let rowLeft = data[rowIndex - 1]
-                    let row = rowRight
+                    let row
 
                     // Find out which value is closer
-                    if (rowLeft !== undefined) {
+                    if (rowLeft !== undefined && rowRight !== undefined) {
                         const leftDateMillis = moment(rowLeft.date).valueOf()
                         const rightDateMillis = moment(rowRight.date).valueOf()
                         if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)) {
                             row = rowLeft
+                        } else {
+                            row = rowRight
                         }
+                    } else if (rowLeft !== undefined) {
+                        row = rowLeft
+                    } else if (rowRight !== undefined) {
+                        row = rowRight
                     }
                     return row
                 }
@@ -284,13 +290,17 @@
 
                 // Get row indexes depending on type of graph being shown
                 if (this.hasPrevious) {
-                    const lastCurrentDateMillis = moment(this.data.results[this.data.results.length - 1].date).valueOf()
-                    if (lastCurrentDateMillis >= xDateMillis) {
-                        rowIndex = bisectDate(this.data.results, xDate);
+                    let lastItem = this.data.resultsForSearch[this.data.resultsForSearch.length - 1]
+
+                    const lastCurrentDateMillis = moment(lastItem.date).valueOf()
+                    let thresholdNotShowingCurrent = lastCurrentDateMillis + (this.data.intervalMinutes * 60 * 1000)/2
+                    if (thresholdNotShowingCurrent >= xDateMillis) {
+                        rowIndex = bisectDate(this.data.resultsForSearch, xDate);
                     }
+
                     rowIndexPrevious = bisectDate(this.data.previousResults, xDate);
                 } else {
-                    rowIndex = bisectDate(this.data.results, xDate);
+                    rowIndex = bisectDate(this.data.resultsForSearch, xDate);
                 }
 
                 let verticalX, selectedDate, hasCurrent = false, hasPrevious = false, values = {}
@@ -306,28 +316,33 @@
                 let currentSum = 0, previousSum = 0
 
                 if (rowIndex !== undefined) {
-                    let currentRow = getSelectedRow(rowIndex, this.data.results)
-                    verticalX = x(currentRow.date)
-                    selectedDate = currentRow.date
-                    hasCurrent = true
+                    let currentRow = getSelectedRow(rowIndex, this.data.resultsForSearch)
+                    if (currentRow !== undefined ) {
+                        verticalX = x(currentRow.date)
+                        selectedDate = currentRow.date
+                        hasCurrent = true
 
-                    this.data.tags.forEach(function(tag) {
-                        values[tag].current = currentRow[tag]
-                        values[tag].color = d3.color(colorScale(tag)).hex()
-                        currentSum += currentRow[tag]
-                    })
+                        this.data.tags.forEach(function(tag) {
+                            values[tag].current = currentRow[tag]
+                            values[tag].color = d3.color(colorScale(tag)).hex()
+                            currentSum += currentRow[tag]
+                        })
+                    }
                 }
 
                 if (rowIndexPrevious !== undefined) {
                     let previousRow = getSelectedRow(rowIndexPrevious, this.data.previousResults)
-                    verticalX = x(previousRow.date)
-                    selectedDate = previousRow.date
-                    hasPrevious = true
+                    if (previousRow !== undefined) {
+                        verticalX = x(previousRow.date)
+                        selectedDate = previousRow.date
+                        hasPrevious = true
 
-                    this.data.tags.forEach(function(tag) {
-                        values[tag].previous = previousRow[tag]
-                        previousSum += previousRow[tag]
-                    })
+                        this.data.tags.forEach(function(tag) {
+                            values[tag].previous = previousRow[tag]
+                            previousSum += previousRow[tag]
+                        })
+                    }
+
                 }
 
                 // After rows are selected, draw line and legend
@@ -336,7 +351,7 @@
                     d += " " + verticalX + "," + 0;
                     return d;
                 })
-                this.legendLeft = Math.round(verticalX) + 20 + "px"
+                this.legendLeft = (Math.round(verticalX) + margin.left) + "px"
 
                 this.highlightedRow = {
                     startDate: selectedDate,
@@ -402,20 +417,24 @@
                 svg.select('.axis--x').transition().call(xAxis)
 
                 let area = d3.area()
+                    .curve(d3.curveMonotoneX)
                     .x((d, i) => x(d.data.date))
                     .y0((d) => y(d[0]))
                     .y1((d) => y(d[1]))
 
                 let areaStroke = d3.line()
+                    .curve(d3.curveMonotoneX)
                     .x((d, i) => x(d.data.date))
                     .y((d) => y(d[1]))
 
                 let areaSimple = d3.area()
+                    .curve(d3.curveMonotoneX)
                     .x((d) => x(d.date))
                     .y0(y(0))
                     .y1((d) => y(d.value))
 
                 let areaSimpleStroke = d3.line()
+                    .curve(d3.curveMonotoneX)
                     .x((d) => x(d.date))
                     .y((d) => y(d.value))
 
@@ -482,6 +501,7 @@
                         this.data = {
                             intervalMinutes: response.data.intervalMinutes,
                             results: results.map(parseDate),
+                            resultsForSearch: results.filter(item => !item.hasOwnProperty('_unfinished')).map(parseDate),
                             previousResults: previousResults.map(parseDate),
                             previousResultsSummed: previousResultsSummed.map((d) => (
                                 {

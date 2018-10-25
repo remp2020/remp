@@ -207,52 +207,56 @@
                         if (that.data !== null) {
                             let mouse = d3.mouse(this);
                             const xDate = x.invert(mouse[0])
-                            let rowIndex = bisectDate(that.data.results, xDate);
-
-                            let rowRight = that.data.results[rowIndex]
-                            let rowLeft = that.data.results[rowIndex - 1]
-                            let row = rowRight
-
-                            // Find out which value is closer
-                            if (rowLeft !== undefined) {
-                                const xDateMillis = moment(xDate).valueOf()
-                                const leftDateMillis = moment(rowLeft.date).valueOf()
-                                const rightDateMillis = moment(rowRight.date).valueOf()
-
-                                if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)){
-                                    row = rowLeft
-                                }
-                            }
-
-                            let verticalX = x(row.date)
-
-                            vertical
-                                .attr("d", function() {
-                                    let d = "M" + verticalX + "," + height;
-                                    d += " " + verticalX + "," + 0;
-                                    return d;
-                                })
-
-                            let valuesSum = 0
-
-                            let values = that.data.tags.map(function (tag) {
-                                valuesSum += row[tag]
-                                return {
-                                    tag: tag,
-                                    value: row[tag],
-                                    color: d3.color(colorScale(tag)).hex()
-                                }
-                            })
-
-                            that.highlightedRow = {
-                                startDate: row.date,
-                                values: values,
-                                sum: valuesSum
-                            }
-
-                            that.legendLeft = (Math.round(x(row.date)) + margin.left) + "px"
+                            that.highlightRow(xDate, height)
                         }
                     })
+            },
+            highlightRow(xDate, height) {
+                let rowIndex = bisectDate(this.data.results, xDate);
+
+                let rowRight = this.data.results[rowIndex]
+                let rowLeft = this.data.results[rowIndex - 1]
+                let row = rowRight
+
+                // Find out which value is closer
+                if (rowLeft !== undefined) {
+                    const xDateMillis = moment(xDate).valueOf()
+                    const leftDateMillis = moment(rowLeft.date).valueOf()
+                    const rightDateMillis = moment(rowRight.date).valueOf()
+
+                    if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)){
+                        row = rowLeft
+                    }
+                }
+
+                let verticalX = x(row.date)
+
+                vertical
+                    .attr("d", function() {
+                        let d = "M" + verticalX + "," + height;
+                        d += " " + verticalX + "," + 0;
+                        return d;
+                    })
+
+                let valuesSum = 0
+
+                let values = this.data.tags.map(function (tag) {
+                    valuesSum += row[tag]
+                    return {
+                        tag: tag,
+                        value: row[tag],
+                        color: d3.color(colorScale(tag)).hex()
+                    }
+                })
+
+                this.highlightedRow = {
+                    startDate: row.date,
+                    values: values,
+                    sum: valuesSum
+                }
+
+                this.legendLeft = (Math.round(x(row.date)) + margin.left) + "px"
+
             },
             fillData() {
                 if (this.data === null){
@@ -293,11 +297,13 @@
                 dataG.selectAll(".layer-line").remove();
 
                 let area = d3.area()
+                    .curve(d3.curveMonotoneX)
                     .x(function (d, i) { return x(d.data.date) })
                     .y0(function (d) { return y(d[0]); })
                     .y1(function (d) { return y(d[1]); })
 
                 let areaStroke = d3.line()
+                    .curve(d3.curveMonotoneX)
                     .x((d, i) => x(d.data.date))
                     .y((d) => y(d[1]))
 
@@ -338,7 +344,7 @@
                         const tags = response.data.tags
                         const data = response.data.results
 
-                        let parsedData = data.map(function (d) {
+                        let parseData = function (d) {
                             let dataObject = {
                                 date: d3.isoParse(d.Date)
                             };
@@ -346,10 +352,10 @@
                                 dataObject[s] = +d[s];
                             })
                             return dataObject;
-                        });
+                        };
 
                         this.data = {
-                            results: parsedData,
+                            results: data.map(parseData),
                             tags: tags,
                             intervalMinutes: response.data.intervalMinutes
                         }
