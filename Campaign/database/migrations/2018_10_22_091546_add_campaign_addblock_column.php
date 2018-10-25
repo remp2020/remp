@@ -14,7 +14,7 @@ class AddCampaignAddblockColumn extends Migration
     public function up()
     {
         Schema::table("campaigns", function (Blueprint $table) {
-            $table->boolean("adblock")->default(true);
+            $table->boolean("usingAdblock")->nullable()->default(null);
         });
     }
 
@@ -26,7 +26,7 @@ class AddCampaignAddblockColumn extends Migration
     public function down()
     {
         Schema::table("campaigns", function (Blueprint $table) {
-            $table->dropColumn("adblock");
+            $table->dropColumn("usingAdblock");
         });
     }
 }

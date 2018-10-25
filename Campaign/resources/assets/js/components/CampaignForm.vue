@@ -174,17 +174,29 @@
                                             </div>
                                         </div>
 
-                                    </div>
+                                        <div class="input-group m-t-30">
+                                            <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+                                            <div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label for="usingAdblock" class="fg-label">User ad-blocking state</label>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <v-select v-model="usingAdblock"
+                                                                  id="usingAdblock"
+                                                                  :name="'usingAdblock'"
+                                                                  :value="usingAdblock"
+                                                                  :options.sync="adBlockingOptions"
+                                                                  :title="'Everyone'"
+                                                        ></v-select>
+                                                        <small class="help-block">
+                                                            To use this filter, you have to be setting <code>usingAdblock: Boolean</code> within your REMP tracking code.
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- .input-group -->
 
-                                    <div class="col-md-4">
-                                        <div class="input-group fg-float m-t-30 checkbox">
-                                            <label class="m-l-15">
-                                                Include users with active ad blocking
-                                                <input type="hidden" name="adblock" value="0">
-                                                <input v-model="adblock" value="1" name="adblock" type="checkbox">
-                                                <i class="input-helper"></i>
-                                            </label>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -420,7 +432,7 @@
         "_bannerId",
         "_variants",
         "_signedIn",
-        "_adblock",
+        "_usingAdblock",
         "_oncePerSession",
         "_active",
         "_countries",
@@ -497,7 +509,7 @@
                 "removedVariants": null,
                 "showABTestingComponent": false,
                 "signedIn": null,
-                "adblock": null,
+                "usingAdblock": null,
                 "oncePerSession": null,
                 "active": null,
                 "countries": [],
@@ -550,6 +562,13 @@
                     {"label": "Everyone", "value": null},
                     {"label": "Only signed in", "value": true},
                     {"label": "Only anonymous ", "value": false},
+                ];
+            },
+            adBlockingOptions: function () {
+                return [
+                    {"label": "Everyone", "value": null},
+                    {"label": "Only with adblock", "value": true},
+                    {"label": "Only without adblock", "value": false}
                 ];
             },
             pageviewRulesNotDefault: function () {

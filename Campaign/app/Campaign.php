@@ -5,7 +5,6 @@ namespace App;
 use Cache;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
-use App\CampaignBanner;
 use Ramsey\Uuid\Uuid;
 
 class Campaign extends Model
@@ -28,7 +27,7 @@ class Campaign extends Model
         'once_per_session',
         'pageview_rules',
         'devices',
-        'adblock',
+        'usingAdblock',
     ];
 
     protected $casts = [
@@ -37,12 +36,12 @@ class Campaign extends Model
         'once_per_session' => 'boolean',
         'pageview_rules' => 'json',
         'devices' => 'json',
-        'adblock' => 'boolean',
+        'usingAdblock' => 'boolean',
     ];
 
     protected $attributes = [
         'once_per_session' => false,
-        'adblock' => true,
+        'usingAdblock' => true,
         'pageview_rules' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]"
     ];
