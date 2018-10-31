@@ -65,9 +65,8 @@ class JobQueueRepository extends Repository
     public function removeUnsubscribed(IRow $batch)
     {
         $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email IN (
-  SELECT users.email FROM users
-  INNER JOIN mail_user_subscriptions ON mail_user_subscriptions.user_id = users.id AND subscribed=0
-  WHERE mail_user_subscriptions.mail_type_id IN (SELECT mail_types.id FROM mail_types INNER JOIN mail_templates ON mail_templates.mail_type_id = mail_types.id WHERE mail_templates.id = mail_job_queue.mail_template_id)
+  SELECT mail_user_subscriptions.user_email FROM mail_user_subscriptions WHERE subscribed=0
+  AND mail_user_subscriptions.mail_type_id IN (SELECT mail_types.id FROM mail_types INNER JOIN mail_templates ON mail_templates.mail_type_id = mail_types.id WHERE mail_templates.id = mail_job_queue.mail_template_id)
 )");
     }
 
@@ -75,8 +74,8 @@ class JobQueueRepository extends Repository
     {
         $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email NOT IN (
   SELECT users.email FROM users
-  INNER JOIN mail_user_subscriptions ON mail_user_subscriptions.user_id = users.id AND subscribed=1
-  INNER JOIN mail_user_subscription_variants ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id AND mail_user_subscription_variants.mail_type_variant_id = '{$variantId}'
+  SELECT mail_user_subscriptions.user_email FROM mail_user_subscriptions
+  INNER JOIN mail_user_subscription_variants ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id AND mail_user_subscription_variants.mail_type_variant_id = '{$variantId}' AND mail_user_subscriptions.subscribed=1
 )");
     }
 
