@@ -166,7 +166,6 @@ class NewsletterController extends Controller
     {
         $newsletter = new Newsletter();
         $newsletter->fill($request->all());
-        $newsletter->personalized_content = $request->input('personalized_content', 0);
         $newsletter->state = Newsletter::STATE_PAUSED;
         $newsletter->save();
 

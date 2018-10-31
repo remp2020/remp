@@ -15,6 +15,10 @@ class Newsletter extends Model
         'personalized_content' => 'boolean',
     ];
 
+    protected $attributes = [
+        'personalized_content' => false,
+    ];
+
     protected $dates = [
         'starts_at',
         'created_at',
