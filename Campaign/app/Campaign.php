@@ -41,7 +41,7 @@ class Campaign extends Model
 
     protected $attributes = [
         'once_per_session' => false,
-        'usingAdblock' => true,
+        'usingAdblock' => null,
         'pageview_rules' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]"
     ];
