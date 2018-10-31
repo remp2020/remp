@@ -8,6 +8,7 @@ use App\ArticleTimespent;
 use App\Contracts\Mailer\MailerContract;
 use App\Conversion;
 use App\Http\Controllers\NewsletterController;
+use App\Model\NewsletterCriteria;
 use App\Newsletter;
 use Carbon\Carbon;
 use DB;
@@ -141,21 +142,21 @@ class SendNewslettersCommand extends Command
         $start = Carbon::now()->subDays($daysSpan);
 
         switch ($criteria) {
-            case NewsletterController::CRITERIA_TIMESPENT_ALL:
+            case NewsletterCriteria::TIMESPENT_ALL:
                 return ArticleTimespent::getMostReadArticles($start, 'sum', $articlesCount);
-            case NewsletterController::CRITERIA_TIMESPENT_SUBSCRIBERS:
+            case NewsletterCriteria::TIMESPENT_SUBSCRIBERS:
                 return ArticleTimespent::getMostReadArticles($start, 'subscribers', $articlesCount);
-            case NewsletterController::CRITERIA_TIMESPENT_SIGNED_IN:
+            case NewsletterCriteria::TIMESPENT_SIGNED_IN:
                 return ArticleTimespent::getMostReadArticles($start, 'signed_in', $articlesCount);
-            case NewsletterController::CRITERIA_PAGEVIEWS_ALL:
+            case NewsletterCriteria::PAGEVIEWS_ALL:
                 return ArticlePageviews::getMostReadArticles($start, 'sum', $articlesCount);
-            case NewsletterController::CRITERIA_PAGEVIEWS_SIGNED_IN:
+            case NewsletterCriteria::PAGEVIEWS_SIGNED_IN:
                 return ArticlePageviews::getMostReadArticles($start, 'signed_in', $articlesCount);
-            case NewsletterController::CRITERIA_PAGEVIEWS_SUBSCRIBERS:
+            case NewsletterCriteria::PAGEVIEWS_SUBSCRIBERS:
                 return ArticlePageviews::getMostReadArticles($start, 'subscribers', $articlesCount);
-            case NewsletterController::CRITERIA_CONVERSIONS:
+            case NewsletterCriteria::CONVERSIONS:
                 return Conversion::getMostReadArticlesByTotalPayment($start, $articlesCount);
-            case NewsletterController::CRITERIA_AVERAGE_PAYMENT:
+            case NewsletterCriteria::AVERAGE_PAYMENT:
                 return Conversion::getMostReadArticlesByAveragePayment($start, $articlesCount);
             default:
                 throw new Exception('unknown article criteria ' . $criteria);
