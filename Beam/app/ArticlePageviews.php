@@ -30,14 +30,18 @@ class ArticlePageviews extends Model
         return $this->belongsTo(Article::class);
     }
 
-    public static function getMostReadArticles(Carbon $start, string $getBy, int $limit): Collection
+    public static function mostReadArticles(Carbon $start, string $getBy, $limit = null): Collection
     {
-        $articleIds = ArticlePageviews::where('time_from', '>=', $start)
+        $query = ArticlePageviews::where('time_from', '>=', $start)
             ->groupBy('article_id')
-            ->select(['article_id', DB::raw("count($getBy) as total_sum")])
-            ->orderByDesc('total_sum')
-            ->limit($limit)
-            ->get()->pluck('article_id');
+            ->select(['article_id', DB::raw("sum($getBy) as total_sum")])
+            ->orderByDesc('total_sum');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        $articleIds = $query->get()->pluck('article_id');
 
         return Article::findMany($articleIds);
     }

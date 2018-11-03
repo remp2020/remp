@@ -99,7 +99,8 @@ class SendNewslettersCommand extends Command
 
     private function sendNewsletter($newsletter)
     {
-        $articles = $this->getArticles($newsletter->criteria, $newsletter->timespan, $newsletter->articles_count);
+        $articles = NewsletterCriteria::getArticles($newsletter->criteria, $newsletter->timespan,
+            $newsletter->articles_count);
 
         [$htmlContent, $textContent] = $this->generateEmail($newsletter, $articles);
 
@@ -137,29 +138,4 @@ class SendNewslettersCommand extends Command
         return [$output['htmlContent'], $output['textContent']];
     }
 
-    private function getArticles($criteria, $daysSpan, $articlesCount)
-    {
-        $start = Carbon::now()->subDays($daysSpan);
-
-        switch ($criteria) {
-            case NewsletterCriteria::TIMESPENT_ALL:
-                return ArticleTimespent::getMostReadArticles($start, 'sum', $articlesCount);
-            case NewsletterCriteria::TIMESPENT_SUBSCRIBERS:
-                return ArticleTimespent::getMostReadArticles($start, 'subscribers', $articlesCount);
-            case NewsletterCriteria::TIMESPENT_SIGNED_IN:
-                return ArticleTimespent::getMostReadArticles($start, 'signed_in', $articlesCount);
-            case NewsletterCriteria::PAGEVIEWS_ALL:
-                return ArticlePageviews::getMostReadArticles($start, 'sum', $articlesCount);
-            case NewsletterCriteria::PAGEVIEWS_SIGNED_IN:
-                return ArticlePageviews::getMostReadArticles($start, 'signed_in', $articlesCount);
-            case NewsletterCriteria::PAGEVIEWS_SUBSCRIBERS:
-                return ArticlePageviews::getMostReadArticles($start, 'subscribers', $articlesCount);
-            case NewsletterCriteria::CONVERSIONS:
-                return Conversion::getMostReadArticlesByTotalPayment($start, $articlesCount);
-            case NewsletterCriteria::AVERAGE_PAYMENT:
-                return Conversion::getMostReadArticlesByAveragePayment($start, $articlesCount);
-            default:
-                throw new Exception('unknown article criteria ' . $criteria);
-        }
-    }
 }

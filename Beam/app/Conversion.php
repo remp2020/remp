@@ -55,23 +55,31 @@ class Conversion extends Model
         $this->attributes['paid_at'] = new Carbon($value);
     }
 
-    public static function getMostReadArticlesByAveragePayment(\Carbon\Carbon $start, int $limit): Collection
+    public static function mostReadArticleIdsByAveragePayment(\Carbon\Carbon $start, $limit = null): Collection
     {
-        return Article::findMany(Conversion::where('paid_at', '>=', $start)
+        $query = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
             ->select(['article_id', DB::raw('avg(amount) as average')])
-            ->orderByDesc('average')
-            ->limit($limit)
-            ->get()->pluck('article_id'));
+            ->orderByDesc('average');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return Article::findMany($query->get()->pluck('article_id'));
     }
 
-    public static function getMostReadArticlesByTotalPayment(\Carbon\Carbon $start, int $limit): Collection
+    public static function mostReadArticleIdsByTotalPayment(\Carbon\Carbon $start, $limit = null): Collection
     {
-        return Article::findMany(Conversion::where('paid_at', '>=', $start)
+        $query = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
-            ->select(['article_id', DB::raw('count(amount) as average')])
-            ->orderByDesc('average')
-            ->limit($limit)
-            ->get()->pluck('article_id'));
+            ->select(['article_id', DB::raw('sum(amount) as average')])
+            ->orderByDesc('average');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return Article::findMany($query->get()->pluck('article_id'));
     }
 }

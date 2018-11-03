@@ -3,27 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\ArticleAggregatedView;
+use App\ArticlePageviews;
 use App\Author;
+use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
+use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
+use App\Model\NewsletterCriteria;
 use App\Section;
 use Carbon\Carbon;
 use HTML;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
+
+    private $journal;
+
     private $journalHelper;
 
     public function __construct(JournalContract $journal)
     {
+        $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
     }
 
@@ -314,6 +324,54 @@ class ArticleController extends Controller
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
             'json' => ArticleResource::collection(collect($articles)),
+        ]);
+    }
+
+    public function unreadArticlesForUsers(UnreadArticlesRequest $request)
+    {
+        $daysSpan = 30;
+        $topCount = 10;
+
+        $start = Carbon::now()->subDays($daysSpan);
+
+        //$topArticles = Article::where('published_at', '>=', $start)->orderBy('pageviews_all', 'DESC')->limit(7)->get();
+        $topArticles = NewsletterCriteria::getArticles(NewsletterCriteria::PAGEVIEWS_ALL, 30, 7);
+        dd($topArticles->pluck('title'));
+        $topArticlesPerUser = [];
+
+        foreach ($request->user_ids as $userId) {
+            $topArticlesPerUser[$userId] = [];
+            // raw query because we want to save time and avoid converting results to models
+            $readArticles = DB::table('article_aggregated_views')
+                ->select('article_id')
+                // user_id is a string column, therefore passing value as a string speeds up the index search
+                ->whereRaw("user_id = '" . (int) $userId . "'")
+                ->groupBy('article_id')
+                ->get();
+
+            $readArticleIds = [];
+            foreach ($readArticles as $article) {
+                $readArticleIds[$article->article_id] = true;
+            }
+
+            $i = 0;
+            while (count($topArticlesPerUser[$userId]) < $topCount) {
+                if (!$topArticles->has($i)) {
+                    break;
+                }
+
+                $topArticle = $topArticles->get($i);
+                if (!array_key_exists($topArticle->id, $readArticleIds)) {
+                    $topArticlesPerUser[$userId][] = $topArticle->external_id;
+                }
+
+                $i++;
+            }
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'data' => $topArticlesPerUser
         ]);
     }
 }
