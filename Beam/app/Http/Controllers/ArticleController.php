@@ -329,14 +329,9 @@ class ArticleController extends Controller
 
     public function unreadArticlesForUsers(UnreadArticlesRequest $request)
     {
-        $daysSpan = 30;
-        $topCount = 10;
+        $topCount = $request->input('top_count');
 
-        $start = Carbon::now()->subDays($daysSpan);
-
-        //$topArticles = Article::where('published_at', '>=', $start)->orderBy('pageviews_all', 'DESC')->limit(7)->get();
-        $topArticles = NewsletterCriteria::getArticles(NewsletterCriteria::PAGEVIEWS_ALL, 30, 7);
-        dd($topArticles->pluck('title'));
+        $topArticles = NewsletterCriteria::getArticles(NewsletterCriteria::PAGEVIEWS_ALL, $request->input('days_span'));
         $topArticlesPerUser = [];
 
         foreach ($request->user_ids as $userId) {

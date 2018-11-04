@@ -24,6 +24,8 @@ class UnreadArticlesRequest extends FormRequest
     public function rules()
     {
         return [
+            'days_span' => 'required|integer',
+            'top_count' => 'required|integer',
             'user_ids.*' => 'required|integer',
         ];
     }
