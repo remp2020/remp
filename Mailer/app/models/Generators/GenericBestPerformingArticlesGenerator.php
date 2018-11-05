@@ -67,13 +67,12 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
 
         $items = [];
         if ($dynamic) {
-            if (!isset($values->articles_count)){
+            if (!isset($values->articles_count)) {
                 throw new ProcessException("Dynamic email requires 'article_count' parameter");
             }
 
             $articlesCount = (int) $values->articles_count;
             for ($i = 1; $i <= $articlesCount; $i++) {
-
                 // Insert Twig variables that will be replaced later
                 $meta = new \stdClass();
                 $meta->title = "{{article_{$i}_title}}";
@@ -81,9 +80,8 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
                 $meta->description = "{{article_{$i}_description}}";
                 $items["{{article_{$i}_url}}"] = $meta;
             }
-
         } else {
-            if (!isset($values->articles)){
+            if (!isset($values->articles)) {
                 throw new ProcessException("Missing 'articles' parameter");
             }
 

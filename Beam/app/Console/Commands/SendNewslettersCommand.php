@@ -97,10 +97,10 @@ class SendNewslettersCommand extends Command
         return [$nextSending, $hasMore];
     }
 
-    private function sendNewsletter($newsletter)
+    private function sendNewsletter(Newsletter $newsletter)
     {
-        $articles = NewsletterCriteria::getArticles($newsletter->criteria, $newsletter->timespan,
-            $newsletter->articles_count);
+        $articles = $newsletter->personalized_content ? [] :
+            NewsletterCriteria::getArticles($newsletter->criteria, $newsletter->timespan, $newsletter->articles_count);
 
         [$htmlContent, $textContent] = $this->generateEmail($newsletter, $articles);
 
@@ -131,11 +131,15 @@ class SendNewslettersCommand extends Command
 
     private function generateEmail($newsletter, $articles)
     {
-        $params = [
-            'articles' => implode("\n", $articles->pluck('url')->toArray())
-        ];
+        $params = [];
+        if ($newsletter->personalized_content) {
+            $params['dynamic'] = true;
+            $params['articles_count'] = $newsletter->articles_count;
+        } else {
+            $params['articles']=  implode("\n", $articles->pluck('url')->toArray());
+        }
+
         $output = $this->mailer->generateEmail($newsletter->mailer_generator_id, $params);
         return [$output['htmlContent'], $output['textContent']];
     }
-
 }
