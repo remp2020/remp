@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Contracts\SegmentAggregator;
 use GeoIp2\Database\Reader;
 use Illuminate\Foundation\Application;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Cache\Repository;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
@@ -49,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SegmentAggregator::class, function (Application $app) {
             return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
         });
+        Paginator::useBootstrapThree();
     }
 
     public function bindObservers()

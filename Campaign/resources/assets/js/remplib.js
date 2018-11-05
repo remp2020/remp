@@ -40,7 +40,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
                     "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewCountStorageKey),
-                    "userAgent": window.navigator.userAgent
+                    "userAgent": window.navigator.userAgent,
+                    "usingAdblock": remplib.usingAdblock
                 }
 
             },
@@ -101,7 +102,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         run: function() {
-            this.request(this.showtime);
+            Promise.all([remplib.checkUsingAdblock()]).then((res) => {
+                this.request(this.showtime);
+            });
         },
 
         request: function(def) {

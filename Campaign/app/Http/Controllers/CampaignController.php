@@ -608,6 +608,11 @@ class CampaignController extends Controller
                 continue;
             }
 
+            // using adblock?
+            if ($campaign->usingAdblock && !$data->usingAdblock || $campaign->usingAdblock === false && $data->usingAdblock) {
+                continue;
+            }
+
             // device rules
             if (!isset($data->userAgent)) {
                 Log::error("Unable to load user agent for userId [{$userId}]");
