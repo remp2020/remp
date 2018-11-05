@@ -2323,16 +2323,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.23.0",
+            "version": "1.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4"
+                "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
-                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
+                "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
                 "shasum": ""
             },
             "require": {
@@ -2397,7 +2397,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2017-06-19T01:22:40+00:00"
+            "time": "2018-11-05T09:00:11+00:00"
         },
         {
             "name": "mustangostang/spyc",
@@ -3358,11 +3358,11 @@
         },
         {
             "name": "remp/laravel-helpers",
-            "version": "dev-tmp_branch",
+            "version": "dev-upgrade-to-56",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-helpers",
-                "reference": "43a702396344d99631e2c89078b7ca6e9aed8253",
+                "reference": "9d537e281843ae3f1c894b5342014a8cd8184c00",
                 "shasum": null
             },
             "require": {
@@ -3372,6 +3372,13 @@
                 "php": "~7.1"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Remp\\LaravelHelpers\\Providers\\HelperServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "files": [
                     "src/laravel_helpers.php"
@@ -3401,11 +3408,11 @@
         },
         {
             "name": "remp/laravel-sso",
-            "version": "dev-tmp_branch",
+            "version": "dev-upgrade-to-56",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-sso",
-                "reference": "af02e1987263ff1a29b155568a23b22aba5e9ffb",
+                "reference": "c9f09f121b028d1495ecd40ec7c5eb36ba787a9c",
                 "shasum": null
             },
             "require": {
@@ -3419,6 +3426,13 @@
                 "psy/psysh": "^0.8"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Remp\\LaravelSso\\Providers\\SsoServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Remp\\LaravelSso\\": "src/"
@@ -3448,11 +3462,11 @@
         },
         {
             "name": "remp/laravel-widgets",
-            "version": "dev-tmp_branch",
+            "version": "dev-upgrade-to-56",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-widgets",
-                "reference": "4bb978908a2a446d8b32d98391cb40613f4c46dc",
+                "reference": "f42e42a49508852525a671eb2a575fd8eb5563d1",
                 "shasum": null
             },
             "require": {
@@ -3462,6 +3476,13 @@
                 "ramsey/uuid": "^3.0"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Remp\\Widgets\\Providers\\WidgetServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Remp\\Widgets\\": "src/"
