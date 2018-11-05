@@ -55,6 +55,7 @@
         "nette/tester": "^1.6",
         "friendsofphp/php-cs-fixer": "*",
         "kwn/php-rdkafka-stubs": "^1.0",
-        "phpunit/phpunit": "^7.1"
+        "phpunit/phpunit": "^7.1",
+        "symfony/var-dumper": "3.3.*"
     }
 }
