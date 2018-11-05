@@ -48,9 +48,14 @@ class MailGeneratorHandler extends BaseHandler
             return $this->getMissingParamsResponse($errors);
         }
 
-        $output = $generator->process((object) $paramsProcessor->getValues());
-
-        return new JsonApiResponse(200, ['status' => 'ok', 'data' => $output]);
+        try {
+            $output = $generator->process((object) $paramsProcessor->getValues());
+            return new JsonApiResponse(200, ['status' => 'ok', 'data' => $output]);
+        } catch (ProcessException $exception) {
+            return new JsonApiResponse(400, [
+                'status' => 'error', 'message' => $exception->getMessage()
+            ]);
+        }
     }
 
     private function getMissingParamsResponse(array $errors)

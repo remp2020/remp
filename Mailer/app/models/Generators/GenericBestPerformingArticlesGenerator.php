@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Remp\MailerModule\Api\v1\Handlers\Mailers\ProcessException;
 use Remp\MailerModule\PageMeta\GenericPageContent;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -53,20 +54,45 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'articles', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'dynamic', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'articles', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'articles_count', InputParam::OPTIONAL)
         ];
     }
 
     public function process($values)
     {
         $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
+        $dynamic = filter_var($values->dynamic, FILTER_VALIDATE_BOOLEAN);
 
         $items = [];
-        $urls = explode("\n", trim($values->articles));
-        foreach ($urls as $url) {
-            $meta = Utils::fetchUrlMeta($url, new GenericPageContent(), $this->transport);
-            if ($meta) {
-                $items[$url] = $meta;
+        if ($dynamic) {
+            if (!isset($values->articles_count)){
+                throw new ProcessException("Dynamic email requires 'article_count' parameter");
+            }
+
+            $articlesCount = (int) $values->articles_count;
+            for ($i = 1; $i <= $articlesCount; $i++) {
+
+                // Insert Twig variables that will be replaced later
+                $meta = new \stdClass();
+                $meta->title = "{{article_{$i}_title}}";
+                $meta->image = "{{article_{$i}_image}}";
+                $meta->description = "{{article_{$i}_description}}";
+                $items["{{article_{$i}_url}}"] = $meta;
+            }
+
+        } else {
+            if (!isset($values->articles)){
+                throw new ProcessException("Missing 'articles' parameter");
+            }
+
+            $urls = explode("\n", trim($values->articles));
+            foreach ($urls as $url) {
+                $meta = Utils::fetchUrlMeta($url, new GenericPageContent(), $this->transport);
+                if ($meta) {
+                    $items[$url] = $meta;
+                }
             }
         }
 
