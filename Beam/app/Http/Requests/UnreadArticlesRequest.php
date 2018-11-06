@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Model\NewsletterCriteria;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UnreadArticlesRequest extends FormRequest
@@ -24,8 +25,9 @@ class UnreadArticlesRequest extends FormRequest
     public function rules()
     {
         return [
-            'days_span' => 'required|integer',
-            'top_count' => 'required|integer',
+            'timespan' => 'required|integer',
+            'articles_count' => 'required|integer',
+            'criteria' => 'required|string|in:' . NewsletterCriteria::allCriteriaConcatenated(),
             'user_ids.*' => 'required|integer',
         ];
     }

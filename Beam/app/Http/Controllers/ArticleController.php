@@ -3,13 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\ArticleAggregatedView;
-use App\ArticlePageviews;
 use App\Author;
-use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
-use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
@@ -21,7 +17,6 @@ use HTML;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
@@ -329,9 +324,11 @@ class ArticleController extends Controller
 
     public function unreadArticlesForUsers(UnreadArticlesRequest $request)
     {
-        $topCount = $request->input('top_count');
+        $articlesCount = $request->input('articles_count');
+        $timespan = $request->input('timespan');
+        $criteria = NewsletterCriteria::get($request->input('criteria'));
 
-        $topArticles = NewsletterCriteria::getArticles(NewsletterCriteria::PAGEVIEWS_ALL, $request->input('days_span'));
+        $topArticles = NewsletterCriteria::getArticles($criteria, $timespan);
         $topArticlesPerUser = [];
 
         foreach ($request->user_ids as $userId) {
@@ -350,7 +347,7 @@ class ArticleController extends Controller
             }
 
             $i = 0;
-            while (count($topArticlesPerUser[$userId]) < $topCount) {
+            while (count($topArticlesPerUser[$userId]) < $articlesCount) {
                 if (!$topArticles->has($i)) {
                     break;
                 }

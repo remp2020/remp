@@ -100,7 +100,10 @@ class SendNewslettersCommand extends Command
     private function sendNewsletter(Newsletter $newsletter)
     {
         $articles = $newsletter->personalized_content ? [] :
-            NewsletterCriteria::getArticles($newsletter->criteria, $newsletter->timespan, $newsletter->articles_count);
+            NewsletterCriteria::getArticles(
+                NewsletterCriteria::get($newsletter->criteria),
+                $newsletter->timespan,
+                $newsletter->articles_count);
 
         [$htmlContent, $textContent] = $this->generateEmail($newsletter, $articles);
 
