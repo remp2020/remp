@@ -112,11 +112,25 @@ class SendNewslettersCommand extends Command
     private function createJob($newsletter, $templateId)
     {
         $jobId = $this->mailer->createJob($newsletter->segment_code, $newsletter->segment_provider, $templateId);
-        $this->line(sprintf("Mailer job successfully created (id: %s)", $jobId));
+        $this->line(sprintf('Mailer job successfully created (id: %s)', $jobId));
     }
 
     private function createTemplate($newsletter, $htmlContent, $textContent): int
     {
+        $extras = null;
+        if ($newsletter->personalized_content) {
+            $extras = json_encode([
+                'dynamic' => true,
+                'source' => 'beam',
+                'endpoint' => 'unread-articles',
+                'parameters' => [
+                    'criteria' => $newsletter->criteria,
+                    'timespan' => $newsletter->timespan,
+                    'articles_count' => $newsletter->articles_count
+                ]
+            ]);
+        }
+
         return $this->mailer->createTemplate(
             $newsletter->name,
             'beam_newsletter',
@@ -125,7 +139,8 @@ class SendNewslettersCommand extends Command
             $newsletter->email_subject,
             $textContent,
             $htmlContent,
-            $newsletter->mail_type_code
+            $newsletter->mail_type_code,
+            $extras
         );
     }
 

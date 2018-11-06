@@ -34,7 +34,8 @@ class TemplatesRepository extends Repository
         return $result;
     }
 
-    public function add($name, $code, $description, $from, $subject, $templateText, $templateHtml, $layoutId, $typeId)
+    public function add($name, $code, $description, $from, $subject,
+        $templateText, $templateHtml, $layoutId, $typeId, $extras = null)
     {
         $result = $this->insert([
             'name' => $name,
@@ -49,6 +50,7 @@ class TemplatesRepository extends Repository
             'mail_type_id' => $typeId,
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),
+            'extras' => $extras
         ]);
 
         if (is_numeric($result)) {
@@ -79,6 +81,7 @@ class TemplatesRepository extends Repository
             'copy_from' => $template->id,
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),
+            'extras' => $template->extras
         ]);
     }
 

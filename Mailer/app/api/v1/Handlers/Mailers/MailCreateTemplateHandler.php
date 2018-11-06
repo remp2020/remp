@@ -34,6 +34,7 @@ class MailCreateTemplateHandler extends BaseHandler
             new InputParam(InputParam::TYPE_POST, 'template_text', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'template_html', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'mail_type_code', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'extras', InputParam::OPTIONAL),
         ];
     }
 
@@ -48,6 +49,12 @@ class MailCreateTemplateHandler extends BaseHandler
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'mail_type_code not found']);
         }
 
+        $extras = $params['extras'] ?? null;
+
+        if ($extras !== null && !$this->isJson($extras)) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => "'extras' parameter contains invalid JSON value"]);
+        }
+
         $template = $this->templatesRepository->add(
             $params['name'],
             $this->templatesRepository->getUniqueTemplateCode($params['code']),
@@ -57,9 +64,15 @@ class MailCreateTemplateHandler extends BaseHandler
             $params['template_text'],
             $params['template_html'],
             $layoutId,
-            $mailType->id
+            $mailType->id,
+            $extras
         );
 
         return new JsonApiResponse(200, ['status' => 'ok', 'id' => $template->id]);
+    }
+
+    private function isJson($string) {
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 }
