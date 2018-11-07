@@ -54,7 +54,7 @@ class UnreadArticlesGenerator
     {
         $params = [];
         foreach ($this->results[$templateCode][$userId] as $i => $url) {
-            if (!array_key_exists($url, $this->articlesMeta)){
+            if (!array_key_exists($url, $this->articlesMeta)) {
                 $this->articlesMeta[$url] = Utils::fetchUrlMeta($url, new GenericPageContent(), $this->transport);
             }
 

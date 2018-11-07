@@ -34,9 +34,19 @@ class TemplatesRepository extends Repository
         return $result;
     }
 
-    public function add($name, $code, $description, $from, $subject,
-        $templateText, $templateHtml, $layoutId, $typeId, $extras = null)
-    {
+    public function add(
+        $name,
+        $code,
+        $description,
+        $from,
+        $subject,
+        $templateText,
+        $templateHtml,
+        $layoutId,
+        $typeId,
+        $extras = null
+    ) {
+    
         $result = $this->insert([
             'name' => $name,
             'code' => $code,

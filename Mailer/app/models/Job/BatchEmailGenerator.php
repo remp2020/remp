@@ -122,7 +122,7 @@ class BatchEmailGenerator
                 'parameters' => []
             ];
 
-            // Dynamic emails
+            // Load dynamic parameters
             if ($template->extras) {
                 $extras = json_decode($template->extras, true);
                 $generator = @$extras['generator'];
@@ -140,6 +140,7 @@ class BatchEmailGenerator
             $userJobOptions[$userId] = $jobOptions;
         }
 
+        // Resolve all dynamic parameters at once
         $this->unreadArticlesGenerator->resolve();
 
         foreach ($userJobOptions as $userId => $jobOptions) {
@@ -147,12 +148,14 @@ class BatchEmailGenerator
                 $jobOptions['parameters'] = $this->unreadArticlesGenerator->getMailParameters($jobOptions['code'], $userId);
             }
 
-            $this->mailCache->addJob($userId,
+            $this->mailCache->addJob(
+                $userId,
                 $jobOptions['email'],
                 $jobOptions['code'],
                 $jobOptions['mail_batch_id'],
                 $jobOptions['context'],
-                $jobOptions['parameters']);
+                $jobOptions['parameters']
+            );
         }
 
         $priority = $this->batchesRepository->getBatchPriority($batch);

@@ -103,7 +103,8 @@ class SendNewslettersCommand extends Command
             NewsletterCriteria::getArticles(
                 NewsletterCriteria::get($newsletter->criteria),
                 $newsletter->timespan,
-                $newsletter->articles_count);
+                $newsletter->articles_count
+            );
 
         [$htmlContent, $textContent] = $this->generateEmail($newsletter, $articles);
 

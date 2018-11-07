@@ -71,7 +71,8 @@ class MailCreateTemplateHandler extends BaseHandler
         return new JsonApiResponse(200, ['status' => 'ok', 'id' => $template->id]);
     }
 
-    private function isJson($string) {
+    private function isJson($string)
+    {
         json_decode($string);
         return json_last_error() === JSON_ERROR_NONE;
     }
