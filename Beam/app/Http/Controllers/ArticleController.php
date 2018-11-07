@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
+use App\Contracts\JournalListRequest;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
@@ -331,33 +333,45 @@ class ArticleController extends Controller
         $topArticles = NewsletterCriteria::getArticles($criteria, $timespan);
         $topArticlesPerUser = [];
 
-        foreach ($request->user_ids as $userId) {
-            $topArticlesPerUser[$userId] = [];
-            // raw query because we want to save time and avoid converting results to models
-            $readArticles = DB::table('article_aggregated_views')
-                ->select('article_id')
-                // user_id is a string column, therefore passing value as a string speeds up the index search
-                ->whereRaw("user_id = '" . (int) $userId . "'")
-                ->groupBy('article_id')
-                ->get();
+        $timeAfter = Carbon::now()->subDays($timespan);
+        $timeBefore = Carbon::now();
 
-            $readArticleIds = [];
-            foreach ($readArticles as $article) {
-                $readArticleIds[$article->article_id] = true;
+        foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
+
+            // Load read articles in batch
+            $usersReadArticles = [];
+            $r = new JournalAggregateRequest('pageviews', 'load');
+            $r->setTimeAfter($timeAfter);
+            $r->setTimeBefore($timeBefore);
+            $r->addGroup('user_id', 'article_id');
+            $r->addFilter('user_id', ...$userIdsChunk);
+            foreach ($this->journal->count($r) as $item) {
+                if (isset($item->tags->article_id)) {
+                    $userId = $item->tags->user_id;
+                    if (!array_key_exists($userId, $usersReadArticles)) {
+                        $usersReadArticles[$userId] = [];
+                    }
+                    $usersReadArticles[$userId][$item->tags->article_id] = true;
+                }
             }
 
-            $i = 0;
-            while (count($topArticlesPerUser[$userId]) < $articlesCount) {
-                if (!$topArticles->has($i)) {
-                    break;
-                }
+            // Save top articles per user
+            foreach ($userIdsChunk as $userId) {
+                $topArticlesPerUser[$userId] = [];
 
-                $topArticle = $topArticles->get($i);
-                if (!array_key_exists($topArticle->id, $readArticleIds)) {
-                    $topArticlesPerUser[$userId][] = $topArticle->url;
-                }
+                $i = 0;
+                while (count($topArticlesPerUser[$userId]) < $articlesCount) {
+                    if (!$topArticles->has($i)) {
+                        break;
+                    }
 
-                $i++;
+                    $topArticle = $topArticles->get($i);
+                    if (!array_key_exists($topArticle->id, $usersReadArticles)) {
+                        $topArticlesPerUser[$userId][] = $topArticle->url;
+                    }
+
+                    $i++;
+                }
             }
         }
 

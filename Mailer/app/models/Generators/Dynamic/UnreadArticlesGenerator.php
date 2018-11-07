@@ -32,20 +32,23 @@ class UnreadArticlesGenerator
             $item->timespan = $parameters['timespan'];
             $item->articlesCount = $parameters['articles_count'];
             $item->criteria = $parameters['criteria'];
-            $item->users = [];
+            $item->userIds = [];
             $this->templates[$templateCode] = $item;
         }
 
-        $this->templates[$templateCode]->users[] = $userId;
+        $this->templates[$templateCode]->userIds[] = $userId;
     }
 
     public function resolve(): void
     {
         foreach ($this->templates as $templateCode => $item) {
-            $results = $this->beamClient->unreadArticles($item->timespan, $item->articlesCount, $item->criteria, $item->users);
+            foreach (array_chunk($item->userIds, 2000) as $userIdsChunk) {
 
-            foreach ($results as $userId => $urls) {
-                $this->results[$templateCode][$userId] = $urls;
+                $results = $this->beamClient->unreadArticles($item->timespan, $item->articlesCount, $item->criteria, $userIdsChunk);
+
+                foreach ($results as $userId => $urls) {
+                    $this->results[$templateCode][$userId] = $urls;
+                }
             }
         }
     }
