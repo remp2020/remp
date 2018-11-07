@@ -123,9 +123,7 @@ class SendNewslettersCommand extends Command
         $extras = null;
         if ($newsletter->personalized_content) {
             $extras = json_encode([
-                'dynamic' => true,
-                'source' => 'beam',
-                'endpoint' => 'unread-articles',
+                'generator' => 'beam-unread-articles',
                 'parameters' => [
                     'criteria' => $newsletter->criteria,
                     'timespan' => $newsletter->timespan,
