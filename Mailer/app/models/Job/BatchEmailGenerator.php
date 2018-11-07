@@ -145,7 +145,7 @@ class BatchEmailGenerator
 
         foreach ($userJobOptions as $userId => $jobOptions) {
             if ($jobOptions['generator'] === self::BEAM_UNREAD_ARTICLES_GENERATOR) {
-                $jobOptions['parameters'] = $this->unreadArticlesGenerator->getMailParameters($jobOptions['code'], $userId);
+                $jobOptions['params'] = $this->unreadArticlesGenerator->getMailParameters($jobOptions['code'], $userId);
             }
 
             $this->mailCache->addJob(
@@ -154,7 +154,7 @@ class BatchEmailGenerator
                 $jobOptions['code'],
                 $jobOptions['mail_batch_id'],
                 $jobOptions['context'],
-                $jobOptions['parameters']
+                $jobOptions['params']
             );
         }
 

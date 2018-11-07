@@ -176,7 +176,7 @@ class MailWorkerCommand extends Command
                         $output->writeln(" * sending <info>{$job->templateCode}</info> from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
                         $email->addRecipient($job->email);
                         $email->setContext($job->context);
-                        $email->setParams($job->parameters ? get_object_vars($job->parameters) : []);
+                        $email->setParams($job->params ? get_object_vars($job->params) : []);
                     }
 
                     $sentCount = 0;

@@ -42,14 +42,14 @@ class MailCache
 
     // Mail Jobs
 
-    public function addJob($userId, $email, $templateCode, $queueId, $context, $parameters = [])
+    public function addJob($userId, $email, $templateCode, $queueId, $context, $params = [])
     {
         $job = json_encode([
             'userId' => $userId,
             'email' => $email,
             'templateCode' => $templateCode,
             'context' => $context,
-            'parameters' => $parameters
+            'params' => $params
         ]);
 
         if ($this->jobExists($job, $queueId)) {
