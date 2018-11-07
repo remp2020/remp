@@ -41,8 +41,8 @@ class ArticlePageviews extends Model
             $query->limit($limit);
         }
 
-        $articleIds = $query->get()->pluck('article_id');
-
-        return Article::findMany($articleIds);
+        return Article::joinSub($query, 'article_pageviews', function ($join) {
+            $join->on('articles.id', '=', 'article_pageviews.article_id');
+        })->get();
     }
 }

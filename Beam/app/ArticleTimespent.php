@@ -39,6 +39,8 @@ class ArticleTimespent extends Model
             $query->limit($limit);
         }
 
-        return Article::findMany($query->get()->pluck('article_id'));
+        return Article::joinSub($query, 'article_timespent', function ($join) {
+            $join->on('articles.id', '=', 'article_timespent.article_id');
+        })->get();
     }
 }

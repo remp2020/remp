@@ -36,12 +36,14 @@ class NewsletterCriteria extends Enum
                 return ArticleTimespent::mostReadArticles($start, 'subscribers', $articlesCount);
             case self::TIMESPENT_SIGNED_IN:
                 return ArticleTimespent::mostReadArticles($start, 'signed_in', $articlesCount);
+
             case self::PAGEVIEWS_ALL:
                 return ArticlePageviews::mostReadArticles($start, 'sum', $articlesCount);
             case self::PAGEVIEWS_SIGNED_IN:
                 return ArticlePageviews::mostReadArticles($start, 'signed_in', $articlesCount);
             case self::PAGEVIEWS_SUBSCRIBERS:
                 return ArticlePageviews::mostReadArticles($start, 'subscribers', $articlesCount);
+
             case self::CONVERSIONS:
                 return Conversion::mostReadArticleIdsByTotalPayment($start, $articlesCount);
             case self::AVERAGE_PAYMENT:

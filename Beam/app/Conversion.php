@@ -66,7 +66,9 @@ class Conversion extends Model
             $query->limit($limit);
         }
 
-        return Article::findMany($query->get()->pluck('article_id'));
+        return Article::joinSub($query, 'c', function ($join) {
+            $join->on('articles.id', '=', 'c.article_id');
+        })->get();
     }
 
     public static function mostReadArticleIdsByTotalPayment(\Carbon\Carbon $start, $limit = null): Collection
@@ -80,6 +82,8 @@ class Conversion extends Model
             $query->limit($limit);
         }
 
-        return Article::findMany($query->get()->pluck('article_id'));
+        return Article::joinSub($query, 'c', function ($join) {
+            $join->on('articles.id', '=', 'c.article_id');
+        })->get();
     }
 }
