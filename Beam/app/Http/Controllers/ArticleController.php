@@ -371,7 +371,7 @@ class ArticleController extends Controller
                     }
 
                     $topArticle = $topArticles[$i];
-                    if (!array_key_exists($topArticle->external_id, $usersReadArticles[$userId])) {
+                    if (!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId])) {
                         $topArticlesPerUser[$userId][] = $topArticle->url;
                     }
 

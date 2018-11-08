@@ -66,8 +66,6 @@ class NewsletterCriteria extends Enum
         $tag = 'top_articles';
         $key = $tag . '|' . $criteria->getValue() . '|' . $daysSpan;
 
-        Cache::flush();
-
         return Cache::tags($tag)->remember($key, 10, function () use ($criteria, $daysSpan) {
             return self::getArticles($criteria, $daysSpan)->map(function($article) {
                 $item = new \stdClass();
