@@ -326,11 +326,16 @@ class ArticleController extends Controller
 
     public function unreadArticlesForUsers(UnreadArticlesRequest $request)
     {
+        // Request with timespan 30 days typically takes about 50 seconds,
+        // therefore add some safe margin to request execution time
+        set_time_limit(120);
+
         $articlesCount = $request->input('articles_count');
         $timespan = $request->input('timespan');
         $criteria = NewsletterCriteria::get($request->input('criteria'));
 
-        $topArticles = NewsletterCriteria::getArticles($criteria, $timespan);
+        $topArticles = NewsletterCriteria::getCachedArticles($criteria, $timespan);
+
         $topArticlesPerUser = [];
 
         $timeAfter = Carbon::now()->subDays($timespan);
@@ -346,7 +351,7 @@ class ArticleController extends Controller
             $r->addGroup('user_id', 'article_id');
             $r->addFilter('user_id', ...$userIdsChunk);
             foreach ($this->journal->count($r) as $item) {
-                if (isset($item->tags->article_id)) {
+                if ($item->tags->article_id !== '') {
                     $userId = $item->tags->user_id;
                     if (!array_key_exists($userId, $usersReadArticles)) {
                         $usersReadArticles[$userId] = [];
@@ -361,12 +366,12 @@ class ArticleController extends Controller
 
                 $i = 0;
                 while (count($topArticlesPerUser[$userId]) < $articlesCount) {
-                    if (!$topArticles->has($i)) {
+                    if ($i >= count($topArticles)) {
                         break;
                     }
 
-                    $topArticle = $topArticles->get($i);
-                    if (!array_key_exists($topArticle->id, $usersReadArticles)) {
+                    $topArticle = $topArticles[$i];
+                    if (!array_key_exists($topArticle->external_id, $usersReadArticles[$userId])) {
                         $topArticlesPerUser[$userId][] = $topArticle->url;
                     }
 

@@ -42,7 +42,7 @@ class UnreadArticlesGenerator
     public function resolve(): void
     {
         foreach ($this->templates as $templateCode => $item) {
-            foreach (array_chunk($item->userIds, 2000) as $userIdsChunk) {
+            foreach (array_chunk($item->userIds, 1000) as $userIdsChunk) {
 
                 $results = $this->beamClient->unreadArticles($item->timespan, $item->articlesCount, $item->criteria, $userIdsChunk);
 

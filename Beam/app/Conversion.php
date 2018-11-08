@@ -68,7 +68,7 @@ class Conversion extends Model
 
         return Article::joinSub($query, 'c', function ($join) {
             $join->on('articles.id', '=', 'c.article_id');
-        })->get();
+        })->orderByDesc('c.average')->get();
     }
 
     public static function mostReadArticleIdsByTotalPayment(\Carbon\Carbon $start, $limit = null): Collection
@@ -84,6 +84,6 @@ class Conversion extends Model
 
         return Article::joinSub($query, 'c', function ($join) {
             $join->on('articles.id', '=', 'c.article_id');
-        })->get();
+        })->orderByDesc('c.average')->get();
     }
 }

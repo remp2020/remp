@@ -39,8 +39,8 @@ class ArticleTimespent extends Model
             $query->limit($limit);
         }
 
-        return Article::joinSub($query, 'article_timespent', function ($join) {
-            $join->on('articles.id', '=', 'article_timespent.article_id');
-        })->get();
+        return Article::joinSub($query, 't', function ($join) {
+            $join->on('articles.id', '=', 't.article_id');
+        })->orderByDesc('t.total_sum')->get();
     }
 }

@@ -41,8 +41,8 @@ class ArticlePageviews extends Model
             $query->limit($limit);
         }
 
-        return Article::joinSub($query, 'article_pageviews', function ($join) {
-            $join->on('articles.id', '=', 'article_pageviews.article_id');
-        })->get();
+        return Article::joinSub($query, 't', function ($join) {
+            $join->on('articles.id', '=', 't.article_id');
+        })->orderByDesc('t.total_sum')->get();
     }
 }

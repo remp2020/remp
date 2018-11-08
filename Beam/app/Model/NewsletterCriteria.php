@@ -5,6 +5,7 @@ use App\ArticlePageviews;
 use App\ArticleTimespent;
 use App\Conversion;
 use Carbon\Carbon;
+use Cache;
 use Illuminate\Support\Collection;
 use MabeEnum\Enum;
 use Recurr\Exception;
@@ -51,5 +52,29 @@ class NewsletterCriteria extends Enum
             default:
                 throw new Exception('unknown article criteria ' . $criteria->getValue());
         }
+    }
+
+
+    /**
+     * @param NewsletterCriteria $criteria
+     * @param int                $daysSpan
+     *
+     * @return array of articles (containing only external_id and url attributes)
+     */
+    public static function getCachedArticles(NewsletterCriteria $criteria, int $daysSpan): array
+    {
+        $tag = 'top_articles';
+        $key = $tag . '|' . $criteria->getValue() . '|' . $daysSpan;
+
+        Cache::flush();
+
+        return Cache::tags($tag)->remember($key, 10, function () use ($criteria, $daysSpan) {
+            return self::getArticles($criteria, $daysSpan)->map(function($article) {
+                $item = new \stdClass();
+                $item->external_id = $article->external_id;
+                $item->url = $article->url;
+                return $item;
+            })->toArray();
+        });
     }
 }
