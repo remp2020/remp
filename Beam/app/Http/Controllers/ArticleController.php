@@ -342,7 +342,6 @@ class ArticleController extends Controller
         $timeBefore = Carbon::now();
 
         foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
-
             // Load read articles in batch
             $usersReadArticles = [];
             $r = new JournalAggregateRequest('pageviews', 'load');

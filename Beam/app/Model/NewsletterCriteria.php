@@ -67,7 +67,7 @@ class NewsletterCriteria extends Enum
         $key = $tag . '|' . $criteria->getValue() . '|' . $daysSpan;
 
         return Cache::tags($tag)->remember($key, 10, function () use ($criteria, $daysSpan) {
-            return self::getArticles($criteria, $daysSpan)->map(function($article) {
+            return self::getArticles($criteria, $daysSpan)->map(function ($article) {
                 $item = new \stdClass();
                 $item->external_id = $article->external_id;
                 $item->url = $article->url;
