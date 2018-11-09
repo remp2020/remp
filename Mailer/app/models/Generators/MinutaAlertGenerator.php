@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
+use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\PageMeta\TyzdenContent;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -13,14 +14,20 @@ class MinutaAlertGenerator implements IGenerator
 {
     protected $sourceTemplatesRepository;
 
+    protected $content;
+
     public $onSubmit;
 
     private $transport;
 
-    public function __construct(SourceTemplatesRepository $sourceTemplatesRepository, TransportInterface $transport)
-    {
+    public function __construct(
+        SourceTemplatesRepository $sourceTemplatesRepository,
+        TransportInterface $transporter,
+        ContentInterface $content
+    ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->transport = $transport;
+        $this->transport = $transporter;
+        $this->content = $content;
     }
 
     public function generateForm(Form $form)
@@ -62,7 +69,7 @@ class MinutaAlertGenerator implements IGenerator
     {
         $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
 
-        $post = Utils::fetchUrlMeta($values->post, new TyzdenContent(), $this->transport);
+        $post = $this->content->fetchUrlMeta($values->post);
 
         $params = [
             'post' => $post,

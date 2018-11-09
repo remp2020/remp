@@ -21,18 +21,14 @@ class MediaBriefingGenerator implements IGenerator
 
     private $content;
 
-    private $transport;
-
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
-        ContentInterface $content,
-        TransportInterface $transport
+        ContentInterface $content
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
-        $this->transport = $transport;
     }
 
     public function apiParams()
@@ -58,7 +54,6 @@ class MediaBriefingGenerator implements IGenerator
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
         $content = $this->content;
-        $transport = $this->transport;
 
         $post = $values->mediabriefing_html;
         $lockedPost = $this->getLockedHtml($post);
@@ -101,9 +96,9 @@ class MediaBriefingGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
+            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content) {
                 $url = "https://dennikn.sk/{$matches[1]}";
-                $meta = Utils::fetchUrlMeta($url, $content, $transport);
+                $meta = $this->content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
 

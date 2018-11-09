@@ -104,7 +104,7 @@ class MMSGenerator implements IGenerator
             // replace link shortcodes
             '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
                 $url = "https://dennikn.sk/{$matches[1]}";
-                $meta = Utils::fetchUrlMeta($url, $content, $transport);
+                $meta = $content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
 

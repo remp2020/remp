@@ -2,8 +2,35 @@
 
 namespace Remp\MailerModule\PageMeta;
 
+use GuzzleHttp\Exception\RequestException;
+
 class GenericPageContent implements ContentInterface
 {
+    private $transport;
+
+    public function __construct(TransportInterface $transport)
+    {
+        $this->transport = $transport;
+    }
+
+    public function fetchUrlMeta($url): ?Meta
+    {
+        $url = preg_replace('/\\?ref=(.*)/', '', $url);
+        try {
+            $content = $this->transport->getContent($url);
+            if (!$content) {
+                return null;
+            }
+            $meta = $this->parseMeta($content);
+            if (!$meta) {
+                return null;
+            }
+        } catch (RequestException $e) {
+            throw new InvalidUrlException("Invalid URL: {$url}", 0, $e);
+        }
+        return $meta;
+    }
+
     public function parseMeta($content)
     {
         // author

@@ -2,17 +2,8 @@
 
 namespace Remp\MailerModule\Generators;
 
-use Remp\MailerModule\PageMeta\PageMeta;
-
 class WordpressHelpers
 {
-    private $pageMeta;
-
-    public function __construct(PageMeta $pageMeta)
-    {
-        $this->pageMeta = $pageMeta;
-    }
-
     public function wpautop($pee, $br = true)
     {
         $pre_tags = array();
