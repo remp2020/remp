@@ -12,28 +12,28 @@
                         <table class="concurrents-table table">
                             <thead>
                                 <tr>
-                                    <th style="width: 40px; text-align: center">
+                                    <th style="width: 5%; text-align: center">
                                         <i data-toggle="tooltip"
                                            data-original-title="Concurrents"
                                            class="icon-header zmdi zmdi-accounts zmdi-hc-fw"></i>
                                     </th>
                                     <th style="text-align: left">Article</th>
-                                    <th style="width: 60px; text-align: center">
+                                    <th style="width: 7%; text-align: left">
                                         <i data-toggle="tooltip"
                                            data-original-title="Engaged Time"
                                            class="icon-header zmdi zmdi-time zmdi-hc-fw"></i>
                                     </th>
-                                    <th style="width: 60px; text-align: center">
+                                    <th style="width: 7%; text-align: left">
                                         <span data-toggle="tooltip"
                                               data-original-title="Conversion rate = (Conversions/Unique visitors) x 10000"
                                               class="icon-header">%</span>
                                     </th>
-                                    <th style="width: 60px; text-align: center">
+                                    <th style="width: 7%; text-align: left">
                                         <i data-toggle="tooltip"
                                            data-original-title="Total conversions"
                                            class="icon-header zmdi zmdi-money zmdi-hc-fw"></i>
                                     </th>
-                                    <th style="width: 60px; text-align: center">
+                                    <th style="width: 7%; text-align: center">
                                         <i data-toggle="tooltip"
                                            data-original-title="Unique browsers"
                                            class="icon-header zmdi zmdi-globe zmdi-hc-fw"></i>
