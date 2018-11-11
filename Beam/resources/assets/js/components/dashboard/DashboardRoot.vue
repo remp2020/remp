@@ -12,16 +12,32 @@
                         <table class="concurrents-table table">
                             <thead>
                                 <tr>
-                                    <th style="width: 40px">Concurrents</th>
-                                    <th style="text-align: left">Article</th>
-                                    <th style="width: 40px">Engaged Time</th>
-                                    <th>
-                                        <abbr title="(Conversions/Unique visitors) x 10000">
-                                            Conversions rate
-                                        </abbr>
+                                    <th style="width: 40px; text-align: center">
+                                        <i data-toggle="tooltip"
+                                           data-original-title="Concurrents"
+                                           class="icon-header zmdi zmdi-accounts zmdi-hc-fw"></i>
                                     </th>
-                                    <th>Total conversions</th>
-                                    <th style="width: 40px; text-align: right">Unique browsers</th>
+                                    <th style="text-align: left">Article</th>
+                                    <th style="width: 60px; text-align: center">
+                                        <i data-toggle="tooltip"
+                                           data-original-title="Engaged Time"
+                                           class="icon-header zmdi zmdi-time zmdi-hc-fw"></i>
+                                    </th>
+                                    <th style="width: 60px; text-align: center">
+                                        <span data-toggle="tooltip"
+                                              data-original-title="Conversion rate = (Conversions/Unique visitors) x 10000"
+                                              class="icon-header">%</span>
+                                    </th>
+                                    <th style="width: 60px; text-align: center">
+                                        <i data-toggle="tooltip"
+                                           data-original-title="Total conversions"
+                                           class="icon-header zmdi zmdi-money zmdi-hc-fw"></i>
+                                    </th>
+                                    <th style="width: 60px; text-align: center">
+                                        <i data-toggle="tooltip"
+                                           data-original-title="Unique browsers"
+                                           class="icon-header zmdi zmdi-globe zmdi-hc-fw"></i>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody name="table-row" is="transition-group">
@@ -30,7 +46,7 @@
                                             <animated-integer :value="article.count"></animated-integer>
                                         </span>
                                     </td>
-                                    <td>
+                                    <td style="min-width: 200px" class="ellipsis">
                                         <template v-if="article.landing_page">
                                             <span class="c-black">{{article.title}}</span>
                                         </template>
@@ -78,6 +94,10 @@
         border: none;
     }
 
+    .icon-header {
+        font-size: 18px;
+    }
+
     td.low-color {
         background-color: #EEFBF3;
     }
@@ -92,6 +112,13 @@
 
     td.no-color {
         background-color: #fff;
+    }
+
+    .ellipsis {
+        max-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .concurrents-table td, .concurrents-table th {
