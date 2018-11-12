@@ -28,7 +28,7 @@
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No segments are available on Mailer, please configure them first',
-                                'disabled' => $disabled ? 'disabled' : ''
+                                'disabled' => $disabled
                             ]
                        ) !!}
                     </div>
@@ -49,7 +49,7 @@
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No source templates using best_performing_articles generator were configured on Mailer',
-                                'disabled' => $disabled ? 'disabled' : '',
+                                'disabled' => $disabled,
                            ]
                        ) !!}
                     </div>
@@ -70,7 +70,7 @@
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No mail types are available on Mailer, please configure them first',
-                                'disabled' => $disabled ? 'disabled' : '',
+                                'disabled' => $disabled,
                             ]
                        ) !!}
                     </div>
@@ -111,6 +111,16 @@
                     {!! Form::label('How many articles', null, ['class' => 'fg-label']) !!}
                     {!! Form::number('articles_count', $newsletter->articles_count, ['class' => 'form-control fg-input', 'min' => 1, 'max' => 100]) !!}
                 </div>
+            </div>
+
+            <div class="input-group m-t-30 checkbox large-tooltip">
+                <label class="m-l-15">
+                    Personalized content
+                    {!! Form::checkbox('personalized_content', 1, $newsletter->personalized_content) !!} <i class="input-helper"></i>
+                    <span data-toggle="tooltip"
+                          data-original-title="For each user, select only those articles he/she has not read yet."
+                          class="glyphicon glyphicon-question-sign"></span>
+                </label>
             </div>
 
             <h5 class="m-t-30">Email parameters</h5>

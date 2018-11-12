@@ -11,12 +11,21 @@ class Newsletter extends Model
     const STATE_PAUSED = 'paused';
     const STATE_FINISHED = 'finished';
 
+    protected $casts = [
+        'personalized_content' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'personalized_content' => false,
+    ];
+
     protected $dates = [
         'starts_at',
         'created_at',
         'updated_at',
         'last_sent_at'
     ];
+
     protected $fillable = [
         'name',
         'mailer_generator_id',
@@ -24,6 +33,7 @@ class Newsletter extends Model
         'mail_type_code',
         'criteria',
         'articles_count',
+        'personalized_content',
         'recurrence_rule',
         'state',
         'timespan',

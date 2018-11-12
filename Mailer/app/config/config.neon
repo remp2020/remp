@@ -176,6 +176,9 @@ services:
 	transporter:
 		class: Remp\MailerModule\PageMeta\GuzzleTransport
 
+	content:
+		class: Remp\MailerModule\PageMeta\GenericPageContent
+
 	# Repositories
 	- Remp\MailerModule\Repository\AuditLogRepository
 	- Remp\MailerModule\Repository\ConfigsRepository
@@ -229,5 +232,3 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
-	- Remp\MailerModule\PageMeta\DenniknContent
-	- Remp\MailerModule\PageMeta\PageMeta

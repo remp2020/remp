@@ -89,8 +89,12 @@ class DashboardController extends Controller
             $numberOfAveragedWeeks = $settings['compareWith'] === 'average' ? 4 : 1;
 
             for ($i = 1; $i <= $numberOfAveragedWeeks; $i++) {
-                $from = (clone $timeBefore)->subWeeks($i);
-                $to = (clone $timeAfter)->subWeeks($i);
+                $from = (clone $timeAfter)->subWeeks($i);
+                $to = (clone $timeBefore)->subWeeks($i);
+
+                // If there was a time shift, remember time needs to be adjusted by the timezone difference
+                $diff = $from->tz('utc')->diff($timeAfter->tz('utc'));
+                $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
                 foreach ($this->pageviewRecordsBasedOnRefererMedium($from, $to, $intervalText) as $records) {
                     $currentTag = $records->tags->derived_referer_medium;
@@ -103,8 +107,11 @@ class DashboardController extends Controller
 
                     foreach ($records->time_histogram as $timeValue) {
                         // we want to plot previous results on same points as current ones,
-                        // therefore add week which was subtracted before when data was queried
-                        $correctedDate = Carbon::parse($timeValue->time)->addWeeks($i)->toIso8601ZuluString();
+                        // therefore add week which was subtracted when data was queried
+                        $correctedDate = Carbon::parse($timeValue->time)
+                            ->addWeeks($i)
+                            ->addHours($hourDifference)
+                            ->toIso8601ZuluString();
 
                         if (!array_key_exists($correctedDate, $shadowRecords)) {
                             $shadowRecords[$correctedDate] = [];
@@ -159,6 +166,12 @@ class DashboardController extends Controller
 
         // Save shadow results
         foreach ($shadowRecords as $date => $tagsAndValues) {
+            // check if all keys exists - e.g. some days might be longer (time-shift)
+            // therefore we do want to map all values to current week
+            if (!array_key_exists($date, $shadowResults)) {
+                continue;
+            }
+
             foreach ($tagsAndValues as $tag => $values) {
                 $avg = (int) round($values->avg());
 
@@ -204,7 +217,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function pageviewRecordsBasedOnRefererMedium(Carbon $timeBefore, Carbon $timeAfter, string $interval)
+    private function pageviewRecordsBasedOnRefererMedium(Carbon $timeAfter, Carbon $timeBefore, string $interval)
     {
         $journalRequest = new JournalAggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);

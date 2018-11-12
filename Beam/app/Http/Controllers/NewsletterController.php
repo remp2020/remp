@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\NewsletterRequest;
 use App\Http\Resources\NewsletterResource;
+use App\Model\NewsletterCriteria;
 use App\Newsletter;
 use Carbon\Carbon;
 use Html;
@@ -15,15 +16,6 @@ use Illuminate\Http\Request;
 
 class NewsletterController extends Controller
 {
-    const CRITERIA_PAGEVIEWS_ALL = 'pageviews_all';
-    const CRITERIA_PAGEVIEWS_SIGNED_IN = 'pageviews_signed_in';
-    const CRITERIA_PAGEVIEWS_SUBSCRIBERS = 'pageviews_subscribers';
-    const CRITERIA_TIMESPENT_ALL = 'timespent_all';
-    const CRITERIA_TIMESPENT_SIGNED_IN = 'timespent_signed_in';
-    const CRITERIA_TIMESPENT_SUBSCRIBERS = 'timespent_subscribers';
-    const CRITERIA_CONVERSIONS = 'conversions';
-    const CRITERIA_AVERAGE_PAYMENT = 'average_payment';
-
     private $mailer;
 
     public function __construct(MailerContract $mailer)
@@ -79,6 +71,7 @@ class NewsletterController extends Controller
         $newsletter = new Newsletter();
         $newsletter->starts_at = Carbon::now()->addHour(1);
         $newsletter->articles_count = 1;
+        $newsletter->personalized_content = false;
 
         if ($generators->isEmpty()) {
             flash('No source templates using best_performing_articles generator were configured on Mailer', 'danger');
@@ -129,31 +122,18 @@ class NewsletterController extends Controller
         ]);
     }
 
-    public static function allCriteriaConcatenated($glue = ',')
-    {
-        return implode($glue, [
-            self::CRITERIA_PAGEVIEWS_ALL,
-            self::CRITERIA_PAGEVIEWS_SIGNED_IN,
-            self::CRITERIA_PAGEVIEWS_SUBSCRIBERS,
-            self::CRITERIA_TIMESPENT_ALL,
-            self::CRITERIA_TIMESPENT_SIGNED_IN,
-            self::CRITERIA_TIMESPENT_SUBSCRIBERS,
-            self::CRITERIA_CONVERSIONS,
-            self::CRITERIA_AVERAGE_PAYMENT,
-            ]);
-    }
 
     private function loadCriteria()
     {
         return [
-            self::CRITERIA_PAGEVIEWS_ALL => 'Pageviews all',
-            self::CRITERIA_PAGEVIEWS_SIGNED_IN => 'Pageviews signed in',
-            self::CRITERIA_PAGEVIEWS_SUBSCRIBERS => 'Pageviews subscribers',
-            self::CRITERIA_TIMESPENT_ALL => 'Time spent all',
-            self::CRITERIA_TIMESPENT_SIGNED_IN => 'Time spent signed in',
-            self::CRITERIA_TIMESPENT_SUBSCRIBERS => 'Time spent subscribers',
-            self::CRITERIA_CONVERSIONS => 'Conversions',
-            self::CRITERIA_AVERAGE_PAYMENT => 'Average payment'
+            NewsletterCriteria::PAGEVIEWS_ALL => 'Pageviews all',
+            NewsletterCriteria::PAGEVIEWS_SIGNED_IN => 'Pageviews signed in',
+            NewsletterCriteria::PAGEVIEWS_SUBSCRIBERS => 'Pageviews subscribers',
+            NewsletterCriteria::TIMESPENT_ALL => 'Time spent all',
+            NewsletterCriteria::TIMESPENT_SIGNED_IN => 'Time spent signed in',
+            NewsletterCriteria::TIMESPENT_SUBSCRIBERS => 'Time spent subscribers',
+            NewsletterCriteria::CONVERSIONS => 'Conversions',
+            NewsletterCriteria::AVERAGE_PAYMENT => 'Average payment'
         ];
     }
 
@@ -205,6 +185,7 @@ class NewsletterController extends Controller
     public function update(NewsletterRequest $request, Newsletter $newsletter)
     {
         $newsletter->fill($request->all());
+        $newsletter->personalized_content = $request->input('personalized_content', false);
         $newsletter->save();
 
         return response()->format([

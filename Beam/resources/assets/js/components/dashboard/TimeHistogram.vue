@@ -8,13 +8,13 @@
             </div>
             <div class="col-md-6">
 
-                <options :classes="['pull-right']"></options>
+                <options :classes="['pull-right', 'm-l-15', 'm-b-5']"></options>
 
                 <button-switcher :options="[
             {text: 'Today', value: 'today'},
             {text: '7 days', value: '7days'},
             {text: '30 days', value: '30days'}]"
-                                 :classes="['pull-right', 'm-r-15']"
+                                 :classes="['pull-right']"
                                  v-model="interval">
                 </button-switcher>
             </div>

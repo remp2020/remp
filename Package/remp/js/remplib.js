@@ -20,6 +20,8 @@ export default {
 
     rempPageviewID: null,
 
+    usingAdblock: null,
+
     getUserId: function() {
         return this.userId;
     },
@@ -263,5 +265,20 @@ export default {
 
     isBot: function(userAgent) {
         return userAgent.match(/bot|crawl|slurp|spider|mediapartners/i);
+    },
+
+    checkUsingAdblock: function () {
+        return new Promise(function (resolve) {
+            var testAd = document.createElement('div');
+            testAd.innerHTML = '&nbsp;';
+            testAd.setAttribute('class', 'pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
+            testAd.setAttribute('style', 'width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px');
+            document.body.appendChild(testAd);
+            window.setTimeout(function() {
+                remplib.usingAdblock = testAd.offsetHeight === 0 || false;
+                testAd.remove();
+                resolve(remplib.usingAdblock);
+            }, 100);
+        });
     },
 }
