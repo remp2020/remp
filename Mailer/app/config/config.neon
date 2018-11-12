@@ -208,6 +208,7 @@ services:
 	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget
 	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget
 	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\TldrWidget
 	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget
 
 	# Forms
@@ -226,6 +227,7 @@ services:
 	- Remp\MailerModule\Forms\NovydenikNewsfilterTemplateFormFactory('users_with_any_subscriptions', 'users-without-subscription')
 	- Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+	- Remp\MailerModule\Forms\TldrTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\MailerModule\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 
 	# Helpers
