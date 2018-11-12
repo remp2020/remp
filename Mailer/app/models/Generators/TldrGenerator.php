@@ -6,7 +6,6 @@ use GuzzleHttp\Client;
 use Nette\Application\UI\Form;
 use Tomaj\NetteApi\Params\InputParam;
 use Remp\MailerModule\PageMeta\ContentInterface;
-use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\TldrWidget;
@@ -21,18 +20,14 @@ class TldrGenerator implements IGenerator
 
     private $content;
 
-    private $transport;
-
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
-        ContentInterface $content,
-        TransportInterface $transport
+        ContentInterface $content
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
-        $this->transport = $transport;
     }
 
     public function apiParams()
@@ -58,7 +53,6 @@ class TldrGenerator implements IGenerator
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
         $content = $this->content;
-        $transport = $this->transport;
 
         $post = $values->tldr_html;
 
@@ -107,9 +101,9 @@ class TldrGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
+            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content) {
                 $url = "https://dennikn.sk/{$matches[1]}";
-                $meta = Utils::fetchUrlMeta($url, $content, $transport);
+                $meta = $content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
 
@@ -342,7 +336,7 @@ class TldrGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= '<p>Dostávajte tento newsletter na e-mail celý. Využite špeciálnu akciu len pre čitateľov MediaBrífingu - <a href="https://predplatne.dennikn.sk/99centb/{{ autologin }}">dva mesiace za 99 centov</a>.<p>';
+            $lockedHtml .= '<p>Dostávajte tento newsletter na e-mail celý. Využite špeciálnu akciu len pre čitateľov tl;dr - <a href="https://predplatne.dennikn.sk/99centb/{{ autologin }}">dva mesiace za 99 centov</a>.<p>';
 
             return $lockedHtml;
         }
