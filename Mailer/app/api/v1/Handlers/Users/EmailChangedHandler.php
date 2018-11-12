@@ -34,8 +34,10 @@ class EmailChangedHandler extends BaseHandler
         $subscriptions = $this->userSubscriptionsRepository->findByEmail($originalEmail);
 
         if (empty($subscriptions)) {
-            return new JsonApiResponse(400,
-                ['status' => 'error', 'message' => 'No user subscriptions for email: ' . $originalEmail]);
+            return new JsonApiResponse(
+                400,
+                ['status' => 'error', 'message' => 'No user subscriptions for email: ' . $originalEmail]
+            );
         }
 
         foreach ($subscriptions as $subscription) {
