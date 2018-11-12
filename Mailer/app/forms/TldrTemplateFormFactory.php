@@ -85,7 +85,7 @@ class TldrTemplateFormFactory
             'code' => 'tldr_' . date('dmY'),
             'mail_layout_id' => 33, // layout for subscribers
             'locked_mail_layout_id' => 33, // layout for non-subscribers
-            'mail_type_id' => 16, // mediabrifing
+            'mail_type_id' => 19, // tldr
             'from' => 'Denník N <info@dennikn.sk>',
         ];
 

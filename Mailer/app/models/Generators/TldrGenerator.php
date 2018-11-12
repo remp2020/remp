@@ -72,8 +72,8 @@ class TldrGenerator implements IGenerator
 
         $rules = [
             // remove shortcodes
-            "/\[greybox\]/is" => "",
-            "/\[\/greybox\]/is" => "",
+            "/\[greybox\]/is" => "<i>",
+            "/\[\/greybox\]/is" => "</i>",
 //            "/\[greybox\].*?\[\/greybox\]/is" => "",
             "/\[pullboth.*?\/pullboth\]/is" => "",
             "/<script.*?\/script>/is" => "",
@@ -336,7 +336,7 @@ class TldrGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= '<p>Dostávajte tento newsletter na e-mail celý. Využite špeciálnu akciu len pre čitateľov tl;dr - <a href="https://predplatne.dennikn.sk/99centb/{{ autologin }}">dva mesiace za 99 centov</a>.<p>';
+            $lockedHtml .= '<p>Tento newsletter môžete dostávať na e-mail celý, stačí byť predplatiteľom Denníka N. <a href="https://predplatne.dennikn.sk/{{ autologin }}">Pozrite si ponuku predplatného.</a>.<p>';
 
             return $lockedHtml;
         }
