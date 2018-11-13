@@ -19,8 +19,9 @@ class UnreadArticlesGenerator
 
     public function __construct(
         Client $beamClient,
-        ContentInterface $content)
-    {
+        ContentInterface $content
+    ) {
+    
         $this->beamClient = $beamClient;
         $this->content = $content;
     }
