@@ -48,6 +48,10 @@ class UserRegisteredHandler extends BaseHandler
 
         $lists = $this->listsRepository->all();
 
+        if (!empty($this->userSubscriptionsRepository->findByEmail($userInfo['email']))) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'User has already been registered.']);
+        }
+
         /** @var ActiveRow $list */
         foreach ($lists as $list) {
             if ($list->auto_subscribe) {
