@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
     && pecl install rdkafka && docker-php-ext-enable rdkafka && rm -rf /tmp/librdkafka && cd /var/www/html \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl \
+    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl sockets \
     && apt-get purge \
         -y --auto-remove \
         -o APT::AutoRemove::RecommendsImportant=false \
