@@ -21,8 +21,8 @@ class EmailChangedHandler extends BaseHandler
     public function params()
     {
         return [
-            new InputParam(InputParam::TYPE_GET, 'original_email', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_GET, 'new_email', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'original_email', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'new_email', InputParam::REQUIRED),
         ];
     }
 

@@ -32,7 +32,7 @@ class UserRegisteredHandler extends BaseHandler
     public function params()
     {
         return [
-            new InputParam(InputParam::TYPE_GET, 'user_id', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'user_id', InputParam::REQUIRED),
         ];
     }
 
@@ -42,7 +42,7 @@ class UserRegisteredHandler extends BaseHandler
 
         $userList = $this->userProvider->list([$userId], 1);
         if (count($userList) === 0) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Invalid user_id parameter']);
+            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Invalid user_id parameter']);
         }
         $userInfo = $userList[$userId];
 
