@@ -7,8 +7,6 @@ parameters:
 		host: @environmentConfig::get('REDIS_HOST')
 		port: @environmentConfig::get('REDIS_PORT')
 		db: @environmentConfig::get('REDIS_DB')
-	kafka:
-		broker: @environmentConfig::get('KAFKA_BROKER')
 	hermes:
 		restart_file_path: @environmentConfig::get('HERMES_RESTART_FILE_PATH')
 	remp:
@@ -142,7 +140,6 @@ services:
 
 	- Remp\MailerModule\Config\Config
 	- Remp\MailerModule\Sender
-	- Remp\MailerModule\Broker\ConsumerFactory(%kafka.broker%)
 	- Remp\MailerModule\Job\BatchEmailGenerator
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Auth\AutoLogin
@@ -157,6 +154,8 @@ services:
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'email-changed'), \Remp\MailerModule\Api\v1\Handlers\Users\EmailChangedHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'user-registered'), \Remp\MailerModule\Api\v1\Handlers\Users\UserRegisteredHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'preprocess-generator-parameters'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorPreprocessHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())

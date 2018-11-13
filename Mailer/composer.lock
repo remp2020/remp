@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5bfdac27bec35f2da9959b5833d635ba",
+    "content-hash": "4e523d9d82d19b41984cb0e2f9a1b0a2",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -4236,40 +4236,6 @@
                 "phpunit"
             ],
             "time": "2017-08-23T07:39:54+00:00"
-        },
-        {
-            "name": "kwn/php-rdkafka-stubs",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kwn/php-rdkafka-stubs.git",
-                "reference": "c35103160ea21cc0e6861fbee4124a8108367213"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kwn/php-rdkafka-stubs/zipball/c35103160ea21cc0e6861fbee4124a8108367213",
-                "reference": "c35103160ea21cc0e6861fbee4124a8108367213",
-                "shasum": ""
-            },
-            "require": {
-                "ext-rdkafka": "*"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Karol Wnuk",
-                    "email": "k.wnuk@ascetic.pl"
-                }
-            ],
-            "description": "Rdkafka extension stubs for your IDE",
-            "time": "2017-03-26T10:14:53+00:00"
         },
         {
             "name": "myclabs/deep-copy",
