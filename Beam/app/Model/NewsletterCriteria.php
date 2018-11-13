@@ -26,7 +26,7 @@ class NewsletterCriteria extends Enum
         return implode($glue, self::getValues());
     }
 
-    public static function getArticles(NewsletterCriteria $criteria, int $daysSpan, $articlesCount = null): Collection
+    public static function getArticles(NewsletterCriteria $criteria, int $daysSpan, ?int $articlesCount = null): Collection
     {
         $start = Carbon::now()->subDays($daysSpan);
 

@@ -30,7 +30,7 @@ class ArticlePageviews extends Model
         return $this->belongsTo(Article::class);
     }
 
-    public static function mostReadArticles(Carbon $start, string $getBy, $limit = null): Collection
+    public static function mostReadArticles(Carbon $start, string $getBy, ?int $limit = null): Collection
     {
         $query = ArticlePageviews::where('time_from', '>=', $start)
             ->groupBy('article_id')
