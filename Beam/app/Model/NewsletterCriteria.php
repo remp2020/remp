@@ -46,9 +46,9 @@ class NewsletterCriteria extends Enum
                 return ArticlePageviews::mostReadArticles($start, 'subscribers', $articlesCount);
 
             case self::CONVERSIONS:
-                return Conversion::mostReadArticleIdsByTotalPayment($start, $articlesCount);
+                return Conversion::mostReadArticlesByTotalPaymentAmount($start, $articlesCount);
             case self::AVERAGE_PAYMENT:
-                return Conversion::mostReadArticleIdsByAveragePayment($start, $articlesCount);
+                return Conversion::mostReadArticlesByAveragePaymentAmount($start, $articlesCount);
             default:
                 throw new Exception('unknown article criteria ' . $criteria->getValue());
         }

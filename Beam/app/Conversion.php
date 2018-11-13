@@ -55,7 +55,7 @@ class Conversion extends Model
         $this->attributes['paid_at'] = new Carbon($value);
     }
 
-    public static function mostReadArticleIdsByAveragePayment(\Carbon\Carbon $start, $limit = null): Collection
+    public static function mostReadArticlesByAveragePaymentAmount(\Carbon\Carbon $start, ?int $limit = null): Collection
     {
         $query = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
@@ -71,7 +71,7 @@ class Conversion extends Model
         })->orderByDesc('c.average')->get();
     }
 
-    public static function mostReadArticleIdsByTotalPayment(\Carbon\Carbon $start, $limit = null): Collection
+    public static function mostReadArticlesByTotalPaymentAmount(\Carbon\Carbon $start, ?int $limit = null): Collection
     {
         $query = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
