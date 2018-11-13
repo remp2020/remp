@@ -125,7 +125,7 @@ class BatchEmailGenerator
             // Load dynamic parameters
             if ($template->extras) {
                 $extras = json_decode($template->extras, true);
-                $generator = @$extras['generator'];
+                $generator = $extras['generator'] ?? null;
 
                 if ($generator === self::BEAM_UNREAD_ARTICLES_GENERATOR) {
                     $jobOptions['generator'] = $generator;
