@@ -2,6 +2,8 @@
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
+use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
@@ -73,7 +75,11 @@ class MailCreateTemplateHandler extends BaseHandler
 
     private function isJson($string)
     {
-        json_decode($string);
-        return json_last_error() === JSON_ERROR_NONE;
+        try {
+            Json::decode($string);
+        } catch (JsonException $exception) {
+            return false;
+        }
+        return true;
     }
 }
