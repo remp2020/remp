@@ -72,6 +72,10 @@
             data: {
                 type: Object,
                 required: true,
+            },
+            campaignData: {
+                type: Object,
+                required: true
             }
         },
         data() {
@@ -112,6 +116,16 @@
 
                     this.variantsData.push(prepared);
                 }
+
+                this.variantsData.push({
+                    name: 'TOTAL',
+                    proportion: 100,
+                    clicks: this.campaignData.click_count.count,
+                    shows: this.campaignData.show_count.count,
+                    earned: this.campaignData.purchase_sum.sum,
+                    ctr: this.campaignData.ctr,
+                    conversions: this.campaignData.conversions,
+                });
             }
         }
     }

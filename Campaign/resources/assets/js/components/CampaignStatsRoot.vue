@@ -14,6 +14,7 @@
                 :variants="variants"
                 :variant-banner-links="variantBannerLinks"
                 :data="variantsData"
+                :campaignData="campaignData"
             ></campaign-stats-results>
 
             <variant-stats
