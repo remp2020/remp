@@ -166,6 +166,12 @@ class DashboardController extends Controller
 
         // Save shadow results
         foreach ($shadowRecords as $date => $tagsAndValues) {
+            // check if all keys exists - e.g. some days might be longer (time-shift)
+            // therefore we do want to map all values to current week
+            if (!array_key_exists($date, $shadowResults)) {
+                continue;
+            }
+
             foreach ($tagsAndValues as $tag => $values) {
                 $avg = (int) round($values->avg());
 

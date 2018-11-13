@@ -75,6 +75,9 @@ class ConversionController extends Controller
     public function upsert(ConversionUpsertRequest $request)
     {
         foreach ($request->get('conversions', []) as $c) {
+            // When saving to DB, Eloquent strips timezone information,
+            // therefore convert to UTC
+            $c['paid_at'] = Carbon::parse($c['paid_at'])->tz('UTC');
             $conversion = Conversion::firstOrNew([
                 'transaction_id' => $c['transaction_id'],
             ]);

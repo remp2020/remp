@@ -4,8 +4,7 @@ namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\ProcessException;
-use Remp\MailerModule\PageMeta\GenericPageContent;
-use Remp\MailerModule\PageMeta\TransportInterface;
+use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -13,14 +12,16 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
 {
     protected $sourceTemplatesRepository;
 
+    protected $content;
+
     public $onSubmit;
 
-    private $transport;
-
-    public function __construct(TransportInterface $transport, SourceTemplatesRepository $sourceTemplatesRepository)
-    {
+    public function __construct(
+        SourceTemplatesRepository $sourceTemplatesRepository,
+        ContentInterface $content
+    ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->transport = $transport;
+        $this->content = $content;
     }
 
     public function generateForm(Form $form)
@@ -66,6 +67,7 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
         $dynamic = filter_var($values->dynamic, FILTER_VALIDATE_BOOLEAN);
 
         $items = [];
+
         if ($dynamic) {
             if (!isset($values->articles_count)) {
                 throw new ProcessException("Dynamic email requires 'article_count' parameter");
@@ -87,7 +89,7 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
 
             $urls = explode("\n", trim($values->articles));
             foreach ($urls as $url) {
-                $meta = Utils::fetchUrlMeta($url, new GenericPageContent(), $this->transport);
+                $meta = $this->content->fetchUrlMeta($url);
                 if ($meta) {
                     $items[$url] = $meta;
                 }

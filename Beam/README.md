@@ -136,17 +136,17 @@ Endpoints can be discovered via generated `/swagger.json`.
 #### Dependencies
 
 - Go ^1.8
-- InfluxDB ^1.2
+- Elastic ^6.2
 - MySQL ^5.7
 
 ## [Telegraf](../Docker/telegraf)
 
-Influx Telegraf is a backend service for moving data out of Kafka to InfluxDB. It needs to be ready as Segments are
-dependent on Influx-based data pushed by Telegraf.
+Influx Telegraf is a backend service for moving data out of Kafka to Elastic. It needs to be ready as Segments service is
+dependent on data pushed to Elastic by Telegraf.
 
 ## [Kafka](../Docker/kafka)
 
-All tracked events are also pushed to Kafka.
+All tracked events are being pushed to Kafka for asynchronous processing.
 
 ## Javascript Snippet
 

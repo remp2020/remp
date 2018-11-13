@@ -3,9 +3,7 @@
 namespace Remp\MailerModule\Generators\Dynamic;
 
 use Remp\MailerModule\Beam\Client;
-use Remp\MailerModule\Generators\Utils;
-use Remp\MailerModule\PageMeta\GenericPageContent;
-use Remp\MailerModule\PageMeta\TransportInterface;
+use Remp\MailerModule\PageMeta\ContentInterface;
 
 class UnreadArticlesGenerator
 {
@@ -17,12 +15,14 @@ class UnreadArticlesGenerator
 
     private $beamClient;
 
-    private $transport;
+    private $content;
 
-    public function __construct(Client $beamClient, TransportInterface $transport)
+    public function __construct(
+        Client $beamClient,
+        ContentInterface $content)
     {
         $this->beamClient = $beamClient;
-        $this->transport = $transport;
+        $this->content = $content;
     }
 
     public function addToResolve($templateCode, $userId, $parameters): void
@@ -57,7 +57,7 @@ class UnreadArticlesGenerator
         $params = [];
         foreach ($this->results[$templateCode][$userId] as $i => $url) {
             if (!array_key_exists($url, $this->articlesMeta)) {
-                $this->articlesMeta[$url] = Utils::fetchUrlMeta($url, new GenericPageContent(), $this->transport);
+                $this->articlesMeta[$url] = $this->content->fetchUrlMeta($url);
             }
 
             $meta = $this->articlesMeta[$url];

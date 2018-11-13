@@ -2,16 +2,15 @@
 
 namespace Remp\MailerModule\Generators;
 
-use Nette\Application\UI\Form;
-use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
-use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget;
-use Remp\MailerModule\PageMeta\ContentInterface;
-use Remp\MailerModule\PageMeta\TransportInterface;
-use Remp\MailerModule\Repository\SourceTemplatesRepository;
-use Tomaj\NetteApi\Params\InputParam;
 use GuzzleHttp\Client;
+use Nette\Application\UI\Form;
+use Tomaj\NetteApi\Params\InputParam;
+use Remp\MailerModule\PageMeta\ContentInterface;
+use Remp\MailerModule\Repository\SourceTemplatesRepository;
+use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
+use Remp\MailerModule\Components\GeneratorWidgets\Widgets\TldrWidget;
 
-class MediaBriefingGenerator implements IGenerator
+class TldrGenerator implements IGenerator
 {
     public $onSubmit;
 
@@ -35,7 +34,7 @@ class MediaBriefingGenerator implements IGenerator
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'mediabriefing_html', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'tldr_html', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
@@ -47,7 +46,7 @@ class MediaBriefingGenerator implements IGenerator
 
     public function getWidgets()
     {
-        return [MediaBriefingWidget::class];
+        return [TldrWidget::class];
     }
 
     public function process($values)
@@ -55,7 +54,11 @@ class MediaBriefingGenerator implements IGenerator
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
         $content = $this->content;
 
-        $post = $values->mediabriefing_html;
+        $post = $values->tldr_html;
+
+        $post = $this->parseOls($post);
+
+
         $lockedPost = $this->getLockedHtml($post);
 
         list(
@@ -69,7 +72,9 @@ class MediaBriefingGenerator implements IGenerator
 
         $rules = [
             // remove shortcodes
-            "/\[greybox\].*?\[\/greybox\]/is" => "",
+            "/\[greybox\]/is" => "<i>",
+            "/\[\/greybox\]/is" => "</i>",
+//            "/\[greybox\].*?\[\/greybox\]/is" => "",
             "/\[pullboth.*?\/pullboth\]/is" => "",
             "/<script.*?\/script>/is" => "",
             "/\[iframe.*?\]/is" => "",
@@ -81,7 +86,7 @@ class MediaBriefingGenerator implements IGenerator
             "/<iframe.*?\/iframe>/is" => "",
 
             // remove paragraphs
-            '/<p.*?>(.*?)<\/p>/is' => "$1",
+            '/<p>(.*?)<\/p>/is' => "$1",
 
             // replace em-s
             "/<em.*?>(.*?)<\/em>/is" => "<i style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;\">$1</i><br>",
@@ -98,7 +103,7 @@ class MediaBriefingGenerator implements IGenerator
             // replace link shortcodes
             '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content) {
                 $url = "https://dennikn.sk/{$matches[1]}";
-                $meta = $this->content->fetchUrlMeta($url);
+                $meta = $content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
 
@@ -111,10 +116,12 @@ class MediaBriefingGenerator implements IGenerator
             // replace images
             '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
 
-            // replace ul & /ul
+            // replace ul and ol
             '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
+            '/<ol>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
 
             '/<\/ul>/is' => '</tbody></table>' . PHP_EOL,
+            '/<\/ol>/is' => '</tbody></table>' . PHP_EOL,
 
             // replace li
             '/<li>(.*?)<\/li>/is' => $liTemplate,
@@ -208,7 +215,7 @@ class MediaBriefingGenerator implements IGenerator
         $addonParams = [
             'lockedHtmlContent' => $output['lockedHtmlContent'],
             'lockedTextContent' => $output['lockedTextContent'],
-            'mediaBriefingTitle' => $values->title,
+            'tldrTitle' => $values->title,
             'from' => $values->from,
             'render' => true
         ];
@@ -229,11 +236,11 @@ class MediaBriefingGenerator implements IGenerator
 
         $form->addText('from', 'Sender');
 
-        $form->addText('url', 'Media Briefing URL')
+        $form->addText('url', 'Tl;dr URL')
             ->addRule(Form::URL)
-            ->setRequired("Field 'Media Briefing URL' is required.");
+            ->setRequired("Field 'Tl;dr URL' is required.");
 
-        $form->addTextArea('mediabriefing_html', 'HTML')
+        $form->addTextArea('tldr_html', 'HTML')
             ->setAttribute('rows', 20)
             ->setAttribute('class', 'form-control html-editor')
             ->getControlPrototype();
@@ -300,7 +307,7 @@ class MediaBriefingGenerator implements IGenerator
         if (!isset($data->post_content)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_content'");
         }
-        $output->mediabriefing_html = $data->post_content;
+        $output->tldr_html = $data->post_content;
 
         return $output;
     }
@@ -335,6 +342,37 @@ class MediaBriefingGenerator implements IGenerator
         }
 
         return $html;
+    }
+
+    public function parseOls($post)
+    {
+        $ols = [];
+        preg_match_all('/<ol>(.*?)<\/ol>/is', $post, $ols);
+
+        foreach ($ols[1] as $olContent) {
+            $olsLis = [];
+            $liNum = 1;
+            $newOlContent = '';
+
+            preg_match_all('/<li>(.*?)<\/li>/is', $olContent, $olsLis);
+
+
+            foreach ($olsLis[1] as $liContent) {
+                $newOlContent .= '
+    <tr style="padding:0;vertical-align:top;text-align:left;">
+        <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">' . $liNum . '</td>
+        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important;">
+            <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">' . $liContent . '</p>
+        </td>
+    </tr>';
+
+                $liNum++;
+            }
+
+            $post = str_replace($olContent, $newOlContent, $post);
+        }
+
+        return $post;
     }
 
     public function parseEmbed($matches)
