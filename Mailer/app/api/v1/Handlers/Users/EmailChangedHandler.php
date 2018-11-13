@@ -35,7 +35,7 @@ class EmailChangedHandler extends BaseHandler
 
         if (empty($subscriptions)) {
             return new JsonApiResponse(
-                400,
+                404,
                 ['status' => 'error', 'message' => 'No user subscriptions for email: ' . $originalEmail]
             );
         }
