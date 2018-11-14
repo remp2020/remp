@@ -18,6 +18,7 @@ class Client
             'base_uri' => $baseUrl,
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
             ]
         ]);
     }
