@@ -613,6 +613,27 @@ class CampaignController extends Controller
                 continue;
             }
 
+            if ($campaign->url_filter === Campaign::URL_FILTER_EXCEPT_AT) {
+                foreach ($campaign->url_patterns as $urlPattern) {
+                    if (strpos($data->url, $urlPattern)) {
+                        continue 2;
+                    }
+                }
+            }
+
+            if ($campaign->url_filter === Campaign::URL_FILTER_ONLY_AT) {
+                $matched = false;
+                foreach ($campaign->url_patterns as $urlPattern) {
+                    if (strpos($data->url, $urlPattern)) {
+                        $matched = true;
+                    }
+                }
+
+                if (!$matched) {
+                    continue;
+                }
+            }
+
             // device rules
             if (!isset($data->userAgent)) {
                 Log::error("Unable to load user agent for userId [{$userId}]");

@@ -17,7 +17,7 @@
                 <div class="row">
                     <div class="col-xs-10 col-sm-11">
                         <url
-                            v-for="(url, i) in urlsList"
+                            v-for="(url, i) in urlPatternList"
                             :key="url.uid"
                             :index="i"
                             :url="url"
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <input v-if="this.urlFilterType === 'everywhere'" type="hidden" name="urls">
+        <input v-if="this.urlFilterType === 'everywhere'" type="hidden" name="url_patterns">
     </div>
 </template>
 
@@ -49,22 +49,22 @@
         props: [
             "urlFilterTypes",
             "urlFilter",
-            "urls"
+            "urlPatterns"
         ],
         data() {
             return {
-                urlsList: [],
+                urlPatternList: [],
                 urlFilterType: null
             };
         },
         created: function () {
             this.urlFilterType = this.urlFilter;
 
-            if (this.urls) {
-                for (let ii = 0; ii < this.urls.length; ii++) {
-                    this.urlsList.push({
+            if (this.urlPatterns) {
+                for (let ii = 0; ii < this.urlPatterns.length; ii++) {
+                    this.urlPatternList.push({
                         uid: this.generateUid(),
-                        url: this.urls[ii]
+                        url: this.urlPatterns[ii]
                     })
                 }
             } else {
@@ -73,15 +73,15 @@
         },
         methods: {
             addUrl() {
-                this.urlsList.push({
+                this.urlPatternList.push({
                     uid: this.generateUid(),
                     url: ""
                 })
             },
             removeUrl(index) {
-                this.urlsList.splice(index, 1);
+                this.urlPatternList.splice(index, 1);
 
-                if (!this.urlsList.length) {
+                if (!this.urlPatternList.length) {
                     this.addUrl();
                 }
 

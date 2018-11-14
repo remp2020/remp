@@ -220,7 +220,7 @@
                                         <url-rules
                                             :urlFilterTypes="urlFilterTypes"
                                             :urlFilter="urlFilter"
-                                            :urls="urls"
+                                            :urlPatterns="urlPatterns"
                                         ></url-rules>
                                     </div>
                                 </div>
@@ -469,7 +469,7 @@
         "_validateUrl",
         "_urlFilterTypes",
         "_urlFilter",
-        "_urls",
+        "_urlPatterns",
 
         "_banners",
         "_availableSegments",
@@ -552,7 +552,7 @@
                 "submitAction": null,
                 "urlFilterTypes": null,
                 "urlFilter": null,
-                "urls": null,
+                "urlPatterns": null,
 
                 "banners": null,
                 "availableSegments": null,

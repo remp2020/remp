@@ -45,7 +45,7 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "validateUrl": {!! @json(route('campaigns.validateForm')) !!},
         "urlFilterTypes": {!! @json($campaign->getAllUrlFilterTypes()) !!},
         "urlFilter": {!! @json($campaign->url_filter) !!},
-        "urls": {!! @json($campaign->urls) !!},
+        "urlPatterns": {!! @json($campaign->url_patterns) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

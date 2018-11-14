@@ -33,7 +33,7 @@ class Campaign extends Model
         'devices',
         'usingAdblock',
         'url_filter',
-        'urls',
+        'url_patterns',
     ];
 
     protected $casts = [
@@ -43,7 +43,7 @@ class Campaign extends Model
         'pageview_rules' => 'json',
         'devices' => 'json',
         'usingAdblock' => 'boolean',
-        'urls' => 'json',
+        'url_patterns' => 'json',
     ];
 
     protected $attributes = [
