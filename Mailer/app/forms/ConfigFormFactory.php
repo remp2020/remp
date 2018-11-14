@@ -3,13 +3,15 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Repository\ConfigsRepository;
 use Remp\MailerModule\Sender\MailerFactory;
 
-class ConfigFormFactory extends Object
+class ConfigFormFactory
 {
+    use SmartObject;
+
     /** @var ConfigsRepository */
     private $configsRepository;
 

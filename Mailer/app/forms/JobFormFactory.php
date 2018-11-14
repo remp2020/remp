@@ -3,15 +3,17 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Form\Rendering\MaterialRenderer;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Segment\Aggregator;
 use Tracy\Debugger;
 
-class JobFormFactory extends Object
+class JobFormFactory
 {
+    use SmartObject;
+
     private $jobsRepository;
 
     private $batchesRepository;

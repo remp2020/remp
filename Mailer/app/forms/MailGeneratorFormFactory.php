@@ -4,13 +4,15 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\InvalidStateException;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Form\Rendering\MaterialRenderer;
 use Remp\MailerModule\Generators\GeneratorFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
-class MailGeneratorFormFactory extends Object
+class MailGeneratorFormFactory
 {
+    use SmartObject;
+
     private $sourceTemplatesRepository;
 
     private $mailGeneratorFactory;

@@ -3,7 +3,7 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
@@ -12,8 +12,10 @@ use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Segment\Aggregator;
 use Tracy\Debugger;
 
-class NewBatchFormFactory extends Object
+class NewBatchFormFactory
 {
+    use SmartObject;
+
     private $jobsRepository;
 
     private $batchesRepository;

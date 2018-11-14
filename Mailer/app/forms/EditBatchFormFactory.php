@@ -5,14 +5,16 @@ namespace Remp\MailerModule\Forms;
 use Nette\Application\UI\Form;
 use Nette\Database\Table\ActiveRow;
 use Nette\Forms\Controls\SubmitButton;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class EditBatchFormFactory extends Object implements IFormFactory
+class EditBatchFormFactory implements IFormFactory
 {
+    use SmartObject;
+
     /** @var JobsRepository */
     private $jobsRepository;
 
