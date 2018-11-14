@@ -89,6 +89,8 @@
             );
             cm.on('change', function() {
                 vm.htmlContent = cm.getValue();
+
+                $('body').trigger('preview:change');
             });
             $('#'+{$form[mail_layout_id]->htmlId}).on('change', function() {
                 vm.htmlLayout = layouts[$(this).val()]
