@@ -29,7 +29,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="row">
@@ -212,7 +212,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseWhereToDisplay" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingWhereToDisplay">
+                        <div id="collapseWhereToDisplay" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingWhereToDisplay">
                             <div class="panel-body p-l-10 p-r-20">
 
                                 <div class="row">
@@ -635,22 +635,6 @@
             },
             highlightABTestingCollapse: function () {
                 return (this.variants.length > 2);
-            },
-            urlWhereToDisplay: function () {
-                return [
-                    {
-                        "label": "Everywhere",
-                        "value": "everywhere"
-                    },
-                    {
-                        "label": "Only at",
-                        "value": "only_at"
-                    },
-                    {
-                        "label": "Everywhere except",
-                        "value": "everywhere_except"
-                    }
-                ];
             }
         },
         methods: {
