@@ -97,6 +97,10 @@
                                 <dt><span data-toggle="tooltip" data-placement="top" title="" data-original-title="Users who already had a subscription in the past">Renewed conversions</span></dt>
                                 <dd>{{$renewedConversionsCount}}</dd>
                             </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Conversions amount</dt>
+                                <dd>{{ $conversionsSum }}</dd>
+                            </dl>
                         </div>
                     </div>
                 </div>
