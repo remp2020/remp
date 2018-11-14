@@ -12,6 +12,7 @@ parameters:
 	remp:
 		beam:
 			web_addr: @environmentConfig::get('REMP_BEAM_ADDR')
+			token: @environmentConfig::get('REMP_BEAM_API_TOKEN')
 			tracker_addr: @environmentConfig::get('REMP_BEAM_TRACKER_ADDR')
 			tracker_property_token: @environmentConfig::get('REMP_BEAM_TRACKER_PROPERTY_TOKEN')
 			segments_addr: @environmentConfig::get('REMP_BEAM_SEGMENTS_ADDR')
@@ -19,6 +20,7 @@ parameters:
 			segments_addr: @environmentConfig::get('REMP_PYTHIA_SEGMENTS_ADDR')
 		campaign:
 			web_addr: @environmentConfig::get('REMP_CAMPAIGN_ADDR')
+
 	errbit:
 		send_errors: false
 
@@ -137,6 +139,10 @@ services:
 	# API authentication
 	apiTokenRepository:
 		class: Remp\MailerModule\Auth\SsoTokenRepository
+
+	# Beam
+	- Remp\MailerModule\Beam\Client(%remp.beam.web_addr%, %remp.beam.token%)
+	- Remp\MailerModule\Generators\Dynamic\UnreadArticlesGenerator
 
 	- Remp\MailerModule\Config\Config
 	- Remp\MailerModule\Sender

@@ -97,9 +97,14 @@ class SendNewslettersCommand extends Command
         return [$nextSending, $hasMore];
     }
 
-    private function sendNewsletter($newsletter)
+    private function sendNewsletter(Newsletter $newsletter)
     {
-        $articles = $this->getArticles($newsletter->criteria, $newsletter->timespan, $newsletter->articles_count);
+        $articles = $newsletter->personalized_content ? [] :
+            NewsletterCriteria::getArticles(
+                NewsletterCriteria::get($newsletter->criteria),
+                $newsletter->timespan,
+                $newsletter->articles_count
+            );
 
         [$htmlContent, $textContent] = $this->generateEmail($newsletter, $articles);
 
@@ -111,11 +116,23 @@ class SendNewslettersCommand extends Command
     private function createJob($newsletter, $templateId)
     {
         $jobId = $this->mailer->createJob($newsletter->segment_code, $newsletter->segment_provider, $templateId);
-        $this->line(sprintf("Mailer job successfully created (id: %s)", $jobId));
+        $this->line(sprintf('Mailer job successfully created (id: %s)', $jobId));
     }
 
     private function createTemplate($newsletter, $htmlContent, $textContent): int
     {
+        $extras = null;
+        if ($newsletter->personalized_content) {
+            $extras = json_encode([
+                'generator' => 'beam-unread-articles',
+                'parameters' => [
+                    'criteria' => $newsletter->criteria,
+                    'timespan' => $newsletter->timespan,
+                    'articles_count' => $newsletter->articles_count
+                ]
+            ]);
+        }
+
         return $this->mailer->createTemplate(
             $newsletter->name,
             'beam_newsletter',
@@ -124,42 +141,22 @@ class SendNewslettersCommand extends Command
             $newsletter->email_subject,
             $textContent,
             $htmlContent,
-            $newsletter->mail_type_code
+            $newsletter->mail_type_code,
+            $extras
         );
     }
 
     private function generateEmail($newsletter, $articles)
     {
-        $params = [
-            'articles' => implode("\n", $articles->pluck('url')->toArray())
-        ];
+        $params = [];
+        if ($newsletter->personalized_content) {
+            $params['dynamic'] = true;
+            $params['articles_count'] = $newsletter->articles_count;
+        } else {
+            $params['articles']=  implode("\n", $articles->pluck('url')->toArray());
+        }
+
         $output = $this->mailer->generateEmail($newsletter->mailer_generator_id, $params);
         return [$output['htmlContent'], $output['textContent']];
-    }
-
-    private function getArticles($criteria, $daysSpan, $articlesCount)
-    {
-        $start = Carbon::now()->subDays($daysSpan);
-
-        switch ($criteria) {
-            case NewsletterCriteria::TIMESPENT_ALL:
-                return ArticleTimespent::getMostReadArticles($start, 'sum', $articlesCount);
-            case NewsletterCriteria::TIMESPENT_SUBSCRIBERS:
-                return ArticleTimespent::getMostReadArticles($start, 'subscribers', $articlesCount);
-            case NewsletterCriteria::TIMESPENT_SIGNED_IN:
-                return ArticleTimespent::getMostReadArticles($start, 'signed_in', $articlesCount);
-            case NewsletterCriteria::PAGEVIEWS_ALL:
-                return ArticlePageviews::getMostReadArticles($start, 'sum', $articlesCount);
-            case NewsletterCriteria::PAGEVIEWS_SIGNED_IN:
-                return ArticlePageviews::getMostReadArticles($start, 'signed_in', $articlesCount);
-            case NewsletterCriteria::PAGEVIEWS_SUBSCRIBERS:
-                return ArticlePageviews::getMostReadArticles($start, 'subscribers', $articlesCount);
-            case NewsletterCriteria::CONVERSIONS:
-                return Conversion::getMostReadArticlesByTotalPayment($start, $articlesCount);
-            case NewsletterCriteria::AVERAGE_PAYMENT:
-                return Conversion::getMostReadArticlesByAveragePayment($start, $articlesCount);
-            default:
-                throw new Exception('unknown article criteria ' . $criteria);
-        }
     }
 }

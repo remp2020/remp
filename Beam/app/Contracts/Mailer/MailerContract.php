@@ -22,7 +22,8 @@ interface MailerContract
         $subject,
         $templateText,
         $templateHtml,
-        $mailTypeCode
+        $mailTypeCode,
+        $extras = null
     ): int;
 
     public function createJob($segmentCode, $segmentProvider, $templateId): int;
