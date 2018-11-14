@@ -21,6 +21,10 @@ class Campaign extends Model
     const DEVICE_MOBILE = 'mobile';
     const DEVICE_DESKTOP = 'desktop';
 
+    const URL_FILTER_EVERYWHERE = 'everywhere';
+    const URL_FILTER_ONLY_AT = 'only_at';
+    const URL_FILTER_EXCEPT_AT = 'except_at';
+
     protected $fillable = [
         'name',
         'signed_in',
@@ -28,6 +32,8 @@ class Campaign extends Model
         'pageview_rules',
         'devices',
         'usingAdblock',
+        'url_filter',
+        'urls',
     ];
 
     protected $casts = [
@@ -37,6 +43,7 @@ class Campaign extends Model
         'pageview_rules' => 'json',
         'devices' => 'json',
         'usingAdblock' => 'boolean',
+        'urls' => 'json',
     ];
 
     protected $attributes = [
@@ -167,6 +174,15 @@ class Campaign extends Model
         }
 
         return $mapping;
+    }
+
+    public function getAllUrlFilterTypes()
+    {
+        return [
+            self::URL_FILTER_EVERYWHERE => 'Everywhere',
+            self::URL_FILTER_ONLY_AT => 'Only at',
+            self::URL_FILTER_EXCEPT_AT => 'Except at',
+        ];
     }
 
     /**
