@@ -27,7 +27,7 @@ class Campaign extends Model
         'once_per_session',
         'pageview_rules',
         'devices',
-        'usingAdblock',
+        'using_adblock',
     ];
 
     protected $casts = [
@@ -36,12 +36,12 @@ class Campaign extends Model
         'once_per_session' => 'boolean',
         'pageview_rules' => 'json',
         'devices' => 'json',
-        'usingAdblock' => 'boolean',
+        'using_adblock' => 'boolean',
     ];
 
     protected $attributes = [
         'once_per_session' => false,
-        'usingAdblock' => null,
+        'using_adblock' => null,
         'pageview_rules' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]"
     ];

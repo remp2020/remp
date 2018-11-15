@@ -609,7 +609,7 @@ class CampaignController extends Controller
             }
 
             // using adblock?
-            if ($campaign->usingAdblock && !$data->usingAdblock || $campaign->usingAdblock === false && $data->usingAdblock) {
+            if ($campaign->using_adblock && !$data->usingAdblock || $campaign->using_adblock === false && $data->usingAdblock) {
                 continue;
             }
 
