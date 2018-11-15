@@ -50,7 +50,8 @@ class Campaign extends Model
         'once_per_session' => false,
         'usingAdblock' => null,
         'pageview_rules' => '[]',
-        'devices' => "[\"desktop\", \"mobile\"]"
+        'devices' => "[\"desktop\", \"mobile\"]",
+        'url_filter' => self::URL_FILTER_EVERYWHERE,
     ];
 
     protected $appends = ['active'];

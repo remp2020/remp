@@ -15,6 +15,13 @@
             <span class="input-group-addon hidden-xs"></span>
             <div>
                 <div class="row">
+                    <div class="col-sx-12">
+                        <small class="help-block" style="padding-left: 15px;">
+                            Url is matched if request url contains one of these strings. Filter does not support any wildcards.
+                        </small>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-xs-10 col-sm-11">
                         <url
                             v-for="(url, i) in urlPatternList"

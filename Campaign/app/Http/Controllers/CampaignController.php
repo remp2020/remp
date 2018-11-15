@@ -615,7 +615,7 @@ class CampaignController extends Controller
 
             if ($campaign->url_filter === Campaign::URL_FILTER_EXCEPT_AT) {
                 foreach ($campaign->url_patterns as $urlPattern) {
-                    if (strpos($data->url, $urlPattern)) {
+                    if (strpos($data->url, $urlPattern) !== false) {
                         continue 2;
                     }
                 }
@@ -624,7 +624,7 @@ class CampaignController extends Controller
             if ($campaign->url_filter === Campaign::URL_FILTER_ONLY_AT) {
                 $matched = false;
                 foreach ($campaign->url_patterns as $urlPattern) {
-                    if (strpos($data->url, $urlPattern)) {
+                    if (strpos($data->url, $urlPattern) !== false) {
                         $matched = true;
                     }
                 }
