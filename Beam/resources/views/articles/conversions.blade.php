@@ -41,10 +41,12 @@
                 ],
                 'conversions_count' => [
                     'header' => 'conversions',
+                    'searchable' => false,
                     'priority' => 2,
                 ],
                 'conversions_rate' => [
                     'orderable' => false,
+                    'searchable' => false,
                     'header' => 'conversions rate',
                     'priority' => 2,
                 ],
