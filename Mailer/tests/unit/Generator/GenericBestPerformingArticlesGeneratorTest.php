@@ -3,6 +3,9 @@ namespace Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Generators\GenericBestPerformingArticlesGenerator;
+use Remp\MailerModule\PageMeta\ContentInterface;
+use Remp\MailerModule\PageMeta\GenericPageContent;
+use Remp\MailerModule\PageMeta\Meta;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
@@ -45,7 +48,7 @@ TEMPLATE;
 
     public function testProcess()
     {
-        $generator = new GenericBestPerformingArticlesGenerator(new class() implements TransportInterface
+        $transport = new class() implements TransportInterface
         {
             public function getContent($url)
             {
@@ -68,7 +71,9 @@ TEMPLATE;
   </body></html>
 HTML;
             }
-        }, $this->sourceTemplateRepository);
+        };
+
+        $generator = new GenericBestPerformingArticlesGenerator($this->sourceTemplateRepository, new GenericPageContent($transport));
 
         $testObj = new \stdClass();
         $testObj->source_template_id = 1;
