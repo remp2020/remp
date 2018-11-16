@@ -28,15 +28,19 @@ class ArticleTimespent extends Model
         return $this->belongsTo(Article::class);
     }
 
-    public static function getMostReadArticles(Carbon $start, string $getBy, int $limit): Collection
+    public static function mostReadArticles(Carbon $start, string $getBy, $limit = null): Collection
     {
-        $articleIds = ArticleTimespent::where('time_from', '>=', $start)
+        $query = ArticleTimespent::where('time_from', '>=', $start)
             ->groupBy('article_id')
-            ->select(['article_id', DB::raw("count($getBy) as total_sum")])
-            ->orderByDesc('total_sum')
-            ->limit($limit)
-            ->get()->pluck('article_id');
+            ->select(['article_id', DB::raw("sum($getBy) as total_sum")])
+            ->orderByDesc('total_sum');
 
-        return Article::findMany($articleIds);
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return Article::joinSub($query, 't', function ($join) {
+            $join->on('articles.id', '=', 't.article_id');
+        })->orderByDesc('t.total_sum')->get();
     }
 }

@@ -20,34 +20,22 @@ class Meta
         $this->authors = $authors;
     }
 
-    /**
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @return string
-     */
-    public function getImage()
+    public function getImage(): string
     {
         return $this->image;
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthors()
+    public function getAuthors(): string
     {
         return $this->authors;
     }

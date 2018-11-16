@@ -3,12 +3,14 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Sender;
 
-class TemplateTestFormFactory extends Object
+class TemplateTestFormFactory
 {
+    use SmartObject;
+
     /** @var TemplatesRepository */
     private $templateRepository;
 

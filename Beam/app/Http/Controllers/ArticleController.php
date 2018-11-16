@@ -4,26 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
-use App\Contracts\Mailer\MailerContract;
+use App\Contracts\JournalListRequest;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
+use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
+use App\Model\NewsletterCriteria;
 use App\Section;
 use Carbon\Carbon;
 use HTML;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Remp\LaravelHelpers\Resources\JsonResource;
+use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
+
+    private $journal;
+
     private $journalHelper;
 
     public function __construct(JournalContract $journal)
     {
+        $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
     }
 
@@ -314,6 +321,67 @@ class ArticleController extends Controller
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
             'json' => ArticleResource::collection(collect($articles)),
+        ]);
+    }
+
+    public function unreadArticlesForUsers(UnreadArticlesRequest $request)
+    {
+        // Request with timespan 30 days typically takes about 50 seconds,
+        // therefore add some safe margin to request execution time
+        set_time_limit(120);
+
+        $articlesCount = $request->input('articles_count');
+        $timespan = $request->input('timespan');
+        $criteria = NewsletterCriteria::get($request->input('criteria'));
+
+        $topArticles = NewsletterCriteria::getCachedArticles($criteria, $timespan);
+
+        $topArticlesPerUser = [];
+
+        $timeAfter = Carbon::now()->subDays($timespan);
+        $timeBefore = Carbon::now();
+
+        foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
+            // Load read articles in batch
+            $usersReadArticles = [];
+            $r = new JournalAggregateRequest('pageviews', 'load');
+            $r->setTimeAfter($timeAfter);
+            $r->setTimeBefore($timeBefore);
+            $r->addGroup('user_id', 'article_id');
+            $r->addFilter('user_id', ...$userIdsChunk);
+            foreach ($this->journal->count($r) as $item) {
+                if ($item->tags->article_id !== '') {
+                    $userId = $item->tags->user_id;
+                    if (!array_key_exists($userId, $usersReadArticles)) {
+                        $usersReadArticles[$userId] = [];
+                    }
+                    $usersReadArticles[$userId][$item->tags->article_id] = true;
+                }
+            }
+
+            // Save top articles per user
+            foreach ($userIdsChunk as $userId) {
+                $topArticlesPerUser[$userId] = [];
+
+                $i = 0;
+                while (count($topArticlesPerUser[$userId]) < $articlesCount) {
+                    if ($i >= count($topArticles)) {
+                        break;
+                    }
+
+                    $topArticle = $topArticles[$i];
+                    if (!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId])) {
+                        $topArticlesPerUser[$userId][] = $topArticle->url;
+                    }
+
+                    $i++;
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'data' => $topArticlesPerUser
         ]);
     }
 }

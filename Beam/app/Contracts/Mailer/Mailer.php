@@ -90,7 +90,8 @@ class Mailer implements MailerContract
         $subject,
         $templateText,
         $templateHtml,
-        $mailTypeCode
+        $mailTypeCode,
+        $extras = null
     ): int {
     
         $multipart = [
@@ -127,6 +128,13 @@ class Mailer implements MailerContract
                 'contents' => $mailTypeCode
             ]
         ];
+
+        if ($extras) {
+            $multipart[] = [
+                'name' => 'extras',
+                'contents' => $extras
+            ];
+        }
 
         try {
             $response = $this->client->post(self::ENDPOINT_CREATE_TEMPLATE, [

@@ -121,9 +121,12 @@ For example for payload
 
 the event would be stored within `foo_bar` topic so everyone can subscribe to it.
 
-#### Dependencies
+#### Build Dependencies
 
 - Go ^1.8
+
+#### Run Dependencies
+
 - Kafka ^0.10
 - Zookeeper ^3.4
 - MySQL ^5.7
@@ -133,16 +136,35 @@ the event would be stored within `foo_bar` topic so everyone can subscribe to it
 Beam Segments serves as a read-only API for getting information about segments and users of these segments.
 Endpoints can be discovered via generated `/swagger.json`.
 
-#### Dependencies
+#### Build Dependencies
 
 - Go ^1.8
+
+#### Dependencies
+
 - Elastic ^6.2
 - MySQL ^5.7
 
 ## [Telegraf](../Docker/telegraf)
 
-Influx Telegraf is a backend service for moving data out of Kafka to Elastic. It needs to be ready as Segments service is
-dependent on data pushed to Elastic by Telegraf.
+Influx Telegraf is a backend service for moving data tracked by Tracker out of Kafka to Elastic. It needs to be ready
+as Segments service is dependent on data pushed to Elastic by Telegraf.
+
+We use forked version of Telegraf as we needed to implement custom plugin to insert data to Elastic. You can find
+the repository in [remp2020/telegraf](https://github.com/remp2020/telegraf). You can either build the whole telegraf
+based on README instructions or run the pre-build binaries.
+
+To download pre-built binaries, head to [remp2020/telegraf/releases](https://github.com/remp2020/telegraf/releases).
+
+You can then run the telegraf by running the binary and passing the path to config file. For example:
+
+```
+/home/user/telegraf --config /home/user/workspace/remp/Docker/telegraf/telegraf.conf
+```
+
+#### Build Dependencies
+
+- Go ^1.8
 
 ## [Kafka](../Docker/kafka)
 

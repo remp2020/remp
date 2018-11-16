@@ -145,6 +145,19 @@ class ArticleDetailsController extends Controller
 
         $conversionRate = $uniqueBrowsersCount == 0 ? 0 : ($article->conversions()->count() / $uniqueBrowsersCount) * 100;
 
+        $conversionsSum = collect();
+        foreach ($article->conversions as $conversions) {
+            if (!$conversionsSum->has($conversions->currency)) {
+                $conversionsSum[$conversions->currency] = 0;
+            }
+            $conversionsSum[$conversions->currency] += $conversions->amount;
+        }
+
+        $conversionsSum = $conversionsSum->map(function ($sum, $currency) {
+            return number_format($sum, 2) . ' ' . $currency;
+        })->values()->implode(', ');
+
+
         $newConversionsCount = $article->loadNewConversionsCount();
         $renewedConversionsCount = $article->loadRenewedConversionsCount();
 
@@ -156,6 +169,7 @@ class ArticleDetailsController extends Controller
                 'article' => $article,
                 'pageviewsSubscribersToAllRatio' => $pageviewsSubscribersToAllRatio,
                 'conversionRate' => $conversionRate,
+                'conversionsSum' => $conversionsSum,
                 'uniqueBrowsersCount' => $uniqueBrowsersCount,
                 'newConversionsCount' => $newConversionsCount,
                 'renewedConversionsCount' => $renewedConversionsCount,

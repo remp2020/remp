@@ -3,10 +3,12 @@
 namespace Remp\MailerModule\Forms\Rules;
 
 use Nette\Forms\IControl;
-use Nette\Object;
+use Nette\SmartObject;
 
-class FormRules extends Object
+class FormRules
 {
+    use SmartObject;
+
     const ADVANCED_EMAIL = 'Remp\MailerModule\Forms\Rules\FormRules::validateAdvancedEmail';
 
     public static function validateAdvancedEmail(IControl $control)

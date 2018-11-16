@@ -4,6 +4,8 @@ SUB_TRACKER="go/cmd/tracker"
 SUB_SEGMENTS="go/cmd/segments"
 PHP_FOLDERS=app config
 
+export TARGET_GOOS TARGET_GOARCH TARGET_SUFFIX
+
 clear:
 	@cd $(SUB_TRACKER) && make clear
 	@cd $(SUB_SEGMENTS) && make clear

@@ -3,12 +3,14 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
 use Nette\Security\AuthenticationException;
 use Nette\Security\User;
+use Nette\SmartObject;
 
-class SignInFormFactory extends Object
+class SignInFormFactory
 {
+    use SmartObject;
+
     /** @var User */
     private $user;
 

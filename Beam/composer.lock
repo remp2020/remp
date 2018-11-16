@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5405e182d4b91c8ff007cb4203acca17",
+    "content-hash": "0dcc99e16cee53f5c746c5fb00fe92c6",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -1814,16 +1814,16 @@
         },
         {
             "name": "league/uri-interfaces",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri-interfaces.git",
-                "reference": "b5063ffb8b129923c8988f1d4061fdeea53b47b9"
+                "reference": "081760c53a4ce76c9935a755a21353610f5495f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/b5063ffb8b129923c8988f1d4061fdeea53b47b9",
-                "reference": "b5063ffb8b129923c8988f1d4061fdeea53b47b9",
+                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/081760c53a4ce76c9935a755a21353610f5495f6",
+                "reference": "081760c53a4ce76c9935a755a21353610f5495f6",
                 "shasum": ""
             },
             "require": {
@@ -1862,7 +1862,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-05-22T12:10:22+00:00"
+            "time": "2018-11-05T14:00:06+00:00"
         },
         {
             "name": "league/uri-manipulations",
@@ -2127,6 +2127,72 @@
                 "psr-6"
             ],
             "time": "2017-06-19T13:31:41+00:00"
+        },
+        {
+            "name": "marc-mabe/php-enum",
+            "version": "v3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/marc-mabe/php-enum.git",
+                "reference": "a75560c23514590e4a36b4dab7527e9253fc4a48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/marc-mabe/php-enum/zipball/a75560c23514590e4a36b4dab7527e9253fc4a48",
+                "reference": "a75560c23514590e4a36b4dab7527e9253fc4a48",
+                "shasum": ""
+            },
+            "require": {
+                "ext-reflection": "*",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "lstrojny/functional-php": "1.2.* || 1.0.*",
+                "phpbench/phpbench": "@dev",
+                "phpunit/phpunit": "^5.7 || ^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev",
+                    "dev-2.x": "2.3-dev",
+                    "dev-1.x": "1.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MabeEnum\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Marc Bennewitz",
+                    "email": "dev@mabe.berlin",
+                    "homepage": "http://mabe.berlin/",
+                    "role": "Lead"
+                }
+            ],
+            "description": "Simple and fast implementation of enumerations with native PHP>=5.6",
+            "homepage": "https://github.com/marc-mabe/php-enum",
+            "keywords": [
+                "enum",
+                "enum-map",
+                "enum-set",
+                "enumeration",
+                "enumerator",
+                "enummap",
+                "enumset",
+                "map",
+                "set",
+                "type",
+                "type-hint",
+                "typehint"
+            ],
+            "time": "2018-08-06T18:02:48+00:00"
         },
         {
             "name": "matomo/searchengine-and-social-list",
@@ -2555,16 +2621,16 @@
         },
         {
             "name": "piwik/device-detector",
-            "version": "3.11.2",
+            "version": "3.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matomo-org/device-detector.git",
-                "reference": "c8e1760a45c4aed201af3b7deee35131bc47fe3e"
+                "reference": "9b7a5f837938c38f1131d6042b859144053ac45c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/c8e1760a45c4aed201af3b7deee35131bc47fe3e",
-                "reference": "c8e1760a45c4aed201af3b7deee35131bc47fe3e",
+                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/9b7a5f837938c38f1131d6042b859144053ac45c",
+                "reference": "9b7a5f837938c38f1131d6042b859144053ac45c",
                 "shasum": ""
             },
             "require": {
@@ -2605,7 +2671,7 @@
                 "parser",
                 "useragent"
             ],
-            "time": "2018-10-08T20:45:21+00:00"
+            "time": "2018-11-11T14:41:22+00:00"
         },
         {
             "name": "predis/predis",
@@ -3392,16 +3458,16 @@
         },
         {
             "name": "simshaun/recurr",
-            "version": "v3.0.7",
+            "version": "v3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/simshaun/recurr.git",
-                "reference": "f729bfd715f4fdf2fc2d8f400e89c9753e479c7c"
+                "reference": "9aa6f01382ced5d2a18addd27799dc0065916af0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simshaun/recurr/zipball/f729bfd715f4fdf2fc2d8f400e89c9753e479c7c",
-                "reference": "f729bfd715f4fdf2fc2d8f400e89c9753e479c7c",
+                "url": "https://api.github.com/repos/simshaun/recurr/zipball/9aa6f01382ced5d2a18addd27799dc0065916af0",
+                "reference": "9aa6f01382ced5d2a18addd27799dc0065916af0",
                 "shasum": ""
             },
             "require": {
@@ -3443,7 +3509,7 @@
                 "recurring",
                 "rrule"
             ],
-            "time": "2018-09-19T05:26:21+00:00"
+            "time": "2018-11-08T20:53:11+00:00"
         },
         {
             "name": "snowplow/referer-parser",
@@ -4524,16 +4590,16 @@
         },
         {
             "name": "tracy/tracy",
-            "version": "v2.5.4",
+            "version": "v2.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/tracy.git",
-                "reference": "dad70c700a595ed3f278c13491b4aff12efc862d"
+                "reference": "35fa649b483b28e16f61de07110ea0585fc8d6ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/tracy/zipball/dad70c700a595ed3f278c13491b4aff12efc862d",
-                "reference": "dad70c700a595ed3f278c13491b4aff12efc862d",
+                "url": "https://api.github.com/repos/nette/tracy/zipball/35fa649b483b28e16f61de07110ea0585fc8d6ea",
+                "reference": "35fa649b483b28e16f61de07110ea0585fc8d6ea",
                 "shasum": ""
             },
             "require": {
@@ -4586,7 +4652,7 @@
                 "nette",
                 "profiler"
             ],
-            "time": "2018-11-02T14:14:22+00:00"
+            "time": "2018-11-05T15:10:59+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4901,16 +4967,16 @@
     "packages-dev": [
         {
             "name": "barryvdh/laravel-ide-helper",
-            "version": "v2.5.1",
+            "version": "v2.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-ide-helper.git",
-                "reference": "7db1843473e1562d8e0490b51db847d3a1415140"
+                "reference": "981ff45b43e0cf808af0a5a5f40f6369e0e29499"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/7db1843473e1562d8e0490b51db847d3a1415140",
-                "reference": "7db1843473e1562d8e0490b51db847d3a1415140",
+                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/981ff45b43e0cf808af0a5a5f40f6369e0e29499",
+                "reference": "981ff45b43e0cf808af0a5a5f40f6369e0e29499",
                 "shasum": ""
             },
             "require": {
@@ -4971,20 +5037,20 @@
                 "phpstorm",
                 "sublime"
             ],
-            "time": "2018-09-06T18:41:09+00:00"
+            "time": "2018-10-06T09:35:51+00:00"
         },
         {
             "name": "barryvdh/reflection-docblock",
-            "version": "v2.0.4",
+            "version": "v2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/ReflectionDocBlock.git",
-                "reference": "3dcbd98b5d9384a5357266efba8fd29884458e5c"
+                "reference": "64165bd4ba9a550d11ea57569463b7c722dc6b0a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/ReflectionDocBlock/zipball/3dcbd98b5d9384a5357266efba8fd29884458e5c",
-                "reference": "3dcbd98b5d9384a5357266efba8fd29884458e5c",
+                "url": "https://api.github.com/repos/barryvdh/ReflectionDocBlock/zipball/64165bd4ba9a550d11ea57569463b7c722dc6b0a",
+                "reference": "64165bd4ba9a550d11ea57569463b7c722dc6b0a",
                 "shasum": ""
             },
             "require": {
@@ -5020,7 +5086,7 @@
                     "email": "mike.vanriel@naenius.com"
                 }
             ],
-            "time": "2016-06-13T19:28:20+00:00"
+            "time": "2018-10-25T19:09:52+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -5698,40 +5764,6 @@
                 "schema"
             ],
             "time": "2018-02-14T22:26:30+00:00"
-        },
-        {
-            "name": "kwn/php-rdkafka-stubs",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kwn/php-rdkafka-stubs.git",
-                "reference": "591bdccc416b673978a39d780897f93b74f3674a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kwn/php-rdkafka-stubs/zipball/591bdccc416b673978a39d780897f93b74f3674a",
-                "reference": "591bdccc416b673978a39d780897f93b74f3674a",
-                "shasum": ""
-            },
-            "require": {
-                "ext-rdkafka": "*"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Karol Wnuk",
-                    "email": "k.wnuk@ascetic.pl"
-                }
-            ],
-            "description": "Rdkafka extension stubs for your IDE",
-            "time": "2018-03-21T08:10:21+00:00"
         },
         {
             "name": "mockery/mockery",
