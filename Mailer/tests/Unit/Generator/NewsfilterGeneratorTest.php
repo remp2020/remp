@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Generator;
+namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Generators\NewsfilterGenerator;
