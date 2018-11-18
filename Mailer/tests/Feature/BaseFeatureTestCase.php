@@ -2,7 +2,6 @@
 namespace Tests\Feature;
 
 use Nette\Database\Context;
-use PDO;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Repository\BatchesRepository;
@@ -12,7 +11,10 @@ use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListCategoriesRepository;
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\ListVariantsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Remp\MailerModule\Repository\UserSubscriptionsRepository;
+use Remp\MailerModule\Repository\UserSubscriptionVariantsRepository;
 
 class BaseFeatureTestCase extends TestCase
 {
@@ -42,8 +44,17 @@ class BaseFeatureTestCase extends TestCase
     /** @var ListsRepository */
     protected $listsRepository;
 
+    /** @var ListVariantsRepository */
+    protected $listVariantsRepository;
+
     /** @var ListCategoriesRepository */
     protected $listCategoriesRepository;
+
+    /** @var UserSubscriptionsRepository */
+    protected $userSubscriptionsRepository;
+
+    /** @var UserSubscriptionVariantsRepository */
+    protected $userSubscriptionVariantsRepository;
 
     protected function setUp()
     {
@@ -57,7 +68,10 @@ class BaseFeatureTestCase extends TestCase
         $this->jobQueueRepository = $this->inject(JobQueueRepository::class);
         $this->batchesRepository = $this->inject(BatchesRepository::class);
         $this->listsRepository = $this->inject(ListsRepository::class);
+        $this->listVariantsRepository = $this->inject(ListVariantsRepository::class);
         $this->listCategoriesRepository = $this->inject(ListCategoriesRepository::class);
+        $this->userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
+        $this->userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
     }
 
     protected function tearDown()/* The :void return type declaration that should be here would cause a BC issue */
@@ -74,7 +88,10 @@ class BaseFeatureTestCase extends TestCase
             $this->jobQueueRepository,
             $this->batchesRepository,
             $this->listsRepository,
-            $this->listCategoriesRepository
+            $this->listVariantsRepository,
+            $this->listCategoriesRepository,
+            $this->userSubscriptionsRepository,
+            $this->userSubscriptionVariantsRepository
         ]));
 
         $db = $this->database->getConnection()->getPdo();
@@ -97,9 +114,9 @@ SET FOREIGN_KEY_CHECKS=1;
         return $this->container->getByType($className);
     }
 
-    protected function createBatch($template)
+    protected function createBatch($template, $mailTypeVariant = null)
     {
-        $mailJob = $this->jobsRepository->add('segment', 'provider');
+        $mailJob = $this->jobsRepository->add('segment', 'provider', null, $mailTypeVariant);
         $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
