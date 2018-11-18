@@ -64,8 +64,8 @@ class JobQueueRepository extends Repository
 
     public function removeUnsubscribed(IRow $batch)
     {
-        $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email IN (
-  SELECT mail_user_subscriptions.user_email FROM mail_user_subscriptions WHERE subscribed=0
+        $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email NOT IN (
+  SELECT mail_user_subscriptions.user_email FROM mail_user_subscriptions WHERE subscribed=1
   AND mail_user_subscriptions.mail_type_id IN (SELECT mail_types.id FROM mail_types INNER JOIN mail_templates ON mail_templates.mail_type_id = mail_types.id WHERE mail_templates.id = mail_job_queue.mail_template_id)
 )");
     }

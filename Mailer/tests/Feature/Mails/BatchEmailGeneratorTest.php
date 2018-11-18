@@ -92,31 +92,29 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
     public function testFiltering()
     {
+        // Prepare data
         $userList = $this->generateUsers(10);
 
         $aggregator = $this->createConfiguredMock(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
-
         $layout = $this->createMailLayout();
         $mailType = $this->createMailTypeWithCategory();
         $template = $this->createTemplate($layout, $mailType);
         $batch = $this->createBatch($template);
 
-        $numberOfUnsubscribedUsers = 3;
+        $numberOfSubscribedUsers = 3;
 
-        foreach ($userList as $i => $item) {
-            if ($i <= $numberOfUnsubscribedUsers) {
-                $this->userSubscriptionsRepository->unsubscribeUser($mailType, $item['id'], $item['email']);
-            } else {
-                $this->userSubscriptionsRepository->subscribeUser($mailType, $item['id'], $item['email']);
-            }
+        for ($i = 1; $i <= $numberOfSubscribedUsers; $i++) {
+            $item = $userList[$i];
+            $this->userSubscriptionsRepository->subscribeUser($mailType, $item['id'], $item['email']);
         }
 
         $userProvider = $this->createMock(IUser::class);
         $userProvider->method('list')->will($this->onConsecutiveCalls($userList, []));
 
+        // Test generator
         $generator = $this->getGenerator($aggregator, $userProvider);
 
         $userMap = [];
@@ -129,7 +127,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         // Filter those that won't be sent
         $generator->filterQueue($batch);
 
-        $this->assertEquals(count($userList) - $numberOfUnsubscribedUsers, $this->jobQueueRepository->totalCount());
+        $this->assertEquals($numberOfSubscribedUsers, $this->jobQueueRepository->totalCount());
     }
 }
 
