@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Console\Commands\AggregateArticlesViews;
 use App\Console\Commands\AggregatePageviewLoadJob;
 use App\Console\Commands\AggregatePageviewTimespentJob;
+use App\Console\Commands\CompressAggregations;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Schema;
@@ -44,6 +45,10 @@ class Kernel extends ConsoleKernel
         //$schedule->command(AggregateArticlesViews::COMMAND)
         //    ->dailyAt('00:10')
         //    ->withoutOverlapping();
+
+        $schedule->command(CompressAggregations::COMMAND)
+            ->dailyAt('00:10')
+            ->withoutOverlapping();
     }
 
     /**
