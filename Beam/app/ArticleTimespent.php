@@ -16,11 +16,19 @@ class ArticleTimespent extends Model
         'time_from',
         'time_to',
         'sum',
+        'signed_in',
+        'subscribers',
     ];
 
     protected $dates = [
         'time_from',
         'time_to',
+    ];
+
+    protected $casts = [
+        'sum' => 'integer',
+        'signed_in' => 'integer',
+        'subscribers' => 'integer',
     ];
 
     public function article()

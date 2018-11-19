@@ -12,10 +12,16 @@
 */
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
+
+use Carbon\Carbon;
+
 $factory->define(\App\Property::class, function (Faker\Generator $faker) {
     return [
         'name' => 'DEMO property',
         'uuid' => $faker->uuid,
+        'account_id' => function () {
+            return factory(App\Account::class)->create()->id;
+        },
     ];
 });
 
@@ -85,5 +91,54 @@ $factory->define(\App\Conversion::class, function (Faker\Generator $faker) {
         'currency' => $faker->randomElement(['EUR','USD']),
         'paid_at' => $faker->dateTimeBetween('-30 days', 'now')->format(DATE_RFC3339),
         'transaction_id' => $faker->uuid,
+    ];
+});
+
+$factory->define(\App\Conversion::class, function (Faker\Generator $faker) {
+    return [
+        'amount' => $faker->numberBetween(5,50),
+        'currency' => $faker->randomElement(['EUR','USD']),
+        'paid_at' => $faker->dateTimeBetween('-30 days', 'now')->format(DATE_RFC3339),
+        'transaction_id' => $faker->uuid,
+    ];
+});
+
+$factory->define(\App\ArticlePageviews::class, function (Faker\Generator $faker) {
+    $sum = $faker->numberBetween(5, 10);
+    $signedIn = $faker->numberBetween(1, 5);
+    $subscribers = $sum - $signedIn;
+
+    $timeTo = Carbon::instance($faker->dateTimeBetween('-30 days', 'now'));
+    $timeFrom = (clone $timeTo)->subHour();
+
+    return [
+        'article_id' => function () {
+            return factory(App\Article::class)->create()->id;
+        },
+        'time_from' => $timeFrom,
+        'time_to' => $timeTo,
+        'sum' => $sum,
+        'signed_in' => $signedIn,
+        'subscribers' => $subscribers
+    ];
+});
+
+$factory->define(\App\ArticleTimespent::class, function (Faker\Generator $faker) {
+    $sum = $faker->numberBetween(100, 400);
+    $signedIn = $faker->numberBetween(1, 50);
+    $subscribers = $sum - $signedIn;
+
+    $timeTo = Carbon::instance($faker->dateTimeBetween('-30 days', 'now'));
+    $timeFrom = (clone $timeTo)->subHour();
+
+    return [
+        'article_id' => function () {
+            return factory(App\Article::class)->create()->id;
+        },
+        'time_from' => $timeFrom,
+        'time_to' => $timeTo,
+        'sum' => $sum,
+        'signed_in' => $signedIn,
+        'subscribers' => $subscribers
     ];
 });

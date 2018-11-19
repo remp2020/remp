@@ -25,6 +25,12 @@ class ArticlePageviews extends Model
         'time_to',
     ];
 
+    protected $casts = [
+        'sum' => 'integer',
+        'signed_in' => 'integer',
+        'subscribers' => 'integer',
+    ];
+
     public function article()
     {
         return $this->belongsTo(Article::class);
