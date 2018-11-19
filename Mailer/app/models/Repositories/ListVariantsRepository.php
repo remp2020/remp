@@ -17,5 +17,6 @@ class ListVariantsRepository extends Repository
             'code' => $code,
             'sorting' => $sorting,
             'created_at' => new DateTime()
-        ]);}
+        ]);
+    }
 }
