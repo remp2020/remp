@@ -184,7 +184,7 @@
                                                     <div class="col-md-12">
                                                         <v-select v-model="usingAdblock"
                                                                   id="usingAdblock"
-                                                                  :name="'usingAdblock'"
+                                                                  :name="'using_adblock'"
                                                                   :value="usingAdblock"
                                                                   :options.sync="adBlockingOptions"
                                                                   :title="'Everyone'"

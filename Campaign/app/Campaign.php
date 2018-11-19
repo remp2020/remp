@@ -31,7 +31,7 @@ class Campaign extends Model
         'once_per_session',
         'pageview_rules',
         'devices',
-        'usingAdblock',
+        'using_adblock',
         'url_filter',
         'url_patterns',
     ];
@@ -42,13 +42,13 @@ class Campaign extends Model
         'once_per_session' => 'boolean',
         'pageview_rules' => 'json',
         'devices' => 'json',
-        'usingAdblock' => 'boolean',
+        'using_adblock' => 'boolean',
         'url_patterns' => 'json',
     ];
 
     protected $attributes = [
         'once_per_session' => false,
-        'usingAdblock' => null,
+        'using_adblock' => null,
         'pageview_rules' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]",
         'url_filter' => self::URL_FILTER_EVERYWHERE,
