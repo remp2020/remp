@@ -11,18 +11,11 @@ class ListVariantsRepository extends Repository
 
     public function add($mailType, $title, $code, $sorting)
     {
-        $result = $this->insert([
+        return $this->insert([
             'mail_type_id' => $mailType->id,
             'title' => $title,
             'code' => $code,
             'sorting' => $sorting,
             'created_at' => new DateTime()
-        ]);
-
-        if (is_numeric($result)) {
-            return $this->getTable()->where('id', $result)->fetch();
-        }
-
-        return $result;
-    }
+        ]);}
 }
