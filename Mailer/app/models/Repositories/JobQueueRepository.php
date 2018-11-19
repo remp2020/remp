@@ -88,12 +88,8 @@ AND mail_job_queue.email NOT IN (SELECT * from tmptbl);
 
 DROP table tmptbl;
 SQL;
-            try {
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$row->mail_template_id, $batch->id, $row->mail_template_id]);
-            } catch (PDOException $e) {
-                echo $e->getMessage();
-            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$row->mail_template_id, $batch->id, $row->mail_template_id]);
         }
     }
 
