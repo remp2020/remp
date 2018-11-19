@@ -93,7 +93,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
     public function testFiltering()
     {
         // Prepare data
-        $userList = $this->generateUsers(10);
+        $userList = $this->generateUsers(1000);
 
         $aggregator = $this->createConfiguredMock(Aggregator::class, [
             'users' => array_keys($userList)
@@ -104,7 +104,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $template = $this->createTemplate($layout, $mailType);
         $batch = $this->createBatch($template);
 
-        $numberOfSubscribedUsers = 3;
+        $numberOfSubscribedUsers = 50;
 
         for ($i = 1; $i <= $numberOfSubscribedUsers; $i++) {
             $item = $userList[$i];
