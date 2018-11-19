@@ -40,9 +40,10 @@ class Kernel extends ConsoleKernel
             ->hourlyAt(5)
             ->withoutOverlapping();
 
-        $schedule->command(AggregateArticlesViews::COMMAND)
-            ->dailyAt('00:10')
-            ->withoutOverlapping();
+        // TODO: temporarily turned off to figure out what is a cause of "MySQL connection refused"
+        //$schedule->command(AggregateArticlesViews::COMMAND)
+        //    ->dailyAt('00:10')
+        //    ->withoutOverlapping();
     }
 
     /**
