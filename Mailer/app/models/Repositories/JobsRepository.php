@@ -42,13 +42,7 @@ class JobsRepository extends Repository
             'mail_type_variant_id' => $mailTypeVariant ? $mailTypeVariant->id : null
         ];
 
-        $result = $this->insert($data);
-
-        if (is_numeric($result)) {
-            return $this->getTable()->where('id', $result)->fetch();
-        }
-
-        return $result;
+        return $this->insert($data);
     }
 
     /**
