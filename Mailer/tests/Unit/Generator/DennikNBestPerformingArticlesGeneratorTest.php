@@ -1,8 +1,9 @@
 <?php
-namespace Tests\Generator;
+namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Generators\GenericBestPerformingArticlesGenerator;
+use Remp\MailerModule\PageMeta\DenniknContent;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
@@ -45,7 +46,7 @@ TEMPLATE;
 
     public function testProcess()
     {
-        $generator = new GenericBestPerformingArticlesGenerator(new class() implements TransportInterface
+        $transport = new class() implements TransportInterface
         {
             public function getContent($url)
             {
@@ -254,7 +255,9 @@ TEMPLATE;
 </body></html>
 HTML;
             }
-        }, $this->sourceTemplateRepository);
+        };
+
+        $generator = new GenericBestPerformingArticlesGenerator($this->sourceTemplateRepository, new DenniknContent($transport));
 
         $testObj = new \stdClass();
         $testObj->source_template_id = 1;
@@ -273,7 +276,7 @@ HTML;
         self::assertContains($description, $htmlOutput);
         self::assertContains($description, $textOutput);
 
-        $img = "https://a-static.projektn.sk/2018/05/unnamed-file-2000x1333.jpg";
+        $img = "https://a-static.projektn.sk/2018/05/unnamed-file-558x270.jpg";
         self::assertContains($img, $htmlOutput);
         self::assertNotContains($img, $textOutput);
     }

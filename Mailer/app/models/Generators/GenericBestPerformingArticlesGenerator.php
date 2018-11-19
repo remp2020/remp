@@ -64,7 +64,7 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
     public function process($values)
     {
         $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
-        $dynamic = filter_var($values->dynamic, FILTER_VALIDATE_BOOLEAN);
+        $dynamic = filter_var($values->dynamic ?? null, FILTER_VALIDATE_BOOLEAN);
 
         $items = [];
 

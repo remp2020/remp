@@ -14,13 +14,15 @@ class Client
 
     public function __construct($baseUrl, $token)
     {
-        $this->client = new \GuzzleHttp\Client([
-            'base_uri' => $baseUrl,
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-            ]
-        ]);
+        if ($baseUrl) {
+            $this->client = new \GuzzleHttp\Client([
+                'base_uri' => $baseUrl,
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+        }
     }
 
     public function unreadArticles($timespan, $articlesCount, $criteria, array $userIds)
