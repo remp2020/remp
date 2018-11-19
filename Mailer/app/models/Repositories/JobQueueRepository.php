@@ -70,7 +70,6 @@ class JobQueueRepository extends Repository
             ->where(['mail_batch_id' => $batch->id])
             ->group('mail_template_id');
 
-        $pdo = $this->getDatabase()->getConnection()->getPdo();
         foreach ($q as $row) {
             $sql = <<<SQL
 CREATE TEMPORARY TABLE IF NOT EXISTS tmptbl AS ( 
@@ -88,8 +87,7 @@ AND mail_job_queue.email NOT IN (SELECT * from tmptbl);
 
 DROP table tmptbl;
 SQL;
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$row->mail_template_id, $batch->id, $row->mail_template_id]);
+            $this->getDatabase()->query($sql, $row->mail_template_id, $batch->id, $row->mail_template_id);
         }
     }
 
