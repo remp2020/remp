@@ -204,6 +204,32 @@
                         </div>
                     </div><!-- .panel (segments) -->
 
+                    <div class="panel panel-default panel-whereToDisplay">
+                        <div class="panel-heading" role="tab" id="headingWhereToDisplay">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWhereToDisplay" aria-expanded="false" aria-controls="collapseWhereToDisplay" :class="{ green: highlightSegmentsCollapse }">
+                                    Where to display?
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseWhereToDisplay" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingWhereToDisplay">
+                            <div class="panel-body p-l-10 p-r-20">
+
+                                <div class="row">
+                                    <div class="col-md-8 col-sm-12">
+                                        <url-rules
+                                            :urlFilterTypes="urlFilterTypes"
+                                            :urlFilter="urlFilter"
+                                            :urlPatterns="urlPatterns"
+                                        ></url-rules>
+                                    </div>
+                                </div>
+
+                            </div><!-- .panel-body -->
+                        </div>
+                    </div><!-- .panel (segments) -->
+
+
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFour">
                             <h4 class="panel-title">
@@ -422,9 +448,10 @@
 
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect";
-    import PageviewRules from "./templates/PageviewRules";
+    import PageviewRules from "./PageviewRules";
     import FormValidator from "remp/js/components/FormValidator";
     import AbTesting from "./AbTesting";
+    import UrlRules from "./UrlRules";
 
     let props = [
         "_name",
@@ -440,6 +467,9 @@
         "_allDevices",
         "_selectedDevices",
         "_validateUrl",
+        "_urlFilterTypes",
+        "_urlFilter",
+        "_urlPatterns",
 
         "_banners",
         "_availableSegments",
@@ -460,6 +490,7 @@
             AbTesting,
             FormValidator,
             PageviewRules,
+            UrlRules
         },
         created: function(){
             let self = this;
@@ -519,6 +550,9 @@
                 "selectedDevices": null,
                 "validateUrl": null,
                 "submitAction": null,
+                "urlFilterTypes": null,
+                "urlFilter": null,
+                "urlPatterns": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -676,6 +710,12 @@
         text-align: center;
         font-size: 16px;
         margin-top: 20px;
+    }
+
+    @media(max-width: 768px) {
+        .panel-whereToDisplay .panel-body {
+            padding-left: 25px !important;
+        }
     }
 </style>
 
