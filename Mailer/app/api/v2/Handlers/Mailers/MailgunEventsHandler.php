@@ -70,7 +70,7 @@ class MailgunEventsHandler extends BaseHandler
             'mail_sender_id' => $params['event-data']['user-variables']['mail_sender_id'],
             'timestamp' => $params['event-data']['timestamp'],
             'event' => $params['event-data']['event'],
-            'reason' => $params['event-data']['reason'],
+            'reason' => $params['event-data']['reason'] ?? null,
         ]));
 
         return new JsonApiResponse(200, ['status' => 'ok']);
