@@ -11,11 +11,14 @@ use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
+use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 
 final class DashboardPresenter extends BasePresenter
 {
+    private $userSubscriptionsRepository;
+
     private $batchTemplatesRepository;
-    
+
     private $templatesRepository;
     
     private $batchesRepository;
@@ -25,6 +28,7 @@ final class DashboardPresenter extends BasePresenter
     private $dateFormatter;
 
     public function __construct(
+        UserSubscriptionsRepository $userSubscriptionsRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         DateFormatterFactory $dateFormatterFactory,
         TemplatesRepository $templatesRepository,
@@ -36,6 +40,7 @@ final class DashboardPresenter extends BasePresenter
         $this->dateFormatter = $dateFormatterFactory
             ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
             
+        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->templatesRepository = $templatesRepository;
         $this->batchesRepository = $batchesRepository;
@@ -96,9 +101,11 @@ final class DashboardPresenter extends BasePresenter
         }
 
         $typesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($from, $now);
+        $typeIds = [];
 
         // parse sent mails by type data to chart.js format
         foreach ($typesData as $row) {
+            $typeIds[] = $row->mail_type_id;
             $typeDataSets[$row->mail_type_id]['count'] += $row->sent_mails;
 
             $typeDataSets[$row->mail_type_id]['data'][
@@ -128,9 +135,29 @@ final class DashboardPresenter extends BasePresenter
             return $b['count'] <=> $a['count'];
         });
 
+        $allSubscribersData = $this->userSubscriptionsRepository->getDashboardAllSubscribersGraphData($typeIds)
+                                                                ->fetchAll();
+
+        $allSubscribersDataPrepared = [];
+
+        foreach ($allSubscribersData as $subscribersData) {
+            $typeId = $subscribersData->mail_type_id;
+            if (!array_key_exists($typeId, $allSubscribersDataPrepared)) {
+                $allSubscribersDataPrepared[$typeId] = [];
+            }
+
+            if ($subscribersData->subscribed) {
+                $allSubscribersDataPrepared[$typeId]['subscribed'] = $subscribersData->count;
+                continue;
+            }
+
+            $allSubscribersDataPrepared[$typeId]['unsubscribed'] = $subscribersData->count;
+        }
+
         $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
         $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
 
+        $this->template->allSubscribersData = $allSubscribersDataPrepared;
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->typeDataSets = array_values($typeDataSets);
         $this->template->inProgressBatches = $inProgressBatches;

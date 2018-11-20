@@ -116,4 +116,14 @@ class UserSubscriptionsRepository extends Repository
             }
         }
     }
+
+    public function getDashboardAllSubscribersGraphData(array $mailTypeIds)
+    {
+        return $this->getTable()
+            ->select('
+                COUNT(*) AS count, mail_type_id, subscribed
+            ')
+            ->where('mail_type_id', $mailTypeIds)
+            ->group('mail_type_id, subscribed');
+    }
 }

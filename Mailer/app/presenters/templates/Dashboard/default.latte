@@ -7,6 +7,37 @@
 <section id="content">
     <div class="container">
         <div id="c-grid" class="clearfix" data-columns>
+            <div class="card c-dark palette-Blue bg">
+
+                <div class="cw-current media">
+                    <div class="pull-left zmdi zmdi-graphic-eq m-t-10 p-r-0" style="font-size: 4em;"></div>
+                    <div class="cwc-info media-body">
+                        <div class="cwci-temp">Subscribers</div>
+                        <ul class="cwci-info">
+                            <li>Total</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="list-group lg-alt lg-even-white">
+                        {foreach $typeDataSets as $key => $dataset}
+                            <div class="list-group-item media">
+                                <a n:href="Dashboard:detail $dataset['id']">
+                                    <div class="media-body ns-item">
+                                        <small>{$dataset['label']}</small>
+                                        <h3 class="m-t-5">
+                                            {$allSubscribersData[$dataset['id']]['subscribed']}
+                                            <small style="color: #fff" title="Unsubscribed">({$allSubscribersData[$dataset['id']]['unsubscribed']})</small>
+                                        </h3>
+                                    </div>
+                                </a>
+                            </div>
+                        {/foreach}
+                    </div><!-- .list-group -->
+                </div><!-- .card-body -->
+            </div><!-- .card -->
+
             <div class="card c-dark palette-Amber bg">
 
                 <div class="cw-current media">
@@ -14,7 +45,7 @@
                     <div class="cwc-info media-body">
                         <div class="cwci-temp">Emails sent</div>
                         <ul class="cwci-info">
-                            <li>Statistics</li>
+                            <li>Last month</li>
                         </ul>
                     </div>
                 </div>
@@ -143,7 +174,7 @@
                                         <h3 class="m-t-5">
                                             {if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}
                                             {$dataset['count']}
-                                            <small style="color: #fff">({$dataset['prevPeriodCount']})</small>
+                                            <small style="color: #fff" title="Previous month">({$dataset['prevPeriodCount']})</small>
                                         </h3>
                                     </div>
                                 </a>
