@@ -5,7 +5,7 @@
 @section('content')
     <div id="dashboard">
         <div class="c-header">
-            <h2>Dashboard</h2>
+            <h2>Live BEAM Dashboard</h2>
         </div>
 
         <dashboard-root :articles-url="articlesUrl" :time-histogram-url="timeHistogramUrl">
