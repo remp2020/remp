@@ -135,29 +135,28 @@ final class DashboardPresenter extends BasePresenter
             return $b['count'] <=> $a['count'];
         });
 
+        $allSubscribersDataSet = [];
         $allSubscribersData = $this->userSubscriptionsRepository->getDashboardAllSubscribersGraphData($typeIds)
                                                                 ->fetchAll();
 
-        $allSubscribersDataPrepared = [];
-
         foreach ($allSubscribersData as $subscribersData) {
             $typeId = $subscribersData->mail_type_id;
-            if (!array_key_exists($typeId, $allSubscribersDataPrepared)) {
-                $allSubscribersDataPrepared[$typeId] = [];
+            if (!array_key_exists($typeId, $allSubscribersDataSet)) {
+                $allSubscribersDataSet[$typeId] = [];
             }
 
             if ($subscribersData->subscribed) {
-                $allSubscribersDataPrepared[$typeId]['subscribed'] = $subscribersData->count;
+                $allSubscribersDataSet[$typeId]['subscribed'] = $subscribersData->count;
                 continue;
             }
 
-            $allSubscribersDataPrepared[$typeId]['unsubscribed'] = $subscribersData->count;
+            $allSubscribersDataSet[$typeId]['unsubscribed'] = $subscribersData->count;
         }
 
         $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
         $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
 
-        $this->template->allSubscribersData = $allSubscribersDataPrepared;
+        $this->template->allSubscribersDataSet = $allSubscribersDataSet;
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->typeDataSets = array_values($typeDataSets);
         $this->template->inProgressBatches = $inProgressBatches;
