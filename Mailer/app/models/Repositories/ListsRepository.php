@@ -52,6 +52,34 @@ class ListsRepository extends Repository
             ->update(['sorting+=' => 1]);
     }
 
+    public function updateSorting($newCategoryId, $newSorting, $oldCategoryId = null, $oldSorting = null)
+    {
+        if ($newSorting === $oldSorting) {
+            return;
+        }
+
+        if ($oldSorting !== null) {
+            $this->getTable()
+                ->where('sorting > ? AND mail_type_category_id = ?', $oldSorting, $oldCategoryId)
+                ->update(['sorting-=' => 1]);
+        }
+
+        if ($oldCategoryId === null || $newCategoryId === $oldCategoryId) {
+            $this->getTable()->where(
+                'sorting >= ? AND mail_type_category_id = ?',
+                $newSorting,
+                $oldCategoryId
+            )->update(['sorting+=' => 1]);
+            return;
+        }
+
+        $this->getTable()->where(
+            'sorting >= ? AND mail_type_category_id = ?',
+            $newSorting,
+            $newCategoryId
+        )->update(['sorting+=' => 1]);
+    }
+
     public function findByCategory($categoryId)
     {
         return $this->getTable()->where(['mail_type_category_id' => $categoryId]);
