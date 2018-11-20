@@ -136,7 +136,7 @@ final class DashboardPresenter extends BasePresenter
         });
 
         $allSubscribersDataSet = [];
-        $allSubscribersData = $this->userSubscriptionsRepository->getDashboardAllSubscribersGraphData($typeIds)
+        $allSubscribersData = $this->userSubscriptionsRepository->getDashboardAllSubscribersData($typeIds)
                                                                 ->fetchAll();
 
         foreach ($allSubscribersData as $subscribersData) {

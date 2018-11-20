@@ -117,7 +117,7 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
-    public function getDashboardAllSubscribersGraphData(array $mailTypeIds)
+    public function getDashboardAllSubscribersData(array $mailTypeIds)
     {
         return $this->getTable()
             ->select('
