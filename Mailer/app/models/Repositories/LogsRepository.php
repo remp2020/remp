@@ -28,6 +28,12 @@ class LogsRepository extends Repository
         'dropped' => 'dropped_at',
     ];
 
+    private $bouncesMap = [
+        'suppress-bounce' => 'hard_bounced_at',
+        'suppress-complaint' => 'hard_bounced_at',
+        'suppress-unsubscribe' => 'hard_bounced_at',
+    ];
+
     public function __construct($startStatsDate, Context $database)
     {
         parent::__construct($database);
@@ -279,12 +285,16 @@ class LogsRepository extends Repository
 
     /**
      * @param string $externalEvent
+     * @param null|string $reason
      * @return string|null
      */
-    public function mapEvent(string $externalEvent): ?string
+    public function mapEvent(string $externalEvent, ?string $reason): ?string
     {
         if (!isset($this->eventMap[$externalEvent])) {
             return null;
+        }
+        if ($externalEvent === 'failed' && in_array($reason, $this->bouncesMap)) {
+            return $this->bouncesMap[$reason];
         }
         return $this->eventMap[$externalEvent];
     }
