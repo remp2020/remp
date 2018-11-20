@@ -87,7 +87,7 @@ class ListFormFactory
             if (reset($keys) === $list->sorting) {
                 $defaults['sorting'] = 'begin';
                 unset($defaults['sorting_after']);
-            } elseif(end($keys) === $list->sorting) {
+            } elseif (end($keys) === $list->sorting) {
                 $defaults['sorting'] = 'end';
                 unset($defaults['sorting_after']);
             } else {
@@ -164,8 +164,7 @@ class ListFormFactory
                 break;
         }
 
-        if (
-            $values['mail_type_category_id'] == $list->mail_type_category_id
+        if ($values['mail_type_category_id'] == $list->mail_type_category_id
             && $list->sorting < $values['sorting']
         ) {
             $values['sorting'] -= 1;
