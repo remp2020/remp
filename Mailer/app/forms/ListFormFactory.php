@@ -154,7 +154,7 @@ class ListFormFactory
                 }
 
                 $values['sorting'] = $values['sorting_after'];
-                if ($values['mail_type_category_id'] != $list->mail_type_category_id) {
+                if (!$list || $values['mail_type_category_id'] != $list->mail_type_category_id) {
                     $values['sorting'] += 1;
                 }
                 break;
@@ -164,7 +164,8 @@ class ListFormFactory
                 break;
         }
 
-        if ($values['mail_type_category_id'] == $list->mail_type_category_id
+        if ($list
+            && $values['mail_type_category_id'] == $list->mail_type_category_id
             && $list->sorting < $values['sorting']
         ) {
             $values['sorting'] -= 1;
@@ -173,13 +174,13 @@ class ListFormFactory
         $this->listsRepository->updateSorting(
             $values['mail_type_category_id'],
             $values['sorting'],
-            is_null($list) ? null : $list->mail_type_category_id,
-            is_null($list) ? null : $list->sorting
+            $list ? $list->mail_type_category_id : null,
+            $list ? $list->sorting : null
         );
 
         unset($values['sorting_after']);
 
-        if ($list !== null) {
+        if ($list) {
             $this->listsRepository->update($list, $values);
             $list = $this->listsRepository->find($list->id);
             ($this->onUpdate)($list);
