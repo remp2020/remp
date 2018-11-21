@@ -141,7 +141,6 @@ services:
     volumes:
       - "./Docker/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
     depends_on:
-      - "influxdb"
       - "kafka"
       - "elasticsearch"
     restart: "unless-stopped"
@@ -164,7 +163,7 @@ services:
   beam_segments:
     build: "./Beam/go/cmd/segments"
     depends_on:
-      - "influxdb"
+      - "elasticsearch"
     restart: "unless-stopped"
 
 volumes:
