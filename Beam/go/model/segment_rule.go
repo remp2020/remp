@@ -133,7 +133,7 @@ func (sr SegmentRule) applyOverrides(o RuleOverrides) *SegmentRule {
 	return &sr
 }
 
-// conditions returns list of influx conditions for current SegmentRule.
+// conditions returns list of available conditions for current SegmentRule.
 func (sr *SegmentRule) options(now time.Time, o RuleOverrides) AggregateOptions {
 	options := AggregateOptions{}
 

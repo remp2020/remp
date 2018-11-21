@@ -93,7 +93,7 @@ Following is list of available hosts. We advise you to add them to your
 # SERVICE APPS
 127.0.0.1 adminer.remp.press # adminer for manipulating with MySQL
 127.0.0.1 mailhog.remp.press # mailhog for catching and debugging sent emails
-127.0.0.1 grafana.beam.remp.press # grafana for manipulating with InfluxDB and displaying charts
+127.0.0.1 kibana.beam.remp.press # kibana for manipulating with Elastic data
 ```
 
 > Note: If you use Docker Toolbox, the IP won't be `127.0.0.1`. Use `docker-machine ls` to get IP address of the machine.
