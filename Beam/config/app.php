@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
@@ -106,23 +106,6 @@ return [
     'key' => env('APP_KEY'),
 
     'cipher' => 'AES-256-CBC',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Logging Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure the log settings for your application. Out of
-    | the box, Laravel uses the Monolog PHP logging library. This gives
-    | you a variety of powerful log handlers / formatters to utilize.
-    |
-    | Available Settings: "single", "daily", "syslog", "errorlog"
-    |
-    */
-
-    'log' => env('APP_LOG', 'single'),
-
-    'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
     /*
     |--------------------------------------------------------------------------
@@ -171,15 +154,13 @@ return [
         /*
          * Application Service Providers...
          */
-        Remp\LaravelSso\Providers\SsoServiceProvider::class,
-        Remp\Widgets\Providers\WidgetServiceProvider::class,
-        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
+        App\Providers\RempMailerServiceProvider::class,
         Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,

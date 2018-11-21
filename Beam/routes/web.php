@@ -13,9 +13,19 @@
 
 Route::get('/error', 'AuthController@error')->name('sso.error');
 
+// Temporarily use basic auth for public dashboard
+// TODO: remove once authentication layer is done
+Route::middleware('auth.basic.dashboard')->group(function () {
+    Route::get('public', 'DashboardController@public')->name('dashboard.public');
+    Route::post('public/articlesJson', 'DashboardController@mostReadArticles')->name('public.articles.json');
+    Route::post('public/timeHistogramJson', 'DashboardController@timeHistogram')->name('public.timeHistogram.json');
+});
+
 Route::middleware('auth.jwt')->group(function () {
-    Route::get('/', 'DashboardController@index')->name('dashboard');
-    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+    Route::get('/', 'DashboardController@index')->name('dashboard.index');
+    Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
+    Route::post('dashboard/articlesJson', 'DashboardController@mostReadArticles')->name('dashboard.articles.json');
+    Route::post('dashboard/timeHistogramJson', 'DashboardController@timeHistogram')->name('dashboard.timeHistogram.json');
 
     Route::get('accounts/json', 'AccountController@json');
     Route::get('accounts/{account}/properties/json', 'PropertyController@json')->name('accounts.properties.json');
@@ -48,13 +58,34 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::resource('segments', 'SegmentController');
 
+    Route::get('articles/{article}/histogramJson', 'ArticleDetailsController@timeHistogram')->name('articles.timeHistogram.json');
     Route::resource('articles', 'ArticleController', [
         'only' => ['store'],
     ]);
+
+    Route::resource('articles', 'ArticleDetailsController', [
+        'only' => ['show'],
+    ]);
+
+    Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');
+    Route::post('newsletters/validate', 'NewsletterController@validateForm')->name('newsletters.validateForm');
+    Route::post('newsletters/{newsletter}/start', 'NewsletterController@start')->name('newsletters.start');
+    Route::post('newsletters/{newsletter}/pause', 'NewsletterController@pause')->name('newsletters.pause');
+    Route::resource('newsletters', 'NewsletterController', ['except' => ['show']]);
+
     Route::resource('conversions', 'ConversionController', [
         'only' => ['index', 'store']
     ]);
     Route::resource('authors', 'AuthorController', [
         'only' => ['index', 'show']
     ]);
+
+    Route::post('entities/validate/{entity?}', 'EntitiesController@validateForm')->name('entities.validateForm');
+    Route::get('entities/json', 'EntitiesController@json')->name('entities.json');
+    Route::resource('entities', 'EntitiesController');
+
+
+    // TODO: temporary, delete after test is over
+    Route::get('tests/author-segments-test', 'TestController@authorSegmentsTest')->name('test.author-segments-test');
+    Route::post('tests/author-segments-test', 'TestController@showResults')->name('test.show-results');
 });

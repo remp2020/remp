@@ -37,6 +37,9 @@ type PageviewRowCollection model.PageviewRowCollection
 // SegmentCache represent cache object for count of events of SegmentRules.
 type SegmentCache model.SegmentCache
 
+// HistogramItem represent row with date time histogram data.
+type HistogramItem model.HistogramItem
+
 // CountRow represent row with count result.
 type CountRow model.CountRow
 
@@ -49,14 +52,20 @@ type SumRow model.SumRow
 // SumRowCollection is the collection of sum rows.
 type SumRowCollection model.SumRowCollection
 
+// AvgRow represent row with sum result.
+type AvgRow model.AvgRow
+
+// AvgRowCollection is the collection of sum rows.
+type AvgRowCollection model.AvgRowCollection
+
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() *app.Segment {
 	return &app.Segment{
 		Code: s.Code,
 		Name: s.Name,
 		Group: &app.SegmentGroup{
-			Name:    "REMP segments",
-			Sorting: 100,
+			Name:    s.Group.Name,
+			Sorting: s.Group.Sorting,
 		},
 	}
 }
@@ -283,12 +292,37 @@ func (sc SegmentCache) ToMediaType() map[int]*app.SegmentRuleCache {
 	return mt
 }
 
+// ToMediaType converts internal HistogramItem representation to application one.
+func (hi HistogramItem) ToMediaType() *app.TimeHistogram {
+	c := float64(hi.Value)
+
+	th := &app.TimeHistogram{
+		Time:  hi.Time,
+		Value: c,
+	}
+
+	return th
+}
+
 // ToMediaType converts internal CountRow representation to application one.
 func (cr CountRow) ToMediaType() *app.Count {
-	mt := &app.Count{
-		Count: cr.Count,
-		Tags:  cr.Tags,
+	coll := app.TimeHistogramCollection{}
+
+	for _, c := range cr.Histogram {
+		hi := (HistogramItem)(c).ToMediaType()
+		coll = append(coll, hi)
 	}
+
+	if len(cr.Tags) == 0 {
+		cr.Tags = nil
+	}
+
+	mt := &app.Count{
+		Count:         cr.Count,
+		Tags:          cr.Tags,
+		TimeHistogram: coll,
+	}
+
 	return mt
 }
 
@@ -304,9 +338,21 @@ func (crc CountRowCollection) ToMediaType() app.CountCollection {
 
 // ToMediaType converts internal SumRow representation to application one.
 func (sr SumRow) ToMediaType() *app.Sum {
+	thc := app.TimeHistogramCollection{}
+
+	for _, c := range sr.Histogram {
+		hi := (HistogramItem)(c).ToMediaType()
+		thc = append(thc, hi)
+	}
+
+	if len(sr.Tags) == 0 {
+		sr.Tags = nil
+	}
+
 	mt := &app.Sum{
-		Sum:  sr.Sum,
-		Tags: sr.Tags,
+		Sum:           sr.Sum,
+		Tags:          sr.Tags,
+		TimeHistogram: thc,
 	}
 	return mt
 }
@@ -316,6 +362,37 @@ func (src SumRowCollection) ToMediaType() app.SumCollection {
 	mt := app.SumCollection{}
 	for _, c := range src {
 		mtc := (SumRow)(c).ToMediaType()
+		mt = append(mt, mtc)
+	}
+	return mt
+}
+
+// ToMediaType converts internal AvgRow representation to application one.
+func (ar AvgRow) ToMediaType() *app.Avg {
+	thc := app.TimeHistogramCollection{}
+
+	for _, c := range ar.Histogram {
+		hi := (HistogramItem)(c).ToMediaType()
+		thc = append(thc, hi)
+	}
+
+	if len(ar.Tags) == 0 {
+		ar.Tags = nil
+	}
+
+	mt := &app.Avg{
+		Avg:           ar.Avg,
+		Tags:          ar.Tags,
+		TimeHistogram: thc,
+	}
+	return mt
+}
+
+// ToMediaType converts internal AvgRowCollection representation to application one.
+func (arc AvgRowCollection) ToMediaType() app.AvgCollection {
+	mt := app.AvgCollection{}
+	for _, c := range arc {
+		mtc := (AvgRow)(c).ToMediaType()
 		mt = append(mt, mtc)
 	}
 	return mt

@@ -31,7 +31,7 @@ class Authenticator implements IAuthenticator
 
     public function authenticate(array $credentials)
     {
-        if (empty($credentials)) {
+        if (empty(array_filter($credentials))) {
             $link = $this->linkGenerator->link('Mailer:Sign:In');
             $this->response->redirect($link);
             exit();

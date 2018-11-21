@@ -3,15 +3,17 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Form\Rendering\MaterialRenderer;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Segment\Aggregator;
-use Remp\MailerModule\Segment\SegmentException;
+use Tracy\Debugger;
 
-class JobFormFactory extends Object
+class JobFormFactory
 {
+    use SmartObject;
+
     private $jobsRepository;
 
     private $batchesRepository;
@@ -49,13 +51,13 @@ class JobFormFactory extends Object
         }
 
         $segments = [];
-        try {
-            $segmentList = $this->segmentAggregator->list();
-            array_walk($segmentList, function ($segment) use (&$segments) {
-                $segments[$segment['provider']][$segment['provider'] . '::' . $segment['code']] = $segment['name'];
-            });
-        } catch (SegmentException $e) {
+        $segmentList = $this->segmentAggregator->list();
+        array_walk($segmentList, function ($segment) use (&$segments) {
+            $segments[$segment['provider']][$segment['provider'] . '::' . $segment['code']] = $segment['name'];
+        });
+        if ($this->segmentAggregator->hasErrors()) {
             $form->addError('Unable to fetch list of segments, please check the application configuration.');
+            Debugger::log($this->segmentAggregator->getErrors()[0], Debugger::WARNING);
         }
 
         $form->addSelect('segment_code', 'Segment', $segments)

@@ -4,19 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Contracts\JournalAggregateRequest;
+use App\Contracts\JournalContract;
+use App\Contracts\JournalHelpers;
+use App\Contracts\JournalListRequest;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
+use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
+use App\Model\NewsletterCriteria;
 use App\Section;
 use Carbon\Carbon;
 use HTML;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Remp\LaravelHelpers\Resources\JsonResource;
+use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
+
+    private $journal;
+
+    private $journalHelper;
+
+    public function __construct(JournalContract $journal)
+    {
+        $this->journal = $journal;
+        $this->journalHelper = new JournalHelpers($journal);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -52,6 +69,7 @@ class ArticleController extends Controller
     {
         $articles = Article::selectRaw(implode(',', [
                 "articles.id",
+                "articles.external_id",
                 "articles.title",
                 "articles.url",
                 "articles.published_at",
@@ -72,22 +90,22 @@ class ArticleController extends Controller
             ->groupBy(['article_author.article_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
-            $publishedFrom = Carbon::parse($request->input('published_from'))->tz('UTC');
+            $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
             $articles->where('published_at', '>=', $publishedFrom);
             $conversionsQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
-            $publishedTo = Carbon::parse($request->input('published_to'))->tz('UTC');
+            $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
             $articles->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
         }
         if ($request->input('conversion_from')) {
-            $conversionFrom = Carbon::parse($request->input('conversion_from'))->tz('UTC');
+            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
             $articles->where('paid_at', '>=', $conversionFrom);
             $conversionsQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
-            $conversionTo = Carbon::parse($request->input('conversion_to'))->tz('UTC');
+            $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
             $articles->where('paid_at', '<=', $conversionTo);
             $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
@@ -99,11 +117,26 @@ class ArticleController extends Controller
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
         }
 
-        return $datatables->of($articles)
+        $dt = $datatables->of($articles);
+        $articles = $dt->results();
+
+        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($articles);
+
+        $threeMonthsAgo = Carbon::now()->subMonths(3);
+
+        return $dt
             ->addColumn('title', function (Article $article) {
-                return HTML::link($article->url, $article->title);
+                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount, $threeMonthsAgo) {
+                $uniqueCount = $externalIdsToUniqueUsersCount->get($article->external_id, 0);
+                if ($uniqueCount === 0 || $article->published_at->lt($threeMonthsAgo)) {
+                    return '';
+                }
+
+                return number_format(($article->conversions_count / $uniqueCount) * 10000, 2);
+            })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {
                     return [0];
@@ -161,21 +194,22 @@ class ArticleController extends Controller
 
     public function dtPageviews(Request $request, Datatables $datatables)
     {
-        $articles = Article::selectRaw("articles.*")
+        $articles = Article::selectRaw('articles.*,' .
+            'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
             ->with(['authors', 'sections'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
         if ($request->input('published_from')) {
-            $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'))->tz('UTC'));
+            $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
         }
         if ($request->input('published_to')) {
-            $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'))->tz('UTC'));
+            $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
         }
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::link($article->url, $article->title);
+                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->addColumn('avg_sum_all', function (Article $article) {
                 if (!$article->timespent_all || !$article->pageviews_all) {
@@ -257,12 +291,12 @@ class ArticleController extends Controller
 
     public function upsert(ArticleUpsertRequest $request)
     {
+        $articles = [];
         foreach ($request->get('articles', []) as $a) {
-            $article = Article::firstOrNew([
-                'external_id' => $a['external_id'],
-            ]);
-            $article->fill($a);
-            $article->save();
+            // When saving to DB, Eloquent strips timezone information,
+            // therefore convert to UTC
+            $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
+            $article = Article::upsert($a);
 
             $article->sections()->detach();
             foreach ($a['sections'] as $sectionName) {
@@ -281,11 +315,73 @@ class ArticleController extends Controller
             }
 
             $article->load(['authors', 'sections']);
+            $articles[] = $article;
         }
 
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
-            'json' => new JsonResource([]),
+            'json' => ArticleResource::collection(collect($articles)),
+        ]);
+    }
+
+    public function unreadArticlesForUsers(UnreadArticlesRequest $request)
+    {
+        // Request with timespan 30 days typically takes about 50 seconds,
+        // therefore add some safe margin to request execution time
+        set_time_limit(120);
+
+        $articlesCount = $request->input('articles_count');
+        $timespan = $request->input('timespan');
+        $criteria = NewsletterCriteria::get($request->input('criteria'));
+
+        $topArticles = NewsletterCriteria::getCachedArticles($criteria, $timespan);
+
+        $topArticlesPerUser = [];
+
+        $timeAfter = Carbon::now()->subDays($timespan);
+        $timeBefore = Carbon::now();
+
+        foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
+            // Load read articles in batch
+            $usersReadArticles = [];
+            $r = new JournalAggregateRequest('pageviews', 'load');
+            $r->setTimeAfter($timeAfter);
+            $r->setTimeBefore($timeBefore);
+            $r->addGroup('user_id', 'article_id');
+            $r->addFilter('user_id', ...$userIdsChunk);
+            foreach ($this->journal->count($r) as $item) {
+                if ($item->tags->article_id !== '') {
+                    $userId = $item->tags->user_id;
+                    if (!array_key_exists($userId, $usersReadArticles)) {
+                        $usersReadArticles[$userId] = [];
+                    }
+                    $usersReadArticles[$userId][$item->tags->article_id] = true;
+                }
+            }
+
+            // Save top articles per user
+            foreach ($userIdsChunk as $userId) {
+                $topArticlesPerUser[$userId] = [];
+
+                $i = 0;
+                while (count($topArticlesPerUser[$userId]) < $articlesCount) {
+                    if ($i >= count($topArticles)) {
+                        break;
+                    }
+
+                    $topArticle = $topArticles[$i];
+                    if (!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId])) {
+                        $topArticlesPerUser[$userId][] = $topArticle->url;
+                    }
+
+                    $i++;
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'data' => $topArticlesPerUser
         ]);
     }
 }

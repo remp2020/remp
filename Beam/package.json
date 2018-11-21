@@ -5,7 +5,8 @@
     "watch": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "watch-poll": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "hot": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "production": "node_modules/npm-run-all/bin/npm-run-all/index.js web-production lib-production iota-production",
+    "web-production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "iota-dev": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=iota NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "iota-watch": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=iota NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "iota-watch-poll": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=iota NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -23,12 +24,14 @@
     "all-production": "node_modules/npm-run-all/bin/npm-run-all/index.js production lib-production iota-production"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^17.2.0",
     "animate.css": "^3.5.2",
     "autosize": "^4.0.0",
-    "axios": "^0.17.1",
+    "axios": "^0.18.0",
     "bootstrap": "^3.3.7",
     "bootstrap-notify": "^3.1.3",
     "bootstrap-select": "^1.12.4",
+    "d3": "^5.7.0",
     "datatables.net": "^1.10.15",
     "datatables.net-responsive": "^2.2.1",
     "datatables.net-rowgroup": "^1.0.0",
@@ -43,8 +46,15 @@
     "material-design-iconic-font": "^2.2.0",
     "moment": "^2.20.1",
     "node-waves": "^0.7.5",
+    "pluralize": "^7.0.0",
     "remp": "file:../Package/remp",
-    "vue": "^2.4.2"
+    "rison": "^0.1.1",
+    "rrule": "^2.2.9",
+    "vue": "^2.4.2",
+    "vue-echarts": "^3.0.9",
+    "vue2-filters": "^0.3.0",
+    "vuex": "^3.0.1",
+    "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
     "bootstrap-sass": "^3.3.7",

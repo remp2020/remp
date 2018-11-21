@@ -24,7 +24,7 @@ use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Segment\Aggregator;
-use Remp\MailerModule\Segment\SegmentException;
+use Tracy\Debugger;
 
 final class JobPresenter extends BasePresenter
 {
@@ -138,7 +138,7 @@ final class JobPresenter extends BasePresenter
                 'orderable' => false,
                 'priority' => 3,
             ])
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show job')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
@@ -174,13 +174,13 @@ final class JobPresenter extends BasePresenter
         ];
 
         $segments = [];
-        try {
-            $segmentList = $this->segmentAggregator->list();
-            array_walk($segmentList, function ($segment) use (&$segments) {
-                $segments[$segment['code']] = $segment['name'];
-            });
-        } catch (SegmentException $e) {
+        $segmentList = $this->segmentAggregator->list();
+        array_walk($segmentList, function ($segment) use (&$segments) {
+            $segments[$segment['code']] = $segment['name'];
+        });
+        if ($this->segmentAggregator->hasErrors()) {
             $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
+            Debugger::log($this->segmentAggregator->getErrors()[0], Debugger::WARNING);
         }
 
         $latte = $this->latteFactory->create();
@@ -217,15 +217,15 @@ final class JobPresenter extends BasePresenter
     {
         $job = $this->jobsRepository->find($id);
 
-        try {
-            $segmentList = $this->segmentAggregator->list();
-            array_walk($segmentList, function ($segment) use (&$job) {
-                if ($segment['code'] == $job->segment_code) {
-                    $this->template->segment = $segment;
-                }
-            });
-        } catch (SegmentException $e) {
+        $segmentList = $this->segmentAggregator->list();
+        array_walk($segmentList, function ($segment) use (&$job) {
+            if ($segment['code'] == $job->segment_code) {
+                $this->template->segment = $segment;
+            }
+        });
+        if ($this->segmentAggregator->hasErrors()) {
             $this->flashMessage('Unable to fetch list of segments, please check the application configuration.', 'danger');
+            Debugger::log($this->segmentAggregator->getErrors(), Debugger::WARNING);
         }
 
         $this->template->job = $job;
@@ -330,10 +330,18 @@ final class JobPresenter extends BasePresenter
 
     public function handleTemplatesByListId($listId, $sourceForm, $sourceField, $targetField, $snippet = null)
     {
-        $this[$sourceForm][$sourceField]
-            ->setDefaultValue($listId);
-        $this[$sourceForm][$targetField]
-            ->setItems($this->templatesRepository->pairs($listId));
+        $emptyValue = empty($listId);
+        if (!empty($listId)) {
+            $this[$sourceForm][$sourceField]
+                ->setDefaultValue($listId);
+            $this[$sourceForm][$targetField]
+                ->setItems($this->templatesRepository->pairs($listId));
+        } else {
+            $this[$sourceForm][$sourceField]
+                ->setDefaultValue(null);
+            $this[$sourceForm][$targetField]
+                ->setItems([]);
+        }
 
         if ($snippet) {
             $this->redrawControl($snippet);
@@ -367,7 +375,7 @@ final class JobPresenter extends BasePresenter
             if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE) {
                 $this->redirect('Show', $batch->job->id);
             } else {
-                $this->redirect('EditBatch', $batch->job->id);
+                $this->redirect('EditBatch', $batch->id);
             }
         };
 

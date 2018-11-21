@@ -189,9 +189,18 @@
                         <div class="card-body card-padding p-l-15">
                             <div class="input-group fg-float m-t-10">
                                 <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
-                                <div class="fg-line">
-                                    <label for="target_selector" class="fg-label">Target element selector</label>
-                                    <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
+                                <div class="row">
+                                    <div class="col-xs-10">
+                                        <div class="fg-line" :class="{'fg-toggled': targetSelector && targetSelector.length}">
+                                            <label for="target_selector" class="fg-label">Choose position</label>
+                                            <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <button class="btn btn-primary waves-effect" :class="{'disabled': !clientSiteUrl}" type="button" @click="openClientSiteAndSendKeepAliveMessages()">
+                                            <i class="zmdi zmdi-my-location"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -283,33 +292,34 @@
     import FormValidator from "remp/js/components/FormValidator";
 
     const props = {
-        _name: String,
-        _targetUrl: String,
-        _position: String,
-        _offsetVertical: Number,
-        _offsetHorizontal: Number,
-        _transition: {
-            type: String,
-            default: 'none'
+        "_name": String,
+        "_targetUrl": String,
+        "_position": String,
+        "_offsetVertical": Number,
+        "_offsetHorizontal": Number,
+        "_transition": {
+            "type": String,
+            "default": 'none'
         },
-        _closeable: Boolean,
-        _closeText: String,
-        _displayDelay: Number,
-        _closeTimeout: Number,
-        _targetSelector: String,
-        _displayType: String,
-        _template: String,
+        "_closeable": Boolean,
+        "_closeText": String,
+        "_displayDelay": Number,
+        "_closeTimeout": Number,
+        "_targetSelector": String,
+        "_displayType": String,
+        "_template": String,
 
-        _mediumRectangleTemplate: Object,
-        _barTemplate: Object,
-        _htmlTemplate: Object,
-        _shortMessageTemplate: Object,
+        "_mediumRectangleTemplate": Object,
+        "_barTemplate": Object,
+        "_htmlTemplate": Object,
+        "_shortMessageTemplate": Object,
 
-        _alignmentOptions: Object,
-        _dimensionOptions: Object,
-        _positionOptions: Object,
+        "_alignmentOptions": Object,
+        "_dimensionOptions": Object,
+        "_positionOptions": Object,
 
-        _validateUrl: String
+        "_validateUrl": String,
+        "_clientSiteUrl": String
     };
 
     export default {
@@ -334,6 +344,7 @@
                     this[item.key] = item.val;
                 }
             });
+            window.addEventListener("message", this.receiveSelector, false);
         },
         data: () => ({
             name: null,
@@ -370,7 +381,27 @@
                 {"label": "Fade in down", "value": "fade-in-down"},
             ],
 
-            validateUrl: null
-        })
+            validateUrl: null,
+            clientSiteUrl: null
+        }),
+        methods: {
+            openClientSiteAndSendKeepAliveMessages() {
+                if(!this.clientSiteUrl.length) {
+                    alert('In order to use interactive selector, please specify a CLIENT_SITE_URL in your .env file');
+                    return;
+                }
+
+                var clientSiteInstance = window.open(this.clientSiteUrl + '#bannerPicker');
+
+                setInterval(() => {
+                    clientSiteInstance.postMessage('Keep alive', this.clientSiteUrl);
+                }, 300);
+            },
+            receiveSelector(event) {
+                if (typeof event.data.selector !== 'undefined' && event.data.selector.length) {
+                    this.targetSelector = event.data.selector;
+                }
+            }
+        }
     }
 </script>

@@ -4448,6 +4448,10 @@ normalize-url@^1.4.0:
     query-string "^4.1.0"
     sort-keys "^1.0.0"
 
+nouislider@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/nouislider/-/nouislider-11.1.0.tgz#1768eb5b854917325d41b96f2dc4eb3757d73381"
+
 npm-run-all@^4.0.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/npm-run-all/-/npm-run-all-4.1.2.tgz#90d62d078792d20669139e718621186656cea056"
@@ -4545,6 +4549,10 @@ opn@^5.1.0:
   resolved "https://registry.yarnpkg.com/opn/-/opn-5.1.0.tgz#72ce2306a17dbea58ff1041853352b4a8fc77519"
   dependencies:
     is-wsl "^1.1.0"
+
+optimal-select@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/optimal-select/-/optimal-select-4.0.1.tgz#47de7da7a39bb0949fd9af54c6f03571548f04c9"
 
 optipng-bin@^3.0.0:
   version "3.1.4"
@@ -5632,6 +5640,10 @@ run-queue@^1.0.0, run-queue@^1.0.3:
 safe-buffer@5.1.1, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
+
+salvattore@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/salvattore/-/salvattore-1.0.9.tgz#b75777850cc6f2a690157c8b852aa99fd18a1291"
 
 sass-graph@^2.2.4:
   version "2.2.4"

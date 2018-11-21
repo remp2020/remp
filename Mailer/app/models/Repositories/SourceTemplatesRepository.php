@@ -17,10 +17,11 @@ class SourceTemplatesRepository extends Repository
         return $this->getTable()->select('*')->order('sorting DESC');
     }
 
-    public function add($title, $generator, $html, $text, $sorting = 100)
+    public function add($title, $code, $generator, $html, $text, $sorting = 100)
     {
         return $this->insert([
             'title' => $title,
+            'code' => $code,
             'generator' => $generator,
             'content_html' => $html,
             'content_text' => $text,

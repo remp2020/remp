@@ -172,6 +172,11 @@
 </div>
 <![endif]-->
 
+<script>
+    $(document).ready(function() {
+        salvattore.init();
+    })
+</script>
 <script type="application/javascript">
     $(document).ready(function() {
         var delay = 250;

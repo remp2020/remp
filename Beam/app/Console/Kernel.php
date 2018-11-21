@@ -2,6 +2,10 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AggregateArticlesViews;
+use App\Console\Commands\AggregatePageviewLoadJob;
+use App\Console\Commands\AggregatePageviewTimespentJob;
+use App\Console\Commands\SendNewslettersCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Schema;
@@ -29,9 +33,21 @@ class Kernel extends ConsoleKernel
             return;
         }
 
-         $schedule->command('aggregate:pageview-load')
+        $schedule->command(SendNewslettersCommand::COMMAND)
+            ->everyMinute();
+
+        $schedule->command(AggregatePageviewLoadJob::COMMAND)
              ->hourlyAt(5)
              ->withoutOverlapping();
+
+        $schedule->command(AggregatePageviewTimespentJob::COMMAND)
+            ->hourlyAt(5)
+            ->withoutOverlapping();
+
+        // TODO: temporarily turned off to figure out what is a cause of "MySQL connection refused"
+        //$schedule->command(AggregateArticlesViews::COMMAND)
+        //    ->dailyAt('00:10')
+        //    ->withoutOverlapping();
     }
 
     /**

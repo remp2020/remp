@@ -32,10 +32,13 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
     Route::post('banners/validate', 'BannerController@validateForm')->name('banners.validateForm');
 
+    Route::get('campaigns/{campaign}/stats', 'CampaignController@stats')->name('campaigns.stats');
+    Route::post('campaigns/{campaign}/stats/data', 'StatsController@getStats')->name('campaigns.stats.data');
+
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
     Route::resource('banners', 'BannerController');
     Route::resource('campaigns', 'CampaignController');
-    Route::resource('schedule', 'ScheduleController');
+    Route::resource('schedule', 'ScheduleController')->only(['index', 'create', 'edit', 'update', 'destroy']);
     Route::resource('campaigns.schedule', 'ScheduleController');
 });

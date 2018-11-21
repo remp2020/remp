@@ -25,6 +25,13 @@
       "Remp\\LaravelHelpers\\": "src/"
     }
   },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Remp\\LaravelHelpers\\Providers\\HelperServiceProvider"
+      ]
+    }
+  },
   "config": {
     "preferred-install": "dist",
     "sort-packages": true,

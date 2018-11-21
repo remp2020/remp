@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
@@ -103,10 +104,11 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 // addGroupBy creates a standard (wrapped) aggregation. The results are fetchable
 // via countRowCollectionFromBuckets or sumRowCollectionFromBuckets.
 func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o AggregateOptions,
-	extras map[string]elastic.Aggregation) (*elastic.SearchService, error) {
-	if len(o.GroupBy) > 0 {
+	extras map[string]elastic.Aggregation, dateHistogramAgg *elastic.DateHistogramAggregation) (*elastic.SearchService, error) {
+
+	if len(o.GroupBy) > 0 || len(extras) > 0 || dateHistogramAgg != nil {
 		var err error
-		search, _, err = eDB.WrapAggregation(index, o.GroupBy, search, extras, nil)
+		search, _, err = eDB.WrapAggregation(index, o.GroupBy, search, extras, dateHistogramAgg, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -119,32 +121,94 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 	var crc CountRowCollection
 	tags := make(map[string]string)
 
-	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) {
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 		crcTags := make(map[string]string)
+
+		var histogram []HistogramItem
+
+		if options.TimeHistogram != nil {
+			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
+			if !ok {
+				errors.New("missing expected histogram aggregation data")
+			}
+
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
+					if err != nil {
+						errors.New("cant parse time from elastic search with RFC3339 layout")
+					}
+
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(histogramItem.DocCount),
+					})
+				}
+			}
+		}
+
 		// copy tags to avoid memory sharing
 		for key, val := range tags {
 			crcTags[key] = val
 		}
+
 		crc = append(crc, CountRow{
-			Tags:  crcTags,
-			Count: int(count),
+			Tags:      crcTags,
+			Count:     int(count),
+			Histogram: histogram,
 		})
+
+		return nil
 	})
+	if err != nil {
+		return nil, false, err
+	}
 
 	return crc, true, nil
 }
 
 // sumRowCollectionFromAggregations generates SumRowCollection based on query result aggregations.
-func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string) (SumRowCollection, bool, error) {
+func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, sumField string) (SumRowCollection, bool, error) {
 	var src SumRowCollection
-	dataPresent := true
 	tags := make(map[string]string)
 
-	eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) {
-		sumAgg, ok := aggregations.Sum(targetAgg)
-		if !ok {
-			dataPresent = false
-			return
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+
+		var histogram []HistogramItem
+		var sumValue float64
+
+		if options.TimeHistogram != nil {
+			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
+			if !ok {
+				return errors.New("missing expected histogram aggregation data")
+			}
+
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					sumAggLabel := fmt.Sprintf("%s_sum", sumField)
+					agg, ok := histogramItem.Aggregations.Sum(sumAggLabel)
+					if !ok {
+						return errors.New("cant find timespent_sum sub agg in date histogram agg")
+					}
+
+					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(*agg.Value),
+					})
+
+					sumValue += float64(*agg.Value)
+				}
+			}
+		} else {
+			sumAgg, ok := aggregations.Sum(targetAgg)
+			if !ok {
+				return nil
+			}
+
+			if sumAgg.Value != nil {
+				sumValue = *sumAgg.Value
+			}
 		}
 
 		srcTags := make(map[string]string)
@@ -153,18 +217,153 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 			srcTags[key] = val
 		}
 
-		var sum float64
-		if sumAgg.Value != nil {
-			sum = *sumAgg.Value
-		}
-
 		src = append(src, SumRow{
-			Tags: srcTags,
-			Sum:  sum,
+			Tags:      srcTags,
+			Sum:       sumValue,
+			Histogram: histogram,
 		})
+
+		return nil
 	})
 
-	return src, dataPresent, nil
+	if err != nil {
+		return nil, false, err
+	}
+
+	ok := len(src) > 0
+	return src, ok, nil
+}
+
+// avgRowCollectionFromAggregations generates AvgRowCollection based on query result aggregations.
+func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, avgField string) (AvgRowCollection, bool, error) {
+	var src AvgRowCollection
+	tags := make(map[string]string)
+
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+
+		var histogram []HistogramItem
+		// in case of histogram, total avg value is 0 since it cannot be simply computed as average of averages
+		var avgValue float64
+
+		if options.TimeHistogram != nil {
+			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
+			if !ok {
+				return errors.New("missing expected histogram aggregation data")
+			}
+
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					avgAggLabel := fmt.Sprintf("%s_avg", avgField)
+					agg, ok := histogramItem.Aggregations.Avg(avgAggLabel)
+					if !ok {
+						return errors.New("unable to retrieve average value from histogram data")
+					}
+
+					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(*agg.Value),
+					})
+				}
+			}
+		} else {
+			avgAgg, ok := aggregations.Avg(targetAgg)
+			if !ok {
+				return nil
+			}
+
+			if avgAgg.Value != nil {
+				avgValue = *avgAgg.Value
+			}
+		}
+
+		srcTags := make(map[string]string)
+		// copy tags to avoid memory sharing
+		for key, val := range tags {
+			srcTags[key] = val
+		}
+
+		src = append(src, AvgRow{
+			Tags:      srcTags,
+			Avg:       avgValue,
+			Histogram: histogram,
+		})
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	ok := len(src) > 0
+	return src, ok, nil
+}
+
+// uniqueRowCollectionFromAggregations generates CountRowCollection based on query result aggregations.
+func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.SearchResult, options AggregateOptions, targetAgg string, uniqueField string) (CountRowCollection, bool, error) {
+	var src CountRowCollection
+	tags := make(map[string]string)
+
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+
+		var histogram []HistogramItem
+		// in case of histogram, total count will be 0 since we cannot compute distinc values from histogram buckets
+		var countValue float64
+
+		if options.TimeHistogram != nil {
+			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
+			if !ok {
+				return errors.New("missing expected histogram aggregation data")
+			}
+
+			if histogramData != nil {
+				for _, histogramItem := range histogramData.Buckets {
+					uniqueAggLabel := fmt.Sprintf("%s_unique", uniqueField)
+					agg, ok := histogramItem.Aggregations.Cardinality(uniqueAggLabel)
+					if !ok {
+						return errors.New("Unable to retrieve cardinality value from histogram data")
+					}
+
+					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
+					histogram = append(histogram, HistogramItem{
+						Time:  time,
+						Value: float64(*agg.Value),
+					})
+				}
+			}
+		} else {
+			avgAgg, ok := aggregations.Cardinality(targetAgg)
+			if !ok {
+				return nil
+			}
+
+			if avgAgg.Value != nil {
+				countValue = *avgAgg.Value
+			}
+		}
+
+		srcTags := make(map[string]string)
+		// copy tags to avoid memory sharing
+		for key, val := range tags {
+			srcTags[key] = val
+		}
+
+		src = append(src, CountRow{
+			Tags:      srcTags,
+			Count:     int(countValue),
+			Histogram: histogram,
+		})
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	ok := len(src) > 0
+	return src, ok, nil
 }
 
 // addCompositeGroupBy creates a composite aggregation. The results are fetchable
@@ -301,7 +500,7 @@ func (eDB *ElasticDB) resolveZeroValue(index, field string) (interface{}, error)
 func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error) {
 	result, err := eDB.Client.GetMapping().Index(index).Type("_doc").Do(eDB.Context)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get field mappings for pageviews index")
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to get field mappings for index: %s", index))
 	}
 
 	root, ok := result[index].(map[string]interface{})
@@ -353,7 +552,24 @@ func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error)
 //
 // Following is a standard wrapping via SubAggregation() endorsed by official docs.
 func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *elastic.SearchService,
-	extras map[string]elastic.Aggregation, agg *elastic.TermsAggregation) (*elastic.SearchService, *elastic.TermsAggregation, error) {
+	extras map[string]elastic.Aggregation, dateHistogramAgg *elastic.DateHistogramAggregation, agg *elastic.TermsAggregation) (*elastic.SearchService, *elastic.TermsAggregation, error) {
+
+	// if there is no group by - add only extras aggs
+	if len(groupBy) == 0 {
+		if dateHistogramAgg != nil {
+			for label, extraAgg := range extras {
+				dateHistogramAgg.SubAggregation(label, extraAgg)
+			}
+
+			search = search.Aggregation("date_time_histogram", dateHistogramAgg)
+		} else {
+			for label, extraAgg := range extras {
+				search = search.Aggregation(label, extraAgg)
+			}
+		}
+
+		return search, nil, nil
+	}
 
 	for _, field := range groupBy {
 		keyword, err := eDB.resolveKeyword(index, field)
@@ -368,14 +584,22 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 		termsAgg := elastic.NewTermsAggregation().Field(keyword).Size(math.MaxInt32).Missing(zeroVal)
 
 		if len(groupBy) > 1 {
-			search, termsAgg, err = eDB.WrapAggregation(index, groupBy[1:], search, extras, termsAgg)
+			search, termsAgg, err = eDB.WrapAggregation(index, groupBy[1:], search, extras, dateHistogramAgg, termsAgg)
 			if err != nil {
 				return nil, nil, err
 			}
 		} else {
-			// include external aggregation if necessary (e.g. sum)
-			for label, extraAgg := range extras {
-				termsAgg = termsAgg.SubAggregation(label, extraAgg)
+			if dateHistogramAgg != nil {
+				for label, extraAgg := range extras {
+					dateHistogramAgg = dateHistogramAgg.SubAggregation(label, extraAgg)
+				}
+
+				termsAgg = termsAgg.SubAggregation("date_time_histogram", dateHistogramAgg)
+			} else {
+				// include external aggregation if necessary (e.g. sum)
+				for label, extraAgg := range extras {
+					termsAgg = termsAgg.SubAggregation(label, extraAgg)
+				}
 			}
 		}
 
@@ -383,10 +607,6 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 			return search.Aggregation(field, termsAgg), nil, nil
 		}
 
-		// include external aggregation if necessary (e.g. sum)
-		for label, extraAgg := range extras {
-			termsAgg = termsAgg.SubAggregation(label, extraAgg)
-		}
 		return search, agg.SubAggregation(field, termsAgg), nil
 	}
 
@@ -395,15 +615,27 @@ func (eDB *ElasticDB) WrapAggregation(index string, groupBy []string, search *el
 
 // UnwrapCallback represents final callback that should be called when all aggregations are unwrapped
 // and the final set of tags and count can be provided
-type UnwrapCallback func(tags map[string]string, docCount int64, aggregations elastic.Aggregations)
+type UnwrapCallback func(tags map[string]string, docCount int64, aggregations elastic.Aggregations) error
 
 // UnwrapAggregation traverses through all the aggregations and calls the provided callback on the lowest level
 // providing tags of the fields and resulting count.
 func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Aggregations, groupBy []string, tags map[string]string, cb UnwrapCallback) error {
+
+	if len(groupBy) == 0 {
+		if err := cb(tags, docCount, aggregations); err != nil {
+			return err
+		}
+		return nil
+	}
+
 	for _, field := range groupBy {
 		agg, ok := aggregations.Terms(field)
 		if !ok {
-			return fmt.Errorf("result is missing data for term aggregation: %s", field)
+			// no result means there was no data for requested aggregation; lets use empty value for remaining tags as a default
+			for _, f := range groupBy {
+				tags[f] = ""
+			}
+			return nil
 		}
 
 		// zero results before we got to the lowest unwrap level
@@ -413,7 +645,9 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 			for _, f := range groupBy {
 				tags[f] = ""
 			}
-			cb(tags, docCount, nil)
+			if err := cb(tags, docCount, nil); err != nil {
+				return err
+			}
 		}
 
 		for _, bucket := range agg.Buckets {
@@ -427,9 +661,15 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 			}
 
 			if len(groupBy) > 1 {
-				eDB.UnwrapAggregation(bucket.DocCount, bucket.Aggregations, groupBy[1:], tags, cb)
-			} else {
-				cb(tags, bucket.DocCount, bucket.Aggregations)
+				err := eDB.UnwrapAggregation(bucket.DocCount, bucket.Aggregations, groupBy[1:], tags, cb)
+				if err != nil {
+					return err
+				}
+				continue
+			}
+
+			if err := cb(tags, bucket.DocCount, bucket.Aggregations); err != nil {
+				return err
 			}
 		}
 	}

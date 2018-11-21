@@ -37,16 +37,17 @@ class ConversionController extends Controller
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id');
 
+
         if ($request->input('conversion_from')) {
-            $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'))->tz('UTC'));
+            $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC'));
         }
         if ($request->input('conversion_to')) {
-            $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'))->tz('UTC'));
+            $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC'));
         }
 
         return $datatables->of($conversions)
             ->addColumn('article.title', function (Conversion $conversion) {
-                return \HTML::link($conversion->article->url, $conversion->article->title);
+                return \HTML::link(route('articles.show', ['article' => $conversion->article->id]), $conversion->article->title);
             })
             ->filterColumn('article.authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
@@ -74,6 +75,9 @@ class ConversionController extends Controller
     public function upsert(ConversionUpsertRequest $request)
     {
         foreach ($request->get('conversions', []) as $c) {
+            // When saving to DB, Eloquent strips timezone information,
+            // therefore convert to UTC
+            $c['paid_at'] = Carbon::parse($c['paid_at'])->tz('UTC');
             $conversion = Conversion::firstOrNew([
                 'transaction_id' => $c['transaction_id'],
             ]);

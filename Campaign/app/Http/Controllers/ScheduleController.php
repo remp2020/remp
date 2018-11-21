@@ -36,11 +36,12 @@ class ScheduleController extends Controller
      * @param Datatables $dataTables
      * @param Campaign|null $campaign
      * @return mixed
+     * @throws \Exception
      */
     public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
     {
         $scheduleSelect = Schedule::select()
-            ->with(['campaign', 'campaign.banner'])
+            ->with(['campaign'])
             ->orderBy('start_time', 'ASC')
             ->orderBy('end_time', 'ASC');
 
@@ -65,24 +66,41 @@ class ScheduleController extends Controller
         return $dataTables->of($schedule)
             ->addColumn('actions', function (Schedule $s) {
                 return [
-                    'edit' => $s->isEditable() ? route('schedule.edit', $s) : null,
+                    'edit' => !$s->isStopped() ? route('schedule.edit', $s) : null,
                     'start' => $s->isRunnable() ? route('schedule.start', $s) : null,
                     'pause' => $s->isRunning() ? route('schedule.pause', $s) : null,
-                    'stop' => $s->isRunning() ? route('schedule.stop', $s) : null,
+                    'stop' => $s->isRunning() || $s->isPaused() ? route('schedule.stop', $s) : null,
                     'destroy' => $s->isEditable() ? route('schedule.destroy', $s) : null,
                 ];
             })
             ->addColumn('campaign', function (Schedule $schedule) {
                 return Html::linkRoute('campaigns.edit', $schedule->campaign->name, $schedule->campaign);
             })
-            ->addColumn('banners', function (Schedule $schedule) {
-                $links = [
-                    Html::linkRoute('banners.edit', $schedule->campaign->banner->name, $schedule->campaign->banner),
-                ];
-                if ($schedule->campaign->altBanner) {
-                    $links[] = Html::linkRoute('banners.edit', $schedule->campaign->altBanner->name, $schedule->campaign->altBanner);
+            ->addColumn('variants', function (Schedule $schedule) {
+                $data = $schedule->campaign->campaignBanners->all();
+                $variants = [];
+
+                foreach ($data as $variant) {
+                    $proportion = $variant['proportion'];
+                    if ($proportion === 0) {
+                        continue;
+                    }
+
+                    if ($variant['control_group'] === 1) {
+                        // handle control group
+                        $variants[] = "Control Group&nbsp;({$proportion}%)";
+                        continue;
+                    }
+
+                    // handle variants with banner
+                    $link = link_to(
+                        route('banners.edit', $variant['banner_id']),
+                        $variant->banner->name
+                    );
+
+                    $variants[] = "{$link}&nbsp;({$proportion}%)";
                 }
-                return implode('<br/>', $links);
+                return $variants;
             })
             ->addColumn('action_methods', [
                 'start' => 'POST',
@@ -92,47 +110,25 @@ class ScheduleController extends Controller
             ])
             ->addColumn('status', function (Schedule $schedule) {
                 if ($schedule->isRunning()) {
-                    return 'Running';
+                    return [['class' => 'badge-success', 'text' => 'Running']];
                 }
                 if ($schedule->status === Schedule::STATUS_PAUSED) {
-                    return 'Paused';
+                    return [['class' => 'badge-primary', 'text' => 'Paused']];
                 }
                 if ($schedule->status === Schedule::STATUS_STOPPED) {
-                    return 'Stopped';
+                    return [['class' => 'badge-default', 'text' => 'Stopped']];
                 }
                 if ($schedule->start_time > Carbon::now()) {
-                    return 'Waiting for start';
+                    return [['class' => 'badge-primary', 'text' => 'Waiting for start']];
                 }
                 if (!$schedule->isRunnable()) {
-                    return 'Finished';
+                    return [['class' => 'badge-default', 'text' => 'Finished']];
                 }
                 throw new \Exception('unhandled schedule status');
             })
-            ->rawColumns(['actions', 'action_methods', 'status', 'banners', 'campaign'])
+            ->rawColumns(['actions', 'action_methods', 'status', 'campaign'])
             ->setRowId('id')
             ->make(true);
-    }
-
-    /**
-     * Show the form for creating a new schedule.
-     *
-     * If $campaign is provided, campaign is pre-selected and selectbox disabled.
-     *
-     * @param Campaign $campaign
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Campaign $campaign)
-    {
-        $schedule = new Schedule();
-        $schedule->fill(old());
-        $schedule->campaign_id = $campaign->id;
-        $campaigns = Campaign::all();
-
-        return view('schedule.create', [
-            'schedule' => $schedule,
-            'campaigns' => $campaigns,
-        ]);
     }
 
     /**
@@ -161,11 +157,9 @@ class ScheduleController extends Controller
     public function edit(Schedule $schedule)
     {
         $schedule->fill(old());
-        $campaigns = Campaign::whereActive(true)->get();
 
         return view('schedule.edit', [
             'schedule' => $schedule,
-            'campaigns' => $campaigns,
         ]);
     }
 
@@ -245,6 +239,9 @@ class ScheduleController extends Controller
         }
 
         $schedule->status = Schedule::STATUS_EXECUTED;
+        if ($schedule->start_time > Carbon::now()) {
+            $schedule->start_time = Carbon::now();
+        }
         $schedule->save();
 
         return response()->format([
@@ -262,7 +259,7 @@ class ScheduleController extends Controller
      */
     public function stop(Schedule $schedule)
     {
-        if (!$schedule->isRunnable()) {
+        if (!$schedule->isRunning() && !$schedule->isPaused()) {
             return response()->format([
                 'html' => redirect(route('campaigns.index'))->with('success', sprintf(
                     "Schedule for campaign %s was not running, stop request ignored",

@@ -17,19 +17,26 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'name',
-                'token',
+                'name' => [
+                    'priority' => 1,
+                ],
+                'token' => [
+                    'priority' => 2,
+                ],
                 'active' => [
                     'header' => 'Is active',
                     'render' => 'boolean',
+                    'priority' => 2,
                 ],
                 'created_at' => [
                     'header' => 'Created at',
                     'render' => 'date',
+                    'priority' => 3,
                 ],
                 'updated_at' => [
                     'header' => 'Updated at',
                     'render' => 'date',
+                    'priority' => 4,
                 ],
             ],
             'dataSource' => route('api-tokens.json'),

@@ -3,12 +3,14 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Repository\ListCategoriesRepository;
 use Remp\MailerModule\Repository\ListsRepository;
 
-class ListFormFactory extends Object
+class ListFormFactory
 {
+    use SmartObject;
+
     /** @var ListsRepository */
     private $listsRepository;
 

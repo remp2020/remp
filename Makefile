@@ -5,6 +5,8 @@ SUB_CAMPAIGN="Campaign"
 SUB_MAILER="Mailer"
 SUB_SSO="Sso"
 
+export TARGET_GOOS TARGET_GOARCH TARGET_SUFFIX
+
 sniff:
 	cd $(SUB_BEAM) && make sniff
 	cd $(SUB_CAMPAIGN) && make sniff

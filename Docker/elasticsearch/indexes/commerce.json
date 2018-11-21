@@ -1,0 +1,11 @@
+{
+    "mappings": {
+        "_doc": {
+            "properties": {
+                "revenue": {
+                    "type": "double"
+                }
+            }
+        }
+    }
+}

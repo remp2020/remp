@@ -2,12 +2,6 @@
 
 @section('title', 'Accounts')
 
-@section('sidebar')
-    @parent
-
-    <p>This is appended to the master sidebar.</p>
-@endsection
-
 @section('content')
 
     <div class="c-header">
@@ -34,7 +28,7 @@
             ],
             'dataSource' => action('AccountController@json'),
             'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit account'],
             ],
         ]) !!}
 

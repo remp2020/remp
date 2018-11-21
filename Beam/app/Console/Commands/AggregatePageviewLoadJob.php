@@ -11,13 +11,15 @@ use Illuminate\Support\Carbon;
 
 class AggregatePageviewLoadJob extends Command
 {
-    protected $signature = 'pageviews:aggregate-load {--now=}';
+    const COMMAND = 'pageviews:aggregate-load';
+
+    protected $signature = self::COMMAND . ' {--now=}';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
-        $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+        $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 

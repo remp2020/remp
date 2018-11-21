@@ -3,9 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
-use Remp\MailerModule\PageMeta\DenniknContent;
-use Remp\MailerModule\PageMeta\GenericPageContent;
-use Remp\MailerModule\PageMeta\TransportInterface;
+use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -13,14 +11,16 @@ class DennikNBestPerformingArticlesGenerator implements IGenerator
 {
     protected $sourceTemplatesRepository;
 
+    protected $content;
+
     public $onSubmit;
 
-    private $transport;
-
-    public function __construct(TransportInterface $transport, SourceTemplatesRepository $sourceTemplatesRepository)
-    {
+    public function __construct(
+        SourceTemplatesRepository $sourceTemplatesRepository,
+        ContentInterface $content
+    ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->transport = $transport;
+        $this->content = $content;
     }
 
     public function generateForm(Form $form)
@@ -44,6 +44,12 @@ class DennikNBestPerformingArticlesGenerator implements IGenerator
         return [];
     }
 
+    public function formSucceeded($form, $values)
+    {
+        $output = $this->process($values);
+        $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
+    }
+
     public function apiParams()
     {
         return [
@@ -59,7 +65,7 @@ class DennikNBestPerformingArticlesGenerator implements IGenerator
         $items = [];
         $urls = explode("\n", trim($values->articles));
         foreach ($urls as $url) {
-            $meta = Utils::fetchUrlMeta($url, new DenniknContent(), $this->transport);
+            $meta = $this->content->fetchUrlMeta($url);
             if ($meta) {
                 $items[$url] = $meta;
             }

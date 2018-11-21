@@ -77,13 +77,15 @@ class DataTable extends Control
     /**
      * @param $actionName
      * @param $actionClass
+     * @param $actionTitle
      * @return $this
      */
-    public function setRowAction($actionName, $actionClass)
+    public function setRowAction($actionName, $actionClass, $actionTitle)
     {
         $this->rowActions[] = [
             'name' => $actionName,
             'class' => $actionClass,
+            'title' => $actionTitle,
         ];
 
         return $this;

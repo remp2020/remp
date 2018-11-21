@@ -3,6 +3,7 @@
 namespace App\Contracts\Remp;
 
 use App\Contracts\JournalAggregateRequest;
+use App\Contracts\JournalConcurrentsRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalException;
 use App\Contracts\JournalListRequest;
@@ -10,6 +11,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
+use Psy\Util\Json;
 
 class Journal implements JournalContract
 {
@@ -27,7 +29,13 @@ class Journal implements JournalContract
 
     const ENDPOINT_GENERIC_SUM = 'journal/%s/actions/%s/sum';
 
+    const ENDPOINT_GENERIC_AVG = 'journal/%s/actions/%s/avg';
+
+    const ENDPOINT_GENERIC_UNIQUE = 'journal/%s/actions/%s/unique/%s';
+
     const ENDPOINT_GENERIC_LIST = 'journal/%s/list';
+
+    const ENDPOINT_CONCURRENTS_COUNT = 'journal/concurrents/count';
 
     private $client;
 
@@ -81,41 +89,53 @@ class Journal implements JournalContract
 
     public function count(JournalAggregateRequest $request): Collection
     {
-        try {
-            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_COUNT), [
-                'json' => [
-                    'filter_by' => $request->getFilterBy(),
-                    'group_by' => $request->getGroupBy(),
-                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
-                ],
-            ]);
-        } catch (ConnectException $e) {
-            throw new JournalException("Could not connect to Journal:Count endpoint: {$e->getMessage()}");
-        } catch (ClientException $e) {
-            \Log::error($e->getResponse()->getBody()->getContents());
-            throw $e;
-        }
-
-        $list = json_decode($response->getBody());
-        return collect($list);
+        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_COUNT));
     }
 
     public function sum(JournalAggregateRequest $request): Collection
     {
+        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_SUM));
+    }
+
+    public function avg(JournalAggregateRequest $request): Collection
+    {
+        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_AVG));
+    }
+
+    public function unique(JournalAggregateRequest $request): Collection
+    {
+        // Unique page views are distinguished by different browsers
+        return $this->aggregateCall(
+            $request,
+            $request->buildUrlWithItem(self::ENDPOINT_GENERIC_UNIQUE, 'browsers')
+        );
+    }
+
+    private function aggregateCall(JournalAggregateRequest $request, string $url): Collection
+    {
         try {
-            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_SUM), [
-                'json' => [
-                    'filter_by' => $request->getFilterBy(),
-                    'group_by' => $request->getGroupBy(),
-                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
-                ],
+            $json = [
+                'filter_by' => $request->getFilterBy(),
+                'group_by' => $request->getGroupBy(),
+                'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+            ];
+
+            if ($request->getTimeHistogram()) {
+                $json['time_histogram'] = $request->getTimeHistogram();
+            }
+
+            $response = $this->client->post($url, [
+                'json' => $json,
             ]);
         } catch (ConnectException $e) {
-            throw new JournalException("Could not connect to Journal:Sum endpoint: {$e->getMessage()}");
+            throw new JournalException("Could not connect to Journal endpoint {$url}: {$e->getMessage()}");
         } catch (ClientException $e) {
-            \Log::error($e->getResponse()->getBody()->getContents());
+            \Log::error(Json::encode([
+                'url' => $url,
+                'payload' => $json,
+                'message' => $e->getResponse()->getBody()->getContents(),
+            ]));
             throw $e;
         }
 
@@ -139,6 +159,30 @@ class Journal implements JournalContract
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:List endpoint: {$e->getMessage()}");
+        } catch (ClientException $e) {
+            \Log::error($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+
+        $list = json_decode($response->getBody());
+        return collect($list);
+    }
+
+    public function concurrents(JournalConcurrentsRequest $request): Collection
+    {
+        try {
+            $json = [
+                'filter_by' => $request->getFilterBy(),
+                'group_by' => $request->getGroupBy(),
+                'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
+            ];
+
+            $response = $this->client->post(self::ENDPOINT_CONCURRENTS_COUNT, [
+                'json' => $json,
+            ]);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:concurrents endpoint: {$e->getMessage()}");
         } catch (ClientException $e) {
             \Log::error($e->getResponse()->getBody()->getContents());
             throw $e;

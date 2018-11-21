@@ -139,7 +139,7 @@ func (sr *SegmentRule) options(now time.Time, o RuleOverrides) AggregateOptions 
 
 	switch sr.EventCategory {
 	case CategoryPageview:
-		// no condition needed yet, pageview-load event is implicit
+		options.Action = sr.EventAction
 	case CategoryCommerce:
 		options.Step = sr.EventAction
 	default:

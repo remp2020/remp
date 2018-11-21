@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Commands;
 
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Job\BatchEmailGenerator;
 use Remp\MailerModule\Job\JobProcess;
 use Remp\MailerModule\Repository\BatchesRepository;
@@ -36,16 +37,15 @@ class ProcessJobCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('');
-        $output->writeln('<info>***** EMAIL JOB *****</info>');
-        $output->writeln('');
+        ini_set('memory_limit', '256M');
+        $output->writeln(sprintf('%s <info>Mail process job</info>', DateTime::from('now')));
 
         $process = new JobProcess();
         $pid = $process->pid();
 
         while ($batch = $this->batchesRepository->getBatchReady()) {
             $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_PROCESSING]);
-            $output->writeln("Processing mail batch <info>#{$batch->id}</info>");
+            $output->writeln("  * processing mail batch <info>#{$batch->id}</info>");
 
             if ($batch->related('mail_job_batch_templates')->count('*') == 0) {
                 $output->writeln("<error>Batch #{$batch->id} has no templates</error>");
@@ -60,7 +60,7 @@ class ProcessJobCommand extends Command
             ]);
         }
 
-        $output->writeln('No batch to process');
+        $output->writeln('  * no batch to process');
 
         $output->writeln('');
         $output->writeln('Done');

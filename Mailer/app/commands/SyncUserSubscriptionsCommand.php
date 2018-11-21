@@ -35,7 +35,7 @@ class SyncUserSubscriptionsCommand extends Command
     protected function configure()
     {
         $this->setName('mail:sync-user-subscriptions')
-            ->setDescription('Gets all users from user base and subscribes them to emails');
+            ->setDescription('Gets all users from user base and subscribes them to emails based on the auto_subscribe flags');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -53,7 +53,11 @@ class SyncUserSubscriptionsCommand extends Command
 
                 /** @var ActiveRow $list */
                 foreach ($lists as $list) {
-                    $this->userSubscriptionsRepository->autoSubscribe($list, $user['id'], $user['email']);
+                    if ($list->auto_subscribe) {
+                        $this->userSubscriptionsRepository->subscribeUser($list, $user['id'], $user['email']);
+                    } else {
+                        $this->userSubscriptionsRepository->unsubscribeUser($list, $user['id'], $user['email']);
+                    }
                 }
 
                 $output->writeln('<info>OK!</info>');

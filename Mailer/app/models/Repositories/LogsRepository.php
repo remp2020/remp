@@ -24,7 +24,14 @@ class LogsRepository extends Repository
         'opened' => 'opened_at',
         'complained' => 'spam_complained_at',
         'bounced' => 'hard_bounced_at',
+        'failed' => 'dropped_at',
         'dropped' => 'dropped_at',
+    ];
+
+    private $bouncesMap = [
+        'suppress-bounce' => 'hard_bounced_at',
+        'suppress-complaint' => 'hard_bounced_at',
+        'suppress-unsubscribe' => 'hard_bounced_at',
     ];
 
     public function __construct($startStatsDate, Context $database)
@@ -87,6 +94,27 @@ class LogsRepository extends Repository
             ->where([
                 'mail_job_batch_id' => $batchTemplate->mail_job_batch_id,
                 'mail_template_id' => $batchTemplate->mail_template_id,
+            ])
+            ->limit(1)
+            ->fetch();
+    }
+
+    public function getNonBatchTemplateStats($templateIds)
+    {
+        $columns = [
+            'COUNT(created_at) AS sent',
+            'COUNT(delivered_at) AS delivered',
+            'COUNT(dropped_at) AS dropped',
+            'COUNT(spam_complained_at) AS spam_complained',
+            'COUNT(hard_bounced_at) AS hard_bounced',
+            'COUNT(clicked_at) AS clicked',
+            'COUNT(opened_at) AS opened',
+        ];
+        return $this->getTable()
+            ->select(implode(',', $columns))
+            ->where([
+                'mail_template_id' => $templateIds,
+                'mail_job_batch_id IS NULL',
             ])
             ->limit(1)
             ->fetch();
@@ -257,12 +285,16 @@ class LogsRepository extends Repository
 
     /**
      * @param string $externalEvent
+     * @param null|string $reason
      * @return string|null
      */
-    public function mapEvent(string $externalEvent): ?string
+    public function mapEvent(string $externalEvent, ?string $reason): ?string
     {
         if (!isset($this->eventMap[$externalEvent])) {
             return null;
+        }
+        if ($externalEvent === 'failed' && in_array($reason, $this->bouncesMap)) {
+            return $this->bouncesMap[$reason];
         }
         return $this->eventMap[$externalEvent];
     }

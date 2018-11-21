@@ -9,7 +9,7 @@ class ArticleSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(Faker\Generator $faker)
     {
         /** @var \App\Property $property */
         $properties = \App\Property::all();
@@ -28,9 +28,9 @@ class ArticleSeeder extends Seeder
             $article->authors()->attach($authors->random());
         });
 
-        $articles->each(function (\App\Article $article) {
+        $articles->each(function (\App\Article $article) use ($faker) {
             $article->conversions()->saveMany(
-                factory(\App\Conversion::class, 20)->make([
+                factory(\App\Conversion::class, $faker->numberBetween(5,20))->make([
                     'article_id' => $article->id,
                 ])
             );

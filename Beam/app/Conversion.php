@@ -2,9 +2,11 @@
 
 namespace App;
 
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * Class Conversion
@@ -21,6 +23,7 @@ class Conversion extends Model
         'amount',
         'currency',
         'paid_at',
+        'user_id',
     ];
 
     protected $dates = [
@@ -50,5 +53,37 @@ class Conversion extends Model
             return;
         }
         $this->attributes['paid_at'] = new Carbon($value);
+    }
+
+    public static function mostReadArticlesByAveragePaymentAmount(\Carbon\Carbon $start, ?int $limit = null): Collection
+    {
+        $query = Conversion::where('paid_at', '>=', $start)
+            ->groupBy('article_id')
+            ->select(['article_id', DB::raw('avg(amount) as average')])
+            ->orderByDesc('average');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return Article::joinSub($query, 'c', function ($join) {
+            $join->on('articles.id', '=', 'c.article_id');
+        })->orderByDesc('c.average')->get();
+    }
+
+    public static function mostReadArticlesByTotalPaymentAmount(\Carbon\Carbon $start, ?int $limit = null): Collection
+    {
+        $query = Conversion::where('paid_at', '>=', $start)
+            ->groupBy('article_id')
+            ->select(['article_id', DB::raw('sum(amount) as average')])
+            ->orderByDesc('average');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return Article::joinSub($query, 'c', function ($join) {
+            $join->on('articles.id', '=', 'c.article_id');
+        })->orderByDesc('c.average')->get();
     }
 }

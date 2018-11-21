@@ -3,6 +3,11 @@
 GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen"
 DESIGN_PKG="gitlab.com/remp/remp/Beam/go/cmd/tracker/design"
 
+TARGET_GOOS?=linux
+TARGET_GOARCH?=amd64
+TARGET_SUFFIX?=
+export TARGET_GOOS TARGET_GOARCH TARGET_SUFFIX
+
 all: clean gen build
 
 build: gen build-only
@@ -29,12 +34,12 @@ build: gen
 	go build -o tracker
 
 build-static: gen
-	CGO_ENABLED=0 go build -a -installsuffix cgo -o tracker
+	CGO_ENABLED=0 GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build -a -installsuffix cgo -o tracker$(TARGET_SUFFIX)
 
 docker-build:
 	set -e; \
-    docker build -t remp-beam_tracker_builder builder; \
-    docker run --rm -v $$PWD/../../:/src/build remp-beam_tracker_builder > tracker.tar;
+	docker build -t remp-beam_tracker_builder builder; \
+	docker run -e TARGET_GOOS -e TARGET_GOARCH -e TARGET_SUFFIX --rm -v $$PWD/../../:/src/build remp-beam_tracker_builder > tracker.tar;
 
 docker-run: docker-build
 	docker build -t remp-beam-tracker .

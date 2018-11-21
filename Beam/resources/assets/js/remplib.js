@@ -40,8 +40,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentEnabled: false,
 
-        usingAdblock: null,
-
         cookiesEnabled: null,
 
         websocketsSupported: null,
@@ -243,7 +241,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         run: function() {
-            Promise.all([remplib.tracker.checkUsingAdblock()]).then((res) => {
+            Promise.all([remplib.checkUsingAdblock()]).then((res) => {
                 this.trackPageview();
 
                 if (this.timeSpentEnabled === true) {
@@ -398,21 +396,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             xmlhttp.send(JSON.stringify(params));
         },
 
-        checkUsingAdblock: function () {
-            return new Promise(function (resolve, reject) {
-                var testAd = document.createElement('div');
-                testAd.innerHTML = '&nbsp;';
-                testAd.setAttribute('class', 'pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
-                testAd.setAttribute('style', 'width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px');
-                document.body.appendChild(testAd);
-                window.setTimeout(function() {
-                    remplib.tracker.usingAdblock = testAd.offsetHeight === 0 || false
-                    testAd.remove();
-                    resolve(remplib.tracker.usingAdblock);
-                }, 100);
-            });
-        },
-
         checkCookiesEnabled: function () {
             document.cookie = "cookietest=1";
             remplib.tracker.cookiesEnabled = document.cookie.indexOf("cookietest=") != -1;
@@ -434,9 +417,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "url":  window.location.href,
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
-                "adblock": remplib.tracker.usingAdblock,
-                "window_height": window.outerHeight,
-                "window_width": window.outerWidth,
+                "adblock": remplib.usingAdblock,
+                "window_height": window.outerHeight || document.documentElement.clientHeight,
+                "window_width": window.outerWidth || document.documentElement.clientWidth,
                 "cookies": remplib.tracker.cookiesEnabled,
                 "websockets": remplib.tracker.websocketsSupported,
                 "source": {
@@ -445,7 +428,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "utm_source": this.getParam("utm_source"),
                     "utm_medium": this.getParam("utm_medium"),
                     "utm_campaign": this.getParam("utm_campaign"),
-                    "utm_content": this.getParam("utm_content")
+                    "utm_content": this.getParam("utm_content"),
+                    "banner_variant": this.getParam("banner_variant")
                 }
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
@@ -463,7 +447,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timespentParamsCleanup: function(params) {
             delete params.user.url;
-            delete params.user.referer;
             delete params.user.user_agent;
             delete params.user.source.utm_source;
             delete params.user.source.utm_medium;

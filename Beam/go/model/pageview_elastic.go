@@ -10,6 +10,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// queryBinding represents information about where and how the data should be fetched.
+type elasticQueryBinding struct {
+	Index string
+	Field string
+}
+
 // PageviewElastic is ElasticDB implementation of PageviewStorage.
 type PageviewElastic struct {
 	DB            *ElasticDB
@@ -18,21 +24,38 @@ type PageviewElastic struct {
 
 // Count returns number of Pageviews matching the filter defined by PageviewOptions.
 func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection, bool, error) {
-	// action is not being tracked within separate measurements and we would get no records back
-	// removing it before applying filter
-	options.Action = ""
-
-	search := pDB.DB.Client.Search().
-		Index("pageviews").
-		Type("_doc").
-		Size(0) // return no specific results
-
-	search, err := pDB.DB.addSearchFilters(search, "pageviews", options)
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := pDB.resolveQueryBindings(options.Action)
 	if err != nil {
 		return nil, false, err
 	}
 
-	search, err = pDB.DB.addGroupBy(search, "pageviews", options, nil)
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
+	options.Action = ""
+
+	extras := make(map[string]elastic.Aggregation)
+
+	search := pDB.DB.Client.Search().
+		Index(binding.Index).
+		Type("_doc").
+		Size(0) // return no specific results
+
+	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
+	if err != nil {
+		return nil, false, err
+	}
+
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+	if options.TimeHistogram != nil {
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
 	}
@@ -43,7 +66,7 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
-	if len(options.GroupBy) == 0 {
+	if len(options.GroupBy) == 0 && options.TimeHistogram == nil {
 		// extract simplified results (no aggregation)
 		return CountRowCollection{
 			CountRow{
@@ -58,25 +81,40 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 
 // Sum returns number of Pageviews matching the filter defined by AggregateOptions.
 func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, bool, error) {
-	extras := make(map[string]elastic.Aggregation)
-	targetAgg := fmt.Sprintf("%s_sum", options.Action)
-	extras[targetAgg] = elastic.NewSumAggregation().Field(options.Action)
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := pDB.resolveQueryBindings(options.Action)
+	if err != nil {
+		return nil, false, err
+	}
 
 	// action is not being tracked within separate measurements and we would get no records back
 	// removing it before applying filter
 	options.Action = ""
 
+	extras := make(map[string]elastic.Aggregation)
+	targetAgg := fmt.Sprintf("%s_sum", binding.Field)
+	extras[targetAgg] = elastic.NewSumAggregation().Field(binding.Field)
+
 	search := pDB.DB.Client.Search().
-		Index("pageviews").
+		Index(binding.Index).
 		Type("_doc").
 		Size(0) // return no specific results
 
-	search, err := pDB.DB.addSearchFilters(search, "pageviews", options)
+	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
 	if err != nil {
 		return nil, false, err
 	}
 
-	search, err = pDB.DB.addGroupBy(search, "pageviews", options, extras)
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+	if options.TimeHistogram != nil {
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
 	}
@@ -87,7 +125,110 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		return nil, false, err
 	}
 
-	return pDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg)
+	return pDB.DB.sumRowCollectionFromAggregations(result, options, targetAgg, binding.Field)
+}
+
+// Avg returns average count of Pageviews/Timespent records matching the filter defined by AggregateOptions.
+func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, bool, error) {
+	// pageview events are stored in multiple measurements which need to be resolved
+	binding, err := pDB.resolveQueryBindings(options.Action)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
+	options.Action = ""
+
+	extras := make(map[string]elastic.Aggregation)
+	targetAgg := fmt.Sprintf("%s_avg", binding.Field)
+	extras[targetAgg] = elastic.NewAvgAggregation().Field(binding.Field)
+
+	search := pDB.DB.Client.Search().
+		Index(binding.Index).
+		Type("_doc").
+		Size(0) // return no specific results
+
+	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
+	if err != nil {
+		return nil, false, err
+	}
+
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+	if options.TimeHistogram != nil {
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// get results
+	result, err := search.Do(pDB.DB.Context)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return pDB.DB.avgRowCollectionFromAggregations(result, options, targetAgg, binding.Field)
+}
+
+// Unique returns unique count of Pageviews records matching the filter defined by AggregateOptions.
+func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (CountRowCollection, bool, error) {
+	var binding elasticQueryBinding
+	switch item {
+	case UniqueCountBrowsers:
+		binding = elasticQueryBinding{
+			Index: TablePageviews,
+			Field: "browser_id.keyword",
+		}
+	default:
+		return nil, false, fmt.Errorf("unable to count uniques for item [%s] ", item)
+	}
+
+	// action is not being tracked within separate measurements and we would get no records back
+	// removing it before applying filter
+	options.Action = ""
+
+	extras := make(map[string]elastic.Aggregation)
+	targetAgg := fmt.Sprintf("%s_unique", binding.Field)
+	extras[targetAgg] = elastic.NewCardinalityAggregation().Field(binding.Field)
+
+	search := pDB.DB.Client.Search().
+		Index(binding.Index).
+		Type("_doc").
+		Size(0) // return no specific results
+
+	search, err := pDB.DB.addSearchFilters(search, binding.Index, options)
+	if err != nil {
+		return nil, false, err
+	}
+
+	var dateHistogramAgg *elastic.DateHistogramAggregation
+	if options.TimeHistogram != nil {
+		dateHistogramAgg = elastic.NewDateHistogramAggregation().
+			Field("time").
+			Interval(options.TimeHistogram.Interval).
+			TimeZone("UTC").
+			Offset(options.TimeHistogram.Offset)
+	}
+
+	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
+	if err != nil {
+		return nil, false, err
+	}
+
+	// get results
+	result, err := search.Do(pDB.DB.Context)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return pDB.DB.uniqueRowCollectionFromAggregations(result, options, targetAgg, binding.Field)
 }
 
 // List returns list of all Pageviews based on given PageviewOptions.
@@ -228,4 +369,22 @@ func (pDB *PageviewElastic) Users() ([]string, error) {
 	}
 
 	return users, nil
+}
+
+// resolveQueryBindings returns name of the table and field used within the aggregate function
+// based on the provided action.
+func (pDB *PageviewElastic) resolveQueryBindings(action string) (elasticQueryBinding, error) {
+	switch action {
+	case ActionPageviewLoad:
+		return elasticQueryBinding{
+			Index: TablePageviews,
+			Field: "token",
+		}, nil
+	case ActionPageviewTimespent:
+		return elasticQueryBinding{
+			Index: TableTimespent,
+			Field: "timespent",
+		}, nil
+	}
+	return elasticQueryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
 }

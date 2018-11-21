@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use PDOException;
 use Remp\MailerModule\Repository;
 use Nette\Database\Table\IRow;
 
@@ -64,19 +65,37 @@ class JobQueueRepository extends Repository
 
     public function removeUnsubscribed(IRow $batch)
     {
-        $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email IN (
-  SELECT users.email FROM users
-  INNER JOIN mail_user_subscriptions ON mail_user_subscriptions.user_id = users.id AND subscribed=0
-  WHERE mail_user_subscriptions.mail_type_id IN (SELECT mail_types.id FROM mail_types INNER JOIN mail_templates ON mail_templates.mail_type_id = mail_types.id WHERE mail_templates.id = mail_job_queue.mail_template_id)
-)");
+        $q = $this->getTable()
+            ->select('mail_template_id')
+            ->where(['mail_batch_id' => $batch->id])
+            ->group('mail_template_id');
+
+        foreach ($q as $row) {
+            $sql = <<<SQL
+CREATE TEMPORARY TABLE IF NOT EXISTS tmptbl AS ( 
+SELECT mail_user_subscriptions.user_email 
+	FROM mail_user_subscriptions 
+	INNER JOIN mail_templates ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
+	AND subscribed = 1 
+	AND mail_templates.id = ?
+);
+
+DELETE FROM mail_job_queue
+WHERE mail_job_queue.mail_batch_id = ?
+AND mail_job_queue.mail_template_id = ?
+AND mail_job_queue.email NOT IN (SELECT * from tmptbl);
+
+DROP table tmptbl;
+SQL;
+            $this->getDatabase()->query($sql, $row->mail_template_id, $batch->id, $row->mail_template_id);
+        }
     }
 
     public function removeOtherVariants(IRow $batch, $variantId)
     {
         $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email NOT IN (
-  SELECT users.email FROM users
-  INNER JOIN mail_user_subscriptions ON mail_user_subscriptions.user_id = users.id AND subscribed=1
-  INNER JOIN mail_user_subscription_variants ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id AND mail_user_subscription_variants.mail_type_variant_id = '{$variantId}'
+  SELECT mail_user_subscriptions.user_email FROM mail_user_subscriptions
+  INNER JOIN mail_user_subscription_variants ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id AND mail_user_subscription_variants.mail_type_variant_id = '{$variantId}' AND mail_user_subscriptions.subscribed=1
 )");
     }
 

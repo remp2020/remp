@@ -44,6 +44,11 @@
                 ],
                 'pageviews_subscribers' => [
                     'header' => 'subscriber pageviews',
+                    'priority' => 5
+                ],
+                'pageviews_subscribers_ratio' => [
+                    'header' => 'subscriber pageviews ratio',
+                    'render' => 'percentage',
                     'priority' => 5,
                 ],
                 'avg_sum_all' => [
@@ -83,7 +88,8 @@
             'order' => [4, 'desc'],
             'requestParams' => [
                 'published_from' => '$(\'[name="published_from"]\').val()',
-                'published_to' => '$(\'[name="published_to"]\').val()'
+                'published_to' => '$(\'[name="published_to"]\').val()',
+                'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
                 [

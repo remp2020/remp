@@ -41,6 +41,13 @@
                 ],
                 'conversions_count' => [
                     'header' => 'conversions',
+                    'searchable' => false,
+                    'priority' => 2,
+                ],
+                'conversions_rate' => [
+                    'orderable' => false,
+                    'searchable' => false,
+                    'header' => 'conversions rate',
                     'priority' => 2,
                 ],
                 'amount' => [
@@ -77,7 +84,8 @@
                 'published_from' => '$(\'[name="published_from"]\').val()',
                 'published_to' => '$(\'[name="published_to"]\').val()',
                 'conversion_from' => '$(\'[name="conversion_from"]\').val()',
-                'conversion_to' => '$(\'[name="conversion_to"]\').val()'
+                'conversion_to' => '$(\'[name="conversion_to"]\').val()',
+                'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
                 [

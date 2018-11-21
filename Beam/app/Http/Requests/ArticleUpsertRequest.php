@@ -30,7 +30,7 @@ class ArticleUpsertRequest extends FormRequest
             'articles.*.url' => "required|url",
             'articles.*.authors' => 'array',
             'articles.*.sections' => 'array',
-            'articles.*.image_url' => 'url',
+            'articles.*.image_url' => 'nullable|url',
             'articles.*.published_at' => 'date',
 
             'articles.*.authors.*' => 'string',

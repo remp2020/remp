@@ -3,13 +3,15 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Repository\ConfigsRepository;
 use Remp\MailerModule\Sender\MailerFactory;
 
-class ConfigFormFactory extends Object
+class ConfigFormFactory
 {
+    use SmartObject;
+
     /** @var ConfigsRepository */
     private $configsRepository;
 
@@ -53,8 +55,10 @@ class ConfigFormFactory extends Object
                 $item = $container->addTextArea($config->name, $config->display_name ? $config->display_name : $config->name)
                     ->setAttribute('rows', 15)
                     ->getControlPrototype()->addAttributes(['class' => 'html-editor']);
+            } elseif ($config->type == Config::TYPE_BOOLEAN) {
+                $item = $container->addCheckbox($config->name, $config->display_name ? $config->display_name : $config->name);
             } else {
-                throw new \Exception();
+                throw new \Exception('unhandled config type: ' . $config->type);
             }
 
             $item->setDefaultValue($config->value);

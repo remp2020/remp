@@ -2,12 +2,6 @@
 
 @section('title', 'Properties')
 
-@section('sidebar')
-    @parent
-
-    <p>This is appended to the master sidebar.</p>
-@endsection
-
 @section('content')
 
     <div class="c-header">
@@ -40,7 +34,7 @@
                 ],
                 'dataSource' => route('accounts.properties.json', $account),
                 'rowActions' => [
-                    ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
+                    ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit property'],
                 ],
             ]) !!}
         </div>

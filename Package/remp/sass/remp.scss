@@ -1,7 +1,6 @@
 $primaryColor: #00acc1 !default;
 $primaryColorDark: #007c91 !default;
 $primaryColorLight: #5ddef4 !default;
-$highlightColor: #4caf50 !default;
 
 a {
     color: $primaryColorDark;
@@ -16,6 +15,10 @@ a {
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     color: inherit;
+}
+
+.c-header > h2 {
+    text-transform: none;
 }
 
 .remp-menu .svg-logo {
@@ -176,6 +179,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /* Z-INDEX FIX */
 /***************/
 .bootstrap-datetimepicker-widget,
+.bootstrap-select.open,
 .bootstrap-select .dropdown-menu.open
 {
     z-index: 3000;
@@ -216,7 +220,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
             }
 
             &.highlight {
-                border-color: $highlightColor;
+                border-color: #009688;
             }
         }
     }

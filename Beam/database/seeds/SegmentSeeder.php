@@ -1,5 +1,6 @@
 <?php
 
+use App\SegmentGroup;
 use Illuminate\Database\Seeder;
 
 class SegmentSeeder extends Seeder
@@ -13,9 +14,17 @@ class SegmentSeeder extends Seeder
     {
         $this->command->getOutput()->writeln('Generating segments...');
 
+        $rempGroup = new SegmentGroup();
+        $rempGroup->name = 'REMP Segments';
+        $rempGroup->code = SegmentGroup::CODE_REMP_SEGMENTS;
+        $rempGroup->type = SegmentGroup::TYPE_RULE;
+        $rempGroup->sorting = 100;
+        $rempGroup->save();
+
         foreach ($this->industrySegments() as $blueprint) {
             if (!\App\Segment::where(['code' => $blueprint['code']])->exists()) {
                 $rules = $blueprint['rulesDef'];
+                $blueprint['segment_group_id'] = $rempGroup->id;
                 unset($blueprint['rulesDef']);
                 $segment = \App\Segment::create($blueprint);
                 foreach ($rules as $rule) {
@@ -146,7 +155,7 @@ class SegmentSeeder extends Seeder
                         'event_action' => 'load',
                         'operator' => '=',
                         'fields' => [],
-                        'flags' => ['_article' => '1'],
+                        'flags' => [[ "key" =>"_article","value" => "1"]],
                     ],
                 ],
             ],
@@ -162,7 +171,7 @@ class SegmentSeeder extends Seeder
                         'event_action' => 'load',
                         'operator' => '>=',
                         'fields' => [],
-                        'flags' => ['_article' => '1'],
+                        'flags' => [[ "key" =>"_article","value" => "1"]],
                     ],
                     [
                         'timespan' => 90*24*60,
@@ -171,7 +180,7 @@ class SegmentSeeder extends Seeder
                         'event_action' => 'load',
                         'operator' => '<=',
                         'fields' => [],
-                        'flags' => ['_article' => '1'],
+                        'flags' => [[ "key" =>"_article","value" => "1"]],
                     ],
                 ],
             ],
@@ -187,7 +196,7 @@ class SegmentSeeder extends Seeder
                         'event_action' => 'load',
                         'operator' => '>=',
                         'fields' => [],
-                        'flags' => ['_article' => '1'],
+                        'flags' => [[ "key" =>"_article","value" => "1"]],
                     ],
                 ],
             ],

@@ -11,13 +11,15 @@ use Illuminate\Support\Carbon;
 
 class AggregatePageviewTimespentJob extends Command
 {
-    protected $signature = 'pageviews:aggregate-timespent {--now=}';
+    const COMMAND = 'pageviews:aggregate-timespent';
+
+    protected $signature = self::COMMAND . ' {--now=}';
 
     protected $description = 'Reads pageview/timespent data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
-        $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+        $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
@@ -56,12 +58,12 @@ class AggregatePageviewTimespentJob extends Command
             $signedIn[$articleId] = $signedIn[$articleId] ?? 0;
             $subscribers[$articleId] = $subscribers[$articleId] ?? 0;
 
-            $all[$articleId] += $record->count;
+            $all[$articleId] += $record->sum;
             if ($record->tags->signed_in === '1') {
-                $signedIn[$articleId] += $record->count;
+                $signedIn[$articleId] += $record->sum;
             }
             if ($record->tags->subscriber === '1') {
-                $subscribers[$articleId] += $record->count;
+                $subscribers[$articleId] += $record->sum;
             }
 
             $bar->advance();

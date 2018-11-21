@@ -3,12 +3,16 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
+	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/avct/uasurfer"
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
+	"github.com/snowplow/referer-parser/go"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -16,8 +20,9 @@ import (
 // TrackController implements the track resource.
 type TrackController struct {
 	*goa.Controller
-	EventProducer   sarama.AsyncProducer
-	PropertyStorage model.PropertyStorage
+	EventProducer       sarama.AsyncProducer
+	PropertyStorage     model.PropertyStorage
+	EntitySchemaStorage model.EntitySchemaStorage
 }
 
 // Event represents Influx event structure
@@ -29,11 +34,12 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage) *TrackController {
+func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage) *TrackController {
 	return &TrackController{
-		Controller:      service.NewController("TrackController"),
-		EventProducer:   ep,
-		PropertyStorage: ps,
+		Controller:          service.NewController("TrackController"),
+		EventProducer:       ep,
+		PropertyStorage:     ps,
+		EntitySchemaStorage: ess,
 	}
 }
 
@@ -54,7 +60,7 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 		tags["remp_commerce_id"] = *ctx.Payload.RempCommerceID
 	}
 
-	values := map[string]interface{}{}
+	fields := map[string]interface{}{}
 
 	if ctx.Payload.Article != nil {
 		at, av := articleValues(ctx.Payload.Article)
@@ -62,42 +68,43 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 			tags[key] = tag
 		}
 		for key, val := range av {
-			values[key] = val
+			fields[key] = val
 		}
 	}
 
 	switch ctx.Payload.Step {
 	case "checkout":
-		values["funnel_id"] = ctx.Payload.Checkout.FunnelID
+		fields["funnel_id"] = ctx.Payload.Checkout.FunnelID
 	case "payment":
 		if ctx.Payload.Payment.FunnelID != nil {
-			values["funnel_id"] = *ctx.Payload.Payment.FunnelID
+			fields["funnel_id"] = *ctx.Payload.Payment.FunnelID
 		}
-		values["product_ids"] = strings.Join(ctx.Payload.Payment.ProductIds, ",")
-		values["revenue"] = ctx.Payload.Payment.Revenue.Amount
-		values["transaction_id"] = ctx.Payload.Payment.TransactionID
+		fields["product_ids"] = strings.Join(ctx.Payload.Payment.ProductIds, ",")
+		fields["revenue"] = ctx.Payload.Payment.Revenue.Amount
+		fields["transaction_id"] = ctx.Payload.Payment.TransactionID
 		tags["currency"] = ctx.Payload.Payment.Revenue.Currency
 	case "purchase":
 		if ctx.Payload.Purchase.FunnelID != nil {
-			values["funnel_id"] = *ctx.Payload.Purchase.FunnelID
+			fields["funnel_id"] = *ctx.Payload.Purchase.FunnelID
 		}
-		values["product_ids"] = strings.Join(ctx.Payload.Purchase.ProductIds, ",")
-		values["revenue"] = ctx.Payload.Purchase.Revenue.Amount
-		values["transaction_id"] = ctx.Payload.Purchase.TransactionID
+		fields["product_ids"] = strings.Join(ctx.Payload.Purchase.ProductIds, ",")
+		fields["revenue"] = ctx.Payload.Purchase.Revenue.Amount
+		fields["transaction_id"] = ctx.Payload.Purchase.TransactionID
 		tags["currency"] = ctx.Payload.Purchase.Revenue.Currency
 	case "refund":
 		if ctx.Payload.Refund.FunnelID != nil {
-			values["funnel_id"] = *ctx.Payload.Refund.FunnelID
+			fields["funnel_id"] = *ctx.Payload.Refund.FunnelID
 		}
-		values["product_ids"] = strings.Join(ctx.Payload.Refund.ProductIds, ",")
-		values["revenue"] = ctx.Payload.Refund.Revenue.Amount
-		values["transaction_id"] = ctx.Payload.Refund.TransactionID
+		fields["product_ids"] = strings.Join(ctx.Payload.Refund.ProductIds, ",")
+		fields["revenue"] = ctx.Payload.Refund.Revenue.Amount
+		fields["transaction_id"] = ctx.Payload.Refund.TransactionID
 		tags["currency"] = ctx.Payload.Refund.Revenue.Currency
 	default:
 		return fmt.Errorf("unhandled commerce step: %s", ctx.Payload.Step)
 	}
 
-	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, model.TableCommerce, tags, values); err != nil {
+	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
+	if err := c.pushInternal(model.TableCommerce, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}
 
@@ -138,7 +145,9 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	for key, val := range ctx.Payload.Fields {
 		fields[key] = val
 	}
-	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, model.TableEvents, tags, fields); err != nil {
+
+	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
+	if err := c.pushInternal(model.TableEvents, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}
 
@@ -167,7 +176,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	tags := map[string]string{
 		"category": model.CategoryPageview,
 	}
-	values := map[string]interface{}{}
+	fields := map[string]interface{}{}
 
 	var measurement string
 	switch ctx.Payload.Action {
@@ -178,10 +187,10 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		tags["action"] = model.ActionPageviewTimespent
 		measurement = model.TableTimespent
 		if ctx.Payload.Timespent != nil {
-			values["timespent"] = ctx.Payload.Timespent.Seconds
-			tags["unload"] = "0"
+			fields["timespent"] = ctx.Payload.Timespent.Seconds
+			fields["unload"] = false
 			if ctx.Payload.Timespent.Unload != nil && *ctx.Payload.Timespent.Unload {
-				tags["unload"] = "1"
+				fields["unload"] = true
 			}
 		}
 	default:
@@ -189,21 +198,58 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	}
 
 	if ctx.Payload.Article != nil {
-		tags[model.FlagArticle] = "1"
+		fields[model.FlagArticle] = true
 		at, av := articleValues(ctx.Payload.Article)
 		for key, tag := range at {
 			tags[key] = tag
 		}
 		for key, val := range av {
-			values[key] = val
+			fields[key] = val
 		}
 	} else {
-		tags[model.FlagArticle] = "0"
+		fields[model.FlagArticle] = false
 	}
 
-	if err := c.pushInternal(ctx.Payload.System, ctx.Payload.User, measurement, tags, values); err != nil {
+	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
+	if err := c.pushInternal(measurement, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}
+
+	return ctx.Accepted()
+}
+
+// Entity runs the entity action.
+func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
+	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+
+	// try to get entity schema
+	schema, ok, err := c.EntitySchemaStorage.Get(ctx.Payload.EntityDef.Name)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.BadRequest(goa.ErrBadRequest(fmt.Errorf("can't find entity schema for entity: %s", ctx.Payload.EntityDef.Name)))
+	}
+
+	// validate entity schema
+	err = (*EntitySchema)(schema).Validate(ctx.Payload)
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(errors.Wrap(err, "schema validation failed")))
+	}
+
+	fields := ctx.Payload.EntityDef.Data
+	fields["remp_entity_id"] = ctx.Payload.EntityDef.ID
+
+	if err := c.pushInternal(model.TableEntities, ctx.Payload.System.Time, nil, fields); err != nil {
+		return err
+	}
+
 	return ctx.Accepted()
 }
 
@@ -220,9 +266,9 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	}
 	if article.Locked != nil {
 		if *article.Locked {
-			tags["locked"] = "1"
+			values["locked"] = true
 		} else {
-			tags["locked"] = "0"
+			values["locked"] = false
 		}
 	}
 	for key, variant := range article.Variants {
@@ -234,9 +280,8 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	return tags, values
 }
 
-// pushInternal pushes new event to the InfluxDB.
-func (c *TrackController) pushInternal(system *app.System, user *app.User,
-	measurement string, tags map[string]string, fields map[string]interface{}) error {
+func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User,
+	tags map[string]string, fields map[string]interface{}) (map[string]string, map[string]interface{}) {
 	fields["token"] = system.PropertyToken
 
 	if user != nil {
@@ -248,16 +293,39 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 		}
 		if user.UserAgent != nil {
 			fields["user_agent"] = *user.UserAgent
+
+			ua := uasurfer.Parse(*user.UserAgent)
+			fields["derived_ua_device"] = strings.TrimPrefix(ua.DeviceType.String(), "Device")
+			fields["derived_ua_os"] = strings.TrimPrefix(ua.OS.Name.String(), "OS")
+			fields["derived_ua_os_version"] = fmt.Sprintf("%d.%d", ua.OS.Version.Major, ua.OS.Version.Minor)
+			fields["derived_ua_platform"] = strings.TrimPrefix(ua.OS.Platform.String(), "Platform")
+			fields["derived_ua_browser"] = strings.TrimPrefix(ua.Browser.Name.String(), "Browser")
+			fields["derived_ua_browser_version"] = fmt.Sprintf("%d.%d", ua.Browser.Version.Major, ua.Browser.Version.Minor)
 		}
-		if user.Referer != nil {
+
+		if user.Referer != nil && len(*user.Referer) > 0 {
 			fields["referer"] = *user.Referer
-		}
-		if user.Adblock != nil {
-			if *user.Adblock {
-				tags["adblock"] = "1"
-			} else {
-				tags["adblock"] = "0"
+			parsedRef := refererparser.Parse(*user.Referer)
+			if user.URL != nil {
+				parsedRef.SetCurrent(*user.URL)
 			}
+			tags["derived_referer_medium"] = parsedRef.Medium
+			tags["derived_referer_source"] = parsedRef.Referer
+
+			if tags["derived_referer_medium"] == "unknown" {
+				tags["derived_referer_medium"] = "external"
+			}
+
+			parsedURL, err := url.Parse(*user.Referer)
+			if err == nil {
+				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Path)
+			}
+		} else {
+			tags["derived_referer_medium"] = "direct"
+		}
+
+		if user.Adblock != nil {
+			fields["adblock"] = *user.Adblock
 		}
 		if user.WindowHeight != nil {
 			fields["window_height"] = *user.WindowHeight
@@ -266,24 +334,16 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			fields["window_width"] = *user.WindowWidth
 		}
 		if user.Cookies != nil {
-			if *user.Cookies {
-				tags["cookies"] = "1"
-			} else {
-				tags["cookies"] = "0"
-			}
+			fields["cookies"] = *user.Cookies
 		}
 		if user.Websockets != nil {
-			if *user.Websockets {
-				tags["websockets"] = "1"
-			} else {
-				tags["websockets"] = "0"
-			}
+			fields["websockets"] = *user.Websockets
 		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID
-			tags["signed_in"] = "1"
+			fields["signed_in"] = true
 		} else {
-			tags["signed_in"] = "0"
+			fields["signed_in"] = false
 		}
 		if user.BrowserID != nil {
 			tags["browser_id"] = *user.BrowserID
@@ -295,11 +355,7 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			tags["remp_pageview_id"] = *user.RempPageviewID
 		}
 		if user.Subscriber != nil {
-			if *user.Subscriber {
-				tags["subscriber"] = "1"
-			} else {
-				tags["subscriber"] = "0"
-			}
+			fields["subscriber"] = *user.Subscriber
 		}
 
 		if user.Source != nil {
@@ -321,12 +377,36 @@ func (c *TrackController) pushInternal(system *app.System, user *app.User,
 			if user.Source.UtmContent != nil {
 				tags["utm_content"] = *user.Source.UtmContent
 			}
+			if user.Source.BannerVariant != nil {
+				tags["banner_variant"] = *user.Source.BannerVariant
+			}
 		}
 	} else {
-		tags["signed_in"] = "0"
+		fields["signed_in"] = false
 	}
 
-	p, err := influxClient.NewPoint(measurement, tags, fields, system.Time)
+	return tags, fields
+}
+
+// pushInternal pushes new event to the InfluxDB.
+func (c *TrackController) pushInternal(measurement string, time time.Time,
+	tags map[string]string, fields map[string]interface{}) error {
+
+	collected := make(map[string]interface{})
+	for key, tag := range tags {
+		collected[key] = tag
+	}
+	for key, field := range fields {
+		collected[key] = field
+	}
+	json, err := json.Marshal(collected)
+	if err != nil {
+		return err
+	}
+	data := make(map[string]interface{})
+	data["_json"] = string(json)
+
+	p, err := influxClient.NewPoint(measurement, nil, data, time)
 	if err != nil {
 		return err
 	}

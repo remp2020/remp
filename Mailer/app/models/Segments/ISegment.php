@@ -9,7 +9,7 @@ interface ISegment
      *
      * @return string
      */
-    public function provider();
+    public function provider(): string;
 
     /**
      * List returns all available segments.

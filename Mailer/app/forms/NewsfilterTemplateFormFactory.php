@@ -53,22 +53,27 @@ class NewsfilterTemplateFormFactory
         $form = new Form;
         $form->addProtection();
 
-        $form->addText('name', 'Name');
+        $form->addText('name', 'Name')
+            ->setRequired("Field 'Name' is required.");
 
-        $form->addText('code', 'Identifier');
+        $form->addText('code', 'Identifier')
+            ->setRequired("Field 'Identifier' is required.");
 
         $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
-        
+
         $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
         $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
 
-        $form->addSelect('mail_type_id', 'Type', $mailTypes);
+        $form->addSelect('mail_type_id', 'Type', $mailTypes)
+            ->setRequired("Field 'Type' is required.");
 
         $form->addText('from', 'Sender')
-            ->setAttribute('placeholder', 'e.g. info@domain.com');
+            ->setAttribute('placeholder', 'e.g. info@domain.com')
+            ->setRequired("Field 'Sender' is required.");
 
-        $form->addText('subject', 'Subject');
+        $form->addText('subject', 'Subject')
+            ->setRequired("Field 'Subject' is required.");
 
         $form->addHidden('html_content');
         $form->addHidden('text_content');
@@ -78,8 +83,8 @@ class NewsfilterTemplateFormFactory
         $defaults = [
             'name' => 'Newsfilter ' . date('j.n.Y'),
             'code' => 'nwsf_' . date('dmY'),
-            'mail_layout_id' => 27, // layout for subscribers
-            'locked_mail_layout_id' => 21, // layout for non-subscribers
+            'mail_layout_id' => 33, // layout for subscribers
+            'locked_mail_layout_id' => 33, // layout for non-subscribers
             'mail_type_id' => 9, // newsfilter,
             'from' => 'Denník N <info@dennikn.sk>',
         ];
@@ -90,6 +95,11 @@ class NewsfilterTemplateFormFactory
         $withJobs->getControlPrototype()
             ->setName('button')
             ->setHtml('Generate newsletter batch and start sending');
+
+        $withJobsCreated = $form->addSubmit('generate_emails_jobs_created', 'system.save');
+        $withJobsCreated->getControlPrototype()
+            ->setName('button')
+            ->setHtml('Generate newsletter batch');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
@@ -116,7 +126,7 @@ class NewsfilterTemplateFormFactory
 
     public function formSucceeded(Form $form, $values)
     {
-        $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values) {
+        $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values, $form) {
             $mailTemplate = $this->templatesRepository->add(
                 $values['name'],
                 $this->getUniqueTemplateCode($values['code']),
@@ -132,7 +142,13 @@ class NewsfilterTemplateFormFactory
             $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS);
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
-            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
+
+            $batchStatus = BatchesRepository::STATUS_READY;
+            if ($form['generate_emails_jobs_created']->isSubmittedBy()) {
+                $batchStatus = BatchesRepository::STATUS_CREATED;
+            }
+
+            $this->batchesRepository->update($batch, ['status' => $batchStatus]);
         };
 
         $generate(

@@ -71,8 +71,9 @@ func main() {
 	var eventStorage model.EventStorage
 	var pageviewStorage model.PageviewStorage
 	var commerceStorage model.CommerceStorage
+	var concurrentsStorage model.ConcurrentsStorage
 
-	eventStorage, pageviewStorage, commerceStorage, err = initElasticEventStorages(ctx, c)
+	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -95,12 +96,20 @@ func main() {
 	ticker10s := time.NewTicker(10 * time.Second)
 	defer ticker10s.Stop()
 
+	ticker1m := time.NewTicker(time.Minute)
+	defer ticker1m.Stop()
+
 	ticker1h := time.NewTicker(time.Hour)
 	defer ticker1h.Stop()
 
 	cacheSegmentDB := func() {
 		if err := segmentStorage.Cache(); err != nil {
 			service.LogError("unable to cache segments", "err", err)
+		}
+	}
+	cacheExplicitSegments := func() {
+		if err := segmentStorage.CacheExplicitSegments(); err != nil {
+			service.LogError("unable to cache explicit segment", "err", err)
 		}
 	}
 	cacheEventDB := func() {
@@ -111,6 +120,7 @@ func main() {
 
 	wg.Add(1)
 	cacheSegmentDB()
+	cacheExplicitSegments()
 	cacheEventDB()
 	go func() {
 		defer wg.Done()
@@ -119,6 +129,8 @@ func main() {
 			select {
 			case <-ticker10s.C:
 				cacheSegmentDB()
+			case <-ticker1m.C:
+				cacheExplicitSegments()
 			case <-ticker1h.C:
 				cacheEventDB()
 			case <-ctx.Done():
@@ -135,6 +147,7 @@ func main() {
 	app.MountCommerceController(service, controller.NewCommerceController(service, commerceStorage))
 	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewStorage))
 	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage))
+	app.MountConcurrentsController(service, controller.NewConcurrentsController(service, concurrentsStorage))
 
 	// server init
 
@@ -163,7 +176,7 @@ func main() {
 	service.LogInfo("bye bye")
 }
 
-func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
+func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
 	eopts := []elastic.ClientOptionFunc{
 		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
 		elastic.SetURL(c.ElasticAddr),
@@ -180,7 +193,7 @@ func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage
 	}
 	ec, err := elastic.NewClient(eopts...)
 	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "unable to initialize elasticsearch client")
+		return nil, nil, nil, nil, errors.Wrap(err, "unable to initialize elasticsearch client")
 	}
 	elasticDB := model.NewElasticDB(ctx, ec, c.Debug)
 
@@ -193,6 +206,9 @@ func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage
 	pageviewStorage := &model.PageviewElastic{
 		DB: elasticDB,
 	}
+	concurrentsStorage := &model.ConcurrentElastic{
+		DB: elasticDB,
+	}
 
-	return eventStorage, pageviewStorage, commerceStorage, nil
+	return eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, nil
 }

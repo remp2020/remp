@@ -17,7 +17,7 @@ class ListsRepository extends Repository
         return $this->getTable()->order('sorting ASC');
     }
 
-    public function add($categoryId, $priority, $code, $name, $order, $isAutoSubscribe, $isLocked, $isPublic, $description = null, $previewUrl = null, $imageUrl = null)
+    public function add($categoryId, $priority, $code, $name, $order, $isAutoSubscribe, $isLocked, $isPublic, $description, $previewUrl = null, $imageUrl = null)
     {
         $this->updateOrder($categoryId, $order);
 

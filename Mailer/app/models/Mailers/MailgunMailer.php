@@ -67,6 +67,7 @@ class MailgunMailer extends Mailer implements IMailer
             'html' => $message->getHtmlBody(),
             'attachment' => $attachments,
             'recipient-variables' => $message->getHeader('X-Mailer-Template-Params'),
+            'h:Precedence' => 'bulk', // https://blog.returnpath.com/precedence/
         ];
         if ($tag) {
             $data['o:tag'] = $tag;

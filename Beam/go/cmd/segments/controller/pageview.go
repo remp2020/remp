@@ -66,6 +66,52 @@ func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
 	return ctx.OK(asrc)
 }
 
+// Avg runs the avg action.
+func (c *PageviewController) Avg(ctx *app.AvgPageviewsContext) error {
+	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o.Action = ctx.Action
+
+	src, ok, err := c.PageviewStorage.Avg(o)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		sr := model.AvgRow{
+			Tags: make(map[string]string),
+			Avg:  0,
+		}
+		src = model.AvgRowCollection{}
+		src = append(src, sr)
+	}
+
+	asrc := AvgRowCollection(src).ToMediaType()
+	return ctx.OK(asrc)
+}
+
+// Unique runs the cardinality count action.
+func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
+	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o.Action = ctx.Action
+
+	src, ok, err := c.PageviewStorage.Unique(o, ctx.Item)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		sr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
+		}
+		src = model.CountRowCollection{}
+		src = append(src, sr)
+	}
+
+	asrc := CountRowCollection(src).ToMediaType()
+	return ctx.OK(asrc)
+}
+
 // List runs the list action.
 func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 	aggOptions := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)
@@ -118,6 +164,13 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) mo
 	}
 	if payload.TimeBefore != nil {
 		o.TimeBefore = *payload.TimeBefore
+	}
+
+	if payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: payload.TimeHistogram.Interval,
+			Offset:   payload.TimeHistogram.Offset,
+		}
 	}
 
 	return o

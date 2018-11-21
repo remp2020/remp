@@ -26,6 +26,13 @@
     "psr-4": {
     }
   },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Remp\\Widgets\\Providers\\WidgetServiceProvider"
+      ]
+    }
+  },
   "config": {
     "preferred-install": "dist",
     "sort-packages": true,

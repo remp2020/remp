@@ -109,23 +109,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Logging Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure the log settings for your application. Out of
-    | the box, Laravel uses the Monolog PHP logging library. This gives
-    | you a variety of powerful log handlers / formatters to utilize.
-    |
-    | Available Settings: "single", "daily", "syslog", "errorlog"
-    |
-    */
-
-    'log' => env('APP_LOG', 'single'),
-
-    'log_level' => env('APP_LOG_LEVEL', 'debug'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Autoloaded Service Providers
     |--------------------------------------------------------------------------
     |
@@ -170,17 +153,16 @@ return [
         /*
          * Application Service Providers...
          */
-        Remp\LaravelSso\Providers\SsoServiceProvider::class,
-        Remp\Widgets\Providers\WidgetServiceProvider::class,
-        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
-        Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\CrmSegmentServiceProvider::class,
-        App\Providers\RempSegmentsServiceProvider::class,
-        App\Providers\RempTrackerServiceProvider::class,
+        App\Providers\BeamSegmentsServiceProvider::class,
+        App\Providers\BeamTrackerServiceProvider::class,
+        App\Providers\PythiaSegmentsServiceProvider::class,
+
+        App\Providers\StatsServiceProvider::class,
 
         Collective\Html\HtmlServiceProvider::class,
         Arrilot\Widgets\ServiceProvider::class,
@@ -243,4 +225,15 @@ return [
         'AsyncWidget' => Arrilot\Widgets\AsyncFacade::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Client Site Url
+    |--------------------------------------------------------------------------
+    |
+    | Url of the site, where remplib.js is implemented
+    |
+    */
+    
+    'client_site_url' => env('CLIENT_SITE_URL'),
 ];

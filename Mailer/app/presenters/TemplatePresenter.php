@@ -75,9 +75,9 @@ final class TemplatePresenter extends BasePresenter
             ->setColSetting('clicked', [
                 'priority' => 3,
             ])
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit')
-            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy')
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show template')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit template')
+            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy', 'Duplicate template')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
@@ -125,8 +125,8 @@ final class TemplatePresenter extends BasePresenter
                 $template->code,
                 "<a href='{$editUrl}'>{$template->subject}</a>",
                 $template->type->title,
-                $template->related('mail_job_batch_template')->sum('opened'),
-                $template->related('mail_job_batch_template')->sum('clicked'),
+                $template->related('mail_job_batch_template')->sum('opened') + $template->related('mail_logs')->where('mail_job_id IS NULL')->count('opened_at'),
+                $template->related('mail_job_batch_template')->sum('clicked') + $template->related('mail_logs')->where('mail_job_id IS NULL')->count('clicked_at'),
             ];
         }
         $this->presenter->sendJson($result);

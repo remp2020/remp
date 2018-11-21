@@ -2,10 +2,37 @@
 
 namespace Remp\MailerModule\PageMeta;
 
+use GuzzleHttp\Exception\RequestException;
 use Nette\Utils\Strings;
+use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 
 class DenniknContent implements ContentInterface
 {
+    private $transport;
+
+    public function __construct(TransportInterface $transport)
+    {
+        $this->transport = $transport;
+    }
+
+    public function fetchUrlMeta($url): ?Meta
+    {
+        $url = preg_replace('/\\?ref=(.*)/', '', $url);
+        try {
+            $content = $this->transport->getContent($url);
+            if (!$content) {
+                return null;
+            }
+            $meta = $this->parseMeta($content);
+            if (!$meta) {
+                return null;
+            }
+        } catch (RequestException $e) {
+            throw new InvalidUrlException("Invalid URL: {$url}", 0, $e);
+        }
+        return $meta;
+    }
+
     public function parseMeta($content)
     {
         // author
@@ -15,7 +42,7 @@ class DenniknContent implements ContentInterface
 
         if ($matches) {
             foreach ($matches[1] as $author) {
-                $denniknAuthors[] = Strings::upper($author);
+                $denniknAuthors[] = Strings::upper(html_entity_decode($author));
             }
         }
 
@@ -24,15 +51,15 @@ class DenniknContent implements ContentInterface
         $matches = [];
         preg_match('/<meta property=\"og:title\" content=\"(.+)\"\s*\/?/U', $content, $matches);
         if ($matches) {
-            $title = $matches[1];
+            $title = html_entity_decode($matches[1]);
         }
 
         // description
         $description = false;
         $matches = [];
-        preg_match('/<meta property=\"og:description\" content=\"(.+)\"\s*\/?/U', $content, $matches);
+        preg_match('/<meta property=\"og:description\" content=\"(.*)\"\s*\/?/U', $content, $matches);
         if ($matches) {
-            $description = $matches[1];
+            $description = html_entity_decode($matches[1]);
         }
 
         // image
@@ -46,10 +73,10 @@ class DenniknContent implements ContentInterface
             $image = array_pop($parts);
             $info = pathinfo($image);
             if (preg_match('/-([0-9]+)x([0-9]+)$/i', $info['filename'])) {
-                $newImageFileName = preg_replace('/-([0-9]+)x([0-9]+)$/', '-200x120', $info['filename']);
+                $newImageFileName = preg_replace('/-([0-9]+)x([0-9]+)$/', '-558x270', $info['filename']);
                 $image = $newImageFileName . '.' . $info['extension'];
             } else {
-                $image = $info['filename'] . '-200x120.' . $info['extension'];
+                $image = $info['filename'] . '-558x270.' . $info['extension'];
             }
             $parts[] = $image;
             $image = implode('/', $parts);

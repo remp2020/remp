@@ -25,9 +25,16 @@
                             'header' => 'Campaign',
                             'priority' => 1,
                         ],
-                        'banners' => [
-                            'header' => 'Banners',
-                            'priority' => 2,
+                        'variants' => [
+                            'header' => 'Variants',
+                            'orderable' => false,
+                            'priority' => 3,
+                            'render' => 'array',
+                        ],
+                        'status' => [
+                            'header' => 'Status',
+                            'priority' => 1,
+                            'render' => 'badge',
                         ],
                         'start_time' => [
                             'header' => 'Scheduled start date',
@@ -37,10 +44,6 @@
                         'end_time' => [
                             'header' => 'Scheduled end date',
                             'render' => 'date',
-                            'priority' => 1,
-                        ],
-                        'status' => [
-                            'header' => 'Status',
                             'priority' => 1,
                         ],
                         'updated_at' => [
@@ -56,6 +59,7 @@
                         ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
                         ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
                     ],
+                    'order' => [5, 'desc'],
                 ]) !!}
                 </div>
             </div>

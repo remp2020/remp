@@ -5,7 +5,7 @@
 @section('content')
 
     <div class="c-header">
-        <h2>Campaigns</h2>
+        <h2>CAMPAIGNS</h2>
     </div>
 
     <div class="card">
@@ -13,47 +13,48 @@
             <h2>Scheduled campaigns<small></small></h2>
             <div class="actions">
                 <a href="{{ route('schedule.index') }}" class="btn palette-Cyan bg waves-effect">View all schedules</a>
-                <a href="{{ route('schedule.create') }}" class="btn palette-Cyan bg waves-effect">Schedule new run</a>
             </div>
         </div>
         <div class="card-body">
             {!! Widget::run('DataTable', [
-            'colSettings' => [
-                'campaign' => [
-                    'header' => 'Campaign',
-                    'priority' => 1,
+                'colSettings' => [
+                    'campaign' => [
+                        'header' => 'Campaign',
+                        'priority' => 1,
+                    ],
+                    'status' => [
+                        'header' => 'Status',
+                        'priority' => 1,
+                        'render' => 'badge',
+                    ],
+                    'start_time' => [
+                        'header' => 'Scheduled start date',
+                        'render' => 'date',
+                        'priority' => 2,
+                    ],
+                    'end_time' => [
+                        'header' => 'Scheduled end date',
+                        'render' => 'date',
+                        'priority' => 2,
+                    ],
                 ],
-                'start_time' => [
-                    'header' => 'Scheduled start date',
-                    'render' => 'date',
-                    'priority' => 2,
+                'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
+                'rowActions' => [
+                    ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit schedule'],
+                    ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play', 'title' => 'Start schedule'],
+                    ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause', 'title' => 'Pause schedule'],
+                    ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop', 'title' => 'Stop schedule'],
+                    ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete', 'title' => 'Delete schedule'],
                 ],
-                'end_time' => [
-                    'header' => 'Scheduled end date',
-                    'render' => 'date',
-                    'priority' => 2,
+                'displaySearchAndPaging' => false,
+                'refreshTriggers' => [
+                    [
+                    // refresh when campaign's active toggle is toggled
+                    'event' => 'campaign_active_toggled',
+                    'selector' => 'document'
+                    ],
                 ],
-                'status' => [
-                    'header' => 'Status',
-                    'priority' => 1,
-                ],
-            ],
-            'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
-            'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
-                ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play'],
-                ['name' => 'pause', 'class' => 'zmdi-palette-Cyan zmdi-pause'],
-                ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
-                ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
-            ],
-            'displaySearchAndPaging' => false,
-            'refreshTriggers' => [
-                [
-                // refresh when campaign's active toggle is toggled
-                'event' => 'campaign_active_toggled',
-                'selector' => 'document'
-                ],
-            ],
+                'order' => [2, 'desc'],
             ]) !!}
         </div>
     </div>
@@ -74,13 +75,11 @@
                         'name' => [
                             'priority' => 1,
                         ],
-                        'banner' => [
-                            'header' => 'Banner',
-                            'priority' => 9,
-                        ],
-                        'alt_banner' => [
-                            'header' => 'Banner B',
-                            'priority' => 9,
+                        'variants' => [
+                            'header' => 'Variants',
+                            'orderable' => false,
+                            'priority' => 3,
+                            'render' => 'array',
                         ],
                         'segments' => [
                             'header' => 'Segments',
@@ -115,14 +114,15 @@
                         ]
                     ],
                     'rowHighlights' => [
-                        'active' => true
+                        'is_running' => true
                     ],
                     'dataSource' => route('campaigns.json'),
                     'rowActions' => [
-                        ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit'],
-                        ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy'],
+                        ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit campaign'],
+                        ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy', 'title' => 'Copy campaign'],
+                        ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart', 'title' => 'Campaign stats'],
                     ],
-                    'order' => [9, 'desc'],
+                    'order' => [8, 'desc'],
                 ]) !!}
                 </div>
             </div>

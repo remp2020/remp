@@ -71,7 +71,11 @@ $factory->define(\App\Article::class, function (Faker\Generator $faker) {
         'image_url' => $faker->imageUrl(),
         'published_at' => $faker->dateTimeBetween('-30 days', 'now')->format(DATE_RFC3339),
         'pageviews_all' => $faker->numberBetween(0, 20000),
+        'pageviews_signed_in' => $faker->numberBetween(0, 20000),
+        'pageviews_subscribers' => $faker->numberBetween(0, 20000),
         'timespent_all' => $faker->numberBetween(0, 600000),
+        'timespent_signed_in' => $faker->numberBetween(0, 600000),
+        'timespent_subscribers' => $faker->numberBetween(0, 600000),
     ];
 });
 
