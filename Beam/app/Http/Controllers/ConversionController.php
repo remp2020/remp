@@ -46,6 +46,11 @@ class ConversionController extends Controller
         }
 
         return $datatables->of($conversions)
+            ->addColumn('actions', function (Conversion $conversion) {
+                return [
+                    'show' => route('conversions.show', $conversion),
+                ];
+            })
             ->addColumn('article.title', function (Conversion $conversion) {
                 return \HTML::link(route('articles.show', ['article' => $conversion->article->id]), $conversion->article->title);
             })
@@ -57,6 +62,7 @@ class ConversionController extends Controller
                 $values = explode(",", $value);
                 $query->whereIn('article_section.section_id', $values);
             })
+            ->rawColumns(['actions'])
             ->make(true);
     }
 
@@ -68,6 +74,16 @@ class ConversionController extends Controller
 
         return response()->format([
             'html' => redirect(route('conversions.index'))->with('success', 'Conversion created'),
+            'json' => new ConversionResource($conversion),
+        ]);
+    }
+
+    public function show(Conversion $conversion)
+    {
+        return response()->format([
+            'html' => view('conversions.show', [
+                'conversion' => $conversion
+            ]),
             'json' => new ConversionResource($conversion),
         ]);
     }
