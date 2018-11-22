@@ -7,7 +7,11 @@ use Remp\MailerModule\PhinxRegistrator;
 $container = require __DIR__ . '/../app/bootstrap.php';
 
 /** @var \Remp\MailerModule\Console\Application $application */
-$application = $container->getByType('Remp\MailerModule\Console\Application');
+try {
+    $application = $container->getByType('Remp\MailerModule\Console\Application');
+} catch (DriverException $e) {
+    $application = new Remp\MailerModule\Console\Application($container);
+}
 
 $phinxRegistrator = new PhinxRegistrator($application, $container->getByType('Remp\MailerModule\EnvironmentConfig'));
 
