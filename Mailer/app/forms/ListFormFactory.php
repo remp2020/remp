@@ -164,13 +164,6 @@ class ListFormFactory
                 break;
         }
 
-        if ($list
-            && $values['mail_type_category_id'] == $list->mail_type_category_id
-            && $list->sorting < $values['sorting']
-        ) {
-            $values['sorting'] -= 1;
-        }
-
         $this->listsRepository->updateSorting(
             $values['mail_type_category_id'],
             $values['sorting'],
