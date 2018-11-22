@@ -2,9 +2,10 @@
 
 namespace App;
 
+use App\Model\Aggregable;
 use Illuminate\Database\Eloquent\Model;
 
-class SessionDevice extends Model
+class SessionDevice extends Model implements Aggregable
 {
     public $timestamps = false;
 
@@ -20,7 +21,13 @@ class SessionDevice extends Model
         'client_type',
         'client_name',
         'client_version',
+        'count'
     ];
+
+    public function aggregatedFields(): array
+    {
+        return ['count'];
+    }
 
     protected $casts = [
         'subscriber' => 'boolean',

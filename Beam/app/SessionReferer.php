@@ -2,9 +2,10 @@
 
 namespace App;
 
+use App\Model\Aggregable;
 use Illuminate\Database\Eloquent\Model;
 
-class SessionReferer extends Model
+class SessionReferer extends Model implements Aggregable
 {
     public $timestamps = false;
 
@@ -18,5 +19,11 @@ class SessionReferer extends Model
         'subscriber',
         'medium',
         'source',
+        'count',
     ];
+
+    public function aggregatedFields(): array
+    {
+        return ['count'];
+    }
 }

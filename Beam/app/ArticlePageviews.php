@@ -2,12 +2,13 @@
 
 namespace App;
 
+use App\Model\Aggregable;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class ArticlePageviews extends Model
+class ArticlePageviews extends Model implements Aggregable
 {
     public $timestamps = false;
 
@@ -19,6 +20,11 @@ class ArticlePageviews extends Model
         'signed_in',
         'subscribers',
     ];
+
+    public function aggregatedFields(): array
+    {
+        return ['sum', 'signed_in', 'subscriber'];
+    }
 
     protected $dates = [
         'time_from',
