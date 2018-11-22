@@ -142,3 +142,37 @@ $factory->define(\App\ArticleTimespent::class, function (Faker\Generator $faker)
         'subscribers' => $subscribers
     ];
 });
+
+$factory->define(\App\SessionDevice::class, function (Faker\Generator $faker) {
+    $timeTo = Carbon::instance($faker->dateTimeBetween('-30 days', 'now'));
+    $timeFrom = (clone $timeTo)->subHour();
+
+    return [
+        'time_from' => $timeFrom,
+        'time_to' => $timeTo,
+        'subscriber' => $faker->boolean(50),
+        'count' => $faker->numberBetween(1, 900),
+        'type' => $faker->word,
+        'model' => $faker->word,
+        'brand' => $faker->word,
+        'os_name' => $faker->word,
+        'os_version' => $faker->numberBetween(1,10),
+        'client_type' => $faker->word,
+        'client_name' => $faker->word,
+        'client_version' => $faker->numberBetween(1,10),
+    ];
+});
+
+$factory->define(\App\SessionReferer::class, function (Faker\Generator $faker) {
+    $timeTo = Carbon::instance($faker->dateTimeBetween('-30 days', 'now'));
+    $timeFrom = (clone $timeTo)->subHour();
+
+    return [
+        'time_from' => $timeFrom,
+        'time_to' => $timeTo,
+        'subscriber' => $faker->boolean(50),
+        'count' => $faker->numberBetween(1, 900),
+        'medium' => $faker->word,
+        'source' => $faker->word,
+    ];
+});

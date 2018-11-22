@@ -26,4 +26,9 @@ class SessionReferer extends Model implements Aggregable
     {
         return ['count'];
     }
+
+    public function groupableFields(): array
+    {
+        return ['subscriber', 'medium', 'source'];
+    }
 }

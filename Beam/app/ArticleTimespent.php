@@ -26,6 +26,11 @@ class ArticleTimespent extends Model implements Aggregable
         return ['sum', 'signed_in', 'subscribers'];
     }
 
+    public function groupableFields(): array
+    {
+        return ['article_id'];
+    }
+
     protected $dates = [
         'time_from',
         'time_to',

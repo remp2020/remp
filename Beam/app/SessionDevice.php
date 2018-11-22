@@ -29,6 +29,11 @@ class SessionDevice extends Model implements Aggregable
         return ['count'];
     }
 
+    public function groupableFields(): array
+    {
+        return ['subscriber', 'type', 'model', 'brand', 'os_name', 'os_version', 'client_type', 'client_name', 'client_version'];
+    }
+
     protected $casts = [
         'subscriber' => 'boolean',
     ];

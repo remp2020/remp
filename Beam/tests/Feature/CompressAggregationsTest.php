@@ -7,6 +7,7 @@ use App\ArticlePageviews;
 use App\ArticleTimespent;
 use App\Console\Commands\CompressAggregations;
 use App\Property;
+use App\SessionDevice;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -17,15 +18,79 @@ class CompressAggregationsTest extends TestCase
 
     public function testPageviewsAggregations()
     {
-        $this->runAndTestAggregations(ArticlePageviews::class);
+        $this->runAndTestArticleAggregations(ArticlePageviews::class);
     }
 
     public function testTimespentAggregations()
     {
-        $this->runAndTestAggregations(ArticleTimespent::class);
+        $this->runAndTestArticleAggregations(ArticleTimespent::class);
     }
 
-    public function runAndTestAggregations($className)
+    public function testSessionDevicesAggregation()
+    {
+        $same = [
+            'type' => 'a',
+            'model' => 'a',
+            'brand' => 'a',
+            'os_name' => 'a',
+            'os_version' => 'a',
+            'client_type' => 'a',
+            'client_name' => 'a',
+            'client_version' => 'a',
+        ];
+
+        factory(SessionDevice::class)->create(array_merge($same, [
+                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'subscriber' => false,
+                'count' => 10,
+            ])
+        );
+
+        factory(SessionDevice::class)->create(array_merge($same, [
+                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'subscriber' => false,
+                'count' => 5,
+            ])
+        );
+
+        factory(SessionDevice::class)->create(array_merge($same, [
+                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'subscriber' => true,
+                'count' => 2,
+            ])
+        );
+
+        //// Do not aggregate these
+        factory(SessionDevice::class)->create(array_merge($same, [
+                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
+                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
+                'subscriber' => false,
+                'count' => 6,
+            ])
+        );
+
+        factory(SessionDevice::class)->create(array_merge($same, [
+                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
+                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
+                'subscriber' => false,
+                'count' => 3,
+            ])
+        );
+
+        $this->artisan(CompressAggregations::COMMAND);
+
+        $this->assertEquals(4, SessionDevice::all()->count());
+
+        $d = Carbon::today()->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS);
+
+        $this->assertEquals(15, SessionDevice::whereDate('time_from', $d)->where('subscriber', false)->first()->count);
+    }
+
+
+    public function runAndTestArticleAggregations($className)
     {
         $property = factory(Property::class)->create();
 
@@ -36,7 +101,7 @@ class CompressAggregationsTest extends TestCase
         $ag1 = factory($className)->create([
             'article_id' => $article1->id,
             'time_from' => Carbon::today()->hour(9)->subDays(91),
-            'time_to' => Carbon::today()->hour(10)->subDays(91)
+            'time_to' => Carbon::today()->hour(10)->subDays(91),
         ]);
 
         $ag2 = factory($className)->create([
@@ -48,16 +113,16 @@ class CompressAggregationsTest extends TestCase
         factory($className)->create([
             'article_id' => $article2->id,
             'time_from' => Carbon::today()->hour(10)->subDays(91),
-            'time_to' => Carbon::today()->hour(11)->subDays(91)
+            'time_to' => Carbon::today()->hour(11)->subDays(91),
         ]);
 
-        // These won't be aggregated
         factory($className)->create([
             'article_id' => $article1->id,
             'time_from' => Carbon::today()->hour(10)->subDays(90),
             'time_to' => Carbon::today()->hour(11)->subDays(90),
         ]);
 
+        // These won't be aggregated
         factory($className)->create([
             'article_id' => $article1->id,
             'time_from' => Carbon::today()->hour(10)->subDays(89),
@@ -85,5 +150,4 @@ class CompressAggregationsTest extends TestCase
         $this->artisan(CompressAggregations::COMMAND);
         $runAsserts();
     }
-
 }

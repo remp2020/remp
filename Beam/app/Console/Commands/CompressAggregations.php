@@ -5,8 +5,11 @@ namespace App\Console\Commands;
 use App\ArticlePageviews;
 use App\ArticleTimespent;
 use App\Model\Aggregable;
+use App\SessionDevice;
+use App\SessionReferer;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class CompressAggregations extends Command
 {
@@ -20,71 +23,82 @@ class CompressAggregations extends Command
 
     public function handle()
     {
+        $this->line('');
+        $this->line('<info>***** Compressing aggregations *****</info>');
+        $this->line('');
+        $this->line('Compressing data older than <info>' . self::COMPRESSION_THRESHOLD_IN_DAYS . 'days</info>.');
+
         $threshold = Carbon::today()->subDays(self::COMPRESSION_THRESHOLD_IN_DAYS);
-        $this->aggregateTable(ArticlePageviews::class, $threshold);
-        $this->aggregateTable(ArticleTimespent::class, $threshold);
+
+        $this->line('Processing <info>ArticlePageviews</info> table');
+        $this->aggregate(ArticlePageviews::class, $threshold);
+
+        $this->line('Processing <info>ArticleTimespents</info> table');
+        $this->aggregate(ArticleTimespent::class, $threshold);
+
+        $this->line('Processing <info>SessionReferers</info> table');
+        $this->aggregate(SessionReferer::class, $threshold);
+
+        $this->line('Processing <info>SessionDevices</info> table');
+        $this->aggregate(SessionDevice::class, $threshold);
+
+        $this->line(' <info>OK!</info>');
     }
 
-    private function aggregateTable($tableClass, $threshold)
+    public function aggregate($modelClass, Carbon $threshold)
     {
-        if (!in_array(Aggregable::class, class_implements($tableClass), true)) {
-            throw new \InvalidArgumentException("'$tableClass' doesn't implement '" . Aggregable::class . "' interface");
+        if (!in_array(Aggregable::class, class_implements($modelClass), true)) {
+            throw new \InvalidArgumentException("'$modelClass' doesn't implement '" . Aggregable::class . "' interface");
         }
 
-        $items = $tableClass::where('time_from', '<=', $threshold)
+        $minDate = $modelClass::select(DB::raw('MIN(time_from) as min_time_from'))
             ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
-            ->get();
+            ->first();
 
-        $model = new $tableClass();
-
-        $aggregates = [];
-        $idsToDelete = [];
-        foreach ($items as $item) {
-            $dayIndex = $item->time_from->startOfDay()->timestamp;
-
-            $idsToDelete[] = $item->id;
-
-            $aggregates[$item->article_id] = $aggregates[$item->article_id] ?? [];
-            $aggregates[$item->article_id][$dayIndex] = $aggregates[$item->article_id][$dayIndex] ??
-                $this->getDefaultAggregables($model);
-
-            foreach ($model->aggregatedFields() as $field) {
-                $aggregates[$item->article_id][$dayIndex][$field] += $item->$field;
-            }
+        if (!$minDate) {
+            return;
         }
 
-        foreach ($aggregates as $articleId => $daysData) {
-            foreach ($daysData as $dayIndex => $values) {
-                [$from, $to] = $this->dayIndexToInterval($dayIndex);
+        $model = new $modelClass();
 
-                $tableClass::create([
-                    'article_id' => $articleId,
-                    'time_from' => $from,
-                    'time_to' => $to,
-                    'sum' => $values['sum'],
-                    'signed_in' => $values['signed_in'],
-                    'subscribers' => $values['subscribers'],
-                ]);
+        $minTimeFrom = Carbon::parse($minDate->min_time_from)->startOfDay();
+        $iterator = clone $minTimeFrom;
+
+        while ($iterator->lte($threshold)) {
+            $this->line("Compressing data for day " . $iterator->toDateString());
+            $dayValues = $modelClass::select(...$model->groupableFields(), ...$this->getSumAgregablesSelection($model))
+                ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
+                ->whereDate('time_from', $iterator->format('Y-m-d'))
+                ->groupBy(...$model->groupableFields())
+                ->get();
+
+            foreach ($dayValues as $dayValue) {
+                $toInsert = [
+                    'time_from' => clone $iterator,
+                    'time_to' => (clone $iterator)->addDay(),
+                ];
+
+                foreach (array_merge($model->aggregatedFields(), $model->groupableFields()) as $field) {
+                    $toInsert[$field] = $dayValue->$field;
+                }
+
+                $modelClass::create($toInsert);
             }
-        }
-        if (!empty($idsToDelete)) {
-            $tableClass::destroy($idsToDelete);
+
+            $modelClass::whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
+                ->whereDate('time_from', $iterator->format('Y-m-d'))
+                ->delete();
+
+            $iterator->addDay();
         }
     }
 
-    private function getDefaultAggregables(Aggregable $model)
+    private function getSumAgregablesSelection(Aggregable $model): array
     {
         $items = [];
         foreach ($model->aggregatedFields() as $field) {
-            $items[$field] = 0;
+            $items[] = DB::raw("sum($field) as $field");
         }
         return $items;
-    }
-
-    private function dayIndexToInterval($dayIndex)
-    {
-        $from = Carbon::createFromTimestampUTC($dayIndex);
-        $to = (clone $from)->addDay();
-        return [$from, $to];
     }
 }
