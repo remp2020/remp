@@ -23,7 +23,7 @@ class ArticleTimespent extends Model implements Aggregable
 
     public function aggregatedFields(): array
     {
-        return ['sum', 'signed_in', 'subscriber'];
+        return ['sum', 'signed_in', 'subscribers'];
     }
 
     protected $dates = [
