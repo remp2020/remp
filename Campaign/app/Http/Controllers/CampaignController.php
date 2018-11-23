@@ -20,6 +20,7 @@ use HTML;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Tracy\Debugger;
 use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
@@ -472,7 +473,17 @@ class CampaignController extends Controller
     ) {
 
         // validation
-        $data = \GuzzleHttp\json_decode($r->get('data'));
+        try {
+            $data = \GuzzleHttp\json_decode($r->get('data'));
+        } catch (\InvalidArgumentException $e) {
+            Debugger::log('could not decode JSON in Campaign:Showtime: ' . $r->get('data'));
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => false,
+                    'errors' => ['invalid data json provided'],
+                ]);
+        }
+
         $url = $data->url ?? null;
         if (!$url) {
             return response()
@@ -609,7 +620,7 @@ class CampaignController extends Controller
             }
 
             // using adblock?
-            if ($campaign->usingAdblock && !$data->usingAdblock || $campaign->usingAdblock === false && $data->usingAdblock) {
+            if ($campaign->using_adblock && !$data->usingAdblock || $campaign->using_adblock === false && $data->usingAdblock) {
                 continue;
             }
 

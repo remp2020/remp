@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Console\Commands\AggregateArticlesViews;
 use App\Console\Commands\AggregatePageviewLoadJob;
 use App\Console\Commands\AggregatePageviewTimespentJob;
+use App\Console\Commands\SendNewslettersCommand;
 use App\Console\Commands\CompressAggregations;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -32,6 +33,9 @@ class Kernel extends ConsoleKernel
         if (!Schema::hasTable("migrations")) {
             return;
         }
+
+        $schedule->command(SendNewslettersCommand::COMMAND)
+            ->everyMinute();
 
         $schedule->command(AggregatePageviewLoadJob::COMMAND)
              ->hourlyAt(5)

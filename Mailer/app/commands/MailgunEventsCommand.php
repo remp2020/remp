@@ -87,7 +87,7 @@ class MailgunEventsCommand extends Command
                     continue;
                 }
 
-                $mappedEvent = $this->logsRepository->mapEvent($event->getEvent());
+                $mappedEvent = $this->logsRepository->mapEvent($event->getEvent(), $event->getReason());
                 if (!$mappedEvent) {
                     // unsupported event type
                     $output->writeln(sprintf("%s: ignoring event: %s (unsupported)", $date, $event->getEvent()));
