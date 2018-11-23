@@ -72,22 +72,28 @@ class JobQueueRepository extends Repository
 
         foreach ($q as $row) {
             $sql = <<<SQL
-CREATE TEMPORARY TABLE IF NOT EXISTS tmptbl AS ( 
-SELECT mail_user_subscriptions.user_email 
-	FROM mail_user_subscriptions 
-	INNER JOIN mail_templates ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
-	AND subscribed = 1 
-	AND mail_templates.id = ?
-);
-
 DELETE FROM mail_job_queue
 WHERE mail_job_queue.mail_batch_id = ?
 AND mail_job_queue.mail_template_id = ?
-AND mail_job_queue.email NOT IN (SELECT * from tmptbl);
+AND mail_job_queue.id NOT IN (
 
-DROP table tmptbl;
+  SELECT id FROM (
+
+    SELECT mail_job_queue.id FROM mail_job_queue
+    INNER JOIN mail_templates 
+      ON mail_job_queue.mail_template_id = mail_templates.id
+    INNER JOIN mail_user_subscriptions
+      ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
+      AND subscribed = 1
+      AND mail_job_queue.email = mail_user_subscriptions.user_email
+    WHERE mail_job_queue.mail_batch_id = ?
+    AND  mail_job_queue.mail_template_id = ?
+
+  ) t1
+
+);
 SQL;
-            $this->getDatabase()->query($sql, $row->mail_template_id, $batch->id, $row->mail_template_id);
+            $this->getDatabase()->query($sql, $batch->id, $row->mail_template_id, $batch->id, $row->mail_template_id);
         }
     }
 
