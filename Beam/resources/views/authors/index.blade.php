@@ -38,45 +38,54 @@
                 'articles_count' => [
                     'header' => 'articles',
                     'priority' => 3,
+                    'searchable' => false,
                 ],
                 'conversions_count' => [
                     'header' => 'conversions',
                     'priority' => 2,
+                    'searchable' => false,
                 ],
                 'conversions_amount' => [
                     'header' => 'amount',
                     'render' => 'array',
                     'priority' => 2,
+                    'searchable' => false,
                 ],
                 'pageviews_all' => [
                     'header' => 'all pageviews',
                     'render' => 'number',
                     'priority' => 2,
+                    'searchable' => false,
                 ],
                 'pageviews_signed_in' => [
                     'header' => 'signed in pageviews',
                     'render' => 'number',
                     'priority' => 5,
+                    'searchable' => false,
                 ],
                 'pageviews_subscribers' => [
                     'header' => 'subscriber pageviews',
                     'render' => 'number',
                     'priority' => 5,
+                    'searchable' => false,
                 ],
                 'avg_timespent_all' => [
                     'header' => 'avg time all',
                     'render' => 'duration',
                     'priority' => 2,
+                    'searchable' => false,
                 ],
                 'avg_timespent_signed_in' => [
                     'header' => 'avg time signed in',
                     'render' => 'duration',
                     'priority' => 5,
+                    'searchable' => false,
                 ],
                 'avg_timespent_subscribers' => [
                     'header' => 'avg time subscribers',
                     'render' => 'duration',
                     'priority' => 5,
+                    'searchable' => true
                 ],
             ],
             'dataSource' => route('authors.dtAuthors'),

@@ -20,7 +20,9 @@ use Recurr\Transformer\Constraint\AfterConstraint;
 
 class SendNewslettersCommand extends Command
 {
-    protected $signature = 'newsletters:send';
+    const COMMAND = 'newsletters:send';
+
+    protected $signature = self::COMMAND;
 
     protected $description = 'Process newsletters data and generate Mailer jobs.';
 

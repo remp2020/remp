@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use PDOException;
 use Remp\MailerModule\Repository;
 use Nette\Database\Table\IRow;
 
@@ -64,10 +65,36 @@ class JobQueueRepository extends Repository
 
     public function removeUnsubscribed(IRow $batch)
     {
-        $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email IN (
-  SELECT mail_user_subscriptions.user_email FROM mail_user_subscriptions WHERE subscribed=0
-  AND mail_user_subscriptions.mail_type_id IN (SELECT mail_types.id FROM mail_types INNER JOIN mail_templates ON mail_templates.mail_type_id = mail_types.id WHERE mail_templates.id = mail_job_queue.mail_template_id)
-)");
+        $q = $this->getTable()
+            ->select('mail_template_id')
+            ->where(['mail_batch_id' => $batch->id])
+            ->group('mail_template_id');
+
+        foreach ($q as $row) {
+            $sql = <<<SQL
+DELETE FROM mail_job_queue
+WHERE mail_job_queue.mail_batch_id = ?
+AND mail_job_queue.mail_template_id = ?
+AND mail_job_queue.id NOT IN (
+
+  SELECT id FROM (
+
+    SELECT mail_job_queue.id FROM mail_job_queue
+    INNER JOIN mail_templates 
+      ON mail_job_queue.mail_template_id = mail_templates.id
+    INNER JOIN mail_user_subscriptions
+      ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
+      AND subscribed = 1
+      AND mail_job_queue.email = mail_user_subscriptions.user_email
+    WHERE mail_job_queue.mail_batch_id = ?
+    AND  mail_job_queue.mail_template_id = ?
+
+  ) t1
+
+);
+SQL;
+            $this->getDatabase()->query($sql, $batch->id, $row->mail_template_id, $batch->id, $row->mail_template_id);
+        }
     }
 
     public function removeOtherVariants(IRow $batch, $variantId)
