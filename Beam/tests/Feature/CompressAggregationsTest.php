@@ -8,6 +8,7 @@ use App\ArticleTimespent;
 use App\Console\Commands\CompressAggregations;
 use App\Property;
 use App\SessionDevice;
+use App\SessionReferer;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -24,6 +25,27 @@ class CompressAggregationsTest extends TestCase
     public function testTimespentAggregations()
     {
         $this->runAndTestArticleAggregations(ArticleTimespent::class);
+    }
+
+    public function testAggregateAllDaySessionReferers()
+    {
+        $start = Carbon::today()->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS + 1);
+        for ($i = 0; $i < 24; $i++) {
+            factory(SessionReferer::class)->create([
+                'time_from' => (clone $start)->addHours($i),
+                'time_to' => (clone $start)->addHours($i + 1),
+                'subscriber' => false,
+                'count' => 1,
+                'medium' => 'a',
+                'source' => 'a',
+            ]);
+        }
+
+        $this->assertEquals(24, SessionReferer::all()->count());
+
+        $this->artisan(CompressAggregations::COMMAND);
+
+        $this->assertEquals(1, SessionReferer::all()->count());
     }
 
     public function testSessionDevicesAggregation()
@@ -65,16 +87,16 @@ class CompressAggregationsTest extends TestCase
 
         //// Do not aggregate these
         factory(SessionDevice::class)->create(array_merge($same, [
-                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
-                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
+                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
+                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
                 'subscriber' => false,
                 'count' => 6,
             ])
         );
 
         factory(SessionDevice::class)->create(array_merge($same, [
-                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
-                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS-1),
+                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
+                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
                 'subscriber' => false,
                 'count' => 3,
             ])

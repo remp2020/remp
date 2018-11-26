@@ -51,46 +51,23 @@ class CompressAggregations extends Command
             throw new \InvalidArgumentException("'$modelClass' doesn't implement '" . Aggregable::class . "' interface");
         }
 
-        $minDate = $modelClass::select(DB::raw('MIN(time_from) as min_time_from'))
-            ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
-            ->first();
-
-        if (!$minDate) {
-            return;
-        }
-
         $model = new $modelClass();
 
-        $minTimeFrom = Carbon::parse($minDate->min_time_from)->startOfDay();
-        $iterator = clone $minTimeFrom;
+        $q = $modelClass::select(DB::raw('DATE(time_from) as day_from'),
+            DB::raw('DATE_ADD(ANY_VALUE(DATE(time_from)), INTERVAL 1 DAY) as day_to'),
+            ...$model->groupableFields(),
+            ...$this->getSumAgregablesSelection($model))
+            ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
+            ->whereDate('time_from', '<=', $threshold->format('Y-m-d'))
+            ->groupBy('day_from', ...$model->groupableFields())
+            ->orderBy('day_from');
 
-        while ($iterator->lte($threshold)) {
-            $this->line("Compressing data for day " . $iterator->toDateString());
-            $dayValues = $modelClass::select(...$model->groupableFields(), ...$this->getSumAgregablesSelection($model))
-                ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
-                ->whereDate('time_from', $iterator->format('Y-m-d'))
-                ->groupBy(...$model->groupableFields())
-                ->get();
+        $fields = implode(',', array_merge(['time_from', 'time_to'], $model->groupableFields(), $model->aggregatedFields()));
+        DB::insert("INSERT INTO {$model->getTable()} ($fields) " . $q->toSql(), $q->getBindings());
 
-            foreach ($dayValues as $dayValue) {
-                $toInsert = [
-                    'time_from' => clone $iterator,
-                    'time_to' => (clone $iterator)->addDay(),
-                ];
-
-                foreach (array_merge($model->aggregatedFields(), $model->groupableFields()) as $field) {
-                    $toInsert[$field] = $dayValue->$field;
-                }
-
-                $modelClass::create($toInsert);
-            }
-
-            $modelClass::whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
-                ->whereDate('time_from', $iterator->format('Y-m-d'))
-                ->delete();
-
-            $iterator->addDay();
-        }
+        $modelClass::whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
+            ->whereDate('time_from', '<=', $threshold->format('Y-m-d'))
+            ->delete();
     }
 
     private function getSumAgregablesSelection(Aggregable $model): array
