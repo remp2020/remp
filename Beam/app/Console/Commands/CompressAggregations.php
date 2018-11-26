@@ -53,10 +53,12 @@ class CompressAggregations extends Command
 
         $model = new $modelClass();
 
-        $q = $modelClass::select(DB::raw('DATE(time_from) as day_from'),
+        $q = $modelClass::select(
+            DB::raw('DATE(time_from) as day_from'),
             DB::raw('DATE_ADD(ANY_VALUE(DATE(time_from)), INTERVAL 1 DAY) as day_to'),
             ...$model->groupableFields(),
-            ...$this->getSumAgregablesSelection($model))
+            ...$this->getSumAgregablesSelection($model)
+        )
             ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
             ->whereDate('time_from', '<=', $threshold->format('Y-m-d'))
             ->groupBy('day_from', ...$model->groupableFields())
