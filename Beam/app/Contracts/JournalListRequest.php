@@ -16,17 +16,23 @@ class JournalListRequest
 
     protected $timeAfter;
 
+    public static function from($category): JournalListRequest
+    {
+        return new self($category);
+    }
+
     public function __construct($category)
     {
         $this->category = $category;
     }
 
-    public function addSelect(string ...$fields)
+    public function addSelect(string ...$fields): JournalListRequest
     {
         $this->select = array_merge($this->select, $fields);
+        return $this;
     }
 
-    public function addFilter(string $tag, string ...$values)
+    public function addFilter(string $tag, string ...$values): JournalListRequest
     {
         foreach ($values as &$v) {
             $v = strval($v);
@@ -35,21 +41,25 @@ class JournalListRequest
             "tag" => $tag,
             "values" => $values,
         ];
+        return $this;
     }
 
-    public function addGroup(string ...$tags)
+    public function addGroup(string ...$tags): JournalListRequest
     {
         $this->groupBy = array_merge($this->groupBy, $tags);
+        return $this;
     }
 
-    public function setTimeBefore(\DateTime $timeBefore)
+    public function setTimeBefore(\DateTime $timeBefore): JournalListRequest
     {
         $this->timeBefore = $timeBefore;
+        return $this;
     }
 
-    public function setTimeAfter(\DateTime $timeAfter)
+    public function setTimeAfter(\DateTime $timeAfter): JournalListRequest
     {
         $this->timeAfter = $timeAfter;
+        return $this;
     }
 
     public function buildUrl($template): string

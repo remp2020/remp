@@ -64,6 +64,16 @@ class Journal implements JournalContract
         ]);
     }
 
+    public function commerceCategories(): Collection
+    {
+        try {
+            $commerceResponse = $this->client->get(self::ENDPOINT_COMMERCE_CATEGORIES);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:ListCategories endpoint: {$e->getMessage()}");
+        }
+        return collect(json_decode($commerceResponse->getBody()));
+    }
+
     public function flags(): Collection
     {
         try {
