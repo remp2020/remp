@@ -14,21 +14,136 @@
                     <div class="cwc-info media-body">
                         <div class="cwci-temp">Subscribers</div>
                         <ul class="cwci-info">
-                            <li>Total</li>
+                            <li>Last month</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="card-body">
+                    {if $allSubscribersDataSet['count'] != 0}
+                        <canvas id="mailer-dashboard-all-subscribers-stats-graph" width="300" height="100"></canvas>
+                        <script>
+                            var ctx = document.getElementById("mailer-dashboard-all-subscribers-stats-graph").getContext('2d');
+                            var myLineChart = new Chart(ctx, {
+                                type: "line",
+                                data: {
+                                    "labels": {$labels},
+                                    "datasets": [{$allSubscribersDataSet}]
+                                },
+                                options: {
+                                    elements: {
+                                        point: {
+                                            radius: 0,
+                                            hitRadius: 3
+                                        }
+                                    },
+                                    layout: {
+                                        padding: -20
+                                    },
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+                                                display: false,
+                                                beginAtZero: true
+                                            },
+                                            gridLines: {
+                                                display: false,
+                                                // color: "rgba(255, 255, 255, 1)",
+                                                color: "rgba(0, 0, 0, 0)",
+                                                lineWidth: 0
+                                            }
+                                        }],
+                                        xAxes: [{
+                                            ticks: {
+                                                display: false
+                                            },
+                                            gridLines: {
+                                                display: false,
+                                                // color: "rgba(255, 255, 255, 1)",
+                                                color: "rgba(0, 0, 0, 0)",
+                                                lineWidth: 0
+                                            }
+                                        }]
+                                    },
+                                    legend: {
+                                        display: false
+                                    }
+                                }
+                            });
+                        </script>
+                    {else}
+                        <div class="list-group lg-alt lg-even-white">
+                            <div class="list-group-item media">
+                                <div class="media-body ns-item">
+                                    <small>You didn't sent any mails for past 30 days.</small>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+
                     <div class="list-group lg-alt lg-even-white">
-                        {foreach $typeDataSets as $key => $dataset}
+                        {foreach $typeSubscriberDataSets as $key => $dataset}
                             <div class="list-group-item media">
                                 <a n:href="Dashboard:detail $dataset['id']">
+                                    <div class="pull-right hidden-sm">
+                                        <canvas id="mailer-dashboard-subscribers-statistics-graph-{$key}" width="80" height="40"></canvas>
+                                        <script>
+                                            var ctx = document.getElementById("mailer-dashboard-subscribers-statistics-graph-{$key}").getContext('2d');
+                                            var myLineChart = new Chart(ctx, {
+                                                type: "line",
+                                                data: {
+                                                    "labels": {$labels},
+                                                    "datasets": [{$dataset}]
+                                                },
+                                                options: {
+                                                    elements: {
+                                                        point: {
+                                                            radius: 0,
+                                                            hitRadius: 4
+                                                        }
+                                                    },
+                                                    layout: {
+                                                        padding: -20
+                                                    },
+                                                    scales: {
+                                                        yAxes: [{
+                                                            ticks: {
+                                                                display: false,
+                                                                beginAtZero: true
+                                                            },
+                                                            gridLines: {
+                                                                display: false,
+                                                                // color: "rgba(255, 255, 255, 1)",
+                                                                color: "rgba(0, 0, 0, 0)",
+                                                                lineWidth: 0
+                                                            }
+                                                        }],
+                                                        xAxes: [{
+                                                            ticks: {
+                                                                display: false
+                                                            },
+                                                            gridLines: {
+                                                                display: false,
+                                                                // color: "rgba(255, 255, 255, 1)",
+                                                                color: "rgba(0, 0, 0, 0)",
+                                                                lineWidth: 0
+                                                            }
+                                                        }]
+                                                    },
+                                                    legend: {
+                                                        display: false
+                                                    }
+                                                }
+                                            });
+                                        </script>
+                                    </div>
+
                                     <div class="media-body ns-item">
                                         <small>{$dataset['label']}</small>
                                         <h3 class="m-t-5">
-                                            {$allSubscribersDataSet[$dataset['id']]['subscribed']}
-                                            <small style="color: #fff" title="Unsubscribed">({$allSubscribersDataSet[$dataset['id']]['unsubscribed']})</small>
+                                            {*{if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}*}
+                                            {$dataset['count']}
+                                            {*<small style="color: #fff" title="Previous month">({$dataset['prevPeriodCount']})</small>*}
                                         </h3>
                                     </div>
                                 </a>

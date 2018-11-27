@@ -9,6 +9,7 @@ use Remp\MailerModule\Formatters\DateFormatterFactory;
 
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
+use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
@@ -27,9 +28,14 @@ final class DashboardPresenter extends BasePresenter
 
     private $dateFormatter;
 
+    /**
+     * @var MailTypeStatsRepository
+     */
+    private $mailTypeStatsRepository;
+
     public function __construct(
-        UserSubscriptionsRepository $userSubscriptionsRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
+        MailTypeStatsRepository $mailTypeStatsRepository,
         DateFormatterFactory $dateFormatterFactory,
         TemplatesRepository $templatesRepository,
         BatchesRepository $batchesRepository,
@@ -39,9 +45,9 @@ final class DashboardPresenter extends BasePresenter
 
         $this->dateFormatter = $dateFormatterFactory
             ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-            
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
+
         $this->batchTemplatesRepository = $batchTemplatesRepository;
+        $this->mailTypeStatsRepository = $mailTypeStatsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->batchesRepository = $batchesRepository;
         $this->listsRepository = $listsRepository;
@@ -86,6 +92,8 @@ final class DashboardPresenter extends BasePresenter
             ] + $defaualtGraphSettings;
         }
 
+        $typeSubscriberDataSets = $typeDataSets;
+
         $allSentMailsData = $this->batchTemplatesRepository->getDashboardAllMailsGraphData($from, $now);
 
         $allSentEmailsDataSet = [] + $defaualtGraphSettings;
@@ -101,11 +109,9 @@ final class DashboardPresenter extends BasePresenter
         }
 
         $typesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($from, $now);
-        $typeIds = [];
 
         // parse sent mails by type data to chart.js format
         foreach ($typesData as $row) {
-            $typeIds[] = $row->mail_type_id;
             $typeDataSets[$row->mail_type_id]['count'] += $row->sent_mails;
 
             $typeDataSets[$row->mail_type_id]['data'][
@@ -135,27 +141,53 @@ final class DashboardPresenter extends BasePresenter
             return $b['count'] <=> $a['count'];
         });
 
-        $allSubscribersDataSet = [];
-        $allSubscribersData = $this->userSubscriptionsRepository->getDashboardAllSubscribersData($typeIds)
-                                                                ->fetchAll();
+        $allSubscribersData = $this->mailTypeStatsRepository->getDashboardData($from, $now);
+        $allSubscribersDataSet = [] + $defaualtGraphSettings;
 
-        foreach ($allSubscribersData as $subscribersData) {
-            $typeId = $subscribersData->mail_type_id;
-            if (!array_key_exists($typeId, $allSubscribersDataSet)) {
-                $allSubscribersDataSet[$typeId] = [];
+        // parse all sent mails data to chart.js format
+        foreach ($allSubscribersData as $row) {
+            $foundAt = array_search(
+                $this->dateFormatter->format($row->created_date),
+                $graphLabels
+            );
+
+            if ($foundAt !== false) {
+                $allSubscribersDataSet['data'][$foundAt] = $row->count;
+                $allSubscribersDataSet['count'] += $row->count;
             }
-
-            if ($subscribersData->subscribed) {
-                $allSubscribersDataSet[$typeId]['subscribed'] = $subscribersData->count;
-                continue;
-            }
-
-            $allSubscribersDataSet[$typeId]['unsubscribed'] = $subscribersData->count;
         }
+
+        $typeSubscribersData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($from, $now);
+
+        foreach ($typeSubscribersData as $row) {
+            $foundAt = array_search(
+                $this->dateFormatter->format($row->created_date),
+                $graphLabels
+            );
+
+            if ($foundAt !== false) {
+                $typeSubscriberDataSets[$row->mail_type_id]['data'][$foundAt] =  $row->count;
+                $typeSubscriberDataSets[$row->mail_type_id]['count'] += $row->count;
+            }
+        }
+
+        // remove sets with zero sent count
+        $typeSubscriberDataSets = array_filter($typeSubscriberDataSets, function ($a) {
+            return ($a['count'] == 0) ? null : $a;
+        });
+
+        // order sets by sent count
+        usort($typeSubscriberDataSets, function ($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
+
+//        dump($typeSubscriberDataSets);
+//        die();
 
         $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
         $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
 
+        $this->template->typeSubscriberDataSets = array_values($typeSubscriberDataSets);
         $this->template->allSubscribersDataSet = $allSubscribersDataSet;
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->typeDataSets = array_values($typeDataSets);
