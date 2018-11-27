@@ -100,26 +100,30 @@ final class DashboardPresenter extends BasePresenter
 
         // parse all sent mails data to chart.js format
         foreach ($allSentMailsData as $row) {
-            $allSentEmailsDataSet['data'][array_search(
+            $foundAt = array_search(
                 $this->dateFormatter->format($row->first_email_sent_at),
                 $graphLabels
-            )] = $row->sent_mails;
+            );
 
-            $allSentEmailsDataSet['count'] += $row->sent_mails;
+            if ($foundAt !== false) {
+                $allSentEmailsDataSet['data'][$foundAt] = $row->sent_mails;
+                $allSentEmailsDataSet['count'] += $row->sent_mails;
+            }
         }
 
         $typesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($from, $now);
 
         // parse sent mails by type data to chart.js format
         foreach ($typesData as $row) {
-            $typeDataSets[$row->mail_type_id]['count'] += $row->sent_mails;
+            $foundAt = array_search(
+                $this->dateFormatter->format($row->first_email_sent_at->getTimestamp()),
+                $graphLabels
+            );
 
-            $typeDataSets[$row->mail_type_id]['data'][
-                array_search(
-                    $this->dateFormatter->format($row->first_email_sent_at->getTimestamp()),
-                    $graphLabels
-                )
-            ] = $row->sent_mails;
+            if ($foundAt !== false) {
+                $typeDataSets[$row->mail_type_id]['count'] += $row->sent_mails;
+                $typeDataSets[$row->mail_type_id]['data'][$foundAt] = $row->sent_mails;
+            }
         }
 
         // parse previous period data (counts)
@@ -180,9 +184,6 @@ final class DashboardPresenter extends BasePresenter
         usort($typeSubscriberDataSets, function ($a, $b) {
             return $b['count'] <=> $a['count'];
         });
-
-//        dump($typeSubscriberDataSets);
-//        die();
 
         $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
         $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
