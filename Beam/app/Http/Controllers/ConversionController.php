@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Author;
+use App\Contracts\JournalContract;
+use App\Contracts\JournalHelpers;
+use App\Contracts\JournalListRequest;
 use App\Conversion;
 use App\Http\Request;
 use App\Http\Requests\ConversionRequest;
@@ -16,6 +19,16 @@ use Yajra\Datatables\Datatables;
 
 class ConversionController extends Controller
 {
+    private $journal;
+
+    private $journalHelper;
+
+    public function __construct(JournalContract $journal)
+    {
+        $this->journal = $journal;
+        $this->journalHelper = new JournalHelpers($journal);
+    }
+
     public function index(Request $request)
     {
         return response()->format([
@@ -80,6 +93,70 @@ class ConversionController extends Controller
 
     public function show(Conversion $conversion)
     {
+        $timeBefore = clone $conversion->paid_at;
+        $timeAfter = (clone $timeBefore)->subDays(14);
+        $actions = collect();
+
+        // Commerce
+        foreach ($this->journal->commerceCategories() as $category){
+            foreach ($this->journal->actions('commerce', $category) as $action) {
+                $commerces = $this->journal->list(JournalListRequest::from('commerce/steps/' . $action)
+                    ->addFilter('user_id', $conversion->user_id)
+                    ->setTimeAfter($timeAfter)
+                    ->setTimeBefore($timeBefore));
+
+                if ($commerces->isNotEmpty()) {
+                    foreach ($commerces[0]->commerces as $item) {
+                        if (isset($item->system->time, $item->step)) {
+                            $obj = new \stdClass();
+                            $obj->time = Carbon::parse($item->system->time);
+                            $obj->action = "commerce:{$item->step}";
+                            $actions->push($obj);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Events
+        $events = $this->journal->list(JournalListRequest::from('events')
+            ->addFilter('user_id', $conversion->user_id)
+            ->setTimeAfter($timeAfter)
+            ->setTimeBefore($timeBefore));
+
+        if ($events->isNotEmpty()) {
+            foreach ($events[0]->events as $item) {
+                if (isset($item->system->time, $item->action, $item->category)) {
+                    $obj = new \stdClass();
+                    $obj->time = Carbon::parse($item->system->time);
+                    $obj->action = "{$item->action}:{$item->category}";
+                    $actions->push($obj);
+                }
+            }
+        }
+
+        // Pageviews
+        $pageviews = $this->journal->list(JournalListRequest::from('pageviews')
+            ->addFilter('user_id', $conversion->user_id)
+            ->setTimeAfter($timeAfter)
+            ->setTimeBefore($timeBefore));
+
+        if ($pageviews->isNotEmpty()) {
+            foreach ($pageviews[0]->pageviews as $item) {
+                if (isset($item->system->time, $item->article->id)) {
+                    $obj = new \stdClass();
+                    $obj->time = Carbon::parse($item->system->time);
+                    $obj->action = 'pageview';
+                    $obj->article_id = $item->article->id;
+                    $actions->push($obj);
+                }
+            }
+        }
+
+        $actions->sortBy('time');
+
+        dd($actions);
+
         return response()->format([
             'html' => view('conversions.show', [
                 'conversion' => $conversion
