@@ -154,7 +154,11 @@ class ListFormFactory
                 }
 
                 $values['sorting'] = $values['sorting_after'];
-                if (!$list || $values['mail_type_category_id'] != $list->mail_type_category_id) {
+
+                if (!$list ||
+                    $values['mail_type_category_id'] != $list->mail_type_category_id ||
+                    ($list && $list->sorting > $values['sorting_after'])
+                ) {
                     $values['sorting'] += 1;
                 }
                 break;
