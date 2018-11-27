@@ -70,7 +70,6 @@ class ProcessJobCommand extends Command
                 ]);
                 $output->writeln("  * <error>processing failed</error>: {$e->getMessage()}; rescheduling to <info>{$reschedule->format(DATE_RFC3339)}</info>");
             }
-
         }
 
         $output->writeln('  * no batch to process');
