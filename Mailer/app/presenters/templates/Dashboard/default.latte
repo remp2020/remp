@@ -304,16 +304,13 @@
                     <div class="cw-current media">
                         <div class="pull-left zmdi zmdi-mail-send m-t-10 p-r-0" style="font-size: 4em;"></div>
                         <div class="cwc-info media-body">
-                            <div class="cwci-temp">In progress</div>
-                            <ul class="cwci-info">
-                                <li>Batches</li>
-                            </ul>
+                            <div class="cwci-temp">Batches</div>
                         </div>
                     </div>
 
-                    {if count($inProgressBatches)}
+                    {if count($lastBatches)}
                     <div class="cw-upcoming">
-                        {foreach $inProgressBatches as $batch}
+                        {foreach $lastBatches as $batch}
                             <ul class="clearfix p-t-20 p-b-20">
                                 <li class="cwu-forecast">
                                     <a n:href="Job:show $batch->mail_job_id">
@@ -338,47 +335,6 @@
                         <div class="list-group-item media">
                             <div class="media-body ns-item">
                                 <small>You don't have any mail batches planed.</small>
-                            </div>
-                        </div>
-                    </div>
-                    {/if}
-                </div>
-            </div>
-
-            <div class="card palette-Green-A700 bg">
-                <div id="c-weather">
-                    <div class="cw-current media">
-                        <div class="pull-left zmdi zmdi-email m-t-10 p-r-0" style="font-size: 4em;"></div>
-                        <div class="cwc-info media-body">
-                            <div class="cwci-temp">Done</div>
-                            <ul class="cwci-info">
-                                <li>Batches</li>
-                            </ul>
-                        </div>
-                    </div>
-                    {if count($lastDoneBatches)}
-                    <div class="cw-upcoming">
-                        {foreach $lastDoneBatches as $batch}
-                        <ul class="clearfix p-t-20 p-b-20">
-                            <li class="cwu-forecast">
-                                <a n:href="Job:show $batch->mail_job_id">
-                                    #{$batch->id}
-                                </a>
-                            </li>
-                            <li style="display: block;">
-                                <strong>Email:</strong> {$batch->template_name}
-                            </li>
-                            <li style="display: block;">
-                                <strong>Sent:</strong> {$batch->sent_emails}
-                            </li>
-                        </ul>
-                        {/foreach}
-                    </div>
-                    {else}
-                    <div class="list-group lg-alt lg-even-white">
-                        <div class="list-group-item media">
-                            <div class="media-body ns-item">
-                                <small>You didn't sent any email batches.</small>
                             </div>
                         </div>
                     </div>

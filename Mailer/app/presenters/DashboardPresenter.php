@@ -191,17 +191,13 @@ final class DashboardPresenter extends BasePresenter
         });
 
 
-
-
-        $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
-        $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
+        $lastBatches = $this->batchesRepository->getLastBatches(10);
 
         $this->template->typeSubscriberDataSets = array_values($typeSubscriberDataSets);
         $this->template->allSubscribersDataSet = $allSubscribersDataSet;
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->typeDataSets = array_values($typeDataSets);
-        $this->template->inProgressBatches = $inProgressBatches;
-        $this->template->lastDoneBatches = $lastDoneBatches;
+        $this->template->lastBatches = $lastBatches;
         $this->template->labels = $graphLabels;
     }
 

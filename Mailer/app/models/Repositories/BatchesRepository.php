@@ -123,6 +123,28 @@ class BatchesRepository extends Repository
             ->limit($limit);
     }
 
+    public function getLastBatches($limit)
+    {
+        return $this->getTable()
+            ->select('
+                mail_job_batch.*,
+                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name,
+                :mail_job_batch_template.mail_job_id
+            ')
+            ->where([
+                'mail_job_batch.status' => [
+                    self::STATUS_READY,
+                    self::STATUS_PROCESSING,
+                    self::STATUS_PROCESSED,
+                    self::STATUS_SENDING,
+                    self::STATUS_DONE
+                ]
+            ])
+            ->group('mail_job_batch.id')
+            ->order('mail_job_batch.last_email_sent_at DESC')
+            ->limit($limit);
+    }
+
     public function notEditableBatches($jobId)
     {
         return $this->getTable()
