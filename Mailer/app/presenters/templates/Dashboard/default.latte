@@ -84,7 +84,7 @@
                     <div class="list-group lg-alt lg-even-white">
                         {foreach $typeSubscriberDataSets as $key => $dataset}
                             <div class="list-group-item media">
-                                <a n:href="Dashboard:detail $dataset['id']">
+                                <a n:href="Dashboard:sentEmailsDetail $dataset['id']">
                                     <div class="pull-right hidden-sm">
                                         <canvas id="mailer-dashboard-subscribers-statistics-graph-{$key}" width="80" height="40"></canvas>
                                         <script>
@@ -141,9 +141,9 @@
                                     <div class="media-body ns-item">
                                         <small>{$dataset['label']}</small>
                                         <h3 class="m-t-5">
-                                            {*{if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}*}
+                                            {if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}
                                             {$dataset['count']}
-                                            {*<small style="color: #fff" title="Previous month">({$dataset['prevPeriodCount']})</small>*}
+                                            <small style="color: #fff" title="Previous month">({$dataset['prevPeriodCount']})</small>
                                         </h3>
                                     </div>
                                 </a>
@@ -230,7 +230,7 @@
                     <div class="list-group lg-alt lg-even-white">
                         {foreach $typeDataSets as $key => $dataset}
                             <div class="list-group-item media">
-                                <a n:href="Dashboard:detail $dataset['id']">
+                                <a n:href="Dashboard:sentEmailsDetail $dataset['id']">
                                     <div class="pull-right hidden-sm">
                                         <canvas id="mailer-dashboard-statistics-graph-{$key}" width="80" height="40"></canvas>
                                         <script>

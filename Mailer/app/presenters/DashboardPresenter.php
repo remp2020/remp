@@ -175,6 +175,11 @@ final class DashboardPresenter extends BasePresenter
             }
         }
 
+        $prevPeriodSubscribersTypeData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($prevPeriodFrom, $from);
+        foreach ($prevPeriodSubscribersTypeData as $row) {
+            $typeSubscriberDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->count;
+        }
+
         // remove sets with zero sent count
         $typeSubscriberDataSets = array_filter($typeSubscriberDataSets, function ($a) {
             return ($a['count'] == 0) ? null : $a;
@@ -184,6 +189,9 @@ final class DashboardPresenter extends BasePresenter
         usort($typeSubscriberDataSets, function ($a, $b) {
             return $b['count'] <=> $a['count'];
         });
+
+
+
 
         $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
         $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
@@ -197,7 +205,7 @@ final class DashboardPresenter extends BasePresenter
         $this->template->labels = $graphLabels;
     }
 
-    public function renderDetail($id)
+    public function renderSentEmailsDetail($id)
     {
         $labels = [];
         $numOfDays = 30;
@@ -234,4 +242,42 @@ final class DashboardPresenter extends BasePresenter
         $this->template->dataSet = $dataSet;
         $this->template->labels = $labels;
     }
+
+//    public function renderDetail($id)
+//    {
+//        $labels = [];
+//        $numOfDays = 30;
+//        $now = new DateTime();
+//        $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
+//
+//        // fill graph columns
+//        for ($i = $numOfDays; $i > 0; $i--) {
+//            $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
+//        }
+//
+//        $mailType = $this->listsRepository->find($id);
+//
+//        $dataSet = [
+//            'label' => $mailType->title,
+//            'data' => array_fill(0, $numOfDays, 0),
+//            'fill' => false,
+//            'borderColor' => 'rgb(75, 192, 192)',
+//            'lineTension' => 0.5
+//        ];
+//
+//        $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $from, $now)->fetchAll();
+//
+//        // parse sent mails by type data to chart.js format
+//        foreach ($data as $row) {
+//            $dataSet['data'][
+//                array_search(
+//                    $this->dateFormatter->format($row->first_email_sent_at),
+//                    $labels
+//                )
+//            ] = $row->sent_mails;
+//        }
+//
+//        $this->template->dataSet = $dataSet;
+//        $this->template->labels = $labels;
+//    }
 }
