@@ -333,7 +333,6 @@
     "github.com/goadesign/goa/goatest",
     "github.com/goadesign/goa/middleware",
     "github.com/influxdata/influxdb/client/v2",
-    "github.com/influxdata/influxdb/models",
     "github.com/jmoiron/sqlx",
     "github.com/joho/godotenv",
     "github.com/kelseyhightower/envconfig",

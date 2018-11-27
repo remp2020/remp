@@ -22,10 +22,8 @@ class Application extends \Symfony\Component\Console\Application
         $this->commands[] = $command;
     }
 
-    public function registerConfiguredCommands()
+    public function getCommands()
     {
-        foreach ($this->commands as $command) {
-            $this->add($command);
-        }
+        return $this->commands;
     }
 }
