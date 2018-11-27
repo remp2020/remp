@@ -205,6 +205,46 @@ final class DashboardPresenter extends BasePresenter
         $this->template->labels = $graphLabels;
     }
 
+    public function renderMailTypeSubscribersDetail($id)
+    {
+        $labels = [];
+        $numOfDays = 30;
+        $now = new DateTime();
+        $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
+
+        // fill graph columns
+        for ($i = $numOfDays; $i > 0; $i--) {
+            $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
+        }
+
+        $mailType = $this->listsRepository->find($id);
+
+        $dataSet = [
+            'label' => $mailType->title,
+            'data' => array_fill(0, $numOfDays, 0),
+            'fill' => false,
+            'borderColor' => 'rgb(75, 192, 192)',
+            'lineTension' => 0.5
+        ];
+
+        $data = $this->mailTypeStatsRepository->getDashboardDetailData($id, $from, $now);
+
+        // parse sent mails by type data to chart.js format
+        foreach ($data as $row) {
+            $foundAt = array_search(
+                $this->dateFormatter->format($row->created_date),
+                $labels
+            );
+
+            if ($foundAt !== false) {
+                $dataSet['data'][$foundAt] = $row->count;
+            }
+        }
+
+        $this->template->dataSet = $dataSet;
+        $this->template->labels = $labels;
+    }
+
     public function renderSentEmailsDetail($id)
     {
         $labels = [];
@@ -231,53 +271,17 @@ final class DashboardPresenter extends BasePresenter
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
-            $dataSet['data'][
-                array_search(
-                    $this->dateFormatter->format($row->first_email_sent_at),
-                    $labels
-                )
-            ] = $row->sent_mails;
+            $foundAt = array_search(
+                $this->dateFormatter->format($row->first_email_sent_at),
+                $labels
+            );
+
+            if ($foundAt !== false) {
+                $dataSet['data'][$foundAt] = $row->sent_mails;
+            }
         }
 
         $this->template->dataSet = $dataSet;
         $this->template->labels = $labels;
     }
-
-//    public function renderDetail($id)
-//    {
-//        $labels = [];
-//        $numOfDays = 30;
-//        $now = new DateTime();
-//        $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
-//
-//        // fill graph columns
-//        for ($i = $numOfDays; $i > 0; $i--) {
-//            $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
-//        }
-//
-//        $mailType = $this->listsRepository->find($id);
-//
-//        $dataSet = [
-//            'label' => $mailType->title,
-//            'data' => array_fill(0, $numOfDays, 0),
-//            'fill' => false,
-//            'borderColor' => 'rgb(75, 192, 192)',
-//            'lineTension' => 0.5
-//        ];
-//
-//        $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $from, $now)->fetchAll();
-//
-//        // parse sent mails by type data to chart.js format
-//        foreach ($data as $row) {
-//            $dataSet['data'][
-//                array_search(
-//                    $this->dateFormatter->format($row->first_email_sent_at),
-//                    $labels
-//                )
-//            ] = $row->sent_mails;
-//        }
-//
-//        $this->template->dataSet = $dataSet;
-//        $this->template->labels = $labels;
-//    }
 }

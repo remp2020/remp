@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use DateTime;
 use Remp\MailerModule\Repository;
 
 class MailTypeStatsRepository extends Repository
@@ -14,12 +15,12 @@ class MailTypeStatsRepository extends Repository
     ) {
         return $this->getTable()->insert([
             'mail_type_id' => $mailTypeId,
-            'created_at' => new \DateTime(),
+            'created_at' => new DateTime(),
             'subscribers_count' => $subscribersCount,
         ]);
     }
 
-    public function getDashboardDataGroupedByTypes(\DateTime $from, \DateTime $to)
+    public function getDashboardDataGroupedByTypes(DateTime $from, DateTime $to)
     {
         return $this->getTable()
             ->select('mail_type_id, MAX(subscribers_count) AS count, DATE(created_at) AS created_date')
@@ -30,7 +31,19 @@ class MailTypeStatsRepository extends Repository
             ->fetchAll();
     }
 
-    public function getDashboardData(\DateTime $from, \DateTime $to)
+    public function getDashboardDetailData($id, DateTime $from, DateTime $to)
+    {
+        return $this->getTable()
+            ->select('mail_type_id, MAX(subscribers_count) AS count, DATE(created_at) AS created_date')
+            ->where('DATE(created_at) >= DATE(?)', $from->format('Y-m-d'))
+            ->where('DATE(created_at) <= DATE(?)', $to->format('Y-m-d'))
+            ->where('mail_type_id = ?', $id)
+            ->group('created_date, mail_type_id')
+            ->order('mail_type_id, created_date DESC')
+            ->fetchAll();
+    }
+
+    public function getDashboardData(DateTime $from, DateTime $to)
     {
         return $this->getTable()
             ->select('MAX(subscribers_count) AS count, DATE(created_at) AS created_date')
