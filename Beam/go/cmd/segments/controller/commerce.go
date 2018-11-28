@@ -142,5 +142,9 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) mo
 		o.TimeBefore = *payload.TimeBefore
 	}
 
+	if payload.Step != nil {
+		o.Step = *payload.Step
+	}
+
 	return o
 }

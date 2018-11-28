@@ -111,6 +111,7 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+	Attribute("step", String, "Filter particular step")
 })
 
 var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {

@@ -213,12 +213,7 @@ var _ = Resource("commerce", func() {
 	})
 	Action("list", func() {
 		Description("Returns full list of events")
-		Routing(POST("/steps/:step/list"))
-		Params(func() {
-			Param("step", String, "Identification of commerce step", func() {
-				Enum("checkout", "payment", "purchase", "refund")
-			})
-		})
+		Routing(POST("/list"))
 		Payload(ListCommerceOptionsPayload)
 		Response(OK, func() {
 			Media(CollectionOf(Commerces, func() {
