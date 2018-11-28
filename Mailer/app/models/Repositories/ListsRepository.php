@@ -19,8 +19,6 @@ class ListsRepository extends Repository
 
     public function add($categoryId, $priority, $code, $name, $order, $isAutoSubscribe, $isLocked, $isPublic, $description, $previewUrl = null, $imageUrl = null)
     {
-        $this->updateOrder($categoryId, $order);
-
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
             'priority' => $priority,
@@ -44,12 +42,26 @@ class ListsRepository extends Repository
         return $result;
     }
 
-    public function updateOrder($categoryId, $order)
+    public function updateSorting($newCategoryId, $newSorting, $oldCategoryId = null, $oldSorting = null)
     {
-        $this->getTable()
-            ->where(['mail_type_category_id' => $categoryId])
-            ->where('sorting > ?', $order)
-            ->update(['sorting+=' => 1]);
+        if ($newSorting === $oldSorting) {
+            return;
+        }
+
+        if ($oldSorting !== null) {
+            $this->getTable()
+                ->where(
+                    'sorting > ? AND mail_type_category_id = ?',
+                    $oldSorting,
+                    $oldCategoryId
+                )->update(['sorting-=' => 1]);
+        }
+
+        $this->getTable()->where(
+            'sorting >= ? AND mail_type_category_id = ?',
+            $newSorting,
+            $newCategoryId
+        )->update(['sorting+=' => 1]);
     }
 
     public function findByCategory($categoryId)
