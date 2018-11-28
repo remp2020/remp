@@ -4,7 +4,7 @@ use Phinx\Migration\AbstractMigration;
 
 class UpdateMailTypesSortingColumn extends AbstractMigration
 {
-    public function change()
+    public function up()
     {
         $this->execute('
             SET @s = 0;
