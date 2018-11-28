@@ -15,7 +15,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
-	client "github.com/influxdata/influxdb/client/v2"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -24,7 +23,6 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/controller"
-	"gitlab.com/remp/remp/Beam/go/influxquery"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
 
@@ -75,14 +73,7 @@ func main() {
 	var commerceStorage model.CommerceStorage
 	var concurrentsStorage model.ConcurrentsStorage
 
-	switch c.EventStorage {
-	case "", "elastic":
-		eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c)
-	case "influx":
-		eventStorage, pageviewStorage, commerceStorage, err = initInfluxEventStorages(ctx, c)
-	default:
-		log.Fatalf("unrecognized storage: %s", c.EventStorage)
-	}
+	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -220,34 +211,4 @@ func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage
 	}
 
 	return eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, nil
-}
-
-func initInfluxEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, error) {
-	ic, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr:     c.InfluxAddr,
-		Username: c.InfluxUser,
-		Password: c.InfluxPasswd,
-	})
-	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to initialize influx http client"))
-	}
-
-	influxDB := &model.InfluxDB{
-		DBName:       c.InfluxDBName,
-		Client:       ic,
-		QueryBuilder: influxquery.NewInfluxBuilder(),
-		Debug:        c.Debug,
-	}
-
-	eventStorage := &model.EventInflux{
-		DB: influxDB,
-	}
-	commerceStorage := &model.CommerceInflux{
-		DB: influxDB,
-	}
-	pageviewStorage := &model.PageviewInflux{
-		DB: influxDB,
-	}
-
-	return eventStorage, pageviewStorage, commerceStorage, nil
 }

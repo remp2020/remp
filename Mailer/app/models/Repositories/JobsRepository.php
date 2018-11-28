@@ -30,7 +30,7 @@ class JobsRepository extends Repository
         $this->batchesRepository = $batchesRepository;
     }
 
-    public function add($segmentCode, $segmentProvider, $context = null)
+    public function add($segmentCode, $segmentProvider, $context = null, $mailTypeVariant = null)
     {
         $data = [
             'segment_code' => $segmentCode,
@@ -39,15 +39,10 @@ class JobsRepository extends Repository
             'status' => static::STATUS_NEW,
             'created_at' => new \DateTime(),
             'updated_at' => new \DateTime(),
+            'mail_type_variant_id' => $mailTypeVariant ? $mailTypeVariant->id : null
         ];
 
-        $result = $this->insert($data);
-
-        if (is_numeric($result)) {
-            return $this->getTable()->where('id', $result)->fetch();
-        }
-
-        return $result;
+        return $this->insert($data);
     }
 
     /**

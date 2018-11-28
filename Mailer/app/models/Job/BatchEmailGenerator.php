@@ -52,7 +52,7 @@ class BatchEmailGenerator
         $this->unreadArticlesGenerator = $unreadArticlesGenerator;
     }
 
-    public function generate(ActiveRow $batch)
+    protected function insertUsersIntoJobQueue(ActiveRow $batch, &$userMap): void
     {
         $this->mailJobQueueRepository->clearBatch($batch);
 
@@ -62,7 +62,6 @@ class BatchEmailGenerator
 
         $job = $batch->job;
 
-        $userMap = [];
         $userIds = $this->segmentAggregator->users(['provider' => $batch->mail_job->segment_provider, 'code' => $batch->mail_job->segment_code]);
 
         foreach (array_chunk($userIds, 1000, true) as $userIdsChunk) {
@@ -93,6 +92,11 @@ class BatchEmailGenerator
         if ($processed) {
             $this->mailJobQueueRepository->multiInsert($insert);
         }
+    }
+
+    protected function filterQueue($batch): void
+    {
+        $job = $batch->job;
 
         $this->mailJobQueueRepository->removeUnsubscribed($batch);
         if ($job->mail_type_variant_id) {
@@ -104,6 +108,13 @@ class BatchEmailGenerator
         $this->mailJobQueueRepository->removeAlreadyQueued($batch);
         $this->mailJobQueueRepository->removeAlreadySent($batch);
         $this->mailJobQueueRepository->stripEmails($batch, $batch->max_emails);
+    }
+
+    public function generate(ActiveRow $batch)
+    {
+        $userMap = [];
+        $this->insertUsersIntoJobQueue($batch, $userMap);
+        $this->filterQueue($batch);
 
         $queueJobs = $this->mailJobQueueRepository->getBatchEmails($batch, 0, null);
         $this->mailCache->pauseQueue($batch->id);

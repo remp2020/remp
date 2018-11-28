@@ -132,8 +132,7 @@ class AuthorController extends Controller
 
         return $datatables->of($authors)
             ->filterColumn('name', function (Builder $query, $value) {
-                $values = explode(",", $value);
-                $query->whereIn('authors.id', $values);
+                $query->where('authors.name', 'like', '%' . $value . '%');
             })
             ->orderColumn('conversions_amount', 'conversions_amount $1')
             ->addColumn('conversions_amount', function (Author $author) use ($conversions) {

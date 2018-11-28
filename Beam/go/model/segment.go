@@ -94,7 +94,7 @@ type BrowserSet map[string]bool
 // Intersector responds to ability to intersect provided userID with some other collection structure.
 type Intersector func(userID string) bool
 
-// SegmentDB represents Segment's storage MySQL/InfluxDB implementation.
+// SegmentDB represents Segment's storage implementation.
 type SegmentDB struct {
 	MySQL                    *sqlx.DB
 	RuleCountCache           *cache.Cache

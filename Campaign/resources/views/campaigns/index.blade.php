@@ -5,7 +5,7 @@
 @section('content')
 
     <div class="c-header">
-        <h2>Campaigns</h2>
+        <h2>CAMPAIGNS</h2>
     </div>
 
     <div class="card">
