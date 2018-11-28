@@ -98,22 +98,18 @@ class ConversionController extends Controller
         $actions = collect();
 
         // Commerce
-        foreach ($this->journal->commerceCategories() as $category){
-            foreach ($this->journal->actions('commerce', $category) as $action) {
-                $commerces = $this->journal->list(JournalListRequest::from('commerce/steps/' . $action)
-                    ->addFilter('user_id', $conversion->user_id)
-                    ->setTimeAfter($timeAfter)
-                    ->setTimeBefore($timeBefore));
+        $commerces = $this->journal->list(JournalListRequest::from('commerce')
+            ->addFilter('user_id', $conversion->user_id)
+            ->setTimeAfter($timeAfter)
+            ->setTimeBefore($timeBefore));
 
-                if ($commerces->isNotEmpty()) {
-                    foreach ($commerces[0]->commerces as $item) {
-                        if (isset($item->system->time, $item->step)) {
-                            $obj = new \stdClass();
-                            $obj->time = Carbon::parse($item->system->time);
-                            $obj->action = "commerce:{$item->step}";
-                            $actions->push($obj);
-                        }
-                    }
+        if ($commerces->isNotEmpty()) {
+            foreach ($commerces[0]->commerces as $item) {
+                if (isset($item->system->time, $item->step)) {
+                    $obj = new \stdClass();
+                    $obj->time = Carbon::parse($item->system->time);
+                    $obj->action = "commerce:{$item->step}";
+                    $actions->push($obj);
                 }
             }
         }
@@ -155,11 +151,10 @@ class ConversionController extends Controller
 
         $actions->sortBy('time');
 
-        dd($actions);
-
         return response()->format([
             'html' => view('conversions.show', [
-                'conversion' => $conversion
+                'conversion' => $conversion,
+                'actions' => $actions
             ]),
             'json' => new ConversionResource($conversion),
         ]);
