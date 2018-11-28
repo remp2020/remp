@@ -6,7 +6,10 @@
 
 <div class="card">
     <div class="card-header">
-        <h2 n:block="title">{$dataSet['label']}<small></small></h2>
+        <h2 n:block="title">
+            <strong>Sent mails of newsletter type:</strong><br>
+            <small>{$dataSet['label']}</small>
+        </h2>
 
         <div class="actions">
             <a n:href="Dashboard:default" class="btn palette-Cyan bg waves-effect">Back to dashboard</a>
