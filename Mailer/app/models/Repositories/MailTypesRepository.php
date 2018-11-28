@@ -10,17 +10,6 @@ class MailTypesRepository extends Repository
 
     public function all()
     {
-        return $this->getTable()->fetchAll();
-    }
-
-    public function getAllIds()
-    {
-        $ids = [];
-
-        foreach ($this->all() as $mailType) {
-            $ids[] = $mailType->id;
-        }
-
-        return $ids;
+        return $this->getTable();
     }
 }

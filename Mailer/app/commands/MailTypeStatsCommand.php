@@ -38,7 +38,7 @@ class MailTypeStatsCommand extends Command
 
     protected function configure()
     {
-        $this->setName('stats:mail_type')
+        $this->setName('mail:subscriber-stats')
             ->setDescription('Run mail type stats update');
     }
 
@@ -48,7 +48,8 @@ class MailTypeStatsCommand extends Command
         $output->writeln('<info>***** UPDATING MAIL TYPE STATS *****</info>');
         $output->writeln('');
 
-        $allMailTypeIds = $this->mailTypesRepository->getAllIds();
+        $allMailTypes = $this->mailTypesRepository->all()->fetchPairs('id', 'title');
+        $allMailTypeIds = array_keys($allMailTypes);
 
         $subscribersData = $this->userSubscriptionsRepository
             ->getAllSubscribersDataForMailTypes($allMailTypeIds);

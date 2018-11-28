@@ -76,9 +76,8 @@ final class DashboardPresenter extends BasePresenter
             'count' => 0
         ];
 
-
         // fill graph column labels
-        for ($i = $numOfDays; $i > 0; $i--) {
+        for ($i = $numOfDays; $i >= 0; $i--) {
             $graphLabels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
         }
 
@@ -145,22 +144,6 @@ final class DashboardPresenter extends BasePresenter
             return $b['count'] <=> $a['count'];
         });
 
-        $allSubscribersData = $this->mailTypeStatsRepository->getDashboardData($from, $now);
-        $allSubscribersDataSet = [] + $defaualtGraphSettings;
-
-        // parse all sent mails data to chart.js format
-        foreach ($allSubscribersData as $row) {
-            $foundAt = array_search(
-                $this->dateFormatter->format($row->created_date),
-                $graphLabels
-            );
-
-            if ($foundAt !== false) {
-                $allSubscribersDataSet['data'][$foundAt] = $row->count;
-                $allSubscribersDataSet['count'] += $row->count;
-            }
-        }
-
         $typeSubscribersData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($from, $now);
 
         foreach ($typeSubscribersData as $row) {
@@ -170,8 +153,8 @@ final class DashboardPresenter extends BasePresenter
             );
 
             if ($foundAt !== false) {
-                $typeSubscriberDataSets[$row->mail_type_id]['data'][$foundAt] =  $row->count;
-                $typeSubscriberDataSets[$row->mail_type_id]['count'] += $row->count;
+                $typeSubscriberDataSets[$row->mail_type_id]['data'][$foundAt] = $row->count;
+                $typeSubscriberDataSets[$row->mail_type_id]['count'] = $row->count;
             }
         }
 
@@ -190,14 +173,14 @@ final class DashboardPresenter extends BasePresenter
             return $b['count'] <=> $a['count'];
         });
 
-
-        $lastBatches = $this->batchesRepository->getLastBatches(10);
+        $inProgressBatches = $this->batchesRepository->getInProgressBatches(10);
+        $lastDoneBatches = $this->batchesRepository->getLastDoneBatches(10);
 
         $this->template->typeSubscriberDataSets = array_values($typeSubscriberDataSets);
-        $this->template->allSubscribersDataSet = $allSubscribersDataSet;
         $this->template->allSentEmailsDataSet = $allSentEmailsDataSet;
         $this->template->typeDataSets = array_values($typeDataSets);
-        $this->template->lastBatches = $lastBatches;
+        $this->template->inProgressBatches = $inProgressBatches;
+        $this->template->lastDoneBatches = $lastDoneBatches;
         $this->template->labels = $graphLabels;
     }
 

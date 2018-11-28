@@ -24,8 +24,8 @@ class MailTypeStatsRepository extends Repository
     {
         return $this->getTable()
             ->select('mail_type_id, MAX(subscribers_count) AS count, DATE(created_at) AS created_date')
-            ->where('DATE(created_at) >= DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(created_at) <= DATE(?)', $to->format('Y-m-d'))
+            ->where('created_at >= ?', $from)
+            ->where('created_at <= ?', $to)
             ->group('created_date, mail_type_id')
             ->order('mail_type_id, created_date DESC')
             ->fetchAll();
@@ -35,8 +35,8 @@ class MailTypeStatsRepository extends Repository
     {
         return $this->getTable()
             ->select('mail_type_id, MAX(subscribers_count) AS count, DATE(created_at) AS created_date')
-            ->where('DATE(created_at) >= DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(created_at) <= DATE(?)', $to->format('Y-m-d'))
+            ->where('created_at >= ?', $from)
+            ->where('created_at <= ?', $to)
             ->where('mail_type_id = ?', $id)
             ->group('created_date, mail_type_id')
             ->order('mail_type_id, created_date DESC')
@@ -47,8 +47,8 @@ class MailTypeStatsRepository extends Repository
     {
         return $this->getTable()
             ->select('MAX(subscribers_count) AS count, DATE(created_at) AS created_date')
-            ->where('DATE(created_at) >= DATE(?)', $from)
-            ->where('DATE(created_at) < DATE(?)', $to)
+            ->where('created_at >= ?', $from)
+            ->where('created_at < ?', $to)
             ->group('created_date')
             ->order('created_date DESC')
             ->fetchAll();
