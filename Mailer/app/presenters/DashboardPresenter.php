@@ -192,7 +192,7 @@ final class DashboardPresenter extends BasePresenter
         $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         // fill graph columns
-        for ($i = $numOfDays; $i > 0; $i--) {
+        for ($i = $numOfDays; $i >= 0; $i--) {
             $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
         }
 
@@ -232,7 +232,7 @@ final class DashboardPresenter extends BasePresenter
         $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
 
         // fill graph columns
-        for ($i = $numOfDays; $i > 0; $i--) {
+        for ($i = $numOfDays; $i >= 0; $i--) {
             $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
         }
 
