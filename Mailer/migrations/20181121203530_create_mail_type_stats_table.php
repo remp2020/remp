@@ -4,7 +4,7 @@ use Phinx\Migration\AbstractMigration;
 
 class CreateMailTypeStatsTable extends AbstractMigration
 {
-    public function change()
+    public function up()
     {
         $mailTypeStats = $this->table('mail_type_stats');
         $mailTypeStats
@@ -14,5 +14,10 @@ class CreateMailTypeStatsTable extends AbstractMigration
                 'signed' => false
             ])
             ->save();
+    }
+
+    public function down()
+    {
+        $this->table('mail_type_stats')->drop();
     }
 }
