@@ -88,6 +88,16 @@
                                 </a>
                             </div>
                         {/foreach}
+
+                        {if empty($typeSubscriberDataSets)}
+                        <div class="list-group lg-alt lg-even-white">
+                            <div class="list-group-item media">
+                                <div class="media-body ns-item">
+                                    <small>You don't have any subscribers or didn't setup newsletter list stats.</small>
+                                </div>
+                            </div>
+                        </div>
+                        {/if}
                     </div><!-- .list-group -->
                 </div><!-- .card-body -->
             </div><!-- .card -->
