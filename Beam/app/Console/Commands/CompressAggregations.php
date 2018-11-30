@@ -52,7 +52,7 @@ class CompressAggregations extends Command
             throw new \InvalidArgumentException("'$modelClass' doesn't implement '" . Aggregable::class . "' interface");
         }
 
-        DB::transaction(function() use ($modelClass, $threshold) {
+        DB::transaction(function () use ($modelClass, $threshold) {
             /** @var Eloquent|Aggregable $model */
             $model = new $modelClass();
 
@@ -78,7 +78,6 @@ class CompressAggregations extends Command
                 ->whereDate('time_from', '<=', $threshold->format('Y-m-d'))
                 ->delete();
         });
-
     }
 
     private function getSumAgregablesSelection(Aggregable $model): array
