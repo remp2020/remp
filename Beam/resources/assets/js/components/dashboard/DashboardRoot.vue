@@ -131,7 +131,6 @@
     import TimeHistogram from './TimeHistogram.vue'
     import Options from './Options.vue'
     import axios from 'axios'
-    import { CONVERSIONS_COLORING_THRESHOLD, CONVERSION_RATE_COLORING_THRESHOLD } from './constants.js'
 
     let props = {
         articlesUrl: {
@@ -141,32 +140,44 @@
         timeHistogramUrl: {
             type: String,
             required: true
-        }
+        },
+        options: {
+            type: Array,
+            required: false
+        },
     }
 
     const REFRESH_DATA_TIMEOUT_MS = 7000
     let loadDataTimer = null
 
-    function conversionsCountColor(count) {
+    function conversionsCountColor(count, options) {
+        if (!options) {
+            return 'no-color'
+        }
+
         count = parseInt(count)
-        if (count > CONVERSIONS_COLORING_THRESHOLD.high) {
+        if (count > options['conversions_count_threshold_high']) {
             return 'high-color'
-        } else if (count > CONVERSIONS_COLORING_THRESHOLD.medium) {
+        } else if (count > options['conversions_count_threshold_medium']) {
             return 'medium-color'
-        } else if (count > CONVERSIONS_COLORING_THRESHOLD.low) {
+        } else if (count > options['conversions_count_threshold_low']) {
             return 'low-color'
         } else {
             return 'no-color'
         }
     }
 
-    function conversionRateColor(rate) {
+    function conversionRateColor(rate, options) {
+        if (!options) {
+            return 'no-color'
+        }
+
         rate = parseFloat(rate)
-        if (rate > CONVERSION_RATE_COLORING_THRESHOLD.high) {
+        if (rate > options['conversion_rate_threshold_high']) {
             return 'high-color'
-        } else if (rate > CONVERSION_RATE_COLORING_THRESHOLD.medium) {
+        } else if (rate > options['conversion_rate_threshold_medium']) {
             return 'medium-color'
-        } else if (rate > CONVERSION_RATE_COLORING_THRESHOLD.low) {
+        } else if (rate > options['conversion_rate_threshold_low']) {
             return 'low-color'
         } else {
             return 'no-color'
@@ -224,8 +235,8 @@
                     })
                     .then(function(response){
                         that.articles = response.data.articles.map(function(item){
-                            item.conversion_rate_color = conversionRateColor(item.conversion_rate)
-                            item.conversions_count_color = conversionsCountColor(item.conversions_count)
+                            item.conversion_rate_color = conversionRateColor(item.conversion_rate, that.options)
+                            item.conversions_count_color = conversionsCountColor(item.conversions_count, that.options)
                             return item
                         })
                         that.totalConcurrents = response.data.totalConcurrents

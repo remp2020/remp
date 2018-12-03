@@ -111,11 +111,13 @@
 
             titleVariants: [],
             imageVariants: [],
+            config: null
         }),
         created: function() {
             EventHub.$on("content-conversions-counts-changed", this.updateConversions);
             EventHub.$on("content-pageviews-changed", this.updatePageviewStats);
             EventHub.$on("content-variants-changed", this.updateVariantStats);
+            EventHub.$on("config-changed", this.configChanged);
         },
         computed: {
             conversionRate() {
@@ -125,11 +127,33 @@
                 // Artificially increased 10000x so conversion rate is more readable
                 return rounding((this.conversions/this.totalPageviews) * 10000, 2);
             },
+            conversionRateColoring() {
+                if (this.config) {
+                    return {
+                        low: this.config.conversion_rate_threshold_low,
+                        medium: this.config.conversion_rate_threshold_medium,
+                        high: this.config.conversion_rate_threshold_high
+                    }
+                } else {
+                    return CONVERSION_RATE_COLORING_THRESHOLD
+                }
+            },
+            conversionsColoring() {
+                if (this.config) {
+                    return {
+                        low: this.config.conversions_count_threshold_low,
+                        medium: this.config.conversions_count_threshold_medium,
+                        high: this.config.conversions_count_threshold_high
+                    }
+                } else {
+                    return CONVERSIONS_COLORING_THRESHOLD
+                }
+            },
             conversionRateColorClass() {
-                return colorThresholdToClass(CONVERSION_RATE_COLORING_THRESHOLD, this.conversionRate)
+                return colorThresholdToClass(this.conversionRateColoring, this.conversionRate)
             },
             conversionsColorClass() {
-                return colorThresholdToClass(CONVERSIONS_COLORING_THRESHOLD, this.conversions)
+                return colorThresholdToClass(this.conversionsColoring, this.conversions)
             },
             sortedPageviewRanges() {
                 return Object.values(this.pageviewRanges).slice().sort((a, b) => a.order - b.order);
@@ -148,6 +172,9 @@
             },
         },
         methods: {
+            configChanged(config) {
+                this.config = config
+            },
             updateConversions(counts) {
                 if (counts === null || !counts[this.articleId]) {
                     this.conversions = 0
