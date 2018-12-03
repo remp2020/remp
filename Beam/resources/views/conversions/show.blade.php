@@ -3,9 +3,6 @@
 @section('title', 'Conversion - ' . $conversion->id)
 
 @section('content')
-
-
-
     <div class="c-header">
         <h2>Conversion detail</h2>
     </div>
@@ -34,6 +31,29 @@
                 </dl>
 
                 <h4>User path</h4>
+                <div class="list-group lg-alt lg-even-black">
+                    @foreach($actions as $action)
+                        <div class="list-group-item media">
+                            <div class="media-body">
+                                <div class="lgi-heading">
+                                    <small><date-formatter format="l LT" date="{{$action->time}}"></date-formatter></small>
+                                    {{$action->action}}
+                                </div>
+                                <small class="lgi-text"></small>
+                                @if($action->action === 'pageview')
+                                <ul class="lgi-attrs">
+                                    @if(isset($action->article))
+                                        <li><a href="{{ route('articles.show', $action->article->id) }}">{{$action->article->title}}</a></li>
+                                    @endif
+                                    @if(isset($action->timespent))
+                                        <li>Timespent: {{$action->timespent}}</li>
+                                    @endif
+                                </ul>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>

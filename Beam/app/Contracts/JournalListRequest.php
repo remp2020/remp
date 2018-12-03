@@ -16,6 +16,8 @@ class JournalListRequest
 
     protected $timeAfter;
 
+    protected $loadTimespent = false;
+
     public static function from($category): JournalListRequest
     {
         return new self($category);
@@ -47,6 +49,12 @@ class JournalListRequest
     public function addGroup(string ...$tags): JournalListRequest
     {
         $this->groupBy = array_merge($this->groupBy, $tags);
+        return $this;
+    }
+
+    public function setLoadTimespent(): JournalListRequest
+    {
+        $this->loadTimespent = true;
         return $this;
     }
 
@@ -90,5 +98,10 @@ class JournalListRequest
     public function getTimeAfter(): ?\DateTime
     {
         return $this->timeAfter;
+    }
+
+    public function getLoadTimespent(): bool
+    {
+        return $this->loadTimespent;
     }
 }

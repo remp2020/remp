@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Article;
 use App\Author;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
@@ -94,7 +95,7 @@ class ConversionController extends Controller
     public function show(Conversion $conversion)
     {
         $timeBefore = clone $conversion->paid_at;
-        $timeAfter = (clone $timeBefore)->subDays(14);
+        $timeAfter = (clone $timeBefore)->subDays(2);
         $actions = collect();
 
         // Commerce
@@ -107,7 +108,7 @@ class ConversionController extends Controller
             foreach ($commerces[0]->commerces as $item) {
                 if (isset($item->system->time, $item->step)) {
                     $obj = new \stdClass();
-                    $obj->time = Carbon::parse($item->system->time);
+                    $obj->time = $item->system->time;
                     $obj->action = "commerce:{$item->step}";
                     $actions->push($obj);
                 }
@@ -124,32 +125,54 @@ class ConversionController extends Controller
             foreach ($events[0]->events as $item) {
                 if (isset($item->system->time, $item->action, $item->category)) {
                     $obj = new \stdClass();
-                    $obj->time = Carbon::parse($item->system->time);
+                    $obj->time = $item->system->time;
                     $obj->action = "{$item->action}:{$item->category}";
                     $actions->push($obj);
                 }
             }
         }
 
+        $articleIds = [];
+
         // Pageviews
         $pageviews = $this->journal->list(JournalListRequest::from('pageviews')
             ->addFilter('user_id', $conversion->user_id)
+            ->setLoadTimespent()
             ->setTimeAfter($timeAfter)
             ->setTimeBefore($timeBefore));
 
         if ($pageviews->isNotEmpty()) {
             foreach ($pageviews[0]->pageviews as $item) {
-                if (isset($item->system->time, $item->article->id)) {
+                if (isset($item->system->time, $item->article->id, $item->user->remp_pageview_id)) {
                     $obj = new \stdClass();
-                    $obj->time = Carbon::parse($item->system->time);
+                    $obj->time = $item->system->time;
                     $obj->action = 'pageview';
                     $obj->article_id = $item->article->id;
+                    $obj->pageview_id = $item->user->remp_pageview_id;
+                    if (isset($item->user->timespent)) {
+                        $obj->timespent = $item->user->timespent;
+                    }
+                    $articleIds[] = $obj->article_id;
                     $actions->push($obj);
                 }
             }
         }
 
-        $actions->sortBy('time');
+        $articles = Article::whereIn('external_id', $articleIds)
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->external_id => $item];
+            });
+
+        foreach ($actions as $action) {
+            if ($action->action === 'pageview') {
+                if ($articles->has($action->article_id)) {
+                    $action->article = $articles->get($action->article_id);
+                }
+            }
+        }
+
+        $actions = $actions->sortByDesc('time');
 
         return response()->format([
             'html' => view('conversions.show', [

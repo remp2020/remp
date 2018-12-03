@@ -156,16 +156,22 @@ class Journal implements JournalContract
     public function list(JournalListRequest $request): Collection
     {
         try {
-            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_LIST), [
-                'json' => [
-                    'select_fields' => $request->getSelect(),
-                    'conditions' => [
-                        'filter_by' => $request->getFilterBy(),
-                        'group_by' => $request->getGroupBy(),
-                        'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                        'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
-                    ],
+            $q = [
+                'select_fields' => $request->getSelect(),
+                'conditions' => [
+                    'filter_by' => $request->getFilterBy(),
+                    'group_by' => $request->getGroupBy(),
+                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
                 ],
+            ];
+
+            if ($request->getLoadTimespent()) {
+                $q['load_timespent'] = true;
+            }
+
+            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_LIST), [
+                'json' => $q,
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:List endpoint: {$e->getMessage()}");
