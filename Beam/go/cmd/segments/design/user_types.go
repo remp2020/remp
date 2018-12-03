@@ -61,6 +61,9 @@ var ListPageviewOptionsPayload = Type("ListPageviewOptionsPayload", func() {
 	Description("Parameters to filter pageview list")
 
 	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("load_timespent", Boolean, "If true, load timespent for each pageview", func() {
+		Default(false)
+	})
 	Attribute("conditions", PageviewOptionsPayload, "Condition definition")
 
 	Required("conditions")

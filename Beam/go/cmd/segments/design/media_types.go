@@ -247,6 +247,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("remp_session_id", String, "ID of reader's session")
 		Attribute("remp_pageview_id", String, "ID of pageview")
 		Attribute("referer", String, "Value of HTTP referer header (if present)")
+		Attribute("timespent", Integer, "Number of seconds spent during pageview (if recorded)")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -259,6 +260,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("remp_session_id")
 		Attribute("remp_pageview_id")
 		Attribute("referer")
+		Attribute("timespent")
 	})
 	Required("remp_pageview_id")
 })

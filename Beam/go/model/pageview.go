@@ -55,6 +55,7 @@ type Pageview struct {
 	Subscriber   bool      `json:"subscriber"`
 	WindowWidth  int       `json:"window_width"`
 	WindowHeight int       `json:"window_height"`
+	Timespent    int       `json:"timespent"`
 }
 
 // PageviewRow represents one row of grouped list.
@@ -77,7 +78,7 @@ type PageviewStorage interface {
 	// Unique returns unique count of given item based on the provided filter options.
 	Unique(o AggregateOptions, item string) (CountRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
-	List(o ListOptions) (PageviewRowCollection, error)
+	List(o ListPageviewsOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.
 	Categories() []string
 	// Flags lists all available flags.

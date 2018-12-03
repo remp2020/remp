@@ -257,6 +257,9 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	if p.UserAgent != "" {
 		pageview.User.UserAgent = &p.UserAgent
 	}
+	if p.Timespent != 0 {
+		pageview.User.Timespent = &p.Timespent
+	}
 
 	return pageview, nil
 }

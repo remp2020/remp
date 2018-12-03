@@ -232,7 +232,7 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 }
 
 // List returns list of all Pageviews based on given PageviewOptions.
-func (pDB *PageviewElastic) List(options ListOptions) (PageviewRowCollection, error) {
+func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowCollection, error) {
 	var prc PageviewRowCollection
 
 	fsc := elastic.NewFetchSourceContext(true).Include(options.SelectFields...)
@@ -248,6 +248,8 @@ func (pDB *PageviewElastic) List(options ListOptions) (PageviewRowCollection, er
 
 	// prepare PageviewRow buckets
 	prBuckets := make(map[string]*PageviewRow)
+
+	pageviewIDs := []string{}
 
 	// get results
 	for {
@@ -309,15 +311,80 @@ func (pDB *PageviewElastic) List(options ListOptions) (PageviewRowCollection, er
 				}
 				prBuckets[key] = pr
 			}
+
+			if pv.PageviewID != "" {
+				pageviewIDs = append(pageviewIDs, pv.PageviewID)
+			}
+
 			pr.Pageviews = append(pr.Pageviews, pv)
 		}
 	}
 
+	// Load timespent
+	var timespentForPageviews map[string]int
+	if options.LoadTimespent {
+		timespentForPageviews, err = loadTimespent(pDB, pageviewIDs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	for _, pr := range prBuckets {
+		if len(timespentForPageviews) != 0 {
+			for _, pv := range pr.Pageviews {
+				if timespent, ok := timespentForPageviews[pv.PageviewID]; ok {
+					pv.Timespent = timespent
+				}
+			}
+		}
+
 		prc = append(prc, pr)
 	}
 
 	return prc, nil
+}
+
+func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, error) {
+	fsc := elastic.NewFetchSourceContext(true).Include("timespent", "remp_pageview_id")
+	scroll := pDB.DB.Client.Scroll("pageviews_time_spent").
+		Type("_doc").
+		Size(1000).
+		FetchSourceContext(fsc)
+
+	var ao AggregateOptions
+
+	fb := &FilterBy{
+		Tag:    "remp_pageview_id",
+		Values: pageviewIDs,
+	}
+	ao.FilterBy = append(ao.FilterBy, fb)
+
+	scroll, err := pDB.DB.addScrollFilters(scroll, "pageviews_time_spent", ao)
+	if err != nil {
+		return nil, err
+	}
+
+	timespentForPageviews := make(map[string]int)
+
+	for {
+		results, err := scroll.Do(pDB.DB.Context)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, errors.Wrap(err, "error while reading list data from elastic")
+		}
+
+		for _, hit := range results.Hits.Hits {
+			pv := &Pageview{}
+			if err := json.Unmarshal(*hit.Source, pv); err != nil {
+				return nil, errors.Wrap(err, "error reading timespent record from elastic")
+			}
+			timespentForPageviews[pv.PageviewID] = pv.Timespent
+		}
+	}
+
+	return timespentForPageviews, nil
 }
 
 // Categories lists all tracked categories.
