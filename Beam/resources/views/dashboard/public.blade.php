@@ -5,7 +5,10 @@
 @section('content')
 
     <div id="dashboard">
-        <dashboard-root :articles-url="articlesUrl" :time-histogram-url="timeHistogramUrl">
+        <dashboard-root
+                :options="options"
+                :articles-url="articlesUrl"
+                :time-histogram-url="timeHistogramUrl">
         </dashboard-root>
     </div>
 
@@ -24,7 +27,8 @@
             data: {
                 articlesUrl: "{!! route('public.articles.json') !!}",
                 timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}",
-                enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }}
+                enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }},
+                options: {!! json_encode($options) !!}
             }
         })
     </script>
