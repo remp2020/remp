@@ -18,18 +18,20 @@ class CompressAggregations extends Command
 
     const COMPRESSION_THRESHOLD_IN_DAYS = 90;
 
-    protected $signature = self::COMMAND;
+    protected $signature = self::COMMAND . ' {--threshold=}';
 
     protected $description = 'Compress aggregations older than 90 days to daily aggregates.';
 
     public function handle()
     {
+        $sub = intval($this->option('threshold') ?? self::COMPRESSION_THRESHOLD_IN_DAYS);
+
         $this->line('');
         $this->line('<info>***** Compressing aggregations *****</info>');
         $this->line('');
-        $this->line('Compressing data older than <info>' . self::COMPRESSION_THRESHOLD_IN_DAYS . 'days</info>.');
+        $this->line('Compressing data older than <info>' . $sub . ' days</info>.');
 
-        $threshold = Carbon::today()->subDays(self::COMPRESSION_THRESHOLD_IN_DAYS);
+        $threshold = Carbon::today()->subDays($sub);
 
         $this->line('Processing <info>ArticlePageviews</info> table');
         $this->aggregate(ArticlePageviews::class, $threshold);

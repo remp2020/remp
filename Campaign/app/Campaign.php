@@ -81,7 +81,7 @@ class Campaign extends Model
     public function banners()
     {
         return $this->belongsToMany(Banner::class, 'campaign_banners')
-            ->withPivot('variant', 'proportion', 'control_group', 'weight');
+            ->withPivot('proportion', 'control_group', 'weight');
     }
 
     public function campaignBanners()
