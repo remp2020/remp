@@ -154,6 +154,11 @@
         $.fn.dataTables.search(dataTable, 'dt-search-{{ $tableId }}');
         $.fn.dataTables.navigation(dataTable, 'dt-nav-{{ $tableId }}');
 
+        $.fn.dataTableExt.errMode = function (e, settings, techNote, message) {
+            console.log(techNote);
+            alert('Error while loading data table, try again later please.');
+        };
+
         @foreach ($refreshTriggers as $def)
             var triggerEvent = '{!! $def['event'] !!}';
 
