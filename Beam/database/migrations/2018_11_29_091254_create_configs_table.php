@@ -17,7 +17,7 @@ class CreateConfigsTable extends Migration
     {
         Schema::create('configs', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('display_name');
             $table->text('value')->nullable();
             $table->text('description')->nullable();
@@ -37,38 +37,38 @@ class CreateConfigsTable extends Migration
      */
     private function seedBeamDashboardConfigs()
     {
-        Config::create([
+        Config::firstOrCreate([
             'name' => DashboardConfig::CONVERSIONS_COUNT_THRESHOLD_LOW,
             'display_name' => 'Conversions count threshold low',
             'type' => 'int',
             'value' => 3
         ]);
-        Config::create([
+        Config::firstOrCreate([
             'name' => DashboardConfig::CONVERSIONS_COUNT_THRESHOLD_MEDIUM,
             'display_name' => 'Conversions count threshold medium',
             'type' => 'int',
             'value' => 8
         ]);
-        Config::create([
+        Config::firstOrCreate([
             'name' => DashboardConfig::CONVERSIONS_COUNT_THRESHOLD_HIGH,
             'display_name' => 'Conversions count threshold high',
             'type' => 'int',
             'value' => 13
         ]);
 
-        Config::create([
+        Config::firstOrCreate([
             'name' => DashboardConfig::CONVERSION_RATE_THRESHOLD_LOW,
             'display_name' => 'Conversion rate threshold low',
             'type' => 'float',
             'value' => 3.0
         ]);
-        Config::create([
+        Config::firstOrCreate([
             'name' => DashboardConfig::CONVERSION_RATE_THRESHOLD_MEDIUM,
             'display_name' => 'Conversion rate threshold medium',
             'type' => 'float',
             'value' => 5.0
         ]);
-        Config::create([
+        Config::firstOrCreate([
             'name' => DashboardConfig::CONVERSION_RATE_THRESHOLD_HIGH,
             'display_name' => 'Conversion rate threshold high',
             'type' => 'float',
