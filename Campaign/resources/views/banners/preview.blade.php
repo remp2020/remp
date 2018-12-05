@@ -1,4 +1,4 @@
-{{--<script type="text/javascript">--}}
+<script type="text/javascript">
 
 @if(is_null($banner))
 var bannerUuid = null;
@@ -67,13 +67,13 @@ var run = function() {
     }
 
     setTimeout(function() {
-        remplib.tracker.trackEvent("banner", "show", {
+        remplib.tracker.trackEvent("banner", "show", null, null, {
             "utm_source": "remp_campaign",
             "utm_medium": banner.displayType,
             "utm_campaign": banner.campaignUuid,
             "utm_content": banner.uuid,
             "banner_variant": banner.variantUuid
-        })
+        });
         banner.show = true;
         if (banner.closeTimeout) {
             setTimeout(function() {
@@ -97,4 +97,4 @@ for (i=0; i<styles.length; i++) {
     });
 }
 
-{{--</script>--}}
+</script>
