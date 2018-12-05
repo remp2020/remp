@@ -132,11 +132,18 @@ class StatsRequest implements StatsContract
 
     public function filterBy(string $field, ...$values) : StatsRequest
     {
-        $this->filterBy[] = [
+        if (isset($this->filterBy[$field])) {
+            $this->filterBy[$field]['values'] = array_merge(
+                $this->filterBy[$field]['values'],
+                $values
+            );
+            return $this;
+        }
+
+        $this->filterBy[$field] = [
             'tag' => $field,
             'values' => $values,
         ];
-
         return $this;
     }
 
@@ -165,7 +172,7 @@ class StatsRequest implements StatsContract
     public function get()
     {
         $payload = [
-            'filter_by' => $this->filterBy,
+            'filter_by' => array_values($this->filterBy),
             'group_by' => $this->groupBy,
         ];
 
