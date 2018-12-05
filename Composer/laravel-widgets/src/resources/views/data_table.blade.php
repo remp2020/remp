@@ -155,7 +155,7 @@
         $.fn.dataTables.navigation(dataTable, 'dt-nav-{{ $tableId }}');
 
         $.fn.dataTableExt.errMode = function (e, settings, techNote, message) {
-            console.log(techNote);
+            console.warn(techNote);
             alert('Error while loading data table, try again later please.');
         };
 
