@@ -425,11 +425,21 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "source": {
                     "ref": this.getRefSource(),
                     "social": this.getSocialSource(),
-                    "utm_source": this.getParam("utm_source"),
-                    "utm_medium": this.getParam("utm_medium"),
-                    "utm_campaign": this.getParam("utm_campaign"),
-                    "utm_content": this.getParam("utm_content"),
-                    "banner_variant": this.getParam("banner_variant")
+                    "utm_source": remplib.findValueRecursive(params, "utm_source") !== undefined
+                        ? remplib.findValueRecursive(params, "utm_source")
+                        : this.getParam("utm_source"),
+                    "utm_medium": remplib.findValueRecursive(params, "utm_medium") !== undefined
+                        ? remplib.findValueRecursive(params, "utm_medium")
+                        : this.getParam("utm_medium"),
+                    "utm_campaign": remplib.findValueRecursive(params, "utm_campaign") !== undefined
+                        ? remplib.findValueRecursive(params, "utm_campaign")
+                        : this.getParam("utm_campaign"),
+                    "utm_content": remplib.findValueRecursive(params, "utm_content") !== undefined
+                        ? remplib.findValueRecursive(params, "utm_content")
+                        : this.getParam("utm_content"),
+                    "banner_variant": remplib.findValueRecursive(params, "banner_variant") !== undefined
+                        ? remplib.findValueRecursive(params, "banner_variant")
+                        : this.getParam("banner_variant"),
                 }
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
