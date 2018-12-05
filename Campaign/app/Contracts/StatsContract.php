@@ -28,6 +28,14 @@ interface StatsContract
     public function forVariant($variantId) : StatsRequest;
 
     /**
+     * filter results by variant ids
+     *
+     * @param array $variantIds
+     * @return StatsRequest
+     */
+    public function forVariants(array $variantIds) : StatsRequest;
+
+    /**
      * get results from events table
      *
      * @param string $categoryArg

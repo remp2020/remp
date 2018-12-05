@@ -24,7 +24,12 @@ class Stats implements StatsContract
 
     public function forVariant($variantId) : StatsRequest
     {
-        return (new StatsRequest($this->client, $this->timeOffset))->events($variantId);
+        return (new StatsRequest($this->client, $this->timeOffset))->forVariant($variantId);
+    }
+
+    public function forVariants(array $variantIds) : StatsRequest
+    {
+        return (new StatsRequest($this->client, $this->timeOffset))->forVariants($variantIds);
     }
 
     public function events(string $categoryArg, string $actionArg): StatsRequest

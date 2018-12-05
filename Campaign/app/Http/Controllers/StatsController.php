@@ -22,11 +22,11 @@ class StatsController extends Controller
         ]
     ];
 
-    public function campaignStatsCount(Campaign $campaign, $type, Stats $stats, Request $request)
+    public function campaignStatsCount($variantUuids, $type, Stats $stats, Request $request)
     {
         $result = $stats->count()
                         ->events('banner', $type)
-                        ->forCampaign($campaign->uuid)
+                        ->forVariants($variantUuids)
                         ->from(Carbon::parse($request->get('from'), $request->input('tz')))
                         ->to(Carbon::parse($request->get('to'), $request->input('tz')))
                         ->get();
@@ -46,33 +46,33 @@ class StatsController extends Controller
         return $result[0];
     }
 
-    public function campaignPaymentStatsCount(Campaign $campaign, $step, Stats $stats, Request $request)
+    public function campaignPaymentStatsCount($variantUuids, $step, Stats $stats, Request $request)
     {
         $result = $stats->count()
                         ->commerce($step)
+                        ->forVariants($variantUuids)
                         ->from(Carbon::parse($request->get('from'), $request->input('tz')))
                         ->to(Carbon::parse($request->get('to'), $request->input('tz')))
-                        ->forCampaign($campaign->uuid)
                         ->get();
 
         return $result[0];
     }
 
-    public function campaignPaymentStatsSum(Campaign $campaign, $step, Stats $stats, Request $request)
+    public function campaignPaymentStatsSum($variantUuids, $step, Stats $stats, Request $request)
     {
         $result = $stats->sum()
                         ->commerce($step)
+                        ->forVariants($variantUuids)
                         ->from(Carbon::parse($request->get('from'), $request->input('tz')))
                         ->to(Carbon::parse($request->get('to'), $request->input('tz')))
-                        ->forCampaign($campaign->uuid)
                         ->get();
 
         return $result[0];
     }
 
-    public function campaignStatsHistogram(Campaign $campaign, Stats $stats, Request $request)
+    public function campaignStatsHistogram($variantUuids, Stats $stats, Request $request)
     {
-        return $this->getHistogramData($stats, $request, $campaign->uuid);
+        return $this->getHistogramData($stats, $request, $variantUuids);
     }
 
     public function variantPaymentStatsCount(CampaignBanner $variant, $step, Stats $stats, Request $request)
@@ -101,10 +101,10 @@ class StatsController extends Controller
 
     public function variantStatsHistogram(CampaignBanner $variant, Stats $stats, Request $request)
     {
-        return $this->getHistogramData($stats, $request, $variant->campaign->uuid, $variant->uuid);
+        return $this->getHistogramData($stats, $request, [$variant->uuid]);
     }
 
-    protected function getHistogramData(Stats $stats, Request $request, $campaignUuid, $variantUuid = null)
+    protected function getHistogramData(Stats $stats, Request $request, $variantUuids)
     {
         $from = Carbon::parse($request->get('from'), $request->input('tz'));
         $to = Carbon::parse($request->get('to'), $request->input('tz'));
@@ -119,14 +119,10 @@ class StatsController extends Controller
 
             $stats = $stats->count()
                         ->events('banner', $type)
-                        ->forCampaign($campaignUuid)
+                        ->forVariants($variantUuids)
                         ->timeHistogram($interval)
                         ->from($from)
                         ->to($to);
-
-            if ($variantUuid) {
-                $stats->forVariant($variantUuid);
-            }
 
             $result = $stats->get();
 
@@ -172,13 +168,17 @@ class StatsController extends Controller
 
     public function campaignStats(Campaign $campaign, Request $request, Stats $stats)
     {
+        $variantUuids = $campaign->campaignBanners->map(function ($banner) {
+            return $banner["uuid"];
+        })->toArray();
+
         $data = [
-            'click_count' => $this->campaignStatsCount($campaign, 'click', $stats, $request),
-            'show_count' => $this->campaignStatsCount($campaign, 'show', $stats, $request),
-            'payment_count' => $this->campaignPaymentStatsCount($campaign, 'payment', $stats, $request),
-            'purchase_count' => $this->campaignPaymentStatsCount($campaign, 'purchase', $stats, $request),
-            'purchase_sum' => $this->campaignPaymentStatsSum($campaign, 'purchase', $stats, $request),
-            'histogram' => $this->campaignStatsHistogram($campaign, $stats, $request),
+            'click_count' => $this->campaignStatsCount($variantUuids, 'click', $stats, $request),
+            'show_count' => $this->campaignStatsCount($variantUuids, 'show', $stats, $request),
+            'payment_count' => $this->campaignPaymentStatsCount($variantUuids, 'payment', $stats, $request),
+            'purchase_count' => $this->campaignPaymentStatsCount($variantUuids, 'purchase', $stats, $request),
+            'purchase_sum' => $this->campaignPaymentStatsSum($variantUuids, 'purchase', $stats, $request),
+            'histogram' => $this->campaignStatsHistogram($variantUuids, $stats, $request),
         ];
 
         return $this->addCalculatedValues($data);

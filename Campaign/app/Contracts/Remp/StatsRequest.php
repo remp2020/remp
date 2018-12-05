@@ -60,6 +60,14 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
+    public function forVariants(array $variantIds): StatsRequest
+    {
+        foreach ($variantIds as $variantId) {
+            $this->forVariant($variantId);
+        }
+        return $this;
+    }
+
     public function events(string $categoryArg, string $actionArg) : StatsRequest
     {
         $this->args['categories'] = $categoryArg;
