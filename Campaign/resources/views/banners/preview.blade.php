@@ -1,4 +1,4 @@
-<script type="text/javascript">
+{{--<script type="text/javascript">--}}
 
 @if(is_null($banner))
 var bannerUuid = null;
@@ -97,4 +97,4 @@ for (i=0; i<styles.length; i++) {
     });
 }
 
-</script>
+{{--</script>--}}
