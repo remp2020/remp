@@ -101,8 +101,9 @@ class JournalHelpers
         Conversion $conversion,
         $daysInPast = 2,
         $loadTimespent = false,
-        $loadArticles = false): Collection
-    {
+        $loadArticles = false
+    ): Collection {
+    
         $timeBefore = clone $conversion->paid_at;
         $timeAfter = (clone $timeBefore)->subDays($daysInPast);
         $actions = collect();
