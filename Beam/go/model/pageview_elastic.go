@@ -322,7 +322,7 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 
 	// Load timespent
 	var timespentForPageviews map[string]int
-	if options.LoadTimespent {
+	if len(pageviewIDs) > 0 && options.LoadTimespent {
 		timespentForPageviews, err = loadTimespent(pDB, pageviewIDs)
 		if err != nil {
 			return nil, err
