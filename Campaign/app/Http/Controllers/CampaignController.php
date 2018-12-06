@@ -110,6 +110,9 @@ class CampaignController extends Controller
                 }
                 return false;
             })
+            ->addColumn('signed_in', function (Campaign $campaign) {
+                return $campaign->signedInLabel();
+            })
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })

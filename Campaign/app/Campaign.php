@@ -235,4 +235,18 @@ class Campaign extends Model
 
         Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
     }
+
+    public function signedInOptions()
+    {
+        return [
+            null => 'Everyone',
+            true => 'Only signed in',
+            false => 'Only anonymous ',
+        ];
+    }
+
+    public function signedInLabel()
+    {
+        return $this->signedInOptions()[$this->signed_in];
+    }
 }
