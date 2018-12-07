@@ -262,7 +262,9 @@
                 if (this.data === null){
                     return
                 }
-                let results = this.data.results, tags = this.data.tags
+                let results = this.data.results,
+                    tags = this.data.tags,
+                    colors = this.data.colors
 
                 let outerWidth = container.clientWidth,
                     outerHeight = container.clientHeight,
@@ -285,8 +287,6 @@
                     .range([0, width])
                 y.domain([0, d3.max(layers, stackMax)])
                     .range([height, 0])
-
-                let colors = constants.GRAPH_COLORS
 
                 colorScale = d3.scaleOrdinal()
                     .domain(tags)
@@ -357,6 +357,7 @@
                         this.data = {
                             results: data.map(parseData),
                             tags: tags,
+                            colors: response.data.colors,
                             intervalMinutes: response.data.intervalMinutes
                         }
                     })

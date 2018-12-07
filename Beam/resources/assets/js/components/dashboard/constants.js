@@ -1,12 +1,3 @@
-export const GRAPH_COLORS = [
-    "#E63952",
-    "#00C7DF",
-    "#FFC34A",
-    "#DEDEDE",
-    "#CDE092",
-    "#3B40b6",
-]
-
 // empirically defined values
 export const CONVERSIONS_COLORING_THRESHOLD = {
     low: 3,

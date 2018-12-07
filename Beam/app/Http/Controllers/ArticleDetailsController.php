@@ -126,7 +126,8 @@ class ArticleDetailsController extends Controller
             'publishedAt' => $article->published_at->toIso8601ZuluString(),
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
-            'tags' => $tags
+            'tags' => $tags,
+            'colors' => DashboardController::tagsToColors($tags)
         ]);
     }
 
