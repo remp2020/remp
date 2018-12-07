@@ -22,7 +22,7 @@ class SettingsController extends Controller
     {
         $settings = $request->get('settings');
         foreach ($settings as $name => $value) {
-            Config::where('locked', false)
+            Config::unlocked()
                 ->where('name', $name)
                 ->update(['value' => $value]);
         }
