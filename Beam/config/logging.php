@@ -38,6 +38,12 @@ return [
             'channels' => ['single'],
         ],
 
+        'airbrake' => [
+            'driver' => 'custom',
+            'via' => App\AirbrakeLogger::class,
+            'level' => 'notice',
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

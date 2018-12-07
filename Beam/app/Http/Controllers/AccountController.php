@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Account;
-use HTML;
+use Html;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 use Yajra\Datatables\Datatables;
@@ -32,7 +32,7 @@ class AccountController extends Controller
                 ];
             })
             ->addColumn('name', function (Account $account) {
-                return HTML::linkRoute('accounts.edit', $account->name, $account);
+                return Html::linkRoute('accounts.edit', $account->name, $account);
             })
             ->rawColumns(['actions'])
             ->make(true);

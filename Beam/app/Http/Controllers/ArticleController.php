@@ -15,7 +15,7 @@ use App\Http\Resources\ArticleResource;
 use App\Model\NewsletterCriteria;
 use App\Section;
 use Carbon\Carbon;
-use HTML;
+use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -126,7 +126,7 @@ class ArticleController extends Controller
 
         return $dt
             ->addColumn('title', function (Article $article) {
-                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
+                return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
             ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount, $threeMonthsAgo) {
@@ -161,7 +161,7 @@ class ArticleController extends Controller
             })
             ->addColumn('authors', function (Article $article) {
                 $authors = $article->authors->map(function (Author $author) {
-                    return ['link' => HTML::linkRoute('authors.show', $author->name, [$author])];
+                    return ['link' => Html::linkRoute('authors.show', $author->name, [$author])];
                 });
                 return $authors->implode('link', '<br/>');
             })
@@ -209,7 +209,7 @@ class ArticleController extends Controller
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
+                return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->addColumn('avg_sum_all', function (Article $article) {
                 if (!$article->timespent_all || !$article->pageviews_all) {
@@ -231,7 +231,7 @@ class ArticleController extends Controller
             })
             ->addColumn('authors', function (Article $article) {
                 $authors = $article->authors->map(function (Author $author) {
-                    return ['link' => HTML::linkRoute('authors.show', $author->name, [$author])];
+                    return ['link' => Html::linkRoute('authors.show', $author->name, [$author])];
                 });
                 return $authors->implode('link', '<br/>');
             })

@@ -147,11 +147,6 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Package Service Providers...
-         */
-        Laravel\Tinker\TinkerServiceProvider::class,
-
-        /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
@@ -161,13 +156,6 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
         App\Providers\RempMailerServiceProvider::class,
-        Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
-        rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
-        Laracasts\Flash\FlashServiceProvider::class,
-
-        Collective\Html\HtmlServiceProvider::class,
-        Arrilot\Widgets\ServiceProvider::class,
-        Yajra\Datatables\DatatablesServiceProvider::class
     ],
 
     /*
@@ -216,11 +204,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
-        'Form' => Collective\Html\FormFacade::class,
-        'HTML' => Collective\Html\HtmlFacade::class,
-        'Widget' => Arrilot\Widgets\Facade::class,
-        'AsyncWidget' => Arrilot\Widgets\AsyncFacade::class,
     ],
 
 ];

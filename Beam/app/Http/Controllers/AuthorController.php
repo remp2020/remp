@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
-use HTML;
+use Html;
 
 class AuthorController extends Controller
 {
@@ -147,7 +147,7 @@ class AuthorController extends Controller
                 return $amounts ?? [0];
             })
             ->addColumn('name', function (Author $author) {
-                return HTML::linkRoute('authors.show', $author->name, $author);
+                return Html::linkRoute('authors.show', $author->name, $author);
             })
             ->make(true);
     }
@@ -207,7 +207,7 @@ class AuthorController extends Controller
 
         return $datatables->of($articles)
             ->addColumn('title', function (Article $article) {
-                return HTML::link(route('articles.show', ['article' => $article->id]), $article->title);
+                return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->addColumn('conversions_sum', function (Article $article) use ($conversions) {
                 if (!isset($conversions[$article->id])) {
