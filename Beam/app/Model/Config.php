@@ -23,6 +23,11 @@ class Config extends Model
         'locked' => 'boolean',
     ];
 
+    public function scopeUnlocked($query)
+    {
+        return $query->where('locked', false);
+    }
+
     public static function loadByName(string $name)
     {
         $result = Config::where('name', $name)->first();
