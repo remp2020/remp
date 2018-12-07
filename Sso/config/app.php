@@ -147,11 +147,6 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Package Service Providers...
-         */
-        Laravel\Tinker\TinkerServiceProvider::class,
-
-        /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
@@ -160,18 +155,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        Collective\Html\HtmlServiceProvider::class,
-        Arrilot\Widgets\ServiceProvider::class,
-        Yajra\Datatables\DatatablesServiceProvider::class,
-        rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
-        Laracasts\Flash\FlashServiceProvider::class,
-        Laravel\Socialite\SocialiteServiceProvider::class,
         Remp\LaravelSso\Providers\SsoServiceProvider::class,
         Remp\Widgets\Providers\WidgetServiceProvider::class,
         Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
-        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
-        Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
-        rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
 
     ],
 
@@ -221,15 +207,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
-        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
-        'Form' => Collective\Html\FormFacade::class,
-        'HTML' => Collective\Html\HtmlFacade::class,
-        'Widget' => Arrilot\Widgets\Facade::class,
-        'AsyncWidget' => Arrilot\Widgets\AsyncFacade::class,
-        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
-        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
-
     ],
 
 ];

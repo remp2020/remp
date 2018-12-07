@@ -146,11 +146,6 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Package Service Providers...
-         */
-        Laravel\Tinker\TinkerServiceProvider::class,
-
-        /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
@@ -161,15 +156,7 @@ return [
         App\Providers\BeamSegmentsServiceProvider::class,
         App\Providers\BeamTrackerServiceProvider::class,
         App\Providers\PythiaSegmentsServiceProvider::class,
-
         App\Providers\StatsServiceProvider::class,
-
-        Collective\Html\HtmlServiceProvider::class,
-        Arrilot\Widgets\ServiceProvider::class,
-        Yajra\DataTables\DataTablesServiceProvider::class,
-        rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
-        Laracasts\Flash\FlashServiceProvider::class,
-        App\Providers\DeviceDetectorServiceProvider::class
     ],
 
     /*
