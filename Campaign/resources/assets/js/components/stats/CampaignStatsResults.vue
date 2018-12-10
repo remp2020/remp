@@ -21,6 +21,11 @@
                         <tbody>
                             <tr v-for="variant in variantsData" :key="variant.id">
                             <td>
+                                <i v-if="variant.deleted_at"
+                                   class="zmdi zmdi-close-circle-o"
+                                   style="color: red;"
+                                   title="This variant was deleted.">&nbsp;</i>
+
                                 <a v-if="variant.link" :href="variant.link">{{ variant.name }}</a>
                                 <span v-else>{{ variant.name }}</span>
                             </td>
@@ -107,6 +112,7 @@
                         earned: data.purchase_sum.sum,
                         ctr: data.ctr,
                         conversions: data.conversions,
+                        deleted_at: variant.deleted_at
                     };
 
                     if (variant.banner !==  null) {

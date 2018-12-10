@@ -138,7 +138,14 @@
             },
             chartTitle() {
                 if (this.variantBannerLink) {
-                    let title = "Variant: <a href=\"" + this.variantBannerLink + "\">" + this.variantName + "</a> <small>(" + this.variant.proportion + "%)</small>";
+                    let title = '';
+
+                    if (this.variant.deleted_at) {
+                        title += '<i v-if="variant.deleted_at" class="zmdi zmdi-close-circle-o" style="color: red;" title="This variant was deleted.">&nbsp;</i>';
+                    }
+
+                    title += "Variant: <a href=\"" + this.variantBannerLink + "\">" + this.variantName + "</a> <small>(" + this.variant.proportion + "%)</small>";
+
                     if (this.variantBannerText) {
                         title += "<br/><small><em>" + this.variantBannerText + "</em></small>";
                     }

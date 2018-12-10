@@ -156,7 +156,7 @@ class StatsController extends Controller
         $campaignData = $this->campaignStats($campaign, $request, $stats);
 
         $variantsData = [];
-        foreach ($campaign->campaignBanners as $variant) {
+        foreach ($campaign->campaignBanners()->withTrashed()->get() as $variant) {
             $variantsData[$variant->id] = $this->variantStats($variant, $request, $stats);
         }
 
