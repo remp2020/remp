@@ -7,6 +7,7 @@ use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalConcurrentsRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
+use App\Helpers\Colors;
 use App\Model\Config;
 use App\Model\DashboardConfig;
 use Carbon\Carbon;
@@ -231,7 +232,7 @@ class DashboardController extends Controller
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
             'tags' => $tags,
-            'colors' => self::tagsToColors($tags)
+            'colors' => Colors::tagsToColors($tags)
         ]);
     }
 
@@ -338,49 +339,5 @@ class DashboardController extends Controller
             'articles' => $topPages,
             'totalConcurrents' => $totalConcurrents,
         ]);
-    }
-
-    public static function tagsToColors($tags): array
-    {
-        $tagColor = [
-            'internal' => '#E63952',
-            'direct' => '#00C7DF',
-            'social' => '#FFC34A',
-            'search' => '#DEDEDE',
-            'external' => '#CDE092',
-            'email' => '#3B40b6',
-        ];
-
-        // If an unexpected tag occurs, assign it one from additional colors
-        $i = 0;
-        $additionalColors = [
-            '#3366cc',
-            '#dc3912',
-            '#ff9900',
-            '#109618',
-            '#990099',
-            '#0099c6',
-            '#dd4477',
-            '#66aa00',
-            '#b82e2e',
-            '#316395',
-            '#994499',
-            '#22aa99',
-            '#aaaa11',
-            '#6633cc',
-            '#e67300',
-            '#8b0707',
-            '#651067',
-            '#329262',
-            '#5574a6',
-            '#3b3eac'
-        ];
-
-        $colors = [];
-
-        foreach ($tags as $tag) {
-            $colors[] = $tagColor[$tag] ?? $additionalColors[$i++];
-        }
-        return $colors;
     }
 }

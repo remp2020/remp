@@ -6,6 +6,7 @@ use App\Article;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
+use App\Helpers\Colors;
 use App\Http\Resources\ArticleResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -127,7 +128,7 @@ class ArticleDetailsController extends Controller
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
             'tags' => $tags,
-            'colors' => DashboardController::tagsToColors($tags)
+            'colors' => Colors::tagsToColors($tags)
         ]);
     }
 
