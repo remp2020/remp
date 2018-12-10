@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
@@ -152,7 +154,9 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 			Time:          c.Time,
 			PropertyToken: token,
 		},
-		User: &app.User{},
+		User:    &app.User{},
+		Details: &app.CommerceDetails{},
+		Source:  &app.Source{},
 	}
 	if c.IP != "" {
 		event.User.IPAddress = &c.IP
@@ -166,6 +170,36 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 	if c.UserAgent != "" {
 		event.User.UserAgent = &c.UserAgent
 	}
+
+	// UTM
+	if c.UtmCampaign != "" {
+		event.Source.UtmCampaign = &c.UtmCampaign
+	}
+	if c.UtmContent != "" {
+		event.Source.UtmContent = &c.UtmContent
+	}
+	if c.UtmMedium != "" {
+		event.Source.UtmMedium = &c.UtmMedium
+	}
+	if c.UtmSource != "" {
+		event.Source.UtmSource = &c.UtmSource
+	}
+
+	// Commerce details
+	if c.FunnelID != "" {
+		event.Details.FunnelID = &c.FunnelID
+	}
+	if c.ProductIDs != "" {
+		event.Details.ProductIds = strings.Split(c.ProductIDs, ",")
+	}
+
+	if c.Revenue != 0 && c.Currency != "" {
+		event.Details.Revenue = &app.Revenue{
+			Amount:   c.Revenue,
+			Currency: c.Currency,
+		}
+	}
+
 	return event, nil
 }
 

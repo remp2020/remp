@@ -193,22 +193,16 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("step", String, func() {
 			Enum("checkout", "payment", "purchase", "refund")
 		})
-		Attribute("checkout", CommerceCheckout)
-		Attribute("payment", CommercePayment)
-		Attribute("purchase", CommercePayment)
-		Attribute("refund", CommercePayment)
-
+		Attribute("details", CommerceDetails)
+		Attribute("source", Source, "UTM and social source metadata")
 		Attribute("article", Article)
 		Attribute("system", System)
 		Attribute("user", User)
 	})
 	View("default", func() {
 		Attribute("step")
-		Attribute("checkout")
-		Attribute("payment")
-		Attribute("purchase")
-		Attribute("refund")
-
+		Attribute("details")
+		Attribute("source")
 		Attribute("article")
 		Attribute("system")
 		Attribute("user")
@@ -314,17 +308,7 @@ var Source = MediaType("application/vnd.source+json", func() {
 	})
 })
 
-var CommerceCheckout = MediaType("application/vnd.commerce.checkout+json", func() {
-	Attributes(func() {
-		Attribute("funnel_id", String, "ID of funnel user is being routed trough")
-	})
-	View("default", func() {
-		Attribute("funnel_id")
-	})
-	Required("funnel_id")
-})
-
-var CommercePayment = MediaType("application/vnd.commerce.payment+json", func() {
+var CommerceDetails = MediaType("application/vnd.commerce_details+json", func() {
 	Attributes(func() {
 		Attribute("funnel_id", String, "ID of funnel user is being routed trough")
 		Attribute("transaction_id", String, "Public ID of transaction (variable symbol)")
@@ -337,7 +321,6 @@ var CommercePayment = MediaType("application/vnd.commerce.payment+json", func() 
 		Attribute("product_ids")
 		Attribute("revenue")
 	})
-	Required("funnel_id", "revenue", "transaction_id", "product_ids")
 })
 
 var Revenue = MediaType("application/vnd.revenue+json", func() {

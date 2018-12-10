@@ -93,7 +93,7 @@ func (cDB *CommerceElastic) List(options ListOptions) (CommerceRowCollection, er
 			// populate commerce for collection
 			commerce := &Commerce{}
 			if err := json.Unmarshal(*hit.Source, commerce); err != nil {
-				return nil, errors.Wrap(err, "error reading pageview record from elastic")
+				return nil, errors.Wrap(err, "error reading commerce record from elastic")
 			}
 
 			// extract raw event data to build tags map
