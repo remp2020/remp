@@ -10,13 +10,6 @@ type ListOptions struct {
 	SelectFields []string
 }
 
-// ListPageviewsOptions represents select and filter options for listing of pageviews
-type ListPageviewsOptions struct {
-	AggregateOptions
-	SelectFields  []string
-	LoadTimespent bool
-}
-
 // AggregateOptions represent filter options for aggregate-related calls.
 type AggregateOptions struct {
 	Category      string

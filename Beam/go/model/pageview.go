@@ -67,6 +67,13 @@ type PageviewRow struct {
 // PageviewRowCollection represents collection of rows of grouped list.
 type PageviewRowCollection []*PageviewRow
 
+// ListPageviewsOptions represents select and filter options for listing of pageviews
+type ListPageviewsOptions struct {
+	AggregateOptions
+	SelectFields  []string
+	LoadTimespent bool
+}
+
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
 	// Count returns count of pageviews based on the provided filter options.

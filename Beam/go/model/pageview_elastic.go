@@ -321,7 +321,7 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 	}
 
 	// Load timespent
-	var timespentForPageviews map[string]int
+	timespentForPageviews := make(map[string]int)
 	if len(pageviewIDs) > 0 && options.LoadTimespent {
 		timespentForPageviews, err = loadTimespent(pDB, pageviewIDs)
 		if err != nil {
@@ -330,11 +330,9 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 	}
 
 	for _, pr := range prBuckets {
-		if len(timespentForPageviews) != 0 {
-			for _, pv := range pr.Pageviews {
-				if timespent, ok := timespentForPageviews[pv.PageviewID]; ok {
-					pv.Timespent = timespent
-				}
+		for _, pv := range pr.Pageviews {
+			if timespent, ok := timespentForPageviews[pv.PageviewID]; ok {
+				pv.Timespent = timespent
 			}
 		}
 
