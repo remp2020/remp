@@ -48,12 +48,6 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
-    public function forCampaign($campaignId) : StatsRequest
-    {
-        $this->filterBy("utm_campaign", $campaignId);
-        return $this;
-    }
-
     public function forVariant($variantId) : StatsRequest
     {
         $this->filterBy("banner_variant", $variantId);

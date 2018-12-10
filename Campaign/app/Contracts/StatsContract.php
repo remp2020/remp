@@ -12,14 +12,6 @@ use App\Contracts\Remp\StatsRequest;
 interface StatsContract
 {
     /**
-     * filter results by campaign id
-     *
-     * @param int $campaignId
-     * @return StatsRequest
-     */
-    public function forCampaign($campaignId) : StatsRequest;
-
-    /**
      * filter results by variant id
      *
      * @param int $variantId
