@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\Conversion;
 use Illuminate\Database\Eloquent\Model;
 
 class ConversionCommerceEvent extends Model
@@ -16,6 +17,7 @@ class ConversionCommerceEvent extends Model
         'utm_content',
         'utm_medium',
         'utm_source',
+        'conversion_id'
     ];
 
     protected $dates = [
@@ -23,6 +25,11 @@ class ConversionCommerceEvent extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function conversion()
+    {
+        return $this->belongsTo(Conversion::class);
+    }
 
     public function products()
     {

@@ -18,6 +18,11 @@ class JournalAggregateRequest
 
     protected $timeHistogram = [];
 
+    public static function from($category, $action)
+    {
+        return new self($category, $action);
+    }
+
     public function __construct($category, $action)
     {
         $this->category = $category;
@@ -60,6 +65,13 @@ class JournalAggregateRequest
     public function setTimeAfter(\DateTime $timeAfter): JournalAggregateRequest
     {
         $this->timeAfter = $timeAfter;
+        return $this;
+    }
+
+    public function setTime(\DateTime $timeAfter, \DateTime $timeBefore): JournalAggregateRequest
+    {
+        $this->timeAfter = $timeAfter;
+        $this->timeBefore = $timeBefore;
         return $this;
     }
 

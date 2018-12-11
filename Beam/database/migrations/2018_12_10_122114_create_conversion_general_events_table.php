@@ -16,12 +16,21 @@ class CreateConversionGeneralEventsTable extends Migration
         Schema::create('conversion_general_events', function (Blueprint $table) {
             $table->increments('id');
 
+            $table->integer('conversion_id')->unsigned();
+
             $table->timestamp('time');
 
             $table->string('action')->nullable();
             $table->string('category')->nullable();
 
+            $table->string('utm_campaign')->nullable();
+            $table->string('utm_content')->nullable();
+            $table->string('utm_medium')->nullable();
+            $table->string('utm_source')->nullable();
+
             $table->timestamps();
+
+            $table->foreign('conversion_id')->references('id')->on('conversions');
         });
     }
 

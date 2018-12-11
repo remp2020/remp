@@ -70,6 +70,13 @@ class JournalListRequest
         return $this;
     }
 
+    public function setTime(\DateTime $timeAfter, \DateTime $timeBefore)
+    {
+        $this->timeAfter = $timeAfter;
+        $this->timeBefore = $timeBefore;
+        return $this;
+    }
+
     public function buildUrl($template): string
     {
         return sprintf($template, $this->category);

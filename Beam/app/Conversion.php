@@ -2,6 +2,9 @@
 
 namespace App;
 
+use App\Model\ConversionCommerceEvent;
+use App\Model\ConversionGeneralEvent;
+use App\Model\ConversionPageviewEvent;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -33,6 +36,21 @@ class Conversion extends Model
     public function article()
     {
         return $this->belongsTo(Article::class);
+    }
+
+    public function commerceEvents()
+    {
+        return $this->hasMany(ConversionCommerceEvent::class);
+    }
+
+    public function pageviewEvents()
+    {
+        return $this->hasMany(ConversionPageviewEvent::class);
+    }
+
+    public function generalEvents()
+    {
+        return $this->hasMany(ConversionGeneralEvent::class);
     }
 
     public function setArticleExternalIdAttribute($articleExternalId)

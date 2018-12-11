@@ -16,6 +16,8 @@ class CreateConversionCommerceEventsTable extends Migration
         Schema::create('conversion_commerce_events', function (Blueprint $table) {
             $table->increments('id');
 
+            $table->integer('conversion_id')->unsigned();
+
             $table->timestamp('time');
 
             $table->string('step');
@@ -28,6 +30,8 @@ class CreateConversionCommerceEventsTable extends Migration
             $table->string('utm_medium')->nullable();
             $table->string('utm_source')->nullable();
             $table->timestamps();
+
+            $table->foreign('conversion_id')->references('id')->on('conversions');
         });
     }
 

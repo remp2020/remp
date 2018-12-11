@@ -16,6 +16,8 @@ class CreateConversionPageviewEventsTable extends Migration
         Schema::create('conversion_pageview_events', function (Blueprint $table) {
             $table->increments('id');
 
+            $table->integer('conversion_id')->unsigned();
+
             $table->timestamp('time');
 
             $table->integer('article_id')->unsigned();
@@ -29,6 +31,7 @@ class CreateConversionPageviewEventsTable extends Migration
 
             $table->timestamps();
 
+            $table->foreign('conversion_id')->references('id')->on('conversions');
             $table->foreign('article_id')->references('id')->on('articles');
         });
     }
