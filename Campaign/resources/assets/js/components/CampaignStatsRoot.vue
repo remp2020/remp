@@ -18,7 +18,21 @@
             ></campaign-stats-results>
 
             <variant-stats
-                v-for="variant in variants"
+                v-for="variant in variantsList"
+                :key="variant.id"
+
+                :variant="variant"
+                :variant-banner-link="variantBannerLinks[variant.id] || null"
+                :variant-banner-text="variantBannerTexts[variant.id] || null"
+                :data="variantsData[variant.id]"
+                :error="error"
+                :loading="loading"
+            ></variant-stats>
+
+            <h3 class="deleted-variants-title">Deleted variants</h3>
+
+            <variant-stats
+                v-for="variant in deletedVariantsList"
                 :key="variant.id"
 
                 :variant="variant"
@@ -83,6 +97,8 @@
         props: props,
         data() {
             return {
+                variantsList: [],
+                deletedVariantsList: [],
                 campaignData: {},
                 variantsData: {},
                 loading: true,
@@ -91,7 +107,9 @@
             }
         },
         mounted() {
-            this.loadData();
+            this.prepareVariantLists().then(() => {
+                this.loadData();
+            })
         },
         watch: {
             from() {
@@ -102,6 +120,20 @@
             }
         },
         methods: {
+            prepareVariantLists() {
+                return new Promise((resolve) => {
+                    for (let ii = 0; ii < this.variants.length; ii++) {
+                        if (this.variants[ii].deleted_at) {
+                            this.deletedVariantsList.push(this.variants[ii]);
+                            continue;
+                        }
+
+                        this.variantsList.push(this.variants[ii]);
+                    }
+
+                    resolve();
+                });
+            },
             loadData() {
                 let vm = this;
                 vm.error = "";
@@ -160,5 +192,10 @@
     .card-earned .card-body,
     .card-earned .card-header {
         font-weight: bold;
+    }
+
+    .deleted-variants-title {
+        margin-top: 1.6em;
+        margin-bottom: 0.5em;
     }
 </style>

@@ -168,7 +168,7 @@ class StatsController extends Controller
 
     public function campaignStats(Campaign $campaign, Request $request, Stats $stats)
     {
-        $variantUuids = $campaign->campaignBanners->map(function ($banner) {
+        $variantUuids = $campaign->campaignBanners()->withTrashed()->get()->map(function ($banner) {
             return $banner["uuid"];
         })->toArray();
 

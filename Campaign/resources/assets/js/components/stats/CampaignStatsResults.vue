@@ -19,11 +19,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="variant in variantsData" :key="variant.id">
+                            <tr v-for="variant in variantsData" :key="variant.id" :class="{ 'deleted-variant': variant.deleted_at }">
                             <td>
                                 <i v-if="variant.deleted_at"
                                    class="zmdi zmdi-close-circle-o"
-                                   style="color: red;"
                                    title="This variant was deleted.">&nbsp;</i>
 
                                 <a v-if="variant.link" :href="variant.link">{{ variant.name }}</a>
@@ -149,5 +148,17 @@
 
     .card-table {
         margin-bottom: 0;
+    }
+
+    .deleted-variant {
+        color: #999;
+    }
+
+    .deleted-variant .zmdi-close-circle-o {
+        color: rgba(255, 0, 0, 0.67);
+    }
+
+    .deleted-variant a {
+        color: rgba(0, 121, 143, 0.58);
     }
 </style>
