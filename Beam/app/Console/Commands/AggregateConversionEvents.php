@@ -69,8 +69,7 @@ class AggregateConversionEvents extends Command
         $records = $this->journal->count(JournalAggregateRequest::from('pageviews', 'load')
             ->addGroup('browser_id')
             ->addFilter('user_id', $conversion->user_id)
-            ->setTime($after, $before)
-        );
+            ->setTime($after, $before));
         foreach ($records as $record) {
             if ($record->tags->browser_id) {
                 $browserIds[] = $record->tags->browser_id;
@@ -103,20 +102,22 @@ class AggregateConversionEvents extends Command
             return;
         }
         $browserIds = $this->getBrowsersForUser($conversion);
-        $this->loadAndStorePageviewEvents($conversion,
+        $this->loadAndStorePageviewEvents(
+            $conversion,
             $this->buildJournalListRequest('pageviews', $browserIds, $conversion->user_id, $days)
                 ->setLoadTimespent()
         );
 
-        $this->loadAndStoreCommerceEvents($conversion,
+        $this->loadAndStoreCommerceEvents(
+            $conversion,
             $this->buildJournalListRequest('commerce', $browserIds, $conversion->user_id, $days)
         );
 
-        $this->loadAndStoreGeneralEvents($conversion,
+        $this->loadAndStoreGeneralEvents(
+            $conversion,
             $this->buildJournalListRequest('events', $browserIds, $conversion->user_id, $days)
         );
     }
-
 
     private function buildJournalListRequest(string $category, array $browserIds, $userId, int $days): JournalListRequest
     {
@@ -137,12 +138,12 @@ class AggregateConversionEvents extends Command
         $events = $this->journal->list($request);
         if ($events->isNotEmpty()) {
             foreach ($events[0]->pageviews as $item) {
-                if (!isset($item->article->id)){
+                if (!isset($item->article->id)) {
                     continue;
                 }
                 $article = Article::where('external_id', $item->article->id)->first();
 
-                if ($article){
+                if ($article) {
                     ConversionPageviewEvent::create([
                         'conversion_id' => $conversion->id,
                         'time' => Carbon::parse($item->system->time)->tz('UTC'),
