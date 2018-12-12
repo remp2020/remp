@@ -231,7 +231,7 @@ class ScheduleController extends Controller
         if (!$schedule->isRunnable()) {
             return response()->format([
                 'html' => redirect(route('campaigns.index'))->with('success', sprintf(
-                    "Schedule for campaign %s was not runnable, satrt request ignored",
+                    "Schedule for campaign %s was not runnable, start request ignored",
                     $schedule->campaign->name
                 )),
                 'json' => new JsonResource(new BadRequestHttpException('cannot start schedule: not runnable')),

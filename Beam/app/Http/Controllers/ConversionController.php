@@ -66,7 +66,7 @@ class ConversionController extends Controller
                 ];
             })
             ->addColumn('article.title', function (Conversion $conversion) {
-                return \HTML::link(route('articles.show', ['article' => $conversion->article->id]), $conversion->article->title);
+                return \Html::link(route('articles.show', ['article' => $conversion->article->id]), $conversion->article->title);
             })
             ->filterColumn('article.authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);

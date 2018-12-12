@@ -84,6 +84,7 @@ services:
 			- register(Remp\MailerModule\Commands\DemoSeedCommand())
 			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
 			- register(Remp\MailerModule\Commands\HeartbeatCommand())
+			- register(Remp\MailerModule\Commands\MailTypeStatsCommand())
 			- register(@hermesWorker)
 			- setCatchExceptions(true)
 
@@ -189,6 +190,7 @@ services:
 	- Remp\MailerModule\Repository\ConfigsRepository
 	- Remp\MailerModule\Repository\UsersRepository
 	- Remp\MailerModule\Repository\UserSubscriptionsRepository
+	- Remp\MailerModule\Repository\UserSubscriptionVariantsRepository
 	- Remp\MailerModule\Repository\LogsRepository('2000-01-01 00:00:00')
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
@@ -201,7 +203,8 @@ services:
 	- Remp\MailerModule\Repository\BatchTemplatesRepository
 	- Remp\MailerModule\Repository\AutoLoginTokensRepository
 	- Remp\MailerModule\Repository\SourceTemplatesRepository
-	- Remp\MailerModule\Repository\UserSubscriptionVariantsRepository
+	- Remp\MailerModule\Repository\MailTypesRepository
+	- Remp\MailerModule\Repository\MailTypeStatsRepository
 
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory

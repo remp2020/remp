@@ -92,7 +92,7 @@ class Banner extends Model
 
     public function campaigns()
     {
-        return $this->belongsToMany(Campaign::class, 'campaign_banners');
+        return $this->belongsToMany(Campaign::class, 'campaign_banners')->whereNull('deleted_at');
     }
 
     public function htmlTemplate()

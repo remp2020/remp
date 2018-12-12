@@ -8,7 +8,10 @@
             <h2>Live BEAM Dashboard</h2>
         </div>
 
-        <dashboard-root :articles-url="articlesUrl" :time-histogram-url="timeHistogramUrl">
+        <dashboard-root
+                :articles-url="articlesUrl"
+                :time-histogram-url="timeHistogramUrl"
+                :options="options">
         </dashboard-root>
     </div>
 
@@ -27,7 +30,8 @@
             data: {
                 articlesUrl: "{!! route('dashboard.articles.json') !!}",
                 timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}",
-                enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }}
+                enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }},
+                options: {!! json_encode($options) !!}
             }
         })
     </script>

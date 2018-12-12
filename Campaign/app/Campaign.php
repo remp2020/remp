@@ -81,7 +81,7 @@ class Campaign extends Model
     public function banners()
     {
         return $this->belongsToMany(Banner::class, 'campaign_banners')
-            ->withPivot('variant', 'proportion', 'control_group', 'weight');
+            ->withPivot('proportion', 'control_group', 'weight');
     }
 
     public function campaignBanners()
@@ -234,5 +234,19 @@ class Campaign extends Model
         }
 
         Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
+    }
+
+    public function signedInOptions()
+    {
+        return [
+            null => 'Everyone',
+            true => 'Only signed in',
+            false => 'Only anonymous ',
+        ];
+    }
+
+    public function signedInLabel()
+    {
+        return $this->signedInOptions()[$this->signed_in];
     }
 }

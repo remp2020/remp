@@ -80,6 +80,9 @@ Route::middleware('auth.jwt')->group(function () {
         'only' => ['index', 'show']
     ]);
 
+    Route::get('settings', 'SettingsController@index')->name('settings.index');
+    Route::post('settings', 'SettingsController@update')->name('settings.update');
+
     Route::post('entities/validate/{entity?}', 'EntitiesController@validateForm')->name('entities.validateForm');
     Route::get('entities/json', 'EntitiesController@json')->name('entities.json');
     Route::resource('entities', 'EntitiesController');

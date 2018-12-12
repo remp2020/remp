@@ -35,7 +35,13 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['single', 'airbrake'],
+        ],
+
+        'airbrake' => [
+            'driver' => 'custom',
+            'via' => App\AirbrakeLogger::class,
+            'level' => 'notice',
         ],
 
         'single' => [

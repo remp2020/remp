@@ -110,6 +110,9 @@ class CampaignController extends Controller
                 }
                 return false;
             })
+            ->addColumn('signed_in', function (Campaign $campaign) {
+                return $campaign->signedInLabel();
+            })
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
@@ -476,7 +479,7 @@ class CampaignController extends Controller
         try {
             $data = \GuzzleHttp\json_decode($r->get('data'));
         } catch (\InvalidArgumentException $e) {
-            Debugger::log('could not decode JSON in Campaign:Showtime: ' . $r->get('data'));
+            Log::warning('could not decode JSON in Campaign:Showtime', $r->get('data'));
             return response()
                 ->jsonp($r->get('callback'), [
                     'success' => false,

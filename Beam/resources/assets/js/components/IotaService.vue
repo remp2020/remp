@@ -31,12 +31,21 @@
                 type: String,
                 required: true,
             },
+            configUrl: {
+                type: String,
+                required: false
+            },
             httpHeaders: {
                 type: Object,
                 default: function() {
                     return {};
                 },
             },
+        },
+        data: function() {
+            return {
+                config: null
+            }
         },
         created: function() {
             let vm = this;
@@ -45,10 +54,23 @@
             });
             Axios.defaults.headers.common['Content-Type'] = 'application/json';
 
-            let now = new Date();
-            this.fetchCommerceStats();
-            this.fetchPageviewStats(now);
-            this.fetchVariantStats(now, ["title_variant", "image_variant"]);
+            new Promise((resolve, reject) => {
+                if (this.configUrl) {
+                    Axios.get(this.configUrl).then(({ data }) => resolve(data), reject)
+                } else {
+                    resolve()
+                }
+            }).then((config) => {
+                if (config) {
+                    EventHub.$emit('config-changed', config)
+                }
+
+                let now = new Date();
+
+                this.fetchCommerceStats();
+                this.fetchPageviewStats(now);
+                this.fetchVariantStats(now, ["title_variant", "image_variant"]);
+            })
         },
         methods: {
             fetchCommerceStats: function() {

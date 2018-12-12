@@ -29,6 +29,9 @@
 
                     <ul class="dropdown-menu pull-right dm-icon">
                         <li>
+                            <a href="{{ route('settings.index') }}"><i class="zmdi zmdi-settings"></i> Settings</a>
+                        </li>
+                        <li>
                             <a href="{{ route('auth.logout') }}"><i class="zmdi zmdi-time-restore"></i> Logout</a>
                         </li>
                     </ul>

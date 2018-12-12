@@ -27,3 +27,8 @@ Route::middleware('auth:api')->group(function() {
 
 Route::get('/journal/{group}/categories/{category}/actions', 'JournalController@actions');
 Route::get('/journal/flags', 'JournalController@flags');
+
+Route::middleware('cors')->group(function() {
+    Route::get('/dashboard/options', 'DashboardController@options')->name('dashboard.options');
+});
+

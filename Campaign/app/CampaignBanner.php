@@ -21,11 +21,10 @@ class CampaignBanner extends Model
     protected $fillable = [
         'id',
         'campaign_id',
-        'variant',
-        'weight',
-        'proportion',
+        'banner_id',
         'control_group',
-        'banner_id'
+        'proportion',
+        'weight',
     ];
 
     protected static function boot()

@@ -74,6 +74,7 @@ final class ListPresenter extends BasePresenter
             ])
             ->setAllColSetting('orderable', false)
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show list')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit layout')
             ->setTableSetting('displayNavigation', false)
             ->setTableSetting('rowGroup', 0);
 
@@ -94,9 +95,11 @@ final class ListPresenter extends BasePresenter
         /** @var ActiveRow $list */
         foreach ($lists as $list) {
             $showUrl = $this->link('Show', $list->id);
+            $editUrl = $this->link('Edit', $list->id);
             $result['data'][] = [
                 'actions' => [
                     'show' => $showUrl,
+                    'edit' => $editUrl,
                 ],
                 $list->type_category ? $list->type_category->title : null,
                 "<a href='{$showUrl}'>{$list->title}</a>",
@@ -107,6 +110,7 @@ final class ListPresenter extends BasePresenter
                 $list->is_public,
             ];
         }
+
         $this->presenter->sendJson($result);
     }
 
@@ -123,6 +127,16 @@ final class ListPresenter extends BasePresenter
             'subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
             'un-subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => false])->count('*'),
         ];
+    }
+
+    public function renderEdit($id)
+    {
+        $list = $this->listsRepository->find($id);
+        if (!$list) {
+            throw new BadRequestException();
+        }
+
+        $this->template->list = $list;
     }
 
     public function createComponentDataTableTemplates(IDataTableFactory $dataTableFactory)
@@ -193,10 +207,15 @@ final class ListPresenter extends BasePresenter
 
     public function createComponentListForm()
     {
-        $form = $this->listFormFactory->create();
+        $id = null;
+        if (isset($this->params['id'])) {
+            $id = intval($this->params['id']);
+        }
+
+        $form = $this->listFormFactory->create($id);
 
         $presenter = $this;
-        $this->listFormFactory->onSuccess = function ($list) use ($presenter) {
+        $this->listFormFactory->onCreate = function ($list) use ($presenter) {
             $this->emitter->emit(new HermesMessage('list-created', [
                 'list_id' => $list->id,
             ]));
@@ -205,13 +224,33 @@ final class ListPresenter extends BasePresenter
             $presenter->redirect('Show', $list->id);
         };
 
+        $this->listFormFactory->onUpdate = function ($list) use ($presenter) {
+            $this->emitter->emit(new HermesMessage('list-updated', [
+                'list_id' => $list->id,
+            ]));
+
+            $presenter->flashMessage('Newsletter list was updated');
+            $presenter->redirect('Edit', $list->id);
+        };
+
         return $form;
     }
 
-    public function handleListCategoryChange($categoryId)
+    public function handleRenderSorting($categoryId, $sorting)
     {
-        $lists = $this->listsRepository->findByCategory($categoryId)->fetchPairs('sorting', 'title');
-        $this['listForm']['sorting_after']->setItems($lists);
+        // set sorting value
+        $this['listForm']['sorting']->setValue($sorting);
+
+        // handle newsletter list category change
+        if ($this['listForm']['mail_type_category_id']->getValue() !== $categoryId) {
+            $lists = $this->listsRepository->findByCategory($categoryId);
+            if ($listId = $this['listForm']['id']->getValue()) {
+                $lists = $lists->where('id != ?', $listId);
+            }
+
+            $lists = $lists->order('sorting ASC')->fetchPairs('sorting', 'title');
+            $this['listForm']['sorting_after']->setItems($lists);
+        }
 
         $this->redrawControl('wrapper');
         $this->redrawControl('sortingAfterSnippet');

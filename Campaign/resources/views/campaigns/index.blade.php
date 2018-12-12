@@ -94,8 +94,7 @@
                             'priority' => 5,
                         ],
                         'signed_in' => [
-                            'header' => 'Signed in',
-                            'render' => 'boolean',
+                            'header' => 'Signed-in state',
                             'priority' => 10,
                         ],
                         'devices' => [

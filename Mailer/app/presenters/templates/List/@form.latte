@@ -1,4 +1,5 @@
 {form listForm}
+    {input id}
     <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
         {$error}<br>
     </div>
@@ -12,7 +13,10 @@
 
             <div class="form-group fg-float m-b-30">
                 {label priority /}
-                {input priority, class => 'selectpicker', data-live-search => 'true', data-live-search-normalize => 'true'}
+                {input priority, class => 'form-control fg-input'}
+                <small class="help-block">
+                    Higher priority (lower number) means newsletter will be sent prior to newsletters with lower priority.
+                </small>
             </div>
 
             <div class="form-group fg-float m-b-30">
@@ -58,7 +62,10 @@
                         <i class="input-helper"></i> {$label}
                         {if $key == 'after'}
                             {snippet sortingAfterSnippet}
-                                {input sorting_after, class => 'selectpicker sorting_after m-t-10'}
+                                {var $form = $control['listForm']}
+                                {if $form['sorting']->getValue() === 'after'}
+                                    {input sorting_after, class => 'selectpicker sorting_after m-t-10'}
+                                {/if}
                             {/snippet}
                         {/if}
                     {/label}
@@ -95,21 +102,31 @@
         </div>
     </div>
 {/form}
-{include jsCallback, input => mail_type_category_id, link => listCategoryChange}
+{include jsCallbackRenderSorting, link => renderSorting}
 
-
-{define jsCallback}
+{define jsCallbackRenderSorting}
     <script>
-        $('#{$control['listForm'][$input]->htmlId|noescape}').off('change').on('change', function () {
+        var $category = $('#{$control['listForm']['mail_type_category_id']->htmlId|noescape}'),
+            $sorting = $('[name={$control['listForm']['sorting']->name|noescape}]');
+
+        var renderSortingAction = function () {
             $.nette.ajax({
                 type: 'GET',
                 url: {link {$link}!},
                 data: {
-                    'categoryId': $(this).val()
+                    'categoryId': $category.val(),
+                    'sorting': $sorting.filter(':checked').val()
                 }
             }).done(function () {
                 $('.selectpicker').selectpicker('refresh');
             });
-        });
+        };
+
+        {if $control['listForm']->hasErrors()}
+            renderSortingAction();
+        {/if}
+
+        $category.off('change').on('change', renderSortingAction);
+        $sorting.off('change').on('change', renderSortingAction);
     </script>
 {/define}

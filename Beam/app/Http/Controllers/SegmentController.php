@@ -7,7 +7,7 @@ use App\Http\Requests\SegmentRequest;
 use App\Segment;
 use App\SegmentGroup;
 use App\SegmentRule;
-use HTML;
+use Html;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 
@@ -44,7 +44,7 @@ class SegmentController extends Controller
                 ];
             })
             ->addColumn('name', function (Segment $segment) {
-                return HTML::linkRoute('segments.edit', $segment->name, $segment);
+                return Html::linkRoute('segments.edit', $segment->name, $segment);
             })
             ->rawColumns(['active', 'actions'])
             ->make(true);

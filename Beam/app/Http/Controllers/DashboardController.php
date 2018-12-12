@@ -7,6 +7,9 @@ use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalConcurrentsRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
+use App\Helpers\Colors;
+use App\Model\Config;
+use App\Model\DashboardConfig;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -37,9 +40,24 @@ class DashboardController extends Controller
 
     private function dashboardView($template)
     {
+        $options = [];
+        foreach (DashboardConfig::getValues() as $value) {
+            $options[$value] = Config::loadByName($value);
+        }
+
         return view($template, [
-            'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null
+            'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
+            'options' => $options
         ]);
+    }
+
+    public function options()
+    {
+        $options = [];
+        foreach (DashboardConfig::getValues() as $value) {
+            $options[$value] = Config::loadByName($value);
+        }
+        return $options;
     }
 
     private function getJournalParameters($interval, $tz)
@@ -213,7 +231,8 @@ class DashboardController extends Controller
             'results' => $results,
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
-            'tags' => $tags
+            'tags' => $tags,
+            'colors' => Colors::tagsToColors($tags)
         ]);
     }
 
@@ -318,7 +337,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'articles' => $topPages,
-            'totalConcurrents' => $totalConcurrents
+            'totalConcurrents' => $totalConcurrents,
         ]);
     }
 }
