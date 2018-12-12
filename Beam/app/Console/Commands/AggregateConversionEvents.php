@@ -50,7 +50,9 @@ class AggregateConversionEvents extends Command
             }
             $this->aggregateConversion($conversion, $days);
         } else {
-            // TODO load all non-aggregated conversions
+            foreach ($this->getUnaggregatedConversions() as $conversion) {
+                $this->aggregateConversion($conversion, $days);
+            }
         }
 
         $this->line(' <info>OK!</info>');
@@ -76,6 +78,22 @@ class AggregateConversionEvents extends Command
         }
 
         return $browserIds;
+    }
+
+    private function getUnaggregatedConversions()
+    {
+        $unionQuery = ConversionGeneralEvent::select('conversion_id')
+            ->groupBy('conversion_id')
+            ->union(ConversionCommerceEvent::select('conversion_id')->groupBy('conversion_id'))
+            ->union(ConversionPageviewEvent::select('conversion_id')->groupBy('conversion_id'));
+
+        return Conversion::select('conversions.*')
+            ->leftJoinSub($unionQuery, 't', function ($join) {
+                $join->on('conversions.id', 't.conversion_id');
+            })
+            ->whereNotNull('conversions.user_id')
+            ->whereNull('t.conversion_id')
+            ->get();
     }
 
     protected function aggregateConversion(Conversion $conversion, int $days)
