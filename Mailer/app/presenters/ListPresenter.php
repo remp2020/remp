@@ -9,8 +9,13 @@ use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Tomaj\Hermes\Emitter;
+use DateTime;
+use DateInterval;
+use IntlDateFormatter;
+use Remp\MailerModule\Formatters\DateFormatterFactory;
 
 final class ListPresenter extends BasePresenter
 {
@@ -20,8 +25,14 @@ final class ListPresenter extends BasePresenter
     /** @var TemplatesRepository */
     private $templatesRepository;
 
+    /** @var MailTypeStatsRepository */
+    private $mailTypeStatsRepository;
+
     /** @var ListFormFactory */
     private $listFormFactory;
+
+    /** @var IntlDateFormatter */
+    private $dateFormatter;
 
     /** @var Emitter */
     private $emitter;
@@ -29,13 +40,19 @@ final class ListPresenter extends BasePresenter
     public function __construct(
         ListsRepository $listsRepository,
         TemplatesRepository $templatesRepository,
+        MailTypeStatsRepository $mailTypeStatsRepository,
+        DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
         Emitter $emitter
     ) {
-
         parent::__construct();
+
+        $this->dateFormatter = $dateFormatterFactory
+            ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+
         $this->listsRepository = $listsRepository;
         $this->templatesRepository = $templatesRepository;
+        $this->mailTypeStatsRepository = $mailTypeStatsRepository;
         $this->listFormFactory = $listFormFactory;
         $this->emitter = $emitter;
     }
@@ -127,6 +144,48 @@ final class ListPresenter extends BasePresenter
             'subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
             'un-subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => false])->count('*'),
         ];
+
+        $this->prepareDetailSubscribersGraphData($id);
+    }
+
+    public function prepareDetailSubscribersGraphData($id)
+    {
+        $labels = [];
+        $numOfDays = 30;
+        $now = new DateTime();
+        $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
+
+        // fill graph columns
+        for ($i = $numOfDays; $i >= 0; $i--) {
+            $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
+        }
+
+        $mailType = $this->listsRepository->find($id);
+
+        $dataSet = [
+            'label' => $mailType->title,
+            'data' => array_fill(0, $numOfDays, 0),
+            'fill' => false,
+            'borderColor' => 'rgb(75, 192, 192)',
+            'lineTension' => 0.5
+        ];
+
+        $data = $this->mailTypeStatsRepository->getDashboardDetailData($id, $from, $now);
+
+        // parse sent mails by type data to chart.js format
+        foreach ($data as $row) {
+            $foundAt = array_search(
+                $this->dateFormatter->format($row->created_date),
+                $labels
+            );
+
+            if ($foundAt !== false) {
+                $dataSet['data'][$foundAt] = $row->count;
+            }
+        }
+
+        $this->template->dataSet = $dataSet;
+        $this->template->labels = $labels;
     }
 
     public function renderEdit($id)

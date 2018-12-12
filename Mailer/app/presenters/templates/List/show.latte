@@ -21,6 +21,50 @@
     </div>
 </div>
 
+
+<div class="card">
+    <div class="card-header">
+        <h2>Subscribed users</h2>
+
+        <div class="actions">
+            <a n:href="Dashboard:default" class="btn palette-Cyan bg waves-effect">Back to dashboard</a>
+        </div>
+    </div>
+
+    <div class="p-30">
+        <canvas id="mailer-dashboard-detail-statistics-graph" width="1500" height="400"></canvas>
+    </div>
+
+    <script>
+        var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph").getContext('2d');
+        var myLineChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                "labels": {$labels},
+                "datasets": [{$dataSet}]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            display: true
+                        }
+                    }]
+                },
+                legend: {
+                    display: false,
+                    position: "right"
+                }
+            }
+        });
+    </script>
+</div>
+
 <div class="row">
     <div class="col-md-4">
         <div class="card">
