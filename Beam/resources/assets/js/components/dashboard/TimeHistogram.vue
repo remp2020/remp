@@ -369,7 +369,8 @@
                 }
                 let results = this.data.results,
                     previousResults = this.data.previousResultsSummed,
-                    tags = this.data.tags
+                    tags = this.data.tags,
+                    colors = this.data.colors
 
                 let outerWidth = container.clientWidth,
                     outerHeight = container.clientHeight,
@@ -400,8 +401,6 @@
                     .range([0, width])
                 y.domain([0, yMax])
                     .range([height, 0])
-
-                let colors = constants.GRAPH_COLORS
 
                 colorScale = d3.scaleOrdinal()
                     .domain(tags)
@@ -509,7 +508,8 @@
                                     value: d.value
                                 }
                             )),
-                            tags: tags
+                            tags: tags,
+                            colors: response.data.colors
                         }
                     })
                     .catch(error => {

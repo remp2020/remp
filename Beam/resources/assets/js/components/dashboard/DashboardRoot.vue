@@ -142,7 +142,7 @@
             required: true
         },
         options: {
-            type: Array,
+            type: Object,
             required: false
         },
     }

@@ -7,6 +7,7 @@ use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalConcurrentsRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
+use App\Helpers\Colors;
 use App\Model\Config;
 use App\Model\DashboardConfig;
 use Carbon\Carbon;
@@ -230,7 +231,8 @@ class DashboardController extends Controller
             'results' => $results,
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
-            'tags' => $tags
+            'tags' => $tags,
+            'colors' => Colors::tagsToColors($tags)
         ]);
     }
 
