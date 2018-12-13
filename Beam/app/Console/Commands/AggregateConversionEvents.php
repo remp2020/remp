@@ -108,12 +108,12 @@ class AggregateConversionEvents extends Command
             $this->line("Conversion #{$conversion->user_id} has no assigned user.");
             return;
         }
-        //$browserIds = $this->getBrowsersForUser($conversion, 'pageviews', 'load');
-        //$this->loadAndStorePageviewEvents(
-        //    $conversion,
-        //    $this->buildJournalListRequest('pageviews', $browserIds, $conversion, $days)
-        //        ->setLoadTimespent()
-        //);
+        $browserIds = $this->getBrowsersForUser($conversion, 'pageviews', 'load');
+        $this->loadAndStorePageviewEvents(
+            $conversion,
+            $this->buildJournalListRequest('pageviews', $browserIds, $conversion, $days)
+                ->setLoadTimespent()
+        );
 
         $browserIds = $this->getBrowsersForUser($conversion, 'commerce');
         $this->loadAndStoreCommerceEvents(
@@ -121,10 +121,11 @@ class AggregateConversionEvents extends Command
             $this->buildJournalListRequest('commerce', $browserIds, $conversion, $days)
         );
 
-        //$this->loadAndStoreGeneralEvents(
-        //    $conversion,
-        //    $this->buildJournalListRequest('events', $browserIds, $conversion, $days)
-        //);
+        $browserIds = $this->getBrowsersForUser($conversion, 'events');
+        $this->loadAndStoreGeneralEvents(
+            $conversion,
+            $this->buildJournalListRequest('events', $browserIds, $conversion, $days)
+        );
     }
 
     private function buildJournalListRequest(string $category, array $browserIds, Conversion $conversion, int $days): JournalListRequest
