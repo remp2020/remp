@@ -85,10 +85,31 @@ func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
 	return ctx.OK(mt)
 }
 
-// Sum runs the sum action.
-func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
+// SumStep runs the sum action for particular step
+func (c *CommerceController) SumStep(ctx *app.SumStepCommerceContext) error {
 	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
 	o.Step = ctx.Step
+
+	src, ok, err := c.CommerceStorage.Sum(o)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		sr := model.SumRow{
+			Tags: make(map[string]string),
+			Sum:  0,
+		}
+		src = model.SumRowCollection{}
+		src = append(src, sr)
+	}
+
+	asrc := SumRowCollection(src).ToMediaType()
+	return ctx.OK(asrc)
+}
+
+// Sum runs the sum action
+func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
+	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
 
 	src, ok, err := c.CommerceStorage.Sum(o)
 	if err != nil {

@@ -193,7 +193,7 @@ var _ = Resource("commerce", func() {
 		})
 	})
 
-	Action("sum", func() {
+	Action("sum_step", func() {
 		Description("Returns sum of amounts within events")
 		Payload(CommerceOptionsPayload)
 		Routing(POST("/steps/:step/sum"))
@@ -211,6 +211,21 @@ var _ = Resource("commerce", func() {
 			}))
 		})
 	})
+
+	Action("sum", func() {
+		Description("Returns sum of amounts within events")
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/sum"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Sum, func() {
+				View("default")
+			}))
+		})
+	})
+
 	Action("list", func() {
 		Description("Returns full list of events")
 		Routing(POST("/list"))
