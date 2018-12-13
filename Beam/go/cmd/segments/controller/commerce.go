@@ -22,32 +22,29 @@ func NewCommerceController(service *goa.Service, cs model.CommerceStorage) *Comm
 
 // Count runs the count action.
 func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
-	o := model.AggregateOptions{
-		Step: ctx.Step,
-	}
+	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
 
-	for _, val := range ctx.Payload.FilterBy {
-		fb := &model.FilterBy{
-			Tag:    val.Tag,
-			Values: val.Values,
+	crc, ok, err := c.CommerceStorage.Count(o)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		cr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
 		}
-		o.FilterBy = append(o.FilterBy, fb)
+		crc = model.CountRowCollection{}
+		crc = append(crc, cr)
 	}
 
-	o.GroupBy = ctx.Payload.GroupBy
-	if ctx.Payload.TimeAfter != nil {
-		o.TimeAfter = *ctx.Payload.TimeAfter
-	}
-	if ctx.Payload.TimeBefore != nil {
-		o.TimeBefore = *ctx.Payload.TimeBefore
-	}
+	acrc := CountRowCollection(crc).ToMediaType()
+	return ctx.OK(acrc)
+}
 
-	if ctx.Payload.TimeHistogram != nil {
-		o.TimeHistogram = &model.TimeHistogram{
-			Interval: ctx.Payload.TimeHistogram.Interval,
-			Offset:   ctx.Payload.TimeHistogram.Offset,
-		}
-	}
+// CountStep runs the count action with step parameter
+func (c *CommerceController) CountStep(ctx *app.CountStepCommerceContext) error {
+	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	o.Step = ctx.Step
 
 	crc, ok, err := c.CommerceStorage.Count(o)
 	if err != nil {
@@ -167,5 +164,13 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) mo
 		o.Step = *payload.Step
 	}
 
+	if payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: payload.TimeHistogram.Interval,
+			Offset:   payload.TimeHistogram.Offset,
+		}
+	}
+
 	return o
+
 }

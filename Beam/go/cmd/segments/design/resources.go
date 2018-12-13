@@ -174,7 +174,7 @@ var _ = Resource("commerce", func() {
 	BasePath("/journal/commerce")
 	NoSecurity()
 
-	Action("count", func() {
+	Action("count_step", func() {
 		Description("Returns counts of commerce events")
 		Payload(CommerceOptionsPayload)
 		Routing(POST("/steps/:step/count"))
@@ -183,6 +183,20 @@ var _ = Resource("commerce", func() {
 				Enum("checkout", "payment", "purchase", "refund")
 			})
 		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
+
+	Action("count", func() {
+		Description("Returns counts of commerce events")
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/count"))
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
