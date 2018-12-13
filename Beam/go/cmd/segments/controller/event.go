@@ -20,36 +20,32 @@ func NewEventController(service *goa.Service, es model.EventStorage) *EventContr
 	}
 }
 
-// Count runs the count action.
+// Count runs the count action
 func (c *EventController) Count(ctx *app.CountEventsContext) error {
-	o := model.AggregateOptions{
-		Action:   ctx.Action,
-		Category: ctx.Category,
-	}
+	o := aggregateOptionsFromEventsOptions(ctx.Payload)
 
-	for _, val := range ctx.Payload.FilterBy {
-		fb := &model.FilterBy{
-			Tag:    val.Tag,
-			Values: val.Values,
+	crc, ok, err := c.EventStorage.Count(o)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		cr := model.CountRow{
+			Tags:  make(map[string]string),
+			Count: 0,
 		}
-		o.FilterBy = append(o.FilterBy, fb)
+		crc = model.CountRowCollection{}
+		crc = append(crc, cr)
 	}
 
-	o.GroupBy = ctx.Payload.GroupBy
+	acrc := CountRowCollection(crc).ToMediaType()
+	return ctx.OK(acrc)
+}
 
-	if ctx.Payload.TimeAfter != nil {
-		o.TimeAfter = *ctx.Payload.TimeAfter
-	}
-	if ctx.Payload.TimeBefore != nil {
-		o.TimeBefore = *ctx.Payload.TimeBefore
-	}
-
-	if ctx.Payload.TimeHistogram != nil {
-		o.TimeHistogram = &model.TimeHistogram{
-			Interval: ctx.Payload.TimeHistogram.Interval,
-			Offset:   ctx.Payload.TimeHistogram.Offset,
-		}
-	}
+// CountAction runs the count action, action and category has to be specified
+func (c *EventController) CountAction(ctx *app.CountActionEventsContext) error {
+	o := aggregateOptionsFromEventsOptions(ctx.Payload)
+	o.Action = ctx.Action
+	o.Category = ctx.Category
 
 	crc, ok, err := c.EventStorage.Count(o)
 	if err != nil {
@@ -132,6 +128,21 @@ func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.A
 	}
 	if payload.TimeBefore != nil {
 		o.TimeBefore = *payload.TimeBefore
+	}
+
+	if payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: payload.TimeHistogram.Interval,
+			Offset:   payload.TimeHistogram.Offset,
+		}
+	}
+
+	if payload.Action != nil {
+		o.Action = *payload.Action
+	}
+
+	if payload.Category != nil {
+		o.Category = *payload.Category
 	}
 
 	return o

@@ -122,7 +122,7 @@ var _ = Resource("events", func() {
 	BasePath("/journal/events")
 	NoSecurity()
 
-	Action("count", func() {
+	Action("count_action", func() {
 		Description("Returns counts of events")
 		Routing(POST("/categories/:category/actions/:action/count"))
 		Payload(EventOptionsPayload)
@@ -130,6 +130,19 @@ var _ = Resource("events", func() {
 			Param("action", String, "Event action")
 			Param("category", String, "Event category")
 		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
+	Action("count", func() {
+		Description("Returns counts of events")
+		Routing(POST("/count"))
+		Payload(EventOptionsPayload)
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
