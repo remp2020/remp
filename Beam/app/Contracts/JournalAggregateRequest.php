@@ -18,12 +18,12 @@ class JournalAggregateRequest
 
     protected $timeHistogram = [];
 
-    public static function from($category, $action)
+    public static function from($category, $action = null)
     {
         return new self($category, $action);
     }
 
-    public function __construct($category, $action)
+    public function __construct($category, $action = null)
     {
         $this->category = $category;
         $this->action = $action;
@@ -77,12 +77,26 @@ class JournalAggregateRequest
 
     public function buildUrl($template): string
     {
-        return sprintf($template, $this->category, $this->action);
+        if ($this->action) {
+            return sprintf($template, $this->category, $this->action);
+        }
+
+        return sprintf($template, $this->category);
     }
 
     public function buildUrlWithItem($template, $item): string
     {
         return sprintf($template, $this->category, $this->action, $item);
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function getAction()
+    {
+        return $this->action;
     }
 
     public function getFilterBy(): array

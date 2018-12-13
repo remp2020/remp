@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Console\Commands\AggregateConversionEvents;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Contracts\JournalListRequest;
@@ -15,6 +16,7 @@ use App\Http\Resources\ConversionResource;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
@@ -116,6 +118,10 @@ class ConversionController extends Controller
             ]);
             $conversion->fill($c);
             $conversion->save();
+
+            Artisan::queue(AggregateConversionEvents::COMMAND, [
+                '--conversion_id' => $conversion->id
+            ]);
         }
 
         return response()->format([

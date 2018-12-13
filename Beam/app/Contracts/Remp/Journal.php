@@ -25,9 +25,13 @@ class Journal implements JournalContract
 
     const ENDPOINT_GROUP_FLAGS = 'journal/flags';
 
-    const ENDPOINT_GENERIC_COUNT = 'journal/%s/actions/%s/count';
+    const ENDPOINT_GENERIC_COUNT_ACTION = 'journal/%s/actions/%s/count';
 
-    const ENDPOINT_GENERIC_SUM = 'journal/%s/actions/%s/sum';
+    const ENDPOINT_GENERIC_COUNT = 'journal/%s/count';
+
+    const ENDPOINT_GENERIC_SUM_ACTION = 'journal/%s/actions/%s/sum';
+
+    const ENDPOINT_GENERIC_SUM = 'journal/%s/sum';
 
     const ENDPOINT_GENERIC_AVG = 'journal/%s/actions/%s/avg';
 
@@ -99,12 +103,22 @@ class Journal implements JournalContract
 
     public function count(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_COUNT));
+        return $this->aggregateCall(
+            $request,
+            $request->getAction() ?
+                $request->buildUrl(self::ENDPOINT_GENERIC_COUNT_ACTION) :
+                $request->buildUrl(self::ENDPOINT_GENERIC_COUNT)
+        );
     }
 
     public function sum(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_SUM));
+        return $this->aggregateCall(
+            $request,
+            $request->getAction() ?
+                $request->buildUrl(self::ENDPOINT_GENERIC_SUM_ACTION) :
+                $request->buildUrl(self::ENDPOINT_GENERIC_SUM)
+        );
     }
 
     public function avg(JournalAggregateRequest $request): Collection

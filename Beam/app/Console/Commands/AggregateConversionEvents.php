@@ -45,9 +45,17 @@ class AggregateConversionEvents extends Command
         if ($conversionId) {
             $conversion = Conversion::find($conversionId);
             if (!$conversion) {
-                $this->error(sprintf('Conversion with ID %d not found.', $conversionId));
+                $this->error("Conversion with ID $conversionId not found.");
                 return;
             }
+
+            if ($conversion->pageviewEvents->count() > 0 ||
+                $conversion->commerceEvents->count() > 0 ||
+                $conversion->generalEvents->count() > 0) {
+                $this->info("Conversion with ID $conversionId already aggregated.");
+                return;
+            }
+
             $this->aggregateConversion($conversion, $days);
         } else {
             foreach ($this->getUnaggregatedConversions() as $conversion) {
@@ -58,20 +66,19 @@ class AggregateConversionEvents extends Command
         $this->line(' <info>OK!</info>');
     }
 
-    protected function getBrowsersForUser(Conversion $conversion)
+    protected function getBrowsersForUser(Conversion $conversion, $category, $action = null)
     {
-
         $before = $conversion->paid_at;
         // take maximum one year old browser IDs
         $after = (clone $before)->subYear();
 
         $browserIds = [];
-        $records = $this->journal->count(JournalAggregateRequest::from('pageviews', 'load')
+        $records = $this->journal->count(JournalAggregateRequest::from($category, $action)
             ->addGroup('browser_id')
             ->addFilter('user_id', $conversion->user_id)
             ->setTime($after, $before));
         foreach ($records as $record) {
-            if ($record->tags->browser_id) {
+            if ($record->tags->browser_id && $record->tags->browser_id !== '') {
                 $browserIds[] = $record->tags->browser_id;
             }
         }
@@ -101,33 +108,34 @@ class AggregateConversionEvents extends Command
             $this->line("Conversion #{$conversion->user_id} has no assigned user.");
             return;
         }
-        $browserIds = $this->getBrowsersForUser($conversion);
-        $this->loadAndStorePageviewEvents(
-            $conversion,
-            $this->buildJournalListRequest('pageviews', $browserIds, $conversion->user_id, $days)
-                ->setLoadTimespent()
-        );
+        //$browserIds = $this->getBrowsersForUser($conversion, 'pageviews', 'load');
+        //$this->loadAndStorePageviewEvents(
+        //    $conversion,
+        //    $this->buildJournalListRequest('pageviews', $browserIds, $conversion, $days)
+        //        ->setLoadTimespent()
+        //);
 
+        $browserIds = $this->getBrowsersForUser($conversion, 'commerce');
         $this->loadAndStoreCommerceEvents(
             $conversion,
-            $this->buildJournalListRequest('commerce', $browserIds, $conversion->user_id, $days)
+            $this->buildJournalListRequest('commerce', $browserIds, $conversion, $days)
         );
 
-        $this->loadAndStoreGeneralEvents(
-            $conversion,
-            $this->buildJournalListRequest('events', $browserIds, $conversion->user_id, $days)
-        );
+        //$this->loadAndStoreGeneralEvents(
+        //    $conversion,
+        //    $this->buildJournalListRequest('events', $browserIds, $conversion, $days)
+        //);
     }
 
-    private function buildJournalListRequest(string $category, array $browserIds, $userId, int $days): JournalListRequest
+    private function buildJournalListRequest(string $category, array $browserIds, Conversion $conversion, int $days): JournalListRequest
     {
         $r = JournalListRequest::from($category)
-            ->setTime(Carbon::now()->subDays($days), Carbon::now());
+            ->setTime((clone $conversion->paid_at)->subDays($days), $conversion->paid_at);
 
         if ($browserIds) {
             $r->addFilter('browser_id', ...$browserIds);
         } else {
-            $r->addFilter('user_id', $userId);
+            $r->addFilter('user_id', $conversion->user_id);
         }
 
         return $r;
