@@ -287,6 +287,7 @@
     import MediumRectangleTemplate from "./templates/MediumRectangle";
     import BarTemplate from "./templates/Bar";
     import ShortMessageTemplate from "./templates/ShortMessage";
+    import OverlayRectangleTemplate from "./templates/OverlayRectangle";
     import BannerPreview from "./BannerPreview";
     import vSelect from "remp/js/components/vSelect";
     import FormValidator from "remp/js/components/FormValidator";
@@ -313,6 +314,7 @@
         "_barTemplate": Object,
         "_htmlTemplate": Object,
         "_shortMessageTemplate": Object,
+        "_overlayRectangleTemplate": Object,
 
         "_alignmentOptions": Object,
         "_dimensionOptions": Object,
@@ -330,7 +332,8 @@
             ShortMessageTemplate,
             BannerPreview,
             vSelect,
-            FormValidator
+            FormValidator,
+            OverlayRectangleTemplate
         },
         name: 'banner-form',
         props: props,
@@ -365,6 +368,7 @@
             barTemplate: null,
             htmlTemplate: null,
             shortMessageTemplate: null,
+            overlayRectangleTemplate: null,
 
             alignmentOptions: [],
             dimensionOptions: [],

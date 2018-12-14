@@ -105,6 +105,35 @@
                 :transition="transition"
                 :displayType="displayType"
         ></short-message-preview>
+
+        <overlay-rectangle-preview v-if="template === 'overlay_rectangle'"
+                :alignmentOptions="alignmentOptions"
+                :positionOptions="positionOptions"
+                :show="visible"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
+
+                :headerText="overlayRectangleTemplate.headerText"
+                :mainText="overlayRectangleTemplate.mainText"
+                :buttonText="overlayRectangleTemplate.buttonText"
+                :width="overlayRectangleTemplate.width"
+                :height="overlayRectangleTemplate.height"
+                :backgroundColor="overlayRectangleTemplate.backgroundColor"
+                :textColor="overlayRectangleTemplate.textColor"
+                :buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
+                :buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+
+                :position="position"
+                :offsetVertical="offsetVertical"
+                :offsetHorizontal="offsetHorizontal"
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :closeText="closeText"
+                :transition="transition"
+                :displayType="displayType"
+        >
+        </overlay-rectangle-preview>
     </div>
 </template>
 
@@ -114,6 +143,7 @@
     import MediumRectanglePreview from "./previews/MediumRectangle";
     import BarPreview from "./previews/Bar";
     import ShortMessagePreview from "./previews/ShortMessage";
+    import OverlayRectanglePreview from "./previews/OverlayRectangle";
 
     const props = [
         "name",
@@ -140,6 +170,7 @@
         "barTemplate",
         "htmlTemplate",
         "shortMessageTemplate",
+        "overlayRectangleTemplate",
 
         "alignmentOptions",
         "dimensionOptions",
@@ -154,6 +185,7 @@
             MediumRectanglePreview,
             BarPreview,
             ShortMessagePreview,
+            OverlayRectanglePreview,
         },
         name: 'banner-preview',
         props: props,
