@@ -578,6 +578,17 @@ class CampaignController extends Controller
                 }
             }
 
+            /** @var CampaignBanner $seenVariant */
+            // unset seen variant if it was deleted
+            if (!($seenVariant = $campaignBanners->get($variantUuid))) {
+                $variantUuid = null;
+            }
+
+            // unset seen variant if its proportion is 0%
+            if ($seenVariant && $seenVariant->proportion === 0) {
+                $variantUuid = null;
+            }
+
             // variant still not set, choose random variant
             if ($variantUuid === null) {
                 $variantsMapping = $campaign->getVariantsProportionMapping();
