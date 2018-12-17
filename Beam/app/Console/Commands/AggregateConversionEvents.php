@@ -114,6 +114,7 @@ class AggregateConversionEvents extends Command
             $this->getBrowsersForUser($conversion, 'pageviews', 'load'),
             $days
         );
+
         $this->loadAndStoreCommerceEvents(
             $conversion,
             $this->getBrowsersForUser($conversion, 'commerce'),
@@ -128,6 +129,10 @@ class AggregateConversionEvents extends Command
 
     protected function loadAndStorePageviewEvents(Conversion $conversion, array $browserIds, $days)
     {
+        if (!$browserIds) {
+            return;
+        }
+
         $from = (clone $conversion->paid_at)->subDays($days);
         $to = $conversion->paid_at;
 
@@ -137,6 +142,7 @@ class AggregateConversionEvents extends Command
             ->setLoadTimespent();
 
         $events = $this->journal->list($r);
+
         if ($events->isNotEmpty()) {
             foreach ($events[0]->commerces as $item) {
                 if (!isset($item->article->id)) {
@@ -201,9 +207,11 @@ class AggregateConversionEvents extends Command
             }
         };
 
-        $process(JournalListRequest::from("commerce")
-            ->setTime($from, $to)
-            ->addFilter('browser_id', ...$browserIds));
+        if ($browserIds) {
+            $process(JournalListRequest::from("commerce")
+                ->setTime($from, $to)
+                ->addFilter('browser_id', ...$browserIds));
+        }
 
         $process(JournalListRequest::from("commerce")
             ->setTime($from, $to)
@@ -241,9 +249,11 @@ class AggregateConversionEvents extends Command
             }
         };
 
-        $process(JournalListRequest::from('events')
-            ->setTime($from, $to)
-            ->addFilter('browser_id', ...$browserIds));
+        if ($browserIds) {
+            $process(JournalListRequest::from('events')
+                ->setTime($from, $to)
+                ->addFilter('browser_id', ...$browserIds));
+        }
 
         $process(JournalListRequest::from('events')
             ->setTime($from, $to)
