@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Article;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
+use App\Contracts\JournalException;
 use App\Contracts\JournalHelpers;
 use App\Contracts\JournalListRequest;
 use App\Conversion;
@@ -63,7 +64,7 @@ class AggregateConversionEvents extends Command
             }
         }
 
-        $this->line(' <info>OK!</info>');
+        $this->line(' <info>Done!</info>');
     }
 
     protected function getBrowsersForUser(Conversion $conversion, $category, $action = null)
@@ -109,22 +110,26 @@ class AggregateConversionEvents extends Command
             return;
         }
 
-        $this->loadAndStorePageviewEvents(
-            $conversion,
-            $this->getBrowsersForUser($conversion, 'pageviews', 'load'),
-            $days
-        );
+        try {
+            $this->loadAndStorePageviewEvents(
+                $conversion,
+                $this->getBrowsersForUser($conversion, 'pageviews', 'load'),
+                $days
+            );
 
-        $this->loadAndStoreCommerceEvents(
-            $conversion,
-            $this->getBrowsersForUser($conversion, 'commerce'),
-            $days
-        );
-        $this->loadAndStoreGeneralEvents(
-            $conversion,
-            $this->getBrowsersForUser($conversion, 'events'),
-            $days
-        );
+            $this->loadAndStoreCommerceEvents(
+                $conversion,
+                $this->getBrowsersForUser($conversion, 'commerce'),
+                $days
+            );
+            $this->loadAndStoreGeneralEvents(
+                $conversion,
+                $this->getBrowsersForUser($conversion, 'events'),
+                $days
+            );
+        } catch (JournalException $exception) {
+            $this->error($exception->getMessage());
+        }
     }
 
     protected function loadAndStorePageviewEvents(Conversion $conversion, array $browserIds, $days)
