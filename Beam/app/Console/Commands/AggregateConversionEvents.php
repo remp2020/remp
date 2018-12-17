@@ -144,7 +144,7 @@ class AggregateConversionEvents extends Command
         $events = $this->journal->list($r);
 
         if ($events->isNotEmpty()) {
-            foreach ($events[0]->commerces as $item) {
+            foreach ($events[0]->pageviews as $item) {
                 if (!isset($item->article->id)) {
                     continue;
                 }
