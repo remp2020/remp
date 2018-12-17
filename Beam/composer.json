@@ -41,6 +41,7 @@
         "laracasts/flash": " ^3.0",
         "laravel/framework": "5.7.*",
         "laravel/horizon": "^2.0",
+        "laravel/tinker": "^1.0",
         "laravelcollective/html": "5.7.*",
         "league/uri": "^5.0",
         "madewithlove/illuminate-psr-cache-bridge": "^1.0",
