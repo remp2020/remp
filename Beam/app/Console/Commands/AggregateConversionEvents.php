@@ -109,14 +109,26 @@ class AggregateConversionEvents extends Command
             return;
         }
 
-        $this->loadAndStorePageviewEvents($conversion, $this->getBrowsersForUser($conversion, 'pageviews', 'load'));
-        $this->loadAndStoreCommerceEvents($conversion, $this->getBrowsersForUser($conversion, 'commerce'));
-        $this->loadAndStoreGeneralEvents($conversion, $this->getBrowsersForUser($conversion, 'events'));
+        $this->loadAndStorePageviewEvents(
+            $conversion,
+            $this->getBrowsersForUser($conversion, 'pageviews', 'load'),
+            $days
+        );
+        $this->loadAndStoreCommerceEvents(
+            $conversion,
+            $this->getBrowsersForUser($conversion, 'commerce'),
+            $days
+        );
+        $this->loadAndStoreGeneralEvents(
+            $conversion,
+            $this->getBrowsersForUser($conversion, 'events'),
+            $days
+        );
     }
 
-    protected function loadAndStorePageviewEvents(Conversion $conversion, array $browserIds)
+    protected function loadAndStorePageviewEvents(Conversion $conversion, array $browserIds, $days)
     {
-        $from = (clone $conversion->paid_at)->subDays(self::DAYS_IN_PAST);
+        $from = (clone $conversion->paid_at)->subDays($days);
         $to = $conversion->paid_at;
 
         $r = JournalListRequest::from('pageviews')
@@ -149,9 +161,9 @@ class AggregateConversionEvents extends Command
         }
     }
 
-    protected function loadAndStoreCommerceEvents(Conversion $conversion, array $browserIds)
+    protected function loadAndStoreCommerceEvents(Conversion $conversion, array $browserIds, $days)
     {
-        $from = (clone $conversion->paid_at)->subDays(self::DAYS_IN_PAST);
+        $from = (clone $conversion->paid_at)->subDays($days);
         $to = $conversion->paid_at;
 
         $processedIds = [];
@@ -198,19 +210,17 @@ class AggregateConversionEvents extends Command
             ->addFilter('user_id', $conversion->user_id));
     }
 
-    protected function loadAndStoreGeneralEvents(Conversion $conversion, array $browserIds)
+    protected function loadAndStoreGeneralEvents(Conversion $conversion, array $browserIds, $days)
     {
-        $from = (clone $conversion->paid_at)->subDays(self::DAYS_IN_PAST);
+        $from = (clone $conversion->paid_at)->subDays($days);
         $to = $conversion->paid_at;
 
         $processedIds = [];
 
         $process = function ($request) use ($conversion, &$processedIds) {
-
             $events = $this->journal->list($request);
             if ($events->isNotEmpty()) {
                 foreach ($events[0]->events as $item) {
-
                     if (array_key_exists($item->_id, $processedIds)) {
                         continue;
                     }
