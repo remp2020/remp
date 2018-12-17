@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\AggregateArticlesViews;
+use App\Console\Commands\AggregateConversionEvents;
 use App\Console\Commands\AggregatePageviewLoadJob;
 use App\Console\Commands\AggregatePageviewTimespentJob;
 use App\Console\Commands\SendNewslettersCommand;
@@ -52,6 +53,12 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(CompressAggregations::COMMAND)
             ->dailyAt('00:10')
+            ->withoutOverlapping();
+
+        // Aggregate any conversion events that weren't aggregated before due to Segments API fail
+        // or other unexpected event
+        $schedule->command(AggregateConversionEvents::COMMAND)
+            ->dailyAt('3:30')
             ->withoutOverlapping();
     }
 
