@@ -108,45 +108,25 @@ class AggregateConversionEvents extends Command
             $this->line("Conversion #{$conversion->user_id} has no assigned user.");
             return;
         }
-        $browserIds = $this->getBrowsersForUser($conversion, 'pageviews', 'load');
-        $this->loadAndStorePageviewEvents(
-            $conversion,
-            $this->buildJournalListRequest('pageviews', $browserIds, $conversion, $days)
-                ->setLoadTimespent()
-        );
 
-        $browserIds = $this->getBrowsersForUser($conversion, 'commerce');
-        $this->loadAndStoreCommerceEvents(
-            $conversion,
-            $this->buildJournalListRequest('commerce', $browserIds, $conversion, $days)
-        );
-
-        $browserIds = $this->getBrowsersForUser($conversion, 'events');
-        $this->loadAndStoreGeneralEvents(
-            $conversion,
-            $this->buildJournalListRequest('events', $browserIds, $conversion, $days)
-        );
+        $this->loadAndStorePageviewEvents($conversion, $this->getBrowsersForUser($conversion, 'pageviews', 'load'));
+        $this->loadAndStoreCommerceEvents($conversion, $this->getBrowsersForUser($conversion, 'commerce'));
+        $this->loadAndStoreGeneralEvents($conversion, $this->getBrowsersForUser($conversion, 'events'));
     }
 
-    private function buildJournalListRequest(string $category, array $browserIds, Conversion $conversion, int $days): JournalListRequest
+    protected function loadAndStorePageviewEvents(Conversion $conversion, array $browserIds)
     {
-        $r = JournalListRequest::from($category)
-            ->setTime((clone $conversion->paid_at)->subDays($days), $conversion->paid_at);
+        $from = (clone $conversion->paid_at)->subDays(self::DAYS_IN_PAST);
+        $to = $conversion->paid_at;
 
-        if ($browserIds) {
-            $r->addFilter('browser_id', ...$browserIds);
-        } else {
-            $r->addFilter('user_id', $conversion->user_id);
-        }
+        $r = JournalListRequest::from('pageviews')
+            ->setTime($from, $to)
+            ->addFilter('browser_id', ...$browserIds)
+            ->setLoadTimespent();
 
-        return $r;
-    }
-
-    protected function loadAndStorePageviewEvents(Conversion $conversion, JournalListRequest $request)
-    {
-        $events = $this->journal->list($request);
+        $events = $this->journal->list($r);
         if ($events->isNotEmpty()) {
-            foreach ($events[0]->pageviews as $item) {
+            foreach ($events[0]->commerces as $item) {
                 if (!isset($item->article->id)) {
                     continue;
                 }
@@ -169,50 +149,94 @@ class AggregateConversionEvents extends Command
         }
     }
 
-    protected function loadAndStoreCommerceEvents(Conversion $conversion, JournalListRequest $request)
+    protected function loadAndStoreCommerceEvents(Conversion $conversion, array $browserIds)
     {
-        $events = $this->journal->list($request);
-        if ($events->isNotEmpty()) {
-            foreach ($events[0]->commerces as $item) {
-                $commerceEvent = ConversionCommerceEvent::create([
-                    'time' => Carbon::parse($item->system->time)->tz('UTC'),
-                    'step' => $item->step,
-                    'funnel_id' => $item->details->funnel_id ?? null,
-                    'amount' => $item->revenue->amount ?? null,
-                    'currency' => $item->revenue->currency ?? null,
-                    'utm_campaign' => $item->source->utm_campaign ?? null,
-                    'utm_content' => $item->source->utm_content ?? null,
-                    'utm_medium' => $item->source->utm_medium ?? null,
-                    'utm_source' => $item->source->utm_source ?? null,
-                    'conversion_id' => $conversion->id,
-                ]);
+        $from = (clone $conversion->paid_at)->subDays(self::DAYS_IN_PAST);
+        $to = $conversion->paid_at;
 
-                if (isset($item->details->product_ids)) {
-                    foreach ($item->details->product_ids as $productId) {
-                        $product = new ConversionCommerceEventProduct(['product_id' => $productId]);
-                        $commerceEvent->products()->save($product);
+        $processedIds = [];
+
+        $process = function ($request) use ($conversion, &$processedIds) {
+            $events = $this->journal->list($request);
+            if ($events->isNotEmpty()) {
+                foreach ($events[0]->commerces as $item) {
+                    if (array_key_exists($item->_id, $processedIds)) {
+                        continue;
+                    }
+
+                    $processedIds[$item->_id] = true;
+
+                    $commerceEvent = ConversionCommerceEvent::create([
+                        'time' => Carbon::parse($item->system->time)->tz('UTC'),
+                        'step' => $item->step,
+                        'funnel_id' => $item->details->funnel_id ?? null,
+                        'amount' => $item->revenue->amount ?? null,
+                        'currency' => $item->revenue->currency ?? null,
+                        'utm_campaign' => $item->source->utm_campaign ?? null,
+                        'utm_content' => $item->source->utm_content ?? null,
+                        'utm_medium' => $item->source->utm_medium ?? null,
+                        'utm_source' => $item->source->utm_source ?? null,
+                        'conversion_id' => $conversion->id,
+                    ]);
+
+                    if (isset($item->details->product_ids)) {
+                        foreach ($item->details->product_ids as $productId) {
+                            $product = new ConversionCommerceEventProduct(['product_id' => $productId]);
+                            $commerceEvent->products()->save($product);
+                        }
                     }
                 }
             }
-        }
+        };
+
+        $process(JournalListRequest::from("commerce")
+            ->setTime($from, $to)
+            ->addFilter('browser_id', ...$browserIds));
+
+        $process(JournalListRequest::from("commerce")
+            ->setTime($from, $to)
+            ->addFilter('user_id', $conversion->user_id));
     }
 
-    protected function loadAndStoreGeneralEvents(Conversion $conversion, JournalListRequest $request)
+    protected function loadAndStoreGeneralEvents(Conversion $conversion, array $browserIds)
     {
-        $events = $this->journal->list($request);
-        if ($events->isNotEmpty()) {
-            foreach ($events[0]->events as $item) {
-                ConversionGeneralEvent::create([
-                    'time' => Carbon::parse($item->system->time)->tz('UTC'),
-                    'action' => $item->action ?? null,
-                    'category' => $item->category ?? null,
-                    'conversion_id' => $conversion->id,
-                    'utm_campaign' => $item->utm_campaign ?? null,
-                    'utm_content' => $item->utm_content ?? null,
-                    'utm_medium' => $item->utm_medium ?? null,
-                    'utm_source' => $item->utm_source ?? null,
-                ]);
+        $from = (clone $conversion->paid_at)->subDays(self::DAYS_IN_PAST);
+        $to = $conversion->paid_at;
+
+        $processedIds = [];
+
+        $process = function ($request) use ($conversion, &$processedIds) {
+
+            $events = $this->journal->list($request);
+            if ($events->isNotEmpty()) {
+                foreach ($events[0]->events as $item) {
+
+                    if (array_key_exists($item->_id, $processedIds)) {
+                        continue;
+                    }
+
+                    $processedIds[$item->_id] = true;
+
+                    ConversionGeneralEvent::create([
+                        'time' => Carbon::parse($item->system->time)->tz('UTC'),
+                        'action' => $item->action ?? null,
+                        'category' => $item->category ?? null,
+                        'conversion_id' => $conversion->id,
+                        'utm_campaign' => $item->utm_campaign ?? null,
+                        'utm_content' => $item->utm_content ?? null,
+                        'utm_medium' => $item->utm_medium ?? null,
+                        'utm_source' => $item->utm_source ?? null,
+                    ]);
+                }
             }
-        }
+        };
+
+        $process(JournalListRequest::from('events')
+            ->setTime($from, $to)
+            ->addFilter('browser_id', ...$browserIds));
+
+        $process(JournalListRequest::from('events')
+            ->setTime($from, $to)
+            ->addFilter('user_id', $conversion->user_id));
     }
 }
