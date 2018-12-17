@@ -33,6 +33,19 @@
                v-bind:show="show"
             ></medium-rectangle-template>
 
+            <overlay-rectangle-template v-if="template === 'overlay_rectangle'"
+               v-bind:_headerText="overlayRectangleTemplate.headerText"
+               v-bind:_mainText="overlayRectangleTemplate.mainText"
+               v-bind:_buttonText="overlayRectangleTemplate.buttonText"
+               v-bind:_width="overlayRectangleTemplate.height"
+               v-bind:_height="overlayRectangleTemplate.width"
+               v-bind:_backgroundColor="overlayRectangleTemplate.backgroundColor"
+               v-bind:_textColor="overlayRectangleTemplate.textColor"
+               v-bind:_buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+               v-bind:show="show"
+            ></overlay-rectangle-template>
+
             <bar-template v-if="template === 'bar'"
                v-bind:_mainText="barTemplate.mainText"
                v-bind:_buttonText="barTemplate.buttonText"
@@ -65,6 +78,14 @@
                                 <div class="fg-line">
                                     <label for="name" class="fg-label">Name</label>
                                     <input v-model="name" class="form-control fg-input" name="name" id="name" type="text">
+                                </div>
+                            </div>
+
+                            <div class="input-group fg-float">
+                                <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
+                                <div class="fg-line">
+                                    <label for="image_link" class="fg-label">Image link</label>
+                                    <input v-model="imageLink" class="form-control fg-input" name="name" id="image_link" type="text">
                                 </div>
                             </div>
 
@@ -253,6 +274,7 @@
                                         :template="template"
 
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
+                                        :overlayRectangleTemplate="overlayRectangleTemplate"
                                         :barTemplate="barTemplate"
                                         :htmlTemplate="htmlTemplate"
                                         :shortMessageTemplate="shortMessageTemplate"
@@ -266,6 +288,8 @@
                                         :transition="transition"
                                         :displayType="displayType"
                                         :forcedPosition="'absolute'"
+
+                                        :imageLink="imageLink"
                                 ></banner-preview>
                             </div>
                         </div>
@@ -321,7 +345,12 @@
         "_positionOptions": Object,
 
         "_validateUrl": String,
-        "_clientSiteUrl": String
+        "_clientSiteUrl": String,
+
+        "_imageLink": {
+            type: String,
+            default: "http://ichef.bbci.co.uk/news/976/cpsprodpb/7355/production/_96252592_marcus_intalex.jpg"
+        },
     };
 
     export default {
@@ -376,6 +405,7 @@
             show: true,
 
             submitAction: null,
+            imageLink: null,
 
             transitionOptions: [
                 {"label": "None", "value": "none"},

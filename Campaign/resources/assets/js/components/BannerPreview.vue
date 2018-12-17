@@ -108,11 +108,9 @@
 
         <overlay-rectangle-preview v-if="template === 'overlay_rectangle'"
                 :alignmentOptions="alignmentOptions"
-                :positionOptions="positionOptions"
                 :show="visible"
                 :uuid="uuid"
                 :campaignUuid="campaignUuid"
-                :forcedPosition="forcedPosition"
 
                 :headerText="overlayRectangleTemplate.headerText"
                 :mainText="overlayRectangleTemplate.mainText"
@@ -124,7 +122,6 @@
                 :buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
                 :buttonTextColor="overlayRectangleTemplate.buttonTextColor"
 
-                :position="position"
                 :offsetVertical="offsetVertical"
                 :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
@@ -132,6 +129,7 @@
                 :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
+                :imageLink="imageLink"
         >
         </overlay-rectangle-preview>
     </div>
@@ -163,6 +161,7 @@
         "campaignUuid",
         "forcedPosition",
         "show",
+        "imageLink",
 
         "variables",
 

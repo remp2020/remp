@@ -20,6 +20,7 @@ class OverlayRectangleTemplates extends Migration
             $table->string('main_text');
             $table->string('button_text');
             $table->string('background_color');
+            $table->string('image_link')->nullable(true);
 
             $table->foreign('banner_id')->references('id')->on('banners');
             $table->timestamps();
