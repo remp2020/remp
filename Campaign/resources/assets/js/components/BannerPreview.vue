@@ -232,7 +232,7 @@
                 if (this.closeTracked) {
                     return true;
                 }
-                this.trackEvent("banner", "close", {
+                this.trackEvent("banner", "close", null, null, {
                     "utm_source": "remp_campaign",
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
@@ -245,7 +245,7 @@
                 if (this.clickTracked) {
                     return true;
                 }
-                this.trackEvent("banner", "click", {
+                this.trackEvent("banner", "click", null, null, {
                     "utm_source": "remp_campaign",
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
@@ -258,11 +258,11 @@
                 }
                 return true;
             },
-            trackEvent: function(category, action, fields) {
+            trackEvent: function(category, action, tags, fields, source) {
                 if (typeof remplib.tracker === 'undefined') {
                     return;
                 }
-                remplib.tracker.trackEvent(category, action, fields);
+                remplib.tracker.trackEvent(category, action, tags, fields, source);
             },
             customPositioned: function() {
                 if (this.displayType === 'inline') {

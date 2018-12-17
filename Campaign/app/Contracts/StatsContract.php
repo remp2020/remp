@@ -12,20 +12,20 @@ use App\Contracts\Remp\StatsRequest;
 interface StatsContract
 {
     /**
-     * filter results by campaign id
-     *
-     * @param int $campaignId
-     * @return StatsRequest
-     */
-    public function forCampaign($campaignId) : StatsRequest;
-
-    /**
      * filter results by variant id
      *
      * @param int $variantId
      * @return StatsRequest
      */
     public function forVariant($variantId) : StatsRequest;
+
+    /**
+     * filter results by variant ids
+     *
+     * @param array $variantIds
+     * @return StatsRequest
+     */
+    public function forVariants(array $variantIds) : StatsRequest;
 
     /**
      * get results from events table

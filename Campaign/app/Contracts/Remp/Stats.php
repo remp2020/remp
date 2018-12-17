@@ -17,14 +17,14 @@ class Stats implements StatsContract
         $this->timeOffset = $timeOffset;
     }
 
-    public function forCampaign($campaignId) : StatsRequest
-    {
-        return (new StatsRequest($this->client, $this->timeOffset))->forCampaign($campaignId);
-    }
-
     public function forVariant($variantId) : StatsRequest
     {
-        return (new StatsRequest($this->client, $this->timeOffset))->events($variantId);
+        return (new StatsRequest($this->client, $this->timeOffset))->forVariant($variantId);
+    }
+
+    public function forVariants(array $variantIds) : StatsRequest
+    {
+        return (new StatsRequest($this->client, $this->timeOffset))->forVariants($variantIds);
     }
 
     public function events(string $categoryArg, string $actionArg): StatsRequest

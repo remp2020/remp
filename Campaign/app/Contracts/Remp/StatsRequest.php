@@ -48,15 +48,17 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
-    public function forCampaign($campaignId) : StatsRequest
-    {
-        $this->filterBy("utm_campaign", $campaignId);
-        return $this;
-    }
-
     public function forVariant($variantId) : StatsRequest
     {
         $this->filterBy("banner_variant", $variantId);
+        return $this;
+    }
+
+    public function forVariants(array $variantIds): StatsRequest
+    {
+        foreach ($variantIds as $variantId) {
+            $this->forVariant($variantId);
+        }
         return $this;
     }
 
@@ -124,11 +126,18 @@ class StatsRequest implements StatsContract
 
     public function filterBy(string $field, ...$values) : StatsRequest
     {
-        $this->filterBy[] = [
+        if (isset($this->filterBy[$field])) {
+            $this->filterBy[$field]['values'] = array_merge(
+                $this->filterBy[$field]['values'],
+                $values
+            );
+            return $this;
+        }
+
+        $this->filterBy[$field] = [
             'tag' => $field,
             'values' => $values,
         ];
-
         return $this;
     }
 
@@ -157,7 +166,7 @@ class StatsRequest implements StatsContract
     public function get()
     {
         $payload = [
-            'filter_by' => $this->filterBy,
+            'filter_by' => array_values($this->filterBy),
             'group_by' => $this->groupBy,
         ];
 
