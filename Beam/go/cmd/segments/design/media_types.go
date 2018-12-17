@@ -152,6 +152,7 @@ var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
 var Event = MediaType("application/vnd.event+json", func() {
 	Description("Generic event")
 	Attributes(func() {
+		Attribute("_id", String)
 		Attribute("category", String)
 		Attribute("action", String)
 		Attribute("system", System)
@@ -162,6 +163,7 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("utm_content", String)
 	})
 	View("default", func() {
+		Attribute("_id")
 		Attribute("category")
 		Attribute("action")
 		Attribute("system")
@@ -190,6 +192,7 @@ var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
 var Commerce = MediaType("application/vnd.commerce+json", func() {
 	Description("Commerce event")
 	Attributes(func() {
+		Attribute("_id", String)
 		Attribute("step", String, func() {
 			Enum("checkout", "payment", "purchase", "refund")
 		})
@@ -200,6 +203,7 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("user", User)
 	})
 	View("default", func() {
+		Attribute("_id")
 		Attribute("step")
 		Attribute("details")
 		Attribute("source")
@@ -213,11 +217,13 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 var Pageview = MediaType("application/vnd.pageview+json", func() {
 	Description("Pageview event")
 	Attributes(func() {
+		Attribute("_id", String)
 		Attribute("system", System)
 		Attribute("user", User)
 		Attribute("article", Article)
 	})
 	View("default", func() {
+		Attribute("_id")
 		Attribute("system")
 		Attribute("user")
 		Attribute("article")

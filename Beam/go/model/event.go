@@ -20,6 +20,7 @@ type EventOptions struct {
 
 // Event represents event data.
 type Event struct {
+	ID        string
 	Category  string    `json:"category"`
 	Action    string    `json:"action"`
 	Token     string    `json:"token"`

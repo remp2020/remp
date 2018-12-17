@@ -22,6 +22,7 @@ type CommerceOptions struct {
 
 // Commerce represents commerce event data.
 type Commerce struct {
+	ID          string
 	Step        string
 	Token       string
 	Time        time.Time

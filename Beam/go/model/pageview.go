@@ -29,6 +29,7 @@ type PageviewOptions struct {
 
 // Pageview represents pageview data.
 type Pageview struct {
+	ID            string
 	ArticleID     string `json:"article_id"`
 	ArticleLocked bool   `json:"locked"`
 	TitleVariant  string `json:"title_variant"`

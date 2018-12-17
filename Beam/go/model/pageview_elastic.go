@@ -268,6 +268,7 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 			if err := json.Unmarshal(*hit.Source, pv); err != nil {
 				return nil, errors.Wrap(err, "error reading pageview record from elastic")
 			}
+			pv.ID = hit.Id
 
 			// extract raw pageview data to build tags map
 			rawPv := make(map[string]interface{})
