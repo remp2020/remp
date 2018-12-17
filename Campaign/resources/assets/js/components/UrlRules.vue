@@ -110,6 +110,11 @@
 
                 return options;
             }
+        },
+        watch: {
+            urlFilterType: function() {
+                this.$parent.urlFilter = this.urlFilterType;
+            }
         }
     }
 </script>

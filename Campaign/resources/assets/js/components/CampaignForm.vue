@@ -24,7 +24,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingOne">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" :class="{ green: highlightNameCollapse }">
                                     Campaign name &amp; primary banner (required)
                                 </a>
                             </h4>
@@ -207,7 +207,7 @@
                     <div class="panel panel-default panel-whereToDisplay">
                         <div class="panel-heading" role="tab" id="headingWhereToDisplay">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWhereToDisplay" aria-expanded="false" aria-controls="collapseWhereToDisplay" :class="{ green: highlightSegmentsCollapse }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWhereToDisplay" aria-expanded="false" aria-controls="collapseWhereToDisplay" :class="{ green: highlightWhereToCollapse }">
                                     Where to display?
                                 </a>
                             </h4>
@@ -621,8 +621,14 @@
 
                 return false;
             },
+            highlightNameCollapse: function() {
+                return (this.name || this.bannerId);
+            },
             highlightSegmentsCollapse: function () {
                 return (this.segments.length || this.signedIn);
+            },
+            highlightWhereToCollapse: function () {
+                return (this.urlFilter !== 'everywhere');
             },
             highlightBannerRulesCollapse: function () {
                 return (this.pageviewRulesNotDefault || this.oncePerSession === true);
