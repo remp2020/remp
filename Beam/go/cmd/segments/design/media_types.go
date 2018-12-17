@@ -235,6 +235,7 @@ var User = MediaType("application/vnd.user+json", func() {
 	Attributes(func() {
 		Attribute("id", String, "ID of reader")
 		Attribute("subscriber", Boolean, "Flag whether user is subscriber (has paid for access)")
+		Attribute("signed_in", Boolean, "Flag whether user was signed in")
 		Attribute("browser_id", String, "Anonymized ID of user's browser")
 		Attribute("url", String, "URL of the content/conversion point", func() {
 			Format("uri")
@@ -252,6 +253,7 @@ var User = MediaType("application/vnd.user+json", func() {
 	View("default", func() {
 		Attribute("id")
 		Attribute("subscriber")
+		Attribute("signed_in")
 		Attribute("browser_id")
 		Attribute("url")
 		Attribute("user_agent")
@@ -263,6 +265,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("timespent")
 	})
 	Required("remp_pageview_id")
+	Required("signed_in")
 })
 
 var System = MediaType("application/vnd.system+json", func() {

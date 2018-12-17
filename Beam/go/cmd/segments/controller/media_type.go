@@ -265,6 +265,9 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	// user data
 	if p.UserID != "" {
 		pageview.User.ID = &p.UserID
+		pageview.User.SignedIn = true
+	} else {
+		pageview.User.SignedIn = false
 	}
 
 	// optional tracked params

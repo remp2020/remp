@@ -8,10 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConversionPageviewEvent extends Model
 {
+    protected $casts = [
+        'locked' => 'boolean',
+        'signed_in' => 'boolean',
+    ];
+
     protected $fillable = [
         'time',
         'article_id',
         'locked',
+        'signed_in',
         'timespent',
         'utm_campaign',
         'utm_content',

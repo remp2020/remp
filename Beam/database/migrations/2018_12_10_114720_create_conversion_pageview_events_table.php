@@ -21,7 +21,8 @@ class CreateConversionPageviewEventsTable extends Migration
             $table->timestamp('time');
 
             $table->integer('article_id')->unsigned();
-            $table->boolean('locked');
+            $table->boolean('locked')->nullable();
+            $table->boolean('signed_in')->nullable();
             $table->integer('timespent')->unsigned()->nullable();
 
             $table->string('utm_campaign')->nullable();
