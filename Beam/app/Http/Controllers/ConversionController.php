@@ -13,6 +13,7 @@ use App\Http\Request;
 use App\Http\Requests\ConversionRequest;
 use App\Http\Requests\ConversionUpsertRequest;
 use App\Http\Resources\ConversionResource;
+use App\Model\ConversionPageviewEvent;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -94,14 +95,75 @@ class ConversionController extends Controller
         ]);
     }
 
+    private function eventsPriorConversion(Conversion $conversion, $daysInPast): array
+    {
+        $from = (clone $conversion->paid_at)->subDays($daysInPast);
+
+        $events = [];
+
+        foreach ($conversion->pageviewEvents()->where('time', '>=', $from)->get() as $event) {
+            $obj = new \stdClass();
+            $obj->name = 'pageview';
+            $obj->time = $event->time;
+            $obj->tags = [];
+
+            if ($event->article) {
+                $t = new \stdClass();
+                $t->title = $event->article->title;
+                $t->href = route('articles.show', $event->article->id);
+                $obj->tags[] = $t;
+            }
+
+            if ($event->timespent) {
+                $t = new \stdClass();
+                $t->title = "Timespent: {$event->timespent} s";
+                $obj->tags[] = $t;
+            }
+
+            if ($event->locked === false) {
+                $t = new \stdClass();
+                $t->title = 'Unlocked';
+                $obj->tags[] = $t;
+            }
+
+            if ($event->signed_in === false) {
+                $t = new \stdClass();
+                $t->title = 'Signed in';
+                $obj->tags[] = $t;
+            }
+
+            $events[$event->time->toDateTimeString()] = $obj;
+        }
+
+        foreach ($conversion->commerceEvents()->where('time', '>=', $from)->get() as $event) {
+            $obj = new \stdClass();
+            $obj->name = "commerce:$event->step";
+            $obj->time = $event->time;
+            $obj->tags = [];
+            $events[$event->time->toDateTimeString()] = $obj;
+        }
+
+        foreach ($conversion->generalEvents()->where('time', '>=', $from)->get() as $event) {
+            $obj = new \stdClass();
+            $obj->name = "{$event->action}:{$event->category}";
+            $obj->time = $event->time;
+            $obj->tags = [];
+            $events[$event->time->toDateTimeString()] = $obj;
+        }
+
+        krsort($events);
+
+        return $events;
+    }
+
     public function show(Conversion $conversion)
     {
-        $actions = $this->journalHelper->actionsPriorConversion($conversion, 2, true, true);
+        $events = $this->eventsPriorConversion($conversion, 10);
 
         return response()->format([
             'html' => view('conversions.show', [
                 'conversion' => $conversion,
-                'actions' => $actions
+                'events' => $events
             ]),
             'json' => new ConversionResource($conversion),
         ]);

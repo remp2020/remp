@@ -32,23 +32,26 @@
 
                 <h4>User path</h4>
                 <div class="list-group lg-alt lg-even-black">
-                    @foreach($actions as $action)
+                    @foreach($events as $event)
                         <div class="list-group-item media">
                             <div class="media-body">
                                 <div class="lgi-heading">
-                                    <small><date-formatter format="l LT" date="{{$action->time}}"></date-formatter></small>
-                                    {{$action->action}}
+                                    <small><date-formatter format="l LT" date="{{$event->time}}"></date-formatter></small>
+                                    {{$event->name}}
                                 </div>
                                 <small class="lgi-text"></small>
-                                @if($action->action === 'pageview')
-                                <ul class="lgi-attrs">
-                                    @if(isset($action->article))
-                                        <li><a href="{{ route('articles.show', $action->article->id) }}">{{$action->article->title}}</a></li>
-                                    @endif
-                                    @if(isset($action->timespent))
-                                        <li>Timespent: {{$action->timespent}}</li>
-                                    @endif
-                                </ul>
+                                @if($event->tags)
+                                    <ul class="lgi-attrs">
+                                        @foreach($event->tags as $tag)
+                                            <li>
+                                                @if(isset($tag->href))
+                                                    <a href="{{$tag->href}}">{{$tag->title}}</a>
+                                                @else
+                                                    {{$tag->title}}
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
                                 @endif
                             </div>
                         </div>
