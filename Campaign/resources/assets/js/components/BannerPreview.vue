@@ -121,6 +121,7 @@
                 :textColor="overlayRectangleTemplate.textColor"
                 :buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
                 :buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+                :imageLink="overlayRectangleTemplate.imageLink"
 
                 :offsetVertical="offsetVertical"
                 :offsetHorizontal="offsetHorizontal"
@@ -129,7 +130,6 @@
                 :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
-                :imageLink="imageLink"
         >
         </overlay-rectangle-preview>
     </div>
@@ -161,7 +161,6 @@
         "campaignUuid",
         "forcedPosition",
         "show",
-        "imageLink",
 
         "variables",
 

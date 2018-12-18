@@ -23,6 +23,7 @@
     
     .overlay-rectangle-overlay {
         position: absolute;
+        font-family: Noto Sans, sans-serif;
         top: 0;
         left: 0;
         width: 100%;
@@ -58,7 +59,6 @@
     }
 
     .overlay-rectangle-preview-box {
-        font-family: Noto Sans, sans-serif;
         white-space: pre-line;
         overflow: hidden;
         position: relative;
@@ -103,42 +103,44 @@
 </style>
 
 <template>
-    <div class="overlay-rectangle-overlay">
-        <transition appear v-bind:name="transition">
+    <transition appear name="fade">
+        <div class="overlay-rectangle-overlay" v-if="isVisible">
+            <transition appear v-bind:name="transition">
 
-            <div v-if="isVisible" class="overlay-rectangle-wrap">
+                <div class="overlay-rectangle-wrap">
 
-                <a class="overlay-rectangle-preview-close"
-                   title="Close banner"
-                   href="javascript://"
-                   v-bind:class="[{hidden: !closeable}]"
-                   v-on:click.stop="$parent.closed"
-                   v-bind:style="closeStyles"><small>{{ closeText }}</small> &times;</a>
+                    <a class="overlay-rectangle-preview-close"
+                       title="Close banner"
+                       href="javascript://"
+                       v-bind:class="[{hidden: !closeable}]"
+                       v-on:click.stop="$parent.closed"
+                       v-bind:style="closeStyles"><small>{{ closeText }}</small> &times;</a>
 
-                <a v-bind:href="$parent.url"
-                   v-on="$parent.url ? { click: $parent.clicked } : {}"
-                   class="overlay-rectangle-preview-link"
-                   v-bind:style="[linkStyles]">
+                    <a v-bind:href="$parent.url"
+                       v-on="$parent.url ? { click: $parent.clicked } : {}"
+                       class="overlay-rectangle-preview-link"
+                       v-bind:style="[linkStyles]">
 
-                        <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
-                            <img :src="imageLink" class="overlay-rectangle-image" alt="">
-                            <div class="overlay-rectangle-content" v-if="headerText || buttonText || mainText">
-                                <div v-if="headerText" class="overlay-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
-                                <div class="overlay-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
+                            <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
+                                <img :src="imageLink" class="overlay-rectangle-image" alt="">
+                                <div class="overlay-rectangle-content" v-if="headerText || buttonText || mainText">
+                                    <div v-if="headerText" class="overlay-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
+                                    <div class="overlay-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
 
-                                <div class="overlay-rectangle-button"
-                                     v-if="buttonText.length > 0"
-                                     v-on:click="$parent.clicked($event, !$parent.url)"
-                                     v-html="$parent.injectVars(buttonText)"
-                                     v-bind:style="[buttonStyles]"></div>
+                                    <div class="overlay-rectangle-button"
+                                         v-if="buttonText.length > 0"
+                                         v-on:click="$parent.clicked($event, !$parent.url)"
+                                         v-html="$parent.injectVars(buttonText)"
+                                         v-bind:style="[buttonStyles]"></div>
+                                </div>
                             </div>
-                        </div>
-                </a>
+                    </a>
 
-            </div>
+                </div>
 
-        </transition>
-    </div>
+            </transition>
+        </div>
+    </transition>
 </template>
 
 <script>

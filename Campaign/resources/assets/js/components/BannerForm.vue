@@ -43,6 +43,7 @@
                v-bind:_textColor="overlayRectangleTemplate.textColor"
                v-bind:_buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
                v-bind:_buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+               v-bind:_imageLink="overlayRectangleTemplate.imageLink"
                v-bind:show="show"
             ></overlay-rectangle-template>
 
@@ -78,14 +79,6 @@
                                 <div class="fg-line">
                                     <label for="name" class="fg-label">Name</label>
                                     <input v-model="name" class="form-control fg-input" name="name" id="name" type="text">
-                                </div>
-                            </div>
-
-                            <div class="input-group fg-float">
-                                <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
-                                <div class="fg-line">
-                                    <label for="image_link" class="fg-label">Image link</label>
-                                    <input v-model="imageLink" class="form-control fg-input" name="image_link" id="image_link" type="text">
                                 </div>
                             </div>
 
@@ -133,6 +126,7 @@
                 <div class="tab-content p-0">
                     <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
+
                             <div class="input-group" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
                                 <div>
@@ -150,6 +144,7 @@
                                     </div>
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="position" value="center">
 
                             <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
@@ -159,6 +154,7 @@
                                     <input v-model="offsetHorizontal" class="form-control fg-input" name="offset_horizontal" type="number" id="offsetHorizontal">
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="offset_horizontal" value="0">
 
                             <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
@@ -168,6 +164,7 @@
                                     <input v-model="offsetVertical" class="form-control fg-input" name="offset_vertical" type="number" id="offsetVertical">
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="offset_vertical" value="0">
 
                             <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
@@ -286,8 +283,6 @@
                                         :transition="transition"
                                         :displayType="displayType"
                                         :forcedPosition="'absolute'"
-
-                                        :imageLink="imageLink"
                                 ></banner-preview>
                             </div>
                         </div>
@@ -344,11 +339,6 @@
 
         "_validateUrl": String,
         "_clientSiteUrl": String,
-
-        "_imageLink": {
-            type: String,
-            default: "http://ichef.bbci.co.uk/news/976/cpsprodpb/7355/production/_96252592_marcus_intalex.jpg"
-        },
     };
 
     export default {
@@ -403,7 +393,6 @@
             show: true,
 
             submitAction: null,
-            imageLink: null,
 
             transitionOptions: [
                 {"label": "None", "value": "none"},

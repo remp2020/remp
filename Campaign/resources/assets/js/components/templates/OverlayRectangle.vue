@@ -58,6 +58,14 @@
                             </div>
                         </div>
 
+                        <div class="input-group fg-float">
+                            <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
+                            <div class="fg-line">
+                                <label for="image_link" class="fg-label">Image link</label>
+                                <input v-model="imageLink" class="form-control fg-input" name="image_link" id="image_link" type="text">
+                            </div>
+                        </div>
+
                         <input type="hidden" name="background_color" v-bind:value="_backgroundColor" />
                         <input type="hidden" name="text_color" v-bind:value="_textColor" />
                         <input type="hidden" name="button_background_color" v-bind:value="_buttonBackgroundColor" />
@@ -110,6 +118,7 @@
         "_buttonTextColor",
         "_width",
         "_height",
+        "_imageLink",
     ];
     export default {
         name: "overlay-rectangle-template",
@@ -129,6 +138,7 @@
             buttonText: "Visit offer",
             width: null,
             height: null,
+            imageLink: null,
 
             colorScheme: "green",
             colorSchemes: {
@@ -226,6 +236,7 @@
                     headerText: this.headerText,
                     mainText: this.mainText,
                     buttonText: this.buttonText,
+                    imageLink: this.imageLink,
                 };
                 if (this.colorSchemes[this.colorScheme]) {
                     let cs = this.colorSchemes[this.colorScheme];
