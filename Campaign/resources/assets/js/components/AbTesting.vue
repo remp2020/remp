@@ -128,7 +128,7 @@
                     connects[i].classList.add('color-' + i);
                 }
 
-                this.$children[0].renderProportionInputValues()
+                this.$children[0].renderProportionInputValues();
 
                 // bind events
                 this.sliderEl.noUiSlider.on('update', this.handleSliderUpdate);
@@ -157,17 +157,17 @@
             // -> this means set handle to sum of all previous + this variant proporion
             // control group doesn't have handle so its treated independently
             handleInputUpdate(event, i) {
-                var a = Array(this.variants.length).fill(null),
+                let a = Array(this.variants.length).fill(null),
                     prevInputsSum = 0,
                     sum = 0;
 
 
                 // sum all previous inputs & all inputs
-                for(var ii = 0; ii < this.variants.length; ii++) {
+                for(let ii = 0; ii < this.variants.length; ii++) {
                     var els = document.getElementsByClassName('ab-testing-input-' + ii);
 
                     if (els.length) {
-                        sum += parseInt(els[0].value)
+                        sum += parseInt(els[0].value);
                         prevInputsSum += (ii < i) ? parseInt(els[0].value) : 0;
                     }
                 }
@@ -185,9 +185,10 @@
                 this.sliderEl.noUiSlider.set(a)
             },
             addEmptyVariant: function (event) {
-                var i = this.variants.length - 1;
+                let i = this.variants.length - 1;
 
-                // remove 10% from variant before adding
+                while (!this.variants[i].proportion) i--;
+
                 this.variants[i].proportion = this.variants[i].proportion-10;
 
                 // add empty variant before control group
@@ -212,7 +213,7 @@
             removeVariant: function (event, i, id) {
                 this.variants.splice(i, 1);
 
-                this.variantsToRemove.push({id: id})
+                this.variantsToRemove.push({id: id});
 
                 setTimeout(() => {
                     this.renderSlider(this.calculateStarts());
