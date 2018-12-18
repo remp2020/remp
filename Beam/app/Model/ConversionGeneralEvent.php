@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConversionGeneralEvent extends Model
 {
+    protected $casts = [
+        'minutes_to_conversion' => 'integer'
+    ];
+
     protected $fillable = [
         'time',
         'action',
@@ -17,6 +21,7 @@ class ConversionGeneralEvent extends Model
         'utm_content',
         'utm_medium',
         'utm_source',
+        'minutes_to_conversion'
     ];
 
     protected $dates = [

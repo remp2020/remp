@@ -19,6 +19,7 @@ class CreateConversionGeneralEventsTable extends Migration
             $table->integer('conversion_id')->unsigned();
 
             $table->timestamp('time');
+            $table->integer('minutes_to_conversion');
 
             $table->string('action')->nullable();
             $table->string('category')->nullable();

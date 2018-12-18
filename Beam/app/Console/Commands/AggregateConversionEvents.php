@@ -156,9 +156,13 @@ class AggregateConversionEvents extends Command
                 $article = Article::where('external_id', $item->article->id)->first();
 
                 if ($article) {
+                    $time = Carbon::parse($item->system->time)->tz('UTC');
+                    $timeToConversion = $conversion->paid_at->diffInMinutes($time);
+
                     ConversionPageviewEvent::create([
                         'conversion_id' => $conversion->id,
-                        'time' => Carbon::parse($item->system->time)->tz('UTC'),
+                        'time' => $time,
+                        'minutes_to_conversion' => $timeToConversion,
                         'article_id' => $article->id,
                         'locked' => isset($item->article->locked) ? filter_var($item->article->locked, FILTER_VALIDATE_BOOLEAN) : null,
                         'signed_in' => isset($item->user->signed_in) ? filter_var($item->user->signed_in, FILTER_VALIDATE_BOOLEAN) : null,
@@ -190,8 +194,12 @@ class AggregateConversionEvents extends Command
 
                     $processedIds[$item->_id] = true;
 
+                    $time = Carbon::parse($item->system->time)->tz('UTC');
+                    $timeToConversion = $conversion->paid_at->diffInMinutes($time);
+
                     $commerceEvent = ConversionCommerceEvent::create([
-                        'time' => Carbon::parse($item->system->time)->tz('UTC'),
+                        'time' => $time,
+                        'minutes_to_conversion' => $timeToConversion,
                         'step' => $item->step,
                         'funnel_id' => $item->details->funnel_id ?? null,
                         'amount' => $item->revenue->amount ?? null,
@@ -241,8 +249,12 @@ class AggregateConversionEvents extends Command
 
                     $processedIds[$item->_id] = true;
 
+                    $time = Carbon::parse($item->system->time)->tz('UTC');
+                    $timeToConversion = $conversion->paid_at->diffInMinutes($time);
+
                     ConversionGeneralEvent::create([
-                        'time' => Carbon::parse($item->system->time)->tz('UTC'),
+                        'time' => $time,
+                        'minutes_to_conversion' => $timeToConversion,
                         'action' => $item->action ?? null,
                         'category' => $item->category ?? null,
                         'conversion_id' => $conversion->id,
