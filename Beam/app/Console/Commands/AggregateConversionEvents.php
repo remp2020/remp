@@ -106,9 +106,11 @@ class AggregateConversionEvents extends Command
     protected function aggregateConversion(Conversion $conversion, int $days)
     {
         if (!$conversion->user_id) {
-            $this->line("Conversion #{$conversion->user_id} has no assigned user.");
+            $this->line("Conversion #{$conversion->id} has no assigned user.");
             return;
         }
+
+        $this->line("Aggregating conversion <info>#{$conversion->id}</info>");
 
         try {
             $this->loadAndStorePageviewEvents(
