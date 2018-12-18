@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Campaign;
 use Carbon\Carbon;
 use App\CampaignBanner;
-use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use App\Contracts\Remp\Stats;
 
@@ -14,12 +13,16 @@ class StatsController extends Controller
     public $statTypes = [
         "show" => [
             "label" => "Shows",
-            "backgroundColor" => "#2196f3"
+            "backgroundColor" => "#E63952",
         ],
         "click" => [
             "label" => "Clicks",
-            "backgroundColor" => "#009688"
-        ]
+            "backgroundColor" => "#00C7DF",
+        ],
+        "commerce" => [
+            "label" => "Conversions",
+            "backgroundColor" => "#FFC34A",
+        ],
     ];
 
     public function campaignStatsCount($variantUuids, $type, Stats $stats, Request $request)
@@ -117,14 +120,19 @@ class StatsController extends Controller
         foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
 
-            $stats = $stats->count()
-                        ->events('banner', $type)
-                        ->forVariants($variantUuids)
-                        ->timeHistogram($interval)
-                        ->from($from)
-                        ->to($to);
+            $data = $stats->count()
+                ->forVariants($variantUuids)
+                ->timeHistogram($interval)
+                ->from($from)
+                ->to($to);
 
-            $result = $stats->get();
+            if ($type === 'commerce') {
+                $data = $data->commerce('purchase');
+            } else {
+                $data = $data->events('banner', $type);
+            }
+
+            $result = $data->get();
 
             $histogramData = $result[0];
 

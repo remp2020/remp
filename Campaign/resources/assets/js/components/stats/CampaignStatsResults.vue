@@ -44,7 +44,8 @@
                             </td>
                             <td>
                                 <strong>
-                                    {{ variant.conversions | round(4) }}%
+                                    {{ variant.purchases }}
+                                    ({{ variant.conversions | round(4) }}%)
                                 </strong>
                             </td>
                             <td>
@@ -109,9 +110,10 @@
                         clicks: data.click_count.count,
                         shows: data.show_count.count,
                         earned: data.purchase_sum.sum,
+                        purchases: data.purchase_count.count,
                         ctr: data.ctr,
                         conversions: data.conversions,
-                        deleted_at: variant.deleted_at
+                        deleted_at: variant.deleted_at,
                     };
 
                     if (variant.banner !==  null) {
@@ -128,6 +130,7 @@
                     clicks: this.campaignData.click_count.count,
                     shows: this.campaignData.show_count.count,
                     earned: this.campaignData.purchase_sum.sum,
+                    purchases: this.campaignData.purchase_count.count,
                     ctr: this.campaignData.ctr,
                     conversions: this.campaignData.conversions,
                 });
