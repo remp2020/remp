@@ -4,11 +4,13 @@
 
     .overlay-rectangle-preview-close {
         position: absolute;
-        top: 5px;
-        right: 10px;
-        font-size: 16px;
-        padding: 5px;
+        top: 0;
+        right: 5px;
+        font-size: 14px;
+        line-height: 18px;
         text-decoration: none;
+        color: #000;
+        padding-top: 3px;
     }
 
     .overlay-rectangle-preview-close.hidden {
@@ -41,9 +43,6 @@
         display: block;
         text-decoration: none;
         overflow: hidden;
-        -webkit-box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
-        -moz-box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
-        box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
     }
 
     .overlay-rectangle-content {
@@ -92,23 +91,53 @@
         cursor: pointer;
         margin-top: 10px;
     }
+
+    .overlay-rectangle-wrap {
+        position: relative;
+        padding: 25px 5px 5px;
+        background: #fff;
+        -webkit-box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
+        -moz-box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
+        box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
+    }
 </style>
 
 <template>
     <div class="overlay-rectangle-overlay">
-        <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible" class="overlay-rectangle-preview-link" v-bind:style="[linkStyles, _position]">
-            <transition appear v-bind:name="transition">
-                <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
-                    <img :src="imageLink" class="overlay-rectangle-image" alt="">
-                    <div class="overlay-rectangle-content">
-                        <a class="overlay-rectangle-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
-                        <div v-if="headerText" class="overlay-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
-                        <div class="overlay-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
-                        <div class="overlay-rectangle-button" v-if="buttonText.length > 0" v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
-                    </div>
-                </div>
-            </transition>
-        </a>
+        <transition appear v-bind:name="transition">
+
+            <div v-if="isVisible" class="overlay-rectangle-wrap">
+
+                <a class="overlay-rectangle-preview-close"
+                   title="Close banner"
+                   href="javascript://"
+                   v-bind:class="[{hidden: !closeable}]"
+                   v-on:click.stop="$parent.closed"
+                   v-bind:style="closeStyles"><small>{{ closeText }}</small> &times;</a>
+
+                <a v-bind:href="$parent.url"
+                   v-on="$parent.url ? { click: $parent.clicked } : {}"
+                   class="overlay-rectangle-preview-link"
+                   v-bind:style="[linkStyles]">
+
+                        <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
+                            <img :src="imageLink" class="overlay-rectangle-image" alt="">
+                            <div class="overlay-rectangle-content" v-if="headerText || buttonText || mainText">
+                                <div v-if="headerText" class="overlay-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
+                                <div class="overlay-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
+
+                                <div class="overlay-rectangle-button"
+                                     v-if="buttonText.length > 0"
+                                     v-on:click="$parent.clicked($event, !$parent.url)"
+                                     v-html="$parent.injectVars(buttonText)"
+                                     v-bind:style="[buttonStyles]"></div>
+                            </div>
+                        </div>
+                </a>
+
+            </div>
+
+        </transition>
     </div>
 </template>
 
@@ -136,6 +165,7 @@
             "offsetHorizontal",
             "targetUrl",
             "closeable",
+            "closeText",
             "displayType",
             "uuid",
             "campaignUuid"
@@ -148,22 +178,6 @@
             }
         },
         computed: {
-            _position: function () {
-                console.log('computed position');
-                let $el = $('.overlay-rectangle-preview-link'),
-                    width = $el.width(),
-                    height = $el.height();
-
-                console.log($el.length);
-
-                console.log('width', width);
-                console.log('height', height);
-
-                return {
-                    marginLeft: -width/2,
-                    marginTop: -height/2,
-                }
-            },
             _headerText: function() {
                 if (headerText !== null && headerText.length > 0) {
                     return headerText;
@@ -185,9 +199,9 @@
                     backgroundColor: this.backgroundColor,
                     color: this.textColor,
                     minWidth: this.width || '100px',
-                    maxWidth: this.width || '370px',
-                    minHeight: this.height || '250px',
-                    maxHeight: this.height || '370px',
+                    maxWidth: this.width || '300px',
+                    minHeight: this.height || '100px',
+                    maxHeight: this.height || '600px',
                 }
             },
             buttonStyles: function() {
@@ -198,7 +212,7 @@
             },
             closeStyles: function() {
                 return {
-                    color: this.textColor,
+                    color: this.backgroundColor,
                 }
             },
             isVisible: function() {

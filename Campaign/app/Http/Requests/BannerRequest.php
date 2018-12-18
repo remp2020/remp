@@ -68,6 +68,21 @@ class BannerRequest extends FormRequest
                         'height' => 'string|nullable',
                     ]);
                     break;
+
+                case Banner::TEMPLATE_OVERLAY_RECTANGLE:
+                    $templateValidator = Validator::make($this->all(), [
+                        'background_color' => 'string|required',
+                        'text_color' => 'string|required',
+                        'button_background_color' => 'string|required',
+                        'button_text_color' => 'string|required',
+                        'header_text' => 'string|nullable',
+                        'main_text' => 'string|required',
+                        'button_text' => 'string|required',
+                        'width' => 'string|nullable',
+                        'height' => 'string|nullable',
+                        'image_link' => 'string|nullable',
+                    ]);
+                    break;
                 case Banner::TEMPLATE_BAR:
                     $templateValidator = Validator::make($this->all(), [
                         'background_color' => 'string|required',

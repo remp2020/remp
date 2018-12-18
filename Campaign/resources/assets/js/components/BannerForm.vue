@@ -85,7 +85,7 @@
                                 <span class="input-group-addon"><i class="zmdi zmdi-link"></i></span>
                                 <div class="fg-line">
                                     <label for="image_link" class="fg-label">Image link</label>
-                                    <input v-model="imageLink" class="form-control fg-input" name="name" id="image_link" type="text">
+                                    <input v-model="imageLink" class="form-control fg-input" name="image_link" id="image_link" type="text">
                                 </div>
                             </div>
 
@@ -124,7 +124,7 @@
                 <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
-                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}">
+                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}" v-if="overlayRectangleTemplate == null">
                     <a href="#inline-banner" role="tab" data-toggle="tab" aria-expanded="false">Inline Banner</a>
                 </li>
             </ul>
@@ -133,7 +133,7 @@
                 <div class="tab-content p-0">
                     <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
-                            <div class="input-group">
+                            <div class="input-group" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
                                 <div>
                                     <div class="row">
@@ -151,7 +151,7 @@
                                 </div>
                             </div><!-- .input-group -->
 
-                            <div class="input-group fg-float">
+                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
 
                                 <div class="fg-line">
@@ -160,7 +160,7 @@
                                 </div>
                             </div><!-- .input-group -->
 
-                            <div class="input-group fg-float">
+                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
 
                                 <div class="fg-line">
@@ -201,12 +201,10 @@
                                 </div>
                             </div><!-- .input-group -->
 
-
-
                         </div>
                     </div>
 
-                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner">
+                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner" v-if="overlayRectangleTemplate == null">
                         <div class="card-body card-padding p-l-15">
                             <div class="input-group fg-float m-t-10">
                                 <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
