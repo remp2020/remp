@@ -52,9 +52,7 @@
                                     <h4 class="text-center">Overlay rectangle banner</h4>
                                 </div>
                                 <div class="card-body">
-                                    <div class="preview" style="margin-top: 55px;">
-                                        <i class="zmdi zmdi-language-html5 zmdi-hc-5x"></i>
-                                    </div>
+                                    <div class="preview overlay-rectangle"></div>
                                 </div>
                             </a>
                         </div>

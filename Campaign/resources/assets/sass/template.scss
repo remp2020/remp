@@ -10,6 +10,12 @@
         background-position: center;
     }
 
+    &.overlay-rectangle {
+        background-image: url('../img/overlay_rectangle.png');
+        background-size: contain;
+        background-position: center;
+    }
+
     &.bar {
         background-image: url('../img/bar.png');
         background-size: contain;
