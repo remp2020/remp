@@ -102,14 +102,10 @@ class UserPathController extends Controller
             });
         }
 
-        $commerceEvents = $commerceEventsQuery->get();
-        $pageviewEvents = $pageviewEventsQuery->get();
-        $generalEvents = $generalEventsQuery->get();
-
         return response()->json([
-            'commerceEvents' => $commerceEvents,
-            'pageviewEvents' => $pageviewEvents,
-            'generalEvents' => $generalEvents,
+            'commerceEvents' => $commerceEventsQuery->get(),
+            'pageviewEvents' => $pageviewEventsQuery->get(),
+            'generalEvents' => $generalEventsQuery->get(),
         ]);
     }
 }

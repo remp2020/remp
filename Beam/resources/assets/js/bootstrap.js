@@ -18,4 +18,5 @@ global.RuleOcurrences = require("./components/RuleOcurrences.vue");
 global.FormValidator = require("remp/js/components/FormValidator");
 global.DashboardRoot = require("./components/dashboard/DashboardRoot.vue");
 global.ArticleHistogram = require("./components/dashboard/ArticleHistogram.vue");
+global.UserPath = require("./components/userpath/UserPath.vue");
 global.DashboardStore = require("./components/dashboard/store.js").default
