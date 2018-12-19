@@ -67,8 +67,6 @@ class UserPathController extends Controller
             });
         }
 
-        $shouldJoin = $authors && $sections && $sums;
-
         $commerceEventsQuery = ConversionCommerceEvent::select('conversion_commerce_events.*')
             ->where('minutes_to_conversion', '<=', $minutes)
             ->select('step', 'funnel_id', DB::raw('count(*) as group_count'))
@@ -88,7 +86,7 @@ class UserPathController extends Controller
             ->select('action', 'category', DB::raw('count(*) as group_count'))
             ->groupBy('action', 'category');
 
-        if ($shouldJoin) {
+        if ($authors || $sections || $sums) {
             $commerceEventsQuery->joinSub($conversionsQuery, 'c', function ($join) {
                 $join->on('conversion_commerce_events.conversion_id', '=', 'c.id');
             });

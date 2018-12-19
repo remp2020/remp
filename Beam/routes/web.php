@@ -73,9 +73,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('newsletters/{newsletter}/pause', 'NewsletterController@pause')->name('newsletters.pause');
     Route::resource('newsletters', 'NewsletterController', ['except' => ['show']]);
 
-    Route::resource('userpath', 'UserPathController', [
-        'only' => ['index']
-    ]);
+    Route::get('userpath', 'UserPathController@index')->name('userpath.index');
+    Route::post('userpath/statsJson', 'UserPathController@stats')->name('userpath.stats');
 
     Route::resource('conversions', 'ConversionController', [
         'only' => ['index', 'store', 'show']
