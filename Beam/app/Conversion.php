@@ -27,10 +27,15 @@ class Conversion extends Model
         'currency',
         'paid_at',
         'user_id',
+        'events_aggregated',
     ];
 
     protected $dates = [
-        'paid_at',
+        'paid_at'
+    ];
+
+    protected $casts = [
+        'events_aggregated' => 'boolean'
     ];
 
     public function article()

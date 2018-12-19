@@ -15,6 +15,7 @@ use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 
 class AggregateConversionEvents extends Command
 {
@@ -50,9 +51,7 @@ class AggregateConversionEvents extends Command
                 return;
             }
 
-            if ($conversion->pageviewEvents->count() > 0 ||
-                $conversion->commerceEvents->count() > 0 ||
-                $conversion->generalEvents->count() > 0) {
+            if ($conversion->events_aggregated) {
                 $this->info("Conversion with ID $conversionId already aggregated.");
                 return;
             }
@@ -87,24 +86,16 @@ class AggregateConversionEvents extends Command
         return $browserIds;
     }
 
-    private function getUnaggregatedConversions()
+    private function getUnaggregatedConversions(): Collection
     {
-        $unionQuery = ConversionGeneralEvent::select('conversion_id')
-            ->groupBy('conversion_id')
-            ->union(ConversionCommerceEvent::select('conversion_id')->groupBy('conversion_id'))
-            ->union(ConversionPageviewEvent::select('conversion_id')->groupBy('conversion_id'));
-
-        return Conversion::select('conversions.*')
-            ->leftJoinSub($unionQuery, 't', function ($join) {
-                $join->on('conversions.id', 't.conversion_id');
-            })
-            ->whereNotNull('conversions.user_id')
-            ->whereNull('t.conversion_id')
-            ->get();
+        return Conversion::where('events_aggregated', 0)->get();
     }
 
     protected function aggregateConversion(Conversion $conversion, int $days)
     {
+        $conversion->events_aggregated = true;
+        $conversion->save();
+
         if (!$conversion->user_id) {
             $this->line("Conversion #{$conversion->id} has no assigned user.");
             return;
