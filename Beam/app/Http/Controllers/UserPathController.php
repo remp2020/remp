@@ -30,7 +30,7 @@ class UserPathController extends Controller
         return view('userpath.index', [
             'authors' => $authors,
             'sections' => $sections,
-            'days' => range(1,14),
+            'days' => range(1, 14),
             'sumCategories' => $sumCategories,
         ]);
     }
@@ -53,17 +53,19 @@ class UserPathController extends Controller
         }
 
         if ($sections) {
-            $conversionsQuery->whereIn('article_section.section_id', $sections);;
+            $conversionsQuery->whereIn('article_section.section_id', $sections);
+            ;
         }
 
         if ($sums) {
-            $conversionsQuery->where(function($query) use ($sums) {
-                foreach ($sums as $sum)
-                $query->orWhere(function ($query) use ($sum) {
-                    [$amount, $currency] = explode('|', $sum, 2);
-                    $query->where('conversions.amount', $amount);
-                    $query->where('conversions.currency', $currency);
-                });
+            $conversionsQuery->where(function ($query) use ($sums) {
+                foreach ($sums as $sum) {
+                    $query->orWhere(function ($query) use ($sum) {
+                        [$amount, $currency] = explode('|', $sum, 2);
+                        $query->where('conversions.amount', $amount);
+                        $query->where('conversions.currency', $currency);
+                    });
+                }
             });
         }
 
@@ -75,7 +77,8 @@ class UserPathController extends Controller
         $pageviewEventsQuery = ConversionPageviewEvent::select('conversion_pageview_events.*')
             ->where('minutes_to_conversion', '<=', $minutes)
             ->select(
-                'locked', 'signed_in',
+                'locked',
+                'signed_in',
                 DB::raw('count(*) as group_count'),
                 DB::raw('coalesce(avg(timespent), 0) as timespent_avg')
             )
