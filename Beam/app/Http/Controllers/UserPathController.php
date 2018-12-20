@@ -83,11 +83,11 @@ class UserPathController extends Controller
 
         // pageview events
         $pageviewEventsQuery = ConversionPageviewEvent::select(
-                'locked',
-                'signed_in',
-                DB::raw('count(*) as group_count'),
-                DB::raw('coalesce(avg(timespent), 0) as timespent_avg')
-            )
+            'locked',
+            'signed_in',
+            DB::raw('count(*) as group_count'),
+            DB::raw('coalesce(avg(timespent), 0) as timespent_avg')
+        )
             ->where('minutes_to_conversion', '<=', $minutes)
             ->groupBy('locked', 'signed_in')
             ->orderByDesc('group_count');

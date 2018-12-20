@@ -145,7 +145,6 @@ class AggregateConversionEvents extends Command
             $this->savePageviewEvents($pageviewEvents, $timesIndex);
             $this->saveCommerceEvents($commerceEvents, $timesIndex);
             $this->saveGeneralEvents($generalEvents, $timesIndex);
-
         } catch (JournalException $exception) {
             $this->error($exception->getMessage());
         }
