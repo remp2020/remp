@@ -11,7 +11,8 @@ class ConversionPageviewEvent extends Model
     protected $casts = [
         'locked' => 'boolean',
         'signed_in' => 'boolean',
-        'minutes_to_conversion' => 'integer'
+        'minutes_to_conversion' => 'integer',
+        'event_prior_conversion' => 'integer',
     ];
 
     protected $fillable = [
@@ -25,7 +26,8 @@ class ConversionPageviewEvent extends Model
         'utm_medium',
         'utm_source',
         'conversion_id',
-        'minutes_to_conversion'
+        'minutes_to_conversion',
+        'event_prior_conversion',
     ];
 
     protected $dates = [

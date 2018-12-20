@@ -20,6 +20,7 @@ class CreateConversionCommerceEventsTable extends Migration
 
             $table->timestamp('time');
             $table->integer('minutes_to_conversion');
+            $table->integer('event_prior_conversion')->unsigned();
 
             $table->string('step');
             $table->string('funnel_id')->nullable();

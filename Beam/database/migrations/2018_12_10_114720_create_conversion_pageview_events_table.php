@@ -20,6 +20,7 @@ class CreateConversionPageviewEventsTable extends Migration
 
             $table->timestamp('time');
             $table->integer('minutes_to_conversion');
+            $table->integer('event_prior_conversion')->unsigned();
 
             $table->integer('article_id')->unsigned();
             $table->boolean('locked')->nullable();

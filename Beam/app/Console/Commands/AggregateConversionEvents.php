@@ -21,6 +21,7 @@ class AggregateConversionEvents extends Command
 {
     const COMMAND = 'conversions:aggregate-events';
     const DAYS_IN_PAST = 14;
+    private const TEMP_PRODUCT_IDS_LABEL = 'TEMP_product_ids';
 
     protected $signature = self::COMMAND . ' {--conversion_id=} {--days=' . self::DAYS_IN_PAST . '}';
 
@@ -104,31 +105,86 @@ class AggregateConversionEvents extends Command
         $this->line("Aggregating conversion <info>#{$conversion->id}</info>");
 
         try {
-            $this->loadAndStorePageviewEvents(
+            $pageviewEvents = $this->loadPageviewEvents(
                 $conversion,
                 $this->getBrowsersForUser($conversion, 'pageviews', 'load'),
                 $days
             );
 
-            $this->loadAndStoreCommerceEvents(
+            $commerceEvents = $this->loadCommerceEvents(
                 $conversion,
                 $this->getBrowsersForUser($conversion, 'commerce'),
                 $days
             );
-            $this->loadAndStoreGeneralEvents(
+            $generalEvents = $this->loadGeneralEvents(
                 $conversion,
                 $this->getBrowsersForUser($conversion, 'events'),
                 $days
             );
+
+            // Compute event numbers prior conversion (across all event types)
+            $times = [];
+            foreach ($pageviewEvents as $event) {
+                $times[] = $event['time']->timestamp;
+            }
+            foreach ($commerceEvents as $event) {
+                $times[] = $event['time']->timestamp;
+            }
+            foreach ($generalEvents as $event) {
+                $times[] = $event['time']->timestamp;
+            }
+            rsort($times);
+            $timesIndex = [];
+
+            foreach ($times as $i => $timestamp) {
+                $timesIndex[(string)$timestamp] = $i + 1;
+            }
+
+            // Save events
+            $this->savePageviewEvents($pageviewEvents, $timesIndex);
+            $this->saveCommerceEvents($commerceEvents, $timesIndex);
+            $this->saveGeneralEvents($generalEvents, $timesIndex);
+
         } catch (JournalException $exception) {
             $this->error($exception->getMessage());
         }
     }
 
-    protected function loadAndStorePageviewEvents(Conversion $conversion, array $browserIds, $days)
+    protected function savePageviewEvents(array &$events, &$timesIndex)
+    {
+        foreach ($events as $data) {
+            $data['event_prior_conversion'] = $timesIndex[(string)$data['time']->timestamp];
+            ConversionPageviewEvent::create($data);
+        }
+    }
+
+    protected function saveCommerceEvents(array &$events, &$timesIndex)
+    {
+        foreach ($events as $data) {
+            $data['event_prior_conversion'] = $timesIndex[(string)$data['time']->timestamp];
+            $productIds = $data[self::TEMP_PRODUCT_IDS_LABEL];
+            unset($data[self::TEMP_PRODUCT_IDS_LABEL]);
+
+            $commerceEvent = ConversionCommerceEvent::create($data);
+            foreach ($productIds as $productId) {
+                $product = new ConversionCommerceEventProduct(['product_id' => $productId]);
+                $commerceEvent->products()->save($product);
+            }
+        }
+    }
+
+    protected function saveGeneralEvents(array &$events, &$timesIndex)
+    {
+        foreach ($events as $data) {
+            $data['event_prior_conversion'] = $timesIndex[(string)$data['time']->timestamp];
+            ConversionGeneralEvent::create($data);
+        }
+    }
+
+    protected function loadPageviewEvents(Conversion $conversion, array $browserIds, $days): array
     {
         if (!$browserIds) {
-            return;
+            return [];
         }
 
         $from = (clone $conversion->paid_at)->subDays($days);
@@ -141,6 +197,8 @@ class AggregateConversionEvents extends Command
 
         $events = $this->journal->list($r);
 
+        $toSave = [];
+
         if ($events->isNotEmpty()) {
             foreach ($events[0]->pageviews as $item) {
                 if (!isset($item->article->id)) {
@@ -152,7 +210,7 @@ class AggregateConversionEvents extends Command
                     $time = Carbon::parse($item->system->time)->tz('UTC');
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
 
-                    ConversionPageviewEvent::create([
+                    $toSave[] = [
                         'conversion_id' => $conversion->id,
                         'time' => $time,
                         'minutes_to_conversion' => $timeToConversion,
@@ -164,20 +222,24 @@ class AggregateConversionEvents extends Command
                         'utm_content' => $item->user->source->utm_content ?? null,
                         'utm_medium' => $item->user->source->utm_medium ?? null,
                         'utm_source' => $item->user->source->utm_source ?? null,
-                    ]);
+                    ];
                 }
             }
         }
+
+        return $toSave;
     }
 
-    protected function loadAndStoreCommerceEvents(Conversion $conversion, array $browserIds, $days)
+    protected function loadCommerceEvents(Conversion $conversion, array $browserIds, $days): array
     {
         $from = (clone $conversion->paid_at)->subDays($days);
         $to = $conversion->paid_at;
 
         $processedIds = [];
 
-        $process = function ($request) use ($conversion, &$processedIds) {
+        $toSave = [];
+
+        $process = function ($request) use ($conversion, &$processedIds, &$toSave) {
             $events = $this->journal->list($request);
             if ($events->isNotEmpty()) {
                 foreach ($events[0]->commerces as $item) {
@@ -190,7 +252,7 @@ class AggregateConversionEvents extends Command
                     $time = Carbon::parse($item->system->time)->tz('UTC');
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
 
-                    $commerceEvent = ConversionCommerceEvent::create([
+                    $toSave[] = [
                         'time' => $time,
                         'minutes_to_conversion' => $timeToConversion,
                         'step' => $item->step,
@@ -202,14 +264,8 @@ class AggregateConversionEvents extends Command
                         'utm_medium' => $item->source->utm_medium ?? null,
                         'utm_source' => $item->source->utm_source ?? null,
                         'conversion_id' => $conversion->id,
-                    ]);
-
-                    if (isset($item->details->product_ids)) {
-                        foreach ($item->details->product_ids as $productId) {
-                            $product = new ConversionCommerceEventProduct(['product_id' => $productId]);
-                            $commerceEvent->products()->save($product);
-                        }
-                    }
+                        self::TEMP_PRODUCT_IDS_LABEL => $item->details->product_ids ?? [] // this will be removed later
+                    ];
                 }
             }
         };
@@ -223,16 +279,20 @@ class AggregateConversionEvents extends Command
         $process(JournalListRequest::from("commerce")
             ->setTime($from, $to)
             ->addFilter('user_id', $conversion->user_id));
+
+        return $toSave;
     }
 
-    protected function loadAndStoreGeneralEvents(Conversion $conversion, array $browserIds, $days)
+    protected function loadGeneralEvents(Conversion $conversion, array $browserIds, $days): array
     {
         $from = (clone $conversion->paid_at)->subDays($days);
         $to = $conversion->paid_at;
 
         $processedIds = [];
 
-        $process = function ($request) use ($conversion, &$processedIds) {
+        $toSave = [];
+
+        $process = function ($request) use ($conversion, &$processedIds, &$toSave) {
             $events = $this->journal->list($request);
             if ($events->isNotEmpty()) {
                 foreach ($events[0]->events as $item) {
@@ -245,7 +305,7 @@ class AggregateConversionEvents extends Command
                     $time = Carbon::parse($item->system->time)->tz('UTC');
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
 
-                    ConversionGeneralEvent::create([
+                    $toSave[] = [
                         'time' => $time,
                         'minutes_to_conversion' => $timeToConversion,
                         'action' => $item->action ?? null,
@@ -255,7 +315,7 @@ class AggregateConversionEvents extends Command
                         'utm_content' => $item->utm_content ?? null,
                         'utm_medium' => $item->utm_medium ?? null,
                         'utm_source' => $item->utm_source ?? null,
-                    ]);
+                    ];
                 }
             }
         };
@@ -269,5 +329,7 @@ class AggregateConversionEvents extends Command
         $process(JournalListRequest::from('events')
             ->setTime($from, $to)
             ->addFilter('user_id', $conversion->user_id));
+
+        return $toSave;
     }
 }
