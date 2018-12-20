@@ -1,6 +1,13 @@
 <template>
     <div class="m-t-20">
-        <template v-if="stats">
+
+        <div v-if="loading" class="preloader pls-purple">
+            <svg class="pl-circular" viewBox="25 25 50 50">
+                <circle class="plc-path" cx="50" cy="50" r="20"></circle>
+            </svg>
+        </div>
+
+        <template v-if="!loading && stats">
             <h4>Statistics</h4>
 
             <h5>Pageviews</h5>
