@@ -54,7 +54,6 @@ class UserPathController extends Controller
 
         if ($sections) {
             $conversionsQuery->whereIn('article_section.section_id', $sections);
-            ;
         }
 
         if ($sums) {
@@ -72,7 +71,8 @@ class UserPathController extends Controller
         $commerceEventsQuery = ConversionCommerceEvent::select('conversion_commerce_events.*')
             ->where('minutes_to_conversion', '<=', $minutes)
             ->select('step', 'funnel_id', DB::raw('count(*) as group_count'))
-            ->groupBy('step', 'funnel_id');
+            ->groupBy('step', 'funnel_id')
+            ->orderByDesc('group_count');
 
         $pageviewEventsQuery = ConversionPageviewEvent::select('conversion_pageview_events.*')
             ->where('minutes_to_conversion', '<=', $minutes)
@@ -82,12 +82,14 @@ class UserPathController extends Controller
                 DB::raw('count(*) as group_count'),
                 DB::raw('coalesce(avg(timespent), 0) as timespent_avg')
             )
-            ->groupBy('locked', 'signed_in');
+            ->groupBy('locked', 'signed_in')
+            ->orderByDesc('group_count');
 
         $generalEventsQuery = ConversionGeneralEvent::select('conversion_general_events.*')
             ->where('minutes_to_conversion', '<=', $minutes)
             ->select('action', 'category', DB::raw('count(*) as group_count'))
-            ->groupBy('action', 'category');
+            ->groupBy('action', 'category')
+            ->orderByDesc('group_count');
 
         if ($authors || $sections || $sums) {
             $commerceEventsQuery->joinSub($conversionsQuery, 'c', function ($join) {

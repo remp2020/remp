@@ -98,7 +98,8 @@
                         that.stats = data;
                         that.loading = false;
                     }, 'json').fail(function() {
-                        that.error = 'Error while loading statistics data, try again later please.'
+                        that.error = 'Error while loading statistics data, try again later please.';
+                        console.warn(that.error);
                         that.loading = false;
                     });
                 }
