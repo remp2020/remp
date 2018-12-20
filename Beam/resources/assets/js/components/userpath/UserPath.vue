@@ -9,7 +9,6 @@
                     <b>State: </b>{{item.locked|choices('Locked article', 'Unlocked article')}}/{{item.signed_in|choices('Signed In', 'Unsigned')}},
                     <b>avg. timespent:</b> {{item.timespent_avg|roundNumber}} s
                     (total: {{item.group_count}})
-
                 </li>
             </ul>
 
@@ -41,18 +40,14 @@
                 type: Boolean,
                 default: false
             },
+            error: {
+                type: String,
+                default: null
+            },
             stats: {
                 required: true
             }
         },
-        data() {
-            return {
-//                tweeningValue: 0
-            }
-        },
-        methods: {
-
-        }
     }
 </script>
 

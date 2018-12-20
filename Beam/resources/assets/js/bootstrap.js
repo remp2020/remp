@@ -10,6 +10,11 @@ Vue.use(Vuex)
 
 global.moment = require('moment');
 
+$.ajaxSetup({
+    headers:
+        { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+});
+
 global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue");
 global.DateTimePicker = require("remp/js/components/DateTimePickerWrapper.vue");
 global.DateFormatter = require("remp/js/components/DateFormatter.vue");

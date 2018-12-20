@@ -68,7 +68,7 @@
                 <button type="submit" class="btn btn-info btn-sm m-t-10 waves-effect">Compute statistics</button>
             </form>
 
-            <user-path :stats="stats" :loading="loading"></user-path>
+            <user-path :stats="stats" :loading="loading" :error="error"></user-path>
         </div>
     </div>
 
@@ -87,18 +87,20 @@
                     sections: [],
                 },
                 stats: null,
-                loading: false
+                loading: false,
+                error: null,
             },
             methods: {
                 sendForm: function () {
                     this.loading = true
                     var that = this;
                     $.post(this.url, this.form, function(data) {
-                        console.log(this)
-
                         that.stats = data;
                         that.loading = false;
-                    }, 'json');
+                    }, 'json').fail(function() {
+                        that.error = 'Error while loading statistics data, try again later please.'
+                        that.loading = false;
+                    });
                 }
             }
         });
