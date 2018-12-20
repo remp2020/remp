@@ -11,6 +11,15 @@
             <h4>Statistics</h4>
 
             <p v-if="emptyStats">No events found for selected filter.</p>
+            <template v-else>
+                <h5>Last {{stats.lastEvents.limit}} events:</h5>
+                <ul>
+                    <li v-for="item in stats.lastEvents.absoluteCounts">
+                        {{item.name|capitalize}}: {{(item.count/stats.lastEvents.total)*100|roundNumber}} %
+                    </li>
+                </ul>
+
+            </template>
 
             <template v-if="stats.pageviewEvents.length > 0">
                 <h5>Pageviews</h5>

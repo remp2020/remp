@@ -68,47 +68,94 @@ class UserPathController extends Controller
             });
         }
 
-        $commerceEventsQuery = ConversionCommerceEvent::select('conversion_commerce_events.*')
-            ->where('minutes_to_conversion', '<=', $minutes)
+        $lastActionsLimit = 5;
+
+        // commerce events
+        $commerceEventsQuery = ConversionCommerceEvent::where('minutes_to_conversion', '<=', $minutes)
             ->select('step', 'funnel_id', DB::raw('count(*) as group_count'))
             ->groupBy('step', 'funnel_id')
             ->orderByDesc('group_count');
 
-        $pageviewEventsQuery = ConversionPageviewEvent::select('conversion_pageview_events.*')
-            ->where('minutes_to_conversion', '<=', $minutes)
-            ->select(
+        $commerceLastEventsQuery = ConversionCommerceEvent::where('minutes_to_conversion', '<=', $minutes)
+            ->select('step', DB::raw('count(*) as group_count'))
+            ->groupBy('step')
+            ->where('event_prior_conversion', '<=', $lastActionsLimit);
+
+        // pageview events
+        $pageviewEventsQuery = ConversionPageviewEvent::select(
                 'locked',
                 'signed_in',
                 DB::raw('count(*) as group_count'),
                 DB::raw('coalesce(avg(timespent), 0) as timespent_avg')
             )
+            ->where('minutes_to_conversion', '<=', $minutes)
             ->groupBy('locked', 'signed_in')
             ->orderByDesc('group_count');
 
-        $generalEventsQuery = ConversionGeneralEvent::select('conversion_general_events.*')
+        $pageviewLastEventsQuery = ConversionPageviewEvent::where('minutes_to_conversion', '<=', $minutes)
+            ->where('event_prior_conversion', '<=', $lastActionsLimit);
+
+        // general events
+        $generalEventsQuery = ConversionGeneralEvent::select('action', 'category', DB::raw('count(*) as group_count'))
             ->where('minutes_to_conversion', '<=', $minutes)
-            ->select('action', 'category', DB::raw('count(*) as group_count'))
             ->groupBy('action', 'category')
             ->orderByDesc('group_count');
 
+        $generalLastEventsQuery = ConversionGeneralEvent::select('action', 'category', DB::raw('count(*) as group_count'))
+            ->where('event_prior_conversion', '<=', $lastActionsLimit)
+            ->where('minutes_to_conversion', '<=', $minutes)
+            ->groupBy('action', 'category');
+
         if ($authors || $sections || $sums) {
-            $commerceEventsQuery->joinSub($conversionsQuery, 'c', function ($join) {
+            $commerceJoin = function ($join) {
                 $join->on('conversion_commerce_events.conversion_id', '=', 'c.id');
-            });
-
-            $pageviewEventsQuery->joinSub($conversionsQuery, 'c', function ($join) {
+            };
+            $pageviewJoin = function ($join) {
                 $join->on('conversion_pageview_events.conversion_id', '=', 'c.id');
-            });
-
-            $generalEventsQuery->joinSub($conversionsQuery, 'c', function ($join) {
+            };
+            $generalJoin = function ($join) {
                 $join->on('conversion_general_events.conversion_id', '=', 'c.id');
-            });
+            };
+
+            $commerceEventsQuery->joinSub($conversionsQuery, 'c', $commerceJoin);
+            $pageviewEventsQuery->joinSub($conversionsQuery, 'c', $pageviewJoin);
+            $generalEventsQuery->joinSub($conversionsQuery, 'c', $generalJoin);
+
+            $commerceLastEventsQuery->joinSub($conversionsQuery, 'c', $commerceJoin);
+            $pageviewLastEventsQuery->joinSub($conversionsQuery, 'c', $pageviewJoin);
+            $generalLastEventsQuery->joinSub($conversionsQuery, 'c', $generalJoin);
+        }
+
+        $total = $pageviewCount = $pageviewLastEventsQuery->count();
+        $absoluteCounts = [
+            ['name' => 'pageview', 'count'=>$pageviewCount]
+        ];
+
+        foreach ($generalLastEventsQuery->get() as $event) {
+            $absoluteCounts[] = [
+                'name' => $event->action . ':' . $event->category,
+                'count' => $event->group_count
+            ];
+            $total += $event->group_count;
+        }
+
+        foreach ($commerceLastEventsQuery->get() as $event) {
+            $absoluteCounts[] = [
+                'name' => $event->step,
+                'count' => $event->group_count
+            ];
+            $total += $event->group_count;
         }
 
         return response()->json([
             'commerceEvents' => $commerceEventsQuery->get(),
             'pageviewEvents' => $pageviewEventsQuery->get(),
             'generalEvents' => $generalEventsQuery->get(),
+            'lastEvents' => [
+                'limit' => $lastActionsLimit,
+                'absoluteCounts' => $absoluteCounts,
+                'total' => $total
+            ]
         ]);
     }
 }

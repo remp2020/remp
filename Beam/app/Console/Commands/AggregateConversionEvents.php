@@ -40,6 +40,7 @@ class AggregateConversionEvents extends Command
 
     public function handle()
     {
+        ini_set('memory_limit', '-1');
         $this->line('Aggregation of conversion events started');
         $conversionId = $this->option('conversion_id') ?? null;
 
