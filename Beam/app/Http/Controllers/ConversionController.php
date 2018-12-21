@@ -49,6 +49,9 @@ class ConversionController extends Controller
             ->addColumn('article.title', function (Conversion $conversion) {
                 return \Html::link(route('articles.show', ['article' => $conversion->article->id]), $conversion->article->title);
             })
+            ->filterColumn('article.title', function (Builder $query, $value) {
+                $query->where('articles.title', 'like', '%' . $value . '%');
+            })
             ->filterColumn('article.authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_author.author_id', $values);

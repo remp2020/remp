@@ -36,34 +36,41 @@
                 ],
                 'pageviews_all' => [
                     'header' => 'all pageviews',
+                    'searchable' => false,
                     'priority' => 2,
                 ],
                 'pageviews_signed_in' => [
                     'header' => 'signed in pageviews',
+                    'searchable' => false,
                     'priority' => 5,
                 ],
                 'pageviews_subscribers' => [
                     'header' => 'subscriber pageviews',
+                    'searchable' => false,
                     'priority' => 5
                 ],
                 'pageviews_subscribers_ratio' => [
                     'header' => 'subscriber pageviews ratio',
                     'render' => 'percentage',
+                    'searchable' => false,
                     'priority' => 5,
                 ],
                 'avg_sum_all' => [
                     'header' => 'avg time all',
                     'render' => 'duration',
+                    'searchable' => false,
                     'priority' => 2,
                 ],
                 'avg_sum_signed_in' => [
                     'header' => 'avg time signed in',
                     'render' => 'duration',
+                    'searchable' => false,
                     'priority' => 5,
                 ],
                 'avg_sum_subscribers' => [
                     'header' => 'avg time subscribers',
                     'render' => 'duration',
+                    'searchable' => false,
                     'priority' => 5,
                 ],
                 'authors' => [

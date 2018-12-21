@@ -167,6 +167,9 @@ class ArticleController extends Controller
             })
             ->orderColumn('amount', 'conversions_sum $1')
             ->orderColumn('average', 'conversions_avg $1')
+            ->filterColumn('title', function (Builder $query, $value) {
+                $query->where('articles.title', 'like', '%' . $value . '%');
+            })
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $query->whereIn('article_author.author_id', $values);
@@ -234,6 +237,9 @@ class ArticleController extends Controller
                     return ['link' => Html::linkRoute('authors.show', $author->name, [$author])];
                 });
                 return $authors->implode('link', '<br/>');
+            })
+            ->filterColumn('title', function (Builder $query, $value) {
+                $query->where('articles.title', 'like', '%' . $value . '%');
             })
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(",", $value);

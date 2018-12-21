@@ -54,11 +54,13 @@
                     'header' => 'amount',
                     'render' => 'array',
                     'priority' => 1,
+                    'searchable' => false,
                 ],
                 'average' => [
                     'header' => 'average',
                     'render' => 'array',
                     'priority' => 2,
+                    'searchable' => false,
                 ],
                 'authors' => [
                     'header' => 'authors',
@@ -73,6 +75,7 @@
                     'priority' => 3,
                 ],
                 'published_at' => [
+                    'searchable' => false,
                     'header' => 'published',
                     'render' => 'date',
                     'priority' => 3,
