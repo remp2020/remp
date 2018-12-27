@@ -4,7 +4,26 @@ namespace App\Helpers;
 
 class Colors
 {
-    public static function tagsToColors($tags): array
+    public static function generalTagsToColors($tags): array
+    {
+        $colors = [
+            '#E63952',
+            '#00C7DF',
+            '#FFC34A',
+            '#DEDEDE',
+            '#CDE092',
+            '#3B40b6',
+        ];
+
+        $toReturn = [];
+
+        for ($i = 0, $iMax = count($tags); $i < $iMax; $i++) {
+            $toReturn[] = $colors[$i];
+        }
+        return $toReturn;
+    }
+
+    public static function refererMediumTagsToColors($tags): array
     {
         $tagColor = [
             'internal' => '#E63952',

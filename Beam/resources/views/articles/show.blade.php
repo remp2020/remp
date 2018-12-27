@@ -131,17 +131,13 @@
             </div>
         </div>
 
-        <div class="card card-chart">
-
-            <div class="card-header">
-                <h2>Article Page Loads
-                </h2>
-            </div>
-            <div class="card-body card-padding">
-                <article-histogram ref="histogram" :url="url">
-                </article-histogram>
-            </div>
-        </div>
+        <article-histogram
+                :has-title-variants="{{$hasTitleVariants ? 'true' : 'false'}}"
+                :has-image-variants="{{$hasImageVariants ? 'true' : 'false'}}"
+                :url="url"
+                :variants-url="variantsUrl"
+                ref="histogram" >
+        </article-histogram>
     </div>
     <script type="text/javascript">
         new Vue({
@@ -155,16 +151,10 @@
             beforeDestroy: function() {
                 document.removeEventListener('visibilitychange', this.visibilityChanged)
             },
-            methods: {
-                visibilityChanged: function() {
-                    if (document.visibilityState === 'visible') {
-                        this.$refs["histogram"].reload()
-                    }
-                }
-            },
             data: function() {
                 return {
-                    url: "{!! route('articles.timeHistogram.json', $article->id) !!}"
+                    url: "{!! route('articles.timeHistogram.json', $article->id) !!}",
+                    variantsUrl: "{!! route('articles.variantsHistogram.json', $article->id) !!}"
                 }
             }
         })

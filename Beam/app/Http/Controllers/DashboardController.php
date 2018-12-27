@@ -232,7 +232,7 @@ class DashboardController extends Controller
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
             'tags' => $tags,
-            'colors' => Colors::tagsToColors($tags)
+            'colors' => Colors::refererMediumTagsToColors($tags)
         ]);
     }
 
