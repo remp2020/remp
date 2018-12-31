@@ -43,6 +43,16 @@
                v-bind:show="show"
             ></bar-template>
 
+            <collapsible-bar-template v-if="template === 'collapsible_bar'"
+               v-bind:_mainText="collapsibleBarTemplate.mainText"
+               v-bind:_buttonText="collapsibleBarTemplate.buttonText"
+               v-bind:_backgroundColor="collapsibleBarTemplate.backgroundColor"
+               v-bind:_textColor="collapsibleBarTemplate.textColor"
+               v-bind:_buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+               v-bind:show="show"
+            ></collapsible-bar-template>
+
             <short-message-template v-if="template === 'short_message'"
               v-bind:_text="shortMessageTemplate.text"
               v-bind:_backgroundColor="shortMessageTemplate.backgroundColor"
@@ -254,6 +264,7 @@
 
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
                                         :barTemplate="barTemplate"
+                                        :collapsibleBarTemplate="collapsibleBarTemplate"
                                         :htmlTemplate="htmlTemplate"
                                         :shortMessageTemplate="shortMessageTemplate"
 
@@ -286,6 +297,7 @@
     import HtmlTemplate from "./templates/Html"
     import MediumRectangleTemplate from "./templates/MediumRectangle";
     import BarTemplate from "./templates/Bar";
+    import CollapsibleBarTemplate from "./templates/CollapsibleBar";
     import ShortMessageTemplate from "./templates/ShortMessage";
     import BannerPreview from "./BannerPreview";
     import vSelect from "remp/js/components/vSelect";
@@ -311,6 +323,7 @@
 
         "_mediumRectangleTemplate": Object,
         "_barTemplate": Object,
+        "_collapsibleBarTemplate": Object,
         "_htmlTemplate": Object,
         "_shortMessageTemplate": Object,
 
@@ -327,6 +340,7 @@
             HtmlTemplate,
             MediumRectangleTemplate,
             BarTemplate,
+            CollapsibleBarTemplate,
             ShortMessageTemplate,
             BannerPreview,
             vSelect,
@@ -363,6 +377,7 @@
 
             mediumRectangleTemplate: null,
             barTemplate: null,
+            collapsibleBarTemplate: null,
             htmlTemplate: null,
             shortMessageTemplate: null,
 
