@@ -104,6 +104,10 @@
             default: function() {
                 return {}
             }
+        },
+        stacked: {
+            type: Boolean,
+            default: true
         }
     }
 
@@ -114,10 +118,6 @@
     }
 
     const bisectDate = d3.bisector(d => d.date).left;
-
-//    let container, svg, dataG, x,y, colorScale, xAxis, vertical, mouseRect,
-//        margin = {top: 20, right: 20, bottom: 20, left: 20},
-//        loadDataTimer = null
 
     export default {
         components: {
@@ -313,15 +313,36 @@
                 this.vars.mouseRect.attr("width", width)
                     .attr("height", height)
 
-                let stack = d3.stack()
-                    .keys(tags)
-                    .offset(d3.stackOffsetNone)
+                // Recompute data depending on graph type
+                let layers = [], yMax = 0
+                if (this.stacked) {
+                    let stack = d3.stack()
+                        .keys(tags)
+                        .offset(d3.stackOffsetNone)
 
-                let layers = stack(results);
+                    layers = stack(results);
+                    yMax = d3.max(layers, stackMax)
+                } else {
+                    for (let j = 0; j < tags.length; j++) {
+                        layers[j] = []
+                        layers["key"] = tags[j]
+                    }
+
+                    for (let i = 0; i < results.length; i++) {
+                        for (let j = 0; j < tags.length; j++) {
+                            let value = results[i][tags[j]]
+                            yMax = Math.max(yMax, value)
+                            layers[j].push({
+                                date: results[i].date,
+                                y: value
+                            })
+                        }
+                    }
+                }
 
                 this.vars.x.domain([results[0].date, results[results.length - 1].date])
                     .range([0, width])
-                this.vars.y.domain([0, d3.max(layers, stackMax)])
+                this.vars.y.domain([0, yMax])
                     .range([height, 0])
 
                 this.vars.colorScale = d3.scaleOrdinal()
@@ -332,25 +353,35 @@
                 this.vars.dataG.selectAll(".layer").remove();
                 this.vars.dataG.selectAll(".layer-line").remove();
 
-                let area = d3.area()
-                    .curve(d3.curveMonotoneX)
-                    .x((d, i) => this.vars.x(d.data.date))
-                    .y0((d) => this.vars.y(d[0]))
-                    .y1((d) => this.vars.y(d[1]))
+                // Update data
+                if (this.stacked) {
+                    let area = d3.area()
+                        .curve(d3.curveMonotoneX)
+                        .x((d, i) => this.vars.x(d.data.date))
+                        .y0((d) => this.vars.y(d[0]))
+                        .y1((d) => this.vars.y(d[1]))
+
+                    this.vars.dataG.selectAll(".layer")
+                        .data(layers)
+                        .enter().append("g")
+                        .attr("class", "layer")
+                        .append("path")
+                        .attr("d", area)
+                        .attr("fill", (d, i) => colors[i])
+                }
 
                 let areaStroke = d3.line()
                     .curve(d3.curveMonotoneX)
-                    .x((d, i) => this.vars.x(d.data.date))
-                    .y((d) => this.vars.y(d[1]))
 
-                // Update data
-                this.vars.dataG.selectAll(".layer")
-                    .data(layers)
-                    .enter().append("g")
-                    .attr("class", "layer")
-                    .append("path")
-                    .attr("d", area)
-                    .attr("fill", (d, i) => colors[i])
+                if (this.stacked) {
+                    areaStroke
+                        .x((d, i) => this.vars.x(d.data.date))
+                        .y((d) => this.vars.y(d[1]))
+                } else {
+                    areaStroke
+                        .x((d, i) => this.vars.x(d.date))
+                        .y((d) => this.vars.y(d.y))
+                }
 
                 this.vars.dataG.selectAll(".layer-line")
                     .data(layers)
@@ -358,8 +389,8 @@
                     .attr("class", "layer-line")
                     .append("path")
                     .attr("d", areaStroke)
-                    .attr("stroke", "#626262")
-                    .attr("opacity", 0.25)
+                    .attr("stroke", this.stacked ? "#626262" : (d, i) => colors[i])
+                    .attr("opacity", this.stacked ? 0.25 : 1)
                     .attr("shape-rendering", "geometricPrecision")
                     .attr("fill", "none")
 

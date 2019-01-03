@@ -17,6 +17,7 @@
             </div>
             <div class="card-body card-padding">
                 <page-loads-graph
+                        :stacked="false"
                         :url-params="{type:'title'}"
                         :url="variantsUrl">
                 </page-loads-graph>
@@ -30,6 +31,7 @@
             </div>
             <div class="card-body card-padding">
                 <page-loads-graph
+                        :stacked="false"
                         :url-params="{type:'image'}"
                         :url="variantsUrl">
                 </page-loads-graph>
