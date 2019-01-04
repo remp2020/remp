@@ -320,13 +320,15 @@ class ArticleController extends Controller
                 $article->authors()->attach($section);
             }
 
-            $article->articleTitles()->delete();
-            $alpha = range('a','z');
-            foreach ($a['titles'] as $i => $title) {
-                $article->articleTitles()->create([
-                    'variant' => $alpha[$i],
-                    'title' => $title
-                ]);
+            if ($a['titles']) {
+                $article->articleTitles()->delete();
+                $alpha = range('a','z');
+                foreach ($a['titles'] as $i => $title) {
+                    $article->articleTitles()->create([
+                        'variant' => $alpha[$i],
+                        'title' => $title
+                    ]);
+                }
             }
 
             $article->load(['authors', 'sections']);
