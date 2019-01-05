@@ -8,6 +8,7 @@ use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Helpers\Colors;
 use App\Http\Resources\ArticleResource;
+use App\Model\ArticleTitle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,21 @@ class ArticleDetailsController extends Controller
         });
         $data['colors'] = Colors::generalTagsToColors($data['tags']);
 
+        $tagToColor = [];
+        for ($i = 0, $iMax = count($data['tags']); $i < $iMax; $i++) {
+            $tagToColor[$data['tags'][$i]] = $data['colors'][$i];
+        }
+
+        $data['tagLabels'] = [];
+
+        $articleTitles = $article->articleTitles()->whereIn('variant', $data['tags'])->get();
+        foreach ($articleTitles as $articleTitle) {
+            $obj = new \stdClass();
+            $obj->label = $articleTitle->title;
+            $obj->color = $tagToColor[$articleTitle->variant];
+
+            $data['tagLabels'][$articleTitle->variant] = $obj;
+        }
         return response()->json($data);
     }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="chartContainer" >
+    <div class="chartContainer">
 
         <button-switcher :options="[
                     {text: 'Today', value: 'today'},
@@ -15,10 +15,16 @@
             </svg>
         </div>
 
+        <div class="m-t-20 m-b-20" v-if="tagLabels">
+            <div v-bind:style="{color: item.color}" v-for="(item, tag) in tagLabels">
+                <b>{{tag}}</b>: {{item.label}}
+            </div>
+        </div>
+
         <div :id="svgContainerId" :ref="svgContainerId" style="height: 200px" class="article-chart">
             <svg style="z-index: 10" :id="svgId" :ref="svgId"></svg>
         </div>
-
+        
         <div class="legend-wrapper">
             <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" class="article-graph-legend">
 
@@ -128,6 +134,7 @@
         data() {
             return {
                 data: null,
+                tagLabels: null,
                 loading: false,
                 interval: 'today',
                 legendVisible: false,
@@ -419,7 +426,7 @@
                                 dataObject[s] = +d[s];
                             })
                             return dataObject;
-                        };
+                        }
 
                         this.data = {
                             results: data.map(parseData),
@@ -427,6 +434,7 @@
                             colors: response.data.colors,
                             intervalMinutes: response.data.intervalMinutes
                         }
+                        this.tagLabels = response.data.tagLabels || null
                     })
                     .catch(error => {
                         this.error = error

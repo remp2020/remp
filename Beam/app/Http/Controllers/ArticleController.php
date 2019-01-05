@@ -322,7 +322,7 @@ class ArticleController extends Controller
 
             if ($a['titles']) {
                 $article->articleTitles()->delete();
-                $alpha = range('a', 'z');
+                $alpha = range('A', 'Z');
                 foreach ($a['titles'] as $i => $title) {
                     $article->articleTitles()->create([
                         'variant' => $alpha[$i],
