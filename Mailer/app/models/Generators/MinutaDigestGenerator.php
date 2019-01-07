@@ -60,6 +60,7 @@ class MinutaDigestGenerator implements IGenerator
         $posts = [];
         $urls = explode("\n", $values->posts);
         foreach ($urls as $url) {
+            $url = trim($url);
             if (Validators::isUrl($url)) {
                 $posts[$url] = $this->content->fetchUrlMeta($url);
             }
