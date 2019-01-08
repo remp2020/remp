@@ -12,6 +12,8 @@ use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Sender\MailerBatchException;
 use Remp\MailerModule\Sender\MailerFactory;
+use Twig_Environment;
+use Twig_Loader_Array;
 
 class Sender
 {
@@ -138,7 +140,7 @@ class Sender
         $message = new Message();
         $message->addTo($recipient['email'], $recipient['name']);
         $message->setFrom($this->template->from);
-        $message->setSubject($this->template->subject);
+        $message->setSubject($this->generateSubject($this->template->subject, $this->params));
 
         $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
         if ($this->template->mail_body_text) {
@@ -183,7 +185,7 @@ class Sender
 
         $message = new Message();
         $message->setFrom($this->template->from);
-        $message->setSubject($this->template->subject);
+        $message->setSubject($this->generateSubject($this->template->subject, $this->params));
 
         $subscribedEmails = [];
         foreach ($this->recipients as $recipient) {
@@ -293,5 +295,14 @@ class Sender
     public function supportsBatch()
     {
         return $this->mailerFactory->getMailer()->supportsBatch();
+    }
+
+    private function generateSubject($subjectTemplate, $params): string
+    {
+        $loader = new Twig_Loader_Array([
+            'my_template' => $subjectTemplate,
+        ]);
+        $twig = new Twig_Environment($loader);
+        return $twig->render('my_template', $params);
     }
 }
