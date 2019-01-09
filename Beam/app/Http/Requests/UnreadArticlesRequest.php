@@ -29,6 +29,7 @@ class UnreadArticlesRequest extends FormRequest
             'articles_count' => 'required|integer',
             'criterias.*' => 'required|string|in:' . NewsletterCriteria::allCriteriaConcatenated(),
             'user_ids.*' => 'required|integer',
+            'ignore_authors.*' => 'string',
         ];
     }
 }

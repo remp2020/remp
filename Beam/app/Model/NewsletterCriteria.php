@@ -1,14 +1,13 @@
 <?php
 namespace App\Model;
 
-use App\ArticlePageviews;
-use App\ArticleTimespent;
-use App\Conversion;
-use Carbon\Carbon;
+use App\Article;
+use App\Author;
 use Cache;
+use Exception;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use MabeEnum\Enum;
-use Recurr\Exception;
 
 class NewsletterCriteria extends Enum
 {
@@ -20,54 +19,71 @@ class NewsletterCriteria extends Enum
     const CONVERSIONS = 'conversions';
     const TIMESPENT_SIGNED_IN = 'timespent_signed_in';
     const PAGEVIEWS_ALL = 'pageviews_all';
+    const BOOKMARKS = 'bookmarks';
 
     public static function allCriteriaConcatenated($glue = ',')
     {
         return implode($glue, self::getValues());
     }
 
-    public static function getArticles(NewsletterCriteria $criteria, int $daysSpan, ?int $articlesCount = null): Collection
+    public static function getArticles(NewsletterCriteria $criteria, int $daysSpan, ?int $articlesCount = null, array $ignoreAuthors = []): Collection
     {
         $start = Carbon::now()->subDays($daysSpan);
 
+        $query = Article::distinct();
+
         switch ($criteria->getValue()) {
             case self::TIMESPENT_ALL:
-                return ArticleTimespent::mostReadArticles($start, 'sum', $articlesCount);
+                $query->mostReadByTimespent($start, 'sum', $articlesCount);
+                break;
             case self::TIMESPENT_SUBSCRIBERS:
-                return ArticleTimespent::mostReadArticles($start, 'subscribers', $articlesCount);
+                $query->mostReadByTimespent($start, 'subscribers', $articlesCount);
+                break;
             case self::TIMESPENT_SIGNED_IN:
-                return ArticleTimespent::mostReadArticles($start, 'signed_in', $articlesCount);
+                $query->mostReadByTimespent($start, 'signed_in', $articlesCount);
+                break;
 
             case self::PAGEVIEWS_ALL:
-                return ArticlePageviews::mostReadArticles($start, 'sum', $articlesCount);
-            case self::PAGEVIEWS_SIGNED_IN:
-                return ArticlePageviews::mostReadArticles($start, 'signed_in', $articlesCount);
+                $query->mostReadByPageviews($start, 'sum', $articlesCount);
+                break;
             case self::PAGEVIEWS_SUBSCRIBERS:
-                return ArticlePageviews::mostReadArticles($start, 'subscribers', $articlesCount);
+                $query->mostReadByPageviews($start, 'subscribers', $articlesCount);
+                break;
+            case self::PAGEVIEWS_SIGNED_IN:
+                $query->mostReadByPageviews($start, 'signed_in', $articlesCount);
+                break;
 
             case self::CONVERSIONS:
-                return Conversion::mostReadArticlesByTotalPaymentAmount($start, $articlesCount);
+                $query->mostReadByTotalPaymentAmount($start, $articlesCount);
+                break;
             case self::AVERAGE_PAYMENT:
-                return Conversion::mostReadArticlesByAveragePaymentAmount($start, $articlesCount);
+                $query->mostReadByAveragePaymentAmount($start, $articlesCount);
+                break;
+            case self::BOOKMARKS:
+                throw new Exception('not implemented');
             default:
                 throw new Exception('unknown article criteria ' . $criteria->getValue());
         }
+
+        $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->get()->pluck('id')->toArray();
+        return $query->ignoreAuthorIds($ignoreAuthorIds)->get();
     }
 
 
     /**
      * @param NewsletterCriteria $criteria
      * @param int                $daysSpan
+     * @param array              $ignoreAuthors
      *
      * @return array of articles (containing only external_id and url attributes)
      */
-    public static function getCachedArticles(NewsletterCriteria $criteria, int $daysSpan): array
+    public static function getCachedArticles(NewsletterCriteria $criteria, int $daysSpan, array $ignoreAuthors = []): array
     {
         $tag = 'top_articles';
         $key = $tag . '|' . $criteria->getValue() . '|' . $daysSpan;
 
-        return Cache::tags($tag)->remember($key, 10, function () use ($criteria, $daysSpan) {
-            return self::getArticles($criteria, $daysSpan)->map(function ($article) {
+        return Cache::tags($tag)->remember($key, 10, function () use ($criteria, $daysSpan, $ignoreAuthors) {
+            return self::getArticles($criteria, $daysSpan, null, $ignoreAuthors)->map(function ($article) {
                 $item = new \stdClass();
                 $item->external_id = $article->external_id;
                 $item->url = $article->url;

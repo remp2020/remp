@@ -126,6 +126,7 @@ class NewsletterController extends Controller
     private function loadCriteria()
     {
         return [
+            NewsletterCriteria::BOOKMARKS => 'Bookmarks',
             NewsletterCriteria::PAGEVIEWS_ALL => 'Pageviews all',
             NewsletterCriteria::PAGEVIEWS_SIGNED_IN => 'Pageviews signed in',
             NewsletterCriteria::PAGEVIEWS_SUBSCRIBERS => 'Pageviews subscribers',

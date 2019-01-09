@@ -338,6 +338,7 @@ class ArticleController extends Controller
 
         $articlesCount = $request->input('articles_count');
         $timespan = $request->input('timespan');
+        $ignoreAuthors = $request->input('ignore_authors', []);
 
         $topArticlesPerCriteria = [];
 
@@ -377,7 +378,7 @@ class ArticleController extends Controller
                 $criteriaIndex = 0;
                 while (count($topArticlesUrls) < $articlesCount) {
                     if (!$topArticlesPerCriteria[$criteriaIndex]) {
-                        $topArticlesPerCriteria[$criteriaIndex] = NewsletterCriteria::getCachedArticles($criterias[$criteriaIndex], $timespan);
+                        $topArticlesPerCriteria[$criteriaIndex] = NewsletterCriteria::getCachedArticles($criterias[$criteriaIndex], $timespan, $ignoreAuthors);
                     }
 
                     if ($i >= count($topArticlesPerCriteria[$criteriaIndex])) {

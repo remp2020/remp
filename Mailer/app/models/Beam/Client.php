@@ -25,7 +25,7 @@ class Client
         }
     }
 
-    public function unreadArticles($timespan, $articlesCount, array $criterias, array $userIds)
+    public function unreadArticles($timespan, $articlesCount, array $criterias, array $userIds, array $ignoreAuthors = [])
     {
         try {
             $response = $this->client->post('api/articles/unread', [
@@ -33,7 +33,8 @@ class Client
                     'user_ids' => $userIds,
                     'timespan' => $timespan,
                     'articles_count' => $articlesCount,
-                    'criterias' => $criterias
+                    'criterias' => $criterias,
+                    'ignore_authors' => $ignoreAuthors,
                 ]
             ]);
 
