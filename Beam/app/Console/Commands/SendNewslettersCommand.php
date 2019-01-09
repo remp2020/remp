@@ -128,7 +128,9 @@ class SendNewslettersCommand extends Command
             $extras = json_encode([
                 'generator' => 'beam-unread-articles',
                 'parameters' => [
-                    'criteria' => $newsletter->criteria,
+                    'criterias' => [
+                        $newsletter->criteria
+                    ],
                     'timespan' => $newsletter->timespan,
                     'articles_count' => $newsletter->articles_count
                 ]
