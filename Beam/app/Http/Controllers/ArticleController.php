@@ -342,7 +342,7 @@ class ArticleController extends Controller
         $topArticlesPerCriteria = [];
 
         $criterias = [];
-        foreach($request->input('criterias') as $criteriaString) {
+        foreach ($request->input('criterias') as $criteriaString) {
             $criterias[] = NewsletterCriteria::get($criteriaString);
             $topArticlesPerCriteria[] = null;
         }
