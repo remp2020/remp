@@ -25,7 +25,7 @@ class Client
         }
     }
 
-    public function unreadArticles($timespan, $articlesCount, $criteria, array $userIds)
+    public function unreadArticles($timespan, $articlesCount, array $criterias, array $userIds)
     {
         try {
             $response = $this->client->post('api/articles/unread', [
@@ -33,7 +33,7 @@ class Client
                     'user_ids' => $userIds,
                     'timespan' => $timespan,
                     'articles_count' => $articlesCount,
-                    'criteria' => $criteria
+                    'criterias' => $criterias
                 ]
             ]);
 

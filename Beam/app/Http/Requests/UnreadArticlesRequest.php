@@ -27,7 +27,7 @@ class UnreadArticlesRequest extends FormRequest
         return [
             'timespan' => 'required|integer',
             'articles_count' => 'required|integer',
-            'criteria' => 'required|string|in:' . NewsletterCriteria::allCriteriaConcatenated(),
+            'criterias.*' => 'required|string|in:' . NewsletterCriteria::allCriteriaConcatenated(),
             'user_ids.*' => 'required|integer',
         ];
     }

@@ -338,10 +338,14 @@ class ArticleController extends Controller
 
         $articlesCount = $request->input('articles_count');
         $timespan = $request->input('timespan');
-        $criteria = NewsletterCriteria::get($request->input('criteria'));
 
-        $topArticles = NewsletterCriteria::getCachedArticles($criteria, $timespan);
+        $topArticlesPerCriteria = [];
 
+        $criterias = [];
+        foreach($request->input('criterias') as $criteriaString) {
+            $criterias[] = NewsletterCriteria::get($criteriaString);
+            $topArticlesPerCriteria[] = null;
+        }
         $topArticlesPerUser = [];
 
         $timeAfter = Carbon::now()->subDays($timespan);
@@ -367,21 +371,34 @@ class ArticleController extends Controller
 
             // Save top articles per user
             foreach ($userIdsChunk as $userId) {
-                $topArticlesPerUser[$userId] = [];
+                $topArticlesUrls = [];
 
                 $i = 0;
-                while (count($topArticlesPerUser[$userId]) < $articlesCount) {
-                    if ($i >= count($topArticles)) {
-                        break;
+                $criteriaIndex = 0;
+                while (count($topArticlesUrls) < $articlesCount) {
+                    if (!$topArticlesPerCriteria[$criteriaIndex]) {
+                        $topArticlesPerCriteria[$criteriaIndex] = NewsletterCriteria::getCachedArticles($criterias[$criteriaIndex], $timespan);
                     }
 
-                    $topArticle = $topArticles[$i];
-                    if (!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId])) {
-                        $topArticlesPerUser[$userId][] = $topArticle->url;
+                    if ($i >= count($topArticlesPerCriteria[$criteriaIndex])) {
+                        if ($criteriaIndex === count($criterias) - 1) {
+                            break;
+                        }
+                        $criteriaIndex++;
+                        $i = 0;
+                        continue;
+                    }
+
+                    $topArticle = $topArticlesPerCriteria[$criteriaIndex][$i];
+                    if ((!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId]))
+                        && !array_key_exists($topArticle->url, $topArticlesUrls)) {
+                        $topArticlesUrls[$topArticle->url] = true;
                     }
 
                     $i++;
                 }
+
+                $topArticlesPerUser[$userId] = array_keys($topArticlesUrls);
             }
         }
 
