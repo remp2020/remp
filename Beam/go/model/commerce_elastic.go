@@ -33,7 +33,9 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
 			TimeZone("UTC").
-			Offset(options.TimeHistogram.Offset)
+			Offset(options.TimeHistogram.Offset).
+			MinDocCount(0).
+			ExtendedBounds(options.TimeAfter, options.TimeBefore)
 	}
 
 	search, err = cDB.DB.addGroupBy(search, "commerce", options, nil, dateHistogramAgg)
@@ -47,7 +49,7 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
-	if len(options.GroupBy) == 0 {
+	if len(options.GroupBy) == 0 && options.TimeHistogram == nil {
 		// extract simplified results (no aggregation)
 		return CountRowCollection{
 			CountRow{
