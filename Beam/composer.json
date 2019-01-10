@@ -41,8 +41,6 @@
         "kouz/laravel-airbrake": "^0.4",
         "laracasts/flash": " ^3.0",
         "laravel/framework": "5.7.*",
-        "laravel/horizon": "^2.0",
-        "laravel/tinker": "^1.0",
         "laravelcollective/html": "5.7.*",
         "league/uri": "^5.0",
         "madewithlove/illuminate-psr-cache-bridge": "^1.0",
@@ -61,6 +59,8 @@
         "yajra/laravel-datatables-oracle": "^8.0"
     },
     "require-dev": {
+        "laravel/horizon": "^2.0",
+        "laravel/tinker": "^1.0",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "^1.2",
         "phpunit/phpunit": "^7.0",
