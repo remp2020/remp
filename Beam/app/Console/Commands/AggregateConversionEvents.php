@@ -95,9 +95,6 @@ class AggregateConversionEvents extends Command
 
     protected function aggregateConversion(Conversion $conversion, int $days)
     {
-        $conversion->events_aggregated = true;
-        $conversion->save();
-
         if (!$conversion->user_id) {
             $this->line("Conversion #{$conversion->id} has no assigned user.");
             return;
@@ -145,6 +142,9 @@ class AggregateConversionEvents extends Command
             $this->savePageviewEvents($pageviewEvents, $timesIndex);
             $this->saveCommerceEvents($commerceEvents, $timesIndex);
             $this->saveGeneralEvents($generalEvents, $timesIndex);
+
+            $conversion->events_aggregated = true;
+            $conversion->save();
         } catch (JournalException $exception) {
             $this->error($exception->getMessage());
         }
