@@ -22,22 +22,10 @@ func NewEventController(service *goa.Service, es model.EventStorage) *EventContr
 
 // Count runs the count action
 func (c *EventController) Count(ctx *app.CountEventsContext) error {
-	o := aggregateOptionsFromEventsOptions(ctx.Payload)
-
-	crc, ok, err := c.EventStorage.Count(o)
+	acrc, err := processEventCount(c, aggregateOptionsFromEventsOptions(ctx.Payload))
 	if err != nil {
 		return err
 	}
-	if !ok {
-		cr := model.CountRow{
-			Tags:  make(map[string]string),
-			Count: 0,
-		}
-		crc = model.CountRowCollection{}
-		crc = append(crc, cr)
-	}
-
-	acrc := CountRowCollection(crc).ToMediaType()
 	return ctx.OK(acrc)
 }
 
@@ -46,10 +34,17 @@ func (c *EventController) CountAction(ctx *app.CountActionEventsContext) error {
 	o := aggregateOptionsFromEventsOptions(ctx.Payload)
 	o.Action = ctx.Action
 	o.Category = ctx.Category
-
-	crc, ok, err := c.EventStorage.Count(o)
+	acrc, err := processEventCount(c, o)
 	if err != nil {
 		return err
+	}
+	return ctx.OK(acrc)
+}
+
+func processEventCount(c *EventController, ao model.AggregateOptions) (app.CountCollection, error) {
+	crc, ok, err := c.EventStorage.Count(ao)
+	if err != nil {
+		return nil, err
 	}
 	if !ok {
 		cr := model.CountRow{
@@ -60,8 +55,7 @@ func (c *EventController) CountAction(ctx *app.CountActionEventsContext) error {
 		crc = append(crc, cr)
 	}
 
-	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.OK(acrc)
+	return CountRowCollection(crc).ToMediaType(), nil
 }
 
 // List runs the list action.
