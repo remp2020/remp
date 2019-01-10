@@ -16,7 +16,7 @@ class ProcessPageviewLoyalVisitors extends Command
 
     public function handle(JournalContract $journalContract)
     {
-        ini_set('memory_limit', '-1');
+        ini_set('memory_limit', '1G');
         $days = $this->option('days') ?? 30;
 
         $bar = $this->output->createProgressBar($days);
