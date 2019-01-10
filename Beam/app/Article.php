@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Model\ArticleTitle;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -59,6 +60,11 @@ class Article extends Model
     public function timespent()
     {
         return $this->hasMany(ArticleTimespent::class);
+    }
+
+    public function articleTitles()
+    {
+        return $this->hasMany(ArticleTitle::class);
     }
 
     public function setPublishedAtAttribute($value)

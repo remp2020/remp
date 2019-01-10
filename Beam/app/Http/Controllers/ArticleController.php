@@ -320,6 +320,16 @@ class ArticleController extends Controller
                 $article->authors()->attach($section);
             }
 
+            if ($a['titles']) {
+                $article->articleTitles()->delete();
+                foreach ($a['titles'] as $variant => $title) {
+                    $article->articleTitles()->create([
+                        'variant' => $variant,
+                        'title' => $title
+                    ]);
+                }
+            }
+
             $article->load(['authors', 'sections']);
             $articles[] = $article;
         }

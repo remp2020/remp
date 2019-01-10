@@ -8,6 +8,7 @@ use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Helpers\Colors;
 use App\Http\Resources\ArticleResource;
+use App\Model\ArticleTitle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +45,46 @@ class ArticleDetailsController extends Controller
         }
     }
 
+    public function variantsHistogram(Article $article, Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:title,image',
+        ]);
+
+        $type = $request->get('type');
+        $groupBy = $type === 'title' ? 'title_variant' : 'image_variant';
+
+        $data = $this->histogram($article, $request, $groupBy, function (JournalAggregateRequest $request) {
+            $request->addFilter('derived_referer_medium', 'internal');
+        });
+        $data['colors'] = Colors::generalTagsToColors($data['tags']);
+
+        $tagToColor = [];
+        for ($i = 0, $iMax = count($data['tags']); $i < $iMax; $i++) {
+            $tagToColor[$data['tags'][$i]] = $data['colors'][$i];
+        }
+
+        $data['tagLabels'] = [];
+
+        $articleTitles = $article->articleTitles()->whereIn('variant', $data['tags'])->get();
+        foreach ($articleTitles as $articleTitle) {
+            $obj = new \stdClass();
+            $obj->label = $articleTitle->title;
+            $obj->color = $tagToColor[$articleTitle->variant];
+
+            $data['tagLabels'][$articleTitle->variant] = $obj;
+        }
+        return response()->json($data);
+    }
+
     public function timeHistogram(Article $article, Request $request)
+    {
+        $data = $this->histogram($article, $request, 'derived_referer_medium');
+        $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
+        return response()->json($data);
+    }
+
+    private function histogram(Article $article, Request $request, $groupBy, callable $addConditions = null)
     {
         $request->validate([
             'tz' => 'timezone',
@@ -87,13 +127,18 @@ class ArticleDetailsController extends Controller
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($intervalElastic, '0h');
-        $journalRequest->addGroup('derived_referer_medium');
+        $journalRequest->addGroup($groupBy);
+
+        if ($addConditions) {
+            $addConditions($journalRequest);
+        }
+
         $currentRecords = $this->journal->count($journalRequest);
 
         // Get all tags
         $tags = [];
         foreach ($currentRecords as $records) {
-            $tags[] = $records->tags->derived_referer_medium;
+            $tags[] = $records->tags->$groupBy;
         }
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
@@ -115,7 +160,7 @@ class ArticleDetailsController extends Controller
             if (!isset($records->time_histogram)) {
                 continue;
             }
-            $currentTag = $records->tags->derived_referer_medium;
+            $currentTag = $records->tags->$groupBy;
 
             foreach ($records->time_histogram as $timeValue) {
                 $results[$timeValue->time][$currentTag] = $timeValue->value;
@@ -123,13 +168,12 @@ class ArticleDetailsController extends Controller
         }
         $results = array_values($results);
 
-        return response()->json([
+        return [
             'publishedAt' => $article->published_at->toIso8601ZuluString(),
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
-            'tags' => $tags,
-            'colors' => Colors::tagsToColors($tags)
-        ]);
+            'tags' => $tags
+        ];
     }
 
     public function show(Article $article, Request $request)
@@ -140,10 +184,18 @@ class ArticleDetailsController extends Controller
         $uniqueRequest = new JournalAggregateRequest('pageviews', 'load');
         $uniqueRequest->setTimeAfter($timeAfter);
         $uniqueRequest->setTimeBefore($timeBefore);
-        $uniqueRequest->addGroup('article_id');
+        $uniqueRequest->addGroup('article_id', 'title_variant', 'image_variant');
         $uniqueRequest->addFilter('article_id', $article->external_id);
         $results = $this->journal->unique($uniqueRequest);
-        $uniqueBrowsersCount = $results[0]->count;
+
+        $titleVariants = [];
+        $imageVariants = [];
+        foreach ($results as $result) {
+            $titleVariants[$result->tags->title_variant] = true;
+            $imageVariants[$result->tags->image_variant] = true;
+        }
+
+        $uniqueBrowsersCount = $results->sum('count');
 
         $conversionRate = $uniqueBrowsersCount == 0 ? 0 : ($article->conversions()->count() / $uniqueBrowsersCount) * 100;
 
@@ -177,6 +229,8 @@ class ArticleDetailsController extends Controller
                 'renewedConversionsCount' => $renewedConversionsCount,
                 'dataFrom' => $request->input('data_from', 'now - 30 days'),
                 'dataTo' => $request->input('data_to', 'now'),
+                'hasTitleVariants' => count($titleVariants) > 1,
+                'hasImageVariants' => count($imageVariants) > 1,
             ]),
             'json' => new ArticleResource($article)
         ]);

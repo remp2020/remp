@@ -59,6 +59,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::resource('segments', 'SegmentController');
 
     Route::get('articles/{article}/histogramJson', 'ArticleDetailsController@timeHistogram')->name('articles.timeHistogram.json');
+    Route::get('articles/{article}/variantsHistogramJson', 'ArticleDetailsController@variantsHistogram')->name('articles.variantsHistogram.json');
+
     Route::resource('articles', 'ArticleController', [
         'only' => ['store'],
     ]);
