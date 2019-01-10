@@ -22,22 +22,10 @@ func NewCommerceController(service *goa.Service, cs model.CommerceStorage) *Comm
 
 // Count runs the count action.
 func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
-	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
-
-	crc, ok, err := c.CommerceStorage.Count(o)
+	acrc, err := processCount(c, aggregateOptionsFromCommerceOptions(ctx.Payload))
 	if err != nil {
 		return err
 	}
-	if !ok {
-		cr := model.CountRow{
-			Tags:  make(map[string]string),
-			Count: 0,
-		}
-		crc = model.CountRowCollection{}
-		crc = append(crc, cr)
-	}
-
-	acrc := CountRowCollection(crc).ToMediaType()
 	return ctx.OK(acrc)
 }
 
@@ -45,10 +33,17 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 func (c *CommerceController) CountStep(ctx *app.CountStepCommerceContext) error {
 	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
 	o.Step = ctx.Step
-
-	crc, ok, err := c.CommerceStorage.Count(o)
+	acrc, err := processCount(c, o)
 	if err != nil {
 		return err
+	}
+	return ctx.OK(acrc)
+}
+
+func processCount(c *CommerceController, ao model.AggregateOptions) (app.CountCollection, error) {
+	crc, ok, err := c.CommerceStorage.Count(ao)
+	if err != nil {
+		return nil, err
 	}
 	if !ok {
 		cr := model.CountRow{
@@ -59,8 +54,7 @@ func (c *CommerceController) CountStep(ctx *app.CountStepCommerceContext) error 
 		crc = append(crc, cr)
 	}
 
-	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.OK(acrc)
+	return CountRowCollection(crc).ToMediaType(), nil
 }
 
 // List runs the list action.
@@ -87,30 +81,26 @@ func (c *CommerceController) SumStep(ctx *app.SumStepCommerceContext) error {
 	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
 	o.Step = ctx.Step
 
-	src, ok, err := c.CommerceStorage.Sum(o)
+	asrc, err := processSum(c, o)
 	if err != nil {
 		return err
 	}
-	if !ok {
-		sr := model.SumRow{
-			Tags: make(map[string]string),
-			Sum:  0,
-		}
-		src = model.SumRowCollection{}
-		src = append(src, sr)
-	}
-
-	asrc := SumRowCollection(src).ToMediaType()
 	return ctx.OK(asrc)
 }
 
 // Sum runs the sum action
 func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
-	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
-
-	src, ok, err := c.CommerceStorage.Sum(o)
+	asrc, err := processSum(c, aggregateOptionsFromCommerceOptions(ctx.Payload))
 	if err != nil {
 		return err
+	}
+	return ctx.OK(asrc)
+}
+
+func processSum(c *CommerceController, ao model.AggregateOptions) (app.SumCollection, error) {
+	src, ok, err := c.CommerceStorage.Sum(ao)
+	if err != nil {
+		return nil, err
 	}
 	if !ok {
 		sr := model.SumRow{
@@ -121,8 +111,7 @@ func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
 		src = append(src, sr)
 	}
 
-	asrc := SumRowCollection(src).ToMediaType()
-	return ctx.OK(asrc)
+	return SumRowCollection(src).ToMediaType(), nil
 }
 
 // Categories runs the categories action.
