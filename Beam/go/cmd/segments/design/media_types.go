@@ -327,6 +327,7 @@ var CommerceDetails = MediaType("application/vnd.commerce_details+json", func() 
 		Attribute("product_ids")
 		Attribute("revenue")
 	})
+	Required("funnel_id", "revenue", "transaction_id", "product_ids")
 })
 
 var Revenue = MediaType("application/vnd.revenue+json", func() {

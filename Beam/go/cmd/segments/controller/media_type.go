@@ -193,7 +193,7 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 
 	// Commerce details
 	if c.FunnelID != "" {
-		event.Details.FunnelID = &c.FunnelID
+		event.Details.FunnelID = c.FunnelID
 	}
 	if c.ProductIDs != "" {
 		event.Details.ProductIds = strings.Split(c.ProductIDs, ",")
