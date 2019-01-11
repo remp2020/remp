@@ -123,7 +123,7 @@ var _ = Resource("events", func() {
 	NoSecurity()
 
 	Action("count_action", func() {
-		Description("Returns counts of events")
+		Description("Returns counts of events for given action and category")
 		Routing(POST("/categories/:category/actions/:action/count"))
 		Payload(EventOptionsPayload)
 		Params(func() {
