@@ -216,7 +216,7 @@ class AggregateConversionEvents extends Command
                         'minutes_to_conversion' => $timeToConversion,
                         'article_id' => $article->id,
                         'locked' => isset($item->article->locked) ? filter_var($item->article->locked, FILTER_VALIDATE_BOOLEAN) : null,
-                        'signed_in' => isset($item->user->signed_in) ? filter_var($item->user->signed_in, FILTER_VALIDATE_BOOLEAN) : null,
+                        'signed_in' => isset($item->user->id),
                         'timespent' => $item->user->timespent ?? null,
                         'utm_campaign' => $item->user->source->utm_campaign ?? null,
                         'utm_content' => $item->user->source->utm_content ?? null,
