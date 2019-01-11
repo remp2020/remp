@@ -49,7 +49,6 @@ type Pageview struct {
 	UserAgent    string    `json:"user_agent"`
 	BrowserID    string    `json:"browser_id"`
 	SessionID    string    `json:"remp_session_id"`
-	PageviewID   string    `json:"remp_pageview_id"`
 	Referer      string    `json:"referer"`
 	Cookies      bool      `json:"cookies"`
 	SignedIn     bool      `json:"signed_in"`

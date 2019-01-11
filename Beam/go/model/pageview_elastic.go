@@ -313,8 +313,8 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 				prBuckets[key] = pr
 			}
 
-			if pv.PageviewID != "" {
-				pageviewIDs = append(pageviewIDs, pv.PageviewID)
+			if pv.ID != "" {
+				pageviewIDs = append(pageviewIDs, pv.ID)
 			}
 
 			pr.Pageviews = append(pr.Pageviews, pv)
@@ -332,7 +332,7 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 
 	for _, pr := range prBuckets {
 		for _, pv := range pr.Pageviews {
-			if timespent, ok := timespentForPageviews[pv.PageviewID]; ok {
+			if timespent, ok := timespentForPageviews[pv.ID]; ok {
 				pv.Timespent = timespent
 			}
 		}
@@ -379,7 +379,7 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 			if err := json.Unmarshal(*hit.Source, pv); err != nil {
 				return nil, errors.Wrap(err, "error reading timespent record from elastic")
 			}
-			timespentForPageviews[pv.PageviewID] = pv.Timespent
+			timespentForPageviews[pv.ID] = pv.Timespent
 		}
 	}
 

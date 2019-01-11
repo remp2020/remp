@@ -243,7 +243,7 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 		},
 		User: &app.User{
 			Source:         &app.Source{},
-			RempPageviewID: p.PageviewID,
+			RempPageviewID: p.ID,
 		},
 	}
 
