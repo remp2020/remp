@@ -98,8 +98,17 @@
                         that.stats = data;
                         that.loading = false;
                     }, 'json').fail(function() {
-                        that.error = 'Error while loading statistics data, try again later please.';
+                        let errorMsg = 'Error while loading statistics data, try again later please.'
+                        that.error = errorMsg
                         console.warn(that.error);
+
+                        $.notify({
+                            message: errorMsg
+                        }, {
+                            allow_dismiss: false,
+                            type: 'danger'
+                        });
+
                         that.loading = false;
                     });
                 }
