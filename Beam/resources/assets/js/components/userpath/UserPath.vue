@@ -69,13 +69,13 @@
                 default: null
             },
             stats: {
+                type: Object,
                 required: true
             }
         },
         computed: {
             emptyStats() {
-                return this.stats &&
-                    this.stats.pageviewEvents.length === 0 &&
+                return this.stats.pageviewEvents.length === 0 &&
                     this.stats.commerceEvents.length === 0 &&
                     this.stats.generalEvents.length === 0
             }
