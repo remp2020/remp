@@ -243,11 +243,11 @@ class AggregateConversionEvents extends Command
             $events = $this->journal->list($request);
             if ($events->isNotEmpty()) {
                 foreach ($events[0]->commerces as $item) {
-                    if (array_key_exists($item->_id, $processedIds)) {
+                    if (array_key_exists($item->id, $processedIds)) {
                         continue;
                     }
 
-                    $processedIds[$item->_id] = true;
+                    $processedIds[$item->id] = true;
 
                     $time = Carbon::parse($item->system->time)->tz('UTC');
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
@@ -296,11 +296,11 @@ class AggregateConversionEvents extends Command
             $events = $this->journal->list($request);
             if ($events->isNotEmpty()) {
                 foreach ($events[0]->events as $item) {
-                    if (array_key_exists($item->_id, $processedIds)) {
+                    if (array_key_exists($item->id, $processedIds)) {
                         continue;
                     }
 
-                    $processedIds[$item->_id] = true;
+                    $processedIds[$item->id] = true;
 
                     $time = Carbon::parse($item->system->time)->tz('UTC');
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
