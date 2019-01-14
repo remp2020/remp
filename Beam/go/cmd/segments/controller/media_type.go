@@ -157,9 +157,9 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 			Time:          c.Time,
 			PropertyToken: token,
 		},
-		User:    &app.User{},
-		Details: &app.CommerceDetails{},
-		Source:  &app.Source{},
+		User: &app.User{},
+		// Details: &app.CommerceDetails{},
+		Source: &app.Source{},
 	}
 	if c.ID != "" {
 		event.ID = &c.ID
@@ -192,21 +192,35 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 	}
 
 	// Commerce details
-	if c.FunnelID != "" {
-		event.Details.FunnelID = c.FunnelID
-	}
-	if c.ProductIDs != "" {
-		event.Details.ProductIds = strings.Split(c.ProductIDs, ",")
+	if c.Step == "checkout" {
+		event.Checkout = &app.CommerceCheckout{
+			FunnelID: c.FunnelID,
+		}
+	} else if c.Step == "payment" {
+		event.Payment = fillCommercePayment(c)
+	} else if c.Step == "purchase" {
+		event.Purchase = fillCommercePayment(c)
+	} else if c.Step == "refund" {
+		event.Refund = fillCommercePayment(c)
 	}
 
+	return event, nil
+}
+
+func fillCommercePayment(c *Commerce) *app.CommercePayment {
+	cp := &app.CommercePayment{
+		FunnelID: c.FunnelID,
+	}
+	if c.ProductIDs != "" {
+		cp.ProductIds = strings.Split(c.ProductIDs, ",")
+	}
 	if c.Revenue != 0 && c.Currency != "" {
-		event.Details.Revenue = &app.Revenue{
+		cp.Revenue = &app.Revenue{
 			Amount:   c.Revenue,
 			Currency: c.Currency,
 		}
 	}
-
-	return event, nil
+	return cp
 }
 
 // ToMediaType converts internal CommerceCollection representation to application one.

@@ -252,19 +252,21 @@ class AggregateConversionEvents extends Command
                     $time = Carbon::parse($item->system->time)->tz('UTC');
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
 
+                    $step = $item->step;
+
                     $toSave[] = [
                         'time' => $time,
                         'minutes_to_conversion' => $timeToConversion,
-                        'step' => $item->step,
-                        'funnel_id' => $item->details->funnel_id ?? null,
-                        'amount' => $item->revenue->amount ?? null,
-                        'currency' => $item->revenue->currency ?? null,
+                        'step' => $step,
+                        'funnel_id' => $item->$step->funnel_id ?? null,
+                        'amount' => $item->$step->revenue->amount ?? null,
+                        'currency' => $item->$step->revenue->currency ?? null,
                         'utm_campaign' => $item->source->utm_campaign ?? null,
                         'utm_content' => $item->source->utm_content ?? null,
                         'utm_medium' => $item->source->utm_medium ?? null,
                         'utm_source' => $item->source->utm_source ?? null,
                         'conversion_id' => $conversion->id,
-                        self::TEMP_PRODUCT_IDS_LABEL => $item->details->product_ids ?? [] // this will be removed later
+                        self::TEMP_PRODUCT_IDS_LABEL => $item->$step->product_ids ?? [] // this will be removed later
                     ];
                 }
             }
