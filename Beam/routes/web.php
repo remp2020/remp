@@ -89,6 +89,10 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('entities/json', 'EntitiesController@json')->name('entities.json');
     Route::resource('entities', 'EntitiesController');
 
+    Route::get('googleanalyticsreporting', 'GoogleAnalyticsReportingController@index')
+        ->name('googleanalyticsreporting.index');
+    Route::get('googleanalyticsreporting/histogramJson', 'GoogleAnalyticsReportingController@timeHistogram')
+        ->name('googleanalyticsreporting.timeHistogram.json');
 
     // TODO: temporary, delete after test is over
     Route::get('tests/author-segments-test', 'TestController@authorSegmentsTest')->name('test.author-segments-test');

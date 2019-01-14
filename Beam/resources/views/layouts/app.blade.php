@@ -123,6 +123,9 @@
                     </li>
                 </ul>
             </li>
+            <li {!! route_active(['googleanalyticsreporting']) !!}>
+                <a href="{{ route('googleanalyticsreporting.index') }}" ><i class="zmdi zmdi-chart-donut"></i> GA Reporting</a>
+            </li>
         </ul>
     </aside>
 

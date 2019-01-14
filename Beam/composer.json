@@ -37,6 +37,8 @@
         "deployer/recipes": "^6.0",
         "doctrine/dbal": "~2.3",
         "fideloper/proxy": "^4.0",
+        "google/apiclient": "^2.0",
+        "kouz/laravel-airbrake": "^0.4",
         "laracasts/flash": " ^3.0",
         "laravel/framework": "5.7.*",
         "laravelcollective/html": "5.7.*",
@@ -54,8 +56,7 @@
         "simshaun/recurr": "^3.0",
         "snowplow/referer-parser": "dev-master",
         "yadakhov/insert-on-duplicate-key": "^1.2",
-        "yajra/laravel-datatables-oracle": "^8.0",
-        "kouz/laravel-airbrake": "^0.4"
+        "yajra/laravel-datatables-oracle": "^8.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
