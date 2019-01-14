@@ -48,7 +48,7 @@
                     <div class="col-sm-3 m-b-25">
                         <p class="f-500 m-b-15 c-black">Authors</p>
 
-                        <select v-model="form.authors" name="authors[]" class="selectpicker bs-select-hidden" title="No filter" data-live-search="true"  multiple="">
+                        <select v-model="form.authors" name="authors[]" class="selectpicker bs-select-hidden" title="No filter" data-live-search="true" data-live-search-normalize="true" multiple="">
                             @foreach($authors as $author)
                                 <option value="{{$author->id}}">{{$author->name}}</option>
                             @endforeach
@@ -58,7 +58,7 @@
                     <div class="col-sm-3 m-b-25">
                         <p class="f-500 m-b-15 c-black">Sections</p>
 
-                        <select v-model="form.sections" name="sections[]" class="selectpicker bs-select-hidden" title="No filter" data-live-search="true" multiple="">
+                        <select v-model="form.sections" name="sections[]" class="selectpicker bs-select-hidden" title="No filter" data-live-search="true" data-live-search-normalize="true" multiple="">
                             @foreach($sections as $section)
                                 <option value="{{$section->id}}">{{$section->name}}</option>
                             @endforeach
