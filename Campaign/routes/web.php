@@ -23,6 +23,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('banners/{sourceBanner}/copy', 'BannerController@copy')->name('banners.copy');
     Route::get('campaigns/json', 'CampaignController@json')->name('campaigns.json');
     Route::get('campaigns/{sourceCampaign}/copy', 'CampaignController@copy')->name('campaigns.copy');
+    Route::get('campaigns/{campaign}/compare', 'CampaignController@addToComparison')->name('campaigns.addToComparison');
     Route::get('campaigns/{campaign}/schedule/json', 'ScheduleController@json')->name('campaign.schedule.json');
     Route::get('schedule/json', 'ScheduleController@json')->name('schedule.json');
     Route::post('schedule/{schedule}/start', 'ScheduleController@start')->name('schedule.start');

@@ -120,6 +120,7 @@
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit campaign'],
                         ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy', 'title' => 'Copy campaign'],
                         ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart', 'title' => 'Campaign stats'],
+                        ['name' => 'compare', 'onclick' => 'addCampaignToComparison(event, this)', 'class' => 'zmdi-palette-Cyan zmdi-swap ', 'title' => 'Add campaign to comparison']
                     ],
                     'order' => [8, 'desc'],
                 ]) !!}
@@ -127,5 +128,28 @@
             </div>
         </div>
     </div>
+    <script>
+        function addCampaignToComparison(e, anchor) {
+            e.preventDefault();
+            $.get(anchor.href, function(data) {
+                $.notify({
+                    message: 'Campaign was added to comparison </br><a class="notifyLink" href="#">Go to comparison page.</a>'
+                }, {
+                    allow_dismiss: false,
+                    type: 'info'
+                });
+            }).fail(function() {
+                var errorMsg = 'Unable to add campaign to comparison';
+                console.warn(errorMsg);
+                $.notify({
+                    message: errorMsg
+                }, {
+                    allow_dismiss: false,
+                    type: 'danger'
+                });
+            });
+
+        }
+    </script>
 
 @endsection
