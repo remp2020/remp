@@ -97,7 +97,7 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 		User: &app.User{},
 	}
 	if e.ID != "" {
-		event.ID = &e.ID
+		event.ID = e.ID
 	}
 	if e.IP != "" {
 		event.User.IPAddress = &e.IP
@@ -162,7 +162,7 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 		Source: &app.Source{},
 	}
 	if c.ID != "" {
-		event.ID = &c.ID
+		event.ID = c.ID
 	}
 	if c.IP != "" {
 		event.User.IPAddress = &c.IP

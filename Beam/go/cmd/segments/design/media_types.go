@@ -173,7 +173,7 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("utm_medium")
 		Attribute("utm_content")
 	})
-	Required("system", "category", "action")
+	Required("id", "system", "category", "action")
 })
 
 var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
@@ -220,7 +220,7 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("system")
 		Attribute("user")
 	})
-	Required("step", "system", "user")
+	Required("id", "step", "system", "user")
 })
 
 var Pageview = MediaType("application/vnd.pageview+json", func() {
