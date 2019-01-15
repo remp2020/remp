@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
@@ -94,6 +96,9 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 		},
 		User: &app.User{},
 	}
+	if e.ID != "" {
+		event.ID = e.ID
+	}
 	if e.IP != "" {
 		event.User.IPAddress = &e.IP
 	}
@@ -153,6 +158,11 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 			PropertyToken: token,
 		},
 		User: &app.User{},
+		// Details: &app.CommerceDetails{},
+		Source: &app.Source{},
+	}
+	if c.ID != "" {
+		event.ID = c.ID
 	}
 	if c.IP != "" {
 		event.User.IPAddress = &c.IP
@@ -166,7 +176,51 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 	if c.UserAgent != "" {
 		event.User.UserAgent = &c.UserAgent
 	}
+
+	// UTM
+	if c.UtmCampaign != "" {
+		event.Source.UtmCampaign = &c.UtmCampaign
+	}
+	if c.UtmContent != "" {
+		event.Source.UtmContent = &c.UtmContent
+	}
+	if c.UtmMedium != "" {
+		event.Source.UtmMedium = &c.UtmMedium
+	}
+	if c.UtmSource != "" {
+		event.Source.UtmSource = &c.UtmSource
+	}
+
+	// Commerce details
+	if c.Step == "checkout" {
+		event.Checkout = &app.CommerceCheckout{
+			FunnelID: c.FunnelID,
+		}
+	} else if c.Step == "payment" {
+		event.Payment = fillCommercePayment(c)
+	} else if c.Step == "purchase" {
+		event.Purchase = fillCommercePayment(c)
+	} else if c.Step == "refund" {
+		event.Refund = fillCommercePayment(c)
+	}
+
 	return event, nil
+}
+
+func fillCommercePayment(c *Commerce) *app.CommercePayment {
+	cp := &app.CommercePayment{
+		FunnelID: c.FunnelID,
+	}
+	if c.ProductIDs != "" {
+		cp.ProductIds = strings.Split(c.ProductIDs, ",")
+	}
+	if c.Revenue != 0 && c.Currency != "" {
+		cp.Revenue = &app.Revenue{
+			Amount:   c.Revenue,
+			Currency: c.Currency,
+		}
+	}
+	return cp
 }
 
 // ToMediaType converts internal CommerceCollection representation to application one.
@@ -203,8 +257,12 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 		},
 		User: &app.User{
 			Source:         &app.Source{},
-			RempPageviewID: p.PageviewID,
+			RempPageviewID: p.ID,
 		},
+	}
+
+	if p.ID != "" {
+		pageview.ID = &p.ID
 	}
 
 	// article data
@@ -256,6 +314,9 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	}
 	if p.UserAgent != "" {
 		pageview.User.UserAgent = &p.UserAgent
+	}
+	if p.Timespent != 0 {
+		pageview.User.Timespent = &p.Timespent
 	}
 
 	return pageview, nil

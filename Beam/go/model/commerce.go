@@ -22,14 +22,23 @@ type CommerceOptions struct {
 
 // Commerce represents commerce event data.
 type Commerce struct {
-	Step      string
-	Token     string
-	Time      time.Time
-	Host      string
-	IP        string
-	UserID    string
-	URL       string
-	UserAgent string
+	ID          string
+	Step        string
+	Token       string
+	Time        time.Time
+	Host        string
+	IP          string
+	UserID      string  `json:"user_id"`
+	URL         string  `json:"url"`
+	UserAgent   string  `json:"user_agent"`
+	FunnelID    string  `json:"funnel_id"`
+	ProductIDs  string  `json:"product_ids"`
+	Revenue     float64 `json:"revenue"`
+	Currency    string  `json:"currency"`
+	UtmCampaign string  `json:"utm_campaign"`
+	UtmContent  string  `json:"utm_content"`
+	UtmMedium   string  `json:"utm_medium"`
+	UtmSource   string  `json:"utm_source"`
 }
 
 // CommerceRow represents one row of grouped list.

@@ -29,6 +29,7 @@ type PageviewOptions struct {
 
 // Pageview represents pageview data.
 type Pageview struct {
+	ID            string
 	ArticleID     string `json:"article_id"`
 	ArticleLocked bool   `json:"locked"`
 	TitleVariant  string `json:"title_variant"`
@@ -48,13 +49,13 @@ type Pageview struct {
 	UserAgent    string    `json:"user_agent"`
 	BrowserID    string    `json:"browser_id"`
 	SessionID    string    `json:"remp_session_id"`
-	PageviewID   string    `json:"remp_pageview_id"`
 	Referer      string    `json:"referer"`
 	Cookies      bool      `json:"cookies"`
 	SignedIn     bool      `json:"signed_in"`
 	Subscriber   bool      `json:"subscriber"`
 	WindowWidth  int       `json:"window_width"`
 	WindowHeight int       `json:"window_height"`
+	Timespent    int       `json:"timespent"`
 }
 
 // PageviewRow represents one row of grouped list.
@@ -65,6 +66,13 @@ type PageviewRow struct {
 
 // PageviewRowCollection represents collection of rows of grouped list.
 type PageviewRowCollection []*PageviewRow
+
+// ListPageviewsOptions represents select and filter options for listing of pageviews
+type ListPageviewsOptions struct {
+	AggregateOptions
+	SelectFields  []string
+	LoadTimespent bool
+}
 
 // PageviewStorage is an interface to get pageview events related data.
 type PageviewStorage interface {
@@ -77,7 +85,7 @@ type PageviewStorage interface {
 	// Unique returns unique count of given item based on the provided filter options.
 	Unique(o AggregateOptions, item string) (CountRowCollection, bool, error)
 	// List returns list of all pageviews based on given PageviewOptions.
-	List(o ListOptions) (PageviewRowCollection, error)
+	List(o ListPageviewsOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.
 	Categories() []string
 	// Flags lists all available flags.

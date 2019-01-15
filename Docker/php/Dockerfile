@@ -9,7 +9,7 @@ ENV RUN_DEPS libicu-dev git wget vim curl less gnupg
 RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl sockets \
+    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl sockets pcntl \
     && apt-get purge \
         -y --auto-remove \
         -o APT::AutoRemove::RecommendsImportant=false \

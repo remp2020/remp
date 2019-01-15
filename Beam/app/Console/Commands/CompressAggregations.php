@@ -16,15 +16,18 @@ class CompressAggregations extends Command
 {
     const COMMAND = 'pageviews:compress-aggregations';
 
-    const COMPRESSION_THRESHOLD_IN_DAYS = 90;
-
     protected $signature = self::COMMAND . ' {--threshold=}';
 
     protected $description = 'Compress aggregations older than 90 days to daily aggregates.';
 
     public function handle()
     {
-        $sub = intval($this->option('threshold') ?? self::COMPRESSION_THRESHOLD_IN_DAYS);
+        $sub = (int)($this->option('threshold') ?? config('beam.aggregated_data_retention_period'));
+
+        if ($sub < 0) {
+            $this->info("Negative threshold given ($sub), not compressing data.");
+            return;
+        }
 
         $this->line('');
         $this->line('<info>***** Compressing aggregations *****</info>');

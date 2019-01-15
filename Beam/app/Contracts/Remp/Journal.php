@@ -25,9 +25,13 @@ class Journal implements JournalContract
 
     const ENDPOINT_GROUP_FLAGS = 'journal/flags';
 
-    const ENDPOINT_GENERIC_COUNT = 'journal/%s/actions/%s/count';
+    const ENDPOINT_GENERIC_COUNT_ACTION = 'journal/%s/actions/%s/count';
 
-    const ENDPOINT_GENERIC_SUM = 'journal/%s/actions/%s/sum';
+    const ENDPOINT_GENERIC_COUNT = 'journal/%s/count';
+
+    const ENDPOINT_GENERIC_SUM_ACTION = 'journal/%s/actions/%s/sum';
+
+    const ENDPOINT_GENERIC_SUM = 'journal/%s/sum';
 
     const ENDPOINT_GENERIC_AVG = 'journal/%s/actions/%s/avg';
 
@@ -64,6 +68,16 @@ class Journal implements JournalContract
         ]);
     }
 
+    public function commerceCategories(): Collection
+    {
+        try {
+            $commerceResponse = $this->client->get(self::ENDPOINT_COMMERCE_CATEGORIES);
+        } catch (ConnectException $e) {
+            throw new JournalException("Could not connect to Journal:ListCategories endpoint: {$e->getMessage()}");
+        }
+        return collect(json_decode($commerceResponse->getBody()));
+    }
+
     public function flags(): Collection
     {
         try {
@@ -89,12 +103,22 @@ class Journal implements JournalContract
 
     public function count(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_COUNT));
+        return $this->aggregateCall(
+            $request,
+            $request->getAction() ?
+                $request->buildUrl(self::ENDPOINT_GENERIC_COUNT_ACTION) :
+                $request->buildUrl(self::ENDPOINT_GENERIC_COUNT)
+        );
     }
 
     public function sum(JournalAggregateRequest $request): Collection
     {
-        return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_SUM));
+        return $this->aggregateCall(
+            $request,
+            $request->getAction() ?
+                $request->buildUrl(self::ENDPOINT_GENERIC_SUM_ACTION) :
+                $request->buildUrl(self::ENDPOINT_GENERIC_SUM)
+        );
     }
 
     public function avg(JournalAggregateRequest $request): Collection
@@ -146,16 +170,22 @@ class Journal implements JournalContract
     public function list(JournalListRequest $request): Collection
     {
         try {
-            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_LIST), [
-                'json' => [
-                    'select_fields' => $request->getSelect(),
-                    'conditions' => [
-                        'filter_by' => $request->getFilterBy(),
-                        'group_by' => $request->getGroupBy(),
-                        'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                        'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
-                    ],
+            $q = [
+                'select_fields' => $request->getSelect(),
+                'conditions' => [
+                    'filter_by' => $request->getFilterBy(),
+                    'group_by' => $request->getGroupBy(),
+                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
+                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
                 ],
+            ];
+
+            if ($request->getLoadTimespent()) {
+                $q['load_timespent'] = true;
+            }
+
+            $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_LIST), [
+                'json' => $q,
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:List endpoint: {$e->getMessage()}");

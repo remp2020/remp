@@ -75,8 +75,11 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('newsletters/{newsletter}/pause', 'NewsletterController@pause')->name('newsletters.pause');
     Route::resource('newsletters', 'NewsletterController', ['except' => ['show']]);
 
+    Route::get('userpath', 'UserPathController@index')->name('userpath.index');
+    Route::post('userpath/statsJson', 'UserPathController@stats')->name('userpath.stats');
+
     Route::resource('conversions', 'ConversionController', [
-        'only' => ['index', 'store']
+        'only' => ['index', 'store', 'show']
     ]);
     Route::resource('authors', 'AuthorController', [
         'only' => ['index', 'show']
@@ -88,7 +91,6 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('entities/validate/{entity?}', 'EntitiesController@validateForm')->name('entities.validateForm');
     Route::get('entities/json', 'EntitiesController@json')->name('entities.json');
     Route::resource('entities', 'EntitiesController');
-
 
     // TODO: temporary, delete after test is over
     Route::get('tests/author-segments-test', 'TestController@authorSegmentsTest')->name('test.author-segments-test');

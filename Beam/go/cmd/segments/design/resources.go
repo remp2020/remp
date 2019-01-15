@@ -122,14 +122,27 @@ var _ = Resource("events", func() {
 	BasePath("/journal/events")
 	NoSecurity()
 
-	Action("count", func() {
-		Description("Returns counts of events")
+	Action("count_action", func() {
+		Description("Returns counts of events for given action and category")
 		Routing(POST("/categories/:category/actions/:action/count"))
 		Payload(EventOptionsPayload)
 		Params(func() {
 			Param("action", String, "Event action")
 			Param("category", String, "Event category")
 		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
+	Action("count", func() {
+		Description("Returns counts of events")
+		Routing(POST("/count"))
+		Payload(EventOptionsPayload)
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
@@ -174,7 +187,7 @@ var _ = Resource("commerce", func() {
 	BasePath("/journal/commerce")
 	NoSecurity()
 
-	Action("count", func() {
+	Action("count_step", func() {
 		Description("Returns counts of commerce events")
 		Payload(CommerceOptionsPayload)
 		Routing(POST("/steps/:step/count"))
@@ -193,7 +206,21 @@ var _ = Resource("commerce", func() {
 		})
 	})
 
-	Action("sum", func() {
+	Action("count", func() {
+		Description("Returns counts of commerce events")
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/count"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
+
+	Action("sum_step", func() {
 		Description("Returns sum of amounts within events")
 		Payload(CommerceOptionsPayload)
 		Routing(POST("/steps/:step/sum"))
@@ -211,14 +238,24 @@ var _ = Resource("commerce", func() {
 			}))
 		})
 	})
+
+	Action("sum", func() {
+		Description("Returns sum of amounts within events")
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/sum"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Sum, func() {
+				View("default")
+			}))
+		})
+	})
+
 	Action("list", func() {
 		Description("Returns full list of events")
-		Routing(POST("/steps/:step/list"))
-		Params(func() {
-			Param("step", String, "Identification of commerce step", func() {
-				Enum("checkout", "payment", "purchase", "refund")
-			})
-		})
+		Routing(POST("/list"))
 		Payload(ListCommerceOptionsPayload)
 		Response(OK, func() {
 			Media(CollectionOf(Commerces, func() {
