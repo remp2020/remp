@@ -31,8 +31,6 @@ use App\Contracts\Remp\Stats;
 
 class CampaignController extends Controller
 {
-    private const SESSION_KEY_COMPARED_CAMPAIGNS = 'compared_campaigns';
-
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +56,7 @@ class CampaignController extends Controller
                     'edit' => route('campaigns.edit', $campaign),
                     'copy' => route('campaigns.copy', $campaign),
                     'stats' => route('campaigns.stats', $campaign),
-                    'compare' => route('campaigns.addToComparison', $campaign),
+                    'compare' => route('comparison.add', $campaign),
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
@@ -122,18 +120,6 @@ class CampaignController extends Controller
             ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants', 'is_running'])
             ->setRowId('id')
             ->make(true);
-    }
-
-    public function addToComparison(Campaign $campaign)
-    {
-        $campaigns = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
-        if (!in_array($campaign->id, $campaigns, true)) {
-            $campaigns[] = $campaign->id;
-        }
-        session([
-            self::SESSION_KEY_COMPARED_CAMPAIGNS => $campaigns
-        ]);
-        return response()->json();
     }
 
     /**

@@ -133,7 +133,8 @@
             e.preventDefault();
             $.get(anchor.href, function(data) {
                 $.notify({
-                    message: 'Campaign was added to comparison </br><a class="notifyLink" href="#">Go to comparison page.</a>'
+                    message: 'Campaign was added to comparison </br>' +
+                    '<a class="notifyLink" href="{!! route('comparison.index') !!}">Go to comparison page.</a>'
                 }, {
                     allow_dismiss: false,
                     type: 'info'
@@ -148,7 +149,6 @@
                     type: 'danger'
                 });
             });
-
         }
     </script>
 

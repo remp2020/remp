@@ -23,12 +23,14 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('banners/{sourceBanner}/copy', 'BannerController@copy')->name('banners.copy');
     Route::get('campaigns/json', 'CampaignController@json')->name('campaigns.json');
     Route::get('campaigns/{sourceCampaign}/copy', 'CampaignController@copy')->name('campaigns.copy');
-    Route::get('campaigns/{campaign}/compare', 'CampaignController@addToComparison')->name('campaigns.addToComparison');
     Route::get('campaigns/{campaign}/schedule/json', 'ScheduleController@json')->name('campaign.schedule.json');
     Route::get('schedule/json', 'ScheduleController@json')->name('schedule.json');
     Route::post('schedule/{schedule}/start', 'ScheduleController@start')->name('schedule.start');
     Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
     Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
+
+    Route::get('comparison', 'CampaignsComparisonController@index')->name('comparison.index');
+    Route::get('comparison/{campaign}/add', 'CampaignsComparisonController@add')->name('comparison.add');
 
     Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
     Route::post('banners/validate', 'BannerController@validateForm')->name('banners.validateForm');
