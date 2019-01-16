@@ -156,6 +156,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
         App\Providers\RempMailerServiceProvider::class,
+        App\Providers\GoogleAnalyticsReportingServiceProvider::class,
     ],
 
     /*
