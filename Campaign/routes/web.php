@@ -30,6 +30,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
 
     Route::get('comparison', 'CampaignsComparisonController@index')->name('comparison.index');
+    Route::get('comparison/json', 'CampaignsComparisonController@json')->name('comparison.json');
     Route::get('comparison/{campaign}/add', 'CampaignsComparisonController@add')->name('comparison.add');
 
     Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');

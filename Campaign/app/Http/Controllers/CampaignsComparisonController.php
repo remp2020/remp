@@ -8,6 +8,8 @@ use App\CampaignBanner;
 use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
+use App\Contracts\StatsContract;
+use App\Contracts\StatsHelper;
 use App\Country;
 use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
@@ -33,19 +35,38 @@ class CampaignsComparisonController extends Controller
 {
     private const SESSION_KEY_COMPARED_CAMPAIGNS = 'compared_campaigns';
 
+    private $statsHelper;
+
+    public function __construct(StatsHelper $statsHelper)
+    {
+        $this->statsHelper = $statsHelper;
+    }
+
     public function index()
     {
         return view('comparison.index', []);
     }
 
+    public function json()
+    {
+        $campaignIds = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
+        $campaigns = Campaign::whereIn('id', $campaignIds)->get();
+
+        foreach ($campaigns as $campaign) {
+            $campaign->stats = $this->statsHelper->campaignStats($campaign);
+        }
+
+        return response()->json(compact('campaigns'));
+    }
+
     public function add(Campaign $campaign)
     {
-        $campaigns = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
-        if (!in_array($campaign->id, $campaigns, true)) {
-            $campaigns[] = $campaign->id;
+        $campaignIds = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
+        if (!in_array($campaign->id, $campaignIds, true)) {
+            $campaignIds[] = $campaign->id;
         }
         session([
-            self::SESSION_KEY_COMPARED_CAMPAIGNS => $campaigns
+            self::SESSION_KEY_COMPARED_CAMPAIGNS => $campaignIds
         ]);
         return response()->json();
     }
