@@ -27,10 +27,10 @@ class GoogleAnalyticsReportingServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(GoogleAnalyticsReportingContract::class, function ($app) {
+        $this->app->bind(GoogleAnalyticsReportingContract::class, function () {
             $client = new Google_Client();
             $client->setApplicationName(config('google.app_name'));
-            $client->setAuthConfig(base_path(config('google.service_account_file')));
+            $client->setAuthConfig(config('google.service_account_file'));
             $client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
             $analytics = new Google_Service_AnalyticsReporting($client);
             return new GoogleAnalyticsReporting($analytics);
