@@ -31,6 +31,7 @@
     ],
     "require": {
         "php": "^7.1.3",
+        "ext-pcntl": "*",
         "arrilot/laravel-widgets": "^3.7",
         "barryvdh/laravel-cors": "^0.11.2",
         "deployer/deployer": "^6.0",
@@ -59,12 +60,14 @@
         "yajra/laravel-datatables-oracle": "^8.0"
     },
     "require-dev": {
-        "fzaninotto/faker": "~1.4",
-        "mockery/mockery": "^1.2",
-        "phpunit/phpunit": "^7.0",
-        "friendsofphp/php-cs-fixer": "^2.13",
         "barryvdh/laravel-ide-helper": "^2.3",
-        "nunomaduro/collision": "^2.1"
+        "friendsofphp/php-cs-fixer": "^2.13",
+        "fzaninotto/faker": "~1.4",
+        "laravel/horizon": "^2.0",
+        "laravel/tinker": "^1.0",
+        "mockery/mockery": "^1.2",
+        "nunomaduro/collision": "^2.1",
+        "phpunit/phpunit": "^7.0"
     },
     "autoload": {
         "classmap": [

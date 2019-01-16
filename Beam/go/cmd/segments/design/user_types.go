@@ -37,6 +37,9 @@ var EventOptionsPayload = Type("EventOptionsPayload", func() {
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+
+	Attribute("action", String, "Event action")
+	Attribute("category", String, "Event category")
 })
 
 var OptionsTimeHistogram = Type("OptionsTimeHistogram", func() {
@@ -61,6 +64,9 @@ var ListPageviewOptionsPayload = Type("ListPageviewOptionsPayload", func() {
 	Description("Parameters to filter pageview list")
 
 	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("load_timespent", Boolean, "If true, load timespent for each pageview", func() {
+		Default(false)
+	})
 	Attribute("conditions", PageviewOptionsPayload, "Condition definition")
 
 	Required("conditions")
@@ -111,6 +117,9 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+	Attribute("step", String, "Filter particular step", func() {
+		Enum("checkout", "payment", "purchase", "refund")
+	})
 })
 
 var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {

@@ -17,6 +17,14 @@ class CompressAggregationsTest extends TestCase
 {
     use RefreshDatabase;
 
+    private $thresholdPeriod;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->thresholdPeriod = config('beam.aggregated_data_retention_period');
+    }
+
     public function testPageviewsAggregations()
     {
         $this->runAndTestArticleAggregations(ArticlePageviews::class);
@@ -29,7 +37,7 @@ class CompressAggregationsTest extends TestCase
 
     public function testAggregateAllDaySessionReferers()
     {
-        $start = Carbon::today()->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS + 1);
+        $start = Carbon::today()->subDays($this->thresholdPeriod + 1);
         for ($i = 0; $i < 24; $i++) {
             factory(SessionReferer::class)->create([
                 'time_from' => (clone $start)->addHours($i),
@@ -62,24 +70,24 @@ class CompressAggregationsTest extends TestCase
         ];
 
         factory(SessionDevice::class)->create(array_merge($same, [
-                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
-                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod),
+                'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod),
                 'subscriber' => false,
                 'count' => 10,
             ])
         );
 
         factory(SessionDevice::class)->create(array_merge($same, [
-                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
-                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod),
+                'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod),
                 'subscriber' => false,
                 'count' => 5,
             ])
         );
 
         factory(SessionDevice::class)->create(array_merge($same, [
-                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
-                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS),
+                'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod),
+                'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod),
                 'subscriber' => true,
                 'count' => 2,
             ])
@@ -87,16 +95,16 @@ class CompressAggregationsTest extends TestCase
 
         //// Do not aggregate these
         factory(SessionDevice::class)->create(array_merge($same, [
-                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
-                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
+                'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod - 1),
+                'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod - 1),
                 'subscriber' => false,
                 'count' => 6,
             ])
         );
 
         factory(SessionDevice::class)->create(array_merge($same, [
-                'time_from' => Carbon::today()->hour(9)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
-                'time_to' => Carbon::today()->hour(10)->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS - 1),
+                'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod - 1),
+                'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod - 1),
                 'subscriber' => false,
                 'count' => 3,
             ])
@@ -106,7 +114,7 @@ class CompressAggregationsTest extends TestCase
 
         $this->assertEquals(4, SessionDevice::all()->count());
 
-        $d = Carbon::today()->subDays(CompressAggregations::COMPRESSION_THRESHOLD_IN_DAYS);
+        $d = Carbon::today()->subDays($this->thresholdPeriod);
 
         $this->assertEquals(15, SessionDevice::whereDate('time_from', $d)->where('subscriber', false)->first()->count);
     }

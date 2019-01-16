@@ -62,6 +62,10 @@
                 ],
             ],
             'dataSource' => route('conversions.json'),
+            'rowActions' => [
+                ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-info-outline', 'title' => 'Show conversions'],
+            ],
+            'rowActionLink' => 'show',
             'order' => [5, 'desc'],
             'requestParams' => [
                 'conversion_from' => '$(\'[name="conversion_from"]\').val()',

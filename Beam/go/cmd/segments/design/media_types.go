@@ -152,6 +152,7 @@ var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
 var Event = MediaType("application/vnd.event+json", func() {
 	Description("Generic event")
 	Attributes(func() {
+		Attribute("id", String)
 		Attribute("category", String)
 		Attribute("action", String)
 		Attribute("system", System)
@@ -162,6 +163,7 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("utm_content", String)
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("category")
 		Attribute("action")
 		Attribute("system")
@@ -171,7 +173,7 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("utm_medium")
 		Attribute("utm_content")
 	})
-	Required("system", "category", "action")
+	Required("id", "system", "category", "action")
 })
 
 var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
@@ -190,6 +192,7 @@ var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
 var Commerce = MediaType("application/vnd.commerce+json", func() {
 	Description("Commerce event")
 	Attributes(func() {
+		Attribute("id", String)
 		Attribute("step", String, func() {
 			Enum("checkout", "payment", "purchase", "refund")
 		})
@@ -198,32 +201,38 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("purchase", CommercePayment)
 		Attribute("refund", CommercePayment)
 
+		Attribute("source", Source, "UTM and social source metadata")
 		Attribute("article", Article)
 		Attribute("system", System)
 		Attribute("user", User)
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("step")
+
 		Attribute("checkout")
 		Attribute("payment")
 		Attribute("purchase")
 		Attribute("refund")
 
+		Attribute("source")
 		Attribute("article")
 		Attribute("system")
 		Attribute("user")
 	})
-	Required("step", "system", "user")
+	Required("id", "step", "system", "user")
 })
 
 var Pageview = MediaType("application/vnd.pageview+json", func() {
 	Description("Pageview event")
 	Attributes(func() {
+		Attribute("id", String)
 		Attribute("system", System)
 		Attribute("user", User)
 		Attribute("article", Article)
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("system")
 		Attribute("user")
 		Attribute("article")
@@ -247,6 +256,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("remp_session_id", String, "ID of reader's session")
 		Attribute("remp_pageview_id", String, "ID of pageview")
 		Attribute("referer", String, "Value of HTTP referer header (if present)")
+		Attribute("timespent", Integer, "Number of seconds spent during pageview (if recorded)")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -259,6 +269,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("remp_session_id")
 		Attribute("remp_pageview_id")
 		Attribute("referer")
+		Attribute("timespent")
 	})
 	Required("remp_pageview_id")
 })
@@ -323,6 +334,7 @@ var CommerceCheckout = MediaType("application/vnd.commerce.checkout+json", func(
 })
 
 var CommercePayment = MediaType("application/vnd.commerce.payment+json", func() {
+	// var CommerceDetails = MediaType("application/vnd.commerce_details+json", func() {
 	Attributes(func() {
 		Attribute("funnel_id", String, "ID of funnel user is being routed trough")
 		Attribute("transaction_id", String, "Public ID of transaction (variable symbol)")

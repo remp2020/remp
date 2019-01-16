@@ -8,6 +8,8 @@ interface JournalContract
 {
     public function categories(): Collection;
 
+    public function commerceCategories(): Collection;
+
     public function flags(): Collection;
 
     public function actions($group, $category): Collection;

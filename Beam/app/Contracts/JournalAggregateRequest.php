@@ -18,13 +18,18 @@ class JournalAggregateRequest
 
     protected $timeHistogram = [];
 
-    public function __construct($category, $action)
+    public static function from($category, $action = null)
+    {
+        return new self($category, $action);
+    }
+
+    public function __construct($category, $action = null)
     {
         $this->category = $category;
         $this->action = $action;
     }
 
-    public function addFilter(string $tag, string ...$values)
+    public function addFilter(string $tag, string ...$values): JournalAggregateRequest
     {
         foreach ($values as &$v) {
             $v = strval($v);
@@ -33,14 +38,16 @@ class JournalAggregateRequest
             "tag" => $tag,
             "values" => $values,
         ];
+        return $this;
     }
 
-    public function addGroup(string ...$tags)
+    public function addGroup(string ...$tags): JournalAggregateRequest
     {
         $this->groupBy = array_merge($this->groupBy, $tags);
+        return $this;
     }
 
-    public function setTimeHistogram(string $interval, string $offset) : JournalAggregateRequest
+    public function setTimeHistogram(string $interval, string $offset): JournalAggregateRequest
     {
         $this->timeHistogram = [
             'interval' => $interval,
@@ -49,24 +56,47 @@ class JournalAggregateRequest
         return $this;
     }
 
-    public function setTimeBefore(\DateTime $timeBefore)
+    public function setTimeBefore(\DateTime $timeBefore): JournalAggregateRequest
     {
         $this->timeBefore = $timeBefore;
+        return $this;
     }
 
-    public function setTimeAfter(\DateTime $timeAfter)
+    public function setTimeAfter(\DateTime $timeAfter): JournalAggregateRequest
     {
         $this->timeAfter = $timeAfter;
+        return $this;
+    }
+
+    public function setTime(\DateTime $timeAfter, \DateTime $timeBefore): JournalAggregateRequest
+    {
+        $this->timeAfter = $timeAfter;
+        $this->timeBefore = $timeBefore;
+        return $this;
     }
 
     public function buildUrl($template): string
     {
-        return sprintf($template, $this->category, $this->action);
+        if ($this->action) {
+            return sprintf($template, $this->category, $this->action);
+        }
+
+        return sprintf($template, $this->category);
     }
 
     public function buildUrlWithItem($template, $item): string
     {
         return sprintf($template, $this->category, $this->action, $item);
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function getAction()
+    {
+        return $this->action;
     }
 
     public function getFilterBy(): array

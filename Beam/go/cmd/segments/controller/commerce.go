@@ -22,36 +22,28 @@ func NewCommerceController(service *goa.Service, cs model.CommerceStorage) *Comm
 
 // Count runs the count action.
 func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
-	o := model.AggregateOptions{
-		Step: ctx.Step,
-	}
-
-	for _, val := range ctx.Payload.FilterBy {
-		fb := &model.FilterBy{
-			Tag:    val.Tag,
-			Values: val.Values,
-		}
-		o.FilterBy = append(o.FilterBy, fb)
-	}
-
-	o.GroupBy = ctx.Payload.GroupBy
-	if ctx.Payload.TimeAfter != nil {
-		o.TimeAfter = *ctx.Payload.TimeAfter
-	}
-	if ctx.Payload.TimeBefore != nil {
-		o.TimeBefore = *ctx.Payload.TimeBefore
-	}
-
-	if ctx.Payload.TimeHistogram != nil {
-		o.TimeHistogram = &model.TimeHistogram{
-			Interval: ctx.Payload.TimeHistogram.Interval,
-			Offset:   ctx.Payload.TimeHistogram.Offset,
-		}
-	}
-
-	crc, ok, err := c.CommerceStorage.Count(o)
+	acrc, err := processCount(c, aggregateOptionsFromCommerceOptions(ctx.Payload))
 	if err != nil {
 		return err
+	}
+	return ctx.OK(acrc)
+}
+
+// CountStep runs the count action with step parameter
+func (c *CommerceController) CountStep(ctx *app.CountStepCommerceContext) error {
+	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	o.Step = ctx.Step
+	acrc, err := processCount(c, o)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(acrc)
+}
+
+func processCount(c *CommerceController, ao model.AggregateOptions) (app.CountCollection, error) {
+	crc, ok, err := c.CommerceStorage.Count(ao)
+	if err != nil {
+		return nil, err
 	}
 	if !ok {
 		cr := model.CountRow{
@@ -62,8 +54,7 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 		crc = append(crc, cr)
 	}
 
-	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.OK(acrc)
+	return CountRowCollection(crc).ToMediaType(), nil
 }
 
 // List runs the list action.
@@ -85,14 +76,31 @@ func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
 	return ctx.OK(mt)
 }
 
-// Sum runs the sum action.
-func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
+// SumStep runs the sum action for particular step
+func (c *CommerceController) SumStep(ctx *app.SumStepCommerceContext) error {
 	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
 	o.Step = ctx.Step
 
-	src, ok, err := c.CommerceStorage.Sum(o)
+	asrc, err := processSum(c, o)
 	if err != nil {
 		return err
+	}
+	return ctx.OK(asrc)
+}
+
+// Sum runs the sum action
+func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
+	asrc, err := processSum(c, aggregateOptionsFromCommerceOptions(ctx.Payload))
+	if err != nil {
+		return err
+	}
+	return ctx.OK(asrc)
+}
+
+func processSum(c *CommerceController, ao model.AggregateOptions) (app.SumCollection, error) {
+	src, ok, err := c.CommerceStorage.Sum(ao)
+	if err != nil {
+		return nil, err
 	}
 	if !ok {
 		sr := model.SumRow{
@@ -103,8 +111,7 @@ func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
 		src = append(src, sr)
 	}
 
-	asrc := SumRowCollection(src).ToMediaType()
-	return ctx.OK(asrc)
+	return SumRowCollection(src).ToMediaType(), nil
 }
 
 // Categories runs the categories action.
@@ -142,5 +149,17 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) mo
 		o.TimeBefore = *payload.TimeBefore
 	}
 
+	if payload.Step != nil {
+		o.Step = *payload.Step
+	}
+
+	if payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: payload.TimeHistogram.Interval,
+			Offset:   payload.TimeHistogram.Offset,
+		}
+	}
+
 	return o
+
 }

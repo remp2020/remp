@@ -115,9 +115,10 @@ func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
 // List runs the list action.
 func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 	aggOptions := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)
-	o := model.ListOptions{
+	o := model.ListPageviewsOptions{
 		AggregateOptions: aggOptions,
 		SelectFields:     ctx.Payload.SelectFields,
+		LoadTimespent:    ctx.Payload.LoadTimespent,
 	}
 
 	prc, err := c.PageviewStorage.List(o)

@@ -106,8 +106,16 @@
                 <a href="{{ route('newsletters.index') }}" ><i class="zmdi zmdi-email"></i> Newsletters</a>
             </li>
             @endif
-            <li {!! route_active(['conversions']) !!}>
-                <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
+            <li {!! route_active(['conversions', 'userpath'], 'sub-menu', 'toggled') !!}>
+                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-face"></i> Conversions</a>
+                <ul>
+                    <li {!! route_active(['conversions']) !!}>
+                        <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
+                    </li>
+                    <li {!! route_active(['userpath']) !!}>
+                        <a href="{{ route('userpath.index') }}" ><i class="zmdi zmdi-arrow-split"></i> User path</a>
+                    </li>
+                </ul>
             </li>
             <li {!! route_active(['authors']) !!}>
                 <a href="{{ route('authors.index') }}" ><i class="zmdi zmdi-account-box"></i> Authors</a>

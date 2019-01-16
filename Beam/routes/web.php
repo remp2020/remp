@@ -75,8 +75,11 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('newsletters/{newsletter}/pause', 'NewsletterController@pause')->name('newsletters.pause');
     Route::resource('newsletters', 'NewsletterController', ['except' => ['show']]);
 
+    Route::get('userpath', 'UserPathController@index')->name('userpath.index');
+    Route::post('userpath/statsJson', 'UserPathController@stats')->name('userpath.stats');
+
     Route::resource('conversions', 'ConversionController', [
-        'only' => ['index', 'store']
+        'only' => ['index', 'store', 'show']
     ]);
     Route::resource('authors', 'AuthorController', [
         'only' => ['index', 'show']

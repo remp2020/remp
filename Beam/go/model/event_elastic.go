@@ -104,6 +104,7 @@ func (eDB *EventElastic) List(options ListOptions) (EventRowCollection, error) {
 			if err := json.Unmarshal(*hit.Source, event); err != nil {
 				return nil, errors.Wrap(err, "error reading pageview record from elastic")
 			}
+			event.ID = hit.Id
 
 			// extract raw event data to build tags map
 			rawEvent := make(map[string]interface{})

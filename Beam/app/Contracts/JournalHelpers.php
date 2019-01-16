@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\Article;
+use App\Conversion;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
