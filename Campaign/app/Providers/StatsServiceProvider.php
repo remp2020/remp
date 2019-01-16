@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Contracts\StatsContract;
 use GuzzleHttp\Client;
 use App\Contracts\Remp\Stats;
 use Illuminate\Foundation\Application;
@@ -26,7 +27,7 @@ class StatsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Stats::class, function (Application $app) {
+        $this->app->bind(StatsContract::class, function (Application $app) {
             $client = new Client([
                 'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
                 'timeout' => 1,
