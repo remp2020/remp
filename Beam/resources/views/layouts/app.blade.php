@@ -131,9 +131,11 @@
                     </li>
                 </ul>
             </li>
+            @if (config('google.ga_reporting_enabled'))
             <li {!! route_active(['googleanalyticsreporting']) !!}>
                 <a href="{{ route('googleanalyticsreporting.index') }}" ><i class="zmdi zmdi-chart-donut"></i> GA Reporting</a>
             </li>
+            @endif
         </ul>
     </aside>
 
