@@ -35,6 +35,28 @@ class StatsController extends Controller
         $this->stats = $stats;
     }
 
+    public function getStats(Campaign $campaign, Request $request)
+    {
+        $from = Carbon::parse($request->get('from'), $request->input('tz'));
+        $to = Carbon::parse($request->get('to'), $request->input('tz'));
+        $chartWidth = $request->get('chartWidth');
+
+        $campaignData = $this->statsHelper->campaignStats($campaign, $from, $to);
+        $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $chartWidth);
+
+        $variantsData = [];
+        foreach ($campaign->campaignBanners()->withTrashed()->get() as $variant) {
+            $variantStats = $this->statsHelper->variantStats($variant, $from, $to);
+            $variantStats['histogram'] = $this->getHistogramData([$variant->uuid], $from, $to, $chartWidth);
+            $variantsData[$variant->id] = $variantStats;
+        }
+
+        return [
+            'campaign' => $campaignData,
+            'variants' => $variantsData,
+        ];
+    }
+
     private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, $chartWidth)
     {
         $parsedData = [];
@@ -76,33 +98,11 @@ class StatsController extends Controller
             return $a > $b;
         });
 
-        list($dataSets, $formattedLabels) = $this->formatDataForChart($parsedData, $labels);
+        [$dataSets, $formattedLabels] = $this->formatDataForChart($parsedData, $labels);
 
         return [
             'dataSets' => $dataSets,
             'labels' => $formattedLabels,
-        ];
-    }
-
-    public function getStats(Campaign $campaign, Request $request)
-    {
-        $from = Carbon::parse($request->get('from'), $request->input('tz'));
-        $to = Carbon::parse($request->get('to'), $request->input('tz'));
-        $chartWidth = $request->get('chartWidth');
-
-        $campaignData = $this->statsHelper->campaignStats($campaign, $from, $to);
-        $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $chartWidth);
-
-        $variantsData = [];
-        foreach ($campaign->campaignBanners()->withTrashed()->get() as $variant) {
-            $variantStats = $this->statsHelper->variantStats($variant, $from, $to);
-            $variantStats['histogram'] = $this->getHistogramData([$variant->uuid], $from, $to, $chartWidth);
-            $variantsData[$variant->id] = $variantStats;
-        }
-
-        return [
-            'campaign' => $campaignData,
-            'variants' => $variantsData,
         ];
     }
 
