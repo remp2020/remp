@@ -75,7 +75,7 @@ class GoogleAnalyticsReportingController extends Controller
         }
         $tags = array_values(array_unique($tags));
 
-        $timeIterator = JournalHelpers::getTimeIterator($timeAfter, $intervalMinutes);
+        $timeIterator = JournalHelpers::getTimeIterator($timeAfter, $intervalMinutes, $tz);
 
         $results = [];
         while ($timeIterator->lessThan($timeBefore)) {
@@ -90,7 +90,7 @@ class GoogleAnalyticsReportingController extends Controller
         }
 
         foreach ($report as $item) {
-            $date = Carbon::createFromFormat('Ymd H:i:s', $item['dimensions']['ga:date'] . ' 00:00:00')->toIso8601ZuluString();
+            $date = Carbon::createFromFormat('Ymd H:i:s', $item['dimensions']['ga:date'] . ' 00:00:00', $tz)->toIso8601ZuluString();
             $results[$date][$item['dimensions'][$dimension]] = $item['metrics'][$metric];
         }
 

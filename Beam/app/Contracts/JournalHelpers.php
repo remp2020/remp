@@ -81,14 +81,15 @@ class JournalHelpers
      *
      * This is useful for preparing data for histogram graphs
      *
-     * @param Carbon $timeAfter
-     * @param int    $intervalMinutes
+     * @param Carbon                $timeAfter
+     * @param int                   $intervalMinutes
+     * @param \DateTimeZone|string  $tz                 Default value is `UTC`.
      *
      * @return Carbon
      */
-    public static function getTimeIterator(Carbon $timeAfter, int $intervalMinutes): Carbon
+    public static function getTimeIterator(Carbon $timeAfter, int $intervalMinutes, $tz = 'UTC'): Carbon
     {
-        $timeIterator = (clone $timeAfter)->tz('UTC')->startOfDay();
+        $timeIterator = (clone $timeAfter)->tz($tz)->startOfDay();
         while ($timeIterator->lessThanOrEqualTo($timeAfter)) {
             $timeIterator->addMinutes($intervalMinutes);
         }
