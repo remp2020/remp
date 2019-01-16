@@ -17,26 +17,22 @@ class StatsHelper
 
     public function campaignStats(Campaign $campaign, Carbon $from = null, Carbon $to = null)
     {
-        $variantUuids = $campaign->variants_uuids;
+        return $this->variantsStats($campaign->variants_uuids, $from, $to);
+    }
+
+    public function variantStats(CampaignBanner $variant, Carbon $from = null, Carbon $to = null)
+    {
+        return $this->variantsStats([$variant->id], $from, $to);
+    }
+
+    private function variantsStats($variantUuids, Carbon $from = null, Carbon $to = null)
+    {
         $data = [
             'click_count' => $this->campaignStatsCount($variantUuids, 'click', $from, $to),
             'show_count' => $this->campaignStatsCount($variantUuids, 'show', $from, $to),
             'payment_count' => $this->campaignPaymentStatsCount($variantUuids, 'payment', $from, $to),
             'purchase_count' => $this->campaignPaymentStatsCount($variantUuids, 'purchase', $from, $to),
             'purchase_sum' => $this->campaignPaymentStatsSum($variantUuids, 'purchase', $from, $to),
-        ];
-
-        return $this->addCalculatedValues($data);
-    }
-
-    public function variantStats(CampaignBanner $variant, Carbon $from = null, Carbon $to = null)
-    {
-        $data = [
-            'click_count' => $this->variantStatsCount($variant, 'click', $from, $to),
-            'show_count' => $this->variantStatsCount($variant, 'show', $from, $to),
-            'payment_count' => $this->variantPaymentStatsCount($variant, 'payment', $from, $to),
-            'purchase_count' => $this->variantPaymentStatsCount($variant, 'purchase', $from, $to),
-            'purchase_sum' => $this->variantPaymentStatsSum($variant, 'purchase', $from, $to),
         ];
 
         return $this->addCalculatedValues($data);
@@ -98,54 +94,6 @@ class StatsHelper
         $r = $this->stats->sum()
             ->commerce($step)
             ->forVariants($variantUuids);
-
-        if ($from) {
-            $r->from($from);
-        }
-        if ($to) {
-            $r->to($to);
-        }
-
-        return $r->get()[0];
-    }
-
-    private function variantStatsCount(CampaignBanner $variant, $type, Carbon $from = null, Carbon $to = null)
-    {
-        $r = $this->stats->count()
-            ->events('banner', $type)
-            ->forVariant($variant->uuid);
-
-        if ($from) {
-            $r->from($from);
-        }
-        if ($to) {
-            $r->to($to);
-        }
-
-        return $r->get()[0];
-    }
-
-    private function variantPaymentStatsCount(CampaignBanner $variant, $step, Carbon $from = null, Carbon $to = null)
-    {
-        $r = $this->stats->count()
-            ->commerce($step)
-            ->forVariant($variant->uuid);
-
-        if ($from) {
-            $r->from($from);
-        }
-        if ($to) {
-            $r->to($to);
-        }
-
-        return $r->get()[0];
-    }
-
-    private function variantPaymentStatsSum(CampaignBanner $variant, $step, Carbon $from = null, Carbon $to = null)
-    {
-        $r = $this->stats->sum()
-            ->commerce($step)
-            ->forVariant($variant->uuid);
 
         if ($from) {
             $r->from($from);
