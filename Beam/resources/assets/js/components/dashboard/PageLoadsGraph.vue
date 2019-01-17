@@ -136,7 +136,7 @@
                 data: null,
                 tagLabels: null,
                 loading: false,
-                interval: 'today',
+                interval: 'all',
                 legendVisible: false,
                 highlightedRow: null,
                 legendLeft: "0px"
