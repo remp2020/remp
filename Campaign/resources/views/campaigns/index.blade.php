@@ -131,7 +131,10 @@
     <script>
         function addCampaignToComparison(e, anchor) {
             e.preventDefault();
-            $.get(anchor.href, function(data) {
+            $.ajax({
+                url: anchor.href,
+                type: 'PUT'
+            }).done(function(data) {
                 $.notify({
                     message: 'Campaign was added to comparison </br>' +
                     '<a class="notifyLink" href="{!! route('comparison.index') !!}">Go to comparison page.</a>'

@@ -52,11 +52,14 @@ class CampaignsComparisonController extends Controller
         $campaignIds = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
         $campaigns = Campaign::whereIn('id', $campaignIds)->get();
 
+        $addUrl = '';
+
         foreach ($campaigns as $campaign) {
             $campaign->stats = $this->statsHelper->campaignStats($campaign);
+            $campaign->deleteUrl = route('comparison.delete', $campaign);
         }
 
-        return response()->json(compact('campaigns'));
+        return response()->json(compact('campaigns', 'addUrl'));
     }
 
     public function add(Campaign $campaign)
@@ -64,6 +67,18 @@ class CampaignsComparisonController extends Controller
         $campaignIds = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
         if (!in_array($campaign->id, $campaignIds, true)) {
             $campaignIds[] = $campaign->id;
+        }
+        session([
+            self::SESSION_KEY_COMPARED_CAMPAIGNS => $campaignIds
+        ]);
+        return response()->json();
+    }
+
+    public function delete(Campaign $campaign)
+    {
+        $campaignIds = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
+        if (($key = array_search($campaign->id, $campaignIds)) !== false) {
+            unset($campaignIds[$key]);
         }
         session([
             self::SESSION_KEY_COMPARED_CAMPAIGNS => $campaignIds

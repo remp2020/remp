@@ -17,6 +17,7 @@
                             <th>Started payments</th>
                             <th>Finished payments</th>
                             <th>Earned</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,6 +47,15 @@
                             <td>
                                 {{ campaign.stats.purchase_sum.sum | round(2) }}€
                             </td>
+                            <th>
+                                <span class="actions">
+                                    <button class="btn btn-sm palette-Cyan bg waves-effect"
+                                            @click="remove(campaign.deleteUrl)"
+                                            title="Remove campaign">
+                                        <i class="zmdi zmdi-palette-Cyan zmdi-close"></i>
+                                    </button>
+                                </span>
+                            </th>
                         </tr>
                     </tbody>
                 </table>
@@ -83,19 +93,35 @@
             this.loadData()
         },
         methods: {
+            processLoadingResponse(data) {
+                this.loading = false
+                this.campaigns = data.campaigns
+            },
             loadData() {
                 this.loading = true
                 axios
                     .get(this.baseUrl)
                     .then(response => {
-                        this.loading = false
-                        this.campaigns = response.data.campaigns
+                        this.processLoadingResponse(response.data)
                     })
                     .catch(error => {
                         this.error = error
                         this.loading = false;
                     })
             },
+            remove(url) {
+                this.loading = true
+                axios
+                    .delete(url)
+                    .then(response => axios.get(this.baseUrl))
+                    .then(response => {
+                        this.processLoadingResponse(response.data)
+                    })
+                    .catch(error => {
+                        this.error = error
+                        this.loading = false;
+                    })
+            }
         }
     }
 </script>
