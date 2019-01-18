@@ -125,6 +125,15 @@
                     </div>
                     {/snippet}
                 </div>
+
+                <div n:if="$batch->related('mail_job_batch_templates')->count('*') > 1">
+                    <div class="card z-depth-1">
+                        <div class="card-header">
+                            <h2><i class="zmdi zmdi-compass"></i> A/B test evaluation</h2>
+                        </div>
+                        {control batchExperimentEvaluation $batch->id}
+                    </div>
+                </div>
                 <div n:foreach="$batch->related('mail_job_batch_templates') as $email" class="card z-depth-1">
                     <div class="card-header">
                         <h2><i class="zmdi zmdi-equalizer"></i> Variant summary <small class="m-t-20"><span class="text-muted">{$email->mail_template->name}: {$email->mail_template->subject}</span> {$email->mail_template->code}</small></h2>

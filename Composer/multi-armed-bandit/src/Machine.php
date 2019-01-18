@@ -9,7 +9,7 @@ class Machine
     protected $draws;
 
     /** @var Lever[] */
-    protected $levers;
+    protected $levers = [];
 
     public function __construct(int $draws = 1000)
     {
@@ -21,9 +21,16 @@ class Machine
         $this->levers[$lever->getId()] = $lever;
     }
 
-    public function run(): Result
+    /**
+     * @return float[]
+     */
+    public function run(): array
     {
         $results = [];
+        if (empty($this->levers)) {
+            return [];
+        }
+
         foreach (range(1, $this->draws) as $_) {
             $simulatedData = [];
 
@@ -40,11 +47,10 @@ class Machine
 
         // calculate probability of win for each lever based on number of draws
         $distribution = array_count_values($results);
-        arsort($distribution);
-
-        // return winning lever data
-        $key = key($distribution);
-        $winningLever = $this->levers[$key];
-        return new Result($winningLever, $distribution[$key] / $this->draws);
+        $probabilities = [];
+        foreach ($this->levers as $leverId => $lever) {
+            $probabilities[$leverId] = $distribution[$leverId] / $this->draws;
+        }
+        return $probabilities;
     }
 }
