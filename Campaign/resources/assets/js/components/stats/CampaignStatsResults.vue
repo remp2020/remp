@@ -13,8 +13,10 @@
                                 <th>Proportion</th>
                                 <th>Shows</th>
                                 <th>Clicks</th>
+                                <th>Click-rate win probability</th>
                                 <th>Click-through rate (CTR)</th>
                                 <th>Conversions (purchases)</th>
+                                <th>Conversion-rate win probability</th>
                                 <th>Earned</th>
                             </tr>
                         </thead>
@@ -38,6 +40,14 @@
                                 {{ variant.clicks }}
                             </td>
                             <td>
+                                <template v-if="variant.click_probability !== undefined">
+                                    <strong>{{ variant.click_probability * 100 | round(2) }}%</strong>
+                                </template>
+                                <template v-else>
+                                    -
+                                </template>
+                            </td>
+                            <td>
                                 <strong>
                                     {{ variant.ctr | round(2) }}%
                                 </strong>
@@ -47,6 +57,14 @@
                                     {{ variant.purchases }}
                                     ({{ variant.conversions | round(4) }}%)
                                 </strong>
+                            </td>
+                            <td>
+                                <template v-if="variant.purchase_probability !== undefined">
+                                    <strong>{{ variant.purchase_probability * 100 | round(2) }}%</strong>
+                                </template>
+                                <template v-else>
+                                    -
+                                </template>
                             </td>
                             <td>
                                 <strong>
@@ -114,6 +132,8 @@
                         ctr: data.ctr,
                         conversions: data.conversions,
                         deleted_at: variant.deleted_at,
+                        click_probability: data.click_probability,
+                        purchase_probability: data.purchase_probability,
                     };
 
                     if (variant.banner !==  null) {

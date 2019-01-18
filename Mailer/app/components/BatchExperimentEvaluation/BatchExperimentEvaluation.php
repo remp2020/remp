@@ -48,6 +48,6 @@ class BatchExperimentEvaluation extends Control
             $machine->addLever(new Lever($jobBatchTemplate->mail_template->code, $jobBatchTemplate->$conversionField, $jobBatchTemplate->sent));
         }
 
-        return array_merge($machine->run(), $zeroStat);
+        return $machine->run() + $zeroStat;
     }
 }
