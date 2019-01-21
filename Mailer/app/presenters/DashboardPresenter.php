@@ -12,12 +12,9 @@ use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
-use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 
 final class DashboardPresenter extends BasePresenter
 {
-    private $userSubscriptionsRepository;
-
     private $batchTemplatesRepository;
 
     private $templatesRepository;

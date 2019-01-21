@@ -7,6 +7,9 @@ use App\Contracts\StatsContract;
 use App\Contracts\StatsHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Contracts\Remp\Stats;
+use Remp\MultiArmedBandit\Lever;
+use Remp\MultiArmedBandit\Machine;
 
 class StatsController extends Controller
 {
@@ -49,6 +52,14 @@ class StatsController extends Controller
             $variantStats = $this->statsHelper->variantStats($variant, $from, $to);
             $variantStats['histogram'] = $this->getHistogramData([$variant->uuid], $from, $to, $chartWidth);
             $variantsData[$variant->id] = $variantStats;
+        }
+
+        // a/b test evaluation data
+        foreach ($this->getVariantProbabilities($variantsData, "click_count") as $variantId => $probability) {
+            $variantsData[$variantId]['click_probability'] = $probability;
+        }
+        foreach ($this->getVariantProbabilities($variantsData, "purchase_count") as $variantId => $probability) {
+            $variantsData[$variantId]['purchase_probability'] = $probability;
         }
 
         return [
@@ -106,6 +117,20 @@ class StatsController extends Controller
         ];
     }
 
+    private function getVariantProbabilities($variantsData, $conversionField)
+    {
+        $machine = new Machine(1000);
+        $zeroStat = [];
+        foreach ($variantsData as $variantId => $data) {
+            if (!$data[$conversionField]->count) {
+                $zeroStat[$variantId] = 0;
+                continue;
+            }
+            $machine->addLever(new Lever($variantId, $data[$conversionField]->count, $data['show_count']->count));
+        }
+        return $machine->run() + $zeroStat;
+    }
+
     private function formatDataForChart($typesData, $labels)
     {
         $dataSets = [];
@@ -140,11 +165,11 @@ class StatsController extends Controller
 
     private function calcInterval(Carbon $from, Carbon $to, $chartWidth)
     {
-        $numOfCols = intval($chartWidth / 40);
+        $numOfCols = (int)($chartWidth / 40);
 
         $diff = $to->diffInSeconds($from);
         $interval = $diff / $numOfCols;
 
-        return intval($interval) . "s";
+        return (int)$interval . 's';
     }
 }

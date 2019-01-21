@@ -36,6 +36,7 @@
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
+        "remp/multi-armed-bandit": "*",
         "yajra/laravel-datatables-oracle": "^8.0",
         "kouz/laravel-airbrake": "^0.4"
     },

@@ -7,6 +7,7 @@ use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\ILatteFactory;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
+use Remp\MailerModule\Components\IBatchExperimentEvaluationFactory;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\Forms\EditBatchFormFactory;
@@ -438,5 +439,10 @@ final class JobPresenter extends BasePresenter
         $templateStats->showConversions();
 
         return $templateStats;
+    }
+
+    public function createComponentBatchExperimentEvaluation(IBatchExperimentEvaluationFactory $factory)
+    {
+        return $factory->create();
     }
 }
