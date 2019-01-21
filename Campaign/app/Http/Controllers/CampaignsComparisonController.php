@@ -12,6 +12,7 @@ use App\Contracts\StatsContract;
 use App\Contracts\StatsHelper;
 use App\Country;
 use App\Http\Request;
+use App\Http\Requests\AddCampaign;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use App\Schedule;
@@ -44,22 +45,28 @@ class CampaignsComparisonController extends Controller
 
     public function index()
     {
-        return view('comparison.index', []);
+        return view('comparison.index');
     }
 
     public function json()
     {
         $campaignIds = session(self::SESSION_KEY_COMPARED_CAMPAIGNS, []);
-        $campaigns = Campaign::whereIn('id', $campaignIds)->get();
+        $campaigns = collect();
+        $campaignsNotCompared = collect();
 
-        $addUrl = '';
+        $addUrl = route('comparison.add', 'CAMPAIGN_ID');
 
-        foreach ($campaigns as $campaign) {
-            $campaign->stats = $this->statsHelper->campaignStats($campaign);
-            $campaign->deleteUrl = route('comparison.delete', $campaign);
+        foreach (Campaign::all() as $campaign) {
+            if (in_array($campaign->id, $campaignIds)) {
+                $campaign->stats = $this->statsHelper->campaignStats($campaign);
+                $campaign->deleteUrl = route('comparison.delete', $campaign);
+                $campaigns->push($campaign);
+            } else {
+                $campaignsNotCompared->push($campaign);
+            }
         }
 
-        return response()->json(compact('campaigns', 'addUrl'));
+        return response()->json(compact('campaigns', 'campaignsNotCompared', 'addUrl'));
     }
 
     public function add(Campaign $campaign)

@@ -4,7 +4,22 @@
             <h2>Compared campaigns<small></small></h2>
         </div>
         <div class="card-body card-padding">
-            <div class="table-responsive">
+
+            <div class="row m-t-20 m-b-20">
+                <div class="col-md-4">
+                    <model-list-select :list="campaignsNotCompared"
+                                       v-model="campaignToAdd"
+                                       option-value="id"
+                                       option-text="name"
+                                       placeholder="Select campaign">
+                    </model-list-select>
+                </div>
+                <div class="col-md-2">
+                    <button @click="addToComparison" class="btn palette-Cyan bg waves-effect">Add to comparison</button>
+                </div>
+            </div>
+
+            <div style="position: relative" class="table-responsive">
                 <loader :yes="loading"></loader>
 
                 <table class="table table-striped">
@@ -70,6 +85,7 @@
 <script>
     import axios from 'axios'
     import Loader from './status/Loader'
+    import { ModelListSelect } from 'vue-search-select'
 
     const props = {
         baseUrl: {
@@ -80,12 +96,15 @@
 
     export default {
         components: {
-            Loader
+            Loader, ModelListSelect
         },
         name: 'campaign-comparison-root',
         props: props,
         data: () => ({
             campaigns: null,
+            campaignsNotCompared: [],
+            campaignToAdd: null,
+            addUrl: null,
             loading: false,
             error: null,
         }),
@@ -96,6 +115,26 @@
             processLoadingResponse(data) {
                 this.loading = false
                 this.campaigns = data.campaigns
+                this.campaignsNotCompared = data.campaignsNotCompared
+                this.addUrl = data.addUrl
+            },
+            addToComparison() {
+                if (!this.addUrl) {
+                    return
+                }
+                let url = this.addUrl.replace('CAMPAIGN_ID', this.campaignToAdd)
+                this.loading = true
+                axios
+                    .put(url)
+                    .then(response => axios.get(this.baseUrl))
+                    .then(response => {
+                        this.processLoadingResponse(response.data)
+                    })
+                    .catch(error => {
+                        this.error = error
+                        this.loading = false;
+                    })
+
             },
             loadData() {
                 this.loading = true

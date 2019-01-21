@@ -8,15 +8,15 @@
     </div>
 
     <div class="card" id="comparison-app">
-        <campaign-comparison-root base-url="{!! route('comparison.json') !!}">
-        </campaign-comparison-root>
+        <campaign-comparison base-url="{!! route('comparison.json') !!}">
+        </campaign-comparison>
     </div>
 
     <script type="text/javascript">
         new Vue({
             el: "#comparison-app",
             components: {
-                CampaignComparisonRoot
+                CampaignComparison
             }
         });
     </script>

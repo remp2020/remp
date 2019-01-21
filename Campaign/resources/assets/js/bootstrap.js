@@ -14,6 +14,6 @@ global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue")
 
 global.CampaignStatsRoot = require("./components/CampaignStatsRoot.vue");
 
-global.CampaignComparisonRoot = require("./components/CampaignComparisonRoot.vue");
+global.CampaignComparison = require("./components/CampaignComparison.vue");
 
 global.salvattore = require("salvattore");
