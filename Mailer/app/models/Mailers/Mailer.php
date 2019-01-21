@@ -2,12 +2,13 @@
 
 namespace Remp\MailerModule\Mailer;
 
+use Nette\Mail\IMailer;
 use Nette\Utils\Strings;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Config\ConfigNotExistsException;
 use Remp\MailerModule\Repository\ConfigsRepository;
 
-abstract class Mailer
+abstract class Mailer implements IMailer
 {
     /** @var ConfigsRepository */
     protected $configsRepository;
