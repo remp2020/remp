@@ -22,16 +22,16 @@
             <div style="position: relative" class="table-responsive">
                 <loader :yes="loading"></loader>
 
-                <table class="table table-striped">
+                <table v-if="!noCampaigns" class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Campaign</th>
-                            <th>Clicks</th>
-                            <th>Click-through rate (CTR)</th>
-                            <th>Conversions</th>
-                            <th>Started payments</th>
-                            <th>Finished payments</th>
-                            <th>Earned</th>
+                            <th @click="sort('name')" :class="sortingClass('name')">Campaign</th>
+                            <th @click="sort('clicks')" :class="sortingClass('clicks')">Clicks</th>
+                            <th @click="sort('ctr')" :class="sortingClass('ctr')">Click-through rate (CTR)</th>
+                            <th @click="sort('conversions')" :class="sortingClass('conversions')">Conversions</th>
+                            <th @click="sort('startedPayments')" :class="sortingClass('startedPayments')">Started payments</th>
+                            <th @click="sort('finishedFayments')" :class="sortingClass('finishedFayments')">Finished payments</th>
+                            <th @click="sort('earned')" :class="sortingClass('earned')">Earned</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -74,6 +74,8 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <p v-if="noCampaigns" style="text-align: center">No campaigns selected</p>
             </div>
         </div>
     </div>
@@ -101,15 +103,24 @@
         name: 'campaign-comparison-root',
         props: props,
         data: () => ({
-            campaigns: null,
+            campaigns: [],
             campaignsNotCompared: [],
             campaignToAdd: null,
             addUrl: null,
             loading: false,
             error: null,
+            sorting: {
+                by: null,
+                asc: true
+            },
         }),
         mounted() {
             this.loadData()
+        },
+        computed: {
+            noCampaigns() {
+                return this.campaigns && this.campaigns.length === 0
+            }
         },
         methods: {
             processLoadingResponse(data) {
@@ -117,6 +128,46 @@
                 this.campaigns = data.campaigns
                 this.campaignsNotCompared = data.campaignsNotCompared
                 this.addUrl = data.addUrl
+                this.sort()
+            },
+            sortingClass(attribute) {
+                if (this.sorting.by === attribute) {
+                    return this.sorting.asc ? 'sorting_asc' : 'sorting_desc'
+                }
+                return 'sorting'
+            },
+            sort(attribute) {
+                if (attribute) {
+                    if (this.sorting.by === attribute) {
+                        this.sorting.asc = !this.sorting.asc
+                    } else {
+                        this.sorting.by = attribute
+                        this.sorting.asc = true
+                    }
+                }
+
+                function switchSorting(attribute, rev) {
+                    switch(attribute) {
+                        case 'name':
+                        default:
+                            return (a,b) => rev * a.name.localeCompare(b.name)
+                        case 'clicks':
+                            return (a,b) => rev * (a.stats.click_count.count - b.stats.click_count.count)
+                        case 'ctr':
+                            return (a,b) => rev * (a.stats.ctr - b.stats.ctr)
+                        case 'conversions':
+                            return (a,b) => rev * (a.stats.conversions - b.stats.conversions)
+                        case 'startedPayments':
+                            return (a,b) => rev * (a.stats.payment_count.count - b.stats.payment_count.count)
+                        case 'finishedFayments':
+                            return (a,b) => rev * (a.stats.purchase_count.count - b.stats.purchase_count.count)
+                        case 'earned':
+                            return (a,b) => rev * (a.stats.purchase_sum.sum - b.stats.purchase_sum.sum)
+                    }
+                }
+                if (this.sorting.by) {
+                    this.campaigns.sort(switchSorting(this.sorting.by, this.sorting.asc ? 1 : -1))
+                }
             },
             addToComparison() {
                 if (!this.addUrl) {
