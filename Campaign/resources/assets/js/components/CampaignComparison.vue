@@ -14,8 +14,10 @@
                                        placeholder="Select campaign">
                     </model-list-select>
                 </div>
-                <div class="col-md-2">
-                    <button @click="addToComparison" class="btn palette-Cyan bg waves-effect">Add to comparison</button>
+                <div class="col-md-8 pull-left">
+                    <button @click="addToComparison" class="btn palette-Cyan bg waves-effect m-r-5">Add to comparison</button>
+                    <button @click="addAll" class="btn palette-Cyan bg waves-effect m-r-5">Add all campaigns</button>
+                    <button @click="removeAll" class="btn palette-Red bg waves-effect">Remove all</button>
                 </div>
             </div>
 
@@ -65,7 +67,7 @@
                             <th>
                                 <span class="actions">
                                     <button class="btn btn-sm palette-Cyan bg waves-effect"
-                                            @click="remove(campaign.deleteUrl)"
+                                            @click="remove(campaign.removeUrl)"
                                             title="Remove campaign">
                                         <i class="zmdi zmdi-palette-Cyan zmdi-close"></i>
                                     </button>
@@ -107,6 +109,8 @@
             campaignsNotCompared: [],
             campaignToAdd: null,
             addUrl: null,
+            addAllUrl: null,
+            removeAllUrl: null,
             loading: false,
             error: null,
             sorting: {
@@ -123,13 +127,6 @@
             }
         },
         methods: {
-            processLoadingResponse(data) {
-                this.loading = false
-                this.campaigns = data.campaigns
-                this.campaignsNotCompared = data.campaignsNotCompared
-                this.addUrl = data.addUrl
-                this.sort()
-            },
             sortingClass(attribute) {
                 if (this.sorting.by === attribute) {
                     return this.sorting.asc ? 'sorting_asc' : 'sorting_desc'
@@ -145,7 +142,6 @@
                         this.sorting.asc = true
                     }
                 }
-
                 function switchSorting(attribute, rev) {
                     switch(attribute) {
                         case 'name':
@@ -169,48 +165,52 @@
                     this.campaigns.sort(switchSorting(this.sorting.by, this.sorting.asc ? 1 : -1))
                 }
             },
+            loadDataAfter(axiosPromise) {
+                axiosPromise
+                    .then(() => axios.get(this.baseUrl))
+                    .then(response => {
+                        let data = response.data
+                        this.loading = false
+                        this.campaigns = data.campaigns
+                        this.campaignsNotCompared = data.campaignsNotCompared
+                        this.addUrl = data.addUrl
+                        this.addAllUrl = data.addAllUrl
+                        this.removeAllUrl = data.removeAllUrl
+                        this.sort()
+                    })
+                    .catch(error => {
+                        this.error = error
+                        this.loading = false;
+                    })
+            },
+            loadData() {
+                this.loading = true
+                this.loadDataAfter(Promise.resolve())
+            },
+            remove(url) {
+                this.loading = true
+                this.loadDataAfter(axios.delete(url))
+            },
+            addAll() {
+                if (!this.addAllUrl) {
+                    return
+                }
+                this.loading = true
+                this.loadDataAfter(axios.post(this.addAllUrl))
+            },
             addToComparison() {
                 if (!this.addUrl) {
                     return
                 }
-                let url = this.addUrl.replace('CAMPAIGN_ID', this.campaignToAdd)
                 this.loading = true
-                axios
-                    .put(url)
-                    .then(response => axios.get(this.baseUrl))
-                    .then(response => {
-                        this.processLoadingResponse(response.data)
-                    })
-                    .catch(error => {
-                        this.error = error
-                        this.loading = false;
-                    })
-
+                this.loadDataAfter(axios.put(this.addUrl.replace('CAMPAIGN_ID', this.campaignToAdd)))
             },
-            loadData() {
+            removeAll() {
+                if (!this.removeAllUrl) {
+                    return
+                }
                 this.loading = true
-                axios
-                    .get(this.baseUrl)
-                    .then(response => {
-                        this.processLoadingResponse(response.data)
-                    })
-                    .catch(error => {
-                        this.error = error
-                        this.loading = false;
-                    })
-            },
-            remove(url) {
-                this.loading = true
-                axios
-                    .delete(url)
-                    .then(response => axios.get(this.baseUrl))
-                    .then(response => {
-                        this.processLoadingResponse(response.data)
-                    })
-                    .catch(error => {
-                        this.error = error
-                        this.loading = false;
-                    })
+                this.loadDataAfter(axios.post(this.removeAllUrl))
             }
         }
     }

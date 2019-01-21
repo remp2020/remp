@@ -32,7 +32,9 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('comparison', 'CampaignsComparisonController@index')->name('comparison.index');
     Route::get('comparison/json', 'CampaignsComparisonController@json')->name('comparison.json');
     Route::put('comparison/{campaign}', 'CampaignsComparisonController@add')->name('comparison.add');
-    Route::delete('comparison/{campaign}/', 'CampaignsComparisonController@delete')->name('comparison.delete');
+    Route::post('comparison/addAll', 'CampaignsComparisonController@addAll')->name('comparison.addAll');
+    Route::post('comparison/removeAll', 'CampaignsComparisonController@removeAll')->name('comparison.removeAll');
+    Route::delete('comparison/{campaign}/', 'CampaignsComparisonController@remove')->name('comparison.remove');
 
     Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
     Route::post('banners/validate', 'BannerController@validateForm')->name('banners.validateForm');
