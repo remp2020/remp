@@ -102,7 +102,7 @@
         components: {
             Loader, ModelListSelect
         },
-        name: 'campaign-comparison-root',
+        name: 'campaign-comparison',
         props: props,
         data: () => ({
             campaigns: [],
@@ -199,7 +199,7 @@
                 this.loadDataAfter(axios.post(this.addAllUrl))
             },
             addToComparison() {
-                if (!this.addUrl) {
+                if (!this.addUrl || !this.campaignToAdd) {
                     return
                 }
                 this.loading = true
