@@ -65,6 +65,7 @@
                 <div class="card-header">
                     <h2>Campaign list <small></small></h2>
                     <div class="actions">
+                        <a href="{{ route('comparison.index') }}" class="btn palette-Cyan bg waves-effect">Compare campaigns</a>
                         <a href="{{ route('campaigns.create') }}" class="btn palette-Cyan bg waves-effect">Add new campaign</a>
                     </div>
                 </div>
