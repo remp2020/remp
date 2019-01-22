@@ -15,14 +15,14 @@
                     </model-list-select>
                 </div>
                 <div class="col-md-8 pull-left">
-                    <button @click="addToComparison" class="btn palette-Cyan bg waves-effect m-r-5">Add to comparison</button>
+                    <button @click="add" class="btn palette-Cyan bg waves-effect m-r-5">Add to comparison</button>
                     <button @click="addAll" class="btn palette-Cyan bg waves-effect m-r-5">Add all campaigns</button>
                     <button @click="removeAll" class="btn palette-Red bg waves-effect">Remove all</button>
                 </div>
             </div>
 
             <div style="position: relative" class="table-responsive">
-                <loader :yes="loading"></loader>
+                <loader :is-centered="false" :yes="loading"></loader>
 
                 <table v-if="!noCampaigns" class="table table-striped">
                     <thead>
@@ -67,7 +67,7 @@
                             <th>
                                 <span class="actions">
                                     <button class="btn btn-sm palette-Cyan bg waves-effect"
-                                            @click="remove(campaign.removeUrl)"
+                                            @click="remove(campaign.id)"
                                             title="Remove campaign">
                                         <i class="zmdi zmdi-palette-Cyan zmdi-close"></i>
                                     </button>
@@ -86,37 +86,29 @@
 <style type="text/css">
 </style>
 
+
+
 <script>
     import axios from 'axios'
     import Loader from './status/Loader'
     import { ModelListSelect } from 'vue-search-select'
-
-    const props = {
-        baseUrl: {
-            type: String,
-            required: true,
-        }
-    }
 
     export default {
         components: {
             Loader, ModelListSelect
         },
         name: 'campaign-comparison',
-        props: props,
+        props: {},
         data: () => ({
             campaigns: [],
             campaignsNotCompared: [],
             campaignToAdd: null,
-            addUrl: null,
-            addAllUrl: null,
-            removeAllUrl: null,
             loading: false,
             error: null,
             sorting: {
                 by: null,
                 asc: true
-            },
+            }
         }),
         mounted() {
             this.loadData()
@@ -167,15 +159,11 @@
             },
             loadDataAfter(axiosPromise) {
                 axiosPromise
-                    .then(() => axios.get(this.baseUrl))
+                    .then(() => axios.get(route('comparison.json').url()))
                     .then(response => {
-                        let data = response.data
                         this.loading = false
-                        this.campaigns = data.campaigns
-                        this.campaignsNotCompared = data.campaignsNotCompared
-                        this.addUrl = data.addUrl
-                        this.addAllUrl = data.addAllUrl
-                        this.removeAllUrl = data.removeAllUrl
+                        this.campaigns = response.data.campaigns
+                        this.campaignsNotCompared = response.data.campaignsNotCompared
                         this.sort()
                     })
                     .catch(error => {
@@ -187,30 +175,24 @@
                 this.loading = true
                 this.loadDataAfter(Promise.resolve())
             },
-            remove(url) {
+            add() {
+                if (!this.campaignToAdd) {
+                    return
+                }
                 this.loading = true
-                this.loadDataAfter(axios.delete(url))
+                this.loadDataAfter(axios.put(route('comparison.remove', this.campaignToAdd).url()))
             },
             addAll() {
-                if (!this.addAllUrl) {
-                    return
-                }
                 this.loading = true
-                this.loadDataAfter(axios.post(this.addAllUrl))
+                this.loadDataAfter(axios.post(route('comparison.addAll').url()))
             },
-            addToComparison() {
-                if (!this.addUrl || !this.campaignToAdd) {
-                    return
-                }
+            remove(campaignId) {
                 this.loading = true
-                this.loadDataAfter(axios.put(this.addUrl.replace('CAMPAIGN_ID', this.campaignToAdd)))
+                this.loadDataAfter(axios.delete(route('comparison.remove', campaignId).url()))
             },
             removeAll() {
-                if (!this.removeAllUrl) {
-                    return
-                }
                 this.loading = true
-                this.loadDataAfter(axios.post(this.removeAllUrl))
+                this.loadDataAfter(axios.post(route('comparison.removeAll').url()))
             }
         }
     }

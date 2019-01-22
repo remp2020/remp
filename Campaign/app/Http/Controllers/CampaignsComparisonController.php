@@ -2,35 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Banner;
 use App\Campaign;
-use App\CampaignBanner;
-use App\CampaignSegment;
-use App\Contracts\SegmentAggregator;
-use App\Contracts\SegmentException;
-use App\Contracts\StatsContract;
 use App\Contracts\StatsHelper;
-use App\Country;
-use App\Http\Request;
-use App\Http\Requests\AddCampaign;
-use App\Http\Requests\CampaignRequest;
-use App\Http\Resources\CampaignResource;
-use App\Schedule;
-use Cache;
-use Carbon\Carbon;
-use GeoIp2;
-use HTML;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
-use Tracy\Debugger;
-use View;
-use Yajra\Datatables\Datatables;
-use App\Models\Dimension\Map as DimensionMap;
-use App\Models\Position\Map as PositionMap;
-use App\Models\Alignment\Map as AlignmentMap;
-use DeviceDetector\DeviceDetector;
-use App\Contracts\Remp\Stats;
 
 class CampaignsComparisonController extends Controller
 {
@@ -54,21 +27,16 @@ class CampaignsComparisonController extends Controller
         $campaigns = collect();
         $campaignsNotCompared = collect();
 
-        $addUrl = route('comparison.add', 'CAMPAIGN_ID');
-        $addAllUrl = route('comparison.addAll');
-        $removeAllUrl = route('comparison.removeAll');
-
         foreach (Campaign::all() as $campaign) {
             if (in_array($campaign->id, $campaignIds)) {
                 $campaign->stats = $this->statsHelper->campaignStats($campaign);
-                $campaign->removeUrl = route('comparison.remove', $campaign);
                 $campaigns->push($campaign);
             } else {
                 $campaignsNotCompared->push($campaign);
             }
         }
 
-        return response()->json(compact('campaigns', 'campaignsNotCompared', 'addUrl', 'addAllUrl', 'removeAllUrl'));
+        return response()->json(compact('campaigns', 'campaignsNotCompared'));
     }
 
     public function add(Campaign $campaign)

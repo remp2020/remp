@@ -8,8 +8,7 @@
     </div>
 
     <div class="card" id="comparison-app">
-        <campaign-comparison base-url="{!! route('comparison.json') !!}">
-        </campaign-comparison>
+        <campaign-comparison></campaign-comparison>
     </div>
 
     <script type="text/javascript">
