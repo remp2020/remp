@@ -90,7 +90,7 @@
 
 <script>
     import axios from 'axios'
-    import Loader from './status/Loader'
+    import Loader from 'remp/js/components/Loader'
     import { ModelListSelect } from 'vue-search-select'
 
     export default {
