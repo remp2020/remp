@@ -85,9 +85,7 @@ class Campaign extends Model
      */
     public function getVariantsUuidsAttribute()
     {
-        return $this->campaignBanners()->withTrashed()->get()->map(function ($banner) {
-            return $banner["uuid"];
-        })->toArray();
+        return $this->campaignBanners()->withTrashed()->get()->pluck('uuid')->toArray();
     }
 
     public function banners()
