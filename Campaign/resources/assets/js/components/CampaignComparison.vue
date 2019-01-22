@@ -7,12 +7,14 @@
 
             <div class="row m-t-20 m-b-20">
                 <div class="col-md-4">
-                    <model-list-select :list="campaignsNotCompared"
-                                       v-model="campaignToAdd"
-                                       option-value="id"
-                                       option-text="name"
-                                       placeholder="Select campaign">
-                    </model-list-select>
+                    <v-select
+                            v-model="campaignToAdd"
+                            :options.sync="campaignsNotCompared"
+                            option-value="id"
+                            option-text="name"
+                            placeholder="Select campaign"
+                            title="Select campaign">
+                    </v-select>
                 </div>
                 <div class="col-md-8 pull-left">
                     <button @click="add" class="btn palette-Cyan bg waves-effect m-r-5">Add to comparison</button>
@@ -91,11 +93,11 @@
 <script>
     import axios from 'axios'
     import Loader from 'remp/js/components/Loader'
-    import { ModelListSelect } from 'vue-search-select'
+    import vSelect from 'remp/js/components/vSelect.vue'
 
     export default {
         components: {
-            Loader, ModelListSelect
+            vSelect, Loader, ModelListSelect
         },
         name: 'campaign-comparison',
         props: {},
