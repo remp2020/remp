@@ -134,7 +134,10 @@ func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 
 // Categories runs the categories action.
 func (c *PageviewController) Categories(ctx *app.CategoriesPageviewsContext) error {
-	categories := c.PageviewStorage.Categories()
+	categories, err := c.PageviewStorage.Categories()
+	if err != nil {
+		return err
+	}
 	return ctx.OK(categories)
 }
 

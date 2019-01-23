@@ -387,10 +387,10 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 }
 
 // Categories lists all tracked categories.
-func (pDB *PageviewElastic) Categories() []string {
+func (pDB *PageviewElastic) Categories() ([]string, error) {
 	return []string{
 		CategoryPageview,
-	}
+	}, nil
 }
 
 // Flags lists all available flags.
