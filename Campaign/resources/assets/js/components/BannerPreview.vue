@@ -123,8 +123,6 @@
                 :buttonTextColor="overlayRectangleTemplate.buttonTextColor"
                 :imageLink="overlayRectangleTemplate.imageLink"
 
-                :offsetVertical="offsetVertical"
-                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
                 :closeable="closeable"
                 :closeText="closeText"

@@ -191,10 +191,10 @@
                     "width": null,
                     "height": null,
                 },
-                "300x300": {
-                    "label": "300x300",
+                "300x600": {
+                    "label": "300x600",
                     "width": "300px",
-                    "height": "300px",
+                    "height": "600px",
                 },
             }
         }),

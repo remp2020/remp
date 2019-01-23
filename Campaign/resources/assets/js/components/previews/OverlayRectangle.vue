@@ -18,6 +18,17 @@
     }
 
     .overlay-rectangle-image {
+        width: 100%;
+        min-width: 300px;
+        background-position: center center;
+        background-size: cover;
+        overflow: hidden;
+        max-height: 400px;
+    }
+
+    .overlay-rectangle-image > img {
+        position: relative;
+        display: block;
         max-width: 100%;
     }
     
@@ -65,7 +76,8 @@
         text-align: center;
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
         align-items: center;
         box-sizing: border-box;
     }
@@ -73,7 +85,7 @@
     .overlay-rectangle-header {
         word-wrap: break-word;
         height: 1em;
-        padding: 10px 0;
+        padding: 0;
         margin-bottom: 10px;
     }
 
@@ -94,11 +106,15 @@
 
     .overlay-rectangle-wrap {
         position: relative;
-        padding: 25px 5px 5px;
+        padding: 5px;
         background: #fff;
         -webkit-box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
         -moz-box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
         box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.26);
+    }
+
+    .overlay-rectangle-wrap.closeable {
+        padding-top: 25px;
     }
 </style>
 
@@ -106,8 +122,7 @@
     <transition appear name="fade">
         <div class="overlay-rectangle-overlay" v-if="isVisible">
             <transition appear v-bind:name="transition">
-
-                <div class="overlay-rectangle-wrap">
+                <div class="overlay-rectangle-wrap" :class="{ closeable: closeable }">
 
                     <a class="overlay-rectangle-preview-close"
                        title="Close banner"
@@ -120,12 +135,19 @@
                        v-on="$parent.url ? { click: $parent.clicked } : {}"
                        class="overlay-rectangle-preview-link"
                        v-bind:style="[linkStyles]">
-
                             <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
-                                <img :src="imageLink" class="overlay-rectangle-image" alt="">
+                                <div v-if="imageLink"
+                                     class="overlay-rectangle-image">
+                                    <img :src="imageLink" alt="">
+                                </div>
+
                                 <div class="overlay-rectangle-content" v-if="headerText || buttonText || mainText">
-                                    <div v-if="headerText" class="overlay-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
-                                    <div class="overlay-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
+                                    <div v-if="headerText"
+                                         v-html="$parent.injectVars(headerText)"
+                                         class="overlay-rectangle-header"></div>
+
+                                    <div class="overlay-rectangle-main"
+                                         v-html="$parent.injectVars(mainText)"></div>
 
                                     <div class="overlay-rectangle-button"
                                          v-if="buttonText.length > 0"
@@ -137,7 +159,6 @@
                     </a>
 
                 </div>
-
             </transition>
         </div>
     </transition>
