@@ -97,7 +97,7 @@
 
     export default {
         components: {
-            vSelect, Loader, ModelListSelect
+            vSelect, Loader
         },
         name: 'campaign-comparison',
         props: {},
