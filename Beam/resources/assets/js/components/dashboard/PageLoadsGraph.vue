@@ -19,7 +19,7 @@
             <div v-bind:style="{color: item.color}" v-for="(item, tag) in tagLabels">
                 <b>{{tag}}</b>:
                 <span v-for="(label, index) in item.labels">
-                    {{label}} <b v-if="index < item.labels.length - 1"> | </b>
+                    {{label}} <span style="color: #000;" v-if="index < item.labels.length - 1"> | </span>
                 </span>
             </div>
         </div>
