@@ -17,7 +17,10 @@
 
         <div class="m-t-20 m-b-20" v-if="tagLabels">
             <div v-bind:style="{color: item.color}" v-for="(item, tag) in tagLabels">
-                <b>{{tag}}</b>: {{item.label}}
+                <b>{{tag}}</b>:
+                <span v-for="(label, index) in item.labels">
+                    {{label}} <b v-if="index < item.labels.length - 1"> | </b>
+                </span>
             </div>
         </div>
 

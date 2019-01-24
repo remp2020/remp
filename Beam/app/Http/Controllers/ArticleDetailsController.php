@@ -11,6 +11,7 @@ use App\Http\Resources\ArticleResource;
 use App\Model\ArticleTitle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -66,13 +67,17 @@ class ArticleDetailsController extends Controller
 
         $data['tagLabels'] = [];
 
-        $articleTitles = $article->articleTitles()->whereIn('variant', $data['tags'])->get();
-        foreach ($articleTitles as $articleTitle) {
-            $obj = new \stdClass();
-            $obj->label = $articleTitle->title;
-            $obj->color = $tagToColor[$articleTitle->variant];
+        $articleTitles = $article
+            ->articleTitles()
+            ->whereIn('variant', $data['tags'])
+            ->get()
+            ->groupBy('variant');
 
-            $data['tagLabels'][$articleTitle->variant] = $obj;
+        foreach ($articleTitles as $variant => $variantTitles) {
+            $obj = new \stdClass();
+            $obj->color = $tagToColor[$variant];
+            $obj->labels = $variantTitles->pluck('title')->toArray();
+            $data['tagLabels'][$variant] = $obj;
         }
         return response()->json($data);
     }
