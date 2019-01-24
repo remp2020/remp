@@ -4,11 +4,24 @@
     <h2>Dashboard</h2>
 </div>
 
+
+<div class="well">
+    <div id="smart-range-selector" class="row">
+        <div class="col-md-4">
+            <h4>Filter by article publish date</h4>
+            <input type="hidden" name="from" value="{$from}">
+            <input type="hidden" name="to" value="{$to}">
+            <smart-range-selector from="{$from}" to="{$to}" :callback="callback">
+            </smart-range-selector>
+        </div>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header">
         <h2 n:block="title">
             <strong>Sent mails of newsletter type:</strong><br>
-            <small>{$dataSet['label']}</small>
+            <small>{$mailTypeTitle}</small>
         </h2>
 
         <div class="actions">
@@ -16,34 +29,70 @@
         </div>
     </div>
 
-    <div class="p-30">
-        <canvas id="mailer-dashboard-detail-statistics-graph" width="1500" height="500"></canvas>
-    </div>
+    {snippet graph}
+        <div class="p-30">
+            <canvas id="mailer-dashboard-detail-statistics-graph" width="1500" height="500"></canvas>
+        </div>
+
+        <script>
+            var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph").getContext('2d');
+            var myLineChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    "labels": {$labels},
+                    "datasets": [{$sentDataSet}, {$openedDataSet}, {$clickedDataSet}]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                display: true
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: "top"
+                    }
+                }
+            });
+        </script>
+    {/snippet}
 
     <script>
-        var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph").getContext('2d');
-        var myLineChart = new Chart(ctx, {
-            type: "line",
-            data: {
-                "labels": {$labels},
-                "datasets": [{$dataSet}]
+        new Vue({
+            el: "#smart-range-selector",
+            components: {
+                SmartRangeSelector
             },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
+            methods: {
+                callback: function (from, to) {
+                    $.ajax({
+                        url: {link filterChanged!},
+                        type: 'POST',
+                        data: {
+                            id: {$mailTypeId},
+                            from: from,
+                            to: to
+                        },
+                        success: function (data, status) {
+                            console.log('response data', data);
+                            console.log('status', status);
+
+                            $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
+                        },
+                        error: function () {
+                            console.log('response error');
                         }
-                    }],
-                    xAxes: [{
-                        ticks: {
-                            display: true
-                        }
-                    }]
-                },
-                legend: {
-                    display: false,
-                    position: "right"
+                    });
+
+                    $('[name="from"]').val(from);
+                    $('[name="to"]').val(to).trigger("change");
                 }
             }
         });

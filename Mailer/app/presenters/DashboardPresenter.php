@@ -2,11 +2,11 @@
 
 namespace Remp\MailerModule\Presenters;
 
+use Carbon\Carbon;
 use DateTime;
 use DateInterval;
 use IntlDateFormatter;
 use Remp\MailerModule\Formatters\DateFormatterFactory;
-
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
@@ -183,27 +183,63 @@ final class DashboardPresenter extends BasePresenter
 
     public function renderSentEmailsDetail($id)
     {
+        $mailType = $this->listsRepository->find($id);
+
+        $this->template->mailTypeId = $mailType->id;
+        $this->template->mailTypeTitle = $mailType->title;
+
+        if (!$this->isAjax()) {
+            $from = 'now - 30 days';
+            $to = 'now';
+            $this->template->from = $from;
+            $this->template->to = $to;
+
+            $data = $this->emailsDetailData($id, $from, $to);
+
+            $this->template->labels = $data['labels'];
+            $this->template->sentDataSet = $data['sentDataSet'];
+            $this->template->openedDataSet = $data['openedDataSet'];
+            $this->template->clickedDataSet = $data['clickedDataSet'];
+        }
+    }
+
+    public function emailsDetailData($id, $from, $to)
+    {
         $labels = [];
-        $numOfDays = 30;
-        $now = new DateTime();
-        $from = (clone $now)->sub(new DateInterval('P' . $numOfDays . 'D'));
+        $from = Carbon::parse($from);
+        $to = Carbon::parse($to);
+        $numOfDays = $from->diffInDays($to);
 
         // fill graph columns
-        for ($i = $numOfDays; $i >= 0; $i--) {
+        for ($i = $numOfDays - 1; $i >= 0; $i--) {
             $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
         }
 
-        $mailType = $this->listsRepository->find($id);
-
-        $dataSet = [
-            'label' => $mailType->title,
+        $sentDataSet = [
+            'label' => 'sent',
             'data' => array_fill(0, $numOfDays, 0),
             'fill' => false,
-            'borderColor' => 'rgb(75, 192, 192)',
+            'borderColor' => 'rgb(0,150,136)',
             'lineTension' => 0.5
         ];
 
-        $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $from, $now)->fetchAll();
+        $openedDataSet = [
+            'label' => 'opened',
+            'data' => array_fill(0, $numOfDays, 0),
+            'fill' => false,
+            'borderColor' => 'rgb(33,150,243)',
+            'lineTension' => 0.5
+        ];
+
+        $clickedDataSet = [
+            'label' => 'clicked',
+            'data' => array_fill(0, $numOfDays, 0),
+            'fill' => false,
+            'borderColor' => 'rgb(230,57,82)',
+            'lineTension' => 0.5
+        ];
+
+        $data = $this->templatesRepository->getDashboardDetailGraphData($id, $from, $to)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
@@ -213,11 +249,29 @@ final class DashboardPresenter extends BasePresenter
             );
 
             if ($foundAt !== false) {
-                $dataSet['data'][$foundAt] = $row->sent_mails;
+                $sentDataSet['data'][$foundAt] = $row->sent_mails;
+                $openedDataSet['data'][$foundAt] = $row->opened_mails;
+                $clickedDataSet['data'][$foundAt] = $row->clicked_mails;
             }
         }
 
-        $this->template->dataSet = $dataSet;
-        $this->template->labels = $labels;
+        return [
+            'labels' => $labels,
+            'sentDataSet' => $sentDataSet,
+            'openedDataSet' => $openedDataSet,
+            'clickedDataSet' => $clickedDataSet,
+        ];
+    }
+
+    public function handleFilterChanged($id, $from, $to)
+    {
+        $data = $this->emailsDetailData($id, $from, $to);
+
+        $this->template->labels = $data['labels'];
+        $this->template->sentDataSet = $data['sentDataSet'];
+        $this->template->openedDataSet = $data['openedDataSet'];
+        $this->template->clickedDataSet = $data['clickedDataSet'];
+
+        $this->redrawControl('graph');
     }
 }

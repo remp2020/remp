@@ -155,4 +155,39 @@ class TemplatesRepository extends Repository
 
         return $selection;
     }
+
+    /**
+     * @param $mailTypeId
+     * @param \DateTime $from
+     * @param \DateTime $to
+     * @return Selection
+     */
+    public function getDashboardDetailGraphData($mailTypeId, \DateTime $from, \DateTime $to)
+    {
+        return $this->getTable()
+            ->select('
+                SUM(COALESCE(mail_templates.sent, 0)) AS sent_mails,
+                SUM(COALESCE(mail_templates.opened, 0)) AS opened_mails,
+                SUM(COALESCE(mail_templates.clicked, 0)) AS clicked_mails,
+                mail_templates.id,
+                mail_templates.mail_type_id,
+                mail_type.title,
+                DATE(:mail_job_batch_templates.mail_job_batch.first_email_sent_at) AS label_date,
+                :mail_job_batch_templates.mail_job_batch.first_email_sent_at
+            ')->where('
+                :mail_job_batch_templates.mail_job_batch.first_email_sent_at IS NOT NULL
+                AND mail_templates.mail_type_id = ?
+                AND DATE(:mail_job_batch_templates.mail_job_batch.first_email_sent_at) >= DATE(?)
+                AND DATE(:mail_job_batch_templates.mail_job_batch.first_email_sent_at) <= DATE(?)
+            ', [
+                $mailTypeId,
+                $from->format('Y-m-d'),
+                $to->format('Y-m-d'),
+            ])->group('
+                mail_templates.mail_type_id,
+                label_date
+            ')->order('
+                sent_mails DESC
+            ');
+    }
 }
