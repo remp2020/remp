@@ -56,6 +56,7 @@ class CampaignController extends Controller
                     'edit' => route('campaigns.edit', $campaign),
                     'copy' => route('campaigns.copy', $campaign),
                     'stats' => route('campaigns.stats', $campaign),
+                    'compare' => route('comparison.add', $campaign),
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {

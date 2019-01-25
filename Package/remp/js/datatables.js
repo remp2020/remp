@@ -226,8 +226,9 @@ $.fn.dataTables = {
             return function(data, type, row) {
                 var actions = '<span class="actions">';
                 $.each(actionSettings, function (key, action) {
+                    var onclick = action['onclick'] || '';
                     if (row.actions[action['name']] === null) {
-                        actions += '<a class="btn btn-sm palette-Cyan bg waves-effect"  disabled="disabled" title="' + action['title'] + '" href="javascript:void(0)"><i class="zmdi ' + action['class'] + '"></i></a>\n';
+                        actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" onclick="' + onclick + '" disabled="disabled" title="' + action['title'] + '" href="javascript:void(0)"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                         return;
                     }
                     if (row.action_methods && row.action_methods[action['name']]) {
@@ -239,7 +240,7 @@ $.fn.dataTables = {
                         actions += '</form>';
                         return;
                     }
-                    actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" title="' + action['title'] + '" href="' + row.actions[action['name']] + '"><i class="zmdi ' + action['class'] + '"></i></a>\n';
+                    actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" onclick="' + onclick + '" title="' + action['title'] + '" href="' + row.actions[action['name']] + '"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                 });
                 actions += '</span>';
                 return actions;

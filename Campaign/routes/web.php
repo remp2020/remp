@@ -29,6 +29,13 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
     Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
 
+    Route::get('comparison', 'CampaignsComparisonController@index')->name('comparison.index');
+    Route::get('comparison/json', 'CampaignsComparisonController@json')->name('comparison.json');
+    Route::put('comparison/{campaign}', 'CampaignsComparisonController@add')->name('comparison.add');
+    Route::post('comparison/addAll', 'CampaignsComparisonController@addAll')->name('comparison.addAll');
+    Route::post('comparison/removeAll', 'CampaignsComparisonController@removeAll')->name('comparison.removeAll');
+    Route::delete('comparison/{campaign}/', 'CampaignsComparisonController@remove')->name('comparison.remove');
+
     Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
     Route::post('banners/validate', 'BannerController@validateForm')->name('banners.validateForm');
 

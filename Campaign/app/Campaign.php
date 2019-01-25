@@ -78,6 +78,16 @@ class Campaign extends Model
         return false;
     }
 
+    /**
+     * Get campaign variants UUIDs
+     *
+     * @return array
+     */
+    public function getVariantsUuidsAttribute()
+    {
+        return $this->campaignBanners()->withTrashed()->get()->pluck('uuid')->toArray();
+    }
+
     public function banners()
     {
         return $this->belongsToMany(Banner::class, 'campaign_banners')

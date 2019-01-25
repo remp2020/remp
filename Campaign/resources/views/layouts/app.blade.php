@@ -35,6 +35,9 @@
         moment.locale('{{ Config::get('app.locale') }}');
     </script>
 
+    {{-- tightenco/ziggy package to pass laravel routes to JS --}}
+    @routes
+
     @stack('head')
 </head>
 
