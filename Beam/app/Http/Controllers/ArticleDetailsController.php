@@ -73,6 +73,8 @@ class ArticleDetailsController extends Controller
             ->get()
             ->groupBy('variant');
 
+        $data['events'] = [];
+
         foreach ($articleTitles as $variant => $variantTitles) {
             $obj = new \stdClass();
             $obj->color = $tagToColor[$variant];

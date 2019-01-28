@@ -305,8 +305,8 @@
                 }
 
                 // show event only if its too close to x-position of mouse
-                if (Math.abs(x(selectedEvent.date) - x(xDate)) < pxThresholdToShowLegend) {
-                    this.eventLegend.left = (x(selectedEvent.date) + margin.left) + "px"
+                if (Math.abs(this.vars.x(selectedEvent.date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
+                    this.eventLegend.left = (this.vars.x(selectedEvent.date) + this.vars.margin.left) + "px"
                     this.eventLegend.visible = true
                     this.eventLegend.data = selectedEvent
                 } else {
@@ -470,7 +470,7 @@
 
                 eventLayers
                     .append("path")
-                    .attr("d", function(item, i){
+                    .attr("d", function(item, i) {
                         let xDate = x(item.date)
                         let d = "M" + xDate + "," + height
                         d += " " + xDate + "," + 0
@@ -510,6 +510,7 @@
                         this.loading = false
                         const tags = response.data.tags
                         const data = response.data.results
+                        const events = response.data.events
 
                         let parseData = function (d) {
                             let dataObject = {
@@ -521,17 +522,17 @@
                             return dataObject;
                         }
 
-                        let events = response.data.events.map(function(event) {
+                        let parseEvents = function(event) {
                             return {
                                 date: d3.isoParse(event.date),
                                 event: event
                             }
-                        })
+                        }
 
                         this.data = {
                             results: data.map(parseData),
                             tags: tags,
-                            events: events,
+                            events: events ? events.map(parseEvents) : [],
                             colors: response.data.colors,
                             intervalMinutes: response.data.intervalMinutes
                         }
