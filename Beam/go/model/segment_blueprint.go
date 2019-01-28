@@ -171,5 +171,12 @@ func (sbdb *SegmentBlueprintDB) commonParams() map[string]SegmentBlueprintTableC
 		Label:    "Match running campaign",
 	}
 
+	commonParams["fields"] = SegmentBlueprintTableCriterionParam{
+		Type:     "string_array",
+		Required: false,
+		Help:     "Add fields (key: value) to segment. Eg. `utm_campaign: election_2019`",
+		Label:    "Fields",
+	}
+
 	return commonParams
 }
