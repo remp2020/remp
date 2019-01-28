@@ -21,7 +21,6 @@ class UnreadArticlesGenerator
         Client $beamClient,
         ContentInterface $content
     ) {
-    
         $this->beamClient = $beamClient;
         $this->content = $content;
     }

@@ -7,18 +7,16 @@ use App\Author;
 use App\Contracts\JournalAggregateRequest;
 use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
-use App\Contracts\JournalListRequest;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\NewsletterCriterion;
 use App\Section;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
@@ -354,26 +352,12 @@ class ArticleController extends Controller
         $timeBefore = Carbon::now();
 
         foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
-            // Load read articles in batch
-            $usersReadArticles = [];
-            $r = new JournalAggregateRequest('pageviews', 'load');
-            $r->setTimeAfter($timeAfter);
-            $r->setTimeBefore($timeBefore);
-            $r->addGroup('user_id', 'article_id');
-            $r->addFilter('user_id', ...$userIdsChunk);
-            foreach ($this->journal->count($r) as $item) {
-                if ($item->tags->article_id !== '') {
-                    $userId = $item->tags->user_id;
-                    if (!array_key_exists($userId, $usersReadArticles)) {
-                        $usersReadArticles[$userId] = [];
-                    }
-                    $usersReadArticles[$userId][$item->tags->article_id] = true;
-                }
-            }
+            $usersReadArticles = $this->readArticlesForUsers($timeAfter, $timeBefore, $userIdsChunk);
 
             // Save top articles per user
             foreach ($userIdsChunk as $userId) {
                 $topArticlesUrls = [];
+                $topArticlesUrlsOrdered = [];
 
                 $i = 0;
                 $criterionIndex = 0;
@@ -396,12 +380,13 @@ class ArticleController extends Controller
                     if ((!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId]))
                         && !array_key_exists($topArticle->url, $topArticlesUrls)) {
                         $topArticlesUrls[$topArticle->url] = true;
+                        $topArticlesUrlsOrdered[] = $topArticle->url;
                     }
 
                     $i++;
                 }
 
-                $topArticlesPerUser[$userId] = array_keys($topArticlesUrls);
+                $topArticlesPerUser[$userId] = $topArticlesUrlsOrdered;
             }
         }
 
@@ -409,5 +394,25 @@ class ArticleController extends Controller
             'status' => 'ok',
             'data' => $topArticlesPerUser
         ]);
+    }
+
+    private function readArticlesForUsers(Carbon $timeAfter, Carbon $timeBefore, array $userIds): array
+    {
+        $usersReadArticles = [];
+        $r = new JournalAggregateRequest('pageviews', 'load');
+        $r->setTimeAfter($timeAfter);
+        $r->setTimeBefore($timeBefore);
+        $r->addGroup('user_id', 'article_id');
+        $r->addFilter('user_id', ...$userIds);
+        foreach ($this->journal->count($r) as $item) {
+            if ($item->tags->article_id !== '') {
+                $userId = $item->tags->user_id;
+                if (!array_key_exists($userId, $usersReadArticles)) {
+                    $usersReadArticles[$userId] = [];
+                }
+                $usersReadArticles[$userId][$item->tags->article_id] = true;
+            }
+        }
+        return $usersReadArticles;
     }
 }
