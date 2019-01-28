@@ -342,6 +342,7 @@ class ArticleController extends Controller
 
         $topArticlesPerCriteria = [];
 
+        /** @var NewsletterCriteria[] $criterias */
         $criterias = [];
         foreach ($request->input('criterias') as $criteriaString) {
             $criterias[] = NewsletterCriteria::get($criteriaString);
@@ -378,7 +379,8 @@ class ArticleController extends Controller
                 $criteriaIndex = 0;
                 while (count($topArticlesUrls) < $articlesCount) {
                     if (!$topArticlesPerCriteria[$criteriaIndex]) {
-                        $topArticlesPerCriteria[$criteriaIndex] = NewsletterCriteria::getCachedArticles($criterias[$criteriaIndex], $timespan, $ignoreAuthors);
+                        $criterium = $criterias[$criteriaIndex];
+                        $topArticlesPerCriteria[$criteriaIndex] = $criterium->getCachedArticles($timespan, $ignoreAuthors);
                     }
 
                     if ($i >= count($topArticlesPerCriteria[$criteriaIndex])) {

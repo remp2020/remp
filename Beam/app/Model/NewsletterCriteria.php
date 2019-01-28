@@ -26,13 +26,13 @@ class NewsletterCriteria extends Enum
         return implode($glue, self::getValues());
     }
 
-    public static function getArticles(NewsletterCriteria $criteria, int $daysSpan, ?int $articlesCount = null, array $ignoreAuthors = []): Collection
+    public function getArticles(int $daysSpan, ?int $articlesCount = null, array $ignoreAuthors = []): Collection
     {
         $start = Carbon::now()->subDays($daysSpan);
 
         $query = Article::distinct();
 
-        switch ($criteria->getValue()) {
+        switch ($this->getValue()) {
             case self::TIMESPENT_ALL:
                 $query->mostReadByTimespent($start, 'sum', $articlesCount);
                 break;
@@ -62,7 +62,7 @@ class NewsletterCriteria extends Enum
             case self::BOOKMARKS:
                 throw new Exception('not implemented');
             default:
-                throw new Exception('unknown article criteria ' . $criteria->getValue());
+                throw new Exception('unknown article criteria ' . $this->getValue());
         }
 
         $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->get()->pluck('id')->toArray();
@@ -71,19 +71,18 @@ class NewsletterCriteria extends Enum
 
 
     /**
-     * @param NewsletterCriteria $criteria
      * @param int                $daysSpan
      * @param array              $ignoreAuthors
      *
      * @return array of articles (containing only external_id and url attributes)
      */
-    public static function getCachedArticles(NewsletterCriteria $criteria, int $daysSpan, array $ignoreAuthors = []): array
+    public function getCachedArticles(int $daysSpan, array $ignoreAuthors = []): array
     {
         $tag = 'top_articles';
-        $key = $tag . '|' . $criteria->getValue() . '|' . $daysSpan;
+        $key = $tag . '|' . $this->getValue() . '|' . $daysSpan;
 
-        return Cache::tags($tag)->remember($key, 10, function () use ($criteria, $daysSpan, $ignoreAuthors) {
-            return self::getArticles($criteria, $daysSpan, null, $ignoreAuthors)->map(function ($article) {
+        return Cache::tags($tag)->remember($key, 10, function () use ($daysSpan, $ignoreAuthors) {
+            return $this->getArticles($daysSpan, null, $ignoreAuthors)->map(function ($article) {
                 $item = new \stdClass();
                 $item->external_id = $article->external_id;
                 $item->url = $article->url;

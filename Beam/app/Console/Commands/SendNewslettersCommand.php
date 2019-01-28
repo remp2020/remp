@@ -101,9 +101,9 @@ class SendNewslettersCommand extends Command
 
     private function sendNewsletter(Newsletter $newsletter)
     {
+        $criterium = NewsletterCriteria::get($newsletter->criteria);
         $articles = $newsletter->personalized_content ? [] :
-            NewsletterCriteria::getArticles(
-                NewsletterCriteria::get($newsletter->criteria),
+            $criterium->getArticles(
                 $newsletter->timespan,
                 $newsletter->articles_count
             );
