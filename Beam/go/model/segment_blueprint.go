@@ -41,13 +41,13 @@ type SegmentBlueprintTableCriterionCollection []*SegmentBlueprintTableCriterion
 
 // SegmentBlueprintTableCriterionParam represents one parameter of Segment Criterion.
 type SegmentBlueprintTableCriterionParam struct {
-	Type      string
-	Required  bool
-	Default   *string
-	Help      string
-	Label     string
-	Group     *string
-	Available []string
+	Type      string   `json:"type"`
+	Required  bool     `json:"required"`
+	Default   *string  `json:"default"`
+	Help      string   `json:"help"`
+	Label     string   `json:"label"`
+	Group     *string  `json:"group"`
+	Available []string `json:"available"`
 }
 
 // PCEStorage is interface which ensures provided storage (Pageview/Commerce/Event)
