@@ -147,10 +147,9 @@ var SegmentCreatePayload = Type("SegmentCreatePayload", func() {
 var SegmentCreateCriteria = Type("SegmentCreateCriteria", func() {
 	Description("Segment's criteria")
 
-	Attribute("version", Integer, "Version of request payload")
 	Attribute("nodes", ArrayOf(SegmentCreateCriteriaOperator), "Criteria operators")
 
-	Required("version", "nodes")
+	Required("nodes")
 })
 
 var SegmentCreateCriteriaOperator = Type("SegmentCreateCriteriaOperator", func() {

@@ -111,7 +111,6 @@ func (c *SegmentController) Create(ctx *app.CreateSegmentsContext) error {
 		Code:           code,
 		Active:         true,
 		SegmentGroupID: p.GroupID,
-		Version:        p.Criteria.Version,
 		Criteria:       string(criteriaJSON),
 	}
 	s, err := c.SegmentStorage.Create(sd)

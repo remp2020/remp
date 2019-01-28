@@ -68,7 +68,6 @@ type SegmentData struct {
 	Code           string
 	Active         bool
 	SegmentGroupID int `db:"segment_group_id"`
-	Version        int
 	Criteria       string
 }
 
@@ -120,14 +119,13 @@ type SegmentDB struct {
 func (sDB *SegmentDB) Create(sd SegmentData) (*Segment, error) {
 	// TODO: insert & get should be in transaction
 	_, err := sDB.MySQL.NamedExec(`
-		INSERT INTO segments (name, code, active, segment_group_id, version, criteria, created_at, updated_at)
-		VALUES (:name, :code, :active, :segment_group_id, :version, :criteria, :created_at, :updated_at)`,
+		INSERT INTO segments (name, code, active, segment_group_id, criteria, created_at, updated_at)
+		VALUES (:name, :code, :active, :segment_group_id, :criteria, :created_at, :updated_at)`,
 		map[string]interface{}{
 			"name":             sd.Name,
 			"code":             sd.Code,
 			"active":           sd.Active,
 			"segment_group_id": sd.SegmentGroupID,
-			"version":          sd.Version,
 			"criteria":         sd.Criteria,
 			"created_at":       time.Now(),
 			"updated_at":       time.Now(),

@@ -14,8 +14,7 @@ class SegmentsAddCriteriaAndVersion extends Migration
     public function up()
     {
         Schema::table("segments", function (Blueprint $table) {
-            $table->integer('version')->nullable(true)->default(null);
-            $table->json('criteria')->nullable(true)->comment('');
+            $table->json('criteria')->nullable(true)->comment('JSON encoded segment criteria');
         });
     }
 
@@ -27,7 +26,6 @@ class SegmentsAddCriteriaAndVersion extends Migration
     public function down()
     {
         Schema::table('segments', function (Blueprint $table) {
-            $table->dropColumn('version');
             $table->dropColumn('criteria');
         });
     }
