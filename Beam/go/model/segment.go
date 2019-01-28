@@ -18,6 +18,8 @@ const (
 
 // SegmentStorage represents interface to get segment related data.
 type SegmentStorage interface {
+	// Create creates new Segment from provided data and returns it.
+	Create(sd SegmentData) (*Segment, error)
 	// Get returns instance of Segment based on the given code.
 	Get(code string) (*Segment, bool, error)
 	// List returns all available segments configured via Beam admin.
@@ -50,16 +52,24 @@ type SegmentCache map[int]*SegmentRuleCache
 
 // Segment structure.
 type Segment struct {
-	ID             int
-	Code           string
-	Name           string
-	Active         bool
-	CreatedAt      time.Time `db:"created_at"`
-	UpdatedAt      time.Time `db:"updated_at"`
-	SegmentGroupID int       `db:"segment_group_id"`
+	ID int
+	SegmentData
+
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 
 	Group SegmentGroup  `db:"segment_group"`
 	Rules []SegmentRule `db:"segment_rules"`
+}
+
+// SegmentData contains data of segment
+type SegmentData struct {
+	Name           string
+	Code           string
+	Active         bool
+	SegmentGroupID int `db:"segment_group_id"`
+	Version        int
+	Criteria       string
 }
 
 // SegmentCollection is list of Segments.
@@ -104,6 +114,36 @@ type SegmentDB struct {
 	Segments                 map[string]*Segment
 	ExplicitSegmentsUsers    map[string]UserSet
 	ExplicitSegmentsBrowsers map[string]BrowserSet
+}
+
+// Create creates new Segment from provided data and returns it.
+func (sDB *SegmentDB) Create(sd SegmentData) (*Segment, error) {
+	// TODO: insert & get should be in transaction
+	_, err := sDB.MySQL.NamedExec(`
+		INSERT INTO segments (name, code, active, segment_group_id, version, criteria, created_at, updated_at)
+		VALUES (:name, :code, :active, :segment_group_id, :version, :criteria, :created_at, :updated_at)`,
+		map[string]interface{}{
+			"name":             sd.Name,
+			"code":             sd.Code,
+			"active":           sd.Active,
+			"segment_group_id": sd.SegmentGroupID,
+			"version":          sd.Version,
+			"criteria":         sd.Criteria,
+			"created_at":       time.Now(),
+			"updated_at":       time.Now(),
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	s, ok, err := sDB.Get(sd.Code)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, errors.New("Transaction error")
+	}
+	return s, nil
 }
 
 // Get returns instance of Segment based on the given code.

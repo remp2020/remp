@@ -103,6 +103,15 @@ var _ = Resource("segments", func() {
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))
 	})
+	Action("create", func() {
+		Description("Create segment")
+		Payload(SegmentCreatePayload)
+		Routing(POST("/create"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, Segment)
+	})
 })
 
 var _ = Resource("journal", func() {

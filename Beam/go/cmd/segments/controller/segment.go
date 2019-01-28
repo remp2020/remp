@@ -91,6 +91,37 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 	return ctx.OK(uc)
 }
 
+// Create runs the create action.
+func (c *SegmentController) Create(ctx *app.CreateSegmentsContext) error {
+	p := ctx.Payload
+
+	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+	}
+
+	// TODO: maybe code should be also part of payload? check with CRM
+	code, err := model.Webalize(p.Name)
+	if err != nil {
+		return err
+	}
+
+	sd := model.SegmentData{
+		Name:           p.Name,
+		Code:           code,
+		Active:         true,
+		SegmentGroupID: p.GroupID,
+		Version:        p.Criteria.Version,
+		Criteria:       string(criteriaJSON),
+	}
+	s, err := c.SegmentStorage.Create(sd)
+	if err != nil {
+		return err
+	}
+
+	return ctx.OK((*Segment)(s).ToMediaType())
+}
+
 // handleCheck determines whether provided identifier is part of segment based on given segment type.
 func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, identifier string, fields, cache *string) (*app.SegmentCheck, bool, error) {
 	s, ok, err := c.SegmentStorage.Get(segmentCode)
