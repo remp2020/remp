@@ -12,7 +12,7 @@ use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
-use App\Model\NewsletterCriteria;
+use App\Model\NewsletterCriterion;
 use App\Section;
 use Carbon\Carbon;
 use Html;
@@ -340,13 +340,13 @@ class ArticleController extends Controller
         $timespan = $request->input('timespan');
         $ignoreAuthors = $request->input('ignore_authors', []);
 
-        $topArticlesPerCriteria = [];
+        $topArticlesPerCriterion = [];
 
-        /** @var NewsletterCriteria[] $criterias */
-        $criterias = [];
-        foreach ($request->input('criterias') as $criteriaString) {
-            $criterias[] = NewsletterCriteria::get($criteriaString);
-            $topArticlesPerCriteria[] = null;
+        /** @var NewsletterCriterion[] $criteria */
+        $criteria = [];
+        foreach ($request->input('criteria') as $criteriaString) {
+            $criteria[] = NewsletterCriterion::get($criteriaString);
+            $topArticlesPerCriterion[] = null;
         }
         $topArticlesPerUser = [];
 
@@ -376,23 +376,23 @@ class ArticleController extends Controller
                 $topArticlesUrls = [];
 
                 $i = 0;
-                $criteriaIndex = 0;
+                $criterionIndex = 0;
                 while (count($topArticlesUrls) < $articlesCount) {
-                    if (!$topArticlesPerCriteria[$criteriaIndex]) {
-                        $criterium = $criterias[$criteriaIndex];
-                        $topArticlesPerCriteria[$criteriaIndex] = $criterium->getCachedArticles($timespan, $ignoreAuthors);
+                    if (!$topArticlesPerCriterion[$criterionIndex]) {
+                        $criterion = $criteria[$criterionIndex];
+                        $topArticlesPerCriterion[$criterionIndex] = $criterion->getCachedArticles($timespan, $ignoreAuthors);
                     }
 
-                    if ($i >= count($topArticlesPerCriteria[$criteriaIndex])) {
-                        if ($criteriaIndex === count($criterias) - 1) {
+                    if ($i >= count($topArticlesPerCriterion[$criterionIndex])) {
+                        if ($criterionIndex === count($criteria) - 1) {
                             break;
                         }
-                        $criteriaIndex++;
+                        $criterionIndex++;
                         $i = 0;
                         continue;
                     }
 
-                    $topArticle = $topArticlesPerCriteria[$criteriaIndex][$i];
+                    $topArticle = $topArticlesPerCriterion[$criterionIndex][$i];
                     if ((!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId]))
                         && !array_key_exists($topArticle->url, $topArticlesUrls)) {
                         $topArticlesUrls[$topArticle->url] = true;

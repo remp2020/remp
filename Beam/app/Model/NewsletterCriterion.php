@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use MabeEnum\Enum;
 
-class NewsletterCriteria extends Enum
+class NewsletterCriterion extends Enum
 {
     const AVERAGE_PAYMENT = 'average_payment';
     const TIMESPENT_ALL = 'timespent_all';
@@ -62,7 +62,7 @@ class NewsletterCriteria extends Enum
             case self::BOOKMARKS:
                 throw new Exception('not implemented');
             default:
-                throw new Exception('unknown article criteria ' . $this->getValue());
+                throw new Exception('unknown article criterion ' . $this->getValue());
         }
 
         $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->get()->pluck('id')->toArray();

@@ -83,7 +83,7 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-key"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
-                        {!! Form::label('Criteria', null, ['class' => 'fg-label']) !!}
+                        {!! Form::label('Criterion', null, ['class' => 'fg-label']) !!}
                         {!! Form::select(
                            'criteria',
                            $criteria,

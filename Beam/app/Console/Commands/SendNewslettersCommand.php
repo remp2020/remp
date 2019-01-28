@@ -2,18 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Article;
-use App\ArticlePageviews;
-use App\ArticleTimespent;
 use App\Contracts\Mailer\MailerContract;
-use App\Conversion;
-use App\Http\Controllers\NewsletterController;
-use App\Model\NewsletterCriteria;
+use App\Model\NewsletterCriterion;
 use App\Newsletter;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Console\Command;
-use Recurr\Exception;
 use Recurr\Transformer\ArrayTransformer;
 use Recurr\Transformer\ArrayTransformerConfig;
 use Recurr\Transformer\Constraint\AfterConstraint;
@@ -101,9 +95,9 @@ class SendNewslettersCommand extends Command
 
     private function sendNewsletter(Newsletter $newsletter)
     {
-        $criterium = NewsletterCriteria::get($newsletter->criteria);
+        $criterion = NewsletterCriterion::get($newsletter->criteria);
         $articles = $newsletter->personalized_content ? [] :
-            $criterium->getArticles(
+            $criterion->getArticles(
                 $newsletter->timespan,
                 $newsletter->articles_count
             );
@@ -128,7 +122,7 @@ class SendNewslettersCommand extends Command
             $extras = json_encode([
                 'generator' => 'beam-unread-articles',
                 'parameters' => [
-                    'criterias' => [
+                    'criteria' => [
                         $newsletter->criteria
                     ],
                     'timespan' => $newsletter->timespan,
