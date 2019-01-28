@@ -38,6 +38,12 @@ You can override any default config from
 - MySQL 5.7
 - Redis 3.2
 
+### Base flow of actions
+
+Here you can see simplified view of how Mailer works at following diagram.
+
+![Mailer Sequence Overview](./resources/docs/sequence_overview.svg)
+
 ### Integration with user base
 
 Mailer is dependent on external user base and segment provider. After the installation the application uses
