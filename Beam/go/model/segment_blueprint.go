@@ -108,7 +108,7 @@ func (sbdb *SegmentBlueprintDB) fillCriterionFromStorage(storage PCEStorage, sbt
 		sbtc := &SegmentBlueprintTableCriterion{
 			Key:    c,
 			Label:  strings.Title(c),
-			Params: sbdb.commonParams(),
+			Params: sbdb.buildParams(c),
 		}
 
 		actions, err := storage.Actions(c)
@@ -128,6 +128,22 @@ func (sbdb *SegmentBlueprintDB) fillCriterionFromStorage(storage PCEStorage, sbt
 	}
 
 	return nil
+}
+
+// buildParams returns map of Params based on provided category.
+func (sbdb *SegmentBlueprintDB) buildParams(category string) map[string]SegmentBlueprintTableCriterionParam {
+	params := sbdb.commonParams()
+
+	switch category {
+	case CategoryPageview:
+		params["_article"] = SegmentBlueprintTableCriterionParam{
+			Type:     "boolean",
+			Required: false,
+			Help:     "Should segment match only article pageviews (true), not-article pageviews (false) or all (parameter not provided)",
+			Label:    "Match article pageviews",
+		}
+	}
+	return params
 }
 
 // commonParams returns map of Params which are common for all tables available for segment.
