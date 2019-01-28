@@ -59,7 +59,7 @@ type CommerceStorage interface {
 	// List returns list of all events based on given CommerceOptions.
 	List(o ListOptions) (CommerceRowCollection, error)
 	// Categories lists all available categories.
-	Categories() []string
+	Categories() ([]string, error)
 	// Flags lists all available flags.
 	Flags() []string
 	// Actions lists all available actions under the given category.

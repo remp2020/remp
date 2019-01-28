@@ -87,7 +87,7 @@ type PageviewStorage interface {
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o ListPageviewsOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.
-	Categories() []string
+	Categories() ([]string, error)
 	// Flags lists all available flags.
 	Flags() []string
 	// Actions lists all tracked actions under the given category.

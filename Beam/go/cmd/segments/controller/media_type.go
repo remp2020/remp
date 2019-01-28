@@ -15,6 +15,18 @@ type Segment model.Segment
 // SegmentCollection is the collection of Segments.
 type SegmentCollection model.SegmentCollection
 
+// SegmentBlueprintTable represents blueprint of one segment table.
+type SegmentBlueprintTable model.SegmentBlueprintTable
+
+// SegmentBlueprintTableCollection is the collection of SegmentBlueprintTable.
+type SegmentBlueprintTableCollection model.SegmentBlueprintTableCollection
+
+// SegmentBlueprintTableCriterion represents criterion of one field of table available for segment.
+type SegmentBlueprintTableCriterion model.SegmentBlueprintTableCriterion
+
+// SegmentBlueprintTableCriterionCollection is the collection of SegmentBlueprintTableCriterion.
+type SegmentBlueprintTableCriterionCollection model.SegmentBlueprintTableCriterionCollection
+
 // Event represent tracked generic events data.
 type Event model.Event
 
@@ -78,6 +90,45 @@ func (sc SegmentCollection) ToMediaType() app.SegmentCollection {
 	for _, s := range sc {
 		mt = append(mt, (*Segment)(s).ToMediaType())
 	}
+	return mt
+}
+
+// ToMediaType converts internal SegmentBlueprint representation to application one.
+func (sbt *SegmentBlueprintTable) ToMediaType() *app.SegmentBlueprintTable {
+	return &app.SegmentBlueprintTable{
+		Table:    sbt.Table,
+		Fields:   sbt.Fields,
+		Criteria: (SegmentBlueprintTableCriterionCollection)(sbt.Criteria).ToMediaType(),
+	}
+}
+
+// ToMediaType converts internal SegmentBlueprintTableCollection representation to application one.
+func (sbtc SegmentBlueprintTableCollection) ToMediaType() app.SegmentBlueprintTableCollection {
+	mt := app.SegmentBlueprintTableCollection{}
+	for _, sbt := range sbtc {
+		mt = append(mt, (*SegmentBlueprintTable)(sbt).ToMediaType())
+	}
+
+	return mt
+}
+
+// ToMediaType converts internal SegmentBlueprintTableCriterion representation to application one.
+func (sbc *SegmentBlueprintTableCriterion) ToMediaType() *app.SegmentBlueprintTableCriterion {
+	return &app.SegmentBlueprintTableCriterion{
+		Key:    sbc.Key,
+		Label:  sbc.Label,
+		Params: sbc.Params,
+		Fields: sbc.Fields,
+	}
+}
+
+// ToMediaType converts internal SegmentBlueprintTableCriterionCollection representation to application one.
+func (sbcc SegmentBlueprintTableCriterionCollection) ToMediaType() app.SegmentBlueprintTableCriterionCollection {
+	mt := app.SegmentBlueprintTableCriterionCollection{}
+	for _, sbc := range sbcc {
+		mt = append(mt, (*SegmentBlueprintTableCriterion)(sbc).ToMediaType())
+	}
+
 	return mt
 }
 

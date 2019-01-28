@@ -149,6 +149,49 @@ var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
 	Required("id", "name", "sorting")
 })
 
+var SegmentBlueprint = MediaType("application/vnd.segment.blueprint+json", func() {
+	Description("Segment blueprint")
+	Attributes(func() {
+		Attribute("blueprint", CollectionOf(SegmentBlueprintTable))
+	})
+	View("default", func() {
+		Attribute("blueprint")
+	})
+	Required("blueprint")
+})
+
+var SegmentBlueprintTable = MediaType("application/vnd.segment.blueprint.table+json", func() {
+	Description("Blueprint of one table available for segment")
+	Attributes(func() {
+		Attribute("table", String, "Table name")
+		Attribute("fields", ArrayOf(String), "Fields of table")
+		Attribute("criteria", CollectionOf(SegmentBlueprintTableCriterion), "Processing criteria for fields of table")
+	})
+	View("default", func() {
+		Attribute("table")
+		Attribute("fields")
+		Attribute("criteria")
+	})
+	Required("table", "fields", "criteria")
+})
+
+var SegmentBlueprintTableCriterion = MediaType("application/vnd.segment.blueprint.table.criterion+json", func() {
+	Description("Criterion for one field of table available for segment")
+	Attributes(func() {
+		Attribute("key", String, "Field of table to which is this criterion related")
+		Attribute("label", String, "Human readable name of field")
+		Attribute("params", Any, "Criteria of field parameters")
+		Attribute("fields", ArrayOf(String), "Field parameters")
+	})
+	View("default", func() {
+		Attribute("key")
+		Attribute("label")
+		Attribute("params")
+		Attribute("fields")
+	})
+	Required("key", "label", "params")
+})
+
 var Event = MediaType("application/vnd.event+json", func() {
 	Description("Generic event")
 	Attributes(func() {

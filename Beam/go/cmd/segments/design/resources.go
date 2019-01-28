@@ -103,6 +103,13 @@ var _ = Resource("segments", func() {
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))
 	})
+	Action("criteria", func() {
+		Description("Provide segment blueprint with criteria for individual tables and fields")
+		Routing(
+			GET("/criteria"),
+		)
+		Response(OK, SegmentBlueprint)
+	})
 })
 
 var _ = Resource("journal", func() {
