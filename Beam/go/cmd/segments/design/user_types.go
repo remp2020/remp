@@ -131,7 +131,7 @@ var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
 	Required("tag", "values")
 })
 
-var SegmentCreatePayload = Type("SegmentCreatePayload", func() {
+var SegmentPayload = Type("SegmentPayload", func() {
 	Description("Request parameters for segment creation")
 
 	Attribute("name", String, "Name of segment")

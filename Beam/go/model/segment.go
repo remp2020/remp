@@ -20,8 +20,12 @@ const (
 type SegmentStorage interface {
 	// Create creates new Segment from provided data and returns it.
 	Create(sd SegmentData) (*Segment, error)
+	// Update updates existing Segment from provided data and returns it.
+	Update(id int, sd SegmentData) (*Segment, bool, error)
 	// Get returns instance of Segment based on the given code.
 	Get(code string) (*Segment, bool, error)
+	// GetByID returns instance of Segment based on the given segment ID.
+	GetByID(id int) (*Segment, bool, error)
 	// List returns all available segments configured via Beam admin.
 	List() (SegmentCollection, error)
 	// CheckUser verifies presence of user within provided segment.
@@ -139,9 +143,56 @@ func (sDB *SegmentDB) Create(sd SegmentData) (*Segment, error) {
 		return nil, err
 	}
 	if !ok {
-		return nil, errors.New("Transaction error")
+		return nil, errors.New("transaction error: unable to load created segment")
 	}
 	return s, nil
+}
+
+// Update updates existing Segment from provided data and returns it.
+func (sDB *SegmentDB) Update(id int, sd SegmentData) (*Segment, bool, error) {
+	// TODO: get & update & get should be in transaction
+
+	// find out if provided ID belongs to some segment
+	_, ok, err := sDB.GetByID(id)
+	if err != nil {
+		return nil, false, err
+	}
+	if !ok {
+		return nil, false, nil
+	}
+
+	// update segment
+	_, err = sDB.MySQL.NamedExec(`
+		UPDATE segments
+		SET
+			name = :name,
+			active = :active,
+			segment_group_id = :segment_group_id,
+			criteria = :criteria,
+			updated_at = :updated_at
+		WHERE id = :id
+		`,
+		map[string]interface{}{
+			"name":             sd.Name,
+			"active":           sd.Active,
+			"segment_group_id": sd.SegmentGroupID,
+			"criteria":         sd.Criteria,
+			"updated_at":       time.Now(),
+			"id":               id,
+		})
+	if err != nil {
+		return nil, false, err
+	}
+
+	// reload segment
+	s, ok, err := sDB.GetByID(id)
+	if err != nil {
+		return nil, false, err
+	}
+	if !ok {
+		return nil, false, errors.New("transaction error: unable to load updated segment")
+	}
+	return s, true, nil
 }
 
 // Get returns instance of Segment based on the given code.
@@ -168,6 +219,21 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 		}
 	}
 	s.Rules = src
+
+	return s, true, nil
+}
+
+// GetByID returns instance of Segment based on the given segment ID.
+// TODO: how to get segment from sDB.Segments?
+func (sDB *SegmentDB) GetByID(id int) (*Segment, bool, error) {
+	s := &Segment{}
+	err := sDB.MySQL.Get(s, "SELECT * FROM segments WHERE id = ?", id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, false, nil
+		}
+		return nil, false, errors.Wrap(err, "unable to get segment from MySQL")
+	}
 
 	return s, true, nil
 }

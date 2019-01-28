@@ -91,8 +91,16 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 	return ctx.OK(uc)
 }
 
-// Create runs the create action.
-func (c *SegmentController) Create(ctx *app.CreateSegmentsContext) error {
+// CreateOrUpdate runs the create_or_update action.
+func (c *SegmentController) CreateOrUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	if ctx.ID != nil {
+		return c.handleUpdate(ctx)
+	}
+	return c.handleCreate(ctx)
+}
+
+// handleCreate handles creation of Segment.
+func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext) error {
 	p := ctx.Payload
 
 	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
@@ -118,6 +126,30 @@ func (c *SegmentController) Create(ctx *app.CreateSegmentsContext) error {
 		return err
 	}
 
+	return ctx.OK((*Segment)(s).ToMediaType())
+}
+
+// handleUpdate handles update of Segment.
+func (c *SegmentController) handleUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	p := ctx.Payload
+
+	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+	}
+	sd := model.SegmentData{
+		Name:           p.Name,
+		Active:         true,
+		SegmentGroupID: p.GroupID,
+		Criteria:       string(criteriaJSON),
+	}
+	s, ok, err := c.SegmentStorage.Update(*ctx.ID, sd)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
 	return ctx.OK((*Segment)(s).ToMediaType())
 }
 
