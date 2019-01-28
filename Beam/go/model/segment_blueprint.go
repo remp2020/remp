@@ -136,7 +136,7 @@ func (sbdb *SegmentBlueprintDB) buildParams(category string) map[string]SegmentB
 
 	switch category {
 	case CategoryPageview:
-		params["_article"] = SegmentBlueprintTableCriterionParam{
+		params["is_article"] = SegmentBlueprintTableCriterionParam{
 			Type:     "boolean",
 			Required: false,
 			Help:     "Should segment match only article pageviews (true), not-article pageviews (false) or all (parameter not provided)",
@@ -158,9 +158,9 @@ func (sbdb *SegmentBlueprintDB) commonParams() map[string]SegmentBlueprintTableC
 	}
 
 	commonParams["timespan"] = SegmentBlueprintTableCriterionParam{
-		Type:     "interval",
+		Type:     "datetime",
 		Required: true,
-		Help:     "Interval against which should be segment run",
+		Help:     "Datetime / interval against which should be segment run",
 		Label:    "Timespan",
 	}
 
