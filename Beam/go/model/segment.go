@@ -246,7 +246,7 @@ func (sDB *SegmentDB) GetByID(id int) (*Segment, bool, error) {
 // List returns all available segments configured via Beam admin.
 func (sDB *SegmentDB) List() (SegmentCollection, error) {
 	sc := SegmentCollection{}
-	err := sDB.MySQL.Select(&sc, "SELECT segments.name, segments.code, segments.segment_group_id, "+
+	err := sDB.MySQL.Select(&sc, "SELECT segments.id, segments.name, segments.code, segments.segment_group_id, "+
 		"segment_groups.id AS 'segment_group.id', "+
 		"segment_groups.name AS 'segment_group.name', "+
 		"segment_groups.code AS 'segment_group.code', "+
