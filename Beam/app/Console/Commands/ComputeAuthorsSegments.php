@@ -15,22 +15,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class CreateAuthorsSegments extends Command
+class ComputeAuthorsSegments extends Command
 {
     const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
-
     const COMMAND = 'segments:create-author-segments';
 
-    protected $signature = self::COMMAND . ' {min_views} {min_average_timespent} {min_ratio} {history} {email}';
+    const CONFIG_MIN_RATIO = 'author_segments_min_ratio';
+    const CONFIG_MIN_AVERAGE_TIMESPENT = 'author_segments_min_average_timespent';
+    const CONFIG_MIN_VIEWS = 'author_segments_min_views';
+
+    protected $signature = self::COMMAND . ' {email} 
+    {--min_views=} 
+    {--min_average_timespent=} 
+    {--min_ratio=} 
+    {--history=} ';
 
     protected $description = "Generate authors' segments from aggregated pageviews and timespent data.";
 
     public function handle()
     {
-        Log::debug('CreateAuthorsSegments job STARTED');
+        $this->line('');
+        $this->line('<info>***** Computing author segments *****</info>');
+        $this->line('');
 
-        $minimalViews = $this->argument('min_views');
-        $minimalAverageTimespent = $this->argument('min_average_timespent');
+        $minimalViews = $this->option('min_views') ?? '';
+        $minimalAverageTimespent = $this->option('min_average_timespent');
         $minimalRatio = $this->argument('min_ratio');
         $history = $this->argument('history');
         $emailDest = $this->argument('email');
@@ -40,7 +49,7 @@ class CreateAuthorsSegments extends Command
         //$this->recomputeBrowsersForAuthorSegments();
         //$this->recomputeUsersForAuthorSegments();
 
-        Log::debug('CreateAuthorsSegments job FINISHED');
+        $this->line(' <info>OK!</info>');
     }
 
     /**
