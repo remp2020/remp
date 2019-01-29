@@ -107,13 +107,16 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 		Attribute("code", String, "Code-friendly identificator of segment")
 		Attribute("name", String, "User-friendly name of segment")
 		Attribute("group", SegmentGroup)
+		Attribute("criteria", Any, "Criteria used to build segment")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("code")
 		Attribute("name")
 		Attribute("group")
+		Attribute("criteria")
 	})
+
 	Required("id", "code", "name", "group")
 })
 

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -79,8 +81,8 @@ type AvgRow model.AvgRow
 type AvgRowCollection model.AvgRowCollection
 
 // ToMediaType converts internal Segment representation to application one.
-func (s *Segment) ToMediaType() *app.Segment {
-	return &app.Segment{
+func (s *Segment) ToMediaType() (*app.Segment, error) {
+	mt := &app.Segment{
 		ID:   s.ID,
 		Code: s.Code,
 		Name: s.Name,
@@ -89,15 +91,28 @@ func (s *Segment) ToMediaType() *app.Segment {
 			Sorting: s.Group.Sorting,
 		},
 	}
+
+	if s.Criteria.Valid {
+		err := json.Unmarshal([]byte(s.Criteria.String), &mt.Criteria)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to unmarshal segments `criteria`")
+		}
+	}
+
+	return mt, nil
 }
 
 // ToMediaType converts internal SegmentCollection representation to application one.
-func (sc SegmentCollection) ToMediaType() app.SegmentCollection {
+func (sc SegmentCollection) ToMediaType() (app.SegmentCollection, error) {
 	mt := app.SegmentCollection{}
 	for _, s := range sc {
-		mt = append(mt, (*Segment)(s).ToMediaType())
+		smt, err := (*Segment)(s).ToMediaType()
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("unable to unmarshal segment with ID [%d]", s.ID))
+		}
+		mt = append(mt, smt)
 	}
-	return mt
+	return mt, nil
 }
 
 // ToMediaType converts internal Segment representation to application one.
