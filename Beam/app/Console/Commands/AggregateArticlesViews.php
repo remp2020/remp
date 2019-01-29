@@ -33,7 +33,9 @@ class AggregateArticlesViews extends Command
 
     public function handle()
     {
-        Log::debug('AggregateArticlesViews job STARTED');
+        $this->line('');
+        $this->line('<info>***** Aggregatting article views *****</info>');
+        $this->line('');
 
         // TODO set this up depending finalized conditions
         // First delete data older than 90 days
@@ -48,8 +50,8 @@ class AggregateArticlesViews extends Command
         $timeBefore = (clone $timeAfter)->addMinutes($timeWindowMinutes);
         $date = $timeAfter->toDateString();
         for ($i = 0; $i < $timeWindowsCount; $i++) {
-            list($data, $articleIds) = $this->aggregatePageviews([], [], $timeAfter, $timeBefore);
-            list($data, $articleIds) = $this->aggregateTimespent($data, $articleIds, $timeAfter, $timeBefore);
+            [$data, $articleIds] = $this->aggregatePageviews([], [], $timeAfter, $timeBefore);
+            [$data, $articleIds] = $this->aggregateTimespent($data, $articleIds, $timeAfter, $timeBefore);
             $this->storeData($data, $articleIds, $date);
 
             $timeAfter = $timeAfter->addMinutes($timeWindowMinutes);
@@ -57,14 +59,12 @@ class AggregateArticlesViews extends Command
         }
 
         // Update 'materialized view' to test author segments conditions
-        // See ComputeAuthorSegments task
         // TODO only temporary, remove this after conditions are finalized
-
         if (!$this->option('skip-temp-aggregation')) {
             $this->createTemporaryAggregations();
         }
 
-        Log::debug('AggregateArticlesViews job FINISHED');
+        $this->line(' <info>OK!</info>');
     }
 
     private function createTemporaryAggregations()
