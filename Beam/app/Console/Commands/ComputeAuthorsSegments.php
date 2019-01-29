@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\ArticleAggregatedView;
 use App\Author;
 use App\Mail\AuthorSegmentsResult;
+use App\Model\Config;
 use App\Segment;
 use App\SegmentBrowser;
 use App\SegmentGroup;
@@ -24,11 +25,10 @@ class ComputeAuthorsSegments extends Command
     const CONFIG_MIN_AVERAGE_TIMESPENT = 'author_segments_min_average_timespent';
     const CONFIG_MIN_VIEWS = 'author_segments_min_views';
 
-    protected $signature = self::COMMAND . ' {email} 
+    protected $signature = self::COMMAND . ' {email} {history}
     {--min_views=} 
     {--min_average_timespent=} 
-    {--min_ratio=} 
-    {--history=} ';
+    {--min_ratio=}';
 
     protected $description = "Generate authors' segments from aggregated pageviews and timespent data.";
 
@@ -38,9 +38,9 @@ class ComputeAuthorsSegments extends Command
         $this->line('<info>***** Computing author segments *****</info>');
         $this->line('');
 
-        $minimalViews = $this->option('min_views') ?? '';
-        $minimalAverageTimespent = $this->option('min_average_timespent');
-        $minimalRatio = $this->argument('min_ratio');
+        $minimalViews = $this->option('min_views') ?? Config::loadByName(self::CONFIG_MIN_VIEWS);
+        $minimalAverageTimespent = $this->option('min_average_timespent') ?? Config::loadByName(self::CONFIG_MIN_AVERAGE_TIMESPENT);
+        $minimalRatio = $this->option('min_ratio') ?? Config::loadByName(self::CONFIG_MIN_RATIO);
         $history = $this->argument('history');
         $emailDest = $this->argument('email');
         $this->computeAuthorSegments($minimalViews, $minimalAverageTimespent, $minimalRatio, $history, $emailDest);

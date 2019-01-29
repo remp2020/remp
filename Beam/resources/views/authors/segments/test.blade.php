@@ -16,7 +16,7 @@
 
         <div class="card-body card-padding">
             @if(isset($results))
-                Computation initiated, results will be sent to {{ $email }}.
+                Computation initiated, results will be sent to <b>{{ $email }}</b>.
             @else
                 <p>Test page for finding right parameters for computation of authors' segments. <br />
                     There are 3 conditions that are taken into account when computing a specific author segment:
@@ -30,8 +30,8 @@
 
                 <h4>Configuration</h4>
                 <p>
-                    After configuration is specified, computed results will show how many users/browsers are in a segment of each author.<br />
-                    Results are computed asynchronously and sent to given email.
+                    After the configuration is specified, computed results will show number of users/browsers present in the segment of each author.<br />
+                    Results are computed asynchronously and sent to provided email.
                 </p>
 
                 <div class="row">

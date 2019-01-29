@@ -57,7 +57,7 @@ class AggregateArticlesViews extends Command
         }
 
         // Update 'materialized view' to test author segments conditions
-        // See CreateAuthorSegments task
+        // See ComputeAuthorSegments task
         // TODO only temporary, remove this after conditions are finalized
 
         if (!$this->option('skip-temp-aggregation')) {

@@ -8,31 +8,33 @@
 
 <body>
 
-<h2>Configuration:</h2>
-<p>
-    The number of past days from which results are counted: {{$history_days}} <br/>
-    Minimal ratio of author articles to all articles (0 az 1.0): {{$minimal_ratio}} <br/>
-    Minimal number of views or author articles: {{$minimal_views}} <br/>
-    Minimal average time spent on author articles: {{$minimal_average_timespent}} s<br/>
-</p>
+<h3>Configuration</h3>
+<ul>
+    <li>number of past days from which results are counted: <b>{{$history_days}}</b></li>
+    <li>minimal ratio of (author articles/all articles): <b>{{$minimal_ratio}}</b></li>
+    <li>minimal number of views or author articles: <b>{{$minimal_views}}</b> <br/></li>
+    <li>minimal average time spent on author articles: <b>{{$minimal_average_timespent}}</b></li>
+</ul>
 
-<h2>Results</h2>
-<br/>
-<br/>
-<table>
-    <tr>
-        <th>Author Segment</th>
-        <th>Browsers Count</th>
-        <th>Users Count</th>
-    </tr>
-    @foreach ($results as $row)
+<h3>Results</h3>
+@if($results)
+    <table>
         <tr>
-            <td>{{$row->name}}</td>
-            <td>{{$row->browser_count}}</td>
-            <td>{{$row->user_count}}</td>
+            <th>Author Segment</th>
+            <th>Browsers Count</th>
+            <th>Users Count</th>
         </tr>
-    @endforeach
-</table>
+        @foreach ($results as $row)
+            <tr>
+                <td>{{$row->name}}</td>
+                <td>{{$row->browser_count}}</td>
+                <td>{{$row->user_count}}</td>
+            </tr>
+        @endforeach
+    </table>
+@else
+    <p>No author segments found for given configuration.</p>
+@endif
 
 </body>
 </html>

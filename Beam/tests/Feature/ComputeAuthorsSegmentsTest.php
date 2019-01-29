@@ -6,7 +6,7 @@ use App\Account;
 use App\Article;
 use App\ArticleAggregatedView;
 use App\Author;
-use App\Console\Commands\CreateAuthorsSegments;
+use App\Console\Commands\ComputeAuthorsSegments;
 use App\Mail\AuthorSegmentsResult;
 use App\Property;
 use Carbon\Carbon;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class CreateAuthorsSegmentsTest extends TestCase
+class ComputeAuthorsSegmentsTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -56,10 +56,10 @@ class CreateAuthorsSegmentsTest extends TestCase
 
         Mail::fake();
 
-        $this->artisan(CreateAuthorsSegments::COMMAND, [
-            'min_views' => 0,
-            'min_average_timespent' => 0,
-            'min_ratio' => 0,
+        $this->artisan(ComputeAuthorsSegments::COMMAND, [
+            '--min_views' => 0,
+            '--min_average_timespent' => 0,
+            '--min_ratio' => 0,
             'history' => 90,
             'email' => 'email@doesnt.matter'
         ]);
