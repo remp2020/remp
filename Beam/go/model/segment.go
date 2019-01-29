@@ -72,7 +72,7 @@ type SegmentData struct {
 	Code           string
 	Active         bool
 	SegmentGroupID int `db:"segment_group_id"`
-	Criteria       string
+	Criteria       sql.NullString
 }
 
 // SegmentCollection is list of Segments.

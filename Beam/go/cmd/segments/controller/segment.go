@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -140,7 +141,10 @@ func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext)
 		Code:           code,
 		Active:         true,
 		SegmentGroupID: p.GroupID,
-		Criteria:       string(criteriaJSON),
+		Criteria: sql.NullString{
+			String: string(criteriaJSON),
+			Valid:  true,
+		},
 	}
 	s, err := c.SegmentStorage.Create(sd)
 	if err != nil {
@@ -162,7 +166,10 @@ func (c *SegmentController) handleUpdate(ctx *app.CreateOrUpdateSegmentsContext)
 		Name:           p.Name,
 		Active:         true,
 		SegmentGroupID: p.GroupID,
-		Criteria:       string(criteriaJSON),
+		Criteria: sql.NullString{
+			String: string(criteriaJSON),
+			Valid:  true,
+		},
 	}
 	s, ok, err := c.SegmentStorage.Update(*ctx.ID, sd)
 	if err != nil {
