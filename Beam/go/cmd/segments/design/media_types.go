@@ -103,16 +103,18 @@ var Commerces = MediaType("application/vnd.commerces+json", func() {
 var Segment = MediaType("application/vnd.segment+json", func() {
 	Description("Segment check")
 	Attributes(func() {
+		Attribute("id", Integer, "ID of segment")
 		Attribute("code", String, "Code-friendly identificator of segment")
 		Attribute("name", String, "User-friendly name of segment")
 		Attribute("group", SegmentGroup)
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("code")
 		Attribute("name")
 		Attribute("group")
 	})
-	Required("code", "name", "group")
+	Required("id", "code", "name", "group")
 })
 
 var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {
@@ -417,4 +419,16 @@ var Flags = MediaType("application/vnd.flags+json", func() {
 		Attribute("events")
 	})
 	Required("pageviews", "commerce", "events")
+})
+
+var SegmentGroupsFallback = MediaType("application/vnd.segment.groups.fallback", func() {
+	Attributes(func() {
+		Attribute("status", String, "OK flag to check before reading the data")
+		Attribute("groups", CollectionOf(SegmentGroup))
+	})
+	View("default", func() {
+		Attribute("status")
+		Attribute("groups")
+	})
+	Required("status", "groups")
 })

@@ -50,6 +50,13 @@ var _ = Resource("segments", func() {
 			}))
 		})
 	})
+	Action("groups", func() {
+		Description("List all segment groups.")
+		Routing(GET("/groups"))
+		Response(OK, func() {
+			Media(SegmentGroupsFallback)
+		})
+	})
 	Action("check_user", func() {
 		Description("Check whether given user ID belongs to segment.")
 		Routing(GET("/:segment_code/users/check/:user_id"))
@@ -112,7 +119,7 @@ var _ = Resource("segments", func() {
 	})
 	// TODO: divide to two separate endpoints after CRM API refactoring
 	Action("create_or_update", func() {
-		Description("Create or update segment (for update, use GET parameter ?id={segment_id})")
+		Description("Create or update segment (for fupdate, use GET parameter ?id={segment_id})")
 		Payload(SegmentPayload)
 		Routing(POST("/detail"))
 		Params(func() {

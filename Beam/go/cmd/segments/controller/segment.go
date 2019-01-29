@@ -50,6 +50,18 @@ func (c *SegmentController) List(ctx *app.ListSegmentsContext) error {
 	return ctx.OK((SegmentCollection)(sc).ToMediaType())
 }
 
+// Groups runs the groups action.
+func (c *SegmentController) Groups(ctx *app.GroupsSegmentsContext) error {
+	sgc, err := c.SegmentStorage.Groups()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(&app.SegmentGroupsFallback{
+		Status: "ok",
+		Groups: (SegmentGroupCollection)(sgc).ToMediaType(),
+	})
+}
+
 // CheckUser runs the check_user action.
 func (c *SegmentController) CheckUser(ctx *app.CheckUserSegmentsContext) error {
 	sc, ok, err := c.handleCheck(UserSegment, ctx.SegmentCode, ctx.UserID, ctx.Fields, ctx.Cache)

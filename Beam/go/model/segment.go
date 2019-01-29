@@ -28,6 +28,8 @@ type SegmentStorage interface {
 	GetByID(id int) (*Segment, bool, error)
 	// List returns all available segments configured via Beam admin.
 	List() (SegmentCollection, error)
+	// Groups returns all available segment groups.
+	Groups() (SegmentGroupCollection, error)
 	// CheckUser verifies presence of user within provided segment.
 	CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
 	// CheckBrowser verifies presence of browser within provided segment.
@@ -88,6 +90,9 @@ type SegmentGroup struct {
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
+
+// SegmentGroupCollection is list of SegmentGroups.
+type SegmentGroupCollection []*SegmentGroup
 
 // User represents information about User in Segment.
 type User struct {
@@ -252,6 +257,17 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 		return nil, err
 	}
 	return sc, nil
+}
+
+// Groups returns all available segment groups configured via Beam admin.
+func (sDB *SegmentDB) Groups() (SegmentGroupCollection, error) {
+	sgc := SegmentGroupCollection{}
+	err := sDB.MySQL.Select(&sgc, "SELECT id, name, code, type, sorting, created_at, updated_at "+
+		"FROM segment_groups ORDER BY sorting")
+	if err != nil {
+		return nil, err
+	}
+	return sgc, nil
 }
 
 // CheckUser verifies presence of user within provided segment.

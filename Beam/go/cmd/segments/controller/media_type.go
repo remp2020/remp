@@ -15,6 +15,12 @@ type Segment model.Segment
 // SegmentCollection is the collection of Segments.
 type SegmentCollection model.SegmentCollection
 
+// SegmentGroup represents segment group information stored in storage.
+type SegmentGroup model.SegmentGroup
+
+// SegmentGroupCollection is the collection of SegmentsGroups.
+type SegmentGroupCollection model.SegmentGroupCollection
+
 // SegmentBlueprintTable represents blueprint of one segment table.
 type SegmentBlueprintTable model.SegmentBlueprintTable
 
@@ -75,6 +81,7 @@ type AvgRowCollection model.AvgRowCollection
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() *app.Segment {
 	return &app.Segment{
+		ID:   s.ID,
 		Code: s.Code,
 		Name: s.Name,
 		Group: &app.SegmentGroup{
@@ -89,6 +96,24 @@ func (sc SegmentCollection) ToMediaType() app.SegmentCollection {
 	mt := app.SegmentCollection{}
 	for _, s := range sc {
 		mt = append(mt, (*Segment)(s).ToMediaType())
+	}
+	return mt
+}
+
+// ToMediaType converts internal Segment representation to application one.
+func (sg *SegmentGroup) ToMediaType() *app.SegmentGroup {
+	return &app.SegmentGroup{
+		ID:      sg.ID,
+		Name:    sg.Name,
+		Sorting: sg.Sorting,
+	}
+}
+
+// ToMediaType converts internal SegmentCollection representation to application one.
+func (sgc SegmentGroupCollection) ToMediaType() app.SegmentGroupCollection {
+	mt := app.SegmentGroupCollection{}
+	for _, sg := range sgc {
+		mt = append(mt, (*SegmentGroup)(sg).ToMediaType())
 	}
 	return mt
 }
