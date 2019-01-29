@@ -148,8 +148,9 @@ var SegmentCreateCriteria = Type("SegmentCreateCriteria", func() {
 	Description("Segment's criteria")
 
 	Attribute("nodes", ArrayOf(SegmentCreateCriteriaOperator), "Criteria operators")
+	Attribute("version", Integer, "Version of criteria format")
 
-	Required("nodes")
+	Required("nodes", "version")
 })
 
 var SegmentCreateCriteriaOperator = Type("SegmentCreateCriteriaOperator", func() {
