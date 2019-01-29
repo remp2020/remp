@@ -1,6 +1,8 @@
 package model
 
 import (
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -32,4 +34,16 @@ type TimeHistogram struct {
 type FilterBy struct {
 	Tag    string
 	Values []string
+}
+
+// Webalize replaces all spaces with dash and removes all non-alphanumerical characters.
+func Webalize(s string) (string, error) {
+	// replace strings
+	s = strings.Replace(s, " ", "-", -1)
+	// remove all non-alphanumerical characters (except dash)
+	reg, err := regexp.Compile("[^a-zA-Z0-9-]+")
+	if err != nil {
+		return "", err
+	}
+	return reg.ReplaceAllString(s, ""), nil
 }

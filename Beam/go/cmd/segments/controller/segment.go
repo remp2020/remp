@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -110,6 +111,74 @@ func (c *SegmentController) Criteria(ctx *app.CriteriaSegmentsContext) error {
 	}
 
 	return ctx.OK(mtsb)
+}
+
+// CreateOrUpdate runs the create_or_update action.
+func (c *SegmentController) CreateOrUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	if ctx.ID != nil {
+		return c.handleUpdate(ctx)
+	}
+	return c.handleCreate(ctx)
+}
+
+// handleCreate handles creation of Segment.
+func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	p := ctx.Payload
+
+	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+	}
+
+	// TODO: maybe code should be also part of payload? check with CRM
+	code, err := model.Webalize(p.Name)
+	if err != nil {
+		return err
+	}
+
+	sd := model.SegmentData{
+		Name:           p.Name,
+		Code:           code,
+		Active:         true,
+		SegmentGroupID: p.GroupID,
+		Criteria: sql.NullString{
+			String: string(criteriaJSON),
+			Valid:  true,
+		},
+	}
+	s, err := c.SegmentStorage.Create(sd)
+	if err != nil {
+		return err
+	}
+
+	return ctx.OK((*Segment)(s).ToMediaType())
+}
+
+// handleUpdate handles update of Segment.
+func (c *SegmentController) handleUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	p := ctx.Payload
+
+	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+	}
+	sd := model.SegmentData{
+		Name:           p.Name,
+		Active:         true,
+		SegmentGroupID: p.GroupID,
+		Criteria: sql.NullString{
+			String: string(criteriaJSON),
+			Valid:  true,
+		},
+	}
+	s, ok, err := c.SegmentStorage.Update(*ctx.ID, sd)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+	return ctx.OK((*Segment)(s).ToMediaType())
 }
 
 // handleCheck determines whether provided identifier is part of segment based on given segment type.

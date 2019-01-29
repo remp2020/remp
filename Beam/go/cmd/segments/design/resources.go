@@ -110,6 +110,22 @@ var _ = Resource("segments", func() {
 		)
 		Response(OK, SegmentBlueprint)
 	})
+	// TODO: divide to two separate endpoints after CRM API refactoring
+	Action("create_or_update", func() {
+		Description("Create or update segment (for update, use GET parameter ?id={segment_id})")
+		Payload(SegmentPayload)
+		Routing(POST("/detail"))
+		Params(func() {
+			Param("id", Integer, "Segment ID")
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(NotFound, func() {
+			Description("Returned when segment with provided ID doesn't exist")
+		})
+		Response(OK, Segment)
+	})
 })
 
 var _ = Resource("journal", func() {
