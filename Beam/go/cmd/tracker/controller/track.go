@@ -193,6 +193,19 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 				fields["unload"] = true
 			}
 		}
+	case model.ActionPageviewProgress:
+		tags["action"] = model.ActionPageviewProgress
+		measurement = model.TableProgress
+		if ctx.Payload.Progress != nil {
+			fields["page_progress"] = ctx.Payload.Progress.PageRatio
+			if ctx.Payload.Progress.ArticleRatio != nil {
+				fields["article_progress"] = *ctx.Payload.Progress.ArticleRatio
+			}
+			fields["unload"] = false
+			if ctx.Payload.Progress.Unload != nil && *ctx.Payload.Progress.Unload {
+				fields["unload"] = true
+			}
+		}
 	default:
 		return ctx.BadRequest(fmt.Errorf("incorrect pageview action [%s]", ctx.Payload.Action))
 	}

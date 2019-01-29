@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\Mailer\MailerContract;
 use App\Http\Requests\NewsletterRequest;
 use App\Http\Resources\NewsletterResource;
-use App\Model\NewsletterCriteria;
+use App\Model\NewsletterCriterion;
 use App\Newsletter;
 use Carbon\Carbon;
 use Html;
@@ -126,14 +126,15 @@ class NewsletterController extends Controller
     private function loadCriteria()
     {
         return [
-            NewsletterCriteria::PAGEVIEWS_ALL => 'Pageviews all',
-            NewsletterCriteria::PAGEVIEWS_SIGNED_IN => 'Pageviews signed in',
-            NewsletterCriteria::PAGEVIEWS_SUBSCRIBERS => 'Pageviews subscribers',
-            NewsletterCriteria::TIMESPENT_ALL => 'Time spent all',
-            NewsletterCriteria::TIMESPENT_SIGNED_IN => 'Time spent signed in',
-            NewsletterCriteria::TIMESPENT_SUBSCRIBERS => 'Time spent subscribers',
-            NewsletterCriteria::CONVERSIONS => 'Conversions',
-            NewsletterCriteria::AVERAGE_PAYMENT => 'Average payment'
+            NewsletterCriterion::BOOKMARKS => 'Bookmarks',
+            NewsletterCriterion::PAGEVIEWS_ALL => 'Pageviews all',
+            NewsletterCriterion::PAGEVIEWS_SIGNED_IN => 'Pageviews signed in',
+            NewsletterCriterion::PAGEVIEWS_SUBSCRIBERS => 'Pageviews subscribers',
+            NewsletterCriterion::TIMESPENT_ALL => 'Time spent all',
+            NewsletterCriterion::TIMESPENT_SIGNED_IN => 'Time spent signed in',
+            NewsletterCriterion::TIMESPENT_SUBSCRIBERS => 'Time spent subscribers',
+            NewsletterCriterion::CONVERSIONS => 'Conversions',
+            NewsletterCriterion::AVERAGE_PAYMENT => 'Average payment'
         ];
     }
 

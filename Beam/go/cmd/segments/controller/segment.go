@@ -23,14 +23,20 @@ const (
 // SegmentController implements the segment resource.
 type SegmentController struct {
 	*goa.Controller
-	SegmentStorage model.SegmentStorage
+	SegmentStorage          model.SegmentStorage
+	SegmentBlueprintStorage model.SegmentBlueprintStorage
 }
 
 // NewSegmentController creates a segment controller.
-func NewSegmentController(service *goa.Service, segmentStorage model.SegmentStorage) *SegmentController {
+func NewSegmentController(
+	service *goa.Service,
+	segmentStorage model.SegmentStorage,
+	segmentBlueprintStorage model.SegmentBlueprintStorage,
+) *SegmentController {
 	return &SegmentController{
-		Controller:     service.NewController("SegmentController"),
-		SegmentStorage: segmentStorage,
+		Controller:              service.NewController("SegmentController"),
+		SegmentStorage:          segmentStorage,
+		SegmentBlueprintStorage: segmentBlueprintStorage,
 	}
 }
 
@@ -89,6 +95,21 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 		return err
 	}
 	return ctx.OK(uc)
+}
+
+// Criteria runs the criteria action.
+func (c *SegmentController) Criteria(ctx *app.CriteriaSegmentsContext) error {
+	sbtc, err := c.SegmentBlueprintStorage.Get()
+	if err != nil {
+		return err
+	}
+	mtsbtc := (SegmentBlueprintTableCollection)(sbtc).ToMediaType()
+
+	mtsb := &app.SegmentBlueprint{
+		Blueprint: mtsbtc,
+	}
+
+	return ctx.OK(mtsb)
 }
 
 // CreateOrUpdate runs the create_or_update action.

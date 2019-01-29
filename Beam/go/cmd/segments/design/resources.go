@@ -103,6 +103,13 @@ var _ = Resource("segments", func() {
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))
 	})
+	Action("criteria", func() {
+		Description("Provide segment blueprint with criteria for individual tables and fields")
+		Routing(
+			GET("/criteria"),
+		)
+		Response(OK, SegmentBlueprint)
+	})
 	// TODO: divide to two separate endpoints after CRM API refactoring
 	Action("create_or_update", func() {
 		Description("Create or update segment (for update, use GET parameter ?id={segment_id})")
