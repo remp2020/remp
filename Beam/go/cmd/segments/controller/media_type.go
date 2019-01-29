@@ -115,6 +115,28 @@ func (sc SegmentCollection) ToMediaType() (app.SegmentCollection, error) {
 	return mt, nil
 }
 
+// ToTinyMediaType converts internal Segment representation to tiny view of application segment.
+func (s *Segment) ToTinyMediaType() *app.SegmentTiny {
+	return &app.SegmentTiny{
+		ID:   s.ID,
+		Code: s.Code,
+		Name: s.Name,
+		Group: &app.SegmentGroup{
+			Name:    s.Group.Name,
+			Sorting: s.Group.Sorting,
+		},
+	}
+}
+
+// ToTinyMediaType converts internal SegmentCollection representation to tiny view of application segment collection.
+func (sc SegmentCollection) ToTinyMediaType() app.SegmentTinyCollection {
+	mt := app.SegmentTinyCollection{}
+	for _, s := range sc {
+		mt = append(mt, (*Segment)(s).ToTinyMediaType())
+	}
+	return mt
+}
+
 // ToMediaType converts internal Segment representation to application one.
 func (sg *SegmentGroup) ToMediaType() *app.SegmentGroup {
 	return &app.SegmentGroup{

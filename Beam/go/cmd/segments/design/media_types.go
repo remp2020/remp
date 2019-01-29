@@ -116,7 +116,12 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 		Attribute("group")
 		Attribute("criteria")
 	})
-
+	View("tiny", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("group")
+	})
 	Required("id", "code", "name", "group")
 })
 

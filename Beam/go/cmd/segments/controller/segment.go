@@ -65,11 +65,7 @@ func (c *SegmentController) List(ctx *app.ListSegmentsContext) error {
 		return err
 	}
 
-	response, err := (SegmentCollection)(sc).ToMediaType()
-	if err != nil {
-		return err
-	}
-	return ctx.OK(response)
+	return ctx.OKTiny((SegmentCollection)(sc).ToTinyMediaType())
 }
 
 // Groups runs the groups action.

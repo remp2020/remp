@@ -58,6 +58,7 @@ var _ = Resource("segments", func() {
 		Response(OK, func() {
 			Media(CollectionOf(Segment, func() {
 				View("default")
+				View("tiny")
 			}))
 		})
 	})
