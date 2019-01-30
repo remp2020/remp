@@ -33,8 +33,8 @@ class AuthorSegmentsController extends Controller
         $email = $request->get('email');
 
         Artisan::queue(ComputeAuthorsSegments::COMMAND, [
-            'email' => $email,
-            'history' => (int) $request->get('history'),
+            '--email' => $email,
+            '--history' => (int) $request->get('history'),
             '--min_views' => $request->get('min_views'),
             '--min_average_timespent' => $request->get('min_average_timespent'),
             '--min_ratio' => $request->get('min_ratio'),

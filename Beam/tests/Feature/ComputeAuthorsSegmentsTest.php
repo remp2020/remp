@@ -60,8 +60,8 @@ class ComputeAuthorsSegmentsTest extends TestCase
             '--min_views' => 0,
             '--min_average_timespent' => 0,
             '--min_ratio' => 0,
-            'history' => 90,
-            'email' => 'email@doesnt.matter'
+            '--history' => 90,
+            '--email' => 'email@doesnt.matter'
         ]);
 
         Mail::assertSent(AuthorSegmentsResult::class);

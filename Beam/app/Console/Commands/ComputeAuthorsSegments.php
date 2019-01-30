@@ -13,19 +13,24 @@ use App\SegmentUser;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class ComputeAuthorsSegments extends Command
 {
     const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
-    const COMMAND = 'segments:create-author-segments';
+    const COMMAND = 'segments:compute-author-segments';
 
     const CONFIG_MIN_RATIO = 'author_segments_min_ratio';
     const CONFIG_MIN_AVERAGE_TIMESPENT = 'author_segments_min_average_timespent';
     const CONFIG_MIN_VIEWS = 'author_segments_min_views';
 
-    protected $signature = self::COMMAND . ' {email} {history}
+    private $minViews;
+    private $minAverageTimespent;
+    private $minRatio;
+
+    protected $signature = self::COMMAND . ' 
+    {--email} 
+    {--history}
     {--min_views=} 
     {--min_average_timespent=} 
     {--min_ratio=}';
@@ -38,29 +43,36 @@ class ComputeAuthorsSegments extends Command
         $this->line('<info>***** Computing author segments *****</info>');
         $this->line('');
 
-        $minimalViews = $this->option('min_views') ?? Config::loadByName(self::CONFIG_MIN_VIEWS);
-        $minimalAverageTimespent = $this->option('min_average_timespent') ?? Config::loadByName(self::CONFIG_MIN_AVERAGE_TIMESPENT);
-        $minimalRatio = $this->option('min_ratio') ?? Config::loadByName(self::CONFIG_MIN_RATIO);
-        $history = $this->argument('history');
-        $emailDest = $this->argument('email');
-        $this->computeAuthorSegments($minimalViews, $minimalAverageTimespent, $minimalRatio, $history, $emailDest);
+        $email = $this->option('email');
 
-        // TODO: enable this after condition are specialized
-        //$this->recomputeBrowsersForAuthorSegments();
-        //$this->recomputeUsersForAuthorSegments();
+        $this->minViews = Config::loadByName(self::CONFIG_MIN_VIEWS);
+        $this->minAverageTimespent = Config::loadByName(self::CONFIG_MIN_AVERAGE_TIMESPENT);
+        $this->minRatio = Config::loadByName(self::CONFIG_MIN_RATIO);
+
+        if ($email) {
+            // Only compute segment statistics
+            $this->line('Generating authors segments statistics');
+            $this->computeAuthorSegments($email);
+        } else {
+            // Generate real segments
+            $this->line('Generating authors segments');
+            $this->recomputeBrowsersForAuthorSegments();
+            $this->recomputeUsersForAuthorSegments();
+        }
 
         $this->line(' <info>OK!</info>');
     }
 
     /**
-     * @param $minimalViews
-     * @param $minimalAverageTimespent
-     * @param $minimalRatio
-     * @param $historyDays
-     * @param $emailDest
+     * @param $email
      */
-    private function computeAuthorSegments($minimalViews, $minimalAverageTimespent, $minimalRatio, $historyDays, $emailDest)
+    private function computeAuthorSegments($email)
     {
+        $minimalViews = $this->option('min_views') ?? $this->minViews;
+        $minimalAverageTimespent = $this->option('min_average_timespent') ?? $this->minAverageTimespent;
+        $minimalRatio = $this->option('min_ratio') ?? $this->minRatio;
+        $historyDays = $this->option('history') ?? 30;
+
         $results = [];
         $fromDay = Carbon::now()->subDays($historyDays)->toDateString();
         // only 30, 60 and 90 are allowed values
@@ -129,23 +141,9 @@ SQL;
             $results[$item->author_id]->user_count = $item->user_count;
         }
 
-        Mail::to($emailDest)->send(
+        Mail::to($email)->send(
             new AuthorSegmentsResult($results, $minimalViews, $minimalAverageTimespent, $minimalRatio, $historyDays)
         );
-    }
-
-    private function getOrCreateAuthorSegment($authorId)
-    {
-        $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_AUTHORS_SEGMENTS])->first();
-        $author = Author::find($authorId);
-
-        return Segment::updateOrCreate([
-            'code' => 'author-' . $author->id
-        ], [
-            'name' => 'Author ' . $author->name,
-            'active' => true,
-            'segment_group_id' => $segmentGroup->id,
-        ]);
     }
 
     private function recomputeUsersForAuthorSegments()
@@ -217,10 +215,7 @@ SQL;
             ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
             ->whereRaw("$groupParameter <> ''")
             ->groupBy([$groupParameter, 'author_id'])
-            // Conditions to select members of particular author segment
-            // are empirically defined.
-            // TODO Improve/describe this after further analysis is done
-            ->havingRaw('avg(timespent) >= ?', ['120'])
+            ->havingRaw('avg(timespent) >= ?', [$this->minAverageTimespent])
             ->cursor();
 
         $segments = [];
@@ -230,10 +225,7 @@ SQL;
                 continue;
             }
             $ratio = (int) $item->total_pageviews / $totalPageviews[$item->$groupParameter];
-            // Conditions to select members of particular author segment
-            // are empirically defined.
-            // TODO Improve/describe this after further analysis is done
-            if ($ratio >= 0.25 && $item->total_pageviews >= 5) {
+            if ($ratio >= $this->minRatio && $item->total_pageviews >= $this->minViews) {
                 if (!array_key_exists($item->author_id, $segments)) {
                     $segments[$item->author_id] = [];
                 }
@@ -242,5 +234,19 @@ SQL;
         }
 
         return $segments;
+    }
+
+    private function getOrCreateAuthorSegment($authorId)
+    {
+        $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_AUTHORS_SEGMENTS])->first();
+        $author = Author::find($authorId);
+
+        return Segment::updateOrCreate([
+            'code' => 'author-' . $author->id
+        ], [
+            'name' => 'Author ' . $author->name,
+            'active' => true,
+            'segment_group_id' => $segmentGroup->id,
+        ]);
     }
 }
