@@ -10,14 +10,11 @@ use Remp\MailerModule\Formatters\DateFormatterFactory;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
-use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 
 final class DashboardPresenter extends BasePresenter
 {
     private $batchTemplatesRepository;
-
-    private $templatesRepository;
     
     private $batchesRepository;
 
@@ -34,7 +31,6 @@ final class DashboardPresenter extends BasePresenter
         BatchTemplatesRepository $batchTemplatesRepository,
         MailTypeStatsRepository $mailTypeStatsRepository,
         DateFormatterFactory $dateFormatterFactory,
-        TemplatesRepository $templatesRepository,
         BatchesRepository $batchesRepository,
         ListsRepository $listsRepository
     ) {
@@ -45,7 +41,6 @@ final class DashboardPresenter extends BasePresenter
 
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
-        $this->templatesRepository = $templatesRepository;
         $this->batchesRepository = $batchesRepository;
         $this->listsRepository = $listsRepository;
     }
@@ -200,6 +195,8 @@ final class DashboardPresenter extends BasePresenter
             $this->template->sentDataSet = $data['sentDataSet'];
             $this->template->openedDataSet = $data['openedDataSet'];
             $this->template->clickedDataSet = $data['clickedDataSet'];
+            $this->template->openRateDataSet = $data['openRateDataSet'];
+            $this->template->clickRateDataSet = $data['clickRateDataSet'];
         }
     }
 
@@ -216,7 +213,7 @@ final class DashboardPresenter extends BasePresenter
         }
 
         $sentDataSet = [
-            'label' => 'sent',
+            'label' => 'Sent',
             'data' => array_fill(0, $numOfDays, 0),
             'fill' => false,
             'borderColor' => 'rgb(0,150,136)',
@@ -224,7 +221,7 @@ final class DashboardPresenter extends BasePresenter
         ];
 
         $openedDataSet = [
-            'label' => 'opened',
+            'label' => 'Opened',
             'data' => array_fill(0, $numOfDays, 0),
             'fill' => false,
             'borderColor' => 'rgb(33,150,243)',
@@ -232,26 +229,62 @@ final class DashboardPresenter extends BasePresenter
         ];
 
         $clickedDataSet = [
-            'label' => 'clicked',
+            'label' => 'Clicked',
             'data' => array_fill(0, $numOfDays, 0),
             'fill' => false,
             'borderColor' => 'rgb(230,57,82)',
             'lineTension' => 0.5
         ];
 
-        $data = $this->templatesRepository->getDashboardDetailGraphData($id, $from, $to)->fetchAll();
+        $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $from, $to)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->first_email_sent_at),
+                $this->dateFormatter->format($row->label_date),
                 $labels
             );
 
             if ($foundAt !== false) {
-                $sentDataSet['data'][$foundAt] = $row->sent_mails;
-                $openedDataSet['data'][$foundAt] = $row->opened_mails;
-                $clickedDataSet['data'][$foundAt] = $row->clicked_mails;
+                $sentDataSet['data'][$foundAt] += $row->sent_mails;
+                $openedDataSet['data'][$foundAt] += $row->opened_mails;
+                $clickedDataSet['data'][$foundAt] += $row->clicked_mails;
+            }
+        }
+
+        $openRateDataSet = [
+            'label' => 'Open rate',
+            'data' => array_fill(0, $numOfDays, 0),
+            'fill' => false,
+            'borderColor' => 'rgb(33,150,243)',
+            'lineTension' => 0.5
+        ];
+
+        foreach ($sentDataSet['data'] as $key => $sent) {
+            $open = $openedDataSet['data'][$key];
+
+            if ($open > 0) {
+                $openRateDataSet['data'][$key] = round(($open / $sent) * 100, 2);
+            } else {
+                $openRateDataSet['data'][$key] = 0;
+            }
+        }
+
+        $clickRateDataSet = [
+            'label' => 'Click rate',
+            'data' => array_fill(0, $numOfDays, 0),
+            'fill' => false,
+            'borderColor' => 'rgb(230,57,82)',
+            'lineTension' => 0.5
+        ];
+
+        foreach ($sentDataSet['data'] as $key => $sent) {
+            $click = $clickedDataSet['data'][$key];
+
+            if ($click > 0) {
+                $clickRateDataSet['data'][$key] = round(($click / $sent) * 100, 2);
+            } else {
+                $clickRateDataSet['data'][$key] = 0;
             }
         }
 
@@ -260,6 +293,9 @@ final class DashboardPresenter extends BasePresenter
             'sentDataSet' => $sentDataSet,
             'openedDataSet' => $openedDataSet,
             'clickedDataSet' => $clickedDataSet,
+
+            'openRateDataSet' => $openRateDataSet,
+            'clickRateDataSet' => $clickRateDataSet,
         ];
     }
 

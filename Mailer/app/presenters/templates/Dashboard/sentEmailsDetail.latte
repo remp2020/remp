@@ -20,7 +20,7 @@
 <div class="card">
     <div class="card-header">
         <h2 n:block="title">
-            <strong>Sent mails of newsletter type:</strong><br>
+            <strong>Stats for mail type:</strong><br>
             <small>{$mailTypeTitle}</small>
         </h2>
 
@@ -58,6 +58,54 @@
                     legend: {
                         display: true,
                         position: "top"
+                    },
+                    tooltips: {
+                        bodyFontSize: 14
+                    }
+                }
+            });
+        </script>
+    {/snippet}
+
+    <hr>
+
+    {snippet relativeGraph}
+        <div class="p-30">
+            <canvas id="mailer-dashboard-detail-statistics-graph-relative" width="1500" height="500"></canvas>
+        </div>
+
+        <script>
+            var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph-relative").getContext('2d');
+            var myLineChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    "labels": {$labels},
+                    "datasets": [{$openRateDataSet}, {$clickRateDataSet}]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                display: true
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: "top"
+                    },
+                    tooltips: {
+                        bodyFontSize: 14,
+                        callbacks: {
+                            label: function (item) {
+                                return item.yLabel + '%';
+                            }
+                        }
                     }
                 }
             });
