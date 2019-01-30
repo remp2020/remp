@@ -108,6 +108,7 @@ class SendingStats extends Control
             $stats['delivered']['value'] += $nonBatchTemplateStat->delivered;
             $stats['opened']['value'] += $nonBatchTemplateStat->opened;
             $stats['clicked']['value'] += $nonBatchTemplateStat->clicked;
+            $stats['converted']['value'] += $nonBatchTemplateStat->converted;
             $stats['dropped']['value'] += $nonBatchTemplateStat->dropped;
             $stats['spam_complained']['value'] += $nonBatchTemplateStat->spam_complained;
         }
