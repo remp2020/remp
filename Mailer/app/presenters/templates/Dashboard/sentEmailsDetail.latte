@@ -102,8 +102,8 @@
                     tooltips: {
                         bodyFontSize: 14,
                         callbacks: {
-                            label: function (item) {
-                                return item.yLabel + '%';
+                            label: function(tooltipItems, data) {
+                                return data.datasets[tooltipItems.datasetIndex].label+': '+tooltipItems.yLabel+'%';
                             }
                         }
                     }
