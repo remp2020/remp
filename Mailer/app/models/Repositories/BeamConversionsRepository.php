@@ -49,7 +49,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
         return $purchases;
     }
 
-    public function getNonBatchTemplateConversions($mailTemplateCode): arrayIConversionsRepository
+    public function getNonBatchTemplateConversions($mailTemplateCode): array
     {
         $request = (new ListRequest('commerce'))
             ->addSelect("step", "utm_campaign", "utm_content", "user_id", "token", "time")
