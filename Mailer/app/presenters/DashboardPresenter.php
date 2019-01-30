@@ -307,7 +307,10 @@ final class DashboardPresenter extends BasePresenter
         $this->template->sentDataSet = $data['sentDataSet'];
         $this->template->openedDataSet = $data['openedDataSet'];
         $this->template->clickedDataSet = $data['clickedDataSet'];
+        $this->template->openRateDataSet = $data['openRateDataSet'];
+        $this->template->clickRateDataSet = $data['clickRateDataSet'];
 
         $this->redrawControl('graph');
+        $this->redrawControl('relativeGraph');
     }
 }
