@@ -99,10 +99,28 @@ SQL;
 
     public function removeOtherVariants(IRow $batch, $variantId)
     {
-        $this->getDatabase()->query("DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email NOT IN (
-  SELECT mail_user_subscriptions.user_email FROM mail_user_subscriptions
-  INNER JOIN mail_user_subscription_variants ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id AND mail_user_subscription_variants.mail_type_variant_id = '{$variantId}' AND mail_user_subscriptions.subscribed=1
-)");
+        $sql = <<<SQL
+
+DELETE FROM mail_job_queue
+WHERE mail_job_queue.id IN (
+
+  SELECT * FROM (
+    
+    SELECT id FROM mail_job_queue
+      WHERE mail_job_queue.mail_batch_id = {$batch->id}
+        AND mail_job_queue.email NOT IN (
+          SELECT mail_user_subscriptions.user_email
+          FROM mail_user_subscriptions
+          INNER JOIN mail_user_subscription_variants
+            ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id
+            AND mail_user_subscription_variants.mail_type_variant_id = '{$variantId}'
+            AND mail_user_subscriptions.subscribed = 1
+        )
+  ) t1
+)
+SQL;
+
+        $this->getDatabase()->query($sql);
     }
 
     public function removeAlreadySentContext(IRow $batch, $context)
