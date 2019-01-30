@@ -83,7 +83,7 @@ class ProcessConversionStatsCommand extends Command
 
         if (in_array('job_batch', $input->getOption('mode'))) {
             $batchTemplates = $this->batchTemplatesRepository->getTable()
-                ->where('created_at > ?', DateTime::from('-1 month'))
+                ->where('created_at > ?', DateTime::from($input->getOption('since')))
                 ->fetchAll();
 
             $progressBar = new ProgressBar($output, count($batchTemplates));
