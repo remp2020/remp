@@ -13,6 +13,7 @@ use Remp\MailerModule\User\IUser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessConversionStatsCommand extends Command
@@ -50,6 +51,20 @@ class ProcessConversionStatsCommand extends Command
     {
         $this->setName('mail:conversion-stats')
             ->setDescription('Process job stats based on conversion data')
+            ->addOption(
+                'since',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'date string specifying which mailJobBatches (since when until now) should be processed',
+                '-1 month'
+            )
+            ->addOption(
+                'mode',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'processing mode (job_batch - processing newsletters, direct - processing system emails)',
+                ['job_batch']
+            )
         ;
     }
 
@@ -66,87 +81,90 @@ class ProcessConversionStatsCommand extends Command
 
         // batch template conversions (from jobs)
 
-        $batchTemplates = $this->batchTemplatesRepository->getTable()
-            ->where('created_at > ?', DateTime::from('-1 month'))
-            ->fetchAll();
+        if (in_array('job_batch', $input->getOption('mode'))) {
+            $batchTemplates = $this->batchTemplatesRepository->getTable()
+                ->where('created_at > ?', DateTime::from('-1 month'))
+                ->fetchAll();
 
-        $progressBar = new ProgressBar($output, count($batchTemplates));
-        $progressBar->setFormat('processStats');
-        $progressBar->start();
+            $progressBar = new ProgressBar($output, count($batchTemplates));
+            $progressBar->setFormat('processStats');
+            $progressBar->start();
 
-        /** @var ActiveRow $batchTemplate */
-        foreach ($batchTemplates as $batchTemplate) {
-            $progressBar->setMessage('Processing jobBatchTemplate <info>' . $batchTemplate->id . '</info>', 'processing');
+            /** @var ActiveRow $batchTemplate */
+            foreach ($batchTemplates as $batchTemplate) {
+                $progressBar->setMessage('Processing jobBatchTemplate <info>' . $batchTemplate->id . '</info>', 'processing');
 
-            $batchTemplateConversions = $this->conversionsRepository->getBatchTemplateConversions($batchTemplate->mail_job_batch->id, $batchTemplate->mail_template->code);
-            $userData = $this->getUserData(array_keys($batchTemplateConversions));
+                $batchTemplateConversions = $this->conversionsRepository->getBatchTemplateConversions($batchTemplate->mail_job_batch->id, $batchTemplate->mail_template->code);
+                $userData = $this->getUserData(array_keys($batchTemplateConversions));
 
-            foreach ($batchTemplateConversions as $userId => $time) {
-                $latestLog = $this->logsRepository->getTable()
-                    ->select('MAX(id) AS id')
-                    ->where([
-                        'email' => $userData[$userId],
-                        'mail_template_id' => $batchTemplate->mail_template_id,
-                        'mail_job_batch_id' => $batchTemplate->mail_job_batch_id,
-                    ])
-                    ->where('created_at < ?', DateTime::from($time))
-                    ->fetch();
+                foreach ($batchTemplateConversions as $userId => $time) {
+                    $latestLog = $this->logsRepository->getTable()
+                        ->select('MAX(id) AS id')
+                        ->where([
+                            'email' => $userData[$userId],
+                            'mail_template_id' => $batchTemplate->mail_template_id,
+                            'mail_job_batch_id' => $batchTemplate->mail_job_batch_id,
+                        ])
+                        ->where('created_at < ?', DateTime::from($time))
+                        ->fetch();
 
-                $log = $this->logsRepository->find($latestLog->id);
-                if (!$log) {
-                    continue;
+                    $log = $this->logsRepository->find($latestLog->id);
+                    if (!$log) {
+                        continue;
+                    }
+                    $this->logConversionsRepository->upsert($log, DateTime::from($time));
                 }
-                $this->logConversionsRepository->upsert($log, DateTime::from($time));
+
+                $progressBar->advance();
             }
 
-            $progressBar->advance();
+            $progressBar->setMessage('done');
+            $progressBar->finish();
+            $output->writeln("");
         }
-
-        $progressBar->setMessage('done');
-        $progressBar->finish();
-        $output->writeln("");
 
         // non batch template conversions (direct sends)
 
-        $templates = $this->templatesRepository->getTable()
-            ->where(':mail_job_batch_templates.id IS NULL')
-            ->fetchAll();
+        if (in_array('direct', $input->getOption('mode'))) {
+            $templates = $this->templatesRepository->getTable()
+                ->where(':mail_job_batch_templates.id IS NULL')
+                ->fetchAll();
 
-        $progressBar = new ProgressBar($output, count($templates));
-        $progressBar->setFormat('processStats');
-        $progressBar->start();
+            $progressBar = new ProgressBar($output, count($templates));
+            $progressBar->setFormat('processStats');
+            $progressBar->start();
 
-        /** @var ActiveRow $template */
-        foreach ($templates as $template) {
-            $progressBar->setMessage('Processing template <info>' . $template->id . '</info>', 'processing');
+            /** @var ActiveRow $template */
+            foreach ($templates as $template) {
+                $progressBar->setMessage('Processing template <info>' . $template->id . '</info>', 'processing');
 
-            $nonBatchTemplateConversions = $this->conversionsRepository->getNonBatchTemplateConversions($template->code);
-            $userData = $this->getUserData(array_keys($nonBatchTemplateConversions));
+                $nonBatchTemplateConversions = $this->conversionsRepository->getNonBatchTemplateConversions($template->code);
+                $userData = $this->getUserData(array_keys($nonBatchTemplateConversions));
 
+                foreach ($nonBatchTemplateConversions as $userId => $time) {
+                    $latestLog = $this->logsRepository->getTable()
+                        ->select('MAX(id) AS id')
+                        ->where([
+                            'email' => $userData[$userId],
+                            'mail_template_id' => $template->id,
+                            'mail_job_batch_id' => null,
+                        ])
+                        ->where('created_at < ?', DateTime::from($time))
+                        ->fetch();
 
-            foreach ($nonBatchTemplateConversions as $userId => $time) {
-                $latestLog = $this->logsRepository->getTable()
-                    ->select('MAX(id) AS id')
-                    ->where([
-                        'email' => $userData[$userId],
-                        'mail_template_id' => $template->id,
-                        'mail_job_batch_id' => null,
-                    ])
-                    ->where('created_at < ?', DateTime::from($time))
-                    ->fetch();
-
-                $log = $this->logsRepository->find($latestLog->id);
-                if (!$log) {
-                    continue;
+                    $log = $this->logsRepository->find($latestLog->id);
+                    if (!$log) {
+                        continue;
+                    }
+                    $this->logConversionsRepository->upsert($log, DateTime::from($time));
                 }
-                $this->logConversionsRepository->upsert($log, DateTime::from($time));
+
+                $progressBar->advance();
             }
 
-            $progressBar->advance();
+            $progressBar->setMessage('done');
+            $progressBar->finish();
         }
-
-        $progressBar->setMessage('done');
-        $progressBar->finish();
 
         $output->writeln('');
         $output->writeln('Done');
