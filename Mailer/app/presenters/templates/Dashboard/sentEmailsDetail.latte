@@ -129,9 +129,6 @@
                             to: to
                         },
                         success: function (data, status) {
-                            console.log('response data', data);
-                            console.log('status', status);
-
                             $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
                             $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
                         },
