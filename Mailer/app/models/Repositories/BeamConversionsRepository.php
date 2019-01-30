@@ -32,7 +32,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
             ->addFilter('step', 'purchase')
             ->addFilter('utm_content', $batchId)
             ->addFilter('utm_campaign', $mailTemplateCode)
-            ->addGroup('utm_content');;
+            ->addGroup('utm_content');
 
         $result = $this->journal->list($request);
 
@@ -49,7 +49,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
         return $purchases;
     }
 
-    public function getNonBatchTemplateConversions($mailTemplateCode): array
+    public function getNonBatchTemplateConversions($mailTemplateCode): arrayIConversionsRepository
     {
         $request = (new ListRequest('commerce'))
             ->addSelect("step", "utm_campaign", "utm_content", "user_id", "token", "time")
