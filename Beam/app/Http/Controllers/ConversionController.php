@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Article;
 use App\Author;
 use App\Console\Commands\AggregateConversionEvents;
-use App\Contracts\JournalContract;
-use App\Contracts\JournalHelpers;
-use App\Contracts\JournalListRequest;
 use App\Conversion;
 use App\Http\Request;
 use App\Http\Requests\ConversionRequest;
 use App\Http\Requests\ConversionUpsertRequest;
 use App\Http\Resources\ConversionResource;
-use App\Model\ConversionPageviewEvent;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -23,16 +18,6 @@ use Yajra\Datatables\Datatables;
 
 class ConversionController extends Controller
 {
-    private $journal;
-
-    private $journalHelper;
-
-    public function __construct(JournalContract $journal)
-    {
-        $this->journal = $journal;
-        $this->journalHelper = new JournalHelpers($journal);
-    }
-
     public function index(Request $request)
     {
         return response()->format([

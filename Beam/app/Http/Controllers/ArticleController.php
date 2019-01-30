@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
@@ -17,6 +15,8 @@ use Illuminate\Support\Carbon;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
@@ -409,12 +409,14 @@ class ArticleController extends Controller
     private function readArticlesForUsers(Carbon $timeAfter, Carbon $timeBefore, array $userIds): array
     {
         $usersReadArticles = [];
-        $r = new JournalAggregateRequest('pageviews', 'load');
+        $r = new AggregateRequest('pageviews', 'load');
         $r->setTimeAfter($timeAfter);
         $r->setTimeBefore($timeBefore);
         $r->addGroup('user_id', 'article_id');
         $r->addFilter('user_id', ...$userIds);
-        foreach ($this->journal->count($r) as $item) {
+
+        $result = collect($this->journal->count($r));
+        foreach ($result as $item) {
             if ($item->tags->article_id !== '') {
                 $userId = $item->tags->user_id;
                 if (!array_key_exists($userId, $usersReadArticles)) {

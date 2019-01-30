@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Contracts\JournalContract;
-use App\Contracts\Remp\Journal;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
+use Remp\Journal\Journal;
+use Remp\Journal\JournalContract;
 
 class RempJournalServiceProvider extends ServiceProvider
 {

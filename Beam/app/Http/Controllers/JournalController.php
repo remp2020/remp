@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Remp\Journal\JournalContract;
 
 class JournalController extends Controller
 {
-    public function flags(\App\Contracts\JournalContract $journalContract)
+    public function flags(JournalContract $journalContract)
     {
         return $journalContract->flags();
     }
 
     public function actions(
-        \App\Contracts\JournalContract $journalContract,
+        JournalContract $journalContract,
         $group,
         $category
     ) {
-        return $journalContract->actions($group, $category);
+        return collect($journalContract->actions($group, $category));
     }
 }

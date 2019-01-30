@@ -9,21 +9,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../Composer/laravel-sso",
-            "options": {
-                "symlink": false
-            }
-        },
-        {
-            "type": "path",
-            "url": "../Composer/laravel-widgets",
-            "options": {
-                "symlink": false
-            }
-        },
-        {
-            "type": "path",
-            "url": "../Composer/laravel-helpers",
+            "url": "../Composer/*",
             "options": {
                 "symlink": false
             }
@@ -54,6 +40,7 @@
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
+        "remp/journal": "*",
         "simshaun/recurr": "^3.0",
         "snowplow/referer-parser": "dev-master",
         "yadakhov/insert-on-duplicate-key": "^1.2",

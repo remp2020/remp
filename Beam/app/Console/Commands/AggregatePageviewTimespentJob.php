@@ -4,10 +4,10 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\ArticleTimespent;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class AggregatePageviewTimespentJob extends Command
 {
@@ -25,12 +25,12 @@ class AggregatePageviewTimespentJob extends Command
 
         $this->line(sprintf("Fetching aggregated timespent data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
-        $request = new JournalAggregateRequest('pageviews', 'timespent');
+        $request = new AggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'signed_in', 'subscriber');
 
-        $records = $journalContract->sum($request);
+        $records = collect($journalContract->sum($request));
 
         if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
             $this->line(sprintf("No articles to process, exiting."));

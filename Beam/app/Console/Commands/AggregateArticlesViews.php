@@ -4,14 +4,14 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\ArticleAggregatedView;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use App\ViewsPerBrowserMv;
 use App\ViewsPerUserMv;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class AggregateArticlesViews extends Command
 {
@@ -132,12 +132,12 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
     private function aggregateTimespent(array $data, array $articleIds, $timeAfter, $timeBefore): array
     {
         $this->line(sprintf("Fetching aggregated <info>timespent</info> data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
-        $request = new JournalAggregateRequest('pageviews', 'timespent');
+        $request = new AggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'user_id', 'browser_id');
 
-        $records = $this->journalContract->sum($request);
+        $records = collect($this->journalContract->sum($request));
 
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process."));
@@ -194,12 +194,12 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
     private function aggregatePageviews(array $data, array $articleIds, $timeAfter, $timeBefore): array
     {
         $this->line(sprintf("Fetching aggregated <info>pageviews</info> data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
-        $request = new JournalAggregateRequest('pageviews', 'load');
+        $request = new AggregateRequest('pageviews', 'load');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'user_id', 'browser_id');
 
-        $records = $this->journalContract->count($request);
+        $records = collect($this->journalContract->count($request));
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process."));
             return [$data, $articleIds];
