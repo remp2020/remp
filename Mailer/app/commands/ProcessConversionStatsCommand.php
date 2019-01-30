@@ -4,7 +4,6 @@ namespace Remp\MailerModule\Commands;
 
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\IConversionsRepository;
 use Remp\MailerModule\Repository\LogConversionsRepository;
@@ -83,16 +82,17 @@ class ProcessConversionStatsCommand extends Command
             $userData = $this->getUserData(array_keys($batchTemplateConversions));
 
             foreach ($batchTemplateConversions as $userId => $time) {
-                $log = $this->logsRepository->find(
-                    $this->logsRepository->getTable()
-                        ->select('MAX(id)')
-                        ->where([
-                            'email' => $userData[$userId],
-                            'mail_template_id' => $batchTemplate->mail_template_id,
-                            'mail_job_batch_id' => $batchTemplate->mail_job_batch_id,
-                        ])
-                        ->where('created_at < ?', DateTime::from($time))
-                );
+                $latestLog = $this->logsRepository->getTable()
+                    ->select('MAX(id) AS id')
+                    ->where([
+                        'email' => $userData[$userId],
+                        'mail_template_id' => $batchTemplate->mail_template_id,
+                        'mail_job_batch_id' => $batchTemplate->mail_job_batch_id,
+                    ])
+                    ->where('created_at < ?', DateTime::from($time))
+                    ->fetch();
+
+                $log = $this->logsRepository->find($latestLog->id);
                 if (!$log) {
                     continue;
                 }
@@ -125,16 +125,17 @@ class ProcessConversionStatsCommand extends Command
 
 
             foreach ($nonBatchTemplateConversions as $userId => $time) {
-                $log = $this->logsRepository->find(
-                    $this->logsRepository->getTable()
-                        ->select('MAX(id)')
-                        ->where([
-                            'email' => $userData[$userId],
-                            'mail_template_id' => $template->id,
-                            'mail_job_batch_id' => null,
-                        ])
-                        ->where('created_at < ?', DateTime::from($time))
-                );
+                $latestLog = $this->logsRepository->getTable()
+                    ->select('MAX(id) AS id')
+                    ->where([
+                        'email' => $userData[$userId],
+                        'mail_template_id' => $template->id,
+                        'mail_job_batch_id' => null,
+                    ])
+                    ->where('created_at < ?', DateTime::from($time))
+                    ->fetch();
+
+                $log = $this->logsRepository->find($latestLog->id);
                 if (!$log) {
                     continue;
                 }

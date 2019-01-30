@@ -11,10 +11,19 @@ class LogConversionsRepository extends Repository
 
     public function upsert(ActiveRow $mailLog, \DateTime $convertedAt)
     {
-        return $this->getTable()->where([
+        $conversion = $this->getTable()->where([
             'mail_log_id' => $mailLog->id,
-        ])->update([
-            'converted_at' => $convertedAt,
-        ]);
+        ])->fetch();
+
+        if ($conversion) {
+            $this->update($conversion, [
+                'converted_at' => $convertedAt,
+            ]);
+        } else {
+            $this->insert([
+                'mail_log_id' => $mailLog->id,
+                'converted_at' => $convertedAt,
+            ]);
+        }
     }
 }

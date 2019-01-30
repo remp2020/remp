@@ -29,6 +29,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
     public function getBatchTemplateConversions($batchId, $mailTemplateCode): array
     {
         $request = (new ListRequest('commerce'))
+            ->addSelect("step", "utm_campaign", "utm_content", "user_id", "token", "time")
             ->addFilter('step', 'purchase')
             ->addFilter('utm_content', $batchId)
             ->addFilter('utm_campaign', $mailTemplateCode)
@@ -38,7 +39,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
 
         $purchases = [];
         foreach ($result as $record) {
-            if (empty($record->tags)) {
+            if (empty($record->tags->utm_content)) {
                 continue;
             }
             foreach ($record->commerces as $purchase) {
@@ -61,7 +62,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
 
         $purchases = [];
         foreach ($result as $record) {
-            if (!empty($record->tags)) {
+            if (!empty($record->tags->utm_content)) {
                 continue;
             }
             foreach ($record->commerces as $purchase) {
