@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Mail;
 
 class ComputeAuthorsSegments extends Command
 {
-    const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
     const COMMAND = 'segments:compute-author-segments';
 
     const CONFIG_MIN_RATIO = 'author_segments_min_ratio';
@@ -32,6 +31,7 @@ class ComputeAuthorsSegments extends Command
 
     protected $signature = self::COMMAND . ' 
     {--email} 
+    {--top=10}
     {--history}
     {--min_views=} 
     {--min_average_timespent=} 
@@ -194,9 +194,7 @@ SQL;
         $queryItems =  ArticleAggregatedView::select(
             DB::raw("$groupParameter, sum(pageviews) as total_pageviews")
         )
-            ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
-            ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
-            ->whereRaw("$groupParameter <> ''")
+            ->whereNotNull($groupParameter)
             ->groupBy($groupParameter)
             ->cursor();
 
@@ -214,8 +212,7 @@ SQL;
             DB::raw("$groupParameter, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent")
         )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
-            ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
-            ->whereRaw("$groupParameter <> ''")
+            ->whereNotNull($groupParameter)
             ->groupBy([$groupParameter, 'author_id'])
             ->havingRaw('avg(timespent) >= ?', [$this->minAverageTimespent])
             ->cursor();

@@ -17,6 +17,7 @@ class AggregateArticlesViews extends Command
 {
     const KEY_SEPARATOR = '||||';
     const COMMAND = 'pageviews:aggregate-articles-views';
+    const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
 
     // TODO remove skip-temp-aggregation after temp aggregation tables are no longer used
     protected $signature = self::COMMAND . ' {--date=} {--skip-temp-aggregation}';
@@ -156,8 +157,11 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
                 $bar->advance();
                 continue;
             }
+            $sum = (int) $record->sum;
+            if ($sum >= self::TIMESPENT_IGNORE_THRESHOLD_SECS) {
+                continue;
+            }
 
-            $sum = $record->sum;
             $key = $browserId . self::KEY_SEPARATOR . $userId;
 
             if (!array_key_exists($key, $data)) {
@@ -256,7 +260,7 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
 
         $items = [];
         foreach ($data as $key => $articlesData) {
-            list($browserId, $userId) = explode(self::KEY_SEPARATOR, $key, 2);
+            [$browserId, $userId] = explode(self::KEY_SEPARATOR, $key, 2);
 
             foreach ($articlesData as $externalArticleId => $record) {
                 if (!isset($articleIdMap[$externalArticleId])) {
@@ -264,8 +268,8 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
                 }
                 $items[] = [
                     'article_id' => $articleIdMap[$externalArticleId],
-                    'browser_id' => $browserId,
-                    'user_id' => $userId,
+                    'browser_id' => $browserId === '' ? null : $browserId,
+                    'user_id' => $userId === '' ? null : $userId,
                     'date' => $date,
                     'pageviews' => $record['pageviews'],
                     'timespent' => $record['timespent']

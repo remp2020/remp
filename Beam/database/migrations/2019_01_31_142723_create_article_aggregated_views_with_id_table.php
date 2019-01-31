@@ -13,7 +13,8 @@ class CreateArticleAggregatedViewsWithIdTable extends Migration
      */
     public function up()
     {
-        Schema::rename('article_aggregated_views', 'article_aggregated_views_WITHOUT_ID');
+        // Recreating table, dumping old data
+        Schema::dropIfExists('article_aggregated_views');
         
         Schema::create('article_aggregated_views', function (Blueprint $table) {
             $table->increments('id');
@@ -29,12 +30,6 @@ class CreateArticleAggregatedViewsWithIdTable extends Migration
             $table->index('browser_id');
             $table->foreign('article_id', 'fk_article_id')->references('id')->on('articles');
         });
-
-        DB::statement('INSERT INTO article_aggregated_views (article_id, user_id, browser_id, date, pageviews, timespent)
-SELECT article_id, if(user_id = "", null, user_id) as user_id, browser_id, date, pageviews, timespent
-FROM article_aggregated_views_WITHOUT_ID');
-
-        Schema::dropIfExists('article_aggregated_views_WITHOUT_ID');
     }
 
     /**
