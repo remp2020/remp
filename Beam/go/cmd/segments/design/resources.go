@@ -59,6 +59,7 @@ var _ = Resource("segments", func() {
 			Media(CollectionOf(Segment, func() {
 				View("default")
 				View("tiny")
+				View("extended")
 			}))
 		})
 	})
@@ -147,12 +148,27 @@ var _ = Resource("segments", func() {
 	})
 	Action("count", func() {
 		Description("Returns number of users in segment based on provided criteria")
-		Payload(SegmentCountPayload)
+		Payload(SegmentTinyPayload)
 		Routing(POST("/count"))
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
 		Response(OK, SegmentCount)
+	})
+	Action("related", func() {
+		Description("Returns segments with same or similar criteria")
+		Payload(SegmentTinyPayload)
+		Routing(POST("/related"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Segment, func() {
+				View("default")
+				View("tiny")
+				View("extended")
+			}))
+		})
 	})
 })
 

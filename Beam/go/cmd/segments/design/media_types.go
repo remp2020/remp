@@ -101,13 +101,14 @@ var Commerces = MediaType("application/vnd.commerces+json", func() {
 })
 
 var Segment = MediaType("application/vnd.segment+json", func() {
-	Description("Segment check")
+	Description("Segment")
 	Attributes(func() {
 		Attribute("id", Integer, "ID of segment")
 		Attribute("code", String, "Code-friendly identificator of segment")
 		Attribute("name", String, "User-friendly name of segment")
 		Attribute("group", SegmentGroup)
 		Attribute("criteria", Any, "Criteria used to build segment")
+		Attribute("url", String, "URL to segment")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -121,6 +122,13 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 		Attribute("code")
 		Attribute("name")
 		Attribute("group")
+	})
+	View("extended", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("group")
+		Attribute("url")
 	})
 	Required("id", "code", "name", "group")
 })

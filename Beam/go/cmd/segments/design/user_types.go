@@ -144,8 +144,8 @@ var SegmentPayload = Type("SegmentPayload", func() {
 	Required("name", "table_name", "group_id", "fields", "criteria")
 })
 
-var SegmentCountPayload = Type("SegmentCountPayload", func() {
-	Description("Request parameters for segment count")
+var SegmentTinyPayload = Type("SegmentTinyPayload", func() {
+	Description("Request parameters for endpoints segments/count and segments/related")
 
 	Attribute("table_name", String, "Name of table above which this segment is calculated")
 	Attribute("criteria", SegmentCreateCriteria, "Segment's criteria")

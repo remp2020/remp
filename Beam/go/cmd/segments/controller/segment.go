@@ -160,6 +160,12 @@ func (c *SegmentController) Count(ctx *app.CountSegmentsContext) error {
 	})
 }
 
+// Related runs the related action.
+func (c *SegmentController) Related(ctx *app.RelatedSegmentsContext) error {
+	// TODO: implementation; for now returns empty list for each call
+	return ctx.OKExtended(app.SegmentExtendedCollection{})
+}
+
 // handleCreate handles creation of Segment.
 func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext) error {
 	p := ctx.Payload
