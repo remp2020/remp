@@ -194,6 +194,19 @@ var SegmentBlueprintTableCriterion = MediaType("application/vnd.segment.blueprin
 	Required("key", "label", "params")
 })
 
+var SegmentCount = MediaType("application/vnd.segment.count+json", func() {
+	Description("Segment count")
+	Attributes(func() {
+		Attribute("count", Integer, "Number of users in segment based on provided criteria")
+		Attribute("status", String, "Status of count. If everything is fine, returns `ok`.")
+	})
+	View("default", func() {
+		Attribute("count")
+		Attribute("status")
+	})
+	Required("count", "status")
+})
+
 var Event = MediaType("application/vnd.event+json", func() {
 	Description("Generic event")
 	Attributes(func() {

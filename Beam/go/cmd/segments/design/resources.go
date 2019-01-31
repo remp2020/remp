@@ -133,6 +133,15 @@ var _ = Resource("segments", func() {
 		})
 		Response(OK, Segment)
 	})
+	Action("count", func() {
+		Description("Returns number of users in segment based on provided criteria")
+		Payload(SegmentCountPayload)
+		Routing(POST("/count"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, SegmentCount)
+	})
 })
 
 var _ = Resource("journal", func() {

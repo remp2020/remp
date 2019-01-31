@@ -133,6 +133,15 @@ func (c *SegmentController) CreateOrUpdate(ctx *app.CreateOrUpdateSegmentsContex
 	return c.handleCreate(ctx)
 }
 
+// Count runs the count action.
+func (c *SegmentController) Count(ctx *app.CountSegmentsContext) error {
+	// TODO: implementation; for now returns 0 for each call
+	return ctx.OK(&app.SegmentCount{
+		Count:  0,
+		Status: "ok",
+	})
+}
+
 // handleCreate handles creation of Segment.
 func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext) error {
 	p := ctx.Payload
