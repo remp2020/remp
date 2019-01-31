@@ -321,6 +321,10 @@ class ArticleController extends Controller
             if ($a['titles'] ?? []) {
                 $article->articleTitles()->delete();
                 foreach ($a['titles'] as $variant => $title) {
+                    if (!$title) {
+                        continue;
+                    }
+
                     $article->articleTitles()->create([
                         'variant' => $variant,
                         'title' => $title
