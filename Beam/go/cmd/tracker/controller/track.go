@@ -12,7 +12,7 @@ import (
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
-	"github.com/snowplow/referer-parser/go"
+	refererparser "github.com/snowplow/referer-parser/go"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
