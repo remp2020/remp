@@ -324,7 +324,6 @@ class ArticleController extends Controller
                     if (!$title) {
                         continue;
                     }
-
                     $article->articleTitles()->create([
                         'variant' => $variant,
                         'title' => $title
