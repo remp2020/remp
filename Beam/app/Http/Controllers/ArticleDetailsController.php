@@ -76,10 +76,22 @@ class ArticleDetailsController extends Controller
         $data['events'] = [];
 
         foreach ($articleTitles as $variant => $variantTitles) {
-            $obj = new \stdClass();
-            $obj->color = $tagToColor[$variant];
-            $obj->labels = $variantTitles->pluck('title')->toArray();
-            $data['tagLabels'][$variant] = $obj;
+            if ($variantTitles->count() > 1) {
+                for ($i = 0; $i < $variantTitles->count() - 1; $i++) {
+                    $oldTitle = $variantTitles[$i];
+                    $newTitle = $variantTitles[$i+1];
+                    $data['events'][] = (object) [
+                        'color' => $tagToColor[$variant],
+                        'date' => $newTitle->created_at->toIso8601ZuluString(),
+                        'title' => "<b>{$variant}</b> title variant changed <br />'{$oldTitle->title}' => '{$newTitle->title}'"
+                    ];
+                }
+            }
+
+            $data['tagLabels'][$variant] = (object) [
+                'color' => $tagToColor[$variant],
+                'labels' => $variantTitles->pluck('title')->toArray(),
+            ];
         }
         return response()->json($data);
     }
