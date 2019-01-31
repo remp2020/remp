@@ -195,7 +195,7 @@ class MailWorkerCommand extends Command
                         }
 
                         $this->smtpErrors = 0;
-                    } catch (SmtpException | Sender\MailerBatchException $exception) {
+                    } catch (SmtpException | Sender\MailerBatchException | \Exception $exception) {
                         $this->smtpErrors++;
                         $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
                         $this->cacheJobs($jobs, $batch->id);
