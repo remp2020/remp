@@ -42,6 +42,8 @@ type SegmentStorage interface {
 	OverridableFields() OverridableFields
 	// Flags returns array of flags available for rules.
 	Flags() Flags
+	// BuildRules builds segment rules from segment criteria.
+	BuildRules(segment *Segment) ([]SegmentRule, bool, error)
 }
 
 // EventRules represent map of rules with given "category/event" assigned
@@ -216,12 +218,9 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 		return nil, false, errors.Wrap(err, "unable to get segment from MySQL")
 	}
 
-	src := []SegmentRule{}
-	err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
+	src, err := sDB.loadSegmentRules(s)
 	if err != nil {
-		if err != sql.ErrNoRows {
-			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
-		}
+		return nil, false, err
 	}
 	s.Rules = src
 
@@ -239,6 +238,12 @@ func (sDB *SegmentDB) GetByID(id int) (*Segment, bool, error) {
 		}
 		return nil, false, errors.Wrap(err, "unable to get segment from MySQL")
 	}
+
+	src, err := sDB.loadSegmentRules(s)
+	if err != nil {
+		return nil, false, err
+	}
+	s.Rules = src
 
 	return s, true, nil
 }
@@ -476,10 +481,9 @@ func (sDB *SegmentDB) Cache() error {
 	}
 
 	for _, s := range sc {
-		src := []SegmentRule{}
-		err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
+		src, err := sDB.loadSegmentRules(s)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
+			return err
 		}
 		s.Rules = src
 	}
@@ -588,4 +592,30 @@ func (sDB *SegmentDB) Flags() Flags {
 		}
 	}
 	return flags
+}
+
+// loadSegmentRules loads SegmentRules from segment_rules table.
+// If no segment rules exist, but Segment contains criteria, it tries to build segment rules.
+func (sDB *SegmentDB) loadSegmentRules(s *Segment) ([]SegmentRule, error) {
+	src := []SegmentRule{}
+	err := sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
+		}
+	}
+
+	if len(src) == 0 && s.Criteria.Valid {
+		var ok bool
+		var err error
+		src, ok, err = sDB.BuildRules(s)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to build segment rules from criteria")
+		}
+		if !ok {
+			return nil, errors.New("unable to build segment rules from criteria")
+		}
+	}
+
+	return src, nil
 }
