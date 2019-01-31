@@ -36,7 +36,7 @@ class ComputeAuthorsSegmentsTest extends TestCase
         $items = [
             [
                 'article_id' => $article->id,
-                'user_id' => '',
+                'user_id' => null,
                 'browser_id' => 'XYZ',
                 'date' => $date,
                 'pageviews' => 10,
