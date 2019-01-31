@@ -41,13 +41,31 @@ func NewSegmentController(
 	}
 }
 
+// Get runs the get action.
+func (c *SegmentController) Get(ctx *app.GetSegmentsContext) error {
+	s, ok, err := c.SegmentStorage.GetByID(ctx.ID)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+
+	response, err := (*Segment)(s).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(response)
+}
+
 // List runs the list action.
 func (c *SegmentController) List(ctx *app.ListSegmentsContext) error {
 	sc, err := c.SegmentStorage.List()
 	if err != nil {
 		return err
 	}
-	return ctx.OK((SegmentCollection)(sc).ToMediaType())
+
+	return ctx.OKTiny((SegmentCollection)(sc).ToTinyMediaType())
 }
 
 // Groups runs the groups action.
@@ -172,7 +190,11 @@ func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext)
 		return err
 	}
 
-	return ctx.OK((*Segment)(s).ToMediaType())
+	response, err := (*Segment)(s).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(response)
 }
 
 // handleUpdate handles update of Segment.
@@ -199,7 +221,12 @@ func (c *SegmentController) handleUpdate(ctx *app.CreateOrUpdateSegmentsContext)
 	if !ok {
 		return ctx.NotFound()
 	}
-	return ctx.OK((*Segment)(s).ToMediaType())
+
+	response, err := (*Segment)(s).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(response)
 }
 
 // handleCheck determines whether provided identifier is part of segment based on given segment type.

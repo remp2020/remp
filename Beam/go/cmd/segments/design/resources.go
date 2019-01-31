@@ -39,6 +39,17 @@ var _ = Resource("segments", func() {
 	BasePath("/segments")
 	NoSecurity()
 
+	Action("get", func() {
+		Description("Get segment")
+		Routing(GET("/show"))
+		Params(func() {
+			Param("id", Integer, "Segment ID")
+			Required("id")
+		})
+		Response(NotFound)
+		Response(BadRequest)
+		Response(OK, Segment)
+	})
 	Action("list", func() {
 		Description("List all segments.")
 		Routing(GET("/"))
@@ -47,6 +58,7 @@ var _ = Resource("segments", func() {
 		Response(OK, func() {
 			Media(CollectionOf(Segment, func() {
 				View("default")
+				View("tiny")
 			}))
 		})
 	})
