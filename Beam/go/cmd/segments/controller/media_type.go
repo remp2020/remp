@@ -128,11 +128,35 @@ func (s *Segment) ToTinyMediaType() *app.SegmentTiny {
 	}
 }
 
+// ToExtendedMediaType converts internal Segment representation to extended view of application segment.
+func (s *Segment) ToExtendedMediaType() *app.SegmentExtended {
+	url := "aloha"
+	return &app.SegmentExtended{
+		ID:   s.ID,
+		Code: s.Code,
+		Name: s.Name,
+		Group: &app.SegmentGroup{
+			Name:    s.Group.Name,
+			Sorting: s.Group.Sorting,
+		},
+		URL: &url,
+	}
+}
+
 // ToTinyMediaType converts internal SegmentCollection representation to tiny view of application segment collection.
 func (sc SegmentCollection) ToTinyMediaType() app.SegmentTinyCollection {
 	mt := app.SegmentTinyCollection{}
 	for _, s := range sc {
 		mt = append(mt, (*Segment)(s).ToTinyMediaType())
+	}
+	return mt
+}
+
+// ToExtendedMediaType converts internal SegmentCollection representation to extended view of application segment collection.
+func (sc SegmentCollection) ToExtendedMediaType() app.SegmentExtendedCollection {
+	mt := app.SegmentExtendedCollection{}
+	for _, s := range sc {
+		mt = append(mt, (*Segment)(s).ToExtendedMediaType())
 	}
 	return mt
 }

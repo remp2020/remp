@@ -162,8 +162,23 @@ func (c *SegmentController) Count(ctx *app.CountSegmentsContext) error {
 
 // Related runs the related action.
 func (c *SegmentController) Related(ctx *app.RelatedSegmentsContext) error {
-	// TODO: implementation; for now returns empty list for each call
-	return ctx.OKExtended(app.SegmentExtendedCollection{})
+	// scan whole criteria as SegmentCriteria
+	cJSON, err := json.Marshal(ctx.Payload.Criteria)
+	if err != nil {
+		return err
+	}
+	var criteria model.SegmentCriteria
+	err = criteria.Scan(string(cJSON))
+	if err != nil {
+		return err
+	}
+
+	sc, err := c.SegmentStorage.Related(criteria)
+	if err != nil {
+		return err
+	}
+
+	return ctx.OKExtended((SegmentCollection)(sc).ToExtendedMediaType())
 }
 
 // handleCreate handles creation of Segment.
