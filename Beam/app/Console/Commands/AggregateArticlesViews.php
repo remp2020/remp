@@ -20,7 +20,7 @@ class AggregateArticlesViews extends Command
     const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
 
     // TODO remove skip-temp-aggregation after temp aggregation tables are no longer used
-    protected $signature = self::COMMAND . ' {--date=} {--skip-temp-aggregation}';
+    protected $signature = self::COMMAND . ' {--date=} {--date-from=} {--date-to=} {--skip-temp-aggregation}';
 
     protected $description = 'Aggregate pageviews and time spent data for each user and article for yesterday';
 
@@ -43,10 +43,45 @@ class AggregateArticlesViews extends Command
         $dateThreshold = Carbon::today()->subDays(90)->toDateString();
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
 
+        $dateFrom = $this->option('date-from');
+        $dateTo = $this->option('date-to');
+        if ($dateFrom || $dateTo) {
+            if (!$dateFrom) {
+                $this->error('Missing --date-from option');
+                return;
+            }
+            if (!$dateTo) {
+                $this->error('Missing --date-to option');
+                return;
+            }
+
+            $from = Carbon::parse($dateFrom)->startOfDay();
+            $to = Carbon::parse($dateTo)->startOfDay();
+
+            while ($from->lte($to)) {
+                $this->aggregateDay($from);
+                $to->addDay();
+            }
+        } else {
+            $date = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
+            $this->aggregateDay($date);
+        }
+
+        // Update 'materialized view' to test author segments conditions
+        // TODO only temporary, remove this after conditions are finalized
+        if (!$this->option('skip-temp-aggregation')) {
+            $this->createTemporaryAggregations();
+        }
+
+        $this->line(' <info>OK!</info>');
+    }
+
+    private function aggregateDay(Carbon $startDate)
+    {
         // Aggregate pageviews and timespent data in time windows
-        $timeWindowMinutes = 30; // in minutes
+        $timeWindowMinutes = 60; // in minutes
         $timeWindowsCount = 1440 / $timeWindowMinutes; // 1440 - number of minutes in day
-        $startDate = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
+
         $timeAfter = $startDate;
         $timeBefore = (clone $timeAfter)->addMinutes($timeWindowMinutes);
         $date = $timeAfter->toDateString();
@@ -58,14 +93,6 @@ class AggregateArticlesViews extends Command
             $timeAfter = $timeAfter->addMinutes($timeWindowMinutes);
             $timeBefore = $timeBefore->addMinutes($timeWindowMinutes);
         }
-
-        // Update 'materialized view' to test author segments conditions
-        // TODO only temporary, remove this after conditions are finalized
-        if (!$this->option('skip-temp-aggregation')) {
-            $this->createTemporaryAggregations();
-        }
-
-        $this->line(' <info>OK!</info>');
     }
 
     private function createTemporaryAggregations()

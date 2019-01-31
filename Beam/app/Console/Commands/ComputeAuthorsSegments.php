@@ -31,7 +31,6 @@ class ComputeAuthorsSegments extends Command
 
     protected $signature = self::COMMAND . ' 
     {--email} 
-    {--top=10}
     {--history}
     {--min_views=} 
     {--min_average_timespent=} 
@@ -155,6 +154,9 @@ SQL;
         SegmentUser::truncate();
 
         foreach ($authorUsers as $authorId => $users) {
+            if (count($users) === 0) {
+                continue;
+            }
             $segment = $this->getOrCreateAuthorSegment($authorId);
             $toInsert = collect($users)->map(function ($userId) use ($segment) {
                 return [
@@ -175,6 +177,10 @@ SQL;
         SegmentBrowser::truncate();
 
         foreach ($authorBrowsers as $authorId => $browsers) {
+            if (count($browsers) === 0) {
+                continue;
+            }
+
             $segment = $this->getOrCreateAuthorSegment($authorId);
             $toInsert = collect($browsers)->map(function ($browserId) use ($segment) {
                 return [
