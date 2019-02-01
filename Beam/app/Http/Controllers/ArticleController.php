@@ -322,7 +322,11 @@ class ArticleController extends Controller
 
             if ($a['titles'] ?? []) {
                 foreach ($a['titles'] as $variant => $title) {
-                    $article->articleTitles()->updateOrCreate([
+                    if ($title === '') {
+                        continue;
+                    }
+
+                    $article->articleTitles()->create([
                         'variant' => $variant,
                         'title' => $title
                     ]);
