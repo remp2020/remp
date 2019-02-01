@@ -40,11 +40,11 @@ class Kernel extends ConsoleKernel
             ->everyMinute();
 
         $schedule->command(AggregatePageviewLoadJob::COMMAND)
-             ->hourlyAt(5)
+             ->hourlyAt(3)
              ->withoutOverlapping();
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND)
-            ->hourlyAt(5)
+            ->hourlyAt(4)
             ->withoutOverlapping();
 
         $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
