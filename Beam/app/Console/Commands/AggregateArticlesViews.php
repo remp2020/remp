@@ -28,6 +28,7 @@ class AggregateArticlesViews extends Command
     public function __construct(JournalContract $journalContract)
     {
         parent::__construct();
+        // Client in Journal uses exponential back-off retry strategy, see service provider for details
         $this->journalContract = $journalContract;
     }
 
