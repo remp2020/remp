@@ -9,7 +9,6 @@ use App\ViewsPerUserMv;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 
@@ -79,7 +78,7 @@ class AggregateArticlesViews extends Command
     private function aggregateDay(Carbon $startDate)
     {
         // Aggregate pageviews and timespent data in time windows
-        $timeWindowMinutes = 60; // in minutes
+        $timeWindowMinutes = 40; // in minutes
         $timeWindowsCount = 1440 / $timeWindowMinutes; // 1440 - number of minutes in day
 
         $timeAfter = $startDate;
