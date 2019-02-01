@@ -167,7 +167,7 @@ class Journal implements JournalContract
     public function list(ListRequest $request): array
     {
         try {
-            $q = [
+            $json = [
                 'select_fields' => $request->getSelect(),
                 'conditions' => [
                     'filter_by' => $request->getFilterBy(),
@@ -182,11 +182,11 @@ class Journal implements JournalContract
                 $json['time_before'] = $request->getTimeBefore()->format(DATE_RFC3339);
             }
             if ($request->getLoadTimespent()) {
-                $q['load_timespent'] = true;
+                $json['load_timespent'] = true;
             }
 
             $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_LIST), [
-                'json' => $q,
+                'json' => $json,
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:List endpoint: {$e->getMessage()}");
