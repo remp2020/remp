@@ -17,9 +17,10 @@ class AggregateArticlesViews extends Command
 {
     const KEY_SEPARATOR = '||||';
     const COMMAND = 'pageviews:aggregate-articles-views';
+    const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
 
     // TODO remove skip-temp-aggregation after temp aggregation tables are no longer used
-    protected $signature = self::COMMAND . ' {--date=} {--skip-temp-aggregation}';
+    protected $signature = self::COMMAND . ' {--date=} {--date-from=} {--date-to=} {--skip-temp-aggregation}';
 
     protected $description = 'Aggregate pageviews and time spent data for each user and article for yesterday';
 
@@ -33,38 +34,65 @@ class AggregateArticlesViews extends Command
 
     public function handle()
     {
-        Log::debug('AggregateArticlesViews job STARTED');
+        $this->line('');
+        $this->line('<info>***** Aggregatting article views *****</info>');
+        $this->line('');
 
         // TODO set this up depending finalized conditions
         // First delete data older than 90 days
         $dateThreshold = Carbon::today()->subDays(90)->toDateString();
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
 
+        $dateFrom = $this->option('date-from');
+        $dateTo = $this->option('date-to');
+        if ($dateFrom || $dateTo) {
+            if (!$dateFrom) {
+                $this->error('Missing --date-from option');
+                return;
+            }
+            if (!$dateTo) {
+                $this->error('Missing --date-to option');
+                return;
+            }
+
+            $from = Carbon::parse($dateFrom)->startOfDay();
+            $to = Carbon::parse($dateTo)->startOfDay();
+
+            while ($from->lte($to)) {
+                $this->aggregateDay($from);
+                $to->addDay();
+            }
+        } else {
+            $date = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
+            $this->aggregateDay($date);
+        }
+
+        // Update 'materialized view' to test author segments conditions
+        // TODO only temporary, remove this after conditions are finalized
+        if (!$this->option('skip-temp-aggregation')) {
+            $this->createTemporaryAggregations();
+        }
+
+        $this->line(' <info>OK!</info>');
+    }
+
+    private function aggregateDay(Carbon $startDate)
+    {
         // Aggregate pageviews and timespent data in time windows
-        $timeWindowMinutes = 30; // in minutes
+        $timeWindowMinutes = 60; // in minutes
         $timeWindowsCount = 1440 / $timeWindowMinutes; // 1440 - number of minutes in day
-        $startDate = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
+
         $timeAfter = $startDate;
         $timeBefore = (clone $timeAfter)->addMinutes($timeWindowMinutes);
         $date = $timeAfter->toDateString();
         for ($i = 0; $i < $timeWindowsCount; $i++) {
-            list($data, $articleIds) = $this->aggregatePageviews([], [], $timeAfter, $timeBefore);
-            list($data, $articleIds) = $this->aggregateTimespent($data, $articleIds, $timeAfter, $timeBefore);
+            [$data, $articleIds] = $this->aggregatePageviews([], [], $timeAfter, $timeBefore);
+            [$data, $articleIds] = $this->aggregateTimespent($data, $articleIds, $timeAfter, $timeBefore);
             $this->storeData($data, $articleIds, $date);
 
             $timeAfter = $timeAfter->addMinutes($timeWindowMinutes);
             $timeBefore = $timeBefore->addMinutes($timeWindowMinutes);
         }
-
-        // Update 'materialized view' to test author segments conditions
-        // See CreateAuthorSegments task
-        // TODO only temporary, remove this after conditions are finalized
-
-        if (!$this->option('skip-temp-aggregation')) {
-            $this->createTemporaryAggregations();
-        }
-
-        Log::debug('AggregateArticlesViews job FINISHED');
     }
 
     private function createTemporaryAggregations()
@@ -156,8 +184,11 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
                 $bar->advance();
                 continue;
             }
+            $sum = (int) $record->sum;
+            if ($sum >= self::TIMESPENT_IGNORE_THRESHOLD_SECS) {
+                continue;
+            }
 
-            $sum = $record->sum;
             $key = $browserId . self::KEY_SEPARATOR . $userId;
 
             if (!array_key_exists($key, $data)) {
@@ -256,7 +287,7 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
 
         $items = [];
         foreach ($data as $key => $articlesData) {
-            list($browserId, $userId) = explode(self::KEY_SEPARATOR, $key, 2);
+            [$browserId, $userId] = explode(self::KEY_SEPARATOR, $key, 2);
 
             foreach ($articlesData as $externalArticleId => $record) {
                 if (!isset($articleIdMap[$externalArticleId])) {
@@ -264,8 +295,8 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
                 }
                 $items[] = [
                     'article_id' => $articleIdMap[$externalArticleId],
-                    'browser_id' => $browserId,
-                    'user_id' => $userId,
+                    'browser_id' => $browserId === '' ? null : $browserId,
+                    'user_id' => $userId === '' ? null : $userId,
                     'date' => $date,
                     'pageviews' => $record['pageviews'],
                     'timespent' => $record['timespent']

@@ -314,6 +314,15 @@ running `db:seed` command. Recommended segments contain users matching these cri
 * Never started the checkout process (additionally could be swapped with 2-5 checkouts but no purchase)
 * First article pageview within 30 days (aditionally could be swapped with 2-3 and 4+ article pageviews)
 
+#### Authors segments
+
+Authors segments are computed for each author using Artisan command:
+
+`php artisan segments:compute-author-segments`
+
+Each segment contains users and browsers assigned to it according to given criteria, which can be adjusted in Beam settings. 
+The command is not run by default (therefore no author segments exist), one has to run it manually or schedule it to recompute segments periodically. 
+
 ## Known issues
 
 ### Some internal API calls are not going through
