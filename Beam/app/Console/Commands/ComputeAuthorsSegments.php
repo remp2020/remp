@@ -24,7 +24,7 @@ class ComputeAuthorsSegments extends Command
     const CONFIG_MIN_VIEWS = 'author_segments_min_views';
     const CONFIG_DAYS_IN_PAST = 'author_segments_days_in_past';
 
-    const ALL_CONFIGS = [self::CONFIG_MIN_RATIO, self::CONFIG_MIN_AVERAGE_TIMESPENT, self::CONFIG_MIN_VIEWS, self::CONFIG_MIN_VIEWS];
+    const ALL_CONFIGS = [self::CONFIG_MIN_RATIO, self::CONFIG_MIN_AVERAGE_TIMESPENT, self::CONFIG_MIN_VIEWS, self::CONFIG_DAYS_IN_PAST];
 
     private $minViews;
     private $minAverageTimespent;
