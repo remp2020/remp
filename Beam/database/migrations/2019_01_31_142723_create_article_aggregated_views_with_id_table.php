@@ -28,6 +28,7 @@ class CreateArticleAggregatedViewsWithIdTable extends Migration
             $table->unique(['article_id', 'user_id', 'browser_id', 'date'], 'unique_index');
             $table->index('user_id');
             $table->index('browser_id');
+            $table->index('date');
             $table->foreign('article_id', 'fk_article_id')->references('id')->on('articles');
         });
     }

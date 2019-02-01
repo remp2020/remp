@@ -22,12 +22,14 @@ class ComputeAuthorsSegments extends Command
     const CONFIG_MIN_RATIO = 'author_segments_min_ratio';
     const CONFIG_MIN_AVERAGE_TIMESPENT = 'author_segments_min_average_timespent';
     const CONFIG_MIN_VIEWS = 'author_segments_min_views';
+    const CONFIG_DAYS_IN_PAST = 'author_segments_days_in_past';
 
-    const ALL_CONFIGS = [self::CONFIG_MIN_RATIO, self::CONFIG_MIN_AVERAGE_TIMESPENT, self::CONFIG_MIN_VIEWS];
+    const ALL_CONFIGS = [self::CONFIG_MIN_RATIO, self::CONFIG_MIN_AVERAGE_TIMESPENT, self::CONFIG_MIN_VIEWS, self::CONFIG_MIN_VIEWS];
 
     private $minViews;
     private $minAverageTimespent;
     private $minRatio;
+    private $dateThreshold;
 
     protected $signature = self::COMMAND . ' 
     {--email} 
@@ -49,6 +51,7 @@ class ComputeAuthorsSegments extends Command
         $this->minViews = Config::loadByName(self::CONFIG_MIN_VIEWS);
         $this->minAverageTimespent = Config::loadByName(self::CONFIG_MIN_AVERAGE_TIMESPENT);
         $this->minRatio = Config::loadByName(self::CONFIG_MIN_RATIO);
+        $this->dateThreshold = Carbon::today()->subDays(Config::loadByName(self::CONFIG_DAYS_IN_PAST));
 
         if ($email) {
             // Only compute segment statistics
@@ -201,6 +204,7 @@ SQL;
             DB::raw("$groupParameter, sum(pageviews) as total_pageviews")
         )
             ->whereNotNull($groupParameter)
+            ->where('date', '>=', $this->dateThreshold)
             ->groupBy($groupParameter)
             ->cursor();
 
@@ -219,6 +223,7 @@ SQL;
         )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
             ->whereNotNull($groupParameter)
+            ->where('date', '>=', $this->dateThreshold)
             ->groupBy([$groupParameter, 'author_id'])
             ->havingRaw('avg(timespent) >= ?', [$this->minAverageTimespent])
             ->cursor();
