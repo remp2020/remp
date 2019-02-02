@@ -60,7 +60,7 @@ class AggregateArticlesViews extends Command
 
             while ($from->lte($to)) {
                 $this->aggregateDay($from);
-                $to->addDay();
+                $from->addDay();
             }
         } else {
             $date = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
