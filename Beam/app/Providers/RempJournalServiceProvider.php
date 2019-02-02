@@ -41,7 +41,7 @@ class RempJournalServiceProvider extends ServiceProvider
             Response $response = null,
             RequestException $exception = null
         ) {
-            if ($retries >= 5) {
+            if ($retries >= 11) {
                 return false;
             }
             if ($exception instanceof JournalException) {
