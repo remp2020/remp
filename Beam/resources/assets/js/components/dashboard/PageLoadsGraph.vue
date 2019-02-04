@@ -25,11 +25,13 @@
         </div>
 
         <div class="events-legend-wrapper">
-            <div class="events-legend"
-                 v-html="eventLegend.data.event.title"
-                 v-if="eventLegend.data"
-                 v-show="eventLegend.visible"
-                 v-bind:style="eventLegend.styleObject">
+            <div>
+                <div class="events-legend"
+                     v-html="eventLegend.data.event.title"
+                     v-if="eventLegend.data"
+                     v-show="eventLegend.visible"
+                     v-bind:style="eventLegend.styleObject">
+                </div>
             </div>
         </div>
 
@@ -71,7 +73,7 @@
         position: relative;
     }
 
-    .legend-wrapper, .events-legend-wrapper {
+    .legend-wrapper {
         position: relative;
         height:0;
     }
@@ -83,8 +85,10 @@
     .article-graph-legend table td, th {
         padding: 3px 6px
     }
+
     .article-graph-legend {
         position:absolute;
+        white-space:nowrap;
         z-index: 1000;
         top:0;
         left: 0;
@@ -95,6 +99,21 @@
         border-radius: 2px;
         border: 2px solid #494949;
         transform: translate(-50%, 0px)
+    }
+
+    .events-legend-wrapper {
+        position: relative;
+        height: 0;
+    }
+
+    /* div to correctly wrap transformed .events-legend */
+    .events-legend-wrapper > div {
+        position: absolute;
+        top:0;
+        left:0;
+        right: -180px;
+        width: auto;
+        background-color:red;
     }
 
     .events-legend {

@@ -83,7 +83,7 @@ class ArticleDetailsController extends Controller
                     $data['events'][] = (object) [
                         'color' => $tagToColor[$variant],
                         'date' => $newTitle->created_at->toIso8601ZuluString(),
-                        'title' => "<b>{$variant} title variant changed:</b><br /><i>'{$oldTitle->title}'</i> to <i>'{$newTitle->title}'</i>"
+                        'title' => "<b>{$variant} Title Variant Changed</b><br /><b>From:</b> {$oldTitle->title}<br /><b>To:</b> {$newTitle->title}"
                     ];
                 }
             }
