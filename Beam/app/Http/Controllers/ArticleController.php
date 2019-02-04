@@ -320,7 +320,7 @@ class ArticleController extends Controller
 
             if ($a['titles'] ?? []) {
                 foreach ($a['titles'] as $variant => $title) {
-                    if ($title === '') {
+                    if (empty($title)) {
                         continue;
                     }
                     $article->articleTitles()->updateOrCreate([
