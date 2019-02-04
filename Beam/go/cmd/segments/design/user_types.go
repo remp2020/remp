@@ -149,15 +149,13 @@ var SegmentTinyPayload = Type("SegmentTinyPayload", func() {
 
 	Attribute("table_name", String, "Name of table above which this segment is calculated")
 	Attribute("criteria", SegmentCreateCriteria, "Segment's criteria")
-
-	Required("table_name")
 })
 
 var SegmentCreateCriteria = Type("SegmentCreateCriteria", func() {
 	Description("Segment's criteria")
 
 	Attribute("nodes", ArrayOf(SegmentCreateCriteriaOperator), "Criteria operators")
-	Attribute("version", Integer, "Version of criteria format")
+	Attribute("version", String, "Version of criteria format")
 
 	Required("nodes", "version")
 })
