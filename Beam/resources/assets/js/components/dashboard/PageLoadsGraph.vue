@@ -29,7 +29,7 @@
                  v-html="eventLegend.data.event.title"
                  v-if="eventLegend.data"
                  v-show="eventLegend.visible"
-                 v-bind:style="{ left: eventLegend.left }">
+                 v-bind:style="eventLegend.styleObject">
             </div>
         </div>
 
@@ -172,8 +172,7 @@
                 eventLegend: {
                     visible: false,
                     data: null,
-                    left: "0px",
-                    text: ""
+                    styleObject: {}
                 }
             };
         },
@@ -307,9 +306,13 @@
 
                 // show event only if its too close to x-position of mouse
                 if (Math.abs(this.vars.x(selectedEvent.date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
-                    this.eventLegend.left = (this.vars.x(selectedEvent.date) + this.vars.margin.left) + "px"
                     this.eventLegend.visible = true
                     this.eventLegend.data = selectedEvent
+                    this.eventLegend.styleObject = {
+                        'background-color': selectedEvent.event.color,
+                        'border-color': selectedEvent.event.color,
+                        'left': (this.vars.x(selectedEvent.date) + this.vars.margin.left) + "px"
+                    }
                 } else {
                     this.eventLegend.visible = false
                 }
@@ -470,8 +473,6 @@
                     .enter().append("g")
                     .attr("class", "event")
 
-                const eventColor = '#00bdf1'
-
                 eventLayers
                     .append("path")
                     .attr("d", item => {
@@ -479,7 +480,7 @@
                         return "M" + xDate + "," + height + " " + xDate + "," + 0
                     })
                     .attr("stroke-dasharray", "6 4")
-                    .attr("stroke", eventColor)
+                    .attr("stroke", item => item.event.color)
 
                 eventLayers
                     .append("polygon")
@@ -494,7 +495,7 @@
                         ]
                         return points.map((p) => p[0] + "," + p[1]).join(" ")
                     })
-                    .attr("fill", eventColor)
+                    .attr("fill", item => item.event.color)
 
                 // Update axis
                 this.vars.svg.select('.axis--x').transition().call(this.vars.xAxis)
