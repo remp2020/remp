@@ -15,21 +15,21 @@
             </svg>
         </div>
 
-        <div class="events-legend-wrapper">
-            <div class="events-legend"
-                 v-if="eventLegend.data"
-                 v-show="eventLegend.visible"
-                 v-bind:style="{ left: eventLegend.left }">
-                Popis eventu
-            </div>
-        </div>
-
         <div class="m-t-20 m-b-20" v-if="tagLabels">
             <div v-bind:style="{color: item.color}" v-for="(item, tag) in tagLabels">
                 <b>{{tag}}</b>:
                 <span v-for="(label, index) in item.labels">
                     {{label}} <span style="color: #000;" v-if="index < item.labels.length - 1"> | </span>
                 </span>
+            </div>
+        </div>
+
+        <div class="events-legend-wrapper">
+            <div class="events-legend"
+                 v-html="eventLegend.data.event.title"
+                 v-if="eventLegend.data"
+                 v-show="eventLegend.visible"
+                 v-bind:style="{ left: eventLegend.left }">
             </div>
         </div>
 
@@ -71,7 +71,7 @@
         position: relative;
     }
 
-    .legend-wrapper {
+    .legend-wrapper, .events-legend-wrapper {
         position: relative;
         height:0;
     }
@@ -100,7 +100,7 @@
     .events-legend {
         position:absolute;
         z-index: 1000;
-        bottom:-20px;
+        bottom:-21px;
         left: 0;
         opacity: 0.85;
         color: #fff;
@@ -172,7 +172,8 @@
                 eventLegend: {
                     visible: false,
                     data: null,
-                    left: "0px"
+                    left: "0px",
+                    text: ""
                 }
             };
         },
@@ -368,7 +369,8 @@
                 }
                 let results = this.data.results,
                     tags = this.data.tags,
-                    colors = this.data.colors
+                    colors = this.data.colors,
+                    events = this.data.events
 
                 let outerWidth = this.vars.container.clientWidth,
                     outerHeight = this.vars.container.clientHeight,
@@ -468,22 +470,22 @@
                     .enter().append("g")
                     .attr("class", "event")
 
+                const eventColor = '#00bdf1'
+
                 eventLayers
                     .append("path")
-                    .attr("d", function(item, i) {
-                        let xDate = x(item.date)
-                        let d = "M" + xDate + "," + height
-                        d += " " + xDate + "," + 0
-                        return d
+                    .attr("d", item => {
+                        let xDate = this.vars.x(item.date)
+                        return "M" + xDate + "," + height + " " + xDate + "," + 0
                     })
                     .attr("stroke-dasharray", "6 4")
-                    .attr("stroke", "#00bdf1")
+                    .attr("stroke", eventColor)
 
                 eventLayers
                     .append("polygon")
-                    .attr("points", function (item, i) {
-                        let xDate = x(item.date)
-                        // small triangle
+                    .attr("points", (item, i) => {
+                        let xDate = this.vars.x(item.date)
+                        // small triangle on top of dashed line
                         let size = 5
                         let points = [
                             [xDate - size, 0],
@@ -492,7 +494,7 @@
                         ]
                         return points.map((p) => p[0] + "," + p[1]).join(" ")
                     })
-                    .attr("fill", "#00bdf1")
+                    .attr("fill", eventColor)
 
                 // Update axis
                 this.vars.svg.select('.axis--x').transition().call(this.vars.xAxis)
