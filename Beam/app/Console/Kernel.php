@@ -40,17 +40,16 @@ class Kernel extends ConsoleKernel
             ->everyMinute();
 
         $schedule->command(AggregatePageviewLoadJob::COMMAND)
-             ->hourlyAt(5)
+             ->hourlyAt(3)
              ->withoutOverlapping();
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND)
-            ->hourlyAt(5)
+            ->hourlyAt(4)
             ->withoutOverlapping();
 
-        // TODO: temporarily turned off to figure out what is a cause of "MySQL connection refused"
-        //$schedule->command(AggregateArticlesViews::COMMAND)
-        //    ->dailyAt('00:10')
-        //    ->withoutOverlapping();
+        $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
+            ->dailyAt('01:00')
+            ->withoutOverlapping();
 
         $schedule->command(DeleteOldAggregations::COMMAND)
             ->dailyAt('00:10')

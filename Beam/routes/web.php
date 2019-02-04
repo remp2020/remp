@@ -42,6 +42,10 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
+    Route::get('author-segments/test', 'AuthorSegmentsController@test')->name('authorSegments.test');
+    Route::post('author-segments/compute', 'AuthorSegmentsController@compute')->name('authorSegments.compute');
+    Route::post('author-segments/validate', 'AuthorSegmentsController@validateForm')->name('authorSegments.validateForm');
+
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
 
@@ -99,7 +103,5 @@ Route::middleware('auth.jwt')->group(function () {
             ->name('googleanalyticsreporting.timeHistogram.json');
     }
 
-    // TODO: temporary, delete after test is over
-    Route::get('tests/author-segments-test', 'TestController@authorSegmentsTest')->name('test.author-segments-test');
-    Route::post('tests/author-segments-test', 'TestController@showResults')->name('test.show-results');
+
 });

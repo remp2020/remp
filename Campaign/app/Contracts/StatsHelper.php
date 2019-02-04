@@ -22,7 +22,7 @@ class StatsHelper
 
     public function variantStats(CampaignBanner $variant, Carbon $from = null, Carbon $to = null)
     {
-        return $this->variantsStats([$variant->id], $from, $to);
+        return $this->variantsStats([$variant->uuid], $from, $to);
     }
 
     private function variantsStats($variantUuids, Carbon $from = null, Carbon $to = null)

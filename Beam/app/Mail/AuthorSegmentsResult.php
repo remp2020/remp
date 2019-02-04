@@ -32,7 +32,7 @@ class AuthorSegmentsResult extends Mailable
 
     public function build()
     {
-        return $this->view('test.results_email')
+        return $this->view('authors.segments.results_email')
             ->with([
                 'results' => $this->results,
                 'minimal_views' => $this->minimalViews,

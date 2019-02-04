@@ -116,7 +116,7 @@ class Segment implements SegmentContract
                 'query' => $params,
             ]);
         } catch (ConnectException $e) {
-            Log::warning("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
+//            Log::warning("Could not connect to Segment:Check endpoint: {$e->getMessage()}");
             return false;
         }
 

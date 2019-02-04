@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use App\Segment;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class ProcessPageviewLoyalVisitors extends Command
 {
@@ -31,13 +31,13 @@ class ProcessPageviewLoyalVisitors extends Command
             $timeBefore = $now->copy()->hour(0)->minute(0)->second(0)->subDays($dayOffset);
             $timeAfter = $now->copy()->hour(0)->minute(0)->second(0)->subDays($dayOffset+1);
 
-            $request = new JournalAggregateRequest('pageviews', 'load');
+            $request = new AggregateRequest('pageviews', 'load');
             $request->setTimeAfter($timeAfter);
             $request->setTimeBefore($timeBefore);
             $request->addFilter('_article', '1');
             $request->addGroup("user_id", "browser_id");
 
-            $pageviews = $journalContract->count($request);
+            $pageviews = collect($journalContract->count($request));
 
             foreach ($pageviews as $record) {
                 if ($record->count === 0) {

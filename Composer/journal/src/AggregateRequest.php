@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Contracts;
+namespace Remp\Journal;
 
-class JournalAggregateRequest
+class AggregateRequest
 {
     protected $category;
 
@@ -29,7 +29,7 @@ class JournalAggregateRequest
         $this->action = $action;
     }
 
-    public function addFilter(string $tag, string ...$values): JournalAggregateRequest
+    public function addFilter(string $tag, string ...$values): AggregateRequest
     {
         foreach ($values as &$v) {
             $v = strval($v);
@@ -41,13 +41,13 @@ class JournalAggregateRequest
         return $this;
     }
 
-    public function addGroup(string ...$tags): JournalAggregateRequest
+    public function addGroup(string ...$tags): AggregateRequest
     {
         $this->groupBy = array_merge($this->groupBy, $tags);
         return $this;
     }
 
-    public function setTimeHistogram(string $interval, string $offset): JournalAggregateRequest
+    public function setTimeHistogram(string $interval, string $offset): AggregateRequest
     {
         $this->timeHistogram = [
             'interval' => $interval,
@@ -56,19 +56,19 @@ class JournalAggregateRequest
         return $this;
     }
 
-    public function setTimeBefore(\DateTime $timeBefore): JournalAggregateRequest
+    public function setTimeBefore(\DateTime $timeBefore): AggregateRequest
     {
         $this->timeBefore = $timeBefore;
         return $this;
     }
 
-    public function setTimeAfter(\DateTime $timeAfter): JournalAggregateRequest
+    public function setTimeAfter(\DateTime $timeAfter): AggregateRequest
     {
         $this->timeAfter = $timeAfter;
         return $this;
     }
 
-    public function setTime(\DateTime $timeAfter, \DateTime $timeBefore): JournalAggregateRequest
+    public function setTime(\DateTime $timeAfter, \DateTime $timeBefore): AggregateRequest
     {
         $this->timeAfter = $timeAfter;
         $this->timeBefore = $timeBefore;

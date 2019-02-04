@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\JournalContract;
 use App\Http\Requests\SegmentRequest;
 use App\Segment;
 use App\SegmentGroup;
 use App\SegmentRule;
 use Html;
+use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 
@@ -193,7 +193,7 @@ class SegmentController extends Controller
             $segment->setRelation('rules', collect($rules));
         }
 
-        $categories = $this->journalContract->categories();
+        $categories = collect($this->journalContract->categories());
 
         return [
             $segment,

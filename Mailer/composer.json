@@ -43,6 +43,7 @@
         "guzzlehttp/psr7": "^1.4",
         "remp/nette-sso": "*",
         "remp/multi-armed-bandit": "*",
+        "remp/journal": "*",
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "tomaj/nette-errbit": "~3.0",

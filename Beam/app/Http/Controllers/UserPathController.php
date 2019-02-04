@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Author;
-use App\Contracts\JournalContract;
 use App\Conversion;
 use App\Http\Request;
 use App\Model\ConversionCommerceEvent;
@@ -14,13 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class UserPathController extends Controller
 {
-    private $journal;
-
-    public function __construct(JournalContract $journal)
-    {
-        $this->journal = $journal;
-    }
-
     public function index()
     {
         $authors = Author::all();

@@ -21,7 +21,6 @@ class UnreadArticlesGenerator
         Client $beamClient,
         ContentInterface $content
     ) {
-    
         $this->beamClient = $beamClient;
         $this->content = $content;
     }
@@ -33,6 +32,7 @@ class UnreadArticlesGenerator
             $item->timespan = $parameters['timespan'];
             $item->articlesCount = $parameters['articles_count'];
             $item->criteria = $parameters['criteria'];
+            $item->ignoreAuthors = $parameters['ignore_authors'] ?? [];
             $item->userIds = [];
             $this->templates[$templateCode] = $item;
         }
@@ -44,7 +44,13 @@ class UnreadArticlesGenerator
     {
         foreach ($this->templates as $templateCode => $item) {
             foreach (array_chunk($item->userIds, 1000) as $userIdsChunk) {
-                $results = $this->beamClient->unreadArticles($item->timespan, $item->articlesCount, $item->criteria, $userIdsChunk);
+                $results = $this->beamClient->unreadArticles(
+                    $item->timespan,
+                    $item->articlesCount,
+                    $item->criteria,
+                    $userIdsChunk,
+                    $item->ignoreAuthors
+                );
 
                 foreach ($results as $userId => $urls) {
                     $this->results[$templateCode][$userId] = $urls;
@@ -56,6 +62,9 @@ class UnreadArticlesGenerator
     public function getMailParameters($templateCode, $userId): array
     {
         $params = [];
+
+        $headlineTitle = null;
+
         foreach ($this->results[$templateCode][$userId] as $i => $url) {
             if (!array_key_exists($url, $this->articlesMeta)) {
                 $this->articlesMeta[$url] = $this->content->fetchUrlMeta($url);
@@ -69,7 +78,12 @@ class UnreadArticlesGenerator
             $params["article_{$counter}_description"] = $meta->getDescription();
             $params["article_{$counter}_image"] = $meta->getImage();
             $params["article_{$counter}_url"] = $url;
+
+            if (!$headlineTitle) {
+                $headlineTitle = $meta->getTitle();
+            }
         }
+        $params['headline_title'] = $headlineTitle;
 
         return $params;
     }

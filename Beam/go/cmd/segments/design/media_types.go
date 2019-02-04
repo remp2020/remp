@@ -101,18 +101,36 @@ var Commerces = MediaType("application/vnd.commerces+json", func() {
 })
 
 var Segment = MediaType("application/vnd.segment+json", func() {
-	Description("Segment check")
+	Description("Segment")
 	Attributes(func() {
+		Attribute("id", Integer, "ID of segment")
 		Attribute("code", String, "Code-friendly identificator of segment")
 		Attribute("name", String, "User-friendly name of segment")
 		Attribute("group", SegmentGroup)
+		Attribute("criteria", Any, "Criteria used to build segment")
+		Attribute("url", String, "URL to segment")
 	})
 	View("default", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("group")
+		Attribute("criteria")
+	})
+	View("tiny", func() {
+		Attribute("id")
 		Attribute("code")
 		Attribute("name")
 		Attribute("group")
 	})
-	Required("code", "name", "group")
+	View("extended", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("group")
+		Attribute("url")
+	})
+	Required("id", "code", "name", "group")
 })
 
 var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {
@@ -147,6 +165,62 @@ var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
 		Attribute("sorting")
 	})
 	Required("id", "name", "sorting")
+})
+
+var SegmentBlueprint = MediaType("application/vnd.segment.blueprint+json", func() {
+	Description("Segment blueprint")
+	Attributes(func() {
+		Attribute("blueprint", CollectionOf(SegmentBlueprintTable))
+	})
+	View("default", func() {
+		Attribute("blueprint")
+	})
+	Required("blueprint")
+})
+
+var SegmentBlueprintTable = MediaType("application/vnd.segment.blueprint.table+json", func() {
+	Description("Blueprint of one table available for segment")
+	Attributes(func() {
+		Attribute("table", String, "Table name")
+		Attribute("fields", ArrayOf(String), "Fields of table")
+		Attribute("criteria", CollectionOf(SegmentBlueprintTableCriterion), "Processing criteria for fields of table")
+	})
+	View("default", func() {
+		Attribute("table")
+		Attribute("fields")
+		Attribute("criteria")
+	})
+	Required("table", "fields", "criteria")
+})
+
+var SegmentBlueprintTableCriterion = MediaType("application/vnd.segment.blueprint.table.criterion+json", func() {
+	Description("Criterion for one field of table available for segment")
+	Attributes(func() {
+		Attribute("key", String, "Field of table to which is this criterion related")
+		Attribute("label", String, "Human readable name of field")
+		Attribute("params", Any, "Criteria of field parameters")
+		Attribute("fields", ArrayOf(String), "Field parameters")
+	})
+	View("default", func() {
+		Attribute("key")
+		Attribute("label")
+		Attribute("params")
+		Attribute("fields")
+	})
+	Required("key", "label", "params")
+})
+
+var SegmentCount = MediaType("application/vnd.segment.count+json", func() {
+	Description("Segment count")
+	Attributes(func() {
+		Attribute("count", Integer, "Number of users in segment based on provided criteria")
+		Attribute("status", String, "Status of count. If everything is fine, returns `ok`.")
+	})
+	View("default", func() {
+		Attribute("count")
+		Attribute("status")
+	})
+	Required("count", "status")
 })
 
 var Event = MediaType("application/vnd.event+json", func() {
@@ -374,4 +448,16 @@ var Flags = MediaType("application/vnd.flags+json", func() {
 		Attribute("events")
 	})
 	Required("pageviews", "commerce", "events")
+})
+
+var SegmentGroupsFallback = MediaType("application/vnd.segment.groups.fallback", func() {
+	Attributes(func() {
+		Attribute("status", String, "OK flag to check before reading the data")
+		Attribute("groups", CollectionOf(SegmentGroup))
+	})
+	View("default", func() {
+		Attribute("status")
+		Attribute("groups")
+	})
+	Required("status", "groups")
 })

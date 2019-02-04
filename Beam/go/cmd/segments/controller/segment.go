@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -23,15 +24,38 @@ const (
 // SegmentController implements the segment resource.
 type SegmentController struct {
 	*goa.Controller
-	SegmentStorage model.SegmentStorage
+	SegmentStorage          model.SegmentStorage
+	SegmentBlueprintStorage model.SegmentBlueprintStorage
 }
 
 // NewSegmentController creates a segment controller.
-func NewSegmentController(service *goa.Service, segmentStorage model.SegmentStorage) *SegmentController {
+func NewSegmentController(
+	service *goa.Service,
+	segmentStorage model.SegmentStorage,
+	segmentBlueprintStorage model.SegmentBlueprintStorage,
+) *SegmentController {
 	return &SegmentController{
-		Controller:     service.NewController("SegmentController"),
-		SegmentStorage: segmentStorage,
+		Controller:              service.NewController("SegmentController"),
+		SegmentStorage:          segmentStorage,
+		SegmentBlueprintStorage: segmentBlueprintStorage,
 	}
+}
+
+// Get runs the get action.
+func (c *SegmentController) Get(ctx *app.GetSegmentsContext) error {
+	s, ok, err := c.SegmentStorage.GetByID(ctx.ID)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+
+	response, err := (*Segment)(s).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(response)
 }
 
 // List runs the list action.
@@ -40,7 +64,20 @@ func (c *SegmentController) List(ctx *app.ListSegmentsContext) error {
 	if err != nil {
 		return err
 	}
-	return ctx.OK((SegmentCollection)(sc).ToMediaType())
+
+	return ctx.OKTiny((SegmentCollection)(sc).ToTinyMediaType())
+}
+
+// Groups runs the groups action.
+func (c *SegmentController) Groups(ctx *app.GroupsSegmentsContext) error {
+	sgc, err := c.SegmentStorage.Groups()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(&app.SegmentGroupsFallback{
+		Status: "ok",
+		Groups: (SegmentGroupCollection)(sgc).ToMediaType(),
+	})
 }
 
 // CheckUser runs the check_user action.
@@ -89,6 +126,113 @@ func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
 		return err
 	}
 	return ctx.OK(uc)
+}
+
+// Criteria runs the criteria action.
+func (c *SegmentController) Criteria(ctx *app.CriteriaSegmentsContext) error {
+	sbtc, err := c.SegmentBlueprintStorage.Get()
+	if err != nil {
+		return err
+	}
+	mtsbtc := (SegmentBlueprintTableCollection)(sbtc).ToMediaType()
+
+	mtsb := &app.SegmentBlueprint{
+		Blueprint: mtsbtc,
+	}
+
+	return ctx.OK(mtsb)
+}
+
+// CreateOrUpdate runs the create_or_update action.
+func (c *SegmentController) CreateOrUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	if ctx.ID != nil {
+		return c.handleUpdate(ctx)
+	}
+	return c.handleCreate(ctx)
+}
+
+// Count runs the count action.
+func (c *SegmentController) Count(ctx *app.CountSegmentsContext) error {
+	// TODO: implementation; for now returns 0 for each call
+	return ctx.OK(&app.SegmentCount{
+		Count:  0,
+		Status: "ok",
+	})
+}
+
+// Related runs the related action.
+func (c *SegmentController) Related(ctx *app.RelatedSegmentsContext) error {
+	// TODO: implementation; for now returns empty list for each call
+	return ctx.OKExtended(app.SegmentExtendedCollection{})
+}
+
+// handleCreate handles creation of Segment.
+func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	p := ctx.Payload
+
+	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+	}
+
+	// TODO: maybe code should be also part of payload? check with CRM
+	code, err := model.Webalize(p.Name)
+	if err != nil {
+		return err
+	}
+
+	sd := model.SegmentData{
+		Name:           p.Name,
+		Code:           code,
+		Active:         true,
+		SegmentGroupID: p.GroupID,
+		Criteria: sql.NullString{
+			String: string(criteriaJSON),
+			Valid:  true,
+		},
+	}
+	s, err := c.SegmentStorage.Create(sd)
+	if err != nil {
+		return err
+	}
+
+	response, err := (*Segment)(s).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(response)
+}
+
+// handleUpdate handles update of Segment.
+func (c *SegmentController) handleUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
+	p := ctx.Payload
+
+	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+	}
+	sd := model.SegmentData{
+		Name:           p.Name,
+		Active:         true,
+		SegmentGroupID: p.GroupID,
+		Criteria: sql.NullString{
+			String: string(criteriaJSON),
+			Valid:  true,
+		},
+	}
+	s, ok, err := c.SegmentStorage.Update(*ctx.ID, sd)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return ctx.NotFound()
+	}
+
+	response, err := (*Segment)(s).ToMediaType()
+	if err != nil {
+		return err
+	}
+	return ctx.OK(response)
 }
 
 // handleCheck determines whether provided identifier is part of segment based on given segment type.

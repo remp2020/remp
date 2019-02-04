@@ -7,7 +7,6 @@ use App\Contracts\StatsContract;
 use App\Contracts\StatsHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Contracts\Remp\Stats;
 use Remp\MultiArmedBandit\Lever;
 use Remp\MultiArmedBandit\Machine;
 
@@ -78,7 +77,7 @@ class StatsController extends Controller
         foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
 
-            $data = $stats->count()
+            $data = $this->stats->count()
                 ->forVariants($variantUuids)
                 ->timeHistogram($interval)
                 ->from($from)
@@ -168,6 +167,11 @@ class StatsController extends Controller
         $numOfCols = (int)($chartWidth / 40);
 
         $diff = $to->diffInSeconds($from);
+
+        if (isset($_COOKIE['dbg'])) {
+            dump($numOfCols, $diff);
+            die;
+        }
         $interval = $diff / $numOfCols;
 
         return (int)$interval . 's';

@@ -2,10 +2,10 @@
 
 namespace App\Contracts;
 
-use App\Article;
-use App\Conversion;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class JournalHelpers
 {
@@ -35,12 +35,14 @@ class JournalHelpers
 
         $externalArticleIds = $articles->pluck('external_id')->toArray();
 
-        $request = new JournalAggregateRequest('pageviews', 'load');
+        $request = new AggregateRequest('pageviews', 'load');
         $request->setTimeAfter($minimalPublishedTime);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id');
         $request->addFilter('article_id', ...$externalArticleIds);
-        return $this->journal->unique($request)
+
+        $result = collect($this->journal->unique($request));
+        return $result
             ->filter(function ($item) {
                 return $item->tags !== null;
             })
@@ -61,13 +63,15 @@ class JournalHelpers
     {
         $externalArticleIds = $articles->pluck('external_id')->toArray();
 
-        $request = new JournalAggregateRequest('pageviews', 'timespent');
+        $request = new AggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($since);
         $request->setTimeBefore(Carbon::now());
         $request->addGroup('article_id');
 
         $request->addFilter('article_id', ...$externalArticleIds);
-        return $this->journal->avg($request)
+
+        $result = collect($this->journal->avg($request));
+        return $result
             ->filter(function ($item) {
                 return $item->tags !== null;
             })

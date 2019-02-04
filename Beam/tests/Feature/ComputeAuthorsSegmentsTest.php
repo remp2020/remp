@@ -6,15 +6,14 @@ use App\Account;
 use App\Article;
 use App\ArticleAggregatedView;
 use App\Author;
-use App\Console\Commands\CreateAuthorsSegments;
-use App\Mail\AuthorSegmentsResult;
+use App\Console\Commands\ComputeAuthorsSegments;
 use App\Property;
+use App\Segment;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class CreateAuthorsSegmentsTest extends TestCase
+class ComputeAuthorsSegmentsTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -37,7 +36,7 @@ class CreateAuthorsSegmentsTest extends TestCase
         $items = [
             [
                 'article_id' => $article->id,
-                'user_id' => '',
+                'user_id' => null,
                 'browser_id' => 'XYZ',
                 'date' => $date,
                 'pageviews' => 10,
@@ -54,25 +53,14 @@ class CreateAuthorsSegmentsTest extends TestCase
         ];
         ArticleAggregatedView::insert($items);
 
-        Mail::fake();
+        $this->artisan(ComputeAuthorsSegments::COMMAND);
 
-        $this->artisan(CreateAuthorsSegments::COMMAND, [
-            'min_views' => 0,
-            'min_average_timespent' => 0,
-            'min_ratio' => 0,
-            'history' => 90,
-            'email' => 'email@doesnt.matter'
-        ]);
+        $segment = Segment::where('code', 'author-' . $author->id)->first();
+        $segmentBrowserIds = $segment->browsers->pluck('browser_id');
+        $segmentUserIds = $segment->users->pluck('user_id');
 
-        Mail::assertSent(AuthorSegmentsResult::class);
-
-        // TODO enable once segments computation is finalized
-        //$segment = Segment::where('code', 'author-' . $author->id)->first();
-        //$segmentBrowserIds = $segment->browsers->pluck('browser_id');
-        //$segmentUserIds = $segment->users->pluck('user_id');
-        //
-        //$this->assertContains('ABC', $segmentBrowserIds);
-        //$this->assertContains('XYZ', $segmentBrowserIds);
-        //$this->assertContains('9', $segmentUserIds);
+        $this->assertContains('ABC', $segmentBrowserIds);
+        $this->assertContains('XYZ', $segmentBrowserIds);
+        $this->assertContains('9', $segmentUserIds);
     }
 }

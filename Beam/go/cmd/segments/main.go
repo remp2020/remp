@@ -19,7 +19,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/olivere/elastic"
-	"github.com/patrickmn/go-cache"
+	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/controller"
@@ -87,6 +87,12 @@ func main() {
 		CommerceStorage: commerceStorage,
 	}
 
+	segmentBlueprintStorage := &model.SegmentBlueprintDB{
+		EventStorage:    eventStorage,
+		PageviewStorage: pageviewStorage,
+		CommerceStorage: commerceStorage,
+	}
+
 	// server cancellation
 
 	var wg sync.WaitGroup
@@ -146,7 +152,7 @@ func main() {
 	app.MountEventsController(service, controller.NewEventController(service, eventStorage))
 	app.MountCommerceController(service, controller.NewCommerceController(service, commerceStorage))
 	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewStorage))
-	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage))
+	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage, segmentBlueprintStorage))
 	app.MountConcurrentsController(service, controller.NewConcurrentsController(service, concurrentsStorage))
 
 	// server init

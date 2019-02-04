@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Contracts;
+namespace Remp\Journal;
 
-class JournalListRequest
+class ListRequest
 {
     protected $category;
 
@@ -18,7 +18,7 @@ class JournalListRequest
 
     protected $loadTimespent = false;
 
-    public static function from($category): JournalListRequest
+    public static function from($category): ListRequest
     {
         return new self($category);
     }
@@ -28,13 +28,13 @@ class JournalListRequest
         $this->category = $category;
     }
 
-    public function addSelect(string ...$fields): JournalListRequest
+    public function addSelect(string ...$fields): ListRequest
     {
         $this->select = array_merge($this->select, $fields);
         return $this;
     }
 
-    public function addFilter(string $tag, string ...$values): JournalListRequest
+    public function addFilter(string $tag, string ...$values): ListRequest
     {
         foreach ($values as &$v) {
             $v = strval($v);
@@ -46,25 +46,25 @@ class JournalListRequest
         return $this;
     }
 
-    public function addGroup(string ...$tags): JournalListRequest
+    public function addGroup(string ...$tags): ListRequest
     {
         $this->groupBy = array_merge($this->groupBy, $tags);
         return $this;
     }
 
-    public function setLoadTimespent(): JournalListRequest
+    public function setLoadTimespent(): ListRequest
     {
         $this->loadTimespent = true;
         return $this;
     }
 
-    public function setTimeBefore(\DateTime $timeBefore): JournalListRequest
+    public function setTimeBefore(\DateTime $timeBefore): ListRequest
     {
         $this->timeBefore = $timeBefore;
         return $this;
     }
 
-    public function setTimeAfter(\DateTime $timeAfter): JournalListRequest
+    public function setTimeAfter(\DateTime $timeAfter): ListRequest
     {
         $this->timeAfter = $timeAfter;
         return $this;

@@ -3,17 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Helpers\Colors;
 use App\Http\Resources\ArticleResource;
-use App\Model\ArticleTitle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class ArticleDetailsController extends Controller
 {
@@ -55,7 +52,7 @@ class ArticleDetailsController extends Controller
         $type = $request->get('type');
         $groupBy = $type === 'title' ? 'title_variant' : 'image_variant';
 
-        $data = $this->histogram($article, $request, $groupBy, function (JournalAggregateRequest $request) {
+        $data = $this->histogram($article, $request, $groupBy, function (AggregateRequest $request) {
             $request->addFilter('derived_referer_medium', 'internal');
         });
         $data['colors'] = Colors::abTestVariantTagsToColors($data['tags']);
@@ -141,7 +138,7 @@ class ArticleDetailsController extends Controller
                 throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days] values, instead '$interval' provided");
         }
 
-        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
+        $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->addFilter('article_id', $article->external_id);
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
@@ -152,7 +149,7 @@ class ArticleDetailsController extends Controller
             $addConditions($journalRequest);
         }
 
-        $currentRecords = $this->journal->count($journalRequest);
+        $currentRecords = collect($this->journal->count($journalRequest));
 
         // Get all tags
         $tags = [];
@@ -200,12 +197,12 @@ class ArticleDetailsController extends Controller
         $timeBefore = Carbon::now();
         $timeAfter = $article->published_at;
 
-        $uniqueRequest = new JournalAggregateRequest('pageviews', 'load');
+        $uniqueRequest = new AggregateRequest('pageviews', 'load');
         $uniqueRequest->setTimeAfter($timeAfter);
         $uniqueRequest->setTimeBefore($timeBefore);
         $uniqueRequest->addGroup('article_id', 'title_variant', 'image_variant');
         $uniqueRequest->addFilter('article_id', $article->external_id);
-        $results = $this->journal->unique($uniqueRequest);
+        $results = collect($this->journal->unique($uniqueRequest));
 
         $titleVariants = [];
         $imageVariants = [];

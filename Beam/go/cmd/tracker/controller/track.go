@@ -12,7 +12,7 @@ import (
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
-	"github.com/snowplow/referer-parser/go"
+	refererparser "github.com/snowplow/referer-parser/go"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -190,6 +190,19 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 			fields["timespent"] = ctx.Payload.Timespent.Seconds
 			fields["unload"] = false
 			if ctx.Payload.Timespent.Unload != nil && *ctx.Payload.Timespent.Unload {
+				fields["unload"] = true
+			}
+		}
+	case model.ActionPageviewProgress:
+		tags["action"] = model.ActionPageviewProgress
+		measurement = model.TableProgress
+		if ctx.Payload.Progress != nil {
+			fields["page_progress"] = ctx.Payload.Progress.PageRatio
+			if ctx.Payload.Progress.ArticleRatio != nil {
+				fields["article_progress"] = *ctx.Payload.Progress.ArticleRatio
+			}
+			fields["unload"] = false
+			if ctx.Payload.Progress.Unload != nil && *ctx.Payload.Progress.Unload {
 				fields["unload"] = true
 			}
 		}

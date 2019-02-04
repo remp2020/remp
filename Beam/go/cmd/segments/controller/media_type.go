@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -14,6 +16,24 @@ type Segment model.Segment
 
 // SegmentCollection is the collection of Segments.
 type SegmentCollection model.SegmentCollection
+
+// SegmentGroup represents segment group information stored in storage.
+type SegmentGroup model.SegmentGroup
+
+// SegmentGroupCollection is the collection of SegmentsGroups.
+type SegmentGroupCollection model.SegmentGroupCollection
+
+// SegmentBlueprintTable represents blueprint of one segment table.
+type SegmentBlueprintTable model.SegmentBlueprintTable
+
+// SegmentBlueprintTableCollection is the collection of SegmentBlueprintTable.
+type SegmentBlueprintTableCollection model.SegmentBlueprintTableCollection
+
+// SegmentBlueprintTableCriterion represents criterion of one field of table available for segment.
+type SegmentBlueprintTableCriterion model.SegmentBlueprintTableCriterion
+
+// SegmentBlueprintTableCriterionCollection is the collection of SegmentBlueprintTableCriterion.
+type SegmentBlueprintTableCriterionCollection model.SegmentBlueprintTableCriterionCollection
 
 // Event represent tracked generic events data.
 type Event model.Event
@@ -61,8 +81,44 @@ type AvgRow model.AvgRow
 type AvgRowCollection model.AvgRowCollection
 
 // ToMediaType converts internal Segment representation to application one.
-func (s *Segment) ToMediaType() *app.Segment {
-	return &app.Segment{
+func (s *Segment) ToMediaType() (*app.Segment, error) {
+	mt := &app.Segment{
+		ID:   s.ID,
+		Code: s.Code,
+		Name: s.Name,
+		Group: &app.SegmentGroup{
+			Name:    s.Group.Name,
+			Sorting: s.Group.Sorting,
+		},
+	}
+
+	if s.Criteria.Valid {
+		err := json.Unmarshal([]byte(s.Criteria.String), &mt.Criteria)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to unmarshal segments `criteria`")
+		}
+	}
+
+	return mt, nil
+}
+
+// ToMediaType converts internal SegmentCollection representation to application one.
+func (sc SegmentCollection) ToMediaType() (app.SegmentCollection, error) {
+	mt := app.SegmentCollection{}
+	for _, s := range sc {
+		smt, err := (*Segment)(s).ToMediaType()
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("unable to unmarshal segment with ID [%d]", s.ID))
+		}
+		mt = append(mt, smt)
+	}
+	return mt, nil
+}
+
+// ToTinyMediaType converts internal Segment representation to tiny view of application segment.
+func (s *Segment) ToTinyMediaType() *app.SegmentTiny {
+	return &app.SegmentTiny{
+		ID:   s.ID,
 		Code: s.Code,
 		Name: s.Name,
 		Group: &app.SegmentGroup{
@@ -72,12 +128,69 @@ func (s *Segment) ToMediaType() *app.Segment {
 	}
 }
 
-// ToMediaType converts internal SegmentCollection representation to application one.
-func (sc SegmentCollection) ToMediaType() app.SegmentCollection {
-	mt := app.SegmentCollection{}
+// ToTinyMediaType converts internal SegmentCollection representation to tiny view of application segment collection.
+func (sc SegmentCollection) ToTinyMediaType() app.SegmentTinyCollection {
+	mt := app.SegmentTinyCollection{}
 	for _, s := range sc {
-		mt = append(mt, (*Segment)(s).ToMediaType())
+		mt = append(mt, (*Segment)(s).ToTinyMediaType())
 	}
+	return mt
+}
+
+// ToMediaType converts internal Segment representation to application one.
+func (sg *SegmentGroup) ToMediaType() *app.SegmentGroup {
+	return &app.SegmentGroup{
+		ID:      sg.ID,
+		Name:    sg.Name,
+		Sorting: sg.Sorting,
+	}
+}
+
+// ToMediaType converts internal SegmentCollection representation to application one.
+func (sgc SegmentGroupCollection) ToMediaType() app.SegmentGroupCollection {
+	mt := app.SegmentGroupCollection{}
+	for _, sg := range sgc {
+		mt = append(mt, (*SegmentGroup)(sg).ToMediaType())
+	}
+	return mt
+}
+
+// ToMediaType converts internal SegmentBlueprint representation to application one.
+func (sbt *SegmentBlueprintTable) ToMediaType() *app.SegmentBlueprintTable {
+	return &app.SegmentBlueprintTable{
+		Table:    sbt.Table,
+		Fields:   sbt.Fields,
+		Criteria: (SegmentBlueprintTableCriterionCollection)(sbt.Criteria).ToMediaType(),
+	}
+}
+
+// ToMediaType converts internal SegmentBlueprintTableCollection representation to application one.
+func (sbtc SegmentBlueprintTableCollection) ToMediaType() app.SegmentBlueprintTableCollection {
+	mt := app.SegmentBlueprintTableCollection{}
+	for _, sbt := range sbtc {
+		mt = append(mt, (*SegmentBlueprintTable)(sbt).ToMediaType())
+	}
+
+	return mt
+}
+
+// ToMediaType converts internal SegmentBlueprintTableCriterion representation to application one.
+func (sbc *SegmentBlueprintTableCriterion) ToMediaType() *app.SegmentBlueprintTableCriterion {
+	return &app.SegmentBlueprintTableCriterion{
+		Key:    sbc.Key,
+		Label:  sbc.Label,
+		Params: sbc.Params,
+		Fields: sbc.Fields,
+	}
+}
+
+// ToMediaType converts internal SegmentBlueprintTableCriterionCollection representation to application one.
+func (sbcc SegmentBlueprintTableCriterionCollection) ToMediaType() app.SegmentBlueprintTableCriterionCollection {
+	mt := app.SegmentBlueprintTableCriterionCollection{}
+	for _, sbc := range sbcc {
+		mt = append(mt, (*SegmentBlueprintTableCriterion)(sbc).ToMediaType())
+	}
+
 	return mt
 }
 
