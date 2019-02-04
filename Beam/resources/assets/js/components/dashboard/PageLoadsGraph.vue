@@ -357,22 +357,18 @@
                 let verticalX = this.vars.x(row.date)
 
                 this.vars.vertical
-                    .attr("d", function() {
-                        let d = "M" + verticalX + "," + height;
-                        d += " " + verticalX + "," + 0;
-                        return d;
+                    .attr("d", () => {
+                        return "M" + verticalX + "," + height + " " + verticalX + "," + 0
                     })
 
                 let valuesSum = 0
 
-                let that = this
-
-                let values = this.data.tags.map(function (tag) {
+                let values = this.data.tags.map(tag => {
                     valuesSum += row[tag]
                     return {
                         tag: tag,
                         value: row[tag],
-                        color: d3.color(that.vars.colorScale(tag)).hex()
+                        color: d3.color(this.vars.colorScale(tag)).hex()
                     }
                 })
 
