@@ -323,7 +323,7 @@ class ArticleController extends Controller
                     if ($title === '') {
                         continue;
                     }
-                    $article->articleTitles()->create([
+                    $article->articleTitles()->updateOrCreate([
                         'variant' => $variant,
                         'title' => $title
                     ]);
