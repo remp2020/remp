@@ -48,20 +48,20 @@ class Kernel extends ConsoleKernel
             ->hourlyAt(4)
             ->withoutOverlapping();
 
-        $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
-            ->dailyAt('01:00')
-            ->withoutOverlapping();
-
-        $schedule->command(ComputeAuthorsSegments::COMMAND)
-            ->dailyAt('02:00')
-            ->withoutOverlapping();
-
         $schedule->command(DeleteOldAggregations::COMMAND)
             ->dailyAt('00:10')
             ->withoutOverlapping();
 
         $schedule->command(CompressAggregations::COMMAND)
             ->dailyAt('00:20')
+            ->withoutOverlapping();
+
+        $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
+            ->dailyAt('01:00')
+            ->withoutOverlapping();
+
+        $schedule->command(ComputeAuthorsSegments::COMMAND)
+            ->dailyAt('02:00')
             ->withoutOverlapping();
 
         // Aggregate any conversion events that weren't aggregated before due to Segments API fail
