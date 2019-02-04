@@ -64,13 +64,31 @@ class ArticleDetailsController extends Controller
 
         $data['tagLabels'] = [];
 
-        $articleTitles = $article->articleTitles()->whereIn('variant', $data['tags'])->get();
-        foreach ($articleTitles as $articleTitle) {
-            $obj = new \stdClass();
-            $obj->label = $articleTitle->title;
-            $obj->color = $tagToColor[$articleTitle->variant];
+        $articleTitles = $article
+            ->articleTitles()
+            ->whereIn('variant', $data['tags'])
+            ->get()
+            ->groupBy('variant');
 
-            $data['tagLabels'][$articleTitle->variant] = $obj;
+        $data['events'] = [];
+
+        foreach ($articleTitles as $variant => $variantTitles) {
+            if ($variantTitles->count() > 1) {
+                for ($i = 0; $i < $variantTitles->count() - 1; $i++) {
+                    $oldTitle = $variantTitles[$i];
+                    $newTitle = $variantTitles[$i+1];
+                    $data['events'][] = (object) [
+                        'color' => $tagToColor[$variant],
+                        'date' => $newTitle->created_at->toIso8601ZuluString(),
+                        'title' => "<b>{$variant} Title Variant Changed</b><br /><b>From:</b> {$oldTitle->title}<br /><b>To:</b> {$newTitle->title}"
+                    ];
+                }
+            }
+
+            $data['tagLabels'][$variant] = (object) [
+                'color' => $tagToColor[$variant],
+                'labels' => $variantTitles->pluck('title')->toArray(),
+            ];
         }
         return response()->json($data);
     }
