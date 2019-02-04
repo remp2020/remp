@@ -82,7 +82,7 @@ type SegmentData struct {
 
 // SegmentCriteria represents segments criteria.
 type SegmentCriteria struct {
-	Version int         `json:"version"`
+	Version string      `json:"version"`
 	Nodes   interface{} `json:"nodes,string"`
 }
 

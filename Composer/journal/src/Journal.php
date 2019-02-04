@@ -176,10 +176,10 @@ class Journal implements JournalContract
             ];
 
             if ($request->getTimeAfter()) {
-                $json['time_after'] = $request->getTimeAfter()->format(DATE_RFC3339);
+                $json['conditions']['time_after'] = $request->getTimeAfter()->format(DATE_RFC3339);
             }
             if ($request->getTimeBefore()) {
-                $json['time_before'] = $request->getTimeBefore()->format(DATE_RFC3339);
+                $json['conditions']['time_before'] = $request->getTimeBefore()->format(DATE_RFC3339);
             }
             if ($request->getLoadTimespent()) {
                 $json['load_timespent'] = true;
