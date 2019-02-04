@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -129,8 +130,8 @@ func (s *Segment) ToTinyMediaType() *app.SegmentTiny {
 }
 
 // ToExtendedMediaType converts internal Segment representation to extended view of application segment.
-func (s *Segment) ToExtendedMediaType() *app.SegmentExtended {
-	url := "aloha"
+func (s *Segment) ToExtendedMediaType(segmentURL string) *app.SegmentExtended {
+	url := strings.Replace(segmentURL, "{segment_id}", strconv.Itoa(s.ID), -1)
 	return &app.SegmentExtended{
 		ID:   s.ID,
 		Code: s.Code,
@@ -153,10 +154,10 @@ func (sc SegmentCollection) ToTinyMediaType() app.SegmentTinyCollection {
 }
 
 // ToExtendedMediaType converts internal SegmentCollection representation to extended view of application segment collection.
-func (sc SegmentCollection) ToExtendedMediaType() app.SegmentExtendedCollection {
+func (sc SegmentCollection) ToExtendedMediaType(segmentURL string) app.SegmentExtendedCollection {
 	mt := app.SegmentExtendedCollection{}
 	for _, s := range sc {
-		mt = append(mt, (*Segment)(s).ToExtendedMediaType())
+		mt = append(mt, (*Segment)(s).ToExtendedMediaType(segmentURL))
 	}
 	return mt
 }

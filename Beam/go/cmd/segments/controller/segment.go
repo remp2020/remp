@@ -26,6 +26,7 @@ type SegmentController struct {
 	*goa.Controller
 	SegmentStorage          model.SegmentStorage
 	SegmentBlueprintStorage model.SegmentBlueprintStorage
+	Config                  SegmentConfig
 }
 
 // NewSegmentController creates a segment controller.
@@ -33,12 +34,19 @@ func NewSegmentController(
 	service *goa.Service,
 	segmentStorage model.SegmentStorage,
 	segmentBlueprintStorage model.SegmentBlueprintStorage,
+	config SegmentConfig,
 ) *SegmentController {
 	return &SegmentController{
 		Controller:              service.NewController("SegmentController"),
 		SegmentStorage:          segmentStorage,
 		SegmentBlueprintStorage: segmentBlueprintStorage,
+		Config:                  config,
 	}
+}
+
+// SegmentConfig represent configuration settings of Segment controller.
+type SegmentConfig struct {
+	URLEdit string
 }
 
 // Get runs the get action.
@@ -178,7 +186,7 @@ func (c *SegmentController) Related(ctx *app.RelatedSegmentsContext) error {
 		return err
 	}
 
-	return ctx.OKExtended((SegmentCollection)(sc).ToExtendedMediaType())
+	return ctx.OKExtended((SegmentCollection)(sc).ToExtendedMediaType(c.Config.URLEdit))
 }
 
 // handleCreate handles creation of Segment.

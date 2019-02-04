@@ -14,4 +14,6 @@ type Config struct {
 	ElasticAddr   string `envconfig:"elastic_addr" required:"true"`
 	ElasticUser   string `envconfig:"elastic_user" required:"false"`
 	ElasticPasswd string `envconfig:"elastic_passwd" required:"false"`
+
+	URLEdit string `envconfig:"url_edit" required:"true"`
 }
