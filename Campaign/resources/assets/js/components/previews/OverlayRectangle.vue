@@ -33,7 +33,7 @@
     }
     
     .overlay-rectangle-overlay {
-        position: absolute;
+        position: fixed;
         font-family: Noto Sans, sans-serif;
         top: 0;
         left: 0;
@@ -48,6 +48,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    #banner-preview .overlay-rectangle-overlay {
+        position: absolute;
     }
 
     .overlay-rectangle-preview-link {
