@@ -101,7 +101,7 @@ return [
         'devices.0' => [
             'required' => 'At least one device needs to be enabled.',
         ],
-        'variants.*.banner_id.required_unless' => 'All variants must have chosen banner.',
+        'variants.*.banner_id.required_unless' => 'You have to choose banner for every AB testing variant.',
         'variants.0.proportion' => [
             'required' => 'All variants must have proportion value.'
         ]
