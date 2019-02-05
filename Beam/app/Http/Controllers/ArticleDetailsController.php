@@ -87,7 +87,9 @@ class ArticleDetailsController extends Controller
 
             $data['tagLabels'][$variant] = (object) [
                 'color' => $tagToColor[$variant],
-                'labels' => $variantTitles->pluck('title')->toArray(),
+                'labels' => $variantTitles->pluck('title')->map(function($title){
+                    return html_entity_decode($title, ENT_QUOTES);
+                })->toArray(),
             ];
         }
         return response()->json($data);
