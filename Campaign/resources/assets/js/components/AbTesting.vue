@@ -202,6 +202,8 @@
 
                 this.variantNumber++;
 
+                this.variants[0].banner_id = this.bannerId;
+
                 setTimeout(() => {
                     this.renderSlider(this.calculateStarts());
                 }, 50);
