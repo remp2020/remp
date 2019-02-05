@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
@@ -42,6 +43,8 @@ type SegmentStorage interface {
 	OverridableFields() OverridableFields
 	// Flags returns array of flags available for rules.
 	Flags() Flags
+	// Related compares provided criteria to existing segments and returns segments with same criteria.
+	Related(SegmentCriteria) (SegmentCollection, error)
 }
 
 // EventRules represent map of rules with given "category/event" assigned
@@ -75,6 +78,22 @@ type SegmentData struct {
 	Active         bool
 	SegmentGroupID int `db:"segment_group_id"`
 	Criteria       sql.NullString
+}
+
+// SegmentCriteria represents segments criteria.
+type SegmentCriteria struct {
+	Version string      `json:"version"`
+	Nodes   interface{} `json:"nodes,string"`
+}
+
+// Scan scans provided input to SegmentCriteria.
+func (sc *SegmentCriteria) Scan(criteria string) error {
+	err := json.Unmarshal([]byte(criteria), sc)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // SegmentCollection is list of Segments.
@@ -588,4 +607,33 @@ func (sDB *SegmentDB) Flags() Flags {
 		}
 	}
 	return flags
+}
+
+// Related compares provided criteria to existing segments and returns segments with same criteria.
+func (sDB *SegmentDB) Related(criteria SegmentCriteria) (SegmentCollection, error) {
+	sc := SegmentCollection{}
+	err := sDB.MySQL.Select(&sc, "SELECT * FROM segments WHERE criteria IS NOT NULL")
+	if err != nil {
+		return nil, err
+	}
+
+	scRelated := SegmentCollection{}
+	for _, s := range sc {
+		if !s.Criteria.Valid {
+			continue
+		}
+
+		sCriteria := SegmentCriteria{}
+		err := sCriteria.Scan(s.Criteria.String)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to scan criteria")
+		}
+
+		// comparing only nodes, version can be different
+		if reflect.DeepEqual(criteria.Nodes, sCriteria.Nodes) {
+			scRelated = append(scRelated, s)
+		}
+	}
+
+	return scRelated, nil
 }

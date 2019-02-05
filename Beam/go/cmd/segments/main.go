@@ -148,11 +148,15 @@ func main() {
 
 	// controllers init
 
+	segmentConfig := controller.SegmentConfig{
+		URLEdit: c.URLEdit,
+	}
+
 	app.MountJournalController(service, controller.NewJournalController(service, eventStorage, commerceStorage, pageviewStorage))
 	app.MountEventsController(service, controller.NewEventController(service, eventStorage))
 	app.MountCommerceController(service, controller.NewCommerceController(service, commerceStorage))
 	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewStorage))
-	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage, segmentBlueprintStorage))
+	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage, segmentBlueprintStorage, segmentConfig))
 	app.MountConcurrentsController(service, controller.NewConcurrentsController(service, concurrentsStorage))
 
 	// server init
