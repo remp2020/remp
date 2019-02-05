@@ -1,12 +1,13 @@
 import Vue2Filters from 'vue2-filters'
 import Vuex from 'vuex'
 import "./filters"
+import Vue from "vue";
 
 global.$ = global.jQuery = require('jquery');
 
 global.Vue = require('vue');
-Vue.use(Vue2Filters)
-Vue.use(Vuex)
+Vue.use(Vue2Filters);
+Vue.use(Vuex);
 
 global.moment = require('moment');
 

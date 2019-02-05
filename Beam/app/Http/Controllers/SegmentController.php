@@ -237,4 +237,15 @@ class SegmentController extends Controller
 
         return $segment;
     }
+
+    public function embed(Request $request)
+    {
+        $segment = null;
+        if ($segmentId = $request->get('segmentId')) {
+            $segment = Segment::find($segmentId);
+        }
+        return view('segments.embed', [
+            'segment' => $segment,
+        ]);
+    }
 }
