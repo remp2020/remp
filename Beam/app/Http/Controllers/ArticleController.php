@@ -325,7 +325,7 @@ class ArticleController extends Controller
                     }
                     $article->articleTitles()->updateOrCreate([
                         'variant' => $variant,
-                        'title' => $title
+                        'title' => html_entity_decode($title, ENT_QUOTES)
                     ]);
                 }
             }
