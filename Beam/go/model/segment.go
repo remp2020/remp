@@ -82,12 +82,6 @@ type SegmentData struct {
 	Criteria       sql.NullString
 }
 
-// SegmentCriteria represents segments criteria.
-type SegmentCriteria struct {
-	Version string      `json:"version"`
-	Nodes   interface{} `json:"nodes,string"`
-}
-
 // Scan scans provided input to SegmentCriteria.
 func (sc *SegmentCriteria) Scan(criteria string) error {
 	err := json.Unmarshal([]byte(criteria), sc)

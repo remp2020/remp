@@ -12,7 +12,7 @@ import (
 
 // SegmentCriteria represents segment's criteria.
 type SegmentCriteria struct {
-	Version int
+	Version string
 	Nodes   SegmentCriteriaOperatorNodeCollection
 }
 
