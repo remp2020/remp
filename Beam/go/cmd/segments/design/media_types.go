@@ -133,6 +133,19 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 	Required("id", "code", "name", "group")
 })
 
+var RelatedSegments = MediaType("application/vnd.segments.related+json", func() {
+	Description("Related segments")
+	Attributes(func() {
+		Attribute("segments", CollectionOf(Segment))
+	})
+	View("default", func() {
+		Attribute("segments", func() {
+			View("extended")
+		})
+	})
+	Required("segments")
+})
+
 var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {
 	Description("Segment check")
 	Attributes(func() {

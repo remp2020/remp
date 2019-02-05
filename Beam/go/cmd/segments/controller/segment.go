@@ -186,7 +186,10 @@ func (c *SegmentController) Related(ctx *app.RelatedSegmentsContext) error {
 		return err
 	}
 
-	return ctx.OKExtended((SegmentCollection)(sc).ToExtendedMediaType(c.Config.URLEdit))
+	mt := app.SegmentsRelated{
+		Segments: (SegmentCollection)(sc).ToExtendedMediaType(c.Config.URLEdit),
+	}
+	return ctx.OK(&mt)
 }
 
 // handleCreate handles creation of Segment.
