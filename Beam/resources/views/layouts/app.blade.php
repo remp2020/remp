@@ -81,9 +81,15 @@
                 </ul>
             </li>
             <li class="m-b-15"></li>
-            <li {!! route_active(['segments', 'entities'], 'sub-menu', 'toggled') !!}>
-                <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-accounts-list-alt"></i> Segments</a>
+            <li {!! route_active(['segments', 'entities', 'authorSegments.index'], 'sub-menu', 'toggled') !!}>
+                <a href="#" data-ma-action="submenu-toggle" ><i class="zmdi zmdi-accounts-list-alt"></i> Segments</a>
                 <ul>
+                    <li {!! route_active(['segments']) !!}>
+                        <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-accounts-list m-r-5"></i> Segments</a>
+                    </li>
+                    <li {!! route_active(['authorSegments.index']) !!}>
+                        <a href="{{ route('authorSegments.index') }}" ><i class="zmdi zmdi-accounts-list m-r-5"></i> Author segments</a>
+                    </li>
                     <li {!! route_active(['entities']) !!}>
                         <a href="{{ route('entities.index') }}" ><i class="zmdi zmdi-crop-free m-r-5"></i> Entities</a>
                     </li>

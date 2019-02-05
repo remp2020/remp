@@ -43,6 +43,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
+    Route::get('author-segments/index', 'AuthorSegmentsController@index')->name('authorSegments.index');
+    Route::get('author-segments/json', 'AuthorSegmentsController@json')->name('authorSegments.json');
     Route::get('author-segments/test', 'AuthorSegmentsController@test')->name('authorSegments.test');
     Route::post('author-segments/compute', 'AuthorSegmentsController@compute')->name('authorSegments.compute');
     Route::post('author-segments/validate', 'AuthorSegmentsController@validateForm')->name('authorSegments.validateForm');
