@@ -37,6 +37,8 @@ type SegmentStorage interface {
 	CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
+	// CountAll returns count of unique tracked users.
+	CountAll() (int, error)
 	// EventRules returns map of rules assigned to given "category/event" key.
 	EventRules() EventRules
 	// OverridableFields returns array of fields that expect to be overriden when rule is checked.
@@ -398,6 +400,22 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue strin
 	}
 
 	return crc[0].Count, nil
+}
+
+// CountAll returns count of unique tracked users.
+func (sDB *SegmentDB) CountAll() (int, error) {
+	var pageviews int
+	var o AggregateOptions
+	o.Action = ActionPageviewLoad
+
+	src, ok, err := sDB.PageviewStorage.Unique(o, UniqueCountBrowsers)
+	if err != nil {
+		return 0, err
+	}
+	if ok {
+		pageviews = src[0].Count
+	}
+	return pageviews, nil
 }
 
 // Users return list of all users within segment.

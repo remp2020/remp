@@ -161,9 +161,43 @@ func (c *SegmentController) CreateOrUpdate(ctx *app.CreateOrUpdateSegmentsContex
 
 // Count runs the count action.
 func (c *SegmentController) Count(ctx *app.CountSegmentsContext) error {
-	// TODO: implementation; for now returns 0 for each call
+	var usersCount int
+	if ctx.Payload.Criteria != nil && len(ctx.Payload.Criteria.Nodes) != 0 && len(ctx.Payload.Criteria.Nodes[0].Nodes) != 0 {
+		var s model.Segment
+
+		criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+		if err != nil {
+			return errors.Wrap(err, "unable to marshal segment's criteria payload")
+		}
+
+		s.SegmentData = model.SegmentData{
+			Criteria: sql.NullString{
+				String: string(criteriaJSON),
+				Valid:  true,
+			},
+		}
+		sr, ok, err := c.SegmentStorage.BuildRules(&s)
+		if err != nil {
+			return nil
+		}
+		if ok {
+			s.Rules = sr
+			users, err := c.SegmentStorage.Users(&s, time.Now(), model.RuleOverrides{})
+			if err != nil {
+				return err
+			}
+			usersCount = len(users)
+		}
+	} else {
+		ca, err := c.SegmentStorage.CountAll()
+		if err != nil {
+			return err
+		}
+		usersCount = ca
+	}
+
 	return ctx.OK(&app.SegmentCount{
-		Count:  0,
+		Count:  usersCount,
 		Status: "ok",
 	})
 }
