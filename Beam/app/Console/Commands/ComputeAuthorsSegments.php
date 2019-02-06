@@ -67,7 +67,7 @@ class ComputeAuthorsSegments extends Command
             $this->line('Generating authors segments');
             $this->recomputeBrowsersForAuthorSegments();
             $this->recomputeUsersForAuthorSegments();
-            $this->deleteEmptySegments();
+            self::deleteEmptySegments();
         }
 
         $this->line(' <info>OK!</info>');
