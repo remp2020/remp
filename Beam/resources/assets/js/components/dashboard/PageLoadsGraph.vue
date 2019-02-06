@@ -292,6 +292,7 @@
                     .attr('pointer-events', 'all')
                     .on('mouseout', function() {
                         that.legend.visible = false
+                        that.eventLegend.visible = false
                         that.vars.vertical
                             .style("opacity", "0");
                     })
