@@ -9,6 +9,8 @@ use App\Author;
 use App\Console\Commands\ComputeAuthorsSegments;
 use App\Property;
 use App\Segment;
+use App\SegmentBrowser;
+use App\SegmentUser;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,5 +64,27 @@ class ComputeAuthorsSegmentsTest extends TestCase
         $this->assertContains('ABC', $segmentBrowserIds);
         $this->assertContains('XYZ', $segmentBrowserIds);
         $this->assertContains('9', $segmentUserIds);
+    }
+
+    public function testDeletingEmptySegments()
+    {
+        $s1 = factory(Segment::class)->state('author')->create();
+        $s1->users()->save(factory(SegmentUser::class)->make());
+        $s1->browsers()->save(factory(SegmentBrowser::class)->make());
+
+        $s2 = factory(Segment::class)->state('author')->create();
+        $s2->users()->save(factory(SegmentUser::class)->make());
+
+        $s3 = factory(Segment::class)->state('author')->create();
+        $s3->browsers()->save(factory(SegmentBrowser::class)->make());
+
+        factory(Segment::class)->state('author')->create();
+
+        $this->assertEquals(4, Segment::all()->count());
+
+        ComputeAuthorsSegments::deleteEmptySegments();
+
+        // Check that only segments without browsers and users were deleted
+        $this->assertEquals(3, Segment::all()->count());
     }
 }

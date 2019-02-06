@@ -67,6 +67,7 @@ class ComputeAuthorsSegments extends Command
             $this->line('Generating authors segments');
             $this->recomputeBrowsersForAuthorSegments();
             $this->recomputeUsersForAuthorSegments();
+            $this->deleteEmptySegments();
         }
 
         $this->line(' <info>OK!</info>');
@@ -274,5 +275,23 @@ SQL;
             'active' => true,
             'segment_group_id' => $segmentGroup->id,
         ]);
+    }
+
+    public static function deleteEmptySegments()
+    {
+        $first = DB::table(SegmentUser::getTableName())
+            ->select('segment_id')
+            ->groupBy('segment_id');
+
+        $unionQuery = DB::table(SegmentBrowser::getTableName())
+            ->select('segment_id')
+            ->groupBy('segment_id')
+            ->union($first);
+
+        Segment::leftJoinSub($unionQuery, 't', function ($join) {
+            $join->on('segments.id', '=', 't.segment_id');
+        })->whereNull('t.segment_id')
+            ->where('segment_group_id', SegmentGroup::getByCode(SegmentGroup::CODE_AUTHORS_SEGMENTS)->id)
+            ->delete();
     }
 }
