@@ -46,9 +46,11 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('author-segments', 'AuthorSegmentsController@index')->name('authorSegments.index');
     Route::get('author-segments/json', 'AuthorSegmentsController@json')->name('authorSegments.json');
-    Route::get('author-segments/test', 'AuthorSegmentsController@test')->name('authorSegments.test');
+    Route::get('author-segments/configuration', 'AuthorSegmentsController@configuration')->name('authorSegments.configuration');
+    Route::post('author-segments/configuration', 'AuthorSegmentsController@saveConfiguration')->name('authorSegments.saveConfiguration');
     Route::post('author-segments/compute', 'AuthorSegmentsController@compute')->name('authorSegments.compute');
-    Route::post('author-segments/validate', 'AuthorSegmentsController@validateForm')->name('authorSegments.validateForm');
+    Route::post('author-segments/validate-configuration', 'AuthorSegmentsController@validateConfiguration')->name('authorSegments.validateConfiguration');
+    Route::post('author-segments/validate-test', 'AuthorSegmentsController@validateTest')->name('authorSegments.validateTest');
 
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');

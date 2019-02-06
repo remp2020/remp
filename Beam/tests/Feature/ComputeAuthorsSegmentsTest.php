@@ -68,6 +68,10 @@ class ComputeAuthorsSegmentsTest extends TestCase
 
     public function testDeletingEmptySegments()
     {
+        SegmentBrowser::query()->delete();
+        SegmentUser::query()->delete();
+        Segment::query()->delete();
+
         $s1 = factory(Segment::class)->state('author')->create();
         $s1->users()->save(factory(SegmentUser::class)->make());
         $s1->browsers()->save(factory(SegmentBrowser::class)->make());

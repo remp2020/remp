@@ -26,9 +26,6 @@
                                     @if($config->description)
                                         <br />{{$config->description}}
                                     @endif
-                                    @if(in_array($config->name, \App\Console\Commands\ComputeAuthorsSegments::ALL_CONFIGS))
-                                        <br /> You can test this parameter at <a href="{{route('authorSegments.test')}}">Author segments testing page</a>
-                                    @endif
                                 </small>
                             </p>
 

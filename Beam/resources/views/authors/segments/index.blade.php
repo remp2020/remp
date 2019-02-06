@@ -11,7 +11,7 @@
         <div class="card-header">
             <h2>List of author segments <small></small></h2>
             <div class="actions">
-                <a href="{{ route('authorSegments.test') }}" class="btn palette-Cyan bg waves-effect">Configuration testing page</a>
+                <a href="{{ route('authorSegments.configuration') }}" class="btn palette-Cyan bg waves-effect">Configuration</a>
             </div>
         </div>
 
