@@ -162,13 +162,7 @@ var _ = Resource("segments", func() {
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
-		Response(OK, func() {
-			Media(CollectionOf(Segment, func() {
-				View("default")
-				View("tiny")
-				View("extended")
-			}))
-		})
+		Response(OK, RelatedSegments)
 	})
 })
 

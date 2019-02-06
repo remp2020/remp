@@ -37,6 +37,8 @@ type SegmentStorage interface {
 	CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
+	// CountAll returns count of unique tracked users.
+	CountAll() (int, error)
 	// EventRules returns map of rules assigned to given "category/event" key.
 	EventRules() EventRules
 	// OverridableFields returns array of fields that expect to be overriden when rule is checked.
@@ -45,6 +47,8 @@ type SegmentStorage interface {
 	Flags() Flags
 	// Related compares provided criteria to existing segments and returns segments with same criteria.
 	Related(SegmentCriteria) (SegmentCollection, error)
+	// BuildRules builds segment rules from segment criteria.
+	BuildRules(segment *Segment) ([]SegmentRule, bool, error)
 }
 
 // EventRules represent map of rules with given "category/event" assigned
@@ -78,12 +82,6 @@ type SegmentData struct {
 	Active         bool
 	SegmentGroupID int `db:"segment_group_id"`
 	Criteria       sql.NullString
-}
-
-// SegmentCriteria represents segments criteria.
-type SegmentCriteria struct {
-	Version string      `json:"version"`
-	Nodes   interface{} `json:"nodes,string"`
 }
 
 // Scan scans provided input to SegmentCriteria.
@@ -134,7 +132,7 @@ type Intersector func(userID string) bool
 // SegmentDB represents Segment's storage implementation.
 type SegmentDB struct {
 	MySQL                    *sqlx.DB
-	RuleCountCache           *cache.Cache
+	CountCache               *cache.Cache
 	EventStorage             EventStorage
 	PageviewStorage          PageviewStorage
 	CommerceStorage          CommerceStorage
@@ -235,12 +233,9 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 		return nil, false, errors.Wrap(err, "unable to get segment from MySQL")
 	}
 
-	src := []SegmentRule{}
-	err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
+	src, err := sDB.loadSegmentRules(s)
 	if err != nil {
-		if err != sql.ErrNoRows {
-			return nil, false, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
-		}
+		return nil, false, err
 	}
 	s.Rules = src
 
@@ -258,6 +253,12 @@ func (sDB *SegmentDB) GetByID(id int) (*Segment, bool, error) {
 		}
 		return nil, false, errors.Wrap(err, "unable to get segment from MySQL")
 	}
+
+	src, err := sDB.loadSegmentRules(s)
+	if err != nil {
+		return nil, false, err
+	}
+	s.Rules = src
 
 	return s, true, nil
 }
@@ -401,6 +402,32 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue strin
 	return crc[0].Count, nil
 }
 
+// CountAll returns count of unique tracked users.
+func (sDB *SegmentDB) CountAll() (int, error) {
+	// return cached count of all
+	if allCache, ok := sDB.CountCache.Get("all"); ok {
+		if all, ok := allCache.(int); ok {
+			return all, nil
+		}
+	}
+
+	var pageviews int
+	var o AggregateOptions
+	o.Action = ActionPageviewLoad
+
+	src, ok, err := sDB.PageviewStorage.Unique(o, UniqueCountUsers)
+	if err != nil {
+		return 0, err
+	}
+	if ok {
+		pageviews = src[0].Count
+	}
+
+	sDB.CountCache.Set("all", pageviews, time.Hour)
+	log.Println("segment's count all cache reloaded")
+	return pageviews, nil
+}
+
 // Users return list of all users within segment.
 func (sDB *SegmentDB) Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error) {
 	if segment.Group.Type == explicitSegmentType {
@@ -495,10 +522,9 @@ func (sDB *SegmentDB) Cache() error {
 	}
 
 	for _, s := range sc {
-		src := []SegmentRule{}
-		err = sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
+		src, err := sDB.loadSegmentRules(s)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
+			return err
 		}
 		s.Rules = src
 	}
@@ -636,4 +662,30 @@ func (sDB *SegmentDB) Related(criteria SegmentCriteria) (SegmentCollection, erro
 	}
 
 	return scRelated, nil
+}
+
+// loadSegmentRules loads SegmentRules from segment_rules table.
+// If no segment rules exist, but Segment contains criteria, it tries to build segment rules.
+func (sDB *SegmentDB) loadSegmentRules(s *Segment) ([]SegmentRule, error) {
+	src := []SegmentRule{}
+	err := sDB.MySQL.Select(&src, "SELECT * FROM segment_rules WHERE segment_id = ?", s.ID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, errors.Wrap(err, fmt.Sprintf("unable to get related segment rules for segment [%d]", s.ID))
+		}
+	}
+
+	if len(src) == 0 && s.Criteria.Valid {
+		var ok bool
+		var err error
+		src, ok, err = sDB.BuildRules(s)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to build segment rules from criteria")
+		}
+		if !ok {
+			return nil, errors.New("unable to build segment rules from criteria")
+		}
+	}
+
+	return src, nil
 }

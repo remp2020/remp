@@ -67,6 +67,23 @@ class SegmentController extends Controller
         ]);
     }
 
+    /**
+     * Show the form for creating a new resource (beta version of new segment builder).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function betaCreate()
+    {
+        $segment = new Segment();
+
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
+
+        return view('segments.beta.create', [
+            'segment' => $segment,
+            'categories' => $categories,
+        ]);
+    }
+
     public function copy(Segment $sourceSegment)
     {
         $segment = new Segment();
@@ -236,5 +253,16 @@ class SegmentController extends Controller
         }
 
         return $segment;
+    }
+
+    public function embed(Request $request)
+    {
+        $segment = null;
+        if ($segmentId = $request->get('segmentId')) {
+            $segment = Segment::find($segmentId);
+        }
+        return view('segments.beta.embed', [
+            'segment' => $segment,
+        ]);
     }
 }
