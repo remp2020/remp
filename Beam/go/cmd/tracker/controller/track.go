@@ -328,6 +328,7 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 			if tags["derived_referer_medium"] == "unknown" {
 				tags["derived_referer_medium"] = "external"
 			}
+			// derived_referer_medium can be also rewritten by user.Source.UtmMedium, see below
 
 			parsedURL, err := url.Parse(*user.Referer)
 			if err == nil {
@@ -335,6 +336,35 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 			}
 		} else {
 			tags["derived_referer_medium"] = "direct"
+		}
+
+		if user.Source != nil {
+			if user.Source.Social != nil {
+				tags["social"] = *user.Source.Social
+			}
+			if user.Source.Ref != nil {
+				tags["ref_source"] = *user.Source.Ref
+			}
+			if user.Source.UtmSource != nil {
+				tags["utm_source"] = *user.Source.UtmSource
+			}
+			if user.Source.UtmMedium != nil {
+				tags["utm_medium"] = *user.Source.UtmMedium
+
+				// Rewrite referer medium in case of email UTM
+				if *user.Source.UtmMedium == "email" {
+					tags["derived_referer_medium"] = "email"
+				}
+			}
+			if user.Source.UtmCampaign != nil {
+				tags["utm_campaign"] = *user.Source.UtmCampaign
+			}
+			if user.Source.UtmContent != nil {
+				tags["utm_content"] = *user.Source.UtmContent
+			}
+			if user.Source.BannerVariant != nil {
+				tags["banner_variant"] = *user.Source.BannerVariant
+			}
 		}
 
 		if user.Adblock != nil {
@@ -369,30 +399,6 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 		}
 		if user.Subscriber != nil {
 			fields["subscriber"] = *user.Subscriber
-		}
-
-		if user.Source != nil {
-			if user.Source.Social != nil {
-				tags["social"] = *user.Source.Social
-			}
-			if user.Source.Ref != nil {
-				tags["ref_source"] = *user.Source.Ref
-			}
-			if user.Source.UtmSource != nil {
-				tags["utm_source"] = *user.Source.UtmSource
-			}
-			if user.Source.UtmMedium != nil {
-				tags["utm_medium"] = *user.Source.UtmMedium
-			}
-			if user.Source.UtmCampaign != nil {
-				tags["utm_campaign"] = *user.Source.UtmCampaign
-			}
-			if user.Source.UtmContent != nil {
-				tags["utm_content"] = *user.Source.UtmContent
-			}
-			if user.Source.BannerVariant != nil {
-				tags["banner_variant"] = *user.Source.BannerVariant
-			}
 		}
 	} else {
 		fields["signed_in"] = false
