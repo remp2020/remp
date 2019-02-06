@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <p class="c-black f-500 m-b-10"><b>Z</b> - minimal time spent on author's articles by user (in seconds):</p>
+        <p class="c-black f-500 m-b-10"><b>Z</b> - minimal average time spent on author's articles by user (in seconds):</p>
 
         <div class="form-group">
             <div class="fg-line">

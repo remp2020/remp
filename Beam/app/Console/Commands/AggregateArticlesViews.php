@@ -78,6 +78,8 @@ class AggregateArticlesViews extends Command
 
     private function aggregateDay(Carbon $startDate)
     {
+        ArticleAggregatedView::where('date', $startDate)->delete();
+
         // Aggregate pageviews and timespent data in time windows
         $timeWindowMinutes = 40; // in minutes
         $timeWindowsCount = 1440 / $timeWindowMinutes; // 1440 - number of minutes in day
@@ -85,6 +87,7 @@ class AggregateArticlesViews extends Command
         $timeAfter = $startDate;
         $timeBefore = (clone $timeAfter)->addMinutes($timeWindowMinutes);
         $date = $timeAfter->toDateString();
+
         for ($i = 0; $i < $timeWindowsCount; $i++) {
             [$data, $articleIds] = $this->aggregatePageviews([], [], $timeAfter, $timeBefore);
             [$data, $articleIds] = $this->aggregateTimespent($data, $articleIds, $timeAfter, $timeBefore);
