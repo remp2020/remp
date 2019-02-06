@@ -3,7 +3,7 @@ package main
 // Config represents config structure for tracker cmd.
 type Config struct {
 	TrackerAddr string `envconfig:"addr" required:"true"`
-	BrokerAddr  string `envconfig:"broker_addr" required:"true"`
+	BrokerAddrs string `envconfig:"broker_addrs" required:"true"`
 	Debug       bool   `envconfig:"debug" required:"false"`
 
 	MysqlNet    string `envconfig:"mysql_net" required:"true"`
