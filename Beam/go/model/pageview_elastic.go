@@ -186,6 +186,11 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 			Index: TablePageviews,
 			Field: "browser_id.keyword",
 		}
+	case UniqueCountUsers:
+		binding = elasticQueryBinding{
+			Index: TablePageviews,
+			Field: "user_id.keyword",
+		}
 	default:
 		return nil, false, fmt.Errorf("unable to count uniques for item [%s] ", item)
 	}

@@ -11,6 +11,7 @@ const (
 	ActionPageviewTimespent = "timespent"
 	ActionPageviewProgress  = "progress"
 	UniqueCountBrowsers     = "browsers"
+	UniqueCountUsers        = "users"
 	TablePageviews          = "pageviews"
 	TableTimespent          = "pageviews_time_spent"
 	TableProgress           = "pageviews_progress"

@@ -415,7 +415,7 @@ func (sDB *SegmentDB) CountAll() (int, error) {
 	var o AggregateOptions
 	o.Action = ActionPageviewLoad
 
-	src, ok, err := sDB.PageviewStorage.Unique(o, UniqueCountBrowsers)
+	src, ok, err := sDB.PageviewStorage.Unique(o, UniqueCountUsers)
 	if err != nil {
 		return 0, err
 	}
