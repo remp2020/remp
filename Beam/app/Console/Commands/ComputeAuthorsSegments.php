@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use PDO;
 
 class ComputeAuthorsSegments extends Command
 {
@@ -42,6 +43,10 @@ class ComputeAuthorsSegments extends Command
 
     public function handle()
     {
+        // Using Cursor on large number of results causing memory issues
+        // https://github.com/laravel/framework/issues/14919
+        DB::connection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+
         $this->line('');
         $this->line('<info>***** Computing author segments *****</info>');
         $this->line('');
@@ -154,6 +159,7 @@ SQL;
     {
         $authorUsers = $this->groupDataFor('user_id');
 
+        $this->line("Updating segments users");
         SegmentUser::truncate();
 
         foreach ($authorUsers as $authorId => $users) {
@@ -179,6 +185,8 @@ SQL;
 
         SegmentBrowser::truncate();
 
+        $this->line("Updating segments browsers");
+
         foreach ($authorBrowsers as $authorId => $browsers) {
             if (count($browsers) === 0) {
                 continue;
@@ -200,9 +208,10 @@ SQL;
     private function aggregatedPageviewsFor($groupParameter)
     {
         $results = [];
-        $queryItems =  ArticleAggregatedView::select(
-            DB::raw("$groupParameter, sum(pageviews) as total_pageviews")
-        )
+
+        // Not using model to save memory
+        $queryItems = DB::table(ArticleAggregatedView::getTableName())
+            ->select($groupParameter, DB::raw('sum(pageviews) as total_pageviews'))
             ->whereNotNull($groupParameter)
             ->where('date', '>=', $this->dateThreshold)
             ->groupBy($groupParameter)
@@ -216,10 +225,15 @@ SQL;
 
     private function groupDataFor($groupParameter)
     {
+        $this->line("Computing total pageviews for parameter '$groupParameter'");
         $totalPageviews = $this->aggregatedPageviewsFor($groupParameter);
+        $this->line("Done");
 
-        $queryItems =  ArticleAggregatedView::select(
-            DB::raw("$groupParameter, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent")
+        $queryItems =  DB::table(ArticleAggregatedView::getTableName())->select(
+            $groupParameter,
+            'author_id',
+            DB::raw('sum(pageviews) as total_pageviews'),
+            DB::raw('avg(timespent) as average_timespent')
         )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
             ->whereNotNull($groupParameter)
@@ -230,6 +244,7 @@ SQL;
 
         $segments = [];
 
+        $this->line("Computing segment items for parameter '$groupParameter'");
         foreach ($queryItems as $item) {
             if ($totalPageviews[$item->$groupParameter] === 0) {
                 continue;
@@ -242,6 +257,7 @@ SQL;
                 $segments[$item->author_id][] = $item->$groupParameter;
             }
         }
+        $this->line("Done");
 
         return $segments;
     }
