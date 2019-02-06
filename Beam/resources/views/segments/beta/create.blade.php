@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add segment')
+@section('title', 'Add segment (beta version)')
 
 @section('content')
 
@@ -9,14 +9,13 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Add new segment</h2>
-            <p>Try <a href="{{ route('segments.beta.create') }}" title="Beta version of new segment builder">beta version of new segment builder</a>.</p>
+            <h2>Add new segment <i>(beta version)</i></h2>
         </div>
         <div class="card-body card-padding">
             @include('flash::message')
 
             {!! Form::model($segment, ['route' => 'segments.store']) !!}
-            @include('segments._form')
+            @include('segments.beta._form')
             {!! Form::close() !!}
         </div>
     </div>

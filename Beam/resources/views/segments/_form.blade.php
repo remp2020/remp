@@ -1,9 +1,21 @@
-<script src="/assets/iframeResizer/iframeResizer.min.js"></script>
+<div id="segment-form">
+    <segment-form></segment-form>
+</div>
 
-<iframe id="outside" height="100%" width="100%" frameborder="0" marginwidth="0" marginheight="0"  src="{{ route('segments.embed', ['segmentId' => ($segment->id ?? null)]) }}"></iframe>
+@push('scripts')
 
 <script type="text/javascript">
-    $(function() {
-        iFrameResize({ log: false, heightCalculationMethod: 'max' }, '#outside');
-    });
+    let segment = {
+        "name": '{!! $segment->name !!}' || null,
+        "code": '{!! $segment->code !!}' || null,
+        "active": {!! @json($segment->active) !!} || null,
+        "rules": {!! $segment->rules->toJson() !!},
+        "removedRules": {!! @json($segment->removedRules) !!},
+        "eventCategories": {!! $categories->toJson() !!},
+        "eventActions": {},
+    }
+
+    remplib.segmentForm.bind("#segment-form", segment);
 </script>
+
+@endpush
