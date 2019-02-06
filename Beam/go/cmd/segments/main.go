@@ -81,7 +81,7 @@ func main() {
 	countCache := cache.New(5*time.Minute, 10*time.Minute)
 	segmentStorage := &model.SegmentDB{
 		MySQL:           mysqlDB,
-		RuleCountCache:  countCache,
+		CountCache:      countCache,
 		EventStorage:    eventStorage,
 		PageviewStorage: pageviewStorage,
 		CommerceStorage: commerceStorage,
@@ -118,6 +118,11 @@ func main() {
 			service.LogError("unable to cache explicit segment", "err", err)
 		}
 	}
+	cacheSegmentsCount := func() {
+		if _, err := segmentStorage.CountAll(); err != nil {
+			service.LogError("unable to cache counts for segment", "err", err)
+		}
+	}
 	cacheEventDB := func() {
 		if err := eventStorage.Cache(); err != nil {
 			service.LogError("unable to cache events", "err", err)
@@ -128,6 +133,7 @@ func main() {
 	cacheSegmentDB()
 	cacheExplicitSegments()
 	cacheEventDB()
+	cacheSegmentsCount()
 	go func() {
 		defer wg.Done()
 		service.LogInfo("starting property caching")
@@ -137,6 +143,7 @@ func main() {
 				cacheSegmentDB()
 			case <-ticker1m.C:
 				cacheExplicitSegments()
+				cacheSegmentsCount()
 			case <-ticker1h.C:
 				cacheEventDB()
 			case <-ctx.Done():

@@ -132,7 +132,7 @@ type Intersector func(userID string) bool
 // SegmentDB represents Segment's storage implementation.
 type SegmentDB struct {
 	MySQL                    *sqlx.DB
-	RuleCountCache           *cache.Cache
+	CountCache               *cache.Cache
 	EventStorage             EventStorage
 	PageviewStorage          PageviewStorage
 	CommerceStorage          CommerceStorage
@@ -404,6 +404,13 @@ func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue strin
 
 // CountAll returns count of unique tracked users.
 func (sDB *SegmentDB) CountAll() (int, error) {
+	// return cached count of all
+	if allCache, ok := sDB.CountCache.Get("all"); ok {
+		if all, ok := allCache.(int); ok {
+			return all, nil
+		}
+	}
+
 	var pageviews int
 	var o AggregateOptions
 	o.Action = ActionPageviewLoad
@@ -415,6 +422,9 @@ func (sDB *SegmentDB) CountAll() (int, error) {
 	if ok {
 		pageviews = src[0].Count
 	}
+
+	sDB.CountCache.Set("all", pageviews, time.Hour)
+	log.Println("segment's count all cache reloaded")
 	return pageviews, nil
 }
 
