@@ -64,7 +64,7 @@
                                 {{ campaign.stats.purchase_count.count }}
                             </td>
                             <td>
-                                {{ campaign.stats.purchase_sum.sum | round(2) }}€
+                                {{ campaign.stats.purchase_sum.sum | round(2) }} {{ campaign.stats.purchase_sum.tags.currency }}
                             </td>
                             <th>
                                 <span class="actions">

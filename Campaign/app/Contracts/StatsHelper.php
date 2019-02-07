@@ -93,7 +93,8 @@ class StatsHelper
     {
         $r = $this->stats->sum()
             ->commerce($step)
-            ->forVariants($variantUuids);
+            ->forVariants($variantUuids)
+            ->groupBy('currency');
 
         if ($from) {
             $r->from($from);
@@ -102,6 +103,7 @@ class StatsHelper
             $r->to($to);
         }
 
+        // TODO currently support only 1 currency
         return $r->get()[0];
     }
 }

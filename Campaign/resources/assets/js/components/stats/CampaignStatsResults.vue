@@ -68,7 +68,7 @@
                             </td>
                             <td>
                                 <strong>
-                                    {{ variant.earned | round(2) }}€
+                                    {{ variant.earned | round(2) }}{{ variant.currency }}
                                 </strong>
                             </td>
                         </tr>
@@ -128,6 +128,7 @@
                         clicks: data.click_count.count,
                         shows: data.show_count.count,
                         earned: data.purchase_sum.sum,
+                        currency: data.purchase_sum.tags.currency,
                         purchases: data.purchase_count.count,
                         ctr: data.ctr,
                         conversions: data.conversions,
@@ -150,6 +151,7 @@
                     clicks: this.campaignData.click_count.count,
                     shows: this.campaignData.show_count.count,
                     earned: this.campaignData.purchase_sum.sum,
+                    currency: this.campaignData.purchase_sum.tags.currency,
                     purchases: this.campaignData.purchase_count.count,
                     ctr: this.campaignData.ctr,
                     conversions: this.campaignData.conversions,
