@@ -43,7 +43,7 @@
                 ],
             ],
             'dataSource' => route('authorSegments.json'),
-            'order' => [1, 'desc'],
+            'order' => [2, 'desc'],
         ]) !!}
     </div>
 

@@ -43,6 +43,7 @@ class ComputeAuthorsSegments extends Command
 
     public function handle()
     {
+        ini_set('memory_limit', '256M');
         // Using Cursor on large number of results causing memory issues
         // https://github.com/laravel/framework/issues/14919
         DB::connection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
@@ -67,7 +68,11 @@ class ComputeAuthorsSegments extends Command
             $this->line('Generating authors segments');
             $this->recomputeBrowsersForAuthorSegments();
             $this->recomputeUsersForAuthorSegments();
-            self::deleteEmptySegments();
+            $deletedSegments = self::deleteEmptySegments();
+            $this->line('Deleting empty author segments');
+            if ($deletedSegments > 0) {
+                $this->line("Deleted $deletedSegments segments");
+            }
         }
 
         $this->line(' <info>OK!</info>');
@@ -277,7 +282,7 @@ SQL;
         ]);
     }
 
-    public static function deleteEmptySegments()
+    public static function deleteEmptySegments(): int
     {
         $first = DB::table(SegmentUser::getTableName())
             ->select('segment_id')
@@ -288,7 +293,7 @@ SQL;
             ->groupBy('segment_id')
             ->union($first);
 
-        Segment::leftJoinSub($unionQuery, 't', function ($join) {
+        return Segment::leftJoinSub($unionQuery, 't', function ($join) {
             $join->on('segments.id', '=', 't.segment_id');
         })->whereNull('t.segment_id')
             ->where('segment_group_id', SegmentGroup::getByCode(SegmentGroup::CODE_AUTHORS_SEGMENTS)->id)

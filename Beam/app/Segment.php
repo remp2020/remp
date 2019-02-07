@@ -2,10 +2,13 @@
 
 namespace App;
 
+use App\Model\TableName;
 use Illuminate\Database\Eloquent\Model;
 
 class Segment extends Model
 {
+    use TableName;
+
     protected $casts = [
         'active' => 'boolean',
     ];
