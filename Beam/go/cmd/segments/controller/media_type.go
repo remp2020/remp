@@ -84,13 +84,10 @@ type AvgRowCollection model.AvgRowCollection
 // ToMediaType converts internal Segment representation to application one.
 func (s *Segment) ToMediaType() (*app.Segment, error) {
 	mt := &app.Segment{
-		ID:   s.ID,
-		Code: s.Code,
-		Name: s.Name,
-		Group: &app.SegmentGroup{
-			Name:    s.Group.Name,
-			Sorting: s.Group.Sorting,
-		},
+		ID:    s.ID,
+		Code:  s.Code,
+		Name:  s.Name,
+		Group: (*SegmentGroup)(&s.Group).ToMediaType(),
 	}
 
 	if s.Criteria.Valid {
@@ -119,13 +116,10 @@ func (sc SegmentCollection) ToMediaType() (app.SegmentCollection, error) {
 // ToTinyMediaType converts internal Segment representation to tiny view of application segment.
 func (s *Segment) ToTinyMediaType() *app.SegmentTiny {
 	return &app.SegmentTiny{
-		ID:   s.ID,
-		Code: s.Code,
-		Name: s.Name,
-		Group: &app.SegmentGroup{
-			Name:    s.Group.Name,
-			Sorting: s.Group.Sorting,
-		},
+		ID:    s.ID,
+		Code:  s.Code,
+		Name:  s.Name,
+		Group: (*SegmentGroup)(&s.Group).ToMediaType(),
 	}
 }
 
@@ -133,14 +127,11 @@ func (s *Segment) ToTinyMediaType() *app.SegmentTiny {
 func (s *Segment) ToExtendedMediaType(segmentURL string) *app.SegmentExtended {
 	url := strings.Replace(segmentURL, "{segment_id}", strconv.Itoa(s.ID), -1)
 	return &app.SegmentExtended{
-		ID:   s.ID,
-		Code: s.Code,
-		Name: s.Name,
-		Group: &app.SegmentGroup{
-			Name:    s.Group.Name,
-			Sorting: s.Group.Sorting,
-		},
-		URL: &url,
+		ID:    s.ID,
+		Code:  s.Code,
+		Name:  s.Name,
+		Group: (*SegmentGroup)(&s.Group).ToMediaType(),
+		URL:   &url,
 	}
 }
 
@@ -152,11 +143,8 @@ func (s *Segment) ToSegmenterMediaType() (*app.SegmentSegmenter, error) {
 		Code:      s.Code,
 		Name:      s.Name,
 		TableName: &tn,
-		Group: &app.SegmentGroup{
-			Name:    s.Group.Name,
-			Sorting: s.Group.Sorting,
-		},
-		GroupID: &s.Group.ID,
+		Group:     (*SegmentGroup)(&s.Group).ToMediaType(),
+		GroupID:   &s.Group.ID,
 	}
 
 	if s.Criteria.Valid {

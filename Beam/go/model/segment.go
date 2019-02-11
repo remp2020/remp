@@ -225,7 +225,18 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 	}
 
 	s := &Segment{}
-	err := sDB.MySQL.Get(s, "SELECT * FROM segments WHERE code = ?", code)
+	err := sDB.MySQL.Get(s, `
+	SELECT
+		segments.*,
+		segment_groups.id AS 'segment_group.id',
+		segment_groups.name AS 'segment_group.name',
+		segment_groups.code AS 'segment_group.code',
+		segment_groups.type AS 'segment_group.type',
+		segment_groups.sorting AS 'segment_group.sorting'
+	FROM segments
+	JOIN segment_groups ON segments.segment_group_id = segment_groups.id
+	WHERE segments.code = ?
+	`, code)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, false, nil
@@ -246,7 +257,18 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 // TODO: how to get segment from sDB.Segments?
 func (sDB *SegmentDB) GetByID(id int) (*Segment, bool, error) {
 	s := &Segment{}
-	err := sDB.MySQL.Get(s, "SELECT * FROM segments WHERE id = ?", id)
+	err := sDB.MySQL.Get(s, `
+	SELECT
+		segments.*,
+		segment_groups.id AS 'segment_group.id',
+		segment_groups.name AS 'segment_group.name',
+		segment_groups.code AS 'segment_group.code',
+		segment_groups.type AS 'segment_group.type',
+		segment_groups.sorting AS 'segment_group.sorting'
+	FROM segments
+	JOIN segment_groups ON segments.segment_group_id = segment_groups.id
+	WHERE segments.id = ?
+	`, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, false, nil
