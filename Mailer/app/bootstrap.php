@@ -18,6 +18,12 @@ if ($environment == 'local') {
 } else {
     $configurator->setDebugMode(false);
 }
+
+// terminal
+if (!isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SHELL'])) {
+    $configurator->setDebugMode(true);
+}
+
 $configurator->enableTracy(__DIR__ . '/../log');
 
 $configurator->setTimeZone(getenv('TIMEZONE'));

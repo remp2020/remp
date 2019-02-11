@@ -1,0 +1,28 @@
+{
+  "name": "remp/journal",
+  "description": "Journal API connector",
+  "keywords": ["laravel", "remp", "journal", "segments"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "rootpd",
+      "email": "dulacka@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "~7.1",
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Remp\\Journal\\": "src/"
+    }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}

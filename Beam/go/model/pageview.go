@@ -6,15 +6,16 @@ import (
 
 // Exported constants for services writing to EventStorage indirectly (e.g. Kafka) and reading from enumerated values.
 const (
-	CategoryPageview         = "pageview"
-	ActionPageviewLoad       = "load"
-	ActionPageviewTimespent  = "timespent"
-	UniqueCountBrowsers      = "browsers"
-	TablePageviews           = "pageviews"
-	TableTimespent           = "pageviews_time_spent"
-	TableTimespentAggregated = "pageviews_time_spent_hourly"
-	TableTimespentRP         = "timespent_rp"
-	FlagArticle              = "_article"
+	CategoryPageview        = "pageview"
+	ActionPageviewLoad      = "load"
+	ActionPageviewTimespent = "timespent"
+	ActionPageviewProgress  = "progress"
+	UniqueCountBrowsers     = "browsers"
+	UniqueCountUsers        = "users"
+	TablePageviews          = "pageviews"
+	TableTimespent          = "pageviews_time_spent"
+	TableProgress           = "pageviews_progress"
+	FlagArticle             = "_article"
 )
 
 // PageviewOptions represent filter options for pageview-related calls.
@@ -87,7 +88,7 @@ type PageviewStorage interface {
 	// List returns list of all pageviews based on given PageviewOptions.
 	List(o ListPageviewsOptions) (PageviewRowCollection, error)
 	// Categories lists all tracked categories.
-	Categories() []string
+	Categories() ([]string, error)
 	// Flags lists all available flags.
 	Flags() []string
 	// Actions lists all tracked actions under the given category.

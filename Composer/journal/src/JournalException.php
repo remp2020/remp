@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts;
+namespace Remp\Journal;
 
 class JournalException extends \Exception
 {

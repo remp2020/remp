@@ -14,24 +14,35 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            <form method="post" action="{{ route('settings.update') }}">
-                {!! Form::token() !!}
+            <div class="row">
+                <div class="col-md-6">
 
-                @foreach($configs as $config)
+                    <form method="post" action="{{ route('settings.update') }}">
+                        {{ csrf_field() }}
 
-                    <div class="form-group fg-float m-b-30">
-                        <div class="fg-line fg-toggled">
-                            <input type="text" name="settings[{{$config->name}}]"  value="{{$config->value}}" class="form-control fg-input">
-                            <label class="fg-label">{{ $config->display_name ?? $config->name}}</label>
-                        </div>
-                    </div>
+                        @foreach($configs as $config)
+                            <p class=" f-500 m-b-10"><span class="c-black">{{ $config->display_name ?? $config->name}}</span>
+                                <small>
+                                    @if($config->description)
+                                        <br />{{$config->description}}
+                                    @endif
+                                </small>
+                            </p>
 
-                @endforeach
+                            <div class="form-group">
+                                <div class="fg-line">
+                                    <input type="text" name="settings[{{$config->name}}]"  value="{{$config->value}}" class="form-control fg-input">
+                                </div>
+                            </div>
+                        @endforeach
 
-                <button type="submit" name="save" value="Save" class="btn btn-info waves-effect">
-                    <i class="zmdi zmdi-mail-send"></i> Save
-                </button>
-            </form>
+                        <button type="submit" name="save" value="Save" class="btn btn-info waves-effect">
+                            <i class="zmdi zmdi-mail-send"></i> Save
+                        </button>
+                    </form>
+
+                </div>
+            </div>
         </div>
     </div>
 

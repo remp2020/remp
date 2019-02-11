@@ -12,7 +12,7 @@ import (
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
-	"github.com/snowplow/referer-parser/go"
+	refererparser "github.com/snowplow/referer-parser/go"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -193,6 +193,19 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 				fields["unload"] = true
 			}
 		}
+	case model.ActionPageviewProgress:
+		tags["action"] = model.ActionPageviewProgress
+		measurement = model.TableProgress
+		if ctx.Payload.Progress != nil {
+			fields["page_progress"] = ctx.Payload.Progress.PageRatio
+			if ctx.Payload.Progress.ArticleRatio != nil {
+				fields["article_progress"] = *ctx.Payload.Progress.ArticleRatio
+			}
+			fields["unload"] = false
+			if ctx.Payload.Progress.Unload != nil && *ctx.Payload.Progress.Unload {
+				fields["unload"] = true
+			}
+		}
 	default:
 		return ctx.BadRequest(fmt.Errorf("incorrect pageview action [%s]", ctx.Payload.Action))
 	}
@@ -315,6 +328,7 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 			if tags["derived_referer_medium"] == "unknown" {
 				tags["derived_referer_medium"] = "external"
 			}
+			// derived_referer_medium can be also rewritten by user.Source.UtmMedium, see below
 
 			parsedURL, err := url.Parse(*user.Referer)
 			if err == nil {
@@ -322,6 +336,35 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 			}
 		} else {
 			tags["derived_referer_medium"] = "direct"
+		}
+
+		if user.Source != nil {
+			if user.Source.Social != nil {
+				tags["social"] = *user.Source.Social
+			}
+			if user.Source.Ref != nil {
+				tags["ref_source"] = *user.Source.Ref
+			}
+			if user.Source.UtmSource != nil {
+				tags["utm_source"] = *user.Source.UtmSource
+			}
+			if user.Source.UtmMedium != nil {
+				tags["utm_medium"] = *user.Source.UtmMedium
+
+				// Rewrite referer medium in case of email UTM
+				if *user.Source.UtmMedium == "email" {
+					tags["derived_referer_medium"] = "email"
+				}
+			}
+			if user.Source.UtmCampaign != nil {
+				tags["utm_campaign"] = *user.Source.UtmCampaign
+			}
+			if user.Source.UtmContent != nil {
+				tags["utm_content"] = *user.Source.UtmContent
+			}
+			if user.Source.BannerVariant != nil {
+				tags["banner_variant"] = *user.Source.BannerVariant
+			}
 		}
 
 		if user.Adblock != nil {
@@ -356,30 +399,6 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 		}
 		if user.Subscriber != nil {
 			fields["subscriber"] = *user.Subscriber
-		}
-
-		if user.Source != nil {
-			if user.Source.Social != nil {
-				tags["social"] = *user.Source.Social
-			}
-			if user.Source.Ref != nil {
-				tags["ref_source"] = *user.Source.Ref
-			}
-			if user.Source.UtmSource != nil {
-				tags["utm_source"] = *user.Source.UtmSource
-			}
-			if user.Source.UtmMedium != nil {
-				tags["utm_medium"] = *user.Source.UtmMedium
-			}
-			if user.Source.UtmCampaign != nil {
-				tags["utm_campaign"] = *user.Source.UtmCampaign
-			}
-			if user.Source.UtmContent != nil {
-				tags["utm_content"] = *user.Source.UtmContent
-			}
-			if user.Source.BannerVariant != nil {
-				tags["banner_variant"] = *user.Source.BannerVariant
-			}
 		}
 	} else {
 		fields["signed_in"] = false

@@ -3,11 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Article;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
-use App\Contracts\JournalException;
 use App\Contracts\JournalHelpers;
-use App\Contracts\JournalListRequest;
 use App\Conversion;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionCommerceEventProduct;
@@ -16,6 +12,10 @@ use App\Model\ConversionPageviewEvent;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
+use Remp\Journal\JournalException;
+use Remp\Journal\ListRequest;
 
 class AggregateConversionEvents extends Command
 {
@@ -75,7 +75,7 @@ class AggregateConversionEvents extends Command
         $after = (clone $before)->subYear();
 
         $browserIds = [];
-        $records = $this->journal->count(JournalAggregateRequest::from($category, $action)
+        $records = $this->journal->count(AggregateRequest::from($category, $action)
             ->addGroup('browser_id')
             ->addFilter('user_id', $conversion->user_id)
             ->setTime($after, $before));
@@ -190,12 +190,12 @@ class AggregateConversionEvents extends Command
         $from = (clone $conversion->paid_at)->subDays($days);
         $to = $conversion->paid_at;
 
-        $r = JournalListRequest::from('pageviews')
+        $r = ListRequest::from('pageviews')
             ->setTime($from, $to)
             ->addFilter('browser_id', ...$browserIds)
             ->setLoadTimespent();
 
-        $events = $this->journal->list($r);
+        $events = collect($this->journal->list($r));
 
         $toSave = [];
 
@@ -240,7 +240,7 @@ class AggregateConversionEvents extends Command
         $toSave = [];
 
         $process = function ($request) use ($conversion, &$processedIds, &$toSave) {
-            $events = $this->journal->list($request);
+            $events = collect($this->journal->list($request));
             if ($events->isNotEmpty()) {
                 foreach ($events[0]->commerces as $item) {
                     if (array_key_exists($item->id, $processedIds)) {
@@ -273,12 +273,12 @@ class AggregateConversionEvents extends Command
         };
 
         if ($browserIds) {
-            $process(JournalListRequest::from("commerce")
+            $process(ListRequest::from("commerce")
                 ->setTime($from, $to)
                 ->addFilter('browser_id', ...$browserIds));
         }
 
-        $process(JournalListRequest::from("commerce")
+        $process(ListRequest::from("commerce")
             ->setTime($from, $to)
             ->addFilter('user_id', $conversion->user_id));
 
@@ -295,7 +295,7 @@ class AggregateConversionEvents extends Command
         $toSave = [];
 
         $process = function ($request) use ($conversion, &$processedIds, &$toSave) {
-            $events = $this->journal->list($request);
+            $events = collect($this->journal->list($request));
             if ($events->isNotEmpty()) {
                 foreach ($events[0]->events as $item) {
                     if (array_key_exists($item->id, $processedIds)) {
@@ -323,12 +323,12 @@ class AggregateConversionEvents extends Command
         };
 
         if ($browserIds) {
-            $process(JournalListRequest::from('events')
+            $process(ListRequest::from('events')
                 ->setTime($from, $to)
                 ->addFilter('browser_id', ...$browserIds));
         }
 
-        $process(JournalListRequest::from('events')
+        $process(ListRequest::from('events')
             ->setTime($from, $to)
             ->addFilter('user_id', $conversion->user_id));
 

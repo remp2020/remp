@@ -2,8 +2,6 @@
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Database\Context;
-use Nette\Database\IRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 use Remp\MailerModule\Selection;
@@ -11,10 +9,6 @@ use Remp\MailerModule\Selection;
 class LogsRepository extends Repository
 {
     protected $tableName = 'mail_logs';
-
-    protected $startStatsDate;
-
-    private $statsTotals = [];
 
     protected $dataTableSearchable = ['email'];
 
@@ -33,12 +27,6 @@ class LogsRepository extends Repository
         'suppress-complaint' => 'hard_bounced_at',
         'suppress-unsubscribe' => 'hard_bounced_at',
     ];
-
-    public function __construct($startStatsDate, Context $database)
-    {
-        parent::__construct($database);
-        $this->startStatsDate = $startStatsDate;
-    }
 
     public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null, $context = null)
     {
@@ -88,6 +76,7 @@ class LogsRepository extends Repository
             'COUNT(hard_bounced_at) AS hard_bounced',
             'COUNT(clicked_at) AS clicked',
             'COUNT(opened_at) AS opened',
+            'COUNT(:mail_log_conversions.converted_at) AS converted',
         ];
         return $this->getTable()
             ->select(implode(',', $columns))
@@ -109,6 +98,7 @@ class LogsRepository extends Repository
             'COUNT(hard_bounced_at) AS hard_bounced',
             'COUNT(clicked_at) AS clicked',
             'COUNT(opened_at) AS opened',
+            'COUNT(:mail_log_conversions.converted_at) AS converted',
         ];
         return $this->getTable()
             ->select(implode(',', $columns))
@@ -118,89 +108,6 @@ class LogsRepository extends Repository
             ])
             ->limit(1)
             ->fetch();
-    }
-
-    public function getStatsRate($mailTemplates, $field, $startTime = null, $endTime = null)
-    {
-        $ids = [];
-        if (is_array($mailTemplates)) {
-            foreach ($mailTemplates as $templateId) {
-                $ids[] = $templateId;
-            }
-        }
-        if (is_a($mailTemplates, IRow::class)) {
-            $ids[] = $mailTemplates->id;
-        }
-
-        $statsKey = implode(',', $ids) . '-' . ($startTime ? $startTime->format('c') : '') . '-' . ($endTime ? $endTime->format('c') : '');
-
-        $logs = $this->getTable()->where(['mail_template_id' => $ids, $field . ' > ? OR ' . $field . ' IS NULL' => $this->startStatsDate]);
-
-        if ($startTime) {
-            $logs->where(['created_at >= ?' => $startTime]);
-        }
-        if ($endTime) {
-            $logs->where(['created_at <= ?' => $endTime]);
-        }
-
-        if (!isset($this->statsTotals[$statsKey])) {
-            $this->statsTotals[$statsKey] = $logs->count('*');
-        }
-        $local = $logs->where([$field . ' NOT' => null])->count('*');
-        $total = $this->statsTotals[$statsKey];
-        return [
-            'per' => $total ? 100 * $local / $total : 0,
-            'value' => $local,
-            'total' => $this->statsTotals[$statsKey],
-        ];
-    }
-
-    public function getConversion($mailTemplates, $startTime = null, $endTime = null)
-    {
-        $ids = [];
-        if (is_array($mailTemplates)) {
-            foreach ($mailTemplates as $templateId) {
-                $ids[] = $templateId;
-            }
-        }
-        if (is_a($mailTemplates, IRow::class)) {
-            $ids[] = $mailTemplates->id;
-        }
-
-        if (count($ids) == 0 || (count($ids) == 1 && !$ids[0])) {
-            return [
-                'per' => 0,
-                'value' => 0,
-                'total' => 0,
-            ];
-        }
-
-        $timeWhere = '';
-        if ($startTime) {
-            $timeWhere .= " AND mail_logs.created_at >= '{$startTime->format('Y-m-d H:i:s')}' ";
-        }
-        if ($endTime) {
-            $timeWhere .= " AND mail_logs.created_at <= '{$endTime->format('Y-m-d H:i:s')}' ";
-        }
-
-        $query = "SELECT count(*) AS count
-            FROM payments
-            INNER JOIN users ON users.id = payments.user_id
-            INNER JOIN mail_logs ON mail_logs.email = users.email AND mail_logs.mail_template_id IN (" . implode(',', $ids) . ") {$timeWhere}
-            LEFT JOIN recurrent_payments ON recurrent_payments.parent_payment_id = payments.id
-            WHERE
-                payments.status = 'paid' AND 
-                payments.created_at BETWEEN mail_logs.created_at AND mail_logs.created_at + INTERVAL 2 DAY AND
-                recurrent_payments.payment_id IS NULL
-        ";
-
-        $res = $this->getDatabase()->query($query);
-        $local = 0;
-        foreach ($res as $row) {
-            $local = $row->count;
-            break;
-        }
-        return $local;
     }
 
     /**

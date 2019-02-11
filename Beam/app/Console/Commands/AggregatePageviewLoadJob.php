@@ -4,10 +4,10 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\ArticlePageviews;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class AggregatePageviewLoadJob extends Command
 {
@@ -25,12 +25,12 @@ class AggregatePageviewLoadJob extends Command
 
         $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
-        $request = new JournalAggregateRequest('pageviews', 'load');
+        $request = new AggregateRequest('pageviews', 'load');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'signed_in', 'subscriber');
 
-        $records = $journalContract->count($request);
+        $records = collect($journalContract->count($request));
 
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process, exiting."));

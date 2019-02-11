@@ -6,6 +6,7 @@ use App\Console\Commands\AggregateArticlesViews;
 use App\Console\Commands\AggregateConversionEvents;
 use App\Console\Commands\AggregatePageviewLoadJob;
 use App\Console\Commands\AggregatePageviewTimespentJob;
+use App\Console\Commands\ComputeAuthorsSegments;
 use App\Console\Commands\DeleteOldAggregations;
 use App\Console\Commands\SendNewslettersCommand;
 use App\Console\Commands\CompressAggregations;
@@ -40,17 +41,12 @@ class Kernel extends ConsoleKernel
             ->everyMinute();
 
         $schedule->command(AggregatePageviewLoadJob::COMMAND)
-             ->hourlyAt(5)
+             ->hourlyAt(3)
              ->withoutOverlapping();
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND)
-            ->hourlyAt(5)
+            ->hourlyAt(4)
             ->withoutOverlapping();
-
-        // TODO: temporarily turned off to figure out what is a cause of "MySQL connection refused"
-        //$schedule->command(AggregateArticlesViews::COMMAND)
-        //    ->dailyAt('00:10')
-        //    ->withoutOverlapping();
 
         $schedule->command(DeleteOldAggregations::COMMAND)
             ->dailyAt('00:10')
@@ -58,6 +54,14 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(CompressAggregations::COMMAND)
             ->dailyAt('00:20')
+            ->withoutOverlapping();
+
+        $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
+            ->dailyAt('01:00')
+            ->withoutOverlapping();
+
+        $schedule->command(ComputeAuthorsSegments::COMMAND)
+            ->dailyAt('02:00')
             ->withoutOverlapping();
 
         // Aggregate any conversion events that weren't aggregated before due to Segments API fail

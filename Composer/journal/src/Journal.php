@@ -1,17 +1,10 @@
 <?php
 
-namespace App\Contracts\Remp;
+namespace Remp\Journal;
 
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalConcurrentsRequest;
-use App\Contracts\JournalContract;
-use App\Contracts\JournalException;
-use App\Contracts\JournalListRequest;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
-use Illuminate\Support\Collection;
-use Psy\Util\Json;
 
 class Journal implements JournalContract
 {
@@ -48,7 +41,7 @@ class Journal implements JournalContract
         $this->client = $client;
     }
 
-    public function categories(): Collection
+    public function categories(): array
     {
         try {
             $pageviewResponse = $this->client->get(self::ENDPOINT_PAGEVIEW_CATEGORIES);
@@ -61,24 +54,24 @@ class Journal implements JournalContract
         $pageviewCategories = json_decode($pageviewResponse->getBody());
         $commerceCategories = json_decode($commerceResponse->getBody());
         $eventCategories = json_decode($eventResponse->getBody());
-        return collect([
+        return [
             'pageviews' => $pageviewCategories,
             'commerce' => $commerceCategories,
             'events' => $eventCategories,
-        ]);
+        ];
     }
 
-    public function commerceCategories(): Collection
+    public function commerceCategories(): array
     {
         try {
             $commerceResponse = $this->client->get(self::ENDPOINT_COMMERCE_CATEGORIES);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:ListCategories endpoint: {$e->getMessage()}");
         }
-        return collect(json_decode($commerceResponse->getBody()));
+        return json_decode($commerceResponse->getBody());
     }
 
-    public function flags(): Collection
+    public function flags(): array
     {
         try {
             $response = $this->client->get(self::ENDPOINT_GROUP_FLAGS);
@@ -86,10 +79,10 @@ class Journal implements JournalContract
             throw new JournalException("Could not connect to Journal:ListCategories endpoint: {$e->getMessage()}");
         }
         $flags = json_decode($response->getBody());
-        return collect($flags);
+        return $flags;
     }
 
-    public function actions($group, $category): Collection
+    public function actions($group, $category): array
     {
         try {
             $response = $this->client->get(sprintf(self::ENDPOINT_GROUP_CATEGORY_ACTIONS, $group, $category));
@@ -98,10 +91,10 @@ class Journal implements JournalContract
         }
 
         $list = json_decode($response->getBody());
-        return collect($list);
+        return $list;
     }
 
-    public function count(JournalAggregateRequest $request): Collection
+    public function count(AggregateRequest $request): array
     {
         return $this->aggregateCall(
             $request,
@@ -111,7 +104,7 @@ class Journal implements JournalContract
         );
     }
 
-    public function sum(JournalAggregateRequest $request): Collection
+    public function sum(AggregateRequest $request): array
     {
         return $this->aggregateCall(
             $request,
@@ -121,12 +114,12 @@ class Journal implements JournalContract
         );
     }
 
-    public function avg(JournalAggregateRequest $request): Collection
+    public function avg(AggregateRequest $request): array
     {
         return $this->aggregateCall($request, $request->buildUrl(self::ENDPOINT_GENERIC_AVG));
     }
 
-    public function unique(JournalAggregateRequest $request): Collection
+    public function unique(AggregateRequest $request): array
     {
         // Unique page views are distinguished by different browsers
         return $this->aggregateCall(
@@ -135,16 +128,20 @@ class Journal implements JournalContract
         );
     }
 
-    private function aggregateCall(JournalAggregateRequest $request, string $url): Collection
+    private function aggregateCall(AggregateRequest $request, string $url): array
     {
         try {
             $json = [
                 'filter_by' => $request->getFilterBy(),
                 'group_by' => $request->getGroupBy(),
-                'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
             ];
 
+            if ($request->getTimeAfter()) {
+                $json['time_after'] = $request->getTimeAfter()->format(DATE_RFC3339);
+            }
+            if ($request->getTimeBefore()) {
+                $json['time_before'] = $request->getTimeBefore()->format(DATE_RFC3339);
+            }
             if ($request->getTimeHistogram()) {
                 $json['time_histogram'] = $request->getTimeHistogram();
             }
@@ -164,28 +161,32 @@ class Journal implements JournalContract
         }
 
         $list = json_decode($response->getBody());
-        return collect($list);
+        return $list;
     }
 
-    public function list(JournalListRequest $request): Collection
+    public function list(ListRequest $request): array
     {
         try {
-            $q = [
+            $json = [
                 'select_fields' => $request->getSelect(),
                 'conditions' => [
                     'filter_by' => $request->getFilterBy(),
                     'group_by' => $request->getGroupBy(),
-                    'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                    'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
                 ],
             ];
 
+            if ($request->getTimeAfter()) {
+                $json['conditions']['time_after'] = $request->getTimeAfter()->format(DATE_RFC3339);
+            }
+            if ($request->getTimeBefore()) {
+                $json['conditions']['time_before'] = $request->getTimeBefore()->format(DATE_RFC3339);
+            }
             if ($request->getLoadTimespent()) {
-                $q['load_timespent'] = true;
+                $json['load_timespent'] = true;
             }
 
             $response = $this->client->post($request->buildUrl(self::ENDPOINT_GENERIC_LIST), [
-                'json' => $q,
+                'json' => $json,
             ]);
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:List endpoint: {$e->getMessage()}");
@@ -195,18 +196,23 @@ class Journal implements JournalContract
         }
 
         $list = json_decode($response->getBody());
-        return collect($list);
+        return $list;
     }
 
-    public function concurrents(JournalConcurrentsRequest $request): Collection
+    public function concurrents(ConcurrentsRequest $request): array
     {
         try {
             $json = [
                 'filter_by' => $request->getFilterBy(),
                 'group_by' => $request->getGroupBy(),
-                'time_after' => $request->getTimeAfter()->format(DATE_RFC3339),
-                'time_before' => $request->getTimeBefore()->format(DATE_RFC3339),
             ];
+
+            if ($request->getTimeAfter()) {
+                $json['time_after'] = $request->getTimeAfter()->format(DATE_RFC3339);
+            }
+            if ($request->getTimeBefore()) {
+                $json['time_before'] = $request->getTimeBefore()->format(DATE_RFC3339);
+            }
 
             $response = $this->client->post(self::ENDPOINT_CONCURRENTS_COUNT, [
                 'json' => $json,
@@ -219,6 +225,6 @@ class Journal implements JournalContract
         }
 
         $list = json_decode($response->getBody());
-        return collect($list);
+        return $list;
     }
 }

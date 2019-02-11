@@ -17,7 +17,21 @@
 
         <div class="m-t-20 m-b-20" v-if="tagLabels">
             <div v-bind:style="{color: item.color}" v-for="(item, tag) in tagLabels">
-                <b>{{tag}}</b>: {{item.label}}
+                <b>{{tag}}</b>:
+                <span v-for="(label, index) in item.labels">
+                    {{label}} <span style="color: #000;" v-if="index < item.labels.length - 1"> | </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="events-legend-wrapper">
+            <div>
+                <div class="events-legend"
+                     v-html="eventLegend.data.event.title"
+                     v-if="eventLegend.data"
+                     v-show="eventLegend.visible"
+                     v-bind:style="eventLegend.styleObject">
+                </div>
             </div>
         </div>
 
@@ -26,7 +40,7 @@
         </div>
         
         <div class="legend-wrapper">
-            <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" class="article-graph-legend">
+            <div v-if="highlightedRow" v-show="legend.visible" v-bind:style="{ left: legend.left }" class="article-graph-legend">
 
                 <span>{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</span>
                 <table>
@@ -71,8 +85,10 @@
     .article-graph-legend table td, th {
         padding: 3px 6px
     }
+
     .article-graph-legend {
         position:absolute;
+        white-space:nowrap;
         z-index: 1000;
         top:0;
         left: 0;
@@ -82,6 +98,35 @@
         background-color: #494949;
         border-radius: 2px;
         border: 2px solid #494949;
+        transform: translate(-50%, 0px)
+    }
+
+    .events-legend-wrapper {
+        position: relative;
+        height: 0;
+    }
+
+    /* div to correctly wrap transformed .events-legend */
+    .events-legend-wrapper > div {
+        position: absolute;
+        top:0;
+        left:0;
+        right: -180px;
+        width: auto;
+        background-color:red;
+    }
+
+    .events-legend {
+        position:absolute;
+        z-index: 1000;
+        bottom:-21px;
+        left: 0;
+        opacity: 0.85;
+        color: #fff;
+        padding: 2px;
+        background-color: #00bdf1;
+        border-radius: 2px;
+        border: 2px solid #00bdf1;
         transform: translate(-50%, 0px)
     }
 
@@ -137,9 +182,17 @@
                 tagLabels: null,
                 loading: false,
                 interval: 'all',
-                legendVisible: false,
                 highlightedRow: null,
-                legendLeft: "0px"
+                legend: {
+                    visible: false,
+                    data: null,
+                    left: "0px"
+                },
+                eventLegend: {
+                    visible: false,
+                    data: null,
+                    styleObject: {}
+                }
             };
         },
         watch: {
@@ -163,6 +216,7 @@
                 container: null,
                 svg: null,
                 dataG: null,
+                eventsG: null,
                 x: null,
                 y: null,
                 colorScale: null,
@@ -217,6 +271,8 @@
                     .attr("class", "axis axis--x")
                     .call(this.vars.xAxis)
 
+                this.vars.eventsG = this.vars.svg.append("g").attr("class", "events-g")
+
                 // Mouse events
                 let mouseG = this.vars.svg.append("g")
                     .attr("class", "mouse-over-effects");
@@ -235,12 +291,13 @@
                     .attr('fill', 'none')
                     .attr('pointer-events', 'all')
                     .on('mouseout', function() {
-                        that.legendVisible = false
+                        that.legend.visible = false
+                        that.eventLegend.visible = false
                         that.vars.vertical
                             .style("opacity", "0");
                     })
                     .on('mouseover', function() {
-                        that.legendVisible = true
+                        that.legend.visible = true
                         that.vars.vertical
                             .style("opacity", "1");
                     })
@@ -249,8 +306,36 @@
                             let mouse = d3.mouse(this);
                             const xDate = that.vars.x.invert(mouse[0])
                             that.highlightRow(xDate, height)
+                            that.highlightEvent(xDate)
                         }
                     })
+            },
+            highlightEvent(xDate) {
+                const xDateMillis = moment(xDate).valueOf()
+                const pxThresholdToShowLegend = 50
+
+                // get closest event (not using bisect, as there are only few events to search)
+                let selectedEvent, min = Number.MAX_SAFE_INTEGER
+                for (const event of this.data.events) {
+                    let diff = Math.abs(xDateMillis - moment(event.date).valueOf())
+                    if (diff < min) {
+                        min = diff
+                        selectedEvent = event
+                    }
+                }
+
+                // show event only if its too close to x-position of mouse
+                if (Math.abs(this.vars.x(selectedEvent.date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
+                    this.eventLegend.visible = true
+                    this.eventLegend.data = selectedEvent
+                    this.eventLegend.styleObject = {
+                        'background-color': selectedEvent.event.color,
+                        'border-color': selectedEvent.event.color,
+                        'left': (this.vars.x(selectedEvent.date) + this.vars.margin.left) + "px"
+                    }
+                } else {
+                    this.eventLegend.visible = false
+                }
             },
             highlightRow(xDate, height) {
                 let rowIndex = bisectDate(this.data.results, xDate);
@@ -273,22 +358,18 @@
                 let verticalX = this.vars.x(row.date)
 
                 this.vars.vertical
-                    .attr("d", function() {
-                        let d = "M" + verticalX + "," + height;
-                        d += " " + verticalX + "," + 0;
-                        return d;
+                    .attr("d", () => {
+                        return "M" + verticalX + "," + height + " " + verticalX + "," + 0
                     })
 
                 let valuesSum = 0
 
-                let that = this
-
-                let values = this.data.tags.map(function (tag) {
+                let values = this.data.tags.map(tag => {
                     valuesSum += row[tag]
                     return {
                         tag: tag,
                         value: row[tag],
-                        color: d3.color(that.vars.colorScale(tag)).hex()
+                        color: d3.color(this.vars.colorScale(tag)).hex()
                     }
                 })
 
@@ -298,7 +379,7 @@
                     sum: valuesSum
                 }
 
-                this.legendLeft = (Math.round(this.vars.x(row.date)) + this.vars.margin.left) + "px"
+                this.legend.left = (Math.round(this.vars.x(row.date)) + this.vars.margin.left) + "px"
 
             },
             fillData() {
@@ -307,7 +388,8 @@
                 }
                 let results = this.data.results,
                     tags = this.data.tags,
-                    colors = this.data.colors
+                    colors = this.data.colors,
+                    events = this.data.events
 
                 let outerWidth = this.vars.container.clientWidth,
                     outerHeight = this.vars.container.clientHeight,
@@ -359,6 +441,7 @@
                 // Remove original data if present
                 this.vars.dataG.selectAll(".layer").remove();
                 this.vars.dataG.selectAll(".layer-line").remove();
+                this.vars.eventsG.selectAll('.event').remove()
 
                 // Update data
                 if (this.stacked) {
@@ -401,6 +484,35 @@
                     .attr("shape-rendering", "geometricPrecision")
                     .attr("fill", "none")
 
+                let eventLayers = this.vars.eventsG.selectAll(".event")
+                    .data(events)
+                    .enter().append("g")
+                    .attr("class", "event")
+
+                eventLayers
+                    .append("path")
+                    .attr("d", item => {
+                        let xDate = this.vars.x(item.date)
+                        return "M" + xDate + "," + height + " " + xDate + "," + 0
+                    })
+                    .attr("stroke-dasharray", "6 4")
+                    .attr("stroke", item => item.event.color)
+
+                eventLayers
+                    .append("polygon")
+                    .attr("points", (item, i) => {
+                        let xDate = this.vars.x(item.date)
+                        // small triangle on top of dashed line
+                        let size = 5
+                        let points = [
+                            [xDate - size, 0],
+                            [xDate + size, 0],
+                            [xDate, size],
+                        ]
+                        return points.map((p) => p[0] + "," + p[1]).join(" ")
+                    })
+                    .attr("fill", item => item.event.color)
+
                 // Update axis
                 this.vars.svg.select('.axis--x').transition().call(this.vars.xAxis)
             },
@@ -417,6 +529,7 @@
                         this.loading = false
                         const tags = response.data.tags
                         const data = response.data.results
+                        const events = response.data.events
 
                         let parseData = function (d) {
                             let dataObject = {
@@ -428,9 +541,17 @@
                             return dataObject;
                         }
 
+                        let parseEvents = function(event) {
+                            return {
+                                date: d3.isoParse(event.date),
+                                event: event
+                            }
+                        }
+
                         this.data = {
                             results: data.map(parseData),
                             tags: tags,
+                            events: events ? events.map(parseEvents) : [],
                             colors: response.data.colors,
                             intervalMinutes: response.data.intervalMinutes
                         }

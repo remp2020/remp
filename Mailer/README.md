@@ -38,6 +38,12 @@ You can override any default config from
 - MySQL 5.7
 - Redis 3.2
 
+### Base flow of actions
+
+Here you can see simplified view of how Mailer works at following diagram.
+
+![Mailer Sequence Overview](./resources/docs/sequence_overview.svg)
+
 ### Integration with user base
 
 Mailer is dependent on external user base and segment provider. After the installation the application uses
@@ -497,3 +503,57 @@ aggregation so they're displayed right in the job detail.
 ```
 * * * * * php /home/remp/workspace/remp/Mailer/bin/command.php mail:job-stats
 ```
+
+### Authentication
+
+The default implementation authenticates via REMP SSO. However it is possible for Mailer
+to use external authentication without the need of having SSO installed.
+
+To replace REMP SSO with your custom authentication, you need to:
+
+* Implement `\Nette\Security\IAuthenticator` interface
+
+    * `authenticate(array $credentials): \Nette\Security\Identity`: Method receiving credentials, validating them against whatever source
+    of truth you want to use (e.g. your own API) and returning instance of `\Nette\Security\Identity`.
+
+        * `$credentials`: Array with credentials, where `$credentials[0]` is username and `$credentials[1]`
+        is password.
+
+* Implement `\Remp\MailerModule\Auth\BearerTokenRepositoryInterface` interface
+
+    * `validToken(string $token): boolean`: Method receiving API token (read from `Authorization` header)
+    returning whether it's valid or not based on your implementation.
+    
+    * `ipRestrictions(): string`: Method returning any IP addresses that should be whitelisted for given
+    token. If there are no restrictions, return `*`.
+
+Last step is to add these new implementations to `config.local.neon`. See following section to read an
+example based on integration with REMP CRM and replace the classes with your own implementation.
+
+#### REMP CRM integration
+
+See the `Remp\MailerModule\Auth\Authenticator` implementation and
+`Remp\MailerModule\Auth\RemoteBearerTokenRepository` implementation to check how you can initialize
+your class the dependencies, structure the request and process the result
+
+The following snippet needs to be added to your `config.local.neon` to enable integration with CRM.
+Classes from the snippet are using REMP CRM to authenticate users and API keys.
+
+```neon
+services:
+    # user authentication
+    authenticator:
+        class: Remp\MailerModule\Auth\Authenticator
+    security.userStorage:
+        class: Nette\Http\UserStorage
+      
+    # api authentication
+    apiTokenRepository:
+        class: Remp\MailerModule\Auth\RemoteBearerTokenRepository(%crm.addr%)
+```
+
+You can see that you override here two services with your own implementation. The third service
+uses default Nette implementation and overrides custom REMP SSO implementation defined in `config.neon`.
+
+From now on the authentication is not done by redirecting user to SSO but by using default sign in
+screen avaiable at http://mailer.remp.press/sign/in.

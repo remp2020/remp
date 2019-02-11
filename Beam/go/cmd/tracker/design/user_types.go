@@ -37,12 +37,13 @@ var Pageview = Type("Pageview", func() {
 	Description("Pageview is the payload for tracking pageview event")
 
 	Attribute("action", String, func() {
-		Enum("load", "timespent")
+		Enum("load", "timespent", "progress")
 	})
 	Attribute("system", System)
 	Attribute("user", User)
 	Attribute("article", Article)
 	Attribute("timespent", TimeSpent)
+	Attribute("progress", Progress)
 
 	Required("system", "user", "action")
 })
@@ -101,6 +102,22 @@ var TimeSpent = Type("TimeSpent", func() {
 	Attribute("unload", Boolean, "Flag to indicate last update of time spent on page before unload event")
 
 	Required("seconds")
+})
+
+var Progress = Type("Progress", func() {
+	Description("Update reading progress on pageview")
+
+	Attribute("page_ratio", Number, "Whole page reading ratio", func() {
+		Minimum(0)
+		Maximum(1)
+	})
+	Attribute("article_ratio", Number, "Article reading ratio", func() {
+		Minimum(0)
+		Maximum(1)
+	})
+	Attribute("unload", Boolean, "Flag to indicate last update of progress on page before unload event")
+
+	Required("page_ratio")
 })
 
 var Source = Type("source", func() {

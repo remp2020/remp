@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\JournalContract;
 use App\Http\Requests\SegmentRequest;
 use App\Segment;
 use App\SegmentGroup;
 use App\SegmentRule;
 use Html;
+use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 
@@ -62,6 +62,23 @@ class SegmentController extends Controller
         list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
 
         return view('segments.create', [
+            'segment' => $segment,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource (beta version of new segment builder).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function betaCreate()
+    {
+        $segment = new Segment();
+
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
+
+        return view('segments.beta.create', [
             'segment' => $segment,
             'categories' => $categories,
         ]);
@@ -134,6 +151,22 @@ class SegmentController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource (beta version of new segment builder).
+     *
+     * @param  \App\Segment $segment
+     * @return \Illuminate\Http\Response
+     */
+    public function betaEdit(Segment $segment)
+    {
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
+
+        return view('segments.beta.edit', [
+            'segment' => $segment,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param SegmentRequest|Request $request
@@ -193,7 +226,7 @@ class SegmentController extends Controller
             $segment->setRelation('rules', collect($rules));
         }
 
-        $categories = $this->journalContract->categories();
+        $categories = collect($this->journalContract->categories());
 
         return [
             $segment,
@@ -236,5 +269,16 @@ class SegmentController extends Controller
         }
 
         return $segment;
+    }
+
+    public function embed(Request $request)
+    {
+        $segment = null;
+        if ($segmentId = $request->get('segmentId')) {
+            $segment = Segment::find($segmentId);
+        }
+        return view('segments.beta.embed', [
+            'segment' => $segment,
+        ]);
     }
 }

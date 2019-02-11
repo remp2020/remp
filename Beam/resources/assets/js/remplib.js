@@ -46,8 +46,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         totalTimeSpent: 0,
 
-        partialTimeSpent: 0,
-
         timeSpentActive: false,
 
         init: function(config) {
@@ -286,23 +284,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             // PRE ES2015 safeguard
             closed = (typeof closed === 'boolean') ? closed : false;
 
-            // send 0 time spent in case it is unload event
-            if (this.partialTimeSpent === 0 && closed === false) {
-                return;
-            }
-
             let params = {
                 "article": this.article,
                 "action": "timespent",
                 "timespent": {
-                    "seconds": this.partialTimeSpent,
+                    "seconds": this.totalTimeSpent,
                     "unload": closed,
                 }
             };
             params = this.addSystemUserParams(params);
             params = this.timespentParamsCleanup(params);
-
-            this.partialTimeSpent = 0; // start counting from 0 again
 
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "timespent", params);
@@ -525,7 +516,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         tickTime: function () {
             if (this.timeSpentActive) {
                 this.totalTimeSpent++;
-                this.partialTimeSpent++;
                 this.scheduledSend();
             }
             setTimeout('remplib.tracker.tickTime()', 1000);

@@ -33,10 +33,27 @@ $factory->define(\App\Account::class, function (Faker\Generator $faker) {
 });
 
 $factory->define(\App\Segment::class, function (Faker\Generator $faker) {
+    $segmentName = $faker->domainWord;
     return [
-        'name' => 'DEMO segment',
-        'code' => 'demo-segment',
+        'name' => $segmentName,
+        'code' => "$segmentName-segment",
         'active' => true,
+    ];
+});
+
+$factory->state(\App\Segment::class, 'author', [
+    'segment_group_id' => \App\SegmentGroup::getByCode(\App\SegmentGroup::CODE_AUTHORS_SEGMENTS)->id,
+]);
+
+$factory->define(\App\SegmentUser::class, function (Faker\Generator $faker) {
+    return [
+        'user_id' => $faker->numberBetween(1, 1000000),
+    ];
+});
+
+$factory->define(\App\SegmentBrowser::class, function (Faker\Generator $faker) {
+    return [
+        'browser_id' => $faker->uuid,
     ];
 });
 

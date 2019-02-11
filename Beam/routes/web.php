@@ -32,6 +32,9 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('segments/json', 'SegmentController@json')->name('segments.json');
     Route::get('segments/{sourceSegment}/copy', 'SegmentController@copy')->name('segments.copy');
+    Route::get('segments/beta/embed', 'SegmentController@embed')->name('segments.beta.embed');
+    Route::get('segments/beta/create', 'SegmentController@betaCreate')->name('segments.beta.create');
+    Route::get('segments/beta/{segment}/edit', 'SegmentController@betaEdit')->name('segments.beta.edit');
 
     Route::get('articles/conversions', 'ArticleController@conversions')->name('articles.conversions');
     Route::get('articles/dtConversions', 'ArticleController@dtConversions')->name('articles.dtConversions');
@@ -41,6 +44,14 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('conversions/json', 'ConversionController@json')->name('conversions.json');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
+
+    Route::get('author-segments', 'AuthorSegmentsController@index')->name('authorSegments.index');
+    Route::get('author-segments/json', 'AuthorSegmentsController@json')->name('authorSegments.json');
+    Route::get('author-segments/configuration', 'AuthorSegmentsController@configuration')->name('authorSegments.configuration');
+    Route::post('author-segments/configuration', 'AuthorSegmentsController@saveConfiguration')->name('authorSegments.saveConfiguration');
+    Route::post('author-segments/compute', 'AuthorSegmentsController@compute')->name('authorSegments.compute');
+    Route::post('author-segments/validate-configuration', 'AuthorSegmentsController@validateConfiguration')->name('authorSegments.validateConfiguration');
+    Route::post('author-segments/validate-test', 'AuthorSegmentsController@validateTest')->name('authorSegments.validateTest');
 
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
@@ -99,7 +110,5 @@ Route::middleware('auth.jwt')->group(function () {
             ->name('googleanalyticsreporting.timeHistogram.json');
     }
 
-    // TODO: temporary, delete after test is over
-    Route::get('tests/author-segments-test', 'TestController@authorSegmentsTest')->name('test.author-segments-test');
-    Route::post('tests/author-segments-test', 'TestController@showResults')->name('test.show-results');
+
 });

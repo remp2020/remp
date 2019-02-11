@@ -192,10 +192,10 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 }
 
 // Categories lists all available categories.
-func (cDB *CommerceElastic) Categories() []string {
+func (cDB *CommerceElastic) Categories() ([]string, error) {
 	return []string{
 		CategoryCommerce,
-	}
+	}, nil
 }
 
 // Flags lists all available flags.

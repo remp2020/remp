@@ -4,21 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
-use App\Contracts\JournalListRequest;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
-use App\Model\NewsletterCriteria;
+use App\Model\NewsletterCriterion;
 use App\Section;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
@@ -321,11 +319,13 @@ class ArticleController extends Controller
             }
 
             if ($a['titles'] ?? []) {
-                $article->articleTitles()->delete();
                 foreach ($a['titles'] as $variant => $title) {
-                    $article->articleTitles()->create([
+                    if (empty($title)) {
+                        continue;
+                    }
+                    $article->articleTitles()->updateOrCreate([
                         'variant' => $variant,
-                        'title' => $title
+                        'title' => html_entity_decode($title, ENT_QUOTES)
                     ]);
                 }
             }
@@ -348,50 +348,57 @@ class ArticleController extends Controller
 
         $articlesCount = $request->input('articles_count');
         $timespan = $request->input('timespan');
-        $criteria = NewsletterCriteria::get($request->input('criteria'));
+        $ignoreAuthors = $request->input('ignore_authors', []);
 
-        $topArticles = NewsletterCriteria::getCachedArticles($criteria, $timespan);
+        $topArticlesPerCriterion = [];
 
+        /** @var NewsletterCriterion[] $criteria */
+        $criteria = [];
+        foreach ($request->input('criteria') as $criteriaString) {
+            $criteria[] = NewsletterCriterion::get($criteriaString);
+            $topArticlesPerCriterion[] = null;
+        }
         $topArticlesPerUser = [];
 
         $timeAfter = Carbon::now()->subDays($timespan);
         $timeBefore = Carbon::now();
 
         foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
-            // Load read articles in batch
-            $usersReadArticles = [];
-            $r = new JournalAggregateRequest('pageviews', 'load');
-            $r->setTimeAfter($timeAfter);
-            $r->setTimeBefore($timeBefore);
-            $r->addGroup('user_id', 'article_id');
-            $r->addFilter('user_id', ...$userIdsChunk);
-            foreach ($this->journal->count($r) as $item) {
-                if ($item->tags->article_id !== '') {
-                    $userId = $item->tags->user_id;
-                    if (!array_key_exists($userId, $usersReadArticles)) {
-                        $usersReadArticles[$userId] = [];
-                    }
-                    $usersReadArticles[$userId][$item->tags->article_id] = true;
-                }
-            }
+            $usersReadArticles = $this->readArticlesForUsers($timeAfter, $timeBefore, $userIdsChunk);
 
             // Save top articles per user
             foreach ($userIdsChunk as $userId) {
-                $topArticlesPerUser[$userId] = [];
+                $topArticlesUrls = [];
+                $topArticlesUrlsOrdered = [];
 
                 $i = 0;
-                while (count($topArticlesPerUser[$userId]) < $articlesCount) {
-                    if ($i >= count($topArticles)) {
-                        break;
+                $criterionIndex = 0;
+                while (count($topArticlesUrls) < $articlesCount) {
+                    if (!$topArticlesPerCriterion[$criterionIndex]) {
+                        $criterion = $criteria[$criterionIndex];
+                        $topArticlesPerCriterion[$criterionIndex] = $criterion->getCachedArticles($timespan, $ignoreAuthors);
                     }
 
-                    $topArticle = $topArticles[$i];
-                    if (!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId])) {
-                        $topArticlesPerUser[$userId][] = $topArticle->url;
+                    if ($i >= count($topArticlesPerCriterion[$criterionIndex])) {
+                        if ($criterionIndex === count($criteria) - 1) {
+                            break;
+                        }
+                        $criterionIndex++;
+                        $i = 0;
+                        continue;
+                    }
+
+                    $topArticle = $topArticlesPerCriterion[$criterionIndex][$i];
+                    if ((!array_key_exists($userId, $usersReadArticles) || !array_key_exists($topArticle->external_id, $usersReadArticles[$userId]))
+                        && !array_key_exists($topArticle->url, $topArticlesUrls)) {
+                        $topArticlesUrls[$topArticle->url] = true;
+                        $topArticlesUrlsOrdered[] = $topArticle->url;
                     }
 
                     $i++;
                 }
+
+                $topArticlesPerUser[$userId] = $topArticlesUrlsOrdered;
             }
         }
 
@@ -399,5 +406,27 @@ class ArticleController extends Controller
             'status' => 'ok',
             'data' => $topArticlesPerUser
         ]);
+    }
+
+    private function readArticlesForUsers(Carbon $timeAfter, Carbon $timeBefore, array $userIds): array
+    {
+        $usersReadArticles = [];
+        $r = new AggregateRequest('pageviews', 'load');
+        $r->setTimeAfter($timeAfter);
+        $r->setTimeBefore($timeBefore);
+        $r->addGroup('user_id', 'article_id');
+        $r->addFilter('user_id', ...$userIds);
+
+        $result = collect($this->journal->count($r));
+        foreach ($result as $item) {
+            if ($item->tags->article_id !== '') {
+                $userId = $item->tags->user_id;
+                if (!array_key_exists($userId, $usersReadArticles)) {
+                    $usersReadArticles[$userId] = [];
+                }
+                $usersReadArticles[$userId][$item->tags->article_id] = true;
+            }
+        }
+        return $usersReadArticles;
     }
 }

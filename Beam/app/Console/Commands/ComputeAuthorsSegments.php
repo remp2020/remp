@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\ArticleAggregatedView;
 use App\Author;
 use App\Mail\AuthorSegmentsResult;
+use App\Model\Config;
 use App\Segment;
 use App\SegmentBrowser;
 use App\SegmentGroup;
@@ -12,46 +13,81 @@ use App\SegmentUser;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use PDO;
 
-class CreateAuthorsSegments extends Command
+class ComputeAuthorsSegments extends Command
 {
-    const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
+    const COMMAND = 'segments:compute-author-segments';
 
-    const COMMAND = 'segments:create-author-segments';
+    const CONFIG_MIN_RATIO = 'author_segments_min_ratio';
+    const CONFIG_MIN_AVERAGE_TIMESPENT = 'author_segments_min_average_timespent';
+    const CONFIG_MIN_VIEWS = 'author_segments_min_views';
+    const CONFIG_DAYS_IN_PAST = 'author_segments_days_in_past';
 
-    protected $signature = self::COMMAND . ' {min_views} {min_average_timespent} {min_ratio} {history} {email}';
+    const ALL_CONFIGS = [self::CONFIG_MIN_RATIO, self::CONFIG_MIN_AVERAGE_TIMESPENT, self::CONFIG_MIN_VIEWS, self::CONFIG_DAYS_IN_PAST];
+
+    private $minViews;
+    private $minAverageTimespent;
+    private $minRatio;
+    private $dateThreshold;
+
+    protected $signature = self::COMMAND . ' 
+    {--email} 
+    {--history}
+    {--min_views=} 
+    {--min_average_timespent=} 
+    {--min_ratio=}';
 
     protected $description = "Generate authors' segments from aggregated pageviews and timespent data.";
 
     public function handle()
     {
-        Log::debug('CreateAuthorsSegments job STARTED');
+        ini_set('memory_limit', '256M');
+        // Using Cursor on large number of results causing memory issues
+        // https://github.com/laravel/framework/issues/14919
+        DB::connection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 
-        $minimalViews = $this->argument('min_views');
-        $minimalAverageTimespent = $this->argument('min_average_timespent');
-        $minimalRatio = $this->argument('min_ratio');
-        $history = $this->argument('history');
-        $emailDest = $this->argument('email');
-        $this->computeAuthorSegments($minimalViews, $minimalAverageTimespent, $minimalRatio, $history, $emailDest);
+        $this->line('');
+        $this->line('<info>***** Computing author segments *****</info>');
+        $this->line('');
 
-        // TODO: enable this after condition are specialized
-        //$this->recomputeBrowsersForAuthorSegments();
-        //$this->recomputeUsersForAuthorSegments();
+        $email = $this->option('email');
 
-        Log::debug('CreateAuthorsSegments job FINISHED');
+        $this->minViews = Config::loadByName(self::CONFIG_MIN_VIEWS);
+        $this->minAverageTimespent = Config::loadByName(self::CONFIG_MIN_AVERAGE_TIMESPENT);
+        $this->minRatio = Config::loadByName(self::CONFIG_MIN_RATIO);
+        $this->dateThreshold = Carbon::today()->subDays(Config::loadByName(self::CONFIG_DAYS_IN_PAST));
+
+        if ($email) {
+            // Only compute segment statistics
+            $this->line('Generating authors segments statistics');
+            $this->computeAuthorSegments($email);
+        } else {
+            // Generate real segments
+            $this->line('Generating authors segments');
+            $this->recomputeBrowsersForAuthorSegments();
+            $this->recomputeUsersForAuthorSegments();
+            $deletedSegments = self::deleteEmptySegments();
+            $this->line('Deleting empty author segments');
+            if ($deletedSegments > 0) {
+                $this->line("Deleted $deletedSegments segments");
+            }
+        }
+
+        $this->line(' <info>OK!</info>');
     }
 
     /**
-     * @param $minimalViews
-     * @param $minimalAverageTimespent
-     * @param $minimalRatio
-     * @param $historyDays
-     * @param $emailDest
+     * @param $email
      */
-    private function computeAuthorSegments($minimalViews, $minimalAverageTimespent, $minimalRatio, $historyDays, $emailDest)
+    private function computeAuthorSegments($email)
     {
+        $minimalViews = $this->option('min_views') ?? $this->minViews;
+        $minimalAverageTimespent = $this->option('min_average_timespent') ?? $this->minAverageTimespent;
+        $minimalRatio = $this->option('min_ratio') ?? $this->minRatio;
+        $historyDays = $this->option('history') ?? 30;
+
         $results = [];
         $fromDay = Carbon::now()->subDays($historyDays)->toDateString();
         // only 30, 60 and 90 are allowed values
@@ -120,32 +156,22 @@ SQL;
             $results[$item->author_id]->user_count = $item->user_count;
         }
 
-        Mail::to($emailDest)->send(
+        Mail::to($email)->send(
             new AuthorSegmentsResult($results, $minimalViews, $minimalAverageTimespent, $minimalRatio, $historyDays)
         );
-    }
-
-    private function getOrCreateAuthorSegment($authorId)
-    {
-        $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_AUTHORS_SEGMENTS])->first();
-        $author = Author::find($authorId);
-
-        return Segment::updateOrCreate([
-            'code' => 'author-' . $author->id
-        ], [
-            'name' => 'Author ' . $author->name,
-            'active' => true,
-            'segment_group_id' => $segmentGroup->id,
-        ]);
     }
 
     private function recomputeUsersForAuthorSegments()
     {
         $authorUsers = $this->groupDataFor('user_id');
 
+        $this->line("Updating segments users");
         SegmentUser::truncate();
 
         foreach ($authorUsers as $authorId => $users) {
+            if (count($users) === 0) {
+                continue;
+            }
             $segment = $this->getOrCreateAuthorSegment($authorId);
             $toInsert = collect($users)->map(function ($userId) use ($segment) {
                 return [
@@ -165,7 +191,13 @@ SQL;
 
         SegmentBrowser::truncate();
 
+        $this->line("Updating segments browsers");
+
         foreach ($authorBrowsers as $authorId => $browsers) {
+            if (count($browsers) === 0) {
+                continue;
+            }
+
             $segment = $this->getOrCreateAuthorSegment($authorId);
             $toInsert = collect($browsers)->map(function ($browserId) use ($segment) {
                 return [
@@ -182,12 +214,12 @@ SQL;
     private function aggregatedPageviewsFor($groupParameter)
     {
         $results = [];
-        $queryItems =  ArticleAggregatedView::select(
-            DB::raw("$groupParameter, sum(pageviews) as total_pageviews")
-        )
-            ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
-            ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
-            ->whereRaw("$groupParameter <> ''")
+
+        // Not using model to save memory
+        $queryItems = DB::table(ArticleAggregatedView::getTableName())
+            ->select($groupParameter, DB::raw('sum(pageviews) as total_pageviews'))
+            ->whereNotNull($groupParameter)
+            ->where('date', '>=', $this->dateThreshold)
             ->groupBy($groupParameter)
             ->cursor();
 
@@ -199,39 +231,72 @@ SQL;
 
     private function groupDataFor($groupParameter)
     {
+        $this->line("Computing total pageviews for parameter '$groupParameter'");
         $totalPageviews = $this->aggregatedPageviewsFor($groupParameter);
+        $this->line("Done");
 
-        $queryItems =  ArticleAggregatedView::select(
-            DB::raw("$groupParameter, author_id, sum(pageviews) as total_pageviews, avg(timespent) as average_timespent")
+        $queryItems =  DB::table(ArticleAggregatedView::getTableName())->select(
+            $groupParameter,
+            'author_id',
+            DB::raw('sum(pageviews) as total_pageviews'),
+            DB::raw('avg(timespent) as average_timespent')
         )
             ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
-            ->where('timespent', '<=', self::TIMESPENT_IGNORE_THRESHOLD_SECS)
-            ->whereRaw("$groupParameter <> ''")
+            ->whereNotNull($groupParameter)
+            ->where('date', '>=', $this->dateThreshold)
             ->groupBy([$groupParameter, 'author_id'])
-            // Conditions to select members of particular author segment
-            // are empirically defined.
-            // TODO Improve/describe this after further analysis is done
-            ->havingRaw('avg(timespent) >= ?', ['120'])
+            ->havingRaw('avg(timespent) >= ?', [$this->minAverageTimespent])
             ->cursor();
 
         $segments = [];
 
+        $this->line("Computing segment items for parameter '$groupParameter'");
         foreach ($queryItems as $item) {
             if ($totalPageviews[$item->$groupParameter] === 0) {
                 continue;
             }
             $ratio = (int) $item->total_pageviews / $totalPageviews[$item->$groupParameter];
-            // Conditions to select members of particular author segment
-            // are empirically defined.
-            // TODO Improve/describe this after further analysis is done
-            if ($ratio >= 0.25 && $item->total_pageviews >= 5) {
+            if ($ratio >= $this->minRatio && $item->total_pageviews >= $this->minViews) {
                 if (!array_key_exists($item->author_id, $segments)) {
                     $segments[$item->author_id] = [];
                 }
                 $segments[$item->author_id][] = $item->$groupParameter;
             }
         }
+        $this->line("Done");
 
         return $segments;
+    }
+
+    private function getOrCreateAuthorSegment($authorId)
+    {
+        $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_AUTHORS_SEGMENTS])->first();
+        $author = Author::find($authorId);
+
+        return Segment::updateOrCreate([
+            'code' => 'author-' . $author->id
+        ], [
+            'name' => 'Author ' . $author->name,
+            'active' => true,
+            'segment_group_id' => $segmentGroup->id,
+        ]);
+    }
+
+    public static function deleteEmptySegments(): int
+    {
+        $first = DB::table(SegmentUser::getTableName())
+            ->select('segment_id')
+            ->groupBy('segment_id');
+
+        $unionQuery = DB::table(SegmentBrowser::getTableName())
+            ->select('segment_id')
+            ->groupBy('segment_id')
+            ->union($first);
+
+        return Segment::leftJoinSub($unionQuery, 't', function ($join) {
+            $join->on('segments.id', '=', 't.segment_id');
+        })->whereNull('t.segment_id')
+            ->where('segment_group_id', SegmentGroup::getByCode(SegmentGroup::CODE_AUTHORS_SEGMENTS)->id)
+            ->delete();
     }
 }

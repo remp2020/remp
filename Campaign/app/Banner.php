@@ -12,6 +12,7 @@ class Banner extends Model
 
     const TEMPLATE_HTML = 'html';
     const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
+    const TEMPLATE_OVERLAY_RECTANGLE = 'overlay_rectangle';
     const TEMPLATE_BAR = 'bar';
     const TEMPLATE_SHORT_MESSAGE = 'short_message';
 
@@ -60,6 +61,7 @@ class Banner extends Model
      *
      * @param array $attributes
      * @return $this
+     * @throws \Exception
      */
     public function fillTemplate(array $attributes)
     {
@@ -84,6 +86,7 @@ class Banner extends Model
      * load template
      *
      * @return $this
+     * @throws \Exception
      */
     public function loadTemplate()
     {
@@ -105,6 +108,11 @@ class Banner extends Model
         return $this->hasOne(MediumRectangleTemplate::class);
     }
 
+    public function overlayRectangleTemplate()
+    {
+        return $this->hasOne(OverlayRectangleTemplate::class);
+    }
+
     public function barTemplate()
     {
         return $this->hasOne(BarTemplate::class);
@@ -119,6 +127,7 @@ class Banner extends Model
      * Returns name of the banner to template relation
      *
      * @return string $relationName
+     * @throws \Exception
      */
     public function getTemplateRelationName()
     {
@@ -132,6 +141,8 @@ class Banner extends Model
                 break;
             case self::TEMPLATE_SHORT_MESSAGE:
                 return 'shortMessageTemplate';
+            case self::TEMPLATE_OVERLAY_RECTANGLE:
+                return 'overlayRectangleTemplate';
             default:
                 throw new \Exception('Unhandled banner template access: ' . $this->template);
         }
@@ -145,6 +156,7 @@ class Banner extends Model
      *
      * @param string $relationName
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @throws \Exception
      */
     public function getTemplateRelation($relationName = null)
     {
@@ -158,6 +170,7 @@ class Banner extends Model
      * Returns banner template object
      *
      * @return Model
+     * @throws \Exception
      */
     public function getTemplate()
     {

@@ -1,0 +1,39 @@
+actor User
+participant Client
+participant SSO
+participant AuthProvider
+
+title SSO Flow
+
+note over AuthProvider:Only Google is implemented\nas authentication provider
+
+User->Client:Visit website
+
+activate Client
+Client->SSO:Read JWT from cookie,\nbackend validate
+activate SSO
+Client<--SSO:User data if valid\nSSO redirect URL if not valid
+deactivate SSO
+
+
+alt token valid
+User<--Client:Return logged response
+end
+
+alt token invalid / not present
+Client-->>SSO:Redirect to SSO\n(providing callback URL)
+activate SSO
+SSO->SSO:Check internal sesion
+
+opt user not authenticated
+SSO->AuthProvider:Authenticate
+activate AuthProvider
+SSO<--AuthProvider:
+deactivate AuthProvider
+end
+
+Client<<--SSO:Redirect to callback with JWT
+deactivate SSO
+User<--Client:Return logged response
+
+end

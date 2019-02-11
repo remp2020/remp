@@ -2,13 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Contracts\JournalContract;
-use App\Contracts\JournalListRequest;
 use App\SessionDevice;
 use App\SessionReferer;
 use DeviceDetector\DeviceDetector;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Remp\Journal\JournalContract;
+use Remp\Journal\ListRequest;
 use Snowplow\RefererParser\Parser;
 
 class ProcessPageviewSessions extends Command
@@ -23,7 +23,7 @@ class ProcessPageviewSessions extends Command
         Parser $refererParser,
         \League\Uri\Parser $uriParser
     ) {
-        $request = new JournalListRequest('pageviews');
+        $request = new ListRequest('pageviews');
 
         $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
         $timeBefore = $now->minute(0)->second(0);
@@ -36,7 +36,7 @@ class ProcessPageviewSessions extends Command
         $request->addGroup("remp_session_id", "subscriber");
 
         $this->line(sprintf('Fetching pageviews made from <info>%s</info> to <info>%s</info>', $timeAfter, $timeBefore));
-        $pageviews = $journalContract->list($request);
+        $pageviews = collect($journalContract->list($request));
 
         $deviceAggregate = [];
         $deviceBlueprint = [

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Model\NewsletterCriteria;
+use App\Model\NewsletterCriterion;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UnreadArticlesRequest extends FormRequest
@@ -27,8 +27,9 @@ class UnreadArticlesRequest extends FormRequest
         return [
             'timespan' => 'required|integer',
             'articles_count' => 'required|integer',
-            'criteria' => 'required|string|in:' . NewsletterCriteria::allCriteriaConcatenated(),
+            'criteria.*' => 'required|string|in:' . NewsletterCriterion::allCriteriaConcatenated(),
             'user_ids.*' => 'required|integer',
+            'ignore_authors.*' => 'string',
         ];
     }
 }

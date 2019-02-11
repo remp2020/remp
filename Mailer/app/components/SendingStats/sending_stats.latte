@@ -27,11 +27,11 @@
     </div>
 
     <div class="col-xs-6 p-0">
-        <div n:ifset="$conversions" class="col-xs-6 col-sm-3 pg-item green">
-            <div class="easy-pie" data-percent="{$conversions['per']|number:0}">
-                <span class="ep-value c-black">{$conversions['per']|number:2}</span>
+        <div class="col-xs-6 col-sm-3 pg-item green">
+            <div class="easy-pie" data-percent="{$converted_stat['per']|number:0}">
+                <span class="ep-value c-black">{$converted_stat['per']|number:2}</span>
             </div>
-            <div class="pgi-title c-black">Conversion<br>{$conversions['value']}</div>
+            <div class="pgi-title c-black">Converted<br>{$converted_stat['value']}</div>
         </div>
         <div class="col-xs-6 col-sm-3 pg-item red">
             <div class="easy-pie" data-percent="{$unsubscribed_stat['per']|number:0}">

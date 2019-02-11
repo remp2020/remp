@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Contracts;
+namespace Remp\Journal;
 
-class JournalConcurrentsRequest
+class ConcurrentsRequest
 {
     protected $filterBy = [];
 

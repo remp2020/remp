@@ -186,6 +186,11 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 			Index: TablePageviews,
 			Field: "browser_id.keyword",
 		}
+	case UniqueCountUsers:
+		binding = elasticQueryBinding{
+			Index: TablePageviews,
+			Field: "user_id.keyword",
+		}
 	default:
 		return nil, false, fmt.Errorf("unable to count uniques for item [%s] ", item)
 	}
@@ -387,10 +392,10 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 }
 
 // Categories lists all tracked categories.
-func (pDB *PageviewElastic) Categories() []string {
+func (pDB *PageviewElastic) Categories() ([]string, error) {
 	return []string{
 		CategoryPageview,
-	}
+	}, nil
 }
 
 // Flags lists all available flags.

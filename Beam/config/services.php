@@ -41,6 +41,10 @@ return [
             'tracker_addr' => env('REMP_TRACKER_ADDR'),
             'tracker_property_token' => env('REMP_TRACKER_ADDR'),
             'segments_addr' => env('REMP_SEGMENTS_ADDR'),
+            'segmenter' => [
+                'api_addr' => env('REMP_SEGMENTER_API_ADDR'),
+                'auth_token' => env('REMP_SEGMENTER_AUTH_TOKEN'),
+            ],
         ],
         'campaign' => [
             'web_addr' => env('REMP_CAMPAIGN_ADDR'),
@@ -50,7 +54,8 @@ return [
             'api_token' => env('REMP_MAILER_API_TOKEN')
         ],
         'sso' => [
-            'web_addr' => env('REMP_SSO_ADDR')
+            'web_addr' => env('REMP_SSO_ADDR'),
+            'api_token' => env('REMP_SSO_API_TOKEN'),
         ],
         'linked' => [
             'beam' => [

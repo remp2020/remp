@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/patrickmn/go-cache"
+	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 )
 
@@ -23,7 +23,9 @@ type SegmentRule struct {
 	EventAction   string        `db:"event_action"`
 	Timespan      sql.NullInt64
 	Operator      string
+	Operator2     *string
 	Count         int
+	Count2        *int
 	CreatedAt     time.Time `db:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at"`
 	Fields        JSONMap
@@ -93,19 +95,47 @@ func (sr *SegmentRule) CacheDuration(count int) (time.Duration, bool) {
 
 // Evaluate evaluates segment rule condition against provided count.
 func (sr *SegmentRule) Evaluate(count int) (bool, error) {
-	switch sr.Operator {
+	// only one count provided
+	if sr.Operator2 == nil && sr.Count2 == nil {
+		return evaluate(sr.Operator, count, sr.Count)
+	}
+
+	// two counts & operators provided
+	if sr.Operator2 != nil && sr.Count2 != nil {
+		first, err := evaluate(sr.Operator, count, sr.Count)
+		if err != nil {
+			return false, err
+		}
+
+		second, err := evaluate(*sr.Operator2, count, *sr.Count2)
+		if err != nil {
+			return false, err
+		}
+
+		return (first && second), nil
+	}
+
+	// TODO: if criteria & segment rules will be validated before, this shouldn't be possible
+	return false, fmt.Errorf("unable to evaluate multiple operators and counts: missing second operator or count")
+}
+
+// evaluate returns result of comparision.
+// Formula is {checkCount} {operator} {against}.
+// Eg. evaluate("<=", 10, 20) will return true as result of (10 <= 20).
+func evaluate(operator string, checkCount, checkAgainst int) (bool, error) {
+	switch operator {
 	case "<=":
-		return count <= sr.Count, nil
+		return checkCount <= checkAgainst, nil
 	case "<":
-		return count < sr.Count, nil
+		return checkCount < checkAgainst, nil
 	case "=":
-		return count == sr.Count, nil
+		return checkCount == checkAgainst, nil
 	case ">=":
-		return count >= sr.Count, nil
+		return checkCount >= checkAgainst, nil
 	case ">":
-		return count > sr.Count, nil
+		return checkCount > checkAgainst, nil
 	default:
-		return false, fmt.Errorf("unhandled operator: %s", sr.Operator)
+		return false, fmt.Errorf("unhandled operator: %s", operator)
 	}
 }
 

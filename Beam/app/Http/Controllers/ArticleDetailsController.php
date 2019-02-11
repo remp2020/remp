@@ -3,16 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Helpers\Colors;
 use App\Http\Resources\ArticleResource;
-use App\Model\ArticleTitle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class ArticleDetailsController extends Controller
 {
@@ -54,7 +52,7 @@ class ArticleDetailsController extends Controller
         $type = $request->get('type');
         $groupBy = $type === 'title' ? 'title_variant' : 'image_variant';
 
-        $data = $this->histogram($article, $request, $groupBy, function (JournalAggregateRequest $request) {
+        $data = $this->histogram($article, $request, $groupBy, function (AggregateRequest $request) {
             $request->addFilter('derived_referer_medium', 'internal');
         });
         $data['colors'] = Colors::abTestVariantTagsToColors($data['tags']);
@@ -66,13 +64,33 @@ class ArticleDetailsController extends Controller
 
         $data['tagLabels'] = [];
 
-        $articleTitles = $article->articleTitles()->whereIn('variant', $data['tags'])->get();
-        foreach ($articleTitles as $articleTitle) {
-            $obj = new \stdClass();
-            $obj->label = $articleTitle->title;
-            $obj->color = $tagToColor[$articleTitle->variant];
+        $articleTitles = $article
+            ->articleTitles()
+            ->whereIn('variant', $data['tags'])
+            ->get()
+            ->groupBy('variant');
 
-            $data['tagLabels'][$articleTitle->variant] = $obj;
+        $data['events'] = [];
+
+        foreach ($articleTitles as $variant => $variantTitles) {
+            if ($variantTitles->count() > 1) {
+                for ($i = 0; $i < $variantTitles->count() - 1; $i++) {
+                    $oldTitle = $variantTitles[$i];
+                    $newTitle = $variantTitles[$i+1];
+                    $data['events'][] = (object) [
+                        'color' => $tagToColor[$variant],
+                        'date' => $newTitle->created_at->toIso8601ZuluString(),
+                        'title' => "<b>{$variant} Title Variant Changed</b><br /><b>From:</b> {$oldTitle->title}<br /><b>To:</b> {$newTitle->title}"
+                    ];
+                }
+            }
+
+            $data['tagLabels'][$variant] = (object) [
+                'color' => $tagToColor[$variant],
+                'labels' => $variantTitles->pluck('title')->map(function ($title) {
+                    return html_entity_decode($title, ENT_QUOTES);
+                })->toArray(),
+            ];
         }
         return response()->json($data);
     }
@@ -122,7 +140,7 @@ class ArticleDetailsController extends Controller
                 throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days] values, instead '$interval' provided");
         }
 
-        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
+        $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->addFilter('article_id', $article->external_id);
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
@@ -133,7 +151,7 @@ class ArticleDetailsController extends Controller
             $addConditions($journalRequest);
         }
 
-        $currentRecords = $this->journal->count($journalRequest);
+        $currentRecords = collect($this->journal->count($journalRequest));
 
         // Get all tags
         $tags = [];
@@ -181,12 +199,12 @@ class ArticleDetailsController extends Controller
         $timeBefore = Carbon::now();
         $timeAfter = $article->published_at;
 
-        $uniqueRequest = new JournalAggregateRequest('pageviews', 'load');
+        $uniqueRequest = new AggregateRequest('pageviews', 'load');
         $uniqueRequest->setTimeAfter($timeAfter);
         $uniqueRequest->setTimeBefore($timeBefore);
         $uniqueRequest->addGroup('article_id', 'title_variant', 'image_variant');
         $uniqueRequest->addFilter('article_id', $article->external_id);
-        $results = $this->journal->unique($uniqueRequest);
+        $results = collect($this->journal->unique($uniqueRequest));
 
         $titleVariants = [];
         $imageVariants = [];

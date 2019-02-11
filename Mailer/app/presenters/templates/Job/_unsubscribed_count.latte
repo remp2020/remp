@@ -8,7 +8,12 @@
             ])
             ->count('*')
         }
+
+        {if $jobBatchTemplate->sent > 0}
         {var $percent = $count ? (100 * $count / $jobBatchTemplate->sent) : 0}
+        {else}
+        {var $percent = 0}
+        {/if}
         {$count} ({$percent|number:0}%)
     </div>
 {/foreach}
