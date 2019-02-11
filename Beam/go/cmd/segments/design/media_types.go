@@ -109,6 +109,10 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 		Attribute("group", SegmentGroup)
 		Attribute("criteria", Any, "Criteria used to build segment")
 		Attribute("url", String, "URL to segment")
+
+		Attribute("table_name", String)
+		Attribute("fields", ArrayOf(String))
+		Attribute("group_id", Integer)
 	})
 	View("default", func() {
 		Attribute("id")
@@ -130,6 +134,17 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 		Attribute("group")
 		Attribute("url")
 	})
+	View("segmenter", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("table_name")
+		Attribute("group")
+
+		Attribute("criteria")
+		Attribute("fields")
+		Attribute("group_id")
+	})
 	Required("id", "code", "name", "group")
 })
 
@@ -144,6 +159,21 @@ var RelatedSegments = MediaType("application/vnd.segments.related+json", func() 
 		})
 	})
 	Required("segments")
+})
+
+var SegmentersSegment = MediaType("application/vnd.segmenters.segment.+json", func() {
+	Description("Segment returned for segmenter")
+	Attributes(func() {
+		Attribute("status", String)
+		Attribute("segment", Segment)
+	})
+	View("default", func() {
+		Attribute("status")
+		Attribute("segment", func() {
+			View("segmenter")
+		})
+	})
+	Required("status", "segment")
 })
 
 var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {

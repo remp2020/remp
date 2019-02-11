@@ -144,6 +144,31 @@ func (s *Segment) ToExtendedMediaType(segmentURL string) *app.SegmentExtended {
 	}
 }
 
+// ToSegmenterMediaType converts internal Segment representation to segmenter view of application segment.
+func (s *Segment) ToSegmenterMediaType() (*app.SegmentSegmenter, error) {
+	tn := "users"
+	mt := app.SegmentSegmenter{
+		ID:        s.ID,
+		Code:      s.Code,
+		Name:      s.Name,
+		TableName: &tn,
+		Group: &app.SegmentGroup{
+			Name:    s.Group.Name,
+			Sorting: s.Group.Sorting,
+		},
+		GroupID: &s.Group.ID,
+	}
+
+	if s.Criteria.Valid {
+		err := json.Unmarshal([]byte(s.Criteria.String), &mt.Criteria)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to unmarshal segments `criteria`")
+		}
+	}
+
+	return &mt, nil
+}
+
 // ToTinyMediaType converts internal SegmentCollection representation to tiny view of application segment collection.
 func (sc SegmentCollection) ToTinyMediaType() app.SegmentTinyCollection {
 	mt := app.SegmentTinyCollection{}

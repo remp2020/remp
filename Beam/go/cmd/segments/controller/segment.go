@@ -59,11 +59,15 @@ func (c *SegmentController) Get(ctx *app.GetSegmentsContext) error {
 		return ctx.NotFound()
 	}
 
-	response, err := (*Segment)(s).ToMediaType()
+	response, err := (*Segment)(s).ToSegmenterMediaType()
 	if err != nil {
 		return err
 	}
-	return ctx.OK(response)
+
+	return ctx.OK(&app.SegmentersSegment{
+		Status:  "ok",
+		Segment: response,
+	})
 }
 
 // List runs the list action.

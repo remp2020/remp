@@ -34,6 +34,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('segments/{sourceSegment}/copy', 'SegmentController@copy')->name('segments.copy');
     Route::get('segments/beta/embed', 'SegmentController@embed')->name('segments.beta.embed');
     Route::get('segments/beta/create', 'SegmentController@betaCreate')->name('segments.beta.create');
+    Route::get('segments/beta/{segment}/edit', 'SegmentController@betaEdit')->name('segments.beta.edit');
 
     Route::get('articles/conversions', 'ArticleController@conversions')->name('articles.conversions');
     Route::get('articles/dtConversions', 'ArticleController@dtConversions')->name('articles.dtConversions');

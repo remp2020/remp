@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit segment')
+@section('title', 'Edit segment (beta version)')
 
 @section('content')
 
@@ -9,14 +9,13 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>Edit segment / <small>{{ $segment->name }}</small></h2>
-            <p>Try <a href="{{ route('segments.beta.edit', $segment) }}" title="Beta version of new segment builder">beta version of new segment builder</a>.</p>
+            <h2>Edit segment / <small>{{ $segment->name }}</small> <i>(beta version)</i></h2>
         </div>
         <div class="card-body card-padding">
             @include('flash::message')
 
             {!! Form::model($segment, ['route' => ['segments.update', $segment], 'method' => 'PATCH']) !!}
-            @include('segments._form')
+            @include('segments.beta._form')
             {!! Form::close() !!}
         </div>
     </div>

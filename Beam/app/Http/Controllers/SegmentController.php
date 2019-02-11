@@ -151,6 +151,22 @@ class SegmentController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource (beta version of new segment builder).
+     *
+     * @param  \App\Segment $segment
+     * @return \Illuminate\Http\Response
+     */
+    public function betaEdit(Segment $segment)
+    {
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
+
+        return view('segments.beta.edit', [
+            'segment' => $segment,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param SegmentRequest|Request $request

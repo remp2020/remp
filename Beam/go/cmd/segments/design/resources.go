@@ -48,7 +48,7 @@ var _ = Resource("segments", func() {
 		})
 		Response(NotFound)
 		Response(BadRequest)
-		Response(OK, Segment)
+		Response(OK, SegmentersSegment)
 	})
 	Action("list", func() {
 		Description("List all segments.")
@@ -60,6 +60,7 @@ var _ = Resource("segments", func() {
 				View("default")
 				View("tiny")
 				View("extended")
+				View("segmenter")
 			}))
 		})
 	})
