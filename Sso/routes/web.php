@@ -11,11 +11,10 @@
 |
 */
 
-Route::get('/', 'ApiTokenController@index');
-
 Route::get('/error', 'AuthController@error')->name('sso.error');
 
 Route::middleware('auth.jwt')->group(function () {
+    Route::get('/', 'ApiTokenController@index');
     Route::get('api-tokens/json', 'ApiTokenController@json')->name('api-tokens.json');
     Route::resource('api-tokens', 'ApiTokenController');
 });

@@ -198,7 +198,7 @@ of payment life-cycle:
 
 See the available endpoints with full JSON structure at `/swagger.json` path of running Tracker API.
 
-#### Javascript Snippet
+##### Javascript Snippet
 
 Any pageview-related data should be tracked from within the browser. Beam provides JS library and snippet
 for tracking these kind of data.
@@ -260,7 +260,7 @@ var rempConfig = {
     // optional, controls where cookies (UTM parameters of visit) are stored
     cookieDomain: ".remp.press",
             
-    // Tracker API specific options          
+    // required, Tracker API specific options          
     tracker: {
         // required, URL location of BEAM Tracker
         url: "http://tracker.beam.remp.press",
