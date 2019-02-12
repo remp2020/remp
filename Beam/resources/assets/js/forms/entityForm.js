@@ -1,5 +1,5 @@
 import Transformer from '../components/_transformer.js';
-import EntityForm from '../components/Entity/EntityForm.vue';
+import EntityForm from '../components/entity/EntityForm.vue';
 
 window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
 

@@ -154,11 +154,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
-        Remp\LaravelSso\Providers\SsoServiceProvider::class,
-        Remp\Widgets\Providers\WidgetServiceProvider::class,
-        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
-
     ],
 
     /*

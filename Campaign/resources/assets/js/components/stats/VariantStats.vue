@@ -67,7 +67,7 @@
                             :loading="loading"
                             :error="error"
                             :value="earnedSum"
-                            :unit="'€'"
+                            :unit="currency"
                         ></single-value>
 
                     </div>
@@ -123,6 +123,7 @@
                 startedPaymentsCount: 0,
                 finishedPaymentsCount: 0,
                 earnedSum: 0,
+                currency: '',
                 ctr: 0,
                 conversions: 0,
                 histogramData: {},
@@ -161,6 +162,7 @@
                 this.startedPaymentsCount = data.payment_count.count;
                 this.finishedPaymentsCount = data.purchase_count.count;
                 this.earnedSum = data.purchase_sum.sum;
+                this.currency = data.purchase_sum.tags.currency;
                 this.histogramData = data.histogram;
                 this.ctr = data.ctr;
                 this.conversions = data.conversions;

@@ -115,9 +115,10 @@ func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
 // List runs the list action.
 func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 	aggOptions := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)
-	o := model.ListOptions{
+	o := model.ListPageviewsOptions{
 		AggregateOptions: aggOptions,
 		SelectFields:     ctx.Payload.SelectFields,
+		LoadTimespent:    ctx.Payload.LoadTimespent,
 	}
 
 	prc, err := c.PageviewStorage.List(o)
@@ -133,7 +134,10 @@ func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 
 // Categories runs the categories action.
 func (c *PageviewController) Categories(ctx *app.CategoriesPageviewsContext) error {
-	categories := c.PageviewStorage.Categories()
+	categories, err := c.PageviewStorage.Categories()
+	if err != nil {
+		return err
+	}
 	return ctx.OK(categories)
 }
 

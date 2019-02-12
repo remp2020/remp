@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -50,8 +51,12 @@ func main() {
 
 	// kafka init
 
-	service.LogInfo("connecting to broker", "bind", c.BrokerAddr)
-	eventProducer, err := newProducer([]string{c.BrokerAddr})
+	brokerAddrs := strings.Split(c.BrokerAddrs, ",")
+	for _, addr := range brokerAddrs {
+		service.LogInfo("connecting to broker", "bind", addr)
+	}
+
+	eventProducer, err := newProducer(brokerAddrs)
 	if err != nil {
 		log.Fatalln(err)
 	}

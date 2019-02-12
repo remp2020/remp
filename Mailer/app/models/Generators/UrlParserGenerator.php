@@ -85,6 +85,7 @@ class UrlParserGenerator implements IGenerator
         $items = [];
         $urls = explode("\n", trim($values->articles));
         foreach ($urls as $url) {
+            $url = trim($url);
             $meta = $this->content->fetchUrlMeta($url);
             if ($meta) {
                 $items[$url] = $meta;

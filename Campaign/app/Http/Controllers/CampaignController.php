@@ -56,6 +56,7 @@ class CampaignController extends Controller
                     'edit' => route('campaigns.edit', $campaign),
                     'copy' => route('campaigns.copy', $campaign),
                     'stats' => route('campaigns.stats', $campaign),
+                    'compare' => route('comparison.add', $campaign),
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
@@ -576,6 +577,17 @@ class CampaignController extends Controller
                         break;
                     }
                 }
+            }
+
+            /** @var CampaignBanner $seenVariant */
+            // unset seen variant if it was deleted
+            if (!($seenVariant = $campaignBanners->get($variantUuid))) {
+                $variantUuid = null;
+            }
+
+            // unset seen variant if its proportion is 0%
+            if ($seenVariant && $seenVariant->proportion === 0) {
+                $variantUuid = null;
             }
 
             // variant still not set, choose random variant

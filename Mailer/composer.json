@@ -8,7 +8,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../Composer/nette-sso",
+            "url": "../Composer/*",
             "options": {
                 "symlink": false
             }
@@ -42,6 +42,8 @@
         "php-http/curl-client": "^1.7",
         "guzzlehttp/psr7": "^1.4",
         "remp/nette-sso": "*",
+        "remp/multi-armed-bandit": "*",
+        "remp/journal": "*",
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "tomaj/nette-errbit": "~3.0",

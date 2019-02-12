@@ -4,6 +4,8 @@ namespace App\Contracts;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class JournalHelpers
 {
@@ -33,12 +35,14 @@ class JournalHelpers
 
         $externalArticleIds = $articles->pluck('external_id')->toArray();
 
-        $request = new JournalAggregateRequest('pageviews', 'load');
+        $request = new AggregateRequest('pageviews', 'load');
         $request->setTimeAfter($minimalPublishedTime);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id');
         $request->addFilter('article_id', ...$externalArticleIds);
-        return $this->journal->unique($request)
+
+        $result = collect($this->journal->unique($request));
+        return $result
             ->filter(function ($item) {
                 return $item->tags !== null;
             })
@@ -59,13 +63,15 @@ class JournalHelpers
     {
         $externalArticleIds = $articles->pluck('external_id')->toArray();
 
-        $request = new JournalAggregateRequest('pageviews', 'timespent');
+        $request = new AggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($since);
         $request->setTimeBefore(Carbon::now());
         $request->addGroup('article_id');
 
         $request->addFilter('article_id', ...$externalArticleIds);
-        return $this->journal->avg($request)
+
+        $result = collect($this->journal->avg($request));
+        return $result
             ->filter(function ($item) {
                 return $item->tags !== null;
             })
@@ -81,14 +87,15 @@ class JournalHelpers
      *
      * This is useful for preparing data for histogram graphs
      *
-     * @param Carbon $timeAfter
-     * @param int    $intervalMinutes
+     * @param Carbon                $timeAfter
+     * @param int                   $intervalMinutes
+     * @param \DateTimeZone|string  $tz                 Default value is `UTC`.
      *
      * @return Carbon
      */
-    public static function getTimeIterator(Carbon $timeAfter, int $intervalMinutes): Carbon
+    public static function getTimeIterator(Carbon $timeAfter, int $intervalMinutes, $tz = 'UTC'): Carbon
     {
-        $timeIterator = (clone $timeAfter)->tz('UTC')->startOfDay();
+        $timeIterator = (clone $timeAfter)->tz($tz)->startOfDay();
         while ($timeIterator->lessThanOrEqualTo($timeAfter)) {
             $timeIterator->addMinutes($intervalMinutes);
         }

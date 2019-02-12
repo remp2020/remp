@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => 'Laravel',
+    'name' => env('APP_NAME', 'REMP Beam'),
 
     /*
     |--------------------------------------------------------------------------
@@ -156,6 +156,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
         App\Providers\RempMailerServiceProvider::class,
+        App\Providers\GoogleAnalyticsReportingServiceProvider::class,
     ],
 
     /*

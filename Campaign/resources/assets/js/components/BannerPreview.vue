@@ -130,6 +130,31 @@
                 :transition="transition"
                 :displayType="displayType"
         ></short-message-preview>
+
+        <overlay-rectangle-preview v-if="template === 'overlay_rectangle'"
+                :alignmentOptions="alignmentOptions"
+                :show="visible"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
+
+                :headerText="overlayRectangleTemplate.headerText"
+                :mainText="overlayRectangleTemplate.mainText"
+                :buttonText="overlayRectangleTemplate.buttonText"
+                :width="overlayRectangleTemplate.width"
+                :height="overlayRectangleTemplate.height"
+                :backgroundColor="overlayRectangleTemplate.backgroundColor"
+                :textColor="overlayRectangleTemplate.textColor"
+                :buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
+                :buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+                :imageLink="overlayRectangleTemplate.imageLink"
+
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :closeText="closeText"
+                :transition="transition"
+                :displayType="displayType"
+        >
+        </overlay-rectangle-preview>
     </div>
 </template>
 
@@ -140,6 +165,7 @@
     import BarPreview from "./previews/Bar";
     import CollapsibleBarPreview from "./previews/CollapsibleBar";
     import ShortMessagePreview from "./previews/ShortMessage";
+    import OverlayRectanglePreview from "./previews/OverlayRectangle";
 
     const props = [
         "name",
@@ -167,6 +193,7 @@
         "collapsibleBarTemplate",
         "htmlTemplate",
         "shortMessageTemplate",
+        "overlayRectangleTemplate",
 
         "alignmentOptions",
         "dimensionOptions",
@@ -182,6 +209,7 @@
             BarPreview,
             CollapsibleBarPreview,
             ShortMessagePreview,
+            OverlayRectanglePreview,
         },
         name: 'banner-preview',
         props: props,

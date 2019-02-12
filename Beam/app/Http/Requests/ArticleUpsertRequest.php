@@ -35,6 +35,7 @@ class ArticleUpsertRequest extends FormRequest
 
             'articles.*.authors.*' => 'string',
             'articles.*.sections.*' => 'string',
+            'articles.*.titles.*' => 'nullable|string',
         ];
     }
 }

@@ -33,6 +33,20 @@
                v-bind:show="show"
             ></medium-rectangle-template>
 
+            <overlay-rectangle-template v-if="template === 'overlay_rectangle'"
+               v-bind:_headerText="overlayRectangleTemplate.headerText"
+               v-bind:_mainText="overlayRectangleTemplate.mainText"
+               v-bind:_buttonText="overlayRectangleTemplate.buttonText"
+               v-bind:_width="overlayRectangleTemplate.height"
+               v-bind:_height="overlayRectangleTemplate.width"
+               v-bind:_backgroundColor="overlayRectangleTemplate.backgroundColor"
+               v-bind:_textColor="overlayRectangleTemplate.textColor"
+               v-bind:_buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+               v-bind:_imageLink="overlayRectangleTemplate.imageLink"
+               v-bind:show="show"
+            ></overlay-rectangle-template>
+
             <bar-template v-if="template === 'bar'"
                v-bind:_mainText="barTemplate.mainText"
                v-bind:_buttonText="barTemplate.buttonText"
@@ -113,7 +127,7 @@
                 <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
-                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}">
+                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}" v-if="overlayRectangleTemplate == null">
                     <a href="#inline-banner" role="tab" data-toggle="tab" aria-expanded="false">Inline Banner</a>
                 </li>
             </ul>
@@ -122,7 +136,8 @@
                 <div class="tab-content p-0">
                     <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
-                            <div class="input-group">
+
+                            <div class="input-group" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
                                 <div>
                                     <div class="row">
@@ -139,8 +154,9 @@
                                     </div>
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="position" value="center">
 
-                            <div class="input-group fg-float">
+                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
 
                                 <div class="fg-line">
@@ -148,8 +164,9 @@
                                     <input v-model="offsetHorizontal" class="form-control fg-input" name="offset_horizontal" type="number" id="offsetHorizontal">
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="offset_horizontal" value="0">
 
-                            <div class="input-group fg-float">
+                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
 
                                 <div class="fg-line">
@@ -157,6 +174,7 @@
                                     <input v-model="offsetVertical" class="form-control fg-input" name="offset_vertical" type="number" id="offsetVertical">
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="offset_vertical" value="0">
 
                             <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
@@ -190,12 +208,10 @@
                                 </div>
                             </div><!-- .input-group -->
 
-
-
                         </div>
                     </div>
 
-                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner">
+                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner" v-if="overlayRectangleTemplate == null">
                         <div class="card-body card-padding p-l-15">
                             <div class="input-group fg-float m-t-10">
                                 <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
@@ -263,6 +279,7 @@
                                         :template="template"
 
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
+                                        :overlayRectangleTemplate="overlayRectangleTemplate"
                                         :barTemplate="barTemplate"
                                         :collapsibleBarTemplate="collapsibleBarTemplate"
                                         :htmlTemplate="htmlTemplate"
@@ -299,6 +316,7 @@
     import BarTemplate from "./templates/Bar";
     import CollapsibleBarTemplate from "./templates/CollapsibleBar";
     import ShortMessageTemplate from "./templates/ShortMessage";
+    import OverlayRectangleTemplate from "./templates/OverlayRectangle";
     import BannerPreview from "./BannerPreview";
     import vSelect from "remp/js/components/vSelect";
     import FormValidator from "remp/js/components/FormValidator";
@@ -326,13 +344,14 @@
         "_collapsibleBarTemplate": Object,
         "_htmlTemplate": Object,
         "_shortMessageTemplate": Object,
+        "_overlayRectangleTemplate": Object,
 
         "_alignmentOptions": Object,
         "_dimensionOptions": Object,
         "_positionOptions": Object,
 
         "_validateUrl": String,
-        "_clientSiteUrl": String
+        "_clientSiteUrl": String,
     };
 
     export default {
@@ -344,7 +363,8 @@
             ShortMessageTemplate,
             BannerPreview,
             vSelect,
-            FormValidator
+            FormValidator,
+            OverlayRectangleTemplate
         },
         name: 'banner-form',
         props: props,
@@ -380,6 +400,7 @@
             collapsibleBarTemplate: null,
             htmlTemplate: null,
             shortMessageTemplate: null,
+            overlayRectangleTemplate: null,
 
             alignmentOptions: [],
             dimensionOptions: [],

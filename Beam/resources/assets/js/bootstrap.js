@@ -1,14 +1,20 @@
 import Vue2Filters from 'vue2-filters'
 import Vuex from 'vuex'
 import "./filters"
+import Vue from "vue";
 
 global.$ = global.jQuery = require('jquery');
 
 global.Vue = require('vue');
-Vue.use(Vue2Filters)
-Vue.use(Vuex)
+Vue.use(Vue2Filters);
+Vue.use(Vuex);
 
 global.moment = require('moment');
+
+$.ajaxSetup({
+    headers:
+        { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+});
 
 global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue");
 global.DateTimePicker = require("remp/js/components/DateTimePickerWrapper.vue");
@@ -18,4 +24,6 @@ global.RuleOcurrences = require("./components/RuleOcurrences.vue");
 global.FormValidator = require("remp/js/components/FormValidator");
 global.DashboardRoot = require("./components/dashboard/DashboardRoot.vue");
 global.ArticleHistogram = require("./components/dashboard/ArticleHistogram.vue");
+global.UserPath = require("./components/userpath/UserPath.vue");
+global.GoogleAnalyticsReportingHistogram = require("./components/dashboard/GoogleAnalyticsReportingHistogram.vue");
 global.DashboardStore = require("./components/dashboard/store.js").default

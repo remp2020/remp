@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/patrickmn/go-cache"
+	cache "github.com/patrickmn/go-cache"
 )
 
 func TestSegmentRule_CacheDuration(t *testing.T) {

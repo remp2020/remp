@@ -45,7 +45,6 @@ class StatsRequest implements StatsContract
     {
         $this->timeOffset = is_null($timeOffset) ? "0h" : $timeOffset;
         $this->client = $client;
-        return $this;
     }
 
     public function forVariant($variantId) : StatsRequest

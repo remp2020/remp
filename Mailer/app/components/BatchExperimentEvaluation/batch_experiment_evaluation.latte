@@ -1,0 +1,20 @@
+<div class="table-responsive">
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Mail template</th>
+            <th>Subject</th>
+            <th>Open-rate<br/>win probability</th>
+            <th>Click-rate<br/>win probability</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr n:foreach="$jobBatchTemplates as $jobBatchTemplate">
+            <td><a href="{plink Template:Show $jobBatchTemplate->mail_template->id}">{$jobBatchTemplate->mail_template->code}</a></td>
+            <td>{$jobBatchTemplate->mail_template->subject}</td>
+            <td>{$openProbabilities[$jobBatchTemplate->mail_template->code] * 100}%</td>
+            <td>{$clickProbabilities[$jobBatchTemplate->mail_template->code] * 100}%</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

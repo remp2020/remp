@@ -39,6 +39,17 @@ var _ = Resource("segments", func() {
 	BasePath("/segments")
 	NoSecurity()
 
+	Action("get", func() {
+		Description("Get segment")
+		Routing(GET("/show"))
+		Params(func() {
+			Param("id", Integer, "Segment ID")
+			Required("id")
+		})
+		Response(NotFound)
+		Response(BadRequest)
+		Response(OK, SegmentersSegment)
+	})
 	Action("list", func() {
 		Description("List all segments.")
 		Routing(GET("/"))
@@ -47,7 +58,17 @@ var _ = Resource("segments", func() {
 		Response(OK, func() {
 			Media(CollectionOf(Segment, func() {
 				View("default")
+				View("tiny")
+				View("extended")
+				View("segmenter")
 			}))
+		})
+	})
+	Action("groups", func() {
+		Description("List all segment groups.")
+		Routing(GET("/groups"))
+		Response(OK, func() {
+			Media(SegmentGroupsFallback)
 		})
 	})
 	Action("check_user", func() {
@@ -103,6 +124,47 @@ var _ = Resource("segments", func() {
 		Response(BadRequest)
 		Response(OK, ArrayOf(String))
 	})
+	Action("criteria", func() {
+		Description("Provide segment blueprint with criteria for individual tables and fields")
+		Routing(
+			GET("/criteria"),
+		)
+		Response(OK, SegmentBlueprint)
+	})
+	// TODO: divide to two separate endpoints after CRM API refactoring
+	Action("create_or_update", func() {
+		Description("Create or update segment (for fupdate, use GET parameter ?id={segment_id})")
+		Payload(SegmentPayload)
+		Routing(POST("/detail"))
+		Params(func() {
+			Param("id", Integer, "Segment ID")
+		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(NotFound, func() {
+			Description("Returned when segment with provided ID doesn't exist")
+		})
+		Response(OK, Segment)
+	})
+	Action("count", func() {
+		Description("Returns number of users in segment based on provided criteria")
+		Payload(SegmentTinyPayload)
+		Routing(POST("/count"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, SegmentCount)
+	})
+	Action("related", func() {
+		Description("Returns segments with same or similar criteria")
+		Payload(SegmentTinyPayload)
+		Routing(POST("/related"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, RelatedSegments)
+	})
 })
 
 var _ = Resource("journal", func() {
@@ -122,14 +184,27 @@ var _ = Resource("events", func() {
 	BasePath("/journal/events")
 	NoSecurity()
 
-	Action("count", func() {
-		Description("Returns counts of events")
+	Action("count_action", func() {
+		Description("Returns counts of events for given action and category")
 		Routing(POST("/categories/:category/actions/:action/count"))
 		Payload(EventOptionsPayload)
 		Params(func() {
 			Param("action", String, "Event action")
 			Param("category", String, "Event category")
 		})
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
+	Action("count", func() {
+		Description("Returns counts of events")
+		Routing(POST("/count"))
+		Payload(EventOptionsPayload)
 		Response(BadRequest, func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
@@ -174,7 +249,7 @@ var _ = Resource("commerce", func() {
 	BasePath("/journal/commerce")
 	NoSecurity()
 
-	Action("count", func() {
+	Action("count_step", func() {
 		Description("Returns counts of commerce events")
 		Payload(CommerceOptionsPayload)
 		Routing(POST("/steps/:step/count"))
@@ -193,7 +268,21 @@ var _ = Resource("commerce", func() {
 		})
 	})
 
-	Action("sum", func() {
+	Action("count", func() {
+		Description("Returns counts of commerce events")
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/count"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Count, func() {
+				View("default")
+			}))
+		})
+	})
+
+	Action("sum_step", func() {
 		Description("Returns sum of amounts within events")
 		Payload(CommerceOptionsPayload)
 		Routing(POST("/steps/:step/sum"))
@@ -211,14 +300,24 @@ var _ = Resource("commerce", func() {
 			}))
 		})
 	})
+
+	Action("sum", func() {
+		Description("Returns sum of amounts within events")
+		Payload(CommerceOptionsPayload)
+		Routing(POST("/sum"))
+		Response(BadRequest, func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Response(OK, func() {
+			Media(CollectionOf(Sum, func() {
+				View("default")
+			}))
+		})
+	})
+
 	Action("list", func() {
 		Description("Returns full list of events")
-		Routing(POST("/steps/:step/list"))
-		Params(func() {
-			Param("step", String, "Identification of commerce step", func() {
-				Enum("checkout", "payment", "purchase", "refund")
-			})
-		})
+		Routing(POST("/list"))
 		Payload(ListCommerceOptionsPayload)
 		Response(OK, func() {
 			Media(CollectionOf(Commerces, func() {

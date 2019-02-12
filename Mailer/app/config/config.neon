@@ -144,6 +144,7 @@ services:
 	# Beam
 	- Remp\MailerModule\Beam\Client(%remp.beam.web_addr%, %remp.beam.token%)
 	- Remp\MailerModule\Generators\Dynamic\UnreadArticlesGenerator
+	- Remp\MailerModule\Beam\JournalFactory(%remp.beam.segments_addr%)
 
 	- Remp\MailerModule\Config\Config
 	- Remp\MailerModule\Sender
@@ -191,7 +192,8 @@ services:
 	- Remp\MailerModule\Repository\UsersRepository
 	- Remp\MailerModule\Repository\UserSubscriptionsRepository
 	- Remp\MailerModule\Repository\UserSubscriptionVariantsRepository
-	- Remp\MailerModule\Repository\LogsRepository('2000-01-01 00:00:00')
+	- Remp\MailerModule\Repository\LogsRepository
+	- Remp\MailerModule\Repository\LogConversionsRepository
 	- Remp\MailerModule\Repository\LayoutsRepository
 	- Remp\MailerModule\Repository\ListsRepository
 	- Remp\MailerModule\Repository\ListCategoriesRepository
@@ -210,6 +212,7 @@ services:
 	- Remp\MailerModule\Components\IDataTableFactory
 	- Remp\MailerModule\Components\ISendingStatsFactory
 	- Remp\MailerModule\Components\IGeneratorWidgetsFactory
+	- Remp\MailerModule\Components\IBatchExperimentEvaluationFactory
 
 	# Generator Widgets
 	- Remp\MailerModule\Components\GeneratorWidgetsManager

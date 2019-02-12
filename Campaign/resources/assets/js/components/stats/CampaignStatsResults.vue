@@ -13,8 +13,10 @@
                                 <th>Proportion</th>
                                 <th>Shows</th>
                                 <th>Clicks</th>
+                                <th>Click-rate win probability</th>
                                 <th>Click-through rate (CTR)</th>
                                 <th>Conversions (purchases)</th>
+                                <th>Conversion-rate win probability</th>
                                 <th>Earned</th>
                             </tr>
                         </thead>
@@ -38,18 +40,35 @@
                                 {{ variant.clicks }}
                             </td>
                             <td>
+                                <template v-if="variant.click_probability !== undefined">
+                                    <strong>{{ variant.click_probability * 100 | round(2) }}%</strong>
+                                </template>
+                                <template v-else>
+                                    -
+                                </template>
+                            </td>
+                            <td>
                                 <strong>
                                     {{ variant.ctr | round(2) }}%
                                 </strong>
                             </td>
                             <td>
                                 <strong>
-                                    {{ variant.conversions | round(4) }}%
+                                    {{ variant.purchases }}
+                                    ({{ variant.conversions | round(4) }}%)
                                 </strong>
                             </td>
                             <td>
+                                <template v-if="variant.purchase_probability !== undefined">
+                                    <strong>{{ variant.purchase_probability * 100 | round(2) }}%</strong>
+                                </template>
+                                <template v-else>
+                                    -
+                                </template>
+                            </td>
+                            <td>
                                 <strong>
-                                    {{ variant.earned | round(2) }}€
+                                    {{ variant.earned | round(2) }}{{ variant.currency }}
                                 </strong>
                             </td>
                         </tr>
@@ -109,9 +128,13 @@
                         clicks: data.click_count.count,
                         shows: data.show_count.count,
                         earned: data.purchase_sum.sum,
+                        currency: data.purchase_sum.tags.currency,
+                        purchases: data.purchase_count.count,
                         ctr: data.ctr,
                         conversions: data.conversions,
-                        deleted_at: variant.deleted_at
+                        deleted_at: variant.deleted_at,
+                        click_probability: data.click_probability,
+                        purchase_probability: data.purchase_probability,
                     };
 
                     if (variant.banner !==  null) {
@@ -128,6 +151,8 @@
                     clicks: this.campaignData.click_count.count,
                     shows: this.campaignData.show_count.count,
                     earned: this.campaignData.purchase_sum.sum,
+                    currency: this.campaignData.purchase_sum.tags.currency,
+                    purchases: this.campaignData.purchase_count.count,
                     ctr: this.campaignData.ctr,
                     conversions: this.campaignData.conversions,
                 });

@@ -28,7 +28,7 @@ class BannerRequest extends FormRequest
         return [
             'name' => 'required|max:255',
             'target_url' => 'nullable|url',
-            'position' => 'required|in:top_left,top_right,bottom_left,bottom_right,middle_left,middle_right',
+            'position' => 'required|in:top_left,top_right,bottom_left,bottom_right,middle_left,middle_right,center',
             'transition' => 'required|string',
             'display_type' => 'string|required|in:overlay,inline',
             'display_delay' => 'nullable|integer|required|required_if:display_type,overlay',
@@ -66,6 +66,21 @@ class BannerRequest extends FormRequest
                         'button_text' => 'string|required',
                         'width' => 'string|nullable',
                         'height' => 'string|nullable',
+                    ]);
+                    break;
+
+                case Banner::TEMPLATE_OVERLAY_RECTANGLE:
+                    $templateValidator = Validator::make($this->all(), [
+                        'background_color' => 'string|required',
+                        'text_color' => 'string|required',
+                        'button_background_color' => 'string|required',
+                        'button_text_color' => 'string|required',
+                        'header_text' => 'string|nullable',
+                        'main_text' => 'string|required',
+                        'button_text' => 'string|required',
+                        'width' => 'string|nullable',
+                        'height' => 'string|nullable',
+                        'image_link' => 'string|nullable',
                     ]);
                     break;
                 case Banner::TEMPLATE_BAR:

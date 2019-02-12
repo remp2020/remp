@@ -6,10 +6,10 @@ use App\Account;
 use App\Article;
 use App\ArticleAggregatedView;
 use App\Console\Commands\AggregateArticlesViews;
-use App\Contracts\JournalContract;
-use App\Contracts\Remp\Journal;
 use App\Property;
 use Mockery;
+use Remp\Journal\Journal;
+use Remp\Journal\JournalContract;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -91,22 +91,27 @@ JSON;
         ]);
 
         // Mock Journal data
-        // job aggregates pageviews day data in time windows (currently 30 mins)
+        // job aggregates pageviews day data in time windows
         $journalMock = Mockery::mock(Journal::class);
         $journalMock->shouldReceive('count')->andReturn(
-            collect(json_decode($pageviews1)),
-            collect(json_decode($pageviews2)),
-            collect(json_decode($pageviews3))
+            json_decode($pageviews1),
+            json_decode($pageviews2),
+            json_decode($pageviews3)
         );
 
-        // job aggregates timespent day data in time windows (currently 30 mins)
+        // job aggregates timespent day data in time windows
         $journalMock->shouldReceive('sum')->andReturn(
-            collect(json_decode($timespent1)),
-            collect(json_decode($timespent2)),
-            collect(json_decode($timespent3))
+            json_decode($timespent1),
+            json_decode($timespent2),
+            json_decode($timespent3)
         );
 
-        $this->app->instance(JournalContract::class, $journalMock);
+        // Bypass RempJournalServiceProvider binding
+        $this->app->instance('mockJournal', $journalMock);
+        $this->app->when(AggregateArticlesViews::class)
+            ->needs(JournalContract::class)
+            ->give('mockJournal');
+
         $this->artisan(AggregateArticlesViews::COMMAND);
 
         $articleView2148518 = ArticleAggregatedView::where([
@@ -124,5 +129,10 @@ JSON;
 
         $this->assertEquals(6, $articleView1148518->pageviews);
         $this->assertEquals(0, $articleView1148518->timespent);
+
+        // Test when aggregation is run twice (and no aggregated data is returned), former data is deleted
+        $this->artisan(AggregateArticlesViews::COMMAND);
+
+        $this->assertEquals(0, ArticleAggregatedView::all()->count());
     }
 }

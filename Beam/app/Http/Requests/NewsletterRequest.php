@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Controllers\NewsletterController;
-use App\Model\NewsletterCriteria;
+use App\Model\NewsletterCriterion;
 use Illuminate\Foundation\Http\FormRequest;
 
 class NewsletterRequest extends FormRequest
@@ -30,7 +29,7 @@ class NewsletterRequest extends FormRequest
             'segment' => 'required|string',
             'mail_type_code' => 'required|string',
             'mailer_generator_id' => 'required|integer',
-            'criteria' => 'required|string|in:' . NewsletterCriteria::allCriteriaConcatenated(),
+            'criteria' => 'required|string|in:' . NewsletterCriterion::allCriteriaConcatenated(),
             'articles_count' => 'required|integer|min:1|max:100',
             'personalized_content' => 'boolean',
             'starts_at' => 'required|date',

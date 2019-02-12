@@ -12,12 +12,9 @@ use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
-use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 
 final class DashboardPresenter extends BasePresenter
 {
-    private $userSubscriptionsRepository;
-
     private $batchTemplatesRepository;
 
     private $templatesRepository;
@@ -160,7 +157,14 @@ final class DashboardPresenter extends BasePresenter
 
         $prevPeriodSubscribersTypeData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($prevPeriodFrom, $from);
         foreach ($prevPeriodSubscribersTypeData as $row) {
-            $typeSubscriberDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->count;
+            $foundAt = array_search(
+                $this->dateFormatter->format($row->created_date),
+                $graphLabels
+            );
+
+            if ($foundAt !== false) {
+                $typeSubscriberDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->count;
+            }
         }
 
         // remove sets with zero sent count

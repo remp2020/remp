@@ -27,25 +27,34 @@
 
 <script>
     let props = {
-        'name': String,
-        'options': [Array, Object],
-        'value': [Array, Boolean, Number, String],
-        'multiple': Boolean,
-        'title': String,
-        'liveSearch': {
-            'type': Boolean,
-            'default': true,
+        name: String,
+        options: [Array, Object],
+        value: [Array, Boolean, Number, String],
+        multiple: Boolean,
+        title: String,
+        dataType: String,
+        disabled: Boolean,
+        liveSearch: {
+            type: Boolean,
+            default: true,
         },
-        'dataType': String,
-        'disabled': Boolean,
-        'allowCustomValue': {
-            'type': Boolean,
-            'default': false,
+        allowCustomValue: {
+            type: Boolean,
+            default: false,
         },
-        'required': {
-            'type': Boolean,
-            'default': false,
-        }
+        required: {
+            type: Boolean,
+            default: false,
+        },
+        // define other than value/label objects parameters to be put into option tag
+        optionValue: {
+            type: String,
+            default: 'value'
+        },
+        optionText: {
+            type: String,
+            default: 'label'
+        },
     };
 
     export default {
@@ -173,14 +182,14 @@
                 this.$emit('input', value);
             },
             textValue: function(option) {
-                if (option.value !== undefined) {
-                    return option.value;
+                if (option[this.optionValue] !== undefined) {
+                    return option[this.optionValue];
                 }
                 return option;
             },
             textLabel: function(option) {
-                if (option.label !== undefined) {
-                    return option.label;
+                if (option[this.optionText] !== undefined) {
+                    return option[this.optionText];
                 }
                 return this.textValue(option);
             },

@@ -33,7 +33,9 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
 			TimeZone("UTC").
-			Offset(options.TimeHistogram.Offset)
+			Offset(options.TimeHistogram.Offset).
+			MinDocCount(0).
+			ExtendedBounds(options.TimeAfter, options.TimeBefore)
 	}
 
 	search, err = cDB.DB.addGroupBy(search, "commerce", options, nil, dateHistogramAgg)
@@ -47,7 +49,7 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
-	if len(options.GroupBy) == 0 {
+	if len(options.GroupBy) == 0 && options.TimeHistogram == nil {
 		// extract simplified results (no aggregation)
 		return CountRowCollection{
 			CountRow{
@@ -93,8 +95,9 @@ func (cDB *CommerceElastic) List(options ListOptions) (CommerceRowCollection, er
 			// populate commerce for collection
 			commerce := &Commerce{}
 			if err := json.Unmarshal(*hit.Source, commerce); err != nil {
-				return nil, errors.Wrap(err, "error reading pageview record from elastic")
+				return nil, errors.Wrap(err, "error reading commerce record from elastic")
 			}
+			commerce.ID = hit.Id
 
 			// extract raw event data to build tags map
 			rawCommerce := make(map[string]interface{})
@@ -189,10 +192,10 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 }
 
 // Categories lists all available categories.
-func (cDB *CommerceElastic) Categories() []string {
+func (cDB *CommerceElastic) Categories() ([]string, error) {
 	return []string{
 		CategoryCommerce,
-	}
+	}, nil
 }
 
 // Flags lists all available flags.

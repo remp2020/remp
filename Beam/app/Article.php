@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Model\ArticleTitle;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -61,12 +62,91 @@ class Article extends Model
         return $this->hasMany(ArticleTimespent::class);
     }
 
+    public function articleTitles()
+    {
+        return $this->hasMany(ArticleTitle::class);
+    }
+
     public function setPublishedAtAttribute($value)
     {
         if (!$value) {
             return;
         }
         $this->attributes['published_at'] = new Carbon($value);
+    }
+
+    // Scopes
+    public function scopeMostReadByTimespent($query, Carbon $start, string $getBy, int $limit = null)
+    {
+        $innerQuery = ArticleTimespent::where('time_from', '>=', $start)
+            ->groupBy('article_id')
+            ->select(['article_id', DB::raw("sum($getBy) as total_sum")])
+            ->orderByDesc('total_sum');
+
+        if ($limit) {
+            $innerQuery->limit($limit);
+        }
+
+        return $query->joinSub($innerQuery, 't', function ($join) {
+            $join->on('articles.id', '=', 't.article_id');
+        })->orderByDesc('t.total_sum');
+    }
+
+    public function scopeMostReadByPageviews($query, Carbon $start, string $getBy, int $limit = null)
+    {
+        $innerQuery = ArticleTimespent::where('time_from', '>=', $start)
+            ->groupBy('article_id')
+            ->select(['article_id', DB::raw("sum($getBy) as total_sum")])
+            ->orderByDesc('total_sum');
+
+        if ($limit) {
+            $innerQuery->limit($limit);
+        }
+
+        return $query->joinSub($innerQuery, 't', function ($join) {
+            $join->on('articles.id', '=', 't.article_id');
+        })->orderByDesc('t.total_sum');
+    }
+
+    public function scopeMostReadByAveragePaymentAmount($query, Carbon $start, ?int $limit = null)
+    {
+        $innerQuery = Conversion::where('paid_at', '>=', $start)
+            ->groupBy('article_id')
+            ->select(['article_id', DB::raw('avg(amount) as average')])
+            ->orderByDesc('average');
+
+        if ($limit) {
+            $innerQuery->limit($limit);
+        }
+
+        return $query->joinSub($innerQuery, 'c', function ($join) {
+            $join->on('articles.id', '=', 'c.article_id');
+        })->orderByDesc('c.average');
+    }
+
+    public function scopeMostReadByTotalPaymentAmount($query, Carbon $start, ?int $limit = null)
+    {
+        $innerQuery = Conversion::where('paid_at', '>=', $start)
+            ->groupBy('article_id')
+            ->select(['article_id', DB::raw('sum(amount) as average')])
+            ->orderByDesc('average');
+
+        if ($limit) {
+            $innerQuery->limit($limit);
+        }
+
+        return $query->joinSub($innerQuery, 'c', function ($join) {
+            $join->on('articles.id', '=', 'c.article_id');
+        })->orderByDesc('c.average');
+    }
+
+    public function scopeIgnoreAuthorIds($query, array $authorIds)
+    {
+        if ($authorIds) {
+            $query->join('article_author', 'articles.id', '=', 'article_author.article_id')
+                ->whereNotIn('article_author.author_id', $authorIds);
+        }
+        return $query;
     }
 
     public function loadNewConversionsCount()

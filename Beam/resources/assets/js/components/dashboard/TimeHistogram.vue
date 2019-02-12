@@ -93,6 +93,7 @@
     }
     #article-graph-legend {
         position:absolute;
+        white-space:nowrap;
         z-index: 1000;
         top:0;
         left: 0;

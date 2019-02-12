@@ -17,13 +17,14 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "fideloper/proxy": "^4.0",
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "doctrine/dbal": "~2.3",
         "fico7489/laravel-pivot": "^2.1",
+        "fideloper/proxy": "^4.0",
         "geoip2/geoip2": "~2.0",
         "guzzlehttp/guzzle": "^6.2",
+        "kouz/laravel-airbrake": "^0.4",
         "laracasts/flash": "^3.0",
         "laravel/framework": "5.7.*",
         "laravelcollective/html": "5.7.*",
@@ -36,8 +37,9 @@
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
-        "yajra/laravel-datatables-oracle": "^8.0",
-        "kouz/laravel-airbrake": "^0.4"
+        "remp/multi-armed-bandit": "*",
+        "tightenco/ziggy": "^0.6.9",
+        "yajra/laravel-datatables-oracle": "^8.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -37,6 +37,9 @@ var EventOptionsPayload = Type("EventOptionsPayload", func() {
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+
+	Attribute("action", String, "Event action")
+	Attribute("category", String, "Event category")
 })
 
 var OptionsTimeHistogram = Type("OptionsTimeHistogram", func() {
@@ -61,6 +64,9 @@ var ListPageviewOptionsPayload = Type("ListPageviewOptionsPayload", func() {
 	Description("Parameters to filter pageview list")
 
 	Attribute("select_fields", ArrayOf(String), "List of fields to select")
+	Attribute("load_timespent", Boolean, "If true, load timespent for each pageview", func() {
+		Default(false)
+	})
 	Attribute("conditions", PageviewOptionsPayload, "Condition definition")
 
 	Required("conditions")
@@ -111,6 +117,9 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+	Attribute("step", String, "Filter particular step", func() {
+		Enum("checkout", "payment", "purchase", "refund")
+	})
 })
 
 var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
@@ -120,4 +129,59 @@ var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
 	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
 
 	Required("tag", "values")
+})
+
+var SegmentPayload = Type("SegmentPayload", func() {
+	Description("Request parameters for segment creation")
+
+	Attribute("name", String, "Name of segment")
+	Attribute("table_name", String, "Name of table above which this segment is calculated")
+	Attribute("group_id", Integer, "ID of parent group")
+	Attribute("fields", ArrayOf(String), "List of fields to select")
+
+	Attribute("criteria", SegmentCreateCriteria, "Segment's criteria")
+
+	Required("name", "table_name", "group_id", "fields", "criteria")
+})
+
+var SegmentTinyPayload = Type("SegmentTinyPayload", func() {
+	Description("Request parameters for endpoints segments/count and segments/related")
+
+	Attribute("table_name", String, "Name of table above which this segment is calculated")
+	Attribute("criteria", SegmentCreateCriteria, "Segment's criteria")
+})
+
+var SegmentCreateCriteria = Type("SegmentCreateCriteria", func() {
+	Description("Segment's criteria")
+
+	Attribute("nodes", ArrayOf(SegmentCreateCriteriaOperator), "Criteria operators")
+	Attribute("version", String, "Version of criteria format")
+
+	Required("nodes", "version")
+})
+
+var SegmentCreateCriteriaOperator = Type("SegmentCreateCriteriaOperator", func() {
+	Description("Single operator node of Segment's criteria")
+
+	Attribute("type", String, "Type of criterion", func() {
+		Enum("operator")
+	})
+	Attribute("operator", String, "Operator for following criteria nodes", func() {
+		Enum("AND", "OR")
+	})
+	Attribute("nodes", ArrayOf(SegmentCreateCriteriaNode), "Criteria nodes")
+
+	Required("type", "operator", "nodes")
+})
+
+var SegmentCreateCriteriaNode = Type("SegmentCreateCriteriaOperatorNode", func() {
+	Description("Single node of Segment's criteria")
+
+	Attribute("type", String, "Type of criterion", func() {
+		// TODO: add posibility to have "operator" on second (and lower) level of nodes
+		Enum("criteria")
+	})
+	Attribute("key", String, "Key of criterion's type")
+	Attribute("negation", Boolean, "Use true if this criterion should be negated")
+	Attribute("values", Any)
 })

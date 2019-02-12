@@ -81,9 +81,15 @@
                 </ul>
             </li>
             <li class="m-b-15"></li>
-            <li {!! route_active(['segments', 'entities'], 'sub-menu', 'toggled') !!}>
-                <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-accounts-list-alt"></i> Segments</a>
+            <li {!! route_active(['segments', 'entities', 'authorSegments.index'], 'sub-menu', 'toggled') !!}>
+                <a href="#" data-ma-action="submenu-toggle" ><i class="zmdi zmdi-accounts-list-alt"></i> Segments</a>
                 <ul>
+                    <li {!! route_active(['segments']) !!}>
+                        <a href="{{ route('segments.index') }}" ><i class="zmdi zmdi-accounts-list m-r-5"></i> Segments</a>
+                    </li>
+                    <li {!! route_active(['authorSegments.index']) !!}>
+                        <a href="{{ route('authorSegments.index') }}" ><i class="zmdi zmdi-accounts-list m-r-5"></i> Author segments</a>
+                    </li>
                     <li {!! route_active(['entities']) !!}>
                         <a href="{{ route('entities.index') }}" ><i class="zmdi zmdi-crop-free m-r-5"></i> Entities</a>
                     </li>
@@ -106,8 +112,16 @@
                 <a href="{{ route('newsletters.index') }}" ><i class="zmdi zmdi-email"></i> Newsletters</a>
             </li>
             @endif
-            <li {!! route_active(['conversions']) !!}>
-                <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
+            <li {!! route_active(['conversions', 'userpath'], 'sub-menu', 'toggled') !!}>
+                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-face"></i> Conversions</a>
+                <ul>
+                    <li {!! route_active(['conversions']) !!}>
+                        <a href="{{ route('conversions.index') }}" ><i class="zmdi zmdi-money-box"></i> Conversions</a>
+                    </li>
+                    <li {!! route_active(['userpath']) !!}>
+                        <a href="{{ route('userpath.index') }}" ><i class="zmdi zmdi-arrow-split"></i> User path</a>
+                    </li>
+                </ul>
             </li>
             <li {!! route_active(['authors']) !!}>
                 <a href="{{ route('authors.index') }}" ><i class="zmdi zmdi-account-box"></i> Authors</a>
@@ -123,6 +137,11 @@
                     </li>
                 </ul>
             </li>
+            @if (config('google.ga_reporting_enabled'))
+            <li {!! route_active(['googleanalyticsreporting']) !!}>
+                <a href="{{ route('googleanalyticsreporting.index') }}" ><i class="zmdi zmdi-chart-donut"></i> GA Reporting</a>
+            </li>
+            @endif
         </ul>
     </aside>
 

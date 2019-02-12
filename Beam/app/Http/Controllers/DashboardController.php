@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalConcurrentsRequest;
-use App\Contracts\JournalContract;
 use App\Contracts\JournalHelpers;
 use App\Helpers\Colors;
 use App\Model\Config;
@@ -13,6 +10,9 @@ use App\Model\DashboardConfig;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\ConcurrentsRequest;
+use Remp\Journal\JournalContract;
 
 class DashboardController extends Controller
 {
@@ -88,12 +88,12 @@ class DashboardController extends Controller
         $interval = $request->get('interval');
         [$timeBefore, $timeAfter, $intervalText, $intervalMinutes] = $this->getJournalParameters($interval, $tz);
 
-        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
+        $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($intervalText, '0h');
         $journalRequest->addGroup('derived_referer_medium');
-        $currentRecords = $this->journal->count($journalRequest);
+        $currentRecords = collect($this->journal->count($journalRequest));
 
         // Get all tags
         $tags = [];
@@ -232,18 +232,18 @@ class DashboardController extends Controller
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
             'tags' => $tags,
-            'colors' => Colors::tagsToColors($tags)
+            'colors' => Colors::refererMediumTagsToColors($tags)
         ]);
     }
 
     private function pageviewRecordsBasedOnRefererMedium(Carbon $timeAfter, Carbon $timeBefore, string $interval)
     {
-        $journalRequest = new JournalAggregateRequest('pageviews', 'load');
+        $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($interval, '0h');
         $journalRequest->addGroup('derived_referer_medium');
-        return $this->journal->count($journalRequest);
+        return collect($this->journal->count($journalRequest));
     }
 
     public function mostReadArticles(Request $request)
@@ -257,7 +257,7 @@ class DashboardController extends Controller
         $timeBefore = Carbon::now();
         $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
 
-        $concurrentsRequest = new JournalConcurrentsRequest();
+        $concurrentsRequest = new ConcurrentsRequest();
 
         $frontpageReferer = config('dashboard.frontpage_referer');
         if ($frontpageReferer && $settings['onlyTrafficFromFrontPage']) {
@@ -268,7 +268,7 @@ class DashboardController extends Controller
         $concurrentsRequest->addGroup('article_id');
 
         // records are already sorted
-        $records = $this->journal->concurrents($concurrentsRequest);
+        $records = collect($this->journal->concurrents($concurrentsRequest));
 
         $topPages = [];
         $i = 0;

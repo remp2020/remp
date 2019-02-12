@@ -67,21 +67,52 @@ class DenniknContent implements ContentInterface
         $matches = [];
         preg_match('/<meta property=\"og:image\" content=\"(.+)\"\s*\/?/U', $content, $matches);
         if ($matches) {
-            $image = $matches[1];
-
-            $parts = explode('/', $image);
-            $image = array_pop($parts);
-            $info = pathinfo($image);
-            if (preg_match('/-([0-9]+)x([0-9]+)$/i', $info['filename'])) {
-                $newImageFileName = preg_replace('/-([0-9]+)x([0-9]+)$/', '-558x270', $info['filename']);
-                $image = $newImageFileName . '.' . $info['extension'];
-            } else {
-                $image = $info['filename'] . '-558x270.' . $info['extension'];
-            }
-            $parts[] = $image;
-            $image = implode('/', $parts);
+            $images = $this->processImage($matches[1]);
+            $image = $images['main'];
         }
 
         return new Meta($title, $description, $image, $denniknAuthors);
+    }
+
+
+    private function processImage($imageUrl)
+    {
+        $images = [];
+
+        $url = new \Nette\Http\Url($imageUrl);
+        if ($url->getHost() == 'img.projektn.sk') {
+            $images = [
+                'small' => (string) $url->appendQuery(['w' => 350, 'h' => 220]),
+                'main' => (string) $url->appendQuery(['w' => 558, 'h' => 270]),
+            ];
+        } else {
+            $matchOutput = false;
+            $result = preg_match("/([0-9]+)x([0-9]+)/", $imageUrl, $matchOutput);
+            if ($result && $matchOutput[0]) {
+                $images = [
+                    'small' => str_replace($matchOutput[0], '350x220', $imageUrl),
+                    'main' => str_replace($matchOutput[0], '558x270', $imageUrl),
+                ];
+            } else {
+                $parts = explode('.', $imageUrl);
+                $parts[count($parts) - 2] = $parts[count($parts) - 2] . '-XXXxYYY';
+                $images = [
+                    'small' => str_replace('XXXxYYY', '350x220', implode('.', $parts)),
+                    'main' => str_replace('XXXxYYY', '558x270', implode('.', $parts)),
+                ];
+            }
+        }
+
+        // return placeholder if image doesnt exist
+        $response = get_headers($images['small']);
+        if (strpos($response[0], '404')) {
+            $images['small'] = 'https://img.projektn.sk/wp-static/2018/10/placeholder_1@2x.png';
+        }
+        $response = get_headers($images['main']);
+        if (strpos($response[0], '404')) {
+            $images['main'] = 'https://img.projektn.sk/wp-static/2018/10/placeholder_2@2x.png';
+        }
+
+        return $images;
     }
 }
