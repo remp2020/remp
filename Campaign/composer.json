@@ -39,10 +39,10 @@
         "remp/laravel-widgets": "*",
         "remp/multi-armed-bandit": "*",
         "tightenco/ziggy": "^0.6.9",
-        "yajra/laravel-datatables-oracle": "^8.0"
+        "yajra/laravel-datatables-oracle": "^8.0",
+        "fzaninotto/faker": "~1.4"
     },
     "require-dev": {
-        "fzaninotto/faker": "~1.4",
         "mockery/mockery": "^1.2",
         "phpunit/phpunit": "^7.0",
         "friendsofphp/php-cs-fixer": "2.13",

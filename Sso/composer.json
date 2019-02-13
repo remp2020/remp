@@ -49,10 +49,10 @@
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "php-amqplib/php-amqplib": "^2.7",
-        "kouz/laravel-airbrake": "^0.4"
+        "kouz/laravel-airbrake": "^0.4",
+        "fzaninotto/faker": "~1.4"
     },
     "require-dev": {
-        "fzaninotto/faker": "~1.4",
         "mockery/mockery": "^1.2",
         "phpunit/phpunit": "^7.0",
         "barryvdh/laravel-ide-helper": "^2.3",
