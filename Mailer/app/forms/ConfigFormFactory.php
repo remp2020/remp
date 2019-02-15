@@ -35,6 +35,7 @@ class ConfigFormFactory
 
         $configs = $this->configsRepository->all();
         $container = $form->addContainer('settings');
+        $activeMailer = null;
 
         foreach ($configs as $config) {
             $item = null;
@@ -44,6 +45,10 @@ class ConfigFormFactory
                 array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
                     $mailers[$name] = get_class($mailer);
                 });
+
+                if ($config->value !== null) {
+                    $activeMailer = $this->mailerFactory->getMailer($config->value);
+                }
 
                 $item = $container->addSelect('default_mailer', 'Default Mailer', $mailers);
             } elseif (in_array($config->type, [Config::TYPE_STRING, Config::TYPE_PASSWORD])) {
@@ -62,6 +67,13 @@ class ConfigFormFactory
             }
 
             $item->setDefaultValue($config->value);
+        }
+
+        if ($activeMailer !== null) {
+            foreach ($activeMailer->getRequiredOptions() as $requiredOption) {
+                $container->getComponent($requiredOption)
+                    ->setRequired(true);
+            }
         }
 
         $form->addSubmit('save', 'Save')

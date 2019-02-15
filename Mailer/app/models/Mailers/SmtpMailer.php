@@ -15,6 +15,8 @@ class SmtpMailer extends Mailer implements IMailer
 
     protected $options = [ 'host', 'port', 'username', 'password', 'secure' ];
 
+    protected $requiredOptions = [ 'host', 'port' ];
+
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository

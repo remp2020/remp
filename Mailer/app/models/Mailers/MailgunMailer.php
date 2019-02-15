@@ -18,6 +18,8 @@ class MailgunMailer extends Mailer implements IMailer
 
     protected $options = [ 'api_key', 'domain' ];
 
+    protected $requiredOptions = [ 'api_key', 'domain' ];
+
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository

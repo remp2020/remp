@@ -20,6 +20,8 @@ abstract class Mailer implements IMailer
 
     protected $options = [];
 
+    protected $requiredOptions = [];
+
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository
@@ -43,19 +45,55 @@ abstract class Mailer implements IMailer
 
     protected function buildConfig()
     {
-        foreach ($this->options as $configName) {
-            try {
-                $prefix = str_replace('-', '_', Strings::webalize(get_called_class()));
-                $this->options[$configName] = $this->config->get($prefix . '_' . $configName);
-                unset($this->options[array_search($configName, $this->options)]);
-            } catch (ConfigNotExistsException $e) {
-                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1) . ' ' . Strings::firstUpper($configName);
-                $description = 'Setting for ' . get_called_class();
-                $this->configsRepository->add($prefix . '_' . $configName, $displayName, null, $description, Config::TYPE_STRING);
+        foreach ($this->options as $optionName) {
+            $configKey = $this->getOptionConfigKey($optionName);
 
-                $this->options[$configName] = null;
+            try {
+                $this->options[$optionName] = $this->config->get($configKey);
+
+                if (in_array($optionName, $this->requiredOptions)) {
+                    $this->requiredOptions[] = $configKey;
+                    unset($this->requiredOptions[array_search($optionName, $this->options)]);
+                }
+
+                unset($this->options[array_search($optionName, $this->options)]);
+            } catch (ConfigNotExistsException $e) {
+                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1) . ' ' . Strings::firstUpper($optionName);
+                $description = 'Setting for ' . get_called_class();
+                $this->configsRepository->add($configKey, $displayName, null, $description, Config::TYPE_STRING);
+
+                $this->options[$optionName] = null;
             }
         }
+    }
+
+    protected function getOptionConfigKey(string $option)
+    {
+        $prefix = str_replace('-', '_', Strings::webalize(get_called_class()));
+        return $prefix . '_' . $option;
+    }
+
+    protected function optionIsRequired(string $option)
+    {
+        if (in_array($option, $this->requiredOptions)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getRequiredOptions()
+    {
+        return $this->requiredOptions;
+    }
+
+    protected function hasOption(string $option)
+    {
+        if (array_key_exists($option, $this->options)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
