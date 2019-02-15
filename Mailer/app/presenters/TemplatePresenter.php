@@ -67,7 +67,7 @@ final class TemplatePresenter extends BasePresenter
             ->setColSetting('type', [
                 'orderable' => false,
                 'filter' => $mailTypePairs,
-                'priority' => 2,
+                'priority' => 1,
             ])
             ->setColSetting('opened', [
                 'priority' => 3,
