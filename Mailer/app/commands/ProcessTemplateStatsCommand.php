@@ -36,16 +36,6 @@ class ProcessTemplateStatsCommand extends Command
             ->setDescription('Process template stats based on batch stats and mail logs');
     }
 
-    protected function getTemplates($limit, $page)
-    {
-        $templates = $this->templatesRepository->getTable()
-            ->select('*')
-            ->where('id = 24420')
-            ->order('id DESC')
-            ->limit($limit, $page * $limit)
-            ->fetchAll();
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('');
