@@ -38,7 +38,7 @@
         "laravelcollective/html": "5.7.*",
         "yajra/laravel-datatables-oracle": "^8.0",
         "laracasts/flash": "^3.0",
-        "laravel/socialite": "^3.0",
+        "laravel/socialite": "^4.0",
         "tymon/jwt-auth": "^1.0",
         "league/uri": "^5.0",
         "recca0120/laravel-tracy": "^1.8",
