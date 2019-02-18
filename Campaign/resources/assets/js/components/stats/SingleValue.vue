@@ -76,7 +76,7 @@
         </div>
 
         <div class="card-body card-padding-sm text-center">
-            {{ value | round(precision) }}{{ unit }}
+            {{ value | round(precision) }}&nbsp;{{ unit }}
         </div>
     </div>
 </template>

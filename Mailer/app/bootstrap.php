@@ -5,6 +5,9 @@ require __DIR__ . '/../vendor/autoload.php';
 $env = new Dotenv\Dotenv(__DIR__ . '/../');
 $env->load();
 
+// attempt to fix access rights issues in writable folders caused by different web/cli users writing to logs
+umask(0);
+
 $configurator = new Nette\Configurator;
 $environment = getenv('ENV');
 
