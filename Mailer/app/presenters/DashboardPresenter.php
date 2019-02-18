@@ -2,7 +2,6 @@
 
 namespace Remp\MailerModule\Presenters;
 
-use Carbon\Carbon;
 use DateTime;
 use DateInterval;
 use IntlDateFormatter;
@@ -210,9 +209,10 @@ final class DashboardPresenter extends BasePresenter
     public function emailsDetailData($id, $from, $to)
     {
         $labels = [];
-        $from = Carbon::parse($from);
-        $to = Carbon::parse($to);
-        $numOfDays = $from->diffInDays($to);
+        $from = (new DateTime)->setTimestamp(strtotime($from));
+        $to = (new DateTime)->setTimestamp(strtotime($to));
+
+        $numOfDays = $from->diff($to)->days;
 
         // fill graph columns
         for ($i = $numOfDays - 1; $i >= 0; $i--) {
