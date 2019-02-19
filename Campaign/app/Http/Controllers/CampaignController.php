@@ -639,6 +639,7 @@ class CampaignController extends Controller
                 continue;
             }
 
+            // url filters
             if ($campaign->url_filter === Campaign::URL_FILTER_EXCEPT_AT) {
                 foreach ($campaign->url_patterns as $urlPattern) {
                     if (strpos($data->url, $urlPattern) !== false) {
@@ -646,7 +647,6 @@ class CampaignController extends Controller
                     }
                 }
             }
-
             if ($campaign->url_filter === Campaign::URL_FILTER_ONLY_AT) {
                 $matched = false;
                 foreach ($campaign->url_patterns as $urlPattern) {
@@ -654,7 +654,29 @@ class CampaignController extends Controller
                         $matched = true;
                     }
                 }
+                if (!$matched) {
+                    continue;
+                }
+            }
 
+            // referer filters
+            if ($campaign->referer_filter === Campaign::URL_FILTER_EXCEPT_AT && $data->referer) {
+                foreach ($campaign->referer_patterns as $refererPattern) {
+                    if (strpos($data->referer, $refererPattern) !== false) {
+                        continue 2;
+                    }
+                }
+            }
+            if ($campaign->referer_filter === Campaign::URL_FILTER_ONLY_AT) {
+                if (!$data->referer) {
+                    continue;
+                }
+                $matched = false;
+                foreach ($campaign->referer_patterns as $refererPattern) {
+                    if (strpos($data->referer, $refererPattern) !== false) {
+                        $matched = true;
+                    }
+                }
                 if (!$matched) {
                     continue;
                 }
