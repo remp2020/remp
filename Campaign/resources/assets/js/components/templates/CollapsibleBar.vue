@@ -46,6 +46,14 @@
                         <div class="input-group fg-float m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
+                                <label for="collapse_text" class="fg-label">Collapse text</label>
+                                <input v-model="collapseText" class="form-control fg-input" name="main_text" id="collapse_text" type="text" requried>
+                            </div>
+                        </div>
+
+                        <div class="input-group fg-float m-t-30">
+                            <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
+                            <div class="fg-line">
                                 <label for="main_text" class="fg-label">Main text</label>
                                 <input v-model="mainText" class="form-control fg-input" name="main_text" id="main_text" type="text" requried>
                             </div>
@@ -72,6 +80,7 @@
 
     let props = [
         "_mainText",
+        "_collapseText",
         "_buttonText",
         "_backgroundColor",
         "_textColor",
@@ -91,6 +100,7 @@
         },
         data: () => ({
             mainText: "Limited time offer<br/>30% discount",
+            collapseText: "Show offer",
             buttonText: "Visit offer",
             colorScheme: "green",
 
@@ -160,6 +170,7 @@
             emitValuesChanged: function() {
                 let val = {
                     mainText: this.mainText,
+                    collapseText: this.collapseText,
                     buttonText: this.buttonText,
                 };
                 if (this.colorSchemes[this.colorScheme]) {
@@ -170,7 +181,7 @@
                     val.buttonTextColor = cs.buttonTextColor;
                 }
                 this.$parent.$emit("values-changed", [{
-                    key: "barTemplate",
+                    key: "collapsibleBarTemplate",
                     val: val,
                 }]);
             },

@@ -16,6 +16,7 @@ class CollapsibleBarTemplate extends Migration
         Schema::create('collapsible_bar_templates', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('banner_id')->unsigned();
+            $table->string('collapse_text');
             $table->string('main_text');
             $table->string('button_text');
             $table->string('background_color');

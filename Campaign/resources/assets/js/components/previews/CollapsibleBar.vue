@@ -2,6 +2,17 @@
     @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
     @import url('../../../sass/transitions.scss');
 
+    .collapsible-bar-wrap {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    #banner-preview .collapsible-bar-wrap {
+        position: absolute;
+    }
+
     .collapsible-bar-preview-close {
         position: absolute;
         top: -5px;
@@ -9,10 +20,6 @@
         font-size: 15px;
         padding: 5px;
         text-decoration: none;
-    }
-
-    .collapsible-bar-preview-close.hidden {
-        display: none;
     }
 
     .collapsible-bar-preview-link {
@@ -50,6 +57,21 @@
         cursor: pointer;
     }
 
+    .collapsible-bar-header {
+        text-align: center;
+        padding: 5px 0;
+        border-top: 1px solid #111;
+        background-color: #fff;
+    }
+
+    .collapsible-bar-toggle {
+        text-transform: uppercase;
+        color: #000;
+        float: right;
+        padding-right: 10px;
+        cursor: pointer;
+    }
+
     @media (max-width: 640px) {
         .collapsible-bar-preview-box {
             flex-direction: column;
@@ -66,18 +88,36 @@
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible" class="collapsible-bar-preview-link" v-bind:style="[
-        linkStyles,
-        _position
-    ]">
-        <transition appear v-bind:name="transition">
-            <div class="collapsible-bar-preview-box" v-bind:style="[boxStyles]">
-                <a class="collapsible-bar-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
-                <div class="collapsible-bar-main" v-html="$parent.injectVars(mainText)"></div>
-                <div class="collapsible-bar-button" v-if="buttonText.length > 0" v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
+    <div class="collapsible-bar-wrap">
+        <div class="collapsible-bar-header">
+            {{ collapseText }}
+
+            <div class="collapsible-bar-toggle" @click="toggle()">
+                Collapse
+                <span>&#9660;</span>
             </div>
-        </transition>
-    </a>
+        </div>
+
+        <a v-bind:href="$parent.url"
+           v-on="$parent.url ? { click: $parent.clicked } : {}"
+           class="collapsible-bar-preview-link">
+
+            <transition appear v-bind:name="transition">
+                <div class="collapsible-bar-preview-box" v-bind:style="[ boxStyles ]">
+
+                    <div class="collapsible-bar-main"
+                         v-html="$parent.injectVars(mainText)"></div>
+
+                    <div class="collapsible-bar-button"
+                         v-if="buttonText.length > 0"
+                         v-on:click="$parent.clicked($event, !$parent.url)"
+                         v-html="$parent.injectVars(buttonText)"
+                         v-bind:style="[buttonStyles]"></div>
+
+                </div>
+            </transition>
+        </a>
+    </div>
 </template>
 
 <script>
@@ -93,6 +133,7 @@
             "buttonTextColor",
             "headerText",
             "mainText",
+            "collapseText",
             "buttonText",
 
             "show",
@@ -109,68 +150,45 @@
         ],
         data: function() {
             return {
-                visible: true,
                 closeTracked: false,
                 clickTracked: false,
             }
         },
         computed: {
-            _position: function() {
-                if (!this.$parent.customPositioned()) {
-                    return {};
-                }
+            linkStyles() {
+                let zIndex;
 
-                if (this.positionOptions[this.position]) {
-                    let styles = this.positionOptions[this.position].style;
-
-                    for (let pos in styles) {
-                        if (!styles.hasOwnProperty(pos)) {
-                            continue;
-                        }
-                        styles[pos] = ((pos === 'top' || pos === 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
-                    }
-
-                    return styles;
-                }
-
-                return {};
-            },
-            linkStyles: function() {
-                let position, zIndex;
                 if (this.displayType === 'overlay') {
-                    position = 'fixed';
                     zIndex = 9999;
-                } else {
-                    position = 'relative'
                 }
-                if (typeof this.forcedPosition !== 'undefined') {
-                    position = this.forcedPosition;
-                }
+
                 return {
-                    position: position,
-                    zIndex: zIndex,
-                }
+                    zIndex: zIndex
+                 }
             },
-            boxStyles: function() {
+            boxStyles() {
                 return {
                     backgroundColor: this.backgroundColor,
                     color: this.textColor,
                 }
             },
-            buttonStyles: function() {
+            buttonStyles() {
                 return {
                     color: this.buttonTextColor,
                     backgroundColor: this.buttonBackgroundColor,
                 }
             },
-            closeStyles: function() {
+            closeStyles() {
                 return {
 					color: this.textColor,
                 }
-            },
-            isVisible: function() {
-                return this.show && this.visible;
-            },
+            }
         },
+        methods: {
+            toggle() {
+                $('.collapsible-bar-preview-box').slideToggle();
+                console.log('toggle')
+            }
+        }
     }
 </script>
