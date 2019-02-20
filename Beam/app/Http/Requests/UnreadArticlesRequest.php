@@ -25,7 +25,10 @@ class UnreadArticlesRequest extends FormRequest
     public function rules()
     {
         return [
-            'timespan' => 'required|integer',
+            'timespan' => [
+                'required',
+                'regex:/^(\d+d)?\s*(\d+h)?\s*(\d+m)?$/i' // e.g. 3d 4h 2m
+            ],
             'articles_count' => 'required|integer',
             'criteria.*' => 'required|string|in:' . NewsletterCriterion::allCriteriaConcatenated(),
             'user_ids.*' => 'required|integer',
