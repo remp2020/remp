@@ -85,7 +85,7 @@ class NewsletterCriterion extends Enum
         $tag = 'top_articles';
         $key = $tag . '|' . $this->getValue() . '|' . $timespan;
 
-        return Cache::tags($tag)->remember($key, 10, function () use ($timespan, $ignoreAuthors) {
+        return Cache::tags($tag)->remember($key, 5, function () use ($timespan, $ignoreAuthors) {
             return $this->getArticles($timespan, null, $ignoreAuthors)->map(function ($article) {
                 $item = new \stdClass();
                 $item->external_id = $article->external_id;
