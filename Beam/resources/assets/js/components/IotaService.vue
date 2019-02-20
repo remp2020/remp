@@ -142,10 +142,14 @@
                                 "tag": "article_id",
                                 "values": this.articleIds,
                             },
+                            {
+                                "tag": "derived_referer_medium",
+                                "values": ["internal"],
+                            },
                         ],
                         "group_by": [
                             "article_id",
-                        ].concat(variantTypes).concat(["social"]),
+                        ].concat(variantTypes),
                     };
 
                     if (range.minutes !== undefined) {
@@ -158,11 +162,6 @@
                         .then(function (response) {
                             let counts = {};
                             for (const group of response.data) {
-                                if (group["tags"]["social"] !== "") {
-                                    // social networks always get variant A due to the nature of replacing
-                                    // we include only direct pageviews into the A/B test
-                                    continue
-                                }
                                 if (parseInt(group["count"]) === 0) {
                                     continue;
                                 }

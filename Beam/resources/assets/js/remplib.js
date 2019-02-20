@@ -421,8 +421,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "cookies": remplib.tracker.cookiesEnabled,
                 "websockets": remplib.tracker.websocketsSupported,
                 "source": {
-                    "ref": this.getRefSource(),
-                    "social": this.getSocialSource(),
                     "utm_source": this.getParam("utm_source"),
                     "utm_medium": this.getParam("utm_medium"),
                     "utm_campaign": this.getParam("utm_campaign"),
@@ -451,40 +449,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             delete params.user.source.utm_campaign;
             delete params.user.source.utm_content;
             return params;
-        },
-
-        getSocialSource: function() {
-            var source = null;
-            if (document.referrer.match(/^https?:\/\/([^\/]+\.)?facebook\.com(\/|$)/i)) {
-                source = "facebook";
-            } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?twitter\.com(\/|$)/i)) {
-                source = "twitter";
-            } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?reddit\.com(\/|$)/i)) {
-                source = "reddit";
-            }
-
-            var storageKey = "social_source";
-            if (source === null) {
-                return remplib.getFromStorage(storageKey);
-            }
-
-            var now = new Date();
-            var item = {
-                "version": 1,
-                "value": source,
-                "createdAt": now,
-                "updatedAt": now,
-            };
-            localStorage.setItem(storageKey, JSON.stringify(item));
-            return item.value;
-        },
-
-        getRefSource: function() {
-            var source = null;
-            if (document.referrer === "" || document.referrer.match(/^https?:\/\/([^\/]+\.)? + window.location.hostname + (\/|$)/i)) {
-                source = "direct";
-            }
-            return source;
         },
 
         getParam: function(key) {
