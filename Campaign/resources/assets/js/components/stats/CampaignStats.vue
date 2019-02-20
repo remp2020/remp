@@ -117,7 +117,7 @@
                 this.startedPayments = data.payment_count.count;
                 this.finishedPayments = data.purchase_count.count;
                 this.earned = data.purchase_sum.sum;
-                this.currency = data.purchase_sum.tags.currency;
+                this.currency = data.purchase_sum.tags != null ? data.purchase_sum.tags.currency : null;
                 this.histogramData = data.histogram;
                 this.ctr = data.ctr;
                 this.conversions = data.conversions;

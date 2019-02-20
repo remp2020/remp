@@ -44,12 +44,12 @@
         "simshaun/recurr": "^3.0",
         "snowplow/referer-parser": "dev-master",
         "yadakhov/insert-on-duplicate-key": "^1.2",
-        "yajra/laravel-datatables-oracle": "^8.0"
+        "yajra/laravel-datatables-oracle": "^8.0",
+        "fzaninotto/faker": "~1.4"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.3",
-        "friendsofphp/php-cs-fixer": "^2.13",
-        "fzaninotto/faker": "~1.4",
+        "friendsofphp/php-cs-fixer": "^2.14",
         "laravel/horizon": "^2.0",
         "laravel/tinker": "^1.0",
         "mockery/mockery": "^1.2",

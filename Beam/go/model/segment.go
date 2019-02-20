@@ -350,14 +350,24 @@ func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.
 func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
 	c := make(SegmentCache)
 
+	// copy cache to new instance to prevent mutability of original cache
+	for key, val := range cache {
+		c[key] = &SegmentRuleCache{
+			Count:    val.Count,
+			SyncedAt: val.SyncedAt,
+		}
+	}
+
 	for _, sr := range segment.Rules {
 		osr := sr.applyOverrides(ro)
+
 		cacheKey := sr.getCacheKey(ro)
+		src, ok := cache[cacheKey]
 
 		// get count
 		var count int
 		var err error
-		if src, ok := cache[cacheKey]; ok {
+		if sr.cacheable() && ok {
 			count = src.Count
 			// update cache
 			c[cacheKey] = &SegmentRuleCache{
@@ -377,7 +387,7 @@ func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time
 		}
 
 		// evaluate
-		ok, err := osr.Evaluate(count)
+		ok, err = osr.Evaluate(count)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "unable to evaluate SegmentRule")
 		}
@@ -628,6 +638,9 @@ func (sDB *SegmentDB) EventRules() EventRules {
 	er := make(EventRules)
 	for _, s := range sDB.Segments {
 		for _, sr := range s.Rules {
+			if !sr.cacheable() {
+				continue
+			}
 			key := fmt.Sprintf("%s/%s", sr.EventCategory, sr.EventAction)
 			er[key] = append(er[key], sr.ID)
 		}

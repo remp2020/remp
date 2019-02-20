@@ -214,17 +214,38 @@
                         </div>
                         <div id="collapseWhereToDisplay" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingWhereToDisplay">
                             <div class="panel-body p-l-10 p-r-20">
-
                                 <div class="row">
                                     <div class="col-md-8 col-sm-12">
                                         <url-rules
+                                            label="URL"
+                                            hint="Rule is matched if pageview URL contains one of these strings. Filter does not support any wildcards."
+                                            id="url_filter"
+                                            title="URL filter"
+                                            filter-name="url_filter"
+                                            patterns-name="url_patterns"
                                             :urlFilterTypes="urlFilterTypes"
                                             :urlFilter="urlFilter"
                                             :urlPatterns="urlPatterns"
                                         ></url-rules>
                                     </div>
                                 </div>
-
+                            </div><!-- .panel-body -->
+                            <div class="panel-body p-l-10 p-r-20">
+                                <div class="row">
+                                    <div class="col-md-8 col-sm-12">
+                                        <url-rules
+                                            label="Referer"
+                                            hint="Rule is matched if pageview's referer contains one of these strings. Filter does not support any wildcards."
+                                            id="referer_filter"
+                                            title="Referer filter"
+                                            filter-name="referer_filter"
+                                            patterns-name="referer_patterns"
+                                            :urlFilterTypes="urlFilterTypes"
+                                            :urlFilter="refererFilter"
+                                            :urlPatterns="refererPatterns"
+                                        ></url-rules>
+                                    </div>
+                                </div>
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (segments) -->
@@ -470,6 +491,8 @@
         "_urlFilterTypes",
         "_urlFilter",
         "_urlPatterns",
+        "_refererFilter",
+        "_refererPatterns",
 
         "_banners",
         "_availableSegments",
@@ -553,6 +576,8 @@
                 "urlFilterTypes": null,
                 "urlFilter": null,
                 "urlPatterns": null,
+                "refererFilter": null,
+                "refererPatterns": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -628,7 +653,7 @@
                 return (this.segments.length || this.signedIn);
             },
             highlightWhereToCollapse: function () {
-                return (this.urlFilter !== 'everywhere');
+                return (this.urlFilter !== 'everywhere' || this.refererFilter !== 'everywhere');
             },
             highlightBannerRulesCollapse: function () {
                 return (this.pageviewRulesNotDefault || this.oncePerSession === true);

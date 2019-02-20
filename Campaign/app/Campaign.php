@@ -34,6 +34,8 @@ class Campaign extends Model
         'using_adblock',
         'url_filter',
         'url_patterns',
+        'referer_filter',
+        'referer_patterns',
     ];
 
     protected $casts = [
@@ -44,6 +46,7 @@ class Campaign extends Model
         'devices' => 'json',
         'using_adblock' => 'boolean',
         'url_patterns' => 'json',
+        'referer_patterns' => 'json',
     ];
 
     protected $attributes = [
@@ -52,6 +55,7 @@ class Campaign extends Model
         'pageview_rules' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]",
         'url_filter' => self::URL_FILTER_EVERYWHERE,
+        'referer_filter' => self::URL_FILTER_EVERYWHERE,
     ];
 
     protected $appends = ['active'];

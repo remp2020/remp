@@ -78,7 +78,7 @@ class Journal implements JournalContract
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:ListCategories endpoint: {$e->getMessage()}");
         }
-        $flags = json_decode($response->getBody());
+        $flags = json_decode($response->getBody(), true);
         return $flags;
     }
 
