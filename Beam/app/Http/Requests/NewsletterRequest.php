@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Misc;
 use App\Model\NewsletterCriterion;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -35,7 +36,7 @@ class NewsletterRequest extends FormRequest
             'starts_at' => 'required|date',
             'timespan' => [
                 'required',
-                'regex:/^(\d+d)?\s*(\d+h)?\s*(\d+m)?$/i' // e.g. 3d 4h 2m
+                'regex:' . Misc::TIMESPAN_VALIDATION_REGEX
             ],
             'email_subject' => 'required|string',
             'email_from' => 'required|string',

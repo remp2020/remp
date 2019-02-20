@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Misc;
 use App\Model\NewsletterCriterion;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -27,7 +28,7 @@ class UnreadArticlesRequest extends FormRequest
         return [
             'timespan' => [
                 'required',
-                'regex:/^(\d+d)?\s*(\d+h)?\s*(\d+m)?$/i' // e.g. 3d 4h 2m
+                'regex:' . Misc::TIMESPAN_VALIDATION_REGEX
             ],
             'articles_count' => 'required|integer',
             'criteria.*' => 'required|string|in:' . NewsletterCriterion::allCriteriaConcatenated(),

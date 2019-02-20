@@ -6,6 +6,9 @@ use Illuminate\Support\Carbon;
 
 class Misc
 {
+    // e.g. 3d 4h 2m
+    const TIMESPAN_VALIDATION_REGEX = '/^(\d+d)?\s*(\d+h)?\s*(\d+m)?$/i';
+
     /**
      * Converts timespan string to Carbon object in past
      * @param string      $timespan format specifying number of days, hours and minutes, e.g. 3d 4h 5m
