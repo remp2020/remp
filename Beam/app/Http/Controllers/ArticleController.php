@@ -361,7 +361,7 @@ class ArticleController extends Controller
         }
         $topArticlesPerUser = [];
 
-        $timeAfter = Misc::timespanInPast($timespan, Carbon::now());
+        $timeAfter = Misc::timespanInPast($timespan);
         $timeBefore = Carbon::now();
 
         foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
