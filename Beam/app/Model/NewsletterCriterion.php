@@ -66,6 +66,9 @@ class NewsletterCriterion extends Enum
                 throw new Exception('unknown article criterion ' . $this->getValue());
         }
 
+        // Do not consider older articles
+        $query->publishedBetween($start);
+
         $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->get()->pluck('id')->toArray();
         return $query->ignoreAuthorIds($ignoreAuthorIds)->get();
     }

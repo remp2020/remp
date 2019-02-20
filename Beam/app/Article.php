@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\ArticleTitle;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Yadakhov\InsertOnDuplicateKey;
@@ -145,6 +146,17 @@ class Article extends Model
         if ($authorIds) {
             $query->join('article_author', 'articles.id', '=', 'article_author.article_id')
                 ->whereNotIn('article_author.author_id', $authorIds);
+        }
+        return $query;
+    }
+
+    public function scopePublishedBetween(Builder $query, Carbon $from = null, Carbon $to = null)
+    {
+        if ($from) {
+            $query->where('published_at', '>=', $from);
+        }
+        if ($to) {
+            $query->where('published_at', '<=', $to);
         }
         return $query;
     }
