@@ -6,9 +6,9 @@
 @if ($segment)
             SEGMENT_ID: {{ $segment->id }},
 @endif
-            API_HOST: "{{ config('services.remp.beam.segmenter.api_addr') }}",
+            API_HOST: "{{ config('services.remp.beam.segments_addr') }}",
 @if (config('services.remp.beam.segmenter.auth_token'))
-            AUTH_TOKEN: "{{ config('services.remp.beam.segmenter.auth_token') }}",
+            AUTH_TOKEN: "{{ config('services.remp.beam.segments_auth_token') }}",
 @endif
             CANCEL_PATH: "{{ route('segments.index') }}"
         }
