@@ -69,6 +69,13 @@ class StatsController extends Controller
 
     private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, $chartWidth)
     {
+        if ($chartWidth == 0) {
+            return [
+                'dataSets' => [],
+                'labels' => [],
+            ];
+        }
+
         $parsedData = [];
         $labels = [];
 
