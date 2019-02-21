@@ -39,7 +39,7 @@
                                     <h4 class="text-center">Collapsible bar</h4>
                                 </div>
                                 <div class="card-body">
-                                    <div class="preview bar"></div>
+                                    <div class="preview collapsible-bar"></div>
                                 </div>
                             </a>
                         </div>
