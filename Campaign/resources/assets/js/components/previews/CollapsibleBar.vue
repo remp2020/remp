@@ -7,6 +7,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
+        overflow: hidden;
     }
 
     #banner-preview .collapsible-bar-wrap {
@@ -23,6 +24,7 @@
     }
 
     .collapsible-bar-preview-link {
+        display: block;
         text-decoration: none;
         overflow: hidden;
         width: 100%;
@@ -34,7 +36,7 @@
         display: flex;
         overflow: hidden;
         position: relative;
-        padding: 0 18px;
+        padding: 10px 18px;
         width: 100%;
         min-height: 68px;
         justify-content: space-between;
@@ -62,6 +64,9 @@
         padding: 5px 0;
         border-top: 1px solid #111;
         background-color: #fff;
+        font-family: Noto Sans, sans-serif;
+        font-size: 14px;
+        color: #5e5e5e;
     }
 
     .collapsible-bar-toggle {
@@ -70,6 +75,16 @@
         float: right;
         padding-right: 10px;
         cursor: pointer;
+    }
+    
+    .collapsible-bar-body {
+        display: block;
+        height: auto;
+        -webkit-transition: height 0.7s;
+        -moz-transition: height 0.7s;
+        -ms-transition: height 0.7s;
+        -o-transition: height 0.7s;
+        transition: height 0.7s;
     }
 
     @media (max-width: 640px) {
@@ -92,31 +107,41 @@
         <div class="collapsible-bar-header">
             {{ collapseText }}
 
-            <div class="collapsible-bar-toggle" @click="toggle()">
-                Collapse
-                <span>&#9660;</span>
+            <div class="collapsible-bar-toggle">
+                <div @click="expand()" id="collapsible-bar-toggle-expand" class="collapsible-bar-toggle-expand" style="display: none;">
+                    Expand
+                    <span>&#9650;</span>
+                </div>
+
+                <div @click="collapse()" id="collapsible-bar-toggle-collapse" class="collapsible-bar-toggle-collapse">
+                    Collapse
+                    <span>&#9660;</span>
+                </div>
             </div>
         </div>
 
-        <a v-bind:href="$parent.url"
-           v-on="$parent.url ? { click: $parent.clicked } : {}"
-           class="collapsible-bar-preview-link">
+        <div id="collapsible-bar-body" class="collapsible-bar-body">
+            <a v-bind:href="$parent.url"
+               v-on="$parent.url ? { click: $parent.clicked } : {}"
+               id="collapsible-bar-preview-link"
+               class="collapsible-bar-preview-link">
 
-            <transition appear v-bind:name="transition">
-                <div class="collapsible-bar-preview-box" v-bind:style="[ boxStyles ]">
+                <transition appear v-bind:name="transition">
+                    <div class="collapsible-bar-preview-box" v-bind:style="[ boxStyles ]">
 
-                    <div class="collapsible-bar-main"
-                         v-html="$parent.injectVars(mainText)"></div>
+                        <div class="collapsible-bar-main"
+                             v-html="$parent.injectVars(mainText)"></div>
 
-                    <div class="collapsible-bar-button"
-                         v-if="buttonText.length > 0"
-                         v-on:click="$parent.clicked($event, !$parent.url)"
-                         v-html="$parent.injectVars(buttonText)"
-                         v-bind:style="[buttonStyles]"></div>
+                        <div class="collapsible-bar-button"
+                             v-if="buttonText.length > 0"
+                             v-on:click="$parent.clicked($event, !$parent.url)"
+                             v-html="$parent.injectVars(buttonText)"
+                             v-bind:style="[buttonStyles]"></div>
 
-                </div>
-            </transition>
-        </a>
+                    </div>
+                </transition>
+            </a>
+        </div>
     </div>
 </template>
 
@@ -124,9 +149,6 @@
     export default {
         name: 'collapsible-bar-preview',
         props: [
-            "positionOptions",
-            "alignmentOptions",
-
             "backgroundColor",
             "buttonBackgroundColor",
             "textColor",
@@ -138,20 +160,26 @@
 
             "show",
             "transition",
-            "position",
-            "offsetVertical",
-            "offsetHorizontal",
             "targetUrl",
-            "closeable",
-            "displayType",
-            "forcedPosition",
             "uuid",
-            "campaignUuid"
+            "campaignUuid",
+            "initialState",
         ],
         data: function() {
             return {
+                bannerHeight: 0,
+                collapsed: false,
                 closeTracked: false,
                 clickTracked: false,
+            }
+        },
+        mounted() {
+            this.resetBannerHeight();
+
+            if (this.initialState === 'expanded') {
+                this.expand();
+            } else {
+                this.collapse();
             }
         },
         computed: {
@@ -185,9 +213,43 @@
             }
         },
         methods: {
+            resetBannerHeight() {
+                const body = document.getElementById('collapsible-bar-body'),
+                      link = document.getElementById('collapsible-bar-preview-link');
+
+                this.bannerHeight = link.getBoundingClientRect().height;
+
+                body.style.height = this.bannerHeight + 'px';
+            },
+            collapse() {
+                this.collapsed = true;
+                this.toggle();
+            },
+            expand() {
+                this.collapsed = false;
+                this.toggle();
+            },
             toggle() {
-                $('.collapsible-bar-preview-box').slideToggle();
-                console.log('toggle')
+                let collapseText = document.getElementById('collapsible-bar-toggle-collapse'),
+                    expandText   = document.getElementById('collapsible-bar-toggle-expand'),
+                    body         = document.getElementById('collapsible-bar-body');
+
+                if (this.collapsed) {
+                    expandText.style.display = 'block';
+                    collapseText.style.display = 'none';
+                    body.style.height = 0;
+                } else {
+                    expandText.style.display = 'none';
+                    collapseText.style.display = 'block';
+                    body.style.height = this.bannerHeight + 'px';
+                }
+            }
+        },
+
+        watch: {
+            mainText: function () {
+                console.log('main text changed');
+                this.resetBannerHeight();
             }
         }
     }

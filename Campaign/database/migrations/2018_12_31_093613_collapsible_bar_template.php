@@ -23,6 +23,7 @@ class CollapsibleBarTemplate extends Migration
             $table->string('text_color');
             $table->string('button_background_color');
             $table->string('button_text_color');
+            $table->string('initial_state');
 
             $table->foreign('banner_id')->references('id')->on('banners');
             $table->timestamps();

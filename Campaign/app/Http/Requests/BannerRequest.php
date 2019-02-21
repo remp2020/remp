@@ -101,6 +101,7 @@ class BannerRequest extends FormRequest
                         'button_text_color' => 'string|required',
                         'main_text' => 'string|required',
                         'button_text' => 'string|required',
+                        'initial_state' => 'string|required',
                     ]);
                     break;
                 case Banner::TEMPLATE_SHORT_MESSAGE:

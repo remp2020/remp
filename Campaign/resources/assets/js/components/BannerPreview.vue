@@ -99,13 +99,9 @@
                 :textColor="collapsibleBarTemplate.textColor"
                 :buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
                 :buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+                :initialState="collapsibleBarTemplate.initialState"
 
-                :position="position"
-                :offsetVertical="offsetVertical"
-                :offsetHorizontal="offsetHorizontal"
                 :targetUrl="targetUrl"
-                :closeable="closeable"
-                :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
         ></collapsible-bar-preview>

@@ -77,7 +77,8 @@ window.remplib = window.remplib || {};
                     backgroundColor: model['collapsible_bar_template']['background_color'] || null,
                     textColor: model['collapsible_bar_template']['text_color'] || null,
                     buttonBackgroundColor: model['collapsible_bar_template']['button_background_color'] || null,
-                    buttonTextColor: model['collapsible_bar_template']['button_text_color'] || null
+                    buttonTextColor: model['collapsible_bar_template']['button_text_color'] || null,
+                    initialState: model['collapsible_bar_template']['initial_state'] || "expanded"
                 }
             }
 

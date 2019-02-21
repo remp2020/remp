@@ -20,6 +20,7 @@
             <div class="tab-content p-0">
                 <div role="tabpanel" class="active tab-pane" id="collapsible-bar-template">
                     <div class="card-body card-padding p-l-15">
+
                         <div class="input-group">
                             <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
                             <div>
@@ -38,6 +39,26 @@
                             </div>
                         </div>
 
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="initial_state" class="fg-label">Initial state</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <v-select v-model="initialState"
+                                                  id="initial_state"
+                                                  name="initial_state"
+                                                  :value="initialState"
+                                                  :options.sync="initialStateOptions"
+                                        ></v-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <input type="hidden" name="background_color" v-bind:value="_backgroundColor" />
                         <input type="hidden" name="text_color" v-bind:value="_textColor" />
                         <input type="hidden" name="button_background_color" v-bind:value="_buttonBackgroundColor" />
@@ -47,7 +68,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="collapse_text" class="fg-label">Collapse text</label>
-                                <input v-model="collapseText" class="form-control fg-input" name="main_text" id="collapse_text" type="text" requried>
+                                <input v-model="collapseText" class="form-control fg-input" name="collapse_text" id="collapse_text" type="text" requried>
                             </div>
                         </div>
 
@@ -76,7 +97,7 @@
 </template>
 
 <script type="text/javascript">
-    let vSelect = require("remp/js/components/vSelect.vue");
+    import vSelect from "remp/js/components/vSelect.vue";
 
     let props = [
         "_mainText",
@@ -86,10 +107,13 @@
         "_textColor",
         "_buttonBackgroundColor",
         "_buttonTextColor",
+        "_initialState",
     ];
     export default {
         name: "collapsible-bar-template",
-        components: { vSelect },
+        components: {
+            vSelect,
+        },
         props: props,
         created: function(){
             props.forEach((prop) => {
@@ -103,7 +127,16 @@
             collapseText: "Show offer",
             buttonText: "Visit offer",
             colorScheme: "green",
-
+            initialStateOptions: [
+                {
+                    "label": "Collapsed",
+                    "value": "collapsed"
+                },
+                {
+                    "label": "Expanded",
+                    "value": "expanded"
+                }
+            ],
             colorSchemes: {
                 "grey": {
                     "label": "Grey",
