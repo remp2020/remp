@@ -124,7 +124,7 @@
         },
         data: () => ({
             mainText: "Limited time offer<br/>30% discount",
-            collapseText: "Show offer",
+            collapseText: "Offer",
             buttonText: "Visit offer",
             colorScheme: "green",
             initialStateOptions: [
