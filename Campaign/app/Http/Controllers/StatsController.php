@@ -167,11 +167,6 @@ class StatsController extends Controller
         $numOfCols = (int)($chartWidth / 40);
 
         $diff = $to->diffInSeconds($from);
-
-        if (isset($_COOKIE['dbg'])) {
-            dump($numOfCols, $diff);
-            die;
-        }
         $interval = $diff / $numOfCols;
 
         return (int)$interval . 's';

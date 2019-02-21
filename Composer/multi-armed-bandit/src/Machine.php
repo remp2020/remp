@@ -49,7 +49,7 @@ class Machine
         $distribution = array_count_values($results);
         $probabilities = [];
         foreach ($this->levers as $leverId => $lever) {
-            $probabilities[$leverId] = $distribution[$leverId] / $this->draws;
+            $probabilities[$leverId] = ($distribution[$leverId] ?? 0) / $this->draws;
         }
         return $probabilities;
     }
