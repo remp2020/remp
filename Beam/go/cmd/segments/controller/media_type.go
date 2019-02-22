@@ -445,9 +445,7 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	if p.UTMContent != "" {
 		pageview.User.Source.UtmContent = &p.UTMContent
 	}
-	if p.SocialSource != "" {
-		pageview.User.Source.Social = &p.SocialSource
-	}
+
 	if p.IP != "" {
 		pageview.User.IPAddress = &p.IP
 	}

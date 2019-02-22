@@ -30,7 +30,7 @@ class ProcessPageviewSessions extends Command
         $timeAfter = (clone $timeBefore)->subHour();
 
         // select first pageview of each session
-        $request->addSelect("token", "referer", "url", "ref_source", "social", "user_agent", "remp_session_id", "subscriber");
+        $request->addSelect("token", "referer", "url", "user_agent", "remp_session_id", "subscriber");
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup("remp_session_id", "subscriber");
@@ -74,7 +74,7 @@ class ProcessPageviewSessions extends Command
             $client = $deviceDetector->getClient();
             $os = $deviceDetector->getOs();
 
-            $deviceData['subscriber'] = boolval($record->tags->subscriber);
+            $deviceData['subscriber'] = (bool) $record->tags->subscriber;
             $deviceData['os_name'] = $os['name'] ?? null;
             $deviceData['os_version'] = $os['version'] ?? null;
             $deviceData['client_type'] = $client['type'] ?? null;
@@ -103,7 +103,7 @@ class ProcessPageviewSessions extends Command
                 $refererData['source'] = $uri['host'];
             }
 
-            $refererData['subscriber'] = boolval($record->tags->subscriber);
+            $refererData['subscriber'] = (bool) $record->tags->subscriber;
             $refererAggregate = $this->increment($refererAggregate, $refererData);
 
             $bar->advance();
