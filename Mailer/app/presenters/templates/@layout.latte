@@ -57,9 +57,6 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    {control missingConfiguration}
-                </li>
                 <li class="dropdown hm-profile">
                     <a data-toggle="dropdown" href="">
                         <img src="https://www.gravatar.com/avatar/{md5(strtolower($currentUser->getIdentity()->data['email']))}?s=45&d=mm" alt="">
@@ -76,6 +73,12 @@
                         {*<a n:href="Sign:Out"><i class="zmdi zmdi-time-restore"></i> Logout</a>*}
                         {*</li>*}
                     </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right">
+                <li>
+                    {control missingConfiguration}
                 </li>
             </ul>
         </div>

@@ -72,14 +72,6 @@ abstract class Mailer implements IMailer
         return $this->requiredOptions;
     }
 
-    protected function hasOption(string $option)
-    {
-        if (array_key_exists($option, $this->options)) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * If Mailer implementation supports template parameters (e.g. within batch email sending)
      * you can replace the real values of params with names of template variables which will
