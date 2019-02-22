@@ -33,6 +33,9 @@ class UnreadArticlesRequest extends FormRequest
             'articles_count' => 'required|integer',
             'criteria.*' => 'required|string|in:' . NewsletterCriterion::allCriteriaConcatenated(),
             'user_ids.*' => 'required|integer',
+            'read_articles_timespan' => [
+                'regex:' . Misc::TIMESPAN_VALIDATION_REGEX
+            ],
             'ignore_authors.*' => 'string',
         ];
     }

@@ -349,6 +349,8 @@ class ArticleController extends Controller
 
         $articlesCount = $request->input('articles_count');
         $timespan = $request->input('timespan');
+        $readArticlesTimespan = $request->input('read_articles_timespan');
+
         $ignoreAuthors = $request->input('ignore_authors', []);
 
         $topArticlesPerCriterion = [];
@@ -362,10 +364,12 @@ class ArticleController extends Controller
         $topArticlesPerUser = [];
 
         $timeAfter = Misc::timespanInPast($timespan);
+        // If no read_articles_timespan is specified, check for week old read articles (past given timespan)
+        $readArticlesAfter = $readArticlesTimespan ? Misc::timespanInPast($readArticlesTimespan) : (clone $timeAfter)->subWeek();
         $timeBefore = Carbon::now();
 
         foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
-            $usersReadArticles = $this->readArticlesForUsers($timeAfter, $timeBefore, $userIdsChunk);
+            $usersReadArticles = $this->readArticlesForUsers($readArticlesAfter, $timeBefore, $userIdsChunk);
 
             // Save top articles per user
             foreach ($userIdsChunk as $userId) {
