@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Author;
 use App\Contracts\JournalHelpers;
+use App\Helpers\Misc;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
@@ -360,7 +361,7 @@ class ArticleController extends Controller
         }
         $topArticlesPerUser = [];
 
-        $timeAfter = Carbon::now()->subDays($timespan);
+        $timeAfter = Misc::timespanInPast($timespan);
         $timeBefore = Carbon::now();
 
         foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {

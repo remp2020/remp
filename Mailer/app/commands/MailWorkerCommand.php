@@ -174,9 +174,9 @@ class MailWorkerCommand extends Command
                         }
 
                         $output->writeln(" * sending <info>{$job->templateCode}</info> from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
-                        $email->addRecipient($job->email);
+                        $recipientParams = $job->params ? get_object_vars($job->params) : [];
+                        $email->addRecipient($job->email, null, $recipientParams);
                         $email->setContext($job->context);
-                        $email->setParams($job->params ? get_object_vars($job->params) : []);
                     }
 
                     $sentCount = 0;
@@ -214,7 +214,7 @@ class MailWorkerCommand extends Command
                     $this->mailJobBatchRepository->update($batch, [
                         'first_email_sent_at' => $first_email,
                         'last_email_sent_at' => $now,
-                        'sent_emails+=' => intval($sentCount),
+                        'sent_emails+=' => (int) $sentCount,
                         'last_ping' => $now
                     ]);
 
