@@ -108,46 +108,55 @@
             {{ collapseText }}
 
             <div class="collapsible-bar-toggle">
-                <div @click="expand()" id="collapsible-bar-toggle-expand" class="collapsible-bar-toggle-expand" style="display: none;">
+                <div v-if="collapsed" @click="collapsed = !collapsed" class="collapsible-bar-toggle-expand">
                     Expand
                     <span>&#9650;</span>
                 </div>
 
-                <div @click="collapse()" id="collapsible-bar-toggle-collapse" class="collapsible-bar-toggle-collapse">
+                <div v-if="!collapsed" @click="collapsed = !collapsed" class="collapsible-bar-toggle-collapse">
                     Collapse
                     <span>&#9660;</span>
                 </div>
             </div>
         </div>
 
-        <div id="collapsible-bar-body" class="collapsible-bar-body">
-            <a v-bind:href="$parent.url"
-               v-on="$parent.url ? { click: $parent.clicked } : {}"
-               id="collapsible-bar-preview-link"
-               class="collapsible-bar-preview-link">
+        <slide-up-down :active="!collapsed" :duration="600">
+            <div id="collapsible-bar-body" class="collapsible-bar-body">
+                <a v-bind:href="$parent.url"
+                   v-on="$parent.url ? { click: $parent.clicked } : {}"
+                   id="collapsible-bar-preview-link"
+                   class="collapsible-bar-preview-link">
 
-                <transition appear v-bind:name="transition">
-                    <div class="collapsible-bar-preview-box" v-bind:style="[ boxStyles ]">
+                    <transition appear name="slide">
+                        <div class="collapsible-bar-preview-box" v-bind:style="[ boxStyles ]">
 
-                        <div class="collapsible-bar-main"
-                             v-html="$parent.injectVars(mainText)"></div>
+                            <div class="collapsible-bar-main"
+                                 v-html="$parent.injectVars(mainText)"></div>
 
-                        <div class="collapsible-bar-button"
-                             v-if="buttonText.length > 0"
-                             v-on:click="$parent.clicked($event, !$parent.url)"
-                             v-html="$parent.injectVars(buttonText)"
-                             v-bind:style="[buttonStyles]"></div>
+                            <div class="collapsible-bar-button"
+                                 v-if="buttonText.length > 0"
+                                 v-on:click="$parent.clicked($event, !$parent.url)"
+                                 v-html="$parent.injectVars(buttonText)"
+                                 v-bind:style="[buttonStyles]"></div>
 
-                    </div>
-                </transition>
-            </a>
-        </div>
+                        </div>
+                    </transition>
+                </a>
+            </div>
+        </slide-up-down>
+
+
     </div>
 </template>
 
 <script>
+    import SlideUpDown from 'vue-slide-up-down'
+
     export default {
         name: 'collapsible-bar-preview',
+        components: {
+            SlideUpDown
+        },
         props: [
             "backgroundColor",
             "buttonBackgroundColor",
@@ -174,12 +183,10 @@
             }
         },
         mounted() {
-            this.resetBannerHeight();
-
             if (this.initialState === 'expanded') {
-                this.expand();
+                this.collapsed = false;
             } else {
-                this.collapse();
+                this.collapsed = true;
             }
         },
         computed: {
@@ -210,46 +217,6 @@
                 return {
 					color: this.textColor,
                 }
-            }
-        },
-        methods: {
-            resetBannerHeight() {
-                const body = document.getElementById('collapsible-bar-body'),
-                      link = document.getElementById('collapsible-bar-preview-link');
-
-                this.bannerHeight = link.getBoundingClientRect().height;
-
-                body.style.height = this.bannerHeight + 'px';
-            },
-            collapse() {
-                this.collapsed = true;
-                this.toggle();
-            },
-            expand() {
-                this.collapsed = false;
-                this.toggle();
-            },
-            toggle() {
-                let collapseText = document.getElementById('collapsible-bar-toggle-collapse'),
-                    expandText   = document.getElementById('collapsible-bar-toggle-expand'),
-                    body         = document.getElementById('collapsible-bar-body');
-
-                if (this.collapsed) {
-                    expandText.style.display = 'block';
-                    collapseText.style.display = 'none';
-                    body.style.height = 0;
-                } else {
-                    expandText.style.display = 'none';
-                    collapseText.style.display = 'block';
-                    body.style.height = this.bannerHeight + 'px';
-                }
-            }
-        },
-
-        watch: {
-            mainText: function () {
-                console.log('main text changed');
-                this.resetBannerHeight();
             }
         }
     }
