@@ -25,10 +25,10 @@ $primaryColorLight: #5ddef4;
   border-color: #f00;
 }
 
-.missing-configuration-widget {
+.missing-configuration-widget,
+.missing-configuration-widget:hover {
   display: inline-block;
   color: red;
-  height: 35px;
+  height: 60px;
   line-height: 35px;
 }
-
