@@ -70,9 +70,11 @@
     }
 
     .collapsible-bar-toggle {
+        position: absolute;
+        top: 5px;
+        right: 0;
         text-transform: uppercase;
         color: #000;
-        float: right;
         padding-right: 10px;
         cursor: pointer;
     }
