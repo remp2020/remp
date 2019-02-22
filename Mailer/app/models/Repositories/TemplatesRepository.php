@@ -77,7 +77,7 @@ class TemplatesRepository extends Repository
     public function update(IRow &$row, $data)
     {
         // if code changed, check if it's unique
-        if ($row['code'] != $data['code'] && $this->exists($data['code'])) {
+        if (isset($data['code']) && $row['code'] != $data['code'] && $this->exists($data['code'])) {
             throw new TemplatesCodeNotUniqueException("Template code [" . $data['code'] . "] is already used.");
         }
         $params['updated_at'] = new \DateTime();
