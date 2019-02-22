@@ -88,6 +88,11 @@ services:
 			- register(@hermesWorker)
 			- setCatchExceptions(true)
 
+	commandsLogger:
+		class: Monolog\Logger('commands-logger')
+		setup:
+			- pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/commands-log.txt"))
+
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
 
