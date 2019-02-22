@@ -61,7 +61,7 @@ class ConfigFormFactory
             }
 
             // handle generic types
-            switch ($config->type):
+            switch ($config->type) :
                 case Config::TYPE_STRING:
                 case Config::TYPE_PASSWORD:
                     $container->addText($config->name, $displayName)
