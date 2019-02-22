@@ -26,7 +26,6 @@ abstract class Mailer implements IMailer
         Config $config,
         ConfigsRepository $configsRepository
     ) {
-    
         $this->configsRepository = $configsRepository;
         $this->config = $config;
 
@@ -45,41 +44,27 @@ abstract class Mailer implements IMailer
 
     protected function buildConfig()
     {
-        foreach ($this->options as $optionName) {
-            $configKey = $this->getOptionConfigKey($optionName);
-
+        foreach ($this->options as $name => $value) {
             try {
-                $this->options[$optionName] = $this->config->get($configKey);
-
-                if (in_array($optionName, $this->requiredOptions)) {
-                    $this->requiredOptions[] = $configKey;
-                    unset($this->requiredOptions[array_search($optionName, $this->options)]);
-                }
-
-                unset($this->options[array_search($optionName, $this->options)]);
+                $this->options[$name] = $this->config->get($name);
             } catch (ConfigNotExistsException $e) {
-                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1) . ' ' . Strings::firstUpper($optionName);
+                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1) . ' ' . Strings::firstUpper($name);
                 $description = 'Setting for ' . get_called_class();
-                $this->configsRepository->add($configKey, $displayName, null, $description, Config::TYPE_STRING);
+                $this->configsRepository->add($name, $displayName, null, $description, Config::TYPE_STRING);
 
-                $this->options[$optionName] = null;
+                $this->options[$name] = null;
             }
         }
     }
 
-    protected function getOptionConfigKey(string $option)
+    public function isConfigured()
     {
-        $prefix = str_replace('-', '_', Strings::webalize(get_called_class()));
-        return $prefix . '_' . $option;
-    }
-
-    protected function optionIsRequired(string $option)
-    {
-        if (in_array($option, $this->requiredOptions)) {
-            return true;
+        foreach ($this->options as $name => $value) {
+            if (in_array($name, $this->requiredOptions) && empty($value)) {
+                return false;
+            }
         }
-
-        return false;
+        return true;
     }
 
     public function getRequiredOptions()
@@ -92,7 +77,6 @@ abstract class Mailer implements IMailer
         if (array_key_exists($option, $this->options)) {
             return true;
         }
-
         return false;
     }
 

@@ -211,6 +211,7 @@ services:
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory
 	- Remp\MailerModule\Components\ISendingStatsFactory
+	- Remp\MailerModule\Components\IMissingConfigurationFactory
 	- Remp\MailerModule\Components\IGeneratorWidgetsFactory
 	- Remp\MailerModule\Components\IBatchExperimentEvaluationFactory
 

@@ -55,7 +55,11 @@
                     <a n:ifset="$service[url]" href="{$service[url]}"><i class="zmdi zmdi-{$service[icon]} zmdi-hc-fw"></i> {$key}</a>
                 </li>
             </ul>
+
             <ul class="nav navbar-nav navbar-right">
+                <li>
+                    {control missingConfiguration}
+                </li>
                 <li class="dropdown hm-profile">
                     <a data-toggle="dropdown" href="">
                         <img src="https://www.gravatar.com/avatar/{md5(strtolower($currentUser->getIdentity()->data['email']))}?s=45&d=mm" alt="">

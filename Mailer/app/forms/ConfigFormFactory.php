@@ -38,10 +38,14 @@ class ConfigFormFactory
         $activeMailer = null;
 
         foreach ($configs as $config) {
+            $displayName = $config->display_name ? $config->display_name : $config->name;
             $item = null;
+
+            // handle special cases
             if ($config->name == 'default_mailer') {
-                $mailers = [];
                 $availableMailers =  $this->mailerFactory->getAvailableMailers();
+
+                $mailers = [];
                 array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
                     $mailers[$name] = get_class($mailer);
                 });
@@ -50,29 +54,46 @@ class ConfigFormFactory
                     $activeMailer = $this->mailerFactory->getMailer($config->value);
                 }
 
-                $item = $container->addSelect('default_mailer', 'Default Mailer', $mailers);
-            } elseif (in_array($config->type, [Config::TYPE_STRING, Config::TYPE_PASSWORD])) {
-                $item = $container->addText($config->name, $config->display_name ? $config->display_name : $config->name);
-            } elseif ($config->type == Config::TYPE_TEXT) {
-                $item = $container->addTextArea($config->name, $config->display_name ? $config->display_name : $config->name)
-                    ->getControlPrototype()->addAttributes(['class' => 'auto-size']);
-            } elseif ($config->type == Config::TYPE_HTML) {
-                $item = $container->addTextArea($config->name, $config->display_name ? $config->display_name : $config->name)
-                    ->setAttribute('rows', 15)
-                    ->getControlPrototype()->addAttributes(['class' => 'html-editor']);
-            } elseif ($config->type == Config::TYPE_BOOLEAN) {
-                $item = $container->addCheckbox($config->name, $config->display_name ? $config->display_name : $config->name);
-            } else {
-                throw new \Exception('unhandled config type: ' . $config->type);
+                $container->addSelect('default_mailer', 'Default Mailer', $mailers)
+                    ->setDefaultValue($config->value);
+
+                continue;
             }
 
-            $item->setDefaultValue($config->value);
+            // handle generic types
+            switch ($config->type):
+                case Config::TYPE_STRING:
+                case Config::TYPE_PASSWORD:
+                    $container->addText($config->name, $displayName)
+                        ->setDefaultValue($config->value);
+                    break;
+                case Config::TYPE_TEXT:
+                    $container->addTextArea($config->name, $displayName)
+                        ->setDefaultValue($config->value)
+                        ->getControlPrototype()
+                        ->addAttributes(['class' => 'auto-size']);
+                    break;
+                case Config::TYPE_HTML:
+                    $container->addTextArea($config->name, $displayName)
+                        ->setAttribute('rows', 15)
+                        ->setDefaultValue($config->value)
+                        ->getControlPrototype()
+                        ->addAttributes(['class' => 'html-editor']);
+                    break;
+                case Config::TYPE_BOOLEAN:
+                    $container->addCheckbox($config->name, $displayName)
+                        ->setDefaultValue($config->value);
+                    break;
+                default:
+                    throw new \Exception('unhandled config type: ' . $config->type);
+            endswitch;
         }
 
         if ($activeMailer !== null) {
-            foreach ($activeMailer->getRequiredOptions() as $requiredOption) {
-                $container->getComponent($requiredOption)
-                    ->setRequired(true);
+            foreach ($activeMailer->getRequiredOptions() as $name) {
+                /** @var $comp \Nette\Forms\Controls\BaseControl */
+                $comp = $container->getComponent($name);
+                $comp->setRequired(true);
             }
         }
 

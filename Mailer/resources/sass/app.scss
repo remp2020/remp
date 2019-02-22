@@ -20,3 +20,8 @@ $primaryColorLight: #5ddef4;
     background-color: transparentize(#ba6b6c, .85);
   }
 }
+
+.fg-input:invalid {
+  border-color: #f00;
+}
+

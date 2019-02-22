@@ -16,16 +16,22 @@ class MailgunMailer extends Mailer implements IMailer
 
     protected $alias = 'remp-mailgun';
 
-    protected $options = [ 'api_key', 'domain' ];
+    protected $options = [
+        'remp_mailermodule_mailer_mailgunmailer_api_key' => null,
+        'remp_mailermodule_mailer_mailgunmailer_domain' => null,
+    ];
 
-    protected $requiredOptions = [ 'api_key', 'domain' ];
+    protected $requiredOptions = [
+        'remp_mailermodule_mailer_mailgunmailer_api_key',
+        'remp_mailermodule_mailer_mailgunmailer_domain'
+    ];
 
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository
     ) {
         parent::__construct($config, $configsRepository);
-        $this->mailer = Mailgun::create($this->options['api_key']);
+        $this->mailer = Mailgun::create($this->options['remp_mailermodule_mailer_mailgunmailer_api_key']);
     }
 
     public function send(Message $message)
