@@ -66,21 +66,22 @@ class CampaignController extends Controller
                 $data = $campaign->campaignBanners->all();
                 $variants = [];
 
+                /** @var CampaignBanner $variant */
                 foreach ($data as $variant) {
-                    $proportion = $variant['proportion'];
+                    $proportion = $variant->proportion;
                     if ($proportion === 0) {
                         continue;
                     }
 
-                    if ($variant['control_group'] === 1) {
-                        // handle control group
+                    // handle control group
+                    if ($variant->control_group === 1) {
                         $variants[] = "Control Group&nbsp;({$proportion}%)";
                         continue;
                     }
 
                     // handle variants with banner
                     $link = link_to(
-                        route('banners.edit', $variant['banner_id']),
+                        route('banners.edit', $variant->banner_id),
                         $variant->banner->name
                     );
 
