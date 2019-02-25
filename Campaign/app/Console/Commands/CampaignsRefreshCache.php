@@ -39,7 +39,7 @@ class CampaignsRefreshCache extends Command
      */
     public function handle()
     {
-        $activeCampaignIds = json_decode(Redis::get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
+        $activeCampaignIds = Campaign::refreshActiveCampaignsCache();
 
         foreach (Campaign::whereIn('id', $activeCampaignIds)->get() as $campaign) {
             $this->line(sprintf('Refreshing campaign: <info>%s</info>', $campaign->name));

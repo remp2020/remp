@@ -225,14 +225,7 @@ class Campaign extends Model
 
     public function cache()
     {
-        $activeCampaignIds = Schedule::applyScopes()
-                                ->runningOrPlanned()
-                                ->orderBy('start_time')
-                                ->pluck('campaign_id')
-                                ->unique()
-                                ->toArray();
-
-        Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode($activeCampaignIds));
+        $this->refreshActiveCampaignsCache();
 
         $campaign = $this->where(['id' => $this->id])->with([
             'segments',
@@ -249,6 +242,20 @@ class Campaign extends Model
         }
 
         Redis::set(self::CAMPAIGN_TAG . ":{$this->id}", serialize($campaign));
+    }
+
+    public static function refreshActiveCampaignsCache()
+    {
+        $activeCampaignIds = Schedule::applyScopes()
+            ->runningOrPlanned()
+            ->orderBy('start_time')
+            ->pluck('campaign_id')
+            ->unique()
+            ->toArray();
+
+        Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode($activeCampaignIds));
+
+        return collect($activeCampaignIds);
     }
 
     public function signedInOptions()
