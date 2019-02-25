@@ -3,7 +3,7 @@
 use App\Campaign;
 use App\CampaignBanner;
 use DeviceDetector\Cache\PSR6Bridge;
-use DeviceDetector\DeviceDetector;
+use GeoIp2\Database\Reader;
 use Illuminate\Support\Collection;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -16,6 +16,11 @@ header('Content-Type: application/json');
 $dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
 
+/**
+ * @param string $callback jsonp callback name
+ * @param array $response response to be json-encoded and returned
+ * @param int $statusCode http status code to be returned
+ */
 function jsonp_response($callback, $response, $statusCode = 200) {
     http_response_code($statusCode);
     $params = json_encode($response);
@@ -23,15 +28,30 @@ function jsonp_response($callback, $response, $statusCode = 200) {
     exit;
 }
 
+/**
+ * public_path overrides Laravel's helper function to prevent usage of Laravel's app()
+ *
+ * @param string $path
+ * @return string
+ */
 function public_path($path = '') {
     return __DIR__ .($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
 }
 
+/**
+ * asset overrides Laravel's helper function to prevent usage of Laravel's app()
+ *
+ * @param $path
+ * @param null $secure
+ * @return string
+ */
 function asset($path, $secure = null) {
     return "//" . $_SERVER['HTTP_HOST'] . "/" . trim($path, '/');
 }
 
 /**
+ * render is responsible for rendering JS to be executed on client.
+ *
  * @param CampaignBanner $variant
  * @param Campaign $campaign
  * @param $alignments
@@ -152,6 +172,63 @@ JS;
     return $js;
 }
 
+class GeoReader
+{
+    private $reader;
+
+    public function get()
+    {
+        if (!$this->reader) {
+            $this->reader = new Reader(base_path(getenv('MAXMIND_DATABASE')));
+        }
+        return $this->reader;
+    }
+}
+
+class DeviceDetector
+{
+    private $detector;
+
+    private $redis;
+
+    public function __construct($redis)
+    {
+        $this->redis = $redis;
+    }
+
+    public function get($userAgent)
+    {
+        if (!$this->detector) {
+            $this->detector = new \DeviceDetector\DeviceDetector();
+            $this->detector->setCache(
+                new PSR6Bridge(
+                    new \Cache\Adapter\Predis\PredisCachePool($this->redis)
+                )
+            );
+
+            $this->detector->setUserAgent($userAgent);
+            $this->detector->parse();
+        }
+        return $this->detector;
+    }
+}
+
+class Request
+{
+    private $request;
+
+    public function get()
+    {
+        if (!$this->request) {
+            $this->request = \App\Http\Request::createFromGlobals();
+        }
+        return $this->request;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// ACTUAL SHOWTIME EXECUTION STEPS
+
 // validation
 try {
     $data = json_decode($data);
@@ -187,6 +264,7 @@ if (!$browserId) {
         ], 400);
 }
 
+// dependencies initialization
 $redis = new \Predis\Client([
     'scheme' => 'tcp',
     'host'   => getenv('REDIS_HOST'),
@@ -222,10 +300,11 @@ $alignments = json_decode($redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_
 
 $displayedCampaigns = [];
 
-/** @var \DeviceDetector\DeviceDetector $deviceDetector */
-// intentionally kept empty here, will be lazy-loaded
-$deviceDetector = null;
+$deviceDetector = new DeviceDetector($redis);
+$geoReader = new GeoReader();
+$request = new Request();
 
+// campaign resolution
 foreach ($campaignIds as $campaignId) {
     $campaign = unserialize($redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
     $running = false;
@@ -245,7 +324,6 @@ foreach ($campaignIds as $campaignId) {
 
     // banner
     if ($campaignBanners->count() == 0) {
-//        Log::error("Active campaign [{$campaign->uuid}] has no banner set");
         continue;
     }
 
@@ -377,23 +455,11 @@ foreach ($campaignIds as $campaignId) {
     if (!isset($data->userAgent)) {
         Log::error("Unable to load user agent for userId [{$userId}]");
     } else {
-        if (!$deviceDetector) {
-            $deviceDetector = new DeviceDetector();
-            $deviceDetector->setCache(
-                new PSR6Bridge(
-                    new \Cache\Adapter\Predis\PredisCachePool($redis)
-                )
-            );
-
-            $deviceDetector->setUserAgent($data->userAgent);
-            $deviceDetector->parse();
-        }
-
-        if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $deviceDetector->isMobile()) {
+        if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $deviceDetector->get($data->userAgent)->isMobile()) {
             continue;
         }
 
-        if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $deviceDetector->isDesktop()) {
+        if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $deviceDetector->get($data->userAgent)->isDesktop()) {
             continue;
         }
     }
@@ -402,7 +468,7 @@ foreach ($campaignIds as $campaignId) {
     if (!$campaign->countries->isEmpty()) {
         // load country ISO code based on IP
         try {
-            $record = $geoIPreader->country($r->ip());
+            $record = $geoReader->get()->country($request->get()->ip());
             $countryCode = $record->country->isoCode;
         } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
             Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
