@@ -50,12 +50,10 @@ class MailWorkerCommand extends Command
 
     private $container;
 
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
 
     public function __construct(
+        LoggerInterface $logger,
         Sender $applicationMailer,
         JobsRepository $mailJobsRepository,
         BatchesRepository $mailJobBatchRepository,
@@ -78,6 +76,7 @@ class MailWorkerCommand extends Command
         $this->mailCache = $redis;
         $this->emitter = $emitter;
         $this->container = $container;
+        $this->logger = $logger;
     }
 
     /**
@@ -98,8 +97,6 @@ class MailWorkerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var $logger LoggerInterface */
-        $logger = $this->container->getService('commandsLogger');
         $sendAsBatch = $input->getOption('batch');
 
         $output->writeln('');
@@ -211,7 +208,12 @@ class MailWorkerCommand extends Command
                     } catch (SmtpException | Sender\MailerBatchException | \Exception $exception) {
                         $this->smtpErrors++;
                         $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
-                        $logger->warning($exception->getMessage());
+
+                        $this->logger->warning("Unable to send an email: " . $exception->getMessage(), [
+                            'batch' => $sendAsBatch && $email->supportsBatch(),
+                            'template' => $templateCode,
+                        ]);
+
                         $this->cacheJobs($jobs, $batch->id);
 
                         if ($this->smtpErrors >= 10) {

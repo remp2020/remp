@@ -79,7 +79,7 @@ services:
 		class: Remp\MailerModule\Console\Application
 		setup:
 			- register(Remp\MailerModule\Commands\ProcessJobCommand())
-			- register(Remp\MailerModule\Commands\MailWorkerCommand())
+			- register(Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger))
 			- register(Remp\MailerModule\Commands\DatabaseSeedCommand())
 			- register(Remp\MailerModule\Commands\DemoSeedCommand())
 			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
@@ -90,8 +90,6 @@ services:
 
 	commandsLogger:
 		class: Monolog\Logger('commands-logger')
-		setup:
-			- pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/commands-log.txt"))
 
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
