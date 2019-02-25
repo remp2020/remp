@@ -3,9 +3,13 @@
 namespace App\Models\Alignment;
 
 use Illuminate\Support\Collection;
+use Psy\Util\Json;
+use Redis;
 
 class Map
 {
+    const ALIGNMENTS_MAP_REDIS_KEY = 'dimensions_map';
+
     /** @var Alignment[] */
     protected $alignments = [];
 
@@ -18,6 +22,8 @@ class Map
                 $dc['style']
             );
         }
+
+        Redis::set(self::ALIGNMENTS_MAP_REDIS_KEY, Json::encode($this->alignments));
     }
 
     public function alignments(): Collection

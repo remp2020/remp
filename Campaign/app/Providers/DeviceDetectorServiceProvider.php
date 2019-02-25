@@ -3,10 +3,10 @@
 namespace App\Providers;
 
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\ServiceProvider;
 use DeviceDetector\Cache\PSR6Bridge;
 use DeviceDetector\DeviceDetector;
+use Redis;
 
 class DeviceDetectorServiceProvider extends ServiceProvider
 {
@@ -23,7 +23,7 @@ class DeviceDetectorServiceProvider extends ServiceProvider
             $dd = new DeviceDetector();
             $dd->setCache(
                 new PSR6Bridge(
-                    new CacheItemPool($app->make(Repository::class))
+                    new \Cache\Adapter\Predis\PredisCachePool(Redis::connection())
                 )
             );
 

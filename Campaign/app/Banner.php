@@ -36,6 +36,8 @@ class Banner extends Model
         'closeable' => 'boolean',
     ];
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
     protected static function boot()
     {
         parent::boot();

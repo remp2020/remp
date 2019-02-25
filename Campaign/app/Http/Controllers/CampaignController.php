@@ -20,14 +20,13 @@ use HTML;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Tracy\Debugger;
+use Redis;
 use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\DeviceDetector;
-use App\Contracts\Remp\Stats;
 
 class CampaignController extends Controller
 {
@@ -520,7 +519,7 @@ class CampaignController extends Controller
             $sa->setCache($data->cache);
         }
 
-        $campaignIds = Cache::get(Campaign::ACTIVE_CAMPAIGN_IDS, []);
+        $campaignIds = json_decode(Redis::get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
         if (count($campaignIds) == 0) {
             return response()
                 ->jsonp($r->get('callback'), [
@@ -537,7 +536,7 @@ class CampaignController extends Controller
         $displayedCampaigns = [];
 
         foreach ($campaignIds as $campaignId) {
-            $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignId);
+            $campaign = unserialize(Redis::get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
             $running = false;
 
             foreach ($campaign->schedules as $schedule) {

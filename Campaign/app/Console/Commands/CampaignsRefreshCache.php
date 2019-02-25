@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Campaign;
-use Cache;
+use Redis;
 
 class CampaignsRefreshCache extends Command
 {
@@ -39,7 +39,7 @@ class CampaignsRefreshCache extends Command
      */
     public function handle()
     {
-        $activeCampaignIds = Cache::get(Campaign::ACTIVE_CAMPAIGN_IDS);
+        $activeCampaignIds = json_decode(Redis::get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
 
         foreach (Campaign::whereIn('id', $activeCampaignIds)->get() as $campaign) {
             $this->line(sprintf('Refreshing campaign: <info>%s</info>', $campaign->name));

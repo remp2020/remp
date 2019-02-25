@@ -29,7 +29,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         /* JSONP START */
 
         showtime: {
-            name: "campaigns/showtime",
+            name: "showtime.php",
             jsonpParameter: "data",
             prepareData: function() {
                 return {
