@@ -3,9 +3,11 @@
 namespace Remp\MailerModule\Commands;
 
 use League\Event\Emitter;
+use Nette\DI\Container;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
+use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
@@ -46,7 +48,12 @@ class MailWorkerCommand extends Command
 
     private $smtpErrors = 0;
 
+    private $container;
+
+    private $logger;
+
     public function __construct(
+        LoggerInterface $logger,
         Sender $applicationMailer,
         JobsRepository $mailJobsRepository,
         BatchesRepository $mailJobBatchRepository,
@@ -55,7 +62,8 @@ class MailWorkerCommand extends Command
         TemplatesRepository $mailTemplatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
-        Emitter $emitter
+        Emitter $emitter,
+        Container $container
     ) {
         parent::__construct();
         $this->applicationMailer = $applicationMailer;
@@ -67,6 +75,8 @@ class MailWorkerCommand extends Command
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailCache = $redis;
         $this->emitter = $emitter;
+        $this->container = $container;
+        $this->logger = $logger;
     }
 
     /**
@@ -198,6 +208,12 @@ class MailWorkerCommand extends Command
                     } catch (SmtpException | Sender\MailerBatchException | \Exception $exception) {
                         $this->smtpErrors++;
                         $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
+
+                        $this->logger->warning("Unable to send an email: " . $exception->getMessage(), [
+                            'batch' => $sendAsBatch && $email->supportsBatch(),
+                            'template' => $templateCode,
+                        ]);
+
                         $this->cacheJobs($jobs, $batch->id);
 
                         if ($this->smtpErrors >= 10) {
