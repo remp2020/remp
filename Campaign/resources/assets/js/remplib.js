@@ -26,10 +26,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsSessionStorageKey: "campaigns_session",
 
+        showtimeExperiment: false,
+
         /* JSONP START */
 
         showtime: {
-            name: "showtime.php",
+            name: function() {
+                if (remplib.campaign.showtimeExperiment) {
+                    return "showtime.php";
+                }
+                return "campaigns/showtime";
+            },
             jsonpParameter: "data",
             prepareData: function() {
                 return {
@@ -83,6 +90,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.variables = config.campaign.variables;
             }
 
+            if (typeof config.campaign.showtimeExperiment !== 'undefined') {
+                this.showtimeExperiment = config.campaign.showtimeExperiment;
+            }
+
             // global
             if (typeof config.userId !== 'undefined' && config.userId !== null) {
                 remplib.userId = config.userId;
@@ -112,7 +123,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             let params = {};
             params[def.jsonpParameter] = JSON.stringify(def.prepareData());
 
-            this.get(this.url + "/" + def.name, params, function (data) {
+            this.get(this.url + "/" + def.name(), params, function (data) {
                 def.processResponse && def.processResponse(data);
             }, function() {
                 def.processError && def.processError();

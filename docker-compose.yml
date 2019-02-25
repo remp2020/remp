@@ -66,6 +66,8 @@ services:
       - "./Campaign:/var/www/html/Campaign:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"
@@ -84,6 +86,8 @@ services:
       - "./Mailer:/var/www/html/Mailer:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"
@@ -104,6 +108,8 @@ services:
       - "./Sso:/var/www/html/Sso:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"
@@ -122,6 +128,8 @@ services:
       - "./Beam:/var/www/html/Beam:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"

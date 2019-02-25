@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
             // It's not possible to serialize closures in plain PHP, but Laravel provides a workaround.
             // This will store a function returning segmentAggregator into the redis which can be later
             // used in plain PHP to bypass Laravel initialization just to get the aggregator.
-            $toSerialize = new SerializableClosure(function() use ($segmentAggregator) {
+            $toSerialize = new SerializableClosure(function () use ($segmentAggregator) {
                 return $segmentAggregator;
             });
             Redis::set(self::SEGMENT_AGGREGATOR_REDIS_KEY, serialize($toSerialize));
