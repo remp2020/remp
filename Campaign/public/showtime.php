@@ -1,20 +1,41 @@
 <?php
 
+use Airbrake\MonologHandler;
 use App\Campaign;
 use App\CampaignBanner;
 use DeviceDetector\Cache\PSR6Bridge;
 use GeoIp2\Database\Reader;
 use Illuminate\Support\Collection;
+use Monolog\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
-$data = filter_input(INPUT_GET, 'data');
-$callback = filter_input(INPUT_GET, 'callback');
 
 header('Content-Type: application/json');
 
 $dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
+
+$logger = new Logger('showtime');
+try {
+    $enabledAirbrake = env('AIRBRAKE_ENABLED', env('APP_ENV') !== 'local');
+    if ($enabledAirbrake) {
+        $airbrake = new \Airbrake\Notifier([
+            'enabled' => true,
+            'projectId' => '_',
+            'projectKey' => env('AIRBRAKE_API_KEY', ''),
+            'host' => env('AIRBRAKE_API_HOST', 'api.airbrake.io'),
+            'environment' => env('APP_ENV', 'production'),
+        ]);
+
+        $logHandler = new MonologHandler($airbrake, Logger::WARNING);
+        $logger->setHandlers([$logHandler]);
+    }
+} catch (\Exception $e) {
+    $logger->warning("unable to register airbrake notifier: " . $e->getMessage());
+}
+
+$data = filter_input(INPUT_GET, 'data');
+$callback = filter_input(INPUT_GET, 'callback');
 
 /**
  * @param string $callback jsonp callback name
@@ -179,7 +200,7 @@ class GeoReader
     public function get()
     {
         if (!$this->reader) {
-            $this->reader = new Reader(base_path(getenv('MAXMIND_DATABASE')));
+            $this->reader = new Reader(realpath(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . getenv('MAXMIND_DATABASE')));
         }
         return $this->reader;
     }
@@ -233,7 +254,7 @@ class Request
 try {
     $data = json_decode($data);
 } catch (\InvalidArgumentException $e) {
-    Log::warning('could not decode JSON in Showtime', $data);
+    $logger->warning('could not decode JSON in Showtime', $data);
     jsonp_response($callback, [
             'success' => false,
             'errors' => ['invalid data json provided'],
@@ -324,6 +345,7 @@ foreach ($campaignIds as $campaignId) {
 
     // banner
     if ($campaignBanners->count() == 0) {
+        $logger->error("Active campaign [{$campaign->uuid}] has no banner set");
         continue;
     }
 
@@ -378,7 +400,7 @@ foreach ($campaignIds as $campaignId) {
     /** @var CampaignBanner $variant */
     $variant = $campaignBanners->get($variantUuid);
     if (!$variant) {
-        Log::error("Unable to get CampaignBanner [{$variantUuid}] for campaign [{$campaign->uuid}]");
+        $logger->error("Unable to get CampaignBanner [{$variantUuid}] for campaign [{$campaign->uuid}]");
         continue;
     }
 
@@ -453,7 +475,7 @@ foreach ($campaignIds as $campaignId) {
 
     // device rules
     if (!isset($data->userAgent)) {
-        Log::error("Unable to load user agent for userId [{$userId}]");
+        $logger->error("Unable to load user agent for userId [{$userId}]");
     } else {
         if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $deviceDetector->get($data->userAgent)->isMobile()) {
             continue;
@@ -471,11 +493,11 @@ foreach ($campaignIds as $campaignId) {
             $record = $geoReader->get()->country($request->get()->ip());
             $countryCode = $record->country->isoCode;
         } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
-            Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
+            $logger->error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
             continue;
         }
         if (is_null($countryCode)) {
-            Log::error("Unable to load country for campaign [{$campaign->uuid}] with country rules");
+            $logger->error("Unable to load country for campaign [{$campaign->uuid}] with country rules");
             continue;
         }
 
