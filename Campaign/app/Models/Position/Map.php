@@ -3,9 +3,13 @@
 namespace App\Models\Position;
 
 use Illuminate\Support\Collection;
+use Psy\Util\Json;
+use Redis;
 
 class Map
 {
+    const POSITIONS_MAP_REDIS_KEY = 'positions_map';
+
     /** @var Position[] */
     protected $positions = [];
 
@@ -18,6 +22,8 @@ class Map
                 $dc['style']
             );
         }
+
+        Redis::set(self::POSITIONS_MAP_REDIS_KEY, Json::encode($this->positions));
     }
 
     public function positions(): Collection

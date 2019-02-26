@@ -33,6 +33,8 @@ class Schedule extends Model
         'end_time',
     ];
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
     public function campaign()
     {
         return $this->belongsTo(Campaign::class);

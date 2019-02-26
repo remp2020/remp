@@ -6,14 +6,13 @@ use App\Contracts\SegmentAggregator;
 use GeoIp2\Database\Reader;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Cache\Repository;
-use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
-use Psr\Cache\CacheItemPoolInterface;
-use Illuminate\Support\Facades\Validator;
+use Redis;
 
 class AppServiceProvider extends ServiceProvider
 {
+    const SEGMENT_AGGREGATOR_REDIS_KEY = 'segment_aggregator';
     /**
      * Bootstrap any application services.
      *
@@ -35,12 +34,6 @@ class AppServiceProvider extends ServiceProvider
             return new \App\Models\Alignment\Map(config('banners.alignments'));
         });
 
-        $this->app->singleton(CacheItemPoolInterface::class, function ($app) {
-            $repository = $app->make(Repository::class);
-
-            return new CacheItemPool($repository);
-        });
-
         $this->app->bind(Reader::class, function (Application $app) {
             return new Reader(config("services.maxmind.database"));
         });
@@ -48,7 +41,18 @@ class AppServiceProvider extends ServiceProvider
         $this->bindObservers();
 
         $this->app->bind(SegmentAggregator::class, function (Application $app) {
-            return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
+            $segmentAggregator = new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
+
+            // SegmentAggregator contains Guzzle clients which have properties defined as closures.
+            // It's not possible to serialize closures in plain PHP, but Laravel provides a workaround.
+            // This will store a function returning segmentAggregator into the redis which can be later
+            // used in plain PHP to bypass Laravel initialization just to get the aggregator.
+            $toSerialize = new SerializableClosure(function () use ($segmentAggregator) {
+                return $segmentAggregator;
+            });
+            Redis::set(self::SEGMENT_AGGREGATOR_REDIS_KEY, serialize($toSerialize));
+
+            return $segmentAggregator;
         });
         Paginator::useBootstrapThree();
     }

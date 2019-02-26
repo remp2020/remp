@@ -3,9 +3,13 @@
 namespace App\Models\Dimension;
 
 use Illuminate\Support\Collection;
+use Psy\Util\Json;
+use Redis;
 
 class Map
 {
+    const DIMENSIONS_MAP_REDIS_KEY = 'dimensions_map';
+
     /** @var Dimensions[] */
     protected $dimensions = [];
 
@@ -19,6 +23,8 @@ class Map
                 $dc['height']
             );
         }
+
+        Redis::set(self::DIMENSIONS_MAP_REDIS_KEY, Json::encode($this->dimensions));
     }
 
     public function dimensions(): Collection

@@ -2,10 +2,11 @@
 
 namespace App;
 
-use Cache;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
+use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
+use Redis;
 
 class Campaign extends Model
 {
@@ -224,14 +225,7 @@ class Campaign extends Model
 
     public function cache()
     {
-        $activeCampaignIds = Schedule::applyScopes()
-                                ->runningOrPlanned()
-                                ->orderBy('start_time')
-                                ->pluck('campaign_id')
-                                ->unique()
-                                ->toArray();
-
-        Cache::forever(self::ACTIVE_CAMPAIGN_IDS, $activeCampaignIds);
+        $this->refreshActiveCampaignsCache();
 
         $campaign = $this->where(['id' => $this->id])->with([
             'segments',
@@ -247,7 +241,21 @@ class Campaign extends Model
             optional($variant->banner)->loadTemplate();
         }
 
-        Cache::tags([self::CAMPAIGN_TAG])->forever($this->id, $campaign);
+        Redis::set(self::CAMPAIGN_TAG . ":{$this->id}", serialize($campaign));
+    }
+
+    public static function refreshActiveCampaignsCache()
+    {
+        $activeCampaignIds = Schedule::applyScopes()
+            ->runningOrPlanned()
+            ->orderBy('start_time')
+            ->pluck('campaign_id')
+            ->unique()
+            ->toArray();
+
+        Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode($activeCampaignIds));
+
+        return collect($activeCampaignIds);
     }
 
     public function signedInOptions()
