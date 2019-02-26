@@ -6,7 +6,7 @@ use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
 use Illuminate\Support\ServiceProvider;
 use DeviceDetector\Cache\PSR6Bridge;
 use DeviceDetector\DeviceDetector;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 
 class DeviceDetectorServiceProvider extends ServiceProvider
 {

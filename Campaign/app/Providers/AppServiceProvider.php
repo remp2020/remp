@@ -8,7 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\ServiceProvider;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,15 +24,27 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
 
-        $this->app->bind(\App\Models\Dimension\Map::class, function ($app) {
-            return new \App\Models\Dimension\Map(config('banners.dimensions'));
+        $dimensionMap = new \App\Models\Dimension\Map(config('banners.dimensions'));
+        $positionsMap = new \App\Models\Position\Map(config('banners.positions'));
+        $alignmentsMap = new \App\Models\Alignment\Map(config('banners.alignments'));
+
+        $this->app->bind(\App\Models\Dimension\Map::class, function ($app) use ($dimensionMap) {
+            return $dimensionMap;
         });
-        $this->app->bind(\App\Models\Position\Map::class, function ($app) {
-            return new \App\Models\Position\Map(config('banners.positions'));
+        $this->app->bind(\App\Models\Position\Map::class, function ($app) use ($positionsMap) {
+            return $positionsMap;
         });
-        $this->app->bind(\App\Models\Alignment\Map::class, function ($app) {
-            return new \App\Models\Alignment\Map(config('banners.alignments'));
+        $this->app->bind(\App\Models\Alignment\Map::class, function ($app) use ($alignmentsMap) {
+            return $alignmentsMap;
         });
+
+        /** @var \Illuminate\Http\Request $request */
+        $request = $this->app->request;
+        if (strpos($request->path(), 'showtime') === false) {
+            Redis::set(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY, $dimensionMap->dimensions()->toJson());
+            Redis::set(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY, $positionsMap->positions()->toJson());
+            Redis::set(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
+        }
 
         $this->app->bind(Reader::class, function (Application $app) {
             return new Reader(config("services.maxmind.database"));
@@ -54,6 +66,7 @@ class AppServiceProvider extends ServiceProvider
 
             return $segmentAggregator;
         });
+
         Paginator::useBootstrapThree();
     }
 

@@ -3,8 +3,6 @@
 namespace App\Models\Alignment;
 
 use Illuminate\Support\Collection;
-use Psy\Util\Json;
-use Redis;
 
 class Map
 {
@@ -22,8 +20,6 @@ class Map
                 $dc['style']
             );
         }
-
-        Redis::set(self::ALIGNMENTS_MAP_REDIS_KEY, Json::encode($this->alignments));
     }
 
     public function alignments(): Collection

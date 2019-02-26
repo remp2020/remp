@@ -6,7 +6,7 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
 use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 
 class Campaign extends Model
 {

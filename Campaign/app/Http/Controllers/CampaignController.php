@@ -20,7 +20,7 @@ use HTML;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
