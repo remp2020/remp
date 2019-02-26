@@ -8,7 +8,7 @@ use Redis;
 
 class Map
 {
-    const ALIGNMENTS_MAP_REDIS_KEY = 'dimensions_map';
+    const ALIGNMENTS_MAP_REDIS_KEY = 'alignments_map';
 
     /** @var Alignment[] */
     protected $alignments = [];
