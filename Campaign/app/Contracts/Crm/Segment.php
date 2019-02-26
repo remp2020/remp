@@ -6,10 +6,10 @@ use App\CampaignSegment;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
 use App\Jobs\CacheSegmentJob;
-use Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class Segment implements SegmentContract
 {

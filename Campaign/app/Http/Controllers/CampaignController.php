@@ -13,7 +13,6 @@ use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use App\Schedule;
-use Cache;
 use Carbon\Carbon;
 use GeoIp2;
 use HTML;
