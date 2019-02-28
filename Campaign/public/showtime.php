@@ -302,7 +302,7 @@ if (!$segmentAggregator) {
 }
 
 if (isset($data->cache)) {
-    $segmentAggregator->setCache($data->cache);
+    $segmentAggregator->setProviderData($data->cache);
 }
 
 $campaignIds = json_decode($redis->get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];

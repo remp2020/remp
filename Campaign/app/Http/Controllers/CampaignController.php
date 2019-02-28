@@ -515,7 +515,7 @@ class CampaignController extends Controller
         }
 
         if (isset($data->cache)) {
-            $sa->setCache($data->cache);
+            $sa->setProviderData($data->cache);
         }
 
         $campaignIds = json_decode(Redis::get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];

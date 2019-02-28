@@ -9,7 +9,6 @@ use App\Jobs\CacheSegmentJob;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 
 class Segment implements SegmentContract
 {
@@ -23,12 +22,15 @@ class Segment implements SegmentContract
 
     private $client;
 
-    private $cache;
+    private $providerData;
 
-    public function __construct(Client $client)
+    private $redis;
+
+    public function __construct(Client $client, \Predis\Client $redis)
     {
         $this->client = $client;
-        $this->cache = new \stdClass;
+        $this->providerData = new \stdClass;
+        $this->redis = $redis;
     }
 
     public function provider(): string
@@ -70,8 +72,9 @@ class Segment implements SegmentContract
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
+
         /** @var array $userIdMap */
-        $userIdMap = Cache::tags([SegmentContract::CACHE_TAG])->get($cacheJob->key());
+        $userIdMap = json_decode($this->redis->get($cacheJob->key()), true);
         if ($userIdMap) {
             return array_key_exists($userId, $userIdMap);
         }
@@ -120,13 +123,13 @@ class Segment implements SegmentContract
         return true;
     }
 
-    public function setCache($cache): void
+    public function setProviderData($providerData): void
     {
-        $this->cache = $cache;
+        $this->providerData = $providerData;
     }
 
     public function getProviderData()
     {
-        return $this->cache;
+        return $this->providerData;
     }
 }

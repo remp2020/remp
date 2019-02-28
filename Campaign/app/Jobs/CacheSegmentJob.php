@@ -4,13 +4,13 @@ namespace App\Jobs;
 
 use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
-use App\Contracts\SegmentContract;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Redis;
+use Psy\Util\Json;
 
 class CacheSegmentJob implements ShouldQueue
 {
@@ -39,7 +39,7 @@ class CacheSegmentJob implements ShouldQueue
      */
     public function handle(SegmentAggregator $segmentAggregator)
     {
-        if (!$this->force && Cache::tags([SegmentContract::CACHE_TAG])->get($this->key())) {
+        if (!$this->force && Redis::get($this->key())) {
             return;
         }
 
@@ -49,10 +49,10 @@ class CacheSegmentJob implements ShouldQueue
 
         $users = $segmentAggregator->users($this->campaignSegment);
         $userIdMap = $users->mapWithKeys(function ($item) {
-            return [$item->id => true];
+            return [$item->id => 1];
         })->toArray();
 
-        Cache::tags([SegmentContract::CACHE_TAG])->put($this->key(), $userIdMap, 60*24);
+        Redis::setex($this->key(), 60*60*24, Json::encode($userIdMap));
     }
 
     /**

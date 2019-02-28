@@ -138,7 +138,7 @@ class Segment implements SegmentContract
         return false;
     }
 
-    public function setCache($cache): void
+    public function setProviderData($cache): void
     {
         $this->cache = $cache;
     }
