@@ -10,7 +10,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Redis;
-use Psy\Util\Json;
 
 class CacheSegmentJob implements ShouldQueue
 {
@@ -48,11 +47,12 @@ class CacheSegmentJob implements ShouldQueue
         }
 
         $users = $segmentAggregator->users($this->campaignSegment);
-        $userIdMap = $users->mapWithKeys(function ($item) {
-            return [$item->id => 1];
+        $userIds = $users->map(function ($item) {
+            return $item->id;
         })->toArray();
 
-        Redis::setex($this->key(), 60*60*24, Json::encode($userIdMap));
+        Redis::connection()->sadd($this->key(), $userIds);
+        Redis::connection()->expire($this->key(), 60*60*24);
     }
 
     /**

@@ -430,6 +430,34 @@ foreach ($campaignIds as $campaignId) {
         continue;
     }
 
+    // pageview rules
+    $pageviewCount = $data->pageviewCount ?? null;
+    if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
+        foreach ($campaign->pageview_rules as $rule) {
+            if (!$rule['num'] || !$rule['rule']) {
+                continue;
+            }
+
+            switch ($rule['rule']) {
+                case Campaign::PAGEVIEW_RULE_EVERY:
+                    if ($pageviewCount % $rule['num'] !== 0) {
+                        continue 3;
+                    }
+                    break;
+                case Campaign::PAGEVIEW_RULE_SINCE:
+                    if ($pageviewCount < $rule['num']) {
+                        continue 3;
+                    }
+                    break;
+                case Campaign::PAGEVIEW_RULE_BEFORE:
+                    if ($pageviewCount >= $rule['num']) {
+                        continue 3;
+                    }
+                    break;
+            }
+        }
+    }
+
     // url filters
     if ($campaign->url_filter === Campaign::URL_FILTER_EXCEPT_AT) {
         foreach ($campaign->url_patterns as $urlPattern) {
@@ -522,34 +550,6 @@ foreach ($campaignIds as $campaignId) {
         } else {
             if (!$segmentAggregator->checkBrowser($campaignSegment, strval($browserId))) {
                 continue 2;
-            }
-        }
-    }
-
-    // pageview rules
-    $pageviewCount = $data->pageviewCount ?? null;
-    if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
-        foreach ($campaign->pageview_rules as $rule) {
-            if (!$rule['num'] || !$rule['rule']) {
-                continue;
-            }
-
-            switch ($rule['rule']) {
-                case Campaign::PAGEVIEW_RULE_EVERY:
-                    if ($pageviewCount % $rule['num'] !== 0) {
-                        continue 3;
-                    }
-                    break;
-                case Campaign::PAGEVIEW_RULE_SINCE:
-                    if ($pageviewCount < $rule['num']) {
-                        continue 3;
-                    }
-                    break;
-                case Campaign::PAGEVIEW_RULE_BEFORE:
-                    if ($pageviewCount >= $rule['num']) {
-                        continue 3;
-                    }
-                    break;
             }
         }
     }

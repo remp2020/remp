@@ -72,17 +72,7 @@ class Segment implements SegmentContract
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
-
-        /** @var array $userIdMap */
-        $userIdMap = json_decode($this->redis->get($cacheJob->key()), true);
-        if ($userIdMap) {
-            return array_key_exists($userId, $userIdMap);
-        }
-
-        dispatch(new CacheSegmentJob($campaignSegment));
-
-        // CRM segments are expensive; if they're not cached, we rather return false here.
-        return false;
+        return $this->redis->sismember($cacheJob->key(), $userId);
     }
 
     /**
