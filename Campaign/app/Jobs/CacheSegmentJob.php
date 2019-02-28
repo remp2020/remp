@@ -38,7 +38,7 @@ class CacheSegmentJob implements ShouldQueue
      */
     public function handle(SegmentAggregator $segmentAggregator)
     {
-        if (!$this->force && Redis::get($this->key())) {
+        if (!$this->force && Redis::connection()->scard($this->key())) {
             return;
         }
 
