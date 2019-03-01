@@ -3,46 +3,25 @@
         {$error}<br>
     </div>
 
-    <div n:foreach="$form['settings']->controls as $input" class="form-group fg-float m-b-30">
-        <div n:if="$input instanceof Nette\Forms\Controls\TextInput" class="fg-line">
-            {input $input, class => 'form-control fg-input'}
-            {label $input, class => 'fg-label' /}
-        </div>
-        <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
-            <div class="col-sm-12">
-                {label $input /}
-                {input $input, class => 'selectpicker'}
+    <div>
+        <div n:foreach="$form['settings']->components as $name => $component" class="form-group fg-float m-b-30">
+            <h3 style="margin: 0 0 30px;">{$name}</h3>
+            <div id="{$name}">
+                <div n:foreach="$component->controls as $input" class="form-group fg-float m-b-30">
+                    <div n:if="$input instanceof Nette\Forms\Controls\TextInput" class="fg-line">
+                        {input $input, class => 'form-control fg-input'}
+                        {label $input, class => 'fg-label' /}
+                    </div>
+                    <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
+                        <div class="col-sm-12">
+                            {label $input /}
+                            {input $input, class => 'selectpicker'}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     {input save, class => 'btn btn-info waves-effect'}
 {/form}
-
-<script>
-    var requiredFields = {$requiredFields};
-
-    $('[name="settings[default_mailer]"]').on('change', function () {
-        var val = $(this).val();
-
-        for (var mailerName in requiredFields) {
-            if (requiredFields.hasOwnProperty(mailerName)) {
-                var requiredOptions = requiredFields[mailerName];
-
-                for (var optionKey in requiredOptions) {
-                    if (requiredOptions.hasOwnProperty(optionKey)) {
-                        var $el = $('[name="settings[' + requiredOptions[optionKey] + ']"]');
-
-                        if (mailerName === val) {
-                            // set required fields for current active mailer
-                            $el.attr('required', true);
-                        } else {
-                            // set optional fields for others
-                            $el.removeAttr('required');
-                        }
-                    }
-                }
-            }
-        }
-    });
-</script>

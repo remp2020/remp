@@ -3,8 +3,11 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Database\Table\Selection;
+use Nette\Forms\Container;
 use Nette\SmartObject;
 use Remp\MailerModule\Config\Config;
+use Remp\MailerModule\Mailer\Mailer;
 use Remp\MailerModule\Repository\ConfigsRepository;
 use Remp\MailerModule\Sender\MailerFactory;
 
@@ -33,68 +36,78 @@ class ConfigFormFactory
         $form = new Form;
         $form->addProtection();
 
+        /**
+         * @var $configs Selection
+         * @var $container Container
+         */
         $configs = $this->configsRepository->all();
+        $configs = $configs->fetchAssoc('name');
         $container = $form->addContainer('settings');
-        $activeMailer = null;
 
-        foreach ($configs as $config) {
-            $displayName = $config->display_name ? $config->display_name : $config->name;
-            $item = null;
+        $mailerContainer = $container->addContainer('mailer');
 
-            // handle special cases
-            if ($config->name == 'default_mailer') {
-                $availableMailers =  $this->mailerFactory->getAvailableMailers();
+        $mailers = [];
+        $availableMailers =  $this->mailerFactory->getAvailableMailers();
+        array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
+            $mailers[$name] = get_class($mailer);
+        });
 
-                $mailers = [];
-                array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
-                    $mailers[$name] = get_class($mailer);
-                });
+        $defaultMailer = $mailerContainer->addSelect('default_mailer', 'Default Mailer', $mailers)
+            ->setDefaultValue($configs['default_mailer']['value']);
+        unset($configs['default_mailer']);
 
-                if ($config->value !== null) {
-                    $activeMailer = $this->mailerFactory->getMailer($config->value);
+        /** @var $mailer Mailer */
+        foreach ($this->mailerFactory->getAvailableMailers() as $mailer) {
+            foreach ($mailer->getOptions() as $name => $option) {
+                $key = $mailer->getPrefix() . '_' . $name;
+                $config = $configs[$key];
+
+                if ($config['type'] === 'string') {
+                    $item = $mailerContainer->addText($config['name'], $config['display_name'])
+                        ->setDefaultValue($config['value']);
                 }
 
-                $container->addSelect('default_mailer', 'Default Mailer', $mailers)
-                    ->setDefaultValue($config->value);
+                if ($option['required']) {
+                    $item->addConditionOn($defaultMailer, Form::EQUAL, $mailer->getAlias())
+                        ->addRule(Form::REQUIRED);
+                }
 
-                continue;
+                unset($configs[$config['name']]);
             }
+        }
+
+        $othersContainer = $container->addContainer('others');
+
+        foreach ($configs as $config) {
+            $item = null;
 
             // handle generic types
-            switch ($config->type) :
+            switch ($config['type']) :
                 case Config::TYPE_STRING:
                 case Config::TYPE_PASSWORD:
-                    $container->addText($config->name, $displayName)
-                        ->setDefaultValue($config->value);
+                    $othersContainer->addText($config['name'], $config['display_name'])
+                        ->setDefaultValue($config['value']);
                     break;
                 case Config::TYPE_TEXT:
-                    $container->addTextArea($config->name, $displayName)
-                        ->setDefaultValue($config->value)
+                    $othersContainer->addTextArea($config['name'], $config['display_name'])
+                        ->setDefaultValue($config['value'])
                         ->getControlPrototype()
                         ->addAttributes(['class' => 'auto-size']);
                     break;
                 case Config::TYPE_HTML:
-                    $container->addTextArea($config->name, $displayName)
+                    $othersContainer->addTextArea($config['name'], $config['display_name'])
                         ->setAttribute('rows', 15)
-                        ->setDefaultValue($config->value)
+                        ->setDefaultValue($config['value'])
                         ->getControlPrototype()
                         ->addAttributes(['class' => 'html-editor']);
                     break;
                 case Config::TYPE_BOOLEAN:
-                    $container->addCheckbox($config->name, $displayName)
-                        ->setDefaultValue($config->value);
+                    $othersContainer->addCheckbox($config['name'], $config['display_name'])
+                        ->setDefaultValue($config['value']);
                     break;
                 default:
-                    throw new \Exception('unhandled config type: ' . $config->type);
+                    throw new \Exception('unhandled config type: ' . $config['type']);
             endswitch;
-        }
-
-        if ($activeMailer !== null) {
-            foreach ($activeMailer->getRequiredOptions() as $name) {
-                /** @var $comp \Nette\Forms\Controls\BaseControl */
-                $comp = $container->getComponent($name);
-                $comp->setRequired(true);
-            }
         }
 
         $form->addSubmit('save', 'Save')

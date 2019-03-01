@@ -20,8 +20,6 @@ abstract class Mailer implements IMailer
 
     protected $options = [];
 
-    protected $requiredOptions = [];
-
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository
@@ -45,31 +43,47 @@ abstract class Mailer implements IMailer
     protected function buildConfig()
     {
         foreach ($this->options as $name => $value) {
+            $prefix = $this->getPrefix();
+
             try {
-                $this->options[$name] = $this->config->get($name);
+                $this->options[$name]['value'] = $this->config->get($prefix . '_' . $name);
+
             } catch (ConfigNotExistsException $e) {
-                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1) . ' ' . Strings::firstUpper($name);
+                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1). ' ' . Strings::firstUpper($name);
                 $description = 'Setting for ' . get_called_class();
-                $this->configsRepository->add($name, $displayName, null, $description, Config::TYPE_STRING);
+                $this->configsRepository->add($prefix . '_' . $name, $displayName, null, $description, Config::TYPE_STRING);
 
                 $this->options[$name] = null;
             }
         }
     }
 
+    public function getPrefix()
+    {
+        return str_replace('-', '_', Strings::webalize(get_called_class()));
+    }
+
     public function isConfigured()
     {
-        foreach ($this->options as $name => $value) {
-            if (in_array($name, $this->requiredOptions) && empty($value)) {
+        foreach ($this->getRequiredOptions() as $option) {
+            if (isset($option['value']) && !$option['value']) {
                 return false;
             }
         }
+
         return true;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     public function getRequiredOptions()
     {
-        return $this->requiredOptions;
+        return array_filter($this->options, function ($option) {
+            return $option['required'];
+        });
     }
 
     /**
