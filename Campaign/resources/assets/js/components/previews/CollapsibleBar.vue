@@ -179,7 +179,7 @@
         data: function() {
             return {
                 bannerHeight: 0,
-                collapsed: false,
+                collapsed: true,
                 closeTracked: false,
                 clickTracked: false,
             }
