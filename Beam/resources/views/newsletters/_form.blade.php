@@ -98,10 +98,10 @@
             <div class="input-group m-t-10">
                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                 <div class="fg-line">
-                    <label class="fg-label">Timespan of data in days</label>
-                    {!! Form::number('timespan',
+                    <label class="fg-label">Criterion timespan (how old articles are included)</label>
+                    {!! Form::text('timespan',
                     $newsletter->timespan,
-                    ['class' => 'form-control fg-input', 'min' => 1, 'placeholder' => "How old data (conversions, pageviews, ...) is included", 'required' => 'required']) !!}
+                    ['class' => 'form-control fg-input', 'placeholder' => "e.g. 3d 1h 4m", 'required' => 'required']) !!}
                 </div>
             </div>
 

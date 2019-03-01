@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 
 class Map
 {
+    const POSITIONS_MAP_REDIS_KEY = 'positions_map';
+
     /** @var Position[] */
     protected $positions = [];
 

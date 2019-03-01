@@ -62,11 +62,12 @@ class Sender
         $this->logsRepository = $logsRepository;
     }
 
-    public function addRecipient($email, $name = null)
+    public function addRecipient(string $email, string $name = null, array $params = [])
     {
         $this->recipients[] = [
             'email' => $email,
             'name' => $name,
+            'params' => $params
         ];
 
         return $this;
@@ -127,6 +128,7 @@ class Sender
 
         $tokens = $this->autoLogin->createTokens([$recipient['email']]);
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
+        $this->params = array_merge($this->params, $recipient['params'] ?? []);
 
         if (getenv('UNSUBSCRIBE_URL')) {
             $this->params['unsubscribe'] = str_replace(getenv('UNSUBSCRIBE_URL'), '%type%', $this->template->mail_type->code) . $this->params['autologin'];
@@ -185,7 +187,6 @@ class Sender
 
         $message = new Message();
         $message->setFrom($this->template->from);
-        $message->setSubject($this->generateSubject($this->template->subject, $this->params));
 
         $subscribedEmails = [];
         foreach ($this->recipients as $recipient) {
@@ -207,15 +208,17 @@ class Sender
                 // we do nothing; it's invalid email and we want to skip it ASAP
             }
 
-            $p = $this->params;
+            $p = array_merge($this->params, $recipient['params'] ?? []);
             $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
             $p['autologin'] = "?token={$autologinTokens[$recipient['email']]}";
 
-            list($transformedParams, $p) = $mailer->transformTemplateParams($p);
+            [$transformedParams, $p] = $mailer->transformTemplateParams($p);
             $templateParams[$recipient['email']] = $p;
         }
 
         $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
+
+        $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
 
         if ($this->template->mail_body_text) {
             $message->setBody($generator->getTextBody($transformedParams));

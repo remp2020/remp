@@ -3,9 +3,11 @@
 namespace Remp\MailerModule\Commands;
 
 use League\Event\Emitter;
+use Nette\DI\Container;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
+use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
@@ -46,7 +48,12 @@ class MailWorkerCommand extends Command
 
     private $smtpErrors = 0;
 
+    private $container;
+
+    private $logger;
+
     public function __construct(
+        LoggerInterface $logger,
         Sender $applicationMailer,
         JobsRepository $mailJobsRepository,
         BatchesRepository $mailJobBatchRepository,
@@ -55,7 +62,8 @@ class MailWorkerCommand extends Command
         TemplatesRepository $mailTemplatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
-        Emitter $emitter
+        Emitter $emitter,
+        Container $container
     ) {
         parent::__construct();
         $this->applicationMailer = $applicationMailer;
@@ -67,6 +75,8 @@ class MailWorkerCommand extends Command
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailCache = $redis;
         $this->emitter = $emitter;
+        $this->container = $container;
+        $this->logger = $logger;
     }
 
     /**
@@ -174,9 +184,9 @@ class MailWorkerCommand extends Command
                         }
 
                         $output->writeln(" * sending <info>{$job->templateCode}</info> from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
-                        $email->addRecipient($job->email);
+                        $recipientParams = $job->params ? get_object_vars($job->params) : [];
+                        $email->addRecipient($job->email, null, $recipientParams);
                         $email->setContext($job->context);
-                        $email->setParams($job->params ? get_object_vars($job->params) : []);
                     }
 
                     $sentCount = 0;
@@ -198,6 +208,12 @@ class MailWorkerCommand extends Command
                     } catch (SmtpException | Sender\MailerBatchException | \Exception $exception) {
                         $this->smtpErrors++;
                         $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
+
+                        $this->logger->warning("Unable to send an email: " . $exception->getMessage(), [
+                            'batch' => $sendAsBatch && $email->supportsBatch(),
+                            'template' => $templateCode,
+                        ]);
+
                         $this->cacheJobs($jobs, $batch->id);
 
                         if ($this->smtpErrors >= 10) {
@@ -214,7 +230,7 @@ class MailWorkerCommand extends Command
                     $this->mailJobBatchRepository->update($batch, [
                         'first_email_sent_at' => $first_email,
                         'last_email_sent_at' => $now,
-                        'sent_emails+=' => intval($sentCount),
+                        'sent_emails+=' => (int) $sentCount,
                         'last_ping' => $now
                     ]);
 

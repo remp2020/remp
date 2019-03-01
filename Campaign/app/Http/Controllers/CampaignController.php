@@ -13,21 +13,19 @@ use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use App\Schedule;
-use Cache;
 use Carbon\Carbon;
 use GeoIp2;
 use HTML;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Tracy\Debugger;
+use Illuminate\Support\Facades\Redis;
 use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use DeviceDetector\DeviceDetector;
-use App\Contracts\Remp\Stats;
 
 class CampaignController extends Controller
 {
@@ -66,21 +64,22 @@ class CampaignController extends Controller
                 $data = $campaign->campaignBanners->all();
                 $variants = [];
 
+                /** @var CampaignBanner $variant */
                 foreach ($data as $variant) {
-                    $proportion = $variant['proportion'];
+                    $proportion = $variant->proportion;
                     if ($proportion === 0) {
                         continue;
                     }
 
-                    if ($variant['control_group'] === 1) {
-                        // handle control group
+                    // handle control group
+                    if ($variant->control_group === 1) {
                         $variants[] = "Control Group&nbsp;({$proportion}%)";
                         continue;
                     }
 
                     // handle variants with banner
                     $link = link_to(
-                        route('banners.edit', $variant['banner_id']),
+                        route('banners.edit', $variant->banner_id),
                         $variant->banner->name
                     );
 
@@ -516,10 +515,10 @@ class CampaignController extends Controller
         }
 
         if (isset($data->cache)) {
-            $sa->setCache($data->cache);
+            $sa->setProviderData($data->cache);
         }
 
-        $campaignIds = Cache::get(Campaign::ACTIVE_CAMPAIGN_IDS, []);
+        $campaignIds = json_decode(Redis::get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
         if (count($campaignIds) == 0) {
             return response()
                 ->jsonp($r->get('callback'), [
@@ -536,7 +535,7 @@ class CampaignController extends Controller
         $displayedCampaigns = [];
 
         foreach ($campaignIds as $campaignId) {
-            $campaign = Cache::tags(Campaign::CAMPAIGN_TAG)->get($campaignId);
+            $campaign = unserialize(Redis::get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
             $running = false;
 
             foreach ($campaign->schedules as $schedule) {

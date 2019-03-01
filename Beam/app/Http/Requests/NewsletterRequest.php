@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Misc;
 use App\Model\NewsletterCriterion;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -33,7 +34,10 @@ class NewsletterRequest extends FormRequest
             'articles_count' => 'required|integer|min:1|max:100',
             'personalized_content' => 'boolean',
             'starts_at' => 'required|date',
-            'timespan' => 'required|integer',
+            'timespan' => [
+                'required',
+                'regex:' . Misc::TIMESPAN_VALIDATION_REGEX
+            ],
             'email_subject' => 'required|string',
             'email_from' => 'required|string',
             'recurrence_rule' => 'nullable|string',
