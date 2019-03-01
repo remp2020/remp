@@ -93,7 +93,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group">
+                            <div class="input-group" :class="{ hidden: collapsibleBarTemplate != null }">
                                 <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
                                 <div>
                                     <div class="row">
