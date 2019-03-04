@@ -479,7 +479,7 @@ class CampaignController extends Controller
         try {
             $data = \GuzzleHttp\json_decode($r->get('data'));
         } catch (\InvalidArgumentException $e) {
-            Log::warning('could not decode JSON in Campaign:Showtime', $r->get('data'));
+            Log::warning('could not decode JSON in Campaign:Showtime. JSON string: "' . $r->get('data') . '"');
             return response()
                 ->jsonp($r->get('callback'), [
                     'success' => false,
