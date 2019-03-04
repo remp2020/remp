@@ -128,7 +128,7 @@ class StatsController extends Controller
         $machine = new Machine(1000);
         $zeroStat = [];
         foreach ($variantsData as $variantId => $data) {
-            if (!$data[$conversionField]->count) {
+            if ($data['show_count']->count === 0 || !$data[$conversionField]->count) {
                 $zeroStat[$variantId] = 0;
                 continue;
             }
