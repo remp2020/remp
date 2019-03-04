@@ -108,7 +108,7 @@ class NewsfilterGenerator implements IGenerator
             '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use ($content) {
                 $url = "https://dennikn.sk/{$matches[1]}";
                 $meta = $this->content->fetchUrlMeta($url);
-                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:none;">' . $meta->getTitle() . '</a>';
+                return 'Čítajte viac: <a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
 
             // replace hrefs
@@ -122,7 +122,7 @@ class NewsfilterGenerator implements IGenerator
 
             // replace ul & /ul
             '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
-            '/<ol.*?>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
+            '/<ol.*?>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%; font-weight: normal;"><tbody>',
 
             '/<\/ul>/is' => '</tbody></table>' . PHP_EOL,
             '/<\/ol>/is' => '</tbody></table>' . PHP_EOL,
