@@ -51,6 +51,7 @@ class CacheSegmentJob implements ShouldQueue
             return $item->id;
         })->toArray();
 
+        Redis::connection()->del([$this->key()]);
         Redis::connection()->sadd($this->key(), $userIds);
         Redis::connection()->expire($this->key(), 60*60*24);
     }
