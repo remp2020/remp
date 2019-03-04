@@ -20,7 +20,7 @@ class NewsfilterGenerator implements IGenerator
 
     private $content;
 
-    private $linksColor = "#F26755";
+    private $linksColor = "#b00c28";
 
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
