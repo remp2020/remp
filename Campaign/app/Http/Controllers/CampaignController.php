@@ -683,7 +683,7 @@ class CampaignController extends Controller
 
             // device rules
             if (!isset($data->userAgent)) {
-                Log::error("Unable to load user agent for userId [{$userId}]");
+                Log::error("Unable to load user agent for userId [{$userId}] & browserId [{$browserId}]");
             } else {
                 $dd->setUserAgent($data->userAgent);
                 $dd->parse();
