@@ -130,6 +130,7 @@ class BannerController extends Controller
      *
      * @param BannerRequest|Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function store(BannerRequest $request)
     {
@@ -156,8 +157,9 @@ class BannerController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Banner  $banner
+     * @param  \App\Banner $banner
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function show(Banner $banner)
     {

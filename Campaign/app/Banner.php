@@ -14,6 +14,7 @@ class Banner extends Model
     const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
     const TEMPLATE_OVERLAY_RECTANGLE = 'overlay_rectangle';
     const TEMPLATE_BAR = 'bar';
+    const TEMPLATE_COLLAPSIBLE_BAR = 'collapsible_bar';
     const TEMPLATE_SHORT_MESSAGE = 'short_message';
 
     protected $fillable = [
@@ -120,6 +121,11 @@ class Banner extends Model
         return $this->hasOne(BarTemplate::class);
     }
 
+    public function collapsibleBarTemplate()
+    {
+        return $this->hasOne(CollapsibleBarTemplate::class);
+    }
+
     public function shortMessageTemplate()
     {
         return $this->hasOne(ShortMessageTemplate::class);
@@ -140,6 +146,9 @@ class Banner extends Model
                 return 'mediumRectangleTemplate';
             case self::TEMPLATE_BAR:
                 return 'barTemplate';
+                break;
+            case self::TEMPLATE_COLLAPSIBLE_BAR:
+                return 'collapsibleBarTemplate';
                 break;
             case self::TEMPLATE_SHORT_MESSAGE:
                 return 'shortMessageTemplate';
