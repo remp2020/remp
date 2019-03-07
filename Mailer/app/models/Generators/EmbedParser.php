@@ -89,4 +89,3 @@ class EmbedParser
         return $html .= "</a></br></br>" . PHP_EOL;
     }
 }
-
