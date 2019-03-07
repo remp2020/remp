@@ -47,7 +47,6 @@ abstract class Mailer implements IMailer
 
             try {
                 $this->options[$name]['value'] = $this->config->get($prefix . '_' . $name);
-
             } catch (ConfigNotExistsException $e) {
                 $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1). ' ' . Strings::firstUpper($name);
                 $description = 'Setting for ' . get_called_class();
