@@ -16,8 +16,7 @@ class EmbedParser
             'link' => $og->getUrl(),
             'title' => $og->getTitle(),
             'text' => $og->getDescription(),
-//            'image' => $this->getBase64EncodedImage($image),
-            'image' => $image,
+            'image' => $this->getBase64EncodedImage($image),
         ];
     }
 
@@ -56,6 +55,7 @@ class EmbedParser
         // facebook
         if (preg_match('/^(?:(?:https?:)?\/\/)?(?:www\.)?facebook\.com\/[a-zA-Z0-9\.]+\/videos\/(?:[a-zA-Z0-9\.]+\/)?([0-9]+)/', $link)
             || preg_match('/youtu/', $link)
+            || preg_match('/twitt/', $link)
         ) {
             $data = $this->fetch($link);
 
@@ -71,7 +71,7 @@ class EmbedParser
 
         if (!is_null($image)) {
             $html .= "
-                <img src='{$image}' 
+                <img src='data:image/png;base64, {$image}' 
                      alt='{$title}' 
                      style='
                         outline:none;
