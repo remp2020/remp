@@ -16,25 +16,28 @@ class EmbedParser
             'link' => $og->getUrl(),
             'title' => $og->getTitle(),
             'text' => $og->getDescription(),
-            'image' => $this->getBase64EncodedImage($image),
+            'image' => $this->getBase64EncodedImage($image, $og->getType() === 'video'),
         ];
     }
 
-    private function getBase64EncodedImage($imageLink)
+    private function getBase64EncodedImage($imageLink, $video = false)
     {
         $image = imagecreatefromstring(file_get_contents($imageLink));
-        $play = imagecreatefrompng(__DIR__ . '/../../../www/assets/img/play.png');
 
-        imagecopy(
-            $image,
-            $play,
-            (imagesx($image)/2) - (imagesx($play)/2),
-            (imagesy($image)/2) - (imagesy($play)/2),
-            0,
-            0,
-            imagesx($play),
-            imagesy($play)
-        );
+        if ($video) {
+            $play = imagecreatefrompng(__DIR__ . '/../../../www/assets/img/play.png');
+
+            imagecopy(
+                $image,
+                $play,
+                (imagesx($image)/2) - (imagesx($play)/2),
+                (imagesy($image)/2) - (imagesy($play)/2),
+                0,
+                0,
+                imagesx($play),
+                imagesy($play)
+            );
+        }
 
         ob_start();
         imagejpeg($image);

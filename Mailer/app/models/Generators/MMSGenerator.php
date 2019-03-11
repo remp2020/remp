@@ -23,7 +23,7 @@ class MMSGenerator implements IGenerator
 
     private $transport;
 
-    private $embeddParser;
+    private $embedParser;
 
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
@@ -36,7 +36,7 @@ class MMSGenerator implements IGenerator
         $this->helpers = $helpers;
         $this->content = $content;
         $this->transport = $transport;
-        $this->embeddParser = $embedParser;
+        $this->embedParser = $embedParser;
     }
 
     public function apiParams()
@@ -133,7 +133,7 @@ class MMSGenerator implements IGenerator
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
             // parse embedds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embeddParser, "parse"),
+            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embedParser, "parse"),
 
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
