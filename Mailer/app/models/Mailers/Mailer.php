@@ -42,15 +42,14 @@ abstract class Mailer implements IMailer
 
     protected function buildConfig()
     {
-        foreach ($this->options as $name => $value) {
+        foreach ($this->options as $name => $definition) {
             $prefix = $this->getPrefix();
 
             try {
                 $this->options[$name]['value'] = $this->config->get($prefix . '_' . $name);
             } catch (ConfigNotExistsException $e) {
-                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1). ' ' . Strings::firstUpper($name);
                 $description = 'Setting for ' . get_called_class();
-                $this->configsRepository->add($prefix . '_' . $name, $displayName, null, $description, Config::TYPE_STRING);
+                $this->configsRepository->add($prefix . '_' . $name, $definition['label'], null, $description, Config::TYPE_STRING);
 
                 $this->options[$name] = null;
             }

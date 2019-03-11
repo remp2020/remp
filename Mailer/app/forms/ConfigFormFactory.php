@@ -36,15 +36,10 @@ class ConfigFormFactory
         $form = new Form;
         $form->addProtection();
 
-        /**
-         * @var $configs Selection
-         * @var $container Container
-         */
-        $configs = $this->configsRepository->all();
-        $configs = $configs->fetchAssoc('name');
-        $container = $form->addContainer('settings');
+        $settings = $form->addContainer('settings');
+        $mailerContainer = $settings->addContainer('Mailer');
 
-        $mailerContainer = $container->addContainer('mailer');
+        $configs = $this->configsRepository->all()->fetchAssoc('name');
 
         $mailers = [];
         $availableMailers =  $this->mailerFactory->getAvailableMailers();
@@ -58,6 +53,9 @@ class ConfigFormFactory
 
         /** @var $mailer Mailer */
         foreach ($this->mailerFactory->getAvailableMailers() as $mailer) {
+            $label = explode('\\', $mailers[$mailer->getAlias()]);
+            $mailerContainer = $settings->addContainer($label[count($label)-1]);
+
             foreach ($mailer->getOptions() as $name => $option) {
                 $key = $mailer->getPrefix() . '_' . $name;
                 $config = $configs[$key];
@@ -69,14 +67,14 @@ class ConfigFormFactory
 
                 if ($option['required']) {
                     $item->addConditionOn($defaultMailer, Form::EQUAL, $mailer->getAlias())
-                        ->addRule(Form::REQUIRED);
+                        ->setRequired("Field {$name} is required when mailer {$mailers[$mailer->getAlias()]} is selected");
                 }
 
                 unset($configs[$config['name']]);
             }
         }
 
-        $othersContainer = $container->addContainer('others');
+        $othersContainer = $settings->addContainer('Internal');
 
         foreach ($configs as $config) {
             $item = null;

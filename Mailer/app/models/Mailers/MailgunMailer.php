@@ -19,7 +19,7 @@ class MailgunMailer extends Mailer implements IMailer
     protected $options = [
         'api_key' => [
             'required' => true,
-            'label' => 'Mailgun api key',
+            'label' => 'Mailgun API key',
         ],
         'domain' => [
             'required' => true,
