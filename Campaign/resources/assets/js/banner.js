@@ -69,6 +69,19 @@ window.remplib = window.remplib || {};
                 }
             }
 
+            if (banner.template === 'collapsible_bar') {
+                banner.collapsibleBarTemplate = {
+                    mainText: model['collapsible_bar_template']['main_text'] || "",
+                    collapseText: model['collapsible_bar_template']['collapse_text'] || "",
+                    buttonText: model['collapsible_bar_template']['button_text'] || "",
+                    backgroundColor: model['collapsible_bar_template']['background_color'] || null,
+                    textColor: model['collapsible_bar_template']['text_color'] || null,
+                    buttonBackgroundColor: model['collapsible_bar_template']['button_background_color'] || null,
+                    buttonTextColor: model['collapsible_bar_template']['button_text_color'] || null,
+                    initialState: model['collapsible_bar_template']['initial_state'] || "expanded"
+                }
+            }
+
             if (banner.template === 'html') {
                 banner.htmlTemplate = {
                     backgroundColor: model['html_template']['background_color'] || null,

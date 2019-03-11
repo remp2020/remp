@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 
 class Map
 {
+    const DIMENSIONS_MAP_REDIS_KEY = 'dimensions_map';
+
     /** @var Dimensions[] */
     protected $dimensions = [];
 

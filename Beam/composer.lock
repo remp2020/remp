@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9204e8212aad0cc0f31bf2423ed3213",
+    "content-hash": "d7eaf77cc84750ee677c0b29d74a1e8b",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -1253,16 +1253,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.83",
+            "version": "v0.85",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "f443f4107d9ba001dad60d18cf1ec0cf0e7234f9"
+                "reference": "66bf538d26b40fec0ae3cda79eea64fe2b0cc6de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/f443f4107d9ba001dad60d18cf1ec0cf0e7234f9",
-                "reference": "f443f4107d9ba001dad60d18cf1ec0cf0e7234f9",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/66bf538d26b40fec0ae3cda79eea64fe2b0cc6de",
+                "reference": "66bf538d26b40fec0ae3cda79eea64fe2b0cc6de",
                 "shasum": ""
             },
             "require": {
@@ -1286,7 +1286,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2019-01-30T22:06:40+00:00"
+            "time": "2019-02-07T00:23:12+00:00"
         },
         {
             "name": "google/auth",
@@ -2083,7 +2083,7 @@
                 {
                     "name": "Luís Otávio Cobucci Oblonczyk",
                     "email": "lcobucci@gmail.com",
-                    "role": "Developer"
+                    "role": "developer"
                 }
             ],
             "description": "A simple library to work with JSON Web Token and JSON Web Signature",
@@ -6756,16 +6756,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.14.1",
+            "version": "v2.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "2e82abd1322897eb8aacb861e5ff551af3888349"
+                "reference": "ff401e58261ffc5934a58f795b3f95b355e276cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/2e82abd1322897eb8aacb861e5ff551af3888349",
-                "reference": "2e82abd1322897eb8aacb861e5ff551af3888349",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/ff401e58261ffc5934a58f795b3f95b355e276cb",
+                "reference": "ff401e58261ffc5934a58f795b3f95b355e276cb",
                 "shasum": ""
             },
             "require": {
@@ -6785,9 +6785,6 @@
                 "symfony/polyfill-php72": "^1.4",
                 "symfony/process": "^3.0 || ^4.0",
                 "symfony/stopwatch": "^3.0 || ^4.0"
-            },
-            "conflict": {
-                "hhvm": "*"
             },
             "require-dev": {
                 "johnkary/phpunit-speedtrap": "^1.1 || ^2.0 || ^3.0",
@@ -6843,7 +6840,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2019-02-10T22:52:33+00:00"
+            "time": "2019-02-17T17:44:13+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -6961,16 +6958,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v2.2.0",
+            "version": "v2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "9ecf2c8e1ccda442a7e338b8d5b0459f7f9e054b"
+                "reference": "f1f830e8de84c2827c9e155a6abd5cc4576b498e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/9ecf2c8e1ccda442a7e338b8d5b0459f7f9e054b",
-                "reference": "9ecf2c8e1ccda442a7e338b8d5b0459f7f9e054b",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/f1f830e8de84c2827c9e155a6abd5cc4576b498e",
+                "reference": "f1f830e8de84c2827c9e155a6abd5cc4576b498e",
                 "shasum": ""
             },
             "require": {
@@ -7025,7 +7022,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2019-02-12T15:39:05+00:00"
+            "time": "2019-02-15T14:14:01+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -7889,16 +7886,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.4",
+            "version": "7.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "2896657da5fb237bc316bdfc18c2650efeee0dc0"
+                "reference": "09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2896657da5fb237bc316bdfc18c2650efeee0dc0",
-                "reference": "2896657da5fb237bc316bdfc18c2650efeee0dc0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9",
+                "reference": "09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9",
                 "shasum": ""
             },
             "require": {
@@ -7969,7 +7966,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-02-07T14:15:04+00:00"
+            "time": "2019-02-18T09:24:50+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

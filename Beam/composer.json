@@ -49,7 +49,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.3",
-        "friendsofphp/php-cs-fixer": "^2.13",
+        "friendsofphp/php-cs-fixer": "^2.14",
         "laravel/horizon": "^2.0",
         "laravel/tinker": "^1.0",
         "mockery/mockery": "^1.2",

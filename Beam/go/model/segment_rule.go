@@ -258,3 +258,26 @@ func (sr *SegmentRule) getCacheKey(ro RuleOverrides) int {
 
 	return sr.cacheKey
 }
+
+// cacheable indicates whether the rule is cacheable or not. Only events trackable
+// via remplib.js on the frontend should be cacheable, otherwise the cache would keep
+// the segment in inconsistent state until the cache is invalidated.
+//
+// Idea behind cacheability is that frontend is able to keep track of number of actual
+// events and the count gets synced with DB state only once in a while
+func (sr *SegmentRule) cacheable() bool {
+	if sr.EventCategory == "pageview" && sr.EventAction == "load" {
+		return false
+	}
+	if sr.EventCategory == "banner" && sr.EventAction == "show" {
+		return false
+	}
+	if sr.EventCategory == "banner" && sr.EventAction == "click" {
+		return false
+	}
+	if sr.EventCategory == "banner" && sr.EventAction == "close" {
+		return false
+	}
+
+	return false
+}

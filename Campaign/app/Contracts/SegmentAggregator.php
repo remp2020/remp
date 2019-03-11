@@ -4,6 +4,7 @@ namespace App\Contracts;
 
 use App\CampaignSegment;
 use Illuminate\Support\Collection;
+use Illuminate\Queue\SerializableClosure;
 
 class SegmentAggregator implements SegmentContract
 {
@@ -65,11 +66,11 @@ class SegmentAggregator implements SegmentContract
             ->cacheEnabled($campaignSegment);
     }
 
-    public function setCache($cache): void
+    public function setProviderData($cache): void
     {
         foreach ($this->contracts as $provider => $contract) {
             if ($cache && isset($cache->$provider)) {
-                $contract->setCache($cache->$provider);
+                $contract->setProviderData($cache->$provider);
             }
         }
     }
@@ -93,5 +94,12 @@ class SegmentAggregator implements SegmentContract
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    public function getSerializableClosure(): SerializableClosure
+    {
+        return new SerializableClosure(function () {
+            return $this;
+        });
     }
 }

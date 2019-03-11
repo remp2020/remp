@@ -6,7 +6,6 @@ use App\CampaignSegment;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
 use App\Jobs\CacheSegmentJob;
-use Cache;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
@@ -23,12 +22,15 @@ class Segment implements SegmentContract
 
     private $client;
 
-    private $cache;
+    private $providerData;
 
-    public function __construct(Client $client)
+    private $redis;
+
+    public function __construct(Client $client, \Predis\Client $redis)
     {
         $this->client = $client;
-        $this->cache = new \stdClass;
+        $this->providerData = new \stdClass;
+        $this->redis = $redis;
     }
 
     public function provider(): string
@@ -70,16 +72,7 @@ class Segment implements SegmentContract
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         $cacheJob = new CacheSegmentJob($campaignSegment);
-        /** @var array $userIdMap */
-        $userIdMap = Cache::tags([SegmentContract::CACHE_TAG])->get($cacheJob->key());
-        if ($userIdMap) {
-            return array_key_exists($userId, $userIdMap);
-        }
-
-        dispatch(new CacheSegmentJob($campaignSegment));
-
-        // CRM segments are expensive; if they're not cached, we rather return false here.
-        return false;
+        return $this->redis->sismember($cacheJob->key(), $userId);
     }
 
     /**
@@ -120,13 +113,13 @@ class Segment implements SegmentContract
         return true;
     }
 
-    public function setCache($cache): void
+    public function setProviderData($providerData): void
     {
-        $this->cache = $cache;
+        $this->providerData = $providerData;
     }
 
     public function getProviderData()
     {
-        return $this->cache;
+        return $this->providerData;
     }
 }

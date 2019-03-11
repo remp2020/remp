@@ -80,14 +80,26 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_html_content');
         $form->addHidden('locked_text_content');
 
-        $defaults = [
-            'name' => 'Newsfilter ' . date('j.n.Y'),
-            'code' => 'nwsf_' . date('dmY'),
-            'mail_layout_id' => 33, // layout for subscribers
-            'locked_mail_layout_id' => 33, // layout for non-subscribers
-            'mail_type_id' => 9, // newsfilter,
-            'from' => 'Denník N <info@dennikn.sk>',
-        ];
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 23) {
+            $defaults = [
+                'name' => 'Športový newsfilter ' . date('j.n.Y'),
+                'code' => 'nwsf_sport_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 20, // newsfilter sport,
+                'from' => 'Michal Červený <michal.cerveny@dennikn.sk>',
+            ];
+        } else {
+            $defaults = [
+                'name' => 'Newsfilter ' . date('j.n.Y'),
+                'code' => 'nwsf_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 9, // newsfilter,
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        }
+
 
         $form->setDefaults($defaults);
 

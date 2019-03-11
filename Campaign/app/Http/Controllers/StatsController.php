@@ -69,6 +69,13 @@ class StatsController extends Controller
 
     private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, $chartWidth)
     {
+        if ($chartWidth == 0) {
+            return [
+                'dataSets' => [],
+                'labels' => [],
+            ];
+        }
+
         $parsedData = [];
         $labels = [];
 
@@ -121,7 +128,7 @@ class StatsController extends Controller
         $machine = new Machine(1000);
         $zeroStat = [];
         foreach ($variantsData as $variantId => $data) {
-            if (!$data[$conversionField]->count) {
+            if ($data['show_count']->count === 0 || !$data[$conversionField]->count) {
                 $zeroStat[$variantId] = 0;
                 continue;
             }
@@ -167,11 +174,6 @@ class StatsController extends Controller
         $numOfCols = (int)($chartWidth / 40);
 
         $diff = $to->diffInSeconds($from);
-
-        if (isset($_COOKIE['dbg'])) {
-            dump($numOfCols, $diff);
-            die;
-        }
         $interval = $diff / $numOfCols;
 
         return (int)$interval . 's';

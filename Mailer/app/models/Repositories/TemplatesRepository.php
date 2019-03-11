@@ -46,7 +46,11 @@ class TemplatesRepository extends Repository
         $typeId,
         $extras = null
     ) {
-    
+
+        if ($this->exists($code)) {
+            throw new TemplatesCodeNotUniqueException("Template code [$code] is already used.");
+        }
+
         $result = $this->insert([
             'name' => $name,
             'code' => $code,
@@ -72,6 +76,10 @@ class TemplatesRepository extends Repository
 
     public function update(IRow &$row, $data)
     {
+        // if code changed, check if it's unique
+        if (isset($data['code']) && $row['code'] != $data['code'] && $this->exists($data['code'])) {
+            throw new TemplatesCodeNotUniqueException("Template code [" . $data['code'] . "] is already used.");
+        }
         $params['updated_at'] = new \DateTime();
         return parent::update($row, $data);
     }
@@ -95,7 +103,7 @@ class TemplatesRepository extends Repository
         ]);
     }
 
-    public function exists($code)
+    public function exists(string $code): bool
     {
         return $this->getTable()->where('code', $code)->count('*') > 0;
     }

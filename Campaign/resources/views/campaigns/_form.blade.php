@@ -46,6 +46,8 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "urlFilterTypes": {!! @json($campaign->getAllUrlFilterTypes()) !!},
         "urlFilter": {!! @json($campaign->url_filter) !!},
         "urlPatterns": {!! @json($campaign->url_patterns) !!},
+        "refererFilter": {!! @json($campaign->referer_filter) !!},
+        "refererPatterns": {!! @json($campaign->referer_patterns) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

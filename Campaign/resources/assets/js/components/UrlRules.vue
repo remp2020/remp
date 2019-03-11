@@ -2,12 +2,14 @@
     <div>
         <div class="input-group">
             <span class="input-group-addon hidden-xs"><i class="zmdi zmdi-link"></i></span>
+            <label :for="id" class="fg-label">{{ label }}</label>
             <v-select
                 v-model="urlFilterType"
                 :options.sync="urlFilterOptions"
                 placeholder="Url filter"
-                title="Url filter"
-                :name="'url_filter'"
+                :title="title"
+                :name="filterName"
+                :id="id"
             >
             </v-select>
         </div>
@@ -17,7 +19,7 @@
                 <div class="row">
                     <div class="col-sx-12">
                         <small class="help-block" style="padding-left: 15px;">
-                            Url is matched if request url contains one of these strings. Filter does not support any wildcards.
+                            {{ hint }}
                         </small>
                     </div>
                 </div>
@@ -28,6 +30,7 @@
                             :key="url.uid"
                             :index="i"
                             :url="url"
+                            :patternsName="patternsName"
                         ></url>
                     </div>
                     <div class="col-xs-2 col-sm-1">
@@ -39,7 +42,7 @@
             </div>
         </div>
 
-        <input v-if="this.urlFilterType === 'everywhere'" type="hidden" name="url_patterns">
+        <input v-if="this.urlFilterType === 'everywhere'" type="hidden" :name="patternsName">
     </div>
 </template>
 
@@ -54,6 +57,12 @@
             Url
         },
         props: [
+            "label",
+            "hint",
+            "title",
+            "id",
+            "filterName",
+            "patternsName",
             "urlFilterTypes",
             "urlFilter",
             "urlPatterns"

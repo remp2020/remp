@@ -28,7 +28,7 @@ interface SegmentContract
      *                     of the stored object is defined by contract of provider itself
      *                     and not subject of validation here.
      */
-    public function setCache($cache): void;
+    public function setProviderData($cache): void;
 
     /**
      * getProviderData returns internal per-provider data objects to be stored

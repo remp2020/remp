@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "634de03eeae0bf40a4bde23774879ff7",
+    "content-hash": "b623e39c1a4b9cbc1d37336212a8d188",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -1599,34 +1599,35 @@
         },
         {
             "name": "laravel/socialite",
-            "version": "v3.2.0",
+            "version": "v4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/socialite.git",
-                "reference": "7194c0cd9fb2ce449669252b8ec316b85b7de481"
+                "reference": "7581c57a60742f423a68362c79d507028f989bd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/socialite/zipball/7194c0cd9fb2ce449669252b8ec316b85b7de481",
-                "reference": "7194c0cd9fb2ce449669252b8ec316b85b7de481",
+                "url": "https://api.github.com/repos/laravel/socialite/zipball/7581c57a60742f423a68362c79d507028f989bd7",
+                "reference": "7581c57a60742f423a68362c79d507028f989bd7",
                 "shasum": ""
             },
             "require": {
+                "ext-json": "*",
                 "guzzlehttp/guzzle": "~6.0",
-                "illuminate/contracts": "~5.4",
-                "illuminate/http": "~5.4",
-                "illuminate/support": "~5.4",
+                "illuminate/contracts": "~5.7.0|~5.8.0",
+                "illuminate/http": "~5.7.0|~5.8.0",
+                "illuminate/support": "~5.7.0|~5.8.0",
                 "league/oauth1-client": "~1.0",
-                "php": ">=5.6.4"
+                "php": "^7.1.3"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~4.0|~5.0"
+                "mockery/mockery": "~1.0",
+                "phpunit/phpunit": "~7.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.0-dev"
+                    "dev-master": "4.0-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -1658,7 +1659,7 @@
                 "laravel",
                 "oauth"
             ],
-            "time": "2018-10-18T03:39:04+00:00"
+            "time": "2019-02-14T16:57:39+00:00"
         },
         {
             "name": "laravelcollective/html",
@@ -6139,16 +6140,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.14.1",
+            "version": "v2.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "2e82abd1322897eb8aacb861e5ff551af3888349"
+                "reference": "ff401e58261ffc5934a58f795b3f95b355e276cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/2e82abd1322897eb8aacb861e5ff551af3888349",
-                "reference": "2e82abd1322897eb8aacb861e5ff551af3888349",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/ff401e58261ffc5934a58f795b3f95b355e276cb",
+                "reference": "ff401e58261ffc5934a58f795b3f95b355e276cb",
                 "shasum": ""
             },
             "require": {
@@ -6168,9 +6169,6 @@
                 "symfony/polyfill-php72": "^1.4",
                 "symfony/process": "^3.0 || ^4.0",
                 "symfony/stopwatch": "^3.0 || ^4.0"
-            },
-            "conflict": {
-                "hhvm": "*"
             },
             "require-dev": {
                 "johnkary/phpunit-speedtrap": "^1.1 || ^2.0 || ^3.0",
@@ -6226,7 +6224,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2019-02-10T22:52:33+00:00"
+            "time": "2019-02-17T17:44:13+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -7141,16 +7139,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.4",
+            "version": "7.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "2896657da5fb237bc316bdfc18c2650efeee0dc0"
+                "reference": "09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2896657da5fb237bc316bdfc18c2650efeee0dc0",
-                "reference": "2896657da5fb237bc316bdfc18c2650efeee0dc0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9",
+                "reference": "09c85e14994df92e5ff1f5ec0b481bdb7d3d3df9",
                 "shasum": ""
             },
             "require": {
@@ -7221,7 +7219,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-02-07T14:15:04+00:00"
+            "time": "2019-02-18T09:24:50+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
