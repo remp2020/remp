@@ -51,7 +51,11 @@ abstract class Mailer implements IMailer
                 $description = 'Setting for ' . get_called_class();
                 $this->configsRepository->add($prefix . '_' . $name, $definition['label'], null, $description, Config::TYPE_STRING);
 
-                $this->options[$name] = null;
+                $this->options[$name] = [
+                    'label' => $definition['label'],
+                    'required' => $definition['required'],
+                    'value' => null,
+                ];
             }
         }
     }
