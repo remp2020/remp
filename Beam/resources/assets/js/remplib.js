@@ -48,16 +48,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentActive: false,
 
-        trackedProgress: [],
-
-        trackedArticle: null,
-
-        trackedProgressInterval: 5,
-
-        trackedProgressPath: this.config.tracker.readingProgress.target,
-
-        dt: 0,
-
         init: function(config) {
             if (typeof config.token !== 'string') {
                 throw "remplib: configuration token invalid or missing: "+config.token
@@ -106,9 +96,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.tracker.article.locked !== 'undefined') {
                     this.article.locked = config.tracker.article.locked;
                 }
-                if (typeof config.articleElement !== 'undefined') {
-                    this.trackedArticle = config.articleElement;
-                }
             } else {
                 this.article = null;
             }
@@ -132,18 +119,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             window.addEventListener("campaign_showtime", this.syncOverridableFields);
             window.addEventListener("campaign_showtime", this.syncFlags);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
-
-            if (this.config.tracker.readingProgress.enabled) {
-
-                setInterval(function () {
-                    this.sendTrackedProgress()
-                }, (this.trackedProgressInterval * 1000));
-
-                window.addEventListener("scroll", this.scrollProgressEvent);
-                window.addEventListener("resize", this.scrollProgressEvent);
-                window.addEventListener("scroll_progress", this.trackProgress);
-                window.addEventListener("beforeunload", this.sendTrackedProgress(true));
-            }
         },
 
         syncSegmentRulesCache: function(e) {
@@ -574,64 +549,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (0 === this.totalTimeSpent % logInterval) {
                 this.trackTimespent();
             }
-        },
-
-        actualProgress: function() {
-            var h = document.documentElement,
-                b = document.body;
-
-            return (h.scrollTop||b.scrollTop) / ((h.scrollHeight||b.scrollHeight) - h.clientHeight);
-        },
-
-        scrollProgressEvent: function () {
-            var a = this.trackedArticle,
-                d = { document: this.actualProgress },
-                dt = document.documentElement.scrollTop;
-
-            if ( Math.abs( dt - this.dt ) < 50 ) {
-                return;
-            }
-
-            this.dt = dt;
-
-            if (a.length) {
-                d.article = Math.min( 1, Math.max( 0, ( document.documentElement.scrollTop - (a[0].offsetTop)) / a[0].offsetHeight ) );
-            }
-            document.trigger('scroll_progress', d)
-        },
-
-        trackProgress: function (e, d) {
-            const windowHeight = window.innerHeight / document.height();
-            var progress = this.trackedProgress;
-
-            if (progress.length) {
-
-                if (e.timeStamp - progress[progress.length - 1].e.timeStamp < 10000 && d.document - progress[progress.length - 1].d > windowHeight) {
-                    return false;
-                }
-            }
-
-            this.trackedProgress.push({
-                "e": e,
-                "d": d,
-            });
-        },
-
-        sendTrackedProgress: function (unload = false) {
-            unload = (typeof unload === 'boolean') ? unload : false;
-            d = this.trackedProgress[this.trackedProgress.length - 1];
-
-            let params = {
-                "action": "progress",
-                "progress": {
-                    "article_ratio": d.article,
-                    "page_ratio": d.document,
-                    "unload": unload
-                }
-            };
-
-            this.post(this.url + this.trackedProgressPath, params);
-            this.trackedProgress = [];
         }
     };
 
