@@ -103,7 +103,6 @@
                         </div>
                         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                             <div class="panel-body p-l-10 p-r-20">
-
                                 <div class="row">
                                     <div class="col-md-8">
                                         <p class="m-l-20">User needs to be member of all selected segments for campaign to be shown.</p>
@@ -132,7 +131,7 @@
                                         <div class="input-group">
                                             <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
                                             <div>
-                                                <div class="row">
+                                                <div v-if="Object.keys(availableSegments).length" class="row">
                                                     <div class="col-md-12">
                                                         <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true" data-max-options="1">
                                                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
@@ -141,6 +140,12 @@
                                                                 </option>
                                                             </optgroup>
                                                         </select>
+                                                    </div>
+                                                </div>
+                                                <div v-else class="panel panel-default">
+                                                    <div class="panel-body app-info p-10">
+                                                        <p>No segments are available for selection. This might be because you don't have any segment providers configured.</p>
+                                                        <p class="m-b-0 p-0">If you want to use segments, configure your environment to use existing Segment Providers or <a href="https://github.com/remp2020/remp/tree/master/Campaign#segment-integration">implement your own integration</a>.</p>
                                                     </div>
                                                 </div>
                                             </div>

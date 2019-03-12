@@ -11,7 +11,7 @@ class SegmentAggregator implements SegmentContract
     const TAG = 'segments';
 
     /** @var SegmentContract[] */
-    private $contracts;
+    private $contracts = [];
 
     private $errors = [];
 

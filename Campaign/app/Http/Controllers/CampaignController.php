@@ -899,7 +899,7 @@ class CampaignController extends Controller
         }
 
         foreach ($segmentAggregator->getErrors() as $error) {
-            flash($error)->error();
+            flash(nl2br($error))->error();
             Log::error($error);
         }
 
