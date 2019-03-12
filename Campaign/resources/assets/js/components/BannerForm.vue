@@ -124,7 +124,7 @@
                 </div>
             </div>
 
-            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal" :class="{ hidden: collapsibleBarTemplate !== null }">
+            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal" :class="{ hidden: collapsibleBarTemplate != null }">
                 <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
@@ -133,7 +133,7 @@
                 </li>
             </ul>
 
-            <div class="card m-t-15" :class="{ hidden: collapsibleBarTemplate !== null }">
+            <div class="card m-t-15" :class="{ hidden: collapsibleBarTemplate != null }">
                 <div class="tab-content p-0">
                     <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
