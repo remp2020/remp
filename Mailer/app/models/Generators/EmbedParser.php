@@ -12,7 +12,7 @@ class EmbedParser
         $og = $data->getProviders()['opengraph'];
         $image = !empty($og->getImagesUrls()) ? $og->getImagesUrls()[0] : null;
 
-        return [
+        return ($og->getUrl() === null) ? null : [
             'link' => $og->getUrl(),
             'title' => $og->getTitle(),
             'text' => $og->getDescription(),
@@ -61,6 +61,10 @@ class EmbedParser
             || preg_match('/twitt/', $link)
         ) {
             $data = $this->fetch($link);
+
+            if ($data === null) {
+                return '<span style="color: red;">Tento link už nie je dostupný.</span>';
+            }
 
             return $this->createEmbeddMarkup($data['link'], $data['title'], $data['text'], $data['image']);
         }
