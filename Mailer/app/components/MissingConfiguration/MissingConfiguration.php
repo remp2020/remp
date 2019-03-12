@@ -26,10 +26,14 @@ class MissingConfiguration extends Control
     public function render()
     {
         $defaultMailerSetting = $this->configsRepository->loadByName('default_mailer');
-        $activeMailer = $this->mailerFactory->getMailer($defaultMailerSetting->value);
+        $mailerConfigured = false;
 
-        if ($mailerConfigured = $activeMailer->isConfigured()) {
-            return;
+        if ($defaultMailerSetting->value !== null) {
+            $activeMailer = $this->mailerFactory->getMailer($defaultMailerSetting->value);
+
+            if ($mailerConfigured = $activeMailer->isConfigured()) {
+                return;
+            }
         }
 
         $this->template->link = $this->getPresenter()->link('Settings:default');
