@@ -68,7 +68,7 @@ abstract class Mailer implements IMailer
     public function isConfigured()
     {
         foreach ($this->getRequiredOptions() as $option) {
-            if (isset($option['value']) && !$option['value']) {
+            if (!isset($option['value'])) {
                 return false;
             }
         }
