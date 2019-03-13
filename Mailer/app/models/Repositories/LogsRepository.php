@@ -205,4 +205,14 @@ class LogsRepository extends Repository
         }
         return $this->eventMap[$externalEvent];
     }
+
+    /**
+     * @param $mailTypeId
+     * @return Selection
+     */
+    public function forType($mailTypeId)
+    {
+        return $this->getTable()
+            ->where('mail_template.mail_type_id', $mailTypeId);
+    }
 }

@@ -9,6 +9,7 @@ use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Tomaj\Hermes\Emitter;
@@ -34,6 +35,9 @@ final class ListPresenter extends BasePresenter
     /** @var IntlDateFormatter */
     private $dateFormatter;
 
+    /** @var LogsRepository */
+    private $logsRepository;
+
     /** @var Emitter */
     private $emitter;
 
@@ -43,6 +47,7 @@ final class ListPresenter extends BasePresenter
         MailTypeStatsRepository $mailTypeStatsRepository,
         DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
+        LogsRepository $logsRepository,
         Emitter $emitter
     ) {
         parent::__construct();
@@ -54,6 +59,7 @@ final class ListPresenter extends BasePresenter
         $this->templatesRepository = $templatesRepository;
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
         $this->listFormFactory = $listFormFactory;
+        $this->logsRepository = $logsRepository;
         $this->emitter = $emitter;
     }
 
@@ -138,11 +144,38 @@ final class ListPresenter extends BasePresenter
             throw new BadRequestException();
         }
 
+        $week = (new DateTime)->setTimestamp(strtotime('-7 days'));
+        $month = (new DateTime)->setTimestamp(strtotime('-30 days'));
+
         $this->template->list = $list;
         $this->template->variants = $list->related('mail_type_variants')->order('sorting');
         $this->template->stats = [
             'subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
             'un-subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => false])->count('*'),
+            'opened' => [
+                '7-days' => $this->logsRepository->forType($list->id)
+                    ->where('opened_at > ?', $week)
+                    ->select('COUNT(DISTINCT email) AS count')
+                    ->fetch()
+                    ->count,
+                '30-days' => $this->logsRepository->forType($list->id)
+                    ->where('opened_at > ?', $month)
+                    ->select('COUNT(DISTINCT email) AS count')
+                    ->fetch()
+                    ->count,
+            ],
+            'clicked' => [
+                '7-days' => $this->logsRepository->forType($list->id)
+                    ->where('clicked_at > ?', $week)
+                    ->select('COUNT(DISTINCT email) AS count')
+                    ->fetch()
+                    ->count,
+                '30-days' => $this->logsRepository->forType($list->id)
+                    ->where('clicked_at > ?', $month)
+                    ->select('COUNT(DISTINCT email) AS count')
+                    ->fetch()
+                    ->count,
+            ]
         ];
 
         $this->prepareDetailSubscribersGraphData($id);
