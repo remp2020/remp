@@ -11,12 +11,13 @@ class EmbedParser
         $data = Embed::create($url);
         $og = $data->getProviders()['opengraph'];
         $image = !empty($og->getImagesUrls()) ? $og->getImagesUrls()[0] : null;
+        $isVideo = $og->getType() === 'video' || preg_match('/youtu/', $og->getUrl());
 
         return ($og->getUrl() === null) ? null : [
             'link' => $og->getUrl(),
             'title' => $og->getTitle(),
             'text' => $og->getDescription(),
-            'image' => $this->getBase64EncodedImage($image, $og->getType() === 'video'),
+            'image' => $this->getBase64EncodedImage($image, $isVideo),
         ];
     }
 
@@ -60,13 +61,9 @@ class EmbedParser
             || preg_match('/youtu/', $link)
             || preg_match('/twitt/', $link)
         ) {
-            $data = $this->fetch($link);
-
-            if ($data === null) {
-                return '<span style="color: red;">Tento link už nie je dostupný.</span>';
+            if ($data = $this->fetch($link)) {
+                return $this->createEmbeddMarkup($data['link'], $data['title'], $data['text'], $data['image']);
             }
-
-            return $this->createEmbeddMarkup($data['link'], $data['title'], $data['text'], $data['image']);
         }
 
         return null;
