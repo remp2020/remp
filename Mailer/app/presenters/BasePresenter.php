@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Presenters;
 use Kdyby\Autowired\AutowireComponentFactories;
 use Kdyby\Autowired\AutowireProperties;
 use Nette\Application\UI\Presenter;
+use Remp\MailerModule\Components\IMissingConfigurationFactory;
 use Remp\MailerModule\EnvironmentConfig;
 use Remp\MailerModule\Forms\IFormFactory;
 
@@ -49,5 +50,11 @@ abstract class BasePresenter extends Presenter
         } else {
             $this->redirect('Edit', $itemID);
         }
+    }
+
+    public function createComponentMissingConfiguration(
+        IMissingConfigurationFactory $IMissingConfigurationFactory
+    ) {
+        return $IMissingConfigurationFactory->create();
     }
 }
