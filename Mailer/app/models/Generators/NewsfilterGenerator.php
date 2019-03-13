@@ -21,7 +21,7 @@ class NewsfilterGenerator implements IGenerator
 
     private $linksColor = "#b00c28";
 
-    private $embeddParser;
+    private $embedParser;
 
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
@@ -32,7 +32,7 @@ class NewsfilterGenerator implements IGenerator
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
-        $this->embeddParser = $embedParser;
+        $this->embedParser = $embedParser;
     }
 
     public function apiParams()
@@ -136,8 +136,8 @@ class NewsfilterGenerator implements IGenerator
             // hr
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
-            // parse embedds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embeddParser, "parse"),
+            // parse embeds
+            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embedParser, "parse"),
 
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {

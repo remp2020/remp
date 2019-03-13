@@ -132,7 +132,7 @@ class MMSGenerator implements IGenerator
             // hr
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
-            // parse embedds
+            // parse embeds
             '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embedParser, "parse"),
 
             // remove br from inside of a
