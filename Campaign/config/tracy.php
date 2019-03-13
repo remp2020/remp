@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'enabled' => env('APP_DEBUG') === true,
-    'showBar' => env('APP_ENV') !== 'production',
+    'enabled' => true,
+    'showBar' => false,
     'accepts'      => [
         'text/html',
     ],

@@ -6,7 +6,6 @@ use App\Contracts\SegmentAggregator;
 use GeoIp2\Database\Reader;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Redis;
 

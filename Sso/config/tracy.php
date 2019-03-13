@@ -2,7 +2,7 @@
 
 return [
     'enabled' => env('APP_DEBUG') === true,
-    'showBar' => env('APP_ENV') !== 'production',
+    'showBar' => env('APP_DEBUG') === true,
     'accepts'      => [
         'text/html',
     ],
