@@ -3,8 +3,6 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Database\Table\Selection;
-use Nette\Forms\Container;
 use Nette\SmartObject;
 use Remp\MailerModule\Config\Config;
 use Remp\MailerModule\Mailer\Mailer;
@@ -119,10 +117,12 @@ class ConfigFormFactory
 
     public function formSucceeded($form, $values)
     {
-        foreach ($values['settings'] as $name => $value) {
-            $config = $this->configsRepository->loadByName($name);
-            if ($config->value != $value) {
-                $this->configsRepository->update($config, ['value' => $value]);
+        foreach ($values['settings'] as $category => $configs) {
+            foreach ($configs as $name => $value) {
+                $config = $this->configsRepository->loadByName($name);
+                if ($config->value != $value) {
+                    $this->configsRepository->update($config, ['value' => $value]);
+                }
             }
         }
 
