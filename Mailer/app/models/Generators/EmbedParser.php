@@ -3,21 +3,27 @@
 namespace Remp\MailerModule\Generators;
 
 use Embed\Embed;
+use Embed\Providers\OEmbed\Twitter;
 
 class EmbedParser
 {
     private function fetch($url)
     {
-        $data = Embed::create($url);
-        $og = $data->getProviders()['opengraph'];
-        $image = !empty($og->getImagesUrls()) ? $og->getImagesUrls()[0] : null;
-        $isVideo = $og->getType() === 'video' || preg_match('/youtu/', $og->getUrl());
+        $embed = Embed::create($url);
+        $type = $embed->getType();
+        $image = $embed->getImage();
 
-        return ($og->getUrl() === null) ? null : [
-            'link' => $og->getUrl(),
-            'title' => $og->getTitle(),
-            'text' => $og->getDescription(),
-            'image' => $this->getBase64EncodedImage($image, $isVideo),
+        // twitter provider returns type `rich` for both image and video
+        // so we have to check for type in og meta tags
+        if ($embed->getProviderName() === substr(strrchr(Twitter::class, '\\'), 1)) {
+            $type = $embed->getProviders()['opengraph']->getType();
+        }
+
+        return ($embed->getUrl() === null) ? null : [
+            'link' => $embed->getUrl(),
+            'title' => $embed->getTitle(),
+            'text' => $embed->getDescription(),
+            'image' => $this->getBase64EncodedImage($image, $type === 'video'),
         ];
     }
 
