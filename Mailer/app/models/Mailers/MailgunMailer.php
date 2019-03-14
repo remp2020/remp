@@ -87,7 +87,7 @@ class MailgunMailer extends Mailer implements IMailer
             $data["v:".$key] = $val;
         }
 
-        $this->mailer->messages()->send($this->options['domain'], $data);
+        $this->mailer->messages()->send($this->options['domain']['value'], $data);
     }
 
     public function mailer()
@@ -97,7 +97,7 @@ class MailgunMailer extends Mailer implements IMailer
 
     public function option($key)
     {
-        return isset($this->options[$key]) ? $this->options[$key] : null;
+        return isset($this->options[$key]['value']) ? $this->options[$key]['value'] : null;
     }
 
     public function transformTemplateParams(array $params)
