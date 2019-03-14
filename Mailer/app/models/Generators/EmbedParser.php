@@ -3,7 +3,6 @@
 namespace Remp\MailerModule\Generators;
 
 use Embed\Embed;
-use Embed\Providers\OEmbed\Twitter;
 
 class EmbedParser
 {
@@ -15,7 +14,7 @@ class EmbedParser
 
         // twitter provider returns type `rich` for both image and video
         // so we have to check for type in og meta tags
-        if ($embed->getProviderName() === substr(strrchr(Twitter::class, '\\'), 1)) {
+        if ($embed->getProviderName() === "Twitter") {
             $type = $embed->getProviders()['opengraph']->getType();
         }
 
