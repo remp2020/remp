@@ -247,3 +247,4 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
+	- Remp\MailerModule\Generators\EmbedParser

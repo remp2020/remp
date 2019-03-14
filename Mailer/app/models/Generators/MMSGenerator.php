@@ -23,16 +23,20 @@ class MMSGenerator implements IGenerator
 
     private $transport;
 
+    private $embedParser;
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
-        TransportInterface $transport
+        TransportInterface $transport,
+        EmbedParser $embedParser
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
         $this->transport = $transport;
+        $this->embedParser = $embedParser;
     }
 
     public function apiParams()
@@ -128,8 +132,8 @@ class MMSGenerator implements IGenerator
             // hr
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
-            // parse embedds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this, "parseEmbed"),
+            // parse embeds
+            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embedParser, "parse"),
 
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
