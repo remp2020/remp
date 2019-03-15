@@ -35,9 +35,21 @@ abstract class Mailer implements IMailer
         return $this->alias;
     }
 
-    public function getConfig()
+    /**
+     * Returns configuration
+     *
+     * Single config field is returned if parameter $config is not null.
+     *
+     * @param string|null $config
+     * @return array|mixed|null
+     */
+    public function getConfig(string $config = null)
     {
-        return $this->options;
+        if (is_null($config)) {
+            return $this->options;
+        }
+
+        return $this->options[$config]['value'] ?? null;
     }
 
     protected function buildConfig()
@@ -74,11 +86,6 @@ abstract class Mailer implements IMailer
         }
 
         return true;
-    }
-
-    public function getOptions()
-    {
-        return $this->options;
     }
 
     public function getRequiredOptions()

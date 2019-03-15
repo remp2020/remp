@@ -32,7 +32,7 @@ class MailgunMailer extends Mailer implements IMailer
         ConfigsRepository $configsRepository
     ) {
         parent::__construct($config, $configsRepository);
-        $this->mailer = Mailgun::create($this->options['api_key']['value']);
+        $this->mailer = Mailgun::create($this->option('api_key'));
     }
 
     public function send(Message $message)
@@ -87,7 +87,7 @@ class MailgunMailer extends Mailer implements IMailer
             $data["v:".$key] = $val;
         }
 
-        $this->mailer->messages()->send($this->options['domain']['value'], $data);
+        $this->mailer->messages()->send($this->option('domain'), $data);
     }
 
     public function mailer()
