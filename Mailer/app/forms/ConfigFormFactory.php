@@ -54,7 +54,7 @@ class ConfigFormFactory
             $label = explode('\\', $mailers[$mailer->getAlias()]);
             $mailerContainer = $settings->addContainer($label[count($label)-1]);
 
-            foreach ($mailer->getOptions() as $name => $option) {
+            foreach ($mailer->getConfigs() as $name => $option) {
                 $key = $mailer->getPrefix() . '_' . $name;
                 $config = $configs[$key];
 

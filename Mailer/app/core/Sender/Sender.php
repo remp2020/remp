@@ -3,15 +3,18 @@
 namespace Remp\MailerModule;
 
 use Nette\Database\IRow;
+use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Json;
 use Remp\MailerModule\Auth\AutoLogin;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\Mailer\Mailer;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Sender\MailerBatchException;
 use Remp\MailerModule\Sender\MailerFactory;
+use Remp\MailerModule\Sender\MailerNotExistsException;
 use Twig_Environment;
 use Twig_Loader_Array;
 
@@ -137,7 +140,7 @@ class Sender
             $this->params['settings'] = getenv('SETTINGS_URL') . $this->params['autologin'];
         }
 
-        $mailer = $this->mailerFactory->getMailer();
+        $mailer = $this->getMailer();
 
         $message = new Message();
         $message->addTo($recipient['email'], $recipient['name']);
@@ -176,7 +179,7 @@ class Sender
 
     public function sendBatch(): int
     {
-        $mailer = $this->mailerFactory->getMailer();
+        $mailer = $this->getMailer();
         if (!$mailer->supportsBatch()) {
             throw new MailerBatchException(
                 sprintf('attempted to send batch via %s mailer: not supported', $mailer->getAlias())
@@ -277,9 +280,14 @@ class Sender
         $message->setHeader('X-Mailer-Template-Params', Json::encode($templateParams));
     }
 
-    public function getMailerConfig($alias = null)
+    /**
+     * @param null|string $alias - If $alias is null, default mailer is returned.
+     * @return IMailer|Mailer
+     * @throws MailerNotExistsException
+     */
+    public function getMailer($alias = null)
     {
-        return $this->mailerFactory->getMailer($alias)->getConfig();
+        return $this->mailerFactory->getMailer($alias);
     }
 
     public function reset()
@@ -297,7 +305,7 @@ class Sender
 
     public function supportsBatch()
     {
-        return $this->mailerFactory->getMailer()->supportsBatch();
+        return $this->getMailer()->supportsBatch();
     }
 
     private function generateSubject($subjectTemplate, $params): string
