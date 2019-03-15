@@ -210,7 +210,7 @@ class LogsRepository extends Repository
      * @param $mailTypeId
      * @return Selection
      */
-    public function forType($mailTypeId)
+    public function byMailType($mailTypeId)
     {
         return $this->getTable()
             ->where('mail_template.mail_type_id', $mailTypeId);

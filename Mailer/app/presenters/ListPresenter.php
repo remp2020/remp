@@ -153,24 +153,24 @@ final class ListPresenter extends BasePresenter
             'subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
             'un-subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => false])->count('*'),
             'opened' => [
-                '7-days' => $this->logsRepository->forType($list->id)
+                '7-days' => $this->logsRepository->byMailType($list->id)
                     ->where('opened_at > ?', $week)
                     ->select('COUNT(DISTINCT email) AS count')
                     ->fetch()
                     ->count,
-                '30-days' => $this->logsRepository->forType($list->id)
+                '30-days' => $this->logsRepository->byMailType($list->id)
                     ->where('opened_at > ?', $month)
                     ->select('COUNT(DISTINCT email) AS count')
                     ->fetch()
                     ->count,
             ],
             'clicked' => [
-                '7-days' => $this->logsRepository->forType($list->id)
+                '7-days' => $this->logsRepository->byMailType($list->id)
                     ->where('clicked_at > ?', $week)
                     ->select('COUNT(DISTINCT email) AS count')
                     ->fetch()
                     ->count,
-                '30-days' => $this->logsRepository->forType($list->id)
+                '30-days' => $this->logsRepository->byMailType($list->id)
                     ->where('clicked_at > ?', $month)
                     ->select('COUNT(DISTINCT email) AS count')
                     ->fetch()
