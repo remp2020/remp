@@ -62,7 +62,7 @@ class MailgunEventsHandler extends BaseHandler
             return $response;
         }
 
-        if (hash_hmac('sha256', $params['signature']['timestamp'] . $params['signature']['token'], $mailerConfig['api_key']) !== $params['signature']['signature']) {
+        if (hash_hmac('sha256', $params['signature']['timestamp'] . $params['signature']['token'], $mailerConfig['api_key']['value']) !== $params['signature']['signature']) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Wrong signature.']);
         }
 
