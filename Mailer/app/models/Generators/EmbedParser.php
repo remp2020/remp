@@ -22,35 +22,8 @@ class EmbedParser
             'link' => $embed->getUrl(),
             'title' => $embed->getTitle(),
             'text' => $embed->getDescription(),
-            'image' => $this->getBase64EncodedImage($image, $type === 'video'),
+            'image' => $image,
         ];
-    }
-
-    private function getBase64EncodedImage($imageLink, $video = false)
-    {
-        $image = imagecreatefromstring(file_get_contents($imageLink));
-
-        if ($video) {
-            $play = imagecreatefrompng(__DIR__ . '/../../../www/assets/img/play.png');
-
-            imagecopy(
-                $image,
-                $play,
-                (imagesx($image)/2) - (imagesx($play)/2),
-                (imagesy($image)/2) - (imagesy($play)/2),
-                0,
-                0,
-                imagesx($play),
-                imagesy($play)
-            );
-        }
-
-        ob_start();
-        imagejpeg($image);
-        $image_data = ob_get_contents();
-        ob_end_clean();
-
-        return base64_encode($image_data);
     }
 
     public function parse($link)
@@ -76,11 +49,11 @@ class EmbedParser
 
     public function createEmbeddMarkup($link, $title, $text = null, $image = null)
     {
-        $html = "<br><a href='{$link}' target='_blank' style='color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-decoration:none;'>";
+        $html = "<br><a href='{$link}' target='_blank' style='display: block;text-align: center;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-decoration:none;'>";
 
         if (!is_null($image)) {
             $html .= "
-                <img src='data:image/png;base64, {$image}' 
+                <img src='{$image}' 
                      alt='{$title}' 
                      style='
                         outline:none;
@@ -89,12 +62,11 @@ class EmbedParser
                         width:auto;
                         max-width:100%;
                         clear:both;
-                        display:block;
-                        margin-bottom:20px;
+                        display:inline;
                      '>
             ";
         }
 
-        return $html .= "</a></br></br>" . PHP_EOL;
+        return $html . "</a>" . PHP_EOL;
     }
 }
