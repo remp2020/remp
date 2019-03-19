@@ -36,11 +36,6 @@
                     'header' => 'Created at',
                     'priority' => 3,
                 ],
-                'updated_at' => [
-                    'render' => 'date',
-                    'header' => 'Updated at',
-                    'priority' => 1,
-                ],
             ],
             'dataSource' => route('authorSegments.json'),
             'order' => [2, 'desc'],
