@@ -7,13 +7,11 @@ use GeoIp2\Database\Reader;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Cache\Repository;
-use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
-use Psr\Cache\CacheItemPoolInterface;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Redis;
 
 class AppServiceProvider extends ServiceProvider
 {
+    const SEGMENT_AGGREGATOR_REDIS_KEY = 'segment_aggregator';
     /**
      * Bootstrap any application services.
      *
@@ -21,24 +19,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-        }
+        $dimensionMap = new \App\Models\Dimension\Map(config('banners.dimensions'));
+        $positionsMap = new \App\Models\Position\Map(config('banners.positions'));
+        $alignmentsMap = new \App\Models\Alignment\Map(config('banners.alignments'));
 
-        $this->app->bind(\App\Models\Dimension\Map::class, function ($app) {
-            return new \App\Models\Dimension\Map(config('banners.dimensions'));
+        $this->app->bind(\App\Models\Dimension\Map::class, function ($app) use ($dimensionMap) {
+            return $dimensionMap;
         });
-        $this->app->bind(\App\Models\Position\Map::class, function ($app) {
-            return new \App\Models\Position\Map(config('banners.positions'));
+        $this->app->bind(\App\Models\Position\Map::class, function ($app) use ($positionsMap) {
+            return $positionsMap;
         });
-        $this->app->bind(\App\Models\Alignment\Map::class, function ($app) {
-            return new \App\Models\Alignment\Map(config('banners.alignments'));
-        });
-
-        $this->app->singleton(CacheItemPoolInterface::class, function ($app) {
-            $repository = $app->make(Repository::class);
-
-            return new CacheItemPool($repository);
+        $this->app->bind(\App\Models\Alignment\Map::class, function ($app) use ($alignmentsMap) {
+            return $alignmentsMap;
         });
 
         $this->app->bind(Reader::class, function (Application $app) {
@@ -47,9 +39,26 @@ class AppServiceProvider extends ServiceProvider
 
         $this->bindObservers();
 
-        $this->app->bind(SegmentAggregator::class, function (Application $app) {
-            return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
+        $segmentAggregator = new SegmentAggregator($this->app->tagged(SegmentAggregator::TAG));
+        $this->app->bind(SegmentAggregator::class, function (Application $app) use ($segmentAggregator) {
+            return $segmentAggregator;
         });
+
+        /** @var \Illuminate\Http\Request $request */
+        $request = $this->app->request;
+        if (strpos($request->path(), 'showtime') === false) {
+            // SegmentAggregator contains Guzzle clients which have properties defined as closures.
+            // It's not possible to serialize closures in plain PHP, but Laravel provides a workaround.
+            // This will store a function returning segmentAggregator into the redis which can be later
+            // used in plain PHP to bypass Laravel initialization just to get the aggregator.
+            $serializableSegmentAggregator = $segmentAggregator->getSerializableClosure();
+            Redis::set(self::SEGMENT_AGGREGATOR_REDIS_KEY, serialize($serializableSegmentAggregator));
+
+            Redis::set(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY, $dimensionMap->dimensions()->toJson());
+            Redis::set(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY, $positionsMap->positions()->toJson());
+            Redis::set(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
+        }
+
         Paginator::useBootstrapThree();
     }
 

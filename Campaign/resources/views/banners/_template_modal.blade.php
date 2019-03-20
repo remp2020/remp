@@ -34,6 +34,19 @@
 
                     <div class="col-md-4">
                         <div class="card">
+                            <a href="{{ route('banners.create', ['template' => \App\Banner::TEMPLATE_COLLAPSIBLE_BAR]) }}">
+                                <div class="card-header">
+                                    <h4 class="text-center">Collapsible bar</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="preview collapsible-bar"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
                             <a href="{{ route('banners.create', ['template' => \App\Banner::TEMPLATE_SHORT_MESSAGE]) }}">
                                 <div class="card-header">
                                     <h4 class="text-center">Short message</h4>

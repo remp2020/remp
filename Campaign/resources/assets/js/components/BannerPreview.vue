@@ -84,6 +84,28 @@
                 :displayType="displayType"
         ></bar-preview>
 
+        <collapsible-bar-preview v-if="template === 'collapsible_bar'"
+                :alignmentOptions="alignmentOptions"
+                :positionOptions="positionOptions"
+                :show="visible"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
+
+                :mainText="collapsibleBarTemplate.mainText"
+                :collapseText="collapsibleBarTemplate.collapseText"
+                :buttonText="collapsibleBarTemplate.buttonText"
+                :backgroundColor="collapsibleBarTemplate.backgroundColor"
+                :textColor="collapsibleBarTemplate.textColor"
+                :buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
+                :buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+                :initialState="collapsibleBarTemplate.initialState"
+
+                :targetUrl="targetUrl"
+                :transition="transition"
+                :displayType="displayType"
+        ></collapsible-bar-preview>
+
         <short-message-preview v-if="template === 'short_message'"
                 :alignmentOptions="alignmentOptions"
                 :positionOptions="positionOptions"
@@ -138,6 +160,7 @@
     import HtmlPreview from "./previews/Html";
     import MediumRectanglePreview from "./previews/MediumRectangle";
     import BarPreview from "./previews/Bar";
+    import CollapsibleBarPreview from "./previews/CollapsibleBar";
     import ShortMessagePreview from "./previews/ShortMessage";
     import OverlayRectanglePreview from "./previews/OverlayRectangle";
 
@@ -164,6 +187,7 @@
 
         "mediumRectangleTemplate",
         "barTemplate",
+        "collapsibleBarTemplate",
         "htmlTemplate",
         "shortMessageTemplate",
         "overlayRectangleTemplate",
@@ -180,6 +204,7 @@
             HtmlPreview,
             MediumRectanglePreview,
             BarPreview,
+            CollapsibleBarPreview,
             ShortMessagePreview,
             OverlayRectanglePreview,
         },

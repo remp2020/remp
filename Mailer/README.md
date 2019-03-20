@@ -38,6 +38,893 @@ You can override any default config from
 - MySQL 5.7
 - Redis 3.2
 
+### Technical feature description
+
+##### Newsletter lists
+
+Lists represent categories of emails (newsletters). Their primary (and only) use case is to group single emails within 
+a newsletter and manage subscriptions of users to these newsletters.
+
+When you create new newsletter, you can specify:
+
+* *Name.* User-friendly name of the newsletter (e.g. "Weekly newsletter", "Breaking news", ...)
+* *Code.* Computer-friendly name of the newsletter (slug; e.g. "weekly_newsletter", "breaking_news", ...)
+* *Auto subscribe flag.* Flag indicating whether new users (reported by external CRM via API) should be automatically
+subscribed to the newsletter or not.
+* *Public flag.* Flag indicating whether the newsletter should be listed in the public listing available for end users.
+Mailer doesn't provide a user-facing frontend, so this flag is targetted primarily for the party implementing the frontend.
+
+Any handling of subscription/unsubscription of end users from newsletters is handled via API. Publishers mostly want
+to have this included within the customer zone of their systems - designed consistently with the rest of their system.
+Therefore Mailer doesn't provide **any** user-facing frontend. 
+
+To see the APIs to integration subscription management, see [Managing user subscription](#managing-user-subscriptions)
+section.
+
+##### Emails and Layouts
+
+Emails and layouts provide a way how to manually create emails with the possibility to see realtime preview of the email
+while doing so. As the names suggest:
+
+* *Layouts.* They are common and reusable parts of the emails. Usually header (containing logo and welcome message) and
+    footer (containing your credentials, link to unsubscribe).
+     
+    To have emails generated correctly, place `{{ content|raw }}` to the place where content of actual *email* should be
+    injected.
+    
+* *Emails.* They represent actual content of the *email* (e.g. single edition of the weekly newsletter). Every *email* has
+couple of settings you can configure:
+
+    * *Name.* User-friendly name of the email. It's displayed only in the administration parts of the system.
+    * *Code.* Computer-friendly name of the email (slug). Primarily being used when referencing single email that's being
+    sent manually.
+    * *Description.* Internal description, so you know even after a year what the purpose of email was.
+    * *Layout.* Layout to be used.
+    * *Newsletter list.* Newsletter (category) to which this email belongs. Before the email is sent to specific end-user,
+    Mailer checks whether the user is subscribed to this newsletter or not. If he/she is not, the email will not be sent.
+    * *From.* Who should be used as a sender of email (e.g. `Support <support@example.com`).
+    * *Subject.* Email subject.
+    * *Text version.* Text version used as a fallback by email clients.
+    * *HTML version.* HTML (primary) version of email that people will see. HTML version is being previewed in the
+    form for creation of new email.
+    
+Text and HTML versions of *email* support [Twig syntax](https://twig.symfony.com/doc/2.x/templates.html). You can use standard Twig features in your templates or use
+custom variables provided by [Generators](#generators).
+    
+Saving the *email* doesn't trigger any sending. It creates an instance of *email* that might be sent manually (or by 3rd
+parties) via API or as a *batch* within a Mailer's *job*. 
+
+##### Jobs
+
+*Jobs* can be understood as a newsletter sending orders. They can consist of smaller *batches* which provide their own
+statistics. This is useful when you want to run an A/B test on smaller *batch*, evaluate and send the *email* to rest of the users. 
+
+When creating a *job*, you implicitly create also its first *batch*. The *job* has only one option shared across all batches:
+
+* *Segment.* Defines which [*segment* of users](#segment-integration) (needs integration) should receive the email. This does not relate to
+the *newsletter* subscribers in any way. *Segment* of users should simply state the set of users you're targetting. For
+example *"people registered yesterday"* or *"people without a payment"*. It's configured on a *job* level and it's shared
+across all *batches*.
+
+All the other options are related to the *batch* that is created with the *job*. Afterwards you'll be able to create more
+*batches* within the job if necessary.
+
+* *Method.* Specifies whether the list of emails provided by *segment* should be randomized or the emails should be sent within
+the same order as they were returned within *segment*.
+* *Email A.* Primary *email* to be sent (implicitly indicates *newsletter list* which will be used for checking whether user can receive the *email*).
+* *Email B.* If you want to include A/B test within your batch, you can specify the other variant of *email*.
+Distribution of variants will be uniform between all variants. 
+* *Number of emails.* Limits number of emails to be sent within the batch.
+* *Start date.* Specifies when the batch should be sent (now or in the future).
+
+When the *job*/*batch* is created, you need to push *"Start sending"* button to trigger the execution. First, the background processor
+will receive necessary information about target group of users and prepares metadata for sending daemon.
+
+Once the metadata is ready and the *batch* is in the *processed* state, it will be picked up by sending daemon and
+actual emails will be sent via preconfigured Mailer (SMTP, Mailgun, ...).
+
+You can create and execute *jobs*/*batches* programatically by using provided API endpoints. 
+
+##### Generators
+
+Generators are single-purpose implementations that help to generate HTML/text content of *emails* programatically
+based on the provided input. That means that instead of manually preparing *email* content (HTML to send) every time
+you want to send an email, you can simplify the creation by implementing custom generator that can do the hard work
+for you.
+
+For example the generator can require list of URLs to your articles. When it gets them, it will parse the content of
+the URLs, extracts title, excerpt and image of the article and injects that into the prepared generator template.
+Person preparing the email has a guarantee that he/she won't create invalid HTML (due to typo) and the whole process
+is sped up as the only thing he/she needs to enter are article URLs. The flow we just described matches with how
+[`UrlParserGenerator`](app/models/Generators/UrlParserGenerator.php) works.
+
+Each prepared *generator template* is directly linked to a generator implementation. It's therefore guaranteed that the
+variables used within generator template will always be provided (unless the implementation contains a bug).
+
+###### Implementing generator
+
+To create new generator, you need to implement [`Remp\MailerModule\Generators\IGenerator` interface](app/models/Generators/IGenerator.php). Methods are descibed
+below with references to `UrlParserGenerator`:
+
+* `generateForm(Form $form)`. Generators need a way how to get arbitrary input from user. This method should add new
+form elements into the `$form` instance and state the validation rules.
+
+    ```php
+    class UrlParserGenerator implements IGenerator
+    {
+        // ...
+        public function generateForm(Form $form)
+        {
+            // ...
+    
+            $form->addTextArea('articles', 'Article')
+                ->setAttribute('rows', 7)
+                ->setOption('description', 'Paste article Urls. Each on separate line.')
+                ->getControlPrototype()
+                ->setAttribute('class', 'form-control html-editor');
+              
+            // ...
+        }
+    ```
+
+* `onSubmit(callable $onSubmit)`. TODO: hide to abstract class?
+
+* `process($values)`. Processes input values provided either by API or by generator form and generates output containing
+array with `htmlContent` and `textContent` attributes. Values of these attributes should be used as HTML/text content
+of *email*. Processing might include text replacing, fetching data from 3rd party services and anything
+that helps to shape the final HTML of *email*.
+
+    ```php
+    class UrlParserGenerator implements IGenerator
+    {
+        // ...
+        public function process($values)
+        {
+            $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
+    
+            $items = [];
+            $urls = explode("\n", trim($values->articles));
+            foreach ($urls as $url) {
+                $url = trim($url);
+                $meta = $this->content->fetchUrlMeta($url);
+                if ($meta) {
+                    $items[$url] = $meta;
+                }
+            }
+    
+            $loader = new \Twig_Loader_Array([
+                'html_template' => $sourceTemplate->content_html,
+                'text_template' => $sourceTemplate->content_text,
+            ]);
+            $twig = new \Twig_Environment($loader);
+            $params = [
+                'intro' => $values->intro,
+                'footer' => $values->footer,
+                'items' => $items,
+                'utm_campaign' => $values->utm_campaign,
+            ];
+    
+            $output = [];
+            $output['htmlContent'] = $twig->render('html_template', $params);
+            $output['textContent'] = $twig->render('text_template', $params);
+            return $output;
+        }
+    }
+    ```
+
+* `getWidgets()`. Provides array of class names of widgets that might be rendered on the page after generator form
+submission. As generator "only" generates HTML/text content of email, you might want to attach some extra behavior or
+controls to the success page - such as email preview or button to create and start *job*/*batch*.
+
+    As an example see return value of [NewsfilterGenerator](app/models/Generators/NewsfilterGenerator.php) and the
+    implementation of [NewsfilterWidget](app/components/GeneratorWidgets/Widgets/NewsfilterWidget/NewsfilterWidget.php)
+    that previews provided HTML contents of email and renders extra form to provide data required to create *email*
+    and *job*/*batch*.
+    
+    ```php
+    class NewsfilterGenerator implements IGenerator
+    {
+        // ...
+        public function getWidgets()
+        {
+            return [NewsfilterWidget::class];
+        }
+    }
+    ```
+    
+* `apiParams()`. Provides array of input parameters that generator requires when used via API. These parameters should
+mirror fields added in `generateForm()` method. They are utilized when calling [Generate mail API]().
+
+    ```php
+    class UrlParserGenerator implements IGenerator
+    {
+        // ...
+        public function apiParams()
+        {
+            return [
+                new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
+                new InputParam(InputParam::TYPE_POST, 'articles', InputParam::REQUIRED),
+                new InputParam(InputParam::TYPE_POST, 'footer', InputParam::REQUIRED),
+                new InputParam(InputParam::TYPE_POST, 'utm_campaign', InputParam::REQUIRED),
+                new InputParam(InputParam::TYPE_POST, 'intro', InputParam::REQUIRED)
+            ];
+        }
+    }
+    ```   
+
+* `preprocessParameters()`. Receives data provided by integrating 3rd party (e.g. Wordpress post data) and maps them
+to the parameters stated in `apiParams()`. This is a very specific use of an integration, that can be used as follows:
+
+    * Your CMS (e.g. Wordpress) contain an integration stating that specific category of posts can utilize Mailer's generator.
+    This integration directly states which generator template can be used. 
+    * CMS calls Mailer's *preprocess* API with Wordpress post in POST data. Generator maps Wordpress post data to the
+    fields it requires as an input. That means no hard ties are made on Wordpress side.
+    * As the generator implementation can be very specific (for example couple of our generators expect text version
+    of Wordpress post as one of the inputs), it's OK to tie API part of the generator to the caller.
+    * CMS receives back data extracted from WP post in a form, that can be submitted to the Mailer's Generator form and
+    also an URL where these data can be submitted.
+    * CMS provides a link, that creates a hidden form, populates it with *preprocessed* data and submits it to the Mailer.
+    
+    The result is, that instead of someone manually copy-pasting data out of Wordpress to Mailer, one can simply "trigger"
+    the email generation and be redirected to the Mailer's generator success page. See
+    [NewsfilterGenerator](app/models/Generators/NewsfilterGenerator.php) for reference implementation.
+    
+    ```php
+    class NewsfilterGenerator implements IGenerator
+    {
+        // ...
+        public function preprocessParameters($data)
+        {
+            $output = new \stdClass();
+    
+            if (!isset($data->post_authors[0]->display_name)) {
+                throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
+            }
+            $output->editor = $data->post_authors[0]->display_name;
+            $output->from = "Denník N <info@dennikn.sk>";
+            foreach ($data->post_authors as $author) {
+                if ($author->user_email === "editori@dennikn.sk") {
+                    continue;
+                }
+                $output->editor = $author->display_name;
+                $output->from = $author->display_name . ' <' . $author->user_email . '>';
+                break;
+            }
+    
+            if (!isset($data->post_title)) {
+                throw new PreprocessException("WP json object does not contain required attribute 'post_title'");
+            }
+            $output->title = $data->post_title;
+    
+            if (!isset($data->post_url)) {
+                throw new PreprocessException("WP json object  does not contain required attribute 'post_url'");
+            }
+            $output->url = $data->post_url;
+    
+            if (!isset($data->post_excerpt)) {
+                throw new PreprocessException("WP json object does not contain required attribute 'post_excerpt'");
+            }
+            $output->summary = $data->post_excerpt;
+    
+            if (!isset($data->post_content)) {
+                throw new PreprocessException("WP json object does not contain required attribute 'post_content'");
+            }
+            $output->newsfilter_html = $data->post_content;
+    
+            return $output;
+        }
+    }
+    ``` 
+    
+### API Documentation
+
+All examples use `http://mailer.remp.press` as a base domain. Please change the host to the one you use
+before executing the examples.
+
+All examples use `XXX` as a default value for authorization token, please replace it with the
+real token API token that can be acquired in the REMP SSO.
+
+API responses can contain following HTTP codes:
+
+| Value | Description |
+| --- | --- |
+| 200 OK | Successful response, default value | 
+| 400 Bad Request | Invalid request (missing required parameters) | 
+| 403 Forbidden | The authorization failed (provided token was not valid) | 
+| 404 Not found | Referenced resource wasn't found | 
+
+If possible, the response includes `application/json` encoded payload with message explaining
+the error further.
+
+---
+
+#### POST `/api/v1/users/subscribe`
+
+API call subscribes email address to the given newsletter.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Body:*
+
+```json5
+{
+	"email": "admin@example.com", // String; email of the user
+	"user_id": 123, // Integer; ID of the user
+	"list_id": 1 // Integer; ID of the newsletter list you're subscribing the user to
+}
+```
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/subscribe \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"email": "admin@example.com",
+	"user_id": 123,
+	"list_id": 1
+}'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok"
+}
+```
+
+---
+
+#### POST `/api/v1/users/un-subscribe`
+
+API call unsubscribes email address from the given newsletter.
+
+Endpoint accepts optional array of UTM parameters. Every link in email send by Mailer contain UTM parameters
+referencing to the specific instance of sent email. If user unsubscribes via specific email, your frontend will also
+receive special UTM parameters, that can be passed to this API call. For instance link to unsubscribe from our daily
+newsletter might look like this:
+
+```
+https://predplatne.dennikn.sk/mail/mail-settings/un-subscribe-email/newsletter_daily?utm_source=newsletter_daily&utm_medium=email&utm_campaign=daily-newsletter-11.3.2019-personalized&utm_content=26026
+```
+
+The `newsletter_daily` stands for *newsletter list code*. UTM parameters reference specific *email* and specific *batch*
+which generated this email. If you won't provide/pass these UTM parameters, statistics related to unsubscribe rate
+of emails won't be available. 
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Body:*
+
+```json5
+{
+	"email": "admin@example.com", // String; email of the user
+	"user_id": 123, // Integer; ID of the user
+	"list_id": 1, // Integer; ID of the newsletter list you're subscribing the user to
+	"utm_params": { // Object; optional UTM parameters for pairing which email caused the user to unsubscribe. UTM params are generated into the email links automatically.
+    		"utm_source": "newsletter_daily",
+    		"utm_medium": "email",
+    		"utm_campaign": "daily-newsletter-11.3.2019-personalized",
+    		"utm_content": "26026"
+    	}
+}
+```
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/un-subscribe \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"email": "admin@example.com",
+	"user_id": 12,
+	"list_id": 1,
+	"utm_params": {
+		"utm_source": "newsletter_daily",
+		"utm_medium": "email",
+		"utm_campaign": "daily-newsletter-11.3.2019-personalized",
+		"utm_content": "26026"
+	}
+}'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok"
+}
+```
+
+---
+
+#### GET `/api/v1/users/check-token`
+
+Verifies validity of autologin token provided within email.
+
+Each email can contain `{{ autologin }}` block within the template. When used within an URL
+(such as `https://predplatne.dennikn.sk{{ autologin }}`), special token is generated and appended to the URL.
+
+Token is appended as a query parameter `token`, for example:
+
+```
+https://predplatne.dennikn.sk/?token=206765522b71289504ae766389bf741x
+```
+
+Your frontend application can read this token on visit and verify against this API whether it's still valid or not.
+If it's valid, you can automatically log user in based on the ID/email the endpoint provides. 
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/check-token \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"token": "206765522b71289504ae766389bf741x"
+}'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "email": "admin@example.com"
+}
+```
+
+---
+
+#### POST `/api/v1/users/user-registered`
+
+When user is registered, Mailer should be notified so it can start tracking newsletter subscription for this new email
+address. This new email address will be automatically subscribed to any newsletter that has enabled *auto subscribe*
+option. 
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| original_email | *String* | yes | Original email address of user. |
+| new_email | *String* | yes | New email address of user. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/email-changed \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'original_email=admin%40example.com&new_email=user%40example.com'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok"
+}
+```
+
+---
+
+#### POST `/api/v1/users/email-changed`
+
+If your system allows users to change their email addrses, Mailer needs to be notified about the address change as the
+subscription information is being stored on *user_id*/*email* level.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| original_email | *String* | yes | Original email address of user. |
+| new_email | *String* | yes | New email address of user. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/email-changed \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'original_email=admin%40example.com&new_email=user%40example.com'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok"
+}
+```
+
+---
+
+#### GET `/api/v1/mailers/mail-types`
+
+Lists all available *newsletter lists* (mail types). *Code* of the newsletter is required when creating
+new *email* template via API.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/templates \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'name=Breaking%20News%20-%20Trump%20elected%20president&code=20161108_breaking_news_trump_elected_president&description=Generated%20by%20CLI%20script&mail_type_code=alerts&from=info%40dennikn.sk&subject=Breaking%20News%20-%20Trump%20elected%20president&template_text=This%20is%20a%20demo%20text%20of%20email&template_html=%3Cp%3EThis%20is%20a%20%3Cstrong%3Edemo%3C%2Fstrong%3E%20text%20of%20email%3C%2Fp%3E'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "data": [
+        {
+            "code": "alerts",
+            "title": "Breaking news"
+        }
+        // ...
+    ]
+}
+```
+
+---
+
+#### POST `/api/v1/mailers/templates`
+
+Creates new email template. Endpoint complements creation of template via web interface.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| name | *String* | yes | User-friendly name of the email. It's displayed only in the administration parts of the system. |
+| code | *String* | yes | Computer-friendly name of the email (slug). Primarily being used when referencing single email that's being sent manually. |
+| description | *String* | yes | Internal description, so you know even after a year what the purpose of email was. |
+| mail_type_code | *String* | yes | Code of newsletter list the email should belong to. Before the email is sent to specific end-user, Mailer checks whether the user is subscribed to this newsletter or not. If he/she is not, the email will not be sent. |
+| from | *String* | yes | Who should be used as a sender of email. |
+| subject | *String* | yes | Email subject. |
+| template_text | *String* | yes | Text version used as a fallback by email clients. |
+| template_html | *String* | yes | HTML (primary) version of email that people will see. HTML version is being previewed in the form for creation of new email. |
+| extras | *String* | no | JSON-encoded arbitrary metadata used internally for email personalization and just-in-time (per-user when sending) email content injection |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/templates \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'name=Breaking%20News%20-%20Trump%20elected%20president&code=20161108_breaking_news_trump_elected_president&description=Generated%20by%20CLI%20script&mail_type_code=alerts&from=info%40dennikn.sk&subject=Breaking%20News%20-%20Trump%20elected%20president&template_text=This%20is%20a%20demo%20text%20of%20email&template_html=%3Cp%3EThis%20is%20a%20%3Cstrong%3Edemo%3C%2Fstrong%3E%20text%20of%20email%3C%2Fp%3E'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "id": 24832 // Integer; ID of created email
+}
+```
+
+---
+
+#### GET `/api/v1/mailers/generator-templates`
+
+Endpoint generates HTML and text content of email based on the selected *generator template* and provided arbitrary
+parameters based on the used *generator*. It complements generation of HTML/text content via web interface.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Example:*
+
+```shell
+curl -X GET \
+  http://mailer.remp.press/api/v1/mailers/generator-templates \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "data": [ // Array; list of available generator templates
+        {
+            "id": 6, // Integer; ID of generator template
+            "title": "Breaking news - alert" // String; user-friendly name of the generator template
+        }
+        // ...
+    ]
+}
+```
+
+---
+
+#### POST `/api/v1/mailers/generate-mail`
+
+Endpoint generates HTML and text content of email based on the selected *generator template* and provided arbitrary
+parameters based on the used *generator*. It complements generation of HTML/text content via web interface.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| source_template_id | *String* | yes | ID of *generator template* to be used. |
+
+Any other parameters are specific to each generator and require knowledge of the generator implementation.
+See `apiParams()` method of the generator for the list of available/required parameters.
+
+##### *Example:*
+
+The command uses *generator template* linked to the *UrlParserGenerator*.
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/generate-mail \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'source_template_id=17&articles=https%3A%2F%2Fdennikn.sk%2F1405858%2Fkedysi-bojovala-za-mier-v-severnom-irsku-teraz-chce-zastavit-brexit%2F%3Fref%3Dtit%0Ahttps%3A%2F%2Fdennikn.sk%2F1406263%2Fpodpora-caputovej-je-tazky-hriech-tvrdil-arcibiskup-predstavitelia-cirkvi-odsudili-aj-radicovu-pred-desiatimi-rokmi%2F%3Fref%3Dtit&footer=%20&intro=%20&utm_campaign=%20'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "data": {
+        "htmlContent": " -- generated HTML content of email", // String; generated HTML email
+        "textContent": " -- generated text content of email " // String; generated plain text email
+    }
+}
+```
+
+---
+
+#### POST `/api/v1/segments/list`
+
+Lists all available segments that can be used in *jobs*.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/jobs \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "data": [ // Array; list of available segments
+        {
+            "name": "Všetci používatelia", // String; User-friendly label of segment
+            "code": "all_users", // String; Machine-friendly code of segment (slug)
+            "provider": "crm-segment" // String; Provider (owning party) of segment
+        }
+        // ...
+    ]
+}
+```
+
+---
+
+#### POST `/api/v1/mailers/jobs`
+
+Creates a new sending job. Endpoint complements manual job creation via web interface.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| segment_code | *String* | yes | Code of the segment to be used. |
+| segment_provider | *String* | yes | Segment provider owning the segment. |
+| template_id | *String* | yes | ID of *email*. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/jobs \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "id": 24066 // Integer; ID of created job
+}
+```
+
+---
+
+#### POST `/api/v1/mailers/preprocess-generator-parameters`
+
+Parses arbitrary input - usually data as they're provided by 3rd party (e.g. Wordpress) and returns generator parameters
+usable to submit to generator (either via API or web).
+
+See [`preprocessParameters()` bullet of Implementing Generator section](#implementing-generator) for integration example.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Body:*
+
+```json5
+{
+    "source_template_id": 17, // Integer; referencing generator template ID
+    "data": { // Object; arbitrary data for generator to evaluate and process
+        // ...
+    }
+}
+```
+
+##### *Example:*
+
+Following example uses `NewsfilterGenerator` which expects values from Wordpress post on the input. Preprocessing is
+expecting JSON-encoded instance of Wordpress post. We've included only necessary parameters to show the transformation
+that generator makes.
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/preprocess-generator-parameters \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"source_template_id": 20,
+	"data": {
+		"post_title": "Example article",
+		"post_url": "https://www.example.com/article",
+		"post_excerpt": "Lorem ipsum...",
+		"post_content": " -- Wordpress text content --",
+		"post_authors": [
+			{
+				"display_name": "Admin Admin"
+			}
+		]
+	}
+}'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "data": {
+        "editor": "Admin Admin",
+        "title": "Example article",
+        "url": "https://www.example.com/article",
+        "summary": "Lorem ipsum...",
+        "newsfilter_html": " -- Wordpress text content --",
+        "source_template_id": 20
+    },
+    "generator_post_url": "http://mailer.remp.press/mail-generator/"
+}
+```
+
+Transformed `data` can be then used as parameters of `/api/v1/mailers/generate-mail` endpoint.
+
+---
+
+#### POST `/api/v1/mailers/mailgun`
+
+Webhook endpoint for legacy Mailgun event reporting. We advise to use `v2` of this endpoint and new implementation
+of webhooks on Mailgun.
+
+You can configure Mailgun webhooks in the Mailgun's [control panel](https://app.mailgun.com/app/webhooks). For more
+information about Mailgun webhooks, please check the [documentation](https://documentation.mailgun.com/en/latest/user_manual.html#webhooks)
+, [quick guide](https://www.mailgun.com/blog/a-guide-to-using-mailguns-webhooks) or [guide to webhooks](https://www.mailgun.com/guides/your-guide-to-webhooks).
+
+Webhook configuration should be enough to enable the tracking in Mailer. Following example is displayed primarily for
+testing purposes and completeness.
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| mail_sender_id | *String* | yes | Back-reference to specific email Mailer sent. |
+| timestamp | *String* | yes | Timestamp when event occurred. |
+| token | *String* | yes | Verification field. |
+| signature | *String* | yes | Verification field. |
+| recipient | *String* | yes | Email address of recipient. |
+| event | *String* | yes | Type of email that occurred. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/jobs \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "id": 24066 // Integer; ID of created job
+}
+```
+
+---
+
 ### Base flow of actions
 
 Here you can see simplified view of how Mailer works at following diagram.

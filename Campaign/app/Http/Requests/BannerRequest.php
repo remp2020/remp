@@ -93,6 +93,17 @@ class BannerRequest extends FormRequest
                         'button_text' => 'string|required',
                     ]);
                     break;
+                case Banner::TEMPLATE_COLLAPSIBLE_BAR:
+                    $templateValidator = Validator::make($this->all(), [
+                        'background_color' => 'string|required',
+                        'text_color' => 'string|required',
+                        'button_background_color' => 'string|required',
+                        'button_text_color' => 'string|required',
+                        'main_text' => 'string|required',
+                        'button_text' => 'string|required',
+                        'initial_state' => 'string|required',
+                    ]);
+                    break;
                 case Banner::TEMPLATE_SHORT_MESSAGE:
                     $templateValidator = Validator::make($this->all(), [
                         'background_color' => 'string|required',

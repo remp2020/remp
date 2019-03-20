@@ -10,6 +10,8 @@ abstract class AbstractTemplate extends Model
         'banner',
     ];
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
     public function banner()
     {
         return $this->belongsTo(Banner::class);

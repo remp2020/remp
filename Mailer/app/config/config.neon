@@ -79,7 +79,7 @@ services:
 		class: Remp\MailerModule\Console\Application
 		setup:
 			- register(Remp\MailerModule\Commands\ProcessJobCommand())
-			- register(Remp\MailerModule\Commands\MailWorkerCommand())
+			- register(Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger))
 			- register(Remp\MailerModule\Commands\DatabaseSeedCommand())
 			- register(Remp\MailerModule\Commands\DemoSeedCommand())
 			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
@@ -88,6 +88,9 @@ services:
 			- register(Remp\MailerModule\Commands\MailTypeStatsCommand())
 			- register(@hermesWorker)
 			- setCatchExceptions(true)
+
+	commandsLogger:
+		class: Monolog\Logger('commands-logger')
 
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
@@ -212,6 +215,7 @@ services:
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory
 	- Remp\MailerModule\Components\ISendingStatsFactory
+	- Remp\MailerModule\Components\IMissingConfigurationFactory
 	- Remp\MailerModule\Components\IGeneratorWidgetsFactory
 	- Remp\MailerModule\Components\IBatchExperimentEvaluationFactory
 
@@ -244,3 +248,4 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
+	- Remp\MailerModule\Generators\EmbedParser

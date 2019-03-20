@@ -24,7 +24,6 @@ abstract class Mailer implements IMailer
         Config $config,
         ConfigsRepository $configsRepository
     ) {
-    
         $this->configsRepository = $configsRepository;
         $this->config = $config;
 
@@ -36,26 +35,63 @@ abstract class Mailer implements IMailer
         return $this->alias;
     }
 
-    public function getConfig()
+    public function getConfigs()
     {
         return $this->options;
     }
 
+    /**
+     * Returns single config value
+     *
+     * @param string $config
+     * @return string|null
+     */
+    public function getConfig(string $config): ?string
+    {
+        return $this->options[$config]['value'] ?? null;
+    }
+
     protected function buildConfig()
     {
-        foreach ($this->options as $configName) {
-            try {
-                $prefix = str_replace('-', '_', Strings::webalize(get_called_class()));
-                $this->options[$configName] = $this->config->get($prefix . '_' . $configName);
-                unset($this->options[array_search($configName, $this->options)]);
-            } catch (ConfigNotExistsException $e) {
-                $displayName = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1) . ' ' . Strings::firstUpper($configName);
-                $description = 'Setting for ' . get_called_class();
-                $this->configsRepository->add($prefix . '_' . $configName, $displayName, null, $description, Config::TYPE_STRING);
+        foreach ($this->options as $name => $definition) {
+            $prefix = $this->getPrefix();
 
-                $this->options[$configName] = null;
+            try {
+                $this->options[$name]['value'] = $this->config->get($prefix . '_' . $name);
+            } catch (ConfigNotExistsException $e) {
+                $description = 'Setting for ' . get_called_class();
+                $this->configsRepository->add($prefix . '_' . $name, $definition['label'], null, $description, Config::TYPE_STRING);
+
+                $this->options[$name] = [
+                    'label' => $definition['label'],
+                    'required' => $definition['required'],
+                    'value' => null,
+                ];
             }
         }
+    }
+
+    public function getPrefix()
+    {
+        return str_replace('-', '_', Strings::webalize(get_called_class()));
+    }
+
+    public function isConfigured()
+    {
+        foreach ($this->getRequiredOptions() as $option) {
+            if (!isset($option['value'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function getRequiredOptions()
+    {
+        return array_filter($this->options, function ($option) {
+            return $option['required'];
+        });
     }
 
     /**

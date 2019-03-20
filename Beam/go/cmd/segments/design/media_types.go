@@ -318,7 +318,7 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("purchase", CommercePayment)
 		Attribute("refund", CommercePayment)
 
-		Attribute("source", Source, "UTM and social source metadata")
+		Attribute("source", Source, "UTM source metadata")
 		Attribute("article", Article)
 		Attribute("system", System)
 		Attribute("user", User)
@@ -369,7 +369,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("ip_address", String, "IP address of client", func() {
 			Format("ip")
 		})
-		Attribute("source", Source, "UTM and social source metadata")
+		Attribute("source", Source, "UTM source metadata")
 		Attribute("remp_session_id", String, "ID of reader's session")
 		Attribute("remp_pageview_id", String, "ID of pageview")
 		Attribute("referer", String, "Value of HTTP referer header (if present)")
@@ -429,14 +429,12 @@ var Source = MediaType("application/vnd.source+json", func() {
 		Attribute("utm_medium", String, "Medium through which the came (e.g. overlay, inline)")
 		Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 		Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
-		Attribute("social", String, "Social source if available")
 	})
 	View("default", func() {
 		Attribute("utm_source")
 		Attribute("utm_medium")
 		Attribute("utm_campaign")
 		Attribute("utm_content")
-		Attribute("social")
 	})
 })
 

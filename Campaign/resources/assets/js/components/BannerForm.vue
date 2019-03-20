@@ -57,6 +57,17 @@
                v-bind:show="show"
             ></bar-template>
 
+            <collapsible-bar-template v-if="template === 'collapsible_bar'"
+               v-bind:_mainText="collapsibleBarTemplate.mainText"
+               v-bind:_buttonText="collapsibleBarTemplate.buttonText"
+               v-bind:_backgroundColor="collapsibleBarTemplate.backgroundColor"
+               v-bind:_textColor="collapsibleBarTemplate.textColor"
+               v-bind:_buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+               v-bind:_initialState="collapsibleBarTemplate.initialState"
+               v-bind:show="show"
+            ></collapsible-bar-template>
+
             <short-message-template v-if="template === 'short_message'"
               v-bind:_text="shortMessageTemplate.text"
               v-bind:_backgroundColor="shortMessageTemplate.backgroundColor"
@@ -82,7 +93,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group">
+                            <div class="input-group" :class="{ hidden: collapsibleBarTemplate != null }">
                                 <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
                                 <div>
                                     <div class="row">
@@ -113,7 +124,7 @@
                 </div>
             </div>
 
-            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
+            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal" :class="{ hidden: collapsibleBarTemplate != null }">
                 <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
@@ -122,7 +133,7 @@
                 </li>
             </ul>
 
-            <div class="card m-t-15">
+            <div class="card m-t-15" :class="{ hidden: collapsibleBarTemplate != null }">
                 <div class="tab-content p-0">
                     <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
@@ -271,6 +282,7 @@
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
                                         :overlayRectangleTemplate="overlayRectangleTemplate"
                                         :barTemplate="barTemplate"
+                                        :collapsibleBarTemplate="collapsibleBarTemplate"
                                         :htmlTemplate="htmlTemplate"
                                         :shortMessageTemplate="shortMessageTemplate"
 
@@ -303,6 +315,7 @@
     import HtmlTemplate from "./templates/Html"
     import MediumRectangleTemplate from "./templates/MediumRectangle";
     import BarTemplate from "./templates/Bar";
+    import CollapsibleBarTemplate from "./templates/CollapsibleBar";
     import ShortMessageTemplate from "./templates/ShortMessage";
     import OverlayRectangleTemplate from "./templates/OverlayRectangle";
     import BannerPreview from "./BannerPreview";
@@ -329,6 +342,7 @@
 
         "_mediumRectangleTemplate": Object,
         "_barTemplate": Object,
+        "_collapsibleBarTemplate": Object,
         "_htmlTemplate": Object,
         "_shortMessageTemplate": Object,
         "_overlayRectangleTemplate": Object,
@@ -346,6 +360,7 @@
             HtmlTemplate,
             MediumRectangleTemplate,
             BarTemplate,
+            CollapsibleBarTemplate,
             ShortMessageTemplate,
             BannerPreview,
             vSelect,
@@ -383,6 +398,7 @@
 
             mediumRectangleTemplate: null,
             barTemplate: null,
+            collapsibleBarTemplate: null,
             htmlTemplate: null,
             shortMessageTemplate: null,
             overlayRectangleTemplate: null,

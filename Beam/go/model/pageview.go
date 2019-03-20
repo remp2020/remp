@@ -40,7 +40,6 @@ type Pageview struct {
 	UTMCampaign   string `json:"utm_campaign"`
 	UTMMedium     string `json:"utm_medium"`
 	UTMContent    string `json:"utm_content"`
-	SocialSource  string `json:"social"`
 
 	Token        string    `json:"token"`
 	Time         time.Time `json:"time"`

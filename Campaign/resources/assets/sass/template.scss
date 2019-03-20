@@ -22,6 +22,12 @@
         background-position: center;
     }
 
+    &.collapsible-bar {
+        background-image: url('../img/collapsible_bar.png');
+        background-size: contain;
+        background-position: center;
+    }
+
     &.short-message {
         background-image: url('../img/short_message.png');
         background-size: 80%;
@@ -56,4 +62,9 @@ a.notifyLink {
 
 a.notifyLink:hover {
     color: #fff;
+}
+
+.app-info {
+    background: $primaryColor;
+    color: white;
 }

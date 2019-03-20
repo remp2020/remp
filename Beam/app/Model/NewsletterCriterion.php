@@ -3,6 +3,7 @@ namespace App\Model;
 
 use App\Article;
 use App\Author;
+use App\Helpers\Misc;
 use Cache;
 use Exception;
 use Illuminate\Support\Carbon;
@@ -26,9 +27,9 @@ class NewsletterCriterion extends Enum
         return implode($glue, self::getValues());
     }
 
-    public function getArticles(int $daysSpan, ?int $articlesCount = null, array $ignoreAuthors = []): Collection
+    public function getArticles(string $timespan, ?int $articlesCount = null, array $ignoreAuthors = []): Collection
     {
-        $start = Carbon::now()->subDays($daysSpan);
+        $start = Misc::timespanInPast($timespan);
 
         $query = Article::distinct();
 
@@ -65,24 +66,27 @@ class NewsletterCriterion extends Enum
                 throw new Exception('unknown article criterion ' . $this->getValue());
         }
 
+        // Do not consider older articles
+        $query->publishedBetween($start);
+
         $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->get()->pluck('id')->toArray();
         return $query->ignoreAuthorIds($ignoreAuthorIds)->get();
     }
 
 
     /**
-     * @param int                $daysSpan
+     * @param string             $timespan
      * @param array              $ignoreAuthors
      *
      * @return array of articles (containing only external_id and url attributes)
      */
-    public function getCachedArticles(int $daysSpan, array $ignoreAuthors = []): array
+    public function getCachedArticles(string $timespan, array $ignoreAuthors = []): array
     {
         $tag = 'top_articles';
-        $key = $tag . '|' . $this->getValue() . '|' . $daysSpan;
+        $key = $tag . '|' . $this->getValue() . '|' . $timespan;
 
-        return Cache::tags($tag)->remember($key, 10, function () use ($daysSpan, $ignoreAuthors) {
-            return $this->getArticles($daysSpan, null, $ignoreAuthors)->map(function ($article) {
+        return Cache::tags($tag)->remember($key, 5, function () use ($timespan, $ignoreAuthors) {
+            return $this->getArticles($timespan, null, $ignoreAuthors)->map(function ($article) {
                 $item = new \stdClass();
                 $item->external_id = $article->external_id;
                 $item->url = $article->url;
