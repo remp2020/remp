@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\CampaignsRefreshCache::class
+        Commands\CampaignsRefreshCache::class,
+        Commands\AggregateCampaignStats::class
     ];
 
     /**
