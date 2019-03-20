@@ -84,47 +84,8 @@
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h2>Stats</h2>
-            </div>
-            <div class="card-body">
-
-                <table class="table">
-                    <tbody>
-                    <tr>
-                        <td><strong>Number of subscribed:</strong></td>
-                        <td>{$stats['subscribed']|number}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Number of un-subscribed:</strong></td>
-                        <td>{$stats['un-subscribed']|number}</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <hr>
-
-                <table class="table">
-                    <thead>
-                        <th>unique subscribers</th>
-                        <th>last 7 days</th>
-                        <th>last 30 days</th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Number of opened</strong></td>
-                            <td>{$stats['opened']['7-days']|number}</td>
-                            <td>{$stats['opened']['30-days']|number}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Number of clicked</strong></td>
-                            <td>{$stats['clicked']['7-days']|number}</td>
-                            <td>{$stats['clicked']['30-days']|number}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div id="list-stats">
+            <list-stats id="{$list->id}"></list-stats>
         </div>
 
         {if $variants->count('*')}
@@ -165,3 +126,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    new Vue({
+        el: '#list-stats',
+        components: {
+            'list-stats': ListStats
+        }
+    })
+</script>

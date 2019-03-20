@@ -144,41 +144,47 @@ final class ListPresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $week = (new DateTime)->setTimestamp(strtotime('-7 days'));
-        $month = (new DateTime)->setTimestamp(strtotime('-30 days'));
-
         $this->template->list = $list;
         $this->template->variants = $list->related('mail_type_variants')->order('sorting');
-        $this->template->stats = [
-            'subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
-            'un-subscribed' => $list->related('mail_user_subscriptions')->where(['subscribed' => false])->count('*'),
+
+        $this->prepareDetailSubscribersGraphData($id);
+    }
+
+    public function renderStats($id)
+    {
+        $list = $this->listsRepository->find($id);
+        if (!$list) {
+            throw new BadRequestException();
+        }
+
+        $week = new DateTime('-7 days');
+        $month = new DateTime('-30 days');
+        $stats = [
+            'subscribed' => $list->related('mail_user_subscriptions')
+                ->where(['subscribed' => true])
+                ->count('*'),
+            'un-subscribed' => $list->related('mail_user_subscriptions')
+                ->where(['subscribed' => false])
+                ->count('*'),
             'opened' => [
                 '7-days' => $this->logsRepository->byMailType($list->id)
                     ->where('opened_at > ?', $week)
-                    ->select('COUNT(DISTINCT email) AS count')
-                    ->fetch()
-                    ->count,
+                    ->count('DISTINCT email'),
                 '30-days' => $this->logsRepository->byMailType($list->id)
                     ->where('opened_at > ?', $month)
-                    ->select('COUNT(DISTINCT email) AS count')
-                    ->fetch()
-                    ->count,
+                    ->count('DISTINCT email'),
             ],
             'clicked' => [
                 '7-days' => $this->logsRepository->byMailType($list->id)
                     ->where('clicked_at > ?', $week)
-                    ->select('COUNT(DISTINCT email) AS count')
-                    ->fetch()
-                    ->count,
+                    ->count('DISTINCT email'),
                 '30-days' => $this->logsRepository->byMailType($list->id)
                     ->where('clicked_at > ?', $month)
-                    ->select('COUNT(DISTINCT email) AS count')
-                    ->fetch()
-                    ->count,
+                    ->count('DISTINCT email'),
             ]
         ];
 
-        $this->prepareDetailSubscribersGraphData($id);
+        $this->sendJson($stats);
     }
 
     public function prepareDetailSubscribersGraphData($id)

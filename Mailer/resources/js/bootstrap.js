@@ -12,4 +12,6 @@ global.clipboard = require("./clipboard.js");
 
 global.salvattore = require("salvattore");
 
+global.ListStats = require('./components/ListStats.vue');
+
 Nette.initOnLoad();
