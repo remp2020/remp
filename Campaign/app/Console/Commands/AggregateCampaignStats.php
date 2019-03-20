@@ -30,7 +30,7 @@ class AggregateCampaignStats extends Command
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
-        $this->line(sprintf("Fetching stats data for active campaigns <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
+        $this->line(sprintf("Fetching stats data for campaigns between <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
         $campaigns = Campaign::all();
         if (!$this->option('include-inactive')) {
