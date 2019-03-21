@@ -17,6 +17,7 @@ class CampaignBannerStats extends Model
         'click_count',
         'show_count',
         'payment_count',
+        'purchase_count',
         'purchase_sum',
         'purchase_currency'
     ];

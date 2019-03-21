@@ -53,7 +53,8 @@ class AggregateCampaignStats extends Command
                 $cbs->click_count = $stats['click_count']->count ?? 0;
                 $cbs->show_count = $stats['show_count']->count ?? 0;
                 $cbs->payment_count = $stats['payment_count']->count ?? 0;
-                $cbs->purchase_sum = $stats['purchase_sum']->count ?? 0;
+                $cbs->purchase_count = $stats['purchase_count']->count ?? 0;
+                $cbs->purchase_sum = $stats['purchase_sum']->sum ?? 0.0;
                 $cbs->purchase_currency = $stats['purchase_sum']->tags->currency ?? null;
                 $cbs->save();
             }

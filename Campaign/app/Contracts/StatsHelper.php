@@ -35,25 +35,6 @@ class StatsHelper
             'purchase_sum' => $this->campaignPaymentStatsSum($variantUuids, 'purchase', $from, $to),
         ];
 
-        return $this->addCalculatedValues($data);
-    }
-
-    private function addCalculatedValues($data)
-    {
-        $data['ctr'] = 0;
-        $data['conversions'] = 0;
-
-        // calculate ctr & conversions
-        if ($data['show_count']->count) {
-            if ($data['click_count']->count) {
-                $data['ctr'] = ($data['click_count']->count / $data['show_count']->count) * 100;
-            }
-
-            if ($data['purchase_count']->count) {
-                $data['conversions'] = ($data['purchase_count']->count / $data['show_count']->count) * 100;
-            }
-        }
-
         return $data;
     }
 

@@ -22,6 +22,7 @@ class CreateCampaignBannerStatsTable extends Migration
             $table->integer('click_count');
             $table->integer('show_count');
             $table->integer('payment_count');
+            $table->integer('purchase_count');
             $table->decimal('purchase_sum', 10, 2);
             $table->string('purchase_currency')->nullable();
 
