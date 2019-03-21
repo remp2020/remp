@@ -25,6 +25,24 @@ class StatsHelper
         return $this->variantsStats([$variant->uuid], $from, $to);
     }
 
+    public static function addCalculatedValues($data)
+    {
+        $data['ctr'] = 0;
+        $data['conversions'] = 0;
+
+        // calculate ctr & conversions
+        if (isset($data['show_count'])) {
+            if ($data['click_count']) {
+                $data['ctr'] = ($data['click_count'] / $data['show_count']) * 100;
+            }
+
+            if ($data['purchase_count']) {
+                $data['conversions'] = ($data['purchase_count'] / $data['show_count']) * 100;
+            }
+        }
+        return $data;
+    }
+
     private function variantsStats($variantUuids, Carbon $from = null, Carbon $to = null)
     {
         $data = [
@@ -35,7 +53,7 @@ class StatsHelper
             'purchase_sum' => $this->campaignPaymentStatsSum($variantUuids, 'purchase', $from, $to),
         ];
 
-        return $data;
+        return self::addCalculatedValues($data);
     }
 
     private function campaignStatsCount($variantUuids, $type, Carbon $from = null, Carbon $to = null)

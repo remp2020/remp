@@ -90,7 +90,7 @@ class StatsController extends Controller
             $variantData['purchase_sum'] = (double) $stat->purchase_sum;
             $variantData['purchase_currency'] = explode(',', $stat->purchase_currency)[0]; // Currently supporting only one currency
 
-            $variantsData[$stat->campaign_banner_id] = $this->addCalculatedValues($variantData);
+            $variantsData[$stat->campaign_banner_id] = StatsHelper::addCalculatedValues($variantData);
 
             $campaignData['click_count'] += $variantData['click_count'];
             $campaignData['show_count'] += $variantData['show_count'];
@@ -123,24 +123,6 @@ class StatsController extends Controller
             'campaign' => $campaignData,
             'variants' => $variantsData,
         ];
-    }
-
-    private function addCalculatedValues($data)
-    {
-        $data['ctr'] = 0;
-        $data['conversions'] = 0;
-
-        // calculate ctr & conversions
-        if (isset($data['show_count'])) {
-            if ($data['click_count']) {
-                $data['ctr'] = ($data['click_count'] / $data['show_count']) * 100;
-            }
-
-            if ($data['purchase_count']) {
-                $data['conversions'] = ($data['purchase_count'] / $data['show_count']) * 100;
-            }
-        }
-        return $data;
     }
 
     private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, $chartWidth)
