@@ -2,32 +2,21 @@
 
 namespace Remp\MailerModule\Commands;
 
-use Remp\MailerModule\Repository\LogsRepository;
-use Remp\MailerModule\Repository\TemplatesRepository;
+use Nette\Database\Connection;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessTemplateStatsCommand extends Command
 {
-    /**
-     * @var LogsRepository
-     */
-    private $logsRepository;
-
-    /**
-     * @var TemplatesRepository
-     */
-    private $templatesRepository;
+    private $database;
 
     public function __construct(
-        LogsRepository $logsRepository,
-        TemplatesRepository $templatesRepository
+        Connection $connection
     ) {
         parent::__construct();
-        $this->logsRepository = $logsRepository;
-        $this->templatesRepository = $templatesRepository;
+
+        $this->database = $connection;
     }
 
     protected function configure()
@@ -42,54 +31,47 @@ class ProcessTemplateStatsCommand extends Command
         $output->writeln('<info>***** UPDATE EMAIL TEMPLATE STATS *****</info>');
         $output->writeln('');
 
-        $templates = $this->templatesRepository->getTable()
-            ->select('id')
-            ->fetchAll();
-
-        ProgressBar::setFormatDefinition(
-            'processStats',
-            "%processing% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%"
-        );
-
-        $progressBar = new ProgressBar($output, count($templates));
-        $progressBar->setFormat('processStats');
-        $progressBar->start();
-
-        foreach ($templates as $template) {
-            $progressBar->setMessage('Processing template <info>' . $template->id . '</info>', 'processing');
-            $toUpdate = [
-                'sent' => 0,
-                'delivered' => 0,
-                'opened' => 0,
-                'clicked' => 0,
-                'dropped' => 0,
-                'spam_complained' => 0,
-            ];
-
-            $jobBatchTemplates = $template->related('mail_job_batch_templates')->fetchAll();
-            foreach ($jobBatchTemplates as $jobBatchTemplate) {
-                $toUpdate['sent'] += $jobBatchTemplate['sent'];
-                $toUpdate['delivered'] += $jobBatchTemplate['delivered'];
-                $toUpdate['opened'] += $jobBatchTemplate['opened'];
-                $toUpdate['clicked'] += $jobBatchTemplate['clicked'];
-                $toUpdate['dropped'] += $jobBatchTemplate['dropped'];
-                $toUpdate['spam_complained'] += $jobBatchTemplate['spam_complained'];
-            }
-
-            $nonBatchTemplateStats = $this->logsRepository->getNonBatchTemplateStats($template->id);
-            $toUpdate['sent'] += $nonBatchTemplateStats['sent'];
-            $toUpdate['delivered'] += $nonBatchTemplateStats['delivered'];
-            $toUpdate['opened'] += $nonBatchTemplateStats['opened'];
-            $toUpdate['clicked'] += $nonBatchTemplateStats['clicked'];
-            $toUpdate['dropped'] += $nonBatchTemplateStats['dropped'];
-            $toUpdate['spam_complained'] += $nonBatchTemplateStats['spam_complained'];
-
-            $this->templatesRepository->update($template, $toUpdate);
-            $progressBar->advance();
-        }
-
-        $progressBar->setMessage('done');
-        $progressBar->finish();
+        $this->database->query('
+            UPDATE mail_templates as dest,
+              (SELECT mail_template_id, sent, delivered, opened, clicked, dropped, spam_complained
+               FROM (
+                      SELECT mjbt.mail_template_id,
+                             SUM(mjbt.sent)            as sent,
+                             SUM(mjbt.delivered)       as delivered,
+                             SUM(mjbt.opened)          as opened,
+                             SUM(mjbt.clicked)         as clicked,
+                             SUM(mjbt.dropped)         as dropped,
+                             SUM(mjbt.spam_complained) as spam_complained
+            
+                      FROM mail_job_batch_templates mjbt
+                      GROUP BY mjbt.mail_template_id
+            
+                      UNION ALL
+            
+                      SELECT mtad.mail_template_id,
+                             SUM(mtad.sent)            as sent,
+                             SUM(mtad.delivered)       as delivered,
+                             SUM(mtad.opened)          as opened,
+                             SUM(mtad.clicked)         as clicked,
+                             SUM(mtad.dropped)         as dropped,
+                             SUM(mtad.spam_complained) as spam_complained
+            
+                      FROM mail_templates_aggregated_data mtad
+                      GROUP BY mtad.mail_template_id
+                    ) a
+            
+               GROUP BY mail_template_id
+               ORDER BY mail_template_id DESC) as src
+            SET
+              dest.sent = src.sent,
+              dest.delivered = src.delivered,
+              dest.opened = src.opened,
+              dest.clicked = src.clicked,
+              dest.dropped = src.dropped,
+              dest.spam_complained = src.spam_complained
+            WHERE
+                dest.id = src.mail_template_id;
+        ');
 
         $output->writeln('');
         $output->writeln('Done');
