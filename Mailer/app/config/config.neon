@@ -83,6 +83,7 @@ services:
 			- register(Remp\MailerModule\Commands\DatabaseSeedCommand())
 			- register(Remp\MailerModule\Commands\DemoSeedCommand())
 			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
+			- register(Remp\MailerModule\Commands\AggregateSystemMailTemplateStatsCommand())
 			- register(Remp\MailerModule\Commands\ProcessTemplateStatsCommand())
 			- register(Remp\MailerModule\Commands\HeartbeatCommand())
 			- register(Remp\MailerModule\Commands\MailTypeStatsCommand())
@@ -210,6 +211,7 @@ services:
 	- Remp\MailerModule\Repository\AutoLoginTokensRepository
 	- Remp\MailerModule\Repository\SourceTemplatesRepository
 	- Remp\MailerModule\Repository\MailTypesRepository
+	- Remp\MailerModule\Repository\MailTemplatesAggregatedDataRepository
 	- Remp\MailerModule\Repository\MailTypeStatsRepository
 
 	# Factories
