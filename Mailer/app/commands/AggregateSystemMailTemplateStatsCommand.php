@@ -8,6 +8,7 @@ use Remp\MailerModule\Repository\MailTemplatesAggregatedDataRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -41,18 +42,26 @@ class AggregateSystemMailTemplateStatsCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mail:system-template-stats')
+        $this->setName('mail:aggregate-system-template-stats')
+            ->addArgument('date', InputArgument::OPTIONAL, 'Date which to aggregate in Y-m-d format.')
             ->setDescription('Process template stats based on batch stats and mail logs');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('');
-        $output->writeln('<info>***** UPDATE EMAIL TEMPLATE STATS *****</info>');
+        $output->writeln('<info>***** AGGREGATE SYSTEM MAIL TEMPLATE STATS  *****</info>');
         $output->writeln('');
 
-        $yesterday = new DateTime('-1 day');
-        $today = new DateTime;
+        $date = $input->getArgument('date');
+
+        if ($date !== null) {
+            $today = new DateTime($date);
+            $yesterday = new DateTime($date . ' -1 day');
+        } else {
+            $today = new DateTime;
+            $yesterday = new DateTime('-1 day');
+        }
 
         $data = $this->logsRepository
             ->getTable()
