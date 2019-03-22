@@ -338,9 +338,49 @@ the error further.
 
 ---
 
+#### POST `/api/v1/users/user-registered`
+
+When user is registered, Mailer should be notified so it can start tracking newsletter subscription for this new email
+address. This new email address will be automatically subscribed to any newsletter that has enabled *auto subscribe*
+option. 
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| email | *String* | yes | Email address of user. |
+| user_id | *String* | yes | ID of user. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/user-registered \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'email=admin%40example.com&user_id=12345'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok"
+}
+```
+
+---
+
 #### POST `/api/v1/users/subscribe`
 
-API call subscribes email address to the given newsletter.
+API call subscribes email address to the given newsletter. Newsletter has to already be created. As there's no API
+for that, please visit `/list/new` to create newsletter via web admin.
 
 ##### *Headers:*
 
@@ -413,11 +453,11 @@ of emails won't be available.
 	"user_id": 123, // Integer; ID of the user
 	"list_id": 1, // Integer; ID of the newsletter list you're subscribing the user to
 	"utm_params": { // Object; optional UTM parameters for pairing which email caused the user to unsubscribe. UTM params are generated into the email links automatically.
-    		"utm_source": "newsletter_daily",
-    		"utm_medium": "email",
-    		"utm_campaign": "daily-newsletter-11.3.2019-personalized",
-    		"utm_content": "26026"
-    	}
+        "utm_source": "newsletter_daily",
+        "utm_medium": "email",
+        "utm_campaign": "daily-newsletter-11.3.2019-personalized",
+        "utm_content": "26026"
+    }
 }
 ```
 
@@ -467,6 +507,14 @@ https://predplatne.dennikn.sk/?token=206765522b71289504ae766389bf741x
 Your frontend application can read this token on visit and verify against this API whether it's still valid or not.
 If it's valid, you can automatically log user in based on the ID/email the endpoint provides. 
 
+##### *Body:*
+
+```json5
+{
+	"token": "206765522b71289504ae766389bf741x", // String; token read from query string
+}
+```
+
 ##### *Example:*
 
 ```shell
@@ -484,45 +532,6 @@ Response:
 {
     "status": "ok",
     "email": "admin@example.com"
-}
-```
-
----
-
-#### POST `/api/v1/users/user-registered`
-
-When user is registered, Mailer should be notified so it can start tracking newsletter subscription for this new email
-address. This new email address will be automatically subscribed to any newsletter that has enabled *auto subscribe*
-option. 
-
-##### *Headers:*
-
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
-
-##### *Params:*
-
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| original_email | *String* | yes | Original email address of user. |
-| new_email | *String* | yes | New email address of user. |
-
-##### *Example:*
-
-```shell
-curl -X POST \
-  http://mailer.remp.press/api/v1/users/email-changed \
-  -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'original_email=admin%40example.com&new_email=user%40example.com'
-```
-
-Response:
-
-```json5
-{
-    "status": "ok"
 }
 ```
 
@@ -580,11 +589,9 @@ new *email* template via API.
 ##### *Example:*
 
 ```shell
-curl -X POST \
-  http://mailer.remp.press/api/v1/mailers/templates \
-  -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'name=Breaking%20News%20-%20Trump%20elected%20president&code=20161108_breaking_news_trump_elected_president&description=Generated%20by%20CLI%20script&mail_type_code=alerts&from=info%40dennikn.sk&subject=Breaking%20News%20-%20Trump%20elected%20president&template_text=This%20is%20a%20demo%20text%20of%20email&template_html=%3Cp%3EThis%20is%20a%20%3Cstrong%3Edemo%3C%2Fstrong%3E%20text%20of%20email%3C%2Fp%3E'
+curl -X GET \
+  http://mailer.remp.press/api/v1/mailers/mail-types \
+  -H 'Authorization: Bearer XXX'
 ```
 
 Response:
@@ -732,7 +739,7 @@ Response:
 
 ---
 
-#### POST `/api/v1/segments/list`
+#### GET `/api/v1/segments/list`
 
 Lists all available segments that can be used in *jobs*.
 
@@ -745,11 +752,9 @@ Lists all available segments that can be used in *jobs*.
 ##### *Example:*
 
 ```shell
-curl -X POST \
-  http://mailer.remp.press/api/v1/mailers/jobs \
-  -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment'
+curl -X GET \
+  http://mailer.remp.press/api/v1/segments/list \
+  -H 'Authorization: Bearer XXX'
 ```
 
 Response:
@@ -772,7 +777,10 @@ Response:
 
 #### POST `/api/v1/mailers/jobs`
 
-Creates a new sending job. Endpoint complements manual job creation via web interface.
+Creates a new sending job with single batch configured to be sent immediately and to randomized list of emails. The job
+is automatically in *ready* state indicating to processing daemon that it should be sent right away.
+
+Endpoint complements manual job creation via web interface.
 
 ##### *Headers:*
 
@@ -879,6 +887,10 @@ Response:
 
 Transformed `data` can be then used as parameters of `/api/v1/mailers/generate-mail` endpoint.
 
+As of the writing of this description, not all generators are required to provide preprocessing of parameters.
+It's responsible of the caller to know whether the source template uses generator that can *preprocess* parameters.
+If the *preprocess* is called for generator not supporting it, *HTTP 400 Bad Request* is returned with error message.
+
 ---
 
 #### POST `/api/v1/mailers/mailgun`
@@ -906,12 +918,14 @@ testing purposes and completeness.
 
 ##### *Example:*
 
+The example serves only for debugging purposes, you shouldn't really need to call it yourself.
+
 ```shell
 curl -X POST \
-  http://mailer.remp.press/api/v1/mailers/jobs \
+  http://mailer.remp.press/api/v1/mailers/mailgun \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment'
+  -d 'mail_sender_id=foo&timestamp=1529006854&token=a8ce0edb2dd8301dee6c2405235584e45aa91d1e9f979f3de0&signature=d2271d12299f6592d9d44cd9d250f0704e4674c30d79d07c47a66f95ce71cf55&recipient=admin%40example.com&event=opened'
 ```
 
 Response:
@@ -919,9 +933,77 @@ Response:
 ```json5
 {
     "status": "ok",
-    "id": 24066 // Integer; ID of created job
 }
 ```
+
+The event itself is just validated and put to the asynchronous queue to be processed later.
+
+---
+
+#### POST `/api/v2/mailers/mailgun`
+
+Webhook endpoint for new Mailgun event reporting. Comparing to `v1` the payload provided by Mailgun is more descriptive
+and is sent as a JSON body instead of HTTP form parameters.
+
+You can configure Mailgun webhooks in the Mailgun's [control panel](https://app.mailgun.com/app/webhooks). For more
+information about Mailgun webhooks, please check the [documentation](https://documentation.mailgun.com/en/latest/user_manual.html#webhooks)
+, [quick guide](https://www.mailgun.com/blog/a-guide-to-using-mailguns-webhooks) or [guide to webhooks](https://www.mailgun.com/guides/your-guide-to-webhooks).
+
+Webhook configuration should be enough to enable the tracking in Mailer. Following example is displayed primarily for
+testing purposes and completeness.
+
+##### *Body:*
+
+```json5
+{
+  "signature": {
+    "timestamp": "1529006854",
+    "token": "a8ce0edb2dd8301dee6c2405235584e45aa91d1e9f979f3de0",
+    "signature": "d2271d12299f6592d9d44cd9d250f0704e4674c30d79d07c47a66f95ce71cf55"
+  },
+  "event-data": {
+    "event": "opened",
+    "timestamp": 1529006854.329574,
+    "id": "DACSsAdVSeGpLid7TN03WA",
+    // ...
+  }
+}
+```
+
+##### *Example:*
+
+The example serves only for debugging purposes, you shouldn't really need to call it yourself. More verbose of example
+can be found in [Mailgun's blogpost](https://www.mailgun.com/blog/same-api-new-tricks-get-event-notifications-just-in-time-with-webhooks)
+introducing new version of webhooks.
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v2/mailers/mailgun \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "signature": {
+    "timestamp": "1529006854",
+    "token": "a8ce0edb2dd8301dee6c2405235584e45aa91d1e9f979f3de0",
+    "signature": "d2271d12299f6592d9d44cd9d250f0704e4674c30d79d07c47a66f95ce71cf55"
+  },
+  "event-data": {
+    "event": "opened",
+    "timestamp": 1529006854.329574,
+    "id": "DACSsAdVSeGpLid7TN03WA"
+  }
+}'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+}
+```
+
+The event itself is just validated and put to the asynchronous queue to be processed later.
 
 ---
 
@@ -1085,85 +1167,19 @@ The changes Mailer is interested in are:
 * _User registration_. Mailer automatically subscribes user to all newsletters that have `auto_subscribe`
 flag enabled.
 
-  * `/api/v1/users/user-registered`:
-  
-    **Request:**  
-    (application/x-www-form-urlencoded)
-    ```POST
-    user_id=STRING
-    ```
-    
-    **Response:**
-    ```
-    HTTP 200 OK
-    {
-        "status": "ok"
-    }
-    ```
+  * [`/api/v1/users/user-registered`](#post-apiv1usersuser-registered)
     
 * _Email change_. Mailer keeps subscription information also to the email address. When the user changes
 his/her email, Mailer needs to update that information too.
 
-  * `/api/v1/users/email-changed`:
-  
-    **Request:**  
-    (application/json)
-    ```json
-    {
-        "original_email": String, // original email of user
-        "new_email": Integer, // new email of user
-    }
-    ```
-    
-    **Response:**
-    ```
-    HTTP 200 OK
-    {
-        "status": "ok"
-    }
-    ```
+  * [`/api/v1/users/email-changed`](#post-apiv1usersemail-changed):
     
 * _Newsletter subscribe and unsubscribe_. Mailer doesn't provide frontend interface for subscribing
 and unsubscribing from newsletters - site owners tend to integrate this into their layout. Due to this
 Mailer provides APIs to subscribe and unsubscribe users from the newsletters
-  * `/api/v1/users/subscribe`:
-  
-    **Request:**  
-    (application/json)
-    ```json
-    {
-        "email": String, // email of user
-        "list_id": Integer, // ID of newsletter list
-        "variant_id": Integer // optional, ID of newsletter list variant 
-    }
-    ```
-    
-    **Response:**
-    ```
-    HTTP 200 OK
-    {
-        "status": "ok"
-    }
-    ```
-    
-  * `/api/v1/users/un-subscribe`
-  
-    **Request:**  
-    (application/json)
-    ```json
-    {
-        "email": String, // email of user
-        "list_id": Integer, // ID of newsletter list
-    }
-    ```
-    
-    **Response:**
-    ```
-    HTTP 200 OK
-    {
-        "status": "ok"
-    }
-    ```
+
+  * [`/api/v1/users/subscribe`](#post-apiv1userssubscribe)
+  * [`/api/v1/users/un-subscribe`](#post-apiv1usersun-subscribe)
     
 In case you're not able to call these APIs, you can create console command and synchronize the data
 against your APIs with your update logic.

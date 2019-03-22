@@ -32,32 +32,25 @@ class UserRegisteredHandler extends BaseHandler
     public function params()
     {
         return [
+            new InputParam(InputParam::TYPE_POST, 'email', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'user_id', InputParam::REQUIRED),
         ];
     }
 
     public function handle($params)
     {
-        $userId = $params['user_id'];
-
-        $userList = $this->userProvider->list([$userId], 1);
-        if (count($userList) === 0) {
-            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Invalid user_id parameter']);
-        }
-        $userInfo = $userList[$userId];
-
         $lists = $this->listsRepository->all();
 
-        if (!empty($this->userSubscriptionsRepository->findByEmail($userInfo['email']))) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'User has already been registered.']);
+        if (!empty($this->userSubscriptionsRepository->findByEmail($params['email']))) {
+            return new JsonApiResponse(200, ['status' => 'ok']);
         }
 
         /** @var ActiveRow $list */
         foreach ($lists as $list) {
             if ($list->auto_subscribe) {
-                $this->userSubscriptionsRepository->subscribeUser($list, $userId, $userInfo['email']);
+                $this->userSubscriptionsRepository->subscribeUser($list, $params['user_id'], $params['email']);
             } else {
-                $this->userSubscriptionsRepository->unsubscribeUser($list, $userId, $userInfo['email']);
+                $this->userSubscriptionsRepository->unsubscribeUser($list, $params['user_id'], $params['email']);
             }
         }
 
