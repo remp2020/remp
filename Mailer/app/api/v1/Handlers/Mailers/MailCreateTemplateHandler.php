@@ -31,11 +31,12 @@ class MailCreateTemplateHandler extends BaseHandler
             new InputParam(InputParam::TYPE_POST, 'name', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'code', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'description', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'mail_layout_id', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'mail_type_code', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'subject', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'template_text', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'template_html', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'mail_type_code', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'extras', InputParam::OPTIONAL),
         ];
     }
@@ -43,7 +44,10 @@ class MailCreateTemplateHandler extends BaseHandler
     public function handle($params)
     {
         // TODO - mail layouts are not identified by code
-        $layoutId = 4; // empty layout
+        if (!$params['mail_layout_id']) {
+            // TODO: remove this fallback once internal API's provide the layout themselves
+            $params['mail_layout_id'] = 4; // internal fallback
+        }
 
         $mailType = $this->listsRepository->findBy('code', $params['mail_type_code']);
 
@@ -65,7 +69,7 @@ class MailCreateTemplateHandler extends BaseHandler
             $params['subject'],
             $params['template_text'],
             $params['template_html'],
-            $layoutId,
+            $params['mail_layout_id'],
             $mailType->id,
             $extras
         );
