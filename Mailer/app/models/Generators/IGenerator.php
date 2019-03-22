@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Tomaj\NetteApi\Params\InputParam;
 
 interface IGenerator
@@ -51,5 +52,5 @@ interface IGenerator
      *
      * @return array
      */
-    public function preprocessParameters($data);
+    public function preprocessParameters($data): ?ArrayHash;
 }

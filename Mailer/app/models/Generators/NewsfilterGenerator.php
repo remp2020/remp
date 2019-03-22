@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget;
 use Remp\MailerModule\PageMeta\ContentInterface;
@@ -275,12 +276,12 @@ HTML;
     /**
      * @param $data object containing WP article data
      *
-     * @return object with data to fill the form with
+     * @return ArrayHash with data to fill the form with
      * @throws \Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException
      */
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ArrayHash
     {
-        $output = new \stdClass();
+        $output = new ArrayHash();
 
         if (!isset($data->post_authors[0]->display_name)) {
             throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");

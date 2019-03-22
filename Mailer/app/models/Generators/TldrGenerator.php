@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Generators;
 
 use GuzzleHttp\Client;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Tomaj\NetteApi\Params\InputParam;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -265,12 +266,12 @@ class TldrGenerator implements IGenerator
     /**
      * @param $data object containing WP article data
      *
-     * @return object with data to fill the form with
+     * @return ArrayHash with data to fill the form with
      * @throws \Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException
      */
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ArrayHash
     {
-        $output = new \stdClass();
+        $output = new ArrayHash();
 
         if (!isset($data->post_authors[0]->display_name)) {
             throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");

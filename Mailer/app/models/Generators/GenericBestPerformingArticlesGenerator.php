@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\ProcessException;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -111,8 +112,8 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
         return $output;
     }
 
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ?ArrayHash
     {
-        return [];
+        return null;
     }
 }

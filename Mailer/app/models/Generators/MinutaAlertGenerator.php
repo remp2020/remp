@@ -3,10 +3,10 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\PageMeta\TransportInterface;
-use Remp\MailerModule\PageMeta\TyzdenContent;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -87,8 +87,8 @@ class MinutaAlertGenerator implements IGenerator
         return $output;
     }
 
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ?ArrayHash
     {
-        return [];
+        return null;
     }
 }

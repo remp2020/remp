@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class EmptyGenerator implements IGenerator
 {
@@ -35,8 +36,8 @@ class EmptyGenerator implements IGenerator
         return [];
     }
 
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ?ArrayHash
     {
-        return [];
+        return null;
     }
 }

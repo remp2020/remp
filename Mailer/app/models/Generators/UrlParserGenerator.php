@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\PageMeta\TransportInterface;
@@ -115,8 +116,8 @@ class UrlParserGenerator implements IGenerator
         return [];
     }
 
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ?ArrayHash
     {
-        return [];
+        return null;
     }
 }

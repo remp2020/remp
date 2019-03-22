@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
@@ -87,8 +88,8 @@ class DennikNBestPerformingArticlesGenerator implements IGenerator
         return $output;
     }
 
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ?ArrayHash
     {
-        return [];
+        return null;
     }
 }
