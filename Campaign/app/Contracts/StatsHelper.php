@@ -32,6 +32,7 @@ class StatsHelper
             'SUM(click_count) AS click_count, '.
             'SUM(show_count) as show_count, '.
             'SUM(payment_count) as payment_count, '.
+            'SUM(purchase_count) as purchase_count, '.
             'SUM(purchase_sum) as purchase_sum, '.
             'COALESCE(GROUP_CONCAT(DISTINCT(purchase_currency) SEPARATOR \',\'),\'\') as purchase_currency';
 
