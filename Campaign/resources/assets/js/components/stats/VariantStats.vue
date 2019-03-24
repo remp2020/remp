@@ -157,12 +157,12 @@
         },
         watch: {
             data(data) {
-                this.clickCount = data.click_count.count;
-                this.showsCount = data.show_count.count;
-                this.startedPaymentsCount = data.payment_count.count;
-                this.finishedPaymentsCount = data.purchase_count.count;
-                this.earnedSum = data.purchase_sum.sum;
-                this.currency = data.purchase_sum.tags != null ? data.purchase_sum.tags.currency : null;
+                this.clickCount = data.click_count;
+                this.showsCount = data.show_count;
+                this.startedPaymentsCount = data.payment_count;
+                this.finishedPaymentsCount = data.purchase_count;
+                this.earnedSum = data.purchase_sum;
+                this.currency = data.purchase_currency != null ? data.purchase_currency : null;
                 this.histogramData = data.histogram;
                 this.ctr = data.ctr;
                 this.conversions = data.conversions;

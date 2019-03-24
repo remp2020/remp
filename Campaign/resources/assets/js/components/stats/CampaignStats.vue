@@ -113,11 +113,12 @@
         },
         watch: {
             data(data) {
-                this.clickCount = data.click_count.count;
-                this.startedPayments = data.payment_count.count;
-                this.finishedPayments = data.purchase_count.count;
-                this.earned = data.purchase_sum.sum;
-                this.currency = data.purchase_sum.tags != null ? data.purchase_sum.tags.currency : null;
+                console.log(data.click_count)
+                this.clickCount = data.click_count;
+                this.startedPayments = data.payment_count;
+                this.finishedPayments = data.purchase_count;
+                this.earned = data.purchase_sum;
+                this.currency = data.purchase_currency != null ? data.purchase_currency : null;
                 this.histogramData = data.histogram;
                 this.ctr = data.ctr;
                 this.conversions = data.conversions;
