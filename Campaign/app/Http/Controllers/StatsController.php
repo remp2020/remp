@@ -53,56 +53,7 @@ class StatsController extends Controller
 
         $chartWidth = $request->get('chartWidth');
 
-        $select = 'campaign_banner_id, '.
-            'SUM(click_count) AS click_count, '.
-            'SUM(show_count) as show_count, '.
-            'SUM(payment_count) as payment_count, '.
-            'SUM(purchase_sum) as purchase_sum, '.
-            'COALESCE(GROUP_CONCAT(DISTINCT(purchase_currency) SEPARATOR \',\'),\'\') as purchase_currency';
-
-        $campaignBannerIds = $campaign->campaignBanners()->withTrashed()->get()->pluck('id');
-
-        $campaignData = [
-            'click_count' => 0,
-            'show_count' => 0,
-            'payment_count' => 0,
-            'purchase_count' => 0,
-            'purchase_sum' => 0.0,
-            'purchase_currency' => ''
-        ];
-
-        foreach ($campaignBannerIds as $id) {
-            $variantsData[$id] = $campaignData;
-        }
-
-        $stats = CampaignBannerStats::select(DB::raw($select))
-            ->whereIn('campaign_banner_id', $campaignBannerIds)
-            ->where('time_from', '>=', $from)
-            ->where('time_to', '<=', $to)
-            ->groupBy('campaign_banner_id')
-            ->get();
-
-        foreach ($stats as $stat) {
-            $variantData['click_count'] = (int) $stat->click_count;
-            $variantData['show_count'] = (int) $stat->show_count;
-            $variantData['payment_count'] = (int) $stat->payment_count;
-            $variantData['purchase_count'] = (int) $stat->purchase_count;
-            $variantData['purchase_sum'] = (double) $stat->purchase_sum;
-            $variantData['purchase_currency'] = explode(',', $stat->purchase_currency)[0]; // Currently supporting only one currency
-
-            $variantsData[$stat->campaign_banner_id] = StatsHelper::addCalculatedValues($variantData);
-
-            $campaignData['click_count'] += $variantData['click_count'];
-            $campaignData['show_count'] += $variantData['show_count'];
-            $campaignData['payment_count'] += $variantData['payment_count'];
-            $campaignData['purchase_count'] += $variantData['purchase_count'];
-            $campaignData['purchase_sum'] += $variantData['purchase_sum'];
-
-            if ($variantData['purchase_currency'] !== '') {
-                $campaignData['purchase_currency'] = $variantData['purchase_currency'];
-            }
-        }
-
+        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $from, $to);
         $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $chartWidth);
 
         foreach ($variantsData as $campaignBannerId => $variantData) {

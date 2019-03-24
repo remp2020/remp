@@ -45,7 +45,7 @@
                                 {{ campaign.name }}
                             </td>
                             <td>
-                                {{ campaign.stats.click_count.count }}
+                                {{ campaign.stats.click_count }}
                             </td>
                             <td>
                                 <strong>
@@ -58,13 +58,13 @@
                                 </strong>
                             </td>
                             <td>
-                                {{ campaign.stats.payment_count.count }}
+                                {{ campaign.stats.payment_count}}
                             </td>
                             <td>
-                                {{ campaign.stats.purchase_count.count }}
+                                {{ campaign.stats.purchase_count }}
                             </td>
                             <td>
-                                {{ campaign.stats.purchase_sum.sum | round(2) }} {{ campaign.stats.purchase_sum.tags.currency }}
+                                {{ campaign.stats.purchase_sum | round(2) }} {{ campaign.stats.purchase_currency }}
                             </td>
                             <th>
                                 <span class="actions">
