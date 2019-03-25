@@ -36,7 +36,7 @@
 
         <script>
             var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph").getContext('2d');
-            var myLineChart = new Chart(ctx, {
+            new Chart(ctx, {
                 type: "line",
                 data: {
                     "labels": {$labels},
@@ -76,7 +76,7 @@
 
         <script>
             var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph-relative").getContext('2d');
-            var myLineChart = new Chart(ctx, {
+            new Chart(ctx, {
                 type: "line",
                 data: {
                     "labels": {$labels},
@@ -113,6 +113,39 @@
     {/snippet}
 
     <script>
+        function getDataAndRenderGraphs(from, to) {
+            $.ajax({
+                url: {link filterChanged!},
+                type: 'POST',
+                data: {
+                    id: {$mailTypeId},
+                    from: from,
+                    to: to,
+                    tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                },
+                success: function (data) {
+                    var params = $.param({
+                        published_from: from,
+                        published_to: to,
+                        tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    });
+
+                    var url = window.location.href;
+                    var urlSplit = url.split( "?" );
+                    var stateObj = { Url: urlSplit[0] + "?" + params};
+                    history.pushState(stateObj, null, stateObj.Url);
+
+                    $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
+                    $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
+                },
+                error: function () {
+                    console.log('response error');
+                }
+            });
+        }
+
+        getDataAndRenderGraphs({$from}, {$to});
+
         new Vue({
             el: "#smart-range-selector",
             components: {
@@ -120,22 +153,7 @@
             },
             methods: {
                 callback: function (from, to) {
-                    $.ajax({
-                        url: {link filterChanged!},
-                        type: 'POST',
-                        data: {
-                            id: {$mailTypeId},
-                            from: from,
-                            to: to
-                        },
-                        success: function (data, status) {
-                            $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
-                            $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
-                        },
-                        error: function () {
-                            console.log('response error');
-                        }
-                    });
+                    getDataAndRenderGraphs(from, to);
 
                     $('[name="from"]').val(from);
                     $('[name="to"]').val(to).trigger("change");

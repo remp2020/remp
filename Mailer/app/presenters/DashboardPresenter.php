@@ -190,12 +190,14 @@ final class DashboardPresenter extends BasePresenter
         $this->template->mailTypeTitle = $mailType->title;
 
         if (!$this->isAjax()) {
-            $from = 'now - 30 days';
-            $to = 'now';
+            $from = $this->getParameter('published_from', 'now - 30 days');
+            $to = $this->getParameter('published_to', 'now');
+            $tz = $this->getParameter('tz');
+
             $this->template->from = $from;
             $this->template->to = $to;
 
-            $data = $this->emailsDetailData($id, $from, $to);
+            $data = $this->emailsDetailData($id, $from, $to, $tz);
 
             $this->template->labels = $data['labels'];
             $this->template->sentDataSet = $data['sentDataSet'];
@@ -206,11 +208,15 @@ final class DashboardPresenter extends BasePresenter
         }
     }
 
-    public function emailsDetailData($id, $from, $to)
+    public function emailsDetailData($id, $from, $to, $tz)
     {
         $labels = [];
-        $from = (new DateTime)->setTimestamp(strtotime($from));
-        $to = (new DateTime)->setTimestamp(strtotime($to));
+        if ($tz !== null) {
+            $tz = new \DateTimeZone($tz);
+        }
+
+        $from = new DateTime($from, $tz);
+        $to = new DateTime($to, $tz);
 
         $numOfDays = $from->diff($to)->days;
 
@@ -243,7 +249,7 @@ final class DashboardPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $data = $this->batchTemplatesRepository->getDashboardDetailGraphData($id, $from, $to)->fetchAll();
+        $data = $this->batchTemplatesRepository->getMailTypeGraphData($id, $from, $to)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
@@ -267,16 +273,6 @@ final class DashboardPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        foreach ($sentDataSet['data'] as $key => $sent) {
-            $open = $openedDataSet['data'][$key];
-
-            if ($open > 0) {
-                $openRateDataSet['data'][$key] = round(($open / $sent) * 100, 2);
-            } else {
-                $openRateDataSet['data'][$key] = 0;
-            }
-        }
-
         $clickRateDataSet = [
             'label' => 'Click rate',
             'data' => array_fill(0, $numOfDays, 0),
@@ -286,7 +282,14 @@ final class DashboardPresenter extends BasePresenter
         ];
 
         foreach ($sentDataSet['data'] as $key => $sent) {
+            $open = $openedDataSet['data'][$key];
             $click = $clickedDataSet['data'][$key];
+
+            if ($open > 0) {
+                $openRateDataSet['data'][$key] = round(($open / $sent) * 100, 2);
+            } else {
+                $openRateDataSet['data'][$key] = 0;
+            }
 
             if ($click > 0) {
                 $clickRateDataSet['data'][$key] = round(($click / $sent) * 100, 2);
@@ -306,9 +309,9 @@ final class DashboardPresenter extends BasePresenter
         ];
     }
 
-    public function handleFilterChanged($id, $from, $to)
+    public function handleFilterChanged($id, $from, $to, $tz)
     {
-        $data = $this->emailsDetailData($id, $from, $to);
+        $data = $this->emailsDetailData($id, $from, $to, $tz);
 
         $this->template->labels = $data['labels'];
         $this->template->sentDataSet = $data['sentDataSet'];

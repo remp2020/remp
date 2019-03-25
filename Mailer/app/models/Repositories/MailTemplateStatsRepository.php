@@ -4,9 +4,9 @@ namespace Remp\MailerModule\Repository;
 
 use Remp\MailerModule\Repository;
 
-class MailTemplatesAggregatedDataRepository extends Repository
+class MailTemplateStatsRepository extends Repository
 {
-    protected $tableName = 'mail_templates_aggregated_data';
+    protected $tableName = 'mail_template_stats';
 
     /**
      * @param \DateTime $date

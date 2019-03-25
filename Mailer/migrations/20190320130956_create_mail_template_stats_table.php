@@ -2,11 +2,11 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class CreateMailTemplatesAggregatedStats extends AbstractMigration
+class CreateMailTemplateStatsTable extends AbstractMigration
 {
     public function up()
     {
-        $this->table('mail_templates_aggregated_data')
+        $this->table('mail_template_stats')
             ->addColumn('mail_template_id', 'integer')
             ->addColumn('date', 'date')
             ->addColumn('sent', 'integer')
@@ -20,7 +20,7 @@ class CreateMailTemplatesAggregatedStats extends AbstractMigration
 
     public function down()
     {
-        $this->table('mail_templates_aggregated_data')
+        $this->table('mail_template_stats')
             ->drop();
     }
 }

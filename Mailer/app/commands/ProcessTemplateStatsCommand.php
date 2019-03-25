@@ -35,19 +35,6 @@ class ProcessTemplateStatsCommand extends Command
             UPDATE mail_templates as dest,
               (SELECT mail_template_id, sent, delivered, opened, clicked, dropped, spam_complained
                FROM (
-                      SELECT mjbt.mail_template_id,
-                             SUM(mjbt.sent)            as sent,
-                             SUM(mjbt.delivered)       as delivered,
-                             SUM(mjbt.opened)          as opened,
-                             SUM(mjbt.clicked)         as clicked,
-                             SUM(mjbt.dropped)         as dropped,
-                             SUM(mjbt.spam_complained) as spam_complained
-            
-                      FROM mail_job_batch_templates mjbt
-                      GROUP BY mjbt.mail_template_id
-            
-                      UNION ALL
-            
                       SELECT mtad.mail_template_id,
                              SUM(mtad.sent)            as sent,
                              SUM(mtad.delivered)       as delivered,
@@ -56,7 +43,7 @@ class ProcessTemplateStatsCommand extends Command
                              SUM(mtad.dropped)         as dropped,
                              SUM(mtad.spam_complained) as spam_complained
             
-                      FROM mail_templates_aggregated_data mtad
+                      FROM mail_template_stats mtad
                       GROUP BY mtad.mail_template_id
                     ) a
             

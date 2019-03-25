@@ -2,8 +2,6 @@
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Caching\IStorage;
-use Nette\Database\Context;
 use Remp\MailerModule\Repository;
 
 class BatchTemplatesRepository extends Repository
@@ -50,7 +48,7 @@ class BatchTemplatesRepository extends Repository
      * @param \DateTime $to
      * @return \Remp\MailerModule\Selection
      */
-    public function getDashboardDetailGraphData($mailTypeId, \DateTime $from, \DateTime $to)
+    public function getMailTypeGraphData($mailTypeId, \DateTime $from, \DateTime $to)
     {
         return $this->getTable()
             ->select('
@@ -62,8 +60,8 @@ class BatchTemplatesRepository extends Repository
                 DATE(mail_template.created_at) AS created_date')
             ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
             ->where('mail_template.mail_type_id = ?', $mailTypeId)
-            ->where('DATE(mail_job_batch.first_email_sent_at) >= DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(mail_job_batch.first_email_sent_at) <= DATE(?)', $to->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) >= DATE(?)', $from)
+            ->where('DATE(mail_job_batch.first_email_sent_at) <= DATE(?)', $to)
             ->group('
                 mail_job_batch_templates.id, 
                 label_date

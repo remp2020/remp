@@ -4,7 +4,7 @@ namespace Remp\MailerModule\Commands;
 
 use DateTime;
 use Remp\MailerModule\Repository\LogsRepository;
-use Remp\MailerModule\Repository\MailTemplatesAggregatedDataRepository;
+use Remp\MailerModule\Repository\MailTemplateStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class AggregateSystemMailTemplateStatsCommand extends Command
+class AggregateMailTemplateStatsCommand extends Command
 {
     /**
      * @var LogsRepository
@@ -25,19 +25,19 @@ class AggregateSystemMailTemplateStatsCommand extends Command
     private $templatesRepository;
 
     /**
-     * @var MailTemplatesAggregatedDataRepository
+     * @var MailTemplateStatsRepository
      */
-    private $mailTemplatesAggregatedDataRepository;
+    private $mailTemplateStatsRepository;
 
     public function __construct(
         LogsRepository $logsRepository,
         TemplatesRepository $templatesRepository,
-        MailTemplatesAggregatedDataRepository $mailTemplatesAggregatedDataRepository
+        MailTemplateStatsRepository $mailTemplateStatsRepository
     ) {
         parent::__construct();
         $this->logsRepository = $logsRepository;
         $this->templatesRepository = $templatesRepository;
-        $this->mailTemplatesAggregatedDataRepository = $mailTemplatesAggregatedDataRepository;
+        $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
     }
 
     protected function configure()
@@ -74,7 +74,6 @@ class AggregateSystemMailTemplateStatsCommand extends Command
                 COUNT(dropped_at) AS dropped, 
                 COUNT(spam_complained_at) AS spam_complained 
             ')
-            ->where('mail_job_batch_id IS NULL')
             ->where('DATE(created_at) >= ?', $yesterday->format('Y-m-d'))
             ->where('DATE(created_at) < ?', $today->format('Y-m-d'))
             ->group('mail_template_id')
@@ -102,14 +101,14 @@ class AggregateSystemMailTemplateStatsCommand extends Command
                     'spam_complained' => $mailTemplateData['spam_complained'],
                 ];
 
-                $agg = $this->mailTemplatesAggregatedDataRepository->byDateAndMailTemplateId($today, $mailTemplateId);
+                $agg = $this->mailTemplateStatsRepository->byDateAndMailTemplateId($today, $mailTemplateId);
                 if (!$agg) {
-                    $this->mailTemplatesAggregatedDataRepository->insert([
+                    $this->mailTemplateStatsRepository->insert([
                         'mail_template_id' => $mailTemplateId,
                         'date' => $today->format('Y-m-d'),
                     ] + $prepData);
                 } else {
-                    $this->mailTemplatesAggregatedDataRepository->update($agg, $prepData);
+                    $this->mailTemplateStatsRepository->update($agg, $prepData);
                 }
 
                 $progressBar->advance();
