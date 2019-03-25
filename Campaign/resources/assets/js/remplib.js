@@ -28,6 +28,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         showtimeExperiment: false,
 
+        initialized: false,
+
         /* JSONP START */
 
         showtime: {
@@ -111,10 +113,26 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (window.opener && window.location.hash === '#bannerPicker') {
                 remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
             }
+
+            this.initialized  = true;
+        },
+
+        checkInit: function() {
+            var that = this;
+            return new Promise(function (resolve) {
+                var startTime = new Date().getTime();
+                var interval = setInterval(function() {
+                    // After 5 seconds, stop checking
+                    if (that.initialized || (new Date().getTime() - startTime > 5000)) {
+                        clearInterval(interval);
+                        resolve(true);
+                    }
+                }, 50);
+            });
         },
 
         run: function() {
-            Promise.all([remplib.checkUsingAdblock()]).then((res) => {
+            Promise.all([remplib.checkUsingAdblock(), this.checkInit()]).then((res) => {
                 this.request(this.showtime);
             });
         },
