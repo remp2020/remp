@@ -628,6 +628,7 @@ Creates new email template. Endpoint complements creation of template via web in
 | name | *String* | yes | User-friendly name of the email. It's displayed only in the administration parts of the system. |
 | code | *String* | yes | Computer-friendly name of the email (slug). Primarily being used when referencing single email that's being sent manually. |
 | description | *String* | yes | Internal description, so you know even after a year what the purpose of email was. |
+| mail_layout_id | *String* | yes | ID of layout to be used for email. If you're providing full HTML/text content, we recommend creating "empty" layout only with *content* within body. |
 | mail_type_code | *String* | yes | Code of newsletter list the email should belong to. Before the email is sent to specific end-user, Mailer checks whether the user is subscribed to this newsletter or not. If he/she is not, the email will not be sent. |
 | from | *String* | yes | Who should be used as a sender of email. |
 | subject | *String* | yes | Email subject. |
@@ -642,7 +643,7 @@ curl -X POST \
   http://mailer.remp.press/api/v1/mailers/templates \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'name=Breaking%20News%20-%20Trump%20elected%20president&code=20161108_breaking_news_trump_elected_president&description=Generated%20by%20CLI%20script&mail_type_code=alerts&from=info%40dennikn.sk&subject=Breaking%20News%20-%20Trump%20elected%20president&template_text=This%20is%20a%20demo%20text%20of%20email&template_html=%3Cp%3EThis%20is%20a%20%3Cstrong%3Edemo%3C%2Fstrong%3E%20text%20of%20email%3C%2Fp%3E'
+  -d 'name=Breaking%20News%20-%20Trump%20elected%20president&code=20161108_breaking_news_trump_elected_president&description=Generated%20by%20CLI%20script&mail_layout_id=1&mail_type_code=alerts&from=info%40dennikn.sk&subject=Breaking%20News%20-%20Trump%20elected%20president&template_text=This%20is%20a%20demo%20text%20of%20email&template_html=%3Cp%3EThis%20is%20a%20%3Cstrong%3Edemo%3C%2Fstrong%3E%20text%20of%20email%3C%2Fp%3E'
 ```
 
 Response:
