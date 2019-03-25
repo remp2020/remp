@@ -119,13 +119,18 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         checkInit: function() {
             var that = this;
-            return new Promise(function (resolve) {
+            return new Promise(function (resolve, reject) {
                 var startTime = new Date().getTime();
                 var interval = setInterval(function() {
-                    // After 5 seconds, stop checking
-                    if (that.initialized || (new Date().getTime() - startTime > 5000)) {
+                    if (that.initialized) {
                         clearInterval(interval);
-                        resolve(true);
+                        return resolve(true);
+                    }
+
+                    // After 5 seconds, stop checking
+                    if (new Date().getTime() - startTime > 5000) {
+                        clearInterval(interval);
+                        reject("Campaign library was not initialized within 5 seconds");
                     }
                 }, 50);
             });

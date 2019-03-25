@@ -48,6 +48,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentActive: false,
 
+        initialized: false,
+
         init: function(config) {
             if (typeof config.token !== 'string') {
                 throw "remplib: configuration token invalid or missing: "+config.token
@@ -238,8 +240,27 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return Hash(k);
         },
 
+        checkInit: function() {
+            var that = this;
+            return new Promise(function (resolve, reject) {
+                var startTime = new Date().getTime();
+                var interval = setInterval(function() {
+                    if (that.initialized) {
+                        clearInterval(interval);
+                        return resolve(true);
+                    }
+
+                    // After 5 seconds, stop checking
+                    if (new Date().getTime() - startTime > 5000) {
+                        clearInterval(interval);
+                        reject("Beam library was not initialized within 5 seconds");
+                    }
+                }, 50);
+            });
+        },
+
         run: function() {
-            Promise.all([remplib.checkUsingAdblock()]).then((res) => {
+            Promise.all([remplib.checkUsingAdblock(), this.checkInit()]).then((res) => {
                 this.trackPageview();
 
                 if (this.timeSpentEnabled === true) {
