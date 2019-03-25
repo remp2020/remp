@@ -175,7 +175,6 @@ class StatsHelper
             $r->to($to);
         }
 
-        // TODO currently support only 1 currency
-        return $r->get()[0];
+        return $r->get();
     }
 }

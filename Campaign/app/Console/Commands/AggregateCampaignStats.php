@@ -54,8 +54,24 @@ class AggregateCampaignStats extends Command
                 $cbs->show_count = $stats['show_count']->count ?? 0;
                 $cbs->payment_count = $stats['payment_count']->count ?? 0;
                 $cbs->purchase_count = $stats['purchase_count']->count ?? 0;
-                $cbs->purchase_sum = $stats['purchase_sum']->sum ?? 0.0;
-                $cbs->purchase_currency = $stats['purchase_sum']->tags->currency ?? null;
+
+                $sums = [];
+
+                foreach ($stats['purchase_sum'] as $sumItem) {
+                    $currency = $sumItem->tags->currency ?? null;
+                    if ($currency) {
+                        if (!array_key_exists($currency, $sums)) {
+                            $sums[$currency] = (object) [
+                                'currency' => $currency,
+                                'sum' => 0.0
+                            ];
+                        }
+                        $sums[$currency]->sum += (double) $sumItem->sum;
+                    }
+                }
+                $sums = array_values($sums);
+                
+                $cbs->purchase_sum = json_encode($sums);
                 $cbs->save();
             }
         }
