@@ -101,11 +101,11 @@ class AggregateMailTemplateStatsCommand extends Command
                     'spam_complained' => $mailTemplateData['spam_complained'],
                 ];
 
-                $agg = $this->mailTemplateStatsRepository->byDateAndMailTemplateId($today, $mailTemplateId);
+                $agg = $this->mailTemplateStatsRepository->byDateAndMailTemplateId($yesterday, $mailTemplateId);
                 if (!$agg) {
                     $this->mailTemplateStatsRepository->insert([
                         'mail_template_id' => $mailTemplateId,
-                        'date' => $today->format('Y-m-d'),
+                        'date' => $yesterday->format('Y-m-d'),
                     ] + $prepData);
                 } else {
                     $this->mailTemplateStatsRepository->update($agg, $prepData);
