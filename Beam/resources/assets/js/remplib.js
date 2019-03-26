@@ -121,6 +121,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             window.addEventListener("campaign_showtime", this.syncOverridableFields);
             window.addEventListener("campaign_showtime", this.syncFlags);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
+
+            this.initialized = true;
         },
 
         syncSegmentRulesCache: function(e) {

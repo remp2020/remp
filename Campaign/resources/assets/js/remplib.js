@@ -114,7 +114,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
             }
 
-            this.initialized  = true;
+            this.initialized = true;
         },
 
         checkInit: function() {
