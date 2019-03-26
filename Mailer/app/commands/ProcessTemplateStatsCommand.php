@@ -33,31 +33,24 @@ class ProcessTemplateStatsCommand extends Command
 
         $this->database->query('
             UPDATE mail_templates as dest,
-              (SELECT mail_template_id, sent, delivered, opened, clicked, dropped, spam_complained
-               FROM (
-                      SELECT mtad.mail_template_id,
-                             SUM(mtad.sent)            as sent,
-                             SUM(mtad.delivered)       as delivered,
-                             SUM(mtad.opened)          as opened,
-                             SUM(mtad.clicked)         as clicked,
-                             SUM(mtad.dropped)         as dropped,
-                             SUM(mtad.spam_complained) as spam_complained
+              (SELECT mts.mail_template_id,
+                      SUM(mts.sent)            as sent,
+                      SUM(mts.delivered)       as delivered,
+                      SUM(mts.opened)          as opened,
+                      SUM(mts.clicked)         as clicked,
+                      SUM(mts.dropped)         as dropped,
+                      SUM(mts.spam_complained) as spam_complained
             
-                      FROM mail_template_stats mtad
-                      GROUP BY mtad.mail_template_id
-                    ) a
-            
-               GROUP BY mail_template_id
-               ORDER BY mail_template_id DESC) as src
-            SET
-              dest.sent = src.sent,
-              dest.delivered = src.delivered,
-              dest.opened = src.opened,
-              dest.clicked = src.clicked,
-              dest.dropped = src.dropped,
-              dest.spam_complained = src.spam_complained
-            WHERE
-                dest.id = src.mail_template_id;
+               FROM mail_template_stats mts
+               GROUP BY mts.mail_template_id
+              ) src
+            SET dest.sent            = src.sent,
+                dest.delivered       = src.delivered,
+                dest.opened          = src.opened,
+                dest.clicked         = src.clicked,
+                dest.dropped         = src.dropped,
+                dest.spam_complained = src.spam_complained
+            WHERE dest.id = src.mail_template_id;
         ');
 
         $output->writeln('');
