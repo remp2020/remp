@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Presenters;
 
 use Nette;
+use Remp\MailerModule\Components\IMissingConfigurationFactory;
 use Remp\MailerModule\EnvironmentConfig;
 
 class Error4xxPresenter extends Nette\Application\UI\Presenter
@@ -30,5 +31,11 @@ class Error4xxPresenter extends Nette\Application\UI\Presenter
         // load template 403.latte or 404.latte or ... 4xx.latte
         $file = __DIR__ . "/templates/Error/{$exception->getCode()}.latte";
         $this->template->setFile(is_file($file) ? $file : __DIR__ . '/templates/Error/4xx.latte');
+    }
+
+    public function createComponentMissingConfiguration(
+        IMissingConfigurationFactory $IMissingConfigurationFactory
+    ) {
+        return $IMissingConfigurationFactory->create();
     }
 }
