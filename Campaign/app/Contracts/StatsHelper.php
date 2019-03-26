@@ -32,9 +32,7 @@ class StatsHelper
             'SUM(click_count) AS click_count, '.
             'SUM(show_count) as show_count, '.
             'SUM(payment_count) as payment_count, '.
-            'SUM(purchase_count) as purchase_count, '.
-            'SUM(purchase_sum) as purchase_sum, '.
-            'COALESCE(GROUP_CONCAT(DISTINCT(purchase_currency) SEPARATOR \',\'),\'\') as purchase_currency';
+            'SUM(purchase_count) as purchase_count, ';
 
         $campaignBannerIds = $campaign->campaignBanners()->withTrashed()->get()->pluck('id');
 
@@ -43,8 +41,6 @@ class StatsHelper
             'show_count' => 0,
             'payment_count' => 0,
             'purchase_count' => 0,
-            'purchase_sum' => 0.0,
-            'purchase_currency' => ''
         ];
 
         foreach ($campaignBannerIds as $id) {

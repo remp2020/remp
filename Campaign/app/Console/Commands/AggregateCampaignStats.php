@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Campaign;
-use App\CampaignBannerStatPurchase;
+use App\CampaignBannerPurchaseStats;
 use App\CampaignBannerStats;
 use App\Contracts\StatsHelper;
 use Illuminate\Console\Command;
@@ -69,12 +69,14 @@ class AggregateCampaignStats extends Command
                 }
 
                 foreach ($sums as $currency => $sum) {
-                    $purchaseStat = CampaignBannerStatPurchase::firstOrNew([
-                        'campaign_banner_stat_id' => $cbs->id,
+                    $purchaseStat = CampaignBannerPurchaseStats::firstOrNew([
+                        'campaign_banner_id' => $campaignBanner->id,
+                        'time_from' => $timeAfter,
+                        'time_to' => $timeBefore,
                         'currency' => $currency
                     ]);
 
-                    /** @var CampaignBannerStatPurchase $purchaseStat */
+                    /** @var CampaignBannerPurchaseStats $purchaseStat */
                     $purchaseStat->sum = $sum;
                     $purchaseStat->save();
                 }
