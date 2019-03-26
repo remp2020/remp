@@ -12,4 +12,6 @@ global.clipboard = require("./clipboard.js");
 
 global.salvattore = require("salvattore");
 
+global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue");
+
 Nette.initOnLoad();

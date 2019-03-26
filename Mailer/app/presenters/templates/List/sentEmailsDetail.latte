@@ -1,0 +1,190 @@
+{layout '../@layout.latte'} {block #content}
+
+<div class="c-header">
+    <h2>Dashboard</h2>
+</div>
+
+
+<div class="well">
+    <div id="smart-range-selector" class="row">
+        <div class="col-md-4">
+            <h4>Filter by article publish date</h4>
+            <input type="hidden" name="from" value="{$from}">
+            <input type="hidden" name="to" value="{$to}">
+            <smart-range-selector from="{$from}" to="{$to}" :callback="callback">
+            </smart-range-selector>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">
+            <strong>Stats for mail type:</strong><br>
+            <small>{$mailTypeTitle}</small>
+        </h2>
+
+        <div class="actions">
+            <div class="pull-left m-r-10" style="line-height: 28px;">Group by:</div>
+            <div role="group" class="btn-group btn-group-sm pull-left">
+                <button type="button" data-value="day" class="btn group-by-trigger {if $groupBy === 'day'}btn-info{else}btn-default{/if}">Day</button>
+                <button type="button" data-value="week" class="btn group-by-trigger {if $groupBy === 'week'}btn-info{else}btn-default{/if}">Week</button>
+                <button type="button" data-value="month" class="btn group-by-trigger {if $groupBy === 'month'}btn-info{else}btn-default{/if}">Month</button>
+            </div>
+
+            <a n:href="Dashboard:default" class="btn btn-sm palette-Cyan bg waves-effect m-l-15">Back to dashboard</a>
+        </div>
+    </div>
+
+    {snippet graph}
+        <div class="p-30">
+            <canvas id="mailer-dashboard-detail-statistics-graph" width="1500" height="500"></canvas>
+        </div>
+
+        <script>
+            var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph").getContext('2d');
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    "labels": {$labels},
+                    "datasets": [{$sentDataSet}, {$openedDataSet}, {$clickedDataSet}]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                display: true
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: "top"
+                    },
+                    tooltips: {
+                        bodyFontSize: 14
+                    }
+                }
+            });
+        </script>
+    {/snippet}
+
+    <hr>
+
+    {snippet relativeGraph}
+        <div class="p-30">
+            <canvas id="mailer-dashboard-detail-statistics-graph-relative" width="1500" height="500"></canvas>
+        </div>
+
+        <script>
+            var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph-relative").getContext('2d');
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    "labels": {$labels},
+                    "datasets": [{$openRateDataSet}, {$clickRateDataSet}]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                display: true
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: "top"
+                    },
+                    tooltips: {
+                        bodyFontSize: 14,
+                        callbacks: {
+                            label: function(tooltipItems, data) {
+                                return data.datasets[tooltipItems.datasetIndex].label+': '+tooltipItems.yLabel+'%';
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+    {/snippet}
+
+    <script>
+        (function () {
+            var $from = $('[name="from"]'),
+                $to   = $('[name="to"]');
+
+            function getDataAndRenderGraphs(from, to, groupBy) {
+                $.ajax({
+                    url: {link filterChanged!},
+                    type: 'POST',
+                    data: {
+                        id: {$mailTypeId},
+                        from: from,
+                        to: to,
+                        groupBy: groupBy,
+                        tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    },
+                    success: function (data) {
+                        var params = $.param({
+                            published_from: from,
+                            published_to: to,
+                            group_by: groupBy,
+                            tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                        });
+
+                        var url = window.location.href;
+                        var urlSplit = url.split( "?" );
+                        var stateObj = { Url: urlSplit[0] + "?" + params};
+                        history.pushState(stateObj, null, stateObj.Url);
+
+                        $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
+                        $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
+                    },
+                    error: function () {
+                        console.log('response error');
+                    }
+                });
+            }
+
+            // bind smart range selector
+            new Vue({
+                el: "#smart-range-selector",
+                components: {
+                    'smart-range-selector': SmartRangeSelector
+                },
+                methods: {
+                    callback: function (from, to) {
+                        getDataAndRenderGraphs(from, to, $('.group-by-trigger.btn-info').data('value'));
+
+                        $('[name="from"]').val(from);
+                        $('[name="to"]').val(to).trigger("change");
+                    }
+                }
+            });
+
+            // bind group by
+            $('.group-by-trigger').on('click', function () {
+                $('.group-by-trigger').removeClass('btn-info').addClass('btn-default');
+                $(this).removeClass('btn-default').addClass('btn-info');
+
+                getDataAndRenderGraphs($from.val(), $to.val(), $('.group-by-trigger.btn-info').data('value'));
+            });
+
+            // get init data
+            getDataAndRenderGraphs({$from}, {$to}, {$groupBy});
+        })();
+    </script>
+</div>
+
+
