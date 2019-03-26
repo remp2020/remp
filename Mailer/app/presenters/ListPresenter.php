@@ -42,9 +42,6 @@ final class ListPresenter extends BasePresenter
     /** @var IntlDateFormatter */
     private $dateFormatter;
 
-    /** @var LogsRepository */
-    private $logsRepository;
-
     /** @var Emitter */
     private $emitter;
 
@@ -56,7 +53,6 @@ final class ListPresenter extends BasePresenter
         BatchTemplatesRepository $batchTemplatesRepository,
         DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
-        LogsRepository $logsRepository,
         Emitter $emitter
     ) {
         parent::__construct();
@@ -70,7 +66,6 @@ final class ListPresenter extends BasePresenter
         $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->listFormFactory = $listFormFactory;
-        $this->logsRepository = $logsRepository;
         $this->emitter = $emitter;
     }
 
@@ -155,22 +150,9 @@ final class ListPresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $this->template->list = $list;
-        $this->template->variants = $list->related('mail_type_variants')->order('sorting');
-
-        $this->prepareDetailSubscribersGraphData($id);
-    }
-
-    public function renderStats($id)
-    {
-        $list = $this->listsRepository->find($id);
-        if (!$list) {
-            throw new BadRequestException();
-        }
-
         $week = new DateTime('-7 days');
         $month = new DateTime('-30 days');
-        $stats = [
+        $this->template->stats = [
             'subscribed' => $list->related('mail_user_subscriptions')
                 ->where(['subscribed' => true])
                 ->count('*'),
@@ -178,24 +160,31 @@ final class ListPresenter extends BasePresenter
                 ->where(['subscribed' => false])
                 ->count('*'),
             'opened' => [
-                '7-days' => $this->logsRepository->byMailType($list->id)
-                    ->where('opened_at > ?', $week)
-                    ->count('DISTINCT email'),
-                '30-days' => $this->logsRepository->byMailType($list->id)
-                    ->where('opened_at > ?', $month)
-                    ->count('DISTINCT email'),
+                '7-days' => $this->mailTemplateStatsRepository->byMailTypeId($list->id)
+                    ->where('date > DATE(?)', $week)
+                    ->select('SUM(mail_template_stats.opened) AS opened')
+                    ->fetch()->opened,
+                '30-days' => $this->mailTemplateStatsRepository->byMailTypeId($list->id)
+                    ->where('date > DATE(?)', $month)
+                    ->select('SUM(mail_template_stats.opened) AS opened')
+                    ->fetch()->opened,
             ],
             'clicked' => [
-                '7-days' => $this->logsRepository->byMailType($list->id)
-                    ->where('clicked_at > ?', $week)
-                    ->count('DISTINCT email'),
-                '30-days' => $this->logsRepository->byMailType($list->id)
-                    ->where('clicked_at > ?', $month)
-                    ->count('DISTINCT email'),
+                '7-days' => $this->mailTemplateStatsRepository->byMailTypeId($list->id)
+                    ->where('date > DATE(?)', $week)
+                    ->select('SUM(mail_template_stats.clicked) AS opened')
+                    ->fetch()->opened,
+                '30-days' => $this->mailTemplateStatsRepository->byMailTypeId($list->id)
+                    ->where('date > DATE(?)', $month)
+                    ->select('SUM(mail_template_stats.clicked) AS opened')
+                    ->fetch()->opened,
             ]
         ];
 
-        $this->sendJson($stats);
+        $this->template->list = $list;
+        $this->template->variants = $list->related('mail_type_variants')->order('sorting');
+
+        $this->prepareDetailSubscribersGraphData($id);
     }
 
     public function prepareDetailSubscribersGraphData($id)
