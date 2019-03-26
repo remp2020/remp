@@ -1,3 +1,7 @@
+parameters:
+	generators:
+		video_text: Kliknutím na obrázok spustíte prehrávanie videa v novom okne
+
 services:
     # All console commands you need to use should be registered here
     # This is a set that we recommend to use
