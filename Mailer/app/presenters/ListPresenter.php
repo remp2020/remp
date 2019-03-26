@@ -339,11 +339,13 @@ final class ListPresenter extends BasePresenter
             $from = $this->getParameter('published_from', 'now - 30 days');
             $to = $this->getParameter('published_to', 'now');
             $tz = $this->getParameter('tz');
+            $groupBy = $this->getParameter('group_by', 'day');
 
             $this->template->from = $from;
             $this->template->to = $to;
+            $this->template->groupBy = $groupBy;
 
-            $data = $this->emailsDetailData($id, $from, $to, $tz);
+            $data = $this->emailsDetailData($id, $from, $to, $groupBy, $tz);
 
             $this->template->labels = $data['labels'];
             $this->template->sentDataSet = $data['sentDataSet'];
@@ -354,7 +356,7 @@ final class ListPresenter extends BasePresenter
         }
     }
 
-    public function emailsDetailData($id, $from, $to, $tz)
+    public function emailsDetailData($id, $from, $to, $groupBy, $tz)
     {
         $labels = [];
         if ($tz !== null) {
@@ -364,16 +366,26 @@ final class ListPresenter extends BasePresenter
         $from = new DateTime($from, $tz);
         $to = new DateTime($to, $tz);
 
-        $numOfDays = $from->diff($to)->days;
-
-        // fill graph columns
-        for ($i = $numOfDays - 1; $i >= 0; $i--) {
-            $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
+        $dateFormat = 'd/m/y';
+        $dateInterval = '+1 day';
+        if ($groupBy === 'week') {
+            $dateFormat = 'W/y';
+            $dateInterval = '+1 week';
+        } elseif ($groupBy === 'month') {
+            $dateFormat = 'm/y';
+            $dateInterval = '+1 month';
         }
+
+        $fromLimit = clone $from;
+        while ($fromLimit < $to) {
+            $labels[] = $fromLimit->format($dateFormat);
+            $fromLimit = $fromLimit->modify($dateInterval);
+        }
+        $numOfGroups = count($labels);
 
         $sentDataSet = [
             'label' => 'Sent',
-            'data' => array_fill(0, $numOfDays, 0),
+            'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(0,150,136)',
             'lineTension' => 0.5
@@ -381,7 +393,7 @@ final class ListPresenter extends BasePresenter
 
         $openedDataSet = [
             'label' => 'Opened',
-            'data' => array_fill(0, $numOfDays, 0),
+            'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(33,150,243)',
             'lineTension' => 0.5
@@ -389,7 +401,7 @@ final class ListPresenter extends BasePresenter
 
         $clickedDataSet = [
             'label' => 'Clicked',
-            'data' => array_fill(0, $numOfDays, 0),
+            'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(230,57,82)',
             'lineTension' => 0.5
@@ -400,7 +412,7 @@ final class ListPresenter extends BasePresenter
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->label_date),
+                $row->label_date->format($dateFormat),
                 $labels
             );
 
@@ -413,7 +425,7 @@ final class ListPresenter extends BasePresenter
 
         $openRateDataSet = [
             'label' => 'Open rate',
-            'data' => array_fill(0, $numOfDays, 0),
+            'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(33,150,243)',
             'lineTension' => 0.5
@@ -421,7 +433,7 @@ final class ListPresenter extends BasePresenter
 
         $clickRateDataSet = [
             'label' => 'Click rate',
-            'data' => array_fill(0, $numOfDays, 0),
+            'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(230,57,82)',
             'lineTension' => 0.5
@@ -455,9 +467,9 @@ final class ListPresenter extends BasePresenter
         ];
     }
 
-    public function handleFilterChanged($id, $from, $to, $tz)
+    public function handleFilterChanged($id, $from, $to, $groupBy, $tz)
     {
-        $data = $this->emailsDetailData($id, $from, $to, $tz);
+        $data = $this->emailsDetailData($id, $from, $to, $groupBy, $tz);
 
         $this->template->labels = $data['labels'];
         $this->template->sentDataSet = $data['sentDataSet'];

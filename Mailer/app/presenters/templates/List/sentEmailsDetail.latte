@@ -25,7 +25,14 @@
         </h2>
 
         <div class="actions">
-            <a n:href="Dashboard:default" class="btn palette-Cyan bg waves-effect">Back to dashboard</a>
+            <div class="pull-left m-r-10" style="line-height: 28px;">Group by:</div>
+            <div role="group" class="btn-group btn-group-sm pull-left">
+                <button type="button" data-value="day" class="btn group-by-trigger {if $groupBy === 'day'}btn-info{else}btn-default{/if}">Day</button>
+                <button type="button" data-value="week" class="btn group-by-trigger {if $groupBy === 'week'}btn-info{else}btn-default{/if}">Week</button>
+                <button type="button" data-value="month" class="btn group-by-trigger {if $groupBy === 'month'}btn-info{else}btn-default{/if}">Month</button>
+            </div>
+
+            <a n:href="Dashboard:default" class="btn btn-sm palette-Cyan bg waves-effect m-l-15">Back to dashboard</a>
         </div>
     </div>
 
@@ -113,53 +120,70 @@
     {/snippet}
 
     <script>
-        function getDataAndRenderGraphs(from, to) {
-            $.ajax({
-                url: {link filterChanged!},
-                type: 'POST',
-                data: {
-                    id: {$mailTypeId},
-                    from: from,
-                    to: to,
-                    tz: Intl.DateTimeFormat().resolvedOptions().timeZone
-                },
-                success: function (data) {
-                    var params = $.param({
-                        published_from: from,
-                        published_to: to,
+        (function () {
+            var $from = $('[name="from"]'),
+                $to   = $('[name="to"]');
+
+            function getDataAndRenderGraphs(from, to, groupBy) {
+                $.ajax({
+                    url: {link filterChanged!},
+                    type: 'POST',
+                    data: {
+                        id: {$mailTypeId},
+                        from: from,
+                        to: to,
+                        groupBy: groupBy,
                         tz: Intl.DateTimeFormat().resolvedOptions().timeZone
-                    });
+                    },
+                    success: function (data) {
+                        var params = $.param({
+                            published_from: from,
+                            published_to: to,
+                            group_by: groupBy,
+                            tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                        });
 
-                    var url = window.location.href;
-                    var urlSplit = url.split( "?" );
-                    var stateObj = { Url: urlSplit[0] + "?" + params};
-                    history.pushState(stateObj, null, stateObj.Url);
+                        var url = window.location.href;
+                        var urlSplit = url.split( "?" );
+                        var stateObj = { Url: urlSplit[0] + "?" + params};
+                        history.pushState(stateObj, null, stateObj.Url);
 
-                    $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
-                    $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
+                        $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
+                        $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
+                    },
+                    error: function () {
+                        console.log('response error');
+                    }
+                });
+            }
+
+            // bind smart range selector
+            new Vue({
+                el: "#smart-range-selector",
+                components: {
+                    'smart-range-selector': SmartRangeSelector
                 },
-                error: function () {
-                    console.log('response error');
+                methods: {
+                    callback: function (from, to) {
+                        getDataAndRenderGraphs(from, to, $('.group-by-trigger.btn-info').data('value'));
+
+                        $('[name="from"]').val(from);
+                        $('[name="to"]').val(to).trigger("change");
+                    }
                 }
             });
-        }
 
-        getDataAndRenderGraphs({$from}, {$to});
+            // bind group by
+            $('.group-by-trigger').on('click', function () {
+                $('.group-by-trigger').removeClass('btn-info').addClass('btn-default');
+                $(this).removeClass('btn-default').addClass('btn-info');
 
-        new Vue({
-            el: "#smart-range-selector",
-            components: {
-                SmartRangeSelector
-            },
-            methods: {
-                callback: function (from, to) {
-                    getDataAndRenderGraphs(from, to);
+                getDataAndRenderGraphs($from.val(), $to.val(), $('.group-by-trigger.btn-info').data('value'));
+            });
 
-                    $('[name="from"]').val(from);
-                    $('[name="to"]').val(to).trigger("change");
-                }
-            }
-        });
+            // get init data
+            getDataAndRenderGraphs({$from}, {$to}, {$groupBy});
+        })();
     </script>
 </div>
 
