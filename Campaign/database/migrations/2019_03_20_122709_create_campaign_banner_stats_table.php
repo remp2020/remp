@@ -23,7 +23,6 @@ class CreateCampaignBannerStatsTable extends Migration
             $table->integer('show_count');
             $table->integer('payment_count');
             $table->integer('purchase_count');
-            $table->json('purchase_sum');
 
             $table->foreign('campaign_banner_id')->references('id')->on('campaign_banners');
             $table->index('time_from');

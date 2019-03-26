@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Campaign;
+use App\CampaignBannerStatPurchase;
 use App\CampaignBannerStats;
 use App\Contracts\StatsHelper;
 use Illuminate\Console\Command;
@@ -54,25 +55,29 @@ class AggregateCampaignStats extends Command
                 $cbs->show_count = $stats['show_count']->count ?? 0;
                 $cbs->payment_count = $stats['payment_count']->count ?? 0;
                 $cbs->purchase_count = $stats['purchase_count']->count ?? 0;
+                $cbs->save();
 
                 $sums = [];
-
                 foreach ($stats['purchase_sum'] as $sumItem) {
                     $currency = $sumItem->tags->currency ?? null;
                     if ($currency) {
                         if (!array_key_exists($currency, $sums)) {
-                            $sums[$currency] = (object) [
-                                'currency' => $currency,
-                                'sum' => 0.0
-                            ];
+                            $sums[$currency] = 0.0;
                         }
-                        $sums[$currency]->sum += (double) $sumItem->sum;
+                        $sums[$currency] += (double) $sumItem->sum;
                     }
                 }
-                $sums = array_values($sums);
-                
-                $cbs->purchase_sum = json_encode($sums);
-                $cbs->save();
+
+                foreach ($sums as $currency => $sum) {
+                    $purchaseStat = CampaignBannerStatPurchase::firstOrNew([
+                        'campaign_banner_stat_id' => $cbs->id,
+                        'currency' => $currency
+                    ]);
+
+                    /** @var CampaignBannerStatPurchase $purchaseStat */
+                    $purchaseStat->sum = $sum;
+                    $purchaseStat->save();
+                }
             }
         }
 
