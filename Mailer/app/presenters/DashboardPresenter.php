@@ -8,6 +8,7 @@ use IntlDateFormatter;
 use Remp\MailerModule\Formatters\DateFormatterFactory;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\BatchesRepository;
+use Remp\MailerModule\Repository\MailTemplateStatsRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 
@@ -26,7 +27,11 @@ final class DashboardPresenter extends BasePresenter
      */
     private $mailTypeStatsRepository;
 
+    /** @var MailTemplateStatsRepository */
+    private $mailTemplateStatsRepository;
+
     public function __construct(
+        MailTemplateStatsRepository $mailTemplateStatsRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailTypeStatsRepository $mailTypeStatsRepository,
         DateFormatterFactory $dateFormatterFactory,
@@ -38,6 +43,7 @@ final class DashboardPresenter extends BasePresenter
         $this->dateFormatter = $dateFormatterFactory
             ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 
+        $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
         $this->batchesRepository = $batchesRepository;
@@ -84,14 +90,14 @@ final class DashboardPresenter extends BasePresenter
 
         $typeSubscriberDataSets = $typeDataSets;
 
-        $allSentMailsData = $this->batchTemplatesRepository->getDashboardAllMailsGraphData($from, $now);
+        $allSentMailsData = $this->mailTemplateStatsRepository->getAllMailTemplatesGraphData($from, $now);
 
         $allSentEmailsDataSet = [] + $defaualtGraphSettings;
 
         // parse all sent mails data to chart.js format
         foreach ($allSentMailsData as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->first_email_sent_at),
+                $this->dateFormatter->format($row->date),
                 $graphLabels
             );
 
@@ -101,12 +107,12 @@ final class DashboardPresenter extends BasePresenter
             }
         }
 
-        $typesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($from, $now);
+        $typesData = $this->mailTemplateStatsRepository->getTemplatesGraphDataGroupedByMailType($from, $now);
 
         // parse sent mails by type data to chart.js format
         foreach ($typesData as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->first_email_sent_at->getTimestamp()),
+                $this->dateFormatter->format($row->date->getTimestamp()),
                 $graphLabels
             );
 
@@ -119,7 +125,7 @@ final class DashboardPresenter extends BasePresenter
         // parse previous period data (counts)
         $prevPeriodFrom = (clone $from)->sub(new DateInterval('P' . $numOfDays . 'D'));
 
-        $prevPeriodTypesData = $this->batchTemplatesRepository->getDashboardGraphDataForTypes($prevPeriodFrom, $from);
+        $prevPeriodTypesData = $this->mailTemplateStatsRepository->getTemplatesGraphDataGroupedByMailType($prevPeriodFrom, $from);
 
         foreach ($prevPeriodTypesData as $row) {
             $typeDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->sent_mails;

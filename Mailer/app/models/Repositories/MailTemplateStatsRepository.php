@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use DateTime;
 use Remp\MailerModule\Repository;
 
 class MailTemplateStatsRepository extends Repository
@@ -37,5 +38,69 @@ class MailTemplateStatsRepository extends Repository
     public function all()
     {
         return $this->getTable();
+    }
+
+    /**
+     * @param $mailTypeId
+     * @param DateTime $from
+     * @param DateTime $to
+     * @return \Remp\MailerModule\Selection
+     */
+    public function getMailTypeGraphData($mailTypeId, DateTime $from, DateTime $to)
+    {
+        return $this->getTable()
+            ->select('
+                SUM(COALESCE(mail_template_stats.sent, 0)) AS sent_mails,
+                SUM(COALESCE(mail_template_stats.opened, 0)) AS opened_mails,
+                SUM(COALESCE(mail_template_stats.clicked, 0)) AS clicked_mails,
+                date AS label_date')
+            ->where('mail_template.mail_type_id = ?', $mailTypeId)
+            ->where('date >= DATE(?)', $from)
+            ->where('date <= DATE(?)', $to)
+            ->group('
+                label_date
+            ')
+            ->order('label_date DESC');
+    }
+
+    /**
+     * @param DateTime $from
+     * @param DateTime $to
+     * @return \Remp\MailerModule\Selection
+     */
+    public function getAllMailTemplatesGraphData(DateTime $from, DateTime $to)
+    {
+        return $this->getTable()
+            ->select('
+                SUM(COALESCE(mail_template_stats.sent, 0)) AS sent_mails,
+                date
+            ')
+            ->where('date > DATE(?)', $from)
+            ->where('date <= DATE(?)', $to)
+            ->group('date');
+    }
+
+    /**
+     * @param DateTime $from
+     * @param DateTime $to
+     * @return \Remp\MailerModule\Selection
+     */
+    public function getTemplatesGraphDataGroupedByMailType(DateTime $from, DateTime $to)
+    {
+        return $this->getTable()
+            ->select('
+                SUM(COALESCE(mail_template_stats.sent, 0)) AS sent_mails,
+                mail_template.mail_type_id,
+                date
+            ')
+            ->where('mail_template.mail_type_id IS NOT NULL')
+            ->where('mail_template_stats.date >= DATE(?)', $from)
+            ->where('mail_template_stats.date <= DATE(?)', $to)
+            ->group('
+                date,
+                mail_template.mail_type_id
+            ')
+            ->order('mail_template.mail_type_id')
+            ->order('mail_template_stats.date DESC');
     }
 }

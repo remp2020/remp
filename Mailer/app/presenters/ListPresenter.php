@@ -10,6 +10,7 @@ use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\MailTemplateStatsRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Tomaj\Hermes\Emitter;
@@ -29,6 +30,9 @@ final class ListPresenter extends BasePresenter
     /** @var MailTypeStatsRepository */
     private $mailTypeStatsRepository;
 
+    /** @var MailTemplateStatsRepository */
+    private $mailTemplateStatsRepository;
+
     /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
 
@@ -45,6 +49,7 @@ final class ListPresenter extends BasePresenter
         ListsRepository $listsRepository,
         TemplatesRepository $templatesRepository,
         MailTypeStatsRepository $mailTypeStatsRepository,
+        MailTemplateStatsRepository $mailTemplateStatsRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
@@ -58,6 +63,7 @@ final class ListPresenter extends BasePresenter
         $this->listsRepository = $listsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
+        $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->listFormFactory = $listFormFactory;
         $this->emitter = $emitter;
@@ -389,7 +395,7 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $data = $this->batchTemplatesRepository->getMailTypeGraphData($id, $from, $to)->fetchAll();
+        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData($id, $from, $to)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
