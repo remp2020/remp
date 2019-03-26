@@ -43,9 +43,9 @@ class AggregateMailTemplateStatsCommand extends Command
         $date = $input->getArgument('date');
 
         if ($date !== null) {
-            $today = (new DateTime($date))->setTime(0,0);
+            $today = (new DateTime($date))->setTime(0, 0);
         } else {
-            $today = (new DateTime())->setTime(0,0);
+            $today = (new DateTime())->setTime(0, 0);
         }
         $yesterday = (clone $today)->sub(new \DateInterval('P1D'));
 
