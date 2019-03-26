@@ -28,7 +28,7 @@ class MailerFactory
     }
 
     /**
-     * @param null|string $alias
+     * @param null|string $alias - If $alias is null, default mailer is returned.
      * @return IMailer|Mailer
      * @throws MailerNotExistsException
      */

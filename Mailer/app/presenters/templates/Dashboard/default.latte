@@ -179,7 +179,7 @@
                     <div class="list-group lg-alt lg-even-white">
                         {foreach $typeDataSets as $key => $dataset}
                             <div class="list-group-item media">
-                                <a n:href="Dashboard:sentEmailsDetail $dataset['id']">
+                                <a n:href="List:sentEmailsDetail $dataset['id']">
                                     <div class="pull-right hidden-sm">
                                         <canvas id="mailer-dashboard-statistics-graph-{$key}" width="80" height="40"></canvas>
                                         <script>

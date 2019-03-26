@@ -24,7 +24,7 @@ class AuthorSegmentsController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
-        $columns = ['id', 'name', 'code', 'created_at', 'updated_at',
+        $columns = ['id', 'name', 'code', 'created_at',
             DB::raw('(SELECT COUNT(*) FROM segment_users WHERE segment_users.segment_id=segments.id) as users_count'),
             DB::raw('(SELECT COUNT(*) FROM segment_browsers WHERE segment_browsers.segment_id=segments.id) as browsers_count'),
             ];

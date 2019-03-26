@@ -57,6 +57,12 @@ class MailGeneratorPreprocessHandler extends BaseHandler
 
         try {
             $output = $generator->preprocessParameters($data->data);
+            if (!$output) {
+                return new JsonApiResponse(400, [
+                    'status' => 'error',
+                    'message' => "Generator [{$template->generator}] used for source template [{$data->source_template_id}] does not support parameter preprocessing",
+                ]);
+            }
             $output->source_template_id = $data->source_template_id;
             return new JsonApiResponse(200, [
                 'status' => 'ok',

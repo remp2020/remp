@@ -43,7 +43,7 @@ class ComputeAuthorsSegments extends Command
 
     public function handle()
     {
-        ini_set('memory_limit', '256M');
+        ini_set('memory_limit', '512M');
         // Using Cursor on large number of results causing memory issues
         // https://github.com/laravel/framework/issues/14919
         DB::connection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
@@ -235,34 +235,40 @@ SQL;
         $totalPageviews = $this->aggregatedPageviewsFor($groupParameter);
         $this->line("Done");
 
-        $queryItems =  DB::table(ArticleAggregatedView::getTableName())->select(
-            $groupParameter,
-            'author_id',
-            DB::raw('sum(pageviews) as total_pageviews'),
-            DB::raw('avg(timespent) as average_timespent')
-        )
-            ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
-            ->whereNotNull($groupParameter)
-            ->where('date', '>=', $this->dateThreshold)
-            ->groupBy([$groupParameter, 'author_id'])
-            ->havingRaw('avg(timespent) >= ?', [$this->minAverageTimespent])
-            ->cursor();
-
         $segments = [];
-
         $this->line("Computing segment items for parameter '$groupParameter'");
-        foreach ($queryItems as $item) {
-            if ($totalPageviews[$item->$groupParameter] === 0) {
-                continue;
-            }
-            $ratio = (int) $item->total_pageviews / $totalPageviews[$item->$groupParameter];
-            if ($ratio >= $this->minRatio && $item->total_pageviews >= $this->minViews) {
-                if (!array_key_exists($item->author_id, $segments)) {
-                    $segments[$item->author_id] = [];
+
+        foreach (array_chunk($totalPageviews, 500, true) as $totalPageviewsChunk) {
+            $forItems = array_keys($totalPageviewsChunk);
+
+            $queryItems =  DB::table(ArticleAggregatedView::getTableName())->select(
+                $groupParameter,
+                'author_id',
+                DB::raw('sum(pageviews) as total_pageviews'),
+                DB::raw('avg(timespent) as average_timespent')
+            )
+                ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
+                ->whereNotNull($groupParameter)
+                ->where('date', '>=', $this->dateThreshold)
+                ->whereIn($groupParameter, $forItems)
+                ->groupBy([$groupParameter, 'author_id'])
+                ->havingRaw('avg(timespent) >= ?', [$this->minAverageTimespent])
+                ->cursor();
+
+            foreach ($queryItems as $item) {
+                if ($totalPageviews[$item->$groupParameter] === 0) {
+                    continue;
                 }
-                $segments[$item->author_id][] = $item->$groupParameter;
+                $ratio = (int) $item->total_pageviews / $totalPageviews[$item->$groupParameter];
+                if ($ratio >= $this->minRatio && $item->total_pageviews >= $this->minViews) {
+                    if (!array_key_exists($item->author_id, $segments)) {
+                        $segments[$item->author_id] = [];
+                    }
+                    $segments[$item->author_id][] = $item->$groupParameter;
+                }
             }
         }
+
         $this->line("Done");
 
         return $segments;

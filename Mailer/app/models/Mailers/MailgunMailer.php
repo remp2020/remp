@@ -16,14 +16,23 @@ class MailgunMailer extends Mailer implements IMailer
 
     protected $alias = 'remp-mailgun';
 
-    protected $options = [ 'api_key', 'domain' ];
+    protected $options = [
+        'api_key' => [
+            'required' => true,
+            'label' => 'Mailgun API key',
+        ],
+        'domain' => [
+            'required' => true,
+            'label' => 'Mailgun domain',
+        ],
+    ];
 
     public function __construct(
         Config $config,
         ConfigsRepository $configsRepository
     ) {
         parent::__construct($config, $configsRepository);
-        $this->mailer = Mailgun::create($this->options['api_key']);
+        $this->mailer = Mailgun::create($this->option('api_key'));
     }
 
     public function send(Message $message)
@@ -78,7 +87,7 @@ class MailgunMailer extends Mailer implements IMailer
             $data["v:".$key] = $val;
         }
 
-        $this->mailer->messages()->send($this->options['domain'], $data);
+        $this->mailer->messages()->send($this->option('domain'), $data);
     }
 
     public function mailer()
@@ -88,7 +97,7 @@ class MailgunMailer extends Mailer implements IMailer
 
     public function option($key)
     {
-        return isset($this->options[$key]) ? $this->options[$key] : null;
+        return isset($this->options[$key]['value']) ? $this->options[$key]['value'] : null;
     }
 
     public function transformTemplateParams(array $params)

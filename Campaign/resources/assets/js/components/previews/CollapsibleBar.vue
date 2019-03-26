@@ -62,21 +62,22 @@
     .collapsible-bar-header {
         text-align: center;
         padding: 5px 0;
-        border-top: 1px solid #111;
         background-color: #fff;
         font-family: Noto Sans, sans-serif;
         font-size: 14px;
         color: #5e5e5e;
+        min-height: 31px;
     }
 
     .collapsible-bar-toggle {
         position: absolute;
-        top: 5px;
+        top: 7px;
         right: 0;
         text-transform: uppercase;
         color: #000;
         padding-right: 10px;
         cursor: pointer;
+        font-size: 12px;
     }
     
     .collapsible-bar-body {

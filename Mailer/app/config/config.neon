@@ -83,6 +83,8 @@ services:
 			- register(Remp\MailerModule\Commands\DatabaseSeedCommand())
 			- register(Remp\MailerModule\Commands\DemoSeedCommand())
 			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
+			- register(Remp\MailerModule\Commands\AggregateMailTemplateStatsCommand())
+			- register(Remp\MailerModule\Commands\ProcessTemplateStatsCommand())
 			- register(Remp\MailerModule\Commands\HeartbeatCommand())
 			- register(Remp\MailerModule\Commands\MailTypeStatsCommand())
 			- register(@hermesWorker)
@@ -209,11 +211,13 @@ services:
 	- Remp\MailerModule\Repository\AutoLoginTokensRepository
 	- Remp\MailerModule\Repository\SourceTemplatesRepository
 	- Remp\MailerModule\Repository\MailTypesRepository
+	- Remp\MailerModule\Repository\MailTemplateStatsRepository
 	- Remp\MailerModule\Repository\MailTypeStatsRepository
 
 	# Factories
 	- Remp\MailerModule\Components\IDataTableFactory
 	- Remp\MailerModule\Components\ISendingStatsFactory
+	- Remp\MailerModule\Components\IMissingConfigurationFactory
 	- Remp\MailerModule\Components\IGeneratorWidgetsFactory
 	- Remp\MailerModule\Components\IBatchExperimentEvaluationFactory
 
@@ -246,3 +250,4 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
+	- Remp\MailerModule\Generators\EmbedParser

@@ -91,12 +91,19 @@
             }
         },
         mounted: function () {
-            var st = document.createElement('style'),
-                styles = this.css ? this.css.replace(/\r?\n|\r/gm," ") : '';
+            let styles = this.css ? this.css.replace(/\r?\n|\r/gm," ") : '',
+                head = document.head || document.getElementsByTagName('head')[0],
+                style = document.createElement('style');
 
-            st.innerText = styles;
+            head.appendChild(style);
 
-            document.body.appendChild(st);
+            style.type = 'text/css';
+            if (style.styleSheet){
+                // This is required for IE8 and below.
+                style.styleSheet.cssText = styles;
+            } else {
+                style.appendChild(document.createTextNode(styles));
+            }
         },
         computed: {
             _textAlign: function() {
@@ -108,9 +115,9 @@
                 }
 
                 if (this.positionOptions[this.position]) {
-                    var styles = this.positionOptions[this.position].style;
+                    let styles = this.positionOptions[this.position].style;
 
-                    for (var ii in styles) {
+                    for (let ii in styles) {
                         styles[ii] = ((ii == 'top' || ii == 'bottom') ? this.offsetVertical : this.offsetHorizontal) + 'px'
                     }
 

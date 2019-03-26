@@ -40,6 +40,7 @@ class VerifyUserToken
 
         try {
             $user = $this->auth->parseToken()->authenticate();
+            $payload = $this->auth->payload();
         } catch (TokenExpiredException $e) {
             return $this->respond('token_expired', 'provided token has already expired: ' . $e->getMessage(), 401);
         } catch (JWTException $e) {
@@ -50,7 +51,7 @@ class VerifyUserToken
             return $this->respond('user_not_found', 'user extracted from token was not found', 404);
         }
 
-        $lastLogout = Redis::hget(User::USER_LAST_LOGOUT_KEY, $this->auth->payload()->get('id'));
+        $lastLogout = Redis::hget(User::USER_LAST_LOGOUT_KEY, $payload->get('id'));
         if ($lastLogout && $lastLogout > $this->auth->getClaim('iat')) {
             $this->auth->invalidate();
             return $this->respond('token_expired', 'provided token was invalidated', 401);

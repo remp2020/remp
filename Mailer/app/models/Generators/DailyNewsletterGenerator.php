@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Validators;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\PageMeta\ContentInterface;
@@ -93,8 +94,8 @@ class DailyNewsletterGenerator implements IGenerator
         ];
     }
 
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ?ArrayHash
     {
-        return [];
+        return null;
     }
 }

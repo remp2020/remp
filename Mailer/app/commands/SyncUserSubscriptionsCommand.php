@@ -42,17 +42,33 @@ class SyncUserSubscriptionsCommand extends Command
     {
         $output->writeln('');
         $output->writeln('<info>***** AUTO-SUBSCRIBING ALL USERS *****</info>');
+        $output->writeln('(already existing records will not be touched)');
         $output->writeln('');
 
         $page = 1;
+        $lists = $this->listsRepository->all();
 
         while ($users = $this->userProvider->list([], $page)) {
+            $emails = [];
             foreach ($users as $user) {
-                $output->write(sprintf("Subscribing user: %s (%s) ... ", $user['email'], $user['id']));
-                $lists = $this->listsRepository->all();
+                $emails[] = $user['email'];
+            }
+
+            $mailSubscriptions = $this->userSubscriptionsRepository->getTable()->where(['user_email' => $emails])->fetchAll();
+            $processed = [];
+            foreach ($mailSubscriptions as $mailSubscription) {
+                $processed[$mailSubscription->user_email][$mailSubscription->mail_type_id] = true;
+            }
+
+            foreach ($users as $user) {
+                $output->write(sprintf("Processing user: %s (%s) ... ", $user['email'], $user['id']));
 
                 /** @var ActiveRow $list */
                 foreach ($lists as $list) {
+                    if (isset($processed[$user['email']][$list->id])) {
+                        continue;
+                    }
+
                     if ($list->auto_subscribe) {
                         $this->userSubscriptionsRepository->subscribeUser($list, $user['id'], $user['email']);
                     } else {

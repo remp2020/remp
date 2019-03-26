@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget;
 use Remp\MailerModule\PageMeta\ContentInterface;
@@ -23,16 +24,20 @@ class MMSGenerator implements IGenerator
 
     private $transport;
 
+    private $embedParser;
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
-        TransportInterface $transport
+        TransportInterface $transport,
+        EmbedParser $embedParser
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
         $this->transport = $transport;
+        $this->embedParser = $embedParser;
     }
 
     public function apiParams()
@@ -128,8 +133,8 @@ class MMSGenerator implements IGenerator
             // hr
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
-            // parse embedds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this, "parseEmbed"),
+            // parse embeds
+            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embedParser, "parse"),
 
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
@@ -260,12 +265,12 @@ class MMSGenerator implements IGenerator
     /**
      * @param $data object containing WP article data
      *
-     * @return object with data to fill the form with
+     * @return ArrayHash with data to fill the form with
      * @throws \Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException
      */
-    public function preprocessParameters($data)
+    public function preprocessParameters($data): ?ArrayHash
     {
-        $output = new \stdClass();
+        $output = new ArrayHash();
 
         if (!isset($data->post_authors[0]->display_name)) {
             throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
