@@ -15,6 +15,7 @@ class CreateMailTemplateStatsTable extends AbstractMigration
             ->addColumn('clicked', 'integer')
             ->addColumn('dropped', 'integer')
             ->addColumn('spam_complained', 'integer')
+            ->addForeignKey('mail_template_id', 'mail_templates')
             ->create();
     }
 

@@ -14,19 +14,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AggregateMailTemplateStatsCommand extends Command
 {
-    /**
-     * @var LogsRepository
-     */
     private $logsRepository;
 
-    /**
-     * @var TemplatesRepository
-     */
     private $templatesRepository;
 
-    /**
-     * @var MailTemplateStatsRepository
-     */
     private $mailTemplateStatsRepository;
 
     public function __construct(
@@ -42,26 +33,23 @@ class AggregateMailTemplateStatsCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mail:aggregate-system-template-stats')
+        $this->setName('mail:aggregate-mail-template-stats')
             ->addArgument('date', InputArgument::OPTIONAL, 'Date which to aggregate in Y-m-d format.')
             ->setDescription('Process template stats based on batch stats and mail logs');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('');
-        $output->writeln('<info>***** AGGREGATE SYSTEM MAIL TEMPLATE STATS  *****</info>');
-        $output->writeln('');
-
         $date = $input->getArgument('date');
 
         if ($date !== null) {
-            $today = new DateTime($date);
-            $yesterday = new DateTime($date . ' -1 day');
+            $today = (new DateTime($date))->setTime(0,0);
         } else {
-            $today = new DateTime;
-            $yesterday = new DateTime('-1 day');
+            $today = (new DateTime())->setTime(0,0);
         }
+        $yesterday = (clone $today)->sub(new \DateInterval('P1D'));
+
+        $output->writeln("Aggregating mail template stats from logs created from <info>{$yesterday->format(DATE_RFC3339)}</info> to <info>{$today->format(DATE_RFC3339)}</info>");
 
         $data = $this->logsRepository
             ->getTable()
@@ -74,8 +62,8 @@ class AggregateMailTemplateStatsCommand extends Command
                 COUNT(dropped_at) AS dropped, 
                 COUNT(spam_complained_at) AS spam_complained 
             ')
-            ->where('DATE(created_at) >= ?', $yesterday->format('Y-m-d'))
-            ->where('DATE(created_at) < ?', $today->format('Y-m-d'))
+            ->where('created_at >= ?', $yesterday->format('Y-m-d'))
+            ->where('created_at < ?', $today->format('Y-m-d'))
             ->group('mail_template_id')
             ->fetchAssoc('mail_template_id');
 
@@ -114,12 +102,11 @@ class AggregateMailTemplateStatsCommand extends Command
                 $progressBar->advance();
             }
 
-            $progressBar->setMessage('done');
+            $progressBar->setMessage('<info>OK!</info>', 'processing');
             $progressBar->finish();
+            $output->writeln('');
+        } else {
+            $output->writeln('<info>OK!</info> (no data)');
         }
-
-        $output->writeln('');
-        $output->writeln('Done');
-        $output->writeln('');
     }
 }
