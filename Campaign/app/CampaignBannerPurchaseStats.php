@@ -23,8 +23,8 @@ class CampaignBannerPurchaseStats extends Model
         'time_to',
     ];
 
-    public function banner()
+    public function campaignBanner()
     {
-        return $this->belongsTo(Banner::class);
+        return $this->belongsTo(CampaignBanner::class);
     }
 }
