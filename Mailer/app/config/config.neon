@@ -157,6 +157,7 @@ services:
 	- Remp\MailerModule\Job\BatchEmailGenerator
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Auth\AutoLogin
+	- Remp\MailerModule\Repository\BeamConversionsRepository
 
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
