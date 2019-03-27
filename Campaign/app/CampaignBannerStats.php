@@ -18,8 +18,6 @@ class CampaignBannerStats extends Model
         'show_count',
         'payment_count',
         'purchase_count',
-        'purchase_sum',
-        'purchase_currency'
     ];
 
     protected $dates = [
