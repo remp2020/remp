@@ -78,6 +78,7 @@
 
 <script>
     import SingleValue from './SingleValue'
+    import MultipleValues from './MultipleValues'
     import Chart from './Chart'
 
     export default {
