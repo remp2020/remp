@@ -6,7 +6,7 @@ use Embed\Embed;
 
 class EmbedParser
 {
-    private $videoLinkText = 'Click on the image to play this video';
+    private $videoLinkText = '';
 
     /**
      * @param string $videoLinkText
