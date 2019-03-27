@@ -6,6 +6,20 @@ use Embed\Embed;
 
 class EmbedParser
 {
+    private $videoLinkText = '';
+
+    /**
+     * @param string $videoLinkText
+     */
+    public function __construct($videoLinkText)
+    {
+        $this->videoLinkText = $videoLinkText;
+    }
+
+    /**
+     * @param $url
+     * @return array|null
+     */
     private function fetch($url)
     {
         $embed = Embed::create($url);
@@ -21,11 +35,15 @@ class EmbedParser
         return ($embed->getUrl() === null) ? null : [
             'link' => $embed->getUrl(),
             'title' => $embed->getTitle(),
-            'text' => $embed->getDescription(),
             'image' => $image,
+            'isVideo' => $type === 'video'
         ];
     }
 
+    /**
+     * @param $link
+     * @return string|null
+     */
     public function parse($link)
     {
         if (!isset($link[0]) && empty($link[0])) {
@@ -40,31 +58,32 @@ class EmbedParser
             || preg_match('/twitt/', $link)
         ) {
             if ($data = $this->fetch($link)) {
-                return $this->createEmbeddMarkup($data['link'], $data['title'], $data['text'], $data['image']);
+                return $this->createEmbedMarkup($data['link'], $data['title'], $data['image'], $data['isVideo']);
             }
         }
 
         return null;
     }
 
-    public function createEmbeddMarkup($link, $title, $text = null, $image = null)
+    /**
+     * @param $link
+     * @param $title
+     * @param null $image
+     * @param bool $isVideo
+     * @return string
+     */
+    public function createEmbedMarkup($link, $title, $image = null, $isVideo = false)
     {
-        $html = "<br><a href='{$link}' target='_blank' style='display: block;text-align: center;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-decoration:none;'>";
+        $html = "<br>";
+
+        if ($isVideo) {
+            $html .= "<p style='text-align: center; font-weight: normal;'><i>{$this->videoLinkText}</i></p><br>";
+        }
+
+        $html .= "<a href='{$link}' target='_blank' style='color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-decoration:none;text-align: center; display: block;'>";
 
         if (!is_null($image)) {
-            $html .= "
-                <img src='{$image}' 
-                     alt='{$title}' 
-                     style='
-                        outline:none;
-                        text-decoration:none;
-                        -ms-interpolation-mode:bicubic;
-                        width:auto;
-                        max-width:100%;
-                        clear:both;
-                        display:inline;
-                     '>
-            ";
+            $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:inline;'>";
         }
 
         return $html . "</a>" . PHP_EOL;
