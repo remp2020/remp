@@ -247,4 +247,4 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
-	- Remp\MailerModule\Generators\EmbedParser
+	- Remp\MailerModule\Generators\EmbedParser(%generators.video_text%)

@@ -9,6 +9,14 @@ class EmbedParser
     private $videoLinkText = 'Click on the image to play this video';
 
     /**
+     * @param string $videoLinkText
+     */
+    public function __construct($videoLinkText)
+    {
+        $this->videoLinkText = $videoLinkText;
+    }
+
+    /**
      * @param $url
      * @return array|null
      */
@@ -50,7 +58,7 @@ class EmbedParser
             || preg_match('/twitt/', $link)
         ) {
             if ($data = $this->fetch($link)) {
-                return $this->createEmbeddMarkup($data['link'], $data['title'], $data['image'], $data['isVideo']);
+                return $this->createEmbedMarkup($data['link'], $data['title'], $data['image'], $data['isVideo']);
             }
         }
 
@@ -64,7 +72,7 @@ class EmbedParser
      * @param bool $isVideo
      * @return string
      */
-    public function createEmbeddMarkup($link, $title, $image = null, $isVideo = false)
+    public function createEmbedMarkup($link, $title, $image = null, $isVideo = false)
     {
         $html = "<br>";
 
@@ -79,15 +87,5 @@ class EmbedParser
         }
 
         return $html . "</a>" . PHP_EOL;
-    }
-
-    /**
-     * @param string $videoLinkText
-     * @return $this
-     */
-    public function setVideoLinkText(string $videoLinkText)
-    {
-        $this->videoLinkText = $videoLinkText;
-        return $this;
     }
 }

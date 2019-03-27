@@ -27,7 +27,6 @@ class MMSGenerator implements IGenerator
     private $embedParser;
 
     public function __construct(
-        $embedVideoText,
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
@@ -38,7 +37,7 @@ class MMSGenerator implements IGenerator
         $this->helpers = $helpers;
         $this->content = $content;
         $this->transport = $transport;
-        $this->embedParser = $embedParser->setVideoLinkText($embedVideoText);
+        $this->embedParser = $embedParser;
     }
 
     public function apiParams()

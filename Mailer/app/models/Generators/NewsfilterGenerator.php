@@ -25,7 +25,6 @@ class NewsfilterGenerator implements IGenerator
     private $embedParser;
 
     public function __construct(
-        $embedVideoText,
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
@@ -34,7 +33,7 @@ class NewsfilterGenerator implements IGenerator
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
-        $this->embedParser = $embedParser->setVideoLinkText($embedVideoText);
+        $this->embedParser = $embedParser;
     }
 
     public function apiParams()
