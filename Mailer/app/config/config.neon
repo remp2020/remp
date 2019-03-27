@@ -87,6 +87,7 @@ services:
 			- register(Remp\MailerModule\Commands\ProcessTemplateStatsCommand())
 			- register(Remp\MailerModule\Commands\HeartbeatCommand())
 			- register(Remp\MailerModule\Commands\MailTypeStatsCommand())
+			- register(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
 			- register(@hermesWorker)
 			- setCatchExceptions(true)
 
