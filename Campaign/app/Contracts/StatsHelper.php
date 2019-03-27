@@ -4,6 +4,7 @@ namespace App\Contracts;
 
 use App\Campaign;
 use App\CampaignBanner;
+use App\CampaignBannerPurchaseStats;
 use App\CampaignBannerStats;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,6 @@ class StatsHelper
         $this->stats = $statsContract;
     }
 
-
     /**
      *
      * @param Campaign    $campaign
@@ -28,12 +28,6 @@ class StatsHelper
      */
     public function cachedCampaignAndVariantsStats(Campaign $campaign, Carbon $from = null, Carbon $to = null): array
     {
-        $select = 'campaign_banner_id, '.
-            'SUM(click_count) AS click_count, '.
-            'SUM(show_count) as show_count, '.
-            'SUM(payment_count) as payment_count, '.
-            'SUM(purchase_count) as purchase_count, ';
-
         $campaignBannerIds = $campaign->campaignBanners()->withTrashed()->get()->pluck('id');
 
         $campaignData = [
@@ -41,30 +35,46 @@ class StatsHelper
             'show_count' => 0,
             'payment_count' => 0,
             'purchase_count' => 0,
+            'purchase_sums' => []
         ];
 
         foreach ($campaignBannerIds as $id) {
             $variantsData[$id] = $campaignData;
         }
 
-        $q = CampaignBannerStats::select(DB::raw($select))
+        $statsQuerySelect = 'campaign_banner_id, '.
+            'SUM(click_count) AS click_count, '.
+            'SUM(show_count) as show_count, '.
+            'SUM(payment_count) as payment_count, '.
+            'SUM(purchase_count) as purchase_count';
+
+        $statsQuery = CampaignBannerStats::select(DB::raw($statsQuerySelect))
             ->whereIn('campaign_banner_id', $campaignBannerIds)
             ->groupBy('campaign_banner_id');
 
+        $purchaseStatsQuerySelect = 'campaign_banner_id, '.
+            'SUM(`sum`) AS purchase_sum, '.
+            'currency';
+
+        $purchaseStatsQuery = CampaignBannerPurchaseStats::select(DB::raw($purchaseStatsQuerySelect))
+            ->whereIn('campaign_banner_id', $campaignBannerIds)
+            ->groupBy(['campaign_banner_id', 'currency']);
+
         if ($from) {
-            $q->where('time_from', '>=', $from);
+            $statsQuery->where('time_from', '>=', $from);
+            $purchaseStatsQuery->where('time_from', '>=', $from);
         }
         if ($to) {
-            $q->where('time_to', '<=', $to);
+            $statsQuery->where('time_to', '<=', $to);
+            $purchaseStatsQuery->where('time_to', '<=', $to);
         }
 
-        foreach ($q->get() as $stat) {
+        foreach ($statsQuery->get() as $stat) {
+            $variantData = $variantsData[$stat->campaign_banner_id];
             $variantData['click_count'] = (int) $stat->click_count;
             $variantData['show_count'] = (int) $stat->show_count;
             $variantData['payment_count'] = (int) $stat->payment_count;
             $variantData['purchase_count'] = (int) $stat->purchase_count;
-            $variantData['purchase_sum'] = (double) $stat->purchase_sum;
-            $variantData['purchase_currency'] = explode(',', $stat->purchase_currency)[0]; // Currently supporting only one currency
 
             $variantsData[$stat->campaign_banner_id] = StatsHelper::addCalculatedValues($variantData);
 
@@ -72,14 +82,24 @@ class StatsHelper
             $campaignData['show_count'] += $variantData['show_count'];
             $campaignData['payment_count'] += $variantData['payment_count'];
             $campaignData['purchase_count'] += $variantData['purchase_count'];
-            $campaignData['purchase_sum'] += $variantData['purchase_sum'];
-
-            if ($variantData['purchase_currency'] !== '') {
-                $campaignData['purchase_currency'] = $variantData['purchase_currency'];
-            }
         }
-
         $campaignData = StatsHelper::addCalculatedValues($campaignData);
+
+        foreach ($purchaseStatsQuery->get() as $stat) {
+            if (!array_key_exists($stat->campaign_banner_id, $variantsData)) {
+                throw new \LogicException("Campaign banner $stat->campaign_banner_id has aggregated purchases without other aggregated attributes.");
+            }
+
+            if (!array_key_exists($stat->currency, $variantsData[$stat->campaign_banner_id]['purchase_sums'])) {
+                $variantsData[$stat->campaign_banner_id]['purchase_sums'][$stat->currency] = 0.0;
+            }
+            $variantsData[$stat->campaign_banner_id]['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
+
+            if (!array_key_exists($stat->currency, $campaignData['purchase_sums'])) {
+                $campaignData['purchase_sums'][$stat->currency] = 0.0;
+            }
+            $campaignData['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
+        }
 
         return [$campaignData, $variantsData];
     }
@@ -171,6 +191,7 @@ class StatsHelper
             $r->to($to);
         }
 
-        return $r->get();
+        // Currently supporting only 1 currency
+        return $r->get()[0];
     }
 }

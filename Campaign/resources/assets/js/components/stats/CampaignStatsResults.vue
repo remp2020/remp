@@ -67,8 +67,8 @@
                                 </template>
                             </td>
                             <td>
-                                <strong>
-                                    {{ variant.earned | round(2) }}{{ variant.currency }}
+                                <strong v-for="(sum, currency) in variant.earned" :key="currency">
+                                    {{ sum | round(2) }} {{ currency }}
                                 </strong>
                             </td>
                         </tr>
@@ -127,8 +127,7 @@
                         proportion: variant.proportion,
                         clicks: data.click_count,
                         shows: data.show_count,
-                        earned: data.purchase_sum,
-                        currency: data.purchase_currency,
+                        earned: data.purchase_sums,
                         purchases: data.purchase_count,
                         ctr: data.ctr,
                         conversions: data.conversions,
@@ -150,8 +149,7 @@
                     proportion: 100,
                     clicks: this.campaignData.click_count,
                     shows: this.campaignData.show_count,
-                    earned: this.campaignData.purchase_sum,
-                    currency: this.campaignData.purchase_currency,
+                    earned: this.campaignData.purchase_sums,
                     purchases: this.campaignData.purchase_count,
                     ctr: this.campaignData.ctr,
                     conversions: this.campaignData.conversions,

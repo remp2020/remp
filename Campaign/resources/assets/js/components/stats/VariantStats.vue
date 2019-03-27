@@ -62,13 +62,12 @@
                             :value="finishedPaymentsCount"
                         ></single-value>
 
-                        <single-value
-                            :title="'Earned'"
-                            :loading="loading"
-                            :error="error"
-                            :value="earnedSum"
-                            :unit="currency"
-                        ></single-value>
+                        <multiple-values
+                                :title="'Earned'"
+                                :loading="loading"
+                                :error="error"
+                                :values="earned"
+                        ></multiple-values>
 
                     </div>
                 </div>
@@ -122,8 +121,7 @@
                 showsCount: 0,
                 startedPaymentsCount: 0,
                 finishedPaymentsCount: 0,
-                earnedSum: 0,
-                currency: '',
+                earned: [],
                 ctr: 0,
                 conversions: 0,
                 histogramData: {},
@@ -161,8 +159,17 @@
                 this.showsCount = data.show_count;
                 this.startedPaymentsCount = data.payment_count;
                 this.finishedPaymentsCount = data.purchase_count;
-                this.earnedSum = data.purchase_sum;
-                this.currency = data.purchase_currency;
+
+                let values = [];
+                for (const currency of Object.keys(data.purchase_sums)) {
+                    let sum = data.purchase_sums[currency];
+                    values.push({
+                        value: sum,
+                        unit: currency
+                    });
+                }
+                this.earned = values;
+
                 this.histogramData = data.histogram;
                 this.ctr = data.ctr;
                 this.conversions = data.conversions;
