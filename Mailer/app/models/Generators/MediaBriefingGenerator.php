@@ -23,6 +23,8 @@ class MediaBriefingGenerator implements IGenerator
 
     private $embedParser;
 
+    private $lockedHtmlPlaceholder = '<!--[LOCKED_TEXT_PLACEHOLDER]-->';
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
@@ -173,6 +175,8 @@ class MediaBriefingGenerator implements IGenerator
 
         $text = str_replace("<br />", "\r\n", $post);
         $lockedText = str_replace("<br />", "\r\n", $lockedPost);
+
+        $lockedPost = $this->replaceLockedHtmlPlaceholder($lockedPost);
 
         $text = strip_tags($text);
         $lockedText = strip_tags($lockedText);
@@ -333,12 +337,43 @@ class MediaBriefingGenerator implements IGenerator
 
             $lockedHtml .= $parts[0];
             $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= '<p>Tento newsletter môžete dostávať na e-mail celý, stačí byť predplatiteľom Denníka N. <a href="https://predplatne.dennikn.sk/{{ autologin }}">Pozrite si ponuku predplatného.</a>.<p>';
+            $lockedHtml .= $this->lockedHtmlPlaceholder;
 
             return $lockedHtml;
         }
 
         return $html;
+    }
+
+    public function replaceLockedHtmlPlaceholder($html)
+    {
+        $lockedHtml = <<< HTML
+<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">Tento článok je exkluzívnym obsahom pre predplatiteľov Denníka N.</h2>
+<table class="button primary large"
+       style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:auto;margin:0 0 16px 0;Margin:0 0 16px 0;text-align: left;">
+    <tbody>
+    <tr style="padding:0;vertical-align:top;text-align:left;">
+        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important;">
+            <table class="button primary large"
+                   style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:auto;margin:0 0 16px 0;Margin:0 0 16px 0;text-align: left;">
+                <tbody>
+                <tr style="padding:0;vertical-align:top;text-align:left;">
+                    <td style="padding:0;vertical-align:top;font-size:18px;line-height:1.6;text-align:left;color:#ffffff;background:#F26755;border:1px solid #F26755;border-collapse:collapse !important;">
+                        <a href="https://predplatne.dennikn.sk/" title="Zobraziť na webe"
+                           style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;padding:10px 20px 10px 20px;font-size:20px;font-size:13px;font-weight:normal;color:#ffffff;text-decoration:none;display:inline-block;padding:14px 12px 14px 12px;border:0 solid #F26755;border-radius:3px;">
+                            <!--[if gte mso 15]>&nbsp;<![endif]-->
+                            Pridajte sa k predplatiteľom</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+HTML;
+
+        return str_replace($this->lockedHtmlPlaceholder, $lockedHtml, $html);
     }
 
     public function parseEmbed($matches)
