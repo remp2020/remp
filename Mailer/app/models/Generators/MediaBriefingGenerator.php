@@ -358,9 +358,9 @@ class MediaBriefingGenerator implements IGenerator
                    style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:auto;margin:0 0 16px 0;Margin:0 0 16px 0;text-align: left;">
                 <tbody>
                 <tr style="padding:0;vertical-align:top;text-align:left;">
-                    <td style="padding:0;vertical-align:top;font-size:18px;line-height:1.6;text-align:left;color:#ffffff;background:#F26755;border:1px solid #F26755;border-collapse:collapse !important;">
+                    <td style="padding:0;vertical-align:top;font-size:18px;line-height:1.6;text-align:left;color:#ffffff;background:#00A251;border:1px solid #00A251;border-collapse:collapse !important;">
                         <a href="https://predplatne.dennikn.sk/" title="Zobraziť na webe"
-                           style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;padding:10px 20px 10px 20px;font-size:20px;font-size:13px;font-weight:normal;color:#ffffff;text-decoration:none;display:inline-block;padding:14px 12px 14px 12px;border:0 solid #F26755;border-radius:3px;">
+                           style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#00A251;padding:10px 20px 10px 20px;font-size:20px;font-size:13px;font-weight:normal;color:#ffffff;text-decoration:none;display:inline-block;padding:14px 12px 14px 12px;border:0 solid #00A251;border-radius:3px;">
                             <!--[if gte mso 15]>&nbsp;<![endif]-->
                             Pridajte sa k predplatiteľom</a>
                     </td>
