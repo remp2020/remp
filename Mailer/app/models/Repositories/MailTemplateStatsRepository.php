@@ -33,6 +33,17 @@ class MailTemplateStatsRepository extends Repository
     }
 
     /**
+     * @param $id
+     * @return \Remp\MailerModule\Selection
+     */
+    public function byMailTypeId($id)
+    {
+        return $this->getTable()
+            ->where('mail_template.mail_type_id', $id)
+            ->group('mail_template.mail_type_id');
+    }
+
+    /**
      * @return \Remp\MailerModule\Selection
      */
     public function all()
