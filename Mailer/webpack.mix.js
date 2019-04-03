@@ -12,8 +12,12 @@ mix
         resourceRoot: "/assets/vendor/"
     })
     .js("resources/js/app.js", "js/app.js")
-    .sass("resources/sass/vendor.scss", "css/vendor.css")
-    .sass("resources/sass/app.scss", "css/app.css")
+    .sass("resources/sass/vendor.scss", "css/vendor.css", {
+        implementation: require('node-sass')
+    })
+    .sass("resources/sass/app.scss", "css/app.css", {
+        implementation: require('node-sass')
+    })
     .extract([
         "./resources/js/bootstrap.js",
         "jquery",
