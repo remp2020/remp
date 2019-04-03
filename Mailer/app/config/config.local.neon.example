@@ -1,7 +1,3 @@
-parameters:
-	generators:
-		video_text: Kliknutím na obrázok spustíte prehrávanie videa v novom okne
-
 services:
     # All console commands you need to use should be registered here
     # This is a set that we recommend to use
@@ -9,6 +5,12 @@ services:
         setup:
             - register(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
             - register(Remp\MailerModule\Commands\MailgunEventsCommand())
+            # If you're using Beam, you can enable this command to pull conversions from there
+			# - register(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
+
+    embedParser:
+        setup:
+            - setVideoLinkText("Click to play video")
 
     # This is a reference IUser implementation.
     # You should make your own implementation against your CRM system and register it here.
@@ -27,6 +29,9 @@ services:
 #        class: League\Event\Emitter
 #        setup:
 #            - addListener(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentHandler())
+
+    # If you're using Beam and want to use ProcessConversionStatsCommand, enable this repository (it's a dependency)
+#    - Remp\MailerModule\Repository\BeamConversionsRepository
 
 # local_configs override DBs configs records.
 local_configs:

@@ -98,6 +98,11 @@ class ProcessConversionStatsCommand extends Command
                 $userData = $this->getUserData(array_keys($batchTemplateConversions));
 
                 foreach ($batchTemplateConversions as $userId => $time) {
+                    if (!isset($userData[$userId])) {
+                        // this might be incorrectly tracker userId; throwing warning won't probably help at this point
+                        // as it's not in Beam and the tracking might be already fixed
+                        continue;
+                    }
                     $latestLog = $this->logsRepository->getTable()
                         ->select('MAX(id) AS id')
                         ->where([
@@ -142,6 +147,11 @@ class ProcessConversionStatsCommand extends Command
                 $userData = $this->getUserData(array_keys($nonBatchTemplateConversions));
 
                 foreach ($nonBatchTemplateConversions as $userId => $time) {
+                    if (!isset($userData[$userId])) {
+                        // this might be incorrectly tracker userId; throwing warning won't probably help at this point
+                        // as it's not in Beam and the tracking might be already fixed
+                        continue;
+                    }
                     $latestLog = $this->logsRepository->getTable()
                         ->select('MAX(id) AS id')
                         ->where([

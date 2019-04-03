@@ -87,7 +87,6 @@ services:
 			- register(Remp\MailerModule\Commands\ProcessTemplateStatsCommand())
 			- register(Remp\MailerModule\Commands\HeartbeatCommand())
 			- register(Remp\MailerModule\Commands\MailTypeStatsCommand())
-			- register(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
 			- register(@hermesWorker)
 			- setCatchExceptions(true)
 
@@ -157,7 +156,6 @@ services:
 	- Remp\MailerModule\Job\BatchEmailGenerator
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Auth\AutoLogin
-	- Remp\MailerModule\Repository\BeamConversionsRepository
 
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
@@ -252,4 +250,5 @@ services:
 
 	# Helpers
 	- Remp\MailerModule\Generators\WordpressHelpers
-	- Remp\MailerModule\Generators\EmbedParser(%generators.video_text%)
+	embedParser:
+		class: Remp\MailerModule\Generators\EmbedParser

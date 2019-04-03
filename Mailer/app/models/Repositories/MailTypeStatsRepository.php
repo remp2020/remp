@@ -23,7 +23,7 @@ class MailTypeStatsRepository extends Repository
     public function getDashboardDataGroupedByTypes(DateTime $from, DateTime $to)
     {
         return $this->getTable()
-            ->select('mail_type_id, subscribers_count AS count, DATE(created_at) AS created_date')
+            ->select('mail_type_id, SUM(subscribers_count) AS count, DATE(created_at) AS created_date')
             ->where('created_at >= ?', $from)
             ->where('created_at <= ?', $to)
             ->where('id IN (SELECT id FROM mail_type_stats GROUP BY DATE(created_at), mail_type_id)')
@@ -35,7 +35,7 @@ class MailTypeStatsRepository extends Repository
     public function getDashboardDetailData($id, DateTime $from, DateTime $to)
     {
         return $this->getTable()
-            ->select('mail_type_id, subscribers_count AS count, DATE(created_at) AS created_date')
+            ->select('mail_type_id, SUM(subscribers_count) AS count, DATE(created_at) AS created_date')
             ->where('created_at >= ?', $from)
             ->where('created_at <= ?', $to)
             ->where('mail_type_id = ?', $id)

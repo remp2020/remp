@@ -87,11 +87,6 @@ class BatchesRepository extends Repository
     public function getInProgressBatches($limit)
     {
         return $this->getTable()
-            ->select('
-                mail_job_batch.*,
-                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name,
-                :mail_job_batch_template.mail_job_id
-            ')
             ->where([
                 'mail_job_batch.status' => [
                     self::STATUS_READY,
@@ -100,7 +95,6 @@ class BatchesRepository extends Repository
                     self::STATUS_SENDING
                 ]
             ])
-            ->group('mail_job_batch.id')
             ->order('start_at ASC')
             ->limit($limit);
     }
@@ -108,17 +102,11 @@ class BatchesRepository extends Repository
     public function getLastDoneBatches($limit)
     {
         return $this->getTable()
-            ->select('
-                mail_job_batch.*,
-                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name,
-                :mail_job_batch_template.mail_job_id
-            ')
             ->where([
                 'mail_job_batch.status' => [
                     self::STATUS_DONE
                 ]
             ])
-            ->group('mail_job_batch.id')
             ->order('mail_job_batch.last_email_sent_at DESC')
             ->limit($limit);
     }

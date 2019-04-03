@@ -264,14 +264,17 @@
                         {if count($inProgressBatches)}
                             <div class="cw-upcoming">
                                 {foreach $inProgressBatches as $batch}
-                                    <ul class="clearfix p-t-20 p-b-20">
-                                        <li class="cwu-forecast">
-                                            <a n:href="Job:show $batch->mail_job_id">
-                                                #{$batch->id}
-                                            </a>
+                                    <ul class="clearfix p-b-20">
+                                        <li class="cwu-forecast p-0 m-0">
+                                            <strong><a class="cg-list dark cgl-main palette-Cyan-50 bg" n:href="Job:show $batch->mail_job_id">#{$batch->id}</a></strong>
                                         </li>
-                                        <li style="display: block;">
-                                            <strong>Email:</strong> {$batch->template_name}
+                                        <li>
+                                            <strong>Templates:</strong>
+                                            <ul>
+                                                <li n:foreach="$batch->related('mail_job_batch_template') as $jobBatchTemplate">
+                                                    <a n:href="Template:show $jobBatchTemplate->mail_template_id">{$jobBatchTemplate->mail_template->name}</a>
+                                                </li>
+                                            </ul>
                                         </li>
                                         <li style="display: block;">
                                             <strong>Status:</strong> {$batch->status}
@@ -316,7 +319,12 @@
                                             </a>
                                         </li>
                                         <li style="display: block;">
-                                            <strong>Email:</strong> {$batch->template_name}
+                                            <strong>Email:</strong>
+                                            <ul>
+                                                <li n:foreach="$batch->related('mail_job_batch_template') as $jobBatchTemplate">
+                                                    {$jobBatchTemplate->mail_template->name}
+                                                </li>
+                                            </ul>
                                         </li>
                                         <li style="display: block;">
                                             <strong>Sent:</strong> {$batch->sent_emails}

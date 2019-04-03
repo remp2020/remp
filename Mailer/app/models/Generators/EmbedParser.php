@@ -6,12 +6,12 @@ use Embed\Embed;
 
 class EmbedParser
 {
-    private $videoLinkText = '';
+    private $videoLinkText;
 
     /**
      * @param string $videoLinkText
      */
-    public function __construct($videoLinkText)
+    public function setVideoLinkText($videoLinkText = null)
     {
         $this->videoLinkText = $videoLinkText;
     }
