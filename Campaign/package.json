@@ -17,6 +17,9 @@
     "all-watch-poll": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch-poll lib-watch-poll",
     "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch"
   },
+  "engines": {
+    "node": ">=8.6"
+  },
   "dependencies": {
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",

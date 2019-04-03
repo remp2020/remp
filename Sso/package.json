@@ -9,6 +9,9 @@
     "prod": "npm run production",
     "production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
+  "engines": {
+    "node": ">=8.6"
+  },
   "dependencies": {
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",

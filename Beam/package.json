@@ -23,6 +23,9 @@
     "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch iota-watch",
     "all-production": "node_modules/npm-run-all/bin/npm-run-all/index.js production lib-production iota-production"
   },
+  "engines": {
+    "node": ">=8.6"
+  },
   "dependencies": {
     "@tweenjs/tween.js": "^17.3.0",
     "animate.css": "^3.7.0",
