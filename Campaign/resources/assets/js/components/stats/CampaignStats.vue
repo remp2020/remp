@@ -56,13 +56,12 @@
                             :value="finishedPayments"
                         ></single-value>
 
-                        <single-value
-                            :title="'Earned'"
-                            :loading="loading"
-                            :error="error"
-                            :value="earned"
-                            :unit="currency"
-                        ></single-value>
+                        <multiple-values
+                                :title="'Earned'"
+                                :loading="loading"
+                                :error="error"
+                                :values="earned"
+                        ></multiple-values>
 
                     </div>
                 </div><!-- .row -->
@@ -74,9 +73,11 @@
 <script>
     import SingleValue from './SingleValue'
     import Chart from './Chart'
+    import MultipleValues from "./MultipleValues";
 
     export default {
         components: {
+            MultipleValues,
             SingleValue,
             Chart
         },
@@ -104,8 +105,7 @@
                 clickCount: 0,
                 startedPayments: 0,
                 finishedPayments: 0,
-                earned: 0,
-                currency: '',
+                earned: [],
                 histogramData: {},
                 ctr: 0,
                 conversions: 0,
@@ -113,11 +113,20 @@
         },
         watch: {
             data(data) {
-                this.clickCount = data.click_count.count;
-                this.startedPayments = data.payment_count.count;
-                this.finishedPayments = data.purchase_count.count;
-                this.earned = data.purchase_sum.sum;
-                this.currency = data.purchase_sum.tags != null ? data.purchase_sum.tags.currency : null;
+                this.clickCount = data.click_count;
+                this.startedPayments = data.payment_count;
+                this.finishedPayments = data.purchase_count;
+
+                let values = [];
+                for (const currency of Object.keys(data.purchase_sums)) {
+                    let sum = data.purchase_sums[currency];
+                    values.push({
+                        value: sum,
+                        unit: currency
+                    });
+                }
+                this.earned = values;
+
                 this.histogramData = data.histogram;
                 this.ctr = data.ctr;
                 this.conversions = data.conversions;

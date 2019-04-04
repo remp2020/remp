@@ -29,7 +29,9 @@ class CampaignsComparisonController extends Controller
 
         foreach (Campaign::all() as $campaign) {
             if (in_array($campaign->id, $campaignIds)) {
-                $campaign->stats = $this->statsHelper->campaignStats($campaign);
+                [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign);
+
+                $campaign->stats = $campaignData;
                 $campaigns->push($campaign);
             } else {
                 $campaignsNotCompared->push($campaign);
