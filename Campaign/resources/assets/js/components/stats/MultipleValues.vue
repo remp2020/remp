@@ -86,7 +86,6 @@
 
 <script>
     export default {
-        name: "multiple-values",
         props: {
             title: {
                 type: String,

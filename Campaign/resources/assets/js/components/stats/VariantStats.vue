@@ -114,6 +114,7 @@
         },
         components: {
             SingleValue,
+            MultipleValues,
             Chart
         },
         data() {
