@@ -24,32 +24,12 @@ if (process.env.REMP_TARGET === 'lib') {
         .js("resources/assets/js/banner.js", "js/banner.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
-        .extract([
-            "./resources/assets/js/bootstrap.js",
-            "jquery",
-            "jquery-placeholder",
-            "bootstrap",
-            "bootstrap-select",
-            "vue",
-            "animate.css",
-            "autosize",
-            "datatables.net",
-            "datatables.net-rowgroup",
-            "datatables.net-responsive",
-            "eonasdan-bootstrap-datetimepicker",
-            "google-material-color",
-            "malihu-custom-scrollbar-plugin",
-            "moment",
-            "node-waves",
-            "bootstrap-notify",
-            "nouislider",
-            "./resources/assets/js/farbtastic.js",
-        ])
+        .extract()
         .autoload({
-            "jquery": ['$', 'jQuery', "window.jQuery"],
-            "node-waves": ["Waves", "window.Waves"],
-            "autosize": ["autosize", "window.autosize"],
-            "vue": ["Vue", "window.Vue"],
-            "moment": ["Moment", "window.Moment"]
+            "jquery": ['$', 'jQuery'],
+            "node-waves": ["Waves"],
+            "autosize": ["autosize"],
+            "vue": ["Vue"],
+            "moment": ["Moment"]
         });
 }

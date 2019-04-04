@@ -39,6 +39,6 @@
     "laravel-mix": "^4.0.15",
     "resolve-url-loader": "^2.3.2",
     "sass": "^1.17.4",
-    "sass-loader": "7.*"
+    "sass-loader": "^7.1.0"
   }
 }

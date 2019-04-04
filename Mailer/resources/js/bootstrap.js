@@ -27,7 +27,7 @@ global.clipboard = require("./clipboard.js");
 
 global.salvattore = require("salvattore");
 
-global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue");
+global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue").default;
 
 global.Chart = require("chart.js");
 
