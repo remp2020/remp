@@ -191,7 +191,6 @@ class StatsHelper
             $r->to($to);
         }
 
-        // Currently supporting only 1 currency
-        return $r->get()[0];
+        return $r->get();
     }
 }
