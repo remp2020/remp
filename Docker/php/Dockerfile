@@ -40,7 +40,7 @@ ENV PATH /root/.yarn/bin:$PATH
 
 ENV YARN_CACHE_FOLDER /yarn
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 
 RUN apt-get install -y nodejs
 

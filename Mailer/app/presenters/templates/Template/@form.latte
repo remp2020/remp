@@ -124,7 +124,7 @@
          };
     </script>
     <script n:if="$form->getErrors()" type="application/javascript">
-        $(document).ready(function() {
+        $(function() {
             var index = 0;
             {foreach $form->getErrors() as $error}
             index += 250;

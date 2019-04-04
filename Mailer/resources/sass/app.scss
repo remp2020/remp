@@ -2,6 +2,7 @@ $primaryColor: Cyan;
 $grey: Grey;
 $white: White;
 
+@import "~bootstrap-select/dist/css/bootstrap-select.min.css";
 @import "~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css";
 @import "~remp/sass/template.scss";
 @import "~remp/sass/remp.scss";

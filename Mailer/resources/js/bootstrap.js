@@ -1,8 +1,23 @@
+var global = require('global');
+
+require('datatables.net');
+require('datatables.net-rowgroup');
+require('datatables.net-responsive');
+
 global.$ = global.jQuery = require('jquery');
 
-global.Nette = require('nette-forms');
+require('bootstrap');
+require('bootstrap-select');
+require('bootstrap-notify');
+
+require('eonasdan-bootstrap-datetimepicker');
+require('easy-pie-chart/dist/jquery.easypiechart.js');
+require('jquery-placeholder');
+
+global.autosize = require('autosize');
 
 global.CodeMirror = require('codemirror');
+require('codemirror/mode/htmlmixed/htmlmixed.js');
 
 global.Vue = require('vue');
 
@@ -14,4 +29,10 @@ global.salvattore = require("salvattore");
 
 global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue");
 
+global.Chart = require("chart.js");
+
+global.Waves = require("node-waves");
+
+global.Nette = require('nette-forms');
+require('nette.ajax.js');
 Nette.initOnLoad();

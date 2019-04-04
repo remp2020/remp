@@ -54,7 +54,7 @@
     {/foreach}
     };
 
-    $(document).ready(function() {
+    $(function() {
         $.fn.dataTable.ext.errMode = 'none';
         var dataTable = $('#{$tableId|noescape}').on('error.dt', function(e, settings, techNote, message) {
             $.notify({
