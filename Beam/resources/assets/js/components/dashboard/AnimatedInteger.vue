@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    let Tween = require('@tweenjs/tween.js');
+    import Tween from '@tweenjs/tween.js';
 
     export default {
         name: "animated-integer",
