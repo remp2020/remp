@@ -5596,7 +5596,7 @@ salvattore@^1.0.9:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/salvattore/-/salvattore-1.0.9.tgz#b75777850cc6f2a690157c8b852aa99fd18a1291"
 
-sass-loader@7.*:
+sass-loader@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-7.1.0.tgz#16fd5138cb8b424bf8a759528a1972d72aad069d"
   integrity sha512-+G+BKGglmZM2GUSfT9TLuEp6tzehHPjAMoRRItOojWIqIGPloVCMhNIQuG639eJ+y033PaGTSjLaTHts8Kw79w==

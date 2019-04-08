@@ -64,7 +64,10 @@
                                 {{ campaign.stats.purchase_count.count }}
                             </td>
                             <td>
-                                {{ campaign.stats.purchase_sum.sum | round(2) }} {{ campaign.stats.purchase_sum.tags.currency }}
+                                {{ campaign.stats.purchase_sum.sum | round(2) }}
+                                <span v-if="campaign.stats.purchase_sum.tags">
+                                    {{ campaign.stats.purchase_sum.tags.currency }}
+                                </span>
                             </td>
                             <th>
                                 <span class="actions">
