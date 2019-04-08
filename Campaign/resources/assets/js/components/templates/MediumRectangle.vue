@@ -98,7 +98,7 @@
 </template>
 
 <script type="text/javascript">
-    let vSelect = require("remp/js/components/vSelect.vue");
+    import vSelect from "remp/js/components/vSelect";
 
     let props = [
         "_headerText",

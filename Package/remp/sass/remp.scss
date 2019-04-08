@@ -175,14 +175,18 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     }
 }
 
-/***************/
-/* Z-INDEX FIX */
-/***************/
+/********************/
+/* BOOTSTRAP SELECT */
+/********************/
 .bootstrap-datetimepicker-widget,
 .bootstrap-select.open,
 .bootstrap-select .dropdown-menu.open
 {
     z-index: 3000;
+}
+
+.btn.dropdown-toggle {
+    box-shadow: none;
 }
 
 /***************/

@@ -141,7 +141,7 @@
 </template>
 
 <script>
-    let vSelect = require("remp/js/components/vSelect.vue");
+    import vSelect from "remp/js/components/vSelect"
 
     export default {
         name: "segment-rule",

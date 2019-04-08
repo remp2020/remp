@@ -79,7 +79,7 @@
 </template>
 
 <script>
-    var SegmentRule = require("./SegmentRule");
+    import SegmentRule from "./SegmentRule";
 
     const props = [
         "_name",

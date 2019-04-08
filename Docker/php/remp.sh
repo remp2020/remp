@@ -10,7 +10,6 @@ then
     composer install
 
     yarn install --no-bin-links
-    npm rebuild node-sass optipng-bin --no-bin-links
     chmod -R u+x node_modules
 
     npm run | grep "all-dev"

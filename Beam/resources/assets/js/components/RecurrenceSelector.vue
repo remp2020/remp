@@ -121,7 +121,7 @@
 
 <script type="text/javascript">
     import RRule from 'rrule'
-    let rrulestr = require('rrule').rrulestr
+    import DateTimePicker from 'remp/js/components/DateTimePickerWrapper'
 
     let repeat2freq = {
         'day': RRule.DAILY,
@@ -205,7 +205,7 @@
             if (this.recurrence !== null) {
                 this.repeat = true
 
-                let rule = rrulestr(this.recurrence)
+                let rule = Rule.rrulestr(this.recurrence)
 
                 this.repeatInterval = rule.options.interval
                 this.repeatEvery = rRuleFreqToRepeatEvery(rule.options.freq)
