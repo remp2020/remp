@@ -38,10 +38,14 @@ class MailTypeStatsRepository extends Repository
     {
         return $this->getTable()
             ->select('mail_type_id, SUM(subscribers_count) AS count, DATE(created_at) AS created_date')
+            ->where('id IN (
+                SELECT MAX(id) FROM mail_type_stats
+                WHERE mail_type_id = ?
+                GROUP BY DATE(created_at), mail_type_id
+            )', $id)
             ->where('created_at >= ?', $from)
             ->where('created_at <= ?', $to)
-            ->where('mail_type_id = ?', $id)
-            ->group('created_date, mail_type_id')
+            ->group('created_date')
             ->order('created_date ASC')
             ->fetchAll();
     }
