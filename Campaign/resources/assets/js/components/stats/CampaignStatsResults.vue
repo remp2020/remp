@@ -67,8 +67,8 @@
                                 </template>
                             </td>
                             <td>
-                                <strong>
-                                    {{ variant.earned | round(2) }}{{ variant.currency }}
+                                <strong v-for="(sum, currency) in variant.earned" :key="currency">
+                                    {{ sum | round(2) }} {{ currency }}
                                 </strong>
                             </td>
                         </tr>
@@ -125,11 +125,10 @@
                     let prepared = {
                         name: "Control Group",
                         proportion: variant.proportion,
-                        clicks: data.click_count.count,
-                        shows: data.show_count.count,
-                        earned: data.purchase_sum.sum,
-                        currency: data.purchase_sum.tags != null ? data.purchase_sum.tags.currency : null,
-                        purchases: data.purchase_count.count,
+                        clicks: data.click_count,
+                        shows: data.show_count,
+                        earned: data.purchase_sums,
+                        purchases: data.purchase_count,
                         ctr: data.ctr,
                         conversions: data.conversions,
                         deleted_at: variant.deleted_at,
@@ -148,11 +147,10 @@
                 this.variantsData.push({
                     name: 'TOTAL',
                     proportion: 100,
-                    clicks: this.campaignData.click_count.count,
-                    shows: this.campaignData.show_count.count,
-                    earned: this.campaignData.purchase_sum.sum,
-                    currency: this.campaignData.purchase_sum.tags != null ? this.campaignData.purchase_sum.tags.currency : null,
-                    purchases: this.campaignData.purchase_count.count,
+                    clicks: this.campaignData.click_count,
+                    shows: this.campaignData.show_count,
+                    earned: this.campaignData.purchase_sums,
+                    purchases: this.campaignData.purchase_count,
                     ctr: this.campaignData.ctr,
                     conversions: this.campaignData.conversions,
                 });

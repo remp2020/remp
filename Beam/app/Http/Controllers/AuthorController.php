@@ -131,10 +131,16 @@ class AuthorController extends Controller
         }
 
         return $datatables->of($authors)
-            ->filterColumn('name', function (Builder $query, $value) {
-                $query->where('authors.name', 'like', '%' . $value . '%');
+            ->addColumn('name', function (Author $author) {
+                return Html::linkRoute('authors.show', $author->name, $author);
             })
-            ->orderColumn('conversions_amount', 'conversions_amount $1')
+            ->filterColumn('name', function (Builder $query, $value) {
+                $authorIds = explode(',', $value);
+                $query->where(function (Builder $query) use ($authorIds, $value) {
+                    $query->where('authors.name', 'like', '%' . $value . '%')
+                        ->orWhereIn('authors.id', $authorIds);
+                });
+            })
             ->addColumn('conversions_amount', function (Author $author) use ($conversions) {
                 if (!isset($conversions[$author->id])) {
                     return 0;
@@ -146,9 +152,7 @@ class AuthorController extends Controller
                 }
                 return $amounts ?? [0];
             })
-            ->addColumn('name', function (Author $author) {
-                return Html::linkRoute('authors.show', $author->name, $author);
-            })
+            ->orderColumn('conversions_amount', 'conversions_amount $1')
             ->make(true);
     }
 

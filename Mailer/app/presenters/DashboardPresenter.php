@@ -142,7 +142,6 @@ final class DashboardPresenter extends BasePresenter
         });
 
         $typeSubscribersData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($from, $now);
-
         foreach ($typeSubscribersData as $row) {
             $foundAt = array_search(
                 $this->dateFormatter->format($row->created_date),
@@ -157,14 +156,7 @@ final class DashboardPresenter extends BasePresenter
 
         $prevPeriodSubscribersTypeData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($prevPeriodFrom, $from);
         foreach ($prevPeriodSubscribersTypeData as $row) {
-            $foundAt = array_search(
-                $this->dateFormatter->format($row->created_date),
-                $graphLabels
-            );
-
-            if ($foundAt !== false) {
-                $typeSubscriberDataSets[$row->mail_type_id]['prevPeriodCount'] += $row->count;
-            }
+            $typeSubscriberDataSets[$row->mail_type_id]['prevPeriodCount'] = $row->count;
         }
 
         // remove sets with zero sent count

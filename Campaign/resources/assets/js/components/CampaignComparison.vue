@@ -35,7 +35,7 @@
                             <th @click="sort('conversions')" :class="sortingClass('conversions')">Conversions</th>
                             <th @click="sort('startedPayments')" :class="sortingClass('startedPayments')">Started payments</th>
                             <th @click="sort('finishedFayments')" :class="sortingClass('finishedFayments')">Finished payments</th>
-                            <th @click="sort('earned')" :class="sortingClass('earned')">Earned</th>
+                            <th>Earned</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -45,7 +45,7 @@
                                 {{ campaign.name }}
                             </td>
                             <td>
-                                {{ campaign.stats.click_count.count }}
+                                {{ campaign.stats.click_count }}
                             </td>
                             <td>
                                 <strong>
@@ -58,15 +58,14 @@
                                 </strong>
                             </td>
                             <td>
-                                {{ campaign.stats.payment_count.count }}
+                                {{ campaign.stats.payment_count}}
                             </td>
                             <td>
-                                {{ campaign.stats.purchase_count.count }}
+                                {{ campaign.stats.purchase_count }}
                             </td>
                             <td>
-                                {{ campaign.stats.purchase_sum.sum | round(2) }}
-                                <span v-if="campaign.stats.purchase_sum.tags">
-                                    {{ campaign.stats.purchase_sum.tags.currency }}
+                                <span v-for="(sum, currency) in campaign.stats.purchase_sums">
+                                {{ sum | round(2) }} {{ currency }}
                                 </span>
                             </td>
                             <th>
@@ -154,8 +153,6 @@
                             return (a,b) => rev * (a.stats.payment_count.count - b.stats.payment_count.count)
                         case 'finishedFayments':
                             return (a,b) => rev * (a.stats.purchase_count.count - b.stats.purchase_count.count)
-                        case 'earned':
-                            return (a,b) => rev * (a.stats.purchase_sum.sum - b.stats.purchase_sum.sum)
                     }
                 }
                 if (this.sorting.by) {

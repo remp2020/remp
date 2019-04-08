@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Campaign;
-use Illuminate\Support\Facades\Redis;
 
 class CampaignsRefreshCache extends Command
 {

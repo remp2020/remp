@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Campaign;
+use App\CampaignBanner;
+use App\CampaignBannerStats;
 use App\Contracts\StatsContract;
 use App\Contracts\StatsHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Remp\MultiArmedBandit\Lever;
 use Remp\MultiArmedBandit\Machine;
 
@@ -41,23 +44,29 @@ class StatsController extends Controller
     {
         $from = Carbon::parse($request->get('from'), $request->input('tz'));
         $to = Carbon::parse($request->get('to'), $request->input('tz'));
+
+        $from->minute(0)->second(0);
+        $nextTo = (clone $to)->minute(0)->second(0);
+        if ($nextTo->ne($to)) {
+            $to = $nextTo->addHour();
+        }
+
         $chartWidth = $request->get('chartWidth');
 
-        $campaignData = $this->statsHelper->campaignStats($campaign, $from, $to);
+        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $from, $to);
         $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $chartWidth);
 
-        $variantsData = [];
-        foreach ($campaign->campaignBanners()->withTrashed()->get() as $variant) {
-            $variantStats = $this->statsHelper->variantStats($variant, $from, $to);
-            $variantStats['histogram'] = $this->getHistogramData([$variant->uuid], $from, $to, $chartWidth);
-            $variantsData[$variant->id] = $variantStats;
+        foreach ($variantsData as $campaignBannerId => $variantData) {
+            $uuid = CampaignBanner::find($campaignBannerId)->uuid;
+            $variantsData[$campaignBannerId]['histogram'] = $this->getHistogramData([$uuid], $from, $to, $chartWidth);
         }
 
         // a/b test evaluation data
-        foreach ($this->getVariantProbabilities($variantsData, "click_count") as $variantId => $probability) {
+        foreach ($this->getVariantProbabilities($variantsData, 'click_count') as $variantId => $probability) {
             $variantsData[$variantId]['click_probability'] = $probability;
         }
-        foreach ($this->getVariantProbabilities($variantsData, "purchase_count") as $variantId => $probability) {
+
+        foreach ($this->getVariantProbabilities($variantsData, 'purchase_count') as $variantId => $probability) {
             $variantsData[$variantId]['purchase_probability'] = $probability;
         }
 
@@ -128,11 +137,11 @@ class StatsController extends Controller
         $machine = new Machine(1000);
         $zeroStat = [];
         foreach ($variantsData as $variantId => $data) {
-            if ($data['show_count']->count === 0 || !$data[$conversionField]->count) {
+            if ($data['show_count'] === 0 || !$data[$conversionField]) {
                 $zeroStat[$variantId] = 0;
                 continue;
             }
-            $machine->addLever(new Lever($variantId, $data[$conversionField]->count, $data['show_count']->count));
+            $machine->addLever(new Lever($variantId, $data[$conversionField], $data['show_count']));
         }
         return $machine->run() + $zeroStat;
     }
