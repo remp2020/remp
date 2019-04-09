@@ -48,7 +48,7 @@
                 ],
                 'amount' => [
                     'header' => 'amount',
-                    'render' => 'decimalNumber',
+                    'render' => 'number',
                     'priority' => 1,
                     'className' => 'text-right',
                 ],
