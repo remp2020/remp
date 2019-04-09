@@ -81,8 +81,8 @@
                                         <small>{$dataset['label']}</small>
                                         <h3 class="m-t-5">
                                             {if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}
-                                            {$dataset['count']}
-                                            <small style="color: #fff" title="Previous month">({$dataset['prevPeriodCount']})</small>
+                                            <span class="format-number-by-locale">{$dataset['count']}</span>
+                                            <small style="color: #fff" title="Previous month">(<span class="format-number-by-locale">{$dataset['prevPeriodCount']}</span>)</small>
                                         </h3>
                                     </div>
                                 </a>
@@ -237,8 +237,8 @@
                                         <small>{$dataset['label']}</small>
                                         <h3 class="m-t-5">
                                             {if $dataset['count'] > $dataset['prevPeriodCount']}&#9650;{else}&#9660;{/if}
-                                            {$dataset['count']}
-                                            <small style="color: #fff" title="Previous month">({$dataset['prevPeriodCount']})</small>
+                                            <span class="format-number-by-locale">{$dataset['count']}</span>
+                                            <small style="color: #fff" title="Previous month">(<span class="format-number-by-locale">{$dataset['prevPeriodCount']}</span>)</small>
                                         </h3>
                                     </div>
                                 </a>
@@ -348,3 +348,13 @@
         </div><!-- #c-grid -->
     </div>
 </section>
+
+<script>
+    (function () {
+        var $els = $('.format-number-by-locale');
+        $els.each(function () {
+            var $this = $(this);
+            $this.text(Number($this.text()).toLocaleString());
+        });
+    })();
+</script>
