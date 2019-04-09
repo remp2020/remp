@@ -71,9 +71,13 @@ final class TemplatePresenter extends BasePresenter
             ])
             ->setColSetting('opened', [
                 'priority' => 3,
+                'render' => 'number',
+                'class' => 'text-right',
             ])
             ->setColSetting('clicked', [
                 'priority' => 3,
+                'render' => 'number',
+                'class' => 'text-right',
             ])
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show template')
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit template')
