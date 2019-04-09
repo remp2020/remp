@@ -48,7 +48,9 @@
                             <dl class="dl-horizontal">
                                 <dt>Authors</dt>
                                 <dd>
-                                    {{$article->authors->implode('name', ', ')}}
+                                    @foreach ($article->authors as $author)
+                                        <a href="{{ route('authors.show', $author->id) }}">{{ $author->name }}</a>@if(!$loop->last), @endif
+                                    @endforeach
                                 </dd>
                             </dl>
                             <dl class="dl-horizontal">

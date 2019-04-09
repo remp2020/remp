@@ -209,8 +209,13 @@ class ArticleDetailsController extends Controller
         $titleVariants = [];
         $imageVariants = [];
         foreach ($results as $result) {
-            $titleVariants[$result->tags->title_variant] = true;
-            $imageVariants[$result->tags->image_variant] = true;
+            if (isset($result->tags->title_variant)) {
+                $titleVariants[$result->tags->title_variant] = true;
+            }
+
+            if (isset($result->tags->image_variant)) {
+                $imageVariants[$result->tags->image_variant] = true;
+            }
         }
 
         $uniqueBrowsersCount = $results->sum('count');
