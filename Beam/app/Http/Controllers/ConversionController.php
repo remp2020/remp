@@ -50,7 +50,7 @@ class ConversionController extends Controller
         return $datatables->of($conversions)
             ->addColumn('actions', function (Conversion $conversion) {
                 return [
-                    'show' => 'conversions.show', $conversion),
+                    'show' => route('conversions.show', $conversion),
                 ];
             })
             ->addColumn('article.title', function (Conversion $conversion) {
