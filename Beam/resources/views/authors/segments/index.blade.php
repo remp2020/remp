@@ -26,15 +26,18 @@
                 'users_count' => [
                     'header' => 'Users count',
                     'priority' => 1,
+                    'className' => 'text-right',
                 ],
                 'browsers_count' => [
                     'header' => 'Browsers count',
                     'priority' => 2,
+                    'className' => 'text-right',
                 ],
                 'created_at' => [
                     'render' => 'date',
                     'header' => 'Created at',
                     'priority' => 3,
+                    'className' => 'text-right',
                 ],
             ],
             'dataSource' => route('authorSegments.json'),

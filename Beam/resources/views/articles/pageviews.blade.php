@@ -36,42 +36,52 @@
                 ],
                 'pageviews_all' => [
                     'header' => 'all pageviews',
+                    'render' => 'number',
                     'searchable' => false,
                     'priority' => 2,
+                    'className' => 'text-right',
                 ],
                 'pageviews_signed_in' => [
                     'header' => 'signed in pageviews',
+                    'render' => 'number',
                     'searchable' => false,
                     'priority' => 5,
+                    'className' => 'text-right',
                 ],
                 'pageviews_subscribers' => [
                     'header' => 'subscriber pageviews',
+                    'render' => 'number',
                     'searchable' => false,
-                    'priority' => 5
+                    'priority' => 5,
+                    'className' => 'text-right',
                 ],
                 'pageviews_subscribers_ratio' => [
                     'header' => 'subscriber pageviews ratio',
                     'render' => 'percentage',
                     'searchable' => false,
                     'priority' => 5,
+                    'className' => 'text-right',
                 ],
                 'avg_sum_all' => [
                     'header' => 'avg time all',
                     'render' => 'duration',
                     'searchable' => false,
                     'priority' => 2,
+                    'className' => 'text-right',
                 ],
                 'avg_sum_signed_in' => [
                     'header' => 'avg time signed in',
                     'render' => 'duration',
                     'searchable' => false,
                     'priority' => 5,
+                    'className' => 'text-right',
                 ],
                 'avg_sum_subscribers' => [
                     'header' => 'avg time subscribers',
                     'render' => 'duration',
                     'searchable' => false,
                     'priority' => 5,
+                    'className' => 'text-right',
                 ],
                 'authors' => [
                     'header' => 'authors',

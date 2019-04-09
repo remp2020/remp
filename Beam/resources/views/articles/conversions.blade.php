@@ -43,24 +43,28 @@
                     'header' => 'conversions',
                     'searchable' => false,
                     'priority' => 2,
+                    'className' => 'text-right',
                 ],
                 'conversions_rate' => [
                     'orderable' => false,
                     'searchable' => false,
                     'header' => 'conversions rate',
                     'priority' => 2,
+                    'className' => 'text-right',
                 ],
                 'amount' => [
                     'header' => 'amount',
                     'render' => 'array',
                     'priority' => 1,
                     'searchable' => false,
+                    'className' => 'text-right',
                 ],
                 'average' => [
                     'header' => 'average',
                     'render' => 'array',
                     'priority' => 2,
                     'searchable' => false,
+                    'className' => 'text-right',
                 ],
                 'authors' => [
                     'header' => 'authors',

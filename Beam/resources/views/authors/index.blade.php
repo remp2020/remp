@@ -39,53 +39,64 @@
                     'header' => 'articles',
                     'priority' => 3,
                     'searchable' => false,
+                    'render' => 'number',
+                    'className' => 'text-right'
                 ],
                 'conversions_count' => [
                     'header' => 'conversions',
                     'priority' => 2,
                     'searchable' => false,
+                    'render' => 'number',
+                    'className' => 'text-right'
                 ],
                 'conversions_amount' => [
                     'header' => 'amount',
                     'render' => 'array',
                     'priority' => 2,
                     'searchable' => false,
+                    'className' => 'text-right'
                 ],
                 'pageviews_all' => [
                     'header' => 'all pageviews',
                     'render' => 'number',
                     'priority' => 2,
                     'searchable' => false,
+                    'className' => 'text-right'
                 ],
                 'pageviews_signed_in' => [
                     'header' => 'signed in pageviews',
                     'render' => 'number',
                     'priority' => 5,
                     'searchable' => false,
+                    'className' => 'text-right'
                 ],
                 'pageviews_subscribers' => [
                     'header' => 'subscriber pageviews',
                     'render' => 'number',
                     'priority' => 5,
                     'searchable' => false,
+                    'className' => 'text-right'
                 ],
                 'avg_timespent_all' => [
                     'header' => 'avg time all',
                     'render' => 'duration',
                     'priority' => 2,
                     'searchable' => false,
+                    'className' => 'text-right'
                 ],
                 'avg_timespent_signed_in' => [
                     'header' => 'avg time signed in',
                     'render' => 'duration',
                     'priority' => 5,
                     'searchable' => false,
+                    'className' => 'text-right'
                 ],
                 'avg_timespent_subscribers' => [
                     'header' => 'avg time subscribers',
                     'render' => 'duration',
                     'priority' => 5,
-                    'searchable' => true
+                    'searchable' => true,
+                    'className' => 'text-right'
                 ],
             ],
             'dataSource' => route('authors.dtAuthors'),

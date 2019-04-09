@@ -71,6 +71,9 @@
                     @if (isset($col['searchable']))
                     searchable: false,
                     @endif
+                    @if (isset($col['className']))
+                    className: '{{ $col['className'] }}',
+                    @endif
                     @if (isset($col['render']))
                     render: $.fn.dataTables.render['{!! $col['render'] !!}']({!! isset($col['renderParams']) ? json_encode($col['renderParams']) : '' !!})
                     @endif

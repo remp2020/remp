@@ -35,6 +35,8 @@
                             'header' => 'visits count',
                             'searchable' => false,
                             'priority' => 1,
+                            'render' => 'number',
+                            'className' => 'text-right',
                         ],
                     ],
                     'dataSource' => route('visitors.dtReferers'),

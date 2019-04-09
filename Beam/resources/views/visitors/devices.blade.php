@@ -31,8 +31,10 @@
                         ],
                         'visits_count' => [
                             'header' => 'visits count',
+                            'render' => 'number',
                             'searchable' => false,
                             'priority' => 1,
+                            'className' => 'text-right',
                         ],
                     ],
                     'dataSource' => route('visitors.dtBrowsers'),
@@ -91,7 +93,9 @@
                         'visits_count' => [
                             'header' => 'visits count',
                             'searchable' => false,
-                            'priority' => 1
+                            'priority' => 1,
+                            'render' => 'number',
+                            'className' => 'text-right',
                         ],
                     ],
                     'dataSource' => route('visitors.dtDevices'),
