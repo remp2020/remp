@@ -12,7 +12,7 @@ mix
         resourceRoot: "/assets/vendor/"
     })
     .js("resources/js/app.js", "js/app.js")
-    .sass("resources/sass/vendor.scss", "css/vendor.css", )
+    .sass("resources/sass/vendor.scss", "css/vendor.css")
     .sass("resources/sass/app.scss", "css/app.css")
     .extract()
     .autoload({
