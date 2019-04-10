@@ -128,6 +128,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin: 3px 0;
 }
 
+.dropdown-menu .inner.open {
+    width: 100%;
+}
+
 .dropdown-header {
     padding: 5px 16px 0px;
 }
@@ -187,6 +191,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .btn.dropdown-toggle {
     box-shadow: none;
+}
+
+.bootstrap-select {
+    .bs-searchbox {
+        background: none;
+    }
 }
 
 /***************/

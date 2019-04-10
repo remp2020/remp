@@ -72,8 +72,11 @@
             $select.selectpicker();
             $(this.$el).find('select').on('changed.bs.select', function () {
                 let val = $(this).val();
-                // noinspection JSPotentiallyInvalidUsageOfThis
-                let group = this.options[this.selectedIndex].parentNode.label;
+                let group = null;
+
+                if (this.options[this.selectedIndex]) {
+                    group = this.options[this.selectedIndex].parentNode.label;
+                }
                 vm.emitValueChanged(val, group);
             });
 

@@ -43,8 +43,8 @@
     "remp": "file:../Package/remp",
     "salvattore": "^1.0.9",
     "vue": "^2.6.10",
-    "vue-slide-up-down": "^1.7.2",
     "vue-loader": "^13.7.3",
+    "vue-slide-up-down": "^1.7.2",
     "vue-template-compiler": "^2.6.10"
   },
   "devDependencies": {
