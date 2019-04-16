@@ -44,7 +44,7 @@
                             <div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label for="color_scheme" class="fg-label">Dimensions</label>
+                                        <label for="dimensions" class="fg-label">Dimensions</label>
                                     </div>
                                     <div class="col-md-12">
                                         <v-select v-model="dimensions"
