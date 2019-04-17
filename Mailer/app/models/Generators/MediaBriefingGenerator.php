@@ -25,16 +25,20 @@ class MediaBriefingGenerator implements IGenerator
 
     private $lockedHtmlPlaceholder = '<!--[LOCKED_TEXT_PLACEHOLDER]-->';
 
+    private $articleLocker;
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
-        EmbedParser $embedParser
+        EmbedParser $embedParser,
+        ArticleLocker $articleLocker
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
         $this->embedParser = $embedParser;
+        $this->articleLocker = $articleLocker;
     }
 
     public function apiParams()
@@ -62,7 +66,7 @@ class MediaBriefingGenerator implements IGenerator
         $content = $this->content;
 
         $post = $values->mediabriefing_html;
-        $lockedPost = $this->getLockedHtml($post);
+        $lockedPost = $this->articleLocker->getLockedPost($post);
 
         list(
             $captionTemplate,
@@ -176,7 +180,7 @@ class MediaBriefingGenerator implements IGenerator
         $text = str_replace("<br />", "\r\n", $post);
         $lockedText = str_replace("<br />", "\r\n", $lockedPost);
 
-        $lockedPost = $this->replaceLockedHtmlPlaceholder($lockedPost);
+        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
 
         $text = strip_tags($text);
         $lockedText = strip_tags($lockedText);
@@ -311,38 +315,6 @@ class MediaBriefingGenerator implements IGenerator
         $output->mediabriefing_html = $data->post_content;
 
         return $output;
-    }
-
-    public function getLockedHtml($html)
-    {
-        $lockedHtml = '';
-        $lock = null;
-
-        list(
-            $captionTemplate,
-            $captionWithLinkTemplate,
-            $liTemplate,
-            $hrTemplate,
-            $spacerTemplate
-        ) = $this->getTemplates();
-
-        if (stripos($html, '[lock newsletter]')) {
-            $lock = '[lock newsletter]';
-        } elseif (stripos($html, '[lock]')) {
-            $lock = '[lock]';
-        }
-
-        if (!is_null($lock)) {
-            $parts = explode($lock, $html);
-
-            $lockedHtml .= $parts[0];
-            $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= $this->lockedHtmlPlaceholder;
-
-            return $lockedHtml;
-        }
-
-        return $html;
     }
 
     public function replaceLockedHtmlPlaceholder($html)

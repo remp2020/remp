@@ -23,16 +23,20 @@ class TldrGenerator implements IGenerator
 
     private $embedParser;
 
+    private $articleLocker;
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
-        EmbedParser $embedParser
+        EmbedParser $embedParser,
+        ArticleLocker $articleLocker
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
         $this->embedParser = $embedParser;
+        $this->articleLocker = $articleLocker;
     }
 
     public function apiParams()
@@ -63,8 +67,7 @@ class TldrGenerator implements IGenerator
 
         $post = $this->parseOls($post);
 
-
-        $lockedPost = $this->getLockedHtml($post);
+        $lockedPost = $this->articleLocker->getLockedPost($post);
 
         list(
             $captionTemplate,
@@ -172,6 +175,8 @@ class TldrGenerator implements IGenerator
 
         $post = $imageHtml . $post;
         $lockedPost = $imageHtml . $lockedPost;
+
+        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
@@ -378,21 +383,6 @@ class TldrGenerator implements IGenerator
         }
 
         return $post;
-    }
-
-    public function parseEmbed($matches)
-    {
-        $link = trim($matches[0]);
-
-        if (preg_match('/youtu/', $link)) {
-            $result = (new Client())->get('https://www.youtube.com/oembed?url=' . $link . '&format=json')->getBody()->getContents();
-            $result = json_decode($result);
-            $thumbLink = $result->thumbnail_url;
-
-            return "<br><a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
-        }
-
-        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#F26755;text-decoration:none;\">$link</a><br><br>";
     }
 
     public function getTemplates()
