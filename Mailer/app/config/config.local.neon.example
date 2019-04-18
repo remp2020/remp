@@ -11,6 +11,10 @@ services:
     embedParser:
         setup:
             - setVideoLinkText("Click to play video")
+    articleLocker:
+        setup:
+            - setLockText("Exclusive content")
+            - setupLockLink("Registration", "https://www.demosite.com/registration")
 
     # This is a reference IUser implementation.
     # You should make your own implementation against your CRM system and register it here.

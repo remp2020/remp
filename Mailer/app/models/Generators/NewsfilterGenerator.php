@@ -24,16 +24,20 @@ class NewsfilterGenerator implements IGenerator
 
     private $embedParser;
 
+    private $articleLocker;
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
-        EmbedParser $embedParser
+        EmbedParser $embedParser,
+        ArticleLocker $articleLocker
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
         $this->embedParser = $embedParser;
+        $this->articleLocker = $articleLocker;
     }
 
     public function apiParams()
@@ -66,7 +70,7 @@ class NewsfilterGenerator implements IGenerator
             $this->linksColor = '#00A251';
         }
 
-        $lockedPost = $this->getLockedHtml($values->newsfilter_html, $values->url);
+        $lockedPost = $this->articleLocker->getLockedPost($post);
 
         list(
             $captionTemplate,
@@ -162,6 +166,8 @@ class NewsfilterGenerator implements IGenerator
         $post = str_replace('<p>', '<p style="font-weight: normal;">', $post);
         $lockedPost = str_replace('<p>', '<p style="font-weight: normal;">', $lockedPost);
 
+        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
+
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
             'text_template' => $sourceTemplate->content_text,
@@ -245,33 +251,6 @@ class NewsfilterGenerator implements IGenerator
     {
         $this->onSubmit = $onSubmit;
     }
-
-    private function getLockedHtml($fullHtml, $newsfilterLink)
-    {
-        $newHtml = '';
-        $cacheHtml = '';
-        $quit = false;
-        foreach (explode("\n", $fullHtml) as $line) {
-            $cacheHtml .= $line . "\n";
-            if (strpos($line, '<h2') !== false) {
-                $newHtml .= $cacheHtml;
-                $cacheHtml = '';
-
-                if ($quit) {
-                    $newHtml .= <<<HTML
-<p> Predplatitelia dostávajú na e-mail celý Newsfilter. Pozrite si <a style="display: inline; text-decoration: none; font-weight: bold; color: #ffffff; background: #249fdc;" href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}"> ponuku predplatného Denníka N.</a></p>
-HTML;
-                    return $newHtml;
-                }
-            }
-            if (strpos($line, '[lock]') !== false) {
-                $quit = true;
-            }
-        }
-        $newHtml .= $cacheHtml;
-        return $newHtml;
-    }
-
 
     /**
      * @param $data object containing WP article data

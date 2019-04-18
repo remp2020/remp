@@ -26,18 +26,22 @@ class MMSGenerator implements IGenerator
 
     private $embedParser;
 
+    private $articleLocker;
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
         TransportInterface $transport,
-        EmbedParser $embedParser
+        EmbedParser $embedParser,
+        ArticleLocker $articleLocker
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
         $this->transport = $transport;
         $this->embedParser = $embedParser;
+        $this->articleLocker = $articleLocker;
     }
 
     public function apiParams()
@@ -66,7 +70,8 @@ class MMSGenerator implements IGenerator
         $transport = $this->transport;
 
         $post = $values->mms_html;
-        $lockedPost = $this->getLockedHtml($post, $values->url);
+
+        $lockedPost = $this->articleLocker->getLockedPost($post);
 
         list(
             $captionTemplate,
@@ -171,6 +176,8 @@ class MMSGenerator implements IGenerator
 
         $post = $imageHtml . $post;
         $lockedPost = $imageHtml . $lockedPost;
+
+        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
 
         $loader = new \Twig_Loader_Array([
             'html_template' => $sourceTemplate->content_html,
@@ -313,55 +320,6 @@ class MMSGenerator implements IGenerator
         $output->mms_html = $data->post_content;
 
         return $output;
-    }
-
-    public function getLockedHtml($html, $link)
-    {
-        $lockedHtml = '';
-        $lock = null;
-
-        list(
-            $captionTemplate,
-            $captionWithLinkTemplate,
-            $liTemplate,
-            $hrTemplate,
-            $spacerTemplate
-        ) = $this->getTemplates();
-
-        if (stripos($html, '[lock newsletter]')) {
-            $lock = '[lock newsletter]';
-        } else if (stripos($html, '[lock]')) {
-            $lock = '[lock]';
-        }
-
-        if (!is_null($lock)) {
-            $parts = explode($lock, $html);
-
-            $lockedHtml .= $parts[0];
-            $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= <<<HTML
-<p>Predplatitelia Denníka N môžu dočítať celý odkaz MMŠ v e-maili. <a href="https://predplatne.dennikn.sk/subscriptions/{{ autologin }}" style="display: inline; text-decoration: none;">Pozrite si ponuku predplatného.</a><p>
-HTML;
-
-            return $lockedHtml;
-        }
-
-        return $html;
-    }
-
-    public function parseEmbed($matches)
-    {
-        $link = trim($matches[0]);
-
-        if (preg_match('/youtu/', $link)) {
-            $result = (new Client())->get('https://www.youtube.com/oembed?url=' . $link . '&format=json')->getBody()->getContents();
-            $result = json_decode($result);
-            $thumbLink = $result->thumbnail_url;
-
-            return "<br><a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;\"><img src=\"{$thumbLink}\" alt=\"\" style=\"outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;\"></a><br><br>" . PHP_EOL;
-        }
-
-        return "<a href=\"{$link}\" target=\"_blank\" style=\"color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#5050f4;text-decoration:none;\">$link</a><br><br>";
     }
 
     public function getTemplates()
