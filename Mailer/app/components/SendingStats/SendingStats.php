@@ -79,15 +79,18 @@ class SendingStats extends Control
             'delivered' => ['value' => 0, 'per' => 0],
             'opened' => ['value' => 0, 'per' => 0],
             'clicked' => ['value' => 0, 'per' => 0],
+            'converted' => ['value' => 0, 'per' => 0],
             'dropped' => ['value' => 0, 'per' => 0],
             'spam_complained' => ['value' => 0, 'per' => 0],
             'unsubscribed' => ['value' => 0, 'per' => 0],
         ];
+
         foreach ($this->jobBatchTemplates as $jobBatchTemplate) {
             $total += $jobBatchTemplate->sent;
             $stats['delivered']['value'] += $jobBatchTemplate->delivered;
             $stats['opened']['value'] += $jobBatchTemplate->opened;
             $stats['clicked']['value'] += $jobBatchTemplate->clicked;
+            $stats['converted']['value'] += $jobBatchTemplate->converted;
             $stats['dropped']['value'] += $jobBatchTemplate->dropped;
             $stats['spam_complained']['value'] += $jobBatchTemplate->spam_complained;
             $stats['unsubscribed']['value'] += $jobBatchTemplate->mail_template->mail_type
@@ -98,6 +101,18 @@ class SendingStats extends Control
                 ])
                 ->count('*');
         }
+
+        $nonBatchTemplateStat = $this->logsRepository->getNonBatchTemplateStats($this->templateIds);
+        if ($nonBatchTemplateStat) {
+            $total += $nonBatchTemplateStat->sent;
+            $stats['delivered']['value'] += $nonBatchTemplateStat->delivered;
+            $stats['opened']['value'] += $nonBatchTemplateStat->opened;
+            $stats['clicked']['value'] += $nonBatchTemplateStat->clicked;
+            $stats['converted']['value'] += $nonBatchTemplateStat->converted;
+            $stats['dropped']['value'] += $nonBatchTemplateStat->dropped;
+            $stats['spam_complained']['value'] += $nonBatchTemplateStat->spam_complained;
+        }
+
         foreach ($stats as $key => $stat) {
             $stats[$key]['per'] = $total ? ($stat['value'] / $total * 100) : 0;
         }
@@ -105,6 +120,7 @@ class SendingStats extends Control
         $this->template->delivered_stat = $stats['delivered'];
         $this->template->opened_stat = $stats['opened'];
         $this->template->clicked_stat = $stats['clicked'];
+        $this->template->converted_stat = $stats['converted'];
         $this->template->dropped_stat = $stats['dropped'];
         $this->template->spam_stat = $stats['spam_complained'];
         $this->template->unsubscribed_stat = $stats['unsubscribed'];

@@ -1,0 +1,62 @@
+title Mailer Overview
+
+actor User
+
+==E-mail management==
+
+User->Mailer Admin:Create newsletter list
+
+participant Mail processor
+participant Mail worker
+participant ISegment
+participant IUser
+
+
+User<--Mailer Admin:
+User->Mailer Admin:Create e-mail layout
+User<--Mailer Admin:
+note over User:E-mail template has to\nbelong to newsletter list\nand use one of the layouts.
+User->Mailer Admin:Create e-mail template
+User<--Mailer Admin:
+==E-mail sending==
+
+User->Mailer Admin:Create job
+
+activate Mailer Admin
+Mailer Admin->ISegment:List segments
+activate ISegment
+note over User:Select what email, when and\nto whom should the email be sent.\nOnly subscribed recipients\n(members of segment)\nwill receive the email.
+Mailer Admin<--ISegment:
+deactivate ISegment
+User<-Mailer Admin:
+deactivate Mailer Admin
+
+User->Mailer Admin:Start job
+activate Mailer Admin
+Mailer Admin->Mail processor:Trigger mail processing
+activate Mail processor
+User<--Mailer Admin:
+Mail processor->ISegment:Get users of segment
+activate ISegment
+deactivate Mailer Admin
+
+Mail processor<--ISegment:
+deactivate ISegment
+Mail processor->IUser:Get user info for each user
+activate IUser
+Mail processor<--IUser:
+deactivate IUser
+
+
+Mail processor->Mail processor:Filter unsubscribed users
+Mail processor->Mail processor:Split users for A/B testing
+Mail processor->Mail processor:Obtain data for dynamic templates
+Mail processor->Mail worker:Mark processed\n(triggers sending)
+deactivate Mail processor
+activate Mail worker
+
+
+loop Sending email
+Mail worker->IMailer:Send email (or batch)
+Mail worker<--IMailer:
+end

@@ -24,7 +24,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingOne">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" :class="{ green: highlightNameCollapse }">
                                     Campaign name &amp; primary banner (required)
                                 </a>
                             </h4>
@@ -73,41 +73,23 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingTwo">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: altBannerId }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: highlightABTestingCollapse }">
                                     A/B test
                                 </a>
                             </h4>
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
-
-                                <div class="row">
-                                    <div class="col-md-9">
-
-                                        <div class="input-group m-t-20">
-                                            <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
-                                            <div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <label for="alt_banner_id" class="fg-label">Banner B alternative</label>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <v-select v-model="altBannerId"
-                                                                id="alt_banner_id"
-                                                                :name="'alt_banner_id'"
-                                                                :value="altBannerId"
-                                                                :title="'No alternative'"
-                                                                :options.sync="altBannerOptions"
-                                                        ></v-select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div><!-- .input-group -->
-                                    </div>
+                                <ab-testing
+                                    v-if="showABTestingComponent"
+                                    :variants="variants"
+                                    :variantOptions="variantOptions"
+                                    :bannerId="bannerId"
+                                ></ab-testing>
+                                <div v-else class="ab-testing-not-available">
+                                    To allow A/B testing you have to set primary banner in previous tab.
                                 </div>
                             </div><!-- .panel-body -->
-
-
                         </div>
                     </div><!-- .panel (a/b testing) -->
 
@@ -121,25 +103,24 @@
                         </div>
                         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                             <div class="panel-body p-l-10 p-r-20">
-
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-8">
                                         <p class="m-l-20">User needs to be member of all selected segments for campaign to be shown.</p>
 
                                         <div class="input-group m-t-30">
                                             <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
                                             <div>
                                                 <div class="row">
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-12">
                                                         <label for="signed_in" class="fg-label">User signed-in state</label>
                                                     </div>
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-12">
                                                         <v-select v-model="signedIn"
-                                                                id="signed_in"
-                                                                :name="'signed_in'"
-                                                                :value="signedIn"
-                                                                :options.sync="signedInOptions"
-                                                                :title="'Everyone'"
+                                                                  id="signed_in"
+                                                                  :name="'signed_in'"
+                                                                  :value="signedIn"
+                                                                  :options.sync="signedInOptions"
+                                                                  :title="'Everyone'"
                                                         ></v-select>
                                                         <small class="help-block">To use this filter, you have to be setting <code>signedIn: Boolean</code> within your REMP tracking code.</small>
                                                     </div>
@@ -150,9 +131,9 @@
                                         <div class="input-group">
                                             <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
                                             <div>
-                                                <div class="row">
-                                                    <div class="col-md-10">
-                                                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true">
+                                                <div v-if="Object.keys(availableSegments).length" class="row">
+                                                    <div class="col-md-12">
+                                                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true" data-max-options="1">
                                                             <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
                                                                 <option v-for="(obj,code) in list" v-bind:value="obj">
                                                                     {{ obj.name }}
@@ -161,11 +142,17 @@
                                                         </select>
                                                     </div>
                                                 </div>
+                                                <div v-else class="panel panel-default">
+                                                    <div class="panel-body app-info p-10">
+                                                        <p>No segments are available for selection. This might be because you don't have any segment providers configured.</p>
+                                                        <p class="m-b-0 p-0">If you want to use segments, configure your environment to use existing Segment Providers or <a href="https://github.com/remp2020/remp/tree/master/Campaign#segment-integration">implement your own integration</a>.</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="row m-t-20 m-l-30">
-                                            <div class="col-md-10">
+                                        <div class="row m-t-20 m-l-30" v-if="segments.length">
+                                            <div class="col-md-12">
                                                 <small>Active user segments</small>
                                             </div>
                                         </div>
@@ -192,12 +179,82 @@
                                             </div>
                                         </div>
 
+                                        <div class="input-group m-t-30">
+                                            <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+                                            <div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label for="usingAdblock" class="fg-label">User ad-blocking state</label>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <v-select v-model="usingAdblock"
+                                                                  id="usingAdblock"
+                                                                  :name="'using_adblock'"
+                                                                  :value="usingAdblock"
+                                                                  :options.sync="adBlockingOptions"
+                                                                  :title="'Everyone'"
+                                                        ></v-select>
+                                                        <small class="help-block">
+                                                            To use this filter, you have to be setting <code>usingAdblock: Boolean</code> within your REMP tracking code.
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- .input-group -->
+
                                     </div>
                                 </div>
 
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (segments) -->
+
+                    <div class="panel panel-default panel-whereToDisplay">
+                        <div class="panel-heading" role="tab" id="headingWhereToDisplay">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWhereToDisplay" aria-expanded="false" aria-controls="collapseWhereToDisplay" :class="{ green: highlightWhereToCollapse }">
+                                    Where to display?
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseWhereToDisplay" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingWhereToDisplay">
+                            <div class="panel-body p-l-10 p-r-20">
+                                <div class="row">
+                                    <div class="col-md-8 col-sm-12">
+                                        <url-rules
+                                            label="URL"
+                                            hint="Rule is matched if pageview URL contains one of these strings. Filter does not support any wildcards."
+                                            id="url_filter"
+                                            title="URL filter"
+                                            filter-name="url_filter"
+                                            patterns-name="url_patterns"
+                                            :urlFilterTypes="urlFilterTypes"
+                                            :urlFilter="urlFilter"
+                                            :urlPatterns="urlPatterns"
+                                        ></url-rules>
+                                    </div>
+                                </div>
+                            </div><!-- .panel-body -->
+                            <div class="panel-body p-l-10 p-r-20">
+                                <div class="row">
+                                    <div class="col-md-8 col-sm-12">
+                                        <url-rules
+                                            label="Referer"
+                                            hint="Rule is matched if pageview's referer contains one of these strings. Filter does not support any wildcards."
+                                            id="referer_filter"
+                                            title="Referer filter"
+                                            filter-name="referer_filter"
+                                            patterns-name="referer_patterns"
+                                            :urlFilterTypes="urlFilterTypes"
+                                            :urlFilter="refererFilter"
+                                            :urlPatterns="refererPatterns"
+                                        ></url-rules>
+                                    </div>
+                                </div>
+                            </div><!-- .panel-body -->
+                        </div>
+                    </div><!-- .panel (segments) -->
+
 
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingFour">
@@ -259,17 +316,35 @@
                                     <div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <label for="countries" class="fg-label">Countries</label>
+                                                <select v-model="addedCountry" title="Select countries" v-on:change="selectCountry" class="selectpicker" data-live-search="true" data-max-options="1">
+                                                    <option v-for="(obj,iso_code) in availableCountries" :value="obj">
+                                                        {{ obj.name }}
+                                                    </option>
+                                                </select>
                                             </div>
-                                            <div class="col-md-12">
-                                                <v-select v-model="countries"
-                                                        id="countries"
-                                                        :name="'countries[]'"
-                                                        :value="countries"
-                                                        :options.sync="availableCountries"
-                                                        multiple
-                                                >
-                                                </v-select>
+                                        </div><!-- .row -->
+
+                                    </div>
+                                </div>
+
+                                <div class="row m-t-20 m-l-30" v-if="countries.length">
+                                    <div class="col-md-10">
+                                        <small>Selected countries</small>
+                                    </div>
+                                </div>
+
+                                <div v-for="country in countries">
+                                    <input type="hidden" name="countries[]" v-model="country.iso_code" />
+                                </div>
+
+                                <div class="row m-t-10 m-l-30">
+                                    <div class="col-md-12">
+                                        <div class="row m-b-10" v-for="(country,i) in countries" style="line-height: 25px">
+                                            <div class="col-md-12 text-left">
+                                                {{ country.name }}
+                                                <div class="pull-left m-r-20">
+                                                    <span v-on:click="removeCountry(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment">&times;</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -341,7 +416,7 @@
 
                                                     <div role="tabpanel" v-bind:class="[{active: activationMode === 'activate-schedule'}, 'tab-pane']" id="schedule-schedule">
                                                         <div class="form-group col-md-9">
-                                                            <small class="help-block">Planning new schedule activates campaign.</small>
+                                                            <small class="help-block">Schedule new campaign run. This does not affect existing schedules.</small>
                                                             <div class="input-group">
                                                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
                                                                 <div class="dtp-container fg-line">
@@ -399,15 +474,18 @@
 
 <script type="text/javascript">
     import vSelect from "remp/js/components/vSelect";
-    import PageviewRules from "./templates/PageviewRules";
+    import PageviewRules from "./PageviewRules";
     import FormValidator from "remp/js/components/FormValidator";
+    import AbTesting from "./AbTesting";
+    import UrlRules from "./UrlRules";
 
     let props = [
         "_name",
         "_segments",
         "_bannerId",
-        "_altBannerId",
+        "_variants",
         "_signedIn",
+        "_usingAdblock",
         "_oncePerSession",
         "_active",
         "_countries",
@@ -415,6 +493,11 @@
         "_allDevices",
         "_selectedDevices",
         "_validateUrl",
+        "_urlFilterTypes",
+        "_urlFilter",
+        "_urlPatterns",
+        "_refererFilter",
+        "_refererPatterns",
 
         "_banners",
         "_availableSegments",
@@ -432,8 +515,10 @@
     export default {
         components: {
             vSelect,
+            AbTesting,
+            FormValidator,
             PageviewRules,
-            FormValidator
+            UrlRules
         },
         created: function(){
             let self = this;
@@ -443,15 +528,13 @@
             });
         },
         mounted: function() {
-            var $startTimeFE = $("#new_schedule_start_time_frontend");
-            var $startTime = $('input[name="new_schedule_start_time"]');
-            var $endTimeFE = $("#new_schedule_end_time_frontend");
-            var $endTime = $('input[name="new_schedule_end_time"]');
-            var self = this;
+            let $startTimeFE = $("#new_schedule_start_time_frontend");
+            let $endTimeFE = $("#new_schedule_end_time_frontend");
+            let self = this;
 
             $startTimeFE.on('dp.change', function() {
-                var st = $(this).data("DateTimePicker").date();
-                var et = $endTimeFE.data("DateTimePicker").date();
+                let st = $(this).data("DateTimePicker").date();
+                let et = $endTimeFE.data("DateTimePicker").date();
                 if (st && et && st.unix() > et.unix()) {
                     $endTimeFE.data("DateTimePicker").date(st);
                 }
@@ -459,13 +542,21 @@
             });
 
             $endTimeFE.on("dp.change", function (e) {
-                var st = $startTimeFE.data("DateTimePicker").date();
-                var et = $(this).data("DateTimePicker").date();
+                let st = $startTimeFE.data("DateTimePicker").date();
+                let et = $(this).data("DateTimePicker").date();
                 if (st && et && et.unix() < st.unix()) {
                     $startTimeFE.data("DateTimePicker").date(et);
                 }
                 self.endTime = et ? et.toISOString() : null;
             }).datetimepicker({useCurrent: false});
+
+            if (this.bannerId) {
+                this.showABTestingComponent = true;
+            }
+
+            for (let ii = 0; ii < this.countries.length; ii++) {
+                this.countries[ii] = this.availableCountries[this.countries[ii]];
+            }
         },
         props: props,
         data: function() {
@@ -473,16 +564,25 @@
                 "name": null,
                 "segments": [],
                 "bannerId": null,
-                "altBannerId": null,
+                "variants": null,
+                "removedVariants": null,
+                "showABTestingComponent": false,
                 "signedIn": null,
+                "usingAdblock": null,
                 "oncePerSession": null,
                 "active": null,
                 "countries": [],
+                "addedCountry": null,
                 "countriesBlacklist": null,
                 "allDevices": null,
                 "selectedDevices": null,
                 "validateUrl": null,
                 "submitAction": null,
+                "urlFilterTypes": null,
+                "urlFilter": null,
+                "urlPatterns": null,
+                "refererFilter": null,
+                "refererPatterns": null,
 
                 "banners": null,
                 "availableSegments": null,
@@ -511,13 +611,14 @@
                 }
                 return result;
             },
-            altBannerOptions: function() {
+            variantOptions: function() {
                 //same as bannerOptions, just add null element (alternative banner is nullable)
                 let result = [];
                 result.push({
                     "label": "No alternative",
                     "value": null,
-                })
+                });
+
                 return result.concat(this.bannerOptions);
             },
             signedInOptions: function() {
@@ -525,6 +626,13 @@
                     {"label": "Everyone", "value": null},
                     {"label": "Only signed in", "value": true},
                     {"label": "Only anonymous ", "value": false},
+                ];
+            },
+            adBlockingOptions: function () {
+                return [
+                    {"label": "Everyone", "value": null},
+                    {"label": "Only with adblock", "value": true},
+                    {"label": "Only without adblock", "value": false}
                 ];
             },
             pageviewRulesNotDefault: function () {
@@ -535,28 +643,35 @@
                 return false;
             },
             isScheduled: function () {
-                if ((this.active && this.activationMode == 'activate-now') ||
-                    (this.startTime != null && this.endTime != null && this.activationMode == 'activate-schedule')
+                if ((this.active && this.activationMode === 'activate-now') ||
+                    (this.startTime != null && this.endTime != null && this.activationMode === 'activate-schedule')
                 ) {
                     return true;
                 }
 
-
                 return false;
+            },
+            highlightNameCollapse: function() {
+                return (this.name || this.bannerId);
             },
             highlightSegmentsCollapse: function () {
                 return (this.segments.length || this.signedIn);
             },
+            highlightWhereToCollapse: function () {
+                return (this.urlFilter !== 'everywhere' || this.refererFilter !== 'everywhere');
+            },
             highlightBannerRulesCollapse: function () {
-                return (this.pageviewRulesNotDefault || this.oncePerSession == true);
+                return (this.pageviewRulesNotDefault || this.oncePerSession === true);
             },
             highlightCountriesCollapse: function () {
                 return (this.countries && this.countries.length);
             },
             highlightDevicesCollapse: function () {
                 return (this.selectedDevices.length < this.allDevices.length);
+            },
+            highlightABTestingCollapse: function () {
+                return (this.variants.length > 2);
             }
-
         },
         methods: {
             handleToggleSelectDevice: function (device) {
@@ -570,7 +685,7 @@
                 this.selectedDevices.push(device);
             },
             deviceSelected: function (device) {
-                if (this.selectedDevices.indexOf(device) != -1) {
+                if (this.selectedDevices.indexOf(device) !== -1) {
                     return true;
                 }
 
@@ -591,6 +706,29 @@
                 let toRemove = this.segments[index];
                 this.segments.splice(index, 1);
                 this.removedSegments.push(toRemove.id);
+            },
+            selectCountry: function() {
+                if (typeof this.addedCountry === 'undefined') {
+                    return;
+                }
+                for (let i in this.countries) {
+                    if (this.countries[i].iso_code === this.addedCountry.iso_code) {
+                        return;
+                    }
+                }
+                this.countries.push(this.addedCountry);
+            },
+            removeCountry: function(index) {
+                this.countries.splice(index, 1);
+            }
+        },
+        watch: {
+            bannerId: function () {
+                if (this.bannerId) {
+                    this.showABTestingComponent = true;
+                } else {
+                    this.showABTestingComponent = false;
+                }
             }
         }
     }
@@ -602,6 +740,18 @@
         font-size: 1.5em;
         line-height: 0.5;
         padding-bottom: 7px !important;
+    }
+
+    .ab-testing-not-available {
+        text-align: center;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+
+    @media(max-width: 768px) {
+        .panel-whereToDisplay .panel-body {
+            padding-left: 25px !important;
+        }
     }
 </style>
 

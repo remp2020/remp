@@ -55,6 +55,7 @@
                     <a n:ifset="$service[url]" href="{$service[url]}"><i class="zmdi zmdi-{$service[icon]} zmdi-hc-fw"></i> {$key}</a>
                 </li>
             </ul>
+
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown hm-profile">
                     <a data-toggle="dropdown" href="">
@@ -72,6 +73,12 @@
                         {*<a n:href="Sign:Out"><i class="zmdi zmdi-time-restore"></i> Logout</a>*}
                         {*</li>*}
                     </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right">
+                <li>
+                    {control missingConfiguration}
                 </li>
             </ul>
         </div>
@@ -183,10 +190,10 @@
 <script>salvattore.init();</script>
 
 <script type="application/javascript">
-    $(document).ready(function() {
+    $(function() {
         var delay = 0;
         {foreach $flashes as $flash}
-        delay += 250;
+        delay += 500;
         window.setTimeout(function() {
             $.notify({
                 message: {$flash->message}

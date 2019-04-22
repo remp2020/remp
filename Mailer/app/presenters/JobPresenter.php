@@ -7,10 +7,12 @@ use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\ILatteFactory;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
+use Remp\MailerModule\Components\IBatchExperimentEvaluationFactory;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\Forms\EditBatchFormFactory;
 use Remp\MailerModule\Forms\IFormFactory;
+use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
 use Remp\MailerModule\Job\MailCache;
@@ -23,11 +25,13 @@ use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Segment\Aggregator;
-use Remp\MailerModule\Segment\SegmentException;
+use Tracy\Debugger;
 
 final class JobPresenter extends BasePresenter
 {
     private $jobsRepository;
+
+    private $jobFormFactory;
 
     private $batchesRepository;
 
@@ -59,6 +63,7 @@ final class JobPresenter extends BasePresenter
 
     public function __construct(
         JobsRepository $jobsRepository,
+        JobFormFactory $jobFormFactory,
         BatchesRepository $batchesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         TemplatesRepository $templatesRepository,
@@ -76,6 +81,7 @@ final class JobPresenter extends BasePresenter
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
+        $this->jobFormFactory = $jobFormFactory;
         $this->batchesRepository = $batchesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->templatesRepository = $templatesRepository;
@@ -99,14 +105,45 @@ final class JobPresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('defaultJsonData'))
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setColSetting('segment', ['orderable' => false])
-            ->setColSetting('batches', ['orderable' => false, 'filter' => $mailTypePairs])
-            ->setColSetting('sent_count', ['header' => 'sent', 'orderable' => false])
-            ->setColSetting('opened_count', ['header' => 'opened', 'orderable' => false])
-            ->setColSetting('clicked_count', ['header' => 'clicked', 'orderable' => false])
-            ->setColSetting('unsubscribed_count', ['header' => 'unsubscribed', 'orderable' => false])
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('segment', [
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('batches', [
+                'orderable' => false,
+                'filter' => $mailTypePairs,
+                'priority' => 2,
+            ])
+            ->setColSetting('sent_count', [
+                'header' => 'sent',
+                'orderable' => false,
+                'priority' => 1,
+                'class' => 'text-right',
+            ])
+            ->setColSetting('opened_count', [
+                'header' => 'opened',
+                'orderable' => false,
+                'priority' => 3,
+                'class' => 'text-right',
+            ])
+            ->setColSetting('clicked_count', [
+                'header' => 'clicked',
+                'orderable' => false,
+                'priority' => 3,
+                'class' => 'text-right',
+            ])
+            ->setColSetting('unsubscribed_count', [
+                'header' => 'unsubscribed',
+                'orderable' => false,
+                'priority' => 3,
+                'class' => 'text-right',
+            ])
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show job')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
@@ -142,13 +179,13 @@ final class JobPresenter extends BasePresenter
         ];
 
         $segments = [];
-        try {
-            $segmentList = $this->segmentAggregator->list();
-            array_walk($segmentList, function ($segment) use (&$segments) {
-                $segments[$segment['code']] = $segment['name'];
-            });
-        } catch (SegmentException $e) {
+        $segmentList = $this->segmentAggregator->list();
+        array_walk($segmentList, function ($segment) use (&$segments) {
+            $segments[$segment['code']] = $segment['name'];
+        });
+        if ($this->segmentAggregator->hasErrors()) {
             $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
+            Debugger::log($this->segmentAggregator->getErrors()[0], Debugger::WARNING);
         }
 
         $latte = $this->latteFactory->create();
@@ -185,19 +222,40 @@ final class JobPresenter extends BasePresenter
     {
         $job = $this->jobsRepository->find($id);
 
-        try {
-            $segmentList = $this->segmentAggregator->list();
-            array_walk($segmentList, function ($segment) use (&$job) {
-                if ($segment['code'] == $job->segment_code) {
-                    $this->template->segment = $segment;
-                }
-            });
-        } catch (SegmentException $e) {
+        $segmentList = $this->segmentAggregator->list();
+        array_walk($segmentList, function ($segment) use (&$job) {
+            if ($segment['code'] == $job->segment_code) {
+                $this->template->segment = $segment;
+            }
+        });
+        if ($this->segmentAggregator->hasErrors()) {
             $this->flashMessage('Unable to fetch list of segments, please check the application configuration.', 'danger');
+            Debugger::log($this->segmentAggregator->getErrors(), Debugger::WARNING);
         }
 
         $this->template->job = $job;
         $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
+        $this->template->jobIsEditable = $this->jobsRepository->isEditable($job->id);
+    }
+
+    public function renderEditJob($id)
+    {
+        $this->template->job = $this->jobsRepository->find($id);
+    }
+
+    public function createComponentEditJobForm()
+    {
+        $jobId = $this->params['id'] ?? null;
+        $form = $this->jobFormFactory->create($jobId);
+        $this->jobFormFactory->onSuccess = function ($job) {
+            $this->flashMessage('Job was updated');
+            $this->redirect('Show', $job->id);
+        };
+        $this->jobFormFactory->onError = function ($job, $message) {
+            $this->flashMessage($message, 'danger');
+            $this->redirect('Show', $job->id);
+        };
+        return $form;
     }
 
     public function renderEditBatch($id)
@@ -218,7 +276,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchReady($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_READY]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -229,7 +287,7 @@ final class JobPresenter extends BasePresenter
         $batch = $this->batchesRepository->find($id);
         $priority = $this->batchesRepository->getBatchPriority($batch);
         $this->mailCache->restartQueue($batch->id, $priority);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_SENDING]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -239,7 +297,7 @@ final class JobPresenter extends BasePresenter
     {
         $batch = $this->batchesRepository->find($id);
         $this->mailCache->pauseQueue($batch->id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_USER_STOP]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_USER_STOP]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -248,7 +306,7 @@ final class JobPresenter extends BasePresenter
     public function handleSetBatchCreated($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATE_CREATED]);
+        $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_CREATED]);
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->job_id);
@@ -275,22 +333,20 @@ final class JobPresenter extends BasePresenter
         $this->redirect('Show', $batch->job_id);
     }
 
-    public function createComponentJobForm()
-    {
-        $form = $this->newBatchFormFactory->create();
-        $this->newBatchFormFactory->onSuccess = function ($job) {
-            $this->flashMessage('Job was created');
-            $this->redirect('Show', $job->id);
-        };
-        return $form;
-    }
-
     public function handleTemplatesByListId($listId, $sourceForm, $sourceField, $targetField, $snippet = null)
     {
-        $this[$sourceForm][$sourceField]
-            ->setDefaultValue($listId);
-        $this[$sourceForm][$targetField]
-            ->setItems($this->templatesRepository->pairs($listId));
+        $emptyValue = empty($listId);
+        if (!empty($listId)) {
+            $this[$sourceForm][$sourceField]
+                ->setDefaultValue($listId);
+            $this[$sourceForm][$targetField]
+                ->setItems($this->templatesRepository->pairs($listId));
+        } else {
+            $this[$sourceForm][$sourceField]
+                ->setDefaultValue(null);
+            $this[$sourceForm][$targetField]
+                ->setItems([]);
+        }
 
         if ($snippet) {
             $this->redrawControl($snippet);
@@ -324,7 +380,7 @@ final class JobPresenter extends BasePresenter
             if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE) {
                 $this->redirect('Show', $batch->job->id);
             } else {
-                $this->redirect('EditBatch', $batch->job->id);
+                $this->redirect('EditBatch', $batch->id);
             }
         };
 
@@ -387,5 +443,10 @@ final class JobPresenter extends BasePresenter
         $templateStats->showConversions();
 
         return $templateStats;
+    }
+
+    public function createComponentBatchExperimentEvaluation(IBatchExperimentEvaluationFactory $factory)
+    {
+        return $factory->create();
     }
 }

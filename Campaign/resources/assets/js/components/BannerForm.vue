@@ -33,6 +33,20 @@
                v-bind:show="show"
             ></medium-rectangle-template>
 
+            <overlay-rectangle-template v-if="template === 'overlay_rectangle'"
+               v-bind:_headerText="overlayRectangleTemplate.headerText"
+               v-bind:_mainText="overlayRectangleTemplate.mainText"
+               v-bind:_buttonText="overlayRectangleTemplate.buttonText"
+               v-bind:_width="overlayRectangleTemplate.height"
+               v-bind:_height="overlayRectangleTemplate.width"
+               v-bind:_backgroundColor="overlayRectangleTemplate.backgroundColor"
+               v-bind:_textColor="overlayRectangleTemplate.textColor"
+               v-bind:_buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+               v-bind:_imageLink="overlayRectangleTemplate.imageLink"
+               v-bind:show="show"
+            ></overlay-rectangle-template>
+
             <bar-template v-if="template === 'bar'"
                v-bind:_mainText="barTemplate.mainText"
                v-bind:_buttonText="barTemplate.buttonText"
@@ -42,6 +56,17 @@
                v-bind:_buttonTextColor="barTemplate.buttonTextColor"
                v-bind:show="show"
             ></bar-template>
+
+            <collapsible-bar-template v-if="template === 'collapsible_bar'"
+               v-bind:_mainText="collapsibleBarTemplate.mainText"
+               v-bind:_buttonText="collapsibleBarTemplate.buttonText"
+               v-bind:_backgroundColor="collapsibleBarTemplate.backgroundColor"
+               v-bind:_textColor="collapsibleBarTemplate.textColor"
+               v-bind:_buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
+               v-bind:_buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+               v-bind:_initialState="collapsibleBarTemplate.initialState"
+               v-bind:show="show"
+            ></collapsible-bar-template>
 
             <short-message-template v-if="template === 'short_message'"
               v-bind:_text="shortMessageTemplate.text"
@@ -68,7 +93,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group">
+                            <div class="input-group" :class="{ hidden: collapsibleBarTemplate != null }">
                                 <span class="input-group-addon"><i class="zmdi zmdi-swap-alt"></i></span>
                                 <div>
                                     <div class="row">
@@ -99,20 +124,21 @@
                 </div>
             </div>
 
-            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
+            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal" :class="{ hidden: collapsibleBarTemplate != null }">
                 <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
-                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}">
+                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}" v-if="overlayRectangleTemplate == null">
                     <a href="#inline-banner" role="tab" data-toggle="tab" aria-expanded="false">Inline Banner</a>
                 </li>
             </ul>
 
-            <div class="card m-t-15">
+            <div class="card m-t-15" :class="{ hidden: collapsibleBarTemplate != null }">
                 <div class="tab-content p-0">
                     <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
-                            <div class="input-group">
+
+                            <div class="input-group" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
                                 <div>
                                     <div class="row">
@@ -129,8 +155,9 @@
                                     </div>
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="position" value="center">
 
-                            <div class="input-group fg-float">
+                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
 
                                 <div class="fg-line">
@@ -138,8 +165,9 @@
                                     <input v-model="offsetHorizontal" class="form-control fg-input" name="offset_horizontal" type="number" id="offsetHorizontal">
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="offset_horizontal" value="0">
 
-                            <div class="input-group fg-float">
+                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
                                 <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
 
                                 <div class="fg-line">
@@ -147,6 +175,7 @@
                                     <input v-model="offsetVertical" class="form-control fg-input" name="offset_vertical" type="number" id="offsetVertical">
                                 </div>
                             </div><!-- .input-group -->
+                            <input v-else type="hidden" name="offset_vertical" value="0">
 
                             <div class="input-group fg-float">
                                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
@@ -180,18 +209,25 @@
                                 </div>
                             </div><!-- .input-group -->
 
-
-
                         </div>
                     </div>
 
-                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner">
+                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner" v-if="overlayRectangleTemplate == null">
                         <div class="card-body card-padding p-l-15">
                             <div class="input-group fg-float m-t-10">
                                 <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
-                                <div class="fg-line">
-                                    <label for="target_selector" class="fg-label">Target element selector</label>
-                                    <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
+                                <div class="row">
+                                    <div class="col-xs-10">
+                                        <div class="fg-line" :class="{'fg-toggled': targetSelector && targetSelector.length}">
+                                            <label for="target_selector" class="fg-label">Choose position</label>
+                                            <input v-model="targetSelector" class="form-control fg-input" name="target_selector" type="text" id="target_selector">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <button class="btn btn-primary waves-effect" :class="{'disabled': !clientSiteUrl}" type="button" @click="openClientSiteAndSendKeepAliveMessages()">
+                                            <i class="zmdi zmdi-my-location"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -244,7 +280,9 @@
                                         :template="template"
 
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
+                                        :overlayRectangleTemplate="overlayRectangleTemplate"
                                         :barTemplate="barTemplate"
+                                        :collapsibleBarTemplate="collapsibleBarTemplate"
                                         :htmlTemplate="htmlTemplate"
                                         :shortMessageTemplate="shortMessageTemplate"
 
@@ -277,59 +315,71 @@
     import HtmlTemplate from "./templates/Html"
     import MediumRectangleTemplate from "./templates/MediumRectangle";
     import BarTemplate from "./templates/Bar";
+    import CollapsibleBarTemplate from "./templates/CollapsibleBar";
     import ShortMessageTemplate from "./templates/ShortMessage";
+    import OverlayRectangleTemplate from "./templates/OverlayRectangle";
     import BannerPreview from "./BannerPreview";
     import vSelect from "remp/js/components/vSelect";
     import FormValidator from "remp/js/components/FormValidator";
 
-    const props = [
-        "_name",
-        "_targetUrl",
-        "_position",
-        "_offsetVertical",
-        "_offsetHorizontal",
-        "_transition",
-        "_closeable",
-        "_closeText",
-        "_displayDelay",
-        "_closeTimeout",
-        "_targetSelector",
-        "_displayType",
-        "_template",
+    const props = {
+        "_name": String,
+        "_targetUrl": String,
+        "_position": String,
+        "_offsetVertical": Number,
+        "_offsetHorizontal": Number,
+        "_transition": {
+            "type": String,
+            "default": 'none'
+        },
+        "_closeable": Boolean,
+        "_closeText": String,
+        "_displayDelay": Number,
+        "_closeTimeout": Number,
+        "_targetSelector": String,
+        "_displayType": String,
+        "_template": String,
 
-        "_mediumRectangleTemplate",
-        "_barTemplate",
-        "_htmlTemplate",
-        "_shortMessageTemplate",
+        "_mediumRectangleTemplate": Object,
+        "_barTemplate": Object,
+        "_collapsibleBarTemplate": Object,
+        "_htmlTemplate": Object,
+        "_shortMessageTemplate": Object,
+        "_overlayRectangleTemplate": Object,
 
-        "_alignmentOptions",
-        "_dimensionOptions",
-        "_positionOptions",
+        "_alignmentOptions": Object,
+        "_dimensionOptions": Object,
+        "_positionOptions": Object,
 
-        "_validateUrl"
-    ];
+        "_validateUrl": String,
+        "_clientSiteUrl": String,
+    };
 
     export default {
         components: {
             HtmlTemplate,
             MediumRectangleTemplate,
             BarTemplate,
+            CollapsibleBarTemplate,
             ShortMessageTemplate,
             BannerPreview,
             vSelect,
-            FormValidator
+            FormValidator,
+            OverlayRectangleTemplate
         },
         name: 'banner-form',
         props: props,
-        created: function(){
-            props.forEach((prop) => {
-                this[prop.slice(1)] = this[prop];
-            });
+        created: function() {
+            for (var key in props) {
+                this[key.slice(1)] = this.$props[key];
+            }
+
             this.$on('values-changed', function(data) {
                 for (let item of data) {
                     this[item.key] = item.val;
                 }
             });
+            window.addEventListener("message", this.receiveSelector, false);
         },
         data: () => ({
             name: null,
@@ -348,8 +398,10 @@
 
             mediumRectangleTemplate: null,
             barTemplate: null,
+            collapsibleBarTemplate: null,
             htmlTemplate: null,
             shortMessageTemplate: null,
+            overlayRectangleTemplate: null,
 
             alignmentOptions: [],
             dimensionOptions: [],
@@ -366,7 +418,27 @@
                 {"label": "Fade in down", "value": "fade-in-down"},
             ],
 
-            validateUrl: null
-        })
+            validateUrl: null,
+            clientSiteUrl: null
+        }),
+        methods: {
+            openClientSiteAndSendKeepAliveMessages() {
+                if(!this.clientSiteUrl.length) {
+                    alert('In order to use interactive selector, please specify a CLIENT_SITE_URL in your .env file');
+                    return;
+                }
+
+                var clientSiteInstance = window.open(this.clientSiteUrl + '#bannerPicker');
+
+                setInterval(() => {
+                    clientSiteInstance.postMessage('Keep alive', this.clientSiteUrl);
+                }, 300);
+            },
+            receiveSelector(event) {
+                if (typeof event.data.selector !== 'undefined' && event.data.selector.length) {
+                    this.targetSelector = event.data.selector;
+                }
+            }
+        }
     }
 </script>

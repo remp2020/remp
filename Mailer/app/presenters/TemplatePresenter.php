@@ -37,7 +37,7 @@ final class TemplatePresenter extends BasePresenter
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository
     ) {
-    
+
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
         $this->logsRepository = $logsRepository;
@@ -53,15 +53,35 @@ final class TemplatePresenter extends BasePresenter
 
         $dataTable = $dataTableFactory->create();
         $dataTable
-            ->setColSetting('created_at', ['header' => 'created at', 'render' => 'date'])
-            ->setColSetting('code')
-            ->setColSetting('subject')
-            ->setColSetting('type', ['orderable' => false, 'filter' => $mailTypePairs])
-            ->setColSetting('opened')
-            ->setColSetting('clicked')
-            ->setRowAction('show', 'palette-Cyan zmdi-eye')
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit')
-            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy')
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('code', [
+                'priority' => 2,
+            ])
+            ->setColSetting('subject', [
+                'priority' => 1,
+            ])
+            ->setColSetting('type', [
+                'orderable' => false,
+                'filter' => $mailTypePairs,
+                'priority' => 1,
+            ])
+            ->setColSetting('opened', [
+                'priority' => 3,
+                'render' => 'number',
+                'class' => 'text-right',
+            ])
+            ->setColSetting('clicked', [
+                'priority' => 3,
+                'render' => 'number',
+                'class' => 'text-right',
+            ])
+            ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show template')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit template')
+            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy', 'Duplicate template')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]));
 
         return $dataTable;
@@ -109,8 +129,8 @@ final class TemplatePresenter extends BasePresenter
                 $template->code,
                 "<a href='{$editUrl}'>{$template->subject}</a>",
                 $template->type->title,
-                $template->related('mail_job_batch_template')->sum('opened'),
-                $template->related('mail_job_batch_template')->sum('clicked'),
+                $template->related('mail_job_batch_template')->sum('opened') + $template->related('mail_logs')->where('mail_job_id IS NULL')->count('opened_at'),
+                $template->related('mail_job_batch_template')->sum('clicked') + $template->related('mail_logs')->where('mail_job_id IS NULL')->count('clicked_at'),
             ];
         }
         $this->presenter->sendJson($result);
@@ -131,10 +151,24 @@ final class TemplatePresenter extends BasePresenter
         $dataTable = $dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('logJsonData'))
-            ->setColSetting('created_at', ['header' => 'sent at', 'render' => 'date'])
-            ->setColSetting('email', ['orderable' => false])
-            ->setColSetting('subject', ['orderable' => false])
-            ->setColSetting('events', ['render' => 'badge', 'orderable' => false])
+            ->setColSetting('created_at', [
+                'header' => 'sent at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setColSetting('email', [
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('subject', [
+                'orderable' => false,
+                'priority' => 1,
+            ])
+            ->setColSetting('events', [
+                'render' => 'badge',
+                'orderable' => false,
+                'priority' => 2,
+            ])
             ->setTableSetting('remove-search')
             ->setTableSetting('order', Json::encode([[2, 'DESC']]))
             ->setTableSetting('add-params', Json::encode(['templateId' => $this->getParameter('id')]));

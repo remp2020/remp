@@ -21,6 +21,7 @@ class ConversionRequest extends FormRequest
             'amount' => "required|numeric",
             'currency' => "required|string",
             'paid_at' => "required|date",
+            'user_id' => 'required|numeric',
         ];
     }
 

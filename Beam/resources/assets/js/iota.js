@@ -16,6 +16,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         url: null,
 
+        configUrl: null,
+
         articleSelector: null,
 
         idCallback: null,
@@ -33,6 +35,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 throw "remplib: configuration iota.url invalid or missing: "+config.iota.url
             }
             this.url = config.iota.url
+
+            if (typeof config.iota.configUrl === 'string') {
+                this.configUrl = config.iota.configUrl
+            }
 
             if (typeof config.iota.articleSelector !== 'string') {
                 throw "remplib: configuration iota.articleSelector invalid or missing: "+config.iota.articleSelector
@@ -95,6 +101,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 propsData: {
                     articleIds: articleIds,
                     baseUrl: this.url,
+                    configUrl: this.configUrl,
                     httpHeaders: this.httpHeaders,
                 }
             });

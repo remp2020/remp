@@ -3,15 +3,22 @@
         {$error}<br>
     </div>
 
-    <div n:foreach="$form['settings']->controls as $input" class="form-group fg-float m-b-30">
-        <div n:if="$input instanceof Nette\Forms\Controls\TextInput" class="fg-line">
-            {input $input, class => 'form-control fg-input'}
-            {label $input, class => 'fg-label' /}
-        </div>
-        <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
-            <div class="col-sm-12">
-                {label $input /}
-                {input $input, class => 'selectpicker'}
+    <div>
+        <div n:foreach="$form['settings']->components as $name => $component" class="form-group fg-float m-b-30">
+            <h3 style="margin: 0 0 30px;">{$name}</h3>
+            <div id="{$name}">
+                <div n:foreach="$component->controls as $input" class="form-group fg-float m-b-30">
+                    <div n:if="$input instanceof Nette\Forms\Controls\TextInput" class="fg-line">
+                        {input $input, class => 'form-control fg-input'}
+                        {label $input, class => 'fg-label' /}
+                    </div>
+                    <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
+                        <div class="col-sm-12">
+                            {label $input /}
+                            {input $input, class => 'selectpicker'}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

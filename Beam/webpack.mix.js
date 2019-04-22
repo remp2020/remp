@@ -31,30 +31,12 @@ if (process.env.REMP_TARGET === 'iota') {
         .js("resources/assets/js/remplib.js", "js/remplib.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
-        .extract([
-            "./resources/assets/js/bootstrap.js",
-            "animate.css",
-            "autosize",
-            "bootstrap",
-            "bootstrap-select",
-            "datatables.net",
-            "datatables.net-rowgroup",
-            "google-material-color",
-            "jquery",
-            "jquery-placeholder",
-            "malihu-custom-scrollbar-plugin",
-            "moment",
-            "node-waves",
-            "easy-pie-chart/dist/jquery.easypiechart.js",
-            "bootstrap-notify",
-            "eonasdan-bootstrap-datetimepicker",
-            "vue"
-        ])
+        .extract()
         .autoload({
-            "jquery": ['$', 'jQuery', "window.jQuery"],
-            "node-waves": ["Waves", "window.Waves"],
-            "autosize": ["autosize", "window.autosize"],
-            "vue": ["vue", "window.vue"],
-            "moment": ["Moment", "window.Moment"],
+            "jquery": ['$', 'jQuery'],
+            "node-waves": ["Waves"],
+            "autosize": ["autosize"],
+            "vue": ["Vue"],
+            "moment": ["Moment"]
         });
 }

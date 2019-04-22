@@ -27,11 +27,16 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Exception  $exception
+     * @param  \Exception $exception
      * @return void
+     * @throws Exception
      */
     public function report(Exception $exception)
     {
+        if ($this->shouldReport($exception) && config('airbrake.enabled')) {
+            $airbrakeNotifier = app(\Airbrake\Notifier::class);
+            $airbrakeNotifier->notify($exception);
+        }
         parent::report($exception);
     }
 

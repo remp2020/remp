@@ -4,33 +4,35 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\ArticlePageviews;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class AggregatePageviewLoadJob extends Command
 {
-    protected $signature = 'pageviews:aggregate-load {--now=}';
+    const COMMAND = 'pageviews:aggregate-load';
+
+    protected $signature = self::COMMAND . ' {--now=}';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
-        $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+        $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
         $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
-        $request = new JournalAggregateRequest('pageviews', 'load');
+        $request = new AggregateRequest('pageviews', 'load');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'signed_in', 'subscriber');
 
-        $records = $journalContract->count($request);
+        $records = collect($journalContract->count($request));
 
-        if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
+        if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
             $this->line(sprintf("No articles to process, exiting."));
             return;
         }

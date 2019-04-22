@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    const Vue = require('vue');
+    import Vue from 'vue';
     const Hub = new Vue();
 
     export default Hub;

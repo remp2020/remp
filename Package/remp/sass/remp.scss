@@ -1,7 +1,6 @@
 $primaryColor: #00acc1 !default;
 $primaryColorDark: #007c91 !default;
 $primaryColorLight: #5ddef4 !default;
-$highlightColor: #4caf50 !default;
 
 a {
     color: $primaryColorDark;
@@ -16,6 +15,10 @@ a {
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     color: inherit;
+}
+
+.c-header > h2 {
+    text-transform: none;
 }
 
 .remp-menu .svg-logo {
@@ -125,6 +128,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin: 3px 0;
 }
 
+.dropdown-menu .inner.open {
+    width: 100%;
+}
+
 .dropdown-header {
     padding: 5px 16px 0px;
 }
@@ -172,13 +179,24 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     }
 }
 
-/***************/
-/* Z-INDEX FIX */
-/***************/
+/********************/
+/* BOOTSTRAP SELECT */
+/********************/
 .bootstrap-datetimepicker-widget,
+.bootstrap-select.open,
 .bootstrap-select .dropdown-menu.open
 {
     z-index: 3000;
+}
+
+.btn.dropdown-toggle {
+    box-shadow: none;
+}
+
+.bootstrap-select {
+    .bs-searchbox {
+        background: none;
+    }
 }
 
 /***************/
@@ -186,8 +204,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /***************/
 
 .dataTables_wrapper {
-    overflow-x: auto;
-
     .dataTables_processing {
         position: absolute;
         top: 85px;
@@ -218,7 +234,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
             }
 
             &.highlight {
-                border-color: $highlightColor;
+                border-color: #009688;
             }
         }
     }

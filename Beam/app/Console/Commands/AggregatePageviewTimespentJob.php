@@ -4,31 +4,33 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\ArticleTimespent;
-use App\Contracts\JournalAggregateRequest;
-use App\Contracts\JournalContract;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class AggregatePageviewTimespentJob extends Command
 {
-    protected $signature = 'pageviews:aggregate-timespent {--now=}';
+    const COMMAND = 'pageviews:aggregate-timespent';
+
+    protected $signature = self::COMMAND . ' {--now=}';
 
     protected $description = 'Reads pageview/timespent data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
-        $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+        $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
         $this->line(sprintf("Fetching aggregated timespent data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
-        $request = new JournalAggregateRequest('pageviews', 'timespent');
+        $request = new AggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'signed_in', 'subscriber');
 
-        $records = $journalContract->sum($request);
+        $records = collect($journalContract->sum($request));
 
         if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
             $this->line(sprintf("No articles to process, exiting."));
@@ -56,12 +58,12 @@ class AggregatePageviewTimespentJob extends Command
             $signedIn[$articleId] = $signedIn[$articleId] ?? 0;
             $subscribers[$articleId] = $subscribers[$articleId] ?? 0;
 
-            $all[$articleId] += $record->count;
+            $all[$articleId] += $record->sum;
             if ($record->tags->signed_in === '1') {
-                $signedIn[$articleId] += $record->count;
+                $signedIn[$articleId] += $record->sum;
             }
             if ($record->tags->subscriber === '1') {
-                $subscribers[$articleId] += $record->count;
+                $subscribers[$articleId] += $record->sum;
             }
 
             $bar->advance();

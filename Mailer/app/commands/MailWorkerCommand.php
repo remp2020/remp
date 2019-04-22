@@ -3,9 +3,11 @@
 namespace Remp\MailerModule\Commands;
 
 use League\Event\Emitter;
+use Nette\DI\Container;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
+use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Job\MailCache;
 use Remp\MailerModule\Repository\BatchesRepository;
@@ -46,7 +48,12 @@ class MailWorkerCommand extends Command
 
     private $smtpErrors = 0;
 
+    private $container;
+
+    private $logger;
+
     public function __construct(
+        LoggerInterface $logger,
         Sender $applicationMailer,
         JobsRepository $mailJobsRepository,
         BatchesRepository $mailJobBatchRepository,
@@ -55,7 +62,8 @@ class MailWorkerCommand extends Command
         TemplatesRepository $mailTemplatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
-        Emitter $emitter
+        Emitter $emitter,
+        Container $container
     ) {
         parent::__construct();
         $this->applicationMailer = $applicationMailer;
@@ -67,6 +75,8 @@ class MailWorkerCommand extends Command
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailCache = $redis;
         $this->emitter = $emitter;
+        $this->container = $container;
+        $this->logger = $logger;
     }
 
     /**
@@ -112,12 +122,12 @@ class MailWorkerCommand extends Command
             if (!$this->mailCache->hasJobs($batch->id)) {
                 $output->writeln("Queue <info>{$batch->id}</info> has no more jobs, cleaning up...");
                 $this->mailCache->removeQueue($batch->id);
-                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_DONE]);
+                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATUS_DONE]);
                 continue;
             }
 
-            if ($batch->status == BatchesRepository::STATE_PROCESSED) {
-                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_SENDING]);
+            if ($batch->status == BatchesRepository::STATUS_PROCESSED) {
+                $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATUS_SENDING]);
             }
 
             $output->writeln("Sending batch <info>{$batch->id}</info>...");
@@ -160,8 +170,7 @@ class MailWorkerCommand extends Command
                     $email = $this->applicationMailer
                         ->reset()
                         ->setJobId($batch->mail_job_id)
-                        ->setBatchId($batch->id)
-                        ->setParams([]);
+                        ->setBatchId($batch->id);
 
                     $queueJobs = [];
                     $template = null;
@@ -175,36 +184,41 @@ class MailWorkerCommand extends Command
                         }
 
                         $output->writeln(" * sending <info>{$job->templateCode}</info> from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
-                        $email->addRecipient($job->email);
+                        $recipientParams = $job->params ? get_object_vars($job->params) : [];
+                        $email->addRecipient($job->email, null, $recipientParams);
                         $email->setContext($job->context);
                     }
+
+                    $sentCount = 0;
 
                     try {
                         $email = $email->setTemplate($template);
                         if ($sendAsBatch && $email->supportsBatch()) {
-                            $result = $email->sendBatch();
+                            $sentCount = $email->sendBatch();
                         } else {
-                            $result = $email->send();
+                            $sentCount = $email->send();
                         }
 
-                        if ($result) {
-                            foreach ($jobs as $i => $job) {
-                                $this->mailJobQueueRepository->delete($queueJobs[$i]);
-                                $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
-                            }
-                        } else {
-                            $this->mailJobBatchRepository->update($batch, ['errors_count+=' => count($jobs)]);
-                            $this->mailJobQueueRepository->update($queueJob, ['status' => JobQueueRepository::STATUS_ERROR]);
+                        foreach ($jobs as $i => $job) {
+                            $this->mailJobQueueRepository->delete($queueJobs[$i]);
+                            $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
                         }
+
                         $this->smtpErrors = 0;
-                    } catch (SmtpException | Sender\MailerBatchException $exception) {
+                    } catch (SmtpException | Sender\MailerBatchException | \Exception $exception) {
                         $this->smtpErrors++;
                         $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
+
+                        $this->logger->warning("Unable to send an email: " . $exception->getMessage(), [
+                            'batch' => $sendAsBatch && $email->supportsBatch(),
+                            'template' => $templateCode,
+                        ]);
+
                         $this->cacheJobs($jobs, $batch->id);
 
                         if ($this->smtpErrors >= 10) {
                             $this->mailCache->pauseQueue($batch->id);
-                            $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATE_WORKER_STOP]);
+                            $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATUS_WORKER_STOP]);
                             break;
                         }
                         sleep(10);
@@ -216,7 +230,7 @@ class MailWorkerCommand extends Command
                     $this->mailJobBatchRepository->update($batch, [
                         'first_email_sent_at' => $first_email,
                         'last_email_sent_at' => $now,
-                        'sent_emails+=' => count($jobs),
+                        'sent_emails+=' => (int) $sentCount,
                         'last_ping' => $now
                     ]);
 

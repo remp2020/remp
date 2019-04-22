@@ -9,6 +9,9 @@
     <div class="card-header">
         <h2 n:block="title">Job <span class="text-muted">#{$job->id}</span><small></small></h2>
         <div class="actions">
+            <a n:if="$jobIsEditable" n:href="Job:EditJob $job->id" class="btn palette-Cyan bg waves-effect">
+                <i class="zmdi zmdi-edit"></i> Edit job
+            </a>
             <a href="#new-batch-form" data-toggle="collapse">
                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-plus-circle"></i> Add batch</button>
             </a>
@@ -122,12 +125,21 @@
                     </div>
                     {/snippet}
                 </div>
+
+                <div n:if="$batch->related('mail_job_batch_templates')->count('*') > 1">
+                    <div class="card z-depth-1">
+                        <div class="card-header">
+                            <h2><i class="zmdi zmdi-compass"></i> A/B test evaluation</h2>
+                        </div>
+                        {control batchExperimentEvaluation $batch->id}
+                    </div>
+                </div>
                 <div n:foreach="$batch->related('mail_job_batch_templates') as $email" class="card z-depth-1">
                     <div class="card-header">
                         <h2><i class="zmdi zmdi-equalizer"></i> Variant summary <small class="m-t-20"><span class="text-muted">{$email->mail_template->name}: {$email->mail_template->subject}</span> {$email->mail_template->code}</small></h2>
                         <div class="actions">
-                            <a n:href="Template:Preview $email->mail_template->id, type => 'html'" target="_blank">
-                                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> Preview email</button>
+                            <a n:href="Template:Show $email->mail_template->id" target="_blank">
+                                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> Show email</button>
                             </a>
                             <a n:href="RemoveTemplate! $email->id">
                                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Remove email</button>

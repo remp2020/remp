@@ -162,53 +162,6 @@ $(document).ready(function(){
     }
 
     /*
-     * Input Slider
-     */
-    //Basic
-    if($('.input-slider')[0]) {
-        $('.input-slider').each(function(){
-            var isStart = $(this).data('is-start');
-
-            $(this).noUiSlider({
-                start: isStart,
-                range: {
-                    'min': 0,
-                    'max': 100,
-                }
-            });
-        });
-    }
-
-    //Range slider
-    if($('.input-slider-range')[0]) {
-        $('.input-slider-range').noUiSlider({
-            start: [30, 60],
-            range: {
-                'min': 0,
-                'max': 100
-            },
-            connect: true
-        });
-    }
-
-    //Range slider with value
-    if($('.input-slider-values')[0]) {
-        $('.input-slider-values').noUiSlider({
-            start: [ 45, 80 ],
-            connect: true,
-            direction: 'rtl',
-            behaviour: 'tap-drag',
-            range: {
-                'min': 0,
-                'max': 100
-            }
-        });
-
-        $('.input-slider-values').Link('lower').to($('#value-lower'));
-        $('.input-slider-values').Link('upper').to($('#value-upper'), 'html');
-    }
-
-    /*
      * Input Mask
      */
     if ($('input-mask')[0]) {
@@ -341,8 +294,6 @@ $(document).ready(function(){
      * Waves Animation
      */
     (function(){
-        Waves.attach('.btn:not(.btn-icon):not(.btn-float)');
-        Waves.attach('.btn-icon, .btn-float', ['waves-circle', 'waves-float']);
         Waves.init();
     })();
 

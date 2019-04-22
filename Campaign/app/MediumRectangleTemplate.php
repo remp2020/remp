@@ -2,9 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-
-class MediumRectangleTemplate extends Model
+class MediumRectangleTemplate extends AbstractTemplate
 {
     protected $fillable = [
         'header_text',
@@ -18,12 +16,12 @@ class MediumRectangleTemplate extends Model
         'button_text_color',
     ];
 
-    protected $touches = [
-        'banner',
-    ];
-
-    public function banner()
+    /**
+     * Text should return textual representation of the banner's main text in the cleanest possible form.
+     * @return mixed
+     */
+    public function text()
     {
-        return $this->belongsTo(Banner::class);
+        return strip_tags("{$this->main_text} -- {$this->button_text}");
     }
 }

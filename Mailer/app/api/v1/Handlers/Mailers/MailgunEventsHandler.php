@@ -36,9 +36,9 @@ class MailgunEventsHandler extends BaseHandler
 
     public function handle($params)
     {
-        $mailerConfig = $this->sender->getMailerConfig('remp-mailgun');
+        $mailer = $this->sender->getMailer('remp-mailgun');
 
-        if (hash_hmac('sha256', $params['timestamp'] . $params['token'], $mailerConfig['api_key']) !== $params['signature']) {
+        if (hash_hmac('sha256', $params['timestamp'] . $params['token'], $mailer->getConfig('api_key')) !== $params['signature']) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Wrong signature.']);
         }
 
@@ -46,6 +46,7 @@ class MailgunEventsHandler extends BaseHandler
             'mail_sender_id' => $params['mail_sender_id'],
             'timestamp' => $params['timestamp'],
             'event' => $params['event'],
+            'reason' => null,
         ]));
 
         return new JsonApiResponse(200, ['status' => 'ok']);

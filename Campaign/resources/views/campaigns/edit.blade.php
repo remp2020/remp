@@ -26,22 +26,25 @@
                     <div class="card-body">
                         {!! Widget::run('DataTable', [
                         'colSettings' => [
-                            'campaign' => [
-                                'header' => 'Campaign',
+                            'status' => [
+                                'header' => 'Status',
+                                'priority' => 1,
+                                'render' => 'badge',
                             ],
                             'start_time' => [
                                 'header' => 'Scheduled start date',
                                 'render' => 'date',
+                                'priority' => 2,
                             ],
                             'end_time' => [
                                 'header' => 'Scheduled end date',
                                 'render' => 'date',
-                            ],
-                            'status' => [
-                                'header' => 'Status',
+                                'priority' => 2,
                             ],
                         ],
-                        'dataSource' => route('campaign.schedule.json', ['campaign' => $campaign]),
+                        'dataSource' => route('campaign.schedule.json', ['campaign' => $campaign, 'active' => true]),
+                        'order' => [1, 'desc'],
+                        'displaySearchAndPaging' => false,
                         ]) !!}
                     </div>
                 </div>

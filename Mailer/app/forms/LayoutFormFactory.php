@@ -4,11 +4,13 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Repository\LayoutsRepository;
 
-class LayoutFormFactory extends Object implements IFormFactory
+class LayoutFormFactory implements IFormFactory
 {
+    use SmartObject;
+
     /** @var LayoutsRepository */
     private $layoutsRepository;
 

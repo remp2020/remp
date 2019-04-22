@@ -3,15 +3,16 @@
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
-use Nette\Object;
-use Nette\Utils\Json;
+use Nette\SmartObject;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class NewTemplateFormFactory extends Object
+class NewTemplateFormFactory
 {
+    use SmartObject;
+
     private $templatesRepository;
 
     private $batchesRepository;

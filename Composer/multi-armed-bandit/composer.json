@@ -1,0 +1,32 @@
+{
+  "name": "remp/multi-armed-bandit",
+  "description": "A package to evaluate two or more multivariate tests with armed bandit",
+  "keywords": ["remp", "a/b testing", "multi armed bandit"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "rootpd",
+      "email": "dulacka@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "gburtini/distributions": "^0.0.2"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Remp\\MultiArmedBandit\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+    }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}

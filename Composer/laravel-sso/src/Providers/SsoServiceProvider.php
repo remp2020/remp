@@ -26,6 +26,10 @@ class SsoServiceProvider extends ServiceProvider
         Auth::extend('jwt', function ($app, $name, array $config) {
             return $app->make(JWTGuard::class);
         });
+        // this is to resolve jwt auth conflict in SSO in a non-breaking fasion
+        Auth::extend('jwtx', function ($app, $name, array $config) {
+            return $app->make(JWTGuard::class);
+        });
         Auth::extend('token', function($app, $name, array $config) {
             return $app->make(TokenGuard::class);
         });

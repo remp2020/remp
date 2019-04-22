@@ -38,16 +38,13 @@ class DataTable extends Control
      * @param $colSetting
      * @return $this
      */
-    public function setColSetting($colName, $colSetting = null)
+    public function setColSetting($colName, $colSetting)
     {
-        if ($colSetting === null) {
-            $colSetting = [
-                'header' => $colName,
-            ];
+        if (!array_key_exists('priority', $colSetting)) {
+            throw new DataTableException('Missing "priority" item in DataTable configuration array for column: "' . $colName . '"');
         }
 
         $this->colSettings[$colName] = $colSetting;
-
         return $this;
     }
 
@@ -80,13 +77,15 @@ class DataTable extends Control
     /**
      * @param $actionName
      * @param $actionClass
+     * @param $actionTitle
      * @return $this
      */
-    public function setRowAction($actionName, $actionClass)
+    public function setRowAction($actionName, $actionClass, $actionTitle)
     {
         $this->rowActions[] = [
             'name' => $actionName,
             'class' => $actionClass,
+            'title' => $actionTitle,
         ];
 
         return $this;
@@ -98,6 +97,15 @@ class DataTable extends Control
         $this->template->colSettings = $this->colSettings;
         $this->template->tableSettings = $this->tableSettings;
         $this->template->rowActions = $this->rowActions;
+
+        foreach ($this->template->colSettings as $colName => $colSetting) {
+            $this->template->colSettings[$colName] = array_merge([
+                'colIndex' => array_search(
+                    $colName,
+                    array_keys($this->template->colSettings)
+                )
+            ], $this->template->colSettings[$colName]);
+        }
 
         $this->template->tableId = 'dt-' . md5(Json::encode([
             $this->template->sourceUrl,

@@ -100,6 +100,10 @@ return [
     'custom' => [
         'devices.0' => [
             'required' => 'At least one device needs to be enabled.',
+        ],
+        'variants.*.banner_id.required_unless' => 'You have to choose banner for every AB testing variant.',
+        'variants.0.proportion' => [
+            'required' => 'All variants must have proportion value.'
         ]
     ],
 
@@ -118,7 +122,7 @@ return [
         'banner_id' => 'banner',
         'alt_banner_id' => 'banner B alternative',
         'pageview_rules.*.num' => 'pageview rule n-th',
-        'pageview_rules.*.rule' => 'pageview rule type'
+        'pageview_rules.*.rule' => 'pageview rule type',
     ],
 
 ];

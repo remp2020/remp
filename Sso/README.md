@@ -33,11 +33,34 @@ php artisan db:seed
 
 #### Dependencies
 
-- PHP 7.1
+- PHP 7.1.3
 - MySQL 5.7
 - Redis 3.2
 
+## SSO flow
+
+### Base flow of actions
+
+Here you can see simplified view of how Mailer works at following diagram.
+
+![SSO Sequence Overview](./resources/docs/sequence_overview.svg)
+
+### Libraries
+
+We've prepared libraries for Laravel and Nette applications that easily integrate with SSO.
+
+Libraries are provided within the main REMP repository. See their documentation to find out
+how to use them within the application.
+
+* [Nette library](../Composer/nette-sso)
+* [Laravel library](../Composer/laravel-sso)
+
+Note: The default configuration of all REMP tools has these libraries integrated and enabled.
+
 ## Auth endpoints
+
+In case you want to make a library for non-supported framework, you'll need to integrate it
+against these APIs.
 
 ### GET /auth/login
 
@@ -134,7 +157,7 @@ is set to `true` (default value), it automatically invalidates the old token.
 }
 ```
 
-### GET /auth/api-token
+### GET /auth/check-token
 
 API endpoint for services to validate provided API token. Endpoint simply returns whether token
 is usable or not and no additional info.

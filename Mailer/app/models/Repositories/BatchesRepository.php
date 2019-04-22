@@ -8,18 +8,24 @@ use Remp\MailerModule\Repository;
 
 class BatchesRepository extends Repository
 {
-    const STATE_CREATED = 'created';
-    const STATE_UPDATED = 'updated';
-    const STATE_READY = 'ready';
-    const STATE_PREPARING = 'preparing';
-    const STATE_PROCESSING = 'processing';
-    const STATE_PROCESSED = 'processed';
-    const STATE_SENDING = 'sending';
-    const STATE_DONE = 'done';
-    const STATE_USER_STOP = 'user_stopped';
-    const STATE_WORKER_STOP = 'worker_stopped';
+    const STATUS_CREATED = 'created';
+    const STATUS_UPDATED = 'updated';
+    const STATUS_READY = 'ready';
+    const STATUS_PREPARING = 'preparing';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_PROCESSED = 'processed';
+    const STATUS_SENDING = 'sending';
+    const STATUS_DONE = 'done';
+    const STATUS_USER_STOP = 'user_stopped';
+    const STATUS_WORKER_STOP = 'worker_stopped';
 
     const METHOD_RANDOM = 'random';
+
+    const EDITABLE_STATUSES = [
+        BatchesRepository::STATUS_CREATED,
+        BatchesRepository::STATUS_UPDATED,
+        BatchesRepository::STATUS_READY,
+    ];
 
     protected $tableName = 'mail_job_batch';
 
@@ -56,7 +62,7 @@ class BatchesRepository extends Repository
     public function getBatchReady()
     {
         return $this->getTable()->select('*')->where([
-            'status' => BatchesRepository::STATE_READY,
+            'status' => BatchesRepository::STATUS_READY,
             'start_at <= ? OR start_at IS NULL' => new DateTime(),
         ])->limit(1)->fetch();
     }
@@ -66,7 +72,7 @@ class BatchesRepository extends Repository
         return $this->getTable()
             ->select('mail_job_batch.*')
             ->where([
-                'mail_job_batch.status' => [ BatchesRepository::STATE_PROCESSED, BatchesRepository::STATE_SENDING ]
+                'mail_job_batch.status' => [ BatchesRepository::STATUS_PROCESSED, BatchesRepository::STATUS_SENDING ]
             ])
             ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
             ->limit(1)
@@ -81,20 +87,14 @@ class BatchesRepository extends Repository
     public function getInProgressBatches($limit)
     {
         return $this->getTable()
-            ->select('
-                mail_job_batch.*,
-                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name,
-                :mail_job_batch_template.mail_job_id
-            ')
             ->where([
                 'mail_job_batch.status' => [
-                    self::STATE_READY,
-                    self::STATE_PROCESSING,
-                    self::STATE_PROCESSED,
-                    self::STATE_SENDING
+                    self::STATUS_READY,
+                    self::STATUS_PROCESSING,
+                    self::STATUS_PROCESSED,
+                    self::STATUS_SENDING
                 ]
             ])
-            ->group('mail_job_batch.id')
             ->order('start_at ASC')
             ->limit($limit);
     }
@@ -102,18 +102,21 @@ class BatchesRepository extends Repository
     public function getLastDoneBatches($limit)
     {
         return $this->getTable()
-            ->select('
-                mail_job_batch.*,
-                GROUP_CONCAT(:mail_job_batch_template.mail_template.name SEPARATOR \', \') AS template_name,
-                :mail_job_batch_template.mail_job_id
-            ')
             ->where([
                 'mail_job_batch.status' => [
-                    self::STATE_DONE
+                    self::STATUS_DONE
                 ]
             ])
-            ->group('mail_job_batch.id')
             ->order('mail_job_batch.last_email_sent_at DESC')
             ->limit($limit);
+    }
+
+    public function notEditableBatches($jobId)
+    {
+        return $this->getTable()
+            ->select('*')
+            ->where(['mail_job_id' => $jobId])
+            ->where(['status NOT IN' => self::EDITABLE_STATUSES])
+            ;
     }
 }

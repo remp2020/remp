@@ -4,14 +4,17 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Forms\Rules\FormRules;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\TemplatesCodeNotUniqueException;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class TemplateFormFactory extends Object implements IFormFactory
+class TemplateFormFactory implements IFormFactory
 {
+    use SmartObject;
+
     /** @var TemplatesRepository */
     private $templatesRepository;
 
@@ -112,23 +115,27 @@ class TemplateFormFactory extends Object implements IFormFactory
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }
 
-        if (!empty($values['id'])) {
-            $row = $this->templatesRepository->find($values['id']);
-            $this->templatesRepository->update($row, $values);
-            ($this->onUpdate)($row, $buttonSubmitted);
-        } else {
-            $row = $this->templatesRepository->add(
-                $values['name'],
-                $values['code'],
-                $values['description'],
-                $values['from'],
-                $values['subject'],
-                $values['mail_body_text'],
-                $values['mail_body_html'],
-                $values['mail_layout_id'],
-                $values['mail_type_id']
-            );
-            ($this->onCreate)($row, $buttonSubmitted);
+        try {
+            if (!empty($values['id'])) {
+                $row = $this->templatesRepository->find($values['id']);
+                $this->templatesRepository->update($row, $values);
+                ($this->onUpdate)($row, $buttonSubmitted);
+            } else {
+                $row = $this->templatesRepository->add(
+                    $values['name'],
+                    $values['code'],
+                    $values['description'],
+                    $values['from'],
+                    $values['subject'],
+                    $values['mail_body_text'],
+                    $values['mail_body_html'],
+                    $values['mail_layout_id'],
+                    $values['mail_type_id']
+                );
+                ($this->onCreate)($row, $buttonSubmitted);
+            }
+        } catch (TemplatesCodeNotUniqueException $e) {
+            $form['code']->addError($e->getMessage());
         }
     }
 }

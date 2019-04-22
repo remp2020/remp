@@ -2,9 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-
-class ShortMessageTemplate extends Model
+class ShortMessageTemplate extends AbstractTemplate
 {
     protected $fillable = [
         'text',
@@ -12,12 +10,12 @@ class ShortMessageTemplate extends Model
         'text_color',
     ];
 
-    protected $touches = [
-        'banner',
-    ];
-
-    public function banner()
+    /**
+     * Text should return textual representation of the banner's main text in the cleanest possible form.
+     * @return mixed
+     */
+    public function text()
     {
-        return $this->belongsTo(Banner::class);
+        return strip_tags($this->text);
     }
 }

@@ -35,25 +35,45 @@ class SyncUserSubscriptionsCommand extends Command
     protected function configure()
     {
         $this->setName('mail:sync-user-subscriptions')
-            ->setDescription('Gets all users from user base and subscribes them to emails');
+            ->setDescription('Gets all users from user base and subscribes them to emails based on the auto_subscribe flags');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('');
         $output->writeln('<info>***** AUTO-SUBSCRIBING ALL USERS *****</info>');
+        $output->writeln('(already existing records will not be touched)');
         $output->writeln('');
 
         $page = 1;
+        $lists = $this->listsRepository->all();
 
         while ($users = $this->userProvider->list([], $page)) {
+            $emails = [];
             foreach ($users as $user) {
-                $output->write(sprintf("Subscribing user: %s (%s) ... ", $user['email'], $user['id']));
-                $lists = $this->listsRepository->all();
+                $emails[] = $user['email'];
+            }
+
+            $mailSubscriptions = $this->userSubscriptionsRepository->getTable()->where(['user_email' => $emails])->fetchAll();
+            $processed = [];
+            foreach ($mailSubscriptions as $mailSubscription) {
+                $processed[$mailSubscription->user_email][$mailSubscription->mail_type_id] = true;
+            }
+
+            foreach ($users as $user) {
+                $output->write(sprintf("Processing user: %s (%s) ... ", $user['email'], $user['id']));
 
                 /** @var ActiveRow $list */
                 foreach ($lists as $list) {
-                    $this->userSubscriptionsRepository->autoSubscribe($list, $user['id'], $user['email']);
+                    if (isset($processed[$user['email']][$list->id])) {
+                        continue;
+                    }
+
+                    if ($list->auto_subscribe) {
+                        $this->userSubscriptionsRepository->subscribeUser($list, $user['id'], $user['email']);
+                    } else {
+                        $this->userSubscriptionsRepository->unsubscribeUser($list, $user['id'], $user['email']);
+                    }
                 }
 
                 $output->writeln('<info>OK!</info>');

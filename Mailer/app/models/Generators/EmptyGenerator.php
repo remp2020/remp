@@ -3,12 +3,17 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class EmptyGenerator implements IGenerator
 {
-    public function generate(Form $form)
+    public function generateForm(Form $form)
     {
         $form->onSuccess[] = [$this, 'formSucceeded'];
+    }
+
+    public function formSucceeded($form, $values)
+    {
     }
 
     public function onSubmit(callable $onSubmit)
@@ -19,5 +24,20 @@ class EmptyGenerator implements IGenerator
     public function getWidgets()
     {
         return [];
+    }
+
+    public function apiParams()
+    {
+        return [];
+    }
+
+    public function process($input)
+    {
+        return [];
+    }
+
+    public function preprocessParameters($data): ?ArrayHash
+    {
+        return null;
     }
 }

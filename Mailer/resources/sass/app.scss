@@ -1,10 +1,12 @@
-$primaryColor: #00acc1;
-$primaryColorDark: #007c91;
-$primaryColorLight: #5ddef4;
+$primaryColor: Cyan;
+$grey: Grey;
+$white: White;
 
+@import "~bootstrap-select/dist/css/bootstrap-select.min.css";
 @import "~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css";
 @import "~remp/sass/template.scss";
 @import "~remp/sass/remp.scss";
+@import "~google-material-color/dist/palette";
 
 .pg-item {
   &.green:nth-child(odd) {
@@ -18,5 +20,32 @@ $primaryColorLight: #5ddef4;
   }
   &.red:nth-child(2n) {
     background-color: transparentize(#ba6b6c, .85);
+  }
+}
+
+.fg-input:invalid {
+  border-color: #f00;
+}
+
+.missing-configuration-widget,
+.missing-configuration-widget:hover {
+  display: inline-block;
+  color: red;
+  height: 60px;
+  line-height: 35px;
+}
+
+.cw-upcoming {
+  a {
+    color: palette($grey, 50);
+    &:hover {
+      color: palette($white);
+    }
+  }
+}
+.cwu-forecast {
+  a, a:hover {
+    color: black;
+    padding: 0.2em;
   }
 }

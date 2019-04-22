@@ -5247,6 +5247,48 @@ a.label:focus {
 .badge:empty {
   display: none;
 }
+.badge-default {
+  background-color: #777777;
+}
+.badge-default[href]:hover,
+.badge-default[href]:focus {
+  background-color: #5e5e5e;
+}
+.badge-primary {
+  background-color: #2196f3;
+}
+.badge-primary[href]:hover,
+.badge-primary[href]:focus {
+  background-color: #0c7cd5;
+}
+.badge-success {
+  background-color: #4caf50;
+}
+.badge-success[href]:hover,
+.badge-success[href]:focus {
+  background-color: #3d8b40;
+}
+.badge-info {
+  background-color: #00bcd4;
+}
+.badge-info[href]:hover,
+.badge-info[href]:focus {
+  background-color: #008fa1;
+}
+.badge-warning {
+  background-color: #ff9800;
+}
+.badge-warning[href]:hover,
+.badge-warning[href]:focus {
+  background-color: #cc7a00;
+}
+.badge-danger {
+  background-color: #f44336;
+}
+.badge-danger[href]:hover,
+.badge-danger[href]:focus {
+  background-color: #ea1c0d;
+}
 .btn .badge {
   position: relative;
   top: -1px;
@@ -6349,12 +6391,15 @@ button.close {
   padding: 0 5px;
 }
 .tooltip-inner {
-  max-width: 200px;
+  max-width: 350px;
   padding: 3px 8px;
   color: #ffffff;
-  text-align: center;
+  text-align: left;
   background-color: #737373;
   border-radius: 2px;
+}
+.large-tooltip .tooltip-inner {
+  width: 300px;
 }
 .tooltip-arrow {
   position: absolute;
@@ -8035,7 +8080,7 @@ pre {
 .container.c-boxed {
   max-width: 1200px;
 }
-#main {
+#main, #main-simple {
   position: relative;
 }
 @media (min-width: 1200px) {
@@ -8043,15 +8088,25 @@ pre {
     padding: 0 40px 30px 270px;
     min-height: calc(100vh - 159px);
   }
+  #main-simple {
+    padding: 20px 40px 30px 40px;
+    min-height: calc(100vh - 159px);
+  }
 }
 @media (max-width: 1199px) and (min-width: 768px) {
   #main {
     padding: 0 40px 30px;
   }
+  #main-simple {
+    padding: 10px 40px 30px;
+  }
 }
 @media (max-width: 767px) {
   #main {
     padding: 0 15px 30px;
+  }
+  #main-simple {
+    padding: 10px 15px 30px;
   }
 }
 .clist {
@@ -13204,103 +13259,7 @@ hr.fc-divider {
 select.chosen {
   display: none;
 }
-.noUi-target {
-  border-radius: 0;
-  box-shadow: none;
-  border: 0;
-}
-.noUi-background {
-  background: #d4d4d4;
-  box-shadow: none;
-}
-.noUi-horizontal {
-  height: 3px;
-}
-.noUi-horizontal .noUi-handle {
-  top: -8px;
-}
-.noUi-vertical {
-  width: 3px;
-}
-.noUi-horizontal .noUi-handle,
-.noUi-vertical .noUi-handle {
-  width: 19px;
-  height: 19px;
-  border: 0;
-  border-radius: 100%;
-  box-shadow: none;
-  -webkit-transition: box-shadow;
-  -o-transition: box-shadow;
-  transition: box-shadow;
-  -webkit-transition-duration: 200ms;
-  transition-duration: 200ms;
-  cursor: pointer;
-  position: relative;
-}
-.noUi-horizontal .noUi-handle:before,
-.noUi-vertical .noUi-handle:before,
-.noUi-horizontal .noUi-handle:after,
-.noUi-vertical .noUi-handle:after {
-  display: none;
-}
-.noUi-horizontal .noUi-handle:active,
-.noUi-vertical .noUi-handle:active {
-  background: #ccc !important;
-}
-.noUi-horizontal .noUi-handle .is-tooltip,
-.noUi-vertical .noUi-handle .is-tooltip {
-  position: absolute;
-  bottom: 32px;
-  height: 35px;
-  border-radius: 2px;
-  color: #fff;
-  text-align: center;
-  line-height: 33px;
-  width: 50px;
-  left: 50%;
-  margin-left: -25px;
-  padding: 0 10px;
-  -webkit-transition: all;
-  -o-transition: all;
-  transition: all;
-  -webkit-transition-duration: 200ms;
-  transition-duration: 200ms;
-  -webkit-backface-visibility: hidden;
-  -moz-backface-visibility: hidden;
-  backface-visibility: hidden;
-  opacity: 0;
-  filter: alpha(opacity=0);
-  -webkit-transform: scale(0);
-  -ms-transform: scale(0);
-  -o-transform: scale(0);
-  transform: scale(0);
-}
-.noUi-horizontal .noUi-handle .is-tooltip:after,
-.noUi-vertical .noUi-handle .is-tooltip:after {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 15px 10px 0 10px;
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  margin-left: -9px;
-  content: "";
-}
-.noUi-horizontal .noUi-active,
-.noUi-vertical .noUi-active {
-  box-shadow: 0 0 0 13px rgba(0, 0, 0, 0.1);
-}
-.noUi-horizontal .noUi-active .is-tooltip,
-.noUi-vertical .noUi-active .is-tooltip {
-  -webkit-transform: scale(1);
-  -ms-transform: scale(1);
-  -o-transform: scale(1);
-  transform: scale(1);
-  bottom: 40px;
-  opacity: 1;
-  filter: alpha(opacity=100);
-}
+
 .input-slider:not([data-is-color]) .noUi-handle,
 .input-slider-range:not([data-is-color]) .noUi-handle,
 .input-slider-values:not([data-is-color]) .noUi-handle,
@@ -13658,10 +13617,13 @@ select.chosen {
 .timepicker-picker table tbody tr + tr:not(:last-child) td {
   border-radius: 0;
 }
-.timepicker-picker .btn,
+.timepicker-picker .btn {
+  background: #fff !important;
+  color: #333 !important;
+}
 .timepicker-picker .btn:hover {
-  background: #fff;
-  color: #333;
+  background: #F0F0F0 !important;
+  color: #333 !important;
 }
 .datepicker.top {
   -webkit-transform-origin: 0 100% !important;

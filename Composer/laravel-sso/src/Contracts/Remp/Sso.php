@@ -14,7 +14,7 @@ class Sso implements SsoContract
 
     const ENDPOINT_REFRESH = '/api/auth/refresh';
 
-    const ENDPOINT_CHECK_TOKEN = '/api/auth/api-token';
+    const ENDPOINT_CHECK_TOKEN = '/api/auth/check-token';
 
     const ENDPOINT_INVALIDATE = '/api/auth/invalidate';
 

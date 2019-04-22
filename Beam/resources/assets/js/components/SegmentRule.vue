@@ -72,7 +72,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-n-1-square"></i></span>
                             <div class="fg-line">
                                 <label class="fg-label">Count</label>
-                                <input :value="count" :name="'rules['+index+'][count]'" placeholder="e.g. 5" class="form-control fg-input" title="count" type="number" required />
+                                <input v-model="mutCount" :name="'rules['+index+'][count]'" placeholder="e.g. 5" class="form-control fg-input" title="count" type="number" required />
                             </div>
                         </div>
                     </div>
@@ -141,7 +141,7 @@
 </template>
 
 <script>
-    let vSelect = require("remp/js/components/vSelect.vue");
+    import vSelect from "remp/js/components/vSelect"
 
     export default {
         name: "segment-rule",
@@ -163,6 +163,7 @@
                 "mutFlags": this.flags,
                 "mutFields": this.fields,
                 "mutTimespan": this.timespan,
+                "mutCount": this.count,
                 "mutEventAction": this.eventAction,
                 "mutEventCategory": this.eventCategory,
                 "timespanUserFormatted": null,

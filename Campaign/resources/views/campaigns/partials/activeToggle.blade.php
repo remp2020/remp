@@ -3,6 +3,7 @@
         name="campaigns-list-item-active-toggle-{{ $id }}"
         id="campaigns-list-item-active-toggle-{{ $id }}"
         :is-checked="{!! @json($active) !!}"
+        title="{{ $title }}"
 
         method="post"
         toggle-url="{!! route('api.campaigns.toggle_active', ['campaign' => $id]) !!}"

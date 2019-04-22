@@ -5,11 +5,11 @@ version: "3"
 services:
   nginx:
     image: "nginx:stable"
+    environment:
+      NGINX_PORT: "[::]:80"
     volumes:
       - ".:/var/www/html:rw"
-      - "./Docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
-    ports:
-      - "80:80"
+      - "./Docker/nginx/nginx.conf:/etc/nginx/conf.d/default.template:ro"
     restart: "unless-stopped"
     networks:
       default:
@@ -20,8 +20,9 @@ services:
           - "beam.remp.press"
           - "tracker.beam.remp.press"
           - "segments.beam.remp.press"
-          - "grafana.beam.remp.press"
           - "mailhog.remp.press"
+          - "kibana.beam.remp.press"
+    command: /bin/bash -c "envsubst '$$NGINX_PORT' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
 
   mysql:
     image: "mysql:5.7" # minimal 5.7.8
@@ -65,6 +66,8 @@ services:
       - "./Campaign:/var/www/html/Campaign:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"
@@ -82,7 +85,9 @@ services:
     volumes:
       - "./Mailer:/var/www/html/Mailer:rw"
       - "./Composer:/var/www/html/Composer:rw"
-      - "./Package:/var/www/html/Package:rw"      
+      - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"
@@ -102,7 +107,9 @@ services:
     volumes:
       - "./Sso:/var/www/html/Sso:rw"
       - "./Composer:/var/www/html/Composer:rw"
-      - "./Package:/var/www/html/Package:rw"      
+      - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"
@@ -120,7 +127,9 @@ services:
     volumes:
       - "./Beam:/var/www/html/Beam:rw"
       - "./Composer:/var/www/html/Composer:rw"
-      - "./Package:/var/www/html/Package:rw"      
+      - "./Package:/var/www/html/Package:rw"
+      - "./phpcs:/var/www/html/phpcs:ro"
+      - "./phpcbf:/var/www/html/phpcbf:ro"
     depends_on:
       - "nginx"
       - "mysql"
@@ -132,63 +141,47 @@ services:
       ADVERTISED_HOST: "kafka"
       ADVERTISED_PORT: "9092"
       CREATE_TOPICS: "beam_events:1:1"
-    ports:
-      - "9092:9092"
     volumes:
       - "kafka-data:/data"
-
-  influxdb:
-    image: "influxdb:1.4"
-    volumes:
-      - "influxdb-data:/var/lib/influxdb"
-    environment:
-      INFLUXDB_DATA_MAX_VALUES_PER_TAG: 0
-      INFLUXDB_DATA_MAX_SERIES_PER_DATABASE: 0
-    ports:
-      - "8098:8086"
-    restart: "unless-stopped"
 
   telegraf:
     build: "./Docker/telegraf"
     volumes:
       - "./Docker/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
     depends_on:
-      - "influxdb"
       - "kafka"
+      - "elasticsearch"
     restart: "unless-stopped"
 
-  grafana:
-    image: "grafana/grafana"
+  elasticsearch:
+    build: "./Docker/elasticsearch"
     volumes:
-      - "grafana-data:/var/lib/grafana"
-    restart: "unless-stopped"
+      - "./Docker/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+      - "elastic-data:/usr/share/elasticsearch/data"
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:6.2.2"
 
   beam_tracker:
     build: "./Beam/go/cmd/tracker"
     depends_on:
       - "kafka"
-    ports:
-      - "8091:8081"
     restart: "unless-stopped"
 
   beam_segments:
     build: "./Beam/go/cmd/segments"
     depends_on:
-      - "influxdb"
-    ports:
-      - "8092:8082"
+      - "elasticsearch"
     restart: "unless-stopped"
 
 volumes:
-  influxdb-data:
-    driver: "local"
   kafka-data:
     driver: "local"
   mysql-data:
     driver: "local"
   redis-data:
     driver: "local"
-  grafana-data:
+  elastic-data:
     driver: "local"
 
 networks:

@@ -98,8 +98,8 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'params' => [
+            'required' => 'You have to specify at least one property.',
         ],
     ],
 
@@ -114,6 +114,9 @@ return [
     |
     */
 
-    'attributes' => [],
-
+    'attributes' => [
+        'parent_id' => 'parent',
+        'params.*.name' => 'param name',
+        'params.*.type' => 'param type',
+    ],
 ];

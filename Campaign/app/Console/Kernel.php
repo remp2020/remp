@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Campaign;
+use App\Console\Commands\AggregateCampaignStats;
 use App\Jobs\CacheSegmentJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -17,7 +18,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\CampaignsRefreshCache::class,
+        Commands\AggregateCampaignStats::class
     ];
 
     /**
@@ -31,6 +33,10 @@ class Kernel extends ConsoleKernel
         if (!Schema::hasTable("migrations")) {
             return;
         }
+
+        $schedule->command(AggregateCampaignStats::COMMAND)
+            ->everyMinute()
+            ->withoutOverlapping();
 
         // invalidate segments cache
         try {

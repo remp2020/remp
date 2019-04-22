@@ -35,6 +35,9 @@
         moment.locale('{{ Config::get('app.locale') }}');
     </script>
 
+    {{-- tightenco/ziggy package to pass laravel routes to JS --}}
+    @routes
+
     @stack('head')
 </head>
 
@@ -172,6 +175,11 @@
 </div>
 <![endif]-->
 
+<script>
+    $(document).ready(function() {
+        salvattore.init();
+    })
+</script>
 <script type="application/javascript">
     $(document).ready(function() {
         var delay = 250;

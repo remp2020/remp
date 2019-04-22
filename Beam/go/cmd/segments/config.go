@@ -11,8 +11,9 @@ type Config struct {
 	MysqlPasswd string `envconfig:"mysql_passwd" required:"true"`
 	MysqlDBName string `envconfig:"mysql_dbname" required:"true"`
 
-	InfluxAddr   string `envconfig:"influx_addr" required:"true"`
-	InfluxUser   string `envconfig:"influx_user" required:"true"`
-	InfluxPasswd string `envconfig:"influx_passwd" required:"true"`
-	InfluxDBName string `envconfig:"influx_dbname" required:"true"`
+	ElasticAddr   string `envconfig:"elastic_addr" required:"true"`
+	ElasticUser   string `envconfig:"elastic_user" required:"false"`
+	ElasticPasswd string `envconfig:"elastic_passwd" required:"false"`
+
+	URLEdit string `envconfig:"url_edit" required:"true"`
 }

@@ -37,29 +37,29 @@ return [
         'top_left' => [
             'name' => 'Top-Left',
             'style' => [
-                'top' => '10px',
-                'left' => '10px',
+                'top' => '0px',
+                'left' => '0px',
             ],
         ],
         'top_right' => [
             'name' => 'Top-Right',
             'style' => [
-                'top' => '10px',
-                'right' => '10px',
+                'top' => '0px',
+                'right' => '0px',
             ],
         ],
         'bottom_left' => [
             'name' => 'Bottom-Left',
             'style' => [
-                'bottom' => '10px',
-                'left' => '10px',
+                'bottom' => '0px',
+                'left' => '0px',
             ],
         ],
         'bottom_right' => [
             'name' => 'Bottom-Right',
             'style' => [
-                'bottom' => '10px',
-                'right' => '10px',
+                'bottom' => '0px',
+                'right' => '0px',
             ],
         ],
     ],

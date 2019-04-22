@@ -59,6 +59,7 @@
 
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
+            'responsive': true,
             'columns': [
                     @foreach ($cols as $col)
                 {
@@ -69,6 +70,9 @@
                     @endif
                     @if (isset($col['searchable']))
                     searchable: false,
+                    @endif
+                    @if (isset($col['className']))
+                    className: '{{ $col['className'] }}',
                     @endif
                     @if (isset($col['render']))
                     render: $.fn.dataTables.render['{!! $col['render'] !!}']({!! isset($col['renderParams']) ? json_encode($col['renderParams']) : '' !!})
@@ -82,6 +86,20 @@
                     orderable: false,
                     searchable: false,
                     render: $.fn.dataTables.render.actions({!! @json($rowActions) !!})
+                },
+                @endif
+            ],
+            'columnDefs': [
+                @foreach ($cols as $col)
+                {
+                    responsivePriority: {{ $col['priority'] }},
+                    targets: {{ $col['colIndex'] }},
+                },
+                @endforeach
+                @if (!empty($rowActions))
+                {
+                    responsivePriority: 1,
+                    targets: -1
                 },
                 @endif
             ],
@@ -138,6 +156,11 @@
 
         $.fn.dataTables.search(dataTable, 'dt-search-{{ $tableId }}');
         $.fn.dataTables.navigation(dataTable, 'dt-nav-{{ $tableId }}');
+
+        $.fn.dataTableExt.errMode = function (e, settings, techNote, message) {
+            console.warn(techNote);
+            alert('Error while loading data table, try again later please.');
+        };
 
         @foreach ($refreshTriggers as $def)
             var triggerEvent = '{!! $def['event'] !!}';

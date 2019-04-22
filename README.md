@@ -2,13 +2,60 @@
 
 ## Apps
 
-See separate documentations of each app:
-* [Beam](Beam)
-* [Campaign](Campaign)
-* [Mailer](Mailer)
-* [Sso](Sso)
+Each of the REMP services provides its own description and integration documentation - you can access
+it by clicking one of the headings below.
+
+Following is a brief description of REMP services included in this mono-repository. 
+
+#### [SSO](Sso)
+
+SSO is the single point of authentication in the default REMP tools configuration. Currently it allows users of
+REMP tools (Beam, Campaign, Mailer) to log in via their Google accounts.
+
+It also serves as an authentication tool for API requests across the REMP tools - you can manage your API keys
+within the web administration of the SSO.
+
+In the future we plan to make easier to develop other authentication mechanisms to connect and also proper
+authorization management for users.
+
+#### [Beam](Beam)
+
+Beam is primary tool for tracking all events across the system and providing aggregated data for statistical
+components in Beam and other REMP services.
+
+You can track pageview related events right from the Javascript on your website or call an API from backend.
+
+Beam admin provides a way to display real time usage stats on your website, aggregated article/author/conversion
+data and allows you to create user segments based on the tracked data.
+
+#### [Campaign](Campaign)
+
+Campaign is a tool for easy creation and showing of banners on your website. In the banner definition you can
+configure how the banner should look like, where it should be displayed and what it should include.
+
+In the campaign definition you can configure who should see the banner and how often.
+
+If Beam is installed, you can use user segments in configuration who should see the banner. You can also link
+other segment providers (e.g. your own CRM) to provide other user segments.
+
+#### [Mailer](Mailer)
+
+Mailer provides a way to manage emails (layouts and templates) which can be sent as newsletters. Mailer provides
+APIs for managing user's newsletter subscriptions, handles batch sending of emails and A/B testing.
+
+To complement all users subscribed to newsletter, you're able to use user segment when sending a newsletter.
+Therefore only users belonging to the selected segment which are also subscribed to the newsletter will receive
+an email. In the default configuration, Beam segments are available. You can link your own segment provider
+(e.g. your own CRM) to provide other user segments.
+
+In a default implementation SMTP and Mailgun mailer providers are implemented. You can extend the implementation
+with your own Mailer provider if you need it. 
+
 
 ## Install
+
+### Docker installation
+*(recommended for development or testing)*
 
 #### 1. Pre-building binaries of Go apps
 
@@ -93,12 +140,12 @@ Following is list of available hosts. We advise you to add them to your
 # SERVICE APPS
 127.0.0.1 adminer.remp.press # adminer for manipulating with MySQL
 127.0.0.1 mailhog.remp.press # mailhog for catching and debugging sent emails
-127.0.0.1 grafana.beam.remp.press # grafana for manipulating with InfluxDB and displaying charts
+127.0.0.1 kibana.beam.remp.press # kibana for manipulating with Elastic data
 ```
 
 > Note: If you use Docker Toolbox, the IP won't be `127.0.0.1`. Use `docker-machine ls` to get IP address of the machine.
 
-## Manual installation
+### Manual installation
 
 Please use `docker-compose.yml` and configuration/scripts within [Docker](./Docker) folder as a reference for manual
 installation of each service.

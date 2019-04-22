@@ -40,17 +40,15 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentEnabled: false,
 
-        usingAdblock: null,
-
         cookiesEnabled: null,
 
         websocketsSupported: null,
 
         totalTimeSpent: 0,
 
-        partialTimeSpent: 0,
-
         timeSpentActive: false,
+
+        initialized: false,
 
         init: function(config) {
             if (typeof config.token !== 'string') {
@@ -123,6 +121,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             window.addEventListener("campaign_showtime", this.syncOverridableFields);
             window.addEventListener("campaign_showtime", this.syncFlags);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
+
+            this.initialized = true;
         },
 
         syncSegmentRulesCache: function(e) {
@@ -242,8 +242,27 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return Hash(k);
         },
 
+        checkInit: function() {
+            var that = this;
+            return new Promise(function (resolve, reject) {
+                var startTime = new Date().getTime();
+                var interval = setInterval(function() {
+                    if (that.initialized) {
+                        clearInterval(interval);
+                        return resolve(true);
+                    }
+
+                    // After 5 seconds, stop checking
+                    if (new Date().getTime() - startTime > 5000) {
+                        clearInterval(interval);
+                        reject("Beam library was not initialized within 5 seconds");
+                    }
+                }, 50);
+            });
+        },
+
         run: function() {
-            Promise.all([remplib.tracker.checkUsingAdblock()]).then((res) => {
+            Promise.all([remplib.checkUsingAdblock(), this.checkInit()]).then((res) => {
                 this.trackPageview();
 
                 if (this.timeSpentEnabled === true) {
@@ -253,15 +272,23 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             })
         },
 
-        trackEvent: function(category, action, tags, fields, value) {
+        trackEvent: function(category, action, tags, fields, source, value) {
             var params = {
                 "category": category,
                 "action": action,
                 "tags": tags || {},
                 "fields": fields || {},
-                "value": value
+                "value": value,
+                "remp_event_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
+
+            for (var key in source) {
+                if (source.hasOwnProperty(key)) {
+                    params["user"]["source"][key] = source[key];
+                }
+            }
+
             this.post(this.url + "/track/event", params);
             this.dispatchEvent(category, action, params);
         },
@@ -280,23 +307,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             // PRE ES2015 safeguard
             closed = (typeof closed === 'boolean') ? closed : false;
 
-            // send 0 time spent in case it is unload event
-            if (this.partialTimeSpent === 0 && closed === false) {
-                return;
-            }
-
             let params = {
                 "article": this.article,
                 "action": "timespent",
                 "timespent": {
-                    "seconds": this.partialTimeSpent,
+                    "seconds": this.totalTimeSpent,
                     "unload": closed,
                 }
             };
             params = this.addSystemUserParams(params);
             params = this.timespentParamsCleanup(params);
-
-            this.partialTimeSpent = 0; // start counting from 0 again
 
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "timespent", params);
@@ -308,7 +328,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
                 "checkout": {
                     "funnel_id": funnelId
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -326,7 +347,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "currency": currency
                     },
                     "product_ids": productIds
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -344,7 +366,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "currency": currency
                     },
                     "product_ids": productIds
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -362,7 +385,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         "currency": currency
                     },
                     "product_ids": productIds
-                }
+                },
+                "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -393,21 +417,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             xmlhttp.send(JSON.stringify(params));
         },
 
-        checkUsingAdblock: function () {
-            return new Promise(function (resolve, reject) {
-                var testAd = document.createElement('div');
-                testAd.innerHTML = '&nbsp;';
-                testAd.setAttribute('class', 'pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
-                testAd.setAttribute('style', 'width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px');
-                document.body.appendChild(testAd);
-                window.setTimeout(function() {
-                    remplib.tracker.usingAdblock = testAd.offsetHeight === 0 || false
-                    testAd.remove();
-                    resolve(remplib.tracker.usingAdblock);
-                }, 100);
-            });
-        },
-
         checkCookiesEnabled: function () {
             document.cookie = "cookietest=1";
             remplib.tracker.cookiesEnabled = document.cookie.indexOf("cookietest=") != -1;
@@ -429,18 +438,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "url":  window.location.href,
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
-                "adblock": remplib.tracker.usingAdblock,
-                "window_height": window.outerHeight,
-                "window_width": window.outerWidth,
+                "adblock": remplib.usingAdblock,
+                "window_height": window.outerHeight || document.documentElement.clientHeight,
+                "window_width": window.outerWidth || document.documentElement.clientWidth,
                 "cookies": remplib.tracker.cookiesEnabled,
                 "websockets": remplib.tracker.websocketsSupported,
                 "source": {
-                    "ref": this.getRefSource(),
-                    "social": this.getSocialSource(),
                     "utm_source": this.getParam("utm_source"),
                     "utm_medium": this.getParam("utm_medium"),
                     "utm_campaign": this.getParam("utm_campaign"),
-                    "utm_content": this.getParam("utm_content")
+                    "utm_content": this.getParam("utm_content"),
+                    "banner_variant": this.getParam("banner_variant"),
                 }
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
@@ -458,47 +466,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timespentParamsCleanup: function(params) {
             delete params.user.url;
-            delete params.user.referer;
             delete params.user.user_agent;
             delete params.user.source.utm_source;
             delete params.user.source.utm_medium;
             delete params.user.source.utm_campaign;
             delete params.user.source.utm_content;
             return params;
-        },
-
-        getSocialSource: function() {
-            var source = null;
-            if (document.referrer.match(/^https?:\/\/([^\/]+\.)?facebook\.com(\/|$)/i)) {
-                source = "facebook";
-            } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?twitter\.com(\/|$)/i)) {
-                source = "twitter";
-            } else if (document.referrer.match(/^https?:\/\/([^\/]+\.)?reddit\.com(\/|$)/i)) {
-                source = "reddit";
-            }
-
-            var storageKey = "social_source";
-            if (source === null) {
-                return remplib.getFromStorage(storageKey);
-            }
-
-            var now = new Date();
-            var item = {
-                "version": 1,
-                "value": source,
-                "createdAt": now,
-                "updatedAt": now,
-            };
-            localStorage.setItem(storageKey, JSON.stringify(item));
-            return item.value;
-        },
-
-        getRefSource: function() {
-            var source = null;
-            if (document.referrer === "" || document.referrer.match(/^https?:\/\/([^\/]+\.)? + window.location.hostname + (\/|$)/i)) {
-                source = "direct";
-            }
-            return source;
         },
 
         getParam: function(key) {
@@ -530,7 +503,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         tickTime: function () {
             if (this.timeSpentActive) {
                 this.totalTimeSpent++;
-                this.partialTimeSpent++;
                 this.scheduledSend();
             }
             setTimeout('remplib.tracker.tickTime()', 1000);

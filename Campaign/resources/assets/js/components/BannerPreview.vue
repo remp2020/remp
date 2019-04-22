@@ -84,6 +84,28 @@
                 :displayType="displayType"
         ></bar-preview>
 
+        <collapsible-bar-preview v-if="template === 'collapsible_bar'"
+                :alignmentOptions="alignmentOptions"
+                :positionOptions="positionOptions"
+                :show="visible"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
+                :forcedPosition="forcedPosition"
+
+                :mainText="collapsibleBarTemplate.mainText"
+                :collapseText="collapsibleBarTemplate.collapseText"
+                :buttonText="collapsibleBarTemplate.buttonText"
+                :backgroundColor="collapsibleBarTemplate.backgroundColor"
+                :textColor="collapsibleBarTemplate.textColor"
+                :buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
+                :buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+                :initialState="collapsibleBarTemplate.initialState"
+
+                :targetUrl="targetUrl"
+                :transition="transition"
+                :displayType="displayType"
+        ></collapsible-bar-preview>
+
         <short-message-preview v-if="template === 'short_message'"
                 :alignmentOptions="alignmentOptions"
                 :positionOptions="positionOptions"
@@ -105,6 +127,31 @@
                 :transition="transition"
                 :displayType="displayType"
         ></short-message-preview>
+
+        <overlay-rectangle-preview v-if="template === 'overlay_rectangle'"
+                :alignmentOptions="alignmentOptions"
+                :show="visible"
+                :uuid="uuid"
+                :campaignUuid="campaignUuid"
+
+                :headerText="overlayRectangleTemplate.headerText"
+                :mainText="overlayRectangleTemplate.mainText"
+                :buttonText="overlayRectangleTemplate.buttonText"
+                :width="overlayRectangleTemplate.width"
+                :height="overlayRectangleTemplate.height"
+                :backgroundColor="overlayRectangleTemplate.backgroundColor"
+                :textColor="overlayRectangleTemplate.textColor"
+                :buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
+                :buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+                :imageLink="overlayRectangleTemplate.imageLink"
+
+                :targetUrl="targetUrl"
+                :closeable="closeable"
+                :closeText="closeText"
+                :transition="transition"
+                :displayType="displayType"
+        >
+        </overlay-rectangle-preview>
     </div>
 </template>
 
@@ -113,7 +160,9 @@
     import HtmlPreview from "./previews/Html";
     import MediumRectanglePreview from "./previews/MediumRectangle";
     import BarPreview from "./previews/Bar";
+    import CollapsibleBarPreview from "./previews/CollapsibleBar";
     import ShortMessagePreview from "./previews/ShortMessage";
+    import OverlayRectanglePreview from "./previews/OverlayRectangle";
 
     const props = [
         "name",
@@ -138,12 +187,16 @@
 
         "mediumRectangleTemplate",
         "barTemplate",
+        "collapsibleBarTemplate",
         "htmlTemplate",
         "shortMessageTemplate",
+        "overlayRectangleTemplate",
 
         "alignmentOptions",
         "dimensionOptions",
         "positionOptions",
+
+        "variantUuid",
     ];
 
     export default {
@@ -151,7 +204,9 @@
             HtmlPreview,
             MediumRectanglePreview,
             BarPreview,
+            CollapsibleBarPreview,
             ShortMessagePreview,
+            OverlayRectanglePreview,
         },
         name: 'banner-preview',
         props: props,
@@ -166,9 +221,11 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
+
+            this.visible = this.show;
         },
         data: () => ({
-            visible: true,
+            visible: false,
         }),
         watch: {
             'transition': function() {
@@ -182,7 +239,7 @@
         },
         computed: {
             url: function() {
-                if (this.targetUrl === null) {
+                if (!this.targetUrl) {
                     return null;
                 }
                 let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
@@ -193,6 +250,9 @@
                 }
                 if (this.uuid) {
                     url += "&utm_content=" + encodeURIComponent(this.uuid);
+                }
+                if (this.variantUuid) {
+                    url += "&banner_variant=" + encodeURIComponent(this.variantUuid);
                 }
                 return url;
             },
@@ -225,32 +285,37 @@
                 if (this.closeTracked) {
                     return true;
                 }
-                this.trackEvent("banner", "close", {
+                this.trackEvent("banner", "close", null, null, {
                     "utm_source": "remp_campaign",
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
-                    "utm_content": this.uuid
+                    "utm_content": this.uuid,
+                    "banner_variant": this.variantUuid
                 });
                 this.closeTracked = true;
             },
-            clicked: function() {
+            clicked: function(event, hideBanner = false) {
                 if (this.clickTracked) {
                     return true;
                 }
-                this.trackEvent("banner", "click", {
+                this.trackEvent("banner", "click", null, null, {
                     "utm_source": "remp_campaign",
                     "utm_medium": this.displayType,
                     "utm_campaign": this.campaignUuid,
-                    "utm_content": this.uuid
+                    "utm_content": this.uuid,
+                    "banner_variant": this.variantUuid
                 });
                 this.clickTracked = true;
+                if (hideBanner) {
+                    this.visible = false;
+                }
                 return true;
             },
-            trackEvent: function(category, action, fields) {
+            trackEvent: function(category, action, tags, fields, source) {
                 if (typeof remplib.tracker === 'undefined') {
                     return;
                 }
-                remplib.tracker.trackEvent(category, action, fields);
+                remplib.tracker.trackEvent(category, action, tags, fields, source);
             },
             customPositioned: function() {
                 if (this.displayType === 'inline') {

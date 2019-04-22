@@ -37,12 +37,13 @@ var Pageview = Type("Pageview", func() {
 	Description("Pageview is the payload for tracking pageview event")
 
 	Attribute("action", String, func() {
-		Enum("load", "timespent")
+		Enum("load", "timespent", "progress")
 	})
 	Attribute("system", System)
 	Attribute("user", User)
 	Attribute("article", Article)
 	Attribute("timespent", TimeSpent)
+	Attribute("progress", Progress)
 
 	Required("system", "user", "action")
 })
@@ -56,6 +57,7 @@ var Commerce = Type("Commerce", func() {
 	Attribute("step", String, func() {
 		Enum("checkout", "payment", "purchase", "refund")
 	})
+	Attribute("remp_commerce_id", String, "ID of event")
 	Attribute("checkout", CommerceCheckout, "Used when user enters the checkout process (reviews the cart)")
 	Attribute("payment", CommercePayment, "Used when user confirmed checkout and was redirected to the payment processor")
 	Attribute("purchase", CommercePayment, "Used when payment processor confirms the payment")
@@ -75,6 +77,7 @@ var Event = Type("Event", func() {
 	Attribute("value", Number, "Numeric value of event (read 60 seconds, paused after 200 seconds, 3rd comment")
 	Attribute("tags", HashOf(String, String), "Custom filtering tags")
 	Attribute("fields", HashOf(String, Any), "Additinal key-value data")
+	Attribute("remp_event_id", String, "ID of event")
 
 	Required("system", "category", "action")
 })
@@ -101,6 +104,22 @@ var TimeSpent = Type("TimeSpent", func() {
 	Required("seconds")
 })
 
+var Progress = Type("Progress", func() {
+	Description("Update reading progress on pageview")
+
+	Attribute("page_ratio", Number, "Whole page reading ratio", func() {
+		Minimum(0)
+		Maximum(1)
+	})
+	Attribute("article_ratio", Number, "Article reading ratio", func() {
+		Minimum(0)
+		Maximum(1)
+	})
+	Attribute("unload", Boolean, "Flag to indicate last update of progress on page before unload event")
+
+	Required("page_ratio")
+})
+
 var Source = Type("source", func() {
 	Description("User-source related data")
 
@@ -108,8 +127,7 @@ var Source = Type("source", func() {
 	Attribute("utm_medium", String, "Medium through which the came (e.g. overlay, inline)")
 	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
-	Attribute("social", String, "Social source if available")
-	Attribute("ref", String, "Direct referrer source if available")
+	Attribute("banner_variant", String, "Reference to specific banner variant (e.g. variant ID)")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {
@@ -132,4 +150,16 @@ var Revenue = Type("Revenue", func() {
 	Attribute("currency", String, "ISO 4217 representation of currency")
 
 	Required("amount", "currency")
+})
+
+var Entity = Type("Entity", func() {
+	Attribute("entity_def", func() {
+		Attribute("id", String)
+		Attribute("name", String)
+		Attribute("data", HashOf(String, Any))
+
+		Required("id", "name", "data")
+	})
+	Attribute("system", System)
+	Required("entity_def", "system")
 })

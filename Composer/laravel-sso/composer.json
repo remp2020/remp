@@ -30,6 +30,13 @@
     "psr-4": {
     }
   },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Remp\\LaravelSso\\Providers\\SsoServiceProvider"
+      ]
+    }
+  },
   "config": {
     "preferred-install": "dist",
     "sort-packages": true,

@@ -4,13 +4,13 @@
             <div :class="allowCustomValue ? 'col-xs-10' : 'col-xs-12'">
                 <select v-if="typeof options === 'object' && options.length === undefined" :title="title || 'Please select'" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
                     <optgroup v-for="(group, label) in options" :label="label">
-                        <option v-for="option in group" :data-subtext="option.sublabel || ''" :value="textValue(option)" >
+                        <option v-for="option in group" :data-content="content(option)" :value="textValue(option)" >
                             {{ textLabel(option) }}
                         </option>
                     </optgroup>
                 </select>
                 <select v-else :title="title || 'Please select'" :name="name" :data-type="dataType" :multiple="multiple" class="selectpicker" :data-live-search="liveSearch" :disabled="disabled" :required="required">
-                    <option v-for="option in options" :data-subtext="option.sublabel || ''" :value="textValue(option)" >
+                    <option v-for="option in options" :data-content="content(option)" :value="textValue(option)" >
                         {{ textLabel(option) }}
                     </option>
                 </select>
@@ -27,25 +27,34 @@
 
 <script>
     let props = {
-        'name': String,
-        'options': [Array, Object],
-        'value': [Array, Boolean, Number, String],
-        'multiple': Boolean,
-        'title': String,
-        'liveSearch': {
-            'type': Boolean,
-            'default': true,
+        name: String,
+        options: [Array, Object],
+        value: [Array, Boolean, Number, String],
+        multiple: Boolean,
+        title: String,
+        dataType: String,
+        disabled: Boolean,
+        liveSearch: {
+            type: Boolean,
+            default: true,
         },
-        'dataType': String,
-        'disabled': Boolean,
-        'allowCustomValue': {
-            'type': Boolean,
-            'default': false,
+        allowCustomValue: {
+            type: Boolean,
+            default: false,
         },
-        'required': {
-            'type': Boolean,
-            'default': false,
-        }
+        required: {
+            type: Boolean,
+            default: false,
+        },
+        // define other than value/label objects parameters to be put into option tag
+        optionValue: {
+            type: String,
+            default: 'value'
+        },
+        optionText: {
+            type: String,
+            default: 'label'
+        },
     };
 
     export default {
@@ -63,8 +72,11 @@
             $select.selectpicker();
             $(this.$el).find('select').on('changed.bs.select', function () {
                 let val = $(this).val();
-                // noinspection JSPotentiallyInvalidUsageOfThis
-                let group = this.options[this.selectedIndex].parentNode.label;
+                let group = null;
+
+                if (this.options[this.selectedIndex]) {
+                    group = this.options[this.selectedIndex].parentNode.label;
+                }
                 vm.emitValueChanged(val, group);
             });
 
@@ -173,22 +185,28 @@
                 this.$emit('input', value);
             },
             textValue: function(option) {
-                if (option.value !== undefined) {
-                    return option.value;
+                if (option[this.optionValue] !== undefined) {
+                    return option[this.optionValue];
                 }
                 return option;
             },
             textLabel: function(option) {
-                if (option.label !== undefined) {
-                    return option.label;
+                if (option[this.optionText] !== undefined) {
+                    return option[this.optionText];
                 }
                 return this.textValue(option);
             },
+            sublabel: function(option) {
+                return option.sublabel || '';
+            },
+            content: function(option) {
+                return this.textLabel(option) + ' ' + this.sublabel(option);
+            },
             selectPickerVal: function() {
-                  if (this.value instanceof Array) {
-                      return this.value;
-                  }
-                  return String(this.value);
+                if (this.value instanceof Array) {
+                    return this.value;
+                }
+                return String(this.value);
             },
         }
     }

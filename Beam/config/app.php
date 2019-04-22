@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => 'Laravel',
+    'name' => env('APP_NAME', 'REMP Beam'),
 
     /*
     |--------------------------------------------------------------------------
@@ -109,23 +109,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Logging Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure the log settings for your application. Out of
-    | the box, Laravel uses the Monolog PHP logging library. This gives
-    | you a variety of powerful log handlers / formatters to utilize.
-    |
-    | Available Settings: "single", "daily", "syslog", "errorlog"
-    |
-    */
-
-    'log' => env('APP_LOG', 'single'),
-
-    'log_level' => env('APP_LOG_LEVEL', 'debug'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Autoloaded Service Providers
     |--------------------------------------------------------------------------
     |
@@ -164,29 +147,16 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Package Service Providers...
-         */
-        Laravel\Tinker\TinkerServiceProvider::class,
-
-        /*
          * Application Service Providers...
          */
-        Remp\LaravelSso\Providers\SsoServiceProvider::class,
-        Remp\Widgets\Providers\WidgetServiceProvider::class,
-        Remp\LaravelHelpers\Providers\HelperServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\RempJournalServiceProvider::class,
-        Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
-        rigor789\AirbrakeLaravel\AirbrakeServiceProvider::class,
-        Laracasts\Flash\FlashServiceProvider::class,
-
-        Collective\Html\HtmlServiceProvider::class,
-        Arrilot\Widgets\ServiceProvider::class,
-        Yajra\Datatables\DatatablesServiceProvider::class
+        App\Providers\RempMailerServiceProvider::class,
+        App\Providers\GoogleAnalyticsReportingServiceProvider::class,
     ],
 
     /*
@@ -235,11 +205,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
-        'Form' => Collective\Html\FormFacade::class,
-        'HTML' => Collective\Html\HtmlFacade::class,
-        'Widget' => Arrilot\Widgets\Facade::class,
-        'AsyncWidget' => Arrilot\Widgets\AsyncFacade::class,
     ],
 
 ];

@@ -46,11 +46,17 @@ class SubscribeHandler extends BaseHandler
         try {
             $data = Json::decode($params['raw'], Json::FORCE_ARRAY);
         } catch (JsonException $e) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Wrong format.']);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'input data was not valid JSON']);
         }
 
-        if (!isset($data['email']) || !isset($data['list_id'])) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing parameters.']);
+        if (!isset($data['email'])) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: email']);
+        }
+        if (!isset($data['user_id'])) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: user_id']);
+        }
+        if (!isset($data['list_id'])) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: list_id']);
         }
 
         if (isset($data['variant_id'])) {
@@ -67,15 +73,7 @@ class SubscribeHandler extends BaseHandler
             $variantId = $list->default_variant_id;
         }
 
-        $userSubscription = $this->userSubscriptionsRepository->findByEmailList($data['email'], $data['list_id']);
-        if ($userSubscription === false) {
-            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'Data not found.']);
-        }
-
-        $this->userSubscriptionsRepository->update($userSubscription, [
-            'subscribed' => true,
-            'mail_type_variant_id' => $variantId,
-        ]);
+        $this->userSubscriptionsRepository->subscribeUser($list, $data['user_id'], $data['email'], $variantId);
 
         return new JsonApiResponse(200, ['status' => 'ok']);
     }

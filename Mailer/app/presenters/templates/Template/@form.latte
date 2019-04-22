@@ -1,3 +1,12 @@
+<style>
+    .field_error {
+        display: block;
+        padding: 2px 5px;
+        color: white;
+        background-color: #f44336;
+    }
+</style>
+
 {form templateForm}
     {include jsCallback, form => $form}
     {input id}
@@ -15,6 +24,9 @@
                     {input code, class => 'form-control fg-input'}
                     {label code, class => 'fg-label' /}
                 </div>
+                {if $form['code']->hasErrors()}
+                    <span class="field_error">{$form['code']->error}</span>
+                {/if}
             </div>
 
             <div class="form-group fg-float m-b-30">
@@ -89,6 +101,8 @@
             );
             cm.on('change', function() {
                 vm.htmlContent = cm.getValue();
+
+                $('body').trigger('preview:change');
             });
             $('#'+{$form[mail_layout_id]->htmlId}).on('change', function() {
                 vm.htmlLayout = layouts[$(this).val()]
@@ -110,7 +124,7 @@
          };
     </script>
     <script n:if="$form->getErrors()" type="application/javascript">
-        $(document).ready(function() {
+        $(function() {
             var index = 0;
             {foreach $form->getErrors() as $error}
             index += 250;

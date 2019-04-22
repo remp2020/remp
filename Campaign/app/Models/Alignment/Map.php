@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 
 class Map
 {
+    const ALIGNMENTS_MAP_REDIS_KEY = 'alignments_map';
+
     /** @var Alignment[] */
     protected $alignments = [];
 

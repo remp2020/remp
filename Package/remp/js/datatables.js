@@ -113,6 +113,7 @@ $.fn.dataTables = {
         if (!value) {
             value = "";
         }
+        value = encodeURIComponent(value);
         let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
         let separator = url.indexOf('?') !== -1 ? "&" : "?";
         if (url.match(re)) {
@@ -146,12 +147,18 @@ $.fn.dataTables = {
                 if (data === null) {
                     return "";
                 }
-                return "<span title='" + moment.utc(data).format('LLL') + "'>" + moment.utc(data).locale('en').fromNow() + "</span>";
+                return "<span title='" + moment.utc(data).local().format('LLL') + "'>" + moment.utc(data).locale('en').fromNow() + "</span>";
             }
         },
         number: function () {
             return function(data) {
-                return data.toLocaleString();
+                return Number(data).toLocaleString();
+            }
+        },
+        percentage: function () {
+            return function(data) {
+                // http://www.jacklmoore.com/notes/rounding-in-javascript/
+                return Number(Math.round(data+'e2')+'e-2').toFixed(2) + "%";
             }
         },
         boolean: function () {
@@ -192,11 +199,13 @@ $.fn.dataTables = {
             return function(data) {
                 var result = '';
                 for (var i=0; i<data.length; i++) {
+                    let text;
                     if (column === null) {
-                        result += data[i] + '<br/>';
+                        text = $("<textarea/>").html(data[i]).text();
                     } else {
-                        result += data[i][column] + '<br/>';
+                        text = $("<textarea/>").html(data[i][column][i]).text();
                     }
+                    result += text + '<br/>';
                 }
                 return result;
             }
@@ -217,20 +226,21 @@ $.fn.dataTables = {
             return function(data, type, row) {
                 var actions = '<span class="actions">';
                 $.each(actionSettings, function (key, action) {
+                    var onclick = action['onclick'] || '';
                     if (row.actions[action['name']] === null) {
-                        actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" disabled="disabled" href=""><i class="zmdi ' + action['class'] + '"></i></a>\n';
+                        actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" onclick="' + onclick + '" disabled="disabled" title="' + action['title'] + '" href="javascript:void(0)"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                         return;
                     }
                     if (row.action_methods && row.action_methods[action['name']]) {
                         var tokenVal = $('meta[name="csrf-token"]').attr('content');
-                        actions += '<form method="POST" action="' + row.actions[action['name']] + '">';
+                        actions += '<form method="POST" title="' + action['title'] + '" action="' + row.actions[action['name']] + '">';
                         actions += '<button type="submit" class="btn btn-sm palette-Cyan bg waves-effect"><i class="zmdi ' + action['class'] + '"></i></button>\n';
                         actions += '<input type="hidden" name="_token" value="' + tokenVal + '" />\n';
                         actions += '<input type="hidden" name="_method" value="' + row.action_methods[action['name']] + '" />\n';
                         actions += '</form>';
                         return;
                     }
-                    actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" href="' + row.actions[action['name']] + '"><i class="zmdi ' + action['class'] + '"></i></a>\n';
+                    actions += '<a class="btn btn-sm palette-Cyan bg waves-effect" onclick="' + onclick + '" title="' + action['title'] + '" href="' + row.actions[action['name']] + '"><i class="zmdi ' + action['class'] + '"></i></a>\n';
                 });
                 actions += '</span>';
                 return actions;
@@ -243,7 +253,7 @@ $.fn.dataTables = {
                     return '0s';
                 }
                 let d = moment.duration(duration, 'seconds');
-                let durationString = ""
+                let durationString = "";
                 if (d.asHours() >= 1) {
                     durationString += Math.floor(d.asHours()) + "h&nbsp;"
                 }
@@ -258,6 +268,9 @@ $.fn.dataTables = {
         },
         numberStat: function() {
             return function (data) {
+                if (!data) {
+                    return "";
+                }
                 if (data.length === 1) {
                     return data[0];
                 }
@@ -287,6 +300,9 @@ $.fn.dataTables = {
         },
         durationStat: function() {
             return function (data) {
+                if (!data) {
+                    return "";
+                }
                 if (data.length === 1) {
                     return data[0];
                 }

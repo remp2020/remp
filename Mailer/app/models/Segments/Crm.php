@@ -2,18 +2,16 @@
 namespace Remp\MailerModule\Segment;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Nette\Utils\Json;
-use Nette\Utils\JsonException;
 
 class Crm implements ISegment
 {
     const PROVIDER_ALIAS = 'crm-segment';
 
-    const ENDPOINT_LIST = 'user-segments/list';
+    const ENDPOINT_LIST = 'api/v1/user-segments/list';
 
-    const ENDPOINT_USERS = 'user-segments/users';
+    const ENDPOINT_USERS = 'api/v1/user-segments/users';
 
     private $baseUrl;
 
@@ -25,9 +23,9 @@ class Crm implements ISegment
         $this->token = $token;
     }
 
-    public function provider()
+    public function provider(): string
     {
-        return [static::PROVIDER_ALIAS => $this];
+        return static::PROVIDER_ALIAS;
     }
 
     public function list()
@@ -54,6 +52,7 @@ class Crm implements ISegment
         foreach ($response['users'] as $user) {
             $userIds[] = $user['id'];
         }
+        $response = null;
         return $userIds;
     }
 

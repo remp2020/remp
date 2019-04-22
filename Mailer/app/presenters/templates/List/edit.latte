@@ -1,0 +1,17 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Newsletter lists</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">Edit newsletter list <small></small></h2>
+    </div>
+    <div class="card-body card-padding">
+        {snippetArea wrapper}
+            {include @form.latte}
+        {/snippetArea}
+    </div>
+</div>

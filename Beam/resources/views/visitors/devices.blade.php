@@ -19,24 +19,39 @@
 
                 {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'client_name' => ['header' => 'client name', 'orderable' => false],
-                        'client_type' => ['header' => 'client type', 'orderable' => false],
-                        'visits_count' => ['header' => 'visits count', 'searchable' => false],
+                        'client_name' => [
+                            'header' => 'client name',
+                            'orderable' => false,
+                            'priority' => 1,
+                        ],
+                        'client_type' => [
+                            'header' => 'client type',
+                            'orderable' => false,
+                            'priority' => 1,
+                        ],
+                        'visits_count' => [
+                            'header' => 'visits count',
+                            'render' => 'number',
+                            'searchable' => false,
+                            'priority' => 1,
+                            'className' => 'text-right',
+                        ],
                     ],
                     'dataSource' => route('visitors.dtBrowsers'),
                     'order' => [2, 'desc'],
                     'requestParams' => [
-                        'visited_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"visited_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                        'visited_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"visited_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
+                        'visited_from' => '$(\'[name="visited_from"]\').val()',
+                        'visited_to' => '$(\'[name="visited_to"]\').val()',
+                        'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone',
                         'subscriber' => '$("[name=\"subscriber\"]:checked").val()',
                     ],
                     'refreshTriggers' => [
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_from"]'
                         ],
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_to"]',
                         ],
                         [
@@ -57,25 +72,47 @@
 
                 {!! Widget::run('DataTable', [
                     'colSettings' => [
-                        'brand' => ['header' => 'brand', 'orderable' => false, 'filter' => $brands],
-                        'model' => ['header' => 'model', 'orderable' => false, 'filter' => $models],
-                        'os_name' => ['header' => 'OS', 'orderable' => false, 'filter' => $osNames],
-                        'visits_count' => ['header' => 'visits count', 'searchable' => false],
+                        'brand' => [
+                            'header' => 'brand',
+                            'orderable' => false,
+                            'filter' => $brands,
+                            'priority' => 1
+                        ],
+                        'model' => [
+                            'header' => 'model',
+                            'orderable' => false,
+                            'filter' => $models,
+                            'priority' => 1
+                        ],
+                        'os_name' => [
+                            'header' => 'OS',
+                            'orderable' => false,
+                            'filter' => $osNames,
+                            'priority' => 1
+                        ],
+                        'visits_count' => [
+                            'header' => 'visits count',
+                            'searchable' => false,
+                            'priority' => 1,
+                            'render' => 'number',
+                            'className' => 'text-right',
+                        ],
                     ],
                     'dataSource' => route('visitors.dtDevices'),
                     'order' => [3, 'desc'],
                     'requestParams' => [
-                        'visited_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"visited_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                        'visited_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"visited_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
+                        'visited_from' => '$(\'[name="visited_from"]\').val()',
+                        'visited_to' => '$(\'[name="visited_to"]\').val()',
+                        'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone',
                         'subscriber' => '$("[name=\"subscriber\"]:checked").val()',
                     ],
                     'refreshTriggers' => [
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_from"]'
                         ],
                         [
-                            'event' => 'dp.change',
+                            'event' => 'change',
                             'selector' => '[name="visited_to"]',
                         ],
                         [

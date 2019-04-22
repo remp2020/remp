@@ -3,15 +3,20 @@
 namespace Remp\MailerModule;
 
 use Nette\Database\IRow;
+use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Json;
 use Remp\MailerModule\Auth\AutoLogin;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\Mailer\Mailer;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Sender\MailerBatchException;
 use Remp\MailerModule\Sender\MailerFactory;
+use Remp\MailerModule\Sender\MailerNotExistsException;
+use Twig_Environment;
+use Twig_Loader_Array;
 
 class Sender
 {
@@ -60,11 +65,12 @@ class Sender
         $this->logsRepository = $logsRepository;
     }
 
-    public function addRecipient($email, $name = null)
+    public function addRecipient(string $email, string $name = null, array $params = [])
     {
         $this->recipients[] = [
             'email' => $email,
             'name' => $name,
+            'params' => $params
         ];
 
         return $this;
@@ -98,7 +104,7 @@ class Sender
         return $this;
     }
 
-    public function setParams($params)
+    public function setParams(array $params)
     {
         $this->params = $params;
 
@@ -112,7 +118,7 @@ class Sender
         return $this;
     }
 
-    public function send($checkEmailSubscribed = true)
+    public function send($checkEmailSubscribed = true): int
     {
         if (count($this->recipients) > 1) {
             throw new MailerBatchException(sprintf("attempted to send batch via send() method: please use single recipient: %s", Json::encode($this->recipients)));
@@ -120,11 +126,12 @@ class Sender
         $recipient = reset($this->recipients);
 
         if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($recipient['email'], $this->template->mail_type->id)) {
-            return false;
+            return 0;
         }
 
         $tokens = $this->autoLogin->createTokens([$recipient['email']]);
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
+        $this->params = array_merge($this->params, $recipient['params'] ?? []);
 
         if (getenv('UNSUBSCRIBE_URL')) {
             $this->params['unsubscribe'] = str_replace(getenv('UNSUBSCRIBE_URL'), '%type%', $this->template->mail_type->code) . $this->params['autologin'];
@@ -133,12 +140,12 @@ class Sender
             $this->params['settings'] = getenv('SETTINGS_URL') . $this->params['autologin'];
         }
 
-        $mailer = $this->mailerFactory->getMailer();
+        $mailer = $this->getMailer();
 
         $message = new Message();
         $message->addTo($recipient['email'], $recipient['name']);
         $message->setFrom($this->template->from);
-        $message->setSubject($this->template->subject);
+        $message->setSubject($this->generateSubject($this->template->subject, $this->params));
 
         $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
         if ($this->template->mail_body_text) {
@@ -167,12 +174,12 @@ class Sender
         $mailer->send($message);
         $this->reset();
 
-        return true;
+        return 1;
     }
 
-    public function sendBatch()
+    public function sendBatch(): int
     {
-        $mailer = $this->mailerFactory->getMailer();
+        $mailer = $this->getMailer();
         if (!$mailer->supportsBatch()) {
             throw new MailerBatchException(
                 sprintf('attempted to send batch via %s mailer: not supported', $mailer->getAlias())
@@ -183,7 +190,6 @@ class Sender
 
         $message = new Message();
         $message->setFrom($this->template->from);
-        $message->setSubject($this->template->subject);
 
         $subscribedEmails = [];
         foreach ($this->recipients as $recipient) {
@@ -193,6 +199,7 @@ class Sender
 
         $autologinTokens = $this->autoLogin->createTokens($subscribedEmails);
 
+        $transformedParams = [];
         foreach ($this->recipients as $recipient) {
             if (!isset($subscribedEmails[$recipient['email']]) || !$subscribedEmails[$recipient['email']]) {
                 continue;
@@ -204,15 +211,17 @@ class Sender
                 // we do nothing; it's invalid email and we want to skip it ASAP
             }
 
-            $p = $this->params;
+            $p = array_merge($this->params, $recipient['params'] ?? []);
             $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
             $p['autologin'] = "?token={$autologinTokens[$recipient['email']]}";
 
-            list($transformedParams, $p) = $mailer->transformTemplateParams($p);
+            [$transformedParams, $p] = $mailer->transformTemplateParams($p);
             $templateParams[$recipient['email']] = $p;
         }
 
         $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
+
+        $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
 
         if ($this->template->mail_body_text) {
             $message->setBody($generator->getTextBody($transformedParams));
@@ -245,7 +254,7 @@ class Sender
         $mailer->send($message);
         $this->reset();
 
-        return true;
+        return count($subscribedEmails);
     }
 
     private function setMessageAttachments(Message $message): ?int
@@ -271,9 +280,14 @@ class Sender
         $message->setHeader('X-Mailer-Template-Params', Json::encode($templateParams));
     }
 
-    public function getMailerConfig($alias = null)
+    /**
+     * @param null|string $alias - If $alias is null, default mailer is returned.
+     * @return IMailer|Mailer
+     * @throws MailerNotExistsException
+     */
+    public function getMailer($alias = null)
     {
-        return $this->mailerFactory->getMailer($alias)->getConfig();
+        return $this->mailerFactory->getMailer($alias);
     }
 
     public function reset()
@@ -291,6 +305,15 @@ class Sender
 
     public function supportsBatch()
     {
-        return $this->mailerFactory->getMailer()->supportsBatch();
+        return $this->getMailer()->supportsBatch();
+    }
+
+    private function generateSubject($subjectTemplate, $params): string
+    {
+        $loader = new Twig_Loader_Array([
+            'my_template' => $subjectTemplate,
+        ]);
+        $twig = new Twig_Environment($loader);
+        return $twig->render('my_template', $params);
     }
 }

@@ -18,10 +18,6 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
     return [$item->code => $item->name];
 });
 
-$availableCountries = $availableCountries->map(function(\App\Country $country) {
-   return ['value' => $country->iso_code, 'label' => $country->name];
-});
-
 @endphp
 
 <div id="campaign-form">
@@ -36,8 +32,9 @@ $availableCountries = $availableCountries->map(function(\App\Country $country) {
         "action": '{{ $action }}',
         "segments": {!! isset($selectedSegments) ? $selectedSegments->toJson(JSON_UNESCAPED_UNICODE) : $campaign->segments->toJson(JSON_UNESCAPED_UNICODE) !!},
         "bannerId": {!! @json($bannerId) !!},
-        "altBannerId": {!! @json($altBannerId) !!},
+        "variants": {!! @json($variants) !!},
         "signedIn": {!! @json($campaign->signed_in) !!},
+        "usingAdblock": {!! @json($campaign->using_adblock) !!},
         "oncePerSession": {!! @json($campaign->once_per_session) !!},
         "active": {!! @json($campaign->active) !!},
         "pageviewRules": {!! @json($campaign->pageview_rules) !!} || [],
@@ -46,6 +43,11 @@ $availableCountries = $availableCountries->map(function(\App\Country $country) {
         "allDevices": {!! @json($campaign->getAllDevices()) !!},
         "selectedDevices": {!! @json($campaign->devices) !!} || [],
         "validateUrl": {!! @json(route('campaigns.validateForm')) !!},
+        "urlFilterTypes": {!! @json($campaign->getAllUrlFilterTypes()) !!},
+        "urlFilter": {!! @json($campaign->url_filter) !!},
+        "urlPatterns": {!! @json($campaign->url_patterns) !!},
+        "refererFilter": {!! @json($campaign->referer_filter) !!},
+        "refererPatterns": {!! @json($campaign->referer_patterns) !!},
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},

@@ -10,8 +10,20 @@
         background-position: center;
     }
 
+    &.overlay-rectangle {
+        background-image: url('../img/overlay_rectangle.png');
+        background-size: contain;
+        background-position: center;
+    }
+
     &.bar {
         background-image: url('../img/bar.png');
+        background-size: contain;
+        background-position: center;
+    }
+
+    &.collapsible-bar {
+        background-image: url('../img/collapsible_bar.png');
         background-size: contain;
         background-position: center;
     }
@@ -42,4 +54,17 @@
 #modal-template-select .card {
     max-height: 274px;
     height: 274px;
+}
+
+a.notifyLink {
+    color: #ccc;
+}
+
+a.notifyLink:hover {
+    color: #fff;
+}
+
+.app-info {
+    background: $primaryColor;
+    color: white;
 }

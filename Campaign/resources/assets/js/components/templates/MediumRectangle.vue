@@ -44,7 +44,7 @@
                             <div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label for="color_scheme" class="fg-label">Dimensions</label>
+                                        <label for="dimensions" class="fg-label">Dimensions</label>
                                     </div>
                                     <div class="col-md-12">
                                         <v-select v-model="dimensions"
@@ -98,7 +98,7 @@
 </template>
 
 <script type="text/javascript">
-    let vSelect = require("remp/js/components/vSelect.vue");
+    import vSelect from "remp/js/components/vSelect";
 
     let props = [
         "_headerText",

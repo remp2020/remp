@@ -23,23 +23,32 @@
                     'colSettings' => [
                         'campaign' => [
                             'header' => 'Campaign',
+                            'priority' => 1,
                         ],
-                        'banners' => [
-                            'header' => 'Banners',
+                        'variants' => [
+                            'header' => 'Variants',
+                            'orderable' => false,
+                            'priority' => 3,
+                            'render' => 'array',
+                        ],
+                        'status' => [
+                            'header' => 'Status',
+                            'priority' => 1,
+                            'render' => 'badge',
                         ],
                         'start_time' => [
                             'header' => 'Scheduled start date',
                             'render' => 'date',
+                            'priority' => 2,
                         ],
                         'end_time' => [
                             'header' => 'Scheduled end date',
                             'render' => 'date',
-                        ],
-                        'status' => [
-                            'header' => 'Status',
+                            'priority' => 1,
                         ],
                         'updated_at' => [
                             'header' => 'Updated at',
+                            'priority' => 3,
                         ],
                     ],
                     'dataSource' => route('schedule.json'),
@@ -50,6 +59,7 @@
                         ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
                         ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
                     ],
+                    'order' => [5, 'desc'],
                 ]) !!}
                 </div>
             </div>

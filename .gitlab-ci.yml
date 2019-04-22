@@ -1,13 +1,12 @@
 stages:
   - test
-  - build
   - deploy
 
 cache:
   paths:
     - bin/
 
-test:syntax:7.1:
+syntax:7.1:
   stage: test
   image: php:7.1-cli
   tags:
@@ -15,7 +14,7 @@ test:syntax:7.1:
   script:
     - make syntax
 
-test:sniffer:
+sniffer:
   stage: test
   image: php:7.1-cli
   tags:
@@ -23,18 +22,37 @@ test:sniffer:
   script:
     - make sniff
 
-deploy:mailer:admin:
+mailer/🇸🇰:
   stage: deploy
   script:
-    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
-    - cd Mailer/
-    - ln -s ~/.env.mailer .env
-    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run production ; rm -fr ./node_modules
-    - vendor/bin/dep deploy mailer --revision=$CI_COMMIT_SHA -vvv
-  environment:
-    name: production/remp2020/mailer
-    url: https://mailer.remp2020.com
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=dennikn/mailer"
+    -F "variables[URL]=https://mailer.remp2020.com"
+    -F "variables[APP]=mailer"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+  only:
+    - master
+
+campaign/🇸🇰:
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=dennikn/campaign"
+    -F "variables[URL]=https://campaign.remp2020.com"
+    -F "variables[APP]=campaign"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
     - remp2020
@@ -43,18 +61,18 @@ deploy:mailer:admin:
     - master
   dependencies: []
 
-deploy:campaign:admin:
+beam/🇸🇰:
   stage: deploy
   script:
-    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
-    - cd Campaign/
-    - ln -s ~/.env.campaign .env
-    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run all-production ; rm -fr ./node_modules
-    - vendor/bin/dep deploy campaign --revision=$CI_COMMIT_SHA -vvv
-  environment:
-    name: production/remp2020/campaign
-    url: https://campaign.remp2020.com
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=dennikn/beam"
+    -F "variables[URL]=https://beam.remp2020.com"
+    -F "variables[APP]=beam"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
     - remp2020
@@ -63,18 +81,18 @@ deploy:campaign:admin:
     - master
   dependencies: []
 
-deploy:beam:admin:
+sso/🇸🇰:
   stage: deploy
   script:
-    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
-    - cd Beam/
-    - ln -s ~/.env.beam .env
-    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run all-production ; rm -fr ./node_modules
-    - vendor/bin/dep deploy beam --revision=$CI_COMMIT_SHA -vvv
-  environment:
-    name: production/remp2020/beam
-    url: https://beam.remp2020.com
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=dennikn/sso"
+    -F "variables[URL]=https://sso.remp2020.com"
+    -F "variables[APP]=sso"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
     - remp2020
@@ -83,22 +101,82 @@ deploy:beam:admin:
     - master
   dependencies: []
 
-deploy:sso:admin:
+"mailer/🇨🇿":
   stage: deploy
   script:
-    - if [ ! -f bin/composer ]; then mkdir bin && curl -sS https://getcomposer.org/installer -o composer-setup.php && php composer-setup.php --install-dir=bin --filename=composer ; fi
-    - cd Sso/
-    - ln -s ~/.env.sso .env
-    - ../bin/composer install --optimize-autoloader --verbose --prefer-dist --no-progress --no-interaction --no-suggest --no-dev
-    - yarn install && yarn run production ; rm -fr ./node_modules
-    - vendor/bin/dep deploy sso --revision=$CI_COMMIT_SHA -vvv
-  environment:
-    name: production/remp2020/sso
-    url: https://sso.remp2020.com
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=denikncz/mailer"
+      -F "variables[URL]=https://mailer.denikn.cz"
+      -F "variables[APP]=mailer"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
   when: manual
   tags:
     - remp2020
     - deploy
   only:
     - master
+  dependencies: []
+
+"campaign/🇨🇿":
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=denikncz/campaign"
+    -F "variables[URL]=https://campaign.denikn.cz"
+    -F "variables[APP]=campaign"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
+
+"beam/🇨🇿":
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=denikncz/beam"
+    -F "variables[URL]=https://beam.denikn.cz"
+    -F "variables[APP]=beam"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
+  dependencies: []
+
+"sso/🇨🇿":
+  stage: deploy
+  script:
+  - >
+    curl -X POST
+    -F "token=$CI_JOB_TOKEN"
+    -F "ref=master"
+    -F "variables[REF]=$CI_COMMIT_SHA"
+    -F "variables[STAGE]=denikncz/sso"
+    -F "variables[URL]=https://sso.denikn.cz"
+    -F "variables[APP]=sso"
+    https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+  - remp2020
+  - deploy
+  only:
+  - master
   dependencies: []

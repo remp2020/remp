@@ -3,18 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Banner;
-use App\HtmlTemplate;
 use App\Http\Requests\BannerRequest;
 use App\Http\Resources\BannerResource;
-use App\MediumRectangleTemplate;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
 use HTML;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
 
@@ -135,6 +130,7 @@ class BannerController extends Controller
      *
      * @param BannerRequest|Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function store(BannerRequest $request)
     {
@@ -161,8 +157,9 @@ class BannerController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Banner  $banner
+     * @param  \App\Banner $banner
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function show(Banner $banner)
     {
@@ -180,8 +177,9 @@ class BannerController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Banner  $banner
+     * @param  \App\Banner $banner
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function edit(Banner $banner)
     {
@@ -202,6 +200,7 @@ class BannerController extends Controller
      * @param BannerRequest|Request $request
      * @param  \App\Banner $banner
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function update(BannerRequest $request, Banner $banner)
     {

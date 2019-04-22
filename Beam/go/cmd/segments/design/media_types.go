@@ -21,10 +21,12 @@ var Count = MediaType("application/vnd.count+json", func() {
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("count", Integer)
+		Attribute("time_histogram", CollectionOf(TimeHistogram))
 	})
 	View("default", func() {
 		Attribute("tags")
 		Attribute("count")
+		Attribute("time_histogram")
 	})
 	Required("tags", "count")
 })
@@ -34,12 +36,29 @@ var Sum = MediaType("application/vnd.sum+json", func() {
 	Attributes(func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("sum", Number)
+		Attribute("time_histogram", CollectionOf(TimeHistogram))
 	})
 	View("default", func() {
 		Attribute("tags")
 		Attribute("sum")
+		Attribute("time_histogram")
 	})
 	Required("tags", "sum")
+})
+
+var Avg = MediaType("application/vnd.avg+json", func() {
+	Description("Avg")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("avg", Number)
+		Attribute("time_histogram", CollectionOf(TimeHistogram))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("avg")
+		Attribute("time_histogram")
+	})
+	Required("tags", "avg")
 })
 
 var Pageviews = MediaType("application/vnd.pageviews+json", func() {
@@ -55,19 +74,106 @@ var Pageviews = MediaType("application/vnd.pageviews+json", func() {
 	Required("tags", "pageviews")
 })
 
-var Segment = MediaType("application/vnd.segment+json", func() {
-	Description("Segment check")
+var Events = MediaType("application/vnd.events+json", func() {
+	Description("Events")
 	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("events", CollectionOf(Event))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("events")
+	})
+	Required("tags", "events")
+})
+
+var Commerces = MediaType("application/vnd.commerces+json", func() {
+	Description("Commerce events")
+	Attributes(func() {
+		Attribute("tags", HashOf(String, String))
+		Attribute("commerces", CollectionOf(Commerce))
+	})
+	View("default", func() {
+		Attribute("tags")
+		Attribute("commerces")
+	})
+	Required("tags", "commerces")
+})
+
+var Segment = MediaType("application/vnd.segment+json", func() {
+	Description("Segment")
+	Attributes(func() {
+		Attribute("id", Integer, "ID of segment")
 		Attribute("code", String, "Code-friendly identificator of segment")
 		Attribute("name", String, "User-friendly name of segment")
 		Attribute("group", SegmentGroup)
+		Attribute("criteria", Any, "Criteria used to build segment")
+		Attribute("url", String, "URL to segment")
+
+		Attribute("table_name", String)
+		Attribute("fields", ArrayOf(String))
+		Attribute("group_id", Integer)
 	})
 	View("default", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("group")
+		Attribute("criteria")
+	})
+	View("tiny", func() {
+		Attribute("id")
 		Attribute("code")
 		Attribute("name")
 		Attribute("group")
 	})
-	Required("code", "name", "group")
+	View("extended", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("group")
+		Attribute("url")
+	})
+	View("segmenter", func() {
+		Attribute("id")
+		Attribute("code")
+		Attribute("name")
+		Attribute("table_name")
+		Attribute("group")
+
+		Attribute("criteria")
+		Attribute("fields")
+		Attribute("group_id")
+	})
+	Required("id", "code", "name", "group")
+})
+
+var RelatedSegments = MediaType("application/vnd.segments.related+json", func() {
+	Description("Related segments")
+	Attributes(func() {
+		Attribute("segments", CollectionOf(Segment))
+	})
+	View("default", func() {
+		Attribute("segments", func() {
+			View("extended")
+		})
+	})
+	Required("segments")
+})
+
+var SegmentersSegment = MediaType("application/vnd.segmenters.segment.+json", func() {
+	Description("Segment returned for segmenter")
+	Attributes(func() {
+		Attribute("status", String)
+		Attribute("segment", Segment)
+	})
+	View("default", func() {
+		Attribute("status")
+		Attribute("segment", func() {
+			View("segmenter")
+		})
+	})
+	Required("status", "segment")
 })
 
 var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {
@@ -104,26 +210,106 @@ var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
 	Required("id", "name", "sorting")
 })
 
+var SegmentBlueprint = MediaType("application/vnd.segment.blueprint+json", func() {
+	Description("Segment blueprint")
+	Attributes(func() {
+		Attribute("blueprint", CollectionOf(SegmentBlueprintTable))
+	})
+	View("default", func() {
+		Attribute("blueprint")
+	})
+	Required("blueprint")
+})
+
+var SegmentBlueprintTable = MediaType("application/vnd.segment.blueprint.table+json", func() {
+	Description("Blueprint of one table available for segment")
+	Attributes(func() {
+		Attribute("table", String, "Table name")
+		Attribute("fields", ArrayOf(String), "Fields of table")
+		Attribute("criteria", CollectionOf(SegmentBlueprintTableCriterion), "Processing criteria for fields of table")
+	})
+	View("default", func() {
+		Attribute("table")
+		Attribute("fields")
+		Attribute("criteria")
+	})
+	Required("table", "fields", "criteria")
+})
+
+var SegmentBlueprintTableCriterion = MediaType("application/vnd.segment.blueprint.table.criterion+json", func() {
+	Description("Criterion for one field of table available for segment")
+	Attributes(func() {
+		Attribute("key", String, "Field of table to which is this criterion related")
+		Attribute("label", String, "Human readable name of field")
+		Attribute("params", Any, "Criteria of field parameters")
+		Attribute("fields", ArrayOf(String), "Field parameters")
+	})
+	View("default", func() {
+		Attribute("key")
+		Attribute("label")
+		Attribute("params")
+		Attribute("fields")
+	})
+	Required("key", "label", "params")
+})
+
+var SegmentCount = MediaType("application/vnd.segment.count+json", func() {
+	Description("Segment count")
+	Attributes(func() {
+		Attribute("count", Integer, "Number of users in segment based on provided criteria")
+		Attribute("status", String, "Status of count. If everything is fine, returns `ok`.")
+	})
+	View("default", func() {
+		Attribute("count")
+		Attribute("status")
+	})
+	Required("count", "status")
+})
+
 var Event = MediaType("application/vnd.event+json", func() {
 	Description("Generic event")
 	Attributes(func() {
+		Attribute("id", String)
 		Attribute("category", String)
 		Attribute("action", String)
 		Attribute("system", System)
 		Attribute("user", User)
+		Attribute("utm_source", String)
+		Attribute("utm_campaign", String)
+		Attribute("utm_medium", String)
+		Attribute("utm_content", String)
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("category")
 		Attribute("action")
 		Attribute("system")
 		Attribute("user")
+		Attribute("utm_source")
+		Attribute("utm_campaign")
+		Attribute("utm_medium")
+		Attribute("utm_content")
 	})
-	Required("system", "category", "action")
+	Required("id", "system", "category", "action")
+})
+
+var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
+	Description("Time histogram data")
+	Attributes(func() {
+		Attribute("time", DateTime)
+		Attribute("value", Number)
+	})
+	View("default", func() {
+		Attribute("time")
+		Attribute("value")
+	})
+	Required("time", "value")
 })
 
 var Commerce = MediaType("application/vnd.commerce+json", func() {
 	Description("Commerce event")
 	Attributes(func() {
+		Attribute("id", String)
 		Attribute("step", String, func() {
 			Enum("checkout", "payment", "purchase", "refund")
 		})
@@ -132,32 +318,38 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("purchase", CommercePayment)
 		Attribute("refund", CommercePayment)
 
+		Attribute("source", Source, "UTM source metadata")
 		Attribute("article", Article)
 		Attribute("system", System)
 		Attribute("user", User)
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("step")
+
 		Attribute("checkout")
 		Attribute("payment")
 		Attribute("purchase")
 		Attribute("refund")
 
+		Attribute("source")
 		Attribute("article")
 		Attribute("system")
 		Attribute("user")
 	})
-	Required("step", "system", "user")
+	Required("id", "step", "system", "user")
 })
 
 var Pageview = MediaType("application/vnd.pageview+json", func() {
 	Description("Pageview event")
 	Attributes(func() {
+		Attribute("id", String)
 		Attribute("system", System)
 		Attribute("user", User)
 		Attribute("article", Article)
 	})
 	View("default", func() {
+		Attribute("id")
 		Attribute("system")
 		Attribute("user")
 		Attribute("article")
@@ -177,10 +369,11 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("ip_address", String, "IP address of client", func() {
 			Format("ip")
 		})
-		Attribute("source", Source, "UTM and social source metadata")
+		Attribute("source", Source, "UTM source metadata")
 		Attribute("remp_session_id", String, "ID of reader's session")
 		Attribute("remp_pageview_id", String, "ID of pageview")
 		Attribute("referer", String, "Value of HTTP referer header (if present)")
+		Attribute("timespent", Integer, "Number of seconds spent during pageview (if recorded)")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -193,6 +386,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("remp_session_id")
 		Attribute("remp_pageview_id")
 		Attribute("referer")
+		Attribute("timespent")
 	})
 	Required("remp_pageview_id")
 })
@@ -235,14 +429,12 @@ var Source = MediaType("application/vnd.source+json", func() {
 		Attribute("utm_medium", String, "Medium through which the came (e.g. overlay, inline)")
 		Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 		Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
-		Attribute("social", String, "Social source if available")
 	})
 	View("default", func() {
 		Attribute("utm_source")
 		Attribute("utm_medium")
 		Attribute("utm_campaign")
 		Attribute("utm_content")
-		Attribute("social")
 	})
 })
 
@@ -257,6 +449,7 @@ var CommerceCheckout = MediaType("application/vnd.commerce.checkout+json", func(
 })
 
 var CommercePayment = MediaType("application/vnd.commerce.payment+json", func() {
+	// var CommerceDetails = MediaType("application/vnd.commerce_details+json", func() {
 	Attributes(func() {
 		Attribute("funnel_id", String, "ID of funnel user is being routed trough")
 		Attribute("transaction_id", String, "Public ID of transaction (variable symbol)")
@@ -296,4 +489,16 @@ var Flags = MediaType("application/vnd.flags+json", func() {
 		Attribute("events")
 	})
 	Required("pageviews", "commerce", "events")
+})
+
+var SegmentGroupsFallback = MediaType("application/vnd.segment.groups.fallback", func() {
+	Attributes(func() {
+		Attribute("status", String, "OK flag to check before reading the data")
+		Attribute("groups", CollectionOf(SegmentGroup))
+	})
+	View("default", func() {
+		Attribute("status")
+		Attribute("groups")
+	})
+	Required("status", "groups")
 })

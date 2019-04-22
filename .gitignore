@@ -1,8 +1,10 @@
 .idea
 .vscode
+.history
 .env
 *.sublime-project
 *.sublime-workspace
+.metadata
 
 docker-compose.override.yml
 .yarn-error.log

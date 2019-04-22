@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette;
 use Nette\Application\Responses;
+use Remp\MailerModule\Components\IMissingConfigurationFactory;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -34,5 +35,11 @@ class ErrorPresenter implements Nette\Application\IPresenter
         return new Responses\CallbackResponse(function () {
             require __DIR__ . '/templates/Error/500.phtml';
         });
+    }
+
+    public function createComponentMissingConfiguration(
+        IMissingConfigurationFactory $IMissingConfigurationFactory
+    ) {
+        return $IMissingConfigurationFactory->create();
     }
 }

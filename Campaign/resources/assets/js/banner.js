@@ -25,7 +25,8 @@ window.remplib = window.remplib || {};
                 displayDelay: model['display_delay'] || 0,
                 closeTimeout: model['close_timeout'] || null,
                 // inline
-                targetSelector: model['target_selector'] || null
+                targetSelector: model['target_selector'] || null,
+                variant: model['variant_uuid']
             };
 
             if (banner.template === 'medium_rectangle') {
@@ -42,6 +43,21 @@ window.remplib = window.remplib || {};
                 }
             }
 
+            if (banner.template === 'overlay_rectangle') {
+                banner.overlayRectangleTemplate = {
+                    headerText: model['overlay_rectangle_template']['header_text'] || "",
+                    mainText: model['overlay_rectangle_template']['main_text'] || "",
+                    buttonText: model['overlay_rectangle_template']['button_text'] || "",
+                    width: model['overlay_rectangle_template']['width'] || null,
+                    height: model['overlay_rectangle_template']['height'] || null,
+                    backgroundColor: model['overlay_rectangle_template']['background_color'] || null,
+                    textColor: model['overlay_rectangle_template']['text_color'] || null,
+                    buttonBackgroundColor: model['overlay_rectangle_template']['button_background_color'] || null,
+                    buttonTextColor: model['overlay_rectangle_template']['button_text_color'] || null,
+                    imageLink:  model['overlay_rectangle_template']['image_link'] || null,
+                }
+            }
+
             if (banner.template === 'bar') {
                 banner.barTemplate = {
                     mainText: model['bar_template']['main_text'] || "",
@@ -50,6 +66,19 @@ window.remplib = window.remplib || {};
                     textColor: model['bar_template']['text_color'] || null,
                     buttonBackgroundColor: model['bar_template']['button_background_color'] || null,
                     buttonTextColor: model['bar_template']['button_text_color'] || null
+                }
+            }
+
+            if (banner.template === 'collapsible_bar') {
+                banner.collapsibleBarTemplate = {
+                    mainText: model['collapsible_bar_template']['main_text'] || "",
+                    collapseText: model['collapsible_bar_template']['collapse_text'] || "",
+                    buttonText: model['collapsible_bar_template']['button_text'] || "",
+                    backgroundColor: model['collapsible_bar_template']['background_color'] || null,
+                    textColor: model['collapsible_bar_template']['text_color'] || null,
+                    buttonBackgroundColor: model['collapsible_bar_template']['button_background_color'] || null,
+                    buttonTextColor: model['collapsible_bar_template']['button_text_color'] || null,
+                    initialState: model['collapsible_bar_template']['initial_state'] || "expanded"
                 }
             }
 

@@ -3,19 +3,19 @@
 namespace Remp\MailerModule\Generators;
 
 use Nette\Application\UI\Form;
-use Nette\DI\Container;
-use Remp\MailerModule\Components\GeneratorWidgetsManager;
+use Nette\Utils\ArrayHash;
+use Tomaj\NetteApi\Params\InputParam;
 
 interface IGenerator
 {
     /**
-     * generate generates additional form elements based on the Generator type. If generator adds custom submit element,
+     * generates additional form elements based on the Generator type. If generator adds custom submit element,
      * it should return array of tabs in format [linkToTab => label].
      *
      * @param Form $form
      * @return string|null
      */
-    public function generate(Form $form);
+    public function generateForm(Form $form);
 
     /**
      * @param callable $onSubmit
@@ -29,4 +29,28 @@ interface IGenerator
      * @return string[]
      */
     public function getWidgets();
+
+    /**
+     * Returns available parameters that generator needs
+     *
+     * @return InputParam[]
+     */
+    public function apiParams();
+
+    /**
+     * Generates output data from input values object
+     * Used by both Form POST and API call
+     *
+     * @return array
+     */
+    public function process($values);
+
+
+    /**
+     * Generates parameters for generator from arbitrary object (e.g. WP article dump)
+     * Each generator can define its own rules
+     *
+     * @return array
+     */
+    public function preprocessParameters($data): ?ArrayHash;
 }

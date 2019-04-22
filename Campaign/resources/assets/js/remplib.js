@@ -26,21 +26,32 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsSessionStorageKey: "campaigns_session",
 
+        showtimeExperiment: false,
+
+        initialized: false,
+
         /* JSONP START */
 
         showtime: {
-            name: "campaigns/showtime",
+            name: function() {
+                if (remplib.campaign.showtimeExperiment) {
+                    return "showtime.php";
+                }
+                return "campaigns/showtime";
+            },
             jsonpParameter: "data",
             prepareData: function() {
                 return {
                     "userId": remplib.getUserId(),
                     "browserId": remplib.getBrowserId(),
                     "url": window.location.href,
+                    "referer": document.referrer || null,
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
                     "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewCountStorageKey),
-                    "userAgent": window.navigator.userAgent
+                    "userAgent": window.navigator.userAgent,
+                    "usingAdblock": remplib.usingAdblock
                 }
 
             },
@@ -81,6 +92,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.variables = config.campaign.variables;
             }
 
+            if (typeof config.campaign.showtimeExperiment !== 'undefined') {
+                this.showtimeExperiment = config.campaign.showtimeExperiment;
+            }
+
             // global
             if (typeof config.userId !== 'undefined' && config.userId !== null) {
                 remplib.userId = config.userId;
@@ -91,20 +106,47 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (typeof config.cookieDomain === 'string') {
                 remplib.cookieDomain = config.cookieDomain;
-            } 
+            }
 
             this.incrementPageviewCount();
+
+            if (window.opener && window.location.hash === '#bannerPicker') {
+                remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
+            }
+
+            this.initialized = true;
+        },
+
+        checkInit: function() {
+            var that = this;
+            return new Promise(function (resolve, reject) {
+                var startTime = new Date().getTime();
+                var interval = setInterval(function() {
+                    if (that.initialized) {
+                        clearInterval(interval);
+                        return resolve(true);
+                    }
+
+                    // After 5 seconds, stop checking
+                    if (new Date().getTime() - startTime > 5000) {
+                        clearInterval(interval);
+                        reject("Campaign library was not initialized within 5 seconds");
+                    }
+                }, 50);
+            });
         },
 
         run: function() {
-            this.request(this.showtime);
+            Promise.all([remplib.checkUsingAdblock(), this.checkInit()]).then((res) => {
+                this.request(this.showtime);
+            });
         },
 
         request: function(def) {
             let params = {};
             params[def.jsonpParameter] = JSON.stringify(def.prepareData());
 
-            this.get(this.url + "/" + def.name, params, function (data) {
+            this.get(this.url + "/" + def.name(), params, function (data) {
                 def.processResponse && def.processResponse(data);
             }, function() {
                 def.processError && def.processError();
@@ -156,18 +198,18 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         // used to store campaign details, called from banner view
-        storeCampaignDetails: function(campaignId, bannerId) {
-            this.storeCampaigns(campaignId, bannerId);
+        storeCampaignDetails: function(campaignId, bannerId, variantId) {
+            this.storeCampaigns(campaignId, bannerId, variantId);
             this.storeCampaignsSession(campaignId);
         },
 
 
         // store persistent campaign details
-        storeCampaigns: function(campaignId, bannerId) {
+        storeCampaigns: function(campaignId, bannerId, variantId) {
             const now = new Date();
             let campaigns = remplib.getFromStorage(this.campaignsStorageKey, true);
 
-            if (typeof campaigns === "undefined" || campaigns === null) {
+            if (typeof campaigns === "undefined" ||  campaigns === null) {
                 campaigns = {
                     "version": 1,
                     "createdAt": now,
@@ -180,11 +222,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 campaigns.values = {};
             }
 
-            if (!(campaignId in campaigns.values)) {
-                campaigns.values[campaignId] = {
-                    "bannerId": bannerId,
-                };
-            }
+            // always set the new value in case user doesn't have all object properties cached
+            campaigns.values[campaignId] = {
+                "bannerId": bannerId,
+                "variantId": variantId,
+            };
 
             localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
         },

@@ -44,6 +44,10 @@ task('deploy:migration', function() {
     run("cd {{release_path}}; php artisan migrate --force");
 })->desc('Migrate database');
 
+task('deploy:commands', function () {
+    run("cd {{release_path}}; php artisan campaigns:refresh-cache");
+})->desc('Run necessary commands');
+
 task('deploy:tmplink', function() {
     run("rm -fr {{release_path}}/storage/framework");
     run("ln -s /tmp/remp_campaign {{release_path}}/storage/framework");
@@ -56,6 +60,7 @@ task('deploy', [
     'deploy:shared',
     'deploy:tmplink',
     'deploy:migration',
+    'deploy:commands',
     'deploy:symlink',
     'deploy:rabbit',
     'cleanup',

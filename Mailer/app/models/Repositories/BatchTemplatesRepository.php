@@ -2,8 +2,6 @@
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Caching\IStorage;
-use Nette\Database\Context;
 use Remp\MailerModule\Repository;
 
 class BatchTemplatesRepository extends Repository
@@ -20,45 +18,11 @@ class BatchTemplatesRepository extends Repository
                 mail_job_batch.first_email_sent_at')
             ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
             ->where('mail_template.mail_type_id IS NOT NULL')
-            ->where('DATE(mail_job_batch.first_email_sent_at) > DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(mail_job_batch.first_email_sent_at) < DATE(?)', $to->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) >= DATE(?)', $from->format('Y-m-d'))
+            ->where('DATE(mail_job_batch.first_email_sent_at) <= DATE(?)', $to->format('Y-m-d'))
             ->group('
                 DATE(mail_job_batch.first_email_sent_at),
                 mail_template.mail_type_id,
-                mail_template.mail_type.title
-            ')
-            ->order('mail_template.mail_type_id')
-            ->order('mail_job_batch.first_email_sent_at DESC');
-    }
-
-    public function getDashboardAllMailsGraphData(\DateTime $from, \DateTime $to)
-    {
-        return $this->getTable()
-            ->select('
-                SUM(COALESCE(mail_job_batch_templates.sent, 0)) AS sent_mails,
-                mail_job_batch.first_email_sent_at
-            ')
-            ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
-            ->where('DATE(mail_job_batch.first_email_sent_at) > DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(mail_job_batch.first_email_sent_at) < DATE(?)', $to->format('Y-m-d'))
-            ->group('DATE(mail_job_batch.first_email_sent_at)');
-    }
-
-    public function getDashboardDetailGraphData($mailTypeId, \DateTime $from, \DateTime $to)
-    {
-        return $this->getTable()
-            ->select('
-                SUM(COALESCE(mail_job_batch_templates.sent, 0)) AS sent_mails,
-                mail_template.mail_type_id,
-                mail_template.mail_type.title AS mail_type_title,
-                mail_job_batch.first_email_sent_at')
-            ->where('mail_job_batch.first_email_sent_at IS NOT NULL')
-            ->where('mail_template.mail_type_id = ?', $mailTypeId)
-            ->where('DATE(mail_job_batch.first_email_sent_at) > DATE(?)', $from->format('Y-m-d'))
-            ->where('DATE(mail_job_batch.first_email_sent_at) < DATE(?)', $to->format('Y-m-d'))
-            ->group('
-                mail_template.mail_type_id,
-                DATE(mail_job_batch.first_email_sent_at),
                 mail_template.mail_type.title
             ')
             ->order('mail_template.mail_type_id')

@@ -33,6 +33,8 @@ class Schedule extends Model
         'end_time',
     ];
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
     public function campaign()
     {
         return $this->belongsTo(Campaign::class);
@@ -49,6 +51,7 @@ class Schedule extends Model
     public function setEndTimeAttribute($value)
     {
         if (!$value) {
+            $this->attributes['end_time'] = null;
             return;
         }
         $this->attributes['end_time'] = new Carbon($value);
@@ -92,7 +95,12 @@ class Schedule extends Model
 
     public function isStopped()
     {
-        return $this->status === self::STATUS_STOPPED;
+        return $this->status === self::STATUS_STOPPED || ($this->end_time !== null && $this->end_time < Carbon::now());
+    }
+
+    public function isPaused()
+    {
+        return $this->status === self::STATUS_PAUSED;
     }
 
     public function endsInFuture()

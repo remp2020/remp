@@ -9,7 +9,7 @@ class Application extends \Symfony\Component\Console\Application
 {
     private $container;
 
-    private $announced = [];
+    private $commands = [];
 
     public function __construct(Container $container)
     {
@@ -17,17 +17,13 @@ class Application extends \Symfony\Component\Console\Application
         $this->container = $container;
     }
 
-    public function announce($command)
+    public function register($command)
     {
-        $this->announced[] = $command;
+        $this->commands[] = $command;
     }
 
-    public function registerAnnounced()
+    public function getCommands()
     {
-        foreach ($this->announced as $type) {
-            /** @var Command $instance */
-            $instance = $this->container->getByType($type);
-            $this->add($instance);
-        }
+        return $this->commands;
     }
 }

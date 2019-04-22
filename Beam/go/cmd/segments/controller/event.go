@@ -20,33 +20,31 @@ func NewEventController(service *goa.Service, es model.EventStorage) *EventContr
 	}
 }
 
-// Count runs the count action.
+// Count runs the count action
 func (c *EventController) Count(ctx *app.CountEventsContext) error {
-	o := model.AggregateOptions{
-		Action:   ctx.Action,
-		Category: ctx.Category,
-	}
-
-	for _, val := range ctx.Payload.FilterBy {
-		fb := &model.FilterBy{
-			Tag:    val.Tag,
-			Values: val.Values,
-		}
-		o.FilterBy = append(o.FilterBy, fb)
-	}
-
-	o.GroupBy = ctx.Payload.GroupBy
-
-	if ctx.Payload.TimeAfter != nil {
-		o.TimeAfter = *ctx.Payload.TimeAfter
-	}
-	if ctx.Payload.TimeBefore != nil {
-		o.TimeBefore = *ctx.Payload.TimeBefore
-	}
-
-	crc, ok, err := c.EventStorage.Count(o)
+	acrc, err := processEventCount(c, aggregateOptionsFromEventsOptions(ctx.Payload))
 	if err != nil {
 		return err
+	}
+	return ctx.OK(acrc)
+}
+
+// CountAction runs the count action, action and category has to be specified
+func (c *EventController) CountAction(ctx *app.CountActionEventsContext) error {
+	o := aggregateOptionsFromEventsOptions(ctx.Payload)
+	o.Action = ctx.Action
+	o.Category = ctx.Category
+	acrc, err := processEventCount(c, o)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(acrc)
+}
+
+func processEventCount(c *EventController, ao model.AggregateOptions) (app.CountCollection, error) {
+	crc, ok, err := c.EventStorage.Count(ao)
+	if err != nil {
+		return nil, err
 	}
 	if !ok {
 		cr := model.CountRow{
@@ -57,34 +55,22 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 		crc = append(crc, cr)
 	}
 
-	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.OK(acrc)
+	return CountRowCollection(crc).ToMediaType(), nil
 }
 
 // List runs the list action.
 func (c *EventController) List(ctx *app.ListEventsContext) error {
-	o := model.EventOptions{}
-	if ctx.Action != nil {
-		o.Action = *ctx.Action
-	}
-	if ctx.Category != nil {
-		o.Category = *ctx.Category
-	}
-	if ctx.TimeAfter != nil {
-		o.TimeAfter = *ctx.TimeAfter
-	}
-	if ctx.TimeBefore != nil {
-		o.TimeBefore = *ctx.TimeBefore
-	}
-	if ctx.UserID != nil {
-		o.UserID = *ctx.UserID
+	aggOptions := aggregateOptionsFromEventsOptions(ctx.Payload.Conditions)
+	o := model.ListOptions{
+		AggregateOptions: aggOptions,
+		SelectFields:     ctx.Payload.SelectFields,
 	}
 
-	ec, err := c.EventStorage.List(o)
+	erc, err := c.EventStorage.List(o)
 	if err != nil {
 		return err
 	}
-	mt, err := EventCollection(ec).ToMediaType()
+	mt, err := EventRowCollection(erc).ToMediaType()
 	if err != nil {
 		return err
 	}
@@ -116,4 +102,42 @@ func (c *EventController) Users(ctx *app.UsersEventsContext) error {
 		return err
 	}
 	return ctx.OK(users)
+}
+
+// aggregateOptionsFromEventsOptions converts payload data to AggregateOptions.
+func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.AggregateOptions {
+	var o model.AggregateOptions
+
+	for _, val := range payload.FilterBy {
+		fb := &model.FilterBy{
+			Tag:    val.Tag,
+			Values: val.Values,
+		}
+		o.FilterBy = append(o.FilterBy, fb)
+	}
+
+	o.GroupBy = payload.GroupBy
+	if payload.TimeAfter != nil {
+		o.TimeAfter = *payload.TimeAfter
+	}
+	if payload.TimeBefore != nil {
+		o.TimeBefore = *payload.TimeBefore
+	}
+
+	if payload.TimeHistogram != nil {
+		o.TimeHistogram = &model.TimeHistogram{
+			Interval: payload.TimeHistogram.Interval,
+			Offset:   payload.TimeHistogram.Offset,
+		}
+	}
+
+	if payload.Action != nil {
+		o.Action = *payload.Action
+	}
+
+	if payload.Category != nil {
+		o.Category = *payload.Category
+	}
+
+	return o
 }

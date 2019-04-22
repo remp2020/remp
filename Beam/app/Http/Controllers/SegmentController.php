@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\JournalContract;
 use App\Http\Requests\SegmentRequest;
 use App\Segment;
+use App\SegmentGroup;
 use App\SegmentRule;
-use HTML;
+use Html;
+use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,8 @@ class SegmentController extends Controller
     public function json(Request $request, Datatables $datatables)
     {
         $columns = ['id', 'name', 'active', 'code', 'created_at', 'updated_at'];
-        $segments = Segment::select($columns);
+        $segments = Segment::select($columns)
+            ->where('segment_group_id', SegmentGroup::getByCode(SegmentGroup::CODE_REMP_SEGMENTS)->id);
 
         return $datatables->of($segments)
             ->addColumn('actions', function (Segment $segment) {
@@ -42,7 +44,7 @@ class SegmentController extends Controller
                 ];
             })
             ->addColumn('name', function (Segment $segment) {
-                return HTML::linkRoute('segments.edit', $segment->name, $segment);
+                return Html::linkRoute('segments.edit', $segment->name, $segment);
             })
             ->rawColumns(['active', 'actions'])
             ->make(true);
@@ -60,6 +62,23 @@ class SegmentController extends Controller
         list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
 
         return view('segments.create', [
+            'segment' => $segment,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource (beta version of new segment builder).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function betaCreate()
+    {
+        $segment = new Segment();
+
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
+
+        return view('segments.beta.create', [
             'segment' => $segment,
             'categories' => $categories,
         ]);
@@ -90,7 +109,7 @@ class SegmentController extends Controller
     {
         $segment = new Segment();
 
-        $segment = $this->saveSegment($segment, $request->all(), $request->all('rules'));
+        $segment = $this->saveSegment($segment, $request->all(), $request->get('rules'));
 
         return response()->format([
             'html' => $this->getRouteBasedOnAction(
@@ -126,6 +145,22 @@ class SegmentController extends Controller
         list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
 
         return view('segments.edit', [
+            'segment' => $segment,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource (beta version of new segment builder).
+     *
+     * @param  \App\Segment $segment
+     * @return \Illuminate\Http\Response
+     */
+    public function betaEdit(Segment $segment)
+    {
+        list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
+
+        return view('segments.beta.edit', [
             'segment' => $segment,
             'categories' => $categories,
         ]);
@@ -191,7 +226,7 @@ class SegmentController extends Controller
             $segment->setRelation('rules', collect($rules));
         }
 
-        $categories = $this->journalContract->categories();
+        $categories = collect($this->journalContract->categories());
 
         return [
             $segment,
@@ -209,6 +244,10 @@ class SegmentController extends Controller
      */
     public function saveSegment(Segment $segment, array $data, array $rules)
     {
+        if (!array_key_exists('segment_group_id', $data)) {
+            $data['segment_group_id'] = SegmentGroup::getByCode(SegmentGroup::CODE_REMP_SEGMENTS)->id;
+        }
+
         $segment->fill($data);
         $segment->save();
 
@@ -230,5 +269,16 @@ class SegmentController extends Controller
         }
 
         return $segment;
+    }
+
+    public function embed(Request $request)
+    {
+        $segment = null;
+        if ($segmentId = $request->get('segmentId')) {
+            $segment = Segment::find($segmentId);
+        }
+        return view('segments.beta.embed', [
+            'segment' => $segment,
+        ]);
     }
 }

@@ -59,6 +59,7 @@ class ProcessJobStatsCommand extends Command
                 'delivered' => $stats->delivered ?? 0,
                 'opened' => $stats->opened ?? 0,
                 'clicked' => $stats->clicked ?? 0,
+                'converted' => $stats->converted ?? 0,
                 'dropped' => $stats->dropped ?? 0,
                 'spam_complained' => $stats->spam_complained ?? 0,
                 'hard_bounced' => $stats->hard_bounced ?? 0,

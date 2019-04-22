@@ -19,6 +19,7 @@ class ConversionUpsertRequest extends FormRequest
             'conversions.*.amount' => "required|numeric",
             'conversions.*.currency' => "required|string",
             'conversions.*.paid_at' => "required|date",
+            'conversions.*.user_id' => "required|string",
         ];
     }
 

@@ -1,6 +1,6 @@
 # REMP Tracker
 
-This is a gateway for storing both user and system events. Tracker validates the request and posts InfluxDB-formatted
+This is a gateway for storing both user and system events. Tracker validates the request and posts Influx-formatted
 set of data to Kafka. For generic events, it also creates a Kafka topic based on provided `$category_$action`.
 
 ## Building
@@ -46,7 +46,3 @@ TRACKER_MYSQL_ADDR|`mysql:3306`
 TRACKER_MYSQL_DBNAME|`beam`
 TRACKER_MYSQL_USER|`root`
 TRACKER_MYSQL_PASSWD|`secret`
-TRACKER_INFLUX_ADDR|`http://influxdb:8086`
-TRACKER_INFLUX_DBNAME|`beam`
-TRACKER_INFLUX_USER|`root`
-TRACKER_INFLUX_PASSWD|`secret`

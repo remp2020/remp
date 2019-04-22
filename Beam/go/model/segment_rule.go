@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/patrickmn/go-cache"
+	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 )
 
@@ -23,7 +23,9 @@ type SegmentRule struct {
 	EventAction   string        `db:"event_action"`
 	Timespan      sql.NullInt64
 	Operator      string
+	Operator2     *string
 	Count         int
+	Count2        *int
 	CreatedAt     time.Time `db:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at"`
 	Fields        JSONMap
@@ -93,19 +95,47 @@ func (sr *SegmentRule) CacheDuration(count int) (time.Duration, bool) {
 
 // Evaluate evaluates segment rule condition against provided count.
 func (sr *SegmentRule) Evaluate(count int) (bool, error) {
-	switch sr.Operator {
+	// only one count provided
+	if sr.Operator2 == nil && sr.Count2 == nil {
+		return evaluate(sr.Operator, count, sr.Count)
+	}
+
+	// two counts & operators provided
+	if sr.Operator2 != nil && sr.Count2 != nil {
+		first, err := evaluate(sr.Operator, count, sr.Count)
+		if err != nil {
+			return false, err
+		}
+
+		second, err := evaluate(*sr.Operator2, count, *sr.Count2)
+		if err != nil {
+			return false, err
+		}
+
+		return (first && second), nil
+	}
+
+	// TODO: if criteria & segment rules will be validated before, this shouldn't be possible
+	return false, fmt.Errorf("unable to evaluate multiple operators and counts: missing second operator or count")
+}
+
+// evaluate returns result of comparision.
+// Formula is {checkCount} {operator} {against}.
+// Eg. evaluate("<=", 10, 20) will return true as result of (10 <= 20).
+func evaluate(operator string, checkCount, checkAgainst int) (bool, error) {
+	switch operator {
 	case "<=":
-		return count <= sr.Count, nil
+		return checkCount <= checkAgainst, nil
 	case "<":
-		return count < sr.Count, nil
+		return checkCount < checkAgainst, nil
 	case "=":
-		return count == sr.Count, nil
+		return checkCount == checkAgainst, nil
 	case ">=":
-		return count >= sr.Count, nil
+		return checkCount >= checkAgainst, nil
 	case ">":
-		return count > sr.Count, nil
+		return checkCount > checkAgainst, nil
 	default:
-		return false, fmt.Errorf("unhandled operator: %s", sr.Operator)
+		return false, fmt.Errorf("unhandled operator: %s", operator)
 	}
 }
 
@@ -133,40 +163,32 @@ func (sr SegmentRule) applyOverrides(o RuleOverrides) *SegmentRule {
 	return &sr
 }
 
-// conditions returns list of influx conditions for current SegmentRule.
-func (sr *SegmentRule) conditions(now time.Time, o RuleOverrides) []string {
-	var conds []string
+// conditions returns list of available conditions for current SegmentRule.
+func (sr *SegmentRule) options(now time.Time, o RuleOverrides) AggregateOptions {
+	options := AggregateOptions{}
+
 	switch sr.EventCategory {
 	case CategoryPageview:
-		// no condition needed yet, pageview-load event is implicit
+		options.Action = sr.EventAction
 	case CategoryCommerce:
-		conds = append(
-			conds,
-			fmt.Sprintf(`"step" = '%s'`, sr.EventAction),
-		)
+		options.Step = sr.EventAction
 	default:
-		conds = append(
-			conds,
-			fmt.Sprintf(`"category" = '%s'`, sr.EventCategory),
-			fmt.Sprintf(`"action" = '%s'`, sr.EventAction),
-		)
+		options.Category = sr.EventCategory
+		options.Action = sr.EventAction
 	}
 
 	for _, def := range sr.Fields {
 		if def["key"] == "" || def["value"] == "" {
 			continue
 		}
-		conds = append(
-			conds,
-			fmt.Sprintf(`"%s" = '%s'`, def["key"], def["value"]),
-		)
+		options.FilterBy = append(options.FilterBy, &FilterBy{Tag: def["key"], Values: []string{def["value"]}})
 	}
 
 	if sr.Timespan.Valid {
 		t := now.Add(time.Minute * time.Duration(int(sr.Timespan.Int64)*-1))
-		conds = append(conds, fmt.Sprintf(`"time" >= '%s'`, t.Format(time.RFC3339Nano)))
+		options.TimeAfter = t
 	}
-	return conds
+	return options
 }
 
 func (sr *SegmentRule) groups() []string {
@@ -235,4 +257,27 @@ func (sr *SegmentRule) getCacheKey(ro RuleOverrides) int {
 	sr.cacheKey = int(h.Sum32())
 
 	return sr.cacheKey
+}
+
+// cacheable indicates whether the rule is cacheable or not. Only events trackable
+// via remplib.js on the frontend should be cacheable, otherwise the cache would keep
+// the segment in inconsistent state until the cache is invalidated.
+//
+// Idea behind cacheability is that frontend is able to keep track of number of actual
+// events and the count gets synced with DB state only once in a while
+func (sr *SegmentRule) cacheable() bool {
+	if sr.EventCategory == "pageview" && sr.EventAction == "load" {
+		return false
+	}
+	if sr.EventCategory == "banner" && sr.EventAction == "show" {
+		return false
+	}
+	if sr.EventCategory == "banner" && sr.EventAction == "click" {
+		return false
+	}
+	if sr.EventCategory == "banner" && sr.EventAction == "close" {
+		return false
+	}
+
+	return false
 }

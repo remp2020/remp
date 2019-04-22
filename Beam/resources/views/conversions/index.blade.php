@@ -10,25 +10,13 @@
 
     <div class="well">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <h4>Filter by conversion date</h4>
-                <div class="input-group m-b-10">
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        {!! Form::datetime('conversion_from', $conversionFrom, array_filter([
-                            'class' => 'form-control date-picker',
-                            'placeholder' => 'Conversion from...'
-                        ])) !!}
-                    </div>
-                    <span class="input-group-addon"><i class="zmdi zmdi-calendar"></i></span>
-                    <div class="dtp-container fg-line">
-                        <div class="dtp-container fg-line">
-                            {!! Form::datetime('conversion_to', $conversionTo, array_filter([
-                                'class' => 'form-control date-picker',
-                                'placeholder' => 'Conversion to...'
-                            ])) !!}
-                        </div>
-                    </div>
+                <div id="smart-range-selector">
+                    {!! Form::hidden('conversion_from', $conversionFrom) !!}
+                    {!! Form::hidden('conversion_to', $conversionTo) !!}
+                    <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
+                    </smart-range-selector>
                 </div>
             </div>
         </div>
@@ -41,31 +29,77 @@
 
         {!! Widget::run('DataTable', [
             'colSettings' => [
-                'article.title' => ['header' => 'article', 'orderable' => false],
-                'article.authors[, ].name' => ['header' => 'authors', 'orderable' => false, 'filter' => $authors],
-                'article.sections[, ].name' => ['header' => 'sections', 'orderable' => false, 'filter' => $sections],
-                'amount' => ['header' => 'amount'],
-                'currency' => ['header' => 'currency', 'orderable' => false],
-                'paid_at' => ['header' => 'paid at', 'render' => 'date'],
+                'article.title' => [
+                    'header' => 'article',
+                    'orderable' => false,
+                    'priority' => 1,
+                ],
+                'article.authors[, ].name' => [
+                    'header' => 'authors',
+                    'orderable' => false,
+                    'filter' => $authors,
+                    'priority' => 2,
+                ],
+                'article.sections[, ].name' => [
+                    'header' => 'sections',
+                    'orderable' => false,
+                    'filter' => $sections,
+                    'priority' => 4,
+                ],
+                'amount' => [
+                    'header' => 'amount',
+                    'render' => 'number',
+                    'priority' => 1,
+                    'className' => 'text-right',
+                ],
+                'currency' => [
+                    'header' => 'currency',
+                    'orderable' => false,
+                    'priority' => 3,
+                ],
+                'paid_at' => [
+                    'header' => 'paid at',
+                    'render' => 'date',
+                    'priority' => 2,
+                ],
             ],
             'dataSource' => route('conversions.json'),
+            'rowActions' => [
+                ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-info-outline', 'title' => 'Show conversions'],
+            ],
+            'rowActionLink' => 'show',
             'order' => [5, 'desc'],
             'requestParams' => [
-                'conversion_from' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_from\"]", {hour:0,minute:0,second:0,millisecond:0})',
-                'conversion_to' => '$.fn.datetimepicker.isoDateFromSelector("[name=\"conversion_to\"]", {hour:23,minute:59,second:59,millisecond:999})',
+                'conversion_from' => '$(\'[name="conversion_from"]\').val()',
+                'conversion_to' => '$(\'[name="conversion_to"]\').val()',
+                'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="conversion_from"]'
                 ],
                 [
-                    'event' => 'dp.change',
+                    'event' => 'change',
                     'selector' => '[name="conversion_to"]',
                 ],
             ],
         ]) !!}
-
     </div>
+
+    <script type="text/javascript">
+        new Vue({
+            el: "#smart-range-selector",
+            components: {
+                SmartRangeSelector
+            },
+            methods: {
+                callback: function (from, to) {
+                    $('[name="conversion_from"]').val(from);
+                    $('[name="conversion_to"]').val(to).trigger("change");
+                }
+            }
+        });
+    </script>
 
 @endsection

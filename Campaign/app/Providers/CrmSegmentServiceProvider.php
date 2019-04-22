@@ -7,6 +7,7 @@ use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
+use Illuminate\Redis\RedisManager;
 use Illuminate\Support\ServiceProvider;
 
 class CrmSegmentServiceProvider extends ServiceProvider
@@ -30,14 +31,18 @@ class CrmSegmentServiceProvider extends ServiceProvider
     {
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.crm_segment.base_url'),
+                'base_uri' => config('services.crm_segment.base_url'),
                 'headers' => [
                     'Authorization' => 'Bearer ' . $app['config']->get('services.crm_segment.token'),
                 ],
             ]);
-            return new Segment($client);
+            /** @var RedisManager $redis */
+            $redis = $app->make('redis')->connection()->client();
+            return new Segment($client, $redis);
         });
-        $this->app->tag(Segment::class, SegmentAggregator::TAG);
+        if (config('services.crm_segment.base_url')) {
+            $this->app->tag(Segment::class, [SegmentAggregator::TAG]);
+        }
     }
 
     public function provides()

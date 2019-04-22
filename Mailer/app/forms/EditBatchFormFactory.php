@@ -5,14 +5,16 @@ namespace Remp\MailerModule\Forms;
 use Nette\Application\UI\Form;
 use Nette\Database\Table\ActiveRow;
 use Nette\Forms\Controls\SubmitButton;
-use Nette\Object;
+use Nette\SmartObject;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 
-class EditBatchFormFactory extends Object implements IFormFactory
+class EditBatchFormFactory implements IFormFactory
 {
+    use SmartObject;
+
     /** @var JobsRepository */
     private $jobsRepository;
 
@@ -83,7 +85,7 @@ class EditBatchFormFactory extends Object implements IFormFactory
     {
         $batch = $this->batchesRepository->find($values['id']);
 
-        if (!in_array($batch->status, [BatchesRepository::STATE_CREATED, BatchesRepository::STATE_UPDATED, BatchesRepository::STATE_READY])) {
+        if (!in_array($batch->status, BatchesRepository::EDITABLE_STATUSES)) {
             $form->addError("Unable to edit batch, already in non-editable status: {$batch->status}");
             return;
         }
