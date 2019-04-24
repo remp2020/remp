@@ -106,8 +106,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.tracker.article.locked !== 'undefined') {
                     this.article.locked = config.tracker.article.locked;
                 }
-                if (typeof config.articleElementFn !== 'undefined') {
-                    this.trackedArticle = config.articleElementFn;
+                if (typeof config.articleElementFn() !== 'undefined') {
+                    this.trackedArticle = config.articleElementFn()
                 }
                 if (typeof config.tracker.readingProgress.interval !== 'undefined') {
                     this.trackedProgressInterval = config.tracker.readingProgress.interval;
@@ -142,7 +142,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (config.tracker.readingProgress.enabled === true) {
                 setInterval(function () {
                     remplib.tracker.sendTrackedProgress()
-                }, (this.trackedProgressInterval * 1000));
+                }, (remplib.tracker.trackedProgressInterval * 1000));
 
                 window.addEventListener("scroll", this.scrollProgressEvent);
                 window.addEventListener("resize", this.scrollProgressEvent);
@@ -606,49 +606,72 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             var element = document.documentElement,
                 body = document.body;
 
-            return (element.scrollTop||body.scrollTop) / ((element.scrollHeight||body.scrollHeight) - element.clientHeight);
+
+            return (body.scrollTop||body.scrollTop) / ((element.scrollHeight||body.scrollHeight - element.clientHeight));
         },
 
         scrollProgressEvent: function () {
             var article = remplib.tracker.trackedArticle,
-                page = { page: remplib.tracker.actualProgress };
+                page = { page: remplib.tracker.actualProgress() },
+                currentPosition = (document.documentElement.scrollTop||document.body.scrollTop);
 
-            if (article.length) {
-                page.article = Math.min( 1, Math.max( 0, ( document.documentElement.scrollTop - (article[0].offsetTop)) / article[0].offsetHeight ) );
+            if (article) {
+                page.article = Math.min( 1, Math.max( 0, ( currentPosition - article.offsetTop) / article.offsetHeight ));
             }
-            document.trigger('scroll_progress', page)
+
+            var event = new CustomEvent('scroll_progress', {
+                detail : {
+                    page: page,
+                }
+            });
+            window.dispatchEvent(event);
         },
 
-        trackProgress: function (element, page) {
-            const windowHeight = window.innerHeight / document.height();
-            var progress = remplib.tracker.trackedProgress;
+        trackProgress: function (event) {
+            const windowHeight = window.innerHeight / document.body.scrollHeight;
+            var page = event.detail.page,
+                progress = remplib.tracker.trackedProgress;
 
             if (progress.length) {
                 //Prevent fast scrolling
-                if (element.timeStamp - progress[progress.length - 1].element.timeStamp < remplib.tracker.timeForWindowHeight && page.document - progress[progress.length - 1].page > windowHeight) {
+                if (event.timeStamp - progress[progress.length - 1].event.timeStamp < remplib.tracker.timeForWindowHeight && page.document - progress[progress.length - 1].page > windowHeight) {
                     return false;
                 }
             }
 
-            remplib.tracker.trackedProgress.push({
-                "element": element,
-                "page": page,
-            });
+            var data = {
+                "event": event,
+                "page_ratio": page.page,
+            };
+
+            if (typeof page.article !== 'undefined') {
+                data.article_ratio = page.article;
+            }
+
+            remplib.tracker.trackedProgress.push(data);
         },
 
         sendTrackedProgress: function (unload = false) {
-            var unload = (typeof unload === 'boolean') ? unload : false,
-                lastPossiton = remplib.tracker.trackedProgress[remplib.tracker.trackedProgress.length - 1];
-            let params = {
+            const lastPossiton = remplib.tracker.trackedProgress[remplib.tracker.trackedProgress.length - 1];
+
+            if (!lastPossiton) {
+                return;
+            }
+
+
+            const params = {
                 "action": "progress",
                 "progress": {
-                    "article_ratio": lastPossiton.article,
-                    "page_ratio": lastPossiton.page,
+                    "page_ratio": lastPossiton.page_ratio,
                     "unload": unload
                 }
             };
 
-            remplib.tracker.post(this.url + "/track/pageview", params);
+            if (typeof lastPossiton.article_ratio !== 'undefined') {
+                params.progress.article_ratio = lastPossiton.article_ratio;
+            }
+
+            console.log(params);
             remplib.tracker.trackedProgress = [];
         }
     };
