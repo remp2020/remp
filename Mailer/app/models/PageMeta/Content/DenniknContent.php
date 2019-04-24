@@ -68,7 +68,7 @@ class DenniknContent implements ContentInterface
         preg_match('/<meta property=\"og:image\" content=\"(.+)\"\s*\/?/U', $content, $matches);
         if ($matches) {
             $images = $this->processImage($matches[1]);
-            $image = $images['main'];
+            $image = $images['small'];
         }
 
         return new Meta($title, $description, $image, $denniknAuthors);
