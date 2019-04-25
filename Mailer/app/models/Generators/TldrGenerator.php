@@ -322,38 +322,6 @@ class TldrGenerator implements IGenerator
         return $output;
     }
 
-    public function getLockedHtml($html)
-    {
-        $lockedHtml = '';
-        $lock = null;
-
-        list(
-            $captionTemplate,
-            $captionWithLinkTemplate,
-            $liTemplate,
-            $hrTemplate,
-            $spacerTemplate
-        ) = $this->getTemplates();
-
-        if (stripos($html, '[lock newsletter]')) {
-            $lock = '[lock newsletter]';
-        } elseif (stripos($html, '[lock]')) {
-            $lock = '[lock]';
-        }
-
-        if (!is_null($lock)) {
-            $parts = explode($lock, $html);
-
-            $lockedHtml .= $parts[0];
-            $lockedHtml .= $spacerTemplate . PHP_EOL . PHP_EOL;
-            $lockedHtml .= '<p>Tento newsletter môžete dostávať na e-mail celý, stačí byť predplatiteľom Denníka N. <a href="https://predplatne.dennikn.sk/{{ autologin }}">Pozrite si ponuku predplatného.</a>.<p>';
-
-            return $lockedHtml;
-        }
-
-        return $html;
-    }
-
     public function parseOls($post)
     {
         $ols = [];
