@@ -671,7 +671,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 params.progress.article_ratio = lastPossiton.article_ratio;
             }
 
-            console.log(params);
+            remplib.tracker.post(this.url + "/track/pageview", params);
             remplib.tracker.trackedProgress = [];
         }
     };
