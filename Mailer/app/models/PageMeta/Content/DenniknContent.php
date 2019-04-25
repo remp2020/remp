@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\PageMeta;
 
 use GuzzleHttp\Exception\RequestException;
+use Nette\Http\Url;
 use Nette\Utils\Strings;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 
@@ -68,42 +69,25 @@ class DenniknContent implements ContentInterface
         preg_match('/<meta property=\"og:image\" content=\"(.+)\"\s*\/?/U', $content, $matches);
         if ($matches) {
             $images = $this->processImage($matches[1]);
-            $image = $images['small'];
+            $image = $images['main'];
         }
 
         return new Meta($title, $description, $image, $denniknAuthors);
     }
 
-
     private function processImage($imageUrl)
     {
-        $images = [];
-
-        $url = new \Nette\Http\Url($imageUrl);
-        if ($url->getHost() == 'img.projektn.sk') {
-            $images = [
-                'small' => (string) $url->appendQuery(['w' => 350, 'h' => 220]),
-                'main' => (string) $url->appendQuery(['w' => 558, 'h' => 270]),
-            ];
-        } else {
-            $matchOutput = false;
-            $result = preg_match("/([0-9]+)x([0-9]+)/", $imageUrl, $matchOutput);
-            if ($result && $matchOutput[0]) {
-                $images = [
-                    'small' => str_replace($matchOutput[0], '350x220', $imageUrl),
-                    'main' => str_replace($matchOutput[0], '558x270', $imageUrl),
-                ];
-            } else {
-                $parts = explode('.', $imageUrl);
-                $parts[count($parts) - 2] = $parts[count($parts) - 2] . '-XXXxYYY';
-                $images = [
-                    'small' => str_replace('XXXxYYY', '350x220', implode('.', $parts)),
-                    'main' => str_replace('XXXxYYY', '558x270', implode('.', $parts)),
-                ];
-            }
+        $url = new Url($imageUrl);
+        if ($url->getHost() !== 'img.projektn.sk') {
+            $url = new Url('https://img.projektn.sk/wp-static' . $url->path);
         }
 
-        // return placeholder if image doesnt exist
+        $images = [
+            'small' => (string) $url->appendQuery(['w' => 350, 'h' => 220, 'fit' =>'crop']),
+            'main' => (string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']),
+        ];
+
+        // return placeholder if image doesn't exist
         $response = get_headers($images['small']);
         if (strpos($response[0], '404')) {
             $images['small'] = 'https://img.projektn.sk/wp-static/2018/10/placeholder_1@2x.png';
