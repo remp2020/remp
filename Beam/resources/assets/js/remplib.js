@@ -619,17 +619,15 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 page.article = Math.min( 1, Math.max( 0, ( currentPosition - article.offsetTop) / article.offsetHeight ));
             }
 
-            var event = new CustomEvent('scroll_progress', {
-                detail : {
-                    page: page,
-                }
-            });
+            var event = document.createEvent('CustomEvent'); // old legacy way of defining custom events, because of IE support
+            event.initCustomEvent('scroll_progress', true, true);
+            event.page =  page;
             window.dispatchEvent(event);
         },
 
         trackProgress: function (event) {
             const windowHeight = window.innerHeight / document.body.scrollHeight;
-            var page = event.detail.page,
+            var page = event.page,
                 progress = remplib.tracker.trackedProgress;
 
             if (progress.length) {
