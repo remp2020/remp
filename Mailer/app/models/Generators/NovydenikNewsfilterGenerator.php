@@ -239,34 +239,6 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $this->onSubmit = $onSubmit;
     }
 
-    private function getLockedHtml($fullHtml, $newsfilterLink)
-    {
-        $newHtml = '';
-        $cacheHtml = '';
-        $quit = false;
-        foreach (explode("\n", $fullHtml) as $line) {
-            $cacheHtml .= $line . "\n";
-            if (strpos($line, '<h3') !== false) {
-                $newHtml .= $cacheHtml;
-                $cacheHtml = '';
-
-                if ($quit) {
-                    $newHtml .= <<<HTML
-<h3>Notes v plné verzi posíláme pouze předplatitelům Deníku N.</h3>
-<p><a data-skipregex="1" style="display: block; margin: 0 0 20px; padding: 10px; text-decoration: none; text-align: center; font-weight: bold; color: #ffffff; background: #32CD32;" href="https://denikn.cz">Přidejte se k předplatitelům</a></p>
-HTML;
-                    return $newHtml;
-                }
-            }
-            if (strpos($line, '[lock]') !== false) {
-                $quit = true;
-            }
-        }
-        $newHtml .= $cacheHtml;
-        return $newHtml;
-    }
-
-
     /**
      * @param $data object containing WP article data
      *
