@@ -40,9 +40,17 @@ class SmtpMailer extends Mailer implements IMailer
         Config $config,
         ConfigsRepository $configsRepository
     ) {
-    
         parent::__construct($config, $configsRepository);
-        $this->mailer = new \Nette\Mail\SmtpMailer($this->options);
+
+        // SMTP Mailer expects plain options
+        $options = [];
+        foreach ($this->options as $name => $option) {
+            if (isset($option['value'])) {
+                $options[$name] = $option['value'];
+            }
+        }
+
+        $this->mailer = new \Nette\Mail\SmtpMailer($options);
     }
 
     public function send(Message $message)
