@@ -13,7 +13,9 @@ use Snowplow\RefererParser\Parser;
 
 class ProcessPageviewSessions extends Command
 {
-    protected $signature = 'pageviews:process-sessions {--now=}';
+    const COMMAND = 'pageviews:process-sessions';
+
+    protected $signature = self::COMMAND . ' {--now=}';
 
     protected $description = 'Reads and parses session referers tracked within Beam';
 
@@ -59,7 +61,7 @@ class ProcessPageviewSessions extends Command
         ];
 
         $bar = $this->output->createProgressBar(count($pageviews));
-        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%');
         $bar->setMessage('Detecting devices and sources');
 
         foreach ($pageviews as $record) {
@@ -67,7 +69,7 @@ class ProcessPageviewSessions extends Command
                 continue;
             }
             $pageview = $record->pageviews[0];
-            
+
             $deviceDetector->setUserAgent($pageview->user->user_agent);
             $deviceDetector->parse();
 
@@ -115,7 +117,7 @@ class ProcessPageviewSessions extends Command
         $deviceConditionsAndCounts = $this->conditionAndCounts($deviceAggregate, $deviceBlueprint);
         if (count($deviceConditionsAndCounts) > 0) {
             $bar = $this->output->createProgressBar(count($deviceConditionsAndCounts));
-            $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+            $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%');
             $bar->setMessage('Storing device data');
 
             foreach ($deviceConditionsAndCounts as $device) {
@@ -138,7 +140,7 @@ class ProcessPageviewSessions extends Command
         $refererConditionsAndCounts = $this->conditionAndCounts($refererAggregate, $refererBlueprint);
         if (count($refererConditionsAndCounts) > 0) {
             $bar = $this->output->createProgressBar(count($refererConditionsAndCounts));
-            $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%');
+            $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%');
             $bar->setMessage('Storing referer data');
 
             foreach ($refererConditionsAndCounts as $referer) {

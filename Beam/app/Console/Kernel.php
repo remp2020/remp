@@ -8,6 +8,7 @@ use App\Console\Commands\AggregatePageviewLoadJob;
 use App\Console\Commands\AggregatePageviewTimespentJob;
 use App\Console\Commands\ComputeAuthorsSegments;
 use App\Console\Commands\DeleteOldAggregations;
+use App\Console\Commands\ProcessPageviewSessions;
 use App\Console\Commands\SendNewslettersCommand;
 use App\Console\Commands\CompressAggregations;
 use Illuminate\Console\Scheduling\Schedule;
@@ -46,6 +47,10 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND)
             ->hourlyAt(4)
+            ->withoutOverlapping();
+
+        $schedule->command(ProcessPageviewSessions::COMMAND)
+            ->hourlyAt(5)
             ->withoutOverlapping();
 
         $schedule->command(DeleteOldAggregations::COMMAND)
