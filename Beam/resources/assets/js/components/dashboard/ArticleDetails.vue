@@ -41,12 +41,6 @@
 
 </template>
 
-<style>
-</style>
-
-<style scoped>
-</style>
-
 <script>
     import PageLoadsGraph from './PageLoadsGraph.vue'
 
