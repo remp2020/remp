@@ -21,38 +21,21 @@ class ArticleDetailsController extends Controller
         $this->journal = $journal;
     }
 
-    private function getIntervalDependingOnArticlePublishedDate(Article $article): array
-    {
-        $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
-        if ($articleAgeInMins <= 60) { // 1 hour
-            return ["5m", 5];
-        } else if ($articleAgeInMins <= 60*24) { // 1 day
-            return ["20m", 20];
-        } else if ($articleAgeInMins <= 7*60*24) { // 7 days
-            return ["1h", 60];
-        } else if ($articleAgeInMins <= 30*60*24) { // 30 days
-            return ["2h", 120];
-        } else if ($articleAgeInMins <= 90*60*24) { // 90 days
-            return ["3h", 180];
-        } else if ($articleAgeInMins <= 180*60*24) { // 180 days
-            return ["6h", 360];
-        } else if ($articleAgeInMins <= 365*60*24) { // 1 year
-            return ["12h", 720];
-        } else { // 1+ year
-            return ["24h", 1440];
-        }
-    }
-
     public function variantsHistogram(Article $article, Request $request)
     {
         $request->validate([
+            'tz' => 'timezone',
+            'interval' => 'required|in:today,7days,30days,all',
             'type' => 'required|in:title,image',
         ]);
 
         $type = $request->get('type');
         $groupBy = $type === 'title' ? 'title_variant' : 'image_variant';
 
-        $data = $this->histogram($article, $request, $groupBy, function (AggregateRequest $request) {
+        $tz = new \DateTimeZone($request->get('tz', 'UTC'));
+        $journalInterval = JournalInterval::from($tz, $request->get('interval'), $article);
+
+        $data = $this->histogram($article, $journalInterval, $groupBy, function (AggregateRequest $request) {
             $request->addFilter('derived_referer_medium', 'internal');
         });
         $data['colors'] = Colors::abTestVariantTagsToColors($data['tags']);
@@ -97,55 +80,41 @@ class ArticleDetailsController extends Controller
 
     public function timeHistogram(Article $article, Request $request)
     {
-        $data = $this->histogram($article, $request, 'derived_referer_medium');
-        $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
-        return response()->json($data);
-    }
-
-    private function histogram(Article $article, Request $request, $groupBy, callable $addConditions = null)
-    {
         $request->validate([
             'tz' => 'timezone',
             'interval' => 'required|in:today,7days,30days,all',
         ]);
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
+        $journalInterval = JournalInterval::from($tz, $request->get('interval'), $article);
 
-        $interval = $request->get('interval');
-        switch ($interval) {
-            case 'today':
-                $timeBefore = Carbon::now($tz);
-                $timeAfter = Carbon::today($tz);
-                $intervalElastic = '20m';
-                $intervalMinutes = 20;
-                break;
-            case '7days':
-                $timeBefore = Carbon::now($tz);
-                $timeAfter = Carbon::today($tz)->subDays(6);
-                $intervalElastic = '1h';
-                $intervalMinutes = 60;
-                break;
-            case '30days':
-                $timeBefore = Carbon::now($tz);
-                $timeAfter = Carbon::today($tz)->subDays(29);
-                $intervalElastic = '2h';
-                $intervalMinutes = 120;
-                break;
-            case 'all':
-                $timeBefore = Carbon::now($tz);
-                $timeAfter = (clone $article->published_at)->tz($tz);
-                [$intervalElastic, $intervalMinutes] = $this->getIntervalDependingOnArticlePublishedDate($article);
-                break;
-            default:
-                throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days] values, instead '$interval' provided");
+        $data = $this->histogram($article, $journalInterval, 'derived_referer_medium');
+        $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
+        $data['events'] = [];
+
+        // Load conversion events
+        $conversions = $article->conversions()
+            ->whereBetween('paid_at', [$journalInterval->timeAfter, $journalInterval->timeBefore])
+            ->get();
+
+        foreach ($conversions as $conversion) {
+            $data['events'][] = (object) [
+                'color' => '#651067',
+                'date' => $conversion->paid_at->toIso8601ZuluString(),
+                'title' => "{$conversion->amount} {$conversion->currency}"
+            ];
         }
 
-        $journalRequest = new AggregateRequest('pageviews', 'load');
-        $journalRequest->addFilter('article_id', $article->external_id);
-        $journalRequest->setTimeAfter($timeAfter);
-        $journalRequest->setTimeBefore($timeBefore);
-        $journalRequest->setTimeHistogram($intervalElastic, '0h');
-        $journalRequest->addGroup($groupBy);
+        return response()->json($data);
+    }
+
+    private function histogram(Article $article, JournalInterval $journalInterval, $groupBy, callable $addConditions = null)
+    {
+        $journalRequest = (new AggregateRequest('pageviews', 'load'))
+            ->addFilter('article_id', $article->external_id)
+            ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
+            ->setTimeHistogram($journalInterval->intervalText, '0h')
+            ->addGroup($groupBy);
 
         if ($addConditions) {
             $addConditions($journalRequest);
@@ -153,7 +122,6 @@ class ArticleDetailsController extends Controller
 
         $currentRecords = collect($this->journal->count($journalRequest));
 
-        // Get all tags
         $tags = [];
         foreach ($currentRecords as $records) {
             $tags[] = $records->tags->$groupBy;
@@ -161,16 +129,16 @@ class ArticleDetailsController extends Controller
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
         $results = [];
-        $timeIterator = JournalHelpers::getTimeIterator($timeAfter, $intervalMinutes);
+        $timeIterator = JournalHelpers::getTimeIterator($journalInterval->timeAfter, $journalInterval->intervalMinutes);
 
-        while ($timeIterator->lessThan($timeBefore)) {
+        while ($timeIterator->lessThan($journalInterval->timeBefore)) {
             $zuluDate = $timeIterator->toIso8601ZuluString();
             $results[$zuluDate] = collect($tags)->mapWithKeys(function ($item) {
                 return [$item => 0];
             });
             $results[$zuluDate]['Date'] = $zuluDate;
 
-            $timeIterator->addMinutes($intervalMinutes);
+            $timeIterator->addMinutes($journalInterval->intervalMinutes);
         }
 
         // Save results
@@ -188,7 +156,7 @@ class ArticleDetailsController extends Controller
 
         return [
             'publishedAt' => $article->published_at->toIso8601ZuluString(),
-            'intervalMinutes' => $intervalMinutes,
+            'intervalMinutes' => $journalInterval->intervalMinutes,
             'results' => $results,
             'tags' => $tags
         ];
@@ -257,5 +225,86 @@ class ArticleDetailsController extends Controller
             ]),
             'json' => new ArticleResource($article)
         ]);
+    }
+}
+
+class JournalInterval
+{
+    public $timeAfter;
+    public $timeBefore;
+    public $intervalText;
+    public $intervalMinutes;
+
+    public function __construct(Carbon $timeAfter, Carbon $timeBefore, string $intervalText, int $intervalMinutes)
+    {
+        $this->timeBefore = $timeBefore;
+        $this->timeAfter = $timeAfter;
+        $this->intervalText = $intervalText;
+        $this->intervalMinutes = $intervalMinutes;
+    }
+
+    public static function from(\DateTimeZone $tz, string $interval, Article $article): JournalInterval
+    {
+        switch ($interval) {
+            case 'today':
+                return new JournalInterval(
+                    Carbon::today($tz),
+                    Carbon::now($tz),
+                    '20m',
+                    20
+                );
+            case '7days':
+                return new JournalInterval(
+                    Carbon::today($tz)->subDays(6),
+                    Carbon::now($tz),
+                    '1h',
+                    60
+                );
+            case '30days':
+                return new JournalInterval(
+                    Carbon::today($tz)->subDays(29),
+                    Carbon::now($tz),
+                    '2h',
+                    120
+                );
+            case 'all':
+                [$intervalText, $intervalMinutes] = self::getIntervalDependingOnArticlePublishedDate($article);
+                return new JournalInterval(
+                    (clone $article->published_at)->tz($tz),
+                    Carbon::now($tz),
+                    $intervalText,
+                    $intervalMinutes
+                );
+            default:
+                throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days, all] values, instead '$interval' provided");
+        }
+    }
+
+    private static function getIntervalDependingOnArticlePublishedDate(Article $article): array
+    {
+        $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
+
+        if ($articleAgeInMins <= 60) { // 1 hour
+            return ["5m", 5];
+        }
+        if ($articleAgeInMins <= 60*24) { // 1 day
+            return ["20m", 20];
+        }
+        if ($articleAgeInMins <= 7*60*24) { // 7 days
+            return ["1h", 60];
+        }
+        if ($articleAgeInMins <= 30*60*24) { // 30 days
+            return ["2h", 120];
+        }
+        if ($articleAgeInMins <= 90*60*24) { // 90 days
+            return ["3h", 180];
+        }
+        if ($articleAgeInMins <= 180*60*24) { // 180 days
+            return ["6h", 360];
+        }
+        if ($articleAgeInMins <= 365*60*24) { // 1 year
+            return ["12h", 720];
+        }
+        return ["24h", 1440]; // 1+ year
     }
 }
