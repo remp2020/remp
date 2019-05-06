@@ -24,6 +24,13 @@
             </div>
         </div>
 
+        <div class="m-t-10" v-if="eventOptions">
+            <label class="checkbox checkbox-inline m-r-20" v-for="option in eventOptions">
+                <input :id="option.value" :value="option" type="checkbox" v-model="selectedEvents" />
+                <i class="input-helper"></i>{{option.text}}
+            </label>
+        </div>
+
         <div class="events-legend-wrapper">
             <div>
                 <div class="events-legend"
@@ -156,6 +163,10 @@
                 return {}
             }
         },
+        eventOptions: {
+            type: Array,
+            default: () => []
+        },
         stacked: {
             type: Boolean,
             default: true
@@ -192,7 +203,8 @@
                     visible: false,
                     data: null,
                     styleObject: {}
-                }
+                },
+                selectedEvents: []
             };
         },
         watch: {
@@ -200,6 +212,9 @@
                 this.fillData()
             },
             interval(value) {
+                this.reload()
+            },
+            selectedEvents(values) {
                 this.reload()
             }
         },
@@ -523,6 +538,7 @@
                         params: Object.assign({
                             tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
                             interval: this.interval,
+                            events: this.selectedEvents.map(option => option.value)
                         }, this.urlParams)
                     })
                     .then(response => {

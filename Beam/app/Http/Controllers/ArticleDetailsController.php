@@ -14,6 +14,8 @@ use Remp\Journal\JournalContract;
 
 class ArticleDetailsController extends Controller
 {
+    const ALLOWED_INTERVALS = 'today,7days,30days,all';
+
     private $journal;
 
     public function __construct(JournalContract $journal)
@@ -25,7 +27,7 @@ class ArticleDetailsController extends Controller
     {
         $request->validate([
             'tz' => 'timezone',
-            'interval' => 'required|in:today,7days,30days,all',
+            'interval' => 'required|in:' . self::ALLOWED_INTERVALS,
             'type' => 'required|in:title,image',
         ]);
 
@@ -82,8 +84,11 @@ class ArticleDetailsController extends Controller
     {
         $request->validate([
             'tz' => 'timezone',
-            'interval' => 'required|in:today,7days,30days,all',
+            'interval' => 'required|in:' . self::ALLOWED_INTERVALS,
+            'events.*' => 'in:conversions'
         ]);
+
+        $eventOptions = $request->get('events', []);
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $journalInterval = JournalInterval::from($tz, $request->get('interval'), $article);
@@ -92,17 +97,18 @@ class ArticleDetailsController extends Controller
         $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
         $data['events'] = [];
 
-        // Load conversion events
-        $conversions = $article->conversions()
-            ->whereBetween('paid_at', [$journalInterval->timeAfter, $journalInterval->timeBefore])
-            ->get();
+        if (in_array('conversions', $eventOptions, false)) {
+            $conversions = $article->conversions()
+                ->whereBetween('paid_at', [$journalInterval->timeAfter, $journalInterval->timeBefore])
+                ->get();
 
-        foreach ($conversions as $conversion) {
-            $data['events'][] = (object) [
-                'color' => '#651067',
-                'date' => $conversion->paid_at->toIso8601ZuluString(),
-                'title' => "{$conversion->amount} {$conversion->currency}"
-            ];
+            foreach ($conversions as $conversion) {
+                $data['events'][] = (object) [
+                    'color' => '#651067',
+                    'date' => $conversion->paid_at->toIso8601ZuluString(),
+                    'title' => "{$conversion->amount} {$conversion->currency}"
+                ];
+            }
         }
 
         return response()->json($data);
@@ -276,7 +282,7 @@ class JournalInterval
                     $intervalMinutes
                 );
             default:
-                throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days, all] values, instead '$interval' provided");
+                throw new InvalidArgumentException("Parameter 'interval' must be one of the [" . ArticleDetailsController::ALLOWED_INTERVALS . " ] values, instead '$interval' provided");
         }
     }
 
