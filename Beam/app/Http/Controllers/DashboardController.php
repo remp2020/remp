@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\Contracts\JournalHelpers;
+use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Model\Config;
 use App\Model\DashboardConfig;
