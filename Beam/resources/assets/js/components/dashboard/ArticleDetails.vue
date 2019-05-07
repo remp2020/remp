@@ -7,7 +7,7 @@
             </div>
             <div class="card-body card-padding">
                 <page-loads-graph
-                        :event-options="[{text: 'Conversions', value: 'conversions'}]"
+                        :event-options="[{text: 'Conversions', value: 'conversions', checked: true}]"
                         :url="url">
                 </page-loads-graph>
             </div>

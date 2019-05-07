@@ -227,6 +227,12 @@
             }
         },
         created() {
+            for (const option of this.eventOptions) {
+                if (option.checked) {
+                    this.selectedEvents.push(option)
+                }
+            }
+
             this.vars = {
                 container: null,
                 svg: null,
