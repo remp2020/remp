@@ -340,7 +340,7 @@
                 }
 
                 // show event only if its too close to x-position of mouse
-                if (Math.abs(this.vars.x(selectedEvent.date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
+                if (selectedEvent && Math.abs(this.vars.x(selectedEvent.date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
                     this.eventLegend.visible = true
                     this.eventLegend.data = selectedEvent
                     this.eventLegend.styleObject = {
