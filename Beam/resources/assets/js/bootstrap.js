@@ -25,7 +25,7 @@ require("./filters");
 global.RuleOcurrences = require("./components/RuleOcurrences.vue").default;
 global.RecurrenceSelector = require("./components/RecurrenceSelector.vue").default;
 global.DashboardRoot = require("./components/dashboard/DashboardRoot.vue").default;
-global.ArticleHistogram = require("./components/dashboard/ArticleHistogram.vue").default;
+global.ArticleDetails = require("./components/dashboard/ArticleDetails.vue").default;
 global.UserPath = require("./components/userpath/UserPath.vue").default;
 global.GoogleAnalyticsReportingHistogram = require("./components/dashboard/GoogleAnalyticsReportingHistogram.vue").default;
 global.DashboardStore = require("./components/dashboard/store.js").default;

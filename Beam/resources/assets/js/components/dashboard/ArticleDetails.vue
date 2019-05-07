@@ -6,7 +6,10 @@
                 </h2>
             </div>
             <div class="card-body card-padding">
-                <page-loads-graph :url="url"></page-loads-graph>
+                <page-loads-graph
+                        :event-options="[{text: 'Conversions', value: 'conversions'}]"
+                        :url="url">
+                </page-loads-graph>
             </div>
         </div>
 
@@ -40,12 +43,6 @@
     </div>
 
 </template>
-
-<style>
-</style>
-
-<style scoped>
-</style>
 
 <script>
     import PageLoadsGraph from './PageLoadsGraph.vue'

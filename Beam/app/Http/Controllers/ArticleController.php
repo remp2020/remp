@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
-use App\Contracts\JournalHelpers;
+use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;

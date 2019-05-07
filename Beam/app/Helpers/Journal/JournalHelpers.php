@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts;
+namespace App\Helpers\Journal;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;

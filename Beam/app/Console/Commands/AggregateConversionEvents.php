@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Article;
-use App\Contracts\JournalHelpers;
+use App\Helpers\Journal\JournalHelpers;
 use App\Conversion;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionCommerceEventProduct;

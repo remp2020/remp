@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contracts\GoogleAnalytics\GoogleAnalyticsReportingContract;
 use App\Contracts\GoogleAnalytics\GoogleAnalyticsReportingRequest;
-use App\Contracts\JournalHelpers;
+use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

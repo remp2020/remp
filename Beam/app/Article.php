@@ -77,7 +77,7 @@ class Article extends Model
     }
 
     // Scopes
-    public function scopeMostReadByTimespent($query, Carbon $start, string $getBy, int $limit = null)
+    public function scopeMostReadByTimespent(Builder $query, Carbon $start, string $getBy, int $limit = null)
     {
         $innerQuery = ArticleTimespent::where('time_from', '>=', $start)
             ->groupBy('article_id')
@@ -93,7 +93,7 @@ class Article extends Model
         })->orderByDesc('t.total_sum');
     }
 
-    public function scopeMostReadByPageviews($query, Carbon $start, string $getBy, int $limit = null)
+    public function scopeMostReadByPageviews(Builder $query, Carbon $start, string $getBy, int $limit = null)
     {
         $innerQuery = ArticleTimespent::where('time_from', '>=', $start)
             ->groupBy('article_id')
@@ -109,7 +109,7 @@ class Article extends Model
         })->orderByDesc('t.total_sum');
     }
 
-    public function scopeMostReadByAveragePaymentAmount($query, Carbon $start, ?int $limit = null)
+    public function scopeMostReadByAveragePaymentAmount(Builder $query, Carbon $start, ?int $limit = null)
     {
         $innerQuery = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
@@ -125,7 +125,7 @@ class Article extends Model
         })->orderByDesc('c.average');
     }
 
-    public function scopeMostReadByTotalPaymentAmount($query, Carbon $start, ?int $limit = null)
+    public function scopeMostReadByTotalPaymentAmount(Builder $query, Carbon $start, ?int $limit = null)
     {
         $innerQuery = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
@@ -141,7 +141,7 @@ class Article extends Model
         })->orderByDesc('c.average');
     }
 
-    public function scopeIgnoreAuthorIds($query, array $authorIds)
+    public function scopeIgnoreAuthorIds(Builder $query, array $authorIds)
     {
         if ($authorIds) {
             $query->join('article_author', 'articles.id', '=', 'article_author.article_id')

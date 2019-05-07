@@ -133,19 +133,19 @@
             </div>
         </div>
 
-        <article-histogram
+        <article-details
                 :has-title-variants="{{$hasTitleVariants ? 'true' : 'false'}}"
                 :has-image-variants="{{$hasImageVariants ? 'true' : 'false'}}"
                 :url="url"
                 :variants-url="variantsUrl"
                 ref="histogram" >
-        </article-histogram>
+        </article-details>
     </div>
     <script type="text/javascript">
         new Vue({
             el: "#article-vue-wrapper",
             components: {
-                ArticleHistogram, DateFormatter
+                ArticleDetails, DateFormatter
             },
             created: function() {
                 document.addEventListener('visibilitychange', this.visibilityChanged)
