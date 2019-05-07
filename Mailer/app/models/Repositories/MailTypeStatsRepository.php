@@ -37,7 +37,7 @@ class MailTypeStatsRepository extends Repository
     public function getDashboardDetailData($id, DateTime $from, DateTime $to)
     {
         return $this->getTable()
-            ->select('mail_type_id, SUM(subscribers_count) AS count, DATE(created_at) AS created_date')
+            ->select('SUM(subscribers_count) AS count, DATE(created_at) AS created_date')
             ->where('id IN (
                 SELECT MAX(id) FROM mail_type_stats
                 WHERE mail_type_id = ?
