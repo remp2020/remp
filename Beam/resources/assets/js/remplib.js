@@ -48,13 +48,15 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentActive: false,
 
+        progressTracking: false,
+
         trackedProgress: [],
 
         trackedArticle: null,
 
-        trackedProgressInterval: null,
+        trackedProgressInterval: 5,
 
-        timeForWindowHeight: 5000,
+        timeForWindowHeight: 5,
 
         initialized: false,
 
@@ -106,14 +108,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.tracker.article.locked !== 'undefined') {
                     this.article.locked = config.tracker.article.locked;
                 }
-                if (typeof config.articleElementFn() !== 'undefined') {
-                    this.trackedArticle = config.articleElementFn()
-                }
-                if (typeof config.tracker.readingProgress.interval !== 'undefined') {
-                    this.trackedProgressInterval = config.tracker.readingProgress.interval;
-                }
-                if (typeof config.tracker.readingProgress.timeForWindowHeight !== 'undefined') {
-                    this.timeForWindowHeight = config.tracker.readingProgress.timeForWindowHeight;
+                if (typeof config.articleElementFn !== 'undefined') {
+                    this.trackedArticle = config.articleElementFn
                 }
             } else {
                 this.article = null;
@@ -139,7 +135,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             window.addEventListener("campaign_showtime", this.syncFlags);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
 
-            if (config.tracker.readingProgress.enabled === true) {
+            if (typeof config.tracker.readingProgress === 'object' && config.tracker.readingProgress.enabled === true) {
+                this.progressTracking = true;
+
+                if (typeof config.tracker.readingProgress.interval !== 'undefined') {
+                    this.trackedProgressInterval = config.tracker.readingProgress.interval;
+                }
+                if (typeof config.tracker.readingProgress.timeForWindowHeight !== 'undefined') {
+                    this.timeForWindowHeight = config.tracker.readingProgress.timeForWindowHeight;
+                }
+
                 setInterval(function () {
                     remplib.tracker.sendTrackedProgress()
                 }, (remplib.tracker.trackedProgressInterval * 1000));
@@ -611,7 +616,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         scrollProgressEvent: function () {
-            var article = remplib.tracker.trackedArticle,
+            var article = remplib.tracker.trackedArticle(),
                 page = { page: remplib.tracker.actualProgress() },
                 currentPosition = (document.documentElement.scrollTop||document.body.scrollTop);
 
@@ -619,20 +624,21 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 page.article = Math.min( 1, Math.max( 0, ( currentPosition - article.offsetTop) / article.offsetHeight ));
             }
 
-            var event = document.createEvent('CustomEvent'); // old legacy way of defining custom events, because of IE support
-            event.initCustomEvent('scroll_progress', true, true);
-            event.page =  page;
+            let event = new CustomEvent("scroll_progress", {
+                detail: page,
+            });
+
             window.dispatchEvent(event);
         },
 
         trackProgress: function (event) {
             const windowHeight = window.innerHeight / document.body.scrollHeight;
-            var page = event.page,
+            var page = event.detail,
                 progress = remplib.tracker.trackedProgress;
 
             if (progress.length) {
                 //Prevent fast scrolling
-                if (event.timeStamp - progress[progress.length - 1].event.timeStamp < remplib.tracker.timeForWindowHeight && page.document - progress[progress.length - 1].page > windowHeight) {
+                if (event.timeStamp - progress[progress.length - 1].event.timeStamp < (remplib.tracker.timeForWindowHeight * 1000) && page.document - progress[progress.length - 1].page > windowHeight) {
                     return false;
                 }
             }
@@ -645,7 +651,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof page.article !== 'undefined') {
                 data.article_ratio = page.article;
             }
-
             remplib.tracker.trackedProgress.push(data);
         },
 
@@ -657,7 +662,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
 
-            const params = {
+            var params = {
                 "action": "progress",
                 "progress": {
                     "page_ratio": lastPossiton.page_ratio,
@@ -669,6 +674,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 params.progress.article_ratio = lastPossiton.article_ratio;
             }
 
+            params = this.addSystemUserParams(params);
             remplib.tracker.post(this.url + "/track/pageview", params);
             remplib.tracker.trackedProgress = [];
         }
