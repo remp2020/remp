@@ -51,11 +51,11 @@
                                             <span class="c-black">{{article.title}}</span>
                                         </template>
                                         <template v-else>
-                                            <span v-if="article.title_ab_test"
+                                            <span v-if="article.has_title_test"
                                                   class="ab-test"
                                                   title="Title A/B test">A/B</span>
 
-                                            <span v-if="article.image_ab_test"
+                                            <span v-if="article.has_image_test"
                                                   class="ab-test image"
                                                   title="Image A/B test">IMG A/B</span>
 
@@ -134,11 +134,14 @@
     }
 
     span.ab-test {
-        border-radius: 1px;
+        display: inline-block;
+        border-radius: 2px;
         background: #ff180c;
-        padding: 2px;
+        padding: 1px 2px ;
         font-size: 8px;
         color: #fff;
+        vertical-align: top;
+        margin-top: 3px;
         cursor: pointer;
     }
 

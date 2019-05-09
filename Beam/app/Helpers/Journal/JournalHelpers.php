@@ -81,6 +81,56 @@ class JournalHelpers
     }
 
     /**
+     * Load a/b test flags for articles
+     *
+     * @param Collection $articles
+     * @param Carbon     $since
+     *
+     * @return Collection containing mapping of articles' external_ids to a/b test flags
+     */
+    public function abTestFlagsForArticles(Collection $articles, Carbon $since): Collection
+    {
+        $externalArticleIds = $articles->pluck('external_id')->toArray();
+
+        $request = new AggregateRequest('pageviews', 'load');
+        $request->setTimeAfter($since);
+        $request->setTimeBefore(Carbon::now());
+        $request->addGroup('article_id', 'title_variant', 'image_variant');
+
+        $request->addFilter('article_id', ...$externalArticleIds);
+
+        $result = collect($this->journal->count($request));
+        $articles = collect();
+
+        foreach ($result as $item) {
+            $key = $item->tags->article_id;
+            if (!$articles->has($key)) {
+                $articles->put($key, (object) [
+                    'title_variants' => collect(),
+                    'image_variants' => collect()
+                ]);
+            }
+            $articles[$key]->title_variants->push($item->tags->title_variant);
+            $articles[$key]->image_variants->push($item->tags->image_variant);
+        }
+
+        return $articles->map(function ($item) {
+            $hasTitleTest = $item->title_variants->filter(function ($variant) {
+                return $variant !== '';
+            })->unique()->count() > 1;
+
+            $hasImageTest = $item->image_variants->filter(function ($variant) {
+                    return $variant !== '';
+            })->unique()->count() > 1;
+
+            return (object) [
+                'has_title_test' => $hasTitleTest,
+                'has_image_test' => $hasImageTest
+            ];
+        });
+    }
+
+    /**
      * Get time iterator, which is the earliest point of time (Carbon instance) that when
      * interval of length $intervalMinutes is added,
      * the resulting Carbon instance is greater or equal to $timeAfter

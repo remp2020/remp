@@ -315,6 +315,8 @@ class DashboardController extends Controller
         );
 
         $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($topArticles);
+        // Check for A/B titles/images for last 5 minutes
+        $externalIdsToAbTestFlags = $this->journalHelper->abTestFlagsForArticles($topArticles, Carbon::now()->subMinutes(5));
 
         $threeMonthsAgo = Carbon::now()->subMonths(3);
 
@@ -330,6 +332,9 @@ class DashboardController extends Controller
                     // Artificially increased 10000x so conversion rate is more readable
                     $item->conversion_rate = number_format(($item->conversions_count / $item->unique_browsers_count) * 10000, 2);
                 }
+
+                $item->has_title_test = $externalIdsToAbTestFlags[$item->external_article_id]->has_title_test ?? false;
+                $item->has_image_test = $externalIdsToAbTestFlags[$item->external_article_id]->has_image_test ?? false;
 
                 $item->url = route('articles.show', ['article' => $item->article->id]);
             }
