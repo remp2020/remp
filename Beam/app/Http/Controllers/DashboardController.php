@@ -225,7 +225,6 @@ class DashboardController extends Controller
             $results = collect(array_values($results))->take($numberOfCurrentValues);
         }
 
-
         return response()->json([
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
@@ -265,15 +264,34 @@ class DashboardController extends Controller
         }
         $concurrentsRequest->setTimeAfter($timeAfter);
         $concurrentsRequest->setTimeBefore($timeBefore);
-        $concurrentsRequest->addGroup('article_id');
 
-        // records are already sorted
+        $concurrentsRequest->addGroup('article_id', 'title_variant', 'image_variant');
         $records = collect($this->journal->concurrents($concurrentsRequest));
+
+        // preprocess A/B testing flags
+        $articles = collect();
+        foreach ($records as $record) {
+            $externalArticleId = $record->tags->article_id;
+            if (!$articles->has($externalArticleId)) {
+                $articles->put($externalArticleId, (object) [
+                    'count' => 0,
+                    'external_article_id' => $externalArticleId,
+                    'image_variants' => collect(),
+                    'title_variants' => collect()
+                ]);
+            }
+
+            $articles[$externalArticleId]->count += $record->count;
+            $articles[$externalArticleId]->external_article_id = $externalArticleId;
+            $articles[$externalArticleId]->image_variants->push($record->tags->image_variant);
+            $articles[$externalArticleId]->title_variants->push($record->tags->title_variant);
+        }
+        $articles = $articles->sortByDesc('count')->values()->all();
 
         $topPages = [];
         $i = 0;
         $totalConcurrents = 0;
-        foreach ($records as $record) {
+        foreach ($articles as $record) {
             $totalConcurrents += $record->count;
 
             if ($i >= self::NUMBER_OF_ARTICLES) {
@@ -282,13 +300,21 @@ class DashboardController extends Controller
 
             $obj = new \stdClass();
             $obj->count = $record->count;
-            $obj->external_article_id = $record->tags->article_id;
+            $obj->external_article_id = $record->external_article_id;
 
-            if (!$record->tags->article_id) {
+            $obj->image_ab_test = $record->external_article_id && $record->image_variants->filter(function ($value, $key) {
+                return $value !== '';
+            })->unique()->count() > 1;
+
+            $obj->title_ab_test = $record->external_article_id && $record->title_variants->filter(function ($value, $key) {
+                return $value !== '';
+            })->unique()->count() > 1;
+
+            if (!$record->external_article_id) {
                 $obj->title = 'Landing page';
                 $obj->landing_page = true;
             } else {
-                $article = Article::where('external_id', $record->tags->article_id)->first();
+                $article = Article::where('external_id', $record->external_article_id)->first();
                 if (!$article) {
                     continue;
                 }
@@ -308,7 +334,7 @@ class DashboardController extends Controller
             return !empty($item->external_article_id);
         })->pluck('article');
 
-        // Timespent is computed as average of timespent values 2 hours in the past
+        // Timespent is computed as average of timespent values of past 2 hours
         $externalIdsToTimespent = $this->journalHelper->timespentForArticles(
             $topArticles,
             (clone $timeAfter)->subHours(2)
