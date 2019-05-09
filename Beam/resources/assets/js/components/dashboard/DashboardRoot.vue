@@ -51,6 +51,14 @@
                                             <span class="c-black">{{article.title}}</span>
                                         </template>
                                         <template v-else>
+                                            <span v-if="article.title_ab_test"
+                                                  class="ab-test"
+                                                  title="Title A/B test">A/B</span>
+
+                                            <span v-if="article.image_ab_test"
+                                                  class="ab-test image"
+                                                  title="Image A/B test">IMG A/B</span>
+
                                             <a class="c-black" :href="article.url">{{article.title}}</a>
                                             <br />
                                             <small>{{ article.published_at | relativeDate }}</small>
@@ -124,6 +132,20 @@
     .concurrents-table td, .concurrents-table th {
         padding: 6px;
     }
+
+    span.ab-test {
+        border-radius: 1px;
+        background: #ff180c;
+        padding: 2px;
+        font-size: 8px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    span.ab-test.image {
+        background: #28f16f;
+    }
+
 </style>
 
 <script>
