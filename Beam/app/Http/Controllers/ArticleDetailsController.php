@@ -99,7 +99,7 @@ class ArticleDetailsController extends Controller
 
         if (in_array('conversions', $eventOptions, false)) {
             $conversions = $article->conversions()
-                ->whereBetween('paid_at', [$journalInterval->timeAfter, $journalInterval->timeBefore])
+                ->whereBetween('paid_at', [$journalInterval->timeAfter->tz('UTC'), $journalInterval->timeBefore->tz('UTC')])
                 ->get();
 
             foreach ($conversions as $conversion) {
