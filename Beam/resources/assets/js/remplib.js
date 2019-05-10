@@ -28,6 +28,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             variants: {},
         },
 
+        extraParams: {},
+
         uriParams: {},
 
         segmentProvider: "remp_segment",
@@ -298,7 +300,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
                 "action": "load",
             };
-            params = this.addSystemUserParams(params);
+            params = this.addSystemUserParams(params, this.extraParams);
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "load", params);
         },
@@ -427,8 +429,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         checkWebsocketsSupport: function () {
             remplib.tracker.websocketsSupported = 'WebSocket' in window || false;
         },
-
-        addSystemUserParams: function(params) {
+        addSystemUserParams: function(params, extras) {
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
             params["user"] = {
@@ -453,6 +454,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
             params["user"][remplib.rempPageviewIDKey] = remplib.getRempPageviewID();
+
+            if (extras) {
+                params["user"]["extras"] = extras;
+            }
 
             var cleanup = function(obj) {
                 Object.keys(obj).forEach(function(key) {
