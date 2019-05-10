@@ -28,7 +28,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             variants: {},
         },
 
-        extraParams: {},
+        extras: {},
 
         uriParams: {},
 
@@ -102,6 +102,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             } else {
                 this.article = null;
+            }
+
+            if (typeof config.tracker.extras === 'object') {
+                this.extras = config.tracker.extras;
             }
 
             if (typeof config.cookieDomain === 'string') {
@@ -300,7 +304,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
                 "action": "load",
             };
-            params = this.addSystemUserParams(params, this.extraParams);
+            params = this.addSystemUserParams(params, this.extras);
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "load", params);
         },
