@@ -22,6 +22,7 @@ var User = Type("User", func() {
 		Format("ip")
 	})
 	Attribute("source", Source, "UTM and social source metadata")
+	Attribute("extras", Extras, "Optional user parameters")
 	Attribute("remp_session_id", String, "ID of reader's session")
 	Attribute("remp_pageview_id", String, "ID of pageview")
 	Attribute("referer", String, "Value of HTTP referer header (if present)")
@@ -128,6 +129,12 @@ var Source = Type("source", func() {
 	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
 	Attribute("banner_variant", String, "Reference to specific banner variant (e.g. variant ID)")
+})
+
+var Extras = Type("extras", func() {
+	Description("Custom user parameters defined by each site separately")
+
+	Attribute("explicit_referer_medium", String, "Attribute for more specific tracking of referer medium")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {
