@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"sort"
 	"strconv"
 	"time"
 
@@ -503,10 +504,27 @@ func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error)
 		return nil, errors.Wrap(err, fmt.Sprintf("unable to get field mappings for index: %s", index))
 	}
 
+	// read mapping info of index
 	root, ok := result[index].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("invalid index provided, no mapping data available: %s", index)
+		// there's no such index, but there might be an alias
+		aliases, err := eDB.Client.Aliases().Index(index).Do(eDB.Context)
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("unable to get aliases for index: %s", index))
+		}
+
+		indices := aliases.IndicesByAlias(index)
+		if len(indices) == 0 {
+			return nil, fmt.Errorf("invalid index provided, no mapping data available: %s", index)
+		}
+
+		sort.Strings(indices)
+		root, ok = result[indices[len(indices)-1]].(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("invalid alias provided, no mapping data available: %s", index)
+		}
 	}
+
 	mappings, ok := root["mappings"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("\"mappings\" field not present within field mapping response")
