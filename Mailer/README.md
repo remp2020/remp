@@ -1093,8 +1093,10 @@ parameters:
         api_token: @environmentConfig::get('CRM_API_TOKEN')
 
 services:
-	# add your implementation
-	- Remp\MailerModule\Segment\Crm(%crm.addr%, %crm.api_token%)
+    segmentAgreggator:
+            setup:
+                # add your implementation
+                - register(Remp\MailerModule\Segment\Crm(%crm.addr%, %crm.api_token%))
 ```
 
 #### User integration
