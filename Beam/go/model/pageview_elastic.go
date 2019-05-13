@@ -358,8 +358,9 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 	var ao AggregateOptions
 
 	fb := &FilterBy{
-		Tag:    "remp_pageview_id",
-		Values: pageviewIDs,
+		Tag:     "remp_pageview_id",
+		Values:  pageviewIDs,
+		Inverse: false,
 	}
 	ao.FilterBy = append(ao.FilterBy, fb)
 
