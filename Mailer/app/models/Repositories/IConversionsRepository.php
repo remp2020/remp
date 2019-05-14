@@ -4,7 +4,7 @@ namespace Remp\MailerModule\Repository;
 
 interface IConversionsRepository
 {
-    public function getBatchTemplateConversions($batchId, $mailTemplateCode): array;
+    public function getBatchTemplatesConversions(array $batchIds, array $mailTemplateCodes): array;
 
-    public function getNonBatchTemplateConversions($mailTemplateCode): array;
+    public function getNonBatchTemplateConversions(array $mailTemplateCodes): array;
 }

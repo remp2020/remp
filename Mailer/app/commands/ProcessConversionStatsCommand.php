@@ -90,11 +90,28 @@ class ProcessConversionStatsCommand extends Command
             $progressBar->setFormat('processStats');
             $progressBar->start();
 
+            $jobBatchIds = [];
+            $mailTemplateCodes = [];
+
+            foreach ($batchTemplates as $batchTemplate) {
+                $jobBatchIds[$batchTemplate->mail_job_batch_id] = true;
+                $mailTemplateCodes[$batchTemplate->mail_template->code] = true;
+            }
+            $batchTemplatesConversions = $this->conversionsRepository->getBatchTemplatesConversions(
+                array_keys($jobBatchIds),
+                array_keys($mailTemplateCodes)
+            );
+
             /** @var ActiveRow $batchTemplate */
             foreach ($batchTemplates as $batchTemplate) {
                 $progressBar->setMessage('Processing jobBatchTemplate <info>' . $batchTemplate->id . '</info>', 'processing');
 
-                $batchTemplateConversions = $this->conversionsRepository->getBatchTemplateConversions($batchTemplate->mail_job_batch->id, $batchTemplate->mail_template->code);
+                if (!isset($batchTemplatesConversions[$batchTemplate->mail_job_batch_id][$batchTemplate->mail_template->code])) {
+                    $progressBar->advance();
+                    continue;
+                }
+
+                $batchTemplateConversions = $batchTemplatesConversions[$batchTemplate->mail_job_batch->id][$batchTemplate->mail_template->code] ?? [];
                 $userData = $this->getUserData(array_keys($batchTemplateConversions));
 
                 foreach ($batchTemplateConversions as $userId => $time) {
@@ -139,11 +156,25 @@ class ProcessConversionStatsCommand extends Command
             $progressBar->setFormat('processStats');
             $progressBar->start();
 
+            $mailTemplateCodes = [];
+
+            foreach ($templates as $template) {
+                $mailTemplateCodes[$template->code] = true;
+            }
+            $nonBatchTemplatesConversions = $this->conversionsRepository->getNonBatchTemplateConversions(
+                array_keys($mailTemplateCodes)
+            );
+
             /** @var ActiveRow $template */
             foreach ($templates as $template) {
                 $progressBar->setMessage('Processing template <info>' . $template->id . '</info>', 'processing');
 
-                $nonBatchTemplateConversions = $this->conversionsRepository->getNonBatchTemplateConversions($template->code);
+                if (!isset($batchTemplatesConversions[$batchTemplate->mail_job_batch_id][$batchTemplate->mail_template->code])) {
+                    $progressBar->advance();
+                    continue;
+                }
+
+                $nonBatchTemplateConversions = $nonBatchTemplatesConversions[$batchTemplate->mail_template->code] ?? [];
                 $userData = $this->getUserData(array_keys($nonBatchTemplateConversions));
 
                 foreach ($nonBatchTemplateConversions as $userId => $time) {
