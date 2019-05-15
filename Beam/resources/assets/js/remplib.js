@@ -48,6 +48,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentActive: false,
 
+        progressTracking: false,
+
+        trackedProgress: [],
+
+        trackedArticle: null,
+
+        trackedProgressInterval: 5,
+
+        timeForWindowHeight: 5,
+
         initialized: false,
 
         init: function(config) {
@@ -98,6 +108,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.tracker.article.locked !== 'undefined') {
                     this.article.locked = config.tracker.article.locked;
                 }
+                if (typeof config.articleElementFn !== 'undefined') {
+                    this.trackedArticle = config.articleElementFn
+                }
             } else {
                 this.article = null;
             }
@@ -121,6 +134,26 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             window.addEventListener("campaign_showtime", this.syncOverridableFields);
             window.addEventListener("campaign_showtime", this.syncFlags);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
+
+            if (typeof config.tracker.readingProgress === 'object' && config.tracker.readingProgress.enabled === true) {
+                this.progressTracking = true;
+
+                if (typeof config.tracker.readingProgress.interval !== 'undefined') {
+                    this.trackedProgressInterval = config.tracker.readingProgress.interval;
+                }
+                if (typeof config.tracker.readingProgress.timeForWindowHeight !== 'undefined') {
+                    this.timeForWindowHeight = config.tracker.readingProgress.timeForWindowHeight;
+                }
+
+                setInterval(function () {
+                    remplib.tracker.sendTrackedProgress()
+                }, (remplib.tracker.trackedProgressInterval * 1000));
+
+                window.addEventListener("scroll", this.scrollProgressEvent);
+                window.addEventListener("resize", this.scrollProgressEvent);
+                window.addEventListener("scroll_progress", this.trackProgress);
+                window.addEventListener("beforeunload", this.sendTrackedProgress(true));
+            }
 
             this.initialized = true;
         },
@@ -572,6 +605,78 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (0 === this.totalTimeSpent % logInterval) {
                 this.trackTimespent();
             }
+        },
+
+        actualProgress: function() {
+            var element = document.documentElement,
+                body = document.body;
+
+
+            return (body.scrollTop||body.scrollTop) / ((element.scrollHeight||body.scrollHeight - element.clientHeight));
+        },
+
+        scrollProgressEvent: function () {
+            var article = remplib.tracker.trackedArticle(),
+                page = { page: remplib.tracker.actualProgress() },
+                currentPosition = (document.documentElement.scrollTop||document.body.scrollTop);
+
+            if (article) {
+                page.article = Math.min( 1, Math.max( 0, ( currentPosition - article.offsetTop) / article.offsetHeight ));
+            }
+
+            let event = new CustomEvent("scroll_progress", {
+                detail: page,
+            });
+
+            window.dispatchEvent(event);
+        },
+
+        trackProgress: function (event) {
+            const windowHeight = window.innerHeight / document.body.scrollHeight;
+            var page = event.detail,
+                progress = remplib.tracker.trackedProgress;
+
+            if (progress.length) {
+                //Prevent fast scrolling
+                if (event.timeStamp - progress[progress.length - 1].event.timeStamp < (remplib.tracker.timeForWindowHeight * 1000) && page.document - progress[progress.length - 1].page > windowHeight) {
+                    return false;
+                }
+            }
+
+            var data = {
+                "event": event,
+                "page_ratio": page.page,
+            };
+
+            if (typeof page.article !== 'undefined') {
+                data.article_ratio = page.article;
+            }
+            remplib.tracker.trackedProgress.push(data);
+        },
+
+        sendTrackedProgress: function (unload = false) {
+            const lastPossiton = remplib.tracker.trackedProgress[remplib.tracker.trackedProgress.length - 1];
+
+            if (!lastPossiton) {
+                return;
+            }
+
+
+            var params = {
+                "action": "progress",
+                "progress": {
+                    "page_ratio": lastPossiton.page_ratio,
+                    "unload": unload
+                }
+            };
+
+            if (typeof lastPossiton.article_ratio !== 'undefined') {
+                params.progress.article_ratio = lastPossiton.article_ratio;
+            }
+
+            params = this.addSystemUserParams(params);
+            remplib.tracker.post(this.url + "/track/pageview", params);
+            remplib.tracker.trackedProgress = [];
         }
     };
 
