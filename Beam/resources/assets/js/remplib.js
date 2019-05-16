@@ -59,8 +59,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         trackedProgressInterval: 5,
 
-        timeForWindowHeight: 10,
-
         initialized: false,
 
         init: function(config) {
@@ -143,9 +141,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                 if (typeof config.tracker.readingProgress.interval !== 'undefined') {
                     this.trackedProgressInterval = config.tracker.readingProgress.interval;
-                }
-                if (typeof config.tracker.readingProgress.timeForWindowHeight !== 'undefined') {
-                    this.timeForWindowHeight = config.tracker.readingProgress.timeForWindowHeight;
                 }
 
                 setInterval(function() {
