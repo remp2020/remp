@@ -504,10 +504,57 @@ func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error)
 		return nil, errors.Wrap(err, fmt.Sprintf("unable to get field mappings for index: %s", index))
 	}
 
+	// prepare mapping map and reading callback
+	fields := make(map[string]string)
+
+	readMapping := func(root map[string]interface{}) error {
+		mappings, ok := root["mappings"].(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("\"mappings\" field not present within field mapping response")
+		}
+		doc, ok := mappings["_doc"].(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("invalid document provided, no mapping data available for document: _doc")
+		}
+		properties, ok := doc["properties"].(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("\"properties\" field not present within field mapping response for document: _doc")
+		}
+
+		for f, rawField := range properties {
+			if _, ok := fields[f]; ok {
+				// field is already mapped
+				continue
+			}
+
+			field, ok := rawField.(map[string]interface{})
+			if !ok {
+				return fmt.Errorf("unexpected type of field property, expected map[string]interface{}: %T", rawField)
+			}
+			typ, ok := field["type"].(string)
+			if !ok {
+				return fmt.Errorf("non-string field property mapping type received: %T", field["type"])
+			}
+			fields[f] = typ
+
+			subfields, ok := field["fields"].(map[string]interface{})
+			if ok {
+				if _, ok := subfields["keyword"]; ok {
+					fields[fmt.Sprintf("%s.keyword", f)] = "keyword"
+				}
+			}
+		}
+
+		return nil
+	}
+
 	// read mapping info of index
 	root, ok := result[index].(map[string]interface{})
-	if !ok {
-		// there's no such index, but there might be an alias
+	if ok {
+		// mapping found directly for requested index
+		readMapping(root)
+	} else {
+		// there's no such index, but there might be an alias, let's try those
 		aliases, err := eDB.Client.Aliases().Index(index).Do(eDB.Context)
 		if err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("unable to get aliases for index: %s", index))
@@ -518,45 +565,17 @@ func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error)
 			return nil, fmt.Errorf("invalid index provided, no mapping data available: %s", index)
 		}
 
-		sort.Strings(indices)
-		root, ok = result[indices[len(indices)-1]].(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("invalid alias provided, no mapping data available: %s", index)
-		}
-	}
-
-	mappings, ok := root["mappings"].(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("\"mappings\" field not present within field mapping response")
-	}
-	doc, ok := mappings["_doc"].(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("invalid document provided, no mapping data available for document: _doc")
-	}
-	properties, ok := doc["properties"].(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("\"properties\" field not present within field mapping response for document: _doc")
-	}
-
-	fields := make(map[string]string)
-	for f, rawField := range properties {
-		field, ok := rawField.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("unexpected type of field property, expected map[string]interface{}: %T", rawField)
-		}
-		typ, ok := field["type"].(string)
-		if !ok {
-			return nil, fmt.Errorf("non-string field property mapping type received: %T", field["type"])
-		}
-		fields[f] = typ
-
-		subfields, ok := field["fields"].(map[string]interface{})
-		if ok {
-			if _, ok := subfields["keyword"]; ok {
-				fields[fmt.Sprintf("%s.keyword", f)] = "keyword"
+		// sort aliases by name in reverse order and run mappings
+		sort.Sort(sort.Reverse(sort.StringSlice(indices)))
+		for _, idx := range indices {
+			root, ok = result[idx].(map[string]interface{})
+			if !ok {
+				return nil, fmt.Errorf("invalid alias provided, no mapping data available: %s", idx)
 			}
+			readMapping(root)
 		}
 	}
+
 	eDB.fieldsCache[index] = fields
 	return fields, nil
 }
