@@ -64,6 +64,11 @@ class ListsRepository extends Repository
         )->update(['sorting+=' => 1]);
     }
 
+    public function findByCode($code)
+    {
+        return $this->getTable()->where(['code' => $code]);
+    }
+
     public function findByCategory($categoryId)
     {
         return $this->getTable()->where(['mail_type_category_id' => $categoryId]);

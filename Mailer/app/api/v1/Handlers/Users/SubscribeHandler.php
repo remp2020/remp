@@ -55,8 +55,9 @@ class SubscribeHandler extends BaseHandler
         if (!isset($data['user_id'])) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: user_id']);
         }
-        if (!isset($data['list_id'])) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: list_id']);
+
+        if (!isset($data['list_id']) && !isset($data['list_code'])) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: list_id or list_code']);
         }
 
         if (isset($data['variant_id'])) {
@@ -66,7 +67,12 @@ class SubscribeHandler extends BaseHandler
             }
             $variantId = $variant->id;
         } else {
-            $list = $this->listsRepository->find($data['list_id']);
+            if (isset($data['list_code'])) {
+                $list = $this->listsRepository->findByCode($data['list_code'])->fetch();
+            } else {
+                $list = $this->listsRepository->find($data['list_id']);
+            }
+
             if ($list === false) {
                 return new JsonApiResponse(404, ['status' => 'error', 'message' => 'List not found.']);
             }

@@ -25,6 +25,7 @@ class MailTypesListingHandler extends BaseHandler
         $output = [];
         foreach ($results as $row) {
             $item = new \stdClass();
+            $item->id = $row->id;
             $item->code = $row->code;
             $item->title = $row->title;
             $output[] = $item;

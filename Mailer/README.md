@@ -394,7 +394,10 @@ for that, please visit `/list/new` to create newsletter via web admin.
 {
 	"email": "admin@example.com", // String; email of the user
 	"user_id": 123, // Integer; ID of the user
-	"list_id": 1 // Integer; ID of the newsletter list you're subscribing the user to
+	
+	// one of the following is required
+	"list_id": 14, // Integer; ID of the newsletter list you're subscribing the user to
+	"list_code": "alerts", // String; code of the newsletter list you're subscribing the user to
 }
 ```
 
@@ -449,10 +452,15 @@ of emails won't be available.
 
 ```json5
 {
-	"email": "admin@example.com", // String; email of the user
-	"user_id": 123, // Integer; ID of the user
-	"list_id": 1, // Integer; ID of the newsletter list you're subscribing the user to
-	"utm_params": { // Object; optional UTM parameters for pairing which email caused the user to unsubscribe. UTM params are generated into the email links automatically.
+    "email": "admin@example.com", // String; email of the user
+    "user_id": 123, // Integer; ID of the user
+	
+    // one of the following is required
+    "list_id": 14, // Integer; ID of the newsletter list you're subscribing the user to
+    "list_code": "alerts", // String; code of the newsletter list you're subscribing the user to
+    
+    // optional UTM parameters for tracking "what" made the user unsubscribe
+    "utm_params": { // Object; optional UTM parameters for pairing which email caused the user to unsubscribe. UTM params are generated into the email links automatically.
         "utm_source": "newsletter_daily",
         "utm_medium": "email",
         "utm_campaign": "daily-newsletter-11.3.2019-personalized",
@@ -601,6 +609,7 @@ Response:
     "status": "ok",
     "data": [
         {
+            "id": 14,
             "code": "alerts",
             "title": "Breaking news"
         }
