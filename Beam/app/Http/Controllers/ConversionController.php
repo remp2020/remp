@@ -166,12 +166,17 @@ class ConversionController extends Controller
             $conversion = Conversion::firstOrNew([
                 'transaction_id' => $c['transaction_id'],
             ]);
+
+            $shouldAggregateEvents = !$conversion->exists;
+
             $conversion->fill($c);
             $conversion->save();
 
-            Artisan::queue(AggregateConversionEvents::COMMAND, [
-                '--conversion_id' => $conversion->id
-            ]);
+            if ($shouldAggregateEvents) {
+                Artisan::queue(AggregateConversionEvents::COMMAND, [
+                    '--conversion_id' => $conversion->id
+                ]);
+            }
         }
 
         return response()->format([
