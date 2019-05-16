@@ -29,7 +29,7 @@ class AggregateRequest
         $this->action = $action;
     }
 
-    public function addNegativeFilter(string $tag, string ...$values): AggregateRequest
+    public function addInverseFilter(string $tag, string ...$values): AggregateRequest
     {
         foreach ($values as &$v) {
             $v = strval($v);

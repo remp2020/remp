@@ -34,7 +34,7 @@ class ListRequest
         return $this;
     }
 
-    public function addNegativeFilter(string $tag, string ...$values): ListRequest
+    public function addInverseFilter(string $tag, string ...$values): ListRequest
     {
         foreach ($values as &$v) {
             $v = strval($v);

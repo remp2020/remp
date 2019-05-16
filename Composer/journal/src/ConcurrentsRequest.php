@@ -12,7 +12,7 @@ class ConcurrentsRequest
 
     protected $timeAfter;
 
-    public function addNegativeFilter(string $tag, string ...$values)
+    public function addInverseFilter(string $tag, string ...$values)
     {
         foreach ($values as &$v) {
             $v = strval($v);
