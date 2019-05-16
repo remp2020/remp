@@ -1,5 +1,6 @@
 import Remplib from 'remp/js/remplib'
 import Hash from 'fnv1a'
+import { throttle } from 'lodash';
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
@@ -51,6 +52,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         progressTracking: false,
 
         trackedProgress: [],
+
+        maxPageProgressAchieved: 0,
 
         trackedArticle: null,
 
@@ -633,7 +636,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return (body.scrollTop + body.clientHeight) / body.scrollHeight;
         },
 
-        scrollProgressEvent: function() {
+        scrollProgressEvent: throttle(function() {
             const body = document.body,
                 article = remplib.tracker.trackedArticle(),
                 payload = {pageScrollRatio: remplib.tracker.pageProgress(), timestamp: new Date()};
@@ -649,20 +652,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             });
 
             window.dispatchEvent(event);
-        },
+        }, 250),
 
         trackProgress: function(currentEvent) {
-            const viewableWindowHeightRatio = window.innerHeight / document.body.scrollHeight,
-                trackedProgress = remplib.tracker.trackedProgress;
+            // maybe do here some sort of fast scrolling check in the future if is needed
 
-            if (trackedProgress.some(trackedItem => {
-                const littleTimeDifferenceBetweenTwoEvents = (currentEvent.detail.timestamp - trackedItem.detail.timestamp) / 1000 < remplib.tracker.timeForWindowHeight,
-                    bigScrollDifferenceBetweenTwoEvents = currentEvent.detail.pageScrollRatio - trackedItem.detail.pageScrollRatio > viewableWindowHeightRatio;
-                return (littleTimeDifferenceBetweenTwoEvents && bigScrollDifferenceBetweenTwoEvents);
-            })) {
-                // user is scrolling too fast
+            if (currentEvent.detail.pageScrollRatio <= remplib.tracker.maxPageProgressAchieved) {
                 return;
             }
+
+            remplib.tracker.maxPageProgressAchieved = currentEvent.detail.pageScrollRatio;
 
             remplib.tracker.trackedProgress.push(currentEvent);
         },
