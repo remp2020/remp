@@ -150,7 +150,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 window.addEventListener("scroll", this.scrollProgressEvent);
                 window.addEventListener("resize", this.scrollProgressEvent);
                 window.addEventListener("scroll_progress", this.trackProgress);
-                window.addEventListener("beforeunload", this.sendTrackedProgress(true));
+                window.addEventListener("beforeunload", function() {
+                    this.sendTrackedProgress(true)
+                });
             }
 
             this.initialized = true;
