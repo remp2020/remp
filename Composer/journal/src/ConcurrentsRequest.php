@@ -20,7 +20,7 @@ class ConcurrentsRequest
         $this->filterBy[] = [
             "tag" => $tag,
             "values" => $values,
-            "inverse" => false,
+            "inverse" => true,
         ];
     }
 
@@ -32,7 +32,7 @@ class ConcurrentsRequest
         $this->filterBy[] = [
             "tag" => $tag,
             "values" => $values,
-            "inverse" => true,
+            "inverse" => false,
         ];
     }
 
