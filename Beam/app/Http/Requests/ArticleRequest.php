@@ -25,7 +25,7 @@ class ArticleRequest extends FormRequest
     {
         return [
             'external_id' => "required|string",
-            'property_uuid' => "required|string",
+            'property_uuid' => "required|string|exists:properties,uuid",
             'title' => "required|string",
             'url' => "required|url",
             'authors' => 'array',

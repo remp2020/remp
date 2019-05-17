@@ -25,7 +25,7 @@ class ArticleUpsertRequest extends FormRequest
     {
         return [
             'articles.*.external_id' => "required|string",
-            'articles.*.property_uuid' => "required|string",
+            'articles.*.property_uuid' => "required|string|exists:properties,uuid",
             'articles.*.title' => "required|string",
             'articles.*.url' => "required|url",
             'articles.*.authors' => 'array',

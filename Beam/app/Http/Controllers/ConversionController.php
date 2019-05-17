@@ -159,6 +159,7 @@ class ConversionController extends Controller
 
     public function upsert(ConversionUpsertRequest $request)
     {
+        $conversions = [];
         foreach ($request->get('conversions', []) as $c) {
             // When saving to DB, Eloquent strips timezone information,
             // therefore convert to UTC
@@ -171,6 +172,7 @@ class ConversionController extends Controller
 
             $conversion->fill($c);
             $conversion->save();
+            $conversions[] = $conversion;
 
             if ($shouldAggregateEvents) {
                 Artisan::queue(AggregateConversionEvents::COMMAND, [
@@ -181,7 +183,7 @@ class ConversionController extends Controller
 
         return response()->format([
             'html' => redirect(route('conversions.index'))->with('success', 'Conversions created'),
-            'json' => new JsonResource([]),
+            'json' => ConversionResource::collection(collect($conversions)),
         ]);
     }
 }
