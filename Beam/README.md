@@ -277,6 +277,12 @@ var rempConfig = {
         // optional time spent measuring (default value `false`)
         // if enabled, tracks time spent on current page
         timeSpentEnabled: true,
+        
+        // optional, achieved scroll depth tracking (default value `false`)
+        readingProgress: {
+            enabled: Boolean, // if enabled, tracks achieved scroll depth
+            interval: Number // optional, frequency of sending tracked progress in seconds (default value 5)
+        }
     },
 };
 remplib.tracker.init(rempConfig);
