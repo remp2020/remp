@@ -28,7 +28,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             variants: {},
         },
 
-        extras: {},
+        explicitRefererMedium: null,
 
         uriParams: {},
 
@@ -104,8 +104,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.article = null;
             }
 
-            if (typeof config.tracker.extras === 'object') {
-                this.extras = config.tracker.extras;
+            if (typeof config.tracker.explicit_referer_medium !== 'undefined') {
+                this.explicitRefererMedium = config.tracker.explicit_referer_medium;
             }
 
             if (typeof config.cookieDomain === 'string') {
@@ -304,7 +304,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "article": this.article,
                 "action": "load",
             };
-            params = this.addSystemUserParams(params, this.extras);
+            params = this.addSystemUserParams(params);
             this.post(this.url + "/track/pageview", params);
             this.dispatchEvent("pageview", "load", params);
         },
@@ -433,7 +433,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         checkWebsocketsSupport: function () {
             remplib.tracker.websocketsSupported = 'WebSocket' in window || false;
         },
-        addSystemUserParams: function(params, extras) {
+        addSystemUserParams: function(params) {
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
             params["user"] = {
@@ -459,8 +459,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
             params["user"][remplib.rempPageviewIDKey] = remplib.getRempPageviewID();
 
-            if (extras) {
-                params["user"]["extras"] = extras;
+            if (this.explicitRefererMedium) {
+                params["user"]["explicit_referer_medium"] = this.explicitRefererMedium;
             }
 
             var cleanup = function(obj) {
