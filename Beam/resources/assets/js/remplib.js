@@ -139,7 +139,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.tracker.readingProgress === 'object' && config.tracker.readingProgress.enabled === true) {
                 this.progressTracking = true;
 
-                if (typeof config.tracker.readingProgress.interval !== 'undefined') {
+                if (typeof config.tracker.readingProgress.interval === 'number' && config.tracker.readingProgress.interval >= 1) {
                     this.trackedProgressInterval = config.tracker.readingProgress.interval;
                 }
 
