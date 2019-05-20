@@ -379,7 +379,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "step": "refund",
                 "article": this.article,
                 "refund": {
-                    "amount": transactionId,
+                    "transaction_id": transactionId,
                     "revenue": {
                         "amount": amount,
                         "currency": currency
