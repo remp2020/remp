@@ -104,7 +104,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.article = null;
             }
 
-            if (typeof config.tracker.explicit_referer_medium !== 'undefined') {
+            let explicitRefererMediumType = typeof config.tracker.explicit_referer_medium;
+            if (explicitRefererMediumType !== 'undefined') {
+                if (explicitRefererMediumType !== 'string') {
+                    throw "remplib: value of tracker.explicit_referer_medium has to be string, instead " + explicitRefererMediumType + " provided";
+                }
                 this.explicitRefererMedium = config.tracker.explicit_referer_medium;
             }
 
