@@ -138,8 +138,12 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) mo
 
 	for _, val := range payload.FilterBy {
 		fb := &model.FilterBy{
-			Tag:    val.Tag,
-			Values: val.Values,
+			Tag:     val.Tag,
+			Values:  val.Values,
+			Inverse: false,
+		}
+		if val.Inverse != nil {
+			fb.Inverse = *val.Inverse
 		}
 		o.FilterBy = append(o.FilterBy, fb)
 	}

@@ -32,8 +32,9 @@ type TimeHistogram struct {
 
 // FilterBy represents tag and values used to filter results of count-related calls.
 type FilterBy struct {
-	Tag    string
-	Values []string
+	Tag     string
+	Values  []string
+	Inverse bool
 }
 
 // Webalize replaces all spaces with dash and removes all non-alphanumerical characters.

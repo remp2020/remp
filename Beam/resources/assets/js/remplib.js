@@ -29,6 +29,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             variants: {},
         },
 
+        explicitRefererMedium: null,
+
         uriParams: {},
 
         segmentProvider: "remp_segment",
@@ -114,6 +116,15 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             } else {
                 this.article = null;
+            }
+
+            let explicitRefererMediumType = typeof config.tracker.explicit_referer_medium;
+            if (explicitRefererMediumType !== 'undefined') {
+                if (explicitRefererMediumType !== 'string') {
+                    console.warn("remplib: value of tracker.explicit_referer_medium has to be string, instead " + explicitRefererMediumType + " provided")
+                } else {
+                    this.explicitRefererMedium = config.tracker.explicit_referer_medium;
+                }
             }
 
             if (typeof config.cookieDomain === 'string') {
@@ -469,7 +480,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         checkWebsocketsSupport: function() {
             remplib.tracker.websocketsSupported = 'WebSocket' in window || false;
         },
-
         addSystemUserParams: function(params) {
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
@@ -495,6 +505,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
             params["user"][remplib.rempPageviewIDKey] = remplib.getRempPageviewID();
+
+            if (this.explicitRefererMedium) {
+                params["user"]["explicit_referer_medium"] = this.explicitRefererMedium;
+            }
 
             var cleanup = function(obj) {
                 Object.keys(obj).forEach(function(key) {

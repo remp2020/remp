@@ -56,6 +56,7 @@ var EventOptionsFilterBy = Type("EventOptionsFilterBy", func() {
 
 	Attribute("tag", String, "Tag used to filter results")
 	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
+	Attribute("inverse", Boolean, "If true, condition will be inversed")
 
 	Required("tag", "values")
 })
@@ -87,6 +88,7 @@ var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
 
 	Attribute("tag", String, "Tag used to filter results (use tag name: user_id, article_id, ...)")
 	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
+	Attribute("inverse", Boolean, "If true, condition will be inversed")
 
 	Required("tag", "values")
 })
@@ -127,6 +129,7 @@ var CommerceOptionsFilterBy = Type("CommerceOptionsFilterBy", func() {
 
 	Attribute("tag", String, "Tag used to filter results")
 	Attribute("values", ArrayOf(String), "Values of TAG used to filter result")
+	Attribute("inverse", Boolean, "If true, condition will be inversed")
 
 	Required("tag", "values")
 })

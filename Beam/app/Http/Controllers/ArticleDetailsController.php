@@ -39,7 +39,9 @@ class ArticleDetailsController extends Controller
 
         $data = $this->histogram($article, $journalInterval, $groupBy, function (AggregateRequest $request) {
             $request->addFilter('derived_referer_medium', 'internal');
+            $request->addInverseFilter('explicit_referer_medium', 'mpm');
         });
+
         $data['colors'] = Colors::abTestVariantTagsToColors($data['tags']);
 
         $tagToColor = [];

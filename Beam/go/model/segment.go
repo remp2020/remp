@@ -404,7 +404,7 @@ func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time
 // getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
 func (sDB *SegmentDB) getRuleEventCount(sr *SegmentRule, tagName, tagValue string, now time.Time, ro RuleOverrides) (int, error) {
 	options := sr.options(now, ro)
-	options.FilterBy = append(options.FilterBy, &FilterBy{tagName, []string{tagValue}})
+	options.FilterBy = append(options.FilterBy, &FilterBy{Tag: tagName, Values: []string{tagValue}})
 
 	var crc CountRowCollection
 	var ok bool

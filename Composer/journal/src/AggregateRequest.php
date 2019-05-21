@@ -29,6 +29,19 @@ class AggregateRequest
         $this->action = $action;
     }
 
+    public function addInverseFilter(string $tag, string ...$values): AggregateRequest
+    {
+        foreach ($values as &$v) {
+            $v = strval($v);
+        }
+        $this->filterBy[] = [
+            "tag" => $tag,
+            "values" => $values,
+            "inverse" => true,
+        ];
+        return $this;
+    }
+
     public function addFilter(string $tag, string ...$values): AggregateRequest
     {
         foreach ($values as &$v) {
@@ -37,6 +50,7 @@ class AggregateRequest
         $this->filterBy[] = [
             "tag" => $tag,
             "values" => $values,
+            "inverse" => false,
         ];
         return $this;
     }

@@ -34,6 +34,19 @@ class ListRequest
         return $this;
     }
 
+    public function addInverseFilter(string $tag, string ...$values): ListRequest
+    {
+        foreach ($values as &$v) {
+            $v = strval($v);
+        }
+        $this->filterBy[] = [
+            "tag" => $tag,
+            "values" => $values,
+            "inverse" => true,
+        ];
+        return $this;
+    }
+
     public function addFilter(string $tag, string ...$values): ListRequest
     {
         foreach ($values as &$v) {
@@ -42,6 +55,7 @@ class ListRequest
         $this->filterBy[] = [
             "tag" => $tag,
             "values" => $values,
+            "inverse" => false,
         ];
         return $this;
     }

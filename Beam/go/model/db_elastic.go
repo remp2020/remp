@@ -65,7 +65,12 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 		if err != nil {
 			return nil, err
 		}
-		bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
+
+		if f.Inverse {
+			bq = bq.MustNot(elastic.NewTermsQuery(field, interfaceSlice...))
+		} else {
+			bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
+		}
 	}
 
 	if o.Category != "" {

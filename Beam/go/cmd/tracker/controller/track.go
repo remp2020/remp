@@ -394,6 +394,9 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 		if user.Subscriber != nil {
 			fields["subscriber"] = *user.Subscriber
 		}
+		if user.ExplicitRefererMedium != nil {
+			tags["explicit_referer_medium"] = *user.ExplicitRefererMedium
+		}
 	} else {
 		fields["signed_in"] = false
 	}

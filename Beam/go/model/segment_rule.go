@@ -181,7 +181,7 @@ func (sr *SegmentRule) options(now time.Time, o RuleOverrides) AggregateOptions 
 		if def["key"] == "" || def["value"] == "" {
 			continue
 		}
-		options.FilterBy = append(options.FilterBy, &FilterBy{Tag: def["key"], Values: []string{def["value"]}})
+		options.FilterBy = append(options.FilterBy, &FilterBy{Tag: def["key"], Values: []string{def["value"]}, Inverse: false})
 	}
 
 	if sr.Timespan.Valid {
