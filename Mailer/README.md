@@ -377,6 +377,107 @@ Response:
 
 ---
 
+#### POST `/api/v1/users/bulk-user-registered`
+
+Similar to previous api `users/user-registerd`. Subscribes multiple provided users.
+
+When user is registered, Mailer should be notified so it can start tracking newsletter subscription for this new email
+address. This new email address will be automatically subscribed to any newsletter that has enabled *auto subscribe*
+option.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Body:*
+
+```json5
+{
+  "users": [
+      {
+        "email": "admin@example.com",
+        "user_id": "12345"
+      },
+      {
+        "email": "test@example.com",
+        "user_id": "67890"
+      }
+  ]
+}
+```
+
+###### *Properties of one user*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| email | *String* | yes | Email address of user. |
+| user_id | *String* | yes | ID of user. |
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/bulk-user-registered \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "users": [
+          {
+            "email": "admin@example.com",
+            "user_id": "12345"
+          },
+          {
+            "email": "test@example.com",
+            "user_id": "67890"
+          }
+        ]
+      }'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok"
+}
+```
+
+###### *Example with errors:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/bulk-user-registered \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "users": [
+          {
+            "email": "admin@example.com"
+          },
+          {
+            "user_id": "67890"
+          }
+        ]
+      }'
+```
+
+Response:
+
+```json5
+{
+  "status": "error",
+  "message": "Input data contains errors. See included list of errors.",
+  "errors": {
+    "element_0": "Required field missing: user_id.",
+    "element_1": "Required field missing: email."
+  }
+}
+```
+
+---
+
 #### POST `/api/v1/users/subscribe`
 
 API call subscribes email address to the given newsletter. Newsletter has to already be created. As there's no API

@@ -46,11 +46,15 @@ class BulkUserRegisteredHandler extends BaseHandler
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Input data was not valid JSON.']);
         }
 
+        if (!isset($data['users'])) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => "Input data missing 'users' array."]);
+        }
+
         $errors = [];
         $iteration = -1;
         $users = [];
 
-        foreach ($data as $item) {
+        foreach ($data['users'] as $item) {
             $iteration++;
 
             // process email
