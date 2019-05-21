@@ -49,15 +49,15 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentActive: false,
 
-        progressTracking: false,
+        progressTrackingEnabled: false,
+
+        progressTrackingInterval: 5,
 
         trackedProgress: [],
 
         maxPageProgressAchieved: 0,
 
         trackedArticle: null,
-
-        trackedProgressInterval: 5,
 
         initialized: false,
 
@@ -136,16 +136,25 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             window.addEventListener("campaign_showtime", this.syncFlags);
             window.addEventListener("beam_event", this.incrementSegmentRulesCache);
 
-            if (typeof config.tracker.readingProgress === 'object' && config.tracker.readingProgress.enabled === true) {
-                this.progressTracking = true;
+            if (typeof config.tracker.readingProgress === 'object') {
+                if (typeof config.tracker.readingProgress.enabled === 'boolean') {
+                    this.progressTrackingEnabled = config.tracker.readingProgress.enabled;
+                }
+                if (!this.progressTrackingEnabled) {
+                    return;
+                }
 
-                if (typeof config.tracker.readingProgress.interval === 'number' && config.tracker.readingProgress.interval >= 1) {
-                    this.trackedProgressInterval = config.tracker.readingProgress.interval;
+                if (typeof config.tracker.readingProgress.interval === 'number') {
+                    if (config.tracker.readingProgress.interval >= 1) {
+                        this.progressTrackingInterval = config.tracker.readingProgress.interval;
+                    } else {
+                        console.warn("remplib cannot be initialized with readingProgress.interval less than 1, keeping default value (" + this.progressTrackingInterval + ")")
+                    }
                 }
 
                 setInterval(function() {
                     remplib.tracker.sendTrackedProgress()
-                }, (remplib.tracker.trackedProgressInterval * 1000));
+                }, (remplib.tracker.progressTrackingInterval * 1000));
 
                 window.addEventListener("scroll", this.scrollProgressEvent);
                 window.addEventListener("resize", this.scrollProgressEvent);
