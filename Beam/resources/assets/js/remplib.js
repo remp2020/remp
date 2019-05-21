@@ -107,9 +107,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             let explicitRefererMediumType = typeof config.tracker.explicit_referer_medium;
             if (explicitRefererMediumType !== 'undefined') {
                 if (explicitRefererMediumType !== 'string') {
-                    throw "remplib: value of tracker.explicit_referer_medium has to be string, instead " + explicitRefererMediumType + " provided";
+                    console.warn("remplib: value of tracker.explicit_referer_medium has to be string, instead " + explicitRefererMediumType + " provided")
+                } else {
+                    this.explicitRefererMedium = config.tracker.explicit_referer_medium;
                 }
-                this.explicitRefererMedium = config.tracker.explicit_referer_medium;
             }
 
             if (typeof config.cookieDomain === 'string') {
