@@ -562,7 +562,7 @@ of payment life-cycle:
 
 See the available endpoints with full JSON structure at `/swagger.json` path of running Tracker API.
 
-##### Javascript Snippet
+#### Javascript Snippet
 
 Any pageview-related data should be tracked from within the browser. Beam provides JS library and snippet
 for tracking these kind of data.
@@ -655,6 +655,60 @@ var rempConfig = {
 };
 remplib.tracker.init(rempConfig);
 ```
+
+##### Pageview tracking
+
+All pageviews are tracked automatically when `remplib.tracker.init()` is called. Pageview is tracked only once immediately
+after the initialization.
+
+##### Timespent tracking
+
+Optionally you can enable timespent tracking, which tracks amount of second user spent on a website. Tracking is done
+periodically and on the page unload (when user leaves the page). Timespent is linked to the pageview data by internal
+`remp_pageview_id` field which can be found in the Elasticsearch data.
+
+Tracking period is not configurable right now. It starts on tick every 5 seconds and raises logarithmically longer
+the user is on the website.
+
+You can enable the tracking by setting `rempConfig.tracker.timeSpentEnabled = true`.
+
+##### Reading progress tracking
+
+Optionally you can enable reading progress tracking, which tracks how far the user read the webpage. Tracking is done
+periodially and on the page unload (when user leaves the page). Reading progress is linked to the pageview data by
+internal `remp_pageview_id` field which can be found in the Elasticsearch data.
+
+Reading progress period is configurable and defaults to update to server every 5 seconds. The minimum period to track
+is 1 second, but it's safe to raise it to more than 5 seconds as *unload* event tracks the progress anyway.
+
+You can enable the tracking by setting `rempConfig.tracker.readingProgress = { enabled: true }`
+
+##### JS tracking interface
+
+* `remplib.tracker.trackEvent(category, action, tags, fields, source)`: tracks generic events to Beam
+    * `category`: Category of event (e.g. `"spring promo"`).
+    * `action`: Actual event name (e.g. `"click"`).
+    * `tags`: Extra metadata you want to track with event (e.g. `{foo: bar}`).
+    * `fields`: Extra metadata you want to track with event (e.g. `{foo: bar}`)).
+    * `source`: Object with utm parameters (e.g. `{ utm_campaign: "foo" }`). 
+    
+* `remplib.tracker.trackChekout(funnelId)`: tracks checkout commerce event - indicating that user is summarizing his order 
+    * `funnelId`: Reference to funnel bringing user to checkout page. You can use IDs if your system contains referencable
+    funnels or string keys otherwise. If your system doesn't support funnels and you don't need to differentiate them,
+    use `"default"`.
+    
+* `remplib.tracker.trackPayment(transactionId, amount, currency, productIds)`: tracks commerce payment event - indicating
+that the payment has started (user was redirected to payment gateway)
+    * `transactionId`: Reference to transaction (should be unique for every payment; e.g. `"778453213"`) 
+    * `amount`: Numeric amount (e.g. `18.99`)
+    * `currency`: String currency (e.g. `EUR`)
+    * `productIds`: List of purchased products (e.g. `["product_1"]`)
+    
+* `remplib.tracker.trackPurchase(transactionId, amount, currency, productIds)`: tracks commerce purchase event - indicating
+that the payment was successful
+
+* `remplib.tracker.trackRefund(transactionId, amount, currency, productIds)`: tracks commerce refund event - indicating
+that confirmed payment (one that had *purchase* event) was refunded
 
 #### Build Dependencies
 
