@@ -45,12 +45,20 @@ class UserRegisteredHandler extends BaseHandler
             return new JsonApiResponse(200, ['status' => 'ok']);
         }
 
+        $userID = filter_var($params['user_id'], FILTER_VALIDATE_INT);
+        if ($userID === false) {
+            return new JsonApiResponse(400, [
+                'status' => 'error',
+                'message' => "Parameter 'user_id' must be integer. Got [{$params['user_id']}]."
+            ]);
+        }
+
         /** @var ActiveRow $list */
         foreach ($lists as $list) {
             if ($list->auto_subscribe) {
-                $this->userSubscriptionsRepository->subscribeUser($list, $params['user_id'], $params['email']);
+                $this->userSubscriptionsRepository->subscribeUser($list, $userID, $params['email']);
             } else {
-                $this->userSubscriptionsRepository->unsubscribeUser($list, $params['user_id'], $params['email']);
+                $this->userSubscriptionsRepository->unsubscribeUser($list, $userID, $params['email']);
             }
         }
 

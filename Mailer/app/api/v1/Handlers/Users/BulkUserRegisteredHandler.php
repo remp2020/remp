@@ -71,8 +71,18 @@ class BulkUserRegisteredHandler extends BaseHandler
                 $errors = array_merge($errors, ["element_" . $iteration => 'Required field missing: user_id.']);
                 continue;
             }
-            
-            $users[] = $item;
+            $userID = filter_var($item['user_id'], FILTER_VALIDATE_INT);
+            if ($userID === false) {
+                $errors = array_merge($errors, [
+                    "element_" . $iteration => "Invalid field: 'user_id' must be integer. Got [{$item['user_id']}]."
+                ]);
+                continue;
+            }
+
+            $users[] = [
+                'email' => $item['email'],
+                'user_id' => $userID,
+            ];
         }
 
         if (!empty($errors)) {

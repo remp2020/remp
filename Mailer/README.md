@@ -355,7 +355,7 @@ option.
 | Name | Value | Required | Description |
 | --- |---| --- | --- |
 | email | *String* | yes | Email address of user. |
-| user_id | *String* | yes | ID of user. |
+| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes | ID of user. |
 
 ##### *Example:*
 
@@ -413,7 +413,7 @@ option.
 | Name | Value | Required | Description |
 | --- |---| --- | --- |
 | email | *String* | yes | Email address of user. |
-| user_id | *String* | yes | ID of user. |
+| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes | ID of user. |
 
 ##### *Example:*
 
@@ -426,7 +426,7 @@ curl -X POST \
         "users": [
           {
             "email": "admin@example.com",
-            "user_id": "12345"
+            "user_id": 12345
           },
           {
             "email": "test@example.com",
@@ -458,6 +458,10 @@ curl -X POST \
           },
           {
             "user_id": "67890"
+          },
+          {
+            "email": "qa@example.com",
+            "user_id": "qa123"
           }
         ]
       }'
@@ -471,7 +475,8 @@ Response:
   "message": "Input data contains errors. See included list of errors.",
   "errors": {
     "element_0": "Required field missing: user_id.",
-    "element_1": "Required field missing: email."
+    "element_1": "Required field missing: email.",
+    "element_2": "Invalid field: 'user_id' must be integer. Got [qa123]."
   }
 }
 ```
