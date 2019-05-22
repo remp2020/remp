@@ -19,4 +19,9 @@ class ListVariantsRepository extends Repository
             'created_at' => new DateTime()
         ]);
     }
+
+    public function findByIdAndMailTypeId(int $id, int $mailTypeID)
+    {
+        return $this->getTable()->where(['id' => $id, 'mail_type_id' => $mailTypeID])->fetch();
+    }
 }

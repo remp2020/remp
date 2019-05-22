@@ -13,13 +13,10 @@ use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class SubscribeHandler extends BaseHandler
 {
-    /** @var UserSubscriptionsRepository */
     private $userSubscriptionsRepository;
 
-    /** @var ListsRepository */
     private $listsRepository;
 
-    /** @var ListVariantsRepository */
     private $listVariantsRepository;
 
     public function __construct(
@@ -46,40 +43,75 @@ class SubscribeHandler extends BaseHandler
         try {
             $data = Json::decode($params['raw'], Json::FORCE_ARRAY);
         } catch (JsonException $e) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'input data was not valid JSON']);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Input data was not valid JSON.']);
         }
 
         if (!isset($data['email'])) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: email']);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Required field missing: `email`.']);
         }
+        $email = $data['email'];
+
+        // validate user_id
         if (!isset($data['user_id'])) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: user_id']);
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Required field missing: `user_id`.']);
+        }
+        $userID = filter_var($data['user_id'], FILTER_VALIDATE_INT);
+        if ($userID === false) {
+            return new JsonApiResponse(400, [
+                'status' => 'error',
+                'message' => "Parameter 'user_id' must be integer. Got [{$data['user_id']}]."
+            ]);
         }
 
+        // validate & load list
         if (!isset($data['list_id']) && !isset($data['list_code'])) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'required field missing: list_id or list_code']);
+            return new JsonApiResponse(400, [
+                'status' => 'error',
+                'message' => 'Required field missing: `list_id` or `list_code`.',
+            ]);
         }
-
-        if (isset($data['variant_id'])) {
-            $variant = $this->listVariantsRepository->find($data['variant_id']);
-            if ($variant === false || $variant->mail_type_id != $data['list_id']) {
-                return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Wrong parameter.']);
-            }
-            $variantId = $variant->id;
+        if (isset($data['list_code'])) {
+            $list = $this->listsRepository->findByCode($data['list_code'])->fetch();
         } else {
-            if (isset($data['list_code'])) {
-                $list = $this->listsRepository->findByCode($data['list_code'])->fetch();
-            } else {
-                $list = $this->listsRepository->find($data['list_id']);
+            $listID = filter_var($data['list_id'], FILTER_VALIDATE_INT);
+            if ($listID === false) {
+                return new JsonApiResponse(400, [
+                    'status' => 'error',
+                    'message' => "Parameter 'list_id' must be integer. Got [{$data['list_id']}]."
+                ]);
             }
 
-            if ($list === false) {
-                return new JsonApiResponse(404, ['status' => 'error', 'message' => 'List not found.']);
-            }
-            $variantId = $list->default_variant_id;
+            $list = $this->listsRepository->find($listID);
+        }
+        if ($list === false) {
+            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'List not found.']);
         }
 
-        $this->userSubscriptionsRepository->subscribeUser($list, $data['user_id'], $data['email'], $variantId);
+        // validate & load variant
+        if (isset($data['variant_id'])) {
+            $variantID = filter_var($data['variant_id'], FILTER_VALIDATE_INT);
+            if ($variantID === false) {
+                return new JsonApiResponse(400, [
+                    'status' => 'error',
+                    'message' => "Parameter 'variant_id' must be integer. Got [{$data['variant_id']}]."
+                ]);
+            }
+
+            $variant = $this->listVariantsRepository->findByIdAndMailTypeId($variantID, $list->id);
+            if ($variant === false) {
+                return new JsonApiResponse(404, [
+                    'status' => 'error',
+                    'message' => "Variant with ID [{$variantID}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
+                ]);
+            }
+
+            $variantID = $variant->id;
+        } else {
+            $variantID = $list->default_variant_id;
+        }
+
+        // ready to subscribe
+        $this->userSubscriptionsRepository->subscribeUser($list, $userID, $email, $variantID);
 
         return new JsonApiResponse(200, ['status' => 'ok']);
     }
