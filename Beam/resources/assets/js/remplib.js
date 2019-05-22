@@ -665,16 +665,20 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return document.documentElement;
         },
 
+        getElementOffsetTop: function(el) {
+            const rect = el.getBoundingClientRect();
+            return rect.top + (window.pageYOffset || document.documentElement.scrollTop)
+        },
+
         scrollProgressEvent: throttle(function() {
-            const body = document.body,
-                article = remplib.tracker.articleElementFn(),
+            const article = remplib.tracker.articleElementFn(),
                 payload = {pageScrollRatio: remplib.tracker.pageProgress(), timestamp: new Date()};
 
             if (article) {
                 const root = remplib.tracker.getRootElement();
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
                 payload.articleScrollRatio = Math.min(1, Math.max(0,
-                    (scrollTop + root.clientHeight - article.offsetTop) / article.scrollHeight
+                    (scrollTop + root.clientHeight - remplib.tracker.getElementOffsetTop(article)) / article.scrollHeight
                 ));
             }
 
