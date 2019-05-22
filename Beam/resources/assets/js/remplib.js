@@ -651,10 +651,18 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         pageProgress: function() {
-            const body = document.body;
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            const root = remplib.tracker.getRootElement();
+            const scrollTop = window.pageYOffset || root.scrollTop || document.body.scrollTop || 0;
+            return (scrollTop + root.clientHeight) / root.scrollHeight;
+        },
 
-            return (scrollTop + body.clientHeight) / body.scrollHeight;
+        getRootElement: function() {
+            if (document.documentElement.clientHeight === document.documentElement.scrollHeight) {
+                // if documentElement has CSS property setting height to 100%, it's affecting client height
+                // body is used as a safe fallback in such scenario
+                return document.body;
+            }
+            return document.documentElement;
         },
 
         scrollProgressEvent: throttle(function() {
@@ -663,10 +671,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 payload = {pageScrollRatio: remplib.tracker.pageProgress(), timestamp: new Date()};
 
             if (article) {
+                const root = remplib.tracker.getRootElement();
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-
                 payload.articleScrollRatio = Math.min(1, Math.max(0,
-                    (scrollTop + body.clientHeight - article.offsetTop) / article.scrollHeight
+                    (scrollTop + root.clientHeight - article.offsetTop) / article.scrollHeight
                 ));
             }
 
