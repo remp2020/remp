@@ -59,7 +59,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         maxPageProgressAchieved: 0,
 
-        trackedArticle: null,
+        articleElementFn: null,
 
         initialized: false,
 
@@ -112,7 +112,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     this.article.locked = config.tracker.article.locked;
                 }
                 if (typeof config.articleElementFn !== 'undefined') {
-                    this.trackedArticle = config.articleElementFn
+                    this.articleElementFn = config.articleElementFn
                 }
             } else {
                 this.article = null;
@@ -171,7 +171,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 window.addEventListener("resize", this.scrollProgressEvent);
                 window.addEventListener("scroll_progress", this.trackProgress);
                 window.addEventListener("beforeunload", function() {
-                    this.sendTrackedProgress(true)
+                    remplib.tracker.sendTrackedProgress(true)
                 });
             }
 
@@ -652,18 +652,21 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         pageProgress: function() {
             const body = document.body;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
 
-            return (body.scrollTop + body.clientHeight) / body.scrollHeight;
+            return (scrollTop + body.clientHeight) / body.scrollHeight;
         },
 
         scrollProgressEvent: throttle(function() {
             const body = document.body,
-                article = remplib.tracker.trackedArticle(),
+                article = remplib.tracker.articleElementFn(),
                 payload = {pageScrollRatio: remplib.tracker.pageProgress(), timestamp: new Date()};
 
             if (article) {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
                 payload.articleScrollRatio = Math.min(1, Math.max(0,
-                    (body.scrollTop + body.clientHeight - article.offsetTop) / article.scrollHeight
+                    (scrollTop + body.clientHeight - article.offsetTop) / article.scrollHeight
                 ));
             }
 
