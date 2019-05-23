@@ -181,5 +181,12 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) mo
 		}
 	}
 
+	if payload.CountHistogram != nil {
+		o.CountHistogram = &model.CountHistogram{
+			Field:    payload.CountHistogram.Field,
+			Interval: payload.CountHistogram.Interval,
+		}
+	}
+
 	return o
 }

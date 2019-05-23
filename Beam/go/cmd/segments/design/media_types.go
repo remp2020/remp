@@ -22,11 +22,13 @@ var Count = MediaType("application/vnd.count+json", func() {
 		Attribute("tags", HashOf(String, String))
 		Attribute("count", Integer)
 		Attribute("time_histogram", CollectionOf(TimeHistogram))
+		Attribute("count_histogram", CollectionOf(CountHistogram))
 	})
 	View("default", func() {
 		Attribute("tags")
 		Attribute("count")
 		Attribute("time_histogram")
+		Attribute("count_histogram")
 	})
 	Required("tags", "count")
 })
@@ -304,6 +306,19 @@ var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
 		Attribute("value")
 	})
 	Required("time", "value")
+})
+
+var CountHistogram = MediaType("application/vnd.count.histogram+json", func() {
+	Description("Count histogram data")
+	Attributes(func() {
+		Attribute("bucket_key", Number)
+		Attribute("value", Number)
+	})
+	View("default", func() {
+		Attribute("bucket_key")
+		Attribute("value")
+	})
+	Required("bucket_key", "value")
 })
 
 var Commerce = MediaType("application/vnd.commerce+json", func() {
