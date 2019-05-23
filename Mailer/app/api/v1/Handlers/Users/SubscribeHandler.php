@@ -14,7 +14,7 @@ use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class SubscribeHandler extends BaseHandler
 {
-    private $userSubscriptionsRepository;
+    protected $userSubscriptionsRepository;
 
     private $listsRepository;
 
@@ -73,7 +73,7 @@ class SubscribeHandler extends BaseHandler
      * @return string
      * @throws \Exception
      */
-    private function getUserEmail($params): string
+    protected function getUserEmail($params): string
     {
         if (!isset($params['email'])) {
             throw new \Exception('Required field missing: `email`.', 400);
@@ -88,7 +88,7 @@ class SubscribeHandler extends BaseHandler
      * @return int - Returns user_id
      * @throws \Exception - Thrown if user_id is not valid (code 400).
      */
-    private function getUserID($params): int
+    protected function getUserID($params): int
     {
         if (!isset($params['user_id'])) {
             throw new \Exception('Required field missing: `user_id`.', 400);
@@ -108,7 +108,7 @@ class SubscribeHandler extends BaseHandler
      * @return ActiveRow $list - Returns mail list entity.
      * @throws \Exception - Thrown if list_id or list_code are invalid (code 400) or if list is not found (code 404).
      */
-    private function getList($params): ActiveRow
+    protected function getList($params): ActiveRow
     {
         if (!isset($params['list_id']) && !isset($params['list_code'])) {
             throw new \Exception('Required field missing: `list_id` or `list_code`.', 400);
@@ -139,7 +139,7 @@ class SubscribeHandler extends BaseHandler
      * @return null|int - Returns validated Variant ID. If no variant_id was provided, returns list's default variant id (can be null).
      * @throws \Exception - Thrown if variant_id is invalid or doesn't belong to list (code 400) or if variant with given ID doesn't exist (code 404).
      */
-    private function getVariantID(array $params, ActiveRow $list): ?int
+    protected function getVariantID(array $params, ActiveRow $list): ?int
     {
         if (!isset($params['variant_id'])) {
             return $list->default_variant_id;
