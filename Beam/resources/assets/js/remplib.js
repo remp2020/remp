@@ -59,7 +59,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         maxPageProgressAchieved: 0,
 
-        articleElementFn: null,
+        articleElementFn: function() { return null },
 
         initialized: false,
 
