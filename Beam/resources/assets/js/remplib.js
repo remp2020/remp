@@ -710,6 +710,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             let params = {
                 "action": "progress",
+                "article": remplib.tracker.article,
                 "progress": {
                     "page_ratio": lastPosition.detail.pageScrollRatio,
                     "unload": isUnloading
