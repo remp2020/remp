@@ -14,20 +14,27 @@ type ListOptions struct {
 
 // AggregateOptions represent filter options for aggregate-related calls.
 type AggregateOptions struct {
-	Category      string
-	Action        string
-	Step          string
-	FilterBy      []*FilterBy
-	GroupBy       []string
-	TimeAfter     time.Time
-	TimeBefore    time.Time
-	TimeHistogram *TimeHistogram
+	Category       string
+	Action         string
+	Step           string
+	FilterBy       []*FilterBy
+	GroupBy        []string
+	TimeAfter      time.Time
+	TimeBefore     time.Time
+	TimeHistogram  *TimeHistogram
+	CountHistogram *CountHistogram
 }
 
-// TimeHistogram is used to split response to buckets
+// TimeHistogram is used to split response to time-based buckets.
 type TimeHistogram struct {
 	Interval string
 	Offset   string
+}
+
+// CountHistogram is used to split count of matched results based on provided Field within specified Interval.
+type CountHistogram struct {
+	Field    string
+	Interval float64
 }
 
 // FilterBy represents tag and values used to filter results of count-related calls.

@@ -130,8 +130,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 		crcTags := make(map[string]string)
 
-		var histogram []HistogramItem
-
+		var timeHistogram []TimeHistogramItem
 		if options.TimeHistogram != nil {
 			histogramData, ok := aggregations.DateHistogram("date_time_histogram")
 			if !ok {
@@ -139,15 +138,32 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 			}
 
 			if histogramData != nil {
-				for _, histogramItem := range histogramData.Buckets {
-					time, err := time.Parse(time.RFC3339, *histogramItem.KeyAsString)
+				for _, timeHistogramItem := range histogramData.Buckets {
+					time, err := time.Parse(time.RFC3339, *timeHistogramItem.KeyAsString)
 					if err != nil {
 						errors.New("cant parse time from elastic search with RFC3339 layout")
 					}
 
-					histogram = append(histogram, HistogramItem{
+					timeHistogram = append(timeHistogram, TimeHistogramItem{
 						Time:  time,
-						Value: float64(histogramItem.DocCount),
+						Value: float64(timeHistogramItem.DocCount),
+					})
+				}
+			}
+		}
+
+		var countHistogram []CountHistogramItem
+		if options.CountHistogram != nil {
+			histogramData, ok := aggregations.Histogram(options.CountHistogram.Field)
+			if !ok {
+				errors.New("missing expected histogram aggregation data")
+			}
+
+			if histogramData != nil {
+				for _, countHistogramItem := range histogramData.Buckets {
+					countHistogram = append(countHistogram, CountHistogramItem{
+						BucketKey: countHistogramItem.Key,
+						Value:     float64(countHistogramItem.DocCount),
 					})
 				}
 			}
@@ -159,9 +175,10 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 		}
 
 		crc = append(crc, CountRow{
-			Tags:      crcTags,
-			Count:     int(count),
-			Histogram: histogram,
+			Tags:           crcTags,
+			Count:          int(count),
+			TimeHistogram:  timeHistogram,
+			CountHistogram: countHistogram,
 		})
 
 		return nil
@@ -180,7 +197,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 
 	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 
-		var histogram []HistogramItem
+		var timeHistogram []TimeHistogramItem
 		var sumValue float64
 
 		if options.TimeHistogram != nil {
@@ -190,15 +207,15 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 			}
 
 			if histogramData != nil {
-				for _, histogramItem := range histogramData.Buckets {
+				for _, timeHistogramItem := range histogramData.Buckets {
 					sumAggLabel := fmt.Sprintf("%s_sum", sumField)
-					agg, ok := histogramItem.Aggregations.Sum(sumAggLabel)
+					agg, ok := timeHistogramItem.Aggregations.Sum(sumAggLabel)
 					if !ok {
 						return errors.New("cant find timespent_sum sub agg in date histogram agg")
 					}
 
-					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
-					histogram = append(histogram, HistogramItem{
+					time := time.Unix(0, int64(timeHistogramItem.Key)*int64(time.Millisecond)).UTC()
+					timeHistogram = append(timeHistogram, TimeHistogramItem{
 						Time:  time,
 						Value: float64(*agg.Value),
 					})
@@ -224,9 +241,9 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 		}
 
 		src = append(src, SumRow{
-			Tags:      srcTags,
-			Sum:       sumValue,
-			Histogram: histogram,
+			Tags:          srcTags,
+			Sum:           sumValue,
+			TimeHistogram: timeHistogram,
 		})
 
 		return nil
@@ -247,7 +264,7 @@ func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchRes
 
 	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 
-		var histogram []HistogramItem
+		var timeHistogram []TimeHistogramItem
 		// in case of histogram, total avg value is 0 since it cannot be simply computed as average of averages
 		var avgValue float64
 
@@ -258,15 +275,15 @@ func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchRes
 			}
 
 			if histogramData != nil {
-				for _, histogramItem := range histogramData.Buckets {
+				for _, timeHistogramItem := range histogramData.Buckets {
 					avgAggLabel := fmt.Sprintf("%s_avg", avgField)
-					agg, ok := histogramItem.Aggregations.Avg(avgAggLabel)
+					agg, ok := timeHistogramItem.Aggregations.Avg(avgAggLabel)
 					if !ok {
 						return errors.New("unable to retrieve average value from histogram data")
 					}
 
-					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
-					histogram = append(histogram, HistogramItem{
+					time := time.Unix(0, int64(timeHistogramItem.Key)*int64(time.Millisecond)).UTC()
+					timeHistogram = append(timeHistogram, TimeHistogramItem{
 						Time:  time,
 						Value: float64(*agg.Value),
 					})
@@ -290,9 +307,9 @@ func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchRes
 		}
 
 		src = append(src, AvgRow{
-			Tags:      srcTags,
-			Avg:       avgValue,
-			Histogram: histogram,
+			Tags:          srcTags,
+			Avg:           avgValue,
+			TimeHistogram: timeHistogram,
 		})
 
 		return nil
@@ -313,7 +330,7 @@ func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.Search
 
 	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 
-		var histogram []HistogramItem
+		var timeHistogram []TimeHistogramItem
 		// in case of histogram, total count will be 0 since we cannot compute distinc values from histogram buckets
 		var countValue float64
 
@@ -324,15 +341,15 @@ func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.Search
 			}
 
 			if histogramData != nil {
-				for _, histogramItem := range histogramData.Buckets {
+				for _, timeHistogramItem := range histogramData.Buckets {
 					uniqueAggLabel := fmt.Sprintf("%s_unique", uniqueField)
-					agg, ok := histogramItem.Aggregations.Cardinality(uniqueAggLabel)
+					agg, ok := timeHistogramItem.Aggregations.Cardinality(uniqueAggLabel)
 					if !ok {
 						return errors.New("Unable to retrieve cardinality value from histogram data")
 					}
 
-					time := time.Unix(0, int64(histogramItem.Key)*int64(time.Millisecond)).UTC()
-					histogram = append(histogram, HistogramItem{
+					time := time.Unix(0, int64(timeHistogramItem.Key)*int64(time.Millisecond)).UTC()
+					timeHistogram = append(timeHistogram, TimeHistogramItem{
 						Time:  time,
 						Value: float64(*agg.Value),
 					})
@@ -356,9 +373,9 @@ func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.Search
 		}
 
 		src = append(src, CountRow{
-			Tags:      srcTags,
-			Count:     int(countValue),
-			Histogram: histogram,
+			Tags:          srcTags,
+			Count:         int(countValue),
+			TimeHistogram: timeHistogram,
 		})
 
 		return nil

@@ -351,7 +351,7 @@ var _ = Resource("pageviews", func() {
 		Routing(POST("/actions/:action/count"))
 		Params(func() {
 			Param("action", String, "Identification of pageview action", func() {
-				Enum("load")
+				Enum("load", "progress")
 			})
 		})
 		Response(BadRequest, func() {

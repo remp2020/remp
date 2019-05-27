@@ -51,6 +51,15 @@ var OptionsTimeHistogram = Type("OptionsTimeHistogram", func() {
 	Required("interval", "offset")
 })
 
+var OptionsCountHistogram = Type("OptionsCountHistogram", func() {
+	Description("Values used to split results in count buckets")
+
+	Attribute("field", String, "Name of the field for aggregation")
+	Attribute("interval", Number, "Interval of buckets")
+
+	Required("field", "interval")
+})
+
 var EventOptionsFilterBy = Type("EventOptionsFilterBy", func() {
 	Description("Tags and values used to filter results")
 
@@ -80,7 +89,8 @@ var PageviewOptionsPayload = Type("PageviewOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
-	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into time-based buckets")
+	Attribute("count_histogram", OptionsCountHistogram, "Attribute containing values for splitting result into count-based buckets based on provided Field")
 })
 
 var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
@@ -118,7 +128,7 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
-	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
+	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into time-based buckets")
 	Attribute("step", String, "Filter particular step", func() {
 		Enum("checkout", "payment", "purchase", "refund")
 	})
