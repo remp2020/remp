@@ -46,6 +46,15 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
+	var countHistogramAgg *elastic.HistogramAggregation
+	if options.CountHistogram != nil {
+		countHistogramAgg = elastic.NewHistogramAggregation().
+			Field(options.CountHistogram.Field).
+			Interval(options.CountHistogram.Interval)
+
+		extras[options.CountHistogram.Field] = countHistogramAgg
+	}
+
 	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
@@ -66,7 +75,7 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
-	if len(options.GroupBy) == 0 && options.TimeHistogram == nil {
+	if len(options.GroupBy) == 0 && options.TimeHistogram == nil && options.CountHistogram == nil {
 		// extract simplified results (no aggregation)
 		return CountRowCollection{
 			CountRow{
@@ -457,6 +466,12 @@ func (pDB *PageviewElastic) resolveQueryBindings(action string) (elasticQueryBin
 			Index: TableTimespent,
 			Field: "timespent",
 		}, nil
+	case ActionPageviewProgress:
+		return elasticQueryBinding{
+			Index: TableProgress,
+			Field: "page_progress",
+		}, nil
 	}
+
 	return elasticQueryBinding{}, fmt.Errorf("unable to resolve query bindings: action [%s] unknown", action)
 }

@@ -27,17 +27,24 @@ func (gt FilterType) column() string {
 	return fts[string(gt)]
 }
 
-// HistogramItem represents one row of histogram results.
-type HistogramItem struct {
+// TimeHistogramItem represents one row of time-based histogram results.
+type TimeHistogramItem struct {
 	Time  time.Time
 	Value float64
 }
 
+// CountHistogramItem represents one row of count-based histogram results.
+type CountHistogramItem struct {
+	BucketKey float64
+	Value     float64
+}
+
 // CountRow represents one row of grouped count.
 type CountRow struct {
-	Tags      map[string]string
-	Count     int
-	Histogram []HistogramItem
+	Tags           map[string]string
+	Count          int
+	TimeHistogram  []TimeHistogramItem
+	CountHistogram []CountHistogramItem
 }
 
 // CountRowCollection represents collection of rows of grouped count.
@@ -45,9 +52,9 @@ type CountRowCollection []CountRow
 
 // SumRow represents one row of grouped sum.
 type SumRow struct {
-	Tags      map[string]string
-	Sum       float64
-	Histogram []HistogramItem
+	Tags          map[string]string
+	Sum           float64
+	TimeHistogram []TimeHistogramItem
 }
 
 // SumRowCollection represents collection of rows of grouped sum.
@@ -55,9 +62,9 @@ type SumRowCollection []SumRow
 
 // AvgRow represents one row of grouped sum.
 type AvgRow struct {
-	Tags      map[string]string
-	Avg       float64
-	Histogram []HistogramItem
+	Tags          map[string]string
+	Avg           float64
+	TimeHistogram []TimeHistogramItem
 }
 
 // AvgRowCollection represents collection of rows of grouped sum.
