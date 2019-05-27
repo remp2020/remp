@@ -42,8 +42,8 @@ class StatsController extends Controller
 
     public function getStats(Campaign $campaign, Request $request)
     {
-        $from = Carbon::parse($request->get('from'), $request->input('tz'));
-        $to = Carbon::parse($request->get('to'), $request->input('tz'));
+        $from = Carbon::parse($request->get('from'), $request->input('tz'))->tz('UTC');
+        $to = Carbon::parse($request->get('to'), $request->input('tz'))->tz('UTC');
 
         $from->minute(0)->second(0);
         $nextTo = (clone $to)->minute(0)->second(0);

@@ -21,8 +21,8 @@ class StatsHelper
     /**
      *
      * @param Campaign    $campaign
-     * @param Carbon|null $from
-     * @param Carbon|null $to
+     * @param Carbon|null $from Expected time in UTC
+     * @param Carbon|null $to Expected time in UTC
      *
      * @return array [$campaignStats, $variantsStats]
      */
