@@ -28,10 +28,10 @@ class AggregateCampaignStats extends Command
     public function handle()
     {
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
-        $timeBefore = $now->minute(0)->second(0);
-        $timeAfter = (clone $timeBefore)->subHour();
+        $timeFrom = $now->minute(0)->second(0);
+        $timeTo = (clone $timeFrom)->addHour();
 
-        $this->line(sprintf("Fetching stats data for campaigns between <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
+        $this->line(sprintf("Fetching stats data for campaigns between <info>%s</info> to <info>%s</info>.", $timeFrom, $timeTo));
 
         $campaigns = Campaign::all();
         if (!$this->option('include-inactive')) {
@@ -42,13 +42,13 @@ class AggregateCampaignStats extends Command
 
         foreach ($campaigns as $campaign) {
             foreach ($campaign->campaignBanners as $campaignBanner) {
-                $stats = $this->statsHelper->variantStats($campaignBanner, $timeAfter, $timeBefore);
+                $stats = $this->statsHelper->variantStats($campaignBanner, $timeFrom, $timeTo);
 
                 /** @var CampaignBannerStats $cbs */
                 $cbs = CampaignBannerStats::firstOrNew([
                     'campaign_banner_id' => $campaignBanner->id,
-                    'time_from' => $timeAfter,
-                    'time_to' => $timeBefore,
+                    'time_from' => $timeFrom,
+                    'time_to' => $timeTo,
                 ]);
 
                 $cbs->click_count = $stats['click_count']->count ?? 0;
@@ -71,8 +71,8 @@ class AggregateCampaignStats extends Command
                 foreach ($sums as $currency => $sum) {
                     $purchaseStat = CampaignBannerPurchaseStats::firstOrNew([
                         'campaign_banner_id' => $campaignBanner->id,
-                        'time_from' => $timeAfter,
-                        'time_to' => $timeBefore,
+                        'time_from' => $timeFrom,
+                        'time_to' => $timeTo,
                         'currency' => $currency
                     ]);
 
