@@ -10,6 +10,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Remp\Journal\Journal;
 use Remp\Journal\JournalContract;
@@ -59,20 +60,22 @@ class RempJournalServiceProvider extends ServiceProvider
 
         $this->app->when(AggregateArticlesViews::class)
             ->needs(JournalContract::class)
-            ->give(function ($app) use ($handlerStack) {
+            ->give(function (Application $app) use ($handlerStack) {
                 $client = new Client([
                     'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
                     'handler' => $handlerStack,
                 ]);
 
-                return new Journal($client);
+                $redis = $app->make('redis')->connection()->client();
+                return new Journal($client, $redis);
             });
 
-        $this->app->bind(JournalContract::class, function ($app) {
+        $this->app->bind(JournalContract::class, function (Application $app) {
             $client = new Client([
                 'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
             ]);
-            return new Journal($client);
+            $redis = $app->make('redis')->connection()->client();
+            return new Journal($client, $redis);
         });
     }
 

@@ -108,6 +108,8 @@ services:
 		class: Tomaj\Hermes\Emitter(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger)
 	- Remp\MailerModule\Hermes\HermesTasksQueue(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Repository\HermesTasksRepository
+
+	redisCache: Remp\MailerModule\RedisCache(%redis.host%, %redis.port%, %redis.db%)
 	hermesWorker:
 		class: Remp\MailerModule\Commands\HermesWorkerCommand
 		setup:
