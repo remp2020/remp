@@ -2,6 +2,7 @@
 
 namespace Remp\Journal;
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
@@ -36,9 +37,12 @@ class Journal implements JournalContract
 
     private $client;
 
-    public function __construct(Client $client)
+    private $redis;
+
+    public function __construct(Client $client, \Predis\Client $redis)
     {
         $this->client = $client;
+        $this->redis = $redis;
     }
 
     public function categories(): array
@@ -152,7 +156,7 @@ class Journal implements JournalContract
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal endpoint {$url}: {$e->getMessage()}");
         } catch (ClientException $e) {
-            \Log::error(Json::encode([
+            \Log::error(json_encode([
                 'url' => $url,
                 'payload' => $json,
                 'message' => $e->getResponse()->getBody()->getContents(),
@@ -201,6 +205,8 @@ class Journal implements JournalContract
 
     public function concurrents(ConcurrentsRequest $request): array
     {
+        $cacheKey = null;
+
         try {
             $json = [
                 'filter_by' => $request->getFilterBy(),
@@ -208,15 +214,31 @@ class Journal implements JournalContract
             ];
 
             if ($request->getTimeAfter()) {
-                $json['time_after'] = $request->getTimeAfter()->format(DATE_RFC3339);
+                // round down to 10 seconds to allow request caching
+                $timeAfter = Carbon::instance($request->getTimeAfter());
+                $timeAfter->second($timeAfter->second - ($timeAfter->second % 10));
+                $json['time_after'] = $timeAfter->format(DATE_RFC3339);
             }
             if ($request->getTimeBefore()) {
-                $json['time_before'] = $request->getTimeBefore()->format(DATE_RFC3339);
+                // round down to 10 seconds to allow request caching
+                $timeBefore = Carbon::instance($request->getTimeBefore());
+                $timeBefore->second($timeBefore->second - ($timeBefore->second % 10));
+                $json['time_before'] = $timeBefore->format(DATE_RFC3339);
             }
 
-            $response = $this->client->post(self::ENDPOINT_CONCURRENTS_COUNT, [
-                'json' => $json,
-            ]);
+            $cacheKey = $this->requestHash($json);
+
+            $body = $this->redis->get($cacheKey);
+            if (!$body) {
+                $response = $this->client->post(self::ENDPOINT_CONCURRENTS_COUNT, [
+                    'json' => $json,
+                ]);
+                $body = $response->getBody();
+
+                // cache body
+                $this->redis->set($cacheKey, $body);
+                $this->redis->expire($cacheKey, 60);
+            }
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal:concurrents endpoint: {$e->getMessage()}");
         } catch (ClientException $e) {
@@ -224,7 +246,12 @@ class Journal implements JournalContract
             throw $e;
         }
 
-        $list = json_decode($response->getBody());
+        $list = json_decode($body);
         return $list;
+    }
+
+    private function requestHash($json)
+    {
+        return md5(json_encode($json));
     }
 }
