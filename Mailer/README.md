@@ -605,6 +605,156 @@ Response:
 
 ---
 
+#### POST `/api/v1/users/bulk-subscribe`
+
+Bulk subscribe allows to subscribe and unsubscribe multiple users in one batch. For details about subscribe / unsubscribe see individual calls above.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Body:*
+
+
+```json5
+{
+  "users": [
+    {
+      "email": "admin@example.com", // String; email of the user
+      "user_id": 12345, // Integer; ID of the user
+
+      // one of the following is required
+      "list_id": 14, // Integer; ID of the newsletter list you're subscribing the user to
+      "list_code": "alerts", // String; code of the newsletter list you're subscribing the user to
+
+      "variant_id": 3, // Integer; ID of the variant of newsletter list you're subscribing user to. Must belong to provided list.
+
+      "subscribe": false, // Boolean; indicates if you want to subscribe or unsubscribe user
+
+      // optional UTM parameters used only if `subscribe:false` for tracking "what" made the user unsubscribe
+      "utm_params": { // Object; optional UTM parameters for pairing which email caused the user to unsubscribe. UTM params are generated into the email links automatically.
+        "utm_source": "newsletter_daily",
+        "utm_medium": "email",
+        "utm_campaign": "daily-newsletter-11.3.2019-personalized",
+        "utm_content": "26026"
+      }
+    }
+  //...
+  ]
+}
+```
+
+###### *Properties of one users element*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| email | *String* | yes | Email address of user. |
+| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes | ID of user. |
+| subscribe | *Boolean* | yes | Flag to indicate if user should subscribed or un-subscribed. |
+| list_id | *Integer* | yes _(use list_id or list_code)_ | ID of mail list. |
+| list_code | *String* | yes _(use list_id or list_code)_ | Code of mail list. |
+| variant_id | *Integer* | no | Optional ID of variant. |
+| utm_params | *Integer* | no | Optional UTM parameters for pairing which email caused the user to unsubscribe. |
+
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/bulk-subscribe \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "users": [
+          {
+            "email": "admin@example.com",
+            "user_id": 1,
+            "subscribe": true,
+            "list_id": 2
+          },
+          {
+            "email": "test@example.com",
+            "user_id": 2,
+            "subscribe": true,
+            "list_code": "demo-weekly-newsletter",
+            "variant_id": 4
+          },
+          {
+            "email": "silent@example.com",
+            "user_id": 3,
+            "subscribe": false,
+            "list_id": 3,
+            "utm_params": {
+              "utm_source": "newsletter_daily",
+              "utm_medium": "email",
+              "utm_campaign": "daily-newsletter-11.3.2019-personalized",
+              "utm_content": "26026"
+            }
+          }
+        ]
+}'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok"
+}
+```
+
+###### *Example with errors:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/bulk-subscribe \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "users": [
+          {
+            "email": "admin@example.com"
+          },
+          {
+            "user_id": "67890"
+          },
+          {
+            "email": "qa@example.com",
+            "user_id": "qa123"
+          },
+          {
+            "email": "qa1@example.com",
+            "user_id": "123"
+          },
+          {
+            "email": "qa2@example.com",
+            "user_id": "123",
+            "list_id": 1
+          }
+        ]
+      }'
+```
+
+Error Response:
+
+```json5
+{
+  "status": "error",
+  "message": "Input data contains errors. See included list of errors.",
+  "errors": {
+    "element_0": "Required field missing: `user_id`.",
+    "element_1": "Required field missing: `email`.",
+    "element_2": "Parameter `user_id` must be integer. Got [qa123].",
+    "element_3": "Required field missing: `list_id` or `list_code`.",
+    "element_4": "Required field missing: `subscribe`.",
+  }
+}
+```
+
+---
+
 #### GET `/api/v1/users/check-token`
 
 Verifies validity of autologin token provided within email.

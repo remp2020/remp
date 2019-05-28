@@ -166,6 +166,7 @@ services:
 			- enableGlobalPreflight()
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'bulk-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\BulkSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'email-changed'), \Remp\MailerModule\Api\v1\Handlers\Users\EmailChangedHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'user-registered'), \Remp\MailerModule\Api\v1\Handlers\Users\UserRegisteredHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
