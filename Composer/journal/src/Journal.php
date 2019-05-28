@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
-use Psy\Util\Json;
 
 class Journal implements JournalContract
 {
@@ -157,7 +156,7 @@ class Journal implements JournalContract
         } catch (ConnectException $e) {
             throw new JournalException("Could not connect to Journal endpoint {$url}: {$e->getMessage()}");
         } catch (ClientException $e) {
-            \Log::error(Json::encode([
+            \Log::error(json_encode([
                 'url' => $url,
                 'payload' => $json,
                 'message' => $e->getResponse()->getBody()->getContents(),
@@ -253,6 +252,6 @@ class Journal implements JournalContract
 
     private function requestHash($json)
     {
-        return md5(Json::encode($json));
+        return md5(json_encode($json));
     }
 }
