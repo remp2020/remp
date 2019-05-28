@@ -8,6 +8,7 @@
         left: 0;
         width: 100%;
         overflow: hidden;
+        z-index: 9999;
     }
 
     #banner-preview .collapsible-bar-wrap {
