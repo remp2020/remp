@@ -150,7 +150,7 @@ class Journal implements JournalContract
                 $json['time_histogram'] = $request->getTimeHistogram();
             }
 
-            $cacheKey = $this->requestHash($json);
+            $cacheKey = $url . "_" . $this->requestHash($url, $json);
 
             $body = $this->redis->get($cacheKey);
             if (!$body) {
@@ -230,7 +230,7 @@ class Journal implements JournalContract
                 $json['time_before'] = $this->roundSecondsDown($request->getTimeBefore())->format(DATE_RFC3339);
             }
 
-            $cacheKey = $this->requestHash($json);
+            $cacheKey = $this->requestHash(self::ENDPOINT_CONCURRENTS_COUNT, $json);
 
             $body = $this->redis->get($cacheKey);
             if (!$body) {
@@ -269,8 +269,8 @@ class Journal implements JournalContract
         return $c;
     }
 
-    private function requestHash($json)
+    private function requestHash($path, $json)
     {
-        return md5(json_encode($json));
+        return $path . '_' . md5(json_encode($json));
     }
 }
