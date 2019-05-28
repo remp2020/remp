@@ -150,7 +150,7 @@ class Journal implements JournalContract
                 $json['time_histogram'] = $request->getTimeHistogram();
             }
 
-            $cacheKey = $url . "_" . $this->requestHash($url, $json);
+            $cacheKey = $this->requestHash($url, $json);
 
             $body = $this->redis->get($cacheKey);
             if (!$body) {
