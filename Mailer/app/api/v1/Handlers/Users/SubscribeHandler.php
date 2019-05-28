@@ -52,7 +52,7 @@ class SubscribeHandler extends BaseHandler
             $userID = $this->getUserID($data);
             $list = $this->getList($data);
             $variantID = $this->getVariantID($data, $list);
-        } catch (\Exception $e) {
+        } catch (InvalidApiInputParamException $e) {
             return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
         }
 
@@ -71,12 +71,12 @@ class SubscribeHandler extends BaseHandler
      *
      * @param $params
      * @return string
-     * @throws \Exception
+     * @throws InvalidApiInputParamException
      */
     protected function getUserEmail($params): string
     {
         if (!isset($params['email'])) {
-            throw new \Exception('Required field missing: `email`.', 400);
+            throw new InvalidApiInputParamException('Required field missing: `email`.', 400);
         }
         return $params['email'];
     }
@@ -86,16 +86,19 @@ class SubscribeHandler extends BaseHandler
      *
      * @param $params
      * @return int - Returns user_id
-     * @throws \Exception - Thrown if user_id is not valid (code 400).
+     * @throws InvalidApiInputParamException - Thrown if user_id is not valid (code 400).
      */
     protected function getUserID($params): int
     {
         if (!isset($params['user_id'])) {
-            throw new \Exception('Required field missing: `user_id`.', 400);
+            throw new InvalidApiInputParamException('Required field missing: `user_id`.', 400);
         }
         $userID = filter_var($params['user_id'], FILTER_VALIDATE_INT);
         if ($userID === false) {
-            throw new \Exception("Parameter `user_id` must be integer. Got [{$params['user_id']}].", 400);
+            throw new InvalidApiInputParamException(
+                "Parameter `user_id` must be integer. Got [{$params['user_id']}].",
+                400
+            );
         }
 
         return $userID;
@@ -106,12 +109,12 @@ class SubscribeHandler extends BaseHandler
      *
      * @param $params
      * @return ActiveRow $list - Returns mail list entity.
-     * @throws \Exception - Thrown if list_id or list_code are invalid (code 400) or if list is not found (code 404).
+     * @throws InvalidApiInputParamException - Thrown if list_id or list_code are invalid (code 400) or if list is not found (code 404).
      */
     protected function getList($params): ActiveRow
     {
         if (!isset($params['list_id']) && !isset($params['list_code'])) {
-            throw new \Exception('Required field missing: `list_id` or `list_code`.', 400);
+            throw new InvalidApiInputParamException('Required field missing: `list_id` or `list_code`.', 400);
         }
 
         if (isset($params['list_code'])) {
@@ -119,13 +122,16 @@ class SubscribeHandler extends BaseHandler
         } else {
             $listID = filter_var($params['list_id'], FILTER_VALIDATE_INT);
             if ($listID === false) {
-                throw new \Exception("Parameter 'list_id' must be integer. Got [{$params['list_id']}].", 400);
+                throw new InvalidApiInputParamException(
+                    "Parameter 'list_id' must be integer. Got [{$params['list_id']}].",
+                    400
+                );
             }
             $list = $this->listsRepository->find($listID);
         }
 
         if ($list === false) {
-            throw new \Exception('List not found.', 404);
+            throw new InvalidApiInputParamException('List not found.', 404);
         }
 
         return $list;
@@ -137,7 +143,7 @@ class SubscribeHandler extends BaseHandler
      * @param array $params
      * @param ActiveRow $list - Already validated $list. Used to provide default variant_id if none was provided and to validate relationship between provided variant and list.
      * @return null|int - Returns validated Variant ID. If no variant_id was provided, returns list's default variant id (can be null).
-     * @throws \Exception - Thrown if variant_id is invalid or doesn't belong to list (code 400) or if variant with given ID doesn't exist (code 404).
+     * @throws InvalidApiInputParamException - Thrown if variant_id is invalid or doesn't belong to list (code 400) or if variant with given ID doesn't exist (code 404).
      */
     protected function getVariantID(array $params, ActiveRow $list): ?int
     {
@@ -147,12 +153,18 @@ class SubscribeHandler extends BaseHandler
 
         $variantID = filter_var($params['variant_id'], FILTER_VALIDATE_INT);
         if ($variantID === false) {
-            throw new \Exception("Parameter 'variant_id' must be integer. Got [{$params['variant_id']}].", 400);
+            throw new InvalidApiInputParamException(
+                "Parameter 'variant_id' must be integer. Got [{$params['variant_id']}].",
+                400
+            );
         }
 
         $variant = $this->listVariantsRepository->findByIdAndMailTypeId($variantID, $list->id);
         if ($variant === false) {
-            throw new \Exception("Variant with ID [{$variantID}] for list [ID: {$list->id}, code: {$list->code}] was not found.", 404);
+            throw new InvalidApiInputParamException(
+                "Variant with ID [{$variantID}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
+                404
+            );
         }
 
         return $variant->id;

@@ -53,7 +53,7 @@ class BulkSubscribeHandler extends SubscribeHandler
                 $userID = $this->getUserID($item);
                 $list = $this->getList($item);
                 $variantID = $this->getVariantID($item, $list);
-            } catch (\Exception $e) {
+            } catch (InvalidApiInputParamException $e) {
                 $errors = array_merge($errors, ["element_" . $iteration => $e->getMessage()]);
                 continue;
             }
