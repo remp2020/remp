@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-sm-12 col-md-8 variant-chart-wrap">
                 <chart
-                    :name="'variant-stats-chart-' + variant.id"
+                    :name="'variant-stats-chart-' + variant.uuid"
                     :title="chartTitle"
                     :height="400"
                     :loading="loading"

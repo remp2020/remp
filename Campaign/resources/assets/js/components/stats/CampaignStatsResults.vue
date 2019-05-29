@@ -21,7 +21,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="variant in variantsData" :key="variant.id" :class="{ 'deleted-variant': variant.deleted_at }">
+                            <tr v-for="variant in variantsData" :key="variant.uuid" :class="{ 'deleted-variant': variant.deleted_at }">
                             <td>
                                 <i v-if="variant.deleted_at"
                                    class="zmdi zmdi-close-circle-o"
@@ -120,7 +120,7 @@
 
                 for (let ii = 0; ii < this.variants.length; ii++) {
                     let variant = this.variants[ii];
-                    let data = this.data[variant.id];
+                    let data = this.data[variant.uuid];
 
                     let prepared = {
                         name: "Control Group",
@@ -138,7 +138,7 @@
 
                     if (variant.banner !==  null) {
                         prepared.name = variant.banner.name;
-                        prepared.link = this.variantBannerLinks[variant.id] || null;
+                        prepared.link = this.variantBannerLinks[variant.uuid] || null;
                     }
 
                     this.variantsData.push(prepared);

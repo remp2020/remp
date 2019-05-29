@@ -19,12 +19,12 @@
 
             <variant-stats
                 v-for="variant in variantsList"
-                :key="variant.id"
+                :key="variant.uuid"
 
                 :variant="variant"
-                :variant-banner-link="variantBannerLinks[variant.id] || null"
-                :variant-banner-text="variantBannerTexts[variant.id] || null"
-                :data="variantsData[variant.id]"
+                :variant-banner-link="variantBannerLinks[variant.uuid] || null"
+                :variant-banner-text="variantBannerTexts[variant.uuid] || null"
+                :data="variantsData[variant.uuid]"
                 :error="error"
                 :loading="loading"
             ></variant-stats>
@@ -33,12 +33,12 @@
 
             <variant-stats
                 v-for="variant in deletedVariantsList"
-                :key="variant.id"
+                :key="variant.uuid"
 
                 :variant="variant"
-                :variant-banner-link="variantBannerLinks[variant.id] || null"
-                :variant-banner-text="variantBannerTexts[variant.id] || null"
-                :data="variantsData[variant.id]"
+                :variant-banner-link="variantBannerLinks[variant.uuid] || null"
+                :variant-banner-text="variantBannerTexts[variant.uuid] || null"
+                :data="variantsData[variant.uuid]"
                 :error="error"
                 :loading="loading"
             ></variant-stats>

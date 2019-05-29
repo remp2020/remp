@@ -920,8 +920,8 @@ class CampaignController extends Controller
             if (!$variant->banner) {
                 continue;
             }
-            $variantBannerLinks[$variant->id] = route('banners.show', ['banner' => $variant->banner]);
-            $variantBannerTexts[$variant->id] = $variant->banner->getTemplate()->text();
+            $variantBannerLinks[$variant->uuid] = route('banners.show', ['banner' => $variant->banner]);
+            $variantBannerTexts[$variant->uuid] = $variant->banner->getTemplate()->text();
         }
 
         return view('campaigns.stats', [

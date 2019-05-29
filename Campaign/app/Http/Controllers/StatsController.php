@@ -56,9 +56,8 @@ class StatsController extends Controller
         [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $from, $to);
         $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $chartWidth);
 
-        foreach ($variantsData as $campaignBannerId => $variantData) {
-            $uuid = CampaignBanner::find($campaignBannerId)->uuid;
-            $variantsData[$campaignBannerId]['histogram'] = $this->getHistogramData([$uuid], $from, $to, $chartWidth);
+        foreach ($variantsData as $uuid => $variantData) {
+            $variantsData[$uuid]['histogram'] = $this->getHistogramData([$uuid], $from, $to, $chartWidth);
         }
 
         // a/b test evaluation data

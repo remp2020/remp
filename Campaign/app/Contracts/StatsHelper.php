@@ -7,6 +7,7 @@ use App\CampaignBanner;
 use App\CampaignBannerPurchaseStats;
 use App\CampaignBannerStats;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class StatsHelper
@@ -28,18 +29,21 @@ class StatsHelper
      */
     public function cachedCampaignAndVariantsStats(Campaign $campaign, Carbon $from = null, Carbon $to = null): array
     {
-        $campaignBannerIds = $campaign->campaignBanners()->withTrashed()->get()->pluck('id');
+        /** @var Collection $campaignBanners */
+        $campaignBanners = $campaign->campaignBanners()->withTrashed()->get();
 
         $campaignData = [
             'click_count' => 0,
             'show_count' => 0,
             'payment_count' => 0,
             'purchase_count' => 0,
-            'purchase_sums' => []
+            'purchase_sums' => [],
+            'ctr' => 0,
+            'conversions' => 0,
         ];
 
-        foreach ($campaignBannerIds as $id) {
-            $variantsData[$id] = $campaignData;
+        foreach ($campaignBanners as $campaignBanner) {
+            $variantsData[$campaignBanner->uuid] = $campaignData;
         }
 
         $statsQuerySelect = 'campaign_banner_id, '.
@@ -49,7 +53,7 @@ class StatsHelper
             'SUM(purchase_count) as purchase_count';
 
         $statsQuery = CampaignBannerStats::select(DB::raw($statsQuerySelect))
-            ->whereIn('campaign_banner_id', $campaignBannerIds)
+            ->whereIn('campaign_banner_id', $campaignBanners->pluck('id'))
             ->groupBy('campaign_banner_id');
 
         $purchaseStatsQuerySelect = 'campaign_banner_id, '.
@@ -57,7 +61,7 @@ class StatsHelper
             'currency';
 
         $purchaseStatsQuery = CampaignBannerPurchaseStats::select(DB::raw($purchaseStatsQuerySelect))
-            ->whereIn('campaign_banner_id', $campaignBannerIds)
+            ->whereIn('campaign_banner_id', $campaignBanners->pluck('id'))
             ->groupBy(['campaign_banner_id', 'currency']);
 
         if ($from) {
@@ -69,14 +73,15 @@ class StatsHelper
             $purchaseStatsQuery->where('time_to', '<=', $to);
         }
 
+        /** @var CampaignBannerStats $stat */
         foreach ($statsQuery->get() as $stat) {
-            $variantData = $variantsData[$stat->campaign_banner_id];
+            $variantData = $variantsData[$stat->campaignBanner->uuid];
             $variantData['click_count'] = (int) $stat->click_count;
             $variantData['show_count'] = (int) $stat->show_count;
             $variantData['payment_count'] = (int) $stat->payment_count;
             $variantData['purchase_count'] = (int) $stat->purchase_count;
 
-            $variantsData[$stat->campaign_banner_id] = StatsHelper::addCalculatedValues($variantData);
+            $variantsData[$stat->campaignBanner->uuid] = StatsHelper::addCalculatedValues($variantData);
 
             $campaignData['click_count'] += $variantData['click_count'];
             $campaignData['show_count'] += $variantData['show_count'];
@@ -87,13 +92,13 @@ class StatsHelper
 
         foreach ($purchaseStatsQuery->get() as $stat) {
             if (!array_key_exists($stat->campaign_banner_id, $variantsData)) {
-                throw new \LogicException("Campaign banner $stat->campaign_banner_id has aggregated purchases without other aggregated attributes.");
+                throw new \LogicException("Campaign banner {$stat->campaignBanner->uuid} has aggregated purchases without other aggregated attributes.");
             }
 
-            if (!array_key_exists($stat->currency, $variantsData[$stat->campaign_banner_id]['purchase_sums'])) {
-                $variantsData[$stat->campaign_banner_id]['purchase_sums'][$stat->currency] = 0.0;
+            if (!array_key_exists($stat->currency, $variantsData[$stat->campaignBanner->uuid]['purchase_sums'])) {
+                $variantsData[$stat->campaignBanner->uuid]['purchase_sums'][$stat->currency] = 0.0;
             }
-            $variantsData[$stat->campaign_banner_id]['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
+            $variantsData[$stat->campaignBanner->uuid]['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
 
             if (!array_key_exists($stat->currency, $campaignData['purchase_sums'])) {
                 $campaignData['purchase_sums'][$stat->currency] = 0.0;
@@ -116,9 +121,6 @@ class StatsHelper
 
     public function addCalculatedValues($data)
     {
-        $data['ctr'] = 0;
-        $data['conversions'] = 0;
-
         // calculate ctr & conversions
         if (isset($data['show_count'])) {
             if ($data['click_count']) {
