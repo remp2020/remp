@@ -92,6 +92,10 @@ services:
 
 	commandsLogger:
 		class: Monolog\Logger('commands-logger')
+	mailProcessLogger:
+		class: Monolog\Logger('mail-process-logger')
+		setup:
+			- pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/mail_process_job.log"))
 
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
@@ -155,7 +159,7 @@ services:
 
 	- Remp\MailerModule\Config\Config
 	- Remp\MailerModule\Sender
-	- Remp\MailerModule\Job\BatchEmailGenerator
+	- Remp\MailerModule\Job\BatchEmailGenerator(@mailProcessLogger)
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Auth\AutoLogin
 
