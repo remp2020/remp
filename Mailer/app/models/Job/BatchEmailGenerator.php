@@ -71,12 +71,16 @@ class BatchEmailGenerator
                     $userMap[$user['email']] = $user['id'];
                     $templateId = $this->getTemplate($batch);
 
+                    $userParams = $user; // arrays are assigned by copying
+                    unset($userParams['email'], $userParams['id']);
+
                     $insert[] = [
                         'batch' => $batch,
                         'templateId' => $templateId,
                         'email' => $user['email'],
                         'sorting' => rand(),
                         'context' => $job->context,
+                        'params' => json_encode($userParams)
                     ];
                     ++$processed;
                     if ($processed == $batchInsert) {
@@ -130,7 +134,7 @@ class BatchEmailGenerator
                 'code' => $template->code,
                 'mail_batch_id' => $queueJob->mail_batch_id,
                 'context' => $queueJob->context,
-                'parameters' => []
+                'params' => json_decode($queueJob->params, true) ?? []
             ];
 
             // Load dynamic parameters
@@ -156,7 +160,11 @@ class BatchEmailGenerator
 
         foreach ($userJobOptions as $userId => $jobOptions) {
             if ($jobOptions['generator'] ?? null === self::BEAM_UNREAD_ARTICLES_GENERATOR) {
-                $jobOptions['params'] = $this->unreadArticlesGenerator->getMailParameters($jobOptions['code'], $userId);
+                $additionalParams = $this->unreadArticlesGenerator->getMailParameters($jobOptions['code'], $userId);
+                // Generator params override user params
+                foreach ($additionalParams as $name => $value) {
+                    $jobOptions['params'][$name] = $value;
+                }
             }
 
             $this->mailCache->addJob(
@@ -165,7 +173,7 @@ class BatchEmailGenerator
                 $jobOptions['code'],
                 $jobOptions['mail_batch_id'],
                 $jobOptions['context'],
-                $jobOptions['params'] ?? []
+                $jobOptions['params']
             );
         }
 
