@@ -183,7 +183,10 @@ class AuthorController extends Controller
             ->where([
                 'article_author.author_id' => $author->id
             ])
-            ->groupBy(['articles.id', 'articles.title', 'articles.published_at', 'articles.url']);
+            ->groupBy(['articles.id', 'articles.title', 'articles.published_at', 'articles.url', "articles.pageviews_all",
+                "articles.pageviews_signed_in", "articles.pageviews_subscribers", "articles.timespent_all",
+                "articles.timespent_signed_in", "articles.timespent_subscribers", 'avg_timespent_all',
+                'avg_timespent_signed_in', 'avg_timespent_subscribers']);
 
         $conversionsQuery = \DB::table('conversions')
             ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_author.article_id')
