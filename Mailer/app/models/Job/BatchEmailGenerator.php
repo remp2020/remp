@@ -52,13 +52,15 @@ class BatchEmailGenerator
         $this->unreadArticlesGenerator = $unreadArticlesGenerator;
     }
 
-    protected function insertUsersIntoJobQueue(ActiveRow $batch, &$userMap): void
+    protected function insertUsersIntoJobQueue(ActiveRow $batch, &$userMap): array
     {
         $this->mailJobQueueRepository->clearBatch($batch);
 
         $batchInsert = 1000;
         $insert = [];
         $processed = 0;
+
+        $templateUsersCount = [];
 
         $job = $batch->job;
 
@@ -70,6 +72,8 @@ class BatchEmailGenerator
                 foreach ($users as $user) {
                     $userMap[$user['email']] = $user['id'];
                     $templateId = $this->getTemplate($batch);
+
+                    $templateUsersCount[$templateId] = ($templateUsersCount[$templateId] ?? 0) + 1;
 
                     $insert[] = [
                         'batch' => $batch,
@@ -92,9 +96,11 @@ class BatchEmailGenerator
         if ($processed) {
             $this->mailJobQueueRepository->multiInsert($insert);
         }
+
+        return $templateUsersCount;
     }
 
-    protected function filterQueue($batch): void
+    protected function filterQueue($batch): array
     {
         $job = $batch->job;
 
@@ -108,13 +114,33 @@ class BatchEmailGenerator
         $this->mailJobQueueRepository->removeAlreadyQueued($batch);
         $this->mailJobQueueRepository->removeAlreadySent($batch);
         $this->mailJobQueueRepository->stripEmails($batch, $batch->max_emails);
+
+        // Count remaining users
+        $templateUsersCount = [];
+        $q = $this->mailJobQueueRepository->getTable()
+                ->select('count(*) as users_count, mail_template_id')
+                ->where(['mail_batch_id' => $batch->id])
+                ->group('mail_template_id');
+
+        foreach ($q->fetchAll() as $row) {
+            $templateUsersCount[$row->mail_template_id] = $row->users_count;
+        }
+        return $templateUsersCount;
     }
 
     public function generate(ActiveRow $batch)
     {
         $userMap = [];
-        $this->insertUsersIntoJobQueue($batch, $userMap);
-        $this->filterQueue($batch);
+
+        $templateUsersCount = $this->insertUsersIntoJobQueue($batch, $userMap);
+        foreach ($templateUsersCount as $templateId => $count) {
+            $this->logger->log(LogLevel::INFO, "Generating batch queue, before filtering: batch={$batch->id}, template={$templateId}, usersCount={$count}");
+        }
+
+        $templateUsersCount = $this->filterQueue($batch);
+        foreach ($templateUsersCount as $templateId => $count) {
+            $this->logger->log(LogLevel::INFO, "Generating batch queue, after filtering: batch={$batch->id}, template={$templateId}, usersCount={$count}");
+        }
 
         $queueJobs = $this->mailJobQueueRepository->getBatchEmails($batch, 0, null);
         $this->mailCache->pauseQueue($batch->id);
