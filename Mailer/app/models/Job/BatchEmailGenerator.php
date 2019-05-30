@@ -75,8 +75,6 @@ class BatchEmailGenerator
                     $userMap[$user['email']] = $user['id'];
                     $templateId = $this->getTemplate($batch);
 
-                    $userParams = $user; // arrays are assigned by copying
-                    unset($userParams['email'], $userParams['id']);
                     $templateUsersCount[$templateId] = ($templateUsersCount[$templateId] ?? 0) + 1;
 
                     $insert[] = [
@@ -85,7 +83,7 @@ class BatchEmailGenerator
                         'email' => $user['email'],
                         'sorting' => rand(),
                         'context' => $job->context,
-                        'params' => json_encode($userParams)
+                        'params' => json_encode($user) // forward all user attributes to template params
                     ];
                     ++$processed;
                     if ($processed == $batchInsert) {
