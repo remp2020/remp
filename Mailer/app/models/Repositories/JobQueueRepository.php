@@ -26,6 +26,7 @@ class JobQueueRepository extends Repository
                 'sorting' => $row['sorting'],
                 'email' => $row['email'],
                 'context' => $row['context'],
+                'params' => $row['params'] ?? [],
             ];
         }
         $this->database->query("INSERT INTO {$this->tableName}", $insertLogsData);
