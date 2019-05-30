@@ -91,7 +91,7 @@ class StatsHelper
         $campaignData = StatsHelper::addCalculatedValues($campaignData);
 
         foreach ($purchaseStatsQuery->get() as $stat) {
-            if (!array_key_exists($stat->campaign_banner_id, $variantsData)) {
+            if (!array_key_exists($stat->campaignBanner->uuid, $variantsData)) {
                 throw new \LogicException("Campaign banner {$stat->campaignBanner->uuid} has aggregated purchases without other aggregated attributes.");
             }
 
