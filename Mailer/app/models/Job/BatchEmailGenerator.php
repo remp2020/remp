@@ -2,7 +2,7 @@
 
 namespace Remp\MailerModule\Job;
 
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Generators\Dynamic\UnreadArticlesGenerator;
@@ -15,8 +15,6 @@ use Remp\MailerModule\User\IUser;
 class BatchEmailGenerator
 {
     const BEAM_UNREAD_ARTICLES_GENERATOR = 'beam-unread-articles';
-
-    use LoggerAwareTrait;
 
     private $mailJobsRepository;
 
@@ -34,7 +32,10 @@ class BatchEmailGenerator
 
     private $unreadArticlesGenerator;
 
+    private $logger;
+
     public function __construct(
+        LoggerInterface $logger,
         JobsRepository $mailJobsRepository,
         JobQueueRepository $mailJobQueueRepository,
         BatchesRepository $batchesRepository,
@@ -50,15 +51,18 @@ class BatchEmailGenerator
         $this->userProvider = $userProvider;
         $this->mailCache = $mailCache;
         $this->unreadArticlesGenerator = $unreadArticlesGenerator;
+        $this->logger = $logger;
     }
 
-    protected function insertUsersIntoJobQueue(ActiveRow $batch, &$userMap): void
+    protected function insertUsersIntoJobQueue(ActiveRow $batch, &$userMap): array
     {
         $this->mailJobQueueRepository->clearBatch($batch);
 
         $batchInsert = 1000;
         $insert = [];
         $processed = 0;
+
+        $templateUsersCount = [];
 
         $job = $batch->job;
 
@@ -73,6 +77,7 @@ class BatchEmailGenerator
 
                     $userParams = $user; // arrays are assigned by copying
                     unset($userParams['email'], $userParams['id']);
+                    $templateUsersCount[$templateId] = ($templateUsersCount[$templateId] ?? 0) + 1;
 
                     $insert[] = [
                         'batch' => $batch,
@@ -96,9 +101,11 @@ class BatchEmailGenerator
         if ($processed) {
             $this->mailJobQueueRepository->multiInsert($insert);
         }
+
+        return $templateUsersCount;
     }
 
-    protected function filterQueue($batch): void
+    protected function filterQueue($batch): array
     {
         $job = $batch->job;
 
@@ -112,13 +119,41 @@ class BatchEmailGenerator
         $this->mailJobQueueRepository->removeAlreadyQueued($batch);
         $this->mailJobQueueRepository->removeAlreadySent($batch);
         $this->mailJobQueueRepository->stripEmails($batch, $batch->max_emails);
+
+        // Count remaining users
+        $templateUsersCount = [];
+        $q = $this->mailJobQueueRepository->getTable()
+                ->select('count(*) AS users_count, mail_template_id')
+                ->where(['mail_batch_id' => $batch->id])
+                ->group('mail_template_id');
+
+        foreach ($q->fetchAll() as $row) {
+            $templateUsersCount[$row->mail_template_id] = $row->users_count;
+        }
+        return $templateUsersCount;
     }
 
     public function generate(ActiveRow $batch)
     {
         $userMap = [];
-        $this->insertUsersIntoJobQueue($batch, $userMap);
-        $this->filterQueue($batch);
+
+        $templateUsersCount = $this->insertUsersIntoJobQueue($batch, $userMap);
+        foreach ($templateUsersCount as $templateId => $count) {
+            $this->logger->info('Generating batch queue', [
+                'batchId' => $batch->id,
+                'templateId' => $templateId,
+                'usersCount' => $count
+            ]);
+        }
+
+        $templateUsersCount = $this->filterQueue($batch);
+        foreach ($templateUsersCount as $templateId => $count) {
+            $this->logger->info('Users from batch queue filtered', [
+                'batchId' => $batch->id,
+                'templateId' => $templateId,
+                'usersCount' => $count
+            ]);
+        }
 
         $queueJobs = $this->mailJobQueueRepository->getBatchEmails($batch, 0, null);
         $this->mailCache->pauseQueue($batch->id);
@@ -149,7 +184,7 @@ class BatchEmailGenerator
                         $this->unreadArticlesGenerator->addToResolve($template->code, $userId, $parameters);
                     }
                 } elseif ($generator !== null) {
-                    $this->logger->log(LogLevel::ERROR, sprintf('Generating dynamic emails: unknown generator: %s', $generator));
+                    $this->logger->log(LogLevel::ERROR, "Generating dynamic emails: unknown generator: {$generator}");
                 }
             }
             $userJobOptions[$userId] = $jobOptions;
@@ -158,6 +193,8 @@ class BatchEmailGenerator
         // Resolve all dynamic parameters at once
         $this->unreadArticlesGenerator->resolve();
 
+        $regularJobsCount = $generatorJobsCount = 0;
+
         foreach ($userJobOptions as $userId => $jobOptions) {
             if ($jobOptions['generator'] ?? null === self::BEAM_UNREAD_ARTICLES_GENERATOR) {
                 $additionalParams = $this->unreadArticlesGenerator->getMailParameters($jobOptions['code'], $userId);
@@ -165,6 +202,9 @@ class BatchEmailGenerator
                 foreach ($additionalParams as $name => $value) {
                     $jobOptions['params'][$name] = $value;
                 }
+                $generatorJobsCount++;
+            } else {
+                $regularJobsCount++;
             }
 
             $this->mailCache->addJob(
@@ -176,6 +216,10 @@ class BatchEmailGenerator
                 $jobOptions['params']
             );
         }
+        $this->logger->info("Jobs inserted into mail cache", [
+            'regularJobsCount' => $regularJobsCount,
+            'generatorJobsCount' => $generatorJobsCount
+        ]);
 
         $priority = $this->batchesRepository->getBatchPriority($batch);
         $this->mailCache->restartQueue($batch->id, $priority);
