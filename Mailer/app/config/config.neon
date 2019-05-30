@@ -90,17 +90,17 @@ services:
 			- register(@hermesWorker)
 			- setCatchExceptions(true)
 
+	# Loggers
 	commandsLogger:
 		class: Monolog\Logger('commands-logger')
+	mailProcessLogger:
+		class: Monolog\Logger('mail-process-logger')
+	hermesLogger:
+		class: Monolog\Logger('hermes-logger')
 
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
 
-	hermesLogger:
-		class: Monolog\Logger('hermes-logger')
-		setup:
-			- pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/hermes-log.txt"))
-			- pushHandler(Monolog\Handler\ErrorLogHandler())
 	hermesRestart: Tomaj\Hermes\Restart\SharedFileRestart(%hermes.restart_file_path%)
 	hermesDispatcher:
 		class: Tomaj\Hermes\Dispatcher(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger, @hermesRestart)
@@ -155,7 +155,7 @@ services:
 
 	- Remp\MailerModule\Config\Config
 	- Remp\MailerModule\Sender
-	- Remp\MailerModule\Job\BatchEmailGenerator
+	- Remp\MailerModule\Job\BatchEmailGenerator(@mailProcessLogger)
 	- Remp\MailerModule\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Auth\AutoLogin
 

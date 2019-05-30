@@ -16,6 +16,18 @@ services:
             - setLockText("Exclusive content")
             - setupLockLink("Registration", "https://www.demosite.com/registration")
 
+    # Setup loggers output
+    commandsLogger:
+        setup:
+            - pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/commands.log"))
+    mailProcessLogger:
+        setup:
+            - pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/mail_process_job.log"))
+    hermesLogger:
+        setup:
+            - pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/hermes.log"))
+            - pushHandler(Monolog\Handler\ErrorLogHandler())
+
     # This is a reference IUser implementation.
     # You should make your own implementation against your CRM system and register it here.
     - Remp\MailerModule\User\Dummy
