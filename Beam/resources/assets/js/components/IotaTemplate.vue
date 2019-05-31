@@ -110,36 +110,32 @@
 
       <div v-if="sortedPageviewRanges.length > 0" class="ri_box_line">
         <div class="ri_box_title">Readers:</div>
-        <div v-for="range in sortedPageviewRanges" class="ri_box_item">
+        <div v-for="range in sortedPageviewRanges" class="ri_box_item" :key="range.label">
           <div class="ri_box_key">{{ range.label }}</div>
           <div class="ri_box_value">{{ pageviewStats[range.label] }}&nbsp;</div>
         </div>
       </div>
 
-      <div
-        v-if="sortedTitleVariants.length > 1"
-        v-for="variant in sortedTitleVariants"
-        class="ri_box_line"
-      >
-        <div class="ri_box_item">
-          <div class="ri_box_title">Title {{ variant }} (direct)</div>
-          <div v-for="range in sortedTitleVariantRanges">
-            <div class="ri_box_key">{{ range.label }}</div>
-            <div class="ri_box_value">{{ titleVariantStats[variant][range.label] || 0 }}&nbsp;</div>
+      <div v-if="sortedTitleVariants.length > 1">
+        <div v-for="variant in sortedTitleVariants" :key="variant" class="ri_box_line">
+          <div class="ri_box_item">
+            <div class="ri_box_title">Title {{ variant }} (direct)</div>
+            <div v-for="range in sortedTitleVariantRanges" :key="range.label">
+              <div class="ri_box_key">{{ range.label }}</div>
+              <div class="ri_box_value">{{ titleVariantStats[variant][range.label] || 0 }}&nbsp;</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div
-        v-if="sortedImageVariants.length > 1"
-        v-for="variant in sortedImageVariants"
-        class="ri_box_line"
-      >
-        <div class="ri_box_item">
-          <div class="ri_box_title">Image {{ variant }} (direct)</div>
-          <div v-for="range in sortedImageVariantRanges">
-            <div class="ri_box_key">{{ range.label }}</div>
-            <div class="ri_box_value">{{ imageVariantStats[variant][range.label] || 0 }}&nbsp;</div>
+      <div v-if="sortedImageVariants.length > 1">
+        <div v-for="variant in sortedImageVariants" :key="variant" class="ri_box_line">
+          <div class="ri_box_item">
+            <div class="ri_box_title">Image {{ variant }} (direct)</div>
+            <div v-for="range in sortedImageVariantRanges" :key="range.label">
+              <div class="ri_box_key">{{ range.label }}</div>
+              <div class="ri_box_value">{{ imageVariantStats[variant][range.label] || 0 }}&nbsp;</div>
+            </div>
           </div>
         </div>
       </div>
