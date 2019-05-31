@@ -41,8 +41,7 @@ class MailCache
     }
 
     // Mail Jobs
-
-    public function addJob($userId, $email, $templateCode, $queueId, $context, $params = [])
+    public function addJob($userId, $email, $templateCode, $queueId, $context, $params = []): bool
     {
         $job = json_encode([
             'userId' => $userId,
@@ -53,7 +52,7 @@ class MailCache
         ]);
 
         if ($this->jobExists($job, $queueId)) {
-            return true;
+            return false;
         }
 
         return (bool)$this->connect()->sadd(static::REDIS_KEY . $queueId, [$job]);

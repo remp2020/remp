@@ -194,18 +194,17 @@ class BatchEmailGenerator
         $regularJobsCount = $generatorJobsCount = 0;
 
         foreach ($userJobOptions as $userId => $jobOptions) {
+            $generatorJob = false;
             if ($jobOptions['generator'] ?? null === self::BEAM_UNREAD_ARTICLES_GENERATOR) {
                 $additionalParams = $this->unreadArticlesGenerator->getMailParameters($jobOptions['code'], $userId);
                 // Generator params override user params
                 foreach ($additionalParams as $name => $value) {
                     $jobOptions['params'][$name] = $value;
                 }
-                $generatorJobsCount++;
-            } else {
-                $regularJobsCount++;
+                $generatorJob = true;
             }
 
-            $this->mailCache->addJob(
+            $result = $this->mailCache->addJob(
                 $userId,
                 $jobOptions['email'],
                 $jobOptions['code'],
@@ -213,6 +212,14 @@ class BatchEmailGenerator
                 $jobOptions['context'],
                 $jobOptions['params']
             );
+
+            if ($result !== false) {
+                if ($generatorJob) {
+                    $generatorJobsCount++;
+                } else {
+                    $regularJobsCount++;
+                }
+            }
         }
         $this->logger->info("Jobs inserted into mail cache", [
             'regularJobsCount' => $regularJobsCount,
