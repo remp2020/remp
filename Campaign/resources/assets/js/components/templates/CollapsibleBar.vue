@@ -67,8 +67,24 @@
                         <div class="input-group fg-float m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
+                                <label for="header_text" class="fg-label">Header text</label>
+                                <input v-model="headerText" class="form-control fg-input" name="header_text" id="header_text" type="text" requried>
+                            </div>
+                        </div>
+
+                        <div class="input-group fg-float m-t-30">
+                            <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
+                            <div class="fg-line">
                                 <label for="collapse_text" class="fg-label">Collapse text</label>
                                 <input v-model="collapseText" class="form-control fg-input" name="collapse_text" id="collapse_text" type="text" requried>
+                            </div>
+                        </div>
+
+                        <div class="input-group fg-float m-t-30">
+                            <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
+                            <div class="fg-line">
+                                <label for="expand_text" class="fg-label">Expand text</label>
+                                <input v-model="expandText" class="form-control fg-input" name="expand_text" id="expand_text" type="text" requried>
                             </div>
                         </div>
 
@@ -101,7 +117,9 @@
 
     let props = [
         "_mainText",
+        "_headerText",
         "_collapseText",
+        "_expandText",
         "_buttonText",
         "_backgroundColor",
         "_textColor",
@@ -124,7 +142,9 @@
         },
         data: () => ({
             mainText: "Limited time offer<br/>30% discount",
-            collapseText: "Offer",
+            headerText: "Offer",
+            collapseText: "Collapse",
+            expandText: "Expand",
             buttonText: "Visit offer",
             colorScheme: "green",
             initialStateOptions: [
@@ -203,7 +223,9 @@
             emitValuesChanged: function() {
                 let val = {
                     mainText: this.mainText,
+                    headerText: this.headerText,
                     collapseText: this.collapseText,
+                    expandText: this.expandText,
                     buttonText: this.buttonText,
                 };
                 if (this.colorSchemes[this.colorScheme]) {

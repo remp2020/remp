@@ -109,16 +109,16 @@
 <template>
     <div class="collapsible-bar-wrap">
         <div class="collapsible-bar-header">
-            {{ collapseText }}
+            {{ headerText }}
 
             <div class="collapsible-bar-toggle">
                 <div v-if="collapsed" @click="collapsed = !collapsed" class="collapsible-bar-toggle-expand">
-                    Expand
+                    {{ expandText }}
                     <span>&#9650;</span>
                 </div>
 
                 <div v-if="!collapsed" @click="collapsed = !collapsed" class="collapsible-bar-toggle-collapse">
-                    Collapse
+                    {{ collapseText }}
                     <span>&#9660;</span>
                 </div>
             </div>
@@ -168,7 +168,9 @@
             "buttonTextColor",
             "headerText",
             "mainText",
+            "headerText",
             "collapseText",
+            "expandText",
             "buttonText",
 
             "show",
