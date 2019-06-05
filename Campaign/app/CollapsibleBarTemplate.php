@@ -6,7 +6,9 @@ class CollapsibleBarTemplate extends AbstractTemplate
 {
     protected $fillable = [
         'main_text',
+        'header_text',
         'collapse_text',
+        'expand_text',
         'button_text',
         'background_color',
         'text_color',

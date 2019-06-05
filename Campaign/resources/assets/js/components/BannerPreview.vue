@@ -93,7 +93,9 @@
                 :forcedPosition="forcedPosition"
 
                 :mainText="collapsibleBarTemplate.mainText"
+                :headerText="collapsibleBarTemplate.headerText"
                 :collapseText="collapsibleBarTemplate.collapseText"
+                :expandText="collapsibleBarTemplate.expandText"
                 :buttonText="collapsibleBarTemplate.buttonText"
                 :backgroundColor="collapsibleBarTemplate.backgroundColor"
                 :textColor="collapsibleBarTemplate.textColor"
