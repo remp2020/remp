@@ -9,15 +9,21 @@
     </div>
 
     <div class="well">
-        <div class="row">
-            <div class="col-md-6">
+        <div id="smart-range-selectors" class="row">
+            <div class="col-md-4">
                 <h4>Filter by publish date</h4>
-                <div id="smart-range-selector">
-                    {!! Form::hidden('published_from', $publishedFrom) !!}
-                    {!! Form::hidden('published_to', $publishedTo) !!}
-                    <smart-range-selector from="{{$publishedFrom}}" to="{{$publishedTo}}" :callback="callback">
-                    </smart-range-selector>
-                </div>
+                {!! Form::hidden('published_from', $publishedFrom) !!}
+                {!! Form::hidden('published_to', $publishedTo) !!}
+                <smart-range-selector from="{{$publishedFrom}}" to="{{$publishedTo}}" :callback="callbackPublished">
+                </smart-range-selector>
+            </div>
+
+            <div class="col-md-4">
+                <h4>Filter by conversion date</h4>
+                {!! Form::hidden('conversion_from', $conversionFrom) !!}
+                {!! Form::hidden('conversion_to', $conversionTo) !!}
+                <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callbackConversion">
+                </smart-range-selector>
             </div>
         </div>
     </div>
@@ -104,6 +110,8 @@
             'requestParams' => [
                 'published_from' => '$(\'[name="published_from"]\').val()',
                 'published_to' => '$(\'[name="published_to"]\').val()',
+                'conversion_from' => '$(\'[name="conversion_from"]\').val()',
+                'conversion_to' => '$(\'[name="conversion_to"]\').val()',
                 'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
@@ -115,20 +123,32 @@
                     'event' => 'change',
                     'selector' => '[name="published_to"]',
                 ],
+                [
+                    'event' => 'change',
+                    'selector' => '[name="conversion_from"]'
+                ],
+                [
+                    'event' => 'change',
+                    'selector' => '[name="conversion_to"]',
+                ],
             ],
         ]) !!}
     </div>
 
     <script type="text/javascript">
         new Vue({
-            el: "#smart-range-selector",
+            el: "#smart-range-selectors",
             components: {
                 SmartRangeSelector
             },
             methods: {
-                callback: function (from, to) {
+                callbackPublished: function (from, to) {
                     $('[name="published_from"]').val(from);
                     $('[name="published_to"]').val(to).trigger("change");
+                },
+                callbackConversion: function (from, to) {
+                    $('[name="conversion_from"]').val(from);
+                    $('[name="conversion_to"]').val(to).trigger("change");
                 }
             }
         });
