@@ -35,7 +35,10 @@ php artisan migrate
 # 5. Generate app key
 php artisan key:generate
 
-# 6. Run seeders (optional)
+# 6. Create elastic structure for campaign stats
+curl -XPUT -H "Content-Type: application/json" elastic:9200/commerce -d '{"mappings": {"_doc": {"properties": {"revenue": {"type": "double"}}}}}' 
+
+# 7. Run seeders (optional)
 php artisan db:seed
 ```
 
