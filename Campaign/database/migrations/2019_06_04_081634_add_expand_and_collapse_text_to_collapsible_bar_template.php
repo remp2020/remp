@@ -14,8 +14,8 @@ class AddExpandAndCollapseTextToCollapsibleBarTemplate extends Migration
     public function up()
     {
         Schema::table('collapsible_bar_templates', function (Blueprint $table) {
-            $table->string('collapse_text')->default('Collapse');
-            $table->string('expand_text')->default('Expand');
+            $table->string('collapse_text');
+            $table->string('expand_text');
         });
     }
 
