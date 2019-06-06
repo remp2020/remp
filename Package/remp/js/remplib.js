@@ -22,6 +22,8 @@ export default {
 
     usingAdblock: null,
 
+    articleElementFn: function() { return null },
+
     getUserId: function() {
         return this.userId;
     },

@@ -59,8 +59,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         maxPageProgressAchieved: 0,
 
-        articleElementFn: function() { return null },
-
         initialized: false,
 
         init: function(config) {
@@ -112,7 +110,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     this.article.locked = config.tracker.article.locked;
                 }
                 if (typeof config.articleElementFn !== 'undefined') {
-                    this.articleElementFn = config.articleElementFn
+                    remplib.articleElementFn = config.articleElementFn
                 }
             } else {
                 this.article = null;
@@ -671,7 +669,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         scrollProgressEvent: throttle(function() {
-            const article = remplib.tracker.articleElementFn(),
+            const article = remplib.articleElementFn(),
                 payload = {pageScrollRatio: remplib.tracker.pageProgress(), timestamp: new Date()};
 
             if (article) {
