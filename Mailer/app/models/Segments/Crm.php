@@ -3,7 +3,7 @@ namespace Remp\MailerModule\Segment;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
-use Nette\Utils\Json;
+use Psr\Http\Message\StreamInterface;
 
 class Crm implements ISegment
 {
@@ -31,9 +31,10 @@ class Crm implements ISegment
     public function list()
     {
         $response = $this->request(static::ENDPOINT_LIST);
-        $segments = [];
+        $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
 
-        foreach ($response['segments'] as $segment) {
+        $segments = [];
+        foreach (\JsonMachine\JsonMachine::fromStream($stream, "/segments") as $segment) {
             $segments[] = [
                 'name' => $segment['name'],
                 'provider' => static::PROVIDER_ALIAS,
@@ -42,21 +43,25 @@ class Crm implements ISegment
             ];
         }
 
+        fclose($stream);
         return $segments;
     }
 
     public function users($segment)
     {
         $response = $this->request(static::ENDPOINT_USERS, ['code' => $segment['code']]);
+        $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
+
         $userIds = [];
-        foreach ($response['users'] as $user) {
-            $userIds[] = $user['id'];
+        foreach (\JsonMachine\JsonMachine::fromStream($stream, "/users") as $userId => $_) {
+            $userIds[] = $userId;
         }
-        $response = null;
+
+        fclose($stream);
         return $userIds;
     }
 
-    private function request($url, $query = [])
+    private function request($url, $query = []): StreamInterface
     {
         $client = new Client([
             'base_uri' => $this->baseUrl,
@@ -70,7 +75,7 @@ class Crm implements ISegment
                 'query' => $query,
             ]);
 
-            return Json::decode($response->getBody(), Json::FORCE_ARRAY);
+            return $response->getBody();
         } catch (ConnectException $connectException) {
             throw new SegmentException("Could not connect to Segment:{$url} endpoint: {$connectException->getMessage()}");
         }
