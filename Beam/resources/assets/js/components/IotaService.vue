@@ -70,6 +70,7 @@ export default {
       this.fetchCommerceStats();
       this.fetchPageviewStats(now);
       this.fetchVariantStats(now, ["title_variant", "image_variant"]);
+      this.fetchReadProgressStats();
     });
   },
   methods: {
@@ -198,6 +199,37 @@ export default {
             console.warn(error);
           });
       }
+    },
+
+    fetchReadProgressStats() {
+      const payload = {
+        filter_by: [
+          {
+            tag: "article_id",
+            values: this.articleIds
+          }
+        ],
+        group_by: ["article_id"],
+        count_histogram: {
+          field: "page_progress",
+          interval: 0.01
+        }
+      };
+
+      Axios.post(
+        this.baseUrl + "/journal/pageviews/actions/progress/count",
+        payload
+      )
+        .then(function(response) {
+          EventHub.$emit(
+            "read-progress-data-changed",
+            response.data[0].count,
+            response.data[0].count_histogram
+          );
+        })
+        .catch(function(error) {
+          console.warn(error);
+        });
     }
   }
 };

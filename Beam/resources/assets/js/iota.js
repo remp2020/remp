@@ -2,6 +2,7 @@ import Remplib from 'remp/js/remplib';
 import Vue from 'vue';
 import IotaTemplate from './components/IotaTemplate';
 import IotaService from './components/IotaService';
+import IotaScrolledToHere from './components/IotaScrolledToHere';
 
 remplib = typeof remplib === 'undefined' ? {} : remplib;
 
@@ -114,6 +115,12 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
         }
       });
       vm.$mount(iotaContainer);
+
+      // TODO: add check here if we are on a detail of article
+      const iotaScrolledToHereContainer = document.createElement('div');
+      document.body.appendChild(iotaScrolledToHereContainer);
+      vm = new (Vue.extend(IotaScrolledToHere))();
+      vm.$mount(iotaScrolledToHereContainer);
     }
   };
 
