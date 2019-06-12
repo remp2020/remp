@@ -318,21 +318,25 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 
 		if user.Referer != nil && len(*user.Referer) > 0 {
 			fields["referer"] = *user.Referer
-			parsedRef := refererparser.Parse(*user.Referer)
-			if user.URL != nil {
-				parsedRef.SetCurrent(*user.URL)
-			}
-			tags["derived_referer_medium"] = parsedRef.Medium
-			tags["derived_referer_source"] = parsedRef.Referer
 
-			if tags["derived_referer_medium"] == "unknown" {
-				tags["derived_referer_medium"] = "external"
-			}
-			// derived_referer_medium can be also rewritten by user.Source.UtmMedium, see below
-
+			// Try to parse URL before being passed to refererparser library (since it produces NPE in case of invalid URL)
 			parsedURL, err := url.Parse(*user.Referer)
-			if err == nil {
+			if err != nil {
+				tags["derived_referer_medium"] = "unknown"
+			} else {
 				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Path)
+
+				parsedRef := refererparser.Parse(*user.Referer)
+				if user.URL != nil {
+					parsedRef.SetCurrent(*user.URL)
+				}
+				tags["derived_referer_medium"] = parsedRef.Medium
+				tags["derived_referer_source"] = parsedRef.Referer
+
+				if tags["derived_referer_medium"] == "unknown" {
+					tags["derived_referer_medium"] = "external"
+				}
+				// derived_referer_medium can be also rewritten by user.Source.UtmMedium, see below
 			}
 		} else {
 			tags["derived_referer_medium"] = "direct"
