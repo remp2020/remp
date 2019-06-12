@@ -519,7 +519,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         timespentParamsCleanup: function(params) {
-            delete params.user.url;
             delete params.user.user_agent;
             delete params.user.source.utm_source;
             delete params.user.source.utm_medium;
