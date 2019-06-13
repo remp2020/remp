@@ -19,6 +19,10 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
 
     configUrl: null,
 
+    articleElementFn: function() {
+      return null;
+    },
+
     articleSelector: null,
 
     idCallback: null,
@@ -42,6 +46,12 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       if (typeof config.iota.configUrl === 'string') {
         this.configUrl = config.iota.configUrl;
       }
+
+      if (typeof config.iota.articleElementFn !== 'function') {
+        throw 'remplib: configuration iota.articleElementFn invalid or missing: ' +
+          config.iota.articleElementFn;
+      }
+      this.articleElementFn = config.iota.articleElementFn;
 
       if (typeof config.iota.articleSelector !== 'string') {
         throw 'remplib: configuration iota.articleSelector invalid or missing: ' +
@@ -74,59 +84,70 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
 
     run: function() {
       let articleIds = [];
-      for (let elem of document.querySelectorAll(this.articleSelector)) {
-        const iotaElemContainer = document.createElement('div');
 
-        if (this.targetElementCallback) {
-          let targetElement = this.targetElementCallback(elem);
-          if (!targetElement) {
+      // initialize IotaTemplate component
+      if (!this.articleElementFn()) {
+        for (let elem of document.querySelectorAll(this.articleSelector)) {
+          const iotaElemContainer = document.createElement('div');
+
+          if (this.targetElementCallback) {
+            let targetElement = this.targetElementCallback(elem);
+            if (!targetElement) {
+              continue;
+            }
+            targetElement.parentNode.insertBefore(
+              iotaElemContainer,
+              targetElement.nextSibling
+            );
+          } else {
+            elem.parentNode.insertBefore(iotaElemContainer, elem.nextSibling);
+          }
+
+          let aid = this.idCallback(elem);
+          if (!aid) {
             continue;
           }
-          targetElement.parentNode.insertBefore(
-            iotaElemContainer,
-            targetElement.nextSibling
-          );
-        } else {
-          elem.parentNode.insertBefore(iotaElemContainer, elem.nextSibling);
-        }
 
-        let aid = this.idCallback(elem);
-        if (!aid) {
-          continue;
+          articleIds.push(aid);
+          let vm = new (Vue.extend(IotaTemplate))({
+            propsData: {
+              articleId: aid
+            }
+          });
+          vm.$mount(iotaElemContainer);
         }
-
-        articleIds.push(aid);
-        let vm = new (Vue.extend(IotaTemplate))({
-          propsData: {
-            articleId: aid
-          }
-        });
-        vm.$mount(iotaElemContainer);
       }
 
+      // initialize IotaService component
       const iotaContainer = document.createElement('div');
       document.body.appendChild(iotaContainer);
-
       let vm = new (Vue.extend(IotaService))({
         propsData: {
-          articleIds: articleIds,
+          articleIds: articleIds.length ? articleIds : ['1497874'], // TODO: how to add here current article detail ID?
           baseUrl: this.url,
           configUrl: this.configUrl,
-          httpHeaders: this.httpHeaders
+          httpHeaders: this.httpHeaders,
+          onArticleDetail: !!this.articleElementFn()
         }
       });
       vm.$mount(iotaContainer);
 
-      // TODO: add check here if we are on a detail of article
-      const iotaScrolledToHereContainer = document.createElement('div');
-      document.body.appendChild(iotaScrolledToHereContainer);
-      vm = new (Vue.extend(IotaScrolledToHere))();
-      vm.$mount(iotaScrolledToHereContainer);
+      // initialize IotaScrolledToHere component
+      if (this.articleElementFn()) {
+        const iotaScrolledToHereContainer = document.createElement('div');
+        document.body.appendChild(iotaScrolledToHereContainer);
+        vm = new (Vue.extend(IotaScrolledToHere))();
+        vm.$mount(iotaScrolledToHereContainer);
+      }
 
-      // TODO: add check here if we are on a detail of article
+      // initialize IotaSettings component
       const iotaSettingsContainer = document.createElement('div');
       document.body.appendChild(iotaSettingsContainer);
-      vm = new (Vue.extend(IotaSettings))();
+      vm = new (Vue.extend(IotaSettings))({
+        propsData: {
+          onArticleDetail: !!this.articleElementFn()
+        }
+      });
       vm.$mount(iotaSettingsContainer);
     }
   };

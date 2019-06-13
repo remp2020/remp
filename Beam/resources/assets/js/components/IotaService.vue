@@ -40,6 +40,10 @@ export default {
       default: function() {
         return {};
       }
+    },
+    onArticleDetail: {
+      type: Boolean,
+      required: true
     }
   },
   data: function() {
@@ -69,27 +73,49 @@ export default {
 
       let now = new Date();
 
-      this.fetchCommerceStats();
-      this.fetchPageviewStats(now);
-      this.fetchVariantStats(now, ["title_variant", "image_variant"]);
-      this.fetchReadProgressStats();
+      if (this.onArticleDetail) {
+        this.fetchReadProgressStats();
+      } else {
+        this.fetchCommerceStats();
+        this.fetchPageviewStats(now);
+        this.fetchVariantStats(now, ["title_variant", "image_variant"]);
+      }
     });
   },
   methods: {
     refetchAllData(deviceType, articleLocked, subscriber) {
       const now = new Date();
 
-      this.fetchCommerceStats();
-      this.fetchPageviewStats(now);
-      this.fetchVariantStats(now, ["title_variant", "image_variant"]);
-      this.fetchReadProgressStats(deviceType, articleLocked, subscriber);
+      if (this.onArticleDetail) {
+        this.fetchReadProgressStats(deviceType, articleLocked);
+      } else {
+        this.fetchCommerceStats(deviceType, subscriber);
+        this.fetchPageviewStats(now, deviceType, subscriber);
+        this.fetchVariantStats(
+          now,
+          ["title_variant", "image_variant"],
+          deviceType,
+          subscriber
+        );
+      }
     },
-    fetchCommerceStats: function() {
+    fetchCommerceStats: function(deviceType = "all", subscriber = "all") {
       const payload = {
         filter_by: [
           {
             tag: "article_id",
             values: this.articleIds
+          },
+          {
+            tag: "derived_ua_device",
+            values:
+              deviceType === "all"
+                ? ["Computer", "Phone", "Tablet"]
+                : [deviceType]
+          },
+          {
+            tag: "subscriber",
+            values: subscriber === "all" ? ["true", "false"] : [subscriber]
           }
         ],
         group_by: ["article_id"]
@@ -111,13 +137,24 @@ export default {
         });
     },
 
-    fetchPageviewStats: function(now) {
+    fetchPageviewStats: function(now, deviceType = "all", subscriber = "all") {
       for (let range of this.pageviewMinuteRanges) {
         const payload = {
           filter_by: [
             {
               tag: "article_id",
               values: this.articleIds
+            },
+            {
+              tag: "derived_ua_device",
+              values:
+                deviceType === "all"
+                  ? ["Computer", "Phone", "Tablet"]
+                  : [deviceType]
+            },
+            {
+              tag: "subscriber",
+              values: subscriber === "all" ? ["true", "false"] : [subscriber]
             }
           ],
           group_by: ["article_id"]
@@ -146,7 +183,12 @@ export default {
       }
     },
 
-    fetchVariantStats: function(now, variantTypes) {
+    fetchVariantStats: function(
+      now,
+      variantTypes,
+      deviceType = "all",
+      subscriber = "all"
+    ) {
       for (let range of this.variantsMinuteRanges) {
         const variantPayload = {
           filter_by: [
@@ -157,6 +199,17 @@ export default {
             {
               tag: "derived_referer_medium",
               values: ["internal"]
+            },
+            {
+              tag: "derived_ua_device",
+              values:
+                deviceType === "all"
+                  ? ["Computer", "Phone", "Tablet"]
+                  : [deviceType]
+            },
+            {
+              tag: "subscriber",
+              values: subscriber === "all" ? ["true", "false"] : [subscriber]
             }
           ],
           group_by: ["article_id"].concat(variantTypes)
@@ -211,16 +264,12 @@ export default {
       }
     },
 
-    fetchReadProgressStats(
-      deviceType = "all",
-      articleLocked = "false",
-      subscriber = "all"
-    ) {
+    fetchReadProgressStats(deviceType = "all", articleLocked = "false") {
       const payload = {
         filter_by: [
           {
             tag: "article_id",
-            values: this.articleIds // TODO: put single id here of visiting article
+            values: this.articleIds
           },
           {
             tag: "derived_ua_device",
@@ -232,10 +281,6 @@ export default {
           {
             tag: "locked",
             values: [articleLocked]
-          },
-          {
-            tag: "subscriber",
-            values: subscriber === "all" ? ["true", "false"] : [subscriber]
           }
         ],
         group_by: ["article_id"],

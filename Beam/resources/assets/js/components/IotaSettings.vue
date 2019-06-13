@@ -154,8 +154,7 @@
         <label for="ri-settings-device-phone">Phone</label>
       </div>
     </div>
-    <!-- TODO check if we are on index, if yes, don't show this section -->
-    <div class="ri-settings__group">
+    <div class="ri-settings__group" v-if="onArticleDetail">
       <p class="ri-settings__group__title">Article version</p>
       <div class="ri-settings__input-wrapper">
         <input
@@ -178,8 +177,7 @@
         <label for="ri-settings-article-version-locked">Locked article</label>
       </div>
     </div>
-    <!-- TODO check if we are on article, if yes, don't show this section -->
-    <div class="ri-settings__group">
+    <div class="ri-settings__group" v-if="!onArticleDetail">
       <p class="ri-settings__group__title">Reader type</p>
       <div class="ri-settings__input-wrapper">
         <input
@@ -220,21 +218,17 @@ import EventHub from "./EventHub";
 
 export default {
   name: "iota-settings",
+  props: {
+    onArticleDetail: {
+      type: Boolean,
+      required: true
+    }
+  },
   data: () => ({
     deviceType: "all",
     articleLocked: "false",
     subscriber: "all"
   }),
-  created: function() {
-    // EventHub.$on("read-progress-data-changed", this.receiveReadProgressData);
-  },
-  computed: {
-    // scrolledToHerePercent() {
-    //   return Math.round(
-    //     (this.readersWhoScrolledUpUntilThisPoint * 100) / this.totalReaders
-    //   );
-    // }
-  },
   methods: {
     fireEventToRefetchData() {
       EventHub.$emit(

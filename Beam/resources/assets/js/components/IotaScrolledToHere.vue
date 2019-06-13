@@ -39,7 +39,8 @@
       ></path>
     </svg>
     <span class="ri-scrolled-to-here__caption">
-      <strong>{{ scrolledToHerePercent }}%</strong> of desktop users scrolled to here
+      <strong>{{ scrolledToHerePercent }}%</strong>
+      of {{ deviceType.toLowerCase() }} users scrolled to here
     </span>
   </div>
 </template>
@@ -52,10 +53,12 @@ export default {
   data: () => ({
     totalReaders: 0,
     readersWhoScrolledUpUntilThisPoint: 0,
-    histogram: []
+    histogram: [],
+    deviceType: "all"
   }),
   created: function() {
     EventHub.$on("read-progress-data-changed", this.receiveReadProgressData);
+    EventHub.$on("metrics-settings-changed", this.receiveDifferentDevice);
     window.addEventListener(
       "scroll_progress",
       this.recalculateRemainingReaders
@@ -69,9 +72,13 @@ export default {
     }
   },
   methods: {
+    receiveDifferentDevice(deviceType, articleLocked, subscriber) {
+      this.deviceType = deviceType;
+    },
     receiveReadProgressData(totalReaders, histogram) {
       this.totalReaders = totalReaders;
       this.histogram = histogram;
+      window.scrollBy(0, 1); // kind of hacky way to force refiring of scroll_progress event
     },
     recalculateRemainingReaders(scrollProgressEvent) {
       const readersWhoLeftUpUntilThisPoint = this.histogram.reduce(
