@@ -3,6 +3,7 @@ import Vue from 'vue';
 import IotaTemplate from './components/IotaTemplate';
 import IotaService from './components/IotaService';
 import IotaScrolledToHere from './components/IotaScrolledToHere';
+import IotaSettings from './components/IotaSettings';
 
 remplib = typeof remplib === 'undefined' ? {} : remplib;
 
@@ -121,6 +122,12 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       document.body.appendChild(iotaScrolledToHereContainer);
       vm = new (Vue.extend(IotaScrolledToHere))();
       vm.$mount(iotaScrolledToHereContainer);
+
+      // TODO: add check here if we are on a detail of article
+      const iotaSettingsContainer = document.createElement('div');
+      document.body.appendChild(iotaSettingsContainer);
+      vm = new (Vue.extend(IotaSettings))();
+      vm.$mount(iotaSettingsContainer);
     }
   };
 

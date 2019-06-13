@@ -48,6 +48,8 @@ export default {
     };
   },
   created: function() {
+    EventHub.$on("metrics-settings-changed", this.refetchAllData);
+
     let vm = this;
     Object.keys(this.httpHeaders).forEach(function(name) {
       Axios.defaults.headers.common[name] = vm.httpHeaders[name];
@@ -74,6 +76,14 @@ export default {
     });
   },
   methods: {
+    refetchAllData(deviceType, articleLocked, subscriber) {
+      const now = new Date();
+
+      this.fetchCommerceStats();
+      this.fetchPageviewStats(now);
+      this.fetchVariantStats(now, ["title_variant", "image_variant"]);
+      this.fetchReadProgressStats(deviceType, articleLocked, subscriber);
+    },
     fetchCommerceStats: function() {
       const payload = {
         filter_by: [
@@ -201,12 +211,31 @@ export default {
       }
     },
 
-    fetchReadProgressStats() {
+    fetchReadProgressStats(
+      deviceType = "all",
+      articleLocked = "false",
+      subscriber = "all"
+    ) {
       const payload = {
         filter_by: [
           {
             tag: "article_id",
-            values: this.articleIds
+            values: this.articleIds // TODO: put single id here of visiting article
+          },
+          {
+            tag: "derived_ua_device",
+            values:
+              deviceType === "all"
+                ? ["Computer", "Phone", "Tablet"]
+                : [deviceType]
+          },
+          {
+            tag: "locked",
+            values: [articleLocked]
+          },
+          {
+            tag: "subscriber",
+            values: subscriber === "all" ? ["true", "false"] : [subscriber]
           }
         ],
         group_by: ["article_id"],
