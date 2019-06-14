@@ -11,7 +11,7 @@ type Config struct {
 	MysqlPasswd string `envconfig:"mysql_passwd" required:"true"`
 	MysqlDBName string `envconfig:"mysql_dbname" required:"true"`
 
-	ElasticAddr   string `envconfig:"elastic_addr" required:"true"`
+	ElasticAddrs  string `envconfig:"elastic_addrs" required:"true"`
 	ElasticUser   string `envconfig:"elastic_user" required:"false"`
 	ElasticPasswd string `envconfig:"elastic_passwd" required:"false"`
 
