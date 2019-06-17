@@ -4,6 +4,7 @@ import IotaTemplate from './components/IotaTemplate';
 import IotaService from './components/IotaService';
 import IotaScrolledToHere from './components/IotaScrolledToHere';
 import IotaSettings from './components/IotaSettings';
+import IotaHistogram from './components/IotaHistogram';
 
 remplib = typeof remplib === 'undefined' ? {} : remplib;
 
@@ -83,10 +84,11 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
     },
 
     run: function() {
+      const weAreOnArticleDetail = !!this.articleElementFn();
       let articleIds = [];
 
       // initialize IotaTemplate component
-      if (!this.articleElementFn()) {
+      if (!weAreOnArticleDetail) {
         for (let elem of document.querySelectorAll(this.articleSelector)) {
           const iotaElemContainer = document.createElement('div');
 
@@ -127,17 +129,25 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
           baseUrl: this.url,
           configUrl: this.configUrl,
           httpHeaders: this.httpHeaders,
-          onArticleDetail: !!this.articleElementFn()
+          onArticleDetail: weAreOnArticleDetail
         }
       });
       vm.$mount(iotaContainer);
 
       // initialize IotaScrolledToHere component
-      if (this.articleElementFn()) {
+      if (weAreOnArticleDetail) {
         const iotaScrolledToHereContainer = document.createElement('div');
         document.body.appendChild(iotaScrolledToHereContainer);
         vm = new (Vue.extend(IotaScrolledToHere))();
         vm.$mount(iotaScrolledToHereContainer);
+      }
+
+      // initialize IotaHistogram component
+      if (weAreOnArticleDetail) {
+        const iotaHistogramContainer = document.createElement('div');
+        document.body.appendChild(iotaHistogramContainer);
+        vm = new (Vue.extend(IotaHistogram))();
+        vm.$mount(iotaHistogramContainer);
       }
 
       // initialize IotaSettings component
@@ -145,7 +155,7 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       document.body.appendChild(iotaSettingsContainer);
       vm = new (Vue.extend(IotaSettings))({
         propsData: {
-          onArticleDetail: !!this.articleElementFn()
+          onArticleDetail: weAreOnArticleDetail
         }
       });
       vm.$mount(iotaSettingsContainer);
