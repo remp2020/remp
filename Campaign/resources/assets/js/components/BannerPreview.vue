@@ -152,6 +152,7 @@
                 :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
+                :adminPreview="adminPreview"
         >
         </overlay-rectangle-preview>
     </div>
@@ -199,6 +200,8 @@
         "positionOptions",
 
         "variantUuid",
+
+        "adminPreview"
     ];
 
     export default {
