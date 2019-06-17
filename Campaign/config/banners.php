@@ -62,6 +62,11 @@ return [
                 'right' => '0px',
             ],
         ],
+        'center' => [
+            'name' => 'Center',
+            'style' => [
+            ]
+        ]
     ],
     'alignments' => [
         'left' => [
