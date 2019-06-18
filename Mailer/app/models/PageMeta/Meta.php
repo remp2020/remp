@@ -35,7 +35,7 @@ class Meta
         return $this->image;
     }
 
-    public function getAuthors(): string
+    public function getAuthors(): array
     {
         return $this->authors;
     }
