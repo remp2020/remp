@@ -37,6 +37,6 @@ class Meta
 
     public function getAuthors(): array
     {
-        return $this->authors;
+        return is_array($this->authors) ? $this->authors : [];
     }
 }
