@@ -41,7 +41,6 @@ class SnapshotArticlesViews extends Command
         $this->line("<info>***** Snapshotting traffic data for $thisMinute *****</info>");
         $this->line('');
 
-
         $this->snapshot($thisMinute);
 
         $this->line(' <info>OK!</info>');
