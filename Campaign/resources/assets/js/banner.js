@@ -93,6 +93,7 @@ window.remplib = window.remplib || {};
                     textAlign: model['html_template']['text_align'] || null,
                     text: model['html_template']['text'] || null,
                     css: model['html_template']['css'] || null,
+                    js: model['html_template']['js'] || null,
                     dimensions: model['html_template']['dimensions'] || null,
                 }
             }

@@ -78,6 +78,7 @@
             "closeText",
             "text",
             "css",
+            "js",
             "displayType",
             "forcedPosition",
             "uuid",
@@ -93,7 +94,8 @@
         mounted: function () {
             let styles = this.css ? this.css.replace(/\r?\n|\r/gm," ") : '',
                 head = document.head || document.getElementsByTagName('head')[0],
-                style = document.createElement('style');
+                style = document.createElement('style'),
+                js = this.js;
 
             head.appendChild(style);
 
@@ -104,6 +106,10 @@
             } else {
                 style.appendChild(document.createTextNode(styles));
             }
+
+            this.$nextTick(() => {
+                eval('(function() {' + js + '})()');
+            }, this)
         },
         computed: {
             _textAlign: function() {

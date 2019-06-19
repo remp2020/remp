@@ -20,6 +20,7 @@
                 :backgroundColor="htmlTemplate.backgroundColor"
                 :text="htmlTemplate.text"
                 :css="htmlTemplate.css"
+                :js="htmlTemplate.js"
 
                 :position="position"
                 :offsetVertical="offsetVertical"
