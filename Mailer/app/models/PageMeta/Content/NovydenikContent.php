@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\PageMeta;
 
 use GuzzleHttp\Exception\RequestException;
+use Nette\Http\Url;
 use Nette\Utils\Strings;
 
 class NovydenikContent implements ContentInterface
@@ -66,21 +67,35 @@ class NovydenikContent implements ContentInterface
         $matches = [];
         preg_match('/<meta property=\"og:image\" content=\"(.+)\"\s*\/?/U', $content, $matches);
         if ($matches) {
-            $image = $matches[1];
-
-            $parts = explode('/', $image);
-            $image = array_pop($parts);
-            $info = pathinfo($image);
-            if (preg_match('/-([0-9]+)x([0-9]+)$/i', $info['filename'])) {
-                $newImageFileName = preg_replace('/-([0-9]+)x([0-9]+)$/', '-558x270', $info['filename']);
-                $image = $newImageFileName . '.' . $info['extension'];
-            } else {
-                $image = $info['filename'] . '-558x270.' . $info['extension'];
-            }
-            $parts[] = $image;
-            $image = implode('/', $parts);
+            $images = $this->processImage($matches[1]);
+            $image = $images['main'];
         }
 
         return new Meta($title, $description, $image, $denniknAuthors);
+    }
+
+    private function processImage($imageUrl)
+    {
+        $url = new Url($imageUrl);
+        if ($url->getHost() !== 'img.novydenik.com') {
+            $url = new Url('https://img.novydenik.com/wp-static' . $url->path);
+        }
+
+        $images = [
+            'small' => (string) $url->appendQuery(['w' => 350, 'h' => 220, 'fit' =>'crop']),
+            'main' => (string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']),
+        ];
+
+        // return placeholder if image doesn't exist
+        $response = get_headers($images['small']);
+        if (strpos($response[0], '404')) {
+            $images['small'] = 'https://static.novydenik.com/2018/11/placeholder_1@2x.png';
+        }
+        $response = get_headers($images['main']);
+        if (strpos($response[0], '404')) {
+            $images['main'] = 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
+        }
+
+        return $images;
     }
 }
