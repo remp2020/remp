@@ -17,7 +17,8 @@ class CreateArticleViewsSnapshotsTable extends Migration
             $table->increments('id');
             $table->timestamp('time');
             $table->string('property_token');
-            $table->integer('article_id')->unsigned();
+            $table->integer('article_id')->nullable()->unsigned();
+            $table->string('external_article_id');
             $table->string('derived_referer_medium')->nullable();
             $table->string('explicit_referer_medium')->nullable();
             $table->integer('count')->unsigned();
