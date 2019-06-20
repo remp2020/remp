@@ -39,7 +39,7 @@ class DenniknContent implements ContentInterface
         // author
         $denniknAuthors = false;
         $matches = [];
-        preg_match_all('/<cite class=\"d-author\"\>(.+)[\<]\/cite\>/U', $content, $matches);
+        preg_match_all('/<cite class=\"e_author_t\"\>(.+)[\<]\/cite\>/U', $content, $matches);
 
         if ($matches) {
             foreach ($matches[1] as $author) {
