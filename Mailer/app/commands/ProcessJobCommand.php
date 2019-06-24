@@ -39,7 +39,7 @@ class ProcessJobCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        ini_set('memory_limit', '256M');
+        ini_set('memory_limit', '512M');
         $output->writeln(sprintf('%s <info>Mail process job</info>', DateTime::from('now')));
 
         $process = new JobProcess();
