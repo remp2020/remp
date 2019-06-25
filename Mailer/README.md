@@ -88,8 +88,25 @@ couple of settings you can configure:
     * *HTML version.* HTML (primary) version of email that people will see. HTML version is being previewed in the
     form for creation of new email.
     
-Text and HTML versions of *email* support [Twig syntax](https://twig.symfony.com/doc/2.x/templates.html). You can use standard Twig features in your templates or use
-custom variables provided by [Generators](#generators).
+Text and HTML versions of *email* support [Twig syntax](https://twig.symfony.com/doc/2.x/templates.html) and you can use
+standard Twig features in your templates. Mailer is able to provide custom variables to your templates. These can
+originate from different sources:
+
+* System variables.
+  * `autologin`: generates and prints unique token for each email address, that can be later validated via
+  [users/check-token](#get-apiv1userscheck-token) API.
+  
+    It's meant to be used within URLs (e.g. `http://dennikn.sk/email-settings{{ autologin }}`)
+ 
+* Variables provided by [Generators](#generators), which can **only** be used in generator templates.
+If your generator provides `foo` variable, you can use it as `{{ foo }}` in your generator template.
+
+* Variables provided by `IUser` (see [User integration](#user-integration)). For example if the response from your API
+includes `first_name` key as described in the user integration example, you can use it in your email template as
+`{{ first_name }}` variable.
+
+*Note: Mailer doesn't verify presence of the variable nor does it currently provide fallback value. If you use the
+custom variable and it won't be present in the `IUser` response, empty string will be injected into your email body.*   
     
 Saving the *email* doesn't trigger any sending. It creates an instance of *email* that might be sent manually (or by 3rd
 parties) via API or as a *batch* within a Mailer's *job*. 
@@ -1405,6 +1422,10 @@ however strongly recommended.
       $userId => [
           'id' => String, // userId
           'email' => String, // valid email address of user
+        
+          // you can provide optional data that can be used within your email templates, for example:
+          'first_name' => String,
+          'last_name' => String, 
       ],
   ];
   ```
