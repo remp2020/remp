@@ -316,6 +316,26 @@ to the parameters stated in `apiParams()`. This is a very specific use of an int
     }
     ``` 
     
+###### Registering generator
+
+When your implementation is ready, register your generator in `config.local.neon`. The parameters of `registerGenerator`
+method are:
+
+* *type*: URL-friendly name of the generator which is used to link generator template with the actual implementing class.
+Removing *type* which is still used in generator templates might cause system inconsistency and errors.
+* *label*: Name of the generator as is displayed in Mailer admin forms.
+* *instance of `Remp\MailerModule\Generators\IGenerator`*: Implementation class used when generator is selected. It's
+safe to swap implementation instances anytime as *type* is used for referencing/linking generator templates and
+generator implementations.
+
+```neon
+services:
+	# ...
+	generator:
+		setup:
+			- registerGenerator('newsfilter', 'Newsfilter', Remp\MailerModule\Generators\NewsfilterGenerator())
+```
+    
 ### API Documentation
 
 All examples use `http://mailer.remp.press` as a base domain. Please change the host to the one you use
