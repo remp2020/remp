@@ -76,8 +76,7 @@ class MaterialRenderer extends DefaultFormRenderer
                 $control instanceof Controls\SelectBox ||
                 $control instanceof Controls\MultiSelectBox) {
                 $control->getControlPrototype()->addClass('form-control fg-input');
-            } elseif (
-                $control instanceof Controls\CheckboxList ||
+            } elseif ($control instanceof Controls\CheckboxList ||
                 $control instanceof Controls\RadioList) {
                 $control->getSeparatorPrototype()->setName('div')->addClass($control->getControlPrototype()->type);
             }
