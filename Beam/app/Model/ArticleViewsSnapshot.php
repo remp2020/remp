@@ -15,7 +15,6 @@ class ArticleViewsSnapshot extends Model
         'derived_referer_medium',
         'explicit_referer_medium',
         'count',
-        'count_by_referer_host',
     ];
 
     protected $casts = [
