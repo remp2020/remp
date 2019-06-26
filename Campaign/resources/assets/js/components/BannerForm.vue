@@ -328,7 +328,6 @@
 
         <input type="hidden" name="display_type" v-bind:value="displayType" />
 
-
         <form-validator :url="validateUrl"></form-validator>
     </div>
 </template>
@@ -378,7 +377,7 @@
         "_clientSiteUrl": String,
 
         "_js": String,
-        "_includes": Array
+        "_includes": String
     };
 
     export default {
@@ -445,7 +444,10 @@
             ],
 
             validateUrl: null,
-            clientSiteUrl: null
+            clientSiteUrl: null,
+
+            js: null,
+            includes: null
         }),
         methods: {
             openClientSiteAndSendKeepAliveMessages() {

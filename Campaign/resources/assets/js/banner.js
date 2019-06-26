@@ -29,7 +29,7 @@ window.remplib = window.remplib || {};
                 variant: model['variant_uuid'],
                 adminPreview: false,
                 js: model['js'] || null,
-                includes: model['includes'] ? model['includes'].split(/\n/) : null,
+                includes: model['includes'] || null
             };
 
             if (banner.template === 'medium_rectangle') {
