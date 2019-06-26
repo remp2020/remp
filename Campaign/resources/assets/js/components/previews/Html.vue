@@ -108,7 +108,13 @@
             }
 
             this.$nextTick(() => {
-                eval('(function() {' + js + '})()');
+                setTimeout(function() {
+                    try {
+                        eval('(function() {' + js + '})()');
+                    } catch {
+                        console.warn("unable to execute custom banner JS:", js);
+                    }
+                }, 0);
             }, this)
         },
         computed: {
