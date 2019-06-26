@@ -9,6 +9,7 @@ class HtmlTemplate extends AbstractTemplate
         'text',
         'css',
         'js',
+        'includes',
         'text_align',
         'font_size',
         'text_color',

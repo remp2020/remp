@@ -79,6 +79,7 @@
             "text",
             "css",
             "js",
+            "includes",
             "displayType",
             "forcedPosition",
             "uuid",
@@ -95,7 +96,53 @@
             let styles = this.css ? this.css.replace(/\r?\n|\r/gm," ") : '',
                 head = document.head || document.getElementsByTagName('head')[0],
                 style = document.createElement('style'),
-                js = this.js;
+                js = this.js,
+                scripts = [],
+                loadedScriptsCount = 0;
+
+            for (let ii = 0; ii < this.includes.length; ii++) {
+                scripts[ii] = document.createElement("script");
+                scripts[ii].type = "text/javascript";
+                scripts[ii].src = this.includes[ii];
+                document.head.appendChild(scripts[ii]);
+
+                if (scripts[ii].readyState) { // ie
+                    scripts[ii].onreadystatechange = () => {
+                        if ( scripts[ii].readyState === "loaded" || scripts[ii].readyState === "complete" ) {
+                            scripts[ii].onreadystatechange = null;
+                            loadedScriptsCount++;
+
+                            if (loadedScriptsCount === this.includes.length) {
+                                this.$nextTick(() => {
+                                    setTimeout(function() {
+                                        try {
+                                            eval('(function() {' + js + '})()');
+                                        } catch {
+                                            console.warn("unable to execute custom banner JS:", js);
+                                        }
+                                    }, 0);
+                                }, this)
+                            }
+                        }
+                    };
+                } else { // others
+                    scripts[ii].onload = () => {
+                        loadedScriptsCount++;
+
+                        if (loadedScriptsCount === this.includes.length) {
+                            this.$nextTick(() => {
+                                setTimeout(function() {
+                                    try {
+                                        eval('(function() {' + js + '})()');
+                                    } catch {
+                                        console.warn("unable to execute custom banner JS:", js);
+                                    }
+                                }, 0);
+                            }, this)
+                        }
+                    }
+                }
+            }
 
             head.appendChild(style);
 
@@ -106,16 +153,6 @@
             } else {
                 style.appendChild(document.createTextNode(styles));
             }
-
-            this.$nextTick(() => {
-                setTimeout(function() {
-                    try {
-                        eval('(function() {' + js + '})()');
-                    } catch {
-                        console.warn("unable to execute custom banner JS:", js);
-                    }
-                }, 0);
-            }, this)
         },
         computed: {
             _textAlign: function() {

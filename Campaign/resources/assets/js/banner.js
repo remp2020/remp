@@ -94,6 +94,7 @@ window.remplib = window.remplib || {};
                     text: model['html_template']['text'] || null,
                     css: model['html_template']['css'] || null,
                     js: model['html_template']['js'] || null,
+                    includes: model['html_template']['includes'] ? model['html_template']['includes'].split(/\n/) : null,
                     dimensions: model['html_template']['dimensions'] || null,
                 }
             }

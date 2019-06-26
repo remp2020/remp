@@ -21,6 +21,7 @@
                 :text="htmlTemplate.text"
                 :css="htmlTemplate.css"
                 :js="htmlTemplate.js"
+                :includes="htmlTemplate.includes"
 
                 :position="position"
                 :offsetVertical="offsetVertical"

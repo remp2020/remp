@@ -68,6 +68,15 @@
                             </div>
                         </div><!-- .input-group -->
 
+                        <div class="input-group fg-float m-t-30">
+                            <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                            <div class="fg-line">
+                                <label for="includes" class="fg-label">Includes</label>
+                                <textarea v-model="includes" class="form-control fg-input" rows="6" name="includes" cols="50" id="includes"></textarea>
+                            </div>
+                            <div style="margin-top: 5px;">Enter include script urls separated by new line. e.g. jQuery</div>
+                        </div><!-- .input-group -->
+
                         <div class="cp-container">
                             <div class="input-group fg-float m-t-30">
                                 <span class="input-group-addon"><i class="zmdi zmdi-format-color-text"></i></span>
@@ -126,6 +135,7 @@
         "_text",
         "_css",
         "_js",
+        "_includes",
         "_textColor",
         "_fontSize",
         "_textAlign",

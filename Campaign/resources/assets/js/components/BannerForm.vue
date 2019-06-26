@@ -12,6 +12,7 @@
                 v-bind:_text="htmlTemplate.text"
                 v-bind:_css="htmlTemplate.css"
                 v-bind:_js="htmlTemplate.js"
+                v-bind:_includes="htmlTemplate.includes"
                 v-bind:_textColor="htmlTemplate.textColor"
                 v-bind:_fontSize="htmlTemplate.fontSize"
                 v-bind:_textAlign="htmlTemplate.textAlign"
