@@ -11,8 +11,6 @@
                 v-bind:_backgroundColor="htmlTemplate.backgroundColor"
                 v-bind:_text="htmlTemplate.text"
                 v-bind:_css="htmlTemplate.css"
-                v-bind:_js="htmlTemplate.js"
-                v-bind:_includes="htmlTemplate.includes"
                 v-bind:_textColor="htmlTemplate.textColor"
                 v-bind:_fontSize="htmlTemplate.fontSize"
                 v-bind:_textAlign="htmlTemplate.textAlign"
@@ -124,6 +122,23 @@
                                     <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                                 </div>
                             </div>
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                                <div class="fg-line">
+                                    <label for="js" class="fg-label">Custom JS</label>
+                                    <textarea v-model="js" class="form-control fg-input" rows="6" name="js" cols="50" id="js"></textarea>
+                                </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                                <div class="fg-line">
+                                    <label for="includes" class="fg-label">Includes</label>
+                                    <textarea v-model="includes" class="form-control fg-input" rows="6" name="includes" cols="50" id="includes"></textarea>
+                                </div>
+                                <div style="margin-top: 5px;">Enter include script/stylesheets urls separated by new line.</div>
+                            </div><!-- .input-group -->
                         </div>
                     </div>
                 </div>
@@ -300,6 +315,9 @@
                                         :transition="transition"
                                         :displayType="displayType"
                                         :forcedPosition="'absolute'"
+
+                                        :js="js"
+                                        :includes="includes"
                                 ></banner-preview>
                             </div>
                         </div>
@@ -358,6 +376,9 @@
 
         "_validateUrl": String,
         "_clientSiteUrl": String,
+
+        "_js": String,
+        "_includes": Array
     };
 
     export default {

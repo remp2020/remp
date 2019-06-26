@@ -31,6 +31,8 @@ class Banner extends Model
         'display_type',
         'target_selector',
         'template',
+        'js',
+        'includes',
     ];
 
     protected $casts = [

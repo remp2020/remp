@@ -27,7 +27,9 @@ window.remplib = window.remplib || {};
                 // inline
                 targetSelector: model['target_selector'] || null,
                 variant: model['variant_uuid'],
-                adminPreview: false
+                adminPreview: false,
+                js: model['js'] || null,
+                includes: model['includes'] ? model['includes'].split(/\n/) : null,
             };
 
             if (banner.template === 'medium_rectangle') {
@@ -93,8 +95,6 @@ window.remplib = window.remplib || {};
                     textAlign: model['html_template']['text_align'] || null,
                     text: model['html_template']['text'] || null,
                     css: model['html_template']['css'] || null,
-                    js: model['html_template']['js'] || null,
-                    includes: model['html_template']['includes'] ? model['html_template']['includes'].split(/\n/) : null,
                     dimensions: model['html_template']['dimensions'] || null,
                 }
             }
