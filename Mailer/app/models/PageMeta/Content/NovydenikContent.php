@@ -60,13 +60,17 @@ class NovydenikContent implements ContentInterface
 
         $title = $schema->headline ?? false;
         $description = $schema->description ?? false;
-        $image = $this->processImage($schema->image->url);
+        $image = $this->processImage($schema->image->url ?? null);
 
         return new Meta($title, $description, $image, $denniknAuthors);
     }
 
     private function processImage($imageUrl)
     {
+        if (!$imageUrl) {
+            return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
+        }
+        
         $url = new Url($imageUrl);
         $url = (string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']);
 
