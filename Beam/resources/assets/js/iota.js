@@ -102,36 +102,34 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       let articleIds = [];
 
       // initialize IotaTemplate component
-      if (!weAreOnArticleDetail) {
-        for (let elem of document.querySelectorAll(this.articleSelector)) {
-          const iotaElemContainer = document.createElement('div');
+      for (let elem of document.querySelectorAll(this.articleSelector)) {
+        const iotaElemContainer = document.createElement('div');
 
-          if (this.targetElementCallback) {
-            let targetElement = this.targetElementCallback(elem);
-            if (!targetElement) {
-              continue;
-            }
-            targetElement.parentNode.insertBefore(
-              iotaElemContainer,
-              targetElement.nextSibling
-            );
-          } else {
-            elem.parentNode.insertBefore(iotaElemContainer, elem.nextSibling);
-          }
-
-          let aid = this.idCallback(elem);
-          if (!aid) {
+        if (this.targetElementCallback) {
+          let targetElement = this.targetElementCallback(elem);
+          if (!targetElement) {
             continue;
           }
-
-          articleIds.push(aid);
-          let vm = new (Vue.extend(IotaTemplate))({
-            propsData: {
-              articleId: aid
-            }
-          });
-          vm.$mount(iotaElemContainer);
+          targetElement.parentNode.insertBefore(
+            iotaElemContainer,
+            targetElement.nextSibling
+          );
+        } else {
+          elem.parentNode.insertBefore(iotaElemContainer, elem.nextSibling);
         }
+
+        let aid = this.idCallback(elem);
+        if (!aid) {
+          continue;
+        }
+
+        articleIds.push(aid);
+        let vm = new (Vue.extend(IotaTemplate))({
+          propsData: {
+            articleId: aid
+          }
+        });
+        vm.$mount(iotaElemContainer);
       }
 
       // initialize IotaService component

@@ -177,7 +177,7 @@
         <label for="ri-settings-article-version-locked">Locked article</label>
       </div>
     </div>
-    <div class="ri-settings__group" v-if="!onArticleDetail">
+    <div class="ri-settings__group">
       <p class="ri-settings__group__title">Reader type</p>
       <div class="ri-settings__input-wrapper">
         <input

@@ -84,16 +84,16 @@ export default {
 
       if (this.onArticleDetail) {
         this.fetchReadProgressStats(deviceType, articleLocked);
-      } else {
-        this.fetchCommerceStats(deviceType, subscriber);
-        this.fetchPageviewStats(now, deviceType, subscriber);
-        this.fetchVariantStats(
-          now,
-          ["title_variant", "image_variant"],
-          deviceType,
-          subscriber
-        );
       }
+
+      this.fetchCommerceStats(deviceType, subscriber);
+      this.fetchPageviewStats(now, deviceType, subscriber);
+      this.fetchVariantStats(
+        now,
+        ["title_variant", "image_variant"],
+        deviceType,
+        subscriber
+      );
     },
     fetchCommerceStats: function(deviceType = "all", subscriber = "all") {
       const payload = {
