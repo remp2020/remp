@@ -11,8 +11,8 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class MailTypeUpsertHandler extends BaseHandler {
-
+class MailTypeUpsertHandler extends BaseHandler
+{
     private $listsRepository;
 
     private $listCategoriesRepository;
@@ -27,13 +27,15 @@ class MailTypeUpsertHandler extends BaseHandler {
         $this->listCategoriesRepository = $listCategoriesRepository;
     }
 
-    public function params() {
+    public function params()
+    {
         return [
             new InputParam(InputParam::TYPE_POST_RAW, 'raw'),
         ];
     }
 
-    public function handle($params) {
+    public function handle($params)
+    {
         try {
             $data = Json::decode($params['raw'], Json::FORCE_ARRAY);
         } catch (JsonException $e) {
@@ -84,7 +86,8 @@ class MailTypeUpsertHandler extends BaseHandler {
         ]);
     }
 
-    private function getList($input) {
+    private function getList($input)
+    {
         if (isset($input['id'])) {
             return $this->listsRepository->find($input['id']);
         }
@@ -96,7 +99,8 @@ class MailTypeUpsertHandler extends BaseHandler {
         return false;
     }
 
-    private function getLastSortingNumberByCategory($categoryId) {
+    private function getLastSortingNumberByCategory($categoryId)
+    {
         $listsInCategory = $this->listsRepository->findByCategory($categoryId)
             ->order('mail_types.sorting')
             ->fetchAll();
@@ -108,7 +112,8 @@ class MailTypeUpsertHandler extends BaseHandler {
         return 1;
     }
 
-    private function addList($params) {
+    private function addList($params)
+    {
         $required = [
             'mail_type_category_id',
             'priority',
