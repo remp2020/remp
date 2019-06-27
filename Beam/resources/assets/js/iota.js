@@ -125,7 +125,7 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       document.body.appendChild(iotaContainer);
       let vm = new (Vue.extend(IotaService))({
         propsData: {
-          articleIds: articleIds.length ? articleIds : ['1497874'], // TODO: how to add here current article detail ID?
+          articleIds: articleIds.length ? articleIds : ['1506332'], // TODO: how to add here current article detail ID?
           baseUrl: this.url,
           configUrl: this.configUrl,
           httpHeaders: this.httpHeaders,

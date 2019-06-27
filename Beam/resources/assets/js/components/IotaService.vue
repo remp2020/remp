@@ -112,11 +112,12 @@ export default {
               deviceType === "all"
                 ? ["Computer", "Phone", "Tablet"]
                 : [deviceType]
-          },
-          {
-            tag: "subscriber",
-            values: subscriber === "all" ? ["true", "false"] : [subscriber]
           }
+          // FIXME: this section, if uncommented, causes to return 0 in every conversion bubble
+          // {
+          //   tag: "subscriber",
+          //   values: subscriber === "all" ? ["true", "false"] : [subscriber]
+          // }
         ],
         group_by: ["article_id"]
       };
