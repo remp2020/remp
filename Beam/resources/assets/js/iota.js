@@ -83,7 +83,7 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
         this.httpHeaders = config.iota.httpHeaders;
       }
 
-      if (typeof config.article === 'object') {
+      if (config.article && typeof config.article === 'object') {
         if (
           typeof config.article.id === 'undefined' ||
           config.article.id === null
