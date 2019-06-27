@@ -31,33 +31,39 @@ class Crm implements ISegment
     public function list()
     {
         $response = $this->request(static::ENDPOINT_LIST);
-        $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
 
-        $segments = [];
-        foreach (\JsonMachine\JsonMachine::fromStream($stream, "/segments") as $segment) {
-            $segments[] = [
-                'name' => $segment['name'],
-                'provider' => static::PROVIDER_ALIAS,
-                'code' => $segment['code'],
-                'group' => $segment['group'],
-            ];
+        try {
+            $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
+            $segments = [];
+            foreach (\JsonMachine\JsonMachine::fromStream($stream, "/segments") as $segment) {
+                $segments[] = [
+                    'name' => $segment['name'],
+                    'provider' => static::PROVIDER_ALIAS,
+                    'code' => $segment['code'],
+                    'group' => $segment['group'],
+                ];
+            }
+        } finally {
+            fclose($stream);
         }
 
-        fclose($stream);
         return $segments;
     }
 
     public function users($segment)
     {
         $response = $this->request(static::ENDPOINT_USERS, ['code' => $segment['code']]);
-        $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
 
-        $userIds = [];
-        foreach (\JsonMachine\JsonMachine::fromStream($stream, "/users") as $userId => $_) {
-            $userIds[] = $userId;
+        try {
+            $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
+            $userIds = [];
+            foreach (\JsonMachine\JsonMachine::fromStream($stream, "/users") as $user) {
+                $userIds[] = $user['id'];
+            }
+        } finally {
+            fclose($stream);
         }
 
-        fclose($stream);
         return $userIds;
     }
 
