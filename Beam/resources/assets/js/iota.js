@@ -98,7 +98,7 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
     },
 
     run: function() {
-      const weAreOnArticleDetail = !!this.articleElementFn();
+      const weAreOnArticleDetail = !!(this.article && this.article.id);
       let articleIds = [];
 
       // initialize IotaTemplate component
@@ -139,7 +139,8 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       document.body.appendChild(iotaContainer);
       let vm = new (Vue.extend(IotaService))({
         propsData: {
-          articleIds: articleIds.length ? articleIds : ['1506332'], // TODO: how to add here current article detail ID?
+          articleIds: articleIds,
+          articleDetailId: weAreOnArticleDetail ? this.article.id : null,
           baseUrl: this.url,
           configUrl: this.configUrl,
           httpHeaders: this.httpHeaders,

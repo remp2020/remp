@@ -9,6 +9,10 @@ export default {
       type: Array,
       required: true
     },
+    articleDetailId: {
+      type: String,
+      required: false
+    },
     pageviewMinuteRanges: {
       type: Array,
       default: function() {
@@ -71,15 +75,7 @@ export default {
         EventHub.$emit("config-changed", config);
       }
 
-      let now = new Date();
-
-      if (this.onArticleDetail) {
-        this.fetchReadProgressStats();
-      } else {
-        this.fetchCommerceStats();
-        this.fetchPageviewStats(now);
-        this.fetchVariantStats(now, ["title_variant", "image_variant"]);
-      }
+      this.refetchAllData();
     });
   },
   methods: {
@@ -270,7 +266,7 @@ export default {
         filter_by: [
           {
             tag: "article_id",
-            values: this.articleIds
+            values: [this.articleDetailId]
           },
           {
             tag: "derived_ua_device",
