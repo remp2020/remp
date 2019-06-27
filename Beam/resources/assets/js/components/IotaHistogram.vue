@@ -74,15 +74,14 @@ export default {
   },
   computed: {
     maxLeavedReadersInChunk() {
-      return (this.maxLeavedReadersInChunk = this.histogram.reduce(
+      return this.histogram.reduce(
         (max, current) => (current.value > max ? current.value : max),
         0
-      ));
+      );
     }
   },
   methods: {
     receiveReadProgressData(totalReaders, histogram) {
-      console.log(histogram);
       this.totalReaders = totalReaders;
       this.histogram = histogram;
     },
