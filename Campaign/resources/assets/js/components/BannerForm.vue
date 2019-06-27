@@ -134,10 +134,12 @@
                             <div class="input-group fg-float m-t-30">
                                 <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
                                 <div class="fg-line">
-                                    <label for="includes" class="fg-label">Includes</label>
-                                    <textarea v-model="includes" class="form-control fg-input" rows="6" name="includes" cols="50" id="includes"></textarea>
+                                    <label for="includesStr" class="fg-label">Includes</label>
+                                    <textarea v-model="includesStr" class="form-control fg-input" rows="6" name="includesStr" cols="50" id="includesStr"></textarea>
                                 </div>
                                 <div style="margin-top: 5px;">Enter include script/stylesheets urls separated by new line.</div>
+
+                                <input v-for="include in includes" type="hidden" name="includes[]" :value="include">
                             </div><!-- .input-group -->
                         </div>
                     </div>
@@ -377,7 +379,7 @@
         "_clientSiteUrl": String,
 
         "_js": String,
-        "_includes": String
+        "_includes": Array
     };
 
     export default {
@@ -449,6 +451,18 @@
             js: null,
             includes: null
         }),
+        computed: {
+            includesStr: {
+                get: function () {
+                    return this.includes ? this.includes.join("\n") : null;
+                },
+                set: function (value) {
+                    console.log('value', value);
+
+                    // this.includes = value ? value.split("\n") : null;
+                }
+            }
+        },
         methods: {
             openClientSiteAndSendKeepAliveMessages() {
                 if(!this.clientSiteUrl.length) {

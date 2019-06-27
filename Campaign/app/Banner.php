@@ -37,6 +37,7 @@ class Banner extends Model
 
     protected $casts = [
         'closeable' => 'boolean',
+        'includes' => 'array',
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';
