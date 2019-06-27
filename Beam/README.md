@@ -623,20 +623,21 @@ var rempConfig = {
     
     // optional, controls where cookies (UTM parameters of visit) are stored
     cookieDomain: ".remp.press",
+    
+    // optional, article details if pageview is on the article
+    article: {
+        id: String, // required, ID of article in your CMS
+        author_id: String, // optional, name of the author
+        category: String, // optional, category/section of the article
+        locked: Boolean, // optional, flag whether content was locked at the time of visit for this pageview
+        tags: [String, String, String], // optional, any tags associated with the article
+        elementFn: Function // callback returning DOM element containing article content
+    },
             
     // required, Tracker API specific options          
     tracker: {
         // required, URL location of BEAM Tracker
         url: "http://tracker.beam.remp.press",
-        
-        // optional, article details if pageview is on the article
-        article: {
-            id: String, // required, ID of article in your CMS
-            author_id: String, // optional, name of the author
-            category: String, // optional, category/section of the article
-            locked: Boolean, // optional, flag whether content was locked at the time of visit for this pageview
-            tags: [String, String, String] // optional, any tags associated with the article
-        },
         
         // optional time spent measuring (default value `false`)
         // if enabled, tracks time spent on current page

@@ -26,6 +26,8 @@ class AuthorController extends Controller
                 'authors' => Author::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'now - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
+                'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
+                'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
             'json' => AuthorResource::collection(Author::paginate()),
         ]);
@@ -39,6 +41,8 @@ class AuthorController extends Controller
                 'sections' => Section::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'now - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
+                'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
+                'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
             'json' => new AuthorResource($author),
         ]);
@@ -72,7 +76,7 @@ class AuthorController extends Controller
 
         $conversionsQuery = Conversion::selectRaw(implode(',', [
             'author_id',
-            'count(conversions.id) as conversions_count',
+            'count(distinct conversions.id) as conversions_count',
             'sum(conversions.amount) as conversions_amount',
         ]))
             ->leftJoin('article_author', 'conversions.article_id', '=', 'article_author.article_id')
@@ -93,27 +97,35 @@ class AuthorController extends Controller
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
-            $authorArticlesQuery->whereDate('published_at', '>=', $publishedFrom);
-            $conversionsQuery->whereDate('published_at', '>=', $publishedFrom);
-            $pageviewsQuery->whereDate('published_at', '>=', $publishedFrom);
+            $authorArticlesQuery->where('published_at', '>=', $publishedFrom);
+            $conversionsQuery->where('published_at', '>=', $publishedFrom);
+            $pageviewsQuery->where('published_at', '>=', $publishedFrom);
         }
 
         if ($request->input('published_to')) {
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
-            $authorArticlesQuery->whereDate('published_at', '<=', $publishedTo);
-            $conversionsQuery->whereDate('published_at', '<=', $publishedTo);
-            $pageviewsQuery->whereDate('published_at', '<=', $publishedTo);
+            $authorArticlesQuery->where('published_at', '<=', $publishedTo);
+            $conversionsQuery->where('published_at', '<=', $publishedTo);
+            $pageviewsQuery->where('published_at', '<=', $publishedTo);
+        }
+        if ($request->input('conversion_from')) {
+            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
+            $conversionsQuery->where('paid_at', '>=', $conversionFrom);
+        }
+        if ($request->input('conversion_to')) {
+            $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
+            $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
 
         $authors = Author::selectRaw(implode(",", $cols))
             ->leftJoin(DB::raw("({$authorArticlesQuery->toSql()}) as aa"), 'authors.id', '=', 'aa.author_id')->addBinding($authorArticlesQuery->getBindings())
-            ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($authorArticlesQuery->getBindings())
-            ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'authors.id', '=', 'pv.author_id')->addBinding($authorArticlesQuery->getBindings())
+            ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($conversionsQuery->getBindings())
+            ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'authors.id', '=', 'pv.author_id')->addBinding($pageviewsQuery->getBindings())
             ->groupBy(['authors.name', 'authors.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
                 'pageviews_signed_in', 'pageviews_subscribers', 'timespent_all', 'timespent_signed_in', 'timespent_subscribers']);
 
         $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('sum(amount) as sum, currency, article_author.author_id')
+            ->selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_author.author_id')
             ->join('article_author', 'conversions.article_id', '=', 'article_author.article_id')
             ->join('articles', 'article_author.article_id', '=', 'articles.id')
             ->groupBy(['article_author.author_id', 'conversions.currency']);
@@ -124,10 +136,20 @@ class AuthorController extends Controller
         if ($request->input('published_to')) {
             $conversionsQuery->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
         }
+        if ($request->input('conversion_from')) {
+            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');http://beam.remp.press/authors?published_from=now%20-%202%20years&published_to=now&conversion_from=first%20day%20of%20this%20month&conversion_to=first%20day%20of%20next%20month%20-%201%20sec&tz=Europe%2FBratislava#
+            $conversionsQuery->where('paid_at', '>=', $conversionFrom);
+        }
+        if ($request->input('conversion_to')) {
+            $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
+            $conversionsQuery->where('paid_at', '<=', $conversionTo);
+        }
 
-        $conversions = [];
+        $conversionAmounts = [];
+        $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
-            $conversions[$record->author_id][$record->currency] = $record->sum;
+            $conversionAmounts[$record->author_id][$record->currency] = $record->sum;
+            $conversionCounts[$record->author_id] = $record->count;
         }
 
         return $datatables->of($authors)
@@ -141,17 +163,21 @@ class AuthorController extends Controller
                         ->orWhereIn('authors.id', $authorIds);
                 });
             })
-            ->addColumn('conversions_amount', function (Author $author) use ($conversions) {
-                if (!isset($conversions[$author->id])) {
+            ->addColumn('conversions_count', function (Author $author) use ($conversionCounts) {
+                return $conversionCounts[$author->id] ?? 0;
+            })
+            ->addColumn('conversions_amount', function (Author $author) use ($conversionAmounts) {
+                if (!isset($conversionAmounts[$author->id])) {
                     return 0;
                 }
                 $amounts = [];
-                foreach ($conversions[$author->id] as $currency => $c) {
+                foreach ($conversionAmounts[$author->id] as $currency => $c) {
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
                 return $amounts ?? [0];
             })
+            ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
             ->make(true);
     }
@@ -203,6 +229,16 @@ class AuthorController extends Controller
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
             $articles->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
+        }
+        if ($request->input('conversion_from')) {
+            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
+            $articles->where('paid_at', '>=', $conversionFrom);
+            $conversionsQuery->where('paid_at', '>=', $conversionFrom);
+        }
+        if ($request->input('conversion_to')) {
+            $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
+            $articles->where('paid_at', '<=', $conversionTo);
+            $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
 
         $conversions = [];

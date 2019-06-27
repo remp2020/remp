@@ -27,6 +27,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             locked: null,
             tags: [],
             variants: {},
+            elementFn: function() { return null },
         },
 
         explicitRefererMedium: null,
@@ -59,8 +60,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         maxPageProgressAchieved: 0,
 
-        articleElementFn: function() { return null },
-
         initialized: false,
 
         init: function(config) {
@@ -88,31 +87,31 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 remplib.browserId = config.browser;
             }
 
-            if (typeof config.tracker.article === 'object') {
-                if (typeof config.tracker.article.id === 'undefined' || config.tracker.article.id === null) {
-                    throw "remplib: configuration tracker.article.id invalid or missing: " + config.tracker.article.id
+            if (typeof config.article === 'object') {
+                if (typeof config.article.id === 'undefined' || config.article.id === null) {
+                    throw "remplib: configuration tracker.article.id invalid or missing: " + config.article.id
                 }
-                this.article.id = config.tracker.article.id;
-                if (typeof config.tracker.article.campaign_id !== 'undefined') {
-                    this.article.campaign_id = config.tracker.article.campaign_id;
+                this.article.id = config.article.id;
+                if (typeof config.article.campaign_id !== 'undefined') {
+                    this.article.campaign_id = config.article.campaign_id;
                 }
-                if (typeof config.tracker.article.author_id !== 'undefined') {
-                    this.article.author_id = config.tracker.article.author_id;
+                if (typeof config.article.author_id !== 'undefined') {
+                    this.article.author_id = config.article.author_id;
                 }
-                if (typeof config.tracker.article.category !== 'undefined') {
-                    this.article.category = config.tracker.article.category;
+                if (typeof config.article.category !== 'undefined') {
+                    this.article.category = config.article.category;
                 }
-                if (config.tracker.article.tags instanceof Array) {
-                    this.article.tags = config.tracker.article.tags;
+                if (config.article.tags instanceof Array) {
+                    this.article.tags = config.article.tags;
                 }
-                if (typeof config.tracker.article.variants !== 'undefined') {
-                    this.article.variants = config.tracker.article.variants;
+                if (typeof config.article.variants !== 'undefined') {
+                    this.article.variants = config.article.variants;
                 }
-                if (typeof config.tracker.article.locked !== 'undefined') {
-                    this.article.locked = config.tracker.article.locked;
+                if (typeof config.article.locked !== 'undefined') {
+                    this.article.locked = config.article.locked;
                 }
-                if (typeof config.articleElementFn !== 'undefined') {
-                    this.articleElementFn = config.articleElementFn
+                if (typeof config.article.elementFn !== 'undefined') {
+                    this.article.elementFn = config.article.elementFn
                 }
             } else {
                 this.article = null;
@@ -521,7 +520,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         timespentParamsCleanup: function(params) {
-            delete params.user.url;
             delete params.user.user_agent;
             delete params.user.source.utm_source;
             delete params.user.source.utm_medium;
@@ -671,12 +669,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         scrollProgressEvent: throttle(function() {
-            const article = remplib.tracker.articleElementFn(),
-                payload = {pageScrollRatio: remplib.tracker.pageProgress(), timestamp: new Date()};
+            const payload = {
+                pageScrollRatio: remplib.tracker.pageProgress(),
+                timestamp: new Date(),
+            };
 
-            if (article) {
+            if (remplib.tracker.article) {
+                const article = remplib.tracker.article.elementFn();
                 const root = remplib.tracker.getRootElement();
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
                 payload.articleScrollRatio = Math.min(1, Math.max(0,
                     (scrollTop + root.clientHeight - remplib.tracker.getElementOffsetTop(article)) / article.scrollHeight
                 ));

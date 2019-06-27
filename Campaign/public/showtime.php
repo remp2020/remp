@@ -290,8 +290,8 @@ $redis = new \Predis\Client([
     'scheme' => 'tcp',
     'host'   => getenv('REDIS_HOST'),
     'port'   => getenv('REDIS_PORT') ?: 6379,
+    'password' => getenv('REDIS_PASSWORD') ?: null,
 ]);
-
 /** @var \App\Contracts\SegmentAggregator $segmentAggregator */
 $segmentAggregator = unserialize($redis->get(\App\Providers\AppServiceProvider::SEGMENT_AGGREGATOR_REDIS_KEY))();
 if (!$segmentAggregator) {

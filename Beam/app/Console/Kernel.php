@@ -11,6 +11,7 @@ use App\Console\Commands\DeleteOldAggregations;
 use App\Console\Commands\ProcessPageviewSessions;
 use App\Console\Commands\SendNewslettersCommand;
 use App\Console\Commands\CompressAggregations;
+use App\Console\Commands\SnapshotArticlesViews;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Schema;
@@ -37,6 +38,9 @@ class Kernel extends ConsoleKernel
         if (!Schema::hasTable("migrations")) {
             return;
         }
+
+        $schedule->command(SnapshotArticlesViews::COMMAND)
+            ->everyMinute();
 
         $schedule->command(SendNewslettersCommand::COMMAND)
             ->everyMinute();

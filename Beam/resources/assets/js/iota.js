@@ -16,21 +16,28 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
   prodlib.iota = {
     _: [],
 
+    // required: URL of Beam segments API
     url: null,
 
+    // URL of Beam configuration settings
     configUrl: null,
 
-    articleElementFn: function() {
-      return null;
-    },
-
+    // required: selector matching all "article" elements on site you want to be reported
     articleSelector: null,
 
+    // required: callback for articleId extraction out of matched element
     idCallback: null,
 
+    // optional: callback for selecting element where the stats will be placed as next sibling; if not present, stats are appended as next sibling to matchedElement
     targetElementCallback: null,
 
+    // optional: HTTP headers to be used in API calls
     httpHeaders: {},
+
+    // optional: article information object, should be populated only on article pageview
+    article: {
+      id: null
+    },
 
     init: function(config) {
       if (typeof config.iota !== 'object') {
@@ -47,12 +54,6 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       if (typeof config.iota.configUrl === 'string') {
         this.configUrl = config.iota.configUrl;
       }
-
-      if (typeof config.iota.articleElementFn !== 'function') {
-        throw 'remplib: configuration iota.articleElementFn invalid or missing: ' +
-          config.iota.articleElementFn;
-      }
-      this.articleElementFn = config.iota.articleElementFn;
 
       if (typeof config.iota.articleSelector !== 'string') {
         throw 'remplib: configuration iota.articleSelector invalid or missing: ' +
@@ -80,6 +81,19 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
             config.iota.httpHeaders;
         }
         this.httpHeaders = config.iota.httpHeaders;
+      }
+
+      if (typeof config.article === 'object') {
+        if (
+          typeof config.article.id === 'undefined' ||
+          config.article.id === null
+        ) {
+          throw 'remplib: configuration tracker.article.id invalid or missing: ' +
+            config.article.id;
+        }
+        this.article.id = config.article.id;
+      } else {
+        this.article = null;
       }
     },
 

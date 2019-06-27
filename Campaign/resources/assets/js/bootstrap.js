@@ -12,6 +12,7 @@ require('bootstrap-notify');
 
 require('eonasdan-bootstrap-datetimepicker');
 require('jquery-placeholder');
+require('./farbtastic');
 
 global.autosize = require('autosize');
 

@@ -26,7 +26,8 @@ window.remplib = window.remplib || {};
                 closeTimeout: model['close_timeout'] || null,
                 // inline
                 targetSelector: model['target_selector'] || null,
-                variant: model['variant_uuid']
+                variant: model['variant_uuid'],
+                adminPreview: false
             };
 
             if (banner.template === 'medium_rectangle') {
@@ -72,7 +73,9 @@ window.remplib = window.remplib || {};
             if (banner.template === 'collapsible_bar') {
                 banner.collapsibleBarTemplate = {
                     mainText: model['collapsible_bar_template']['main_text'] || "",
+                    headerText: model['collapsible_bar_template']['header_text'] || "",
                     collapseText: model['collapsible_bar_template']['collapse_text'] || "",
+                    expandText: model['collapsible_bar_template']['expand_text'] || "",
                     buttonText: model['collapsible_bar_template']['button_text'] || "",
                     backgroundColor: model['collapsible_bar_template']['background_color'] || null,
                     textColor: model['collapsible_bar_template']['text_color'] || null,

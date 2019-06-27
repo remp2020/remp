@@ -35,8 +35,8 @@ class Meta
         return $this->image;
     }
 
-    public function getAuthors(): string
+    public function getAuthors(): array
     {
-        return $this->authors;
+        return is_array($this->authors) ? $this->authors : [];
     }
 }
