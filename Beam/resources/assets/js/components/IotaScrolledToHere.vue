@@ -84,6 +84,12 @@ export default {
   },
   computed: {
     scrolledToHerePercent() {
+      if (
+        this.readersWhoScrolledUpUntilThisPoint === 0 &&
+        this.totalReaders === 0
+      ) {
+        return 0;
+      }
       return Math.round(
         (this.readersWhoScrolledUpUntilThisPoint * 100) / this.totalReaders
       );
