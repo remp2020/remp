@@ -237,9 +237,9 @@
             let vm = this,
                 js = this.js,
                 loadedScriptsCount = 0,
-                includesArr = this.includes.filter(function (el) {
+                includesArr = this.includes ? this.includes.filter(function (el) {
                     return el != null && ['js', 'css'].indexOf(el.split('.').pop().trim()) !== -1
-                });
+                }) : null;
 
             if (includesArr) {
                 for (let ii = 0; ii < includesArr.length; ii++) {
