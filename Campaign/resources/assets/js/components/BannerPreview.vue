@@ -160,6 +160,8 @@
 
 
 <script>
+    import remplib from "remp/js/remplib";
+
     import HtmlPreview from "./previews/Html";
     import MediumRectanglePreview from "./previews/MediumRectangle";
     import BarPreview from "./previews/Bar";
@@ -233,36 +235,30 @@
             this.visible = this.show;
 
             let js = this.js,
-                scripts = [],
+                vm = this,
                 includesArr = this.includes ? this.includes.split("\n") : null,
                 loadedScriptsCount = 0;
 
             if (includesArr) {
                 for (let ii = 0; ii < includesArr.length; ii++) {
-                    scripts[ii] = document.createElement("script");
-                    scripts[ii].type = "text/javascript";
-                    scripts[ii].src = includesArr[ii];
-                    document.head.appendChild(scripts[ii]);
+                    let fileType = includesArr[ii].split('.').pop().trim();
 
-                    if (scripts[ii].readyState) { // ie
-                        scripts[ii].onreadystatechange = () => {
-                            if ( scripts[ii].readyState === "loaded" || scripts[ii].readyState === "complete" ) {
-                                scripts[ii].onreadystatechange = null;
-                                loadedScriptsCount++;
-
-                                if (loadedScriptsCount === includesArr.length) {
-                                    this.runCustomJavascript(js);
-                                }
-                            }
-                        };
-                    } else { // others
-                        scripts[ii].onload = () => {
+                    if (fileType === 'js') {
+                        remplib.loadScript(includesArr[ii], function () {
                             loadedScriptsCount++;
 
                             if (loadedScriptsCount === includesArr.length) {
-                                this.runCustomJavascript(js);
+                                vm.runCustomJavascript(js);
                             }
-                        }
+                        });
+                    } else if (fileType === 'css') {
+                        remplib.loadStyle(includesArr[ii], function () {
+                            loadedScriptsCount++;
+
+                            if (loadedScriptsCount === includesArr.length) {
+                                vm.runCustomJavascript(js);
+                            }
+                        });
                     }
                 }
             } else {
