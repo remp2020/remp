@@ -1,6 +1,6 @@
 <?php
 
-namespace Remp\MailerModule\Api\v1\Handlers\Users;
+namespace Remp\MailerModule\Api;
 
 class InvalidApiInputParamException extends \Exception
 {

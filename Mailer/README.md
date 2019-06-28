@@ -913,6 +913,84 @@ Response:
 
 ---
 
+#### POST `/api/v1/mailers/mail-type-upsert`
+
+Creates or updates mail type (newsletter list). Endpoint complements creation of newsletter list via web interface.
+
+If existing `id`/`code` is provided, API handler updates existing record, otherwise new record is created. Field `id`
+has higher precedence in finding the existing record.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Body:*
+
+```json5
+{
+    "mail_type_category_id": 5, // Integer, required; Reference to mail type category.
+    "priority": 100, // Integer, required; Priority of newsletter during sending. Higher number is prioritized in queue.
+    "code": 22, // String, required; URL-friendly slug identifying mail type
+    "title": "Foo Bar", // String, required: Title of mail type
+    "description": "Newsletter sent to our premium subscribers", // String, required: Description of list visible in Mailer admin
+    "sorting": 100, // Integer, optional; Indicator of how the mail types should be sorted in API and web. Sorting is in ascending order.
+    "locked": false, // Boolean, optional; Flag indicating whether users should be able to subscribe/unsubscribe from the list (e.g. you want your system emails locked and subscribed for everyone)  
+    "auto_subscribe": false, // Boolean, optional; Flag indicating whether users should be subscribed to this list automatically  
+    "is_public": false, // Boolean, optional; Flag whether the list should be available in Mailer admin for selection. Defaults to true.
+    "public_listing": false, // Boolean, optional; Flag whether the user should see the newsletter. Defaults to false.
+    "image_url": "http://example.com/image.jpg", // String, optional; URL of image for frontend UI.
+    "preview_url": "http://example.com/demo.html", // String, optional; URL of example newsletter to preview content to users.
+}
+```
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/mail-type-upsert \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -b PHPSESSID=cfa9527535e31a0ccb678f792299b0d2 \
+  -d '{
+	"mail_type_category_id": 5,
+	"priority": 100,
+	"code": "foo-bar",
+	"title": "Foo Bar",
+	"description": "Testing list"
+}'
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "data": {
+        "id": 23,
+        "code": "foo-bar",
+        "title": "Foo Bar",
+        "sorting": 15,
+        "description": null,
+        "priority": 100,
+        "mail_type_category_id": 5,
+        "locked": false,
+        "is_public": false,
+        "public_listing": true,
+        "auto_subscribe": false,
+        "image_url": null,
+        "preview_url": null,
+        "created_at": "2019-06-27T14:08:25+02:00",
+        "updated_at": "2019-06-27T14:08:36+02:00",
+        "is_multi_variant": false,
+        "default_variant_id": null
+    }
+}
+```
+
+---
+
 #### POST `/api/v1/mailers/templates`
 
 Creates new email template. Endpoint complements creation of template via web interface.
