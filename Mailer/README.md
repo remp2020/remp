@@ -934,8 +934,9 @@ has higher precedence in finding the existing record.
     "priority": 100, // Integer, required; Priority of newsletter during sending. Higher number is prioritized in queue.
     "code": 22, // String, required; URL-friendly slug identifying mail type
     "title": "Foo Bar", // String, required: Title of mail type
-    "description": "Newsletter sent to our premium subscribers", // String, optional
+    "description": "Newsletter sent to our premium subscribers", // String, required: Description of list visible in Mailer admin
     "sorting": 100, // Integer, optional; Indicator of how the mail types should be sorted in API and web. Sorting is in ascending order.
+    "locked": false, // Boolean, optional; Flag indicating whether users should be able to subscribe/unsubscribe from the list (e.g. you want your system emails locked and subscribed for everyone)  
     "auto_subscribe": false, // Boolean, optional; Flag indicating whether users should be subscribed to this list automatically  
     "is_public": false, // Boolean, optional; Flag whether the list should be available in Mailer admin for selection. Defaults to true.
     "public_listing": false, // Boolean, optional; Flag whether the user should see the newsletter. Defaults to false.
@@ -956,7 +957,8 @@ curl -X POST \
 	"mail_type_category_id": 5,
 	"priority": 100,
 	"code": "foo-bar",
-	"title": "Foo Bar"
+	"title": "Foo Bar",
+	"description": "Testing list"
 }'
 ```
 
@@ -967,20 +969,21 @@ Response:
     "status": "ok",
     "data": {
         "id": 23,
-        "code": "newz",
-        "title": "Foo typezz",
+        "code": "foo-bar",
+        "title": "Foo Bar",
         "sorting": 15,
         "description": null,
         "priority": 100,
         "mail_type_category_id": 5,
-        "is_public": 0,
-        "public_listing": 0,
-        "auto_subscribe": 0,
+        "locked": false,
+        "is_public": false,
+        "public_listing": true,
+        "auto_subscribe": false,
         "image_url": null,
         "preview_url": null,
         "created_at": "2019-06-27T14:08:25+02:00",
         "updated_at": "2019-06-27T14:08:36+02:00",
-        "is_multi_variant": 0,
+        "is_multi_variant": false,
         "default_variant_id": null
     }
 }

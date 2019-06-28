@@ -73,14 +73,15 @@ class MailTypeUpsertHandler extends BaseHandler
                 'description' => $list->description,
                 'priority' => $list->priority,
                 'mail_type_category_id' => $list->mail_type_category_id,
-                'is_public' => $list->is_public,
-                'public_listing' => $list->public_listing,
-                'auto_subscribe' => $list->auto_subscribe,
+                'locked' => (bool) $list->locked,
+                'is_public' => (bool) $list->is_public,
+                'public_listing' => (bool) $list->public_listing,
+                'auto_subscribe' => (bool) $list->auto_subscribe,
                 'image_url' => $list->image_url,
                 'preview_url' => $list->preview_url,
                 'created_at' => $list->created_at->format(DATE_RFC3339),
                 'updated_at' => $list->updated_at->format(DATE_RFC3339),
-                'is_multi_variant' => $list->is_multi_variant,
+                'is_multi_variant' => (bool) $list->is_multi_variant,
                 'default_variant_id' => $list->default_variant_id,
             ],
         ]);
@@ -119,6 +120,7 @@ class MailTypeUpsertHandler extends BaseHandler
             'priority',
             'code',
             'title',
+            'description',
         ];
         $missing = [];
 
