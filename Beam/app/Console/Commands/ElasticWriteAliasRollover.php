@@ -50,7 +50,7 @@ class ElasticWriteAliasRollover extends Command
                 ],
             ]);
         } catch (ClientException $e) {
-            $body = json_decode($e->getResponse());
+            $body = json_decode($e->getResponse()->getBody());
             dump($body);
             return;
         }
