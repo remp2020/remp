@@ -126,7 +126,14 @@ class SnapshotArticlesViews extends Command
         // Save
         ArticleViewsSnapshot::where('time', $to)->delete();
         
-        foreach (array_chunk($items, 500) as $itemsChunk) {
+        foreach (array_chunk($items, 100) as $itemsChunk) {
+
+            foreach ($itemsChunk as $item) {
+                if (count($item) !== 7) {
+                    throw new \Exception('Invalid item to insert: ' . json_encode($item));
+                }
+            }
+
             ArticleViewsSnapshot::insert($itemsChunk);
             $count = count($itemsChunk);
             $this->line("$count records inserted");
