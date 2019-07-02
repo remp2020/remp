@@ -457,9 +457,7 @@
                     return this.includes ? this.includes.join("\n") : null;
                 },
                 set: function (value) {
-                    console.log('value', value);
-
-                    // this.includes = value ? value.split("\n") : null;
+                    this.includes = value ? value.split("\n") : null;
                 }
             }
         },
