@@ -71,6 +71,7 @@ services:
     depends_on:
       - "nginx"
       - "mysql"
+      - "redis"
     restart: "unless-stopped"
 
   # mailer
@@ -113,6 +114,7 @@ services:
     depends_on:
       - "nginx"
       - "mysql"
+      - "redis"
     restart: "unless-stopped"
 
   # beam
@@ -133,6 +135,7 @@ services:
     depends_on:
       - "nginx"
       - "mysql"
+      - "redis"
     restart: "unless-stopped"
 
   kafka:

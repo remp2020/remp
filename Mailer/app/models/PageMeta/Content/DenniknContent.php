@@ -4,6 +4,8 @@ namespace Remp\MailerModule\PageMeta;
 
 use GuzzleHttp\Exception\RequestException;
 use Nette\Http\Url;
+use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 use Nette\Utils\Strings;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 
@@ -36,67 +38,49 @@ class DenniknContent implements ContentInterface
 
     public function parseMeta($content)
     {
+        preg_match_all('/<script id="schema" type="application\/ld\+json">(.*?)<\/script>/', $content, $matches);
+
+        if (!$matches) {
+            return new Meta(false, false, false, false);
+        }
+
+        try {
+            $schema = Json::decode($matches[1][0]);
+        } catch (JsonException $e) {
+            return new Meta(false, false, false, false);
+        }
+
         // author
         $denniknAuthors = false;
-        $matches = [];
-        preg_match_all('/<cite class=\"d-author\"\>(.+)[\<]\/cite\>/U', $content, $matches);
-
-        if ($matches) {
-            foreach ($matches[1] as $author) {
-                $denniknAuthors[] = Strings::upper(html_entity_decode($author));
-            }
+        if (isset($schema->author) && !is_array($schema->author)) {
+            $schema->author = [$schema->author];
+        }
+        foreach ($schema->author as $author) {
+            $denniknAuthors[] = Strings::upper($author->name);
         }
 
-        // title
-        $title = false;
-        $matches = [];
-        preg_match('/<meta property=\"og:title\" content=\"(.+)\"\s*\/?/U', $content, $matches);
-        if ($matches) {
-            $title = html_entity_decode($matches[1]);
-        }
-
-        // description
-        $description = false;
-        $matches = [];
-        preg_match('/<meta property=\"og:description\" content=\"(.*)\"\s*\/?/U', $content, $matches);
-        if ($matches) {
-            $description = html_entity_decode($matches[1]);
-        }
-
-        // image
-        $image = false;
-        $matches = [];
-        preg_match('/<meta property=\"og:image\" content=\"(.+)\"\s*\/?/U', $content, $matches);
-        if ($matches) {
-            $images = $this->processImage($matches[1]);
-            $image = $images['main'];
-        }
+        $title = $schema->headline ?? false;
+        $description = $schema->description ?? false;
+        $image = $this->processImage($schema->image->url ?? null);
 
         return new Meta($title, $description, $image, $denniknAuthors);
     }
 
     private function processImage($imageUrl)
     {
-        $url = new Url($imageUrl);
-        if ($url->getHost() !== 'img.projektn.sk') {
-            $url = new Url('https://img.projektn.sk/wp-static' . $url->path);
+        if (!$imageUrl) {
+            return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
         }
-
-        $images = [
-            'small' => (string) $url->appendQuery(['w' => 350, 'h' => 220, 'fit' =>'crop']),
-            'main' => (string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']),
-        ];
+        
+        $url = new Url($imageUrl);
+        $url = (string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']);
 
         // return placeholder if image doesn't exist
-        $response = get_headers($images['small']);
+        $response = get_headers($url);
         if (strpos($response[0], '404')) {
-            $images['small'] = 'https://img.projektn.sk/wp-static/2018/10/placeholder_1@2x.png';
-        }
-        $response = get_headers($images['main']);
-        if (strpos($response[0], '404')) {
-            $images['main'] = 'https://img.projektn.sk/wp-static/2018/10/placeholder_2@2x.png';
+            return 'https://img.projektn.sk/wp-static/2018/10/placeholder_2@2x.png';
         }
 
-        return $images;
+        return $url;
     }
 }

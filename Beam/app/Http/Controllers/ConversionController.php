@@ -168,13 +168,11 @@ class ConversionController extends Controller
                 'transaction_id' => $c['transaction_id'],
             ]);
 
-            $shouldAggregateEvents = !$conversion->exists;
-
             $conversion->fill($c);
             $conversion->save();
             $conversions[] = $conversion;
 
-            if ($shouldAggregateEvents) {
+            if (!$conversion->events_aggregated) {
                 Artisan::queue(AggregateConversionEvents::COMMAND, [
                     '--conversion_id' => $conversion->id
                 ]);

@@ -3,7 +3,7 @@ namespace Remp\MailerModule\Segment;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
-use Nette\Utils\Json;
+use Psr\Http\Message\StreamInterface;
 
 class Crm implements ISegment
 {
@@ -31,15 +31,20 @@ class Crm implements ISegment
     public function list()
     {
         $response = $this->request(static::ENDPOINT_LIST);
-        $segments = [];
 
-        foreach ($response['segments'] as $segment) {
-            $segments[] = [
-                'name' => $segment['name'],
-                'provider' => static::PROVIDER_ALIAS,
-                'code' => $segment['code'],
-                'group' => $segment['group'],
-            ];
+        try {
+            $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
+            $segments = [];
+            foreach (\JsonMachine\JsonMachine::fromStream($stream, "/segments") as $segment) {
+                $segments[] = [
+                    'name' => $segment['name'],
+                    'provider' => static::PROVIDER_ALIAS,
+                    'code' => $segment['code'],
+                    'group' => $segment['group'],
+                ];
+            }
+        } finally {
+            fclose($stream);
         }
 
         return $segments;
@@ -48,15 +53,21 @@ class Crm implements ISegment
     public function users($segment)
     {
         $response = $this->request(static::ENDPOINT_USERS, ['code' => $segment['code']]);
-        $userIds = [];
-        foreach ($response['users'] as $user) {
-            $userIds[] = $user['id'];
+
+        try {
+            $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
+            $userIds = [];
+            foreach (\JsonMachine\JsonMachine::fromStream($stream, "/users") as $user) {
+                $userIds[] = $user['id'];
+            }
+        } finally {
+            fclose($stream);
         }
-        $response = null;
+
         return $userIds;
     }
 
-    private function request($url, $query = [])
+    private function request($url, $query = []): StreamInterface
     {
         $client = new Client([
             'base_uri' => $this->baseUrl,
@@ -70,7 +81,7 @@ class Crm implements ISegment
                 'query' => $query,
             ]);
 
-            return Json::decode($response->getBody(), Json::FORCE_ARRAY);
+            return $response->getBody();
         } catch (ConnectException $connectException) {
             throw new SegmentException("Could not connect to Segment:{$url} endpoint: {$connectException->getMessage()}");
         }

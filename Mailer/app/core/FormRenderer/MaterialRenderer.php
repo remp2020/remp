@@ -67,7 +67,7 @@ class MaterialRenderer extends DefaultFormRenderer
     public function render(Form $form, $mode = null)
     {
         foreach ($form->getControls() as $control) {
-            if ($control instanceof  Controls\Button) {
+            if ($control instanceof Controls\Button) {
                 if (strpos($control->getControlPrototype()->getClass(), 'btn') === false) {
                     $control->getControlPrototype()->addClass(empty($usedPrimary) ? 'btn btn-info' : 'btn btn-default');
                     $usedPrimary = true;
@@ -76,13 +76,28 @@ class MaterialRenderer extends DefaultFormRenderer
                 $control instanceof Controls\SelectBox ||
                 $control instanceof Controls\MultiSelectBox) {
                 $control->getControlPrototype()->addClass('form-control fg-input');
-            } elseif ($control instanceof Controls\Checkbox ||
-                $control instanceof Controls\CheckboxList ||
+            } elseif ($control instanceof Controls\CheckboxList ||
                 $control instanceof Controls\RadioList) {
                 $control->getSeparatorPrototype()->setName('div')->addClass($control->getControlPrototype()->type);
             }
         }
         return parent::render($form, $mode);
+    }
+
+    public function renderControl(\Nette\Forms\IControl $control)
+    {
+        if ($control instanceof Nette\Forms\Controls\Checkbox) {
+            $el = Html::el("div", [
+                'class' => 'toggle-switch',
+                'data-ts-color' => 'cyan',
+            ]);
+            $el->addHtml($control->getLabelPart()->addClass('ts-label'));
+            $el->addHtml($control->getControlPart());
+            $el->addHtml('<label for="' . $control->htmlId . '" class="ts-helper"></label>');
+            return $el;
+        }
+
+        return parent::renderControl($control);
     }
 
     /**
