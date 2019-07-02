@@ -39,7 +39,7 @@ class AutoLogin
         $validTo = $validFrom->modifyClone('+1 month');
 
         foreach ($emails as $email) {
-            $token = md5($email . microtime(true) . rand(100, 100000) . rand(10000, 1000000));
+            $token = TokenGenerator::generate();
             $autologinInsertData[] = $this->autoLoginTokensRepository->getInsertData(
                 $token,
                 $email,
