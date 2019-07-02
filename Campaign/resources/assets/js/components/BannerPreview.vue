@@ -236,32 +236,28 @@
 
             let vm = this,
                 js = this.js,
-                loadedScriptsCount = 0,
-                includesArr = this.includes ? this.includes.filter(function (el) {
-                    return el != null && ['js', 'css'].indexOf(el.split('.').pop().trim()) !== -1
-                }) : null;
+                loadedScriptsCount = 0;
 
-            if (includesArr) {
-                for (let ii = 0; ii < includesArr.length; ii++) {
-                    if (!includesArr[ii]) {
+            if (this.includes) {
+                for (let ii = 0; ii < this.includes.length; ii++) {
+                    if (!this.includes[ii]) {
+                        loadedScriptsCount++;
                         continue;
                     }
 
-                    let fileType = includesArr[ii].split('.').pop().trim();
+                    let fileType = this.includes[ii].split('.').pop().trim();
 
                     if (fileType === 'js') {
-                        remplib.loadScript(includesArr[ii], function () {
+                        remplib.loadScript(this.includes[ii], function () {
                             loadedScriptsCount++;
-
-                            if (loadedScriptsCount === includesArr.length) {
+                            if (loadedScriptsCount === vm.includes.length) {
                                 vm.runCustomJavascript(js);
                             }
                         });
                     } else if (fileType === 'css') {
-                        remplib.loadStyle(includesArr[ii], function () {
+                        remplib.loadStyle(this.includes[ii], function () {
                             loadedScriptsCount++;
-
-                            if (loadedScriptsCount === includesArr.length) {
+                            if (loadedScriptsCount === vm.includes.length) {
                                 vm.runCustomJavascript(js);
                             }
                         });
