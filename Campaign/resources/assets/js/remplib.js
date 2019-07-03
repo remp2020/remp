@@ -89,6 +89,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             this.bannerUrlParams = config.campaign.bannerUrlParams || {};
 
+            for (let param in this.bannerUrlParams) {
+                if (typeof (this.bannerUrlParams[param]) != "function") {
+                    console.warn("all values in `bannerUrlParams` should be functions")
+                }
+            }
+
             if (typeof config.campaign.variables !== 'undefined') {
                 if (typeof config.campaign.variables !== 'object') {
                     throw "remplib: configuration variables invalid (object required): "+config.campaign.variables
