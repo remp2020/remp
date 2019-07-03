@@ -30,6 +30,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         initialized: false,
 
+        customParams: {},
+
         /* JSONP START */
 
         showtime: {
@@ -84,6 +86,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 throw "remplib: configuration campaign.url invalid or missing: "+config.campaign.url
             }
             this.url = config.campaign.url;
+
+            this.customParams = config.campaign.customParams || {};
 
             if (typeof config.campaign.variables !== 'undefined') {
                 if (typeof config.campaign.variables !== 'object') {
