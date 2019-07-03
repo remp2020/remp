@@ -698,6 +698,23 @@ You can enable the tracking by setting `rempConfig.tracker.readingProgress = { e
     funnels or string keys otherwise. If your system doesn't support funnels and you don't need to differentiate them,
     use `"default"`.
     
+* `remplib.tracker.trackCheckoutWithSource: function(funnelId, article, source)`: tracks checkout commerce event with custom article source - indicating that user is summarizing his order 
+	* `funnelId`: Reference to funnel bringing user to checkout page. You can use IDs if your system contains referencable
+    funnels or string keys otherwise. If your system doesn't support funnels and you don't need to differentiate them,
+    * `article`: Object with info about current article 
+		```
+		{
+			id: String, // required, ID of article in your CMS
+			author_id: String, // optional, name of the author
+			category: String, // optional, category/section of the article
+			locked: Boolean, // optional, flag whether content was locked at the time of visit for this pageview
+			tags: [String, String, String], // optional, any tags associated with the article
+			elementFn: Function // callback returning DOM element containing article content 
+		}
+		```
+	
+    * `source`: String with checkout source
+    
 * `remplib.tracker.trackPayment(transactionId, amount, currency, productIds)`: tracks commerce payment event - indicating
 that the payment has started (user was redirected to payment gateway)
     * `transactionId`: Reference to transaction (should be unique for every payment; e.g. `"778453213"`) 
@@ -705,11 +722,17 @@ that the payment has started (user was redirected to payment gateway)
     * `currency`: String currency (e.g. `EUR`)
     * `productIds`: List of purchased products (e.g. `["product_1"]`)
     
+* `remplib.tracker.trackPaymentWithSource: function(transactionId, amount, currency, productIds, article, source)`: tracks commerce payment event with custom article and source - indicating that the payment has started (user was redirected to payment gateway)
+
 * `remplib.tracker.trackPurchase(transactionId, amount, currency, productIds)`: tracks commerce purchase event - indicating
 that the payment was successful
 
+* `remplib.tracker.trackPurchaseWithSource: function(transactionId, amount, currency, productIds, article, source)`: tracks commerce purchase event with custom article and source - indicating that the payment was successful
+
 * `remplib.tracker.trackRefund(transactionId, amount, currency, productIds)`: tracks commerce refund event - indicating
 that confirmed payment (one that had *purchase* event) was refunded
+
+* `remplib.tracker.trackRefundWithSource(transactionId, amount, currency, productIds, article, source)`: tracks commerce refund event with custom article and source - indicating that confirmed payment (one that had *purchase* event) was refunded
 
 #### Build Dependencies
 
