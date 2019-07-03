@@ -206,7 +206,8 @@
         "adminPreview",
 
         "js",
-        "includes"
+        "jsIncludes",
+        "cssIncludes"
     ];
 
     export default {
@@ -234,34 +235,29 @@
 
             this.visible = this.show;
 
+            if (this.cssIncludes) {
+                for (let ii = 0; ii < this.cssIncludes.length; ii++) {
+                    remplib.loadStyle(this.cssIncludes[ii]);
+                }
+            }
+
             let vm = this,
                 js = this.js,
                 loadedScriptsCount = 0;
 
-            if (this.includes) {
-                for (let ii = 0; ii < this.includes.length; ii++) {
-                    if (!this.includes[ii]) {
+            if (this.jsIncludes) {
+                for (let ii = 0; ii < this.jsIncludes.length; ii++) {
+                    if (!this.jsIncludes[ii]) {
                         loadedScriptsCount++;
                         continue;
                     }
 
-                    let fileType = this.includes[ii].split('.').pop().trim();
-
-                    if (fileType === 'js') {
-                        remplib.loadScript(this.includes[ii], function () {
-                            loadedScriptsCount++;
-                            if (loadedScriptsCount === vm.includes.length) {
-                                vm.runCustomJavascript(js);
-                            }
-                        });
-                    } else if (fileType === 'css') {
-                        remplib.loadStyle(this.includes[ii], function () {
-                            loadedScriptsCount++;
-                            if (loadedScriptsCount === vm.includes.length) {
-                                vm.runCustomJavascript(js);
-                            }
-                        });
-                    }
+                    remplib.loadScript(this.jsIncludes[ii], function () {
+                        loadedScriptsCount++;
+                        if (loadedScriptsCount === vm.jsIncludes.length) {
+                            vm.runCustomJavascript(js);
+                        }
+                    });
                 }
             } else {
                 this.runCustomJavascript(js);

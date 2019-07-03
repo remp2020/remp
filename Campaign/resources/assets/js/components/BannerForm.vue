@@ -134,13 +134,25 @@
                             <div class="input-group fg-float m-t-30">
                                 <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
                                 <div class="fg-line">
-                                    <label for="includesStr" class="fg-label">Includes</label>
-                                    <textarea v-model="includesStr" class="form-control fg-input" rows="6" name="includesStr" cols="50" id="includesStr"></textarea>
+                                    <label for="jsIncludesStr" class="fg-label">Javascript includes</label>
+                                    <textarea v-model="jsIncludesStr" class="form-control fg-input" rows="6" name="jsIncludesStr" cols="50" id="jsIncludesStr"></textarea>
                                 </div>
-                                <div style="margin-top: 5px;">Enter include script/stylesheets urls separated by new line.</div>
+                                <div style="margin-top: 5px;">Enter include script urls separated by new line.</div>
 
-                                <input v-for="include in includes" type="hidden" name="includes[]" :value="include">
+                                <input v-for="jsInclude in jsIncludes" type="hidden" name="js_includes[]" :value="jsInclude">
                             </div><!-- .input-group -->
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                                <div class="fg-line">
+                                    <label for="cssIncludesStr" class="fg-label">Stylesheet includes</label>
+                                    <textarea v-model="cssIncludesStr" class="form-control fg-input" rows="6" name="cssIncludesStr" cols="50" id="cssIncludesStr"></textarea>
+                                </div>
+                                <div style="margin-top: 5px;">Enter include stylesheets urls separated by new line.</div>
+
+                                <input v-for="cssInclude in cssIncludes" type="hidden" name="css_includes[]" :value="cssInclude">
+                            </div><!-- .input-group -->
+
                         </div>
                     </div>
                 </div>
@@ -319,7 +331,8 @@
                                         :forcedPosition="'absolute'"
 
                                         :js="js"
-                                        :includes="includes"
+                                        :jsIncludes="jsIncludes"
+                                        :cssIncludes="cssIncludes"
                                 ></banner-preview>
                             </div>
                         </div>
@@ -379,7 +392,8 @@
         "_clientSiteUrl": String,
 
         "_js": String,
-        "_includes": Array
+        "_jsIncludes": Array,
+        "_cssIncludes": Array
     };
 
     export default {
@@ -449,15 +463,24 @@
             clientSiteUrl: null,
 
             js: null,
-            includes: null
+            jsIncludes: null,
+            cssIncludes: null
         }),
         computed: {
-            includesStr: {
+            jsIncludesStr: {
                 get: function () {
-                    return this.includes ? this.includes.join("\n") : null;
+                    return this.jsIncludes ? this.jsIncludes.join("\n") : null;
                 },
                 set: function (value) {
-                    this.includes = value ? value.split("\n") : null;
+                    this.jsIncludes = value ? value.split("\n") : null;
+                }
+            },
+            cssIncludesStr: {
+                get: function () {
+                    return this.cssIncludes ? this.cssIncludes.join("\n") : null;
+                },
+                set: function (value) {
+                    this.cssIncludes = value ? value.split("\n") : null;
                 }
             }
         },

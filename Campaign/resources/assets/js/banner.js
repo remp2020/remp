@@ -29,7 +29,8 @@ window.remplib = window.remplib || {};
                 variant: model['variant_uuid'],
                 adminPreview: false,
                 js: model['js'] || null,
-                includes: model['includes'] || null
+                jsIncludes: model['js_includes'] || null,
+                cssIncludes: model['css_includes'] || null
             };
 
             if (banner.template === 'medium_rectangle') {

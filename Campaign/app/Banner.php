@@ -32,12 +32,14 @@ class Banner extends Model
         'target_selector',
         'template',
         'js',
-        'includes',
+        'js_includes',
+        'css_includes',
     ];
 
     protected $casts = [
         'closeable' => 'boolean',
-        'includes' => 'array',
+        'js_includes' => 'array',
+        'css_includes' => 'array',
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';

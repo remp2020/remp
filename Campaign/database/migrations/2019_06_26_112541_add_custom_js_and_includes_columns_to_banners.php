@@ -15,7 +15,8 @@ class AddCustomJsAndIncludesColumnsToBanners extends Migration
     {
         Schema::table('banners', function (Blueprint $table) {
             $table->text('js')->nullable(true);
-            $table->json('includes')->nullable(true);
+            $table->json('js_includes')->nullable(true);
+            $table->json('css_includes')->nullable(true);
         });
     }
 
@@ -28,7 +29,8 @@ class AddCustomJsAndIncludesColumnsToBanners extends Migration
     {
         Schema::table('banners', function (Blueprint $table) {
             $table->dropColumn('js');
-            $table->dropColumn('includes');
+            $table->dropColumn('js_includes')->nullable(true);
+            $table->dropColumn('css_includes')->nullable(true);
         });
     }
 }
