@@ -87,13 +87,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
             this.url = config.campaign.url;
 
-            this.bannerUrlParams = config.campaign.bannerUrlParams || {};
-
-            for (let param in this.bannerUrlParams) {
-                if (typeof (this.bannerUrlParams[param]) != "function") {
-                    console.warn("all values in `bannerUrlParams` should be functions")
+            for (let param in config.campaign.bannerUrlParams) {
+                if (config.campaign.bannerUrlParams.hasOwnProperty(param) && typeof (config.campaign.bannerUrlParams[param]) !== "function") {
+                    throw "remplib: configuration campaign.bannerUrlParams invalid (callback required) for param: " + param
                 }
             }
+            this.bannerUrlParams = config.campaign.bannerUrlParams || {};
 
             if (typeof config.campaign.variables !== 'undefined') {
                 if (typeof config.campaign.variables !== 'object') {

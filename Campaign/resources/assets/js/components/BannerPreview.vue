@@ -263,7 +263,7 @@
                 if (remplib.campaign && remplib.campaign.bannerUrlParams) {
                     for (let param in remplib.campaign.bannerUrlParams) {
                         if (remplib.campaign.bannerUrlParams.hasOwnProperty(param)) {
-                            url += "&" + encodeURI(param) + '=' + encodeURI(remplib.campaign.bannerUrlParams[param]())
+                            url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(remplib.campaign.bannerUrlParams[param]())
                         }
                     }
                 }
