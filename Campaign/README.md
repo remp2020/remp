@@ -126,6 +126,10 @@ var rempConfig = {
                 value: function() {
                     return "foo@example.com"
                 }
+            },
+            bannerUrlParams:  {
+                "foo": function() { return "bar" },
+                "baz": function() { return "XXX" }
             }
         }
     }

@@ -30,7 +30,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         initialized: false,
 
-        customParams: {},
+        bannerUrlParams: {},
 
         /* JSONP START */
 
@@ -87,7 +87,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
             this.url = config.campaign.url;
 
-            this.customParams = config.campaign.customParams || {};
+            this.bannerUrlParams = config.campaign.bannerUrlParams || {};
 
             if (typeof config.campaign.variables !== 'undefined') {
                 if (typeof config.campaign.variables !== 'object') {
