@@ -260,9 +260,11 @@
                     url += "&banner_variant=" + encodeURIComponent(this.variantUuid);
                 }
 
-                for (let param in remplib.campaign.bannerUrlParams) {
-                    if (remplib.campaign.bannerUrlParams.hasOwnProperty(param)) {
-                        url += "&" + encodeURI(param) + '=' + encodeURI(remplib.campaign.bannerUrlParams[param]())
+                if (remplib.campaign && remplib.campaign.bannerUrlParams) {
+                    for (let param in remplib.campaign.bannerUrlParams) {
+                        if (remplib.campaign.bannerUrlParams.hasOwnProperty(param)) {
+                            url += "&" + encodeURI(param) + '=' + encodeURI(remplib.campaign.bannerUrlParams[param]())
+                        }
                     }
                 }
 
