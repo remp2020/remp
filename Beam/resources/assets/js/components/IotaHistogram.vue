@@ -1,4 +1,4 @@
-<style lang="scss">
+<style lang="scss" scoped>
 .ri-histogram {
   font-family: sans-serif;
   font-weight: 400;

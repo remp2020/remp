@@ -1,4 +1,4 @@
-<style lang="scss">
+<style lang="scss" scoped>
 // previous color values, just a little bit darker
 $colors: (
   no-color: darken(#eef7fe, 2%),

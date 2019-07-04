@@ -1,4 +1,4 @@
-<style lang="scss">
+<style lang="scss" scoped>
 .ri-settings {
   font-family: sans-serif;
   font-weight: 400;
@@ -99,15 +99,15 @@
         <polygon
           fill="white"
           points="35.8 2.74 16.91 13.65 23.2 17.29 35.8 10.02 54.7 20.93 35.8 31.84 35.8 31.84 10.61 17.29 10.61 53.59 16.91 57.23 16.91 28.2 35.8 39.11 35.8 39.11 35.8 39.11 35.8 39.11 61 24.57 61 17.29 35.8 2.74"
-        ></polygon>
+        />
         <polygon
           fill="white"
           points="23.2 53.66 23.2 60.93 35.8 68.14 61 53.59 61 46.32 35.8 60.86 23.2 53.66"
-        ></polygon>
+        />
         <polygon
           fill="white"
           points="35.8 46.28 23.2 39.08 23.2 46.35 35.8 53.55 35.8 53.66 61 39.11 61 31.84 35.8 46.39 35.8 46.28"
-        ></polygon>
+        />
       </svg>
       Metrics settings
     </div>
@@ -120,7 +120,7 @@
           name="ri-settings-device-group"
           value="all"
           v-model="deviceType"
-        >
+        />
         <label for="ri-settings-device-all">All</label>
       </div>
       <div class="ri-settings__input-wrapper">
@@ -130,7 +130,7 @@
           name="ri-settings-device-group"
           value="Computer"
           v-model="deviceType"
-        >
+        />
         <label for="ri-settings-device-computer">Computer</label>
       </div>
       <div class="ri-settings__input-wrapper">
@@ -140,7 +140,7 @@
           name="ri-settings-device-group"
           value="Tablet"
           v-model="deviceType"
-        >
+        />
         <label for="ri-settings-device-tablet">Tablet</label>
       </div>
       <div class="ri-settings__input-wrapper">
@@ -150,7 +150,7 @@
           name="ri-settings-device-group"
           value="Phone"
           v-model="deviceType"
-        >
+        />
         <label for="ri-settings-device-phone">Phone</label>
       </div>
     </div>
@@ -163,7 +163,7 @@
           name="ri-settings-article-version-group"
           value="false"
           v-model="articleLocked"
-        >
+        />
         <label for="ri-settings-article-version-unlocked">Whole article</label>
       </div>
       <div class="ri-settings__input-wrapper">
@@ -173,7 +173,7 @@
           name="ri-settings-article-version-group"
           value="true"
           v-model="articleLocked"
-        >
+        />
         <label for="ri-settings-article-version-locked">Locked article</label>
       </div>
     </div>
@@ -186,7 +186,7 @@
           name="ri-settings-reder-type-group"
           value="all"
           v-model="subscriber"
-        >
+        />
         <label for="ri-settings-reader-type-all">All</label>
       </div>
       <div class="ri-settings__input-wrapper">
@@ -196,7 +196,7 @@
           name="ri-settings-reder-type-group"
           value="true"
           v-model="subscriber"
-        >
+        />
         <label for="ri-settings-reader-type-subscriber">Subscriber</label>
       </div>
       <div class="ri-settings__input-wrapper">
@@ -206,7 +206,7 @@
           name="ri-settings-reder-type-group"
           value="false"
           v-model="subscriber"
-        >
+        />
         <label for="ri-settings-reader-type-visitor">Visitor</label>
       </div>
     </div>
