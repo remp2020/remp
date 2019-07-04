@@ -48,11 +48,10 @@
 <template>
   <div class="ri-histogram">
     <div
-      class="ri-histogram__item"
       v-for="item in histogram"
       :key="item.bucket_key"
       :style="{width: `${calculatePercentageFromMax(item.value)}%`}"
-      :class="{'ri-histogram__item--max': item.value === maxLeavedReadersInChunk}"
+      :class="{'ri-histogram__item--max': item.value === maxLeavedReadersInChunk, 'ri-histogram__item': true }"
     >
       <span class="ri-histogram__item__number">{{ item.value }}</span>
     </div>
