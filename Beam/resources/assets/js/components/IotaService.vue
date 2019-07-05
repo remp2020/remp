@@ -101,22 +101,25 @@ export default {
           {
             tag: "article_id",
             values: this.articleIds
-          },
-          {
-            tag: "derived_ua_device",
-            values:
-              deviceType === "all"
-                ? ["Computer", "Phone", "Tablet"]
-                : [deviceType]
           }
-          // FIXME: this section, if uncommented, causes to return 0 in every conversion bubble
-          // {
-          //   tag: "subscriber",
-          //   values: subscriber === "all" ? ["true", "false"] : [subscriber]
-          // }
         ],
         group_by: ["article_id"]
       };
+
+      if (subscriber !== "all") {
+        payload.filter_by.push({
+          tag: "subscriber",
+          values: ["true"],
+          inverse: subscriber === "true" ? false : true
+        });
+      }
+
+      if (deviceType !== "all") {
+        payload.filter_by.push({
+          tag: "derived_ua_device",
+          values: [deviceType]
+        });
+      }
 
       Axios.post(
         this.baseUrl + "/journal/commerce/steps/purchase/count",
@@ -141,21 +144,25 @@ export default {
             {
               tag: "article_id",
               values: this.articleIds
-            },
-            {
-              tag: "derived_ua_device",
-              values:
-                deviceType === "all"
-                  ? ["Computer", "Phone", "Tablet"]
-                  : [deviceType]
-            },
-            {
-              tag: "subscriber",
-              values: subscriber === "all" ? ["true", "false"] : [subscriber]
             }
           ],
           group_by: ["article_id"]
         };
+
+        if (subscriber !== "all") {
+          payload.filter_by.push({
+            tag: "subscriber",
+            values: ["true"],
+            inverse: subscriber === "true" ? false : true
+          });
+        }
+
+        if (deviceType !== "all") {
+          payload.filter_by.push({
+            tag: "derived_ua_device",
+            values: [deviceType]
+          });
+        }
 
         if (range.minutes !== undefined) {
           let d = new Date(now.getTime());
@@ -196,21 +203,25 @@ export default {
             {
               tag: "derived_referer_medium",
               values: ["internal"]
-            },
-            {
-              tag: "derived_ua_device",
-              values:
-                deviceType === "all"
-                  ? ["Computer", "Phone", "Tablet"]
-                  : [deviceType]
-            },
-            {
-              tag: "subscriber",
-              values: subscriber === "all" ? ["true", "false"] : [subscriber]
             }
           ],
           group_by: ["article_id"].concat(variantTypes)
         };
+
+        if (subscriber !== "all") {
+          variantPayload.filter_by.push({
+            tag: "subscriber",
+            values: ["true"],
+            inverse: subscriber === "true" ? false : true
+          });
+        }
+
+        if (deviceType !== "all") {
+          variantPayload.filter_by.push({
+            tag: "derived_ua_device",
+            values: [deviceType]
+          });
+        }
 
         if (range.minutes !== undefined) {
           let d = new Date(now.getTime());
@@ -269,13 +280,6 @@ export default {
             values: [this.articleDetailId]
           },
           {
-            tag: "derived_ua_device",
-            values:
-              deviceType === "all"
-                ? ["Computer", "Phone", "Tablet"]
-                : [deviceType]
-          },
-          {
             tag: "locked",
             values: [articleLocked]
           }
@@ -286,6 +290,13 @@ export default {
           interval: 0.01
         }
       };
+
+      if (deviceType !== "all") {
+        payload.filter_by.push({
+          tag: "derived_ua_device",
+          values: [deviceType]
+        });
+      }
 
       Axios.post(
         this.baseUrl + "/journal/pageviews/actions/progress/count",
