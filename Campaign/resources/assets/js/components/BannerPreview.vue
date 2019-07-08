@@ -160,6 +160,8 @@
 
 
 <script>
+    import remplib from "remp/js/remplib";
+
     import HtmlPreview from "./previews/Html";
     import MediumRectanglePreview from "./previews/MediumRectangle";
     import BarPreview from "./previews/Bar";
@@ -201,7 +203,11 @@
 
         "variantUuid",
 
-        "adminPreview"
+        "adminPreview",
+
+        "js",
+        "jsIncludes",
+        "cssIncludes"
     ];
 
     export default {
@@ -228,6 +234,34 @@
             });
 
             this.visible = this.show;
+
+            if (this.cssIncludes) {
+                for (let ii = 0; ii < this.cssIncludes.length; ii++) {
+                    remplib.loadStyle(this.cssIncludes[ii]);
+                }
+            }
+
+            let vm = this,
+                js = this.js,
+                loadedScriptsCount = 0;
+
+            if (this.jsIncludes) {
+                for (let ii = 0; ii < this.jsIncludes.length; ii++) {
+                    if (!this.jsIncludes[ii]) {
+                        loadedScriptsCount++;
+                        continue;
+                    }
+
+                    remplib.loadScript(this.jsIncludes[ii], function () {
+                        loadedScriptsCount++;
+                        if (loadedScriptsCount === vm.jsIncludes.length) {
+                            vm.runCustomJavascript(js);
+                        }
+                    });
+                }
+            } else {
+                this.runCustomJavascript(js);
+            }
         },
         data: () => ({
             visible: false,
@@ -343,6 +377,17 @@
                 }
                 return false;
             },
+            runCustomJavascript: function (js) {
+                this.$nextTick(() => {
+                    setTimeout(function() {
+                        try {
+                            eval('(function() {' + js + '})()');
+                        } catch {
+                            console.warn("unable to execute custom banner JS:", js);
+                        }
+                    }, 0);
+                }, this)
+            }
         }
     }
 </script>

@@ -38,6 +38,8 @@ class BannerRequest extends FormRequest
             'template' => 'required|string',
             'offset_vertical' => 'required|integer',
             'offset_horizontal' => 'required|integer',
+            'js_includes' => 'array',
+            'css_includes' => 'array',
         ];
     }
 

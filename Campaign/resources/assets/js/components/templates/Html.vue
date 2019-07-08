@@ -58,6 +58,7 @@
                                 <label for="css" class="fg-label">Custom CSS</label>
                                 <textarea v-model="css" class="form-control fg-input" rows="6" name="css" cols="50" id="css"></textarea>
                             </div>
+                            <small>Styles in this field are applied globally.<br> Prevent colliding with other styles by prefixing your classes.</small>
                         </div><!-- .input-group -->
 
                         <div class="cp-container">
@@ -117,6 +118,8 @@
         "_backgroundColor",
         "_text",
         "_css",
+        "_js",
+        "_includes",
         "_textColor",
         "_fontSize",
         "_textAlign",
@@ -139,6 +142,8 @@
             backgroundColor: null,
             text: null,
             css: null,
+            js: null,
+            includes: null,
             textColor: null,
             fontSize: null,
             textAlign: null,

@@ -31,10 +31,15 @@ class Banner extends Model
         'display_type',
         'target_selector',
         'template',
+        'js',
+        'js_includes',
+        'css_includes',
     ];
 
     protected $casts = [
         'closeable' => 'boolean',
+        'js_includes' => 'array',
+        'css_includes' => 'array',
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';

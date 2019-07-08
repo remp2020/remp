@@ -27,7 +27,10 @@ window.remplib = window.remplib || {};
                 // inline
                 targetSelector: model['target_selector'] || null,
                 variant: model['variant_uuid'],
-                adminPreview: false
+                adminPreview: false,
+                js: model['js'] || null,
+                jsIncludes: model['js_includes'] || null,
+                cssIncludes: model['css_includes'] || null
             };
 
             if (banner.template === 'medium_rectangle') {
