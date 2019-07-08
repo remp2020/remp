@@ -388,6 +388,26 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.dispatchEvent("commerce", "checkout", params);
         },
 
+        trackCheckoutWithSource: function(funnelId, article, source)
+        {
+            let params = {
+                "step": "checkout",
+                "article": article,
+                "checkout": {
+                    "funnel_id": funnelId
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4(),
+            };
+
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "checkout", params);
+        },
+
         trackPayment: function(transactionId, amount, currency, productIds) {
             var params = {
                 "step": "payment",
@@ -403,6 +423,30 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "payment", params);
+        },
+
+        trackPaymentWithSource: function(transactionId, amount, currency, productIds, article, source) {
+            let params = {
+                "step": "purchase",
+                "article": article,
+                "purchase": {
+                    "transaction_id": transactionId,
+                    "revenue": {
+                        "amount": amount,
+                        "currency": currency
+                    },
+                    "product_ids": productIds
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4(),
+            };
+
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "payment", params);
         },
@@ -426,6 +470,30 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.dispatchEvent("commerce", "purchase", params);
         },
 
+        trackPurchaseWithSource: function(transactionId, amount, currency, productIds, article, source) {
+            let params = {
+                "step": "purchase",
+                "article": article,
+                "purchase": {
+                    "transaction_id": transactionId,
+                    "revenue": {
+                        "amount": amount,
+                        "currency": currency
+                    },
+                    "product_ids": productIds
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4(),
+            };
+
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "purchase", params);
+        },
+
         trackRefund: function(transactionId, amount, currency, productIds) {
             var params = {
                 "step": "refund",
@@ -441,6 +509,29 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "refund", params);
+        },
+
+        trackRefundWithSource: function(transactionId, amount, currency, productIds, article, source) {
+            let params = {
+                "step": "refund",
+                "article": article,
+                "refund": {
+                    "transaction_id": transactionId,
+                    "revenue": {
+                        "amount": amount,
+                        "currency": currency
+                    },
+                    "product_ids": productIds
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4()
+            };
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "refund", params);
         },
