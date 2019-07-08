@@ -117,7 +117,9 @@ class SnapshotArticlesViews extends Command
                 foreach ($tokenReferers as $articleId => $articleReferers) {
                     foreach ($articleReferers as $explicitRefererMedium => $mediumReferers) {
                         $key = self::key($token, $articleId, 'external', $explicitRefererMedium);
-                        $items[$key]['count_by_referer'] = json_encode($mediumReferers);
+                        if (array_key_exists($key, $items)) {
+                            $items[$key]['count_by_referer'] = json_encode($mediumReferers);
+                        }
                     }
                 }
             }
@@ -127,12 +129,6 @@ class SnapshotArticlesViews extends Command
         ArticleViewsSnapshot::where('time', $to)->delete();
         
         foreach (array_chunk($items, 100) as $itemsChunk) {
-            foreach ($itemsChunk as $item) {
-                if (count($item) !== 7) {
-                    throw new \Exception('Invalid item to insert: ' . json_encode($item));
-                }
-            }
-
             ArticleViewsSnapshot::insert($itemsChunk);
             $count = count($itemsChunk);
             $this->line("$count records inserted");
