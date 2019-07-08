@@ -126,6 +126,15 @@ var rempConfig = {
                 value: function() {
                     return "foo@example.com"
                 }
+            },
+            // Additional params that will be appended links within displayed banner
+            //
+            // Key represents variable name, value should be defined as callback returning string response.
+            // Following example will be appended as "&foo=bar&baz=XXX".
+            // If the value is not function, remplib validation will throw an error and won't proceed further.
+            bannerUrlParams:  {
+                "foo": function() { return "bar" },
+                "baz": function() { return "XXX" }
             }
         }
     }

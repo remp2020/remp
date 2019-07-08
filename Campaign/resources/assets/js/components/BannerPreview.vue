@@ -259,6 +259,15 @@
                 if (this.variantUuid) {
                     url += "&banner_variant=" + encodeURIComponent(this.variantUuid);
                 }
+
+                if (remplib.campaign && remplib.campaign.bannerUrlParams) {
+                    for (let param in remplib.campaign.bannerUrlParams) {
+                        if (remplib.campaign.bannerUrlParams.hasOwnProperty(param)) {
+                            url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(remplib.campaign.bannerUrlParams[param]())
+                        }
+                    }
+                }
+
                 return url;
             },
         },
