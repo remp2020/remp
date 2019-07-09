@@ -19,13 +19,14 @@ type SearchSource struct {
 	explain                  *bool
 	version                  *bool
 	sorters                  []Sorter
-	trackScores              bool
+	trackScores              *bool
+	trackTotalHits           *bool
 	searchAfterSortValues    []interface{}
 	minScore                 *float64
 	timeout                  string
 	terminateAfter           *int
 	storedFieldNames         []string
-	docvalueFields           []string
+	docvalueFields           DocvalueFields
 	scriptFields             []*ScriptField
 	fetchSourceContext       *FetchSourceContext
 	aggregations             map[string]Aggregation
@@ -39,6 +40,7 @@ type SearchSource struct {
 	innerHits                map[string]*InnerHit
 	collapse                 *CollapseBuilder
 	profile                  bool
+	// TODO extBuilders []SearchExtBuilder
 }
 
 // NewSearchSource initializes a new SearchSource.
@@ -46,7 +48,6 @@ func NewSearchSource() *SearchSource {
 	return &SearchSource{
 		from:         -1,
 		size:         -1,
-		trackScores:  false,
 		aggregations: make(map[string]Aggregation),
 		indexBoosts:  make(map[string]float64),
 		innerHits:    make(map[string]*InnerHit),
@@ -77,7 +78,7 @@ func (s *SearchSource) PostFilter(postFilter Query) *SearchSource {
 // Slice allows partitioning the documents in multiple slices.
 // It is e.g. used to slice a scroll operation, supported in
 // Elasticsearch 5.0 or later.
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.2/search-request-scroll.html#sliced-scroll
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-scroll.html#sliced-scroll
 // for details.
 func (s *SearchSource) Slice(sliceQuery Query) *SearchSource {
 	s.sliceQuery = sliceQuery
@@ -161,14 +162,24 @@ func (s *SearchSource) hasSort() bool {
 // TrackScores is applied when sorting and controls if scores will be
 // tracked as well. Defaults to false.
 func (s *SearchSource) TrackScores(trackScores bool) *SearchSource {
-	s.trackScores = trackScores
+	s.trackScores = &trackScores
+	return s
+}
+
+// TrackTotalHits indicates if the total hit count for the query should be tracked.
+// Defaults to true.
+//
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/index-modules-index-sorting.html#early-terminate
+// for details.
+func (s *SearchSource) TrackTotalHits(trackTotalHits bool) *SearchSource {
+	s.trackTotalHits = &trackTotalHits
 	return s
 }
 
 // SearchAfter allows a different form of pagination by using a live cursor,
 // using the results of the previous page to help the retrieval of the next.
 //
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.2/search-request-search-after.html
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-search-after.html
 func (s *SearchSource) SearchAfter(sortValues ...interface{}) *SearchSource {
 	s.searchAfterSortValues = append(s.searchAfterSortValues, sortValues...)
 	return s
@@ -243,6 +254,17 @@ func (s *SearchSource) FetchSourceContext(fetchSourceContext *FetchSourceContext
 	return s
 }
 
+// FetchSourceIncludeExclude specifies that _source should be returned
+// with each hit, where "include" and "exclude" serve as a simple wildcard
+// matcher that gets applied to its fields
+// (e.g. include := []string{"obj1.*","obj2.*"}, exclude := []string{"description.*"}).
+func (s *SearchSource) FetchSourceIncludeExclude(include, exclude []string) *SearchSource {
+	s.fetchSourceContext = NewFetchSourceContext(true).
+		Include(include...).
+		Exclude(exclude...)
+	return s
+}
+
 // NoStoredFields indicates that no fields should be loaded, resulting in only
 // id and type to be returned per field.
 func (s *SearchSource) NoStoredFields() *SearchSource {
@@ -268,13 +290,29 @@ func (s *SearchSource) StoredFields(storedFieldNames ...string) *SearchSource {
 // DocvalueField adds a single field to load from the field data cache
 // and return as part of the search request.
 func (s *SearchSource) DocvalueField(fieldDataField string) *SearchSource {
-	s.docvalueFields = append(s.docvalueFields, fieldDataField)
+	s.docvalueFields = append(s.docvalueFields, DocvalueField{Field: fieldDataField})
+	return s
+}
+
+// DocvalueField adds a single docvalue field to load from the field data cache
+// and return as part of the search request.
+func (s *SearchSource) DocvalueFieldWithFormat(fieldDataFieldWithFormat DocvalueField) *SearchSource {
+	s.docvalueFields = append(s.docvalueFields, fieldDataFieldWithFormat)
 	return s
 }
 
 // DocvalueFields adds one or more fields to load from the field data cache
 // and return as part of the search request.
 func (s *SearchSource) DocvalueFields(docvalueFields ...string) *SearchSource {
+	for _, f := range docvalueFields {
+		s.docvalueFields = append(s.docvalueFields, DocvalueField{Field: f})
+	}
+	return s
+}
+
+// DocvalueFields adds one or more docvalue fields to load from the field data cache
+// and return as part of the search request.
+func (s *SearchSource) DocvalueFieldsWithFormat(docvalueFields ...DocvalueField) *SearchSource {
 	s.docvalueFields = append(s.docvalueFields, docvalueFields...)
 	return s
 }
@@ -346,13 +384,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 		}
 		source["post_filter"] = src
 	}
-	if s.sliceQuery != nil {
-		src, err := s.sliceQuery.Source()
-		if err != nil {
-			return nil, err
-		}
-		source["slice"] = src
-	}
 	if s.minScore != nil {
 		source["min_score"] = *s.minScore
 	}
@@ -365,13 +396,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 	if s.profile {
 		source["profile"] = s.profile
 	}
-	if s.collapse != nil {
-		src, err := s.collapse.Source()
-		if err != nil {
-			return nil, err
-		}
-		source["collapse"] = src
-	}
 	if s.fetchSourceContext != nil {
 		src, err := s.fetchSourceContext.Source()
 		if err != nil {
@@ -379,7 +403,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 		}
 		source["_source"] = src
 	}
-
 	if s.storedFieldNames != nil {
 		switch len(s.storedFieldNames) {
 		case 1:
@@ -388,11 +411,13 @@ func (s *SearchSource) Source() (interface{}, error) {
 			source["stored_fields"] = s.storedFieldNames
 		}
 	}
-
 	if len(s.docvalueFields) > 0 {
-		source["docvalue_fields"] = s.docvalueFields
+		src, err := s.docvalueFields.Source()
+		if err != nil {
+			return nil, err
+		}
+		source["docvalue_fields"] = src
 	}
-
 	if len(s.scriptFields) > 0 {
 		sfmap := make(map[string]interface{})
 		for _, scriptField := range s.scriptFields {
@@ -404,7 +429,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 		}
 		source["script_fields"] = sfmap
 	}
-
 	if len(s.sorters) > 0 {
 		var sortarr []interface{}
 		for _, sorter := range s.sorters {
@@ -416,19 +440,25 @@ func (s *SearchSource) Source() (interface{}, error) {
 		}
 		source["sort"] = sortarr
 	}
-
-	if s.trackScores {
-		source["track_scores"] = s.trackScores
+	if v := s.trackScores; v != nil {
+		source["track_scores"] = *v
 	}
-
+	if v := s.trackTotalHits; v != nil {
+		source["track_total_hits"] = *v
+	}
 	if len(s.searchAfterSortValues) > 0 {
 		source["search_after"] = s.searchAfterSortValues
 	}
-
+	if s.sliceQuery != nil {
+		src, err := s.sliceQuery.Source()
+		if err != nil {
+			return nil, err
+		}
+		source["slice"] = src
+	}
 	if len(s.indexBoosts) > 0 {
 		source["indices_boost"] = s.indexBoosts
 	}
-
 	if len(s.aggregations) > 0 {
 		aggsMap := make(map[string]interface{})
 		for name, aggregate := range s.aggregations {
@@ -440,7 +470,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 		}
 		source["aggregations"] = aggsMap
 	}
-
 	if s.highlight != nil {
 		src, err := s.highlight.Source()
 		if err != nil {
@@ -448,7 +477,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 		}
 		source["highlight"] = src
 	}
-
 	if len(s.suggesters) > 0 {
 		suggesters := make(map[string]interface{})
 		for _, s := range s.suggesters {
@@ -463,7 +491,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 		}
 		source["suggest"] = suggesters
 	}
-
 	if len(s.rescores) > 0 {
 		// Strip empty rescores from request
 		var rescores []*Rescore
@@ -472,7 +499,6 @@ func (s *SearchSource) Source() (interface{}, error) {
 				rescores = append(rescores, r)
 			}
 		}
-
 		if len(rescores) == 1 {
 			rescores[0].defaultRescoreWindowSize = s.defaultRescoreWindowSize
 			src, err := rescores[0].Source()
@@ -493,9 +519,17 @@ func (s *SearchSource) Source() (interface{}, error) {
 			source["rescore"] = slice
 		}
 	}
-
 	if len(s.stats) > 0 {
 		source["stats"] = s.stats
+	}
+	// TODO ext builders
+
+	if s.collapse != nil {
+		src, err := s.collapse.Source()
+		if err != nil {
+			return nil, err
+		}
+		source["collapse"] = src
 	}
 
 	if len(s.innerHits) > 0 {

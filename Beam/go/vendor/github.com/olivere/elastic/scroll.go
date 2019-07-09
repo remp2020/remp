@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
@@ -36,6 +37,9 @@ type ScrollService struct {
 	ignoreUnavailable *bool
 	allowNoIndices    *bool
 	expandWildcards   string
+	headers           http.Header
+	maxResponseSize   int64
+	filterPath        []string
 
 	mu       sync.RWMutex
 	scrollId string
@@ -49,6 +53,15 @@ func NewScrollService(client *Client) *ScrollService {
 		keepAlive: DefaultScrollKeepAlive,
 	}
 	return builder
+}
+
+// Header sets headers on the request
+func (s *ScrollService) Header(name string, value string) *ScrollService {
+	if s.headers == nil {
+		s.headers = http.Header{}
+	}
+	s.headers.Add(name, value)
+	return s
 }
 
 // Retrier allows to set specific retry logic for this ScrollService.
@@ -84,7 +97,7 @@ func (s *ScrollService) Scroll(keepAlive string) *ScrollService {
 }
 
 // KeepAlive sets the maximum time after which the cursor will expire.
-// It is "2m" by default.
+// It is "5m" by default.
 func (s *ScrollService) KeepAlive(keepAlive string) *ScrollService {
 	s.keepAlive = keepAlive
 	return s
@@ -125,7 +138,7 @@ func (s *ScrollService) Query(query Query) *ScrollService {
 
 // PostFilter is executed as the last filter. It only affects the
 // search hits but not facets. See
-// https://www.elastic.co/guide/en/elasticsearch/reference/6.2/search-request-post-filter.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-post-filter.html
 // for details.
 func (s *ScrollService) PostFilter(postFilter Query) *ScrollService {
 	s.ss = s.ss.PostFilter(postFilter)
@@ -134,7 +147,7 @@ func (s *ScrollService) PostFilter(postFilter Query) *ScrollService {
 
 // Slice allows slicing the scroll request into several batches.
 // This is supported in Elasticsearch 5.0 or later.
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.2/search-request-scroll.html#sliced-scroll
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-scroll.html#sliced-scroll
 // for details.
 func (s *ScrollService) Slice(sliceQuery Query) *ScrollService {
 	s.ss = s.ss.Slice(sliceQuery)
@@ -155,7 +168,7 @@ func (s *ScrollService) FetchSourceContext(fetchSourceContext *FetchSourceContex
 }
 
 // Version can be set to true to return a version for each search hit.
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.2/search-request-version.html.
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-version.html.
 func (s *ScrollService) Version(version bool) *ScrollService {
 	s.ss = s.ss.Version(version)
 	return s
@@ -224,6 +237,21 @@ func (s *ScrollService) AllowNoIndices(allowNoIndices bool) *ScrollService {
 // concrete indices that are open, closed or both.
 func (s *ScrollService) ExpandWildcards(expandWildcards string) *ScrollService {
 	s.expandWildcards = expandWildcards
+	return s
+}
+
+// MaxResponseSize sets an upper limit on the response body size that we accept,
+// to guard against OOM situations.
+func (s *ScrollService) MaxResponseSize(maxResponseSize int64) *ScrollService {
+	s.maxResponseSize = maxResponseSize
+	return s
+}
+
+// FilterPath allows reducing the response, a mechanism known as
+// response filtering and described here:
+// https://www.elastic.co/guide/en/elasticsearch/reference/6.8/common-options.html#common-options-response-filtering.
+func (s *ScrollService) FilterPath(filterPath ...string) *ScrollService {
+	s.filterPath = append(s.filterPath, filterPath...)
 	return s
 }
 
@@ -298,11 +326,13 @@ func (s *ScrollService) first(ctx context.Context) (*SearchResult, error) {
 
 	// Get HTTP response
 	res, err := s.client.PerformRequest(ctx, PerformRequestOptions{
-		Method:  "POST",
-		Path:    path,
-		Params:  params,
-		Body:    body,
-		Retrier: s.retrier,
+		Method:          "POST",
+		Path:            path,
+		Params:          params,
+		Body:            body,
+		Retrier:         s.retrier,
+		Headers:         s.headers,
+		MaxResponseSize: s.maxResponseSize,
 	})
 	if err != nil {
 		return nil, err
@@ -317,7 +347,7 @@ func (s *ScrollService) first(ctx context.Context) (*SearchResult, error) {
 	s.scrollId = ret.ScrollId
 	s.mu.Unlock()
 	if ret.Hits == nil || len(ret.Hits.Hits) == 0 {
-		return nil, io.EOF
+		return ret, io.EOF
 	}
 	return ret, nil
 }
@@ -373,6 +403,11 @@ func (s *ScrollService) buildFirstURL() (string, url.Values, error) {
 	if s.ignoreUnavailable != nil {
 		params.Set("ignore_unavailable", fmt.Sprintf("%v", *s.ignoreUnavailable))
 	}
+	if len(s.filterPath) > 0 {
+		// Always add "hits._scroll_id", otherwise we cannot scroll
+		s.filterPath = append(s.filterPath, "_scroll_id")
+		params.Set("filter_path", strings.Join(s.filterPath, ","))
+	}
 
 	return path, params, nil
 }
@@ -418,11 +453,13 @@ func (s *ScrollService) next(ctx context.Context) (*SearchResult, error) {
 
 	// Get HTTP response
 	res, err := s.client.PerformRequest(ctx, PerformRequestOptions{
-		Method:  "POST",
-		Path:    path,
-		Params:  params,
-		Body:    body,
-		Retrier: s.retrier,
+		Method:          "POST",
+		Path:            path,
+		Params:          params,
+		Body:            body,
+		Retrier:         s.retrier,
+		Headers:         s.headers,
+		MaxResponseSize: s.maxResponseSize,
 	})
 	if err != nil {
 		return nil, err
@@ -437,7 +474,7 @@ func (s *ScrollService) next(ctx context.Context) (*SearchResult, error) {
 	s.scrollId = ret.ScrollId
 	s.mu.Unlock()
 	if ret.Hits == nil || len(ret.Hits.Hits) == 0 {
-		return nil, io.EOF
+		return ret, io.EOF
 	}
 	return ret, nil
 }
@@ -450,6 +487,11 @@ func (s *ScrollService) buildNextURL() (string, url.Values, error) {
 	params := url.Values{}
 	if s.pretty {
 		params.Set("pretty", "true")
+	}
+	if len(s.filterPath) > 0 {
+		// Always add "hits._scroll_id", otherwise we cannot scroll
+		s.filterPath = append(s.filterPath, "_scroll_id")
+		params.Set("filter_path", strings.Join(s.filterPath, ","))
 	}
 
 	return path, params, nil

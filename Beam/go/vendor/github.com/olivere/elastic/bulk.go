@@ -23,7 +23,7 @@ import (
 // reuse BulkService to send many batches. You do not have to create a new
 // BulkService for each batch.
 //
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.2/docs-bulk.html
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-bulk.html
 // for more details.
 type BulkService struct {
 	client  *Client
@@ -52,7 +52,8 @@ func NewBulkService(client *Client) *BulkService {
 	return builder
 }
 
-func (s *BulkService) reset() {
+// Reset cleans up the request queue
+func (s *BulkService) Reset() {
 	s.requests = make([]BulkableRequest, 0)
 	s.sizeInBytes = 0
 	s.sizeInBytesCursor = 0
@@ -93,7 +94,7 @@ func (s *BulkService) Timeout(timeout string) *BulkService {
 // changes to be made visible by a refresh before reying), or "false"
 // (no refresh related actions). The default value is "false".
 //
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.2/docs-refresh.html
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-refresh.html
 // for details.
 func (s *BulkService) Refresh(refresh string) *BulkService {
 	s.refresh = refresh
@@ -265,7 +266,7 @@ func (s *BulkService) Do(ctx context.Context) (*BulkResponse, error) {
 	}
 
 	// Reset so the request can be reused
-	s.reset()
+	s.Reset()
 
 	return ret, nil
 }
@@ -324,7 +325,7 @@ type BulkResponseItem struct {
 	Id            string        `json:"_id,omitempty"`
 	Version       int64         `json:"_version,omitempty"`
 	Result        string        `json:"result,omitempty"`
-	Shards        *shardsInfo   `json:"_shards,omitempty"`
+	Shards        *ShardsInfo   `json:"_shards,omitempty"`
 	SeqNo         int64         `json:"_seq_no,omitempty"`
 	PrimaryTerm   int64         `json:"_primary_term,omitempty"`
 	Status        int           `json:"status,omitempty"`

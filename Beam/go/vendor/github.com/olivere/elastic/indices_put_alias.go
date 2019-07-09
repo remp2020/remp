@@ -26,6 +26,7 @@ type AliasAddAction struct {
 	routing       string
 	searchRouting string
 	indexRouting  string
+	isWriteIndex  *bool
 }
 
 // NewAliasAddAction returns an action to add an alias.
@@ -76,6 +77,12 @@ func (a *AliasAddAction) SearchRouting(routing ...string) *AliasAddAction {
 	return a
 }
 
+// IsWriteIndex associates an is_write_index flag to the alias.
+func (a *AliasAddAction) IsWriteIndex(flag bool) *AliasAddAction {
+	a.isWriteIndex = &flag
+	return a
+}
+
 // Validate checks if the operation is valid.
 func (a *AliasAddAction) Validate() error {
 	var invalid []string
@@ -87,6 +94,9 @@ func (a *AliasAddAction) Validate() error {
 	}
 	if len(invalid) > 0 {
 		return fmt.Errorf("missing required fields: %v", invalid)
+	}
+	if a.isWriteIndex != nil && len(a.index) > 1 {
+		return fmt.Errorf("more than 1 target index specified in operation with 'is_write_index' flag present")
 	}
 	return nil
 }
@@ -122,6 +132,9 @@ func (a *AliasAddAction) Source() (interface{}, error) {
 	}
 	if len(a.searchRouting) > 0 {
 		act["search_routing"] = a.searchRouting
+	}
+	if a.isWriteIndex != nil {
+		act["is_write_index"] = *a.isWriteIndex
 	}
 	return src, nil
 }
@@ -189,10 +202,43 @@ func (a *AliasRemoveAction) Source() (interface{}, error) {
 	return src, nil
 }
 
+// AliasRemoveIndexAction is an action to remove an index during an alias
+// operation.
+type AliasRemoveIndexAction struct {
+	index string // index name
+}
+
+// NewAliasRemoveIndexAction returns an action to remove an index.
+func NewAliasRemoveIndexAction(index string) *AliasRemoveIndexAction {
+	return &AliasRemoveIndexAction{
+		index: index,
+	}
+}
+
+// Validate checks if the operation is valid.
+func (a *AliasRemoveIndexAction) Validate() error {
+	if a.index == "" {
+		return fmt.Errorf("missing required field: index")
+	}
+	return nil
+}
+
+// Source returns the JSON-serializable data.
+func (a *AliasRemoveIndexAction) Source() (interface{}, error) {
+	if err := a.Validate(); err != nil {
+		return nil, err
+	}
+	src := make(map[string]interface{})
+	act := make(map[string]interface{})
+	src["remove_index"] = act
+	act["index"] = a.index
+	return src, nil
+}
+
 // -- Service --
 
 // AliasService enables users to add or remove an alias.
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-aliases.html
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-aliases.html
 // for details.
 type AliasService struct {
 	client  *Client

@@ -8,6 +8,7 @@ Elastic is an [Elasticsearch](http://www.elasticsearch.org/) client for the
 [![Build Status](https://travis-ci.org/olivere/elastic.svg?branch=release-branch.v6)](https://travis-ci.org/olivere/elastic)
 [![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](http://godoc.org/github.com/olivere/elastic)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/olivere/elastic/master/LICENSE)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Folivere%2Felastic.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Folivere%2Felastic?ref=badge_shield)
 
 See the [wiki](https://github.com/olivere/elastic/wiki) for additional information about Elastic.
 
@@ -39,10 +40,10 @@ To use the required version of Elastic in your application, it is strongly
 advised to use a tool like
 [dep](https://github.com/golang/dep)
 or
-[Glide](https://glide.sh/)
-to manage that dependency. Make sure to use a version such as `^6.0.0`.
+[Go modules](https://github.com/golang/go/wiki/Modules)
+to manage dependencies. Make sure to use a version such as `^6.0.0`.
 
-To use Elastic, simply import:
+To use Elastic, import:
 
 ```go
 import "github.com/olivere/elastic"
@@ -52,7 +53,7 @@ import "github.com/olivere/elastic"
 
 Elastic 6.0 targets Elasticsearch 6.x which was [released on 14th November 2017](https://www.elastic.co/blog/elasticsearch-6-0-0-released).
 
-Notice that there are will be a lot of [breaking changes in Elasticsearch 6.0](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/breaking-changes-6.0.html)
+Notice that there are a lot of [breaking changes in Elasticsearch 6.0](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/breaking-changes-6.0.html)
 and we used this as an opportunity to [clean up and refactor Elastic](https://github.com/olivere/elastic/blob/release-branch.v6/CHANGELOG-6.0.md)
 as we did in the transition from earlier versions of Elastic.
 
@@ -100,8 +101,8 @@ Having said that, there have been no big API changes that required you
 to rewrite your application big time. More often than not it's renaming APIs
 and adding/removing features so that Elastic is in sync with Elasticsearch.
 
-Elastic has been used in production with the following Elasticsearch versions:
-0.90, 1.0-1.7, and 2.0-2.4.1. Furthermore, we use [Travis CI](https://travis-ci.org/)
+Elastic has been used in production starting with Elasticsearch 0.90 up to recent 6.x
+versions. Furthermore, we use [Travis CI](https://travis-ci.org/)
 to test Elastic with the most recent versions of Elasticsearch and Go.
 See the [.travis.yml](https://github.com/olivere/elastic/blob/master/.travis.yml)
 file for the exact matrix and [Travis](https://travis-ci.org/olivere/elastic)
@@ -126,9 +127,16 @@ An example is available [here](https://olivere.github.io/elastic/).
 
 Here's a [link to a complete working example for v6](https://gist.github.com/olivere/e4a376b4783c0914e44ea4f745ce2ebf).
 
-See the [wiki](https://github.com/olivere/elastic/wiki) for more details.
+Here are a few tips on how to get used to Elastic:
 
-There are also [some recipes](https://github.com/olivere/elastic/tree/release-branch.v6/recipes) for bulk indexing, scrolling through documents in indices etc.
+1. Head over to the [Wiki](https://github.com/olivere/elastic/wiki) for detailed information and
+   topics like e.g. [how to add a middleware](https://github.com/olivere/elastic/wiki/HttpTransport)
+   or how to [connect to AWS](https://github.com/olivere/elastic/wiki/Using-with-AWS-Elasticsearch-Service).
+2. If you are unsure how to implement something, read the tests (all `_test.go` files).
+   They not only serve as a guard against changes, but also as a reference.
+3. The [recipes](https://github.com/olivere/elastic/tree/release-branch.v6/recipes)
+   contains small examples on how to implement something, e.g. bulk indexing, scrolling etc.
+
 
 ## API Status
 
@@ -251,6 +259,19 @@ There are also [some recipes](https://github.com/olivere/elastic/tree/release-br
 - [x] Refresh
 - [x] Force Merge
 
+### Index Lifecycle Management APIs
+
+- [x] Create Policy
+- [x] Get Policy
+- [x] Delete Policy
+- [ ] Move to Step
+- [ ] Remove Policy
+- [ ] Retry Policy
+- [ ] Get Ilm Status
+- [ ] Explain Lifecycle
+- [ ] Start Ilm
+- [ ] Stop Ilm
+
 ### cat APIs
 
 The cat APIs are not implemented as of now. We think they are better suited for operating with Elasticsearch on the command line.
@@ -280,7 +301,7 @@ The cat APIs are not implemented as of now. We think they are better suited for 
 - [x] Cluster State
 - [x] Cluster Stats
 - [ ] Pending Cluster Tasks
-- [ ] Cluster Reroute
+- [x] Cluster Reroute
 - [ ] Cluster Update Settings
 - [x] Nodes Stats
 - [x] Nodes Info
@@ -351,11 +372,17 @@ The cat APIs are not implemented as of now. We think they are better suited for 
 
 - Snapshot and Restore
   - [x] Repositories
-  - [x] Snapshot
+  - [x] Snapshot get
+  - [x] Snapshot create
+  - [x] Snapshot delete
   - [ ] Restore
   - [ ] Snapshot status
   - [ ] Monitoring snapshot/restore status
   - [ ] Stopping currently running snapshot and restore
+- Scripting
+  - [x] GetScript
+  - [x] PutScript
+  - [x] DeleteScript
 
 ### Sorting
 
@@ -394,3 +421,6 @@ by Joshua Tacoma,
 
 MIT-LICENSE. See [LICENSE](http://olivere.mit-license.org/)
 or the LICENSE file provided in the repository for details.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Folivere%2Felastic.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Folivere%2Felastic?ref=badge_large)

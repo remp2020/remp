@@ -65,12 +65,13 @@ func main() {
 	// DB init
 
 	mysqlDBConfig := mysql.Config{
-		Net:       c.MysqlNet,
-		Addr:      c.MysqlAddr,
-		User:      c.MysqlUser,
-		Passwd:    c.MysqlPasswd,
-		DBName:    c.MysqlDBName,
-		ParseTime: true,
+		Net:                  c.MysqlNet,
+		Addr:                 c.MysqlAddr,
+		User:                 c.MysqlUser,
+		Passwd:               c.MysqlPasswd,
+		DBName:               c.MysqlDBName,
+		ParseTime:            true,
+		AllowNativePasswords: true,
 	}
 	mysqlDB, err := sqlx.Connect("mysql", mysqlDBConfig.FormatDSN())
 	if err != nil {
