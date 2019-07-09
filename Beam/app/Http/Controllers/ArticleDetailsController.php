@@ -35,7 +35,7 @@ class ArticleDetailsController extends Controller
         $groupBy = $type === 'title' ? 'title_variant' : 'image_variant';
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
-        $journalInterval = JournalInterval::from($tz, $request->get('interval'), $article);
+        $journalInterval = JournalInterval::forArticle($tz, $request->get('interval'), $article);
 
         $data = $this->histogram($article, $journalInterval, $groupBy, function (AggregateRequest $request) {
             $request->addFilter('derived_referer_medium', 'internal');
@@ -93,7 +93,7 @@ class ArticleDetailsController extends Controller
         $eventOptions = $request->get('events', []);
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
-        $journalInterval = JournalInterval::from($tz, $request->get('interval'), $article);
+        $journalInterval = JournalInterval::forArticle($tz, $request->get('interval'), $article);
 
         $data = $this->histogram($article, $journalInterval, 'derived_referer_medium');
         $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);

@@ -21,8 +21,17 @@ class JournalInterval
         $this->intervalMinutes = $intervalMinutes;
     }
 
-    public static function from(\DateTimeZone $tz, string $interval, Article $article): JournalInterval
+    public static function for(\DateTimeZone $tz, string $interval, array $allowedIntervals = null): JournalInterval
     {
+        return self::forArticle($tz, $interval, null, $allowedIntervals);
+    }
+
+    public static function forArticle(\DateTimeZone $tz, string $interval, Article $article = null, array $allowedIntervals = null): JournalInterval
+    {
+        if ($allowedIntervals && !in_array($interval, $allowedIntervals)) {
+            throw new InvalidArgumentException("Parameter 'interval' must be one of the [" . implode(',', $allowedIntervals) . "] values, instead '$interval' provided");
+        }
+
         switch ($interval) {
             case 'today':
                 return new JournalInterval(
@@ -46,6 +55,9 @@ class JournalInterval
                     120
                 );
             case 'all':
+                if (!$article) {
+                    throw new InvalidArgumentException("Missing article for 'all' option");
+                }
                 [$intervalText, $intervalMinutes] = self::getIntervalDependingOnArticlePublishedDate($article);
                 return new JournalInterval(
                     (clone $article->published_at)->tz($tz),
