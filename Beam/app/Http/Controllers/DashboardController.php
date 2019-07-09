@@ -108,9 +108,8 @@ class DashboardController extends Controller
             $numberOfAveragedWeeks = $settings['compareWith'] === 'average' ? 4 : 1;
 
             for ($i = 1; $i <= $numberOfAveragedWeeks; $i++) {
-                // TODO switch to weeks
-                $shadowFrom = (clone $from)->subDays($i); //$shadowFrom = (clone $from)->subWeeks($i);
-                $shadowTo = (clone $to)->subDays($i); //$shadowTo = (clone $to)->subWeeks($i);
+                $shadowFrom = (clone $from)->subWeeks($i);
+                $shadowTo = (clone $to)->subWeeks($i);
 
                 // If there was a time shift, remember time needs to be adjusted by the timezone difference
                 $diff = $shadowFrom->tz('utc')->diff($from->tz('utc'));
@@ -121,7 +120,7 @@ class DashboardController extends Controller
                     // we want to plot previous results on same points as current ones,
                     // therefore add week which was subtracted when data was queried
                     $correctedDate = Carbon::parse($item->time)
-                        ->addDays($i) // TODO switch to week
+                        ->addWeeks($i)
                         ->addHours($hourDifference)
                         ->toIso8601ZuluString();
 
