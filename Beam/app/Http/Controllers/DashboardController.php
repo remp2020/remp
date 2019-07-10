@@ -161,7 +161,6 @@ class DashboardController extends Controller
 
         // Fill empty records for shadow values first
         if (count($shadowRecords) > 0) {
-
             $toEndOfDay = (clone $to)->endOfDay();
 
             $timeIterator = JournalHelpers::getTimeIterator($from, $intervalMinutes);
