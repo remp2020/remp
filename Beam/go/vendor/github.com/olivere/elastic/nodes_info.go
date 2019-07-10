@@ -16,7 +16,7 @@ import (
 
 // NodesInfoService allows to retrieve one or more or all of the
 // cluster nodes information.
-// It is documented at https://www.elastic.co/guide/en/elasticsearch/reference/6.2/cluster-nodes-info.html.
+// It is documented at https://www.elastic.co/guide/en/elasticsearch/reference/6.8/cluster-nodes-info.html.
 type NodesInfoService struct {
 	client       *Client
 	pretty       bool
@@ -156,7 +156,7 @@ type NodesInfoNode struct {
 	TotalIndexingBuffer int64 `json:"total_indexing_buffer"` // e.g. 16gb
 	// TotalIndexingBufferInBytes is the same as TotalIndexingBuffer, but
 	// expressed in bytes.
-	TotalIndexingBufferInBytes int64 `json:"total_indexing_buffer_in_bytes"`
+	TotalIndexingBufferInBytes string `json:"total_indexing_buffer_in_bytes"`
 
 	// Roles of the node, e.g. [master, ingest, data]
 	Roles []string `json:"roles"`

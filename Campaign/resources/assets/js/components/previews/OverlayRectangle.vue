@@ -13,6 +13,19 @@
         padding-top: 3px;
     }
 
+    .preview-admin-close {
+        position: fixed;
+        top: 14px;
+        right: 30px;
+        font-size: 14px;
+        line-height: 18px;
+        text-decoration: none;
+        color: #ff2e00;
+        background-color: #fff;
+        padding: 2px;
+        z-index: 100000;
+    }
+
     .overlay-rectangle-preview-close.hidden {
         display: none;
     }
@@ -125,7 +138,13 @@
 </style>
 
 <template>
+    <div>
+    <a href="#"
+       class="preview-admin-close"
+       v-on:click.stop="$parent.closed"
+       v-if="isVisible && !closeable && adminPreview">CLOSE BANNER</a>
     <transition appear name="fade">
+
         <div class="overlay-rectangle-overlay" v-if="isVisible">
             <transition appear v-bind:name="transition">
                 <div class="overlay-rectangle-wrap" :class="{ closeable: closeable }">
@@ -168,6 +187,7 @@
             </transition>
         </div>
     </transition>
+    </div>
 </template>
 
 <script>
@@ -197,7 +217,9 @@
             "closeText",
             "displayType",
             "uuid",
-            "campaignUuid"
+            "campaignUuid",
+
+            "adminPreview"
         ],
         data: function() {
             return {

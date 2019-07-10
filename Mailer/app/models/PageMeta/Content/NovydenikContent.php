@@ -3,6 +3,9 @@
 namespace Remp\MailerModule\PageMeta;
 
 use GuzzleHttp\Exception\RequestException;
+use Nette\Http\Url;
+use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 use Nette\Utils\Strings;
 
 class NovydenikContent implements ContentInterface
@@ -34,53 +37,49 @@ class NovydenikContent implements ContentInterface
 
     public function parseMeta($content)
     {
+        preg_match_all('/<script id="schema" type="application\/ld\+json">(.*?)<\/script>/', $content, $matches);
+
+        if (!$matches) {
+            return new Meta(false, false, false, false);
+        }
+
+        try {
+            $schema = Json::decode($matches[1][0]);
+        } catch (JsonException $e) {
+            return new Meta(false, false, false, false);
+        }
+
         // author
         $denniknAuthors = false;
-        $matches = [];
-        preg_match_all('/<cite class=\"d-author\"\>(.+)[\<]\/cite\>/U', $content, $matches);
-
-        if ($matches) {
-            foreach ($matches[1] as $author) {
-                $denniknAuthors[] = Strings::upper(html_entity_decode($author));
-            }
+        if (isset($schema->author) && !is_array($schema->author)) {
+            $schema->author = [$schema->author];
+        }
+        foreach ($schema->author as $author) {
+            $denniknAuthors[] = Strings::upper($author->name);
         }
 
-        // title
-        $title = false;
-        $matches = [];
-        preg_match('/<meta property=\"og:title\" content=\"(.+)\"\s*\/?/U', $content, $matches);
-        if ($matches) {
-            $title = html_entity_decode($matches[1]);
-        }
-
-        // description
-        $description = false;
-        $matches = [];
-        preg_match('/<meta property=\"og:description\" content=\"(.*)\"\s*\/?/U', $content, $matches);
-        if ($matches) {
-            $description = html_entity_decode($matches[1]);
-        }
-
-        // image
-        $image = false;
-        $matches = [];
-        preg_match('/<meta property=\"og:image\" content=\"(.+)\"\s*\/?/U', $content, $matches);
-        if ($matches) {
-            $image = $matches[1];
-
-            $parts = explode('/', $image);
-            $image = array_pop($parts);
-            $info = pathinfo($image);
-            if (preg_match('/-([0-9]+)x([0-9]+)$/i', $info['filename'])) {
-                $newImageFileName = preg_replace('/-([0-9]+)x([0-9]+)$/', '-558x270', $info['filename']);
-                $image = $newImageFileName . '.' . $info['extension'];
-            } else {
-                $image = $info['filename'] . '-558x270.' . $info['extension'];
-            }
-            $parts[] = $image;
-            $image = implode('/', $parts);
-        }
+        $title = $schema->headline ?? false;
+        $description = $schema->description ?? false;
+        $image = $this->processImage($schema->image->url ?? null);
 
         return new Meta($title, $description, $image, $denniknAuthors);
+    }
+
+    private function processImage($imageUrl)
+    {
+        if (!$imageUrl) {
+            return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
+        }
+        
+        $url = new Url($imageUrl);
+        $url = (string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']);
+
+        // return placeholder if image doesn't exist
+        $response = get_headers($url);
+        if (strpos($response[0], '404')) {
+            return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
+        }
+
+        return $url;
     }
 }

@@ -78,6 +78,8 @@
             "closeText",
             "text",
             "css",
+            "js",
+            "includes",
             "displayType",
             "forcedPosition",
             "uuid",

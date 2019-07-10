@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Database\Table\Selection;
 use PDOException;
 use Remp\MailerModule\Repository;
 use Nette\Database\Table\IRow;
@@ -140,7 +141,7 @@ SQL;
         $this->getDatabase()->query($query);
     }
 
-    public function getBatchEmails(IRow $mailBatch, $lastId, $count = null)
+    public function getBatchEmails(IRow $mailBatch, $lastId, $count = null): Selection
     {
         $selection = $this->getTable()->where(['id > ?' => $lastId, 'mail_batch_id' => $mailBatch->id])->order('id ASC');
         if ($count !== null) {

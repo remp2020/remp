@@ -153,39 +153,49 @@ class BatchEmailGenerator
             ]);
         }
 
-        $queueJobs = $this->mailJobQueueRepository->getBatchEmails($batch, 0, null);
+        $queueJobsSelection = $this->mailJobQueueRepository->getBatchEmails($batch, 0, null);
         $this->mailCache->pauseQueue($batch->id);
 
+        $totalQueueSize = (clone $queueJobsSelection)->count('*');
+        $lastId = PHP_INT_MIN;
+        $limit = 1000;
+
         $userJobOptions = [];
+        for ($i = 0; $i <= ceil($totalQueueSize / $limit); $i++) {
+            $queueJobs = (clone $queueJobsSelection)
+                ->where('id > ?', $lastId)
+                ->limit($limit);
 
-        /** @var ActiveRow $queueJob */
-        foreach ($queueJobs as $queueJob) {
-            $template = $queueJob->ref('mail_templates', 'mail_template_id');
-            $userId = $userMap[$queueJob->email];
-            $jobOptions = [
-                'email' => $queueJob->email,
-                'code' => $template->code,
-                'mail_batch_id' => $queueJob->mail_batch_id,
-                'context' => $queueJob->context,
-                'params' => json_decode($queueJob->params, true) ?? []
-            ];
+            /** @var ActiveRow $queueJob */
+            foreach ($queueJobs as $queueJob) {
+                $template = $queueJob->ref('mail_templates', 'mail_template_id');
+                $userId = $userMap[$queueJob->email];
+                $jobOptions = [
+                    'email' => $queueJob->email,
+                    'code' => $template->code,
+                    'mail_batch_id' => $queueJob->mail_batch_id,
+                    'context' => $queueJob->context,
+                    'params' => json_decode($queueJob->params, true) ?? []
+                ];
 
-            // Load dynamic parameters
-            if ($template->extras) {
-                $extras = json_decode($template->extras, true);
-                $generator = $extras['generator'] ?? null;
+                // Load dynamic parameters
+                if ($template->extras) {
+                    $extras = json_decode($template->extras, true);
+                    $generator = $extras['generator'] ?? null;
 
-                if ($generator === self::BEAM_UNREAD_ARTICLES_GENERATOR) {
-                    $jobOptions['generator'] = $generator;
-                    $parameters = $extras['parameters'] ?? false;
-                    if ($parameters) {
-                        $this->unreadArticlesGenerator->addToResolve($template->code, $userId, $parameters);
+                    if ($generator === self::BEAM_UNREAD_ARTICLES_GENERATOR) {
+                        $jobOptions['generator'] = $generator;
+                        $parameters = $extras['parameters'] ?? false;
+                        if ($parameters) {
+                            $this->unreadArticlesGenerator->addToResolve($template->code, $userId, $parameters);
+                        }
+                    } elseif ($generator !== null) {
+                        $this->logger->log(LogLevel::ERROR, "Generating dynamic emails: unknown generator: {$generator}");
                     }
-                } elseif ($generator !== null) {
-                    $this->logger->log(LogLevel::ERROR, "Generating dynamic emails: unknown generator: {$generator}");
                 }
+                $userJobOptions[$userId] = $jobOptions;
+                $lastId = $queueJob->id;
             }
-            $userJobOptions[$userId] = $jobOptions;
         }
 
         // Resolve all dynamic parameters at once

@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\ListVariantsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;

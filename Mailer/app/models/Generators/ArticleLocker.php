@@ -11,12 +11,16 @@ class ArticleLocker
 
     public function getLockedPost($post)
     {
-        $lock = stripos($post, '[lock newsletter]') !== false
-            ? '[lock newsletter]'
-            : '[lock]';
+        if (stripos($post, '[lock newsletter]') !== false) {
+            $lock = '[lock newsletter]';
+        } elseif (stripos($post, '[lock]') !== false) {
+            $lock = '[lock]';
+        } else {
+            // no lock, no placeholder
+            return $post;
+        }
 
         $parts = explode($lock, $post);
-
         return $parts[0] . $this->placeholder;
     }
 

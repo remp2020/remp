@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -56,12 +57,13 @@ func main() {
 	// DB init
 
 	mysqlDBConfig := mysql.Config{
-		Net:       c.MysqlNet,
-		Addr:      c.MysqlAddr,
-		User:      c.MysqlUser,
-		Passwd:    c.MysqlPasswd,
-		DBName:    c.MysqlDBName,
-		ParseTime: true,
+		Net:                  c.MysqlNet,
+		Addr:                 c.MysqlAddr,
+		User:                 c.MysqlUser,
+		Passwd:               c.MysqlPasswd,
+		DBName:               c.MysqlDBName,
+		ParseTime:            true,
+		AllowNativePasswords: true,
 	}
 	mysqlDB, err := sqlx.Connect("mysql", mysqlDBConfig.FormatDSN())
 	if err != nil {
@@ -194,9 +196,10 @@ func main() {
 }
 
 func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
+	elasticAddrs := strings.Split(c.ElasticAddrs, ",")
 	eopts := []elastic.ClientOptionFunc{
 		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
-		elastic.SetURL(c.ElasticAddr),
+		elastic.SetURL(elasticAddrs...),
 		elastic.SetSniff(false),
 		elastic.SetHealthcheckInterval(10 * time.Second),
 		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),

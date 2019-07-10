@@ -25,11 +25,11 @@
     var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
 
     banner.show = true;
-    banner.closeable = false;
     banner.forcedPosition = 'absolute';
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
+    banner.adminPreview = true;
 
     remplib.banner.bindPreview('#banner-preview', banner);
 </script>
@@ -168,9 +168,7 @@
             <div class="card-body card-padding">
                 <div class="row cp-container" style="min-height: 300px">
                     <div class="col-md-12">
-                        <div id="banner-preview">
-                            <banner-preview></banner-preview>
-                        </div>
+                        <div id="banner-preview"></div>
                     </div>
                 </div>
             </div>

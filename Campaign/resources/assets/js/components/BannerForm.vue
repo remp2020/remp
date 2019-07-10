@@ -122,6 +122,37 @@
                                     <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                                 </div>
                             </div>
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                                <div class="fg-line">
+                                    <label for="js" class="fg-label">Custom JS</label>
+                                    <textarea v-model="js" class="form-control fg-input" rows="6" name="js" cols="50" id="js"></textarea>
+                                </div>
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                                <div class="fg-line">
+                                    <label for="jsIncludesStr" class="fg-label">Javascript includes</label>
+                                    <textarea v-model="jsIncludesStr" class="form-control fg-input" rows="6" name="jsIncludesStr" cols="50" id="jsIncludesStr"></textarea>
+                                </div>
+                                <div style="margin-top: 5px;">Enter include script urls separated by new line.</div>
+
+                                <input v-for="jsInclude in jsIncludes" type="hidden" name="js_includes[]" :value="jsInclude">
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
+                                <div class="fg-line">
+                                    <label for="cssIncludesStr" class="fg-label">Stylesheet includes</label>
+                                    <textarea v-model="cssIncludesStr" class="form-control fg-input" rows="6" name="cssIncludesStr" cols="50" id="cssIncludesStr"></textarea>
+                                </div>
+                                <div style="margin-top: 5px;">Enter include stylesheets urls separated by new line.</div>
+
+                                <input v-for="cssInclude in cssIncludes" type="hidden" name="css_includes[]" :value="cssInclude">
+                            </div><!-- .input-group -->
+
                         </div>
                     </div>
                 </div>
@@ -298,6 +329,10 @@
                                         :transition="transition"
                                         :displayType="displayType"
                                         :forcedPosition="'absolute'"
+
+                                        :js="js"
+                                        :jsIncludes="jsIncludes"
+                                        :cssIncludes="cssIncludes"
                                 ></banner-preview>
                             </div>
                         </div>
@@ -307,7 +342,6 @@
         </div>
 
         <input type="hidden" name="display_type" v-bind:value="displayType" />
-
 
         <form-validator :url="validateUrl"></form-validator>
     </div>
@@ -356,6 +390,10 @@
 
         "_validateUrl": String,
         "_clientSiteUrl": String,
+
+        "_js": String,
+        "_jsIncludes": Array,
+        "_cssIncludes": Array
     };
 
     export default {
@@ -422,8 +460,30 @@
             ],
 
             validateUrl: null,
-            clientSiteUrl: null
+            clientSiteUrl: null,
+
+            js: null,
+            jsIncludes: null,
+            cssIncludes: null
         }),
+        computed: {
+            jsIncludesStr: {
+                get: function () {
+                    return this.jsIncludes ? this.jsIncludes.join("\n") : null;
+                },
+                set: function (value) {
+                    this.jsIncludes = value ? value.split("\n") : null;
+                }
+            },
+            cssIncludesStr: {
+                get: function () {
+                    return this.cssIncludes ? this.cssIncludes.join("\n") : null;
+                },
+                set: function (value) {
+                    this.cssIncludes = value ? value.split("\n") : null;
+                }
+            }
+        },
         methods: {
             openClientSiteAndSendKeepAliveMessages() {
                 if(!this.clientSiteUrl.length) {

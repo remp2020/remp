@@ -26,7 +26,11 @@ window.remplib = window.remplib || {};
                 closeTimeout: model['close_timeout'] || null,
                 // inline
                 targetSelector: model['target_selector'] || null,
-                variant: model['variant_uuid']
+                variant: model['variant_uuid'],
+                adminPreview: false,
+                js: model['js'] || null,
+                jsIncludes: model['js_includes'] || null,
+                cssIncludes: model['css_includes'] || null
             };
 
             if (banner.template === 'medium_rectangle') {

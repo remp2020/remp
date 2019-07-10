@@ -152,6 +152,7 @@
                 :closeText="closeText"
                 :transition="transition"
                 :displayType="displayType"
+                :adminPreview="adminPreview"
         >
         </overlay-rectangle-preview>
     </div>
@@ -159,6 +160,8 @@
 
 
 <script>
+    import remplib from "remp/js/remplib";
+
     import HtmlPreview from "./previews/Html";
     import MediumRectanglePreview from "./previews/MediumRectangle";
     import BarPreview from "./previews/Bar";
@@ -199,6 +202,12 @@
         "positionOptions",
 
         "variantUuid",
+
+        "adminPreview",
+
+        "js",
+        "jsIncludes",
+        "cssIncludes"
     ];
 
     export default {
@@ -225,6 +234,34 @@
             });
 
             this.visible = this.show;
+
+            if (this.cssIncludes) {
+                for (let ii = 0; ii < this.cssIncludes.length; ii++) {
+                    remplib.loadStyle(this.cssIncludes[ii]);
+                }
+            }
+
+            let vm = this,
+                js = this.js,
+                loadedScriptsCount = 0;
+
+            if (this.jsIncludes) {
+                for (let ii = 0; ii < this.jsIncludes.length; ii++) {
+                    if (!this.jsIncludes[ii]) {
+                        loadedScriptsCount++;
+                        continue;
+                    }
+
+                    remplib.loadScript(this.jsIncludes[ii], function () {
+                        loadedScriptsCount++;
+                        if (loadedScriptsCount === vm.jsIncludes.length) {
+                            vm.runCustomJavascript(js);
+                        }
+                    });
+                }
+            } else {
+                this.runCustomJavascript(js);
+            }
         },
         data: () => ({
             visible: false,
@@ -256,6 +293,15 @@
                 if (this.variantUuid) {
                     url += "&banner_variant=" + encodeURIComponent(this.variantUuid);
                 }
+
+                if (remplib.campaign && remplib.campaign.bannerUrlParams) {
+                    for (let param in remplib.campaign.bannerUrlParams) {
+                        if (remplib.campaign.bannerUrlParams.hasOwnProperty(param)) {
+                            url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(remplib.campaign.bannerUrlParams[param]())
+                        }
+                    }
+                }
+
                 return url;
             },
         },
@@ -331,6 +377,17 @@
                 }
                 return false;
             },
+            runCustomJavascript: function (js) {
+                this.$nextTick(() => {
+                    setTimeout(function() {
+                        try {
+                            eval('(function() {' + js + '})()');
+                        } catch {
+                            console.warn("unable to execute custom banner JS:", js);
+                        }
+                    }, 0);
+                }, this)
+            }
         }
     }
 </script>

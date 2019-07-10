@@ -11,10 +11,11 @@ class ArticleViewsSnapshot extends Model
     protected $fillable = [
         'time',
         'property_token',
-        'article_id',
+        'external_article_id',
         'derived_referer_medium',
         'explicit_referer_medium',
         'count',
+        'count_by_referer'
     ];
 
     protected $casts = [
@@ -24,9 +25,4 @@ class ArticleViewsSnapshot extends Model
     protected $dates = [
         'time',
     ];
-
-    public function article()
-    {
-        return $this->belongsTo(Article::class);
-    }
 }

@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	testAliasName = "elastic-test-alias"
+	testAliasName  = "elastic-test-alias"
+	testAliasName2 = "elastic-test-alias2"
 )
 
 func TestAliasLifecycle(t *testing.T) {
@@ -98,6 +99,53 @@ func TestAliasLifecycle(t *testing.T) {
 	}
 	if searchResult2.Hits.TotalHits != 1 {
 		t.Errorf("expected SearchResult.Hits.TotalHits = %d; got %d", 1, searchResult2.Hits.TotalHits)
+	}
+
+	// Add second index back to alias as write index
+	aliasCreate, err = client.Alias().
+		Action(NewAliasAddAction(testAliasName).Index(testIndexName).IsWriteIndex(false)).
+		Do(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !aliasCreate.Acknowledged {
+		t.Errorf("expected AliasResult.Acknowledged %v; got %v", true, aliasCreate.Acknowledged)
+	}
+	aliasCreate, err = client.Alias().
+		Action(NewAliasAddAction(testAliasName).Index(testIndexName2).IsWriteIndex(true)).
+		Do(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !aliasCreate.Acknowledged {
+		t.Errorf("expected AliasResult.Acknowledged %v; got %v", true, aliasCreate.Acknowledged)
+	}
+
+	_, err = client.Aliases().Do(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tweet4 := tweet{User: "chris", Message: "Foo bar baz."}
+	_, err = client.Index().Index(testAliasName).Type("doc").Id("4").BodyJson(&tweet4).Do(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = client.Flush().Index(testIndexName, testIndexName2).Do(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	searchResult3, err := client.Search().Index(testIndexName2).Query(NewIdsQuery("doc").Ids("4")).Do(context.TODO())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if searchResult3.Hits == nil {
+		t.Errorf("expected SearchResult.Hits != nil; got nil")
+	}
+	if searchResult3.Hits.TotalHits != 1 {
+		t.Errorf("expected SearchResult.Hits.TotalHits = %d; got %d", 1, searchResult3.Hits.TotalHits)
 	}
 }
 
@@ -196,6 +244,44 @@ func TestAliasRemoveAction(t *testing.T) {
 		{
 			Action:   NewAliasRemoveAction("alias1").Index("index1", "index2"),
 			Expected: `{"remove":{"alias":"alias1","indices":["index1","index2"]}}`,
+		},
+	}
+
+	for i, tt := range tests {
+		src, err := tt.Action.Source()
+		if err != nil {
+			if !tt.Invalid {
+				t.Errorf("#%d: expected to succeed", i)
+			}
+		} else {
+			if tt.Invalid {
+				t.Errorf("#%d: expected to fail", i)
+			} else {
+				dst, err := json.Marshal(src)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if want, have := tt.Expected, string(dst); want != have {
+					t.Errorf("#%d: expected %s, got %s", i, want, have)
+				}
+			}
+		}
+	}
+}
+
+func TestAliasRemoveIndexAction(t *testing.T) {
+	var tests = []struct {
+		Action   *AliasRemoveIndexAction
+		Expected string
+		Invalid  bool
+	}{
+		{
+			Action:  NewAliasRemoveIndexAction(""),
+			Invalid: true,
+		},
+		{
+			Action:   NewAliasRemoveIndexAction("index1"),
+			Expected: `{"remove_index":{"index":"index1"}}`,
 		},
 	}
 

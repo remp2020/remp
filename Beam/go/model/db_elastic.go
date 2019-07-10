@@ -521,7 +521,7 @@ func (eDB *ElasticDB) resolveZeroValue(index, field string) (interface{}, error)
 
 // cacheFieldMapping downloads and caches field mappings for specified index
 func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error) {
-	result, err := eDB.Client.GetMapping().Index(index).Type("_doc").Do(eDB.Context)
+	result, err := eDB.Client.GetMapping().Index(index).Do(eDB.Context)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("unable to get field mappings for index: %s", index))
 	}
@@ -534,13 +534,24 @@ func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error)
 		if !ok {
 			return fmt.Errorf("\"mappings\" field not present within field mapping response")
 		}
+
+		properties := make(map[string]interface{})
+
 		doc, ok := mappings["_doc"].(map[string]interface{})
 		if !ok {
-			return fmt.Errorf("invalid document provided, no mapping data available for document: _doc")
+			// elastic v7 removes the types and skips _doc level of nesting; this is temporary to maintain both 6.* and 7.* compatibility
+			properties, ok = mappings["properties"].(map[string]interface{})
+			if !ok {
+				return fmt.Errorf("invalid document provided, no mapping data available for document: _doc")
+			}
 		}
-		properties, ok := doc["properties"].(map[string]interface{})
-		if !ok {
-			return fmt.Errorf("\"properties\" field not present within field mapping response for document: _doc")
+
+		if properties == nil {
+			// this handles properties extraction out of _doc document type in Elastic 6.*
+			properties, ok = doc["properties"].(map[string]interface{})
+			if !ok {
+				return fmt.Errorf("\"properties\" field not present within field mapping response for document: _doc")
+			}
 		}
 
 		for f, rawField := range properties {

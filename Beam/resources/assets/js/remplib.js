@@ -27,6 +27,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             locked: null,
             tags: [],
             variants: {},
+            elementFn: function() { return null },
         },
 
         explicitRefererMedium: null,
@@ -86,31 +87,31 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 remplib.browserId = config.browser;
             }
 
-            if (typeof config.tracker.article === 'object') {
-                if (typeof config.tracker.article.id === 'undefined' || config.tracker.article.id === null) {
-                    throw "remplib: configuration tracker.article.id invalid or missing: " + config.tracker.article.id
+            if (typeof config.article === 'object') {
+                if (typeof config.article.id === 'undefined' || config.article.id === null) {
+                    throw "remplib: configuration tracker.article.id invalid or missing: " + config.article.id
                 }
-                this.article.id = config.tracker.article.id;
-                if (typeof config.tracker.article.campaign_id !== 'undefined') {
-                    this.article.campaign_id = config.tracker.article.campaign_id;
+                this.article.id = config.article.id;
+                if (typeof config.article.campaign_id !== 'undefined') {
+                    this.article.campaign_id = config.article.campaign_id;
                 }
-                if (typeof config.tracker.article.author_id !== 'undefined') {
-                    this.article.author_id = config.tracker.article.author_id;
+                if (typeof config.article.author_id !== 'undefined') {
+                    this.article.author_id = config.article.author_id;
                 }
-                if (typeof config.tracker.article.category !== 'undefined') {
-                    this.article.category = config.tracker.article.category;
+                if (typeof config.article.category !== 'undefined') {
+                    this.article.category = config.article.category;
                 }
-                if (config.tracker.article.tags instanceof Array) {
-                    this.article.tags = config.tracker.article.tags;
+                if (config.article.tags instanceof Array) {
+                    this.article.tags = config.article.tags;
                 }
-                if (typeof config.tracker.article.variants !== 'undefined') {
-                    this.article.variants = config.tracker.article.variants;
+                if (typeof config.article.variants !== 'undefined') {
+                    this.article.variants = config.article.variants;
                 }
-                if (typeof config.tracker.article.locked !== 'undefined') {
-                    this.article.locked = config.tracker.article.locked;
+                if (typeof config.article.locked !== 'undefined') {
+                    this.article.locked = config.article.locked;
                 }
-                if (typeof config.articleElementFn !== 'undefined') {
-                    remplib.articleElementFn = config.articleElementFn
+                if (typeof config.article.elementFn !== 'undefined') {
+                    this.article.elementFn = config.article.elementFn
                 }
             } else {
                 this.article = null;
@@ -387,6 +388,26 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.dispatchEvent("commerce", "checkout", params);
         },
 
+        trackCheckoutWithSource: function(funnelId, article, source)
+        {
+            let params = {
+                "step": "checkout",
+                "article": article,
+                "checkout": {
+                    "funnel_id": funnelId
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4(),
+            };
+
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "checkout", params);
+        },
+
         trackPayment: function(transactionId, amount, currency, productIds) {
             var params = {
                 "step": "payment",
@@ -402,6 +423,30 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "payment", params);
+        },
+
+        trackPaymentWithSource: function(transactionId, amount, currency, productIds, article, source) {
+            let params = {
+                "step": "purchase",
+                "article": article,
+                "purchase": {
+                    "transaction_id": transactionId,
+                    "revenue": {
+                        "amount": amount,
+                        "currency": currency
+                    },
+                    "product_ids": productIds
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4(),
+            };
+
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "payment", params);
         },
@@ -425,6 +470,30 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.dispatchEvent("commerce", "purchase", params);
         },
 
+        trackPurchaseWithSource: function(transactionId, amount, currency, productIds, article, source) {
+            let params = {
+                "step": "purchase",
+                "article": article,
+                "purchase": {
+                    "transaction_id": transactionId,
+                    "revenue": {
+                        "amount": amount,
+                        "currency": currency
+                    },
+                    "product_ids": productIds
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4(),
+            };
+
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "purchase", params);
+        },
+
         trackRefund: function(transactionId, amount, currency, productIds) {
             var params = {
                 "step": "refund",
@@ -440,6 +509,29 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "remp_commerce_id": remplib.uuidv4(),
             };
             params = this.addSystemUserParams(params);
+            this.post(this.url + "/track/commerce", params);
+            this.dispatchEvent("commerce", "refund", params);
+        },
+
+        trackRefundWithSource: function(transactionId, amount, currency, productIds, article, source) {
+            let params = {
+                "step": "refund",
+                "article": article,
+                "refund": {
+                    "transaction_id": transactionId,
+                    "revenue": {
+                        "amount": amount,
+                        "currency": currency
+                    },
+                    "product_ids": productIds
+                },
+                "user": {
+                    "source": source
+                },
+                "remp_commerce_id": remplib.uuidv4()
+            };
+            params = this.addSystemUserParams(params);
+            params["user"]["source"] = source;
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "refund", params);
         },
@@ -668,12 +760,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         scrollProgressEvent: throttle(function() {
-            const article = remplib.articleElementFn(),
-                payload = {pageScrollRatio: remplib.tracker.pageProgress(), timestamp: new Date()};
+            const payload = {
+                pageScrollRatio: remplib.tracker.pageProgress(),
+                timestamp: new Date(),
+            };
 
-            if (article) {
+            if (remplib.tracker.article) {
+                const article = remplib.tracker.article.elementFn();
                 const root = remplib.tracker.getRootElement();
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
                 payload.articleScrollRatio = Math.min(1, Math.max(0,
                     (scrollTop + root.clientHeight - remplib.tracker.getElementOffsetTop(article)) / article.scrollHeight
                 ));

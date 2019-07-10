@@ -43,8 +43,11 @@ func TestPercentilesAggregationWithCustomPercents(t *testing.T) {
 	}
 }
 
-func TestPercentilesAggregationWithFormat(t *testing.T) {
-	agg := NewPercentilesAggregation().Field("price").Format("00000.00")
+func TestPercentilesAggregationWithOptions(t *testing.T) {
+	agg := NewPercentilesAggregation().
+		Field("price").
+		Format("00000.00").
+		Missing(1.2)
 	src, err := agg.Source()
 	if err != nil {
 		t.Fatal(err)
@@ -54,7 +57,7 @@ func TestPercentilesAggregationWithFormat(t *testing.T) {
 		t.Fatalf("marshaling to JSON failed: %v", err)
 	}
 	got := string(data)
-	expected := `{"percentiles":{"field":"price","format":"00000.00"}}`
+	expected := `{"percentiles":{"field":"price","format":"00000.00","missing":1.2}}`
 	if got != expected {
 		t.Errorf("expected\n%s\n,got:\n%s", expected, got)
 	}
@@ -72,6 +75,44 @@ func TestPercentilesAggregationWithMetaData(t *testing.T) {
 	}
 	got := string(data)
 	expected := `{"meta":{"name":"Oliver"},"percentiles":{"field":"price"}}`
+	if got != expected {
+		t.Errorf("expected\n%s\n,got:\n%s", expected, got)
+	}
+}
+
+func TestPercentilesAggregationWithCompression(t *testing.T) {
+	agg := NewPercentilesAggregation().Field("load_time").Compression(200.0)
+	src, err := agg.Source()
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := json.Marshal(src)
+	if err != nil {
+		t.Fatalf("marshaling to JSON failed: %v", err)
+	}
+	got := string(data)
+	expected := `{"percentiles":{"field":"load_time","tdigest":{"compression":200}}}`
+	if got != expected {
+		t.Errorf("expected\n%s\n,got:\n%s", expected, got)
+	}
+}
+
+func TestPercentilesAggregationWithNumberOfSignificantValueDigits(t *testing.T) {
+	agg := NewPercentilesAggregation().
+		Field("load_time").
+		Percentiles(95, 99, 99.9).
+		Method("hdr").
+		NumberOfSignificantValueDigits(5)
+	src, err := agg.Source()
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := json.Marshal(src)
+	if err != nil {
+		t.Fatalf("marshaling to JSON failed: %v", err)
+	}
+	got := string(data)
+	expected := `{"percentiles":{"field":"load_time","hdr":{"number_of_significant_value_digits":5},"percents":[95,99,99.9]}}`
 	if got != expected {
 		t.Errorf("expected\n%s\n,got:\n%s", expected, got)
 	}

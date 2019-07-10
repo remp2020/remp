@@ -13,11 +13,13 @@ import (
 	"github.com/olivere/elastic/uritemplates"
 )
 
-// AliasesService returns the aliases associated with one or more indices.
-// See http://www.elastic.co/guide/en/elasticsearch/reference/5.2/indices-aliases.html.
+// AliasesService returns the aliases associated with one or more indices, or the
+// indices associated with one or more aliases, or a combination of those filters.
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-aliases.html.
 type AliasesService struct {
 	client *Client
 	index  []string
+	alias  []string
 	pretty bool
 }
 
@@ -41,21 +43,31 @@ func (s *AliasesService) Index(index ...string) *AliasesService {
 	return s
 }
 
+// Alias adds one or more aliases.
+func (s *AliasesService) Alias(alias ...string) *AliasesService {
+	s.alias = append(s.alias, alias...)
+	return s
+}
+
 // buildURL builds the URL for the operation.
 func (s *AliasesService) buildURL() (string, url.Values, error) {
 	var err error
 	var path string
 
 	if len(s.index) > 0 {
-		path, err = uritemplates.Expand("/{index}/_alias", map[string]string{
+		path, err = uritemplates.Expand("/{index}/_alias/{alias}", map[string]string{
 			"index": strings.Join(s.index, ","),
+			"alias": strings.Join(s.alias, ","),
 		})
 	} else {
-		path = "/_alias"
+		path, err = uritemplates.Expand("/_alias/{alias}", map[string]string{
+			"alias": strings.Join(s.alias, ","),
+		})
 	}
 	if err != nil {
 		return "", url.Values{}, err
 	}
+	path = strings.TrimSuffix(path, "/")
 
 	// Add query string parameters
 	params := url.Values{}
@@ -92,7 +104,11 @@ func (s *AliasesService) Do(ctx context.Context) (*AliasesResult, error) {
 	//     ...
 	//   },
 	// }
-	indexMap := make(map[string]interface{})
+	indexMap := make(map[string]struct {
+		Aliases map[string]struct {
+			IsWriteIndex bool `json:"is_write_index"`
+		} `json:"aliases"`
+	})
 	if err := s.client.decoder.Decode(res.Body, &indexMap); err != nil {
 		return nil, err
 	}
@@ -102,21 +118,19 @@ func (s *AliasesService) Do(ctx context.Context) (*AliasesResult, error) {
 		Indices: make(map[string]indexResult),
 	}
 	for indexName, indexData := range indexMap {
+		if indexData.Aliases == nil {
+			continue
+		}
+
 		indexOut, found := ret.Indices[indexName]
 		if !found {
 			indexOut = indexResult{Aliases: make([]aliasResult, 0)}
 		}
 
 		// { "aliases" : { ... } }
-		indexDataMap, ok := indexData.(map[string]interface{})
-		if ok {
-			aliasesData, ok := indexDataMap["aliases"].(map[string]interface{})
-			if ok {
-				for aliasName, _ := range aliasesData {
-					aliasRes := aliasResult{AliasName: aliasName}
-					indexOut.Aliases = append(indexOut.Aliases, aliasRes)
-				}
-			}
+		for aliasName, aliasData := range indexData.Aliases {
+			aliasRes := aliasResult{AliasName: aliasName, IsWriteIndex: aliasData.IsWriteIndex}
+			indexOut.Aliases = append(indexOut.Aliases, aliasRes)
 		}
 
 		ret.Indices[indexName] = indexOut
@@ -127,6 +141,7 @@ func (s *AliasesService) Do(ctx context.Context) (*AliasesResult, error) {
 
 // -- Result of an alias request.
 
+// AliasesResult is the outcome of calling AliasesService.Do.
 type AliasesResult struct {
 	Indices map[string]indexResult
 }
@@ -136,9 +151,11 @@ type indexResult struct {
 }
 
 type aliasResult struct {
-	AliasName string
+	AliasName    string
+	IsWriteIndex bool
 }
 
+// IndicesByAlias returns all indices given a specific alias name.
 func (ar AliasesResult) IndicesByAlias(aliasName string) []string {
 	var indices []string
 	for indexName, indexInfo := range ar.Indices {
@@ -151,6 +168,7 @@ func (ar AliasesResult) IndicesByAlias(aliasName string) []string {
 	return indices
 }
 
+// HasAlias returns true if the index has a specific alias.
 func (ir indexResult) HasAlias(aliasName string) bool {
 	for _, alias := range ir.Aliases {
 		if alias.AliasName == aliasName {
