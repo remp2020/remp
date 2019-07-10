@@ -13,20 +13,7 @@ class JournalInterval
     public $intervalText;
     public $intervalMinutes;
 
-    public function __construct(Carbon $timeAfter, Carbon $timeBefore, string $intervalText, int $intervalMinutes)
-    {
-        $this->timeBefore = $timeBefore;
-        $this->timeAfter = $timeAfter;
-        $this->intervalText = $intervalText;
-        $this->intervalMinutes = $intervalMinutes;
-    }
-
-    public static function for(\DateTimeZone $tz, string $interval, array $allowedIntervals = null): JournalInterval
-    {
-        return self::forArticle($tz, $interval, null, $allowedIntervals);
-    }
-
-    public static function forArticle(\DateTimeZone $tz, string $interval, Article $article = null, array $allowedIntervals = null): JournalInterval
+    public function __construct(\DateTimeZone $tz, string $interval, Article $article = null, array $allowedIntervals = null)
     {
         if ($allowedIntervals && !in_array($interval, $allowedIntervals)) {
             throw new InvalidArgumentException("Parameter 'interval' must be one of the [" . implode(',', $allowedIntervals) . "] values, instead '$interval' provided");
@@ -34,37 +21,33 @@ class JournalInterval
 
         switch ($interval) {
             case 'today':
-                return new JournalInterval(
-                    Carbon::today($tz),
-                    Carbon::now($tz),
-                    '20m',
-                    20
-                );
+                $this->timeAfter = Carbon::today($tz);
+                $this->timeBefore = Carbon::now($tz);
+                $this->intervalText = '20m';
+                $this->intervalMinutes = 20;
+                break;
             case '7days':
-                return new JournalInterval(
-                    Carbon::today($tz)->subDays(6),
-                    Carbon::now($tz),
-                    '1h',
-                    60
-                );
+                $this->timeAfter = Carbon::today($tz)->subDays(6);
+                $this->timeBefore = Carbon::now($tz);
+                $this->intervalText = '1h';
+                $this->intervalMinutes = 60;
+                break;
             case '30days':
-                return new JournalInterval(
-                    Carbon::today($tz)->subDays(29),
-                    Carbon::now($tz),
-                    '2h',
-                    120
-                );
+                $this->timeAfter = Carbon::today($tz)->subDays(29);
+                $this->timeBefore = Carbon::now($tz);
+                $this->intervalText = '2h';
+                $this->intervalMinutes = 120;
+                break;
             case 'all':
                 if (!$article) {
                     throw new InvalidArgumentException("Missing article for 'all' option");
                 }
                 [$intervalText, $intervalMinutes] = self::getIntervalDependingOnArticlePublishedDate($article);
-                return new JournalInterval(
-                    (clone $article->published_at)->tz($tz),
-                    Carbon::now($tz),
-                    $intervalText,
-                    $intervalMinutes
-                );
+                $this->timeAfter = (clone $article->published_at)->tz($tz);
+                $this->timeBefore = Carbon::now($tz);
+                $this->intervalText = $intervalText;
+                $this->intervalMinutes = $intervalMinutes;
+                break;
             default:
                 throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days,all] values, instead '$interval' provided");
         }

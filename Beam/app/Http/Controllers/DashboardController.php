@@ -88,7 +88,7 @@ class DashboardController extends Controller
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $interval = $request->get('interval');
-        $journalInterval = JournalInterval::for($tz, $interval, ['today', '7days', '30days']);
+        $journalInterval = new JournalInterval($tz, $interval, null, ['today', '7days', '30days']);
 
         $from = $journalInterval->timeAfter->tz('UTC');
         $to = $journalInterval->timeBefore->tz('UTC');
