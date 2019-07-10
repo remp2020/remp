@@ -535,7 +535,7 @@ func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error)
 			return fmt.Errorf("\"mappings\" field not present within field mapping response")
 		}
 
-		properties := make(map[string]interface{})
+		var properties map[string]interface{}
 
 		doc, ok := mappings["_doc"].(map[string]interface{})
 		if !ok {
