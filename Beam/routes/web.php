@@ -19,7 +19,7 @@ Route::middleware('auth.basic.dashboard')->group(function () {
     Route::get('public', 'DashboardController@public')->name('dashboard.public');
     Route::post('public/articlesJson', 'DashboardController@mostReadArticles')->name('public.articles.json');
     Route::post('public/timeHistogramJson', 'DashboardController@timeHistogram')->name('public.timeHistogram.json');
-    Route::post('public/timeHistogramNewJson', 'DashboardController@timeHistogramNew')->name('dashboard.timeHistogramNew.json');
+    Route::post('public/timeHistogramNewJson', 'DashboardController@timeHistogramNew')->name('public.timeHistogramNew.json');
 });
 
 Route::middleware('auth.jwt')->group(function () {
