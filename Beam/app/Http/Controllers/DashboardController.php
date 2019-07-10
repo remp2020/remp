@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
+use App\Helpers\Journal\JournalInterval;
 use App\Model\Config;
 use App\Model\DashboardConfig;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
@@ -72,6 +74,185 @@ class DashboardController extends Controller
             default:
                 throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days] values, instead '$interval' provided");
         }
+    }
+
+    public function timeHistogramNew(Request $request)
+    {
+        $request->validate([
+            'tz' => 'timezone',
+            'interval' => 'required|in:today,7days,30days',
+            'settings.compareWith' => 'required|in:last_week,average'
+        ]);
+
+        $settings = $request->get('settings');
+
+        $tz = new \DateTimeZone($request->get('tz', 'UTC'));
+        $interval = $request->get('interval');
+        $journalInterval = new JournalInterval($tz, $interval, null, ['today', '7days', '30days']);
+
+        $from = $journalInterval->timeAfter->tz('UTC');
+        $to = $journalInterval->timeBefore->tz('UTC');
+        $intervalMinutes = $journalInterval->intervalMinutes;
+
+        $timePoints = $this->timePoints($from, $to, $intervalMinutes, true);
+        $currentData = $this->dataFor($timePoints);
+
+        $tags = [];
+        foreach ($currentData as $item) {
+            $tags[$item->derived_referer_medium] = true;
+        }
+
+        // Compute shadow values for today and 7-days intervals
+        $shadowRecords = [];
+        if ($interval !== '30days') {
+            $numberOfAveragedWeeks = $settings['compareWith'] === 'average' ? 4 : 1;
+
+            for ($i = 1; $i <= $numberOfAveragedWeeks; $i++) {
+                $shadowFrom = (clone $from)->subWeeks($i);
+                $shadowTo = (clone $to)->subWeeks($i);
+
+                // If there was a time shift, remember time needs to be adjusted by the timezone difference
+                $diff = $shadowFrom->tz('utc')->diff($from->tz('utc'));
+                $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
+
+                $timePoints = $this->timePoints($shadowFrom, $shadowTo, $intervalMinutes);
+                foreach ($this->dataFor($timePoints) as $item) {
+                    // we want to plot previous results on same points as current ones,
+                    // therefore add week which was subtracted when data was queried
+                    $correctedDate = Carbon::parse($item->time)
+                        ->addWeeks($i)
+                        ->addHours($hourDifference)
+                        ->toIso8601ZuluString();
+
+                    $currentTag = $item->derived_referer_medium;
+                    $tags[$currentTag] = true;
+
+                    if (!array_key_exists($correctedDate, $shadowRecords)) {
+                        $shadowRecords[$correctedDate] = [];
+                    }
+                    if (!array_key_exists($currentTag, $shadowRecords[$correctedDate])) {
+                        $shadowRecords[$correctedDate][$currentTag] = collect();
+                    }
+                    $shadowRecords[$correctedDate][$currentTag]->push($item->count);
+                }
+            }
+        }
+
+        // Get tags
+        $tags = array_keys($tags);
+        $emptyValues = [];
+        foreach ($tags as $tag) {
+            $emptyValues[$tag] = 0;
+        }
+
+        // Start building results
+        $results = [];
+        $shadowResults = [];
+        $shadowResultsSummed = [];
+
+        // Save current results
+        foreach ($currentData as $item) {
+            $zuluTime = Carbon::parse($item->time)->toIso8601ZuluString();
+            if (!array_key_exists($zuluTime, $results)) {
+                $results[$zuluTime] = array_merge($emptyValues, ['Date' => $zuluTime]);
+            }
+            $results[$zuluTime][$item->derived_referer_medium] = $item->count;
+        }
+
+        // Fill empty records for shadow values first
+        if (count($shadowRecords) > 0) {
+            $timeIterator = JournalHelpers::getTimeIterator($from, $intervalMinutes);
+            while ($timeIterator->lessThan($to)) {
+                $zuluDate = $timeIterator->toIso8601ZuluString();
+
+                $shadowResults[$zuluDate] = $emptyValues;
+                $shadowResults[$zuluDate]['Date'] = $shadowResultsSummed[$zuluDate]['Date'] = $zuluDate;
+                $shadowResultsSummed[$zuluDate]['value'] = 0;
+
+                $timeIterator->addMinutes($intervalMinutes);
+            }
+        }
+
+        // Save shadow results
+        foreach ($shadowRecords as $date => $tagsAndValues) {
+            // check if all keys exists - e.g. some days might be longer (time-shift)
+            // therefore we do want to map all values to current week
+            if (!array_key_exists($date, $shadowResults)) {
+                continue;
+            }
+
+            foreach ($tagsAndValues as $tag => $values) {
+                $avg = (int) round($values->avg());
+                $shadowResults[$date][$tag] = $avg;
+                $shadowResultsSummed[$date]['value'] += $avg;
+            }
+        }
+
+        return response()->json([
+            'results' => array_values($results),
+            'intervalMinutes' => $intervalMinutes,
+            'previousResults' => array_values($shadowResults),
+            'previousResultsSummed' => array_values($shadowResultsSummed),
+            'tags' => $tags,
+            'colors' => Colors::refererMediumTagsToColors($tags)
+        ]);
+    }
+
+    private function dataFor(array $timePoints)
+    {
+        return DB::table('article_views_snapshots')
+            ->select('article_views_snapshots.time', 'derived_referer_medium', DB::raw('sum(count) as count'))
+            ->whereIn('time', $timePoints)
+            ->groupBy(['article_views_snapshots.time', 'derived_referer_medium'])
+            // TODO: add grouping by 'explicit_referer_medium'
+            ->get();
+    }
+
+    private function timePoints(Carbon $from, Carbon $to, int $intervalMinutes, bool $addLastMinute = false): array
+    {
+        $timeRecords = DB::table('article_views_snapshots')
+            ->select('time')
+            ->whereBetween('time', [$from, $to])
+            ->groupBy('time')
+            ->get()
+            ->map(function ($item) {
+                return Carbon::parse($item->time);
+            })->toArray();
+
+        $timeIterator = clone $from;
+
+        $points = [];
+        $i = 0;
+
+        // Computes lowest time point (present in DB) per each $intervalMinutes window, starting from $from
+        $lastPoint = null;
+        while ($timeIterator->lte($to)) {
+            $upperLimit = (clone $timeIterator)->addMinutes($intervalMinutes - 1);
+            $timeIteratorString = $timeIterator->toIso8601ZuluString();
+
+            while ($i < count($timeRecords)) {
+                if (array_key_exists($timeIteratorString, $points)) {
+                    break;
+                }
+
+                if ($timeRecords[$i]->between($timeIterator, $upperLimit)) {
+                    $points[$timeIteratorString] = $timeRecords[$i];
+                    $lastPoint = $timeRecords[$i];
+                }
+
+                $i++;
+            }
+
+            $timeIterator->addMinutes($intervalMinutes);
+        }
+
+        if ($addLastMinute && $lastPoint) {
+            if ($timeRecords[count($timeRecords) - 1]->gt($lastPoint)) {
+                $points[] = $timeRecords[count($timeRecords) - 1];
+            }
+        }
+
+        return array_values($points);
     }
 
     public function timeHistogram(Request $request)
@@ -224,7 +405,6 @@ class DashboardController extends Controller
         } else {
             $results = collect(array_values($results))->take($numberOfCurrentValues);
         }
-
 
         return response()->json([
             'intervalMinutes' => $intervalMinutes,

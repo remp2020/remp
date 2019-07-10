@@ -5,12 +5,13 @@
 @section('content')
     <div id="dashboard">
         <div class="c-header">
-            <h2>Live BEAM Dashboard</h2>
+            <h2>Live Dashboard</h2>
         </div>
 
         <dashboard-root
                 :articles-url="articlesUrl"
                 :time-histogram-url="timeHistogramUrl"
+                :time-histogram-url-new="timeHistogramUrlNew"
                 :options="options">
         </dashboard-root>
     </div>
@@ -30,6 +31,7 @@
             data: {
                 articlesUrl: "{!! route('dashboard.articles.json') !!}",
                 timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}",
+                timeHistogramUrlNew: "{!! route('dashboard.timeHistogramNew.json') !!}",
                 enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }},
                 options: {!! json_encode($options) !!}
             }

@@ -34,7 +34,9 @@
                 <div id="legend-wrapper">
                     <div v-if="highlightedRow" v-show="legendVisible" v-bind:style="{ left: legendLeft }" id="article-graph-legend">
 
-                        <div class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
+                        <div v-if="settings.newGraph" class="legend-title">{{highlightedRow.startDate | filterLegendTitle}}</div>
+                        <div v-else class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
+
                         <table>
                             <tr>
                                 <th></th>
@@ -133,6 +135,10 @@
             type: String,
             required: true
         },
+        urlNew: {
+            type: String,
+            required: true
+        },
         concurrents: {
             type: Number,
             required: true
@@ -192,6 +198,11 @@
             window.addEventListener('resize', debounce((e) => {
                 this.fillData()
             }, 100));
+        },
+        filters: {
+            filterLegendTitle(value) {
+                return moment(value).format('lll')
+            }
         },
         methods: {
             reload() {
@@ -476,7 +487,7 @@
             loadData() {
                 this.loading = true
                 axios
-                    .post(this.url, {
+                    .post(this.settings.newGraph ? this.urlNew : this.url, {
                         tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
                         interval: this.interval,
                         settings: this.settings

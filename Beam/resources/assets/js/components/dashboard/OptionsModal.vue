@@ -46,6 +46,17 @@
                                     </label>
                                 </div>
 
+                                <div class="checkbox m-b-15">
+                                    <label>
+                                        <input v-model="newGraph"
+                                               type="checkbox">
+                                        <i class="input-helper"></i>
+                                        <template>
+                                            Point graph [EXPERIMENTAL]
+                                        </template>
+                                    </label>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -85,6 +96,7 @@
         inject: ['enableFrontpageFiltering'],
         data() {
             return {
+                newGraph: this.$store.state.settings.newGraph,
                 compareWith: this.$store.state.settings.compareWith,
                 onlyTrafficFromFrontPage: this.$store.state.settings.onlyTrafficFromFrontPage,
             }
@@ -93,6 +105,7 @@
             save() {
                 this.$store.commit('changeSettings', {
                     compareWith: this.compareWith,
+                    newGraph: this.newGraph,
                     onlyTrafficFromFrontPage: this.onlyTrafficFromFrontPage
                 })
                 this.$emit('close')

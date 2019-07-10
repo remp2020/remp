@@ -3,6 +3,7 @@
         <div class="card-body">
             <time-histogram ref="histogram"
                             :url="timeHistogramUrl"
+                            :url-new="timeHistogramUrlNew"
                             :concurrents="totalConcurrents">
             </time-histogram>
 
@@ -163,6 +164,12 @@
             required: true
         },
         timeHistogramUrl: {
+            type: String,
+            required: true
+        },
+        // Just for testing of new graph
+        // TODO remove once testing is done
+        timeHistogramUrlNew: {
             type: String,
             required: true
         },
