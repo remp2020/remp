@@ -43,6 +43,7 @@ class ProcessJobStatsCommand extends Command
         $batchTemplates = $this->batchTemplatesRepository->getTable()->fetchAll();
         if (!count($batchTemplates)) {
             $output->writeln('<info>Nothing to do, exiting.</info>');
+            return;
         }
 
         ProgressBar::setFormatDefinition(
