@@ -1,0 +1,6 @@
+# Ignore executable
+cellar
+goa-cellar
+goa-cellar.json
+.vscode/
+tool/cellar-cli/cellar-cli

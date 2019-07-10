@@ -1,0 +1,13 @@
+runtime: go
+api_version: go1
+vm: true
+
+beta_settings:
+  # Enable Google Cloud Endpoints API management.
+  use_endpoints_api_management: true
+  # Specify the Swagger API specification.
+  endpoints_swagger_spec_file: public/swagger/swagger.yaml
+
+handlers:
+- url: /.*
+  script: _go_app

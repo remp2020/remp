@@ -1,0 +1,872 @@
+consumes:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+definitions:
+  Account:
+    description: A tenant account (default view)
+    example:
+      created_at: 2015-09-23T18:51:57Z
+      created_by: me@goa.design
+      href: /accounts/1
+      id: 1
+      name: test
+    properties:
+      created_at:
+        description: Date of creation
+        example: 2015-09-23T18:51:57Z
+        format: date-time
+        type: string
+      created_by:
+        description: Email of account owner
+        example: me@goa.design
+        format: email
+        type: string
+      href:
+        description: API href of account
+        example: /accounts/1
+        type: string
+      id:
+        description: ID of account
+        example: 1
+        format: int64
+        type: integer
+      name:
+        description: Name of account
+        example: test
+        type: string
+    required:
+    - id
+    - href
+    - name
+    - created_at
+    - created_by
+    title: 'Mediatype identifier: application/vnd.account+json; view=default'
+    type: object
+  AccountCollection:
+    description: AccountCollection is the media type for an array of Account (default
+      view)
+    example:
+    - created_at: 2015-09-23T18:51:57Z
+      created_by: me@goa.design
+      href: /accounts/1
+      id: 1
+      name: test
+    - created_at: 2015-09-23T18:51:57Z
+      created_by: me@goa.design
+      href: /accounts/1
+      id: 1
+      name: test
+    items:
+      $ref: '#/definitions/Account'
+    title: 'Mediatype identifier: application/vnd.account+json; type=collection; view=default'
+    type: array
+  AccountLink:
+    description: A tenant account (link view)
+    example:
+      href: /accounts/1
+      id: 1
+    properties:
+      href:
+        description: API href of account
+        example: /accounts/1
+        type: string
+      id:
+        description: ID of account
+        example: 1
+        format: int64
+        type: integer
+    required:
+    - id
+    - href
+    title: 'Mediatype identifier: application/vnd.account+json; view=link'
+    type: object
+  AccountTiny:
+    description: A tenant account (tiny view)
+    example:
+      href: /accounts/1
+      id: 1
+      name: test
+    properties:
+      href:
+        description: API href of account
+        example: /accounts/1
+        type: string
+      id:
+        description: ID of account
+        example: 1
+        format: int64
+        type: integer
+      name:
+        description: Name of account
+        example: test
+        type: string
+    required:
+    - id
+    - href
+    - name
+    title: 'Mediatype identifier: application/vnd.account+json; view=tiny'
+    type: object
+  Bottle:
+    description: A bottle of wine (default view)
+    example:
+      account:
+        href: /accounts/1
+        id: 1
+        name: test
+      href: /accounts/1/bottles/1
+      id: 1
+      links:
+        account:
+          href: /accounts/1
+          id: 1
+      name: Number 8
+      rating: 3
+      varietal: Merlot
+      vineyard: Asti
+      vintage: 2012
+    properties:
+      account:
+        $ref: '#/definitions/AccountTiny'
+      href:
+        description: API href of bottle
+        example: /accounts/1/bottles/1
+        type: string
+      id:
+        description: ID of bottle
+        example: 1
+        format: int64
+        type: integer
+      links:
+        $ref: '#/definitions/BottleLinks'
+      name:
+        example: Number 8
+        minLength: 2
+        type: string
+      rating:
+        description: Rating of bottle between 1 and 5
+        example: 3
+        maximum: 5
+        minimum: 1
+        type: integer
+      varietal:
+        example: Merlot
+        minLength: 4
+        type: string
+      vineyard:
+        example: Asti
+        minLength: 2
+        type: string
+      vintage:
+        example: 2012
+        maximum: 2020
+        minimum: 1900
+        type: integer
+    required:
+    - id
+    - href
+    - name
+    - vineyard
+    - varietal
+    - vintage
+    title: 'Mediatype identifier: application/vnd.bottle+json; view=default'
+    type: object
+  BottleCollection:
+    description: BottleCollection is the media type for an array of Bottle (default
+      view)
+    example:
+    - account:
+        href: /accounts/1
+        id: 1
+        name: test
+      href: /accounts/1/bottles/1
+      id: 1
+      links:
+        account:
+          href: /accounts/1
+          id: 1
+      name: Number 8
+      rating: 3
+      varietal: Merlot
+      vineyard: Asti
+      vintage: 2012
+    - account:
+        href: /accounts/1
+        id: 1
+        name: test
+      href: /accounts/1/bottles/1
+      id: 1
+      links:
+        account:
+          href: /accounts/1
+          id: 1
+      name: Number 8
+      rating: 3
+      varietal: Merlot
+      vineyard: Asti
+      vintage: 2012
+    items:
+      $ref: '#/definitions/Bottle'
+    title: 'Mediatype identifier: application/vnd.bottle+json; type=collection; view=default'
+    type: array
+  BottleLinks:
+    description: BottleLinks contains links to related resources of Bottle.
+    example:
+      account:
+        href: /accounts/1
+        id: 1
+    properties:
+      account:
+        $ref: '#/definitions/AccountLink'
+    title: BottleLinks
+    type: object
+  BottlePayload:
+    example:
+      color: white
+      country: USA
+      name: Number 8
+      region: Napa Valley
+      review: Great and inexpensive
+      sweetness: 1
+      varietal: Merlot
+      vineyard: Asti
+      vintage: 2012
+    properties:
+      color:
+        enum:
+        - red
+        - white
+        - rose
+        - yellow
+        - sparkling
+        example: white
+        type: string
+      country:
+        example: USA
+        minLength: 2
+        type: string
+      name:
+        example: Number 8
+        minLength: 2
+        type: string
+      region:
+        example: Napa Valley
+        type: string
+      review:
+        example: Great and inexpensive
+        maxLength: 300
+        minLength: 3
+        type: string
+      sweetness:
+        example: 1
+        maximum: 5
+        minimum: 1
+        type: integer
+      varietal:
+        example: Merlot
+        minLength: 4
+        type: string
+      vineyard:
+        example: Asti
+        minLength: 2
+        type: string
+      vintage:
+        example: 2012
+        maximum: 2020
+        minimum: 1900
+        type: integer
+    title: BottlePayload
+    type: object
+  CreateAccountPayload:
+    example:
+      name: test
+    properties:
+      name:
+        description: Name of account
+        example: test
+        type: string
+    required:
+    - name
+    title: CreateAccountPayload
+    type: object
+  CreateBottlePayload:
+    example:
+      color: white
+      country: USA
+      name: Number 8
+      region: Napa Valley
+      review: Great and inexpensive
+      sweetness: 1
+      varietal: Merlot
+      vineyard: Asti
+      vintage: 2012
+    properties:
+      color:
+        enum:
+        - red
+        - white
+        - rose
+        - yellow
+        - sparkling
+        example: white
+        type: string
+      country:
+        example: USA
+        minLength: 2
+        type: string
+      name:
+        example: Number 8
+        minLength: 2
+        type: string
+      region:
+        example: Napa Valley
+        type: string
+      review:
+        example: Great and inexpensive
+        maxLength: 300
+        minLength: 3
+        type: string
+      sweetness:
+        example: 1
+        maximum: 5
+        minimum: 1
+        type: integer
+      varietal:
+        example: Merlot
+        minLength: 4
+        type: string
+      vineyard:
+        example: Asti
+        minLength: 2
+        type: string
+      vintage:
+        example: 2012
+        maximum: 2020
+        minimum: 1900
+        type: integer
+    required:
+    - name
+    - vineyard
+    - varietal
+    - vintage
+    - color
+    title: CreateBottlePayload
+    type: object
+  RateBottlePayload:
+    example:
+      rating: 3
+    properties:
+      rating:
+        description: Rating of bottle between 1 and 5
+        example: 3
+        maximum: 5
+        minimum: 1
+        type: integer
+    required:
+    - rating
+    title: RateBottlePayload
+    type: object
+  UpdateAccountPayload:
+    example:
+      name: test
+    properties:
+      name:
+        description: Name of account
+        example: test
+        type: string
+    required:
+    - name
+    title: UpdateAccountPayload
+    type: object
+  error:
+    description: Error response media type (default view)
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: 3F1FKVRR
+      meta:
+        timestamp: 1.458609e+09
+      status: "400"
+    properties:
+      code:
+        description: an application-specific error code, expressed as a string value.
+        example: invalid_value
+        type: string
+      detail:
+        description: a human-readable explanation specific to this occurrence of the
+          problem.
+        example: Value of ID must be an integer
+        type: string
+      id:
+        description: a unique identifier for this particular occurrence of the problem.
+        example: 3F1FKVRR
+        type: string
+      meta:
+        additionalProperties: true
+        description: a meta object containing non-standard meta-information about
+          the error.
+        example:
+          timestamp: 1.458609e+09
+        type: object
+      status:
+        description: the HTTP status code applicable to this problem, expressed as
+          a string value.
+        example: "400"
+        type: string
+    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    type: object
+externalDocs:
+  description: goa guide
+  url: http://goa.design/getting-started.html
+host: localhost:8081
+info:
+  contact:
+    email: admin@goa.design
+    name: goa team
+    url: http://goa.design
+  description: A basic example of a CRUD API implemented with goa
+  license:
+    name: MIT
+    url: https://github.com/goadesign/goa/blob/master/LICENSE
+  title: The virtual wine cellar
+  version: ""
+paths:
+  /cellar/_ah/health:
+    get:
+      description: Perform health check.
+      operationId: health#health
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+      schemes:
+      - http
+      summary: health health
+      tags:
+      - health
+  /cellar/accounts:
+    get:
+      description: Retrieve all accounts.
+      operationId: account#list
+      produces:
+      - application/vnd.account+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AccountCollection'
+      schemes:
+      - http
+      summary: list account
+      tags:
+      - account
+    post:
+      description: Create new account
+      operationId: account#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAccountPayload'
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "201":
+          description: Resource created
+          headers:
+            Location:
+              description: href to created resource
+              pattern: /accounts/[0-9]+
+              type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: create account
+      tags:
+      - account
+  /cellar/accounts/{accountID}:
+    delete:
+      operationId: account#delete
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountID
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: delete account
+      tags:
+      - account
+    get:
+      description: Retrieve account with given id. IDs 1 and 2 pre-exist in the system.
+      operationId: account#show
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      produces:
+      - application/vnd.account+json
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Account'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show account
+      tags:
+      - account
+    put:
+      description: Change account name
+      operationId: account#update
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountID
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAccountPayload'
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: update account
+      tags:
+      - account
+  /cellar/accounts/{accountID}/bottles:
+    get:
+      description: List all bottles in account optionally filtering by year
+      operationId: bottle#list
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      - description: Filter by years
+        in: query
+        items:
+          type: integer
+        name: years
+        required: false
+        type: array
+      produces:
+      - application/vnd.bottle+json; type=collection
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/BottleCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: list bottle
+      tags:
+      - bottle
+    post:
+      description: Record new bottle
+      operationId: bottle#create
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateBottlePayload'
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "201":
+          description: Resource created
+          headers:
+            Location:
+              description: href to created resource
+              pattern: ^/accounts/[0-9]+/bottles/[0-9]+$
+              type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: create bottle
+      tags:
+      - bottle
+  /cellar/accounts/{accountID}/bottles/{bottleID}:
+    delete:
+      operationId: bottle#delete
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      - in: path
+        name: bottleID
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: delete bottle
+      tags:
+      - bottle
+    get:
+      description: Retrieve bottle with given id
+      operationId: bottle#show
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      - in: path
+        name: bottleID
+        required: true
+        type: integer
+      produces:
+      - application/vnd.bottle+json
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Bottle'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show bottle
+      tags:
+      - bottle
+    patch:
+      operationId: bottle#update
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      - in: path
+        name: bottleID
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/BottlePayload'
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: update bottle
+      tags:
+      - bottle
+  /cellar/accounts/{accountID}/bottles/{bottleID}/actions/rate:
+    put:
+      operationId: bottle#rate
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      - in: path
+        name: bottleID
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/RateBottlePayload'
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: rate bottle
+      tags:
+      - bottle
+  /cellar/accounts/{accountID}/bottles/{bottleID}/watch:
+    get:
+      description: Retrieve bottle with given id
+      operationId: bottle#watch
+      parameters:
+      - description: Account ID
+        in: path
+        minimum: 1
+        name: accountID
+        required: true
+        type: integer
+      - in: path
+        name: bottleID
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "101":
+          description: Switching Protocols
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - ws
+      summary: watch bottle
+      tags:
+      - bottle
+  /js/{filepath}:
+    get:
+      operationId: js#/js/*filepath
+      parameters:
+      - description: Relative file path
+        in: path
+        name: filepath
+        required: true
+        type: string
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+        "404":
+          description: File not found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: Download public/js
+  /swagger.json:
+    get:
+      operationId: swagger#/swagger.json
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+      schemes:
+      - http
+      summary: Download public/swagger/swagger.json
+  /ui:
+    get:
+      operationId: public#/ui
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+      schemes:
+      - http
+      summary: Download public/html/index.html
+produces:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+responses:
+  NoContent:
+    description: No Content
+  NotFound:
+    description: Not Found
+  OK:
+    description: OK
+    schema:
+      $ref: '#/definitions/Account'
+  SwitchingProtocols:
+    description: Switching Protocols
+schemes:
+- http
+swagger: "2.0"

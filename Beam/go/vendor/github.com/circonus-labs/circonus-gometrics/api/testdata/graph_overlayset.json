@@ -1,0 +1,280 @@
+{
+  "overlay_sets": {
+    "AbC3d": {
+      "overlays": {
+        "Kvf1M9": {
+          "data_opts": {
+            "method": "auto",
+            "transform": "snowth::reg_v2"
+          },
+          "id": "Kvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Kvf1M9",
+            "label": "Automatic",
+            "type": "auto_regression",
+            "z": "1"
+          }
+        },
+        "Lvf1M9": {
+          "data_opts": {
+            "method": "lin",
+            "transform": "snowth::reg_v2"
+          },
+          "id": "Lvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Lvf1M9",
+            "label": "Linear",
+            "type": "linear_regression",
+            "z": "1"
+          }
+        },
+        "Mvf1M9": {
+          "data_opts": {
+            "method": "exp",
+            "transform": "snowth::reg_v2"
+          },
+          "id": "Mvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Mvf1M9",
+            "label": "Exponential",
+            "type": "exponential_regression",
+            "z": "1"
+          }
+        },
+        "Nvf1M9": {
+          "data_opts": {
+            "array_output": "1",
+            "season_length": "86400",
+            "transform": "snowth::holtwinters"
+          },
+          "id": "Nvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Nvf1M9",
+            "label": "Periodic",
+            "type": "periodic",
+            "z": "1"
+          }
+        },
+        "Ovf1M9": {
+          "data_opts": {
+            "alerts": "2",
+            "extension": "lua/anomaly_detection",
+            "model": "auto",
+            "model_period": "",
+            "sensitivity": "50",
+            "transform": "snowth::anomaly_detection",
+            "version": "1"
+          },
+          "id": "Ovf1M9",
+          "ui_specs": {
+            "decouple": true,
+            "id": "Ovf1M9",
+            "label": "Anomaly Detection",
+            "type": "anomaly_detection",
+            "z": "1"
+          }
+        },
+        "Pvf1M9": {
+          "data_opts": {
+            "base_period": "0",
+            "extension": "lua/allquantile",
+            "in_percent": "true",
+            "inverse": "0",
+            "quantiles": "50,90,99",
+            "single_value": "0",
+            "target_period": "1M",
+            "time_offset": "7h",
+            "transform": "snowth::allquantile"
+          },
+          "id": "Pvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Pvf1M9",
+            "label": "Percentiles",
+            "type": "quantile",
+            "z": "1"
+          }
+        },
+        "Qvf1M9": {
+          "data_opts": {
+            "base_period": "0",
+            "extension": "lua/allquantile",
+            "in_percent": "true",
+            "inverse": "1",
+            "quantiles": "100,200",
+            "single_value": "0",
+            "target_period": "1M",
+            "time_offset": "7h",
+            "transform": "snowth::allquantile"
+          },
+          "id": "Qvf1M9",
+          "ui_specs": {
+            "decouple": true,
+            "id": "Qvf1M9",
+            "label": "Inverse Percentiles",
+            "type": "invquantile",
+            "z": "1"
+          }
+        },
+        "Rvf1M9": {
+          "data_opts": {
+            "base_period": "0",
+            "extension": "lua/allquantile",
+            "in_percent": "true",
+            "inverse": "0",
+            "presets": "min_max",
+            "quantiles": "0,100",
+            "single_value": "0",
+            "target_period": "1M",
+            "transform": "snowth::allquantile"
+          },
+          "id": "Rvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Rvf1M9",
+            "label": "Percentile Aggregation",
+            "type": "quantileagg",
+            "z": "1"
+          }
+        },
+        "Svf1M9": {
+          "data_opts": {
+            "extension": "lua/histogram_aggregation",
+            "transform": "snowth::histogram_aggregation"
+          },
+          "id": "Svf1M9",
+          "ui_specs": {
+            "decouple": true,
+            "id": "Svf1M9",
+            "label": "Histogram Aggregation",
+            "type": "histogram_agg",
+            "z": "1"
+          }
+        },
+        "Tvf1M9": {
+          "data_opts": {
+            "graph_id": "a75df2b4-cf56-438b-b9f6-0dfc9544263e",
+            "graph_title": "Current Graph",
+            "x_shift": "1d"
+          },
+          "id": "Tvf1M9",
+          "ui_specs": {
+            "decouple": true,
+            "id": "Tvf1M9",
+            "label": "Current Graph (Time-Shift: 1d)",
+            "type": "graph_comparison",
+            "z": "1"
+          }
+        },
+        "Uvf1M9": {
+          "data_opts": {
+            "delay": "3600",
+            "extension": "lua/reg",
+            "method": "exp",
+            "model_end": "",
+            "model_relative": "1",
+            "out": "value",
+            "transform": "snowth::reg"
+          },
+          "id": "Uvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Uvf1M9",
+            "label": "Exponential Prediction",
+            "type": "expreg",
+            "z": "1"
+          }
+        },
+        "Vvf1M9": {
+          "data_opts": {
+            "delay": "3600",
+            "extension": "lua/reg",
+            "method": "auto",
+            "model_end": "",
+            "model_relative": "1",
+            "out": "value",
+            "transform": "snowth::reg"
+          },
+          "id": "Vvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Vvf1M9",
+            "label": "Automatic Prediction",
+            "type": "autoreg",
+            "z": "1"
+          }
+        },
+        "Wvf1M9": {
+          "data_opts": {
+            "delay": "3600",
+            "extension": "lua/reg",
+            "method": "lin",
+            "model_end": "",
+            "model_relative": "1",
+            "out": "value",
+            "transform": "snowth::reg"
+          },
+          "id": "Wvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Wvf1M9",
+            "label": "Linear Prediction",
+            "type": "linreg",
+            "z": "1"
+          }
+        },
+        "Xvf1M9": {
+          "data_opts": {
+            "array_output": "1",
+            "method": "add",
+            "prequel": "2",
+            "transform": "snowth::holtwinters"
+          },
+          "id": "Xvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Xvf1M9",
+            "label": "Holt-Winters",
+            "type": "SnowthHWFetch",
+            "z": "1"
+          }
+        },
+        "Yvf1M9": {
+          "data_opts": {
+            "extension": "lua/mvalue",
+            "transform": "snowth::mvalue"
+          },
+          "id": "Yvf1M9",
+          "ui_specs": {
+            "decouple": true,
+            "id": "Yvf1M9",
+            "label": "Histogram Mode Detection (mvalue)",
+            "type": "mvalue",
+            "z": "1"
+          }
+        },
+        "Zvf1M9": {
+          "data_opts": {
+            "extension": "lua/sliding_window",
+            "time_shift": "-3600",
+            "transform": "snowth::sliding_window",
+            "window": "300"
+          },
+          "id": "Zvf1M9",
+          "ui_specs": {
+            "decouple": false,
+            "id": "Zvf1M9",
+            "label": "Sliding Window",
+            "type": "sliding_window",
+            "z": "1"
+          }
+        }
+      },
+      "title": "Example Overlay Sets"
+    }
+  }
+}
