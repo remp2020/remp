@@ -4,6 +4,7 @@
 
 <script>
     import Tween from '@tweenjs/tween.js';
+    import '../../filters';
 
     export default {
         name: "animated-integer",

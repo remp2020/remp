@@ -836,7 +836,9 @@ rempConfig.iota = {
     articleSelector: String,
     // required: callback for articleId extraction out of matched element
     idCallback: Function, // function (matchedElement) {}
-    // optional: callback for selecting element where the stats will be placed as next sibling; if not present, stats are appended as next sibling to matchedElement
+    // optional: callback for selecting element where the stats will be placed;
+    // if not present, stats are appended as next sibling to matchedElement
+    // stats are positioned absolutely, so they need a relative parent
     targetElementCallback: Function, // function (matchedElement) {}
     // optional: HTTP headers to be used in API calls 
     httpHeaders: Object
