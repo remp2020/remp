@@ -30,6 +30,11 @@ final class SignPresenter extends Presenter
         $this->redirect('in');
     }
 
+    public function renderError()
+    {
+        $this->template->error = $this->request->getParameter('error');
+    }
+
     protected function createComponentSignInForm()
     {
         $form = $this->signInFormFactory->create();

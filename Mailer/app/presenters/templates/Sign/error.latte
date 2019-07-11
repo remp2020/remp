@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{ifset title}{include title|stripHtml} | {/ifset} REMP</title>
+
+    <!-- Vendor CSS -->
+    <link href="/assets/vendor/css/vendor.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="/assets/vendor/css/app.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="login" data-lbg="teal">
+    <!-- Login -->
+    <div class="l-block toggled" id="l-login">
+        <div class="lb-header palette-Teal bg">
+            <i class="zmdi zmdi-account-circle"></i>
+            <p>There was an error signing you in.</p>
+            <p>If you believe this shouldn't happen, please contact your administrator.</p>
+        </div>
+
+        <div class="lb-body">
+            {$error}
+        </div>
+    </div>
+</div>
+</body>
+</html>

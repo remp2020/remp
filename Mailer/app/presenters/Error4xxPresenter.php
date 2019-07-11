@@ -34,8 +34,8 @@ class Error4xxPresenter extends Nette\Application\UI\Presenter
     }
 
     public function createComponentMissingConfiguration(
-        IMissingConfigurationFactory $IMissingConfigurationFactory
+        IMissingConfigurationFactory $missingConfigurationFactory
     ) {
-        return $IMissingConfigurationFactory->create();
+        return $missingConfigurationFactory->create();
     }
 }

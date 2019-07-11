@@ -53,8 +53,8 @@ abstract class BasePresenter extends Presenter
     }
 
     public function createComponentMissingConfiguration(
-        IMissingConfigurationFactory $IMissingConfigurationFactory
+        IMissingConfigurationFactory $missingConfigurationFactory
     ) {
-        return $IMissingConfigurationFactory->create();
+        return $missingConfigurationFactory->create();
     }
 }

@@ -21,7 +21,6 @@ class ErrorPresenter implements Nette\Application\IPresenter
         $this->logger = $logger;
     }
 
-
     public function run(Nette\Application\Request $request)
     {
         $exception = $request->getParameter('exception');
@@ -38,8 +37,8 @@ class ErrorPresenter implements Nette\Application\IPresenter
     }
 
     public function createComponentMissingConfiguration(
-        IMissingConfigurationFactory $IMissingConfigurationFactory
+        IMissingConfigurationFactory $missingConfigurationFactory
     ) {
-        return $IMissingConfigurationFactory->create();
+        return $missingConfigurationFactory->create();
     }
 }
