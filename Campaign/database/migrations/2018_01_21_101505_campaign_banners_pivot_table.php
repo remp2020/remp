@@ -14,6 +14,7 @@ class CampaignBannersPivotTable extends Migration
     public function up()
     {
         Schema::create('campaign_banners', function (Blueprint $table) {
+            $table->increments('id');
             $table->integer('campaign_id')->unsigned();
             $table->integer('banner_id')->unsigned();
             $table->string('variant');

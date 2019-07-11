@@ -22,6 +22,7 @@ class CampaignGeotargeting extends Migration
 
         // pivot table to connect countries to campaigns
         Schema::create('campaign_country', function (Blueprint $table) {
+            $table->increments('id');
             $table->integer('campaign_id')->unsigned();
             $table->string('country_iso_code', 5);
             $table->boolean('blacklisted')->default(false);

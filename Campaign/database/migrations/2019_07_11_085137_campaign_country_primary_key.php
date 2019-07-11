@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class VariantsPrimaryKey extends Migration
+class CampaignCountryPrimaryKey extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class VariantsPrimaryKey extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('campaign_banners', 'id'))
+        if (!Schema::hasColumn('campaign_country', 'id'))
         {
-            Schema::table('campaign_banners', function (Blueprint $table) {
+            Schema::table('campaign_country', function (Blueprint $table) {
                 $table->increments('id')->first();
             });
         }
@@ -28,7 +28,7 @@ class VariantsPrimaryKey extends Migration
      */
     public function down()
     {
-        Schema::table('campaign_banners', function (Blueprint $table) {
+        Schema::table('campaign_country', function (Blueprint $table) {
             $table->dropColumn('id');
         });
     }
