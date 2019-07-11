@@ -6,9 +6,9 @@ cache:
   paths:
     - bin/
 
-syntax:7.2:
+syntax:7.3:
   stage: test
-  image: php:7.2-cli
+  image: php:7.3-cli
   tags:
     - docker
   script:
@@ -16,7 +16,7 @@ syntax:7.2:
 
 sniffer:
   stage: test
-  image: php:7.2-cli
+  image: php:7.3-cli
   tags:
     - docker
   script:

@@ -98,7 +98,6 @@ class CampaignController extends Controller
                     } else {
                         $segmentNames[] = "- <span title='{$segment->code}'>{$segment->code}</span></em>";
                     }
-
                 }
                 return $segmentNames;
             })
