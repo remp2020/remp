@@ -42,11 +42,13 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables)
+    public function json(Datatables $dataTables, SegmentAggregator $segmentAggregator)
     {
         $campaigns = Campaign::select()
             ->with(['segments', 'countries', 'campaignBanners', 'campaignBanners.banner', 'schedules'])
             ->get();
+
+        $segments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
 
         return $dataTables->of($campaigns)
             ->addColumn('actions', function (Campaign $campaign) {
@@ -88,8 +90,17 @@ class CampaignController extends Controller
 
                 return $variants;
             })
-            ->addColumn('segments', function (Campaign $campaign) {
-                return implode(' ', $campaign->segments->pluck('code')->toArray());
+            ->addColumn('segments', function (Campaign $campaign) use ($segments) {
+                $segmentNames = [];
+                foreach ($campaign->segments as $segment) {
+                    if ($segments->get($segment->code)) {
+                        $segmentNames[] = "- <span title='{$segment->code}'>{$segments->get($segment->code)}</span></em>";
+                    } else {
+                        $segmentNames[] = "- <span title='{$segment->code}'>{$segment->code}</span></em>";
+                    }
+
+                }
+                return $segmentNames;
             })
             ->addColumn('countries', function (Campaign $campaign) {
                 return implode(' ', $campaign->countries->pluck('name')->toArray());
@@ -116,7 +127,7 @@ class CampaignController extends Controller
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
-            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants', 'is_running'])
+            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants', 'is_running', 'segments'])
             ->setRowId('id')
             ->make(true);
     }
@@ -888,7 +899,7 @@ class CampaignController extends Controller
         ];
     }
 
-    public function getAllSegments(SegmentAggregator $segmentAggregator)
+    public function getAllSegments(SegmentAggregator $segmentAggregator): Collection
     {
         try {
             $segments = $segmentAggregator->list();

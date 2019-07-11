@@ -85,6 +85,7 @@
                         'segments' => [
                             'header' => 'Segments',
                             'priority' => 10,
+                            'render' => 'array',
                         ],
                         'countries' => [
                             'header' => 'Countries',
