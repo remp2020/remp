@@ -321,7 +321,7 @@ data related to Beam (e.g. A/B testing of titles).
             ],
             "url": "http://example.com/74565321", // Public and valid URL of the article,
             "authors": [ // Optional
-                "John Snow" // Name of the author
+                "Jon Snow" // Name of the author
             ],
             "sections": [ // Optional
                 "Opinions" // Name of the section
@@ -332,7 +332,12 @@ data related to Beam (e.g. A/B testing of titles).
 }
 ```
 
-##### *Example:*
+<details>
+<summary>
+
+##### *Example (curl):*
+
+</summary>
 
 ```shell
 curl -X POST \
@@ -352,7 +357,7 @@ curl -X POST \
             ],
             "url": "http://example.com/74565321", 
             "authors": [ 
-                "John Snow" 
+                "Jon Snow" 
             ],
             "sections": [
                 "Opinions" 
@@ -363,7 +368,61 @@ curl -X POST \
 }'
 ```
 
-Response:
+</details>
+
+<details>
+<summary>
+
+##### *Example (raw PHP):*
+
+</summary>
+
+```php
+$payload = [
+    "articles" => [
+        [
+            "external_id" => "74565321",
+            "property_uuid" => "1a8feb16-3e30-4f9b-bf74-20037ea8505a",
+            "title" => "10 things you need to know",
+            "titles" => [
+                "10 things you need to know",
+                "10 things everyone hides from you"
+            ],
+            "url" => "http://example.com/74565321",
+            "authors" => [
+                "Jon Snow"
+            ],
+            "sections" => [
+                "Opinions"
+            ],
+            "published_at" => "2018-06-05T06:03:05Z",
+        ]
+    ]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/articles/upsert ", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+<details>
+<summary>
+
+##### *Response:*
+
+</summary>
 
 ```json5
 {
@@ -386,7 +445,7 @@ Response:
             "updated_at": "2019-05-17 11:43:04",
             "authors": [
                 {
-                    "name": "John Snow",
+                    "name": "Jon Snow",
                     "created_at": "2019-05-17 11:43:04",
                     "updated_at": "2019-05-17 11:43:04"
                 }
@@ -405,6 +464,8 @@ Response:
 
 Any create/update matching is based on the article's `external_id`. You're free to update the article as many times
 as you want.
+
+</details>
 
 ---
 
@@ -439,7 +500,12 @@ tracked via Tracker API (see `/track/commerce` definition in Tracker's `swagger.
 }
 ```
 
-##### *Example*:
+<details>
+<summary>
+
+##### *Example (curl)*:
+
+</summary>
 
 ```shell
 curl -X POST \
@@ -461,7 +527,52 @@ curl -X POST \
 }'
 ```
 
-Response:
+</details>
+
+<details>
+<summary>
+
+##### *Example (raw PHP):*
+
+</summary>
+
+```php
+$payload = [
+    "conversions" => [
+        [
+            "article_external_id" => "74565321",
+            "transaction_id" => "8743320112",
+            "amount" => 17.99,
+            "currency" => "EUR",
+            "paid_at" => "2018-06-05T12:03:05Z",
+            "user_id" => "74412"
+        ]
+    ]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/conversions/upsert ", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+<details>
+<summary>
+
+##### *Response:*
+
+</summary>
 
 ```json5
 {
@@ -482,6 +593,7 @@ Response:
 }
 ```
 
+</details>
 
 ### Scheduled events
 
