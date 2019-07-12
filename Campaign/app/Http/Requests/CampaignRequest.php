@@ -31,6 +31,7 @@ class CampaignRequest extends FormRequest
             'active' => 'boolean|required',
             'banner_id' => 'required|integer',
             'signed_in' => 'boolean|nullable',
+            'using_adblock' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
             'segments' => 'array',
             'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
@@ -47,8 +48,11 @@ class CampaignRequest extends FormRequest
     public function all($keys = null)
     {
         $data = parent::all($keys);
-        if (isset($data['signed_in'])) {
-            $data['signed_in'] = $this->getInputSource()->getBoolean('signed_in');
+        if (!isset($data['signed_in'])) {
+            $data['signed_in'] = null;
+        }
+        if (!isset($data['using_adblock'])) {
+            $data['using_adblock'] = null;
         }
         $data['active'] = $this->getInputSource()->getBoolean('active', false);
         $data['once_per_session'] = $this->getInputSource()->getBoolean('once_per_session', false);
