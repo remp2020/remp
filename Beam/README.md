@@ -332,9 +332,10 @@ data related to Beam (e.g. A/B testing of titles).
 }
 ```
 
-##### *Example (curl):*
+##### *Examples:*
 
 <details>
+<summary>curl</summary>
 
 ```shell
 curl -X POST \
@@ -367,9 +368,8 @@ curl -X POST \
 
 </details>
 
-##### *Example (raw PHP):*
-
 <details>
+<summary>raw PHP</summary>
 
 ```php
 $payload = [
@@ -413,8 +413,6 @@ $response = file_get_contents("http://beam.remp.press/api/articles/upsert ", fal
 
 ##### *Response:*
 
-<details>
-
 ```json5
 {
     "data": [
@@ -456,8 +454,6 @@ $response = file_get_contents("http://beam.remp.press/api/articles/upsert ", fal
 Any create/update matching is based on the article's `external_id`. You're free to update the article as many times
 as you want.
 
-</details>
-
 ---
 
 ##### POST `api/conversions/upsert`
@@ -491,9 +487,10 @@ tracked via Tracker API (see `/track/commerce` definition in Tracker's `swagger.
 }
 ```
 
-##### *Example (curl)*:
+##### *Examples*:
 
 <details>
+<summary>curl</summary>
 
 ```shell
 curl -X POST \
@@ -517,9 +514,8 @@ curl -X POST \
 
 </details>
 
-##### *Example (raw PHP):*
-
 <details>
+<summary>raw PHP</summary>
 
 ```php
 $payload = [
@@ -554,8 +550,6 @@ $response = file_get_contents("http://beam.remp.press/api/conversions/upsert ", 
 
 ##### *Response:*
 
-<details>
-
 ```json5
 {
     "data": [
@@ -574,8 +568,6 @@ $response = file_get_contents("http://beam.remp.press/api/conversions/upsert ", 
     ]
 }
 ```
-
-</details>
 
 ### Scheduled events
 
