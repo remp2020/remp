@@ -634,10 +634,14 @@ class CampaignController extends Controller
             }
 
             // using adblock?
-            if (!isset($data->usingAdblock)) {
-                Log::error("Unable to load if user with ID [{$userId}] & browserId [{$browserId}] is using AdBlock.");
-            } elseif ($campaign->using_adblock && !$data->usingAdblock || $campaign->using_adblock === false && $data->usingAdblock) {
-                continue;
+            if ($campaign->using_adblock !== null) {
+                if (!isset($data->usingAdblock)) {
+                    Log::error("Unable to load if user with ID [{$userId}] & browserId [{$browserId}] is using AdBlock.");
+                    continue;
+                }
+                if ($campaign->using_adblock && !$data->usingAdblock || $campaign->using_adblock === false && $data->usingAdblock) {
+                    continue;
+                }
             }
 
             // url filters
