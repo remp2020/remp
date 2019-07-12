@@ -332,12 +332,9 @@ data related to Beam (e.g. A/B testing of titles).
 }
 ```
 
-<details>
-<summary>
-
 ##### *Example (curl):*
 
-</summary>
+<details>
 
 ```shell
 curl -X POST \
@@ -370,12 +367,9 @@ curl -X POST \
 
 </details>
 
-<details>
-<summary>
-
 ##### *Example (raw PHP):*
 
-</summary>
+<details>
 
 ```php
 $payload = [
@@ -417,12 +411,9 @@ $response = file_get_contents("http://beam.remp.press/api/articles/upsert ", fal
 
 </details>
 
-<details>
-<summary>
-
 ##### *Response:*
 
-</summary>
+<details>
 
 ```json5
 {
@@ -500,12 +491,9 @@ tracked via Tracker API (see `/track/commerce` definition in Tracker's `swagger.
 }
 ```
 
-<details>
-<summary>
-
 ##### *Example (curl)*:
 
-</summary>
+<details>
 
 ```shell
 curl -X POST \
@@ -529,12 +517,9 @@ curl -X POST \
 
 </details>
 
-<details>
-<summary>
-
 ##### *Example (raw PHP):*
 
-</summary>
+<details>
 
 ```php
 $payload = [
@@ -567,12 +552,9 @@ $response = file_get_contents("http://beam.remp.press/api/conversions/upsert ", 
 
 </details>
 
-<details>
-<summary>
-
 ##### *Response:*
 
-</summary>
+<details>
 
 ```json5
 {
