@@ -52,10 +52,6 @@ class RedisDriver implements DriverInterface
                 }
 
                 $result = $callback($hermesMessage);
-                $this->tasksRepository->add(
-                    $hermesMessage,
-                    $result ? HermesTasksRepository::STATE_DONE : HermesTasksRepository::STATE_ERROR
-                );
             } else {
                 sleep($this->sleepTime);
             }
