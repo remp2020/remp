@@ -6,6 +6,7 @@ use Closure;
 use Remp\MailerModule\Repository\HermesTasksRepository;
 use Tomaj\Hermes\Driver\DriverInterface;
 use Tomaj\Hermes\MessageInterface;
+use Tomaj\Hermes\MessageSerializer;
 
 class RedisDriver implements DriverInterface
 {
@@ -13,23 +14,26 @@ class RedisDriver implements DriverInterface
 
     private $tasksQueue;
 
+    private $serializer;
+
     private $sleepTime = 5;
 
     public function __construct(HermesTasksRepository $tasksRepository, HermesTasksQueue $tasksQueue)
     {
         $this->tasksRepository = $tasksRepository;
         $this->tasksQueue = $tasksQueue;
+        $this->serializer = new MessageSerializer();
     }
 
-    public function send(MessageInterface $message)
+    public function send(MessageInterface $message): bool
     {
-        $serializer = new HermesMessageSerializer();
+        $task = $this->serializer->serialize($message);
+        $executeAt = 0;
+        if ($message->getExecuteAt()) {
+            $executeAt = $message->getExecuteAt();
+        }
 
-        // update message data for hermes scheduling feature
-        $task = $serializer->serialize($message);
-        $message = $serializer->unserialize($task);
-
-        $result = $this->tasksQueue->addTask($task, $message->getProcess());
+        $result = $this->tasksQueue->addTask($task, $executeAt);
         if ($result) {
             $this->tasksQueue->incrementType($message->getType());
         }
@@ -37,21 +41,25 @@ class RedisDriver implements DriverInterface
         return $result;
     }
 
-    public function wait(Closure $callback)
+    public function wait(Closure $callback): void
     {
-        $serializer = new HermesMessageSerializer();
         while (true) {
             $message = $this->tasksQueue->getTask();
             if ($message) {
-                $hermesMessage = $serializer->unserialize($message[0]);
+                $hermesMessage = $this->serializer->unserialize($message[0]);
                 $this->tasksQueue->decrementType($hermesMessage->getType());
-
-                if ($hermesMessage->getProcess() > time()) {
+                if ($hermesMessage->getExecuteAt() > time()) {
                     $this->send($hermesMessage);
                     continue;
                 }
 
                 $result = $callback($hermesMessage);
+                if (!$result) {
+                    $this->tasksRepository->add(
+                        $hermesMessage,
+                        HermesTasksRepository::STATE_ERROR
+                    );
+                }
             } else {
                 sleep($this->sleepTime);
             }

@@ -33,17 +33,18 @@ class HermesTasksQueue
                 'host'   => $this->host,
                 'port'   => $this->port,
             ]);
-
-            $this->redis->select($this->db);
+            if ($this->db) {
+                $this->redis->select($this->db);
+            }
         }
 
         return $this->redis;
     }
 
     // Tasks
-    public function addTask($task, $process)
+    public function addTask(string $task, float $executeAt)
     {
-        return $this->connect()->zadd(static::TASKS_KEY, [$task => $process]) > 0;
+        return $this->connect()->zadd(static::TASKS_KEY, [$task => $executeAt]) > 0;
     }
 
     public function getTask()

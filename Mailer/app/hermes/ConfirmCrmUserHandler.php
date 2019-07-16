@@ -21,7 +21,7 @@ class ConfirmCrmUserHandler implements HandlerInterface
         $this->logsRepository = $logsRepository;
     }
 
-    public function handle(MessageInterface $message)
+    public function handle(MessageInterface $message): bool
     {
         $payload = $message->getPayload();
         if (!isset($payload['mail_sender_id'])) {

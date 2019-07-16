@@ -30,7 +30,7 @@ class ListCreatedHandler implements HandlerInterface
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
-    public function handle(MessageInterface $message)
+    public function handle(MessageInterface $message): bool
     {
         $payload = $message->getPayload();
         if (!isset($payload['list_id'])) {

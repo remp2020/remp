@@ -15,7 +15,7 @@ class PingMysql implements HandlerInterface
         $this->database = $database;
     }
 
-    public function handle(MessageInterface $message)
+    public function handle(MessageInterface $message): bool
     {
         $this->database->query('SELECT "heartbeat"');
         return true;

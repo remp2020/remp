@@ -21,7 +21,7 @@ class MailSentHandler implements HandlerInterface
         $this->tracker = $tracker;
     }
 
-    public function handle(MessageInterface $message)
+    public function handle(MessageInterface $message): bool
     {
         $payload = $message->getPayload();
         if (!isset($payload['user_id'])) {

@@ -4,8 +4,8 @@ namespace Remp\MailerModule\Repository;
 
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
-use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Repository;
+use Tomaj\Hermes\MessageInterface;
 
 class HermesTasksRepository extends Repository
 {
@@ -14,19 +14,18 @@ class HermesTasksRepository extends Repository
 
     protected $tableName = 'hermes_tasks';
 
-    public function add(HermesMessage $message, $state)
+    public function add(MessageInterface $message, $state)
     {
-        list($usec, $sec) = explode(' ', $message->getCreated());
-        $timestamp = number_format(((float)$usec + (float)$sec), 6, '.', '');
-        $createdAt = DateTime::createFromFormat('U.u', $timestamp)
-            ->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+        $createdAt = DateTime::from(strtotime($message->getCreated()));
 
         return $this->insert([
-            'id' => $message->getId(),
+            'message_id' => $message->getId(),
             'type' => $message->getType(),
             'payload' => Json::encode($message->getPayload()),
+            'retry' => $message->getRetries(),
             'state' => $state,
             'created_at' => $createdAt,
+            'execute_at' => $message->getExecuteAt() ? $message->getExecuteAt() : null,
             'processed_at' => new DateTime(),
         ]);
     }
