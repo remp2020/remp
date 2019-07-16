@@ -155,6 +155,33 @@
                 :adminPreview="adminPreview"
         >
         </overlay-rectangle-preview>
+
+        <html-overlay-preview v-if="template === 'html_overlay'"
+              :alignmentOptions="alignmentOptions"
+              :dimensionOptions="dimensionOptions"
+              :positionOptions="positionOptions"
+              :show="visible"
+              :uuid="uuid"
+              :campaignUuid="campaignUuid"
+              :forcedPosition="forcedPosition"
+
+              :textAlign="htmlOverlayTemplate.textAlign"
+              :dimensions="htmlOverlayTemplate.dimensions"
+              :textColor="htmlOverlayTemplate.textColor"
+              :fontSize="htmlOverlayTemplate.fontSize"
+              :backgroundColor="htmlOverlayTemplate.backgroundColor"
+              :text="htmlOverlayTemplate.text"
+              :css="htmlOverlayTemplate.css"
+
+              :position="position"
+              :offsetVertical="offsetVertical"
+              :offsetHorizontal="offsetHorizontal"
+              :targetUrl="targetUrl"
+              :closeable="closeable"
+              :closeText="closeText"
+              :transition="transition"
+              :displayType="displayType"
+        ></html-overlay-preview>
     </div>
 </template>
 
@@ -168,6 +195,7 @@
     import CollapsibleBarPreview from "./previews/CollapsibleBar";
     import ShortMessagePreview from "./previews/ShortMessage";
     import OverlayRectanglePreview from "./previews/OverlayRectangle";
+    import HtmlOverlayPreview from "./previews/HtmlOverlay";
 
     const props = [
         "name",
@@ -196,6 +224,7 @@
         "htmlTemplate",
         "shortMessageTemplate",
         "overlayRectangleTemplate",
+        "htmlOverlayTemplate",
 
         "alignmentOptions",
         "dimensionOptions",
@@ -218,6 +247,7 @@
             CollapsibleBarPreview,
             ShortMessagePreview,
             OverlayRectanglePreview,
+            HtmlOverlayPreview,
         },
         name: 'banner-preview',
         props: props,
