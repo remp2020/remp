@@ -18,9 +18,12 @@ class ArticleDetailsController extends Controller
 
     private $journal;
 
+    private $journalHelper;
+
     public function __construct(JournalContract $journal)
     {
         $this->journal = $journal;
+        $this->journalHelper = new JournalHelpers($journal);
     }
 
     public function variantsHistogram(Article $article, Request $request)
@@ -217,6 +220,10 @@ class ArticleDetailsController extends Controller
         $pageviewsSubscribersToAllRatio =
             $article->pageviews_all == 0 ? 0 : ($article->pageviews_subscribers / $article->pageviews_all) * 100;
 
+        $mediums = $this->journalHelper->derivedRefererMediumGroups()->mapWithKeys(function ($item) {
+            return [$item => $item];
+        });
+
         return response()->format([
             'html' => view('articles.show', [
                 'article' => $article,
@@ -230,8 +237,61 @@ class ArticleDetailsController extends Controller
                 'dataTo' => $request->input('data_to', 'now'),
                 'hasTitleVariants' => count($titleVariants) > 1,
                 'hasImageVariants' => count($imageVariants) > 1,
+                'mediums' => $mediums,
+                'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
+                'visitedTo' => $request->input('visited_to', 'now'),
             ]),
-            'json' => new ArticleResource($article)
+            'json' => new ArticleResource($article),
+        ]);
+    }
+
+    public function dtReferers(Article $article, Request $request)
+    {
+        $length = $request->input('length');
+        $start = $request->input('start');
+        $orderOptions = $request->input('order');
+        $draw = $request->input('draw');
+
+        $visitedTo = Carbon::parse($request->input('visited_to'), $request->input('tz'))->tz('UTC');
+        $visitedFrom = Carbon::parse($request->input('visited_from'), $request->input('tz'))->tz('UTC');
+
+        $ar = (new AggregateRequest('pageviews', 'load'))
+            ->setTime($visitedFrom, $visitedTo)
+            ->addGroup('derived_referer_host_with_path', 'derived_referer_medium')
+            ->addFilter('article_id', $article->external_id);
+
+        $columns = $request->input('columns');
+        foreach ($columns as $index => $column) {
+            if (isset($column['search']['value'])) {
+                $ar->addFilter($column['name'], ...explode(',', $column['search']['value']));
+            }
+        }
+
+        $data = collect();
+
+        foreach ($this->journal->count($ar) as $record) {
+            $data->push([
+                'derived_referer_medium' => $record->tags->derived_referer_medium,
+                'source' => $record->tags->derived_referer_host_with_path,
+                'visits_count' => $record->count,
+            ]);
+        }
+
+        if (count($orderOptions) > 0) {
+            $option = $orderOptions[0];
+            $orderColumn = $columns[$option['column']]['name'];
+            $orderDirectionDesc = $option['dir'] === 'desc';
+            $data = $data->sortBy($orderColumn, SORT_REGULAR, $orderDirectionDesc)->values();
+        }
+
+        $recordsTotal = $data->count();
+        $data = $data->slice($start, $length)->values();
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsTotal,
+            'data' => $data
         ]);
     }
 }

@@ -73,6 +73,7 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('articles/{article}/histogramJson', 'ArticleDetailsController@timeHistogram')->name('articles.timeHistogram.json');
     Route::get('articles/{article}/variantsHistogramJson', 'ArticleDetailsController@variantsHistogram')->name('articles.variantsHistogram.json');
+    Route::get('articles/{article}/dtReferers', 'ArticleDetailsController@dtReferers')->name('articles.dtReferers');
 
     Route::resource('articles', 'ArticleController', [
         'only' => ['store'],
@@ -111,6 +112,4 @@ Route::middleware('auth.jwt')->group(function () {
         Route::get('googleanalyticsreporting/histogramJson', 'GoogleAnalyticsReportingController@timeHistogram')
             ->name('googleanalyticsreporting.timeHistogram.json');
     }
-
-
 });
