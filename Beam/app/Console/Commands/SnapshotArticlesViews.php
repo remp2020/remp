@@ -83,47 +83,48 @@ class SnapshotArticlesViews extends Command
         }
 
         // Load sources count for each external referer
-        foreach (array_chunk($externalIds, 100) as $externalIdsChunk) {
-            $r = new ConcurrentsRequest();
-            $r->setTimeAfter($from);
-            $r->setTimeBefore($to);
-            $r->addFilter('article_id', ...$externalIdsChunk);
-            $r->addFilter('derived_referer_medium', 'external');
-            $r->addGroup('article_id', 'token', 'explicit_referer_medium', 'derived_referer_host_with_path');
-    
-
-            $referers = [];
-            foreach ($this->journal->concurrents($r) as $record) {
-                $articleId = $record->tags->article_id;
-                $token = $record->tags->token;
-                $explicitRefererMedium = $record->tags->explicit_referer_medium;
-                $host = $record->tags->derived_referer_host_with_path;
-
-                if (!array_key_exists($token, $referers)) {
-                    $referers[$token] = [];
-                }
-                if (!array_key_exists($articleId, $referers[$token])) {
-                    $referers[$token][$articleId] = [];
-                }
-                if (!array_key_exists($explicitRefererMedium, $referers[$token][$articleId])) {
-                    $referers[$token][$articleId][$explicitRefererMedium] = [];
-                }
-
-                $referers[$token][$articleId][$explicitRefererMedium][$host] = $record->count;
-            }
-
-
-            foreach ($referers as $token => $tokenReferers) {
-                foreach ($tokenReferers as $articleId => $articleReferers) {
-                    foreach ($articleReferers as $explicitRefererMedium => $mediumReferers) {
-                        $key = self::key($token, $articleId, 'external', $explicitRefererMedium);
-                        if (array_key_exists($key, $items)) {
-                            $items[$key]['count_by_referer'] = json_encode($mediumReferers);
-                        }
-                    }
-                }
-            }
-        }
+        // TODO temporarily disabled loading of external referers
+        //foreach (array_chunk($externalIds, 100) as $externalIdsChunk) {
+        //    $r = new ConcurrentsRequest();
+        //    $r->setTimeAfter($from);
+        //    $r->setTimeBefore($to);
+        //    $r->addFilter('article_id', ...$externalIdsChunk);
+        //    $r->addFilter('derived_referer_medium', 'external');
+        //    $r->addGroup('article_id', 'token', 'explicit_referer_medium', 'derived_referer_host_with_path');
+        //
+        //
+        //    $referers = [];
+        //    foreach ($this->journal->concurrents($r) as $record) {
+        //        $articleId = $record->tags->article_id;
+        //        $token = $record->tags->token;
+        //        $explicitRefererMedium = $record->tags->explicit_referer_medium;
+        //        $host = $record->tags->derived_referer_host_with_path;
+        //
+        //        if (!array_key_exists($token, $referers)) {
+        //            $referers[$token] = [];
+        //        }
+        //        if (!array_key_exists($articleId, $referers[$token])) {
+        //            $referers[$token][$articleId] = [];
+        //        }
+        //        if (!array_key_exists($explicitRefererMedium, $referers[$token][$articleId])) {
+        //            $referers[$token][$articleId][$explicitRefererMedium] = [];
+        //        }
+        //
+        //        $referers[$token][$articleId][$explicitRefererMedium][$host] = $record->count;
+        //    }
+        //
+        //
+        //    foreach ($referers as $token => $tokenReferers) {
+        //        foreach ($tokenReferers as $articleId => $articleReferers) {
+        //            foreach ($articleReferers as $explicitRefererMedium => $mediumReferers) {
+        //                $key = self::key($token, $articleId, 'external', $explicitRefererMedium);
+        //                if (array_key_exists($key, $items)) {
+        //                    $items[$key]['count_by_referer'] = json_encode($mediumReferers);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         // Save
         ArticleViewsSnapshot::where('time', $to)->delete();
