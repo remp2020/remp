@@ -92,6 +92,8 @@ class DashboardController extends Controller
 
         $from = $journalInterval->timeAfter->tz('UTC');
         $to = $journalInterval->timeBefore->tz('UTC');
+        $toEndOfDay = $to->tz($tz)->endOfDay()->addSecond()->tz('UTC');
+
         $intervalMinutes = $journalInterval->intervalMinutes;
 
         $timePoints = $this->timePoints($from, $to, $intervalMinutes, true);
@@ -109,7 +111,7 @@ class DashboardController extends Controller
 
             for ($i = 1; $i <= $numberOfAveragedWeeks; $i++) {
                 $shadowFrom = (clone $from)->subWeeks($i);
-                $shadowTo = (clone $to)->subWeeks($i)->endOfDay();
+                $shadowTo = (clone $toEndOfDay)->subWeeks($i);
 
                 // If there was a time shift, remember time needs to be adjusted by the timezone difference
                 $diff = $shadowFrom->tz('utc')->diff($from->tz('utc'));
@@ -161,8 +163,6 @@ class DashboardController extends Controller
 
         // Fill empty records for shadow values first
         if (count($shadowRecords) > 0) {
-            $toEndOfDay = (clone $to)->endOfDay();
-
             $timeIterator = JournalHelpers::getTimeIterator($from, $intervalMinutes);
             while ($timeIterator->lessThan($toEndOfDay)) {
                 $zuluDate = $timeIterator->toIso8601ZuluString();
