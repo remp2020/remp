@@ -104,10 +104,8 @@
         "_textColor",
         "_fontSize",
         "_textAlign",
-        "_dimensions",
 
-        "alignmentOptions",
-        "dimensionOptions",
+        "alignmentOptions"
     ];
     export default {
         name: "html-overlay-template",
@@ -127,8 +125,7 @@
             includes: null,
             textColor: null,
             fontSize: null,
-            textAlign: null,
-            dimensions: null,
+            textAlign: null
         }),
         updated: function() {
             this.emitValuesChanged();
@@ -143,7 +140,6 @@
                         textColor: this.textColor,
                         fontSize: this.fontSize,
                         textAlign: this.textAlign,
-                        dimensions: this.dimensions,
                     }},
                 ]);
             }
@@ -152,6 +148,8 @@
             mappedTextAlignOptions: function () {
                 let opts = [];
 
+                console.log(this.alignmentOptions);
+
                 for (let i in this.alignmentOptions) {
                     opts.push({
                         label: this.alignmentOptions[i].name,
@@ -159,16 +157,6 @@
                     });
                 }
 
-                return opts;
-            },
-            mappedDimensionOptions: function() {
-                let opts = [];
-                for (let i in this.dimensionOptions) {
-                    opts.push({
-                        label: this.dimensionOptions[i].name,
-                        value: this.dimensionOptions[i].key,
-                    });
-                }
                 return opts;
             }
         }

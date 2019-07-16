@@ -30,15 +30,6 @@
         display: none;
     }
 
-    .html-overlay-rectangle-image {
-        width: 100%;
-        min-width: 300px;
-        background-position: center center;
-        background-size: cover;
-        overflow: hidden;
-        max-height: 400px;
-    }
-
     .html-overlay-rectangle-image > img {
         position: relative;
         display: block;
@@ -79,7 +70,6 @@
     .html-overlay-rectangle-content {
         position: relative;
         width: 100%;
-        padding: 20px;
         text-align: center;
         justify-content: space-around;
         display: flex;
@@ -101,26 +91,9 @@
         box-sizing: border-box;
     }
 
-    .html-overlay-rectangle-header {
-        word-wrap: break-word;
-        height: 1em;
-        padding: 0;
-        margin-bottom: 10px;
-    }
-
     .html-overlay-rectangle-main {
         font-size: 26px;
         word-wrap: break-word;
-    }
-
-    .html-overlay-rectangle-button {
-        width: 70%;
-        border-radius: 15px;
-        padding: 5px;
-        word-wrap: break-word;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
     }
 
     .html-overlay-rectangle-wrap {
@@ -163,7 +136,7 @@
                             <div class="html-overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
                                 <div class="html-overlay-rectangle-content" v-if="text">
                                     <div class="html-overlay-rectangle-main"
-                                         v-html="$parent.injectVars(text)"></div>
+                                         v-html="$parent.injectVars(text)" v-bind:style="[_textAlign, textStyles]"></div>
                                 </div>
                             </div>
                     </a>
@@ -184,6 +157,7 @@
             "backgroundColor",
             "buttonBackgroundColor",
             "textColor",
+            "textAlign",
             "text",
             "width",
             "height",
@@ -210,6 +184,9 @@
             }
         },
         computed: {
+            _textAlign: function() {
+                return this.alignmentOptions[this.textAlign] ? this.alignmentOptions[this.textAlign].style : {};
+            },
             linkStyles: function() {
                 let zIndex;
                 if (this.displayType === 'overlay') {
@@ -224,10 +201,16 @@
                 return {
                     backgroundColor: this.backgroundColor,
                     color: this.textColor,
-                    minWidth: this.width || '100px',
-                    maxWidth: this.width || '300px',
-                    minHeight: this.height || '100px',
-                    maxHeight: this.height || '600px',
+                    minWidth: this.width || '0px',
+                    maxWidth: this.width || '800px',
+                    minHeight: this.height || '0px',
+                    maxHeight: this.height || 'auto',
+                }
+            },
+            textStyles: function() {
+                return {
+                    color: this.textColor,
+                    fontSize: this.fontSize + "px",
                 }
             },
             closeStyles: function() {
@@ -245,8 +228,6 @@
                 style = document.createElement('style');
 
             head.appendChild(style);
-
-            console.log(styles);
 
             style.type = 'text/css';
             if (style.styleSheet){

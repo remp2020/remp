@@ -54,9 +54,7 @@
                 v-bind:_textColor="htmlOverlayTemplate.textColor"
                 v-bind:_fontSize="htmlOverlayTemplate.fontSize"
                 v-bind:_textAlign="htmlOverlayTemplate.textAlign"
-                v-bind:_dimensions="htmlOverlayTemplate.dimensions"
                 v-bind:alignmentOptions="alignmentOptions"
-                v-bind:dimensionOptions="dimensionOptions"
                 v-bind:show="show"
             ></html-overlay-template>
 
