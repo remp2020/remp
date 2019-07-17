@@ -189,6 +189,7 @@
         "show",
 
         "variables",
+        "urlParams",
 
         "mediumRectangleTemplate",
         "barTemplate",
@@ -207,7 +208,7 @@
 
         "js",
         "jsIncludes",
-        "cssIncludes"
+        "cssIncludes",
     ];
 
     export default {
@@ -294,10 +295,10 @@
                     url += "&banner_variant=" + encodeURIComponent(this.variantUuid);
                 }
 
-                if (remplib.campaign && remplib.campaign.bannerUrlParams) {
-                    for (let param in remplib.campaign.bannerUrlParams) {
-                        if (remplib.campaign.bannerUrlParams.hasOwnProperty(param)) {
-                            url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(remplib.campaign.bannerUrlParams[param]())
+                if (this.urlParams) {
+                    for (let param in this.urlParams) {
+                        if (this.urlParams.hasOwnProperty(param)) {
+                            url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(this.urlParams[param]())
                         }
                     }
                 }

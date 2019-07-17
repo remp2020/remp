@@ -133,6 +133,10 @@ var run = function() {
     banner.campaignUuid = campaignUuid;
     banner.variantUuid = variantUuid;
     banner.uuid = bannerUuid;
+    
+    if (typeof remplib.campaign.bannerUrlParams !== "undefined") {
+        banner.urlParams = remplib.campaign.bannerUrlParams;
+    }
 
     if (isControlGroup) {
         banner.displayDelay = 0;
