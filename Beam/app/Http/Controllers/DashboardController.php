@@ -8,6 +8,7 @@ use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Model\Config;
 use App\Model\DashboardConfig;
+use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +25,13 @@ class DashboardController extends Controller
 
     private $journalHelper;
 
-    public function __construct(JournalContract $journal)
+    private $snapshotHelpers;
+
+    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
+        $this->snapshotHelpers = $snapshotHelpers;
     }
 
     public function index()
@@ -96,7 +100,7 @@ class DashboardController extends Controller
 
         $intervalMinutes = $journalInterval->intervalMinutes;
 
-        $timePoints = $this->timePoints($from, $to, $intervalMinutes, true);
+        $timePoints = $this->snapshotHelpers->timePoints($from, $to, $intervalMinutes, true);
         $currentData = $this->dataFor($timePoints);
 
         $tags = [];
@@ -117,7 +121,7 @@ class DashboardController extends Controller
                 $diff = $shadowFrom->tz('utc')->diff($from->tz('utc'));
                 $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
-                $timePoints = $this->timePoints($shadowFrom, $shadowTo, $intervalMinutes);
+                $timePoints = $this->snapshotHelpers->timePoints($shadowFrom, $shadowTo, $intervalMinutes);
                 foreach ($this->dataFor($timePoints) as $item) {
                     // we want to plot previous results on same points as current ones,
                     // therefore add week which was subtracted when data was queried
@@ -210,52 +214,7 @@ class DashboardController extends Controller
             ->get();
     }
 
-    private function timePoints(Carbon $from, Carbon $to, int $intervalMinutes, bool $addLastMinute = false): array
-    {
-        $timeRecords = DB::table('article_views_snapshots')
-            ->select('time')
-            ->whereBetween('time', [$from, $to])
-            ->groupBy('time')
-            ->get()
-            ->map(function ($item) {
-                return Carbon::parse($item->time);
-            })->toArray();
 
-        $timeIterator = clone $from;
-
-        $points = [];
-        $i = 0;
-
-        // Computes lowest time point (present in DB) per each $intervalMinutes window, starting from $from
-        $lastPoint = null;
-        while ($timeIterator->lte($to)) {
-            $upperLimit = (clone $timeIterator)->addMinutes($intervalMinutes - 1);
-            $timeIteratorString = $timeIterator->toIso8601ZuluString();
-
-            while ($i < count($timeRecords)) {
-                if (array_key_exists($timeIteratorString, $points)) {
-                    break;
-                }
-
-                if ($timeRecords[$i]->between($timeIterator, $upperLimit)) {
-                    $points[$timeIteratorString] = $timeRecords[$i];
-                    $lastPoint = $timeRecords[$i];
-                }
-
-                $i++;
-            }
-
-            $timeIterator->addMinutes($intervalMinutes);
-        }
-
-        if ($addLastMinute && $lastPoint) {
-            if ($timeRecords[count($timeRecords) - 1]->gt($lastPoint)) {
-                $points[] = $timeRecords[count($timeRecords) - 1];
-            }
-        }
-
-        return array_values($points);
-    }
 
     public function timeHistogram(Request $request)
     {
