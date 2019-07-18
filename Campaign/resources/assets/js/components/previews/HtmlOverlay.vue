@@ -158,6 +158,7 @@
             "buttonBackgroundColor",
             "textColor",
             "textAlign",
+            "fontSize",
             "text",
             "width",
             "height",

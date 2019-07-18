@@ -116,10 +116,8 @@ class BannerRequest extends FormRequest
                 case Banner::TEMPLATE_HTML_OVERLAY:
                     $templateValidator = Validator::make($this->all(), [
                         'text' => 'required',
-                        'text_align' => 'required',
                         'text_color' => 'required',
                         'background_color' => 'required',
-                        'font_size' => 'required',
                     ]);
                     break;
                 default:
