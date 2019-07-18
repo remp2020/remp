@@ -140,6 +140,7 @@
                 :variants-url="variantsUrl"
                 ref="histogram" >
         </article-details>
+
     </div>
     <script type="text/javascript">
         new Vue({
@@ -160,6 +161,78 @@
                 }
             }
         })
+    </script>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Referer stats <small></small></h2>
+                    <div id="smart-range-selector">
+                        {!! Form::hidden('visited_from', $visitedFrom) !!}
+                        {!! Form::hidden('visited_to', $visitedTo) !!}
+                        <smart-range-selector from="{{$visitedFrom}}" to="{{$visitedTo}}" :callback="callback">
+                        </smart-range-selector>
+                    </div>
+                </div>
+
+                {!! Widget::run('DataTable', [
+                    'colSettings' => [
+                        'derived_referer_medium' => [
+                            'header' => 'medium',
+                            'orderable' => false,
+                            'filter' => $mediums,
+                            'priority' => 1,
+                        ],
+                        'source' => [
+                            'header' => 'source',
+                            'searchable' => false,
+                            'orderable' => false,
+                            'priority' => 1,
+                        ],
+                        'visits_count' => [
+                            'header' => 'visits count',
+                            'searchable' => false,
+                            'priority' => 1,
+                            'render' => 'number',
+                            'className' => 'text-right',
+                        ],
+                    ],
+                    'dataSource' => route('articles.dtReferers', $article->id),
+                    'order' => [2, 'desc'],
+                    'requestParams' => [
+                        'visited_from' => '$(\'[name="visited_from"]\').val()',
+                        'visited_to' => '$(\'[name="visited_to"]\').val()',
+                        'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone',
+                    ],
+                    'refreshTriggers' => [
+                        [
+                            'event' => 'change',
+                            'selector' => '[name="visited_from"]'
+                        ],
+                        [
+                            'event' => 'change',
+                            'selector' => '[name="visited_to"]',
+                        ]
+                    ],
+                ]) !!}
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        new Vue({
+            el: "#smart-range-selector",
+            components: {
+                SmartRangeSelector
+            },
+            methods: {
+                callback: function (from, to) {
+                    $('[name="visited_from"]').val(from);
+                    $('[name="visited_to"]').val(to).trigger("change");
+                }
+            }
+        });
     </script>
 
 @endsection

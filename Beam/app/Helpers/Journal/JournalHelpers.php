@@ -17,6 +17,23 @@ class JournalHelpers
     }
 
     /**
+     * Get available referer mediums in pageviews segments storage per last $hoursAgo
+     * Useful for filtering in data tables
+     * @param int $hoursAgo
+     *
+     * @return Collection
+     */
+    public function derivedRefererMediumGroups(int $hoursAgo = 12): Collection
+    {
+        $ar = (new AggregateRequest('pageviews', 'load'))
+            ->setTime(Carbon::now()->subHours($hoursAgo), Carbon::now())
+            ->addGroup('derived_referer_medium');
+
+        $results = collect($this->journal->count($ar));
+        return $results->pluck('tags.derived_referer_medium');
+    }
+
+    /**
      * Load unique users count per each article
      *
      * @param Collection $articles
