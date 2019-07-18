@@ -160,8 +160,6 @@
 
 
 <script>
-    import remplib from "remp/js/remplib";
-
     import HtmlPreview from "./previews/Html";
     import MediumRectanglePreview from "./previews/MediumRectangle";
     import BarPreview from "./previews/Bar";
