@@ -257,7 +257,7 @@ class ArticleDetailsController extends Controller
 
         $ar = (new AggregateRequest('pageviews', 'load'))
             ->setTime($visitedFrom, $visitedTo)
-            ->addGroup('derived_referer_host_with_path', 'derived_referer_medium')
+            ->addGroup('derived_referer_host_with_path', 'derived_referer_medium', 'derived_referer_source')
             ->addFilter('article_id', $article->external_id);
 
         $columns = $request->input('columns');
@@ -268,13 +268,40 @@ class ArticleDetailsController extends Controller
         }
 
         $data = collect();
+        $records = $this->journal->count($ar);
 
-        foreach ($this->journal->count($ar) as $record) {
-            $data->push([
-                'derived_referer_medium' => $record->tags->derived_referer_medium,
-                'source' => $record->tags->derived_referer_host_with_path,
-                'visits_count' => $record->count,
-            ]);
+        // 'derived_referer_source' has priority over 'derived_referer_host_with_path'
+        // since we do not want to distinguish between e.g. m.facebook.com and facebook.com, all should be categorized as one
+        $aggregated = [];
+        foreach ($records as $record) {
+            $derivedMedium = $record->tags->derived_referer_medium;
+            $derivedSource = $record->tags->derived_referer_source;
+            $source = $record->tags->derived_referer_host_with_path;
+            $count = $record->count;
+
+            if (!array_key_exists($derivedMedium, $aggregated)) {
+                $aggregated[$derivedMedium] = [];
+            }
+
+            $key = $source;
+            if ($derivedSource) {
+                $key = $derivedSource;
+            }
+
+            if (!array_key_exists($key, $aggregated[$derivedMedium])) {
+                $aggregated[$derivedMedium][$key] = 0;
+            }
+            $aggregated[$derivedMedium][$key] += $count;
+        }
+
+        foreach ($aggregated as $medium => $mediumSources) {
+            foreach ($mediumSources as $source => $count) {
+                $data->push([
+                    'derived_referer_medium' => $medium,
+                    'source' => $source,
+                    'visits_count' => $count,
+                ]);
+            }
         }
 
         if (count($orderOptions) > 0) {
