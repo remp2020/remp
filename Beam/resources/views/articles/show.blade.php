@@ -164,7 +164,7 @@
     </script>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h2>Referer stats <small></small></h2>
