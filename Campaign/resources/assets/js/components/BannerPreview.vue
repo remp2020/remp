@@ -167,6 +167,8 @@
     import ShortMessagePreview from "./previews/ShortMessage";
     import OverlayRectanglePreview from "./previews/OverlayRectangle";
 
+    import lib from "remp/js/remplib.js";
+
     const props = [
         "name",
         "targetUrl",
@@ -236,7 +238,7 @@
 
             if (this.cssIncludes) {
                 for (let ii = 0; ii < this.cssIncludes.length; ii++) {
-                    remplib.loadStyle(this.cssIncludes[ii]);
+                    lib.loadStyle(this.cssIncludes[ii]);
                 }
             }
 
@@ -251,7 +253,7 @@
                         continue;
                     }
 
-                    remplib.loadScript(this.jsIncludes[ii], function () {
+                    lib.loadScript(this.jsIncludes[ii], function () {
                         loadedScriptsCount++;
                         if (loadedScriptsCount === vm.jsIncludes.length) {
                             vm.runCustomJavascript(js);
