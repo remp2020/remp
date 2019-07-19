@@ -3,7 +3,7 @@
 </style>
 
 <template>
-    <div class="remp-banner">
+    <div class="remp-banner" :id="wrapperId">
         <html-preview v-if="template === 'html'"
                 :alignmentOptions="alignmentOptions"
                 :dimensionOptions="dimensionOptions"
@@ -167,6 +167,8 @@
     import ShortMessagePreview from "./previews/ShortMessage";
     import OverlayRectanglePreview from "./previews/OverlayRectangle";
 
+    import lib from "remp/js/remplib";
+
     const props = [
         "name",
         "targetUrl",
@@ -228,6 +230,8 @@
             });
         },
         mounted: function() {
+            this.wrapperId = 'remp-banner-' + lib.uuidv4();
+
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
@@ -236,7 +240,7 @@
 
             if (this.cssIncludes) {
                 for (let ii = 0; ii < this.cssIncludes.length; ii++) {
-                    remplib.loadStyle(this.cssIncludes[ii]);
+                    lib.loadStyle(this.cssIncludes[ii]);
                 }
             }
 
@@ -251,7 +255,7 @@
                         continue;
                     }
 
-                    remplib.loadScript(this.jsIncludes[ii], function () {
+                    lib.loadScript(this.jsIncludes[ii], function () {
                         loadedScriptsCount++;
                         if (loadedScriptsCount === vm.jsIncludes.length) {
                             vm.runCustomJavascript(js);
@@ -261,9 +265,22 @@
             } else {
                 this.runCustomJavascript(js);
             }
+
+            setTimeout(() => {
+                let hrefs = document.getElementById(this.wrapperId).getElementsByTagName('a');
+
+                for(let ii = 0; ii < hrefs.length; ii++) {
+                    let href = hrefs[ii].getAttribute('href');
+                    if (href) {
+                        hrefs[ii].setAttribute('href', this.addUrlParams(href));
+                    }
+                }
+                // console.log(hrefs);
+            }, 0)
         },
         data: () => ({
             visible: false,
+            wrapperId: null
         }),
         watch: {
             'transition': function() {
@@ -277,11 +294,16 @@
         },
         computed: {
             url: function() {
-                if (!this.targetUrl) {
-                    return null;
+                if (this.targetUrl) {
+                    return this.targetUrl;
                 }
-                let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
-                let url =  this.targetUrl + separator + "utm_source=remp_campaign" +
+                return null;
+            },
+        },
+        methods: {
+            addUrlParams: function(url) {
+                let separator = url.indexOf("?") === -1 ? "?" : "&";
+                url =  url + separator + "utm_source=remp_campaign" +
                     "&utm_medium=" + encodeURIComponent(this.displayType);
                 if (this.campaignUuid) {
                     url += "&utm_campaign=" + encodeURIComponent(this.campaignUuid);
@@ -303,8 +325,6 @@
 
                 return url;
             },
-        },
-        methods: {
             injectVars: function(str) {
                 if (!remplib || !remplib.campaign) {
                     return str;
