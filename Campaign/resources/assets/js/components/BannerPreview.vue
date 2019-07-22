@@ -275,7 +275,6 @@
                         hrefs[ii].setAttribute('href', this.addUrlParams(href));
                     }
                 }
-                // console.log(hrefs);
             }, 0)
         },
         data: () => ({
