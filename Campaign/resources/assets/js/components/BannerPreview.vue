@@ -167,7 +167,7 @@
     import ShortMessagePreview from "./previews/ShortMessage";
     import OverlayRectanglePreview from "./previews/OverlayRectangle";
 
-    import lib from "remp/js/remplib";
+    import lib from "remp/js/remplib.js";
 
     const props = [
         "name",
