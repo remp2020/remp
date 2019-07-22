@@ -113,6 +113,13 @@ class BannerRequest extends FormRequest
                         'text' => 'string|required',
                     ]);
                     break;
+                case Banner::TEMPLATE_HTML_OVERLAY:
+                    $templateValidator = Validator::make($this->all(), [
+                        'text' => 'required',
+                        'text_color' => 'required',
+                        'background_color' => 'required',
+                    ]);
+                    break;
                 default:
                     throw new \Exception('unhandled template type: ' . $templateType);
             }

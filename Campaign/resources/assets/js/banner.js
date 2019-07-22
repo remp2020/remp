@@ -100,6 +100,17 @@ window.remplib = window.remplib || {};
                 }
             }
 
+            if (banner.template === 'html_overlay') {
+                banner.htmlOverlayTemplate = {
+                    backgroundColor: model['html_overlay_template']['background_color'] || null,
+                    textColor: model['html_overlay_template']['text_color'] || null,
+                    fontSize: model['html_overlay_template']['font_size'] || null,
+                    textAlign: model['html_overlay_template']['text_align'] || null,
+                    text: model['html_overlay_template']['text'] || null,
+                    css: model['html_overlay_template']['css'] || null,
+                }
+            }
+
             if (banner.template === 'short_message') {
                 banner.shortMessageTemplate = {
                     backgroundColor: model['short_message_template']['background_color'] || null,

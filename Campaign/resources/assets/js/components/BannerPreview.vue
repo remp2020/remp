@@ -155,6 +155,26 @@
                 :adminPreview="adminPreview"
         >
         </overlay-rectangle-preview>
+
+        <html-overlay-preview v-if="template === 'html_overlay'"
+              :alignmentOptions="alignmentOptions"
+              :show="visible"
+              :uuid="uuid"
+              :campaignUuid="campaignUuid"
+
+              :textAlign="htmlOverlayTemplate.textAlign"
+              :textColor="htmlOverlayTemplate.textColor"
+              :fontSize="htmlOverlayTemplate.fontSize"
+              :backgroundColor="htmlOverlayTemplate.backgroundColor"
+              :text="htmlOverlayTemplate.text"
+              :css="htmlOverlayTemplate.css"
+
+              :targetUrl="targetUrl"
+              :closeable="closeable"
+              :closeText="closeText"
+              :transition="transition"
+              :displayType="displayType"
+        ></html-overlay-preview>
     </div>
 </template>
 
@@ -166,6 +186,7 @@
     import CollapsibleBarPreview from "./previews/CollapsibleBar";
     import ShortMessagePreview from "./previews/ShortMessage";
     import OverlayRectanglePreview from "./previews/OverlayRectangle";
+    import HtmlOverlayPreview from "./previews/HtmlOverlay";
 
     import lib from "remp/js/remplib.js";
 
@@ -197,6 +218,7 @@
         "htmlTemplate",
         "shortMessageTemplate",
         "overlayRectangleTemplate",
+        "htmlOverlayTemplate",
 
         "alignmentOptions",
         "dimensionOptions",
@@ -219,6 +241,7 @@
             CollapsibleBarPreview,
             ShortMessagePreview,
             OverlayRectanglePreview,
+            HtmlOverlayPreview,
         },
         name: 'banner-preview',
         props: props,
