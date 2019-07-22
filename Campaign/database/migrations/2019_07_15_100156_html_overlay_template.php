@@ -17,9 +17,9 @@ class HtmlOverlayTemplate extends Migration
             $table->increments('id');
             $table->integer('banner_id')->unsigned();
             $table->text('text');
-            $table->string('text_align');
+            $table->string('text_align')->nullable(true);
             $table->string('text_color');
-            $table->string('font_size');
+            $table->string('font_size')->nullable(true);
             $table->string('background_color');
             $table->text('css')->nullable();
 
