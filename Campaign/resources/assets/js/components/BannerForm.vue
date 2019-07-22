@@ -121,6 +121,7 @@
                                     <label for="target_url" class="fg-label">Target URL</label>
                                     <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                                 </div>
+                                <div><small>UTM params will be automatically appended to this link.</small></div>
                             </div>
 
                             <div class="input-group fg-float m-t-30">

@@ -48,6 +48,7 @@
                                 <label for="text" class="fg-label">Text</label>
                                 <input v-model="text" class="form-control fg-input" name="text" id="text" type="text" requried>
                             </div>
+                            <div><small>UTM params will be automatically appended to every link in this field.</small></div>
                         </div>
 
                     </div>
