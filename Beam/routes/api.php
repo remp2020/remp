@@ -23,6 +23,8 @@ Route::middleware('auth:api')->group(function() {
     Route::post('articles/unread', 'ArticleController@unreadArticlesForUsers')->name('articles.unreadArticlesForUsers');
     Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
+
+    Route::get('/segments/concurrents/count/{article?}', 'Api\SegmentsController@concurrentsCount');
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', 'JournalController@actions');
@@ -31,4 +33,6 @@ Route::get('/journal/flags', 'JournalController@flags');
 Route::middleware('cors')->group(function() {
     Route::get('/dashboard/options', 'DashboardController@options')->name('dashboard.options');
 });
+
+
 
