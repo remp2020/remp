@@ -24,7 +24,7 @@ Route::middleware('auth:api')->group(function() {
     Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
-    Route::get('/segments/concurrents/count/{article?}', 'Api\SegmentsController@concurrentsCount');
+    Route::get('/journal/concurrents/count/{article?}', 'JournalController@concurrentsCount');
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', 'JournalController@actions');
