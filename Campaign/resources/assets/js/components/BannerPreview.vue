@@ -266,7 +266,7 @@
                 this.runCustomJavascript(js);
             }
 
-            setTimeout(() => {
+            this.$nextTick(() => {
                 let hrefs = document.getElementById(this.wrapperId).getElementsByTagName('a');
 
                 for(let ii = 0; ii < hrefs.length; ii++) {
@@ -275,7 +275,7 @@
                         hrefs[ii].setAttribute('href', this.addUrlParams(href));
                     }
                 }
-            }, 0)
+            }, this);
         },
         data: () => ({
             visible: false,
