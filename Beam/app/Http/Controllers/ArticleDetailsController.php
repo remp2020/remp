@@ -197,7 +197,6 @@ class ArticleDetailsController extends Controller
             }
             $conversionsSums[$conversions->currency] += $conversions->amount;
         }
-
         $conversionsSums = $conversionsSums->map(function ($sum, $currency) {
             return number_format($sum, 2) . ' ' . $currency;
         })->values()->implode(', ');
