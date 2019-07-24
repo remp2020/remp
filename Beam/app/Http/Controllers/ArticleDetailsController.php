@@ -173,49 +173,34 @@ class ArticleDetailsController extends Controller
         ];
     }
 
-    public function show(Article $article, Request $request)
+    public function show(Request $request, Article $article = null)
     {
-        $timeBefore = Carbon::now();
-        $timeAfter = $article->published_at;
+        if (!$article) {
+            $externalId = $request->input('external-id');
+            $url = $request->input('url');
 
-        $uniqueRequest = new AggregateRequest('pageviews', 'load');
-        $uniqueRequest->setTimeAfter($timeAfter);
-        $uniqueRequest->setTimeBefore($timeBefore);
-        $uniqueRequest->addGroup('article_id', 'title_variant', 'image_variant');
-        $uniqueRequest->addFilter('article_id', $article->external_id);
-        $results = collect($this->journal->unique($uniqueRequest));
-
-        $titleVariants = [];
-        $imageVariants = [];
-        foreach ($results as $result) {
-            if (isset($result->tags->title_variant)) {
-                $titleVariants[$result->tags->title_variant] = true;
-            }
-
-            if (isset($result->tags->image_variant)) {
-                $imageVariants[$result->tags->image_variant] = true;
+            if ($externalId) {
+                $article = Article::where('external_id', $externalId)->first();
+            } elseif ($url) {
+                $article = Article::where('url', $url)->first();
             }
         }
 
-        $uniqueBrowsersCount = $results->sum('count');
+        if (!$article) {
+            abort(404);
+        }
 
-        $conversionRate = $uniqueBrowsersCount == 0 ? 0 : ($article->conversions()->count() / $uniqueBrowsersCount) * 100;
-
-        $conversionsSum = collect();
+        $conversionsSums = collect();
         foreach ($article->conversions as $conversions) {
-            if (!$conversionsSum->has($conversions->currency)) {
-                $conversionsSum[$conversions->currency] = 0;
+            if (!$conversionsSums->has($conversions->currency)) {
+                $conversionsSums[$conversions->currency] = 0;
             }
-            $conversionsSum[$conversions->currency] += $conversions->amount;
+            $conversionsSums[$conversions->currency] += $conversions->amount;
         }
 
-        $conversionsSum = $conversionsSum->map(function ($sum, $currency) {
+        $conversionsSums = $conversionsSums->map(function ($sum, $currency) {
             return number_format($sum, 2) . ' ' . $currency;
         })->values()->implode(', ');
-
-
-        $newConversionsCount = $article->loadNewConversionsCount();
-        $renewedConversionsCount = $article->loadRenewedConversionsCount();
 
         $pageviewsSubscribersToAllRatio =
             $article->pageviews_all == 0 ? 0 : ($article->pageviews_subscribers / $article->pageviews_all) * 100;
@@ -228,20 +213,14 @@ class ArticleDetailsController extends Controller
             'html' => view('articles.show', [
                 'article' => $article,
                 'pageviewsSubscribersToAllRatio' => $pageviewsSubscribersToAllRatio,
-                'conversionRate' => $conversionRate,
-                'conversionsSum' => $conversionsSum,
-                'uniqueBrowsersCount' => $uniqueBrowsersCount,
-                'newConversionsCount' => $newConversionsCount,
-                'renewedConversionsCount' => $renewedConversionsCount,
+                'conversionsSum' => $conversionsSums,
                 'dataFrom' => $request->input('data_from', 'now - 30 days'),
                 'dataTo' => $request->input('data_to', 'now'),
-                'hasTitleVariants' => count($titleVariants) > 1,
-                'hasImageVariants' => count($imageVariants) > 1,
                 'mediums' => $mediums,
                 'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
             ]),
-            'json' => new ArticleResource($article),
+            'json' => new ArticleResource($article)
         ]);
     }
 

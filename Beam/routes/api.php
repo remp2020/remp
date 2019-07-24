@@ -25,6 +25,7 @@ Route::middleware('auth:api')->group(function() {
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
     Route::match(['GET', 'POST'], '/journal/concurrents/count/', 'JournalController@concurrentsCount');
+    Route::get('article/{article?}', 'ArticleDetailsController@show');
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', 'JournalController@actions');
