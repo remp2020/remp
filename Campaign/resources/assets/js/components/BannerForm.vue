@@ -200,7 +200,6 @@
                                     </div>
                                 </div>
                             </div><!-- .input-group -->
-                            <input v-else type="hidden" name="position" value="center">
 
                             <div class="input-group fg-float" v-if="isOverlay">
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
