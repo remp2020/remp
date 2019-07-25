@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Helpers\Journal\JournalHelpers;
 use App\Model\ArticleTitle;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,13 +15,10 @@ class Article extends Model
 {
     private $journal;
 
-    private $journalHelper;
-
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
         $this->journal = resolve(JournalContract::class);
-        $this->journalHelper = new JournalHelpers($this->journal);
     }
 
     use InsertOnDuplicateKey;
