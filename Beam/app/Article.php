@@ -15,6 +15,8 @@ class Article extends Model
 {
     private $journal;
 
+    private $cachedAttributes = [];
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -87,6 +89,10 @@ class Article extends Model
      */
     public function getVariantsCountAttribute(): array
     {
+        if (array_key_exists('variants_count', $this->cachedAttributes)) {
+            return $this->cachedAttributes['variants_count'];
+        }
+
         $r = (new AggregateRequest('pageviews', 'load'))
             ->setTime($this->published_at, Carbon::now())
             ->addGroup('article_id', 'title_variant', 'image_variant')
@@ -103,6 +109,8 @@ class Article extends Model
             }
             $variants[$titleVariant][$imageVariant] = $result->count;
         }
+
+        $this->cachedAttributes['variants_count'] = $variants;
 
         return $variants;
     }
