@@ -31,7 +31,7 @@ class JournalController extends Controller
         return collect($this->journal->actions($group, $category));
     }
 
-    public function concurrentsCount(Request $request)
+    public function articlesConcurrentsCount(Request $request)
     {
         $ids = (array) $request->input('id', []);
 
@@ -39,42 +39,39 @@ class JournalController extends Controller
             $urls = (array) $request->input('url', []);
             if ($urls) {
                 $articles = Article::whereIn('url', $urls)->get();
-                foreach ($articles as $article) {
-                    $ids[] = $article->external_id;
-                }
+                $ids = $articles->pluck('external_id')->toArray();
             }
         }
 
-        $timeBefore = Carbon::now();
-        $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
-
-        $req = new ConcurrentsRequest();
-        $req->setTimeAfter($timeAfter);
-        $req->setTimeBefore($timeBefore);
-        $req->addGroup('article_id');
-        if ($ids > 0) {
-            $req->addFilter('article_id', ...$ids);
+        if (!$ids) {
+            abort(400, 'Please specify id or url parameters');
         }
-        $records = collect($this->journal->concurrents($req));
 
-        $total = 0;
+        $records = $this->journalHelpers->currentConcurrentsCount(function (ConcurrentsRequest $r) use ($ids) {
+            $r->addGroup('article_id');
+            if ($ids > 0) {
+                $r->addFilter('article_id', ...$ids);
+            }
+        });
+
         $articles = [];
         foreach ($records as $record) {
-            $total += $record->count;
-            if ($ids) {
-                $articles[] = [
-                    'external_id' => $record->tags->article_id,
-                    'count' => $record->count,
-                ];
-            }
+            $articles[] = [
+                'external_id' => $record->tags->article_id,
+                'count' => $record->count,
+            ];
         }
 
-        $response = ['total' => $total];
+        return response()->json([
+            'articles' => $articles,
+        ]);
+    }
 
-        if ($articles) {
-            $response = ['articles' => $articles];
-        }
-
-        return response()->json($response);
+    public function concurrentsCount()
+    {
+        $records = $this->journalHelpers->currentConcurrentsCount();
+        return response()->json([
+            'total' => $records->sum('count'),
+        ]);
     }
 }
