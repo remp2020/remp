@@ -176,7 +176,7 @@ class ArticleDetailsController extends Controller
     public function show(Request $request, Article $article = null)
     {
         if (!$article) {
-            $externalId = $request->input('external-id');
+            $externalId = $request->input('external_id');
             $url = $request->input('url');
 
             if ($externalId) {
