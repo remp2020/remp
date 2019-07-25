@@ -2,8 +2,15 @@
 
 namespace App\Http\Resources;
 
+use App\Article;
 use Remp\LaravelHelpers\Resources\JsonResource;
 
+/**
+ * Class ArticleResource
+ *
+ * @mixin Article
+ * @package App\Http\Resources
+ */
 class ArticleResource extends JsonResource
 {
     /**
