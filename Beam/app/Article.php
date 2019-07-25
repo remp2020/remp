@@ -130,8 +130,11 @@ class Article extends Model
     public function getConversionRateAttribute(): float
     {
         $uniqueBrowsersCount = $this->unique_browsers_count;
-        $conversionRate = $uniqueBrowsersCount == 0 ? 0.0 : ($this->conversions()->count() / $uniqueBrowsersCount) * 100;
-        return (float) $conversionRate;
+        if ($uniqueBrowsersCount === 0) {
+            return 0.0;
+        }
+
+        return (float) ($this->conversions()->count() / $uniqueBrowsersCount) * 100;
     }
 
     /**
