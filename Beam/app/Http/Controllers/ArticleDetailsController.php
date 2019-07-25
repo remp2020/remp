@@ -212,7 +212,7 @@ class ArticleDetailsController extends Controller
             'html' => view('articles.show', [
                 'article' => $article,
                 'pageviewsSubscribersToAllRatio' => $pageviewsSubscribersToAllRatio,
-                'conversionsSum' => $conversionsSums,
+                'conversionsSums' => $conversionsSums,
                 'dataFrom' => $request->input('data_from', 'now - 30 days'),
                 'dataTo' => $request->input('data_to', 'now'),
                 'mediums' => $mediums,

@@ -101,7 +101,7 @@
                             </dl>
                             <dl class="dl-horizontal">
                                 <dt>Conversions amount</dt>
-                                <dd>{{ $conversionsSum }}</dd>
+                                <dd>{{ $conversionsSums }}</dd>
                             </dl>
                         </div>
                     </div>
