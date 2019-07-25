@@ -35,5 +35,3 @@ Route::middleware('cors')->group(function() {
     Route::get('/dashboard/options', 'DashboardController@options')->name('dashboard.options');
 });
 
-
-
