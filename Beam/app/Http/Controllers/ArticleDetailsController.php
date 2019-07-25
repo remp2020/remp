@@ -184,14 +184,13 @@ class ArticleDetailsController extends Controller
                 if (!$article) {
                     abort(404, 'No article found for given external_id parameter');
                 }
-
             } elseif ($url) {
                 $article = Article::where('url', $url)->first();
                 if (!$article) {
-                    abort(404,'No article found for given URL parameter');
+                    abort(404, 'No article found for given URL parameter');
                 }
             } else {
-                abort(404,'Please specify either article ID, external_id or URL');
+                abort(404, 'Please specify either article ID, external_id or URL');
             }
         }
 
