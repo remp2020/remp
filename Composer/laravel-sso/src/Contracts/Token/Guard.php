@@ -8,6 +8,7 @@ use Remp\LaravelSso\Contracts\SsoException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard as AuthGuard;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class Guard implements AuthGuard
 {
@@ -128,8 +129,8 @@ class Guard implements AuthGuard
             if ($authorizationHeader) {
                 foreach (explode(',', $authorizationHeader) as $headerValue) {
                     $headerValue = trim($headerValue);
-                    if (self::startsWith($headerValue, 'Bearer ')) {
-                        $token = substr($headerValue, 7);
+                    if (Str::startsWith($headerValue, 'Bearer ')) {
+                        $token = Str::substr($headerValue, 7);
                     }
                 }
             }
@@ -140,24 +141,5 @@ class Guard implements AuthGuard
         }
 
         return $token;
-    }
-
-    /**
-     * Determine if a given string starts with a given substring.
-     * Copy of Illuminate\Support\Str::startsWith function
-     *
-     * @param  string  $haystack
-     * @param  string|array  $needles
-     * @return bool
-     */
-    public static function startsWith($haystack, $needles)
-    {
-        foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
