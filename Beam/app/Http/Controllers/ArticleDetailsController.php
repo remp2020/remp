@@ -219,7 +219,7 @@ class ArticleDetailsController extends Controller
                 'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
             ]),
-            'json' => new ArticleResource($article)
+            'json' => new ArticleResource($article),
         ]);
     }
 
