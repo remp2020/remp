@@ -11,6 +11,12 @@
         text-decoration: none;
     }
 
+    .medium-rectangle-preview-close > span {
+        position: relative;
+        top: -2px;
+        font-size: 12px;
+    }
+
     .medium-rectangle-preview-close.hidden {
         display: none;
     }
@@ -61,7 +67,7 @@
     ]">
         <transition appear v-bind:name="transition">
             <div class="medium-rectangle-preview-box" v-bind:style="[boxStyles]">
-                <a class="medium-rectangle-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="closeStyles">&times;</a>
+                <a class="medium-rectangle-preview-close" title="Close banner" href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed" v-bind:style="[closeStyles]"><span>{{ closeText }}</span>&nbsp;&times;</a>
                 <div class="medium-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
                 <div class="medium-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
                 <div class="medium-rectangle-button" v-if="buttonText.length > 0" v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectVars(buttonText)" v-bind:style="[buttonStyles]"></div>
@@ -94,6 +100,7 @@
             "offsetHorizontal",
             "targetUrl",
             "closeable",
+            "closeText",
             "displayType",
             "forcedPosition",
             "uuid",

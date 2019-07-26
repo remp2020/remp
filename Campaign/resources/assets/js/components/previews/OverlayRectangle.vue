@@ -263,7 +263,7 @@
             },
             closeStyles: function() {
                 return {
-                    color: this.buttonBackgroundColor,
+                    color: this.closeTextColor,
                 }
             },
             isVisible: function() {
