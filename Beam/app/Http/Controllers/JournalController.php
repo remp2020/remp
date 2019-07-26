@@ -49,7 +49,7 @@ class JournalController extends Controller
 
         $records = $this->journalHelpers->currentConcurrentsCount(function (ConcurrentsRequest $r) use ($ids) {
             $r->addGroup('article_id');
-            if ($ids > 0) {
+            if (count($ids) > 0) {
                 $r->addFilter('article_id', ...$ids);
             }
         });
