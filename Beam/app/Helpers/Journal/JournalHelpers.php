@@ -5,6 +5,7 @@ namespace App\Helpers\Journal;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Remp\Journal\AggregateRequest;
+use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
 
 class JournalHelpers
@@ -14,6 +15,21 @@ class JournalHelpers
     public function __construct(JournalContract $journal)
     {
         $this->journal = $journal;
+    }
+
+    public function currentConcurrentsCount(callable $conditions = null): Collection
+    {
+        $timeBefore = Carbon::now();
+        $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
+        $req = new ConcurrentsRequest();
+        $req->setTimeAfter($timeAfter);
+        $req->setTimeBefore($timeBefore);
+
+        if ($conditions) {
+            $conditions($req);
+        }
+
+        return collect($this->journal->concurrents($req));
     }
 
     /**
