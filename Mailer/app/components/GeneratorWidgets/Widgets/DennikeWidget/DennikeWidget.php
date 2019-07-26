@@ -6,7 +6,7 @@ use Nette\Application\Responses\JsonResponse;
 use Nette\Http\Session;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
-use Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory;
+use Remp\MailerModule\Forms\DennikeTemplateFormFactory;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListsRepository;
@@ -56,10 +56,10 @@ class DennikeWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentMediaBriefingTemplateForm(MediaBriefingTemplateFormFactory $mediaBriefingTemplateFormFactory)
+    public function createComponentDennikeTemplateForm(DennikeTemplateFormFactory $dennikeTemplateFormFactory)
     {
-        $form = $mediaBriefingTemplateFormFactory->create();
-        $mediaBriefingTemplateFormFactory->onSave = function () {
+        $form = $dennikeTemplateFormFactory->create();
+        $dennikeTemplateFormFactory->onSave = function () {
             $this->getPresenter()->flashMessage("Dennike batches were created and run.");
             $this->getPresenter()->redirect("Job:Default");
         };
@@ -67,7 +67,7 @@ class DennikeWidget extends BaseControl implements IGeneratorWidget
         return $form;
     }
 
-    public function handleMediaBriefingPreview()
+    public function handleDennikePreview()
     {
         $request = $this->getPresenter()->getRequest();
 

@@ -81,11 +81,11 @@ class DennikeTemplateFormFactory
         $form->addHidden('locked_text_content');
 
         $defaults = [
-            'name' => 'MediaBrifing ' . date('j.n.Y'),
-            'code' => 'mbrf_' . date('dmY'),
+            'name' => 'Denník E ' . date('j.n.Y'),
+            'code' => 'dennike_' . date('dmY'),
             'mail_layout_id' => 33, // layout for subscribers
             'locked_mail_layout_id' => 33, // layout for non-subscribers
-            'mail_type_id' => 16, // mediabrifing
+            'mail_type_id' => 16, // dennike
             'from' => 'Denník N <info@dennikn.sk>',
         ];
 

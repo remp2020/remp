@@ -218,7 +218,7 @@ class DennikeGenerator implements IGenerator
         $addonParams = [
             'lockedHtmlContent' => $output['lockedHtmlContent'],
             'lockedTextContent' => $output['lockedTextContent'],
-            'mediaBriefingTitle' => $values->title,
+            'dennikeTitle' => $values->title,
             'from' => $values->from,
             'render' => true
         ];
@@ -239,9 +239,9 @@ class DennikeGenerator implements IGenerator
 
         $form->addText('from', 'Sender');
 
-        $form->addText('url', 'Media Briefing URL')
+        $form->addText('url', 'Dennik E URL')
             ->addRule(Form::URL)
-            ->setRequired("Field 'Media Briefing URL' is required.");
+            ->setRequired("Field 'Dennik E URL' is required.");
 
         $form->addTextArea('dennike_html', 'HTML')
             ->setAttribute('rows', 20)
