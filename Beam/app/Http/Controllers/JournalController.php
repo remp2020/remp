@@ -33,7 +33,7 @@ class JournalController extends Controller
 
     public function articlesConcurrentsCount(Request $request)
     {
-        $ids = (array) $request->input('id', []);
+        $ids = (array) $request->input('external_id', []);
 
         if (!$ids) {
             $urls = (array) $request->input('url', []);
@@ -44,7 +44,7 @@ class JournalController extends Controller
         }
 
         if (!$ids) {
-            abort(400, 'Please specify id or url parameters');
+            abort(400, 'Please specify external_id or url parameters');
         }
 
         $records = $this->journalHelpers->currentConcurrentsCount(function (ConcurrentsRequest $r) use ($ids) {
