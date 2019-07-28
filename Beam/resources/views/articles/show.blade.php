@@ -176,6 +176,15 @@
                     </div>
                 </div>
 
+                <script>
+                    $.fn.dataTables['render']['referer_medium'] = function () {
+                        return function(data) {
+                            var colors = {!! json_encode($mediumColors) !!};
+                            return "<span style='color:" + colors[data] + "'>●</span> " + data;
+                        }
+                    };
+                </script>
+
                 {!! Widget::run('DataTable', [
                     'colSettings' => [
                         'derived_referer_medium' => [
@@ -183,6 +192,7 @@
                             'orderable' => false,
                             'filter' => $mediums,
                             'priority' => 1,
+                            'render' => 'referer_medium',
                         ],
                         'source' => [
                             'header' => 'source',

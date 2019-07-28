@@ -220,6 +220,7 @@ class ArticleDetailsController extends Controller
                 'dataFrom' => $request->input('data_from', 'now - 30 days'),
                 'dataTo' => $request->input('data_to', 'now'),
                 'mediums' => $mediums,
+                'mediumColors' => Colors::refererMediumTagsToColors($mediums, true),
                 'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
             ]),
