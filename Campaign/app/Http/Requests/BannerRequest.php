@@ -28,7 +28,7 @@ class BannerRequest extends FormRequest
         return [
             'name' => 'required|max:255',
             'target_url' => 'nullable|url',
-            'position' => 'required|in:top_left,top_right,bottom_left,bottom_right,middle_left,middle_right,center',
+            'position' => 'nullable|in:top_left,top_right,bottom_left,bottom_right',
             'transition' => 'required|string',
             'display_type' => 'string|required|in:overlay,inline',
             'display_delay' => 'nullable|integer|required|required_if:display_type,overlay',
@@ -111,6 +111,13 @@ class BannerRequest extends FormRequest
                         'background_color' => 'string|required',
                         'text_color' => 'string|required',
                         'text' => 'string|required',
+                    ]);
+                    break;
+                case Banner::TEMPLATE_HTML_OVERLAY:
+                    $templateValidator = Validator::make($this->all(), [
+                        'text' => 'required',
+                        'text_color' => 'required',
+                        'background_color' => 'required',
                     ]);
                     break;
                 default:

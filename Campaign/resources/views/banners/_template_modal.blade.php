@@ -86,6 +86,21 @@
                         </div>
                     </div>
 
+                    <div class="col-md-4">
+                        <div class="card">
+                            <a href="{{ route('banners.create', ['template' => \App\Banner::TEMPLATE_HTML_OVERLAY]) }}">
+                                <div class="card-header">
+                                    <h4 class="text-center">HTML overlay</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="preview" style="margin-top: 55px;">
+                                        <i class="zmdi zmdi-language-html5 zmdi-hc-5x"></i>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

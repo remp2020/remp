@@ -47,6 +47,17 @@
                v-bind:show="show"
             ></overlay-rectangle-template>
 
+            <html-overlay-template v-if="template === 'html_overlay'"
+                v-bind:_backgroundColor="htmlOverlayTemplate.backgroundColor"
+                v-bind:_text="htmlOverlayTemplate.text"
+                v-bind:_css="htmlOverlayTemplate.css"
+                v-bind:_textColor="htmlOverlayTemplate.textColor"
+                v-bind:_fontSize="htmlOverlayTemplate.fontSize"
+                v-bind:_textAlign="htmlOverlayTemplate.textAlign"
+                v-bind:alignmentOptions="alignmentOptions"
+                v-bind:show="show"
+            ></html-overlay-template>
+
             <bar-template v-if="template === 'bar'"
                v-bind:_mainText="barTemplate.mainText"
                v-bind:_buttonText="barTemplate.buttonText"
@@ -140,7 +151,10 @@
                                 </div>
                                 <div style="margin-top: 5px;">Enter include script urls separated by new line.</div>
 
-                                <input v-for="jsInclude in jsIncludes" type="hidden" name="js_includes[]" :value="jsInclude">
+                                <div v-if="jsIncludes">
+                                    <input v-for="jsInclude in jsIncludes" type="hidden" name="js_includes[]" :value="jsInclude">
+                                </div>
+                                <input v-else type="hidden" name="js_includes[]">
                             </div><!-- .input-group -->
 
                             <div class="input-group fg-float m-t-30">
@@ -151,7 +165,10 @@
                                 </div>
                                 <div style="margin-top: 5px;">Enter include stylesheets urls separated by new line.</div>
 
-                                <input v-for="cssInclude in cssIncludes" type="hidden" name="css_includes[]" :value="cssInclude">
+                                <div v-if="cssIncludes">
+                                    <input v-for="cssInclude in cssIncludes" type="hidden" name="css_includes[]" :value="cssInclude">
+                                </div>
+                                <input v-else type="hidden" name="css_includes[]">
                             </div><!-- .input-group -->
 
                         </div>
@@ -163,7 +180,7 @@
                 <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
-                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}" v-if="overlayRectangleTemplate == null">
+                <li v-on:click="displayType='inline'" v-bind:class="{active: displayType === 'inline'}" v-if="isOverlay">
                     <a href="#inline-banner" role="tab" data-toggle="tab" aria-expanded="false">Inline Banner</a>
                 </li>
             </ul>
@@ -173,7 +190,7 @@
                     <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
 
-                            <div class="input-group" v-if="overlayRectangleTemplate == null">
+                            <div class="input-group" v-if="isOverlay">
                                 <span class="input-group-addon"><i class="zmdi zmdi-photo-size-select-large"></i></span>
                                 <div>
                                     <div class="row">
@@ -190,9 +207,8 @@
                                     </div>
                                 </div>
                             </div><!-- .input-group -->
-                            <input v-else type="hidden" name="position" value="center">
 
-                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
+                            <div class="input-group fg-float" v-if="isOverlay">
                                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
 
                                 <div class="fg-line">
@@ -202,7 +218,7 @@
                             </div><!-- .input-group -->
                             <input v-else type="hidden" name="offset_horizontal" value="0">
 
-                            <div class="input-group fg-float" v-if="overlayRectangleTemplate == null">
+                            <div class="input-group fg-float" v-if="isOverlay">
                                 <span class="input-group-addon"><i class="zmdi zmdi-long-arrow-down"></i></span>
 
                                 <div class="fg-line">
@@ -247,7 +263,7 @@
                         </div>
                     </div>
 
-                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner" v-if="overlayRectangleTemplate == null">
+                    <div role="tabpanel" v-bind:class="[{active: displayType === 'inline'}, 'tab-pane']" id="inline-banner" v-if="isOverlay">
                         <div class="card-body card-padding p-l-15">
                             <div class="input-group fg-float m-t-10">
                                 <span class="input-group-addon"><i class="zmdi zmdi-filter-center-focus"></i></span>
@@ -319,6 +335,7 @@
                                         :barTemplate="barTemplate"
                                         :collapsibleBarTemplate="collapsibleBarTemplate"
                                         :htmlTemplate="htmlTemplate"
+                                        :htmlOverlayTemplate="htmlOverlayTemplate"
                                         :shortMessageTemplate="shortMessageTemplate"
 
                                         :position="position"
@@ -359,6 +376,7 @@
     import BannerPreview from "./BannerPreview";
     import vSelect from "remp/js/components/vSelect";
     import FormValidator from "remp/js/components/FormValidator";
+    import HtmlOverlayTemplate from "./templates/HtmlOverlay";
 
     const props = {
         "_name": String,
@@ -382,6 +400,7 @@
         "_barTemplate": Object,
         "_collapsibleBarTemplate": Object,
         "_htmlTemplate": Object,
+        "_htmlOverlayTemplate": Object,
         "_shortMessageTemplate": Object,
         "_overlayRectangleTemplate": Object,
 
@@ -399,6 +418,7 @@
 
     export default {
         components: {
+            HtmlOverlayTemplate,
             HtmlTemplate,
             MediumRectangleTemplate,
             BarTemplate,
@@ -442,6 +462,7 @@
             barTemplate: null,
             collapsibleBarTemplate: null,
             htmlTemplate: null,
+            htmlOverlayTemplate: null,
             shortMessageTemplate: null,
             overlayRectangleTemplate: null,
 
@@ -470,6 +491,9 @@
             fieldParamsMessage: "UTM params will be automatically appended to every link in this field.<br> If you want to add custom parameter to specific link: add data-param-* attribute. e.g.: data-param-foo=\"baz\""
         }),
         computed: {
+            isOverlay: function() {
+                return this.overlayRectangleTemplate == null && this.htmlOverlayTemplate == null;
+            },
             jsIncludesStr: {
                 get: function () {
                     return this.jsIncludes ? this.jsIncludes.join("\n") : null;

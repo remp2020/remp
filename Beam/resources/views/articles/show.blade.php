@@ -89,19 +89,19 @@
                                 <dt>
                                     <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Ratio of new conversions and unique visitors">Conversion rate</span>
                                 </dt>
-                                <dd>{{number_format($conversionRate, 4)}} %</dd>
+                                <dd>{{number_format($article->conversion_rate, 4)}} %</dd>
                             </dl>
                             <dl class="dl-horizontal">
                                 <dt>New conversions</dt>
-                                <dd>{{$newConversionsCount}}</dd>
+                                <dd>{{$article->new_conversions_count}}</dd>
                             </dl>
                             <dl class="dl-horizontal">
                                 <dt><span data-toggle="tooltip" data-placement="top" title="" data-original-title="Users who already had a subscription in the past">Renewed conversions</span></dt>
-                                <dd>{{$renewedConversionsCount}}</dd>
+                                <dd>{{$article->renewed_conversions_count}}</dd>
                             </dl>
                             <dl class="dl-horizontal">
                                 <dt>Conversions amount</dt>
-                                <dd>{{ $conversionsSum }}</dd>
+                                <dd>{{ $conversionsSums }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -134,8 +134,8 @@
         </div>
 
         <article-details
-                :has-title-variants="{{$hasTitleVariants ? 'true' : 'false'}}"
-                :has-image-variants="{{$hasImageVariants ? 'true' : 'false'}}"
+                :has-title-variants="{{$article->has_title_variants ? 'true' : 'false'}}"
+                :has-image-variants="{{$article->has_image_variants ? 'true' : 'false'}}"
                 :url="url"
                 :variants-url="variantsUrl"
                 ref="histogram" >
@@ -176,6 +176,15 @@
                     </div>
                 </div>
 
+                <script>
+                    $.fn.dataTables['render']['referer_medium'] = function () {
+                        return function(data) {
+                            var colors = {!! json_encode($mediumColors) !!};
+                            return "<span style='font-size: 18px; color:" + colors[data] + "'>●</span> " + data;
+                        }
+                    };
+                </script>
+
                 {!! Widget::run('DataTable', [
                     'colSettings' => [
                         'derived_referer_medium' => [
@@ -183,6 +192,7 @@
                             'orderable' => false,
                             'filter' => $mediums,
                             'priority' => 1,
+                            'render' => 'referer_medium',
                         ],
                         'source' => [
                             'header' => 'source',

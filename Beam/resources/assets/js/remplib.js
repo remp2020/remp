@@ -429,7 +429,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         trackPaymentWithSource: function(transactionId, amount, currency, productIds, article, source) {
             let params = {
-                "step": "purchase",
+                "step": "payment",
                 "article": article,
                 "purchase": {
                     "transaction_id": transactionId,

@@ -8,6 +8,7 @@ use Remp\LaravelSso\Contracts\SsoException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard as AuthGuard;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class Guard implements AuthGuard
 {
@@ -120,6 +121,19 @@ class Guard implements AuthGuard
 
         if (empty($token)) {
             $token = $this->request->bearerToken();
+        }
+
+        if (empty($token)) {
+            // Support for multiple header values
+            $authorizationHeader = $this->request->header('Authorization');
+            if ($authorizationHeader) {
+                foreach (explode(',', $authorizationHeader) as $headerValue) {
+                    $headerValue = trim($headerValue);
+                    if (Str::startsWith($headerValue, 'Bearer ')) {
+                        $token = Str::substr($headerValue, 7);
+                    }
+                }
+            }
         }
 
         if (empty($token)) {

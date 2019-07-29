@@ -7,10 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 use Yadakhov\InsertOnDuplicateKey;
 
 class Article extends Model
 {
+    private $journal;
+
+    private $cachedAttributes = [];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->journal = resolve(JournalContract::class);
+    }
+
     use InsertOnDuplicateKey;
 
     protected $fillable = [
@@ -68,6 +80,143 @@ class Article extends Model
         return $this->hasMany(ArticleTitle::class);
     }
 
+    // Accessors
+
+    /**
+     * variants_count
+     * indexed by title variant name first, image variant name second
+     * @return array
+     */
+    public function getVariantsCountAttribute(): array
+    {
+        if (array_key_exists('variants_count', $this->cachedAttributes)) {
+            return $this->cachedAttributes['variants_count'];
+        }
+
+        $r = (new AggregateRequest('pageviews', 'load'))
+            ->setTime($this->published_at, Carbon::now())
+            ->addGroup('article_id', 'title_variant', 'image_variant')
+            ->addFilter('article_id', $this->external_id);
+        $results = collect($this->journal->unique($r));
+        $variants = [];
+
+        foreach ($results as $result) {
+            $titleVariant = $result->tags->title_variant;
+            $imageVariant = $result->tags->image_variant;
+
+            if (!array_key_exists($titleVariant, $variants)) {
+                $variants[$titleVariant] = [];
+            }
+            $variants[$titleVariant][$imageVariant] = $result->count;
+        }
+
+        $this->cachedAttributes['variants_count'] = $variants;
+
+        return $variants;
+    }
+
+    /**
+     * unique_browsers_count
+     * @return int
+     */
+    public function getUniqueBrowsersCountAttribute(): int
+    {
+        $total = 0;
+        $variantsCount = $this->variants_count; // Retrieved from accessor
+        foreach ($variantsCount as $title => $titleVariants) {
+            foreach ($titleVariants as $image => $count) {
+                $total += $count;
+            }
+        }
+        return $total;
+    }
+
+    /**
+     * conversion_rate
+     * @return float
+     */
+    public function getConversionRateAttribute(): float
+    {
+        $uniqueBrowsersCount = $this->unique_browsers_count;
+        if ($uniqueBrowsersCount === 0) {
+            return 0.0;
+        }
+
+        return (float) ($this->conversions()->count() / $uniqueBrowsersCount) * 100;
+    }
+
+    /**
+     * renewed_conversions_count
+     * @return int
+     */
+    public function getRenewedConversionsCountAttribute(): int
+    {
+        $renewSubscriptionsCountSql = <<<SQL
+        select count(*) as subscriptions_count from (
+            select c1.user_id from conversions c1
+            left join conversions c2
+            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at and c2.id != c1.id
+            where c2.id is not Null
+            and c1.article_id = ?
+            group by user_id
+        ) t
+SQL;
+        return DB::select($renewSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
+    }
+
+    /**
+     * new_conversions_count
+     * @return int
+     */
+    public function getNewConversionsCountAttribute(): int
+    {
+        $newSubscriptionsCountSql = <<<SQL
+        select count(*) as subscriptions_count from (
+            select c1.* from conversions c1
+            left join conversions c2
+            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at
+            where c2.id is Null
+            and c1.article_id = ?
+        ) t
+SQL;
+        return DB::select($newSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
+    }
+
+    /**
+     * has_image_variants
+     * @return int
+     */
+    public function getHasImageVariantsAttribute(): bool
+    {
+        $imageNames = [];
+        $variantsCount = $this->variants_count;
+        foreach ($variantsCount as $titleName => $titleVariants) {
+            foreach ($variantsCount as $imageName => $count) {
+                if ($imageName !== '') {
+                    $imageNames[$imageName] = true;
+                }
+            }
+        }
+        return count($imageNames) > 1;
+    }
+
+    /**
+     * has_title_variants
+     * @return bool
+     */
+    public function getHasTitleVariantsAttribute(): bool
+    {
+        $titleNames = [];
+        $variantsCount = $this->variants_count;
+        foreach ($variantsCount as $titleName => $titleVariants) {
+            if ($titleName !== '') {
+                $titleNames[$titleName] = true;
+            }
+        }
+        return count($titleNames) > 1;
+    }
+
+    // Mutators
     public function setPublishedAtAttribute($value)
     {
         if (!$value) {
@@ -159,35 +308,6 @@ class Article extends Model
             $query->where('published_at', '<=', $to);
         }
         return $query;
-    }
-
-    public function loadNewConversionsCount()
-    {
-        $newSubscriptionsCountSql = <<<SQL
-        select count(*) as subscriptions_count from (
-            select c1.* from conversions c1
-            left join conversions c2
-            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at
-            where c2.id is Null
-            and c1.article_id = ?
-        ) t
-SQL;
-        return DB::select($newSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
-    }
-
-    public function loadRenewedConversionsCount()
-    {
-        $renewSubscriptionsCountSql = <<<SQL
-        select count(*) as subscriptions_count from (
-            select c1.user_id from conversions c1
-            left join conversions c2
-            on c1.user_id = c2.user_id and c2.paid_at < c1.paid_at and c2.id != c1.id
-            where c2.id is not Null
-            and c1.article_id = ?
-            group by user_id
-        ) t
-SQL;
-        return DB::select($renewSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
     }
 
     /**

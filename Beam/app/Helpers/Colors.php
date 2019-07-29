@@ -66,7 +66,7 @@ class Colors
         return $colors;
     }
 
-    public static function refererMediumTagsToColors($tags): array
+    public static function refererMediumTagsToColors($tags, $withKeys = false): array
     {
         $tagColor = [
             'internal' => '#E63952',
@@ -80,8 +80,12 @@ class Colors
         $i = 0;
         $colors = [];
         foreach ($tags as $tag) {
-            $colors[] = $tagColor[$tag] ?? self::$additionalColors[$i++];
+            $colors[$tag] = $tagColor[$tag] ?? self::$additionalColors[$i++];
         }
-        return $colors;
+        if ($withKeys) {
+            return $colors;
+        }
+
+        return array_values($colors);
     }
 }
