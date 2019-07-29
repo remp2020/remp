@@ -288,32 +288,11 @@
             } else {
                 this.runCustomJavascript(js);
             }
-
-            this.$nextTick(() => {
-                let hrefs = document.getElementById(this.wrapperId).getElementsByTagName('a');
-
-                for(let ii = 0; ii < hrefs.length; ii++) {
-                    let href = hrefs[ii].getAttribute('href'),
-                        linkParams = {};
-
-                    [].forEach.call(hrefs[ii].attributes, function(attr) {
-                        if (/^data-param-/.test(attr.name)) {
-                            let camelCaseName = attr.name.substr(11).replace(/-(.)/g, function ($0, $1) {
-                                return $1.toUpperCase();
-                            });
-                            linkParams[camelCaseName] = attr.value;
-                        }
-                    });
-
-                    if (href) {
-                        hrefs[ii].setAttribute('href', this.addUrlParams(href, linkParams));
-                    }
-                }
-            }, this);
         },
         data: () => ({
             visible: false,
-            wrapperId: null
+            wrapperId: null,
+            paramsAdded: false
         }),
         watch: {
             'transition': function() {
@@ -321,8 +300,15 @@
                 setTimeout(function() { vm.visible = false }, 100);
                 setTimeout(function() { vm.visible = true }, 800);
             },
-            'show': function() {
-            	this.visible = this.show;
+            'show': {
+                handler: function() {
+                    if (this.show) {
+                        this.addParamsToLinks();
+                    }
+
+                    this.visible = this.show;
+                },
+                immediate: true
             }
         },
         computed: {
@@ -334,6 +320,34 @@
             },
         },
         methods: {
+            addParamsToLinks: function () {
+                if (!this.paramsAdded) {
+                    this.$nextTick(() => {
+                        let wrap = document.getElementById(this.wrapperId);
+                        let hrefs = wrap.getElementsByTagName('a');
+
+                        for(let ii = 0; ii < hrefs.length; ii++) {
+                            let href = hrefs[ii].getAttribute('href'),
+                                linkParams = {};
+
+                            [].forEach.call(hrefs[ii].attributes, function(attr) {
+                                if (/^data-param-/.test(attr.name)) {
+                                    let camelCaseName = attr.name.substr(11).replace(/-(.)/g, function ($0, $1) {
+                                        return $1.toUpperCase();
+                                    });
+                                    linkParams[camelCaseName] = attr.value;
+                                }
+                            });
+
+                            if (href) {
+                                hrefs[ii].setAttribute('href', this.addUrlParams(href, linkParams));
+                            }
+                        }
+                    }, this);
+                }
+
+                this.paramsAdded = true;
+            },
             addUrlParams: function(url, linkParams) {
                 let separator = url.indexOf("?") === -1 ? "?" : "&";
                 url =  url + separator + "utm_source=remp_campaign" +
