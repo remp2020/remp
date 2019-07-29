@@ -46,7 +46,6 @@
                     'className' => 'text-right',
                 ],
                 'conversions_rate' => [
-                    'orderable' => false,
                     'searchable' => false,
                     'header' => 'conversions rate',
                     'priority' => 2,
