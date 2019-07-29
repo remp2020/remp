@@ -180,7 +180,7 @@
                     $.fn.dataTables['render']['referer_medium'] = function () {
                         return function(data) {
                             var colors = {!! json_encode($mediumColors) !!};
-                            return "<span style='color:" + colors[data] + "'>●</span> " + data;
+                            return "<span style='font-size: 18px; color:" + colors[data] + "'>●</span> " + data;
                         }
                     };
                 </script>
