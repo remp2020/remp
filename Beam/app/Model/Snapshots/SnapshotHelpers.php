@@ -6,6 +6,15 @@ use Illuminate\Support\Facades\DB;
 
 class SnapshotHelpers
 {
+
+    /**
+     * Inverse function to timePoints(), selects those time points that should be excluded
+     * @param Carbon $from
+     * @param Carbon $to
+     * @param int    $intervalMinutes
+     *
+     * @return array
+     */
     public function timePointsToExclude(Carbon $from, Carbon $to, int $intervalMinutes): array
     {
         $timeRecords = DB::table('article_views_snapshots')

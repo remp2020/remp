@@ -20,6 +20,11 @@ class SnapshotHelperTest extends TestCase
         $this->snapshotHelpers = new SnapshotHelpers();
     }
 
+    /**
+     * SnapshotHelpers#timePoints() selects only single (lowest) snapshot per given interval from DB
+     * and #timePointsToExclude() excludes those snapshots that are not the lowest per given interval.
+     * This test inserts several snapshots and checks whether correct ones are selected/excluded.
+     */
     public function testExcludedTimePoints()
     {
         $start = Carbon::today();
