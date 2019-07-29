@@ -270,9 +270,20 @@
                 let hrefs = document.getElementById(this.wrapperId).getElementsByTagName('a');
 
                 for(let ii = 0; ii < hrefs.length; ii++) {
-                    let href = hrefs[ii].getAttribute('href');
+                    let href = hrefs[ii].getAttribute('href'),
+                        linkParams = {};
+
+                    [].forEach.call(hrefs[ii].attributes, function(attr) {
+                        if (/^data-param-/.test(attr.name)) {
+                            let camelCaseName = attr.name.substr(11).replace(/-(.)/g, function ($0, $1) {
+                                return $1.toUpperCase();
+                            });
+                            linkParams[camelCaseName] = attr.value;
+                        }
+                    });
+
                     if (href) {
-                        hrefs[ii].setAttribute('href', this.addUrlParams(href));
+                        hrefs[ii].setAttribute('href', this.addUrlParams(href, linkParams));
                     }
                 }
             }, this);
@@ -300,7 +311,7 @@
             },
         },
         methods: {
-            addUrlParams: function(url) {
+            addUrlParams: function(url, linkParams) {
                 let separator = url.indexOf("?") === -1 ? "?" : "&";
                 url =  url + separator + "utm_source=remp_campaign" +
                     "&utm_medium=" + encodeURIComponent(this.displayType);
@@ -318,6 +329,14 @@
                     for (let param in this.urlParams) {
                         if (this.urlParams.hasOwnProperty(param)) {
                             url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(this.urlParams[param]())
+                        }
+                    }
+                }
+
+                if (linkParams) {
+                    for (let param in linkParams) {
+                        if (linkParams.hasOwnProperty(param)) {
+                            url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(linkParams[param])
                         }
                     }
                 }

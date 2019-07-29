@@ -465,7 +465,9 @@
 
             js: null,
             jsIncludes: null,
-            cssIncludes: null
+            cssIncludes: null,
+
+            fieldParamsMessage: "UTM params will be automatically appended to every link in this field.<br> If you want to add custom parameter to specific link: add data-param-* attribute. e.g.: data-param-foo=\"baz\""
         }),
         computed: {
             jsIncludesStr: {
