@@ -137,6 +137,26 @@ $colors: (
         color: #2d2d2d;
       }
     }
+
+    &__beam-link {
+      display: block;
+      text-align: center;
+      background-color: #f7f7f7;
+      padding: 10px 0;
+      font-size: 11px;
+      color: #616060;
+      transition: all 0.2s ease-in-out;
+      &:hover {
+        background-color: #eaeaea;
+      }
+      svg {
+        fill: #616060;
+        height: 11px;
+        position: relative;
+        top: 1px;
+        left: 2px;
+      }
+    }
   }
 
   &__detail-animation-enter-active {
@@ -192,15 +212,15 @@ $colors: (
               <polygon
                 fill="black"
                 points="35.8 2.74 16.91 13.65 23.2 17.29 35.8 10.02 54.7 20.93 35.8 31.84 35.8 31.84 10.61 17.29 10.61 53.59 16.91 57.23 16.91 28.2 35.8 39.11 35.8 39.11 35.8 39.11 35.8 39.11 61 24.57 61 17.29 35.8 2.74"
-              ></polygon>
+              />
               <polygon
                 fill="black"
                 points="23.2 53.66 23.2 60.93 35.8 68.14 61 53.59 61 46.32 35.8 60.86 23.2 53.66"
-              ></polygon>
+              />
               <polygon
                 fill="black"
                 points="35.8 46.28 23.2 39.08 23.2 46.35 35.8 53.55 35.8 53.66 61 39.11 61 31.84 35.8 46.39 35.8 46.28"
-              ></polygon>
+              />
             </svg>
             Article Overview
           </div>
@@ -242,7 +262,7 @@ $colors: (
               :key="range.label"
             >
               <div class="ri-metrics__detail__performance__item__number">
-                <AnimatedInteger :value="pageviewStats[range.label]"/>
+                <AnimatedInteger :value="pageviewStats[range.label]" />
               </div>
               <div class="ri-metrics__detail__performance__item__caption">Readers {{ range.label }}</div>
             </div>
@@ -259,7 +279,7 @@ $colors: (
                 :key="'title'+range.label"
               >
                 <div class="ri-metrics__detail__ab__item__number">
-                  <AnimatedInteger :value="titleVariantStats[variant][range.label] || 0"/>
+                  <AnimatedInteger :value="titleVariantStats[variant][range.label] || 0" />
                 </div>
                 <div class="ri-metrics__detail__ab__item__caption">Readers {{ range.label }}</div>
               </div>
@@ -275,13 +295,28 @@ $colors: (
                 :key="'image'+range.label"
               >
                 <div class="ri-metrics__detail__ab__item__number">
-                  <AnimatedInteger :value="imageVariantStats[variant][range.label] || 0"/>
+                  <AnimatedInteger :value="imageVariantStats[variant][range.label] || 0" />
                 </div>
                 <div class="ri-metrics__detail__ab__item__caption">Readers {{ range.label }}</div>
               </div>
             </div>
           </div>
         </div>
+        <a href="#" class="ri-metrics__detail__beam-link">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            x="0px"
+            y="0px"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M 5 3 C 3.9069372 3 3 3.9069372 3 5 L 3 19 C 3 20.093063 3.9069372 21 5 21 L 19 21 C 20.093063 21 21 20.093063 21 19 L 21 12 L 19 12 L 19 19 L 5 19 L 5 5 L 12 5 L 12 3 L 5 3 z M 14 3 L 14 5 L 17.585938 5 L 8.2929688 14.292969 L 9.7070312 15.707031 L 19 6.4140625 L 19 10 L 21 10 L 21 3 L 14 3 z"
+            />
+          </svg>
+          BEAM article detail
+        </a>
       </div>
     </transition>
   </div>
