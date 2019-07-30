@@ -154,29 +154,6 @@
         <label for="ri-settings-device-phone">Phone</label>
       </div>
     </div>
-    <div class="ri-settings__group" v-if="onArticleDetail">
-      <p class="ri-settings__group__title">Article version</p>
-      <div class="ri-settings__input-wrapper">
-        <input
-          type="radio"
-          id="ri-settings-article-version-unlocked"
-          name="ri-settings-article-version-group"
-          value="false"
-          v-model="articleLocked"
-        />
-        <label for="ri-settings-article-version-unlocked">Whole article</label>
-      </div>
-      <div class="ri-settings__input-wrapper">
-        <input
-          type="radio"
-          id="ri-settings-article-version-locked"
-          name="ri-settings-article-version-group"
-          value="true"
-          v-model="articleLocked"
-        />
-        <label for="ri-settings-article-version-locked">Locked article</label>
-      </div>
-    </div>
     <div class="ri-settings__group">
       <p class="ri-settings__group__title">Reader type</p>
       <div class="ri-settings__input-wrapper">
@@ -210,6 +187,62 @@
         <label for="ri-settings-reader-type-visitor">Visitor</label>
       </div>
     </div>
+    <div class="ri-settings__group" v-if="onArticleDetail">
+      <p class="ri-settings__group__title">Article version</p>
+      <div class="ri-settings__input-wrapper">
+        <input
+          type="radio"
+          id="ri-settings-article-version-unlocked"
+          name="ri-settings-article-version-group"
+          value="false"
+          v-model="articleLocked"
+        />
+        <label for="ri-settings-article-version-unlocked">Whole article</label>
+      </div>
+      <div class="ri-settings__input-wrapper">
+        <input
+          type="radio"
+          id="ri-settings-article-version-locked"
+          name="ri-settings-article-version-group"
+          value="true"
+          v-model="articleLocked"
+        />
+        <label for="ri-settings-article-version-locked">Locked article</label>
+      </div>
+    </div>
+    <div class="ri-settings__group" v-if="!onArticleDetail">
+      <p class="ri-settings__group__title">Timeframe</p>
+      <div class="ri-settings__input-wrapper">
+        <input
+          type="radio"
+          id="ri-settings-timeframe-concurrents"
+          name="ri-settings-article-version-group"
+          :value="0"
+          v-model="timeframe"
+        />
+        <label for="ri-settings-article-version-unlocked">Concurrents</label>
+      </div>
+      <div class="ri-settings__input-wrapper">
+        <input
+          type="radio"
+          id="ri-settings-timeframe-1h"
+          name="ri-settings-article-version-group"
+          :value="1"
+          v-model="timeframe"
+        />
+        <label for="ri-settings-article-version-locked">1 hour</label>
+      </div>
+      <div class="ri-settings__input-wrapper">
+        <input
+          type="radio"
+          id="ri-settings-timeframe-4h"
+          name="ri-settings-article-version-group"
+          :value="4"
+          v-model="timeframe"
+        />
+        <label for="ri-settings-article-version-unlocked">4 hours</label>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -227,7 +260,8 @@ export default {
   data: () => ({
     deviceType: "all",
     articleLocked: "false",
-    subscriber: "all"
+    subscriber: "all",
+    timeframe: 0
   }),
   methods: {
     fireEventToRefetchData() {
