@@ -31,8 +31,22 @@ $colors: (
       border-bottom-right-radius: 0;
       display: flex;
       align-items: center;
+      flex-direction: column;
       &:hover {
         cursor: pointer;
+      }
+      &__concurrents {
+        min-width: 14px;
+        padding-bottom: 2px;
+        margin-bottom: 2px;
+        border-bottom: 1px solid #d1e9fc;
+      }
+      &__conversions {
+        display: flex;
+        font-weight: 600;
+        &--with-ab {
+          margin-top: 3px;
+        }
       }
       &__ab {
         padding: 2px;
@@ -41,6 +55,7 @@ $colors: (
         border-radius: 3px;
         margin-right: 5px;
         font-size: 9px;
+        font-weight: 400;
       }
     }
   }
@@ -137,6 +152,26 @@ $colors: (
         color: #2d2d2d;
       }
     }
+
+    &__beam-link {
+      display: block;
+      text-align: center;
+      background-color: #f7f7f7;
+      padding: 10px 0;
+      font-size: 11px;
+      color: #616060;
+      transition: all 0.2s ease-in-out;
+      &:hover {
+        background-color: #eaeaea;
+      }
+      svg {
+        fill: #616060;
+        height: 11px;
+        position: relative;
+        top: 1px;
+        left: 2px;
+      }
+    }
   }
 
   &__detail-animation-enter-active {
@@ -171,6 +206,9 @@ $colors: (
       background-color: $hex;
       border: 1px solid darken($hex, 4%);
       box-shadow: -1px 1px 3px $hex;
+      &__concurrents {
+        border-bottom: 1px solid darken($hex, 6%);
+      }
     }
   }
 }
@@ -180,8 +218,15 @@ $colors: (
   <div class="ri-metrics">
     <div class="ri-metrics__inline-metric" :class="conversionsColorClass">
       <div @click="toggleMetricsDetail" class="ri-metrics__inline-metric__bubble">
-        <span class="ri-metrics__inline-metric__bubble__ab" v-if="hasABTests">A/B</span>
-        <span>{{ conversions }}</span>
+        <div class="ri-metrics__inline-metric__bubble__concurrents">
+          <AnimatedInteger :value="concurrents" />
+        </div>
+        <div
+          :class="{'ri-metrics__inline-metric__bubble__conversions': true, 'ri-metrics__inline-metric__bubble__conversions--with-ab': hasABTests}"
+        >
+          <span class="ri-metrics__inline-metric__bubble__ab" v-if="hasABTests">A/B</span>
+          <AnimatedInteger :value="conversions" />
+        </div>
       </div>
     </div>
     <transition name="ri-metrics__detail-animation">
@@ -192,15 +237,15 @@ $colors: (
               <polygon
                 fill="black"
                 points="35.8 2.74 16.91 13.65 23.2 17.29 35.8 10.02 54.7 20.93 35.8 31.84 35.8 31.84 10.61 17.29 10.61 53.59 16.91 57.23 16.91 28.2 35.8 39.11 35.8 39.11 35.8 39.11 35.8 39.11 61 24.57 61 17.29 35.8 2.74"
-              ></polygon>
+              />
               <polygon
                 fill="black"
                 points="23.2 53.66 23.2 60.93 35.8 68.14 61 53.59 61 46.32 35.8 60.86 23.2 53.66"
-              ></polygon>
+              />
               <polygon
                 fill="black"
                 points="35.8 46.28 23.2 39.08 23.2 46.35 35.8 53.55 35.8 53.66 61 39.11 61 31.84 35.8 46.39 35.8 46.28"
-              ></polygon>
+              />
             </svg>
             Article Overview
           </div>
@@ -235,14 +280,20 @@ $colors: (
             </div>
           </div>
 
-          <div class="ri-metrics__detail__performance" v-if="sortedPageviewRanges.length > 0">
+          <div class="ri-metrics__detail__performance">
+            <div class="ri-metrics__detail__performance__item">
+              <div class="ri-metrics__detail__performance__item__number">
+                <AnimatedInteger :value="concurrents" />
+              </div>
+              <div class="ri-metrics__detail__performance__item__caption">Readers Concurrent</div>
+            </div>
             <div
               class="ri-metrics__detail__performance__item"
               v-for="range in sortedPageviewRanges"
               :key="range.label"
             >
               <div class="ri-metrics__detail__performance__item__number">
-                <AnimatedInteger :value="pageviewStats[range.label]"/>
+                <AnimatedInteger :value="pageviewStats[range.label]" />
               </div>
               <div class="ri-metrics__detail__performance__item__caption">Readers {{ range.label }}</div>
             </div>
@@ -259,7 +310,7 @@ $colors: (
                 :key="'title'+range.label"
               >
                 <div class="ri-metrics__detail__ab__item__number">
-                  <AnimatedInteger :value="titleVariantStats[variant][range.label] || 0"/>
+                  <AnimatedInteger :value="titleVariantStats[variant][range.label] || 0" />
                 </div>
                 <div class="ri-metrics__detail__ab__item__caption">Readers {{ range.label }}</div>
               </div>
@@ -275,13 +326,32 @@ $colors: (
                 :key="'image'+range.label"
               >
                 <div class="ri-metrics__detail__ab__item__number">
-                  <AnimatedInteger :value="imageVariantStats[variant][range.label] || 0"/>
+                  <AnimatedInteger :value="imageVariantStats[variant][range.label] || 0" />
                 </div>
                 <div class="ri-metrics__detail__ab__item__caption">Readers {{ range.label }}</div>
               </div>
             </div>
           </div>
         </div>
+        <a
+          :href="`${baseUrl}/article?external_id=${articleId}`"
+          target="_blank"
+          class="ri-metrics__detail__beam-link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            x="0px"
+            y="0px"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M 5 3 C 3.9069372 3 3 3.9069372 3 5 L 3 19 C 3 20.093063 3.9069372 21 5 21 L 19 21 C 20.093063 21 21 20.093063 21 19 L 21 12 L 19 12 L 19 19 L 5 19 L 5 5 L 12 5 L 12 3 L 5 3 z M 14 3 L 14 5 L 17.585938 5 L 8.2929688 14.292969 L 9.7070312 15.707031 L 19 6.4140625 L 19 10 L 21 10 L 21 3 L 14 3 z"
+            />
+          </svg>
+          BEAM article detail
+        </a>
       </div>
     </transition>
   </div>
@@ -314,12 +384,17 @@ export default {
     articleId: {
       type: String,
       required: true
+    },
+    baseUrl: {
+      type: String,
+      required: true
     }
   },
   components: { AnimatedInteger },
   data: () => ({
     conversions: 0,
     totalPageviews: 0,
+    concurrents: 0,
 
     pageviewStats: {},
     titleVariantStats: {},
@@ -341,6 +416,7 @@ export default {
   created: function() {
     EventHub.$on("content-conversions-counts-changed", this.updateConversions);
     EventHub.$on("content-pageviews-changed", this.updatePageviewStats);
+    EventHub.$on("content-concurrents-changed", this.updateConcurrentsStats);
     EventHub.$on("content-variants-changed", this.updateVariantStats);
     EventHub.$on("config-changed", this.configChanged);
     EventHub.$on("opening-metrics-detail", this.hideMetricsDetail);
@@ -449,6 +525,10 @@ export default {
       if (range.label === "Total") {
         this.totalPageviews = counts[this.articleId];
       }
+    },
+    updateConcurrentsStats(data) {
+      const foundItem = data.find(item => item.external_id === this.articleId);
+      this.concurrents = foundItem ? foundItem.count : 0;
     },
     updateVariantStats(variantTypes, range, counts) {
       for (const variantType of variantTypes) {

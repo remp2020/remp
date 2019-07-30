@@ -17,7 +17,7 @@ export default {
       type: Array,
       default: function() {
         return [
-          { minutes: 15, label: "15m", order: 0 },
+          // { minutes: 15, label: "15m", order: 0 },
           { minutes: undefined, label: "Total", order: 1 }
         ];
       }
@@ -79,14 +79,17 @@ export default {
     });
   },
   methods: {
-    refetchAllData(deviceType, articleLocked, subscriber) {
+    refetchAllData(deviceType, articleLocked, subscriber, timeframe) {
       const now = new Date();
 
+      this.fetchAllConcurrents();
       if (this.onArticleDetail) {
-        this.fetchReadProgressStats(deviceType, articleLocked);
+        this.fetchConcurrents(this.articleDetailId);
+      } else {
+        this.fetchConcurrents(null, window.location.href);
       }
-
-      this.fetchCommerceStats(deviceType, subscriber);
+      this.fetchReadProgressStats(deviceType, articleLocked, timeframe);
+      this.fetchCommerceStats(deviceType);
       this.fetchPageviewStats(now, deviceType, subscriber);
       this.fetchVariantStats(
         now,
@@ -95,7 +98,7 @@ export default {
         subscriber
       );
     },
-    fetchCommerceStats: function(deviceType = "all", subscriber = "all") {
+    fetchCommerceStats: function(deviceType = "all") {
       const payload = {
         filter_by: [
           {
@@ -106,14 +109,6 @@ export default {
         group_by: ["article_id"]
       };
 
-      if (subscriber !== "all") {
-        payload.filter_by.push({
-          tag: "subscriber",
-          values: ["true"],
-          inverse: subscriber === "true" ? false : true
-        });
-      }
-
       if (deviceType !== "all") {
         payload.filter_by.push({
           tag: "derived_ua_device",
@@ -122,7 +117,7 @@ export default {
       }
 
       Axios.post(
-        this.baseUrl + "/journal/commerce/steps/purchase/count",
+        `${this.baseUrl}/api/journal/commerce/steps/purchase/count`,
         payload
       )
         .then(function(response) {
@@ -137,7 +132,7 @@ export default {
         });
     },
 
-    fetchPageviewStats: function(now, deviceType = "all", subscriber = "all") {
+    fetchPageviewStats: function(now, deviceType = "all", subscriber = "true") {
       for (let range of this.pageviewMinuteRanges) {
         const payload = {
           filter_by: [
@@ -171,7 +166,7 @@ export default {
         }
 
         Axios.post(
-          this.baseUrl + "/journal/pageviews/actions/load/unique/browsers",
+          `${this.baseUrl}/api/journal/pageviews/actions/load/unique/browsers`,
           payload
         )
           .then(function(response) {
@@ -185,13 +180,23 @@ export default {
             console.warn(error);
           });
       }
+
+      Axios.post(`${this.baseUrl}/api/journal/concurrents/count/articles`, {
+        external_id: this.articleIds
+      })
+        .then(response => {
+          EventHub.$emit("content-concurrents-changed", response.data.articles);
+        })
+        .catch(error => {
+          console.warn(error);
+        });
     },
 
     fetchVariantStats: function(
       now,
       variantTypes,
       deviceType = "all",
-      subscriber = "all"
+      subscriber = "true"
     ) {
       for (let range of this.variantsMinuteRanges) {
         const variantPayload = {
@@ -230,7 +235,7 @@ export default {
         }
 
         Axios.post(
-          this.baseUrl + "/journal/pageviews/actions/load/unique/browsers",
+          `${this.baseUrl}/api/journal/pageviews/actions/load/unique/browsers`,
           variantPayload
         )
           .then(function(response) {
@@ -272,9 +277,21 @@ export default {
       }
     },
 
-    fetchReadProgressStats(deviceType = "all", articleLocked = "false") {
+    fetchReadProgressStats(
+      deviceType = "all",
+      articleLocked = "false",
+      timeframe = 10 * 60 * 1000
+    ) {
       const payload = {
-        filter_by: [
+        filter_by: [],
+        count_histogram: {
+          field: "page_progress",
+          interval: 0.01
+        }
+      };
+
+      if (this.onArticleDetail) {
+        payload.filter_by.push(
           {
             tag: "article_id",
             values: [this.articleDetailId]
@@ -283,13 +300,14 @@ export default {
             tag: "locked",
             values: [articleLocked]
           }
-        ],
-        group_by: ["article_id"],
-        count_histogram: {
-          field: "page_progress",
-          interval: 0.01
-        }
-      };
+        );
+      } else {
+        payload.filter_by.push({
+          tag: "url",
+          values: [window.location.href]
+        });
+        payload.time_after = new Date(new Date() - timeframe).toISOString();
+      }
 
       if (deviceType !== "all") {
         payload.filter_by.push({
@@ -299,17 +317,45 @@ export default {
       }
 
       Axios.post(
-        this.baseUrl + "/journal/pageviews/actions/progress/count",
+        `${this.baseUrl}/api/journal/pageviews/actions/progress/count`,
         payload
       )
         .then(function(response) {
           EventHub.$emit(
             "read-progress-data-changed",
             response.data[0].count,
-            response.data[0].count_histogram
+            response.data[0].count_histogram || []
           );
         })
         .catch(function(error) {
+          console.warn(error);
+        });
+    },
+    fetchAllConcurrents() {
+      Axios.get(`${this.baseUrl}/api/journal/concurrents/count`)
+        .then(response => {
+          EventHub.$emit("all-concurrents-changed", response.data.total);
+        })
+        .catch(error => {
+          console.warn(error);
+        });
+    },
+    fetchConcurrents(articleId = null, url = null) {
+      let urlParam;
+      if (articleId) {
+        urlParam = `?external_id[]=${articleId}`;
+      } else {
+        urlParam = `?url[]=${url}`;
+      }
+      Axios.get(
+        `${this.baseUrl}/api/journal/concurrents/count/articles${urlParam}`
+      )
+        .then(({ data }) => {
+          if (data.articles && data.articles.length) {
+            EventHub.$emit("page-concurrents-changed", data.articles[0].count);
+          }
+        })
+        .catch(error => {
           console.warn(error);
         });
     }
