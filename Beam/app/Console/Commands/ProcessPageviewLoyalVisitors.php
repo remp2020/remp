@@ -95,11 +95,15 @@ class ProcessPageviewLoyalVisitors extends Command
             return;
         }
 
+        $segmentGroupId = \App\SegmentGroup::whereCode($segmentCode)->id;
+
         $segment = Segment::create([
             'name' => "{$treshold}+ article views in {$days} days",
             'code' => $segmentCode,
             'active' => true,
+            'segment_group_id' => $segmentGroupId,
         ]);
+        
         $segment->rules()->create([
             'timespan' => $days*24*60,
             'count' => $treshold,
