@@ -71,6 +71,11 @@ class AggregatePageviewLoadJob extends Command
         $bar->finish();
         $this->line(' <info>OK!</info>');
 
+        if (count($all) === 0) {
+            $this->line(sprintf("No data to store for articles, exiting."));
+            return;
+        }
+
         $bar = $this->output->createProgressBar(count($all));
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');

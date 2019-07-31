@@ -33,7 +33,7 @@ class AggregatePageviewTimespentJob extends Command
         $records = collect($journalContract->sum($request));
 
         if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
-            $this->line(sprintf("No articles to process, exiting."));
+            $this->line("No articles to process, exiting.");
             return;
         }
 
@@ -70,6 +70,11 @@ class AggregatePageviewTimespentJob extends Command
         }
         $bar->finish();
         $this->line(' <info>OK!</info>');
+
+        if (count($all) === 0) {
+            $this->line("No data to store for articles, exiting.");
+            return;
+        }
 
         $bar = $this->output->createProgressBar(count($all));
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');

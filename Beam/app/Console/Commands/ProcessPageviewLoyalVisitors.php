@@ -19,6 +19,11 @@ class ProcessPageviewLoyalVisitors extends Command
         ini_set('memory_limit', '-1');
         $days = $this->option('days') ?? 30;
 
+        if (!$days) {
+            $this->line("No days to process, exiting.");
+            return;
+        }
+
         $bar = $this->output->createProgressBar($days);
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Extracting aggregated pageview data (days)');
