@@ -31,8 +31,22 @@ $colors: (
       border-bottom-right-radius: 0;
       display: flex;
       align-items: center;
+      flex-direction: column;
       &:hover {
         cursor: pointer;
+      }
+      &__concurrents {
+        min-width: 14px;
+        padding-bottom: 2px;
+        margin-bottom: 2px;
+        border-bottom: 1px solid #d1e9fc;
+      }
+      &__conversions {
+        display: flex;
+        font-weight: 600;
+        &--with-ab {
+          margin-top: 3px;
+        }
       }
       &__ab {
         padding: 2px;
@@ -41,6 +55,7 @@ $colors: (
         border-radius: 3px;
         margin-right: 5px;
         font-size: 9px;
+        font-weight: 400;
       }
     }
   }
@@ -191,6 +206,9 @@ $colors: (
       background-color: $hex;
       border: 1px solid darken($hex, 4%);
       box-shadow: -1px 1px 3px $hex;
+      &__concurrents {
+        border-bottom: 1px solid darken($hex, 6%);
+      }
     }
   }
 }
@@ -200,8 +218,13 @@ $colors: (
   <div class="ri-metrics">
     <div class="ri-metrics__inline-metric" :class="conversionsColorClass">
       <div @click="toggleMetricsDetail" class="ri-metrics__inline-metric__bubble">
-        <span class="ri-metrics__inline-metric__bubble__ab" v-if="hasABTests">A/B</span>
-        <span>{{ conversions }}</span>
+        <div class="ri-metrics__inline-metric__bubble__concurrents">134</div>
+        <div
+          :class="{'ri-metrics__inline-metric__bubble__conversions': true, 'ri-metrics__inline-metric__bubble__conversions--with-ab': hasABTests}"
+        >
+          <span class="ri-metrics__inline-metric__bubble__ab" v-if="hasABTests">A/B</span>
+          <span>{{ conversions }}</span>
+        </div>
       </div>
     </div>
     <transition name="ri-metrics__detail-animation">
