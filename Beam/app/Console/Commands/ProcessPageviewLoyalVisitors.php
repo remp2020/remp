@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Segment;
+use App\SegmentGroup;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Remp\Journal\AggregateRequest;
@@ -73,6 +74,7 @@ class ProcessPageviewLoyalVisitors extends Command
                 }
             }
             $bar->advance();
+            break;
         }
 
         $bar->finish();
@@ -99,6 +101,7 @@ class ProcessPageviewLoyalVisitors extends Command
             'name' => "{$treshold}+ article views in {$days} days",
             'code' => $segmentCode,
             'active' => true,
+            'segment_group_id' => SegmentGroup::getByCode(SegmentGroup::CODE_REMP_SEGMENTS)->id,
         ]);
         $segment->rules()->create([
             'timespan' => $days*24*60,
