@@ -39,7 +39,7 @@ class ProcessPageviewLoyalVisitors extends Command
             $request = new AggregateRequest('pageviews', 'load');
             $request->setTimeAfter($timeAfter);
             $request->setTimeBefore($timeBefore);
-            $request->addFilter('_article', '1');
+            $request->addFilter('_article', 'true');
             $request->addGroup("user_id", "browser_id");
 
             $pageviews = collect($journalContract->count($request));
