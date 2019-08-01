@@ -45,7 +45,7 @@ curl -XPUT -H "Content-Type: application/json" elastic:9200/pageviews_progress -
 curl -XPUT -H "Content-Type: application/json" elastic:9200/concurrents_by_browser -d '{"mappings": {"_doc": {}}}'
 curl -XPUT -H "Content-Type: application/json" elastic:9200/entities -d '{"mappings": {"_doc": {}}}'
 
-# 6. Run seeders (optional)
+# 7. Run seeders (optional)
 php artisan db:seed
 
 
