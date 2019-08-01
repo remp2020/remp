@@ -199,8 +199,8 @@ class ArticleController extends Controller
         $articles = Article::selectRaw('articles.*,' .
             'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
             ->with(['authors', 'sections'])
-            ->join('article_author', 'articles.id', '=', 'article_author.article_id')
-            ->join('article_section', 'articles.id', '=', 'article_section.article_id');
+            ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
+            ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left');
 
         if ($request->input('published_from')) {
             $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
