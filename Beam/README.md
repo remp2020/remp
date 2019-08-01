@@ -36,8 +36,19 @@ php artisan migrate
 # 5. Generate app key
 php artisan key:generate
 
+# 6. Create elastic structure for campaign stats
+curl -XPUT -H "Content-Type: application/json" elastic:9200/commerce -d '{"mappings": {"_doc": {"properties": {"revenue": {"type": "double"}}}}}' 
+curl -XPUT -H "Content-Type: application/json" elastic:9200/events -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elastic:9200/pageviews -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elastic:9200/pageviews_time_spent -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elastic:9200/pageviews_progress -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elastic:9200/concurrents_by_browser -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elastic:9200/entities -d '{"mappings": {"_doc": {}}}'
+
 # 6. Run seeders (optional)
 php artisan db:seed
+
+
 ```
 
 ### Dependencies
@@ -45,7 +56,7 @@ php artisan db:seed
 - PHP ^7.1.3
 - MySQL ^5.7
 - Redis ^3.2
-- Elastic ^6.8.1
+- Segments API (see #segments-go)
 
 ### Admin integration with CMS/CRM
 
