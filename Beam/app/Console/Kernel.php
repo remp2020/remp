@@ -46,15 +46,15 @@ class Kernel extends ConsoleKernel
             ->everyMinute();
 
         $schedule->command(AggregatePageviewLoadJob::COMMAND)
-             ->hourlyAt(3)
+             ->everyMinute()
              ->withoutOverlapping();
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND)
-            ->hourlyAt(4)
+            ->everyMinute()
             ->withoutOverlapping();
 
         $schedule->command(ProcessPageviewSessions::COMMAND)
-            ->hourlyAt(5)
+            ->everyFiveMinutes()
             ->withoutOverlapping();
 
         $schedule->command(DeleteOldAggregations::COMMAND)
