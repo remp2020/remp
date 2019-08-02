@@ -43,6 +43,21 @@ php artisan db:seed
 - PHP ^7.1.3
 - MySQL ^5.7
 - Redis ^3.2
+- Segments API (see #segments-go)
+
+After clean installation Beam Admin and Segments API would throw errors because the underlying database wouldn't have inidices for tracked events created. Docker installation handles this for you, but if you use manual installation, please run the following set of commands against your Elasticsearch instance.
+
+```bash
+curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/commerce -d '{"mappings": {"_doc": {"properties": {"revenue": {"type": "double"}}}}}'
+curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/events -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/pageviews -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/pageviews_time_spent -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/pageviews_progress -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/concurrents_by_browser -d '{"mappings": {"_doc": {}}}'
+curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/entities -d '{"mappings": {"_doc": {}}}'
+```
+
+*These commands need to be run just once. Every further execution would result in BadRequest returned by Elasticsearch that inidices or document types are already present.*
 
 ### Technical feature description
 
