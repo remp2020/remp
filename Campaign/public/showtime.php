@@ -10,7 +10,7 @@ use Monolog\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-header('Content-Type: application/json');
+header('Content-Type: application/javascript');
 
 $dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
 $dotenv->load();
