@@ -431,7 +431,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             let params = {
                 "step": "payment",
                 "article": article,
-                "purchase": {
+                "payment": {
                     "transaction_id": transactionId,
                     "revenue": {
                         "amount": amount,
