@@ -12,6 +12,7 @@ class SnapshotHelperTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @var SnapshotHelpers */
     private $snapshotHelpers;
 
     protected function setUp()
@@ -50,14 +51,14 @@ class SnapshotHelperTest extends TestCase
         // Window 15-19 min
         $shouldBeKept[] = factory(ArticleViewsSnapshot::class)->create(['time' => (clone $start)->addMinutes(16)]);
 
-        $pointsToExclude = $this->snapshotHelpers->timePointsToExclude($start, (clone $start)->addMinutes(20), 5);
+        $timePoints = $this->snapshotHelpers->timePoints($start, (clone $start)->addMinutes(20), 5);
 
         foreach ($shouldBeExcluded as $item) {
-            $this->assertTrue(in_array($item->time->toIso8601ZuluString(), $pointsToExclude));
+            $this->assertTrue(in_array($item->time->toIso8601ZuluString(), $timePoints->toExclude));
         }
 
         foreach ($shouldBeKept as $item) {
-            $this->assertFalse(in_array($item->time->toIso8601ZuluString(), $pointsToExclude));
+            $this->assertFalse(in_array($item->time->toIso8601ZuluString(), $timePoints->toExclude));
         }
     }
 }

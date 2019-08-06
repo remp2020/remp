@@ -1,11 +1,13 @@
 <?php
 namespace App\Model;
 
-use App\Article;
+use DB;
 use Illuminate\Database\Eloquent\Model;
 
 class ArticleViewsSnapshot extends Model
 {
+    use TableName;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -25,4 +27,11 @@ class ArticleViewsSnapshot extends Model
     protected $dates = [
         'time',
     ];
+
+    public static function deleteForTimes(array $times): int
+    {
+        return DB::table(self::getTableName())
+            ->whereIn('time', $times)
+            ->delete();
+    }
 }

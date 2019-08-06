@@ -101,7 +101,7 @@ class DashboardController extends Controller
         $intervalMinutes = $journalInterval->intervalMinutes;
 
         $timePoints = $this->snapshotHelpers->timePoints($from, $to, $intervalMinutes, true);
-        $currentData = $this->dataFor($timePoints);
+        $currentData = $this->dataFor($timePoints->toInclude);
 
         $tags = [];
         foreach ($currentData as $item) {
@@ -122,7 +122,7 @@ class DashboardController extends Controller
                 $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
                 $timePoints = $this->snapshotHelpers->timePoints($shadowFrom, $shadowTo, $intervalMinutes);
-                foreach ($this->dataFor($timePoints) as $item) {
+                foreach ($this->dataFor($timePoints->toInclude) as $item) {
                     // we want to plot previous results on same points as current ones,
                     // therefore add week which was subtracted when data was queried
                     $correctedDate = Carbon::parse($item->time)

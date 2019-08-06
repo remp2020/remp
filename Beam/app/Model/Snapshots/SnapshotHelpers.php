@@ -1,123 +1,74 @@
 <?php
 namespace App\Model\Snapshots;
 
+use App\Model\ArticleViewsSnapshot;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class SnapshotHelpers
 {
-
-    /**
-     * Inverse function to timePoints(), selects those time points that should be excluded
-     * @param Carbon $from
-     * @param Carbon $to
-     * @param int    $intervalMinutes
-     *
-     * @return array
-     */
-    public function timePointsToExclude(Carbon $from, Carbon $to, int $intervalMinutes): array
-    {
-        $timeRecords = DB::table('article_views_snapshots')
-            ->select('time')
-            ->whereBetween('time', [$from, $to])
-            ->groupBy('time')
-            ->get()
-            ->map(function ($item) {
-                return Carbon::parse($item->time);
-            })->toArray();
-
-        $timeIterator = clone $from;
-
-        $points = [];
-        $i = 0;
-
-        while ($timeIterator->lte($to)) {
-            $upperLimit = (clone $timeIterator)->addMinutes($intervalMinutes - 1);
-            $timeIteratorString = $timeIterator->toIso8601ZuluString();
-
-            while ($i < count($timeRecords)) {
-                if (array_key_exists($timeIteratorString, $points)) {
-                    break;
-                }
-
-                if ($timeRecords[$i]->between($timeIterator, $upperLimit)) {
-                    $points[$timeIteratorString] = $timeRecords[$i]->toIso8601ZuluString();
-                }
-
-                $i++;
-            }
-
-            $timeIterator->addMinutes($intervalMinutes);
-        }
-
-        $pointsToExclude = [];
-        foreach ($points as $point) {
-            $pointsToExclude[$point] = true;
-        }
-
-        $toReturn = [];
-        foreach ($timeRecords as $timeRecord) {
-            $timeRecordString = $timeRecord->toIso8601ZuluString();
-            if (!array_key_exists($timeRecordString, $pointsToExclude)) {
-                $toReturn[] = $timeRecordString;
-            }
-        }
-
-        return $toReturn;
-    }
-
     /**
      * Computes lowest time point (present in DB) per each $intervalMinutes window, in [$from, $to] interval
-     * @param Carbon $from
-     * @param Carbon $to
+     *
+     * @param Carbon $from (including)
+     * @param Carbon $to   (excluding)
      * @param int    $intervalMinutes
      * @param bool   $addLastMinute
      *
-     * @return array
+     * @return TimePoints containing array for included/excluded time points
      */
-    public function timePoints(Carbon $from, Carbon $to, int $intervalMinutes, bool $addLastMinute = false): array
+    public function timePoints(Carbon $from, Carbon $to, int $intervalMinutes, bool $addLastMinute = false): TimePoints
     {
-        $timeRecords = DB::table('article_views_snapshots')
+        $timeRecords = DB::table(ArticleViewsSnapshot::getTableName())
             ->select('time')
-            ->whereBetween('time', [$from, $to])
+            ->where('time', '>=', $from)
+            ->where('time', '<', $to)
             ->groupBy('time')
+            ->orderBy('time')
             ->get()
             ->map(function ($item) {
                 return Carbon::parse($item->time);
             })->toArray();
 
+        $includedTimes = [];
+        foreach ($timeRecords as $timeRecord) {
+            $includedTimes[$timeRecord->toIso8601ZuluString()] = false;
+        }
+
         $timeIterator = clone $from;
 
-        $points = [];
-        $i = 0;
-
-        $lastPoint = null;
         while ($timeIterator->lte($to)) {
-            $upperLimit = (clone $timeIterator)->addMinutes($intervalMinutes - 1);
-            $timeIteratorString = $timeIterator->toIso8601ZuluString();
+            $upperLimit = (clone $timeIterator)->addMinutes($intervalMinutes);
 
+            $i = 0;
             while ($i < count($timeRecords)) {
-                if (array_key_exists($timeIteratorString, $points)) {
+                if ($timeRecords[$i]->gte($timeIterator) && $timeRecords[$i]->lt($upperLimit)) {
+                    $includedTimes[$timeRecords[$i]->toIso8601ZuluString()] = true;
                     break;
                 }
-
-                if ($timeRecords[$i]->between($timeIterator, $upperLimit)) {
-                    $points[$timeIteratorString] = $timeRecords[$i];
-                    $lastPoint = $timeRecords[$i];
-                }
-
                 $i++;
             }
-
             $timeIterator->addMinutes($intervalMinutes);
         }
 
-        if ($addLastMinute && $lastPoint) {
-            if ($timeRecords[count($timeRecords) - 1]->gt($lastPoint)) {
-                $points[] = $timeRecords[count($timeRecords) - 1];
+        // Add last minute
+        if ($addLastMinute && count($timeRecords) > 0) {
+            // moves the internal pointer to the end of the array
+            end($includedTimes);
+            $includedTimes[key($includedTimes)] = true;
+        }
+
+        // Filter results
+        $toInclude = [];
+        $toExclude = [];
+        foreach ($includedTimes as $timeValue => $isIncluded) {
+            if ($isIncluded) {
+                $toInclude[] = $timeValue;
+            } else {
+                $toExclude[] = $timeValue;
             }
         }
 
-        return array_values($points);
+        return new TimePoints($toInclude, $toExclude);
     }
 }
