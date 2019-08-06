@@ -3,6 +3,7 @@
 namespace App\Helpers\Journal;
 
 use App\Article;
+use App\Console\Commands\CompressSnapshots;
 use Carbon\Carbon;
 use InvalidArgumentException;
 
@@ -53,31 +54,29 @@ class JournalInterval
         }
     }
 
+
+    /**
+     * @param Article $article
+     *
+     * @return array
+     * @throws \Exception
+     */
     private static function getIntervalDependingOnArticlePublishedDate(Article $article): array
     {
         $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
 
-        if ($articleAgeInMins <= 60) { // 1 hour
-            return ["5m", 5];
+        foreach (CompressSnapshots::RETENTION_RULES as $rule) {
+            $startMinute = $rule[0];
+            $endMinute = $rule[1];
+            $windowSizeInMinutes = $rule[2];
+            $windowSizeText = $rule[3];
+
+
+            if ($endMinute === null || $articleAgeInMins < $endMinute) {
+                return [$windowSizeText, $windowSizeInMinutes];
+            }
         }
-        if ($articleAgeInMins <= 60*24) { // 1 day
-            return ["20m", 20];
-        }
-        if ($articleAgeInMins <= 7*60*24) { // 7 days
-            return ["1h", 60];
-        }
-        if ($articleAgeInMins <= 30*60*24) { // 30 days
-            return ["2h", 120];
-        }
-        if ($articleAgeInMins <= 90*60*24) { // 90 days
-            return ["3h", 180];
-        }
-        if ($articleAgeInMins <= 180*60*24) { // 180 days
-            return ["6h", 360];
-        }
-        if ($articleAgeInMins <= 365*60*24) { // 1 year
-            return ["12h", 720];
-        }
-        return ["24h", 1440]; // 1+ year
+
+        throw new \Exception("No fitting rule for article {$article->id}");
     }
 }
