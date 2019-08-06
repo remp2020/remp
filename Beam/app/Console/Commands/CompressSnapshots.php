@@ -56,7 +56,7 @@ class CompressSnapshots extends Command
             $endMinute = $rule[1];
             $windowSizeInMinutes = $rule[2];
 
-            $this->line("Applying retention rule [{$startMinute}m, {$endMinute}m], window size $windowSizeInMinutes minutes)");
+            $this->line("Applying retention rule [{$startMinute}m, " . ($endMinute ?? 'unlimited ') . "m), window size $windowSizeInMinutes minutes");
 
             $periods = $this->computeDayPeriods($now, $startMinute, $endMinute);
             foreach ($periods as $period) {
@@ -80,7 +80,7 @@ class CompressSnapshots extends Command
             }
         }
     }
-    
+
     /**
      * Function that computes interval [$now-$endMinute, $now-$startMinute] and splits it to days
      * @param Carbon   $now
@@ -97,7 +97,8 @@ class CompressSnapshots extends Command
         if ($endMinute !== null) {
             $from = (clone $now)->subMinutes($endMinute);
         } else {
-            // If $endMinute is null, do not compute unlimited interval, go back only few days
+            // If $endMinute is null, do not construct unlimited interval,
+            // go back only few days since the previous values have already been compressed
             $from = (clone $to)->subDays(2);
         }
 
