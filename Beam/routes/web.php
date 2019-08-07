@@ -82,7 +82,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::resource('articles', 'ArticleDetailsController', [
         'only' => ['show'],
     ]);
-    Route::get('article/{article?}', 'ArticleDetailsController@show');
+    Route::get('article/{article?}', 'ArticleDetailsController@showByParameter');
 
     Route::get('newsletters/json', 'NewsletterController@json')->name('newsletters.json');
     Route::post('newsletters/validate', 'NewsletterController@validateForm')->name('newsletters.validateForm');
