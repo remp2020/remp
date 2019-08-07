@@ -65,6 +65,7 @@ class Handler extends ExceptionHandler
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 
-        return redirect()->guest(route('login'));
+        // No login page (authentication layer done by SSO), just redirect to main page
+        return redirect()->guest('/');
     }
 }
