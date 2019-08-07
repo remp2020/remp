@@ -322,23 +322,25 @@
         methods: {
             addParamsToLinks: function () {
                 if (!this.paramsAdded) {
-                    let wrap = document.getElementById(this.wrapperId);
-                    let hrefs = wrap.getElementsByTagName('a');
+                    this.$nextTick(function () {
+                        let wrap = document.getElementById(this.wrapperId);
+                        let hrefs = wrap.getElementsByTagName('a');
 
-                    for(let ii = 0; ii < hrefs.length; ii++) {
-                        let href = hrefs[ii].getAttribute('href'),
-                            linkParams = {};
+                        for(let ii = 0; ii < hrefs.length; ii++) {
+                            let href = hrefs[ii].getAttribute('href'),
+                                linkParams = {};
 
-                        [].forEach.call(hrefs[ii].attributes, function(attr) {
-                            if (/^data-param-/.test(attr.name)) {
-                                linkParams[attr.name.substr(11)] = attr.value;
+                            [].forEach.call(hrefs[ii].attributes, function(attr) {
+                                if (/^data-param-/.test(attr.name)) {
+                                    linkParams[attr.name.substr(11)] = attr.value;
+                                }
+                            });
+
+                            if (href) {
+                                hrefs[ii].setAttribute('href', this.addUrlParams(href, linkParams));
                             }
-                        });
-
-                        if (href) {
-                            hrefs[ii].setAttribute('href', this.addUrlParams(href, linkParams));
                         }
-                    }
+                    });
                 }
 
                 this.paramsAdded = true;
