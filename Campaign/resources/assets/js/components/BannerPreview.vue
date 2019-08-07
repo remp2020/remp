@@ -3,7 +3,7 @@
 </style>
 
 <template>
-    <div class="remp-banner">
+    <div class="remp-banner" :id="wrapperId">
         <html-preview v-if="template === 'html'"
                 :alignmentOptions="alignmentOptions"
                 :dimensionOptions="dimensionOptions"
@@ -253,6 +253,8 @@
             });
         },
         mounted: function() {
+            this.wrapperId = 'remp-banner-' + lib.uuidv4();
+
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop];
             });
@@ -289,6 +291,8 @@
         },
         data: () => ({
             visible: false,
+            wrapperId: null,
+            paramsAdded: false
         }),
         watch: {
             'transition': function() {
@@ -296,17 +300,54 @@
                 setTimeout(function() { vm.visible = false }, 100);
                 setTimeout(function() { vm.visible = true }, 800);
             },
-            'show': function() {
-            	this.visible = this.show;
+            'show': {
+                handler: function() {
+                    if (this.show) {
+                        this.addParamsToLinks();
+                    }
+
+                    this.visible = this.show;
+                },
+                immediate: true
             }
         },
         computed: {
             url: function() {
-                if (!this.targetUrl) {
-                    return null;
+                if (this.targetUrl) {
+                    return this.targetUrl;
                 }
-                let separator = this.targetUrl.indexOf("?") === -1 ? "?" : "&";
-                let url =  this.targetUrl + separator + "utm_source=remp_campaign" +
+                return null;
+            },
+        },
+        methods: {
+            addParamsToLinks: function () {
+                if (!this.paramsAdded) {
+                    this.$nextTick(function () {
+                        let wrap = document.getElementById(this.wrapperId);
+                        let hrefs = wrap.getElementsByTagName('a');
+
+                        for(let ii = 0; ii < hrefs.length; ii++) {
+                            let href = hrefs[ii].getAttribute('href'),
+                                linkParams = {};
+
+                            [].forEach.call(hrefs[ii].attributes, function(attr) {
+                                if (/^data-param-/.test(attr.name)) {
+                                    linkParams[attr.name.substr(11)] = attr.value;
+                                }
+                            });
+
+                            if (href) {
+                                hrefs[ii].setAttribute('href', this.addUrlParams(href, linkParams));
+                            }
+                        }
+                    });
+                }
+
+                this.paramsAdded = true;
+            },
+            addUrlParams: function(url, linkParams) {
+                let separator = url.indexOf("?") === -1 ? "?" : "&";
+                url =  url + separator + "utm_source=remp_campaign" +
                     "&utm_medium=" + encodeURIComponent(this.displayType);
                 if (this.campaignUuid) {
                     url += "&utm_campaign=" + encodeURIComponent(this.campaignUuid);
@@ -326,10 +367,16 @@
                     }
                 }
 
+                if (linkParams) {
+                    for (let param in linkParams) {
+                        if (linkParams.hasOwnProperty(param)) {
+                            url += "&" + encodeURIComponent(param) + '=' + encodeURIComponent(linkParams[param])
+                        }
+                    }
+                }
+
                 return url;
             },
-        },
-        methods: {
             injectVars: function(str) {
                 if (!remplib || !remplib.campaign) {
                     return str;

@@ -48,6 +48,7 @@
                                 <label for="text" class="fg-label">Text</label>
                                 <input v-model="text" class="form-control fg-input" name="text" id="text" type="text" requried>
                             </div>
+                            <div><small v-html="$parent.fieldParamsMessage"></small></div>
                         </div>
 
                     </div>

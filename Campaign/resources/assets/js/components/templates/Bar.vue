@@ -49,6 +49,7 @@
                                 <label for="main_text" class="fg-label">Main text</label>
                                 <input v-model="mainText" class="form-control fg-input" name="main_text" id="main_text" type="text" requried>
                             </div>
+                            <div><small v-html="$parent.fieldParamsMessage"></small></div>
                         </div>
 
                         <div class="input-group fg-float m-t-30">

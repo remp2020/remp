@@ -132,6 +132,7 @@
                                     <label for="target_url" class="fg-label">Target URL</label>
                                     <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                                 </div>
+                                <div><small>UTM params will be automatically appended to this link.</small></div>
                             </div>
 
                             <div class="input-group fg-float m-t-30">
@@ -485,7 +486,9 @@
 
             js: null,
             jsIncludes: null,
-            cssIncludes: null
+            cssIncludes: null,
+
+            fieldParamsMessage: "UTM params will be automatically appended to every link in this field.<br> If you want to add custom parameter to specific link: add data-param-* attribute. e.g.: data-param-foo=\"baz\""
         }),
         computed: {
             isOverlay: function() {
