@@ -23,6 +23,7 @@ use Psy\Util\Json;
  *      'dataSource' => route('articles.dtPageviews'),
  *      'displaySearchAndPaging' => true,
  *      'order' => [4, 'desc'],
+ *      'paging' => [[10,30,100], 30],
  *      'requestParams' => [
  *          'published_from' => '$("[name=\"published_from\"]").data("DateTimePicker").date().set({hour:0,minute:0,second:0,millisecond:0}).toISOString()',
  *          'published_to' => '$("[name=\"published_to\"]").data("DateTimePicker").date().set({hour:23,minute:59,second:59,millisecond:999}).toISOString()',
@@ -98,6 +99,7 @@ class DataTable extends AbstractWidget
             'rowActions' => $this->config['rowActions'],
             'rowHighlights' => $this->config['rowHighlights'],
             'order' => $this->config['order'],
+            'paging' => $this->config['paging'] ?? [[10,25,50,100], 10],
             'requestParams' => $this->config['requestParams'],
             'refreshTriggers' => $this->config['refreshTriggers'],
             'displaySearchAndPaging' => $this->config['displaySearchAndPaging'],

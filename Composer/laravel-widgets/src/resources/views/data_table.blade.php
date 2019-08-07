@@ -10,12 +10,11 @@
         <ul id="dt-nav-{{ $tableId }}" class="ah-actions actions a-alt">
             <li><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
             <li class="ah-length dropdown">
-                <button class="btn palette-Cyan bg" data-toggle="dropdown">10</button>
+                <button class="btn palette-Cyan bg" data-toggle="dropdown">{{ $paging[1] }}</button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li data-value="10"><a class="dropdown-item dropdown-item-button">10</a></li>
-                    <li data-value="25"><a class="dropdown-item dropdown-item-button">25</a></li>
-                    <li data-value="100"><a class="dropdown-item dropdown-item-button">100</a></li>
-                    <li data-value="250"><a class="dropdown-item dropdown-item-button">250</a></li>
+                    @foreach($paging[0] as $pageCount)
+                        <li data-value="{{$pageCount}}"><a class="dropdown-item dropdown-item-button">{{$pageCount}}</a></li>
+                    @endforeach
                 </ul>
             </li>
 
@@ -59,6 +58,7 @@
 
     $(document).ready(function() {
         var dataTable = $('#{{ $tableId }}').DataTable({
+            'pageLength': {{ $paging[1] }},
             'responsive': true,
             'columns': [
                     @foreach ($cols as $col)
