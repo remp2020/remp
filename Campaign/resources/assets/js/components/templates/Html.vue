@@ -50,6 +50,7 @@
                                 <label for="html_text" class="fg-label">HTML Text</label>
                                 <textarea v-model="text" class="form-control fg-input" rows="6" name="text" cols="50" id="html_text"></textarea>
                             </div>
+                            <div><small v-html="$parent.fieldParamsMessage"></small></div>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
