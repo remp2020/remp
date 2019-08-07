@@ -101,13 +101,15 @@ class Article extends Model
         $variants = [];
 
         foreach ($results as $result) {
-            $titleVariant = $result->tags->title_variant;
-            $imageVariant = $result->tags->image_variant;
+            if ($result->tags) {
+                $titleVariant = $result->tags->title_variant;
+                $imageVariant = $result->tags->image_variant;
 
-            if (!array_key_exists($titleVariant, $variants)) {
-                $variants[$titleVariant] = [];
+                if (!array_key_exists($titleVariant, $variants)) {
+                    $variants[$titleVariant] = [];
+                }
+                $variants[$titleVariant][$imageVariant] = $result->count;
             }
-            $variants[$titleVariant][$imageVariant] = $result->count;
         }
 
         $this->cachedAttributes['variants_count'] = $variants;
