@@ -33,33 +33,39 @@ class JournalController extends Controller
 
     public function articlesConcurrentsCount(Request $request)
     {
-        $ids = (array) $request->input('external_id', []);
+        $externalIds = (array) $request->input('external_id', []);
+        $urls = (array) $request->input('url', []);
 
-        if (!$ids) {
-            $urls = (array) $request->input('url', []);
-            if ($urls) {
-                $articles = Article::whereIn('url', $urls)->get();
-                $ids = $articles->pluck('external_id')->toArray();
+        if (!$externalIds && !$urls) {
+            abort(400, 'Please specify either external_id(s) or url(s) parameters');
+        }
+
+        $records = $this->journalHelpers->currentConcurrentsCount(function (ConcurrentsRequest $r) use ($externalIds, $urls) {
+            if (count($externalIds) > 0) {
+                $r->addFilter('article_id', ...$externalIds);
+                $r->addGroup('article_id');
             }
-        }
-
-        if (!$ids) {
-            abort(400, 'Please specify external_id or url parameters');
-        }
-
-        $records = $this->journalHelpers->currentConcurrentsCount(function (ConcurrentsRequest $r) use ($ids) {
-            $r->addGroup('article_id');
-            if (count($ids) > 0) {
-                $r->addFilter('article_id', ...$ids);
+            if (count($urls) > 0) {
+                $r->addFilter('url', ...$urls);
+                $r->addGroup('url');
             }
         });
 
         $articles = [];
         foreach ($records as $record) {
-            $articles[] = [
-                'external_id' => $record->tags->article_id,
+            $obj = [
                 'count' => $record->count,
             ];
+
+            if (isset($record->tags->article_id)) {
+                $obj['external_id'] = $record->tags->article_id;
+            }
+
+            if (isset($record->tags->url)) {
+                $obj['url'] = $record->tags->url;
+            }
+
+            $articles[] = $obj;
         }
 
         return response()->json([
