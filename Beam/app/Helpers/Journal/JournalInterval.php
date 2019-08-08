@@ -8,6 +8,24 @@ use InvalidArgumentException;
 
 class JournalInterval
 {
+    /**
+     * Retention rules of article snapshots
+     * Rules are used during compression of traffic data and also for rendering articles' traffic histogram
+     * Rules define maximal detail of traffic for given window we can display
+     * Array item describes [INTERVAL_START, INTERVAL_END, WINDOW_SIZE, WINDOW_SIZE_STRING], all in minutes
+     */
+    const RETENTION_RULES = [
+        [0, 10, 1, '1m'], // in interval [0, 10) minutes, keep snapshot of article traffic every minute
+        [10, 60, 5, '5m'], // in interval [10, 60) minutes, keep snapshot of article traffic max every 5 minutes
+        [60, 60*24, 20, '20m'], // [60m, 1d)
+        [60*24 , 60*24*7, 60, '1h'], // [1d, 7d)
+        [60*24*7 , 60*24*30, 120, '2h'], // [7d, 30d)
+        [60*24*30 , 60*24*90, 180, '3h'], // [30d, 90d)
+        [60*24*90 , 60*24*180, 360, '6h'], // [90d, 180d)
+        [60*24*180 , 60*24*365, 720, '12h'], // [180d, 1y)
+        [60*24*365 , null, 1440, '24h'], // [1y, unlimited)
+    ];
+
     public $timeAfter;
     public $timeBefore;
     public $intervalText;
@@ -53,31 +71,29 @@ class JournalInterval
         }
     }
 
+
+    /**
+     * @param Article $article
+     *
+     * @return array
+     * @throws \Exception
+     */
     private static function getIntervalDependingOnArticlePublishedDate(Article $article): array
     {
         $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
 
-        if ($articleAgeInMins <= 60) { // 1 hour
-            return ["5m", 5];
+        foreach (self::RETENTION_RULES as $rule) {
+            $startMinute = $rule[0];
+            $endMinute = $rule[1];
+            $windowSizeInMinutes = $rule[2];
+            $windowSizeText = $rule[3];
+
+
+            if ($endMinute === null || $articleAgeInMins < $endMinute) {
+                return [$windowSizeText, $windowSizeInMinutes];
+            }
         }
-        if ($articleAgeInMins <= 60*24) { // 1 day
-            return ["20m", 20];
-        }
-        if ($articleAgeInMins <= 7*60*24) { // 7 days
-            return ["1h", 60];
-        }
-        if ($articleAgeInMins <= 30*60*24) { // 30 days
-            return ["2h", 120];
-        }
-        if ($articleAgeInMins <= 90*60*24) { // 90 days
-            return ["3h", 180];
-        }
-        if ($articleAgeInMins <= 180*60*24) { // 180 days
-            return ["6h", 360];
-        }
-        if ($articleAgeInMins <= 365*60*24) { // 1 year
-            return ["12h", 720];
-        }
-        return ["24h", 1440]; // 1+ year
+
+        throw new \Exception("No fitting rule for article {$article->id}");
     }
 }

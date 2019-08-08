@@ -6,6 +6,7 @@ use App\Console\Commands\AggregateArticlesViews;
 use App\Console\Commands\AggregateConversionEvents;
 use App\Console\Commands\AggregatePageviewLoadJob;
 use App\Console\Commands\AggregatePageviewTimespentJob;
+use App\Console\Commands\CompressSnapshots;
 use App\Console\Commands\ComputeAuthorsSegments;
 use App\Console\Commands\DeleteOldAggregations;
 use App\Console\Commands\ProcessPageviewSessions;
@@ -71,6 +72,10 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(ComputeAuthorsSegments::COMMAND)
             ->dailyAt('02:00')
+            ->withoutOverlapping();
+
+        $schedule->command(CompressSnapshots::COMMAND)
+            ->dailyAt('02:30')
             ->withoutOverlapping();
 
         // Aggregate any conversion events that weren't aggregated before due to Segments API fail
