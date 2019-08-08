@@ -3,12 +3,29 @@
 namespace App\Helpers\Journal;
 
 use App\Article;
-use App\Console\Commands\CompressSnapshots;
 use Carbon\Carbon;
 use InvalidArgumentException;
 
 class JournalInterval
 {
+    /**
+     * Retention rules of article snapshots
+     * Rules are used during compression of traffic data and also for rendering articles' traffic histogram
+     * Rules define maximal detail of traffic for given window we can display
+     * Array item describes [INTERVAL_START, INTERVAL_END, WINDOW_SIZE, WINDOW_SIZE_STRING], all in minutes
+     */
+    const RETENTION_RULES = [
+        [0, 10, 1, '1m'], // in interval [0, 10) minutes, keep snapshot of article traffic every minute
+        [10, 60, 5, '5m'], // in interval [10, 60) minutes, keep snapshot of article traffic max every 5 minutes
+        [60, 60*24, 20, '20m'], // [60m, 1d)
+        [60*24 , 60*24*7, 60, '1h'], // [1d, 7d)
+        [60*24*7 , 60*24*30, 120, '2h'], // [7d, 30d)
+        [60*24*30 , 60*24*90, 180, '3h'], // [30d, 90d)
+        [60*24*90 , 60*24*180, 360, '6h'], // [90d, 180d)
+        [60*24*180 , 60*24*365, 720, '12h'], // [180d, 1y)
+        [60*24*365 , null, 1440, '24h'], // [1y, unlimited)
+    ];
+
     public $timeAfter;
     public $timeBefore;
     public $intervalText;
@@ -65,7 +82,7 @@ class JournalInterval
     {
         $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
 
-        foreach (CompressSnapshots::RETENTION_RULES as $rule) {
+        foreach (self::RETENTION_RULES as $rule) {
             $startMinute = $rule[0];
             $endMinute = $rule[1];
             $windowSizeInMinutes = $rule[2];
