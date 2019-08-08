@@ -134,7 +134,7 @@ class ArticleController extends Controller
                     return '';
                 }
 
-                return number_format(($article->conversions_count / $uniqueCount) * 10000, 2);
+                return ($article->conversions_count / $uniqueCount) * 100;
             })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {
