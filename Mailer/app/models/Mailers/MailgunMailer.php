@@ -25,6 +25,10 @@ class MailgunMailer extends Mailer implements IMailer
             'required' => true,
             'label' => 'Mailgun domain',
         ],
+        'endpoint' => [
+            'required' => false,
+            'label' => 'Mailgun endpoint',
+        ]
     ];
 
     public function __construct(
@@ -32,7 +36,12 @@ class MailgunMailer extends Mailer implements IMailer
         ConfigsRepository $configsRepository
     ) {
         parent::__construct($config, $configsRepository);
-        $this->mailer = Mailgun::create($this->option('api_key'));
+
+        if ($endpoint = $this->option('endpoint')) {
+            $this->mailer = Mailgun::create($this->option('api_key'), $endpoint);
+        } else {
+            $this->mailer = Mailgun::create($this->option('api_key'));
+        }
     }
 
     public function send(Message $message)
