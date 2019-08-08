@@ -12,6 +12,9 @@
                         {input $input, class => 'form-control fg-input'}
                         {label $input, class => 'fg-label' /}
                     </div>
+                    {if $description = $input->getOption('description')}
+                        <div class="small">{$description}</div>
+                    {/if}
                     <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
                         <div class="col-sm-12">
                             {label $input /}

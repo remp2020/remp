@@ -17,10 +17,12 @@ class SmtpMailer extends Mailer implements IMailer
         'host' => [
             'required' => true,
             'label' => 'SMTP host',
+            'description' => 'IP address or hostname of SMTP server (e.g. 127.0.0.1)',
         ],
         'port' => [
             'required' => true,
             'label' => 'SMTP Port',
+            'description' => 'Port on which your SMTP server is exposed (e.g. 1025)',
         ],
         'username' => [
             'required' => false,
@@ -33,6 +35,7 @@ class SmtpMailer extends Mailer implements IMailer
         'secure' => [
             'required' => false,
             'label' => 'SMTP Secure',
+            'description' => 'Secure protocol used to connect (e.g. ssl)',
         ],
     ];
 

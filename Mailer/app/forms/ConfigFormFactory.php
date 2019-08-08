@@ -45,8 +45,10 @@ class ConfigFormFactory
             $mailers[$name] = get_class($mailer);
         });
 
-        $defaultMailer = $mailerContainer->addSelect('default_mailer', 'Default Mailer', $mailers)
+        $defaultMailer = $mailerContainer
+            ->addSelect('default_mailer', 'Default Mailer', $mailers)
             ->setDefaultValue($configs['default_mailer']['value']);
+
         unset($configs['default_mailer']);
 
         /** @var $mailer Mailer */
@@ -59,7 +61,9 @@ class ConfigFormFactory
                 $config = $configs[$key];
 
                 if ($config['type'] === 'string') {
-                    $item = $mailerContainer->addText($config['name'], $config['display_name'])
+                    $item = $mailerContainer
+                        ->addText($config['name'], $config['display_name'])
+                        ->setOption('description', $config['description'])
                         ->setDefaultValue($config['value']);
                 }
 
@@ -72,38 +76,40 @@ class ConfigFormFactory
             }
         }
 
-        $othersContainer = $settings->addContainer('Internal');
+        if (!empty($configs)) {
+            $othersContainer = $settings->addContainer('Internal');
 
-        foreach ($configs as $config) {
-            $item = null;
+            foreach ($configs as $config) {
+                $item = null;
 
-            // handle generic types
-            switch ($config['type']) :
-                case Config::TYPE_STRING:
-                case Config::TYPE_PASSWORD:
-                    $othersContainer->addText($config['name'], $config['display_name'])
-                        ->setDefaultValue($config['value']);
-                    break;
-                case Config::TYPE_TEXT:
-                    $othersContainer->addTextArea($config['name'], $config['display_name'])
-                        ->setDefaultValue($config['value'])
-                        ->getControlPrototype()
-                        ->addAttributes(['class' => 'auto-size']);
-                    break;
-                case Config::TYPE_HTML:
-                    $othersContainer->addTextArea($config['name'], $config['display_name'])
-                        ->setAttribute('rows', 15)
-                        ->setDefaultValue($config['value'])
-                        ->getControlPrototype()
-                        ->addAttributes(['class' => 'html-editor']);
-                    break;
-                case Config::TYPE_BOOLEAN:
-                    $othersContainer->addCheckbox($config['name'], $config['display_name'])
-                        ->setDefaultValue($config['value']);
-                    break;
-                default:
-                    throw new \Exception('unhandled config type: ' . $config['type']);
-            endswitch;
+                // handle generic types
+                switch ($config['type']) :
+                    case Config::TYPE_STRING:
+                    case Config::TYPE_PASSWORD:
+                        $othersContainer->addText($config['name'], $config['display_name'])
+                            ->setDefaultValue($config['value']);
+                        break;
+                    case Config::TYPE_TEXT:
+                        $othersContainer->addTextArea($config['name'], $config['display_name'])
+                            ->setDefaultValue($config['value'])
+                            ->getControlPrototype()
+                            ->addAttributes(['class' => 'auto-size']);
+                        break;
+                    case Config::TYPE_HTML:
+                        $othersContainer->addTextArea($config['name'], $config['display_name'])
+                            ->setAttribute('rows', 15)
+                            ->setDefaultValue($config['value'])
+                            ->getControlPrototype()
+                            ->addAttributes(['class' => 'html-editor']);
+                        break;
+                    case Config::TYPE_BOOLEAN:
+                        $othersContainer->addCheckbox($config['name'], $config['display_name'])
+                            ->setDefaultValue($config['value']);
+                        break;
+                    default:
+                        throw new \Exception('unhandled config type: ' . $config['type']);
+                endswitch;
+            }
         }
 
         $form->addSubmit('save', 'Save')

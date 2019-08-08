@@ -59,8 +59,13 @@ abstract class Mailer implements IMailer
             try {
                 $this->options[$name]['value'] = $this->config->get($prefix . '_' . $name);
             } catch (ConfigNotExistsException $e) {
-                $description = 'Setting for ' . get_called_class();
-                $this->configsRepository->add($prefix . '_' . $name, $definition['label'], null, $description, Config::TYPE_STRING);
+                $this->configsRepository->add(
+                    $prefix . '_' . $name,
+                    $definition['label'],
+                    null,
+                    $definition['description'] ?? null,
+                    Config::TYPE_STRING
+                );
 
                 $this->options[$name] = [
                     'label' => $definition['label'],

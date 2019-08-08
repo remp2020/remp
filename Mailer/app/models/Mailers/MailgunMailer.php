@@ -20,14 +20,17 @@ class MailgunMailer extends Mailer implements IMailer
         'api_key' => [
             'required' => true,
             'label' => 'Mailgun API key',
+            'description' => 'Mailgun domain (e.g. key-abcdefgh12345678)',
         ],
         'domain' => [
             'required' => true,
             'label' => 'Mailgun domain',
+            'description' => 'Mailgun domain (e.g. mg.example.com)',
         ],
         'endpoint' => [
             'required' => false,
             'label' => 'Mailgun endpoint',
+            'description' => 'Mailgun server URL (e.g. https://api.mailgun.net)',
         ]
     ];
 
