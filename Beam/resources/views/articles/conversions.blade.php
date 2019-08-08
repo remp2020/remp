@@ -48,6 +48,7 @@
                 'conversions_rate' => [
                     'searchable' => false,
                     'header' => 'conversions rate',
+                    'render' => 'percentage',
                     'priority' => 2,
                     'className' => 'text-right',
                 ],
