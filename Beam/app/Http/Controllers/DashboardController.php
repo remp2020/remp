@@ -105,7 +105,7 @@ class DashboardController extends Controller
 
         $tags = [];
         foreach ($currentData as $item) {
-            $tags[$item->derived_referer_medium] = true;
+            $tags[$this->itemTag($item)] = true;
         }
 
         // Compute shadow values for today and 7-days intervals
@@ -130,7 +130,7 @@ class DashboardController extends Controller
                         ->addHours($hourDifference)
                         ->toIso8601ZuluString();
 
-                    $currentTag = $item->derived_referer_medium;
+                    $currentTag = $this->itemTag($item);
                     $tags[$currentTag] = true;
 
                     if (!array_key_exists($correctedDate, $shadowRecords)) {
@@ -147,8 +147,10 @@ class DashboardController extends Controller
         // Get tags
         $tags = array_keys($tags);
         $emptyValues = [];
+        $totalCounts = [];
         foreach ($tags as $tag) {
             $emptyValues[$tag] = 0;
+            $totalCounts[$tag] = 0;
         }
 
         // Start building results
@@ -162,7 +164,8 @@ class DashboardController extends Controller
             if (!array_key_exists($zuluTime, $results)) {
                 $results[$zuluTime] = array_merge($emptyValues, ['Date' => $zuluTime]);
             }
-            $results[$zuluTime][$item->derived_referer_medium] = $item->count;
+            $results[$zuluTime][$this->itemTag($item)] = $item->count;
+            $totalCounts[$this->itemTag($item)] += $item->count;
         }
 
         // Fill empty records for shadow values first
@@ -194,27 +197,42 @@ class DashboardController extends Controller
             }
         }
 
+        // Reorder tags by total counts
+        arsort($totalCounts);
+        $i = 0;
+        $tagOrdering = [];
+        foreach ($totalCounts as $tag => $count) {
+            $tagOrdering[$tag] = $i;
+            $i++;
+        }
+        $orderedTags = array_keys($tagOrdering);
+
         return response()->json([
             'results' => array_values($results),
             'intervalMinutes' => $intervalMinutes,
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
-            'tags' => $tags,
-            'colors' => Colors::refererMediumTagsToColors($tags)
+            'tags' => $orderedTags,
+            'colors' => Colors::refererMediumTagsToColors($orderedTags),
         ]);
+    }
+
+    private function itemTag($item)
+    {
+        if (!empty($item->explicit_referer_medium)) {
+            return $item->explicit_referer_medium;
+        }
+        return $item->derived_referer_medium;
     }
 
     private function dataFor(array $timePoints)
     {
         return DB::table('article_views_snapshots')
-            ->select('article_views_snapshots.time', 'derived_referer_medium', DB::raw('sum(count) as count'))
+            ->select('article_views_snapshots.time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
             ->whereIn('time', $timePoints)
-            ->groupBy(['article_views_snapshots.time', 'derived_referer_medium'])
-            // TODO: add grouping by 'explicit_referer_medium'
+            ->groupBy(['article_views_snapshots.time', 'derived_referer_medium', 'explicit_referer_medium'])
             ->get();
     }
-
-
 
     public function timeHistogram(Request $request)
     {
