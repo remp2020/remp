@@ -18,7 +18,7 @@ class JournalInterval
         [0, 10, 1, '1m'], // in interval [0, 10) minutes, keep snapshot of article traffic every minute
         [10, 60, 5, '5m'], // in interval [10, 60) minutes, keep snapshot of article traffic max every 5 minutes
         [60, 60*24, 20, '20m'], // [60m, 1d)
-        [60*24 , 60*24*7, 60, '1h'], // [1d, 7d)
+        [60*24 , 60*24*8, 60, '1h'], // [1d, 8d)
         [60*24*7 , 60*24*30, 120, '2h'], // [7d, 30d)
         [60*24*30 , 60*24*90, 180, '3h'], // [30d, 90d)
         [60*24*90 , 60*24*180, 360, '6h'], // [90d, 180d)
