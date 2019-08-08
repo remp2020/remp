@@ -30,10 +30,10 @@ class SnapshotArticlesViews extends Command
 
     public function handle()
     {
-        $thisMinute = Carbon::now()->second(0);
+        $thisMinute = Carbon::now();
 
         if ($this->hasOption('time')) {
-            $thisMinute = Carbon::parse($this->option('time'))->second(0);
+            $thisMinute = Carbon::parse($this->option('time'));
         }
 
         $this->line('');
@@ -45,9 +45,9 @@ class SnapshotArticlesViews extends Command
         $this->line(' <info>OK!</info>');
     }
 
-    private function snapshot(Carbon $thisMinute)
+    private function snapshot(Carbon $now)
     {
-        $to = $thisMinute;
+        $to = $now;
         $from = (clone $to)->subSeconds(600); // Last 10 minutes
 
         $request = new ConcurrentsRequest();
@@ -59,6 +59,8 @@ class SnapshotArticlesViews extends Command
 
         $externalIds = [];
 
+        $dbTime = $to->second(0);
+
         foreach ($this->journal->concurrents($request) as $record) {
             $token = $record->tags->token;
             $articleId = $record->tags->article_id;
@@ -68,7 +70,7 @@ class SnapshotArticlesViews extends Command
             $key = self::key($token, $articleId, $derivedRefererMedium, $explicitRefererMedium);
 
             $items[$key] = [
-                'time' => $to,
+                'time' => $dbTime,
                 'property_token' => $token,
                 'external_article_id' => $articleId,
                 'derived_referer_medium' => $derivedRefererMedium,
@@ -127,7 +129,7 @@ class SnapshotArticlesViews extends Command
         //}
 
         // Save
-        ArticleViewsSnapshot::where('time', $to)->delete();
+        ArticleViewsSnapshot::where('time', $dbTime)->delete();
         
         foreach (array_chunk($items, 100) as $itemsChunk) {
             ArticleViewsSnapshot::insert($itemsChunk);
