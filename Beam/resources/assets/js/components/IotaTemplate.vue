@@ -325,7 +325,11 @@ $colors: (
             </div>
           </div>
         </div>
-        <a href="#" class="ri-metrics__detail__beam-link">
+        <a
+          :href="`${baseUrl}/article?external_id=${articleId}`"
+          target="_blank"
+          class="ri-metrics__detail__beam-link"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             x="0px"
@@ -370,6 +374,10 @@ export default {
   name: "iota-article-stats",
   props: {
     articleId: {
+      type: String,
+      required: true
+    },
+    baseUrl: {
       type: String,
       required: true
     }
