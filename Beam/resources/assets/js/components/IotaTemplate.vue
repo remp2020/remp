@@ -218,7 +218,7 @@ $colors: (
   <div class="ri-metrics">
     <div class="ri-metrics__inline-metric" :class="conversionsColorClass">
       <div @click="toggleMetricsDetail" class="ri-metrics__inline-metric__bubble">
-        <div class="ri-metrics__inline-metric__bubble__concurrents">134</div>
+        <div class="ri-metrics__inline-metric__bubble__concurrents">{{concurrents}}</div>
         <div
           :class="{'ri-metrics__inline-metric__bubble__conversions': true, 'ri-metrics__inline-metric__bubble__conversions--with-ab': hasABTests}"
         >
@@ -278,7 +278,13 @@ $colors: (
             </div>
           </div>
 
-          <div class="ri-metrics__detail__performance" v-if="sortedPageviewRanges.length > 0">
+          <div class="ri-metrics__detail__performance">
+            <div class="ri-metrics__detail__performance__item">
+              <div class="ri-metrics__detail__performance__item__number">
+                <AnimatedInteger :value="concurrents" />
+              </div>
+              <div class="ri-metrics__detail__performance__item__caption">Readers Concurrent</div>
+            </div>
             <div
               class="ri-metrics__detail__performance__item"
               v-for="range in sortedPageviewRanges"
@@ -386,6 +392,7 @@ export default {
   data: () => ({
     conversions: 0,
     totalPageviews: 0,
+    concurrents: 0,
 
     pageviewStats: {},
     titleVariantStats: {},
@@ -407,6 +414,7 @@ export default {
   created: function() {
     EventHub.$on("content-conversions-counts-changed", this.updateConversions);
     EventHub.$on("content-pageviews-changed", this.updatePageviewStats);
+    EventHub.$on("content-concurrents-changed", this.updateConcurrentsStats);
     EventHub.$on("content-variants-changed", this.updateVariantStats);
     EventHub.$on("config-changed", this.configChanged);
     EventHub.$on("opening-metrics-detail", this.hideMetricsDetail);
@@ -515,6 +523,10 @@ export default {
       if (range.label === "Total") {
         this.totalPageviews = counts[this.articleId];
       }
+    },
+    updateConcurrentsStats(data) {
+      const foundItem = data.find(item => item.external_id === this.articleId);
+      this.concurrents = foundItem ? foundItem.count : 0;
     },
     updateVariantStats(variantTypes, range, counts) {
       for (const variantType of variantTypes) {

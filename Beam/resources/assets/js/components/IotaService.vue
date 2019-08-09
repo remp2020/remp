@@ -17,7 +17,7 @@ export default {
       type: Array,
       default: function() {
         return [
-          { minutes: 15, label: "15m", order: 0 },
+          // { minutes: 15, label: "15m", order: 0 },
           { minutes: undefined, label: "Total", order: 1 }
         ];
       }
@@ -89,7 +89,7 @@ export default {
         this.fetchConcurrents(null, window.location.href);
       }
       this.fetchReadProgressStats(deviceType, articleLocked, timeframe);
-      this.fetchCommerceStats(deviceType, subscriber);
+      this.fetchCommerceStats(deviceType);
       this.fetchPageviewStats(now, deviceType, subscriber);
       this.fetchVariantStats(
         now,
@@ -98,7 +98,7 @@ export default {
         subscriber
       );
     },
-    fetchCommerceStats: function(deviceType = "all", subscriber = "true") {
+    fetchCommerceStats: function(deviceType = "all") {
       const payload = {
         filter_by: [
           {
@@ -108,14 +108,6 @@ export default {
         ],
         group_by: ["article_id"]
       };
-
-      if (subscriber !== "all") {
-        payload.filter_by.push({
-          tag: "subscriber",
-          values: ["true"],
-          inverse: subscriber === "true" ? false : true
-        });
-      }
 
       if (deviceType !== "all") {
         payload.filter_by.push({
@@ -188,6 +180,20 @@ export default {
             console.warn(error);
           });
       }
+
+      // TODO: later use baseUrl
+      Axios.post(
+        "https://beam.remp2020.com/api/journal/concurrents/count/articles",
+        {
+          external_id: this.articleIds
+        }
+      )
+        .then(response => {
+          EventHub.$emit("content-concurrents-changed", response.data.articles);
+        })
+        .catch(error => {
+          console.warn(error);
+        });
     },
 
     fetchVariantStats: function(
