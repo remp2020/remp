@@ -77,11 +77,9 @@ For dashboard to work correctly, you need to:
 
 * Include tracking [JS snippet](#javascript-snippet) on your website (this will populate today's chart)
 * Push article metadata to Beam via [article tracking API](#post-apiarticlesupsert)
-* Enable *timespent* tracking within this snippet (`rempConfig.tracker.timeSpentEnabled = true`).
+* Enable *timespent* tracking within this snippet (`rempConfig.tracker.timeSpent = { "enabled": true}` ).
 
-Note: *Timespent* tracking will not be mandatory in the future and dashboard will be able to utilize regular pageview
-data instead. In the meantime, you need to have the *timespent* tracking enabled as it's used as source of data for
-number of concurrents connected to the website and also list of currently accessed articles.
+Note: *Timespent* tracking is not mandatory dashboard can utilize regular pageview data instead to calculate number of concurrents. If you don't plan to track timespent, please see [this Telegraf configuration options](https://github.com/remp2020/remp/blob/master/Docker/telegraf/telegraf.conf#L78) so you can switch to pageview-based concurrents instead.
 
 Dashboard allows you to display detail of each article with pageview-related chart containing histogram of visits
 split by traffic source medium (same as in the main dashboard) and also displays article-related events.
@@ -740,11 +738,14 @@ var rempConfig = {
         // required, URL location of BEAM Tracker
         url: "http://tracker.beam.remp.press",
         
-        // optional time spent measuring (default value `false`)
+        // optional time spent measuring (disabled by default)
         // if enabled, tracks time spent on current page
-        timeSpentEnabled: true,
+        timeSpent: {
+            enabled: Boolean, // if enabled, tracks time spent on the webpage
+            interval: Number, // optional, frequency of sending tracked progress in seconds (default value 5; interval is progressive and gets prolonged in time)
+        },
         
-        // optional, achieved scroll depth tracking (default value `false`)
+        // optional, achieved scroll depth tracking (disabled by default)
         readingProgress: {
             enabled: Boolean, // if enabled, tracks achieved scroll depth
             interval: Number // optional, frequency of sending tracked progress in seconds (default value 5)

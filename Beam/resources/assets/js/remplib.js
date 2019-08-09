@@ -44,6 +44,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentEnabled: false,
 
+        timeSpentInterval: 5, // seconds
+
         cookiesEnabled: null,
 
         websocketsSupported: null,
@@ -136,8 +138,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             this.checkWebsocketsSupport();
 
+            // deprecated, kept for legacy implementations
             if (typeof config.tracker.timeSpentEnabled === 'boolean') {
                 this.timeSpentEnabled = config.tracker.timeSpentEnabled;
+            }
+            if (typeof config.tracker.timeSpent === 'object') {
+                if (typeof config.tracker.timeSpent.enabled === 'boolean') {
+                    this.timeSpentEnabled = config.tracker.timeSpent.enabled;
+                }
+                if (typeof config.tracker.timeSpent.interval === 'number') {
+                    this.timeSpentInterval = config.tracker.timeSpent.interval;
+                }
             }
 
             window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
@@ -150,28 +161,26 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.tracker.readingProgress.enabled === 'boolean') {
                     this.progressTrackingEnabled = config.tracker.readingProgress.enabled;
                 }
-                if (!this.progressTrackingEnabled) {
-                    return;
-                }
-
-                if (typeof config.tracker.readingProgress.interval === 'number') {
-                    if (config.tracker.readingProgress.interval >= 1) {
-                        this.progressTrackingInterval = config.tracker.readingProgress.interval;
-                    } else {
-                        console.warn("remplib cannot be initialized with readingProgress.interval less than 1, keeping default value (" + this.progressTrackingInterval + ")")
+                if (this.progressTrackingEnabled) {
+                    if (typeof config.tracker.readingProgress.interval === 'number') {
+                        if (config.tracker.readingProgress.interval >= 1) {
+                            this.progressTrackingInterval = config.tracker.readingProgress.interval;
+                        } else {
+                            console.warn("remplib cannot be initialized with readingProgress.interval less than 1, keeping default value (" + this.progressTrackingInterval + ")")
+                        }
                     }
+
+                    setInterval(function() {
+                        remplib.tracker.sendTrackedProgress()
+                    }, (remplib.tracker.progressTrackingInterval * 1000));
+
+                    window.addEventListener("scroll", this.scrollProgressEvent);
+                    window.addEventListener("resize", this.scrollProgressEvent);
+                    window.addEventListener("scroll_progress", this.trackProgress);
+                    window.addEventListener("beforeunload", function() {
+                        remplib.tracker.sendTrackedProgress(true)
+                    });
                 }
-
-                setInterval(function() {
-                    remplib.tracker.sendTrackedProgress()
-                }, (remplib.tracker.progressTrackingInterval * 1000));
-
-                window.addEventListener("scroll", this.scrollProgressEvent);
-                window.addEventListener("resize", this.scrollProgressEvent);
-                window.addEventListener("scroll_progress", this.trackProgress);
-                window.addEventListener("beforeunload", function() {
-                    remplib.tracker.sendTrackedProgress(true)
-                });
             }
 
             this.initialized = true;
@@ -733,7 +742,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         scheduledSend: function() {
-            let logInterval = Math.round(0.3 * (Math.sqrt(this.totalTimeSpent))) * 5;
+            let logInterval = Math.round(0.3 * (Math.sqrt(this.totalTimeSpent))) * this.timeSpentInterval;
             if (0 === this.totalTimeSpent % logInterval) {
                 this.trackTimespent();
             }
