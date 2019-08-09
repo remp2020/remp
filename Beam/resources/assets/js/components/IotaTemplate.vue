@@ -218,12 +218,14 @@ $colors: (
   <div class="ri-metrics">
     <div class="ri-metrics__inline-metric" :class="conversionsColorClass">
       <div @click="toggleMetricsDetail" class="ri-metrics__inline-metric__bubble">
-        <div class="ri-metrics__inline-metric__bubble__concurrents">{{concurrents}}</div>
+        <div class="ri-metrics__inline-metric__bubble__concurrents">
+          <AnimatedInteger :value="concurrents" />
+        </div>
         <div
           :class="{'ri-metrics__inline-metric__bubble__conversions': true, 'ri-metrics__inline-metric__bubble__conversions--with-ab': hasABTests}"
         >
           <span class="ri-metrics__inline-metric__bubble__ab" v-if="hasABTests">A/B</span>
-          <span>{{ conversions }}</span>
+          <AnimatedInteger :value="conversions" />
         </div>
       </div>
     </div>
