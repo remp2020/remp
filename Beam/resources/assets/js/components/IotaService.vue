@@ -79,13 +79,16 @@ export default {
     });
   },
   methods: {
-    refetchAllData(deviceType, articleLocked, subscriber) {
+    refetchAllData(deviceType, articleLocked, subscriber, timeframe) {
       const now = new Date();
 
+      this.fetchAllConcurrents();
       if (this.onArticleDetail) {
-        this.fetchReadProgressStats(deviceType, articleLocked);
+        this.fetchConcurrents(this.articleDetailId);
+      } else {
+        this.fetchConcurrents(null, window.location.href);
       }
-
+      this.fetchReadProgressStats(deviceType, articleLocked, timeframe);
       this.fetchCommerceStats(deviceType, subscriber);
       this.fetchPageviewStats(now, deviceType, subscriber);
       this.fetchVariantStats(
@@ -95,7 +98,7 @@ export default {
         subscriber
       );
     },
-    fetchCommerceStats: function(deviceType = "all", subscriber = "all") {
+    fetchCommerceStats: function(deviceType = "all", subscriber = "true") {
       const payload = {
         filter_by: [
           {
@@ -137,7 +140,7 @@ export default {
         });
     },
 
-    fetchPageviewStats: function(now, deviceType = "all", subscriber = "all") {
+    fetchPageviewStats: function(now, deviceType = "all", subscriber = "true") {
       for (let range of this.pageviewMinuteRanges) {
         const payload = {
           filter_by: [
@@ -191,7 +194,7 @@ export default {
       now,
       variantTypes,
       deviceType = "all",
-      subscriber = "all"
+      subscriber = "true"
     ) {
       for (let range of this.variantsMinuteRanges) {
         const variantPayload = {
@@ -272,9 +275,21 @@ export default {
       }
     },
 
-    fetchReadProgressStats(deviceType = "all", articleLocked = "false") {
+    fetchReadProgressStats(
+      deviceType = "all",
+      articleLocked = "false",
+      timeframe = 10 * 60 * 1000
+    ) {
       const payload = {
-        filter_by: [
+        filter_by: [],
+        count_histogram: {
+          field: "page_progress",
+          interval: 0.01
+        }
+      };
+
+      if (this.onArticleDetail) {
+        payload.filter_by.push(
           {
             tag: "article_id",
             values: [this.articleDetailId]
@@ -283,13 +298,14 @@ export default {
             tag: "locked",
             values: [articleLocked]
           }
-        ],
-        group_by: ["article_id"],
-        count_histogram: {
-          field: "page_progress",
-          interval: 0.01
-        }
-      };
+        );
+      } else {
+        payload.filter_by.push({
+          tag: "url",
+          values: [window.location.href]
+        });
+        payload.time_after = new Date(new Date() - timeframe).toISOString();
+      }
 
       if (deviceType !== "all") {
         payload.filter_by.push({
@@ -310,6 +326,36 @@ export default {
           );
         })
         .catch(function(error) {
+          console.warn(error);
+        });
+    },
+    fetchAllConcurrents() {
+      // Axios.get(`${this.baseUrl}/journal/concurrents/count`) // TODO: later use this when this.baseUrl is changed to new endpoint
+      Axios.get("https://beam.remp2020.com/api/journal/concurrents/count")
+        .then(response => {
+          EventHub.$emit("all-concurrents-changed", response.data.total);
+        })
+        .catch(error => {
+          console.warn(error);
+        });
+    },
+    fetchConcurrents(articleId = null, url = null) {
+      let urlParam;
+      if (articleId) {
+        urlParam = `?external_id[]=${articleId}`;
+      } else {
+        urlParam = `?url[]=${url}`;
+      }
+      // TODO: later use this.baseUrl
+      Axios.get(
+        `https://beam.remp2020.com/api/journal/concurrents/count/articles${urlParam}`
+      )
+        .then(({ data }) => {
+          if (data.articles && data.articles.length) {
+            EventHub.$emit("page-concurrents-changed", data.articles[0].count);
+          }
+        })
+        .catch(error => {
           console.warn(error);
         });
     }

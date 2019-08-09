@@ -12,7 +12,7 @@
   justify-content: space-between;
   width: 25%;
   z-index: 999999;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out, z-index 0s ease-in-out;
   &__item {
     display: flex;
     align-items: center;
@@ -35,6 +35,7 @@
     width: 5px;
     opacity: 0.5;
     z-index: 0;
+    transition: all 0.15s ease-in-out;
     .ri-histogram__item {
       width: 100% !important;
     }

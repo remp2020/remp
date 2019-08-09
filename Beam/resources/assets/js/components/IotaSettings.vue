@@ -109,7 +109,7 @@
       }
     }
   }
-  &__concurents {
+  &__concurrents {
     padding: 0px 15px 5px 15px;
     color: #666;
     svg {
@@ -117,6 +117,12 @@
       position: relative;
       top: 5px;
       margin-right: 10px;
+    }
+    &__page {
+      color: #3874d0;
+    }
+    &__all {
+      font-size: 11px;
     }
   }
 }
@@ -141,7 +147,7 @@
       </svg>
       Beam metrics
     </div>
-    <div class="ri-settings__concurents">
+    <div class="ri-settings__concurrents">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         x="0px"
@@ -153,7 +159,14 @@
         <path
           d="M 12 4 A 3.5 3.5 0 0 0 8.5 7.5 A 3.5 3.5 0 0 0 12 11 A 3.5 3.5 0 0 0 15.5 7.5 A 3.5 3.5 0 0 0 12 4 z M 4.5 7 A 2.5 2.5 0 0 0 2 9.5 A 2.5 2.5 0 0 0 4.5 12 A 2.5 2.5 0 0 0 7 9.5 A 2.5 2.5 0 0 0 4.5 7 z M 19.5 7 A 2.5 2.5 0 0 0 17 9.5 A 2.5 2.5 0 0 0 19.5 12 A 2.5 2.5 0 0 0 22 9.5 A 2.5 2.5 0 0 0 19.5 7 z M 12 13 C 9.664 13 5 14.173 5 16.5 L 5 19 C 5 19.552 5.448 20 6 20 L 18 20 C 18.552 20 19 19.552 19 19 L 19 16.5 C 19 14.173 14.336 13 12 13 z M 3.8984375 14.052734 C 2.3174375 14.296734 0 15.389078 0 16.705078 L 0 19 C 0 19.552 0.448 20 1 20 L 3 20 L 3 16.5 C 3 15.539 3.3454375 14.732734 3.8984375 14.052734 z M 20.101562 14.052734 C 20.654563 14.732734 21 15.539 21 16.5 L 21 20 L 23 20 C 23.552 20 24 19.552 24 19 L 24 16.705078 C 24 15.389078 21.682562 14.296734 20.101562 14.052734 z"
         />
-      </svg> 1,456
+      </svg>
+      <span class="ri-settings__concurrents__page">
+        <AnimatedInteger :value="pageConcurrents" />
+      </span>
+      <span class="ri-settings__concurrents__all">
+        /
+        <AnimatedInteger :value="allConcurrents" />
+      </span>
     </div>
     <div class="ri-settings__body" v-if="!collapsed">
       <div class="ri-settings__group">
@@ -262,30 +275,30 @@
             type="radio"
             id="ri-settings-timeframe-concurrents"
             name="ri-settings-article-version-group"
-            :value="0"
+            :value="10*60*1000"
             v-model="timeframe"
           />
-          <label for="ri-settings-article-version-unlocked">Concurrents</label>
+          <label for="ri-settings-timeframe-concurrents">Concurrents</label>
         </div>
         <div class="ri-settings__input-wrapper">
           <input
             type="radio"
             id="ri-settings-timeframe-1h"
             name="ri-settings-article-version-group"
-            :value="1"
+            :value="60*60*1000"
             v-model="timeframe"
           />
-          <label for="ri-settings-article-version-locked">1 hour</label>
+          <label for="ri-settings-timeframe-1h">1 hour</label>
         </div>
         <div class="ri-settings__input-wrapper">
           <input
             type="radio"
             id="ri-settings-timeframe-4h"
             name="ri-settings-article-version-group"
-            :value="4"
+            :value="4*60*60*1000"
             v-model="timeframe"
           />
-          <label for="ri-settings-article-version-unlocked">4 hours</label>
+          <label for="ri-settings-timeframe-4h">4 hours</label>
         </div>
       </div>
     </div>
@@ -323,6 +336,7 @@
 
 <script type="text/javascript">
 import EventHub from "./EventHub";
+import AnimatedInteger from "./dashboard/AnimatedInteger";
 
 export default {
   name: "iota-settings",
@@ -332,21 +346,35 @@ export default {
       required: true
     }
   },
+  components: { AnimatedInteger },
   data: () => ({
     collapsed: true,
     deviceType: "all",
     articleLocked: "false",
-    subscriber: "all",
-    timeframe: 0
+    subscriber: "true",
+    timeframe: 10 * 60 * 1000,
+    allConcurrents: 0,
+    pageConcurrents: 0
   }),
+  created: function() {
+    EventHub.$on("all-concurrents-changed", this.updateAllConcurrents);
+    EventHub.$on("page-concurrents-changed", this.updatePageConcurrents);
+  },
   methods: {
     fireEventToRefetchData() {
       EventHub.$emit(
         "metrics-settings-changed",
         this.deviceType,
         this.articleLocked,
-        this.subscriber
+        this.subscriber,
+        this.timeframe
       );
+    },
+    updateAllConcurrents(concurrents) {
+      this.allConcurrents = concurrents;
+    },
+    updatePageConcurrents(concurrents) {
+      this.pageConcurrents = concurrents;
     }
   },
   watch: {
@@ -357,6 +385,9 @@ export default {
       this.fireEventToRefetchData();
     },
     subscriber() {
+      this.fireEventToRefetchData();
+    },
+    timeframe() {
       this.fireEventToRefetchData();
     }
   }
