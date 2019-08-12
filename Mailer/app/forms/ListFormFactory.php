@@ -52,6 +52,7 @@ class ListFormFactory
         )->setRequired("Field 'Category' is required.");
 
         $form->addText('priority', 'Priority')
+            ->addRule(Form::INTEGER, "Priority needs to be a number")
             ->setRequired("Field 'Priority' is required.");
 
         $codeInput = $form->addText('code', 'Code')
@@ -130,13 +131,15 @@ class ListFormFactory
             $list = $this->listsRepository->find($values['id']);
         }
 
-        $listsInCategory = $this->listsRepository->findByCategory($values['mail_type_category_id'])
-                                        ->order('mail_types.sorting')
-                                        ->fetchAll();
+        $listsInCategory = $this->listsRepository
+            ->findByCategory($values['mail_type_category_id'])
+            ->order('mail_types.sorting')
+            ->fetchAll();
 
         switch ($values['sorting']) {
             case 'begin':
-                $values['sorting'] = reset($listsInCategory)->sorting;
+                $first = reset($listsInCategory);
+                $values['sorting'] = $first ? $first->sorting - 1 : 1;
                 break;
 
             case 'after':
@@ -164,7 +167,8 @@ class ListFormFactory
                 break;
             default:
             case 'end':
-                $values['sorting'] = end($listsInCategory)->sorting + 1;
+                $last = end($listsInCategory);
+                $values['sorting'] = $last ? $last->sorting + 1 : 1;
                 break;
         }
 
