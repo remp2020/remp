@@ -101,6 +101,9 @@ class Article extends Model
         $variants = [];
 
         foreach ($results as $result) {
+            if (!$result->count) {
+                continue;
+            }
             $titleVariant = $result->tags->title_variant;
             $imageVariant = $result->tags->image_variant;
 
