@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Account;
+use App\Http\Controllers\PropertyController;
+use App\Property;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -26,28 +28,42 @@ class AppServiceProvider extends ServiceProvider
         // Global selector of current property token
         View::composer('*', function ($view) {
             $selectedPropertyTokenUuid = \Session::get('SELECTED_PROPERTY_TOKEN_UUID');
-            $tokens = [
-                (object)[
-                    'uuid' => null,
-                    'name' => 'All tokens',
-                    'selected' => true,
+            $accountPropertyTokens = [
+                (object) [
+                    'name' => null,
+                    'tokens' => [
+                        (object)[
+                        'uuid' => null,
+                        'name' => 'All tokens',
+                        'selected' => true,
+                        ]
+                    ]
                 ]
             ];
 
             foreach (Account::all() as $account) {
-                $selected = $account->uuid === $selectedPropertyTokenUuid;
-                if ($selected) {
-                    $tokens[0]->selected = false;
+                $tokens = [];
+                foreach ($account->properties as $property) {
+                    $selected = $property->uuid === $selectedPropertyTokenUuid;
+                    if ($selected) {
+                        $accountPropertyTokens[0]->properties[0]->selected = false;
+                    }
+                    $tokens[] = (object)[
+                        'uuid' => $property->uuid,
+                        'name' => $property->name,
+                        'selected' => $selected
+                    ];
                 }
 
-                $tokens[] = (object)[
-                    'uuid' => $account->uuid,
-                    'name' => $account->name,
-                    'selected' => $selected
-                ];
+                if (count($tokens) > 0) {
+                    $accountPropertyTokens[] = (object) [
+                        'name' => $account->name,
+                        'tokens' => $tokens
+                    ];
+                }
             }
 
-            $view->with('propertyTokens', $tokens);
+            $view->with('accountPropertyTokens', $accountPropertyTokens);
         });
     }
 

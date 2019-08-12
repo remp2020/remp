@@ -69,8 +69,18 @@
     <aside id="s-main-menu" class="sidebar">
 
         <select name="token" class="token-select">
-            @foreach($propertyTokens as $token)
-                <option value="{{$token->uuid}}" {{$token->selected ? 'selected' : ''}}>{{$token->name}}</option>
+            @foreach($accountPropertyTokens as $account)
+                @if($account->name)
+                    <optgroup label="{{$account->name}}">
+                @endif
+
+                @foreach($account->tokens as $token)
+                    <option value="{{$token->uuid}}" {{$token->selected ? 'selected' : ''}}>{{$token->name}}</option>
+                @endforeach
+
+                @if($account->name)
+                    </optgroup>
+                @endif
             @endforeach
         </select>
 
