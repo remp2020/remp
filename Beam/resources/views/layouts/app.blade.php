@@ -42,7 +42,9 @@
 </div>
 
 <header id="header" class="media">
+
     <div class="pull-left h-logo">
+
         <a href="/" class="hidden-xs"></a>
 
         <div class="menu-collapse" data-ma-action="sidebar-open" data-ma-target="main-menu">
@@ -65,6 +67,13 @@
 
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
+
+        <select name="token" class="token-select">
+            @foreach($propertyTokens as $token)
+                <option value="{{$token->uuid}}" {{$token->selected ? 'selected' : ''}}>{{$token->name}}</option>
+            @endforeach
+        </select>
+
         <ul class="main-menu">
             <li {!! route_active(['dashboard']) !!}>
                 <a href="{{ route('dashboard.index') }}" ><i class="zmdi zmdi-chart"></i> Dashboard</a>
