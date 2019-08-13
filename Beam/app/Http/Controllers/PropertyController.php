@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Model\Property\SelectedProperty;
 use App\Property;
-use App\Providers\AppServiceProvider;
 use Html;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
@@ -12,8 +12,6 @@ use Yajra\Datatables\Datatables;
 
 class PropertyController extends Controller
 {
-    const SELECTED_PROPERTY_TOKEN_UUID = 'selected_property_token_uuid';
-
     /**
      * Display a listing of the resource.
      *
@@ -152,14 +150,11 @@ class PropertyController extends Controller
     {
         $propertyToken = $request->input('token');
 
-        if (!$propertyToken) {
-            $request->session()->remove(self::SELECTED_PROPERTY_TOKEN_UUID);
-        } else {
-            $property = Property::where('uuid', $propertyToken)->first();
-            if (!$property) {
-                abort('400', "No such token");
-            }
-            $request->session()->put(self::SELECTED_PROPERTY_TOKEN_UUID, $property->uuid);
+        $selectedProperty = new SelectedProperty();
+        try {
+            $selectedProperty->setToken($propertyToken);
+        } catch (\InvalidArgumentException $exception) {
+            abort('400', 'No such token');
         }
 
         $referer = $request->server('HTTP_REFERER');

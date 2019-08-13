@@ -8,6 +8,7 @@ use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Model\Config;
 use App\Model\DashboardConfig;
+use App\Model\Property\SelectedProperty;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -27,11 +28,14 @@ class DashboardController extends Controller
 
     private $snapshotHelpers;
 
+    private $selectedProperty;
+
     public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
+        $this->selectedProperty = new SelectedProperty();
     }
 
     public function index()
@@ -227,11 +231,17 @@ class DashboardController extends Controller
 
     private function dataFor(array $timePoints)
     {
-        return DB::table('article_views_snapshots')
+        $query = DB::table('article_views_snapshots')
             ->select('article_views_snapshots.time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
             ->whereIn('time', $timePoints)
-            ->groupBy(['article_views_snapshots.time', 'derived_referer_medium', 'explicit_referer_medium'])
-            ->get();
+            ->groupBy(['article_views_snapshots.time', 'derived_referer_medium', 'explicit_referer_medium']);
+
+        $propertyToken = $this->selectedProperty->getToken();
+        if ($propertyToken) {
+            $query->where('property_token', $propertyToken);
+        }
+
+        return $query->get();
     }
 
     public function timeHistogram(Request $request)
@@ -248,11 +258,16 @@ class DashboardController extends Controller
         $interval = $request->get('interval');
         [$timeBefore, $timeAfter, $intervalText, $intervalMinutes] = $this->getJournalParameters($interval, $tz);
 
+        $selectedProperty = $this->selectedProperty->getToken();
+
         $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($intervalText, '0h');
         $journalRequest->addGroup('derived_referer_medium');
+        if ($selectedProperty) {
+            $journalRequest->addFilter('token', $selectedProperty);
+        }
         $currentRecords = collect($this->journal->count($journalRequest));
 
         // Get all tags
@@ -274,7 +289,7 @@ class DashboardController extends Controller
                 $diff = $from->tz('utc')->diff($timeAfter->tz('utc'));
                 $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
-                foreach ($this->pageviewRecordsBasedOnRefererMedium($from, $to, $intervalText) as $records) {
+                foreach ($this->pageviewRecordsBasedOnRefererMedium($from, $to, $intervalText, $selectedProperty) as $records) {
                     $currentTag = $records->tags->derived_referer_medium;
                     // update tags
                     $tags[$currentTag] = true;
@@ -395,13 +410,22 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function pageviewRecordsBasedOnRefererMedium(Carbon $timeAfter, Carbon $timeBefore, string $interval)
-    {
+    private function pageviewRecordsBasedOnRefererMedium(
+        Carbon $timeAfter,
+        Carbon $timeBefore,
+        string $interval,
+        ?string $propertyToken
+    ) {
         $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($interval, '0h');
         $journalRequest->addGroup('derived_referer_medium');
+
+        if ($propertyToken) {
+            $journalRequest->addFilter('token', $propertyToken);
+        }
+
         return collect($this->journal->count($journalRequest));
     }
 
@@ -422,6 +446,12 @@ class DashboardController extends Controller
         if ($frontpageReferer && $settings['onlyTrafficFromFrontPage']) {
             $concurrentsRequest->addFilter('derived_referer_host_with_path', $frontpageReferer);
         }
+
+        $propertyToken = $this->selectedProperty->getToken();
+        if ($propertyToken) {
+            $concurrentsRequest->addFilter('token', $propertyToken);
+        }
+
         $concurrentsRequest->setTimeAfter($timeAfter);
         $concurrentsRequest->setTimeBefore($timeBefore);
         $concurrentsRequest->addGroup('article_id');
