@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Console\Commands\AggregateArticlesViews;
+use App\Http\Controllers\JournalProxyController;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
@@ -77,6 +78,16 @@ class RempJournalServiceProvider extends ServiceProvider
             $redis = $app->make('redis')->connection()->client();
             return new Journal($client, $redis);
         });
+
+        $this->app->when(JournalProxyController::class)
+            ->needs(Client::class)
+            ->give(function (Application $app) {
+                $client = new Client([
+                    'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
+                ]);
+
+                return $client;
+            });
     }
 
     public function provides()

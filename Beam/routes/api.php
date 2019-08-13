@@ -24,12 +24,20 @@ Route::middleware('auth:api')->group(function() {
     Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
-    Route::get('article/{article?}', 'ArticleDetailsController@show');
-    Route::get('article/{article}/histogram', 'ArticleDetailsController@timeHistogram');
-    Route::get('article/{article}/variants-histogram', 'ArticleDetailsController@variantsHistogram');
-    
-    Route::get('/journal/concurrents/count/', 'JournalController@concurrentsCount');
-    Route::match(['GET', 'POST'], '/journal/concurrents/count/articles', 'JournalController@articlesConcurrentsCount');
+    Route::middleware('cors')->group(function() {
+        Route::get('article/{article?}', 'ArticleDetailsController@show');
+        Route::get('article/{article}/histogram', 'ArticleDetailsController@timeHistogram');
+        Route::get('article/{article}/variants-histogram', 'ArticleDetailsController@variantsHistogram');
+
+        Route::get('/journal/concurrents/count/', 'JournalController@concurrentsCount');
+        Route::match(['GET', 'POST'], '/journal/concurrents/count/articles', 'JournalController@articlesConcurrentsCount');
+        Route::post('/journal/concurrents/count/', 'JournalController@concurrentsCount');
+
+        // Pure proxy calls to Journal API (TODO: rework to more user-friendly API)
+        Route::post('/journal/pageviews/actions/progress/count', 'JournalProxyController@pageviewsProgressCount');
+        Route::post('/journal/pageviews/actions/load/unique/browsers', 'JournalProxyController@pageviewsUniqueBrowsersCount');
+        Route::post('/journal/commerce/steps/purchase/count', 'JournalProxyController@commercePurchaseCount');
+    });
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', 'JournalController@actions');

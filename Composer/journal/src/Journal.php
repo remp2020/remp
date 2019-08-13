@@ -254,11 +254,6 @@ class Journal implements JournalContract
         return $list;
     }
 
-    public function getClient(): Client
-    {
-        return $this->client;
-    }
-
     /**
      * roundSecondsDown rounds second down to the closest multiple of 10.
      *
