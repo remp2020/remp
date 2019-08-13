@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Global selector of current property token
         View::composer('*', function ($view) {
-            $selectedPropertyTokenUuid = \Session::get('SELECTED_PROPERTY_TOKEN_UUID');
+            $selectedPropertyTokenUuid = \Session::get(self::SELECTED_PROPERTY_TOKEN_UUID);
             $accountPropertyTokens = [
                 (object) [
                     'name' => null,
@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
                 foreach ($account->properties as $property) {
                     $selected = $property->uuid === $selectedPropertyTokenUuid;
                     if ($selected) {
-                        $accountPropertyTokens[0]->properties[0]->selected = false;
+                        $accountPropertyTokens[0]->tokens[0]->selected = false;
                     }
                     $tokens[] = (object)[
                         'uuid' => $property->uuid,

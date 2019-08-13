@@ -67,6 +67,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
     Route::resource('accounts', 'AccountController');
+    Route::post('/properties/switch', 'PropertyController@switch')->name('properties.switch');
     Route::resource('accounts.properties', 'PropertyController');
 
     Route::resource('segments', 'SegmentController');

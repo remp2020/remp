@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Account;
 use App\Property;
+use App\Providers\AppServiceProvider;
 use Html;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
@@ -143,5 +144,27 @@ class PropertyController extends Controller
     {
         $property->delete();
         return redirect(route('accounts.properties.index', $account))->with('success', 'Property removed');
+    }
+
+    public function switch(Request $request)
+    {
+        $propertyToken = $request->input('token');
+
+        if (!$propertyToken) {
+            $request->session()->remove(AppServiceProvider::SELECTED_PROPERTY_TOKEN_UUID);
+        } else {
+            $property = Property::where('uuid', $propertyToken)->first();
+            if (!$property) {
+                abort('400', "No such token");
+            }
+            $request->session()->put(AppServiceProvider::SELECTED_PROPERTY_TOKEN_UUID, $property->uuid);
+        }
+
+        $referer = $request->server('HTTP_REFERER');
+        if (!$referer) {
+            return redirect('/');
+        }
+
+        return redirect($referer);
     }
 }
