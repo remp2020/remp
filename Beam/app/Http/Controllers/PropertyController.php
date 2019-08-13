@@ -12,6 +12,8 @@ use Yajra\Datatables\Datatables;
 
 class PropertyController extends Controller
 {
+    const SELECTED_PROPERTY_TOKEN_UUID = 'selected_property_token_uuid';
+
     /**
      * Display a listing of the resource.
      *
@@ -151,13 +153,13 @@ class PropertyController extends Controller
         $propertyToken = $request->input('token');
 
         if (!$propertyToken) {
-            $request->session()->remove(AppServiceProvider::SELECTED_PROPERTY_TOKEN_UUID);
+            $request->session()->remove(self::SELECTED_PROPERTY_TOKEN_UUID);
         } else {
             $property = Property::where('uuid', $propertyToken)->first();
             if (!$property) {
                 abort('400', "No such token");
             }
-            $request->session()->put(AppServiceProvider::SELECTED_PROPERTY_TOKEN_UUID, $property->uuid);
+            $request->session()->put(self::SELECTED_PROPERTY_TOKEN_UUID, $property->uuid);
         }
 
         $referer = $request->server('HTTP_REFERER');

@@ -4,15 +4,12 @@ namespace App\Providers;
 
 use App\Account;
 use App\Http\Controllers\PropertyController;
-use App\Property;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    const SELECTED_PROPERTY_TOKEN_UUID = 'selected_property_token_uuid';
-
     /**
      * Bootstrap any application services.
      *
@@ -27,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Global selector of current property token
         View::composer('*', function ($view) {
-            $selectedPropertyTokenUuid = \Session::get(self::SELECTED_PROPERTY_TOKEN_UUID);
+            $selectedPropertyTokenUuid = \Session::get(PropertyController::SELECTED_PROPERTY_TOKEN_UUID);
             $accountPropertyTokens = [
                 (object) [
                     'name' => null,
