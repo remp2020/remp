@@ -40,7 +40,7 @@ class JournalProxyController extends Controller
                 'json' => $requestJson
             ]);
         } catch (ConnectException $e) {
-            throw new JournalException("Could not connect to Journal:ListActions endpoint: {$e->getMessage()}");
+            throw new JournalException("Could not connect to Journal $journalUri endpoint: {$e->getMessage()}");
         }
 
         return response()->json(json_decode($segmentsResponse->getBody()));
