@@ -9,7 +9,9 @@
                 :options="options"
                 :articles-url="articlesUrl"
                 :time-histogram-url="timeHistogramUrl"
-                :time-histogram-url-new="timeHistogramUrlNew">
+                :time-histogram-url-new="timeHistogramUrlNew"
+                :account-property-tokens="accountPropertyTokens"
+                :csrf-token="csrfToken">
         </dashboard-root>
     </div>
 
@@ -30,7 +32,9 @@
                 timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}",
                 timeHistogramUrlNew: "{!! route('public.timeHistogramNew.json') !!}",
                 enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }},
-                options: {!! json_encode($options) !!}
+                options: {!! json_encode($options) !!},
+                accountPropertyTokens: {!! json_encode($accountPropertyTokens) !!},
+                csrfToken: {!!'"' . csrf_token() . '"'!!}
             }
         })
     </script>

@@ -22,6 +22,9 @@ Route::middleware('auth.basic.dashboard')->group(function () {
     Route::post('public/timeHistogramNewJson', 'DashboardController@timeHistogramNew')->name('public.timeHistogramNew.json');
 });
 
+// Public route for switching token, available from both public dashboard and authenticated section
+Route::post('/properties/switch', 'PropertyController@switch')->name('properties.switch');
+
 Route::middleware('auth.jwt')->group(function () {
     Route::get('/', 'DashboardController@index')->name('dashboard.index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard.index');
@@ -67,7 +70,6 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
 
     Route::resource('accounts', 'AccountController');
-    Route::post('/properties/switch', 'PropertyController@switch')->name('properties.switch');
     Route::resource('accounts.properties', 'PropertyController');
 
     Route::resource('segments', 'SegmentController');

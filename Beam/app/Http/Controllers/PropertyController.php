@@ -146,6 +146,14 @@ class PropertyController extends Controller
         return redirect(route('accounts.properties.index', $account))->with('success', 'Property removed');
     }
 
+
+    /**
+     * Method for switching selected property token
+     * Careful, it's not protected by user authentication, since it should be also available from public dashboard
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function switch(Request $request)
     {
         $propertyToken = $request->input('token');

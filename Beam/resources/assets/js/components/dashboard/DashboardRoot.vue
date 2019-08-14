@@ -5,6 +5,32 @@
                             :url="timeHistogramUrl"
                             :url-new="timeHistogramUrlNew"
                             :concurrents="totalConcurrents">
+
+                <!-- Selector for property tokens, required only in public dashboard -->
+                <template v-if="accountPropertyTokens" v-slot:additional-settings>
+                    <div class="row" style="margin: 0 20px">
+                        <div class="col-md-12">
+                            <form class="pull-right" style="width: 200px" method="post" :action="propertiesSwitchUrl">
+                                <input type="hidden" name="_token" :value="csrfToken" v-if="csrfToken">
+                                <select name="token" class="selectpicker" onchange="javascript:this.form.submit()">
+                                    <template v-for="account in accountPropertyTokens">
+                                        <optgroup v-if="account.name != null" :label="account.name">
+                                            <option v-for="token in account.tokens"
+                                                    :selected="token.selected"
+                                                    :value="token.uuid">{{token.name}}</option>
+                                        </optgroup>
+                                        <template v-else>
+                                            <option v-for="token in account.tokens"
+                                                    :selected="token.selected"
+                                                    :value="token.uuid">{{token.name}}</option>
+                                        </template>
+                                    </template>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </template>
+
             </time-histogram>
 
             <div class="row" style="padding-top: 10px">
@@ -177,6 +203,14 @@
             type: Object,
             required: false
         },
+        accountPropertyTokens: {
+            type: Object,
+            required: false
+        },
+        csrfToken: {
+            type: String,
+            required: false
+        }
     }
 
     const REFRESH_DATA_TIMEOUT_MS = 7000
@@ -234,7 +268,8 @@
         data() {
             return {
                 articles: null,
-                totalConcurrents: 0
+                totalConcurrents: 0,
+                propertiesSwitchUrl: route('properties.switch')
             }
         },
         computed: {

@@ -2,7 +2,9 @@
 
 namespace App\Model\Property;
 
+use App\Account;
 use App\Property;
+use InvalidArgumentException;
 
 class SelectedProperty
 {
@@ -28,5 +30,45 @@ class SelectedProperty
             }
             \Session::put(self::SELECTED_PROPERTY_TOKEN_UUID, $property->uuid);
         }
+    }
+
+    public function uiSelectData()
+    {
+        $selectedPropertyTokenUuid = (new SelectedProperty())->getToken();
+        $accountPropertyTokens = [
+            (object) [
+                'name' => null,
+                'tokens' => [
+                    (object)[
+                        'uuid' => null,
+                        'name' => 'All tokens',
+                        'selected' => true,
+                    ]
+                ]
+            ]
+        ];
+
+        foreach (Account::all() as $account) {
+            $tokens = [];
+            foreach ($account->properties as $property) {
+                $selected = $property->uuid === $selectedPropertyTokenUuid;
+                if ($selected) {
+                    $accountPropertyTokens[0]->tokens[0]->selected = false;
+                }
+                $tokens[] = (object)[
+                    'uuid' => $property->uuid,
+                    'name' => $property->name,
+                    'selected' => $selected
+                ];
+            }
+
+            if (count($tokens) > 0) {
+                $accountPropertyTokens[] = (object) [
+                    'name' => $account->name,
+                    'tokens' => $tokens
+                ];
+            }
+        }
+        return $accountPropertyTokens;
     }
 }

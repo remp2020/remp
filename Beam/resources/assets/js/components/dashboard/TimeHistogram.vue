@@ -7,18 +7,20 @@
                 <h4>Concurrents: <animated-integer :value="concurrents"></animated-integer></h4>
             </div>
             <div class="col-md-6">
-
                 <options :classes="['pull-right', 'm-l-15', 'm-b-5']"></options>
 
                 <button-switcher :options="[
-            {text: 'Today', value: 'today'},
-            {text: '7 days', value: '7days'},
-            {text: '30 days', value: '30days'}]"
+        {text: 'Today', value: 'today'},
+        {text: '7 days', value: '7days'},
+        {text: '30 days', value: '30days'}]"
                                  :classes="['pull-right']"
                                  v-model="interval">
                 </button-switcher>
             </div>
         </div>
+
+        <slot name="additional-settings"></slot>
+
         <div class="col-md-12">
             <div id="chartContainer">
                 <div v-if="loading" class="preloader pls-purple">
