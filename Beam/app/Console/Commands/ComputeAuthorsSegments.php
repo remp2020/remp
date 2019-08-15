@@ -5,7 +5,8 @@ namespace App\Console\Commands;
 use App\ArticleAggregatedView;
 use App\Author;
 use App\Mail\AuthorSegmentsResult;
-use App\Model\Config;
+use App\Model\Config\Config;
+use App\Model\Config\ConfigNames;
 use App\Segment;
 use App\SegmentBrowser;
 use App\SegmentGroup;
@@ -20,12 +21,12 @@ class ComputeAuthorsSegments extends Command
 {
     const COMMAND = 'segments:compute-author-segments';
 
-    const CONFIG_MIN_RATIO = 'author_segments_min_ratio';
-    const CONFIG_MIN_AVERAGE_TIMESPENT = 'author_segments_min_average_timespent';
-    const CONFIG_MIN_VIEWS = 'author_segments_min_views';
-    const CONFIG_DAYS_IN_PAST = 'author_segments_days_in_past';
-
-    const ALL_CONFIGS = [self::CONFIG_MIN_RATIO, self::CONFIG_MIN_AVERAGE_TIMESPENT, self::CONFIG_MIN_VIEWS, self::CONFIG_DAYS_IN_PAST];
+    const ALL_CONFIGS = [
+        ConfigNames::AUTHOR_SEGMENTS_MIN_RATIO,
+        ConfigNames::AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT,
+        ConfigNames::AUTHOR_SEGMENTS_MIN_VIEWS,
+        ConfigNames::AUTHOR_SEGMENTS_DAYS_IN_PAST
+    ];
 
     private $minViews;
     private $minAverageTimespent;
@@ -54,10 +55,10 @@ class ComputeAuthorsSegments extends Command
 
         $email = $this->option('email');
 
-        $this->minViews = Config::loadByName(self::CONFIG_MIN_VIEWS);
-        $this->minAverageTimespent = Config::loadByName(self::CONFIG_MIN_AVERAGE_TIMESPENT);
-        $this->minRatio = Config::loadByName(self::CONFIG_MIN_RATIO);
-        $this->dateThreshold = Carbon::today()->subDays(Config::loadByName(self::CONFIG_DAYS_IN_PAST));
+        $this->minViews = Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_VIEWS);
+        $this->minAverageTimespent = Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT);
+        $this->minRatio = Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_RATIO);
+        $this->dateThreshold = Carbon::today()->subDays(Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_DAYS_IN_PAST));
 
         if ($email) {
             // Only compute segment statistics

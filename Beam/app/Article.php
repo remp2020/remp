@@ -3,6 +3,8 @@
 namespace App;
 
 use App\Model\ArticleTitle;
+use App\Model\Config\Config;
+use App\Model\Config\ConfigNames;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -13,17 +15,21 @@ use Yadakhov\InsertOnDuplicateKey;
 
 class Article extends Model
 {
+    use InsertOnDuplicateKey;
+
     private $journal;
 
     private $cachedAttributes = [];
+
+    private $conversionRateMultiplier;
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
         $this->journal = resolve(JournalContract::class);
-    }
 
-    use InsertOnDuplicateKey;
+        $this->conversionRateMultiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
+    }
 
     protected $fillable = [
         'property_uuid',
@@ -144,8 +150,7 @@ class Article extends Model
         if ($uniqueBrowsersCount === 0) {
             return 0.0;
         }
-
-        return (float) ($this->conversions()->count() / $uniqueBrowsersCount) * 100;
+        return (float) ($this->conversions()->count() / $uniqueBrowsersCount) * $this->conversionRateMultiplier;
     }
 
     /**

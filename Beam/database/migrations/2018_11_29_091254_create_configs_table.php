@@ -1,6 +1,6 @@
 <?php
 
-use App\Model\Config;
+use App\Model\Config\Config;
 use App\Model\DashboardConfig;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Console\Commands\ComputeAuthorsSegments;
-use App\Console\Commands\CreateAuthorsSegments;
 use App\Http\Requests\AuthorSegmentsConfigurationRequest;
 use App\Http\Requests\AuthorSegmentsTestRequest;
 use App\Http\Resources\ConfigResource;
-use App\Model\Config;
+use App\Model\Config\Config;
+use App\Model\Config\ConfigNames;
 use App\Segment;
 use App\SegmentGroup;
 use Illuminate\Http\Request;
@@ -38,20 +38,20 @@ class AuthorSegmentsController extends Controller
     public function configuration()
     {
         return view('authors.segments.configuration', [
-            'daysInPast' => Config::loadByName(ComputeAuthorsSegments::CONFIG_DAYS_IN_PAST),
-            'minViews' => Config::loadByName(ComputeAuthorsSegments::CONFIG_MIN_VIEWS),
-            'minRatio' => Config::loadByName(ComputeAuthorsSegments::CONFIG_MIN_RATIO),
-            'minAverageTimespent' => Config::loadByName(ComputeAuthorsSegments::CONFIG_MIN_AVERAGE_TIMESPENT),
+            'daysInPast' => Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_DAYS_IN_PAST),
+            'minViews' => Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_VIEWS),
+            'minRatio' => Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_RATIO),
+            'minAverageTimespent' => Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT),
         ]);
     }
 
     public function saveConfiguration(AuthorSegmentsConfigurationRequest $request)
     {
         $toUpdate = [
-            ComputeAuthorsSegments::CONFIG_DAYS_IN_PAST => 'days_in_past',
-            ComputeAuthorsSegments::CONFIG_MIN_VIEWS => 'min_views',
-            ComputeAuthorsSegments::CONFIG_MIN_AVERAGE_TIMESPENT => 'min_average_timespent',
-            ComputeAuthorsSegments::CONFIG_MIN_RATIO => 'min_ratio',
+            ConfigNames::AUTHOR_SEGMENTS_DAYS_IN_PAST => 'days_in_past',
+            ConfigNames::AUTHOR_SEGMENTS_MIN_VIEWS => 'min_views',
+            ConfigNames::AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT => 'min_average_timespent',
+            ConfigNames::AUTHOR_SEGMENTS_MIN_RATIO => 'min_ratio',
         ];
 
         foreach ($toUpdate as $configName => $value) {

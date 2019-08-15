@@ -6,7 +6,8 @@ use App\Article;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
-use App\Model\Config;
+use App\Model\Config\Config;
+use App\Model\Config\ConfigNames;
 use App\Model\DashboardConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
@@ -411,6 +412,8 @@ class DashboardController extends Controller
             'settings.onlyTrafficFromFrontPage' => 'required|boolean'
         ]);
 
+        $conversionRateMultiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
+
         $settings = $request->get('settings');
 
         $timeBefore = Carbon::now();
@@ -489,7 +492,7 @@ class DashboardController extends Controller
                 // Show conversion rate only for articles published in last 3 months
                 if ($item->conversions_count !== 0 && $item->article->published_at->gte($threeMonthsAgo)) {
                     // Artificially increased 10000x so conversion rate is more readable
-                    $item->conversion_rate = number_format(($item->conversions_count / $item->unique_browsers_count) * 10000, 2);
+                    $item->conversion_rate = number_format(($item->conversions_count / $item->unique_browsers_count) * $conversionRateMultiplier, 2);
                 }
 
                 $item->has_title_test = $externalIdsToAbTestFlags[$item->external_article_id]->has_title_test ?? false;
