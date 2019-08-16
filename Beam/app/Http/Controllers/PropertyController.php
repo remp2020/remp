@@ -12,6 +12,13 @@ use Yajra\Datatables\Datatables;
 
 class PropertyController extends Controller
 {
+    private $selectedProperty;
+
+    public function __construct(SelectedProperty $selectedProperty)
+    {
+        $this->selectedProperty = $selectedProperty;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -158,9 +165,8 @@ class PropertyController extends Controller
     {
         $propertyToken = $request->input('token');
 
-        $selectedProperty = new SelectedProperty();
         try {
-            $selectedProperty->setToken($propertyToken);
+            $this->selectedProperty->setToken($propertyToken);
         } catch (\InvalidArgumentException $exception) {
             abort('400', 'No such token');
         }

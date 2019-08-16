@@ -9,6 +9,7 @@ use App\Helpers\Journal\JournalInterval;
 use App\Model\Config;
 use App\Model\DashboardConfig;
 use App\Model\Property\SelectedProperty;
+use App\Model\Property\SelectedPropertyHelper;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,12 +31,15 @@ class DashboardController extends Controller
 
     private $selectedProperty;
 
-    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
-    {
+    public function __construct(
+        JournalContract $journal,
+        SnapshotHelpers $snapshotHelpers,
+        SelectedProperty $selectedProperty
+    ) {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
-        $this->selectedProperty = new SelectedProperty();
+        $this->selectedProperty = $selectedProperty;
     }
 
     public function index()
@@ -58,7 +62,7 @@ class DashboardController extends Controller
         return view($template, [
             'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
             'options' => $options,
-            'accountPropertyTokens' => $this->selectedProperty->uiSelectData()
+            'accountPropertyTokens' => SelectedPropertyHelper::selectInputData($this->selectedProperty)
         ]);
     }
 
