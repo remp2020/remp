@@ -99,6 +99,11 @@
                     "textColor": "#ffffff", "backgroundColor": "#00b7db",
                     "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
                 },
+                "dark_blue": {
+                    "label": "Dark Blue",
+                    "textColor": "#ffffff", "backgroundColor": "#1f3f82",
+                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
+                },
                 "green": {
                     "label": "Green",
                     "textColor": "#ffffff", "backgroundColor": "#009688",
