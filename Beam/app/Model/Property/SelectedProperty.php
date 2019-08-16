@@ -36,10 +36,10 @@ class SelectedProperty
     {
         $selectedPropertyTokenUuid = (new SelectedProperty())->getToken();
         $accountPropertyTokens = [
-            (object) [
+            [
                 'name' => null,
                 'tokens' => [
-                    (object)[
+                    [
                         'uuid' => null,
                         'name' => 'All tokens',
                         'selected' => true,
@@ -53,9 +53,9 @@ class SelectedProperty
             foreach ($account->properties as $property) {
                 $selected = $property->uuid === $selectedPropertyTokenUuid;
                 if ($selected) {
-                    $accountPropertyTokens[0]->tokens[0]->selected = false;
+                    $accountPropertyTokens[0]['tokens']['selected'] = false;
                 }
-                $tokens[] = (object)[
+                $tokens[] = [
                     'uuid' => $property->uuid,
                     'name' => $property->name,
                     'selected' => $selected
@@ -63,7 +63,7 @@ class SelectedProperty
             }
 
             if (count($tokens) > 0) {
-                $accountPropertyTokens[] = (object) [
+                $accountPropertyTokens[] = [
                     'name' => $account->name,
                     'tokens' => $tokens
                 ];
