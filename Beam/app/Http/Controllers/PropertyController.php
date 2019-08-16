@@ -165,11 +165,6 @@ class PropertyController extends Controller
             abort('400', 'No such token');
         }
 
-        $referer = $request->server('HTTP_REFERER');
-        if (!$referer) {
-            return redirect('/');
-        }
-
-        return redirect($referer);
+        return back();
     }
 }
