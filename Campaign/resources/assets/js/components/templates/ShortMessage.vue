@@ -102,7 +102,7 @@
                 "dark_blue": {
                     "label": "Dark Blue",
                     "textColor": "#ffffff", "backgroundColor": "#1f3f82",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
+                    "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
                 },
                 "green": {
                     "label": "Green",
