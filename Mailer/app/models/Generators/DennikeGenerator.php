@@ -47,6 +47,7 @@ class DennikeGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'author', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
@@ -189,6 +190,7 @@ class DennikeGenerator implements IGenerator
         $params = [
             'title' => $values->title,
             'sub_title' => $values->sub_title,
+            'author' => $values->author,
             'url' => $values->url,
             'html' => $post,
             'text' => $text,
@@ -197,6 +199,7 @@ class DennikeGenerator implements IGenerator
         $lockedParams = [
             'title' => $values->title,
             'sub_title' => $values->sub_title,
+            'author' => $values->author,
             'url' => $values->url,
             'html' => $lockedPost,
             'text' => strip_tags($lockedText),
@@ -236,6 +239,8 @@ class DennikeGenerator implements IGenerator
         $form->offsetUnset(Form::PROTECTOR_ID);
 
         $form->addText('sub_title', 'Sub title');
+
+        $form->addText('author', 'Author');
 
         $form->addText('from', 'Sender');
 
@@ -360,7 +365,7 @@ HTML;
         $hrTemplate = <<< HTML
     <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;">
         <tr style="padding:0;vertical-align:top;text-align:left;">
-            <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 30px 0 0 0; border-top:1px solid #E2E2E2;"></td>
+            <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 20px 0 0 0; border-top:1px solid #E2E2E2;"></td>
         </tr>
     </table>
 
@@ -377,7 +382,7 @@ HTML;
 HTML;
 
         $imageTemplate = <<< HTML
-        <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
+        <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border: 10px solid #858585;">
 HTML;
 
         return [
