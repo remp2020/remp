@@ -7,7 +7,6 @@ use Nette\Http\Url;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Nette\Utils\Strings;
-use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 
 class DenniknContent implements ContentInterface
 {
