@@ -26,7 +26,7 @@
                                     </th>
                                     <th style="width: 7%; text-align: left">
                                         <span data-toggle="tooltip"
-                                              data-original-title="Conversion rate = (Conversions/Unique visitors) x 10000"
+                                              :data-original-title="conversionRateDescription"
                                               class="icon-header">%</span>
                                     </th>
                                     <th style="width: 7%; text-align: left">
@@ -177,6 +177,10 @@
             type: Object,
             required: false
         },
+        conversionRateMultiplier: {
+            type: Number,
+            required: false
+        }
     }
 
     const REFRESH_DATA_TIMEOUT_MS = 7000
@@ -224,6 +228,11 @@
             document.addEventListener('visibilitychange', this.visibilityChanged)
             this.loadData()
             loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
+
+            this.conversionRateDescription = "Conversion rate = Conversions/Unique visitors"
+            if (this.conversionRateMultiplier) {
+                this.conversionRateDescription = "Conversion rate = (Conversions/Unique visitors) x " + this.conversionRateMultiplier.toString()
+            }
         },
         beforeDestroy() {
             document.removeEventListener('visibilitychange', this.visibilityChanged)
@@ -234,7 +243,8 @@
         data() {
             return {
                 articles: null,
-                totalConcurrents: 0
+                totalConcurrents: 0,
+                conversionRateDescription: ""
             }
         },
         computed: {

@@ -54,7 +54,8 @@ class DashboardController extends Controller
 
         return view($template, [
             'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
-            'options' => $options
+            'options' => $options,
+            'conversionRateMultiplier' => Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER),
         ]);
     }
 
