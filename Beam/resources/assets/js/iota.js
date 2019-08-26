@@ -149,20 +149,16 @@ remplib = typeof remplib === 'undefined' ? {} : remplib;
       vm.$mount(iotaContainer);
 
       // initialize IotaScrolledToHere component
-      // if (weAreOnArticleDetail) {
       const iotaScrolledToHereContainer = document.createElement('div');
       document.body.appendChild(iotaScrolledToHereContainer);
       vm = new (Vue.extend(IotaScrolledToHere))();
       vm.$mount(iotaScrolledToHereContainer);
-      // }
 
       // initialize IotaHistogram component
-      // if (weAreOnArticleDetail) {
       const iotaHistogramContainer = document.createElement('div');
       document.body.appendChild(iotaHistogramContainer);
       vm = new (Vue.extend(IotaHistogram))();
       vm.$mount(iotaHistogramContainer);
-      // }
 
       // initialize IotaSettings component
       const iotaSettingsContainer = document.createElement('div');
