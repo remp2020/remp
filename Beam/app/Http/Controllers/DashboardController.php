@@ -413,6 +413,7 @@ class DashboardController extends Controller
         ]);
 
         $conversionRateMultiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
+        $conversionRateDecimalNumbers = Config::loadByName(ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS);
 
         $settings = $request->get('settings');
 
@@ -491,8 +492,7 @@ class DashboardController extends Controller
                 $item->unique_browsers_count = $externalIdsToUniqueUsersCount[$item->external_article_id];
                 // Show conversion rate only for articles published in last 3 months
                 if ($item->conversions_count !== 0 && $item->article->published_at->gte($threeMonthsAgo)) {
-                    // Artificially increased 10000x so conversion rate is more readable
-                    $item->conversion_rate = number_format(($item->conversions_count / $item->unique_browsers_count) * $conversionRateMultiplier, 2);
+                    $item->conversion_rate = Article::computeConversionRate($item->conversions_count, $item->unique_browsers_count, $conversionRateMultiplier, $conversionRateDecimalNumbers);
                 }
 
                 $item->has_title_test = $externalIdsToAbTestFlags[$item->external_article_id]->has_title_test ?? false;

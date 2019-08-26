@@ -10,4 +10,5 @@ class ConfigNames
     public const AUTHOR_SEGMENTS_DAYS_IN_PAST = 'author_segments_days_in_past';
 
     public const CONVERSION_RATE_MULTIPLIER = 'conversion_rate_multiplier';
+    public const CONVERSION_RATE_DECIMAL_NUMBERS = 'conversion_rate_multiplier_decimals';
 }

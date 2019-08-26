@@ -11,14 +11,23 @@ class SeedConfigValues2 extends Migration
         Config::firstOrCreate([
             'name' => ConfigNames::CONVERSION_RATE_MULTIPLIER,
             'display_name' => 'Conversion rate multiplier',
-            'description' => 'Conversion rate multiplier for dashboard',
+            'description' => 'Conversion rate multiplier',
             'type' => 'integer',
-            'value' => 10000 // empirical value
+            'value' => 1
+        ]);
+
+        Config::firstOrCreate([
+            'name' => ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS,
+            'display_name' => 'Conversion rate decimal numbers',
+            'description' => 'Number of decimal numbers shown when displaying conversion rate',
+            'type' => 'integer',
+            'value' => 5
         ]);
     }
 
     public function down()
     {
         Config::where('name', ConfigNames::CONVERSION_RATE_MULTIPLIER)->delete();
+        Config::where('name', ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS)->delete();
     }
 }
