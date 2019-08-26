@@ -117,7 +117,7 @@ export default {
       }
 
       Axios.post(
-        this.baseUrl + "/journal/commerce/steps/purchase/count",
+        `${this.baseUrl}/api/journal/commerce/steps/purchase/count`,
         payload
       )
         .then(function(response) {
@@ -166,7 +166,7 @@ export default {
         }
 
         Axios.post(
-          this.baseUrl + "/journal/pageviews/actions/load/unique/browsers",
+          `${this.baseUrl}/api/journal/pageviews/actions/load/unique/browsers`,
           payload
         )
           .then(function(response) {
@@ -181,13 +181,9 @@ export default {
           });
       }
 
-      // TODO: later use baseUrl
-      Axios.post(
-        "https://beam.remp2020.com/api/journal/concurrents/count/articles",
-        {
-          external_id: this.articleIds
-        }
-      )
+      Axios.post(`${this.baseUrl}/api/journal/concurrents/count/articles`, {
+        external_id: this.articleIds
+      })
         .then(response => {
           EventHub.$emit("content-concurrents-changed", response.data.articles);
         })
@@ -239,7 +235,7 @@ export default {
         }
 
         Axios.post(
-          this.baseUrl + "/journal/pageviews/actions/load/unique/browsers",
+          `${this.baseUrl}/api/journal/pageviews/actions/load/unique/browsers`,
           variantPayload
         )
           .then(function(response) {
@@ -321,7 +317,7 @@ export default {
       }
 
       Axios.post(
-        this.baseUrl + "/journal/pageviews/actions/progress/count",
+        `${this.baseUrl}/api/journal/pageviews/actions/progress/count`,
         payload
       )
         .then(function(response) {
@@ -336,8 +332,7 @@ export default {
         });
     },
     fetchAllConcurrents() {
-      // Axios.get(`${this.baseUrl}/journal/concurrents/count`) // TODO: later use this when this.baseUrl is changed to new endpoint
-      Axios.get("https://beam.remp2020.com/api/journal/concurrents/count")
+      Axios.get(`${this.baseUrl}/api/journal/concurrents/count`)
         .then(response => {
           EventHub.$emit("all-concurrents-changed", response.data.total);
         })
@@ -352,9 +347,8 @@ export default {
       } else {
         urlParam = `?url[]=${url}`;
       }
-      // TODO: later use this.baseUrl
       Axios.get(
-        `https://beam.remp2020.com/api/journal/concurrents/count/articles${urlParam}`
+        `${this.baseUrl}/api/journal/concurrents/count/articles${urlParam}`
       )
         .then(({ data }) => {
           if (data.articles && data.articles.length) {
