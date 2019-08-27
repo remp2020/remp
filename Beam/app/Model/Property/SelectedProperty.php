@@ -11,7 +11,7 @@ class SelectedProperty implements TokenProvider
 {
     const SELECTED_PROPERTY_TOKEN_UUID = 'selected_property_token_uuid';
 
-    private $cachedSelectInputData = null;
+    private $cachedSelectInputData;
 
     public function getToken(): ?string
     {
