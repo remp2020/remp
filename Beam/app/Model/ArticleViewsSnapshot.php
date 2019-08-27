@@ -1,6 +1,8 @@
 <?php
 namespace App\Model;
 
+use App\Model\Property\SelectedProperty;
+use App\Model\Scopes\PropertyTokenScope;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,6 +29,13 @@ class ArticleViewsSnapshot extends Model
     protected $dates = [
         'time',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        $selectedProperty = resolve(SelectedProperty::class);
+        static::addGlobalScope(new PropertyTokenScope($selectedProperty));
+    }
 
     public static function deleteForTimes(array $times): int
     {

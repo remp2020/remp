@@ -4,8 +4,9 @@ namespace App\Model\Property;
 
 use App\Property;
 use InvalidArgumentException;
+use Remp\Journal\TokenProvider;
 
-class SelectedProperty
+class SelectedProperty implements TokenProvider
 {
     const SELECTED_PROPERTY_TOKEN_UUID = 'selected_property_token_uuid';
 

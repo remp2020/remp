@@ -39,10 +39,13 @@ class Journal implements JournalContract
 
     private $redis;
 
-    public function __construct(Client $client, \Predis\Client $redis)
+    private $tokenProvider;
+
+    public function __construct(Client $client, \Predis\Client $redis, TokenProvider $tokenProvider = null)
     {
         $this->client = $client;
         $this->redis = $redis;
+        $this->tokenProvider = $tokenProvider;
     }
 
     public function categories(): array
@@ -140,6 +143,17 @@ class Journal implements JournalContract
                 'group_by' => $request->getGroupBy(),
             ];
 
+            if ($this->tokenProvider) {
+                $token = $this->tokenProvider->getToken();
+                if ($token) {
+                    $json['filter_by'][] = [
+                        'tag' => 'token',
+                        'values' => [$token],
+                        'inverse' => false,
+                    ];
+                }
+            }
+
             if ($request->getTimeAfter()) {
                 $json['time_after'] = $this->roundSecondsDown($request->getTimeAfter())->format(DATE_RFC3339);
             }
@@ -222,6 +236,17 @@ class Journal implements JournalContract
                 'filter_by' => $request->getFilterBy(),
                 'group_by' => $request->getGroupBy(),
             ];
+
+            if ($this->tokenProvider) {
+                $token = $this->tokenProvider->getToken();
+                if ($token) {
+                    $json['filter_by'][] = [
+                        'tag' => 'token',
+                        'values' => [$token],
+                        'inverse' => false,
+                    ];
+                }
+            }
 
             if ($request->getTimeAfter()) {
                 $json['time_after'] = $this->roundSecondsDown($request->getTimeAfter())->format(DATE_RFC3339);
