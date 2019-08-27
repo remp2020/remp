@@ -11,6 +11,8 @@ class SelectedProperty implements TokenProvider
 {
     const SELECTED_PROPERTY_TOKEN_UUID = 'selected_property_token_uuid';
 
+    private $cachedSelectInputData = null;
+
     public function getToken(): ?string
     {
         return \Session::get(self::SELECTED_PROPERTY_TOKEN_UUID);
@@ -35,6 +37,10 @@ class SelectedProperty implements TokenProvider
 
     public function selectInputData()
     {
+        if ($this->cachedSelectInputData) {
+            return $this->cachedSelectInputData;
+        }
+
         $selectedPropertyTokenUuid = $this->getToken();
         $accountPropertyTokens = [
             [
@@ -49,7 +55,7 @@ class SelectedProperty implements TokenProvider
             ]
         ];
 
-        foreach (Account::all() as $account) {
+        foreach (Account::with('properties')->get() as $account) {
             $tokens = [];
             foreach ($account->properties as $property) {
                 $selected = $property->uuid === $selectedPropertyTokenUuid;
@@ -71,6 +77,7 @@ class SelectedProperty implements TokenProvider
             }
         }
         // Convert to object recursively
-        return json_decode(json_encode($accountPropertyTokens));
+        $this->cachedSelectInputData = json_decode(json_encode($accountPropertyTokens));
+        return $this->cachedSelectInputData;
     }
 }
