@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
         // Global selector of current property token
         View::composer('*', function ($view) {
             $selectedProperty = resolve(SelectedProperty::class);
-            $view->with('accountPropertyTokens', SelectedPropertyHelper::selectInputData($selectedProperty));
+            $view->with('accountPropertyTokens', $selectedProperty->selectInputData());
         });
     }
 

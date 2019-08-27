@@ -2,6 +2,7 @@
 
 namespace App\Model\Property;
 
+use App\Account;
 use App\Property;
 use InvalidArgumentException;
 use Remp\Journal\TokenProvider;
@@ -30,5 +31,46 @@ class SelectedProperty implements TokenProvider
             }
             \Session::put(self::SELECTED_PROPERTY_TOKEN_UUID, $property->uuid);
         }
+    }
+
+    public function selectInputData()
+    {
+        $selectedPropertyTokenUuid = $this->getToken();
+        $accountPropertyTokens = [
+            [
+                'name' => null,
+                'tokens' => [
+                    [
+                        'uuid' => null,
+                        'name' => 'All properties',
+                        'selected' => true,
+                    ]
+                ]
+            ]
+        ];
+
+        foreach (Account::all() as $account) {
+            $tokens = [];
+            foreach ($account->properties as $property) {
+                $selected = $property->uuid === $selectedPropertyTokenUuid;
+                if ($selected) {
+                    $accountPropertyTokens[0]['tokens'][0]['selected'] = false;
+                }
+                $tokens[] = [
+                    'uuid' => $property->uuid,
+                    'name' => $property->name,
+                    'selected' => $selected
+                ];
+            }
+
+            if (count($tokens) > 0) {
+                $accountPropertyTokens[] = [
+                    'name' => $account->name,
+                    'tokens' => $tokens
+                ];
+            }
+        }
+        // Convert to object recursively
+        return json_decode(json_encode($accountPropertyTokens));
     }
 }

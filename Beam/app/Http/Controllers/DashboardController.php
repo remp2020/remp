@@ -10,7 +10,6 @@ use App\Model\ArticleViewsSnapshot;
 use App\Model\Config;
 use App\Model\DashboardConfig;
 use App\Model\Property\SelectedProperty;
-use App\Model\Property\SelectedPropertyHelper;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -63,7 +62,7 @@ class DashboardController extends Controller
         return view($template, [
             'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
             'options' => $options,
-            'accountPropertyTokens' => SelectedPropertyHelper::selectInputData($this->selectedProperty)
+            'accountPropertyTokens' => $this->selectedProperty->selectInputData(),
         ]);
     }
 
