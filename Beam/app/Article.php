@@ -13,6 +13,10 @@ use Yadakhov\InsertOnDuplicateKey;
 
 class Article extends Model
 {
+    private const DEFAULT_TITLE_VARIANT = 'default';
+    
+    private const DEFAULT_IMAGE_VARIANT = 'default';
+    
     private $journal;
 
     private $cachedAttributes = [];
@@ -104,8 +108,8 @@ class Article extends Model
             if (!$result->count) {
                 continue;
             }
-            $titleVariant = $result->tags->title_variant;
-            $imageVariant = $result->tags->image_variant;
+            $titleVariant = $result->tags->title_variant ?? self::DEFAULT_TITLE_VARIANT;
+            $imageVariant = $result->tags->image_variant ?? self::DEFAULT_IMAGE_VARIANT;
 
             if (!array_key_exists($titleVariant, $variants)) {
                 $variants[$titleVariant] = [];
