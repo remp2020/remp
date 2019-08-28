@@ -150,7 +150,7 @@ class Article extends Model
     public function getConversionRateAttribute(): string
     {
         return self::computeConversionRate(
-            $this->conversions()->count(),
+            $this->conversions->count(),
             $this->unique_browsers_count,
             $this->conversionRateMultiplier,
             $this->conversionRateDecimalNumbers
