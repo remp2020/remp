@@ -56,7 +56,7 @@ class JournalHelpers
      *
      * @return Collection containing mapping of articles' external_ids to unique users count
      */
-    public function uniqueUsersCountForArticles(Collection $articles): Collection
+    public function uniqueBrowsersCountForArticles(Collection $articles): Collection
     {
         $minimalPublishedTime = Carbon::now();
         foreach ($articles as $article) {

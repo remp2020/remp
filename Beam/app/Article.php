@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Helpers\Journal\JournalHelpers;
 use App\Model\ArticleTitle;
 use App\Model\Config\Config;
 use App\Model\Config\ConfigNames;
@@ -19,6 +20,8 @@ class Article extends Model
 
     private $journal;
 
+    private $journalHelpers;
+
     private $cachedAttributes = [];
 
     private $conversionRateMultiplier;
@@ -29,6 +32,7 @@ class Article extends Model
     {
         parent::__construct($attributes);
         $this->journal = resolve(JournalContract::class);
+        $this->journalHelpers = new JournalHelpers($this->journal);
 
         $this->conversionRateMultiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
         $this->conversionRateDecimalNumbers = Config::loadByName(ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS);
@@ -133,14 +137,24 @@ class Article extends Model
      */
     public function getUniqueBrowsersCountAttribute(): int
     {
-        $total = 0;
-        $variantsCount = $this->variants_count; // Retrieved from accessor
-        foreach ($variantsCount as $title => $titleVariants) {
-            foreach ($titleVariants as $image => $count) {
-                $total += $count;
-            }
+        if (array_key_exists('unique_browsers_count', $this->cachedAttributes)) {
+            return $this->cachedAttributes['unique_browsers_count'];
         }
-        return $total;
+
+        $results = $this->journalHelpers->uniqueBrowsersCountForArticles(collect([$this]));
+        $count = $results[$this->external_id] ?? 0;
+        $this->cachedAttributes['unique_browsers_count'] = $count;
+        return $count;
+
+        // TODO revert to code below to avoid two Journal API requests after https://gitlab.com/remp/remp/issues/484 is fixed
+        //$total = 0;
+        //$variantsCount = $this->variants_count; // Retrieved from accessor
+        //foreach ($variantsCount as $title => $titleVariants) {
+        //    foreach ($titleVariants as $image => $count) {
+        //        $total += $count;
+        //    }
+        //}
+        //return $total;
     }
 
     /**

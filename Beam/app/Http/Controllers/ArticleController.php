@@ -119,7 +119,7 @@ class ArticleController extends Controller
         $dt = $datatables->of($articles);
         $articles = $dt->results();
 
-        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($articles);
+        $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
 
         $threeMonthsAgo = Carbon::now()->subMonths(3);
 
@@ -128,8 +128,8 @@ class ArticleController extends Controller
                 return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
-            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount, $threeMonthsAgo) {
-                $uniqueCount = $externalIdsToUniqueUsersCount->get($article->external_id, 0);
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueBrowsersCount, $threeMonthsAgo) {
+                $uniqueCount = $externalIdsToUniqueBrowsersCount->get($article->external_id, 0);
                 if ($uniqueCount === 0 || $article->published_at->lt($threeMonthsAgo)) {
                     return '';
                 }

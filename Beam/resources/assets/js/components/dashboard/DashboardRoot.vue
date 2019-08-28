@@ -244,7 +244,9 @@
             return {
                 articles: null,
                 totalConcurrents: 0,
-                conversionRateDescription: ""
+                conversionRateDescription: "",
+                error: null,
+                loading: false,
             }
         },
         computed: {
@@ -270,18 +272,28 @@
                 loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
             },
             loadData() {
+                if (this.loading) {
+                    return
+                }
+
+                this.loading = true
                 let that = this
                 axios
                     .post(this.articlesUrl, {
                         settings: this.settings
                     })
                     .then(function(response){
+                        that.loading = false
                         that.articles = response.data.articles.map(function(item){
                             item.conversion_rate_color = conversionRateColor(item.conversion_rate, that.options)
                             item.conversions_count_color = conversionsCountColor(item.conversions_count, that.options)
                             return item
                         })
                         that.totalConcurrents = response.data.totalConcurrents
+                    })
+                    .catch(error => {
+                        this.error = error
+                        this.loading = false;
                     })
             }
         },

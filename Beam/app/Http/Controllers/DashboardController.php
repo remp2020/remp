@@ -478,7 +478,7 @@ class DashboardController extends Controller
             (clone $timeAfter)->subHours(2)
         );
 
-        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($topArticles);
+        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($topArticles);
         // Check for A/B titles/images for last 5 minutes
         $externalIdsToAbTestFlags = $this->journalHelper->abTestFlagsForArticles($topArticles, Carbon::now()->subMinutes(5));
 
