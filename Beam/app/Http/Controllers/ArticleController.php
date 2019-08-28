@@ -10,6 +10,9 @@ use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
+use App\Model\Config\Config;
+use App\Model\Config\ConfigNames;
+use App\Model\Config\ConversionRateConfig;
 use App\Model\NewsletterCriterion;
 use App\Section;
 use Illuminate\Support\Carbon;
@@ -22,15 +25,17 @@ use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
-
     private $journal;
 
     private $journalHelper;
 
-    public function __construct(JournalContract $journal)
+    private $conversionRateConfig;
+
+    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
+        $this->conversionRateConfig = $conversionRateConfig;
     }
 
     /**
@@ -134,7 +139,8 @@ class ArticleController extends Controller
                     return '';
                 }
 
-                return number_format(($article->conversions_count / $uniqueCount) * 10000, 2);
+                $conversionCount = $article->conversions_count;
+                return Article::computeConversionRate($conversionCount, $uniqueCount, $this->conversionRateConfig);
             })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {

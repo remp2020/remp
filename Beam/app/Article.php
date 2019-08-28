@@ -4,8 +4,7 @@ namespace App;
 
 use App\Helpers\Journal\JournalHelpers;
 use App\Model\ArticleTitle;
-use App\Model\Config\Config;
-use App\Model\Config\ConfigNames;
+use App\Model\Config\ConversionRateConfig;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -24,18 +23,12 @@ class Article extends Model
 
     private $cachedAttributes = [];
 
-    private $conversionRateMultiplier;
-
-    private $conversionRateDecimalNumbers;
-
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
         $this->journal = resolve(JournalContract::class);
         $this->journalHelpers = new JournalHelpers($this->journal);
-
-        $this->conversionRateMultiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
-        $this->conversionRateDecimalNumbers = Config::loadByName(ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS);
+        $this->conversionRateConfig = resolve(ConversionRateConfig::class);
     }
 
     protected $fillable = [
@@ -166,8 +159,7 @@ class Article extends Model
         return self::computeConversionRate(
             $this->conversions->count(),
             $this->unique_browsers_count,
-            $this->conversionRateMultiplier,
-            $this->conversionRateDecimalNumbers
+            $this->conversionRateConfig
         );
     }
 
@@ -354,16 +346,16 @@ SQL;
     public static function computeConversionRate(
         $conversionsCount,
         $uniqueBrowsersCount,
-        $conversionRateMultiplier,
-        $conversionRateDecimalNumbers
+        ConversionRateConfig $conversionRateConfig
     ): string {
         if ($uniqueBrowsersCount === 0) {
             return '0';
         }
-        $conversionRate = (float) ($conversionsCount / $uniqueBrowsersCount) * $conversionRateMultiplier;
-        $conversionRate = number_format($conversionRate, $conversionRateDecimalNumbers);
+        $multiplier = $conversionRateConfig->getMultiplier();
+        $conversionRate = (float) ($conversionsCount / $uniqueBrowsersCount) * $multiplier;
+        $conversionRate = number_format($conversionRate, $conversionRateConfig->getDecimalNumbers());
 
-        if ($conversionRateMultiplier == 100) {
+        if ($multiplier == 100) {
             return "$conversionRate %";
         }
 

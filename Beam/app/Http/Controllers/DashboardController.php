@@ -8,6 +8,7 @@ use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Model\Config\Config;
 use App\Model\Config\ConfigNames;
+use App\Model\Config\ConversionRateConfig;
 use App\Model\DashboardConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
@@ -28,11 +29,14 @@ class DashboardController extends Controller
 
     private $snapshotHelpers;
 
-    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
+    private $conversionRateConfig;
+
+    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers, ConversionRateConfig $conversionRateConfig)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
+        $this->conversionRateConfig = $conversionRateConfig;
     }
 
     public function index()
@@ -413,9 +417,6 @@ class DashboardController extends Controller
             'settings.onlyTrafficFromFrontPage' => 'required|boolean'
         ]);
 
-        $conversionRateMultiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
-        $conversionRateDecimalNumbers = Config::loadByName(ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS);
-
         $settings = $request->get('settings');
 
         $timeBefore = Carbon::now();
@@ -493,7 +494,7 @@ class DashboardController extends Controller
                 $item->unique_browsers_count = $externalIdsToUniqueUsersCount[$item->external_article_id];
                 // Show conversion rate only for articles published in last 3 months
                 if ($item->conversions_count !== 0 && $item->article->published_at->gte($threeMonthsAgo)) {
-                    $item->conversion_rate = Article::computeConversionRate($item->conversions_count, $item->unique_browsers_count, $conversionRateMultiplier, $conversionRateDecimalNumbers);
+                    $item->conversion_rate = Article::computeConversionRate($item->conversions_count, $item->unique_browsers_count, $this->conversionRateConfig);
                 }
 
                 $item->has_title_test = $externalIdsToAbTestFlags[$item->external_article_id]->has_title_test ?? false;

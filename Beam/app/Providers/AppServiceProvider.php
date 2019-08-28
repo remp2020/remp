@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Model\Config\ConversionRateConfig;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,12 +13,13 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(ConversionRateConfig $conversionRateConfig)
     {
         if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
         Paginator::useBootstrapThree();
+        $conversionRateConfig->load();
     }
 
     /**
@@ -27,5 +29,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton(ConversionRateConfig::class);
     }
 }
