@@ -7,9 +7,8 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Model\Config\Config;
-use App\Model\Config\ConfigNames;
 use App\Model\Config\ConversionRateConfig;
-use App\Model\DashboardConfig;
+use App\Model\Config\DashboardConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -59,7 +58,7 @@ class DashboardController extends Controller
         return view($template, [
             'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
             'options' => $options,
-            'conversionRateMultiplier' => Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER),
+            'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
         ]);
     }
 

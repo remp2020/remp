@@ -23,12 +23,14 @@ class Article extends Model
 
     private $cachedAttributes = [];
 
+    private $conversionRateConfig;
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
+        $this->conversionRateConfig = resolve(ConversionRateConfig::class);
         $this->journal = resolve(JournalContract::class);
         $this->journalHelpers = new JournalHelpers($this->journal);
-        $this->conversionRateConfig = resolve(ConversionRateConfig::class);
     }
 
     protected $fillable = [
