@@ -19,7 +19,6 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
         Paginator::useBootstrapThree();
-        $conversionRateConfig->load();
     }
 
     /**
