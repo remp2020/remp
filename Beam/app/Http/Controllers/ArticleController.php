@@ -10,6 +10,9 @@ use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
+use App\Model\Config\Config;
+use App\Model\Config\ConfigNames;
+use App\Model\Config\ConversionRateConfig;
 use App\Model\NewsletterCriterion;
 use App\Section;
 use Illuminate\Support\Carbon;
@@ -22,15 +25,17 @@ use Yajra\Datatables\Datatables;
 
 class ArticleController extends Controller
 {
-
     private $journal;
 
     private $journalHelper;
 
-    public function __construct(JournalContract $journal)
+    private $conversionRateConfig;
+
+    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
+        $this->conversionRateConfig = $conversionRateConfig;
     }
 
     /**
@@ -119,7 +124,7 @@ class ArticleController extends Controller
         $dt = $datatables->of($articles);
         $articles = $dt->results();
 
-        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($articles);
+        $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
 
         $threeMonthsAgo = Carbon::now()->subMonths(3);
 
@@ -128,13 +133,14 @@ class ArticleController extends Controller
                 return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
             ->orderColumn('conversions', 'conversions_count $1')
-            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueUsersCount, $threeMonthsAgo) {
-                $uniqueCount = $externalIdsToUniqueUsersCount->get($article->external_id, 0);
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueBrowsersCount, $threeMonthsAgo) {
+                $uniqueCount = $externalIdsToUniqueBrowsersCount->get($article->external_id, 0);
                 if ($uniqueCount === 0 || $article->published_at->lt($threeMonthsAgo)) {
                     return '';
                 }
 
-                return number_format(($article->conversions_count / $uniqueCount) * 10000, 2);
+                $conversionCount = $article->conversions_count;
+                return Article::computeConversionRate($conversionCount, $uniqueCount, $this->conversionRateConfig);
             })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {

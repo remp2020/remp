@@ -89,7 +89,7 @@
                                 <dt>
                                     <span data-toggle="tooltip" data-placement="top" title="" data-original-title="Ratio of new conversions and unique visitors">Conversion rate</span>
                                 </dt>
-                                <dd>{{number_format($article->conversion_rate, 4)}} %</dd>
+                                <dd>{{$article->conversion_rate}}</dd>
                             </dl>
                             <dl class="dl-horizontal">
                                 <dt>New conversions</dt>

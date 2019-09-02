@@ -1,7 +1,7 @@
 <?php
 
-use App\Model\Config;
-use App\Model\DashboardConfig;
+use App\Model\Config\Config;
+use App\Model\Config\DashboardConfig;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;

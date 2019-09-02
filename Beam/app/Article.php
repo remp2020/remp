@@ -2,7 +2,9 @@
 
 namespace App;
 
+use App\Helpers\Journal\JournalHelpers;
 use App\Model\ArticleTitle;
+use App\Model\Config\ConversionRateConfig;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -13,21 +15,27 @@ use Yadakhov\InsertOnDuplicateKey;
 
 class Article extends Model
 {
+    use InsertOnDuplicateKey;
+
     private const DEFAULT_TITLE_VARIANT = 'default';
     
     private const DEFAULT_IMAGE_VARIANT = 'default';
     
     private $journal;
 
+    private $journalHelpers;
+
     private $cachedAttributes = [];
+
+    private $conversionRateConfig;
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
+        $this->conversionRateConfig = resolve(ConversionRateConfig::class);
         $this->journal = resolve(JournalContract::class);
+        $this->journalHelpers = new JournalHelpers($this->journal);
     }
-
-    use InsertOnDuplicateKey;
 
     protected $fillable = [
         'property_uuid',
@@ -128,28 +136,37 @@ class Article extends Model
      */
     public function getUniqueBrowsersCountAttribute(): int
     {
-        $total = 0;
-        $variantsCount = $this->variants_count; // Retrieved from accessor
-        foreach ($variantsCount as $title => $titleVariants) {
-            foreach ($titleVariants as $image => $count) {
-                $total += $count;
-            }
+        if (array_key_exists('unique_browsers_count', $this->cachedAttributes)) {
+            return $this->cachedAttributes['unique_browsers_count'];
         }
-        return $total;
+
+        $results = $this->journalHelpers->uniqueBrowsersCountForArticles(collect([$this]));
+        $count = $results[$this->external_id] ?? 0;
+        $this->cachedAttributes['unique_browsers_count'] = $count;
+        return $count;
+
+        // TODO revert to code below to avoid two Journal API requests after https://gitlab.com/remp/remp/issues/484 is fixed
+        //$total = 0;
+        //$variantsCount = $this->variants_count; // Retrieved from accessor
+        //foreach ($variantsCount as $title => $titleVariants) {
+        //    foreach ($titleVariants as $image => $count) {
+        //        $total += $count;
+        //    }
+        //}
+        //return $total;
     }
 
     /**
      * conversion_rate
-     * @return float
+     * @return string
      */
-    public function getConversionRateAttribute(): float
+    public function getConversionRateAttribute(): string
     {
-        $uniqueBrowsersCount = $this->unique_browsers_count;
-        if ($uniqueBrowsersCount === 0) {
-            return 0.0;
-        }
-
-        return (float) ($this->conversions()->count() / $uniqueBrowsersCount) * 100;
+        return self::computeConversionRate(
+            $this->conversions->count(),
+            $this->unique_browsers_count,
+            $this->conversionRateConfig
+        );
     }
 
     /**
@@ -330,5 +347,24 @@ SQL;
         static::insertOnDuplicateKey($attributes, $updateKeys);
 
         return static::where('external_id', $values['external_id'])->first();
+    }
+
+    public static function computeConversionRate(
+        $conversionsCount,
+        $uniqueBrowsersCount,
+        ConversionRateConfig $conversionRateConfig
+    ): string {
+        if ($uniqueBrowsersCount === 0) {
+            return '0';
+        }
+        $multiplier = $conversionRateConfig->getMultiplier();
+        $conversionRate = (float) ($conversionsCount / $uniqueBrowsersCount) * $multiplier;
+        $conversionRate = number_format($conversionRate, $conversionRateConfig->getDecimalNumbers());
+
+        if ($multiplier == 100) {
+            return "$conversionRate %";
+        }
+
+        return $conversionRate;
     }
 }

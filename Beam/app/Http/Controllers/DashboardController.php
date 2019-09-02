@@ -6,8 +6,9 @@ use App\Article;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
-use App\Model\Config;
-use App\Model\DashboardConfig;
+use App\Model\Config\Config;
+use App\Model\Config\ConversionRateConfig;
+use App\Model\Config\DashboardConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -27,11 +28,14 @@ class DashboardController extends Controller
 
     private $snapshotHelpers;
 
-    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
+    private $conversionRateConfig;
+
+    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers, ConversionRateConfig $conversionRateConfig)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
+        $this->conversionRateConfig = $conversionRateConfig;
     }
 
     public function index()
@@ -53,7 +57,8 @@ class DashboardController extends Controller
 
         return view($template, [
             'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
-            'options' => $options
+            'options' => $options,
+            'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
         ]);
     }
 
@@ -473,7 +478,7 @@ class DashboardController extends Controller
             (clone $timeAfter)->subHours(2)
         );
 
-        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueUsersCountForArticles($topArticles);
+        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($topArticles);
         // Check for A/B titles/images for last 5 minutes
         $externalIdsToAbTestFlags = $this->journalHelper->abTestFlagsForArticles($topArticles, Carbon::now()->subMinutes(5));
 
@@ -488,8 +493,7 @@ class DashboardController extends Controller
                 $item->unique_browsers_count = $externalIdsToUniqueUsersCount[$item->external_article_id];
                 // Show conversion rate only for articles published in last 3 months
                 if ($item->conversions_count !== 0 && $item->article->published_at->gte($threeMonthsAgo)) {
-                    // Artificially increased 10000x so conversion rate is more readable
-                    $item->conversion_rate = number_format(($item->conversions_count / $item->unique_browsers_count) * 10000, 2);
+                    $item->conversion_rate = Article::computeConversionRate($item->conversions_count, $item->unique_browsers_count, $this->conversionRateConfig);
                 }
 
                 $item->has_title_test = $externalIdsToAbTestFlags[$item->external_article_id]->has_title_test ?? false;
