@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Model\Property\SelectedProperty;
 use App\Model\Config\ConversionRateConfig;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,12 +15,18 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(ConversionRateConfig $conversionRateConfig)
+    public function boot()
     {
         if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
         Paginator::useBootstrapThree();
+
+        // Global selector of current property token
+        View::composer('*', function ($view) {
+            $selectedProperty = resolve(SelectedProperty::class);
+            $view->with('accountPropertyTokens', $selectedProperty->selectInputData());
+        });
     }
 
     /**

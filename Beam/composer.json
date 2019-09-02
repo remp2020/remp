@@ -24,6 +24,7 @@
         "deployer/recipes": "^6.0",
         "doctrine/dbal": "~2.3",
         "fideloper/proxy": "^4.0",
+        "fzaninotto/faker": "~1.4",
         "google/apiclient": "^2.0",
         "kouz/laravel-airbrake": "^0.4",
         "laracasts/flash": " ^3.0",
@@ -37,15 +38,15 @@
         "piwik/device-detector": "^3.10",
         "predis/predis": " ~1.0",
         "recca0120/laravel-tracy": "^1.8",
+        "remp/journal": "*",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
-        "remp/journal": "*",
         "simshaun/recurr": "^3.0",
         "snowplow/referer-parser": "dev-master",
+        "tightenco/ziggy": "^0.7.1",
         "yadakhov/insert-on-duplicate-key": "^1.2",
-        "yajra/laravel-datatables-oracle": "^8.0",
-        "fzaninotto/faker": "~1.4"
+        "yajra/laravel-datatables-oracle": "^8.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.3",

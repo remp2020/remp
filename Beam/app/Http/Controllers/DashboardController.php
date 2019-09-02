@@ -6,9 +6,11 @@ use App\Article;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
+use App\Model\ArticleViewsSnapshot;
 use App\Model\Config\Config;
-use App\Model\Config\ConversionRateConfig;
 use App\Model\Config\DashboardConfig;
+use App\Model\Property\SelectedProperty;
+use App\Model\Config\ConversionRateConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,11 +32,18 @@ class DashboardController extends Controller
 
     private $conversionRateConfig;
 
-    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers, ConversionRateConfig $conversionRateConfig)
-    {
+    private $selectedProperty;
+
+    public function __construct(
+        JournalContract $journal,
+        SnapshotHelpers $snapshotHelpers,
+        SelectedProperty $selectedProperty,
+        ConversionRateConfig $conversionRateConfig
+    ) {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
+        $this->selectedProperty = $selectedProperty;
         $this->conversionRateConfig = $conversionRateConfig;
     }
 
@@ -58,6 +67,7 @@ class DashboardController extends Controller
         return view($template, [
             'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
             'options' => $options,
+            'accountPropertyTokens' => $this->selectedProperty->selectInputData(),
             'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
         ]);
     }
@@ -232,11 +242,11 @@ class DashboardController extends Controller
 
     private function dataFor(array $timePoints)
     {
-        return DB::table('article_views_snapshots')
-            ->select('article_views_snapshots.time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
+        $query = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
             ->whereIn('time', $timePoints)
-            ->groupBy(['article_views_snapshots.time', 'derived_referer_medium', 'explicit_referer_medium'])
-            ->get();
+            ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium']);
+
+        return $query->get();
     }
 
     public function timeHistogram(Request $request)
@@ -400,13 +410,17 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function pageviewRecordsBasedOnRefererMedium(Carbon $timeAfter, Carbon $timeBefore, string $interval)
-    {
+    private function pageviewRecordsBasedOnRefererMedium(
+        Carbon $timeAfter,
+        Carbon $timeBefore,
+        string $interval
+    ) {
         $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
         $journalRequest->setTimeHistogram($interval, '0h');
         $journalRequest->addGroup('derived_referer_medium');
+
         return collect($this->journal->count($journalRequest));
     }
 
@@ -427,6 +441,7 @@ class DashboardController extends Controller
         if ($frontpageReferer && $settings['onlyTrafficFromFrontPage']) {
             $concurrentsRequest->addFilter('derived_referer_host_with_path', $frontpageReferer);
         }
+
         $concurrentsRequest->setTimeAfter($timeAfter);
         $concurrentsRequest->setTimeBefore($timeBefore);
         $concurrentsRequest->addGroup('article_id');

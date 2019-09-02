@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7eaf77cc84750ee677c0b29d74a1e8b",
+    "content-hash": "66741fd510ec92bbfc64c55c8c15e5a5",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -2083,7 +2083,7 @@
                 {
                     "name": "Luís Otávio Cobucci Oblonczyk",
                     "email": "lcobucci@gmail.com",
-                    "role": "Developer"
+                    "role": "developer"
                 }
             ],
             "description": "A simple library to work with JSON Web Token and JSON Web Signature",
@@ -5723,6 +5723,57 @@
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
             "time": "2019-02-23T15:17:42+00:00"
+        },
+        {
+            "name": "tightenco/ziggy",
+            "version": "v0.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tightenco/ziggy.git",
+                "reference": "aa4c42aaec9516da892bc2e9f6e992582646af77"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tightenco/ziggy/zipball/aa4c42aaec9516da892bc2e9f6e992582646af77",
+                "reference": "aa4c42aaec9516da892bc2e9f6e992582646af77",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "~5.4"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.6",
+                "orchestra/testbench": "~3.6"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Tightenco\\Ziggy\\ZiggyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Tightenco\\Ziggy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Stauffer",
+                    "email": "matt@tighten.co"
+                },
+                {
+                    "name": "Daniel Coulbourne",
+                    "email": "daniel@tighten.co"
+                }
+            ],
+            "description": "Generates a Blade directive exporting all of your named Laravel routes. Also provides a nice route() helper function in JavaScript.",
+            "time": "2019-04-26T22:03:47+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Model\Property\SelectedProperty;
 use App\Property;
 use Html;
 use Illuminate\Http\Request;
@@ -11,6 +12,13 @@ use Yajra\Datatables\Datatables;
 
 class PropertyController extends Controller
 {
+    private $selectedProperty;
+
+    public function __construct(SelectedProperty $selectedProperty)
+    {
+        $this->selectedProperty = $selectedProperty;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -143,5 +151,26 @@ class PropertyController extends Controller
     {
         $property->delete();
         return redirect(route('accounts.properties.index', $account))->with('success', 'Property removed');
+    }
+
+
+    /**
+     * Method for switching selected property token
+     * Careful, it's not protected by user authentication, since it should be also available from public dashboard
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function switch(Request $request)
+    {
+        $propertyToken = $request->input('token');
+
+        try {
+            $this->selectedProperty->setToken($propertyToken);
+        } catch (\InvalidArgumentException $exception) {
+            abort('400', 'No such token');
+        }
+
+        return back();
     }
 }
