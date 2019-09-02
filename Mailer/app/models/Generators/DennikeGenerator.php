@@ -47,6 +47,7 @@ class DennikeGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_POST, 'author', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
@@ -60,6 +61,9 @@ class DennikeGenerator implements IGenerator
 
     public function process($values)
     {
+        $this->articleLocker->setLockText('Predplaťte si Denník E a tento newsletter dostanete každé ráno celý.');
+        $this->articleLocker->setupLockLink('Přidejte se k předplatitelům', 'https://predplatne.dennikn.sk/ecko');
+
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
         $content = $this->content;
 
@@ -189,6 +193,7 @@ class DennikeGenerator implements IGenerator
         $params = [
             'title' => $values->title,
             'sub_title' => $values->sub_title,
+            'author' => $values->author,
             'url' => $values->url,
             'html' => $post,
             'text' => $text,
@@ -197,6 +202,7 @@ class DennikeGenerator implements IGenerator
         $lockedParams = [
             'title' => $values->title,
             'sub_title' => $values->sub_title,
+            'author' => $values->author,
             'url' => $values->url,
             'html' => $lockedPost,
             'text' => strip_tags($lockedText),
@@ -236,6 +242,8 @@ class DennikeGenerator implements IGenerator
         $form->offsetUnset(Form::PROTECTOR_ID);
 
         $form->addText('sub_title', 'Sub title');
+
+        $form->addText('author', 'Author');
 
         $form->addText('from', 'Sender');
 
@@ -333,26 +341,18 @@ class DennikeGenerator implements IGenerator
     public function getTemplates()
     {
         $captionTemplate = <<< HTML
-    <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
-    <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
-        <small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$2</small>
-    </p>
+    <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;"><p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;"><small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$2</small></p>
 HTML;
 
         $captionWithLinkTemplate = <<< HTML
-    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:#F26755;text-decoration:none;">
-    <img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border:none;">
-</a>
-    <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
-        <small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$3</small>
-    </p>
+    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:#F26755;text-decoration:none; margin-bottom: 0;"><img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:5px;border:none;"></a><p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:15px;Margin-bottom:15px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;"><small class="text-gray" style="font-size:13px;line-height:18px;display:block;color:#9B9B9B;">$3</small></p>
 HTML;
 
         $liTemplate = <<< HTML
     <tr style="padding:0;vertical-align:top;text-align:left;">
         <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">&#8226;</td>
         <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important;">
-            <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>
+            <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;">$1</p>
         </td>
     </tr>
 HTML;
@@ -360,7 +360,7 @@ HTML;
         $hrTemplate = <<< HTML
     <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;">
         <tr style="padding:0;vertical-align:top;text-align:left;">
-            <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 30px 0 0 0; border-top:1px solid #E2E2E2;"></td>
+            <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 20px 0 0 0; border-top:1px solid #E2E2E2;"></td>
         </tr>
     </table>
 
@@ -377,7 +377,7 @@ HTML;
 HTML;
 
         $imageTemplate = <<< HTML
-        <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
+        <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border: 10px solid #1F3F83;">
 HTML;
 
         return [

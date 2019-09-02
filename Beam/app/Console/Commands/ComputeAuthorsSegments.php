@@ -174,15 +174,18 @@ SQL;
                 continue;
             }
             $segment = $this->getOrCreateAuthorSegment($authorId);
-            $toInsert = collect($users)->map(function ($userId) use ($segment) {
-                return [
-                    'segment_id' => $segment->id,
-                    'user_id' => $userId,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-            });
-            SegmentUser::insert($toInsert->toArray());
+
+            foreach (array_chunk($users, 100) as $usersChunk) {
+                $toInsert = collect($usersChunk)->map(function ($userId) use ($segment) {
+                    return [
+                        'segment_id' => $segment->id,
+                        'user_id' => $userId,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ];
+                });
+                SegmentUser::insert($toInsert->toArray());
+            }
         }
     }
 
@@ -200,15 +203,18 @@ SQL;
             }
 
             $segment = $this->getOrCreateAuthorSegment($authorId);
-            $toInsert = collect($browsers)->map(function ($browserId) use ($segment) {
-                return [
-                    'segment_id' => $segment->id,
-                    'browser_id' => $browserId,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-            });
-            SegmentBrowser::insert($toInsert->toArray());
+
+            foreach (array_chunk($browsers, 100) as $browsersChunk) {
+                $toInsert = collect($browsersChunk)->map(function ($browserId) use ($segment) {
+                    return [
+                        'segment_id' => $segment->id,
+                        'browser_id' => $browserId,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ];
+                });
+                SegmentBrowser::insert($toInsert->toArray());
+            }
         }
     }
 
