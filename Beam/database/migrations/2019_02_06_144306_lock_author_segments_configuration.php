@@ -1,7 +1,7 @@
 <?php
 
 use App\Console\Commands\ComputeAuthorsSegments;
-use App\Model\Config;
+use App\Model\Config\Config;
 use Illuminate\Database\Migrations\Migration;
 
 class LockAuthorSegmentsConfiguration extends Migration

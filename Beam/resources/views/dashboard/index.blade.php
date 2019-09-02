@@ -12,6 +12,7 @@
                 :articles-url="articlesUrl"
                 :time-histogram-url="timeHistogramUrl"
                 :time-histogram-url-new="timeHistogramUrlNew"
+                :conversion-rate-multiplier="conversionRateMultiplier"
                 :options="options">
         </dashboard-root>
     </div>
@@ -33,7 +34,8 @@
                 timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}",
                 timeHistogramUrlNew: "{!! route('dashboard.timeHistogramNew.json') !!}",
                 enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }},
-                options: {!! json_encode($options) !!}
+                options: {!! json_encode($options) !!},
+                conversionRateMultiplier: {!! $conversionRateMultiplier !!}
             }
         })
     </script>

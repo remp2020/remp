@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Console\Commands\AggregateArticlesViews;
 use App\Model\Property\SelectedProperty;
+use App\Http\Controllers\JournalProxyController;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
@@ -13,11 +14,9 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
-use Lcobucci\JWT\Token;
 use Remp\Journal\Journal;
 use Remp\Journal\JournalContract;
 use Remp\Journal\JournalException;
-use Remp\Journal\TokenProvider;
 
 class RempJournalServiceProvider extends ServiceProvider
 {
@@ -80,5 +79,15 @@ class RempJournalServiceProvider extends ServiceProvider
             $redis = $app->make('redis')->connection()->client();
             return new Journal($client, $redis, new SelectedProperty());
         });
+
+        $this->app->when(JournalProxyController::class)
+            ->needs(Client::class)
+            ->give(function (Application $app) {
+                $client = new Client([
+                    'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
+                ]);
+
+                return $client;
+            });
     }
 }

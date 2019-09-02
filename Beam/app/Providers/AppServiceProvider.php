@@ -2,9 +2,8 @@
 
 namespace App\Providers;
 
-use App\Account;
 use App\Model\Property\SelectedProperty;
-use App\Model\Property\SelectedPropertyHelper;
+use App\Model\Config\ConversionRateConfig;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -37,5 +36,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton(ConversionRateConfig::class);
     }
 }

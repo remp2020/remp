@@ -86,7 +86,7 @@ class DennikeTemplateFormFactory
             'mail_layout_id' => 33, // layout for subscribers
             'locked_mail_layout_id' => 33, // layout for non-subscribers
             'mail_type_id' => 23, // dennike
-            'from' => 'Denník N <info@dennikn.sk>',
+            'from' => 'Denník E <e@dennikn.sk>',
         ];
 
         $form->setDefaults($defaults);

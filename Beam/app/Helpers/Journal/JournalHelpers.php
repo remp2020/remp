@@ -56,7 +56,7 @@ class JournalHelpers
      *
      * @return Collection containing mapping of articles' external_ids to unique users count
      */
-    public function uniqueUsersCountForArticles(Collection $articles): Collection
+    public function uniqueBrowsersCountForArticles(Collection $articles): Collection
     {
         $minimalPublishedTime = Carbon::now();
         foreach ($articles as $article) {
@@ -64,17 +64,14 @@ class JournalHelpers
                 $minimalPublishedTime = $article->published_at;
             }
         }
-        $timeBefore = Carbon::now();
-
         $externalArticleIds = $articles->pluck('external_id')->toArray();
 
-        $request = new AggregateRequest('pageviews', 'load');
-        $request->setTimeAfter($minimalPublishedTime);
-        $request->setTimeBefore($timeBefore);
-        $request->addGroup('article_id');
-        $request->addFilter('article_id', ...$externalArticleIds);
+        $r = (new AggregateRequest('pageviews', 'load'))
+            ->setTime($minimalPublishedTime, Carbon::now())
+            ->addGroup('article_id')
+            ->addFilter('article_id', ...$externalArticleIds);
 
-        $result = collect($this->journal->unique($request));
+        $result = collect($this->journal->unique($r));
         return $result
             ->filter(function ($item) {
                 return $item->tags !== null;

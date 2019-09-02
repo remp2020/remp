@@ -79,7 +79,11 @@ class AggregateConversionEvents extends Command
             ->addGroup('browser_id')
             ->addFilter('user_id', $conversion->user_id)
             ->setTime($after, $before));
+
         foreach ($records as $record) {
+            if (!$record->count) {
+                continue;
+            }
             if ($record->tags->browser_id && $record->tags->browser_id !== '') {
                 $browserIds[] = $record->tags->browser_id;
             }

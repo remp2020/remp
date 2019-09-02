@@ -11,7 +11,8 @@
                 :time-histogram-url="timeHistogramUrl"
                 :time-histogram-url-new="timeHistogramUrlNew"
                 :account-property-tokens="accountPropertyTokens"
-                :csrf-token="csrfToken">
+                :csrf-token="csrfToken"
+                :conversion-rate-multiplier="conversionRateMultiplier">
         </dashboard-root>
     </div>
 
@@ -34,7 +35,8 @@
                 enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }},
                 options: {!! json_encode($options) !!},
                 accountPropertyTokens: {!! json_encode($accountPropertyTokens) !!},
-                csrfToken: {!!'"' . csrf_token() . '"'!!}
+                csrfToken: {!!'"' . csrf_token() . '"'!!},
+                conversionRateMultiplier: {!! $conversionRateMultiplier !!}
             }
         })
     </script>

@@ -52,7 +52,7 @@
                                     </th>
                                     <th style="width: 7%; text-align: left">
                                         <span data-toggle="tooltip"
-                                              data-original-title="Conversion rate = (Conversions/Unique visitors) x 10000"
+                                              :data-original-title="conversionRateDescription"
                                               class="icon-header">%</span>
                                     </th>
                                     <th style="width: 7%; text-align: left">
@@ -210,6 +210,10 @@
         csrfToken: {
             type: String,
             required: false
+        },
+        conversionRateMultiplier: {
+            type: Number,
+            required: false
         }
     }
 
@@ -258,6 +262,11 @@
             document.addEventListener('visibilitychange', this.visibilityChanged)
             this.loadData()
             loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
+
+            this.conversionRateDescription = "Conversion rate = Conversions/Unique visitors"
+            if (this.conversionRateMultiplier) {
+                this.conversionRateDescription = "Conversion rate = (Conversions/Unique visitors) x " + this.conversionRateMultiplier.toString()
+            }
         },
         beforeDestroy() {
             document.removeEventListener('visibilitychange', this.visibilityChanged)
@@ -269,7 +278,10 @@
             return {
                 articles: null,
                 totalConcurrents: 0,
-                propertiesSwitchUrl: route('properties.switch')
+                propertiesSwitchUrl: route('properties.switch'),
+                conversionRateDescription: "",
+                error: null,
+                loading: false,
             }
         },
         computed: {
@@ -295,18 +307,28 @@
                 loadDataTimer = setInterval(this.loadData, REFRESH_DATA_TIMEOUT_MS)
             },
             loadData() {
+                if (this.loading) {
+                    return
+                }
+
+                this.loading = true
                 let that = this
                 axios
                     .post(this.articlesUrl, {
                         settings: this.settings
                     })
                     .then(function(response){
+                        that.loading = false
                         that.articles = response.data.articles.map(function(item){
                             item.conversion_rate_color = conversionRateColor(item.conversion_rate, that.options)
                             item.conversions_count_color = conversionsCountColor(item.conversions_count, that.options)
                             return item
                         })
                         that.totalConcurrents = response.data.totalConcurrents
+                    })
+                    .catch(error => {
+                        this.error = error
+                        this.loading = false;
                     })
             }
         },

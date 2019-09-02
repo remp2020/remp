@@ -132,9 +132,12 @@
             </div>
             <div class="card-body">
                 <ul class="list-group">
+                    @if ($banner->position)
                     <li class="list-group-item">
                         <strong>Position: </strong>{{ $positions[$banner->position]->name }}
                     </li>
+                    @endif
+
                     <li class="list-group-item">
                         <strong>Transition: </strong>{{ $banner->transition }}
                     </li>
