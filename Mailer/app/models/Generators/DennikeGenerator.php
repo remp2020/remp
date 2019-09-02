@@ -88,6 +88,7 @@ class DennikeGenerator implements IGenerator
             '/\[\/?lock\]/i' => "",
             '/\[lock newsletter\]/i' => "",
             '/\[lock\]/i' => "",
+            '/\[lock e\]/i' => "",
 
             // remove iframes
             "/<iframe.*?\/iframe>/is" => "",
