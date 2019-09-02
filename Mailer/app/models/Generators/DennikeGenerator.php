@@ -125,12 +125,12 @@ class DennikeGenerator implements IGenerator
             '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
 
             // replace ul & /ul
-            '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
+            '/<ul.*?>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
 
             '/<\/ul>/is' => '</tbody></table>' . PHP_EOL,
 
             // replace li
-            '/<li>(.*?)<\/li>/is' => $liTemplate,
+            '/<li.*?>(.*?)<\/li>/is' => $liTemplate,
 
             // hr
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
