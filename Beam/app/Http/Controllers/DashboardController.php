@@ -7,7 +7,7 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Model\ArticleViewsSnapshot;
-use App\Model\Config;
+use App\Model\Config\Config;
 use App\Model\Config\DashboardConfig;
 use App\Model\Property\SelectedProperty;
 use App\Model\Config\ConversionRateConfig;
