@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	refererparser "snowplow/referer-parser/go"
 	"strings"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
-	refererparser "github.com/snowplow/referer-parser/go"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -320,18 +320,25 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 			fields["referer"] = *user.Referer
 
 			// Try to parse URL before being passed to refererparser library (since it produces NPE in case of invalid URL)
-			parsedURL, err := url.Parse(*user.Referer)
+			parsedRefererURL, err := url.Parse(*user.Referer)
 			if err != nil {
 				tags["derived_referer_medium"] = "unknown"
 			} else {
-				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Path)
+				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedRefererURL.Scheme, parsedRefererURL.Host, parsedRefererURL.Path)
 
 				parsedRef := refererparser.Parse(*user.Referer)
-				if user.URL != nil {
-					parsedRef.SetCurrent(*user.URL)
-				}
+
 				tags["derived_referer_medium"] = parsedRef.Medium
 				tags["derived_referer_source"] = parsedRef.Referer
+
+				// Check for internal traffic
+				if user.URL != nil {
+					parsedURL, _ := url.Parse(*user.URL)
+					// Main domain traffic to subdomain is also considered internal traffic
+					if parsedURL != nil && strings.HasSuffix(parsedURL.Host, parsedRefererURL.Host) {
+						tags["derived_referer_medium"] = "internal"
+					}
+				}
 
 				if tags["derived_referer_medium"] == "unknown" {
 					tags["derived_referer_medium"] = "external"
