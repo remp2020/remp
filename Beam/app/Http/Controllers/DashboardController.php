@@ -263,6 +263,8 @@ class DashboardController extends Controller
         $interval = $request->get('interval');
         [$timeBefore, $timeAfter, $intervalText, $intervalMinutes] = $this->getJournalParameters($interval, $tz);
 
+        $endOfDay = (clone $timeAfter)->tz($tz)->endOfDay()->tz('UTC');
+
         $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
@@ -400,14 +402,20 @@ class DashboardController extends Controller
             $results = collect(array_values($results))->take($numberOfCurrentValues);
         }
 
-        return response()->json([
+        $jsonResponse = [
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
             'tags' => $tags,
             'colors' => Colors::refererMediumTagsToColors($tags)
-        ]);
+        ];
+
+        if ($interval === 'today') {
+            $jsonResponse['maxDate'] = $endOfDay->toIso8601ZuluString();
+        }
+
+        return response()->json($jsonResponse);
     }
 
     private function pageviewRecordsBasedOnRefererMedium(

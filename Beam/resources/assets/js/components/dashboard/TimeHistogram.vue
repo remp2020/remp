@@ -411,6 +411,10 @@
                     yMax = Math.max(d3.max(previousResults, (d) => (d.value)), yMax)
                 }
 
+                if (this.maxDate) { // explicit maxDate
+                    maxDate = this.maxDate
+                }
+
                 x.domain([results[0].date, maxDate])
                     .range([0, width])
                 y.domain([0, yMax])
@@ -524,6 +528,10 @@
                             )),
                             tags: tags,
                             colors: response.data.colors
+                        }
+
+                        if (response.data.maxDate !== undefined) {
+                            this.maxDate = d3.isoParse(response.data.maxDate)
                         }
                     })
                     .catch(error => {
