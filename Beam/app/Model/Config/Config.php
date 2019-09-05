@@ -2,6 +2,7 @@
 
 namespace App\Model\Config;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Config extends Model
@@ -23,9 +24,26 @@ class Config extends Model
         'locked' => 'boolean',
     ];
 
-    public function scopeUnlocked($query)
+    public function configCategory()
+    {
+        return $this->belongsTo(ConfigCategory::class);
+    }
+
+    public function scopeUnlocked(Builder $query)
     {
         return $query->where('locked', false);
+    }
+
+    public function scopeGlobal(Builder $query)
+    {
+        return $query->whereNull('property_id');
+    }
+
+    public function scopeOfCategory(Builder $query, $categoryCode)
+    {
+        return $query->whereHas('configCategory', function (Builder $query) use ($categoryCode) {
+            $query->where('code', $categoryCode);
+        });
     }
 
     public static function loadByName(string $name)

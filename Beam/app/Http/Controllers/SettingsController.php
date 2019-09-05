@@ -12,7 +12,7 @@ class SettingsController extends Controller
     {
         return response()->format([
             'html' => view('settings.index', [
-                'configs' => Config::unlocked()->get(),
+                'configs' => Config::unlocked()->global()->get(),
             ]),
             'json' => ConfigResource::collection(Config::unlocked()->get()),
         ]);
@@ -23,13 +23,14 @@ class SettingsController extends Controller
         $settings = $request->get('settings');
         foreach ($settings as $name => $value) {
             Config::unlocked()
+                ->global()
                 ->where('name', $name)
                 ->update(['value' => $value]);
         }
 
         return response()->format([
             'html' => redirect(route('settings.index'))->with('success', 'Settings updated'),
-            'json' => ConfigResource::collection(Config::unlocked()->get()),
+            'json' => ConfigResource::collection(Config::unlocked()->global()->get()),
         ]);
     }
 }

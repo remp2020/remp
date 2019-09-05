@@ -1,7 +1,7 @@
 <?php
 
 use App\Model\Config\Config;
-use App\Model\Config\DashboardConfig;
+use App\Model\Config\ConfigNames;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -38,38 +38,38 @@ class CreateConfigsTable extends Migration
     private function seedBeamDashboardConfigs()
     {
         Config::firstOrCreate([
-            'name' => DashboardConfig::CONVERSIONS_COUNT_THRESHOLD_LOW,
+            'name' => ConfigNames::CONVERSIONS_COUNT_THRESHOLD_LOW,
             'display_name' => 'Conversions count threshold low',
             'type' => 'int',
             'value' => 3
         ]);
         Config::firstOrCreate([
-            'name' => DashboardConfig::CONVERSIONS_COUNT_THRESHOLD_MEDIUM,
+            'name' => ConfigNames::CONVERSIONS_COUNT_THRESHOLD_MEDIUM,
             'display_name' => 'Conversions count threshold medium',
             'type' => 'int',
             'value' => 8
         ]);
         Config::firstOrCreate([
-            'name' => DashboardConfig::CONVERSIONS_COUNT_THRESHOLD_HIGH,
+            'name' => ConfigNames::CONVERSIONS_COUNT_THRESHOLD_HIGH,
             'display_name' => 'Conversions count threshold high',
             'type' => 'int',
             'value' => 13
         ]);
 
         Config::firstOrCreate([
-            'name' => DashboardConfig::CONVERSION_RATE_THRESHOLD_LOW,
+            'name' => ConfigNames::CONVERSION_RATE_THRESHOLD_LOW,
             'display_name' => 'Conversion rate threshold low',
             'type' => 'float',
             'value' => 3.0
         ]);
         Config::firstOrCreate([
-            'name' => DashboardConfig::CONVERSION_RATE_THRESHOLD_MEDIUM,
+            'name' => ConfigNames::CONVERSION_RATE_THRESHOLD_MEDIUM,
             'display_name' => 'Conversion rate threshold medium',
             'type' => 'float',
             'value' => 5.0
         ]);
         Config::firstOrCreate([
-            'name' => DashboardConfig::CONVERSION_RATE_THRESHOLD_HIGH,
+            'name' => ConfigNames::CONVERSION_RATE_THRESHOLD_HIGH,
             'display_name' => 'Conversion rate threshold high',
             'type' => 'float',
             'value' => 7.0

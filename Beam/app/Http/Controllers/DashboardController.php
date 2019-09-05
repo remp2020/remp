@@ -8,7 +8,7 @@ use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Model\ArticleViewsSnapshot;
 use App\Model\Config\Config;
-use App\Model\Config\DashboardConfig;
+use App\Model\Config\ConfigCategory;
 use App\Model\Property\SelectedProperty;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\Snapshots\SnapshotHelpers;
@@ -59,24 +59,20 @@ class DashboardController extends Controller
 
     private function dashboardView($template)
     {
-        $options = [];
-        foreach (DashboardConfig::getValues() as $value) {
-            $options[$value] = Config::loadByName($value);
-        }
-
         return view($template, [
             'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
-            'options' => $options,
+            'options' => $this->options(),
             'accountPropertyTokens' => $this->selectedProperty->selectInputData(),
             'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
         ]);
     }
 
-    public function options()
+    public function options(): array
     {
         $options = [];
-        foreach (DashboardConfig::getValues() as $value) {
-            $options[$value] = Config::loadByName($value);
+        //foreach (ConfigCategory::dashboard()->->configs as $config) {
+        foreach (Config::ofCategory(ConfigCategory::CODE_DASHBOARD)->get() as $config) {
+            $options[$config->name] = Config::loadByName($config->name);
         }
         return $options;
     }
