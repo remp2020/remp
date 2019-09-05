@@ -23,8 +23,6 @@ class MakeConfigsPropertySpecific extends Migration
             $table->dropUnique(['name']);
             $table->unique(['name', 'property_id']);
         });
-
-
     }
 
     public function down()
