@@ -23,6 +23,7 @@ type TrackController struct {
 	EventProducer       sarama.AsyncProducer
 	PropertyStorage     model.PropertyStorage
 	EntitySchemaStorage model.EntitySchemaStorage
+	InternalHosts       []string
 }
 
 // Event represents Influx event structure
@@ -34,12 +35,13 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage) *TrackController {
+func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string) *TrackController {
 	return &TrackController{
 		Controller:          service.NewController("TrackController"),
 		EventProducer:       ep,
 		PropertyStorage:     ps,
 		EntitySchemaStorage: ess,
+		InternalHosts:       ih,
 	}
 }
 
@@ -328,17 +330,17 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 
 				parsedRef := refererparser.Parse(*user.Referer)
 
-				tags["derived_referer_medium"] = parsedRef.Medium
-				tags["derived_referer_source"] = parsedRef.Referer
-
+				refResolver := RefererResolver{
+					Referer:       parsedRef,
+					InternalHosts: c.InternalHosts,
+				}
 				// Check for internal traffic
 				if user.URL != nil {
-					parsedURL, _ := url.Parse(*user.URL)
-					// Main domain traffic to subdomain is also considered internal traffic
-					if parsedURL != nil && strings.HasSuffix(parsedURL.Host, parsedRefererURL.Host) {
-						tags["derived_referer_medium"] = "internal"
-					}
+					refResolver.SetCurrent(*user.URL)
 				}
+
+				tags["derived_referer_medium"] = parsedRef.Medium
+				tags["derived_referer_source"] = parsedRef.Referer
 
 				if tags["derived_referer_medium"] == "unknown" {
 					tags["derived_referer_medium"] = "external"

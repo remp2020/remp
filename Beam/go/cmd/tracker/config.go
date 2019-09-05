@@ -11,4 +11,6 @@ type Config struct {
 	MysqlUser   string `envconfig:"mysql_user" required:"true"`
 	MysqlPasswd string `envconfig:"mysql_passwd" required:"true"`
 	MysqlDBName string `envconfig:"mysql_dbname" required:"true"`
+
+	InternalHosts string `envconfig:"internal_hosts" required:"false"`
 }
