@@ -412,7 +412,7 @@ class DashboardController extends Controller
         ];
 
         if ($interval === 'today') {
-            $jsonResponse['maxDate'] = $endOfDay->toIso8601ZuluString();
+            $jsonResponse['maxDate'] = $endOfDay->subMinutes($intervalMinutes)->toIso8601ZuluString();
         }
 
         return response()->json($jsonResponse);
