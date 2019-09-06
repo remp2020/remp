@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"net/url"
-
 	refererparser "snowplow/referer-parser/go"
 )
 
@@ -22,9 +20,8 @@ func (ref *RefererResolver) SetCurrent(curl string) {
 		return
 	}
 
-	purl, _ := url.Parse(curl)
 	for _, internalHost := range ref.InternalHosts {
-		if purl.Host == internalHost {
+		if ref.Referer.URI.Host == internalHost {
 			ref.Referer.Medium = "internal"
 			return
 		}
