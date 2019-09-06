@@ -17,4 +17,26 @@ class ConfigNames
     const CONVERSION_RATE_THRESHOLD_LOW =  'conversion_rate_threshold_low';
     const CONVERSION_RATE_THRESHOLD_MEDIUM =  'conversion_rate_threshold_medium';
     const CONVERSION_RATE_THRESHOLD_HIGH =  'conversion_rate_threshold_high';
+
+    const DASHBOARD_FRONTPAGE_REFERER =  'dashboard_frontpage_referer';
+
+
+    /**
+     * Lists config options that can specified for token properties
+     * @return array
+     */
+    public static function propertyConfigs(): array
+    {
+        return [
+            self::CONVERSION_RATE_MULTIPLIER,
+            self::CONVERSION_RATE_DECIMAL_NUMBERS,
+            self::CONVERSIONS_COUNT_THRESHOLD_LOW,
+            self::CONVERSIONS_COUNT_THRESHOLD_MEDIUM,
+            self::CONVERSIONS_COUNT_THRESHOLD_HIGH,
+            self::CONVERSION_RATE_THRESHOLD_LOW,
+            self::CONVERSION_RATE_THRESHOLD_MEDIUM,
+            self::CONVERSION_RATE_THRESHOLD_HIGH,
+            self::DASHBOARD_FRONTPAGE_REFERER
+        ];
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Model\Config;
 
+use App\Model\Property\SelectedProperty;
+use App\Property;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,6 +18,7 @@ class Config extends Model
         'sorting',
         'autoload',
         'locked',
+        'config_category_id'
     ];
 
     protected $casts = [
@@ -24,9 +27,22 @@ class Config extends Model
         'locked' => 'boolean',
     ];
 
+    private $selectedProperty;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->selectedProperty = resolve(SelectedProperty::class);
+    }
+
     public function configCategory()
     {
         return $this->belongsTo(ConfigCategory::class);
+    }
+
+    public function property()
+    {
+        return $this->belongsTo(Property::class);
     }
 
     public function scopeUnlocked(Builder $query)
@@ -39,6 +55,18 @@ class Config extends Model
         return $query->whereNull('property_id');
     }
 
+    public function scopeOfSelectedToken(Builder $query)
+    {
+        $tokenUuid = $this->selectedProperty->getToken();
+        if ($tokenUuid) {
+            return $query->whereHas('property', function (Builder $query) use ($tokenUuid) {
+                $query->where('uuid', $tokenUuid);
+            });
+        }
+
+        return $query;
+    }
+
     public function scopeOfCategory(Builder $query, $categoryCode)
     {
         return $query->whereHas('configCategory', function (Builder $query) use ($categoryCode) {
@@ -48,7 +76,20 @@ class Config extends Model
 
     public static function loadByName(string $name)
     {
-        $result = Config::where('name', $name)->first();
+        $q = Config::where('name', $name);
+        $fallback = false;
+        // Try to load property config if present
+        if (in_array($name, ConfigNames::propertyConfigs(), true)) {
+            $fallback = true;
+            $q = $q->ofSelectedToken();
+        }
+        $result = $q->first();
+
+        // If not, fallback to global config
+        if (!$result && $fallback) {
+            $result = Config::where('name', $name)->first();
+        }
+
         if (!$result) {
             throw new \Exception("missing configuration for '$name'");
         }

@@ -9,6 +9,7 @@ use App\Helpers\Journal\JournalInterval;
 use App\Model\ArticleViewsSnapshot;
 use App\Model\Config\Config;
 use App\Model\Config\ConfigCategory;
+use App\Model\Config\ConfigNames;
 use App\Model\Property\SelectedProperty;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\Snapshots\SnapshotHelpers;
@@ -60,7 +61,7 @@ class DashboardController extends Controller
     private function dashboardView($template)
     {
         return view($template, [
-            'enableFrontpageFiltering' => config('dashboard.frontpage_referer') !== null,
+            'enableFrontpageFiltering' => Config::loadByName(ConfigNames::DASHBOARD_FRONTPAGE_REFERER) !== null,
             'options' => $this->options(),
             'accountPropertyTokens' => $this->selectedProperty->selectInputData(),
             'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
@@ -70,7 +71,6 @@ class DashboardController extends Controller
     public function options(): array
     {
         $options = [];
-        //foreach (ConfigCategory::dashboard()->->configs as $config) {
         foreach (Config::ofCategory(ConfigCategory::CODE_DASHBOARD)->get() as $config) {
             $options[$config->name] = Config::loadByName($config->name);
         }
@@ -441,7 +441,8 @@ class DashboardController extends Controller
 
         $concurrentsRequest = new ConcurrentsRequest();
 
-        $frontpageReferer = config('dashboard.frontpage_referer');
+        $frontpageReferer = Config::loadByName(ConfigNames::DASHBOARD_FRONTPAGE_REFERER);
+
         if ($frontpageReferer && $settings['onlyTrafficFromFrontPage']) {
             $concurrentsRequest->addFilter('derived_referer_host_with_path', $frontpageReferer);
         }
