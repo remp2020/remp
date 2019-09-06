@@ -271,12 +271,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:ba17ad32c019087bd49dcbae114c65532066935eb3a52a7cbde61ca94bc7461e"
-  name = "github.com/snowplow/referer-parser"
-  packages = ["go"]
+  branch = "develop"
+  digest = "1:f0f2057d5df1448502d70182a552bb92656d0014436dc965a7d3a38d6e6899ef"
+  name = "github.com/snowplow-referer-parser/golang-referer-parser"
+  packages = ["."]
   pruneopts = ""
-  revision = "5ce872b60999c63039723959a45928ef1196f03d"
-  version = "0.2.0"
+  revision = "42675519c803bb0bd9829c3d3a59bfcd6232b6f0"
 
 [[projects]]
   branch = "master"
@@ -448,7 +448,7 @@
     "github.com/patrickmn/go-cache",
     "github.com/pkg/errors",
     "github.com/satori/go.uuid",
-    "github.com/snowplow/referer-parser/go",
+    "github.com/snowplow-referer-parser/golang-referer-parser",
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "golang.org/x/tools/go/ast/astutil",

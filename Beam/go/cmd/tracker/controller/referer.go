@@ -1,7 +1,7 @@
 package controller
 
 import (
-	refererparser "snowplow/referer-parser/go"
+	refererparser "github.com/snowplow-referer-parser/golang-referer-parser"
 )
 
 // RefererResolver extends behavior of snowplow RefererResult
