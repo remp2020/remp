@@ -147,6 +147,7 @@ func main() {
 		eventProducer,
 		propertyDB,
 		entitySchemaDB,
+		strings.Split(c.InternalHosts, ","),
 	))
 
 	// server init

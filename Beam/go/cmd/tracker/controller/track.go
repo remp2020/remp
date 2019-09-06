@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	refererparser "snowplow/referer-parser/go"
 	"strings"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/goadesign/goa"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
-	refererparser "github.com/snowplow/referer-parser/go"
 	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
 	"gitlab.com/remp/remp/Beam/go/model"
 )
@@ -23,6 +23,7 @@ type TrackController struct {
 	EventProducer       sarama.AsyncProducer
 	PropertyStorage     model.PropertyStorage
 	EntitySchemaStorage model.EntitySchemaStorage
+	InternalHosts       []string
 }
 
 // Event represents Influx event structure
@@ -34,12 +35,13 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage) *TrackController {
+func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string) *TrackController {
 	return &TrackController{
 		Controller:          service.NewController("TrackController"),
 		EventProducer:       ep,
 		PropertyStorage:     ps,
 		EntitySchemaStorage: ess,
+		InternalHosts:       ih,
 	}
 }
 
@@ -320,16 +322,23 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 			fields["referer"] = *user.Referer
 
 			// Try to parse URL before being passed to refererparser library (since it produces NPE in case of invalid URL)
-			parsedURL, err := url.Parse(*user.Referer)
+			parsedRefererURL, err := url.Parse(*user.Referer)
 			if err != nil {
 				tags["derived_referer_medium"] = "unknown"
 			} else {
-				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Path)
+				tags["derived_referer_host_with_path"] = fmt.Sprintf("%s://%s%s", parsedRefererURL.Scheme, parsedRefererURL.Host, parsedRefererURL.Path)
 
 				parsedRef := refererparser.Parse(*user.Referer)
-				if user.URL != nil {
-					parsedRef.SetCurrent(*user.URL)
+
+				refResolver := RefererResolver{
+					Referer:       parsedRef,
+					InternalHosts: c.InternalHosts,
 				}
+				// Check for internal traffic
+				if user.URL != nil {
+					refResolver.SetCurrent(*user.URL)
+				}
+
 				tags["derived_referer_medium"] = parsedRef.Medium
 				tags["derived_referer_source"] = parsedRef.Referer
 
