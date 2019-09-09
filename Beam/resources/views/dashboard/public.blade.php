@@ -24,7 +24,7 @@
             },
             provide: function() {
                 return {
-                    enableFrontpageFiltering: this.enableFrontpageFiltering
+                    dashboardOptions: this.options
                 }
             },
             store: DashboardStore,
@@ -32,7 +32,6 @@
                 articlesUrl: "{!! route('public.articles.json') !!}",
                 timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}",
                 timeHistogramUrlNew: "{!! route('public.timeHistogramNew.json') !!}",
-                enableFrontpageFiltering: {{ $enableFrontpageFiltering ? 'true' : 'false' }},
                 options: {!! json_encode($options) !!},
                 accountPropertyTokens: {!! json_encode($accountPropertyTokens) !!},
                 csrfToken: {!!'"' . csrf_token() . '"'!!},

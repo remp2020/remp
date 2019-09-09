@@ -61,7 +61,6 @@ class DashboardController extends Controller
     private function dashboardView($template)
     {
         return view($template, [
-            'enableFrontpageFiltering' => Config::loadByName(ConfigNames::DASHBOARD_FRONTPAGE_REFERER) !== null,
             'options' => $this->options(),
             'accountPropertyTokens' => $this->selectedProperty->selectInputData(),
             'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
@@ -74,6 +73,10 @@ class DashboardController extends Controller
         foreach (Config::ofCategory(ConfigCategory::CODE_DASHBOARD)->get() as $config) {
             $options[$config->name] = Config::loadByName($config->name);
         }
+
+        // Additional options
+        $options['dashboard_frontpage_referer_of_properties'] = array_values(Config::loadAllPropertyConfigs(ConfigNames::DASHBOARD_FRONTPAGE_REFERER));
+
         return $options;
     }
 
@@ -441,10 +444,13 @@ class DashboardController extends Controller
 
         $concurrentsRequest = new ConcurrentsRequest();
 
-        $frontpageReferer = Config::loadByName(ConfigNames::DASHBOARD_FRONTPAGE_REFERER);
+        $frontpageReferers = (array) Config::loadByName(ConfigNames::DASHBOARD_FRONTPAGE_REFERER);
+        if (!$frontpageReferers) {
+            $frontpageReferers = array_values(Config::loadAllPropertyConfigs(ConfigNames::DASHBOARD_FRONTPAGE_REFERER));
+        }
 
-        if ($frontpageReferer && $settings['onlyTrafficFromFrontPage']) {
-            $concurrentsRequest->addFilter('derived_referer_host_with_path', $frontpageReferer);
+        if ($frontpageReferers && $settings['onlyTrafficFromFrontPage']) {
+            $concurrentsRequest->addFilter('derived_referer_host_with_path', ...$frontpageReferers);
         }
 
         $concurrentsRequest->setTimeAfter($timeAfter);

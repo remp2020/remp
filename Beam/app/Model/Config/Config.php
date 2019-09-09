@@ -74,12 +74,26 @@ class Config extends Model
         });
     }
 
-    public static function loadByName(string $name)
+    public static function loadAllPropertyConfigs(string $name): array
+    {
+        $configs = Config::with('property')
+            ->where('name', $name)
+            ->whereNotNull('property_id')
+            ->get();
+
+        $results = [];
+        foreach ($configs as $config) {
+            $results[$config->property->id] = self::convertValueToType($config);
+        }
+        return $results;
+    }
+
+    public static function loadByName(string $name, $globalOnly = false)
     {
         $q = Config::where('name', $name);
         $fallback = false;
         // Try to load property config if present
-        if (in_array($name, ConfigNames::propertyConfigs(), true)) {
+        if (!$globalOnly && in_array($name, ConfigNames::propertyConfigs(), true)) {
             $fallback = true;
             $q = $q->ofSelectedToken();
         }
@@ -94,19 +108,24 @@ class Config extends Model
             throw new \Exception("missing configuration for '$name'");
         }
 
-        switch (mb_strtolower($result->type)) {
+        return self::convertValueToType($result);
+    }
+
+    private static function convertValueToType(Config $config)
+    {
+        switch (mb_strtolower($config->type)) {
             case 'double':
-                return (double) $result->value;
+                return (double) $config->value;
             case 'float':
-                return (float) $result->value;
+                return (float) $config->value;
             case 'int':
             case 'integer':
-                return (int) $result->value;
+                return (int) $config->value;
             case 'bool':
             case 'boolean':
-                return (bool) $result->value;
+                return (bool) $config->value;
             default:
-                return $result->value;
+                return $config->value;
         }
     }
 }
