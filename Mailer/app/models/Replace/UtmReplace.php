@@ -2,6 +2,8 @@
 
 namespace Remp\MailerModule\Replace;
 
+use Nette\Http\Url;
+
 class UtmReplace implements ReplaceInterface
 {
     private $utmSource; // newsfilter
@@ -22,22 +24,25 @@ class UtmReplace implements ReplaceInterface
 
     public function replace($content)
     {
-        // replace params
-        $urlString = $this->formatUrlString();
-        $content = preg_replace('/<a(.*?)href="([^"#?]*)([^"]*?)"(.*?)>/i', '<a$1href="$2?' . $urlString . '$3"$4>', $content);
+        $matches = [];
+        preg_match_all('/<a(.*?)href="([^"]*?)"(.*?)>/i', $content, $matches);
 
-        // make sure we don't have two "?" characters in query string
-        preg_match_all('/href="([^"]*)"/iU', $content, $matches);
-        foreach ($matches[0] as $match) {
-            $newHref = substr($match, 0, strpos($match, '?') + 1) . str_replace('?', '&', substr($match, strpos($match, '?') + 1));
-            $content = str_replace($match, $newHref, $content);
+        if (count($matches) > 0) {
+            foreach ($matches[2] as $idx => $hrefUrl) {
+                if (strpos($hrefUrl, 'http') === false) {
+                    continue;
+                }
+                $url = new Url(html_entity_decode($hrefUrl));
+                $url->setQueryParameter('utm_source', $this->utmSource);
+                $url->setQueryParameter('utm_medium', $this->utmMedium);
+                $url->setQueryParameter('utm_campaign', $this->utmCampaign);
+                $url->setQueryParameter('utm_content', $this->utmContent);
+
+                $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $url->getAbsoluteUrl(), $matches[3][$idx]);
+                $content = str_replace($matches[0][$idx], $href, $content);
+            }
         }
 
         return $content;
-    }
-
-    private function formatUrlString()
-    {
-        return "utm_source={$this->utmSource}&utm_medium={$this->utmMedium}&utm_campaign={$this->utmCampaign}&utm_content={$this->utmContent}";
     }
 }
