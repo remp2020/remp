@@ -74,6 +74,24 @@ class Config extends Model
         });
     }
 
+    public function getValue()
+    {
+        switch (mb_strtolower($this->type)) {
+            case 'double':
+                return (double) $this->value;
+            case 'float':
+                return (float) $this->value;
+            case 'int':
+            case 'integer':
+                return (int) $this->value;
+            case 'bool':
+            case 'boolean':
+                return (bool) $this->value;
+            default:
+                return $this->value;
+        }
+    }
+
     public static function loadAllPropertyConfigs(string $name): array
     {
         $configs = Config::with('property')
@@ -83,7 +101,7 @@ class Config extends Model
 
         $results = [];
         foreach ($configs as $config) {
-            $results[$config->property->id] = self::convertValueToType($config);
+            $results[$config->property->id] = $config->getValue();
         }
         return $results;
     }
@@ -97,35 +115,17 @@ class Config extends Model
             $fallback = true;
             $q = $q->ofSelectedToken();
         }
-        $result = $q->first();
+        $config = $q->first();
 
         // If not, fallback to global config
-        if (!$result && $fallback) {
-            $result = Config::where('name', $name)->first();
+        if (!$config && $fallback) {
+            $config = Config::where('name', $name)->first();
         }
 
-        if (!$result) {
+        if (!$config) {
             throw new \Exception("missing configuration for '$name'");
         }
 
-        return self::convertValueToType($result);
-    }
-
-    private static function convertValueToType(Config $config)
-    {
-        switch (mb_strtolower($config->type)) {
-            case 'double':
-                return (double) $config->value;
-            case 'float':
-                return (float) $config->value;
-            case 'int':
-            case 'integer':
-                return (int) $config->value;
-            case 'bool':
-            case 'boolean':
-                return (bool) $config->value;
-            default:
-                return $config->value;
-        }
+        return $config->getValue();
     }
 }
