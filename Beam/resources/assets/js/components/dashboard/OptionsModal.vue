@@ -38,10 +38,11 @@
                                                 type="checkbox">
                                         <i class="input-helper"></i>
                                         <template v-if="enableFrontpageFiltering">
-                                            Only traffic from front-page
+                                            Only traffic from front-page<br/>
+                                            <small v-if="frontPageReferer">({{frontPageReferer}})</small>
                                         </template>
                                         <template v-else>
-                                            <strike title="Front-page URL is not specified in the configuration, please add it to Beam environmental variables.">Only traffic from front-page</strike>
+                                            <strike title="Front-page URL is not specified in the configuration.">Only traffic from front-page</strike>
                                         </template>
                                     </label>
                                 </div>
@@ -93,12 +94,26 @@
 <script>
     export default {
         name: 'options-modal',
-        inject: ['enableFrontpageFiltering'],
+        inject: ['dashboardOptions'],
+        mounted() {
+            let referer = this.dashboardOptions['dashboard_frontpage_referer'];
+            let propertyReferers = this.dashboardOptions['dashboard_frontpage_referer_of_properties']
+
+            if (referer) {
+                this.enableFrontpageFiltering = true
+                this.frontPageReferer = this.dashboardOptions['dashboard_frontpage_referer']
+            } else if (propertyReferers && propertyReferers.length > 0) {
+                this.enableFrontpageFiltering = true
+                this.frontPageReferer = propertyReferers.join(', ')
+            }
+        },
         data() {
             return {
                 newGraph: this.$store.state.settings.newGraph,
                 compareWith: this.$store.state.settings.compareWith,
                 onlyTrafficFromFrontPage: this.$store.state.settings.onlyTrafficFromFrontPage,
+                enableFrontpageFiltering: false,
+                frontPageReferer: null,
             }
         },
         methods: {
