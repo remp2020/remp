@@ -89,6 +89,15 @@ class NewsfilterTemplateFormFactory
                 'mail_type_id' => 20, // newsfilter sport,
                 'from' => 'Michal Červený <michal.cerveny@dennikn.sk>',
             ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 30) {
+            $defaults = [
+                'name' => 'Svetový newsfilter ' . date('j.n.Y'),
+                'code' => 'nwsf_world_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 24, // newsfilter world,
+                'from' => 'Rastislav Kačmár <rastislav.kacmar@dennikn.sk>',
+            ];
         } else {
             $defaults = [
                 'name' => 'Newsfilter ' . date('j.n.Y'),
