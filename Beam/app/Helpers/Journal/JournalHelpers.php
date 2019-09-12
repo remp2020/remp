@@ -181,4 +181,14 @@ class JournalHelpers
         }
         return $timeIterator->subMinutes($intervalMinutes);
     }
+
+    public static function refererMediumAlias(string $medium): string
+    {
+        switch ($medium) {
+            case 'direct':
+                return 'direct/IM';
+            default:
+                return $medium;
+        }
+    }
 }
