@@ -236,7 +236,7 @@ class DashboardController extends Controller
         if (!empty($item->explicit_referer_medium)) {
             return $item->explicit_referer_medium;
         }
-        return $item->derived_referer_medium;
+        return JournalHelpers::refererMediumAlias($item->derived_referer_medium);
     }
 
     private function dataFor(array $timePoints)
@@ -246,6 +246,11 @@ class DashboardController extends Controller
             ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium']);
 
         return $query->get();
+    }
+
+    private function getRefererMediumFromJournalRecord($record)
+    {
+        return JournalHelpers::refererMediumAlias($record->tags->derived_referer_medium);
     }
 
     public function timeHistogram(Request $request)
@@ -273,8 +278,8 @@ class DashboardController extends Controller
 
         // Get all tags
         $tags = [];
-        foreach ($currentRecords as $records) {
-            $tags[$records->tags->derived_referer_medium] = true;
+        foreach ($currentRecords as $record) {
+            $tags[$this->getRefererMediumFromJournalRecord($record)] = true;
         }
 
         // Compute shadow values for today and 7-days intervals
@@ -290,16 +295,16 @@ class DashboardController extends Controller
                 $diff = $from->tz('utc')->diff($timeAfter->tz('utc'));
                 $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
-                foreach ($this->pageviewRecordsBasedOnRefererMedium($from, $to, $intervalText) as $records) {
-                    $currentTag = $records->tags->derived_referer_medium;
+                foreach ($this->pageviewRecordsBasedOnRefererMedium($from, $to, $intervalText) as $record) {
+                    $currentTag = $this->getRefererMediumFromJournalRecord($record);
                     // update tags
                     $tags[$currentTag] = true;
 
-                    if (!isset($records->time_histogram)) {
+                    if (!isset($record->time_histogram)) {
                         continue;
                     }
 
-                    foreach ($records->time_histogram as $timeValue) {
+                    foreach ($record->time_histogram as $timeValue) {
                         // we want to plot previous results on same points as current ones,
                         // therefore add week which was subtracted when data was queried
                         $correctedDate = Carbon::parse($timeValue->time)
@@ -347,13 +352,13 @@ class DashboardController extends Controller
         }
 
         // Save current results
-        foreach ($currentRecords as $records) {
-            if (!isset($records->time_histogram)) {
+        foreach ($currentRecords as $record) {
+            if (!isset($record->time_histogram)) {
                 continue;
             }
-            $currentTag = $records->tags->derived_referer_medium;
+            $currentTag = $this->getRefererMediumFromJournalRecord($record);
 
-            foreach ($records->time_histogram as $timeValue) {
+            foreach ($record->time_histogram as $timeValue) {
                 $results[$timeValue->time][$currentTag] = $timeValue->value;
             }
         }

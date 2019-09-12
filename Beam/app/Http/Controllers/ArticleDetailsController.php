@@ -119,8 +119,15 @@ class ArticleDetailsController extends Controller
         return response()->json($data);
     }
 
-    private function histogram(Article $article, JournalInterval $journalInterval, $groupBy, callable $addConditions = null)
+    private function histogram(Article $article, JournalInterval $journalInterval, string $groupBy, callable $addConditions = null)
     {
+        $getTag = function ($record) use ($groupBy) {
+            if ($groupBy === 'derived_referer_medium') {
+                return JournalHelpers::refererMediumAlias($record->tags->$groupBy);
+            }
+            return $record->tags->$groupBy;
+        };
+
         $journalRequest = (new AggregateRequest('pageviews', 'load'))
             ->addFilter('article_id', $article->external_id)
             ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
@@ -135,7 +142,7 @@ class ArticleDetailsController extends Controller
 
         $tags = [];
         foreach ($currentRecords as $records) {
-            $tags[] = $records->tags->$groupBy;
+            $tags[] = $getTag($records);
         }
 
         // Values might be missing in time histogram, therefore fill all tags with 0s by default
@@ -157,7 +164,7 @@ class ArticleDetailsController extends Controller
             if (!isset($records->time_histogram)) {
                 continue;
             }
-            $currentTag = $records->tags->$groupBy;
+            $currentTag = $getTag($records);
 
             foreach ($records->time_histogram as $timeValue) {
                 $results[$timeValue->time][$currentTag] = $timeValue->value;
@@ -233,7 +240,7 @@ class ArticleDetailsController extends Controller
             $article->pageviews_all == 0 ? 0 : ($article->pageviews_subscribers / $article->pageviews_all) * 100;
 
         $mediums = $this->journalHelper->derivedRefererMediumGroups()->mapWithKeys(function ($item) {
-            return [$item => $item];
+            return [$item => JournalHelpers::refererMediumAlias($item)];
         });
 
         return response()->format([
@@ -281,7 +288,7 @@ class ArticleDetailsController extends Controller
         // since we do not want to distinguish between e.g. m.facebook.com and facebook.com, all should be categorized as one
         $aggregated = [];
         foreach ($records as $record) {
-            $derivedMedium = $record->tags->derived_referer_medium;
+            $derivedMedium = JournalHelpers::refererMediumAlias($record->tags->derived_referer_medium);
             $derivedSource = $record->tags->derived_referer_source;
             $source = $record->tags->derived_referer_host_with_path;
             $count = $record->count;

@@ -70,7 +70,7 @@ class Colors
     {
         $tagColor = [
             'internal' => '#E63952',
-            'direct' => '#00C7DF',
+            'direct/IM' => '#00C7DF',
             'social' => '#FFC34A',
             'search' => '#DEDEDE',
             'external' => '#CDE092',
