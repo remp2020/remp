@@ -267,26 +267,20 @@
                 }
             }
 
-            let vm = this,
-                js = this.js,
-                loadedScriptsCount = 0;
+            let includes = this.jsIncludes.filter(jsInclude => jsInclude);
+            if (includes && includes.length > 0) {
+                let loadedScriptsCount = 0;
 
-            if (this.jsIncludes) {
-                for (let ii = 0; ii < this.jsIncludes.length; ii++) {
-                    if (!this.jsIncludes[ii]) {
-                        loadedScriptsCount++;
-                        continue;
-                    }
-
-                    lib.loadScript(this.jsIncludes[ii], function () {
-                        loadedScriptsCount++;
-                        if (loadedScriptsCount === vm.jsIncludes.length) {
-                            vm.runCustomJavascript(js);
+                includes.forEach((jsInclude) => {
+                    lib.loadScript(jsInclude, () => {
+                        loadedScriptsCount += 1;
+                        if (loadedScriptsCount === includes.length) {
+                            this.runCustomJavascript(this.js);
                         }
                     });
-                }
+                });
             } else {
-                this.runCustomJavascript(js);
+                this.runCustomJavascript(this.js);
             }
         },
         data: () => ({
@@ -453,8 +447,9 @@
                     setTimeout(function() {
                         try {
                             eval('(function() {' + js + '})()');
-                        } catch {
+                        } catch(err) {
                             console.warn("unable to execute custom banner JS:", js);
+                            console.warn(err);
                         }
                     }, 0);
                 }, this)
