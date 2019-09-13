@@ -267,27 +267,11 @@
                 }
             }
 
-            let vm = this,
-                js = this.js,
-                loadedScriptsCount = 0;
-
-            if (this.jsIncludes) {
-                for (let ii = 0; ii < this.jsIncludes.length; ii++) {
-                    if (!this.jsIncludes[ii]) {
-                        loadedScriptsCount++;
-                        continue;
-                    }
-
-                    lib.loadScript(this.jsIncludes[ii], function () {
-                        loadedScriptsCount++;
-                        if (loadedScriptsCount === vm.jsIncludes.length) {
-                            vm.runCustomJavascript(js);
-                        }
-                    });
-                }
-            } else {
-                this.runCustomJavascript(js);
-            }
+            this.jsIncludes && this.jsIncludes
+                .filter(jsInclude => jsInclude)
+                .forEach((jsInclude) => lib.loadScript(jsInclude));
+            
+            this.runCustomJavascript(this.js);
         },
         data: () => ({
             visible: false,
