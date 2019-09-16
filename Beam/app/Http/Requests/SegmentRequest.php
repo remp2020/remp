@@ -30,6 +30,7 @@ class SegmentRequest extends FormRequest
             'code' => "required|string|unique:segments,code,{$id}",
             'active' => 'required|boolean',
 
+            'rules' => 'required|array',
             'rules.*.timespan' => 'required|integer',
             'rules.*.count' => 'required|integer',
             'rules.*.event_category' => 'required|string',
