@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class ScheduleTest extends TestCase
 {
+    protected function setUp() {}
+	
     public function testWaitingSchedule()
     {
         $schedule = new Schedule([
