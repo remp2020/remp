@@ -73,8 +73,8 @@
     height: 12px;
     background: #3974d1;
     position: absolute;
-    top: 4px;
-    left: 4px;
+    top: 3px;
+    left: 3px;
     border-radius: 100%;
     -webkit-transition: all 0.2s ease;
     transition: all 0.2s ease;
@@ -170,7 +170,10 @@
     </div>
     <div class="ri-settings__body" v-if="!collapsed">
       <div class="ri-settings__group">
-        <p class="ri-settings__group__title">Device type</p>
+        <p class="ri-settings__group__title">
+          Device type
+          <HelpIconWithTooltip text="Write some descriptive text here" />
+        </p>
         <div class="ri-settings__input-wrapper">
           <input
             type="radio"
@@ -213,7 +216,10 @@
         </div>
       </div>
       <div class="ri-settings__group">
-        <p class="ri-settings__group__title">Reader type</p>
+        <p class="ri-settings__group__title">
+          Reader type
+          <HelpIconWithTooltip text="Write some descriptive text here" />
+        </p>
         <div class="ri-settings__input-wrapper">
           <input
             type="radio"
@@ -246,7 +252,10 @@
         </div>
       </div>
       <div class="ri-settings__group" v-if="onArticleDetail">
-        <p class="ri-settings__group__title">Article version</p>
+        <p class="ri-settings__group__title">
+          Article version
+          <HelpIconWithTooltip text="Write some descriptive text here" />
+        </p>
         <div class="ri-settings__input-wrapper">
           <input
             type="radio"
@@ -269,7 +278,10 @@
         </div>
       </div>
       <div class="ri-settings__group" v-if="!onArticleDetail">
-        <p class="ri-settings__group__title">Timeframe</p>
+        <p class="ri-settings__group__title">
+          Timeframe
+          <HelpIconWithTooltip text="Write some descriptive text here" />
+        </p>
         <div class="ri-settings__input-wrapper">
           <input
             type="radio"
@@ -337,6 +349,7 @@
 <script type="text/javascript">
 import EventHub from "./EventHub";
 import AnimatedInteger from "./dashboard/AnimatedInteger";
+import HelpIconWithTooltip from "./HelpIconWithTooltip";
 
 export default {
   name: "iota-settings",
@@ -346,7 +359,7 @@ export default {
       required: true
     }
   },
-  components: { AnimatedInteger },
+  components: { AnimatedInteger, HelpIconWithTooltip },
   data: () => ({
     collapsed: true,
     deviceType: "all",
