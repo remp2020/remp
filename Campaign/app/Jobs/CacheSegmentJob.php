@@ -47,13 +47,10 @@ class CacheSegmentJob implements ShouldQueue
         }
 
         $users = $segmentAggregator->users($this->campaignSegment);
-        $userIds = $users->map(function ($item) {
-            return $item->id;
-        })->toArray();
 
         Redis::connection()->del([$this->key()]);
-        if (count($userIds) > 0) {
-            Redis::connection()->sadd($this->key(), $userIds);
+        if ($users->isNotEmpty()) {
+            Redis::connection()->sadd($this->key(), $users->toArray());
             Redis::connection()->expire($this->key(), 60*60*24);
         }
     }

@@ -104,8 +104,11 @@ class Segment implements SegmentContract
         }
 
         $list = json_decode($response->getBody());
-        $collection = collect($list->users);
-        return $collection;
+        $userIds = array_map(function($item) {
+            return $item->id;
+        }, $list->users);
+
+        return collect($userIds);
     }
 
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
