@@ -48,7 +48,8 @@
         "phpunit/phpunit": "^7.0",
         "friendsofphp/php-cs-fixer": "2.14",
         "barryvdh/laravel-ide-helper": "^2.3",
-        "nunomaduro/collision": "^2.1"
+        "nunomaduro/collision": "^2.1",
+        "josiasmontag/laravel-redis-mock": "~1.2"
     },
     "autoload": {
         "classmap": [
