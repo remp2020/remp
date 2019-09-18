@@ -162,7 +162,15 @@ class MailWorkerCommand extends Command
                 }
 
                 foreach ($jobsByTemplateCode as $templateCode => $jobs) {
+                    $originalCount = count($jobs);
                     $jobs = $this->filterAlreadySentJobs($jobs, $batch);
+                    $jobsCount = count($jobs);
+                    $filteredCount = $originalCount - $jobsCount;
+
+                    if ($filteredCount > 0) {
+                        $output->writeln(" * $filteredCount jobs of $originalCount were filtered for template <info>{$job->templateCode}</info>, <info>{$batch->id}</info>");
+                    }
+
                     if (empty($jobs)) {
                         continue;
                     }
@@ -175,6 +183,7 @@ class MailWorkerCommand extends Command
                     $queueJobs = [];
                     $template = null;
 
+                    $output->writeln(" * Processing $jobsCount jobs of template <info>{$job->templateCode}</info>, batch <info>{$batch->id}</info>");
                     foreach ($jobs as $i => $job) {
                         $queueJob = $this->mailJobQueueRepository->getJob($job->email, $batch->id);
                         $queueJobs[$i] = $queueJob;
@@ -198,6 +207,8 @@ class MailWorkerCommand extends Command
                         } else {
                             $sentCount = $email->send();
                         }
+
+                        $output->writeln(" * $sentCount mail(s) of batch <info>{$batch->id}</info> sent");
 
                         foreach ($jobs as $i => $job) {
                             $this->mailJobQueueRepository->delete($queueJobs[$i]);
