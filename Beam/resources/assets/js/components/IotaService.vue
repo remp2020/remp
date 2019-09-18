@@ -324,7 +324,7 @@ export default {
           EventHub.$emit(
             "read-progress-data-changed",
             response.data[0].count,
-            response.data[0].count_histogram
+            response.data[0].count_histogram || []
           );
         })
         .catch(function(error) {
