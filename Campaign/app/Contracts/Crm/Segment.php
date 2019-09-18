@@ -104,7 +104,7 @@ class Segment implements SegmentContract
         }
 
         $list = json_decode($response->getBody());
-        $userIds = array_map(function($item) {
+        $userIds = array_map(function ($item) {
             return $item->id;
         }, $list->users);
 
