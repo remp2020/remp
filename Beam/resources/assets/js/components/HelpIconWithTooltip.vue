@@ -1,5 +1,5 @@
 <template>
-  <span class="ri-help-icon-with-tooltip">
+  <span class="ri-help-icon-with-tooltip" data-app>
     <v-tooltip bottom>
       <template v-slot:activator="{ on }">
         <span v-on="on">
