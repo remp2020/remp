@@ -12,11 +12,14 @@
   display: flex;
   align-items: center;
   z-index: 9999999;
+  &:hover {
+    cursor: pointer;
+  }
 }
 </style>
 
 <template>
-  <div class="ri-scrolled-to-here">
+  <div class="ri-scrolled-to-here" @click="toggleHistogramVisibility">
     <IotaScrolledToHereDeviceIcon :device="deviceType" />
     <span class="ri-scrolled-to-here__caption">
       <strong>{{ scrolledToHerePercent }}%</strong>
@@ -81,6 +84,9 @@ export default {
 
       this.readersWhoScrolledUpUntilThisPoint =
         this.totalReaders - readersWhoLeftUpUntilThisPoint;
+    },
+    toggleHistogramVisibility() {
+      EventHub.$emit("read-progress-histogram-toggle");
     }
   }
 };

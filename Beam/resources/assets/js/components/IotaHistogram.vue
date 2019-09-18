@@ -31,7 +31,8 @@
       color: white;
     }
   }
-  &:not(:hover) {
+
+  &:not(.ri-histogram--opened) {
     width: 5px;
     opacity: 0.5;
     z-index: 0;
@@ -47,7 +48,11 @@
 </style>
 
 <template>
-  <div class="ri-histogram">
+  <div
+    :class="{'ri-histogram': true, 'ri-histogram--opened': histogramVisible}"
+    @mouseenter="histogramHovered = true"
+    @mouseleave="histogramHovered = false"
+  >
     <div
       v-for="item in histogram"
       :key="item.bucket_key"
@@ -65,12 +70,18 @@ import EventHub from "./EventHub";
 export default {
   name: "iota-histogram",
   data: () => ({
+    histogramPermanentlyVisibleOption: false,
+    histogramHovered: false,
     totalReaders: 0,
     histogram: []
   }),
   created: function() {
     document.documentElement.style.position = "relative";
     EventHub.$on("read-progress-data-changed", this.receiveReadProgressData);
+    EventHub.$on(
+      "read-progress-histogram-toggle",
+      this.toggleHistogramVisibility
+    );
   },
   computed: {
     maxLeavedReadersInChunk() {
@@ -78,6 +89,9 @@ export default {
         (max, current) => (current.value > max ? current.value : max),
         0
       );
+    },
+    histogramVisible() {
+      return this.histogramPermanentlyVisibleOption || this.histogramHovered;
     }
   },
   methods: {
@@ -87,6 +101,10 @@ export default {
     },
     calculatePercentageFromMax(value) {
       return (value * 100) / this.maxLeavedReadersInChunk;
+    },
+    toggleHistogramVisibility() {
+      this.histogramPermanentlyVisibleOption = !this
+        .histogramPermanentlyVisibleOption;
     }
   }
 };
