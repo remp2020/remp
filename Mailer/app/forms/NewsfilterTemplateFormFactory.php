@@ -87,7 +87,7 @@ class NewsfilterTemplateFormFactory
                 'mail_layout_id' => 33, // layout for subscribers
                 'locked_mail_layout_id' => 33, // layout for non-subscribers
                 'mail_type_id' => 25, // high five
-                'from' => 'Denník N <info@dennikn.sk>',
+                'from' => 'Kultúra Denník N <kultura@dennikn.sk>',
             ];
         } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 23) {
             $defaults = [
