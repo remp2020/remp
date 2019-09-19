@@ -149,7 +149,7 @@ services:
 
 	# Beam
 	- Remp\MailerModule\Beam\Client(%remp.beam.web_addr%, %remp.beam.token%)
-	- Remp\MailerModule\Generators\Dynamic\UnreadArticlesGenerator
+	- Remp\MailerModule\Beam\UnreadArticlesResolver
 	- Remp\MailerModule\Beam\JournalFactory(%remp.beam.segments_addr%)
 
 	- Remp\MailerModule\Config\Config

@@ -1,11 +1,10 @@
 <?php
 
-namespace Remp\MailerModule\Generators\Dynamic;
+namespace Remp\MailerModule\Beam;
 
-use Remp\MailerModule\Beam\Client;
 use Remp\MailerModule\PageMeta\ContentInterface;
 
-class UnreadArticlesGenerator
+class UnreadArticlesResolver
 {
     private $templates = [];
 
@@ -77,7 +76,7 @@ class UnreadArticlesGenerator
             $params["article_{$counter}_title"] = $meta->getTitle();
             $params["article_{$counter}_description"] = $meta->getDescription();
             $params["article_{$counter}_image"] = $meta->getImage();
-            $params["article_{$counter}_url"] = $url;
+            $params["article_{$counter}_href_url"] = $url;
 
             if (!$headlineTitle) {
                 $headlineTitle = $meta->getTitle();
