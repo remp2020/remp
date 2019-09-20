@@ -1388,6 +1388,58 @@ The event itself is just validated and put to the asynchronous queue to be proce
 
 ---
 
+#### POST `/api/v1/mailers/send-email`
+
+Endpoint for sending single email without creating a job. It should be primarily used for system (event based) emails and testing emails.
+
+##### *Body:*
+
+```json5
+{
+  "mail_template_code": "welcome_email_with_password",
+  "email": "admin@example.com",
+  "params": { // optional: key-value string pairs of parameters to be used mail_template variables
+    "email": "admin@example.com",
+    "password": "secret"
+  },
+  "context": "user.welcome.123", // optional: if email with the same context and mail_template_code was already sent, Mailer will not send the email again
+  "attachments": [ // optional
+    {
+      "file": "/path/to/file", // used to determine name of attachment and possibly content of attachment
+      "content": "-- content of attachment --" // if content is not provided, Mailer attempts to open file based on provided path in "file" property
+    }   
+  ],
+  "schedule_at": "2019-09-23T08:50:03+00:00" // optional: RFC3339-formatted date when email should be sent; if not provided, email is scheduled to be sent immediately
+}
+```
+
+##### *Example:*
+
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/send-email \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"mail_template_code": "welcome_email_with_password",
+	"email": "admin@example.com"
+}
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "message": "Email was scheduled to be sent."
+}
+```
+
+Actual sending is being processed asynchronously by background workers and might be delayed based on available system resources and size of the background processing queue.
+
+---
+
 ### Base flow of actions
 
 Here you can see simplified view of how Mailer works at following diagram.

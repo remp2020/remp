@@ -45,6 +45,11 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => true])->count('*') > 0;
     }
 
+    public function isEmailUnsubscribed($email, $typeId)
+    {
+        return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => false])->count('*') > 0;
+    }
+
     public function filterSubscribedEmails(array $emails, $typeId)
     {
         return $this->getTable()->where([
