@@ -71,7 +71,7 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
 
         if ($dynamic) {
             if (!isset($values->articles_count)) {
-                throw new ProcessException("Dynamic email requires 'article_count' parameter");
+                throw new ProcessException("Dynamic email requires 'articles_count' parameter");
             }
 
             $articlesCount = (int) $values->articles_count;

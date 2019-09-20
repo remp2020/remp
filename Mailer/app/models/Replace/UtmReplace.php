@@ -22,6 +22,16 @@ class UtmReplace implements ReplaceInterface
         $this->utmContent = $utmContent;
     }
 
+    public function replaceUrl(string $hrefUrl): string
+    {
+        $url = new Url(html_entity_decode($hrefUrl));
+        $url->setQueryParameter('utm_source', $this->utmSource);
+        $url->setQueryParameter('utm_medium', $this->utmMedium);
+        $url->setQueryParameter('utm_campaign', $this->utmCampaign);
+        $url->setQueryParameter('utm_content', $this->utmContent);
+        return $url->getAbsoluteUrl();
+    }
+
     public function replace($content)
     {
         $matches = [];
@@ -32,13 +42,8 @@ class UtmReplace implements ReplaceInterface
                 if (strpos($hrefUrl, 'http') === false) {
                     continue;
                 }
-                $url = new Url(html_entity_decode($hrefUrl));
-                $url->setQueryParameter('utm_source', $this->utmSource);
-                $url->setQueryParameter('utm_medium', $this->utmMedium);
-                $url->setQueryParameter('utm_campaign', $this->utmCampaign);
-                $url->setQueryParameter('utm_content', $this->utmContent);
 
-                $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $url->getAbsoluteUrl(), $matches[3][$idx]);
+                $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $this->replaceUrl($hrefUrl), $matches[3][$idx]);
                 $content = str_replace($matches[0][$idx], $href, $content);
             }
         }

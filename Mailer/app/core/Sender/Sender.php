@@ -219,9 +219,13 @@ class Sender
             $templateParams[$recipient['email']] = $p;
         }
 
+        $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
+
         $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
 
-        $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
+        foreach ($templateParams as $email => $params) {
+            $templateParams[$email] = $generator->getEmailParams($params);
+        }
 
         if ($this->template->mail_body_text) {
             $message->setBody($generator->getTextBody($transformedParams));

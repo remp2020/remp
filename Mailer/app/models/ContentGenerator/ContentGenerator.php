@@ -4,12 +4,12 @@ namespace Remp\MailerModule\ContentGenerator;
 
 use Remp\MailerModule\Replace\UtmReplace;
 use Nette\Database\IRow;
+use Nette\Utils\Strings;
 use Twig_Environment;
 use Twig_Loader_Array;
 
 class ContentGenerator
 {
-
     private $mailTemplate;
 
     private $mailLayout;
@@ -47,6 +47,20 @@ class ContentGenerator
         $mail = $this->wrapLayout($this->mailTemplate, $bodyMessageText, $this->mailLayout->layout_text, $params);
         $mail = $this->utmReplace->replace($mail);
         return $mail;
+    }
+
+    public function getEmailParams(array $emailParams)
+    {
+        $outputParams = [];
+
+        foreach ($emailParams as $name => $value) {
+            if (Strings::endsWith($name, '_href_url')) {
+                $value = $this->utmReplace->replaceUrl($value);
+            }
+            $outputParams[$name] = $value;
+        }
+
+        return $outputParams;
     }
 
     private function generateBody($bodyTemplate, $params)
