@@ -2,6 +2,8 @@
 namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Remp\MailerModule\Generators\ArticleLocker;
+use Remp\MailerModule\Generators\EmbedParser;
 use Remp\MailerModule\Generators\NewsfilterGenerator;
 use Remp\MailerModule\Generators\WordpressHelpers;
 use Remp\MailerModule\PageMeta\ContentInterface;
@@ -16,7 +18,9 @@ class NewsfilterGeneratorTest extends TestCase
         $this->generator = new NewsfilterGenerator(
             $this->createMock(SourceTemplatesRepository::class),
             $this->createMock(WordpressHelpers::class),
-            $this->createMock(ContentInterface::class)
+            $this->createMock(ContentInterface::class),
+            $this->createMock(EmbedParser::class),
+            $this->createMock(ArticleLocker::class)
         );
     }
 
