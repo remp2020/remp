@@ -131,14 +131,17 @@ class MailWorkerCommand extends Command
             }
 
             $output->writeln("Sending batch <info>{$batch->id}</info>...");
+            $this->logger->info("Sending batch <info>{$batch->id}</info>...");
 
             while (true) {
                 if (!$this->mailCache->isQueueActive($batch->id)) {
                     $output->writeln("Queue <info>{$batch->id}</info> not active anymore...");
+                    $this->logger->info("Queue <info>{$batch->id}</info> not active anymore...");
                     break;
                 }
                 if (!$this->mailCache->isQueueTopPriority($batch->id)) {
                     $output->writeln("Batch <info>{$batch->id}</info> no longer top priority, switching...");
+                    $this->logger->info("Batch <info>{$batch->id}</info> no longer top priority, switching...");
                     break;
                 }
 
@@ -169,6 +172,7 @@ class MailWorkerCommand extends Command
 
                     if ($filteredCount > 0) {
                         $output->writeln(" * $filteredCount jobs of $originalCount were filtered for template <info>{$job->templateCode}</info>, <info>{$batch->id}</info>");
+                        $this->logger->info(" * $filteredCount jobs of $originalCount were filtered for template <info>{$job->templateCode}</info>, <info>{$batch->id}</info>");
                     }
 
                     if (empty($jobs)) {
@@ -184,6 +188,7 @@ class MailWorkerCommand extends Command
                     $template = null;
 
                     $output->writeln(" * Processing $jobsCount jobs of template <info>{$job->templateCode}</info>, batch <info>{$batch->id}</info>");
+                    $this->logger->info(" * Processing $jobsCount jobs of template <info>{$job->templateCode}</info>, batch <info>{$batch->id}</info>");
                     foreach ($jobs as $i => $job) {
                         $queueJob = $this->mailJobQueueRepository->getJob($job->email, $batch->id);
                         $queueJobs[$i] = $queueJob;
@@ -209,6 +214,7 @@ class MailWorkerCommand extends Command
                         }
 
                         $output->writeln(" * $sentCount mail(s) of batch <info>{$batch->id}</info> sent");
+                        $this->logger->info(" * $sentCount mail(s) of batch <info>{$batch->id}</info> sent");
 
                         foreach ($jobs as $i => $job) {
                             $this->mailJobQueueRepository->delete($queueJobs[$i]);
