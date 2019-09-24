@@ -115,6 +115,7 @@ services:
 			- add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
 			- add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventHandler())
 			- add('heartbeat', Remp\MailerModule\Hermes\PingMysql())
+			- add('send-email', Remp\MailerModule\Hermes\SendEmailHandler())
 #			- add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
 
 	eventEmitter:
@@ -182,6 +183,7 @@ services:
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mail-type-upsert'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeUpsertHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'segments', 'list'), \Remp\MailerModule\Api\v1\Handlers\Segments\SegmentsListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 2, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'send-email'), \Remp\MailerModule\Api\v1\Handlers\Mailers\SendEmailHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 	# Generator
 	generator:
 		class: Remp\MailerModule\Generators\GeneratorFactory
