@@ -213,9 +213,7 @@ class MailWorkerCommand extends Command
                             // TODO temporarily trying to catch all possible errors to debug https://gitlab.com/remp/remp/issues/502
                             // remove once it's fixed
                             try {
-
                                 $sentCount = $email->sendBatch($this->logger);
-
                             } catch (\Throwable $throwable) {
                                 $this->logger->warning('Unexpected error occurred while sending batch ', [
                                     'message' => $throwable->getMessage(),
@@ -223,7 +221,6 @@ class MailWorkerCommand extends Command
                                 ]);
                                 throw $throwable;
                             }
-
                         } else {
                             $sentCount = $email->send();
                         }
