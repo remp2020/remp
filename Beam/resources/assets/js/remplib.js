@@ -629,8 +629,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         getParam: function(key, includeStorage = false) {
+            // retrieve storage value since it also extends value's lifetime in storage
+            let storageValue = remplib.getFromStorage(key, false, true)
+
             if (includeStorage && typeof this.uriParams[key] === 'undefined') {
-                return remplib.getFromStorage(key, false, true);
+                return storageValue;
             }
 
             let value = this.uriParams[key];

@@ -128,6 +128,14 @@ export default {
         document.cookie = key + "=" + value + expires + "; path=/"+ domain + ";";
     },
 
+    /**
+     * Tries to retrieve key's value from localStorage
+     * Side effect of this function is an extension of key's lifetime in the storage
+     * @param key
+     * @param bypassThreshold
+     * @param storeToCookie
+     * @returns {*}
+     */
     getFromStorage: function(key, bypassThreshold, storeToCookie) {
         let now = new Date();
         let data = localStorage.getItem(key);
