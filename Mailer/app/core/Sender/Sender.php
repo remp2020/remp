@@ -7,6 +7,7 @@ use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Json;
+use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Auth\AutoLogin;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Mailer\Mailer;
@@ -177,7 +178,7 @@ class Sender
         return 1;
     }
 
-    public function sendBatch(): int
+    public function sendBatch(LoggerInterface $logger = null): int
     {
         $mailer = $this->getMailer();
         if (!$mailer->supportsBatch()) {
@@ -195,7 +196,18 @@ class Sender
         foreach ($this->recipients as $recipient) {
             $subscribedEmails[] = $recipient['email'];
         }
+        if ($logger !== null) {
+            $logger->info("Sender - sending batch {$this->batchId}", [
+                'recipients_count' => count($subscribedEmails)
+            ]);
+        }
         $subscribedEmails = $this->userSubscriptionsRepository->filterSubscribedEmails($subscribedEmails, $this->template->mail_type_id);
+
+        if ($logger !== null) {
+            $logger->info("Sender - subscribers filtering before sending {$this->batchId}", [
+                'recipients_count_after_filtering' => count($subscribedEmails)
+            ]);
+        }
 
         $autologinTokens = $this->autoLogin->createTokens($subscribedEmails);
 
@@ -233,6 +245,10 @@ class Sender
 
         if ($this->template->mail_body_html) {
             $message->setHtmlBody($generator->getHtmlBody($transformedParams));
+        }
+
+        if ($logger !== null) {
+            $logger->info("Sender - content generated for {$this->batchId}");
         }
 
         $attachmentSize = $this->setMessageAttachments($message);
