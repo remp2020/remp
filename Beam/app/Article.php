@@ -109,25 +109,44 @@ class Article extends Model
             ->setTime($this->published_at, Carbon::now())
             ->addGroup('article_id', 'title_variant', 'image_variant')
             ->addFilter('article_id', $this->external_id);
+
         $results = collect($this->journal->unique($r));
-        $variants = [];
+        $titleVariants = [];
+        $imageVariants = [];
 
         foreach ($results as $result) {
             if (!$result->count) {
                 continue;
             }
             $titleVariant = $result->tags->title_variant ?? self::DEFAULT_TITLE_VARIANT;
-            $imageVariant = $result->tags->image_variant ?? self::DEFAULT_IMAGE_VARIANT;
-
-            if (!array_key_exists($titleVariant, $variants)) {
-                $variants[$titleVariant] = [];
+            if (!isset($titleVariants[$titleVariant])) {
+                $titleVariants[$titleVariant] = 0;
             }
-            $variants[$titleVariant][$imageVariant] = $result->count;
+            $imageVariant = $result->tags->image_variant ?? self::DEFAULT_IMAGE_VARIANT;
+            if (!isset($imageVariants[$imageVariant])) {
+                $imageVariants[$imageVariant] = 0;
+            }
+
+            $titleVariants[$titleVariant] += $result->count;
+            $imageVariants[$imageVariant] += $result->count;
         }
 
-        $this->cachedAttributes['variants_count'] = $variants;
+        $this->cachedAttributes['variants_count'] = [
+            'title' => $titleVariants,
+            'image' => $imageVariants,
+        ];
 
-        return $variants;
+        return $this->cachedAttributes['variants_count'];
+    }
+
+    public function getTitleVariantsCountAttribute(): array
+    {
+        return $this->variants_count['title'];
+    }
+
+    public function getImageVariantsCountAttribute(): array
+    {
+        return $this->variants_count['image'];
     }
 
     /**
@@ -212,16 +231,7 @@ SQL;
      */
     public function getHasImageVariantsAttribute(): bool
     {
-        $imageNames = [];
-        $variantsCount = $this->variants_count;
-        foreach ($variantsCount as $titleName => $titleVariants) {
-            foreach ($variantsCount as $imageName => $count) {
-                if ($imageName !== '') {
-                    $imageNames[$imageName] = true;
-                }
-            }
-        }
-        return count($imageNames) > 1;
+        return count($this->variants_count['image']) > 1;
     }
 
     /**
@@ -230,14 +240,7 @@ SQL;
      */
     public function getHasTitleVariantsAttribute(): bool
     {
-        $titleNames = [];
-        $variantsCount = $this->variants_count;
-        foreach ($variantsCount as $titleName => $titleVariants) {
-            if ($titleName !== '') {
-                $titleNames[$titleName] = true;
-            }
-        }
-        return count($titleNames) > 1;
+        return count($this->variants_count['title']) > 1;
     }
 
     // Mutators
