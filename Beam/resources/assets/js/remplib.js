@@ -628,29 +628,39 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return params;
         },
 
-        getParam: function(key) {
-            if (typeof this.uriParams[key] === 'undefined') {
-                return remplib.getFromStorage(key, false, true);
+        getParam: function(key, includeStorage = false) {
+            // retrieve storage value since it also extends value's lifetime in storage
+            let storageValue = remplib.getFromStorage(key, false, true)
+
+            if (includeStorage && typeof this.uriParams[key] === 'undefined') {
+                return storageValue;
             }
 
-            const now = new Date();
-            const item = {
-                "version": 1,
-                "value": this.uriParams[key],
-                "createdAt": now,
-                "updatedAt": now,
-            };
-            remplib.setToStorage(key, item);
-
-            return item.value;
+            let value = this.uriParams[key];
+            if (value === undefined) {
+                value = null;
+            }
+            return value;
         },
 
         parseUriParams: function() {
             var query = window.location.search.substring(1);
             var vars = query.split('&');
+
+            const now = new Date();
+
             for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split('=');
-                this.uriParams[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+                let pair = vars[i].split('=');
+                let key = decodeURIComponent(pair[0]);
+                this.uriParams[key] = decodeURIComponent(pair[1]);
+
+                let item = {
+                    "version": 1,
+                    "value": this.uriParams[key],
+                    "createdAt": now,
+                    "updatedAt": now,
+                };
+                remplib.setToStorage(key, item);
             }
         },
 
