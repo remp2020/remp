@@ -117,7 +117,8 @@ class MailgunMailer extends Mailer implements IMailer
         $transformed = [];
         foreach ($params as $key => $value) {
             $prefix = '';
-            if ($value[0] === '?') {
+            $value = (string) $value;
+            if ($value !== '' && $value[0] === '?') {
                 $prefix = '?';
                 $params[$key] = substr($value, 1);
             }
