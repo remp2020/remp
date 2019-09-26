@@ -221,6 +221,12 @@ class Sender
                 $message->addTo($recipient['email'], $recipient['name']);
             } catch (AssertionException $e) {
                 // we do nothing; it's invalid email and we want to skip it ASAP
+                if ($logger !== null) {
+                    $logger->warning("Sender - invalid email for {$this->batchId}", [
+                        'error' => $e->getMessage(),
+                        'email' => $recipient['email'],
+                    ]);
+                }
             }
 
             $p = array_merge($this->params, $recipient['params'] ?? []);
@@ -231,6 +237,12 @@ class Sender
             $templateParams[$recipient['email']] = $p;
         }
 
+        if ($logger !== null) {
+            $logger->info("Sender - template params transformed for {$this->batchId}", [
+                'transformedParams' => $transformedParams
+            ]);
+        }
+
         $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
 
         $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
@@ -239,8 +251,16 @@ class Sender
             $templateParams[$email] = $generator->getEmailParams($params);
         }
 
+        if ($logger !== null) {
+            $logger->info("Sender - email params generated for {$this->batchId}");
+        }
+
         if ($this->template->mail_body_text) {
             $message->setBody($generator->getTextBody($transformedParams));
+        }
+
+        if ($logger !== null) {
+            $logger->info("Sender - text content generated for {$this->batchId}");
         }
 
         if ($this->template->mail_body_html) {
@@ -248,7 +268,7 @@ class Sender
         }
 
         if ($logger !== null) {
-            $logger->info("Sender - content generated for {$this->batchId}");
+            $logger->info("Sender - html content generated for {$this->batchId}");
         }
 
         $attachmentSize = $this->setMessageAttachments($message);
@@ -270,6 +290,10 @@ class Sender
         }
         $logsTableName = $this->logsRepository->getTable()->getName();
         $this->logsRepository->getDatabase()->query("INSERT INTO $logsTableName", $insertLogsData);
+
+        if ($logger !== null) {
+            $logger->info("Sender - mail logs stored for {$this->batchId}");
+        }
 
         $mailer->send($message);
         $this->reset();
