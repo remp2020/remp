@@ -8,7 +8,7 @@ create banner campaigns without knowledge of HTML/CSS/JS, A/B test the banners a
   * [Integration with CMS/CRM](#admin-integration-with-cmscrm)
     * [Javascript snippet](#javascript-snippet)
     * [Segment integration](#segment-integration)
-  * [Integration with Beam Journal](#admin-integration-with-journal)
+  * [Integration with Beam Journal](#admin-integration-with-beam-journal)
 
 ## Admin (Laravel)
 
