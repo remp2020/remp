@@ -78,7 +78,7 @@
         <div class="card">
             <div class="row">
                 <div class="col-md-12 m-l-30 m-r-30 m-t-25">
-                        <p>No stats available for the campaign. This might be because you don't have Beam integration configured.</p>
+                        <p>No stats are available for the campaign, since Beam integration is not configured.</p>
                         <p>Information on how to configure Beam integration can be found in <a href="https://github.com/remp2020/remp/tree/master/Campaign">the documentation</a>.</p>
                 </div>
             </div>
