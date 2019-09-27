@@ -3,7 +3,7 @@
 @section('title', $campaign->name . ' stats')
 
 @section('content')
-    @if($beamConfigured)
+    @if($beamJournalConfigured)
         <div class="well">
             <div class="row">
                 <div class="col-md-6">
@@ -78,8 +78,8 @@
         <div class="card">
             <div class="row">
                 <div class="col-md-12 m-l-30 m-r-30 m-t-25">
-                        <p>No stats are available for the campaign, since Beam integration is not configured.</p>
-                        <p>Information on how to configure Beam integration can be found in <a href="https://github.com/remp2020/remp/tree/master/Campaign">the documentation</a>.</p>
+                        <p>No stats are available for the campaign, since Beam Journal integration is not configured.</p>
+                        <p>Information on how to configure Beam Journal integration can be found in <a href="https://github.com/remp2020/remp/tree/master/Campaign##admin-integration-with-journal">the documentation</a>.</p>
                 </div>
             </div>
         </div>
