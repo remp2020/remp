@@ -261,20 +261,21 @@
 
             this.visible = this.show;
 
-            if (this.cssIncludes) {
-                for (let ii = 0; ii < this.cssIncludes.length; ii++) {
-                    lib.loadStyle(this.cssIncludes[ii]);
+            let cssIncludes = this.cssIncludes.filter(cssInclude => cssInclude);
+            if (cssIncludes && cssIncludes.length > 0) {
+                for (let ii = 0; ii < cssIncludes.length; ii++) {
+                    lib.loadStyle(cssIncludes[ii]);
                 }
             }
 
-            let includes = this.jsIncludes.filter(jsInclude => jsInclude);
-            if (includes && includes.length > 0) {
+            let jsIncludes = this.jsIncludes.filter(jsInclude => jsInclude);
+            if (jsIncludes && jsIncludes.length > 0) {
                 let loadedScriptsCount = 0;
 
-                includes.forEach((jsInclude) => {
+                jsIncludes.forEach((jsInclude) => {
                     lib.loadScript(jsInclude, () => {
                         loadedScriptsCount += 1;
-                        if (loadedScriptsCount === includes.length) {
+                        if (loadedScriptsCount === jsIncludes.length) {
                             this.runCustomJavascript(this.js);
                         }
                     });
