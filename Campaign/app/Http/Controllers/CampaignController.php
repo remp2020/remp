@@ -941,6 +941,7 @@ class CampaignController extends Controller
         }
 
         return view('campaigns.stats', [
+            'beamConfigured' => !empty(config('services.remp.beam.web_addr')),
             'campaign' => $campaign,
             'variants' => $variants,
             'variantBannerLinks' => $variantBannerLinks,

@@ -3,32 +3,42 @@
 @section('title', $campaign->name . ' stats')
 
 @section('content')
-    <div class="well">
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Filter by date and time</h4>
-                <div id="smart-range-selector">
-                    {!! Form::hidden('from', $from) !!}
-                    {!! Form::hidden('to', $to) !!}
-                    <smart-range-selector from="{{$from}}" to="{{$to}}" :callback="callback">
-                    </smart-range-selector>
+    @if($beamConfigured)
+        <div class="well">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Filter by date and time</h4>
+                    <div id="smart-range-selector">
+                        {!! Form::hidden('from', $from) !!}
+                        {!! Form::hidden('to', $to) !!}
+                        <smart-range-selector from="{{$from}}" to="{{$to}}" :callback="callback">
+                        </smart-range-selector>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="stats-app">
-        <campaign-stats-root
-            :url="url"
-            :name="name"
-            :variants="variants"
-            :variant-banner-links="variantBannerLinks"
-            :variant-banner-texts="variantBannerTexts"
-            :from="from"
-            :to="to"
-            :timezone="timezone"
-        ></campaign-stats-root>
-    </div>
+        <div id="stats-app">
+                <campaign-stats-root
+                        :url="url"
+                        :name="name"
+                        :variants="variants"
+                        :variant-banner-links="variantBannerLinks"
+                        :variant-banner-texts="variantBannerTexts"
+                        :from="from"
+                        :to="to"
+                        :timezone="timezone"
+                ></campaign-stats-root>
+        </div>
+    @else
+        <div class="card">
+            <div class="row">
+                <div class="col-md-12 m-l-30 m-r-30 m-t-25">
+                        <p>No stats available for the campaign. This might be because you don't have Beam integration configured.</p>
+                        <p>Information on how to configure Beam integration can be found in <a href="https://github.com/remp2020/remp/tree/master/Campaign">the documentation</a>.</p>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <script type="text/javascript">
         new Vue({
