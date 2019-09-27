@@ -254,6 +254,10 @@ Laravel's scheduler currently includes:
 
 - Triggered hourly and forced to refresh cache segments.
 
+*AggregateCampaignStats*:
+
+- Triggered every minute, saves statistics about ongoing campaings from Beam Journal (if configured).
+
 ### Queue
 
 For application to function properly, you also need to have Laravel's queue worker running as a daemon. Please follow the
