@@ -21,7 +21,7 @@
     .error {
         position: absolute;
         top: 0;
-        right: 0;
+        left: 0;
         width: 20px;
         height: 20px;
         background: red;
@@ -69,7 +69,6 @@
                 </svg>
             </div>
         </div>
-        <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header text-center title">
             {{ title }}
@@ -78,6 +77,8 @@
         <div class="card-body card-padding-sm text-center">
             {{ value | round(precision) }}&nbsp;{{ unit }}
         </div>
+
+        <div v-show="error" class="error" :title="error">!</div>
     </div>
 </template>
 
