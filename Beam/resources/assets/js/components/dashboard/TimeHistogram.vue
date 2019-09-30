@@ -227,7 +227,7 @@
 
                 oldDataG = svg.append("g").attr("class", "old-data-g")
                 dataG = svg.append("g").attr("class", "data-g")
-                // Line is the latest so it will always be visible
+                // Line is last so it's going to be always visible
                 oldDataLineG = svg.append("g").attr("class", "data-line-g")
 
                 x = d3.scaleTime().range([0, width])
@@ -258,13 +258,11 @@
                     .attr('pointer-events', 'all')
                     .on('mouseout', function() {
                         that.legendVisible = false
-                        vertical
-                            .style("opacity", "0");
+                        vertical.style("opacity", "0");
                     })
                     .on('mouseover', function() {
                         that.legendVisible = true
-                        vertical
-                            .style("opacity", "1");
+                        vertical.style("opacity", "1");
                     })
                     .on('mousemove', function() {
                         if (that.data !== null) {

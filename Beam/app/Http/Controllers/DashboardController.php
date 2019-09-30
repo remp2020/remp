@@ -110,7 +110,7 @@ class DashboardController extends Controller
 
         $from = $journalInterval->timeAfter->tz('UTC');
         $to = $journalInterval->timeBefore->tz('UTC');
-        $toEndOfDay = $to->tz($tz)->endOfDay()->addSecond()->tz('UTC');
+        $toEndOfDay = (clone $to)->tz($tz)->endOfDay()->addSecond()->tz('UTC');
 
         $intervalMinutes = $journalInterval->intervalMinutes;
 
@@ -141,8 +141,16 @@ class DashboardController extends Controller
                     // therefore add week which was subtracted when data was queried
                     $correctedDate = Carbon::parse($item->time)
                         ->addWeeks($i)
-                        ->addHours($hourDifference)
-                        ->toIso8601ZuluString();
+                        ->addHours($hourDifference);
+
+                    if ($correctedDate->lt($from) || $correctedDate->gt($toEndOfDay)) {
+                        // some days might be longer (e.g. time-shift)
+                        // therefore we do want to map all values to current week
+                        // and avoid those which aren't
+                        continue;
+                    }
+
+                    $correctedDate = $correctedDate->toIso8601ZuluString();
 
                     $currentTag = $this->itemTag($item);
                     $tags[$currentTag] = true;
@@ -156,6 +164,10 @@ class DashboardController extends Controller
                     $shadowRecords[$correctedDate][$currentTag]->push($item->count);
                 }
             }
+
+            // Shadow records might not be in the correct order (if some key is missing from particular week, it's added at the end)
+            // therefore reorder
+            ksort($shadowRecords);
         }
 
         // Get tags
@@ -167,7 +179,6 @@ class DashboardController extends Controller
             $totalCounts[$tag] = 0;
         }
 
-        // Start building results
         $results = [];
         $shadowResults = [];
         $shadowResultsSummed = [];
@@ -182,29 +193,19 @@ class DashboardController extends Controller
             $totalCounts[$this->itemTag($item)] += $item->count;
         }
 
-        // Fill empty records for shadow values first
-        if (count($shadowRecords) > 0) {
-            $timeIterator = JournalHelpers::getTimeIterator($from, $intervalMinutes);
-            while ($timeIterator->lessThan($toEndOfDay)) {
-                $zuluDate = $timeIterator->toIso8601ZuluString();
-
-                $shadowResults[$zuluDate] = $emptyValues;
-                $shadowResults[$zuluDate]['Date'] = $shadowResultsSummed[$zuluDate]['Date'] = $zuluDate;
-                $shadowResultsSummed[$zuluDate]['value'] = 0;
-
-                $timeIterator->addMinutes($intervalMinutes);
-            }
-        }
-
         // Save shadow results
         foreach ($shadowRecords as $date => $tagsAndValues) {
-            // check if all keys exists - e.g. some days might be longer (time-shift)
-            // therefore we do want to map all values to current week
-            if (!array_key_exists($date, $shadowResults)) {
-                continue;
-            }
-
             foreach ($tagsAndValues as $tag => $values) {
+                if (!array_key_exists($date, $shadowResults)) {
+                    $shadowResults[$date] = $emptyValues;
+                    $shadowResults[$date]['Date'] = $date;
+                }
+
+                if (!array_key_exists($date, $shadowResultsSummed)) {
+                    $shadowResultsSummed[$date]['Date'] = $date;
+                    $shadowResultsSummed[$date]['value'] = 0;
+                }
+
                 $avg = (int) round($values->avg());
                 $shadowResults[$date][$tag] = $avg;
                 $shadowResultsSummed[$date]['value'] += $avg;
@@ -221,14 +222,20 @@ class DashboardController extends Controller
         }
         $orderedTags = array_keys($tagOrdering);
 
-        return response()->json([
+        $jsonResponse = [
             'results' => array_values($results),
-            'intervalMinutes' => $intervalMinutes,
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
+            'intervalMinutes' => $intervalMinutes,
             'tags' => $orderedTags,
             'colors' => Colors::refererMediumTagsToColors($orderedTags),
-        ]);
+        ];
+
+        if ($interval === 'today') {
+            $jsonResponse['maxDate'] = $toEndOfDay->toIso8601ZuluString();
+        }
+
+        return response()->json($jsonResponse);
     }
 
     private function itemTag($item)
