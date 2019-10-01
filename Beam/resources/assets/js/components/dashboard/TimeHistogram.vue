@@ -227,7 +227,7 @@
 
                 oldDataG = svg.append("g").attr("class", "old-data-g")
                 dataG = svg.append("g").attr("class", "data-g")
-                // Line is the latest so it will always be visible
+                // Line is last so it's going to be always visible
                 oldDataLineG = svg.append("g").attr("class", "data-line-g")
 
                 x = d3.scaleTime().range([0, width])
@@ -258,13 +258,11 @@
                     .attr('pointer-events', 'all')
                     .on('mouseout', function() {
                         that.legendVisible = false
-                        vertical
-                            .style("opacity", "0");
+                        vertical.style("opacity", "0");
                     })
                     .on('mouseover', function() {
                         that.legendVisible = true
-                        vertical
-                            .style("opacity", "1");
+                        vertical.style("opacity", "1");
                     })
                     .on('mousemove', function() {
                         if (that.data !== null) {
@@ -278,6 +276,15 @@
                 const bisectDate = d3.bisector(d => d.date).left;
                 const xDateMillis = moment(xDate).valueOf()
 
+                function getCloserRow(rowLeft, rowRight, toDateMillis) {
+                    const leftDateMillis = moment(rowLeft.date).valueOf()
+                    const rightDateMillis = moment(rowRight.date).valueOf()
+                    if ((toDateMillis - leftDateMillis) < (rightDateMillis - toDateMillis)) {
+                        return rowLeft
+                    }
+                    return rowRight
+                }
+
                 function getSelectedRow(rowIndex, data) {
                     let rowRight = data[rowIndex]
                     let rowLeft = data[rowIndex - 1]
@@ -285,13 +292,7 @@
 
                     // Find out which value is closer
                     if (rowLeft !== undefined && rowRight !== undefined) {
-                        const leftDateMillis = moment(rowLeft.date).valueOf()
-                        const rightDateMillis = moment(rowRight.date).valueOf()
-                        if ((xDateMillis - leftDateMillis) < (rightDateMillis - xDateMillis)) {
-                            row = rowLeft
-                        } else {
-                            row = rowRight
-                        }
+                        row = getCloserRow(rowLeft, rowRight, xDateMillis)
                     } else if (rowLeft !== undefined) {
                         row = rowLeft
                     } else if (rowRight !== undefined) {
@@ -299,25 +300,16 @@
                     }
                     return row
                 }
-
                 let rowIndex, rowIndexPrevious
 
-                // Get row indexes depending on type of graph being shown
+                rowIndex = bisectDate(this.data.results, xDate)
                 if (this.hasPrevious) {
-                    let lastItem = this.data.resultsForSearch[this.data.resultsForSearch.length - 1]
-
-                    const lastCurrentDateMillis = moment(lastItem.date).valueOf()
-                    let thresholdNotShowingCurrent = lastCurrentDateMillis + (this.data.intervalMinutes * 60 * 1000)/2
-                    if (thresholdNotShowingCurrent >= xDateMillis) {
-                        rowIndex = bisectDate(this.data.resultsForSearch, xDate);
-                    }
-
-                    rowIndexPrevious = bisectDate(this.data.previousResults, xDate);
-                } else {
-                    rowIndex = bisectDate(this.data.resultsForSearch, xDate);
+                    rowIndexPrevious = bisectDate(this.data.previousResults, xDate)
                 }
 
-                let verticalX, selectedDate, hasCurrent = false, hasPrevious = false, values = {}
+                let lastItem = this.data.resultsForSearch[this.data.resultsForSearch.length - 1]
+
+                let verticalX, selectedDate, values = {}
 
                 this.data.tags.forEach(function(tag) {
                     values[tag] = {
@@ -328,35 +320,41 @@
                 })
 
                 let currentSum = 0, previousSum = 0
-
-                if (rowIndex !== undefined) {
-                    let currentRow = getSelectedRow(rowIndex, this.data.resultsForSearch)
-                    if (currentRow !== undefined ) {
-                        verticalX = x(currentRow.date)
-                        selectedDate = currentRow.date
-                        hasCurrent = true
-
-                        this.data.tags.forEach(function(tag) {
-                            values[tag].current = currentRow[tag]
-                            values[tag].color = d3.color(colorScale(tag)).hex()
-                            currentSum += currentRow[tag]
-                        })
-                    }
-                }
+                let previousRow, currentRow
 
                 if (rowIndexPrevious !== undefined) {
-                    let previousRow = getSelectedRow(rowIndexPrevious, this.data.previousResults)
+                    previousRow = getSelectedRow(rowIndexPrevious, this.data.previousResults)
                     if (previousRow !== undefined) {
                         verticalX = x(previousRow.date)
                         selectedDate = previousRow.date
-                        hasPrevious = true
 
                         this.data.tags.forEach(function(tag) {
                             values[tag].previous = previousRow[tag]
                             previousSum += previousRow[tag]
                         })
                     }
+                }
 
+                if (rowIndex !== undefined) {
+                    currentRow = getSelectedRow(rowIndex, this.data.resultsForSearch)
+                    if (currentRow !== undefined) {
+                        if (previousRow !== undefined && lastItem.date === currentRow.date &&
+                            previousRow.date > currentRow.date && getCloserRow(currentRow, previousRow, xDateMillis) === previousRow) {
+
+                            // In this case, we are "out-of" the current results, do not show them in legend
+                            currentRow = undefined
+
+                        } else {
+                            verticalX = x(currentRow.date)
+                            selectedDate = currentRow.date
+
+                            this.data.tags.forEach(function(tag) {
+                                values[tag].current = currentRow[tag]
+                                values[tag].color = d3.color(colorScale(tag)).hex()
+                                currentSum += currentRow[tag]
+                            })
+                        }
+                    }
                 }
 
                 // After rows are selected, draw line and legend
@@ -370,12 +368,11 @@
                 this.highlightedRow = {
                     startDate: selectedDate,
                     values: values,
-                    hasCurrent: hasCurrent,
-                    hasPrevious: hasPrevious,
+                    hasCurrent:  currentRow !== undefined,
+                    hasPrevious: previousRow !== undefined,
                     currentSum: currentSum,
                     previousSum: previousSum
                 }
-
             },
             fillData() {
                 if (this.data === null){
