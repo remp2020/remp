@@ -17,9 +17,13 @@ class JournalHelpers
         $this->journal = $journal;
     }
 
-    public function currentConcurrentsCount(callable $conditions = null): Collection
+    public function currentConcurrentsCount(callable $conditions = null, Carbon $now = null): Collection
     {
-        $timeBefore = Carbon::now();
+        $timeBefore = $now;
+        if ($timeBefore === null) {
+            $timeBefore = Carbon::now();
+        }
+
         $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
         $req = new ConcurrentsRequest();
         $req->setTimeAfter($timeAfter);

@@ -452,25 +452,20 @@ class DashboardController extends Controller
         $settings = $request->get('settings');
 
         $timeBefore = Carbon::now();
-        $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes
-
-        $concurrentsRequest = new ConcurrentsRequest();
 
         $frontpageReferers = (array) Config::loadByName(ConfigNames::DASHBOARD_FRONTPAGE_REFERER);
         if (!$frontpageReferers) {
             $frontpageReferers = array_values(Config::loadAllPropertyConfigs(ConfigNames::DASHBOARD_FRONTPAGE_REFERER));
         }
-
-        if ($frontpageReferers && $settings['onlyTrafficFromFrontPage']) {
-            $concurrentsRequest->addFilter('derived_referer_host_with_path', ...$frontpageReferers);
-        }
-
-        $concurrentsRequest->setTimeAfter($timeAfter);
-        $concurrentsRequest->setTimeBefore($timeBefore);
-        $concurrentsRequest->addGroup('article_id');
+        $filterFrontPage = $frontpageReferers && $settings['onlyTrafficFromFrontPage'];
 
         // records are already sorted
-        $records = collect($this->journal->concurrents($concurrentsRequest));
+        $records = $this->journalHelper->currentConcurrentsCount(function (ConcurrentsRequest $req) use ($filterFrontPage, $frontpageReferers) {
+            $req->addGroup('article_id');
+            if ($filterFrontPage) {
+                $req->addFilter('derived_referer_host_with_path', ...$frontpageReferers);
+            }
+        }, $timeBefore);
 
         $topPages = [];
         $i = 0;
@@ -513,7 +508,7 @@ class DashboardController extends Controller
         // Timespent is computed as average of timespent values 2 hours in the past
         $externalIdsToTimespent = $this->journalHelper->timespentForArticles(
             $topArticles,
-            (clone $timeAfter)->subHours(2)
+            (clone $timeBefore)->subHours(2)
         );
 
         $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($topArticles);

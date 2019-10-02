@@ -48,20 +48,15 @@ class SnapshotArticlesViews extends Command
     private function snapshot(Carbon $now)
     {
         $to = $now;
-        $from = (clone $to)->subSeconds(600); // Last 10 minutes
 
-        $request = new ConcurrentsRequest();
-        $request->setTimeAfter($from);
-        $request->setTimeBefore($to);
-        $request->addGroup('article_id', 'derived_referer_medium', 'explicit_referer_medium', 'token');
+        $records = $this->journalHelper->currentConcurrentsCount(function (ConcurrentsRequest $req) {
+            $req->addGroup('article_id', 'derived_referer_medium', 'explicit_referer_medium', 'token');
+        }, $to);
 
         $items = [];
-
-        $externalIds = [];
-
         $dbTime = $to->second(0);
 
-        foreach ($this->journal->concurrents($request) as $record) {
+        foreach ($records as $record) {
             $token = $record->tags->token;
             $articleId = $record->tags->article_id;
             $derivedRefererMedium = $record->tags->derived_referer_medium;
@@ -76,57 +71,9 @@ class SnapshotArticlesViews extends Command
                 'derived_referer_medium' => $derivedRefererMedium,
                 'explicit_referer_medium' => $explicitRefererMedium,
                 'count' => $record->count,
-                'count_by_referer' => '{}',
+                'count_by_referer' => '{}', // Disabled at the moment
             ];
-
-            if ($derivedRefererMedium === 'external') {
-                $externalIds[] = $articleId;
-            }
         }
-
-        // Load sources count for each external referer
-        // TODO temporarily disabled loading of external referers
-        //foreach (array_chunk($externalIds, 100) as $externalIdsChunk) {
-        //    $r = new ConcurrentsRequest();
-        //    $r->setTimeAfter($from);
-        //    $r->setTimeBefore($to);
-        //    $r->addFilter('article_id', ...$externalIdsChunk);
-        //    $r->addFilter('derived_referer_medium', 'external');
-        //    $r->addGroup('article_id', 'token', 'explicit_referer_medium', 'derived_referer_host_with_path');
-        //
-        //
-        //    $referers = [];
-        //    foreach ($this->journal->concurrents($r) as $record) {
-        //        $articleId = $record->tags->article_id;
-        //        $token = $record->tags->token;
-        //        $explicitRefererMedium = $record->tags->explicit_referer_medium;
-        //        $host = $record->tags->derived_referer_host_with_path;
-        //
-        //        if (!array_key_exists($token, $referers)) {
-        //            $referers[$token] = [];
-        //        }
-        //        if (!array_key_exists($articleId, $referers[$token])) {
-        //            $referers[$token][$articleId] = [];
-        //        }
-        //        if (!array_key_exists($explicitRefererMedium, $referers[$token][$articleId])) {
-        //            $referers[$token][$articleId][$explicitRefererMedium] = [];
-        //        }
-        //
-        //        $referers[$token][$articleId][$explicitRefererMedium][$host] = $record->count;
-        //    }
-        //
-        //
-        //    foreach ($referers as $token => $tokenReferers) {
-        //        foreach ($tokenReferers as $articleId => $articleReferers) {
-        //            foreach ($articleReferers as $explicitRefererMedium => $mediumReferers) {
-        //                $key = self::key($token, $articleId, 'external', $explicitRefererMedium);
-        //                if (array_key_exists($key, $items)) {
-        //                    $items[$key]['count_by_referer'] = json_encode($mediumReferers);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
 
         // Save
         ArticleViewsSnapshot::where('time', $dbTime)->delete();
