@@ -110,6 +110,7 @@ class DashboardController extends Controller
 
         $from = $journalInterval->timeAfter->tz('UTC');
         $to = $journalInterval->timeBefore->tz('UTC');
+
         $toEndOfDay = (clone $to)->tz($tz)->endOfDay()->addSecond()->tz('UTC');
 
         $intervalMinutes = $journalInterval->intervalMinutes;
@@ -189,8 +190,9 @@ class DashboardController extends Controller
             if (!array_key_exists($zuluTime, $results)) {
                 $results[$zuluTime] = array_merge($emptyValues, ['Date' => $zuluTime]);
             }
-            $results[$zuluTime][$this->itemTag($item)] = $item->count;
-            $totalCounts[$this->itemTag($item)] += $item->count;
+            $tag = $this->itemTag($item);
+            $results[$zuluTime][$tag] += $item->count;
+            $totalCounts[$tag] += $item->count;
         }
 
         // Save shadow results
