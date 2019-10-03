@@ -90,7 +90,7 @@ class ArticleDetailsController extends Controller
         $request->validate([
             'tz' => 'timezone',
             'interval' => 'required|in:' . self::ALLOWED_INTERVALS,
-            'events.*' => 'in:conversions'
+            'events.*' => 'in:conversions,title_changes'
         ]);
 
         $eventOptions = $request->get('events', []);
@@ -113,6 +113,30 @@ class ArticleDetailsController extends Controller
                     'date' => $conversion->paid_at->toIso8601ZuluString(),
                     'title' => "{$conversion->amount} {$conversion->currency}"
                 ];
+            }
+        }
+
+        if (in_array('title_changes', $eventOptions, false)) {
+            $articleTitles = $article->articleTitles()
+                ->orderBy('updated_at')
+                ->get()
+                ->groupBy('variant');
+
+            foreach ($articleTitles as $variant => $variantTitles) {
+                if ($variantTitles->count() > 1) {
+                    for ($i = 0; $i < $variantTitles->count() - 1; $i++) {
+                        $oldTitle = $variantTitles[$i];
+                        $newTitle = $variantTitles[$i+1];
+
+                        $variantText = strcasecmp($variant, 'A') === 0 ? '' : $variant . ' ';
+
+                        $data['events'][] = (object) [
+                            'color' => '#28F16F',
+                            'date' => $newTitle->created_at->toIso8601ZuluString(),
+                            'title' => "<b>{$variantText}Title Changed</b><br /><b>From:</b> {$oldTitle->title}<br /><b>To:</b> {$newTitle->title}"
+                        ];
+                    }
+                }
             }
         }
 
