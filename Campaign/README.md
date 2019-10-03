@@ -8,6 +8,7 @@ create banner campaigns without knowledge of HTML/CSS/JS, A/B test the banners a
   * [Integration with CMS/CRM](#admin-integration-with-cmscrm)
     * [Javascript snippet](#javascript-snippet)
     * [Segment integration](#segment-integration)
+  * [Integration with Beam Journal](#admin-integration-with-beam-journal)
 
 ## Admin (Laravel)
 
@@ -54,7 +55,7 @@ as needed.
 
 Note: To automatically track banner events to BEAM Tracker, add also `tracker` property to `rempConfig` object.
 See [BEAM README](../Beam/README.md) for details. The two snippets complement each other and can be combined
-into one big JS snippet including Campaign and Beam functionallity.
+into one big JS snippet including Campaign and Beam functionality.
               
 ```javascript
 (function(win, doc) {
@@ -230,6 +231,15 @@ When implemented, create a segment provider providing the instance of your imple
 should set `\App\Contracts\SegmentAggregator::TAG` to the class so your implementation would get also
 registered to the `SegmentAggregator`.
 
+### Admin integration with Beam Journal
+
+Beam Journal API (also known as Segments API) provides API for retrieving information about ongoing campaigns.
+Its integration with Campaign tool is optional, but provides ability to see campaign statistics directly in the Campaign admin interface.
+
+Information on how to set up Journal API can be found in the [documentation](../Beam/go/cmd/segments/README.md) or in the REMP installation [guidelines](https://gist.github.com/rootpd/9f771b5a5bbb0b0d9a70321cec710511#beam). 
+
+Once Journal API is running, you can enable its integration by pointing `REMP_SEGMENTS_ADDR` to Journal API URL in `.env` configuration file.
+
 ### Schedule
 
 For application to function properly you need to add Laravel's schedule running into your crontab:
@@ -243,6 +253,10 @@ Laravel's scheduler currently includes:
 *CacheSegmentJob*:
 
 - Triggered hourly and forced to refresh cache segments.
+
+*AggregateCampaignStats*:
+
+- Triggered every minute, saves statistics about ongoing campaings from Beam Journal (if configured).
 
 ### Queue
 

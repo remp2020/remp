@@ -1,11 +1,11 @@
-# REMP Segments
+# REMP Segments/Journal
 
-Segments is read-only API to acquire information about segments defined via web administration interface.
+Segments (also known as Journal) is read-only API to acquire information about segments defined via web administration interface. 
 
 It provides:
 
 - Segment API for checking members of segments.
-- Journal API for acquiring raw events.
+- Journal API for acquiring raw events and aggregated statistics about events.
 
 ## Building
 

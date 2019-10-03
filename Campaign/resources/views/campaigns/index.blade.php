@@ -121,7 +121,10 @@
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit campaign'],
                         ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy', 'title' => 'Copy campaign'],
-                        ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart', 'title' => 'Campaign stats'],
+                        array_merge(
+                            ['name' => 'stats', 'class' => 'zmdi-palette-Cyan zmdi-chart', 'title' => 'Campaign stats'],
+                            $beamJournalConfigured ? [] : ['onclick' => 'showHowToEnableStats(event,this)']
+                        ),
                         ['name' => 'compare', 'onclick' => 'addCampaignToComparison(event, this)', 'class' => 'zmdi-palette-Cyan zmdi-swap ', 'title' => 'Add campaign to comparison']
                     ],
                     'order' => [8, 'desc'],
@@ -131,6 +134,20 @@
         </div>
     </div>
     <script>
+        function showHowToEnableStats(e, anchor) {
+            e.preventDefault();
+            if (!$(anchor).hasClass('popoverAdded')) {
+                $(anchor).addClass('popoverAdded').popover({
+                    "toggle": "popover",
+                    "placement": "left",
+                    "trigger": "focus",
+                    "content": '<p class="m-t-5">No stats are available for the campaign, since Beam Journal integration is not configured. To enable stats, please consult <a href="https://github.com/remp2020/remp/tree/master/Campaign#admin-integration-with-beam-journal">the documentation</a>.</p>',
+                    "html": true,
+                });
+            }
+            $(anchor).popover('toggle');
+        }
+
         function addCampaignToComparison(e, anchor) {
             e.preventDefault();
             $.ajax({

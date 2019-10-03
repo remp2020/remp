@@ -29,6 +29,13 @@ use DeviceDetector\DeviceDetector;
 
 class CampaignController extends Controller
 {
+    private $beamJournalConfigured;
+
+    public function __construct()
+    {
+        $this->beamJournalConfigured = !empty(config('services.remp.beam.segments_addr'));
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -37,7 +44,9 @@ class CampaignController extends Controller
     public function index()
     {
         return response()->format([
-            'html' => view('campaigns.index'),
+            'html' => view('campaigns.index', [
+                'beamJournalConfigured' => $this->beamJournalConfigured,
+            ]),
             'json' => CampaignResource::collection(Campaign::paginate()),
         ]);
     }
@@ -941,6 +950,7 @@ class CampaignController extends Controller
         }
 
         return view('campaigns.stats', [
+            'beamJournalConfigured' => $this->beamJournalConfigured,
             'campaign' => $campaign,
             'variants' => $variants,
             'variantBannerLinks' => $variantBannerLinks,
