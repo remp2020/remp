@@ -343,7 +343,7 @@ class ArticleController extends Controller
             $newTitleVariants = array_keys($newTitles);
             $lastTitleVariants = array_keys($lastTitles);
 
-            // Title variants that were not present, but were previously recorded
+            // Titles that were not present in new titles, but were previously recorded
             foreach (array_diff($lastTitleVariants, $newTitleVariants) as $variant) {
                 $lastTitle = $lastTitles[$variant];
                 if ($lastTitle !== null) {
