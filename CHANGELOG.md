@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- Bugfixing possible error on newsletter list editing if custom sorting was used. remp/remp#516
+
 ---
 
 ## [0.9.0] - 2019-10-04

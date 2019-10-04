@@ -72,19 +72,23 @@ class ListFormFactory
 
         $form->addText('image_url', 'Image URL');
 
-        $form->addRadioList('sorting', 'Order', [
+        $orderOptions = [
             'begin' => 'At the beginning',
             'end' => 'At the end',
-            'after' => 'After'
-        ])->setRequired("Field 'Order' is required.");
+        ];
+        $sortingPairs = $this->listsRepository
+            ->findByCategory($defaults['mail_type_category_id'])
+            ->order('sorting ASC')
+            ->fetchPairs('sorting', 'title');
 
-        $orderPairs = $this->listsRepository
-                        ->findByCategory($defaults['mail_type_category_id'])
-                        ->order('sorting ASC')
-                        ->fetchPairs('sorting', 'title');
+        if (count($sortingPairs) > 0) {
+            $orderOptions['after'] = 'After';
+        }
+
+        $form->addRadioList('sorting', 'Order', $orderOptions)->setRequired("Field 'Order' is required.");
 
         if ($list !== null) {
-            $keys = array_keys($orderPairs);
+            $keys = array_keys($sortingPairs);
             if (reset($keys) === $list->sorting) {
                 $defaults['sorting'] = 'begin';
                 unset($defaults['sorting_after']);
@@ -93,13 +97,18 @@ class ListFormFactory
                 unset($defaults['sorting_after']);
             } else {
                 $defaults['sorting'] = 'after';
-                $defaults['sorting_after'] = $list->sorting - 1;
+                foreach ($sortingPairs as $sorting => $_) {
+                    if ($list->sorting <= $sorting) {
+                        break;
+                    }
+                    $defaults['sorting_after'] = $sorting;
+                }
             }
 
-            unset($orderPairs[$list->sorting]);
+            unset($sortingPairs[$list->sorting]);
         }
 
-        $form->addSelect('sorting_after', null, $orderPairs)
+        $form->addSelect('sorting_after', null, $sortingPairs)
                 ->setPrompt('Choose newsletter list');
 
         $form->addCheckbox('auto_subscribe', 'Auto subscribe');
