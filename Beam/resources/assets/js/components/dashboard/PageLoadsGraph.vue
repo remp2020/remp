@@ -32,13 +32,17 @@
         </div>
 
         <div class="events-legend-wrapper">
-            <div>
+            <div
+                v-if="eventLegend.data"
+                v-show="eventLegend.visible"
+                v-bind:style="eventLegend.style">
+
                 <div class="events-legend"
-                     v-html="eventLegend.data.event.title"
-                     v-if="eventLegend.data"
-                     v-show="eventLegend.visible"
-                     v-bind:style="eventLegend.styleObject">
+                     v-for="event in eventLegend.data"
+                     v-html="event.title"
+                     v-bind:style="event.style">
                 </div>
+
             </div>
         </div>
 
@@ -116,21 +120,17 @@
     /* div to correctly wrap transformed .events-legend */
     .events-legend-wrapper > div {
         position: absolute;
-        top:0;
-        left:0;
-        right: -180px;
+        z-index: 1000;
+        bottom:-21px;
         width: auto;
-        background-color:red;
     }
 
     .events-legend {
-        position:absolute;
-        z-index: 1000;
-        bottom:-21px;
-        left: 0;
+        max-width: 220px;
         opacity: 0.85;
         color: #fff;
         padding: 2px;
+        margin-top: 2px;
         background-color: #00bdf1;
         border-radius: 2px;
         border: 2px solid #00bdf1;
@@ -201,8 +201,8 @@
                 },
                 eventLegend: {
                     visible: false,
-                    data: null,
-                    styleObject: {}
+                    data: [],
+                    style: {}
                 },
                 selectedEvents: []
             };
@@ -336,23 +336,34 @@
                 const pxThresholdToShowLegend = 50
 
                 // get closest event (not using bisect, as there are only few events to search)
-                let selectedEvent, min = Number.MAX_SAFE_INTEGER
+                let selectedEvents = [], min = Number.MAX_SAFE_INTEGER
                 for (const event of this.data.events) {
                     let diff = Math.abs(xDateMillis - moment(event.date).valueOf())
                     if (diff < min) {
                         min = diff
-                        selectedEvent = event
+                        selectedEvents = [event]
+                    } else if (diff === min) {
+                        selectedEvents.push(event)
                     }
                 }
 
-                // show event only if its too close to x-position of mouse
-                if (selectedEvent && Math.abs(this.vars.x(selectedEvent.date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
+                // show event only if it's close to x-position of the mouse
+                if (selectedEvents.length > 0 && Math.abs(this.vars.x(selectedEvents[0].date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
                     this.eventLegend.visible = true
-                    this.eventLegend.data = selectedEvent
-                    this.eventLegend.styleObject = {
-                        'background-color': selectedEvent.event.color,
-                        'border-color': selectedEvent.event.color,
-                        'left': (this.vars.x(selectedEvent.date) + this.vars.margin.left) + "px"
+                    this.eventLegend.style = {
+                        'left': (this.vars.x(selectedEvents[0].date) + this.vars.margin.left) + "px"
+                    }
+
+                    this.eventLegend.data = []
+
+                    for (const event of selectedEvents) {
+                        this.eventLegend.data.push({
+                            'title':  event.event.title,
+                            'style': {
+                                'background-color': event.event.color,
+                                'border-color': event.event.color,
+                            }
+                        })
                     }
                 } else {
                     this.eventLegend.visible = false

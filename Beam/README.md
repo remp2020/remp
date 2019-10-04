@@ -328,10 +328,10 @@ data related to Beam (e.g. A/B testing of titles).
             "external_id": "74565321", // String; Required; ID of article in your CMS,
             "property_uuid": "7855a8d9-d445-4dc0-8414-dbd7dfd326f9", // String; Required; Beam property token, you can get it in Beam admin - Properties,
             "title": "10 things you need to know", // String; Required; Primary title of the article,
-            "titles": [ // Optional; If A/B test of titles is used, you can track the titles here
-                "10 things you need to know", // Title of variant ",A"
-                "10 things everyone hides from you" // Title of variant "B"
-            ],
+            "titles": { // Optional; If A/B test of titles is used, you can track the titles here
+                "A": "10 things you need to know", // Title of variant being tracked with key "A"
+                "B": "10 things everyone hides from you" // Title of variant being tracked with key "B"
+            },
             "url": "http://example.com/74565321", // Public and valid URL of the article,
             "authors": [ // Optional
                 "Jon Snow" // Name of the author
@@ -362,10 +362,10 @@ curl -X POST \
             "external_id": "74565321",
             "property_uuid": "1a8feb16-3e30-4f9b-bf74-20037ea8505a", 
             "title": "10 things you need to know",
-            "titles": [
-                "10 things you need to know",
-                "10 things everyone hides from you" 
-            ],
+            "titles": {
+                "A": "10 things you need to know",
+                "B": "10 things everyone hides from you" 
+            },
             "url": "http://example.com/74565321", 
             "authors": [ 
                 "Jon Snow" 
@@ -392,8 +392,8 @@ $payload = [
             "property_uuid" => "1a8feb16-3e30-4f9b-bf74-20037ea8505a",
             "title" => "10 things you need to know",
             "titles" => [
-                "10 things you need to know",
-                "10 things everyone hides from you"
+                "A" => "10 things you need to know",
+                "B" => "10 things everyone hides from you"
             ],
             "url" => "http://example.com/74565321",
             "authors" => [

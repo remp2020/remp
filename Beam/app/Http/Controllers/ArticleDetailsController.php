@@ -63,16 +63,34 @@ class ArticleDetailsController extends Controller
         $data['events'] = [];
 
         foreach ($articleTitles as $variant => $variantTitles) {
-            if ($variantTitles->count() > 1) {
-                for ($i = 0; $i < $variantTitles->count() - 1; $i++) {
-                    $oldTitle = $variantTitles[$i];
-                    $newTitle = $variantTitles[$i+1];
-                    $data['events'][] = (object) [
-                        'color' => $tagToColor[$variant],
-                        'date' => $newTitle->created_at->toIso8601ZuluString(),
-                        'title' => "<b>{$variant} Title Variant Changed</b><br /><b>From:</b> {$oldTitle->title}<br /><b>To:</b> {$newTitle->title}"
-                    ];
+            $variantTitle = $variantTitles[0];
+
+            $data['events'][] = (object) [
+                'color' => $tagToColor[$variant],
+                'date' => $variantTitle->created_at->toIso8601ZuluString(),
+                'title' => "<b>{$variant} Title Variant Added</b><br />{$variantTitle->title}",
+            ];
+
+            for ($i = 1; $i < $variantTitles->count(); $i++) {
+                $oldTitle = $variantTitles[$i-1];
+                $newTitle = $variantTitles[$i];
+
+                $text = null;
+                if ($newTitle->title === null) {
+                    $text = "<b>{$variant} Title Variant Deleted</b><br /><strike>{$oldTitle->title}</strike>";
+                } else if ($oldTitle->title === null) {
+                    $text = "<b>{$variant} Title Variant Added</b><br />{$newTitle->title}";
+                } else {
+                    $text = "<b>{$variant} Title Variant Changed</b><br />" .
+                        "<b>From:</b> {$oldTitle->title}<br />" .
+                        "<b>To:</b> {$newTitle->title}";
                 }
+
+                $data['events'][] = (object) [
+                    'color' => $tagToColor[$variant],
+                    'date' => $newTitle->created_at->toIso8601ZuluString(),
+                    'title' => $text
+                ];
             }
 
             $data['tagLabels'][$variant] = (object) [
@@ -90,7 +108,7 @@ class ArticleDetailsController extends Controller
         $request->validate([
             'tz' => 'timezone',
             'interval' => 'required|in:' . self::ALLOWED_INTERVALS,
-            'events.*' => 'in:conversions'
+            'events.*' => 'in:conversions,title_changes'
         ]);
 
         $eventOptions = $request->get('events', []);
@@ -113,6 +131,49 @@ class ArticleDetailsController extends Controller
                     'date' => $conversion->paid_at->toIso8601ZuluString(),
                     'title' => "{$conversion->amount} {$conversion->currency}"
                 ];
+            }
+        }
+
+        if (in_array('title_changes', $eventOptions, false)) {
+            $articleTitles = $article->articleTitles()
+                ->orderBy('updated_at')
+                ->get()
+                ->groupBy('variant');
+
+            $hasSingleVariant = $articleTitles->count() === 1;
+
+            foreach ($articleTitles as $variant => $variantTitles) {
+                $variantText = $hasSingleVariant ? 'Title' : $variant . ' Title Variant';
+
+                $variantTitle = $variantTitles[0];
+                $data['events'][] = (object) [
+                    'color' => '#28F16F',
+                    'date' => $variantTitle->created_at->toIso8601ZuluString(),
+                    'title' => "<b>{$variantText} Added</b><br />{$variantTitle->title}",
+                ];
+
+                // If more titles
+                for ($i = 1; $i < $variantTitles->count(); $i++) {
+                    $oldTitle = $variantTitles[$i-1];
+                    $newTitle = $variantTitles[$i];
+
+                    $text = null;
+                    if ($newTitle->title === null) {
+                        $text = "<b>{$variantText} Deleted</b><br /><strike>{$oldTitle->title}</strike>";
+                    } else if ($oldTitle->title === null) {
+                        $text = "<b>{$variantText} Added</b><br />{$newTitle->title}";
+                    } else {
+                        $text = "<b>{$variantText} Changed</b><br />" .
+                            "<b>From:</b> {$oldTitle->title}<br />" .
+                            "<b>To:</b> {$newTitle->title}";
+                    }
+
+                    $data['events'][] = (object) [
+                        'color' => '#28F16F',
+                        'date' => $newTitle->created_at->toIso8601ZuluString(),
+                        'title' => $text,
+                    ];
+                }
             }
         }
 
