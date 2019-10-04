@@ -16,6 +16,35 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ---
 
+## [0.9.0] - 2019-10-04
+
+> **Elasticsearch upgrade notice**. We'll be raising Elasticsearch compatibility to 7.* in the beginning of 2020 to keep with the latest changes. Current implementation Segments API is tested and maintained again Elasticsearch 6.*. Please plan your upgrade accordingly.
+
+> **Go** was updated to version **1.13**. 
+
+### [Beam]
+
+- Major refactoring and redesign of IOTA (on-site stats) which now include more relevant statistics. GH-24
+- Article detail now shows referer (traffic source) statistics. remp/remp#445
+- Added command for compressing snapshot data. remp/remp#442
+- Timespent interval configuration in JS is now configurable. remp/remp#461
+- Added configuration for various views of conversion rate (decimals, multiplier). remp/remp#475
+- Added support for property token selection on Beam dashboard. remp/remp#473
+
+### [Campaign]
+
+- Bugfixed notice in showtime when adblock was not detectable. remp/remp#447
+- Campaign listing now displays segment names instead of segment codes.
+- Bugfixed campaign form not being able to update some options to their default value.
+- Added HTML overlay banner template. remp/remp#457
+- Added support to pass custom query parameters to displayed banner URL. 
+- All links in banner (not just CTA) now include Campaign's UTM parameters. remp/remp#455
+
+### [Mailer]
+
+- Updated Hermes library, logging only error events to the database.
+- Refactored UTM parameter replacing in email links.
+- Added support to send single emails via API.
 
 ## [0.8.2] - 2019-07-11
 
