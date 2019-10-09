@@ -20,6 +20,7 @@ use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
@@ -303,6 +304,8 @@ class ArticleController extends Controller
 
     public function upsert(ArticleUpsertRequest $request)
     {
+        Log::info('Upserting articles', ['params' => $request->json()->all()]);
+
         $articles = [];
         foreach ($request->get('articles', []) as $a) {
             // When saving to DB, Eloquent strips timezone information,

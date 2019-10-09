@@ -13,6 +13,7 @@ use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
@@ -159,6 +160,8 @@ class ConversionController extends Controller
 
     public function upsert(ConversionUpsertRequest $request)
     {
+        Log::info('Upserting conversions', ['params' => $request->json()->all()]);
+
         $conversions = [];
         foreach ($request->get('conversions', []) as $c) {
             // When saving to DB, Eloquent strips timezone information,
