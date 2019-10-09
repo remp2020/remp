@@ -42,17 +42,20 @@
                 'conversions_count' => [
                     'header' => 'conversions',
                     'searchable' => false,
+                    'orderSequence' => ['desc'],
                     'priority' => 2,
                     'className' => 'text-right',
                 ],
                 'conversions_rate' => [
                     'searchable' => false,
                     'header' => 'conversions rate',
+                    'orderSequence' => ['desc'],
                     'priority' => 2,
                     'className' => 'text-right',
                 ],
                 'amount' => [
                     'header' => 'amount',
+                    'orderSequence' => ['desc'],
                     'render' => 'array',
                     'priority' => 1,
                     'searchable' => false,
@@ -61,6 +64,7 @@
                 'average' => [
                     'header' => 'average',
                     'render' => 'array',
+                    'orderSequence' => ['desc'],
                     'priority' => 2,
                     'searchable' => false,
                     'className' => 'text-right',
@@ -85,7 +89,7 @@
                 ],
             ],
             'dataSource' => route('articles.dtConversions'),
-            'order' => [5, 'desc'],
+            'order' => [1, 'desc'],
             'requestParams' => [
                 'published_from' => '$(\'[name="published_from"]\').val()',
                 'published_to' => '$(\'[name="published_to"]\').val()',

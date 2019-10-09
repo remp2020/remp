@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- Numeric columns in conversion are sorted descending first (and only way). remp/remp#306
+
 ### [Campaign]
 
 ### [Mailer]

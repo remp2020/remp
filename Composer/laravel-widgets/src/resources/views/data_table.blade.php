@@ -1,28 +1,28 @@
 <div class="table-responsive">
 
     @if ($displaySearchAndPaging)
-    <div class="action-header m-0 palette-White bg clearfix">
-        <div id="dt-search-{{ $tableId }}" class="ah-search" style="display: none;">
-            <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{{ $tableId }}">
-            <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
+        <div class="action-header m-0 palette-White bg clearfix">
+            <div id="dt-search-{{ $tableId }}" class="ah-search" style="display: none;">
+                <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{{ $tableId }}">
+                <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
+            </div>
+
+            <ul id="dt-nav-{{ $tableId }}" class="ah-actions actions a-alt">
+                <li><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
+                <li class="ah-length dropdown">
+                    <button class="btn palette-Cyan bg" data-toggle="dropdown">{{ $paging[1] }}</button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        @foreach($paging[0] as $pageCount)
+                            <li data-value="{{$pageCount}}"><a class="dropdown-item dropdown-item-button">{{$pageCount}}</a></li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li class="ah-pagination ah-prev"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-left"></i></button></li>
+                <li class="ah-pagination ah-curr"><button class="btn palette-Cyan bg disabled">1</button></li>
+                <li class="ah-pagination ah-next"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-right"></i></button></li>
+            </ul>
         </div>
-
-        <ul id="dt-nav-{{ $tableId }}" class="ah-actions actions a-alt">
-            <li><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
-            <li class="ah-length dropdown">
-                <button class="btn palette-Cyan bg" data-toggle="dropdown">{{ $paging[1] }}</button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    @foreach($paging[0] as $pageCount)
-                        <li data-value="{{$pageCount}}"><a class="dropdown-item dropdown-item-button">{{$pageCount}}</a></li>
-                    @endforeach
-                </ul>
-            </li>
-
-            <li class="ah-pagination ah-prev"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-left"></i></button></li>
-            <li class="ah-pagination ah-curr"><button class="btn palette-Cyan bg disabled">1</button></li>
-            <li class="ah-pagination ah-next"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-right"></i></button></li>
-        </ul>
-    </div>
     @endif
 
     <table id="{{ $tableId }}" class="table table-striped table-bordered table-hover" aria-busy="false">
@@ -61,45 +61,38 @@
             'pageLength': {{ $paging[1] }},
             'responsive': true,
             'columns': [
-                    @foreach ($cols as $col)
+                @foreach ($cols as $col)
                 {
-                    data: '{{ $col['name'] }}',
-                    name: '{{ $col['name'] }}',
-                    @if (isset($col['orderable']))
-                    orderable: false,
-                    @endif
-                    @if (isset($col['searchable']))
-                    searchable: false,
-                    @endif
-                    @if (isset($col['className']))
-                    className: '{{ $col['className'] }}',
-                    @endif
+                    data: {!! @json($col['name']) !!},
+                    name: {!! @json($col['name']) !!},
+                    @isset($col['orderable'])
+                    orderable: {!! @json($col['orderable']) !!},
+                    @endisset
+                    @isset($col['searchable'])
+                    searchable: {!! @json($col['searchable']) !!},
+                    @endisset
+                    @isset($col['className'])
+                    className: {!! @json($col['className']) !!},
+                    @endisset
+                    @isset($col['priority'])
+                    responsivePriority: {!! @json($col['priority']) !!},
+                    @endisset
+                    @isset($col['orderSequence'])
+                    orderSequence: {!! @json($col['orderSequence']) !!},
+                    @endisset
                     @if (isset($col['render']))
-                    render: $.fn.dataTables.render['{!! $col['render'] !!}']({!! isset($col['renderParams']) ? json_encode($col['renderParams']) : '' !!})
+                    render: $.fn.dataTables.render[{!! @json($col['render']) !!}]({!! @json($col['renderParams'] ?? '') !!})
                     @endif
                 },
-                    @endforeach
-                    @if (!empty($rowActions))
+                @endforeach
+                @if (!empty($rowActions))
                 {
                     data: 'actions',
                     name: 'actions',
                     orderable: false,
                     searchable: false,
-                    render: $.fn.dataTables.render.actions({!! @json($rowActions) !!})
-                },
-                @endif
-            ],
-            'columnDefs': [
-                @foreach ($cols as $col)
-                {
-                    responsivePriority: {{ $col['priority'] }},
-                    targets: {{ $col['colIndex'] }},
-                },
-                @endforeach
-                @if (!empty($rowActions))
-                {
                     responsivePriority: 1,
-                    targets: -1
+                    render: $.fn.dataTables.render.actions({!! @json($rowActions) !!})
                 },
                 @endif
             ],
@@ -114,7 +107,7 @@
                     var url = window.location.href
                     var param = null;
                     @foreach ($requestParams as $var => $def)
-                        param = '{!! $var !!}';
+                    param = '{!! $var !!}';
                     data[param] = {!! $def !!};
 
                     // update browser URL to persist the selection
@@ -130,7 +123,7 @@
                     highlight = false;
                 }
                 @empty
-                    highlight = false;
+                highlight = false;
                 @endforelse
                 if (highlight) {
                     $(row).addClass('highlight');

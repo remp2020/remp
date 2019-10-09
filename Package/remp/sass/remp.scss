@@ -218,8 +218,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
             background: rgba(0, 188, 212, .10);
         }
 
-        th .bootstrap-select {
-            text-transform: none;
+        th {
+            &.sorting_asc_disabled, &.sorting_desc_disabled {
+                cursor: pointer;
+            }
+
+            .bootstrap-select {
+                text-transform: none;
+            }
         }
 
         tbody tr {
