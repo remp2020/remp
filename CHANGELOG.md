@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Numeric columns in conversion are sorted descending first (and only way). remp/remp#306
+- Bugfixed occasional duplicate records in article listings across Beam. remp/remp#482
+- Bugfixed missing articles on author detail if the article doesn't belong to any section. 
 
 ### [Campaign]
 
