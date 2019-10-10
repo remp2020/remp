@@ -7,6 +7,7 @@ use Remp\MailerModule\Replace\UtmReplace;
 
 class UtmReplaceTest extends TestCase
 {
+    /** @var UtmReplace */
     protected $utmReplace;
 
     public function setUp()
@@ -61,6 +62,15 @@ class UtmReplaceTest extends TestCase
             '<a href="mailto:admin@example.com"/>',
             $content
         );
+    }
+
+    public function testPreserveMailgunVariablesInUrl()
+    {
+        $url = $this->utmReplace->replaceUrl('https://predplatne.dennikn.sk/email-settings');
+        $this->assertEquals('https://predplatne.dennikn.sk/email-settings?utm_source=demo-weekly-newsletter&utm_medium=email&utm_campaign=impresa_mail_20190903103350&utm_content=', $url);
+
+        $url = $this->utmReplace->replaceUrl('https://predplatne.dennikn.sk/email-settings?%recipient.autologin%');
+        $this->assertEquals('https://predplatne.dennikn.sk/email-settings?%recipient.autologin%&utm_source=demo-weekly-newsletter&utm_medium=email&utm_campaign=impresa_mail_20190903103350&utm_content=', $url);
     }
 
 }
