@@ -29,14 +29,6 @@ class Article extends Model
 
     private $conversionRateConfig;
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->conversionRateConfig = resolve(ConversionRateConfig::class);
-        $this->journal = resolve(JournalContract::class);
-        $this->journalHelpers = new JournalHelpers($this->journal);
-    }
-
     protected $fillable = [
         'property_uuid',
         'external_id',
@@ -110,7 +102,7 @@ class Article extends Model
             ->addGroup('article_id', 'title_variant', 'image_variant')
             ->addFilter('article_id', $this->external_id);
 
-        $results = collect($this->journal->unique($r));
+        $results = collect($this->getJournal()->unique($r));
         $titleVariants = [];
         $imageVariants = [];
 
@@ -159,7 +151,7 @@ class Article extends Model
             return $this->cachedAttributes['unique_browsers_count'];
         }
 
-        $results = $this->journalHelpers->uniqueBrowsersCountForArticles(collect([$this]));
+        $results = $this->getJournalHelpers()->uniqueBrowsersCountForArticles(collect([$this]));
         $count = $results[$this->external_id] ?? 0;
         $this->cachedAttributes['unique_browsers_count'] = $count;
         return $count;
@@ -369,5 +361,31 @@ SQL;
         }
 
         return $conversionRate;
+    }
+
+    // Resolvers
+
+    protected function getConversionRateConfig()
+    {
+        if (!$this->conversionRateConfig) {
+            $this->conversionRateConfig = resolve(ConversionRateConfig::class);
+        }
+        return $this->conversionRateConfig;
+    }
+
+    public function getJournal()
+    {
+        if (!$this->journal) {
+            $this->journal = resolve(JournalContract::class);
+        }
+        return $this->journal;
+    }
+
+    public function getJournalHelpers()
+    {
+        if (!$this->journalHelpers) {
+            $this->journalHelpers = new JournalHelpers($this->getJournal());
+        }
+        return $this->journalHelpers;
     }
 }
