@@ -83,37 +83,32 @@ class ArticleController extends Controller
                 "avg(conversions.amount) as conversions_avg"
             ]))
             ->with(['authors', 'sections'])
-            ->join('article_author', 'articles.id', '=', 'article_author.article_id')
-            ->join('article_section', 'articles.id', '=', 'article_section.article_id')
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
             ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at']);
-
-        $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_author.article_id')
-            ->join('article_author', 'conversions.article_id', '=', 'article_author.article_id')
-            ->join('articles', 'articles.id', '=', 'article_author.article_id')
-            ->groupBy(['article_author.article_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
             $articlesQuery->where('published_at', '>=', $publishedFrom);
-            $conversionsQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
             $articlesQuery->where('published_at', '<=', $publishedTo);
-            $conversionsQuery->where('published_at', '<=', $publishedTo);
         }
         if ($request->input('conversion_from')) {
             $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
             $articlesQuery->where('paid_at', '>=', $conversionFrom);
-            $conversionsQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
             $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
             $articlesQuery->where('paid_at', '<=', $conversionTo);
-            $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
+
+        $articles = $articlesQuery->get();
+
+        $conversionsQuery = \DB::table('conversions')
+            ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_id')
+            ->whereIn('article_id', (clone $articles)->pluck('id'))
+            ->groupBy(['conversions.article_id', 'conversions.currency']);
 
         $conversionSums = [];
         $conversionAverages = [];
@@ -122,7 +117,6 @@ class ArticleController extends Controller
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
         }
 
-        $articles = $articlesQuery->get();
         $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
 
         /** @var EloquentDataTable $dt */
@@ -179,11 +173,19 @@ class ArticleController extends Controller
             })
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(",", $value);
-                $query->whereIn('article_author.author_id', $values);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
+                    ->whereIn('article_author.author_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
-                $query->whereIn('article_section.section_id', $values);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
+                    ->whereIn('article_section.section_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
             })
             ->rawColumns(['authors'])
             ->make(true);
@@ -206,9 +208,7 @@ class ArticleController extends Controller
     {
         $articles = Article::selectRaw('articles.*,' .
             'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
-            ->with(['authors', 'sections'])
-            ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
-            ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left');
+            ->with(['authors', 'sections']);
 
         if ($request->input('published_from')) {
             $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
@@ -250,11 +250,19 @@ class ArticleController extends Controller
             })
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(",", $value);
-                $query->whereIn('article_author.author_id', $values);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
+                    ->whereIn('article_author.author_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
-                $query->whereIn('article_section.section_id', $values);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
+                    ->whereIn('article_section.section_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
             })
             ->orderColumn('avg_sum_all', 'timespent_all / pageviews_all $1')
             ->orderColumn('avg_sum_signed_in', 'timespent_signed_in / pageviews_signed_in $1')

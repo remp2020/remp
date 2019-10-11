@@ -202,7 +202,7 @@ class AuthorController extends Controller
         ]))
             ->with(['authors', 'sections'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
-            ->join('article_section', 'articles.id', '=', 'article_section.article_id')
+            ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
             ->where([
                 'article_author.author_id' => $author->id
             ])
@@ -219,7 +219,6 @@ class AuthorController extends Controller
             ->where([
                 'article_author.author_id' => $author->id
             ]);
-
         // adding conditions to queries based on request inputs
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
@@ -322,7 +321,11 @@ class AuthorController extends Controller
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
-                $query->whereIn('article_section.section_id', $values);
+                $filterQuery = \DB::table('sections')
+                    ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
+                    ->whereIn('article_section.author_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
             })
             ->orderColumn('avg_sum', 'timespent_sum / pageviews_all $1')
             ->orderColumn('pageviews_all', 'pageviews_all $1')
