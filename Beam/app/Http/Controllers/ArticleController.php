@@ -106,18 +106,33 @@ class ArticleController extends Controller
         $articles = $articlesQuery->get();
 
         $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_id')
+            ->select([
+                DB::raw('count(*) as count'),
+                DB::raw('sum(amount) as sum'),
+                DB::raw('avg(amount) as avg'),
+                'currency',
+                'article_id',
+                'articles.external_id',
+            ])
+            ->join('articles', 'articles.id', '=', 'conversions.article_id')
             ->whereIn('article_id', (clone $articles)->pluck('id'))
             ->groupBy(['conversions.article_id', 'conversions.currency']);
 
+        $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
+
         $conversionSums = [];
         $conversionAverages = [];
+        $conversionRates = collect();
+
         foreach ($conversionsQuery->get() as $record) {
             $conversionSums[$record->article_id][$record->currency] = $record->sum;
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
+            if ($externalIdsToUniqueBrowsersCount->get($record->external_id, 0) === 0) {
+                $conversionRates[$record->external_id] = 0;
+            } else {
+                $conversionRates[$record->external_id] = $record->count / $externalIdsToUniqueBrowsersCount->get($record->external_id);
+            }
         }
-
-        $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
 
         /** @var EloquentDataTable $dt */
         $dt =  $datatables->of($articlesQuery);
@@ -167,7 +182,7 @@ class ArticleController extends Controller
             })
             ->orderColumn('amount', 'conversions_sum $1')
             ->orderColumn('average', 'conversions_avg $1')
-            ->orderColumn('conversions_rate', DB::raw("FIELD(articles.external_id,". $externalIdsToUniqueBrowsersCount->keys()->implode(",") .") $1, conversions_count $1"))
+            ->orderColumn('conversions_rate', DB::raw("FIELD(articles.external_id,". $conversionRates->sort()->keys()->implode(",") .") $1, conversions_count $1"))
             ->filterColumn('title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');
             })
