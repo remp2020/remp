@@ -5,22 +5,24 @@ All notable changes to this project will be documented in this file.
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/). Instead of change type headers, we use module names.
 
-
 ## [Unreleased]
 
 ### [Beam]
 
-- Numeric columns in conversion are sorted descending first (and only way). remp/remp#306
-- Bugfixed occasional duplicate records in article listings across Beam. remp/remp#482
-- Bugfixed missing articles on author detail if the article doesn't belong to any section. 
 - Added support for conversion rate sorting in Conversions data table. remp/remp#306
 
-### [Campaign]
+## [0.9.1]
+
+### [Beam]
+
+- Numeric columns in conversion are sorted descending first (and only way). remp/remp#306
+- Fixed occasional duplicate records in article listings across Beam. remp/remp#482
+- Fixed missing articles on author detail if the article doesn't belong to any section. 
 
 ### [Mailer]
 
-- Bugfixing possible error on newsletter list editing if custom sorting was used. remp/remp#516
-- Fix broken autologin parameter in unsubscribe email links. remp/remp#518
+- Fixed possible error on newsletter list editing if custom sorting was used. remp/remp#516
+- Fixed autologin parameter in unsubscribe email links. remp/remp#518
 
 ---
 
@@ -142,4 +144,6 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [0.8.0]: https://github.com/remp2020/remp/compare/0.7.0...0.8.0
 [0.8.1]: https://github.com/remp2020/remp/compare/0.8.0...0.8.1
 [0.8.2]: https://github.com/remp2020/remp/compare/0.8.1...0.8.2
-[Unreleased]: https://github.com/remp2020/remp/compare/0.8.2...master
+[0.9.0]: https://github.com/remp2020/remp/compare/0.8.2...0.9.0
+[0.9.1]: https://github.com/remp2020/remp/compare/0.9.0...0.9.1
+[Unreleased]: https://github.com/remp2020/remp/compare/0.9.1...master
