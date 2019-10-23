@@ -44,6 +44,7 @@ class ElasticWriteAliasRollover extends Command
             $response = $client->post(sprintf("/%s/_rollover", $this->input->getOption('write-alias')), [
                 'json' => [
                     'conditions' => [
+                    'max_age' => '31d',
                     'max_size' => '4gb',
 //                        'max_docs' => 1, // condition for testing
                     ],
