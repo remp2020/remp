@@ -280,7 +280,7 @@ class MediaBriefingGenerator implements IGenerator
             if ($author->user_email === "editori@dennikn.sk") {
                 continue;
             }
-            $output->from = $author->display_name . ' <' . $author->user_email . '>';
+            $output->from = $author->display_name . ' Denník N <' . $author->user_email . '>';
             break;
         }
 
