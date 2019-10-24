@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added support for conversion rate sorting in Conversions data table. remp/remp#306
+
 ## [0.9.1]
 
 ### [Beam]

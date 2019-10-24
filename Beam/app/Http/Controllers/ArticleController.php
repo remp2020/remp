@@ -10,8 +10,6 @@ use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
-use App\Model\Config\Config;
-use App\Model\Config\ConfigNames;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\NewsletterCriterion;
 use App\Section;
@@ -19,11 +17,12 @@ use Illuminate\Support\Carbon;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
+use Yajra\DataTables\EloquentDataTable;
 
 class ArticleController extends Controller
 {
@@ -73,7 +72,7 @@ class ArticleController extends Controller
 
     public function dtConversions(Request $request, Datatables $datatables)
     {
-        $articles = Article::selectRaw(implode(',', [
+        $articlesQuery = Article::query()->selectRaw(implode(',', [
                 "articles.id",
                 "articles.external_id",
                 "articles.title",
@@ -89,47 +88,63 @@ class ArticleController extends Controller
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
-            $articles->where('published_at', '>=', $publishedFrom);
+            $articlesQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
-            $articles->where('published_at', '<=', $publishedTo);
+            $articlesQuery->where('published_at', '<=', $publishedTo);
         }
         if ($request->input('conversion_from')) {
             $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
-            $articles->where('paid_at', '>=', $conversionFrom);
+            $articlesQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
             $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
-            $articles->where('paid_at', '<=', $conversionTo);
+            $articlesQuery->where('paid_at', '<=', $conversionTo);
         }
 
-        $dt = $datatables->of($articles);
-        $articles = $dt->results();
+        $articles = $articlesQuery->get();
 
         $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('sum(amount) as sum, avg(amount) as avg, currency, article_id')
+            ->select([
+                DB::raw('count(*) as count'),
+                DB::raw('sum(amount) as sum'),
+                DB::raw('avg(amount) as avg'),
+                'currency',
+                'article_id',
+                'articles.external_id',
+            ])
+            ->join('articles', 'articles.id', '=', 'conversions.article_id')
             ->whereIn('article_id', (clone $articles)->pluck('id'))
             ->groupBy(['conversions.article_id', 'conversions.currency']);
 
+        $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
+
         $conversionSums = [];
         $conversionAverages = [];
+        $conversionRates = collect();
+
         foreach ($conversionsQuery->get() as $record) {
             $conversionSums[$record->article_id][$record->currency] = $record->sum;
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
+            if ($externalIdsToUniqueBrowsersCount->get($record->external_id, 0) === 0) {
+                $conversionRates[$record->external_id] = 0;
+            } else {
+                $conversionRates[$record->external_id] = $record->count / $externalIdsToUniqueBrowsersCount->get($record->external_id);
+            }
         }
 
-        $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
-
-        $threeMonthsAgo = Carbon::now()->subMonths(3);
+        /** @var EloquentDataTable $dt */
+        $dt =  $datatables->of($articlesQuery);
 
         return $dt
             ->addColumn('title', function (Article $article) {
                 return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
-            ->orderColumn('conversions', 'conversions_count $1')
-            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueBrowsersCount, $threeMonthsAgo) {
+            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueBrowsersCount) {
                 $uniqueCount = $externalIdsToUniqueBrowsersCount->get($article->external_id, 0);
+                $threeMonthsAgo = Carbon::now()->subMonths(3);
+
                 if ($uniqueCount === 0 || $article->published_at->lt($threeMonthsAgo)) {
                     return '';
                 }
@@ -167,6 +182,7 @@ class ArticleController extends Controller
             })
             ->orderColumn('amount', 'conversions_sum $1')
             ->orderColumn('average', 'conversions_avg $1')
+            ->orderColumn('conversions_rate', DB::raw("FIELD(articles.external_id,". $conversionRates->sort()->keys()->implode(",") .") $1, conversions_count $1"))
             ->filterColumn('title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');
             })
