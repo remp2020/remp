@@ -273,8 +273,14 @@ class NewsfilterGenerator implements IGenerator
             if ($author->user_email === "editori@dennikn.sk") {
                 continue;
             }
+
             $output->editor = $author->display_name;
-            $output->from = $author->display_name . ' <' . $author->user_email . '>';
+
+            if ($author->user_email !== 'e@dennikn.sk') {
+                $output->from = $author->display_name . ' Denník N <' . $author->user_email . '>';
+            } else {
+                $output->from = $author->display_name . ' <' . $author->user_email . '>';
+            }
             break;
         }
 
