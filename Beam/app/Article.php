@@ -176,7 +176,7 @@ class Article extends Model
         return self::computeConversionRate(
             $this->conversions->count(),
             $this->unique_browsers_count,
-            $this->conversionRateConfig
+            $this->getConversionRateConfig()
         );
     }
 
