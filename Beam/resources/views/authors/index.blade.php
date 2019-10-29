@@ -101,7 +101,7 @@
                     'header' => 'avg time subscribers',
                     'render' => 'duration',
                     'priority' => 5,
-                    'searchable' => true,
+                    'searchable' => false,
                     'className' => 'text-right'
                 ],
             ],

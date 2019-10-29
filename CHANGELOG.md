@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added support for conversion rate sorting in Conversions data table. remp/remp#306
+- Fixed error thrown when using main search on authors listing. remp/remp#531
+- Added command to maintain data retention for rolled-over Elastic indices. remp/remp#527
 
 ## [0.9.1]
 
@@ -18,7 +20,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Numeric columns in conversion are sorted descending first (and only way). remp/remp#306
 - Fixed occasional duplicate records in article listings across Beam. remp/remp#482
 - Fixed missing articles on author detail if the article doesn't belong to any section. 
-- Added command to maintain data retention for rolled-over Elastic indices. remp/remp#527
 
 ### [Mailer]
 
