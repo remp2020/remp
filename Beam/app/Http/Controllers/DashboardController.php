@@ -111,7 +111,7 @@ class DashboardController extends Controller
         $from = $journalInterval->timeAfter->tz('UTC');
         $to = $journalInterval->timeBefore->tz('UTC');
 
-        $toEndOfDay = (clone $to)->tz($tz)->endOfDay()->addSecond()->tz('UTC');
+        $toNextDayStart = (clone $to)->tz($tz)->addDay()->startOfDay()->tz('UTC');
 
         $intervalMinutes = $journalInterval->intervalMinutes;
 
@@ -130,7 +130,7 @@ class DashboardController extends Controller
 
             for ($i = 1; $i <= $numberOfAveragedWeeks; $i++) {
                 $shadowFrom = (clone $from)->subWeeks($i);
-                $shadowTo = (clone $toEndOfDay)->subWeeks($i);
+                $shadowTo = $toNextDayStart->copy()->subWeeks($i);
 
                 // If there was a time shift, remember time needs to be adjusted by the timezone difference
                 $diff = $shadowFrom->tz('utc')->diff($from->tz('utc'));
@@ -144,7 +144,7 @@ class DashboardController extends Controller
                         ->addWeeks($i)
                         ->addHours($hourDifference);
 
-                    if ($correctedDate->lt($from) || $correctedDate->gt($toEndOfDay)) {
+                    if ($correctedDate->lt($from) || $correctedDate->gt($toNextDayStart)) {
                         // some days might be longer (e.g. time-shift)
                         // therefore we do want to map all values to current week
                         // and avoid those which aren't
@@ -234,7 +234,7 @@ class DashboardController extends Controller
         ];
 
         if ($interval === 'today') {
-            $jsonResponse['maxDate'] = $toEndOfDay->toIso8601ZuluString();
+            $jsonResponse['maxDate'] = $toNextDayStart->toIso8601ZuluString();
         }
 
         return response()->json($jsonResponse);

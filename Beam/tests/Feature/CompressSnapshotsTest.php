@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Console\Commands\CompressSnapshots;
 use App\Model\ArticleViewsSnapshot;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -30,13 +31,13 @@ class CompressSnapshotsTest extends TestCase
 
     public function testCompression()
     {
-        $start = Carbon::now();
+        $start = Carbon::now()->second(0);
 
          //Last 10 minutes should be kept
         for ($i = 0; $i < 10; $i++) {
             factory(ArticleViewsSnapshot::class)->create(['time' => (clone $start)->subMinutes($i)]);
         }
-        $this->artisan(CompressSnapshots::COMMAND);
+        $this->artisan(CompressSnapshots::COMMAND, ['--now' => $start]);
         $this->assertEquals(10, ArticleViewsSnapshot::all()->count());
 
         // Between
@@ -44,12 +45,7 @@ class CompressSnapshotsTest extends TestCase
             factory(ArticleViewsSnapshot::class)->create(['time' => (clone $start)->subMinutes($i)]);
         }
 
-        $this->artisan(CompressSnapshots::COMMAND);
-        $this->assertEquals(10 + 4, ArticleViewsSnapshot::all()->count());
-
-
-        for ($i = 10; $i < 30; $i++) {
-            factory(ArticleViewsSnapshot::class)->create(['time' => (clone $start)->subMinutes($i)]);
-        }
+        $this->artisan(CompressSnapshots::COMMAND, ['--now' => $start]);
+        $this->assertEquals(10 + 5, ArticleViewsSnapshot::all()->count());
     }
 }

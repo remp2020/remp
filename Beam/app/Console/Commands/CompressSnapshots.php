@@ -12,7 +12,7 @@ class CompressSnapshots extends Command
 {
     const COMMAND = 'pageviews:compress-snapshots';
 
-    protected $signature = self::COMMAND;
+    protected $signature = self::COMMAND . ' {--now=}';
 
     protected $description = 'Compress snapshots according to the retention rules';
 
@@ -32,6 +32,10 @@ class CompressSnapshots extends Command
 
         // Start compression from last hour (to avoid complicated rounding of retention intervals, to get "nice" datetimes in dashboard)
         $now = Carbon::now()->second(0)->minute(0);
+
+        // $now can be optionally rewritten (useful in tests)
+        $now = $this->option('now') ? Carbon::parse($this->option('now')) : $now;
+
         $this->compress($now);
 
         $this->line(' <info>OK!</info>');

@@ -22,7 +22,7 @@ class SnapshotHelpers
         $timeRecords = DB::table(ArticleViewsSnapshot::getTableName())
             ->select('time')
             ->where('time', '>=', $from)
-            ->where('time', '<', $to)
+            ->where('time', '<=', $to)
             ->groupBy('time')
             ->orderBy('time')
             ->get()
