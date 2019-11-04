@@ -15,13 +15,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Pageviews data source
+    | Pageview graph data source
     |--------------------------------------------------------------------------
     |
-    | Two values are allowed:
-    | snapshots - loaded from DB snapshots of Journal API
-    | journal - loaded directly from Journal API
+    | Valid values:
+    | snapshots - load data stored in DB snapshots of Journal API (data represents recorded concurrents for points in time)
+    | journal - fallback option, load data directly from Journal API (data represents total number of pageviews for specific intervals).
     |
     */
-    'pageviews_data_source' => env('PAGEVIEWS_DATA_SOURCE', 'snapshots')
+    'pageview_graph_data_source' => env('PAGEVIEW_GRAPH_DATA_SOURCE', 'snapshots')
 ];

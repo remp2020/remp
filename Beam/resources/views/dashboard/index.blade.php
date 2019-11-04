@@ -30,8 +30,8 @@
             },
             created: function() {
                 this.$store.commit('changeSettings', {
-                    newGraph: true,
-                })
+                    newGraph: {{ json_encode(config('beam.pageview_graph_data_source') === 'snapshots') }}
+                });
             },
             store: DashboardStore,
             data: {

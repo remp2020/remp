@@ -26,14 +26,14 @@ class ArticleDetailsController extends Controller
 
     private $snapshotHelpers;
 
-    private $pageviewsDataSource;
+    private $pageviewGraphDataSource;
 
     public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
-        $this->pageviewsDataSource = config('beam.pageviews_data_source');
+        $this->pageviewGraphDataSource = config('beam.pageview_graph_data_source');
     }
 
     public function variantsHistogram(Article $article, Request $request)
@@ -177,7 +177,7 @@ class ArticleDetailsController extends Controller
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $journalInterval = new JournalInterval($tz, $request->get('interval'), $article);
 
-        switch ($this->pageviewsDataSource) {
+        switch ($this->pageviewGraphDataSource) {
             case 'snapshots':
                 $data = $this->histogramFromSnapshots($article, $journalInterval);
                 break;
@@ -185,7 +185,7 @@ class ArticleDetailsController extends Controller
                 $data = $this->histogram($article, $journalInterval, 'derived_referer_medium');
                 break;
             default:
-                throw new \Exception("unknown pageviews data source {$this->pageviewsDataSource}");
+                throw new \Exception("unknown pageviews data source {$this->pageviewGraphDataSource}");
         }
 
         $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
@@ -386,7 +386,7 @@ class ArticleDetailsController extends Controller
                 'mediumColors' => Colors::refererMediumTagsToColors($mediums, true),
                 'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
-                'snapshotsDataSource' => $this->pageviewsDataSource === 'snapshots',
+                'snapshotsDataSource' => $this->pageviewGraphDataSource === 'snapshots',
             ]),
             'json' => new ArticleResource($article),
         ]);
