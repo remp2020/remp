@@ -7,6 +7,7 @@
             </div>
             <div class="card-body card-padding">
                 <page-loads-graph
+                        :intervalGraph="!snapshotsDataSource"
                         :event-options="[{text: 'Conversions', value: 'conversions', checked: true}, {text: 'Title changes', value: 'title_changes', checked: false}]"
                         :url="url">
                 </page-loads-graph>
@@ -61,6 +62,10 @@
             default: false
         },
         hasImageVariants: {
+            type: Boolean,
+            default: false
+        },
+        snapshotsDataSource: {
             type: Boolean,
             default: false
         }

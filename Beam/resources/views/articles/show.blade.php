@@ -138,6 +138,7 @@
                 :has-image-variants="{{$article->has_image_variants ? 'true' : 'false'}}"
                 :url="url"
                 :variants-url="variantsUrl"
+                :snapshots-data-source="{{$snapshotsDataSource ? 'true' : 'false'}}"
                 ref="histogram" >
         </article-details>
 

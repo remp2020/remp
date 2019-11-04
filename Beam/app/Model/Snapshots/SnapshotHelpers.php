@@ -7,25 +7,38 @@ use Illuminate\Support\Facades\DB;
 
 class SnapshotHelpers
 {
+
     /**
      * Computes lowest time point (present in DB) per each $intervalMinutes window, in [$from, $to] interval
      *
-     * @param Carbon $from (including)
-     * @param Carbon $to   (excluding)
-     * @param int    $intervalMinutes
-     * @param bool   $addLastMinute
+     * @param Carbon        $from (including)
+     * @param Carbon        $to   (excluding)
+     * @param int           $intervalMinutes
+     * @param bool          $addLastMinute
+     * @param callable|null $conditions
      *
      * @return TimePoints containing array for included/excluded time points
      */
-    public function timePoints(Carbon $from, Carbon $to, int $intervalMinutes, bool $addLastMinute = false): TimePoints
-    {
-        $timeRecords = DB::table(ArticleViewsSnapshot::getTableName())
+    public function timePoints(
+        Carbon $from,
+        Carbon $to,
+        int $intervalMinutes,
+        bool $addLastMinute = false,
+        callable $conditions = null
+    ): TimePoints {
+    
+        $q = DB::table(ArticleViewsSnapshot::getTableName())
             ->select('time')
             ->where('time', '>=', $from)
             ->where('time', '<=', $to)
             ->groupBy('time')
-            ->orderBy('time')
-            ->get()
+            ->orderBy('time');
+
+        if ($conditions) {
+            $conditions($q);
+        }
+
+        $timeRecords = $q->get()
             ->map(function ($item) {
                 return Carbon::parse($item->time);
             })->toArray();

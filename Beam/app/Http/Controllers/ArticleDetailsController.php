@@ -7,7 +7,11 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Http\Resources\ArticleResource;
+use App\Model\ArticleViewsSnapshot;
+use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
+use DB;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
@@ -20,10 +24,16 @@ class ArticleDetailsController extends Controller
 
     private $journalHelper;
 
-    public function __construct(JournalContract $journal)
+    private $snapshotHelpers;
+
+    private $pageviewsDataSource;
+
+    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
+        $this->snapshotHelpers = $snapshotHelpers;
+        $this->pageviewsDataSource = config('beam.pageviews_data_source');
     }
 
     public function variantsHistogram(Article $article, Request $request)
@@ -103,6 +113,56 @@ class ArticleDetailsController extends Controller
         return response()->json($data);
     }
 
+    private function itemTag($item)
+    {
+        $m = !empty($item->explicit_referer_medium) ? $item->explicit_referer_medium : $item->derived_referer_medium;
+        return JournalHelpers::refererMediumAlias($m);
+    }
+
+    private function histogramFromSnapshots(Article $article, JournalInterval $journalInterval)
+    {
+        $from = $journalInterval->timeAfter->tz('UTC');
+        $to = $journalInterval->timeBefore->tz('UTC');
+        $timePoints = $this->snapshotHelpers->timePoints($from, $to, $journalInterval->intervalMinutes, true, function (Builder $query) use ($article) {
+            $query->where('external_article_id', $article->external_id);
+        });
+
+        $records = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
+            ->whereIn('time', $timePoints->toInclude)
+            ->where('external_article_id', $article->external_id)
+            ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium'])
+            ->get();
+
+        $tags = [];
+        foreach ($records as $item) {
+            $tags[$this->itemTag($item)] = true;
+        }
+
+        $tags = array_keys($tags);
+        $emptyValues = [];
+        foreach ($tags as $tag) {
+            $emptyValues[$tag] = 0;
+        }
+
+        $results = [];
+
+        foreach ($records as $item) {
+            $zuluTime = Carbon::parse($item->time)->toIso8601ZuluString();
+            if (!array_key_exists($zuluTime, $results)) {
+                $results[$zuluTime] = array_merge($emptyValues, ['Date' => $zuluTime]);
+            }
+            $tag = $this->itemTag($item);
+            $results[$zuluTime][$tag] += $item->count;
+        }
+
+        return [
+            'publishedAt' => $article->published_at->toIso8601ZuluString(),
+            'intervalMinutes' => $journalInterval->intervalMinutes,
+            'results' => array_values($results),
+            'tags' => $tags
+        ];
+    }
+
     public function timeHistogram(Article $article, Request $request)
     {
         $request->validate([
@@ -116,7 +176,17 @@ class ArticleDetailsController extends Controller
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $journalInterval = new JournalInterval($tz, $request->get('interval'), $article);
 
-        $data = $this->histogram($article, $journalInterval, 'derived_referer_medium');
+        switch ($this->pageviewsDataSource) {
+            case 'snapshots':
+                $data = $this->histogramFromSnapshots($article, $journalInterval);
+                break;
+            case 'journal':
+                $data = $this->histogram($article, $journalInterval, 'derived_referer_medium');
+                break;
+            default:
+                throw new \Exception("unknown pageviews data source {$this->pageviewsDataSource}");
+        }
+
         $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
         $data['events'] = [];
 
@@ -315,6 +385,7 @@ class ArticleDetailsController extends Controller
                 'mediumColors' => Colors::refererMediumTagsToColors($mediums, true),
                 'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
+                'snapshotsDataSource' => $this->pageviewsDataSource === 'snapshots',
             ]),
             'json' => new ArticleResource($article),
         ]);

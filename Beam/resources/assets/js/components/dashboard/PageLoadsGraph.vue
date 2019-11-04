@@ -53,7 +53,9 @@
         <div class="legend-wrapper">
             <div v-if="highlightedRow" v-show="legend.visible" v-bind:style="{ left: legend.left }" class="article-graph-legend">
 
-                <span>{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</span>
+                <div v-if="intervalGraph" class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
+                <div v-else class="legend-title">{{highlightedRow.startDate | filterLegendTitle}}</div>
+
                 <table>
                     <tr>
                         <th>Source</th>
@@ -95,6 +97,11 @@
     }
     .article-graph-legend table td, th {
         padding: 3px 6px
+    }
+
+    .legend-title {
+        text-align: center;
+        font-size: 14px;
     }
 
     .article-graph-legend {
@@ -168,6 +175,10 @@
             default: () => []
         },
         stacked: {
+            type: Boolean,
+            default: true
+        },
+        intervalGraph: {
             type: Boolean,
             default: true
         }
@@ -260,6 +271,11 @@
             window.addEventListener('resize', debounce((e) => {
                 this.fillData()
             }, 100));
+        },
+        filters: {
+            filterLegendTitle(value) {
+                return moment(value).format('lll')
+            }
         },
         methods: {
             reload() {
