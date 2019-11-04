@@ -28,6 +28,11 @@
                     dashboardOptions: this.options
                 }
             },
+            created: function() {
+                this.$store.commit('changeSettings', {
+                    newGraph: true,
+                })
+            },
             store: DashboardStore,
             data: {
                 articlesUrl: "{!! route('dashboard.articles.json') !!}",

@@ -22,6 +22,11 @@
             components: {
                 DashboardRoot
             },
+            created: function() {
+                this.$store.commit('changeSettings', {
+                    newGraph: true,
+                })
+            },
             provide: function() {
                 return {
                     dashboardOptions: this.options
