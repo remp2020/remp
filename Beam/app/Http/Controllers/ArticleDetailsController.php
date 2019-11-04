@@ -124,7 +124,7 @@ class ArticleDetailsController extends Controller
         $from = $journalInterval->timeAfter->tz('UTC');
         $to = $journalInterval->timeBefore->tz('UTC');
         $timePoints = $this->snapshotHelpers->timePoints($from, $to, $journalInterval->intervalMinutes, true, function (Builder $query) use ($article) {
-            $query->where('external_article_id', $article->external_id);
+            $query->where( 'external_article_id', $article->external_id);
         });
 
         $records = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
@@ -159,6 +159,7 @@ class ArticleDetailsController extends Controller
             'publishedAt' => $article->published_at->toIso8601ZuluString(),
             'intervalMinutes' => $journalInterval->intervalMinutes,
             'results' => array_values($results),
+            'minDate' => $journalInterval->timeAfter->toIso8601ZuluString(),
             'tags' => $tags
         ];
     }

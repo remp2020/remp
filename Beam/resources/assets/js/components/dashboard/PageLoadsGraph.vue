@@ -477,7 +477,16 @@
                     }
                 }
 
-                this.vars.x.domain([results[0].date, results[results.length - 1].date])
+                let minDate = results[0].date
+                let maxDate = results[results.length - 1].date
+                if (this.minDate) {
+                    minDate = this.minDate
+                }
+                if (this.maxDate) {
+                    maxDate = this.maxDate
+                }
+
+                this.vars.x.domain([minDate, maxDate])
                     .range([0, width])
                 this.vars.y.domain([0, yMax])
                     .range([height, 0])
@@ -605,6 +614,13 @@
                             intervalMinutes: response.data.intervalMinutes
                         }
                         this.tagLabels = response.data.tagLabels || null
+
+                        if (response.data.minDate !== undefined) {
+                            this.minDate = d3.isoParse(response.data.minDate)
+                        }
+                        if (response.data.maxDate !== undefined) {
+                            this.maxDate = d3.isoParse(response.data.maxDate)
+                        }
                     })
                     .catch(error => {
                         this.error = error
