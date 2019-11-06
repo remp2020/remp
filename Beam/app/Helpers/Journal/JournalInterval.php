@@ -71,7 +71,6 @@ class JournalInterval
         }
     }
 
-
     /**
      * @param Article $article
      *

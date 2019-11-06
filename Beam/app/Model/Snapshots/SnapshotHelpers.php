@@ -1,12 +1,47 @@
 <?php
 namespace App\Model\Snapshots;
 
+use App\Helpers\Journal\JournalInterval;
 use App\Model\ArticleViewsSnapshot;
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 class SnapshotHelpers
 {
+
+    /**
+     * Load concurrents histogram for given interval
+     * Concurrents counts are grouped by time, derived_referer_medium and explicit_referer_medium
+     *
+     * @param JournalInterval $interval
+     * @param null            $externalArticleId if specified, show histogram only for this article
+     * @param bool            $addLastMinute include last minute (for incomplete interval)
+     *
+     * @return ArticleViewsSnapshot[]
+     */
+    public function concurrentsHistogram(JournalInterval $interval, $externalArticleId = null, bool $addLastMinute = false)
+    {
+        /** @var Carbon $from */
+        $from = $interval->timeAfter->tz('UTC');
+        /** @var Carbon $to */
+        $to = $interval->timeBefore->tz('UTC');
+
+        $timePoints = $this->timePoints($from, $to, $interval->intervalMinutes, $addLastMinute, function (Builder $query) use ($externalArticleId) {
+            if ($externalArticleId) {
+                $query->where('external_article_id', $externalArticleId);
+            }
+        });
+
+        $q = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
+            ->whereIn('time', $timePoints->toInclude)
+            ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium']);
+
+        if ($externalArticleId) {
+            $q->where('external_article_id', $externalArticleId);
+        }
+        return $q->get();
+    }
 
     /**
      * Computes lowest time point (present in DB) per each $intervalMinutes window, in [$from, $to] interval

@@ -112,11 +112,9 @@ class DashboardController extends Controller
         $to = $journalInterval->timeBefore->tz('UTC');
 
         $toNextDayStart = (clone $to)->tz($tz)->addDay()->startOfDay()->tz('UTC');
-
         $intervalMinutes = $journalInterval->intervalMinutes;
 
-        $timePoints = $this->snapshotHelpers->timePoints($from, $to, $intervalMinutes, true);
-        $currentData = $this->dataFor($timePoints->toInclude);
+        $currentData = $this->snapshotHelpers->concurrentsHistogram($journalInterval, null, true);
 
         $tags = [];
         foreach ($currentData as $item) {
@@ -136,8 +134,11 @@ class DashboardController extends Controller
                 $diff = $shadowFrom->tz('utc')->diff($from->tz('utc'));
                 $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
-                $timePoints = $this->snapshotHelpers->timePoints($shadowFrom, $shadowTo, $intervalMinutes);
-                foreach ($this->dataFor($timePoints->toInclude) as $item) {
+                $shadowInterval = clone $journalInterval;
+                $shadowInterval->timeAfter = $shadowFrom;
+                $shadowInterval->timeBefore = $shadowTo;
+
+                foreach ($this->snapshotHelpers->concurrentsHistogram($shadowInterval) as $item) {
                     // we want to plot previous results on same points as current ones,
                     // therefore add week which was subtracted when data was queried
                     $correctedDate = Carbon::parse($item->time)
@@ -240,21 +241,9 @@ class DashboardController extends Controller
         return response()->json($jsonResponse);
     }
 
-    private function itemTag($item)
+    private function itemTag($item): string
     {
-        if (!empty($item->explicit_referer_medium)) {
-            return $item->explicit_referer_medium;
-        }
-        return JournalHelpers::refererMediumAlias($item->derived_referer_medium);
-    }
-
-    private function dataFor(array $timePoints)
-    {
-        $query = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
-            ->whereIn('time', $timePoints)
-            ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium']);
-
-        return $query->get();
+        return JournalHelpers::refererMediumFromPageviewRecord($item);
     }
 
     private function getRefererMediumFromJournalRecord($record)

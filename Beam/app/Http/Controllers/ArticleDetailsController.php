@@ -113,25 +113,14 @@ class ArticleDetailsController extends Controller
         return response()->json($data);
     }
 
-    private function itemTag($item)
+    private function itemTag($item): string
     {
-        $m = !empty($item->explicit_referer_medium) ? $item->explicit_referer_medium : $item->derived_referer_medium;
-        return JournalHelpers::refererMediumAlias($m);
+        return JournalHelpers::refererMediumFromPageviewRecord($item);
     }
 
     private function histogramFromSnapshots(Article $article, JournalInterval $journalInterval)
     {
-        $from = $journalInterval->timeAfter->tz('UTC');
-        $to = $journalInterval->timeBefore->tz('UTC');
-        $timePoints = $this->snapshotHelpers->timePoints($from, $to, $journalInterval->intervalMinutes, true, function (Builder $query) use ($article) {
-            $query->where('external_article_id', $article->external_id);
-        });
-
-        $records = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
-            ->whereIn('time', $timePoints->toInclude)
-            ->where('external_article_id', $article->external_id)
-            ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium'])
-            ->get();
+        $records = $this->snapshotHelpers->concurrentsHistogram($journalInterval, $article->external_id, true);
 
         $tags = [];
         foreach ($records as $item) {

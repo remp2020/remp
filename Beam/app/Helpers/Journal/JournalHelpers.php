@@ -195,4 +195,18 @@ class JournalHelpers
                 return $medium;
         }
     }
+
+    /**
+     * Returns referer medium of given pageview record from Journal
+     * `explicit_referer_medium` value (optional) has priority over `derived_referer_medium` value (required)
+     *
+     * @param $record object
+     *
+     * @return string referer medium
+     */
+    public static function refererMediumFromPageviewRecord($record): string
+    {
+        $m = !empty($record->explicit_referer_medium) ? $record->explicit_referer_medium : $record->derived_referer_medium;
+        return JournalHelpers::refererMediumAlias($m);
+    }
 }
