@@ -276,6 +276,113 @@ Laravel's queue currently includes
 
 If the data are still valid, job doesn't refresh them.
 
+### API Documentation
+
+Campaign provides a simple API for several tasks described bellow.
+
+All examples use `http://campaign.remp.press` as a base domain. Please change the host to the one you use
+before executing the examples.
+
+All examples use `XXX` as a default value for authorization token, please replace it with the
+real token API token that can be acquired in the REMP SSO.
+
+All requests should contain (and be compliant) with the follow HTTP headers. 
+
+```
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer REMP_SSO_API_TOKEN
+```
+
+API responses can contain following HTTP codes:
+
+| Value | Description |
+| --- | --- |
+| 200 OK | Successful response, default value |
+| 202 Accepted | Successful response, accepted for processing | 
+| 400 Bad Request | Invalid request (missing required parameters) | 
+| 403 Forbidden | The authorization failed (provided token was not valid) | 
+| 404 Not found | Referenced resource wasn't found | 
+
+If possible, the response includes `application/json` encoded payload with message explaining
+the error further.
+
+---
+
+##### POST `/api/banners/BANNER_ID/one-time-display`
+
+Campaign supports one-time display of banners to specific users. Such banner does not need associated campaign to be displayed.
+This can be used e.g. as a way of reminding users about required actions (instead of notifying them via email).
+
+When calling this endpoint, please replace `BANNER_ID` in URL with an actual ID of the banner.
+Each one-time banner has to specify its expiration date and a user it shows to (targeted either via user ID or via browser ID).
+
+##### *Body:*
+
+```json5
+{
+  "user_id": "29953", // String; Required (if browser_id is not present); ID of targeted user
+  "browser_id": "aaaaaa-bbbb-cccc-dddd-1111111", // String; Required (if user_id is not present); ID of targeted browser
+  "expires_at": "2019-12-29T10:05:00" // Date; Required; RFC3339 formatted datetime, specifying when the one-time banner expires (it won't show after the date)
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X POST \
+  http://campaign.remp.press/api/banners/[BANNER_ID]/one-time-display \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "user_id": "29953",
+        "expires_at": "2019-12-29T10:05:00"
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+    "user_id" => "29953",
+    "expires_at" => "2019-12-29T10:05:00"
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$bannerId = 1;
+$response = file_get_contents("http://campaign.remp.press/api/banners/{$bannerId}/one-time-display", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+
+##### *Response:*
+
+Valid response with 202 HTTP code: 
+```json5
+{
+  "status": "ok"
+}
+```
+
 ## MaxMind - GeoIP2 Lite
 
 This product includes GeoLite2 data created by MaxMind, available from [http://www.maxmind.com](http://www.maxmind.com).

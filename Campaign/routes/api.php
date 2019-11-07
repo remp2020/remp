@@ -20,6 +20,7 @@ Route::middleware('auth:api')->group(function() {
         Route::post('{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
     });
 
+    Route::post('banners/{banner}/one-time-display', 'BannerController@oneTimeDisplay')->name('api.banners.one_time_display');
 
     Route::apiResource('campaigns', 'CampaignController');
     Route::apiResource('banners', 'BannerController');

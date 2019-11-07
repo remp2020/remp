@@ -9,18 +9,19 @@ use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
 use App\Country;
+use App\Helpers\Showtime;
 use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use App\Schedule;
 use Carbon\Carbon;
 use GeoIp2;
+use View;
 use HTML;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
-use View;
 use Yajra\Datatables\Datatables;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
@@ -31,9 +32,12 @@ class CampaignController extends Controller
 {
     private $beamJournalConfigured;
 
-    public function __construct()
+    private $showtime;
+
+    public function __construct(Showtime $showtime)
     {
         $this->beamJournalConfigured = !empty(config('services.remp.beam.segments_addr'));
+        $this->showtime = $showtime;
     }
 
     /**
@@ -537,6 +541,41 @@ class CampaignController extends Controller
             $sa->setProviderData($data->cache);
         }
 
+        $positions = $pm->positions();
+        $dimensions = $dm->dimensions();
+        $alignments = $am->alignments();
+
+        // Try to load one-time banners (they have precedence over campaigns)
+        $banner = null;
+        if ($userId) {
+            $banner = $this->showtime->loadOneTimeUserBanner($userId);
+        }
+        if (!$banner) {
+            $banner = $this->showtime->loadOneTimeBrowserBanner($browserId);
+        }
+        if ($banner) {
+            $renderedBanner =  View::make('banners.preview', [
+                'banner' => $banner,
+                'variantUuid' => '',
+                'campaignUuid' => '',
+                'positions' => $positions,
+                'dimensions' => $dimensions,
+                'alignments' => $alignments,
+                'controlGroup' => 0
+            ])->render();
+
+            return response()
+                ->jsonp($r->get('callback'), [
+                    'success' => true,
+                    'errors' => [],
+                    'data' => [$renderedBanner],
+                    'providerData' => $sa->getProviderData(),
+                ]);
+        }
+
+
+        $displayedCampaigns = [];
+
         $campaignIds = json_decode(Redis::get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
         if (count($campaignIds) == 0) {
             return response()
@@ -547,13 +586,8 @@ class CampaignController extends Controller
                 ]);
         }
 
-        /** @var Campaign $campaign */
-        $positions = $pm->positions();
-        $dimensions = $dm->dimensions();
-        $alignments = $am->alignments();
-        $displayedCampaigns = [];
-
         foreach ($campaignIds as $campaignId) {
+            /** @var Campaign $campaign */
             $campaign = unserialize(Redis::get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
             $running = false;
 
@@ -794,7 +828,7 @@ class CampaignController extends Controller
             $displayedCampaigns[] = View::make('banners.preview', [
                 'banner' => $variant->banner,
                 'variantUuid' => $variant->uuid,
-                'campaign' => $campaign,
+                'campaignUuid' => $campaign->uuid,
                 'positions' => $positions,
                 'dimensions' => $dimensions,
                 'alignments' => $alignments,

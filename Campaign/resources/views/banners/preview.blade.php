@@ -9,7 +9,7 @@ var bannerJsonData = {!! $banner->toJson() !!};
 @endif
 
 var variantUuid = '{{ $variantUuid }}';
-var campaignUuid = '{{ $campaign->uuid }}';
+var campaignUuid = '{{ $campaignUuid }}';
 var isControlGroup = {{ $controlGroup }};
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {

@@ -1,8 +1,10 @@
 <?php
 
 use Airbrake\MonologHandler;
+use App\Banner;
 use App\Campaign;
 use App\CampaignBanner;
+use App\Helpers\Showtime;
 use DeviceDetector\Cache\PSR6Bridge;
 use GeoIp2\Database\Reader;
 use Illuminate\Support\Collection;
@@ -81,27 +83,52 @@ function asset($path, $secure = null) {
  * @return string
  * @throws Exception
  */
-function render($variant, $campaign, $alignments, $dimensions, $positions) {
+function renderCampaign($variant, $campaign, $alignments, $dimensions, $positions) {
+    return renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->controlGroup, $alignments, $dimensions, $positions);
+}
+
+function renderBanner(Banner $banner, $alignments, $dimensions, $positions) {
+    return renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions);
+}
+
+function renderInternal(
+    Banner $banner,
+    $variantUuid,
+    $campaignUuid,
+    $isControlGroup,
+    $alignments,
+    $dimensions,
+    $positions) {
+
     $alignmentsJson = json_encode($alignments);
     $dimensionsJson = json_encode($dimensions);
     $positionsJson = json_encode($positions);
 
     $bannerJs = asset(mix('/js/banner.js', '/assets/lib'));
-    $isControlGroup = intval($variant->controlGroup);
 
-    if (!$variant->banner ){
-        $js = "var bannerUuid = null;";
+    if (!$banner ){
+        $js = 'var bannerUuid = null;';
     } else {
         $js = "
-var bannerUuid = '{$variant->banner->uuid}';
+var bannerUuid = '{$banner->uuid}';
 var bannerId = 'b-' + bannerUuid;
-var bannerJsonData = {$variant->banner->toJson()};
+var bannerJsonData = {$banner->toJson()};
 ";
     }
 
+    if ($variantUuid) {
+        $js .= "var variantUuid = {$variantUuid};\n";
+    } else {
+        $js .= "var variantUuid = null;\n";
+    }
+
+    if ($campaignUuid) {
+        $js .= "var campaignUuid = {$campaignUuid};\n";
+    } else {
+        $js .= "var campaignUuid = null;\n";
+    }
+
     $js .= <<<JS
-var variantUuid = '{$variant->uuid}';
-var campaignUuid = '{$campaign->uuid}';
 var isControlGroup = {$isControlGroup};
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {
@@ -163,20 +190,31 @@ var run = function() {
     }
 
     setTimeout(function() {
-        remplib.tracker.trackEvent("banner", "show", null, null, {
-            "utm_source": "remp_campaign",
-            "utm_medium": banner.displayType,
-            "utm_campaign": banner.campaignUuid,
-            "utm_content": banner.uuid,
-            "banner_variant": banner.variantUuid
-        });
+        var event = {
+            utm_source: "remp_campaign",
+            utm_medium: banner.displayType,
+            utm_content: banner.uuid
+        };
+        
+        if (banner.campaignUuid) {
+            event.utm_campaign = banner.campaignUuid; 
+        }
+        if (banner.variantUuid) {
+            event.banner_variant = banner.variantUuid; 
+        }
+        
+        remplib.tracker.trackEvent("banner", "show", null, null, event);
         banner.show = true;
         if (banner.closeTimeout) {
             setTimeout(function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
-        remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, banner.variantUuid);
+        
+        if (banner.campaignUuid && banner.variantUuid) {
+            remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, banner.variantUuid);    
+        }
+        
     }, banner.displayDelay);
 };
 
@@ -196,6 +234,7 @@ JS;
 
     return $js;
 }
+
 
 class GeoReader
 {
@@ -296,6 +335,13 @@ $redis = new \Predis\Client([
     'port'   => getenv('REDIS_PORT') ?: 6379,
     'password' => getenv('REDIS_PASSWORD') ?: null,
 ]);
+
+$showtime = new Showtime($redis);
+
+$positions = json_decode($redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY)) ?? [];
+$dimensions = json_decode($redis->get(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY)) ?? [];
+$alignments = json_decode($redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY)) ?? [];
+
 /** @var \App\Contracts\SegmentAggregator $segmentAggregator */
 $segmentAggregator = unserialize($redis->get(\App\Providers\AppServiceProvider::SEGMENT_AGGREGATOR_REDIS_KEY))();
 if (!$segmentAggregator) {
@@ -309,6 +355,24 @@ if (isset($data->cache)) {
     $segmentAggregator->setProviderData($data->cache);
 }
 
+// Try to load one-time banners (having precedence over campaigns)
+$banner = null;
+if ($userId) {
+    $banner = $showtime->loadOneTimeUserBanner($userId);
+}
+if (!$banner) {
+    $banner = $showtime->loadOneTimeBrowserBanner($browserId);
+}
+if ($banner) {
+    $displayData[] = renderBanner($banner, $alignments, $dimensions, $positions);
+    jsonp_response($callback, [
+        'success' => true,
+        'errors' => [],
+        'data' => $displayData,
+        'providerData' => $segmentAggregator->getProviderData(),
+    ]);
+}
+
 $campaignIds = json_decode($redis->get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
 if (count($campaignIds) == 0) {
     jsonp_response($callback, [
@@ -318,12 +382,7 @@ if (count($campaignIds) == 0) {
     ]);
 }
 
-/** @var Campaign $campaign */
-$positions = json_decode($redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY)) ?? [];
-$dimensions = json_decode($redis->get(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY)) ?? [];
-$alignments = json_decode($redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY)) ?? [];
-
-$displayedCampaigns = [];
+$displayData = [];
 
 $deviceDetector = new DeviceDetector($redis);
 $geoReader = new GeoReader();
@@ -331,6 +390,7 @@ $request = new Request();
 
 // campaign resolution
 foreach ($campaignIds as $campaignId) {
+    /** @var Campaign $campaign */
     $campaign = unserialize($redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
     $running = false;
 
@@ -564,7 +624,7 @@ foreach ($campaignIds as $campaignId) {
         }
     }
 
-    $displayedCampaigns[] = render(
+    $displayData[] = renderCampaign(
         $variant,
         $campaign,
         $alignments,
@@ -573,7 +633,7 @@ foreach ($campaignIds as $campaignId) {
     );
 }
 
-if (empty($displayedCampaigns)) {
+if (empty($displayData)) {
     jsonp_response($callback, [
         'success' => true,
         'data' => [],
@@ -584,6 +644,6 @@ if (empty($displayedCampaigns)) {
 jsonp_response($callback, [
     'success' => true,
     'errors' => [],
-    'data' => $displayedCampaigns,
+    'data' => $displayData,
     'providerData' => $segmentAggregator->getProviderData(),
 ]);

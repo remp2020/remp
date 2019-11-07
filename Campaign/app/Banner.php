@@ -2,13 +2,18 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Predis\ClientInterface;
 use Ramsey\Uuid\Uuid;
+use Redis;
 
 class Banner extends Model
 {
     use Notifiable;
+
+    const BANNER_TAG = 'banner';
 
     const TEMPLATE_HTML = 'html';
     const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
@@ -44,6 +49,7 @@ class Banner extends Model
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';
+
 
     protected static function boot()
     {
@@ -199,5 +205,20 @@ class Banner extends Model
     public function getTemplate()
     {
         return $this->getRelationValue($this->getTemplateRelationName());
+    }
+
+    public function cache()
+    {
+        $bannerTemplate = $this->loadTemplate();
+        Redis::set(self::BANNER_TAG . ":{$this->id}", serialize($bannerTemplate));
+    }
+
+    public static function loadCachedBanner(ClientInterface $redis, string $bannerId): ?Banner
+    {
+        $serializedBanner = $redis->get(Banner::BANNER_TAG . ":$bannerId");
+        if ($serializedBanner) {
+            return unserialize($serializedBanner, [__CLASS__]);
+        }
+        return null;
     }
 }

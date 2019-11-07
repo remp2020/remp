@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Banner;
+use App\Helpers\Showtime;
+use App\Http\Requests\BannerOneTimeDisplayRequest;
 use App\Http\Requests\BannerRequest;
 use App\Http\Resources\BannerResource;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
+use Carbon\Carbon;
 use HTML;
 use Illuminate\Http\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -18,12 +21,14 @@ class BannerController extends Controller
     protected $dimensionMap;
     protected $positionMap;
     protected $alignmentMap;
+    private $showtime;
 
-    public function __construct(DimensionMap $dm, PositionMap $pm, AlignmentMap $am)
+    public function __construct(DimensionMap $dm, PositionMap $pm, AlignmentMap $am, Showtime $showtime)
     {
         $this->dimensionMap = $dm;
         $this->positionMap = $pm;
         $this->alignmentMap = $am;
+        $this->showtime = $showtime;
     }
 
     /**
@@ -257,5 +262,26 @@ class BannerController extends Controller
                 'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
             ])
             ->header('Content-Type', 'application/x-javascript');
+    }
+
+    public function oneTimeDisplay(BannerOneTimeDisplayRequest $request, Banner $banner)
+    {
+        $userId = $request->get('user_id');
+        $browserId = $request->get('browser_id');
+        $expiresInSeconds = Carbon::parse($request->get('expires_at'))->diffInSeconds(Carbon::now());
+
+        $banner->cache();
+
+        if ($userId) {
+            $this->showtime->displayForUser($banner, $userId, $expiresInSeconds);
+        }
+
+        if ($browserId) {
+            $this->showtime->displayForBrowser($banner, $browserId, $expiresInSeconds);
+        }
+
+        return response()->json([
+            'status' => 'ok'
+        ], 202);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Banner;
 use Illuminate\Console\Command;
 use App\Campaign;
 
@@ -19,7 +20,7 @@ class CampaignsRefreshCache extends Command
      *
      * @var string
      */
-    protected $description = 'Removes cached campaigns and cache the latest version immediatelly.';
+    protected $description = 'Removes cached campaigns and banners and cache the latest version immediately.';
 
     /**
      * Create a new command instance.
@@ -45,7 +46,13 @@ class CampaignsRefreshCache extends Command
             $campaign->cache();
         };
 
+        foreach (Banner::all() as $banner) {
+            $this->line(sprintf('Refreshing banner: <info>%s</info>', $banner->name));
+            $banner->cache();
+        }
+
         $this->line('Campaigns cache refreshed.');
+
         return true;
     }
 }
