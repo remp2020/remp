@@ -11,7 +11,8 @@ class AddIndexesToArticleViewsSnapshots extends Migration
         Schema::table('article_views_snapshots', function(Blueprint $table) {
             $table->index(['external_article_id']);
             $table->index(['property_token']);
-            $table->index(['time', 'derived_referer_medium', 'explicit_referer_medium']);
+            // implicit name for index is too long, therefore naming explicitly
+            $table->index(['time', 'derived_referer_medium', 'explicit_referer_medium'], 'time_referer_mediums');
         });
     }
 }
