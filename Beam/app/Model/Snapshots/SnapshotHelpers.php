@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\DB;
 
 class SnapshotHelpers
 {
-
     /**
      * Load concurrents histogram for given interval
      * Concurrents counts are grouped by time, derived_referer_medium and explicit_referer_medium
+     * TODO: add caching
      *
      * @param JournalInterval $interval
      * @param null            $externalArticleId if specified, show histogram only for this article
