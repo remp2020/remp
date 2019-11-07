@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Redis;
+use Predis\ClientInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(\App\Models\Alignment\Map::class, function ($app) use ($alignmentsMap) {
             return $alignmentsMap;
+        });
+        $this->app->bind(ClientInterface::class, function () {
+            return Redis::connection()->client();
         });
 
         $this->app->bind(Reader::class, function (Application $app) {

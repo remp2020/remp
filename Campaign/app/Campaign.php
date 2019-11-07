@@ -225,7 +225,7 @@ class Campaign extends Model
 
     public function cache()
     {
-        $this->refreshActiveCampaignsCache();
+        self::refreshActiveCampaignsCache();
 
         $campaign = $this->where(['id' => $this->id])->with([
             'segments',

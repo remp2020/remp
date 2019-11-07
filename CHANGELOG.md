@@ -21,6 +21,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed occasional duplicate records in article listings across Beam. remp/remp#482
 - Fixed missing articles on author detail if the article doesn't belong to any section. 
 
+### [Campaign]
+
+- Added support for one-time banners. remp/remp#512
+
 ### [Mailer]
 
 - Fixed possible error on newsletter list editing if custom sorting was used. remp/remp#516
