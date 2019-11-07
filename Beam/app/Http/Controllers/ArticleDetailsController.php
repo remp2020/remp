@@ -149,6 +149,7 @@ class ArticleDetailsController extends Controller
             'intervalMinutes' => $journalInterval->intervalMinutes,
             'results' => array_values($results),
             'minDate' => $journalInterval->timeAfter->toIso8601ZuluString(),
+            'maxDate' => $journalInterval->timeBefore->toIso8601ZuluString(),
             'tags' => $tags
         ];
     }
