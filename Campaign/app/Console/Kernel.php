@@ -39,7 +39,8 @@ class Kernel extends ConsoleKernel
         if ($beamJournalConfigured) {
             $schedule->command(AggregateCampaignStats::COMMAND)
                 ->everyMinute()
-                ->withoutOverlapping();
+                ->withoutOverlapping()
+                ->appendOutputTo(storage_path('logs/aggregate_campaign_stats.log'));;
         }
 
         // invalidate segments cache
