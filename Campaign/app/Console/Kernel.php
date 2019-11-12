@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
             $schedule->command(AggregateCampaignStats::COMMAND)
                 ->everyMinute()
                 ->withoutOverlapping()
-                ->appendOutputTo(storage_path('logs/aggregate_campaign_stats.log'));;
+                ->appendOutputTo(storage_path('logs/aggregate_campaign_stats.log'));
         }
 
         // invalidate segments cache
