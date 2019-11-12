@@ -25,7 +25,7 @@ var User = Type("User", func() {
 	Attribute("remp_session_id", String, "ID of reader's session")
 	Attribute("remp_pageview_id", String, "ID of pageview")
 	Attribute("referer", String, "Value of HTTP referer header (if present)")
-	Attribute("explicit_referer_medium", String, "Attribute for more specific tracking of referer medium")
+	Attribute("explicit_referer_medium", String, "Explicit referer medium value that overrides implicit referer medium based on Referer header")
 })
 
 var System = Type("System", func() {

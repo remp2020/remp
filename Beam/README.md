@@ -751,9 +751,9 @@ var rempConfig = {
             interval: Number // optional, frequency of sending tracked progress in seconds (default value 5)
         },
         
-        // optional, allows to specify custom referer (not based on Referer header) 
-        // that can be utilized later, e.g. in Beam dashboard statistics 
-        explicit_referer_medium: "push_notification"
+        // optional, allows to specify custom referer medium  
+        // this value overrides implicit referer medium computed from Referer header by tracker 
+        refererMedium: "push_notification"
     },
 };
 remplib.tracker.init(rempConfig);

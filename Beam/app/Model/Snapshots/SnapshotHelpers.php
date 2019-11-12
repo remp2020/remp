@@ -33,6 +33,7 @@ class SnapshotHelpers
             }
         });
 
+        // TODO: `explicit_referer_medium` column is not used anymore, remove it from here after old pageviews data expire
         $q = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
             ->whereIn('time', $timePoints->toInclude)
             ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium']);
