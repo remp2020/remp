@@ -120,7 +120,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             let refererMediumType = typeof config.tracker.refererMedium;
-            // "explicit_referer_medium" config option was renamed to "refererMedium", checking both for compatibility reasons
+            // "explicit_referer_medium" config option is deprecated and was renamed to "refererMedium", checking both for compatibility reasons
             let explicitRefererMediumType = typeof config.tracker.explicit_referer_medium;
             if (refererMediumType !== 'undefined') {
                 if (refererMediumType !== 'string') {
