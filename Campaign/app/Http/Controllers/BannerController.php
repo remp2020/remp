@@ -36,11 +36,13 @@ class BannerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->get('perPage', 15);
+
         return response()->format([
             'html' => view('banners.index'),
-            'json' => BannerResource::collection(Banner::paginate()),
+            'json' => BannerResource::collection(Banner::paginate($perPage)),
         ]);
     }
 
