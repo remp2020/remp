@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use App\Banner;
+use App\Campaign;
+use App\Contracts\SegmentAggregator;
 use Carbon\Carbon;
 use Predis\ClientInterface;
 
@@ -56,6 +58,31 @@ class Showtime
         }
 
         return $this->loadOneTimeBanner($browserBannerKeys);
+    }
+
+    public function canSegmentSeeTheCampaign(Campaign $campaign, SegmentAggregator $segmentAggregator, $userId, $browserId) {
+        if ($campaign->segments->isEmpty()) {
+            return true;
+        }
+
+        foreach ($campaign->segments as $campaignSegment) {
+            $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
+
+            if ($userId) {
+                $belongsToSegment = $segmentAggregator->checkUser($campaignSegment, strval($userId));
+            } else {
+                $belongsToSegment = $segmentAggregator->checkBrowser($campaignSegment, strval($browserId));
+            }
+            
+            return $this->canUserSeeTheCampaign($belongsToSegment, $campaignSegment->inclusive);
+        }
+    }
+
+    private function canUserSeeTheCampaign($userBelongsToSegment, $segmentIsInclusive) {
+        $canSeeTheCampaign =
+            ($segmentIsInclusive && $userBelongsToSegment) ||
+            (!$segmentIsInclusive && !$userBelongsToSegment);
+        return $canSeeTheCampaign;
     }
 
     private function loadOneTimeBanner(array $bannerKeys): ?Banner
