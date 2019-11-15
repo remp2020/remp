@@ -124,13 +124,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             let explicitRefererMediumType = typeof config.tracker.explicit_referer_medium;
             if (refererMediumType !== 'undefined') {
                 if (refererMediumType !== 'string') {
-                    console.warn("remplib: value of tracker.refererMedium has to be string, instead " + refererMediumType + " provided")
+                    console.warn("Referer medium has to be string, " + refererMediumType + " provided instead")
                 } else {
                     this.refererMedium = config.tracker.refererMedium;
                 }
             } else if (explicitRefererMediumType !== 'undefined') {
+                console.warn("Tracker option 'explicit_referer_medium' is deprecated, please use 'refererMedium' instead")
                 if (explicitRefererMediumType !== 'string') {
-                    console.warn("remplib: value of tracker.explicit_referer_medium has to be string, instead " + explicitRefererMediumType + " provided")
+                    console.warn("Referer medium has to be string, " + refererMediumType + " provided instead")
                 } else {
                     this.refererMedium = config.tracker.explicit_referer_medium;
                 }
