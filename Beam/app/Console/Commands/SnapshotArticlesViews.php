@@ -50,7 +50,7 @@ class SnapshotArticlesViews extends Command
         $to = $now;
 
         $records = $this->journalHelper->currentConcurrentsCount(function (ConcurrentsRequest $req) {
-            $req->addGroup('article_id', 'derived_referer_medium', 'explicit_referer_medium', 'token');
+            $req->addGroup('article_id', 'derived_referer_medium', 'token');
         }, $to);
 
         $items = [];
@@ -60,20 +60,18 @@ class SnapshotArticlesViews extends Command
             $token = $record->tags->token;
             $articleId = $record->tags->article_id;
             $derivedRefererMedium = $record->tags->derived_referer_medium;
-            $explicitRefererMedium = $record->tags->explicit_referer_medium;
 
-            $key = self::key($token, $articleId, $derivedRefererMedium, $explicitRefererMedium);
-
-            $items[$key] = [
+            $items[] = [
                 'time' => $dbTime,
                 'property_token' => $token,
                 'external_article_id' => $articleId,
                 'derived_referer_medium' => $derivedRefererMedium,
-                'explicit_referer_medium' => $explicitRefererMedium,
                 'count' => $record->count,
                 'count_by_referer' => '{}', // Disabled at the moment
             ];
         }
+
+        // TODO remove `explicit_referer_medium` and `count_by_referer` columns from table, not used anymore
 
         // Save
         ArticleViewsSnapshot::where('time', $dbTime)->delete();
@@ -83,10 +81,5 @@ class SnapshotArticlesViews extends Command
             $count = count($itemsChunk);
             $this->line("$count records inserted");
         }
-    }
-
-    private static function key($token, $articleId, $derivedRefererMedium, $explicitRefererMedium)
-    {
-        return "{$token}|||{$articleId}|||{$derivedRefererMedium}|||{$explicitRefererMedium}";
     }
 }

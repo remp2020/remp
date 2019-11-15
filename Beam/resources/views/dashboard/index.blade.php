@@ -28,6 +28,11 @@
                     dashboardOptions: this.options
                 }
             },
+            created: function() {
+                this.$store.commit('changeSettings', {
+                    newGraph: {{ json_encode(config('beam.pageview_graph_data_source') === 'snapshots') }}
+                });
+            },
             store: DashboardStore,
             data: {
                 articlesUrl: "{!! route('dashboard.articles.json') !!}",

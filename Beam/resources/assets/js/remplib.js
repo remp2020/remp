@@ -30,7 +30,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             elementFn: function() { return null },
         },
 
-        explicitRefererMedium: null,
+        refererMedium: null,
 
         uriParams: {},
 
@@ -119,12 +119,21 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.article = null;
             }
 
+            let refererMediumType = typeof config.tracker.refererMedium;
+            // "explicit_referer_medium" config option is deprecated and was renamed to "refererMedium", checking both for compatibility reasons
             let explicitRefererMediumType = typeof config.tracker.explicit_referer_medium;
-            if (explicitRefererMediumType !== 'undefined') {
-                if (explicitRefererMediumType !== 'string') {
-                    console.warn("remplib: value of tracker.explicit_referer_medium has to be string, instead " + explicitRefererMediumType + " provided")
+            if (refererMediumType !== 'undefined') {
+                if (refererMediumType !== 'string') {
+                    console.warn("Referer medium has to be string, " + refererMediumType + " provided instead")
                 } else {
-                    this.explicitRefererMedium = config.tracker.explicit_referer_medium;
+                    this.refererMedium = config.tracker.refererMedium;
+                }
+            } else if (explicitRefererMediumType !== 'undefined') {
+                console.warn("Tracker option 'explicit_referer_medium' is deprecated, please use 'refererMedium' instead")
+                if (explicitRefererMediumType !== 'string') {
+                    console.warn("Referer medium has to be string, " + refererMediumType + " provided instead")
+                } else {
+                    this.refererMedium = config.tracker.explicit_referer_medium;
                 }
             }
 
@@ -605,8 +614,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
             params["user"][remplib.rempPageviewIDKey] = remplib.getRempPageviewID();
 
-            if (this.explicitRefererMedium) {
-                params["user"]["explicit_referer_medium"] = this.explicitRefererMedium;
+            if (this.refererMedium) {
+                params["user"]["explicit_referer_medium"] = this.refererMedium;
             }
 
             var cleanup = function(obj) {

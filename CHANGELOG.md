@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for conversion rate sorting in Conversions data table. remp/remp#306
 - Fixed error thrown when using main search on authors listing. remp/remp#531
 - Added command to maintain data retention for rolled-over Elastic indices. remp/remp#527
+- Pageviews graph in article details page loads data from Journal snapshots instead of directly quering Journal API by default. Option `PAGEVIEWS_DATA_SOURCE` added to `.env` file to allow switching to old behaviour. remp/remp#442
+- `rempConfig.tracker` configuration option `explicit_referer_medium` is deprecated and renamed to `refererMedium`. The old one is still accepted due to compatibility reasons.
 
 ## [0.9.1]
 

@@ -53,7 +53,7 @@
                                                type="checkbox">
                                         <i class="input-helper"></i>
                                         <template>
-                                            Point graph [EXPERIMENTAL]
+                                            Snapshots graph
                                         </template>
                                     </label>
                                 </div>

@@ -30,6 +30,9 @@ class ArticleViewsSnapshot extends Model
         'time',
     ];
 
+    /**
+     * By default, apply property token filtering when selecting snapshot data
+     */
     protected static function boot()
     {
         parent::boot();

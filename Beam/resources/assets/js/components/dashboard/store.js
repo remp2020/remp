@@ -6,7 +6,7 @@ export default new Vuex.Store({
     state: {
         settings: {
             compareWith: 'average',
-            newGraph: false,
+            newGraph: true,
             onlyTrafficFromFrontPage: false
         }
     },
