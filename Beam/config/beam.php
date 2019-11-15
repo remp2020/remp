@@ -20,8 +20,8 @@ return [
     |
     | Valid values:
     | snapshots - load data stored in DB snapshots of Journal API (data represents recorded concurrents for points in time)
-    | journal - fallback option, load data directly from Journal API (data represents total number of pageviews for specific intervals).
+    | journal - (default for now) load data directly from Journal API (data represents total number of pageviews for specific intervals).
     |
     */
-    'pageview_graph_data_source' => env('PAGEVIEW_GRAPH_DATA_SOURCE', 'snapshots')
+    'pageview_graph_data_source' => env('PAGEVIEW_GRAPH_DATA_SOURCE', 'journal')
 ];
