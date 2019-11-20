@@ -117,13 +117,13 @@ var bannerJsonData = {$banner->toJson()};
     }
 
     if ($variantUuid) {
-        $js .= "var variantUuid = {$variantUuid};\n";
+        $js .= "var variantUuid = '{$variantUuid}';\n";
     } else {
         $js .= "var variantUuid = null;\n";
     }
 
     if ($campaignUuid) {
-        $js .= "var campaignUuid = {$campaignUuid};\n";
+        $js .= "var campaignUuid = '{$campaignUuid}';\n";
     } else {
         $js .= "var campaignUuid = null;\n";
     }
