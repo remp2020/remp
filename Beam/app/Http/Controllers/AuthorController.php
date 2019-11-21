@@ -137,7 +137,7 @@ class AuthorController extends Controller
             $conversionsQuery->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
         }
         if ($request->input('conversion_from')) {
-            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');http://beam.remp.press/authors?published_from=now%20-%202%20years&published_to=now&conversion_from=first%20day%20of%20this%20month&conversion_to=first%20day%20of%20next%20month%20-%201%20sec&tz=Europe%2FBratislava#
+            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
             $conversionsQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
