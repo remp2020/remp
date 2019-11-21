@@ -37,8 +37,8 @@ class ConversionController extends Controller
         $conversions = Conversion::select('conversions.*')
             ->with(['article', 'article.authors', 'article.sections'])
             ->join('articles', 'articles.id', '=', 'conversions.article_id')
-            ->join('article_author', 'articles.id', '=', 'article_author.article_id')
-            ->join('article_section', 'articles.id', '=', 'article_section.article_id');
+            ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
+            ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id');
 
 
         if ($request->input('conversion_from')) {
