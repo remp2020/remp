@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Added support for one-time banners. remp/remp#512
+- Unified z-index of banner in all templates to 100000. remp/web#968
 
 ### [Mailer]
 
