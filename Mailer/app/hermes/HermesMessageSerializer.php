@@ -12,7 +12,7 @@ class HermesMessageSerializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function serialize(MessageInterface $message)
+    public function serialize(MessageInterface $message): string
     {
         if (method_exists($message, 'getProcess')) {
             $process = $message->getProcess();
@@ -40,7 +40,7 @@ class HermesMessageSerializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function unserialize($string)
+    public function unserialize(string $string): MessageInterface
     {
         $data = JSON::decode($string, Json::FORCE_ARRAY);
         $message = $data['message'];

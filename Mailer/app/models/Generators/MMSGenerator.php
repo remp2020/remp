@@ -10,7 +10,6 @@ use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
-use GuzzleHttp\Client;
 
 class MMSGenerator implements IGenerator
 {
@@ -67,7 +66,6 @@ class MMSGenerator implements IGenerator
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
         $content = $this->content;
-        $transport = $this->transport;
 
         $post = $values->mms_html;
 
@@ -112,7 +110,7 @@ class MMSGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content, $transport) {
+            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content) {
                 $url = "https://dennikn.sk/{$matches[1]}";
                 $meta = $content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';

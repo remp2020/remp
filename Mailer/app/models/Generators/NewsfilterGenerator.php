@@ -113,7 +113,7 @@ class NewsfilterGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use ($content) {
+            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) {
                 $url = "https://dennikn.sk/{$matches[1]}";
                 $meta = $this->content->fetchUrlMeta($url);
                 return 'Čítajte viac: <a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:none;">' . $meta->getTitle() . '</a>';

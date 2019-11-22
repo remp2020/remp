@@ -136,13 +136,12 @@ class WordpressHelpers
         if (1 === count($replace_pairs)) {
                 // Extract $needle and $replace.
             foreach ($replace_pairs as $needle => $replace) {
-                //
-            }
                 // Loop through delimiters (elements) only.
-            for ($i = 1, $c = count($textarr); $i < $c; $i += 2) {
-                if (false !== strpos($textarr[$i], $needle)) {
-                    $textarr[$i] = str_replace($needle, $replace, $textarr[$i]);
-                    $changed = true;
+                for ($i = 1, $c = count($textarr); $i < $c; $i += 2) {
+                    if (false !== strpos($textarr[$i], $needle)) {
+                        $textarr[$i] = str_replace($needle, $replace, $textarr[$i]);
+                        $changed = true;
+                    }
                 }
             }
         } else {

@@ -86,7 +86,7 @@ class MaterialRenderer extends DefaultFormRenderer
 
     public function renderControl(\Nette\Forms\IControl $control)
     {
-        if ($control instanceof Nette\Forms\Controls\Checkbox) {
+        if ($control instanceof Controls\Checkbox) {
             $el = Html::el("div", [
                 'class' => 'toggle-switch',
                 'data-ts-color' => 'cyan',

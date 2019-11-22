@@ -56,7 +56,7 @@ class MinutaDigestGenerator implements IGenerator
 
     public function process($values)
     {
-        $sourceTemplate = $this->sourceTemplateRepository->find($values->source_template_id);
+        $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
 
         $posts = [];
         $urls = explode("\n", $values->posts);

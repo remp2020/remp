@@ -2,7 +2,6 @@
 
 namespace Remp\MailerModule\Generators;
 
-use GuzzleHttp\Client;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
@@ -59,7 +58,6 @@ class NovydenikNewsfilterGenerator implements IGenerator
     public function process($values)
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
-        $content = $this->content;
 
         $post = $values->newsfilter_html;
         $lockedPost = $this->articleLocker->getLockedPost($post);
@@ -105,7 +103,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use ($content) {
+            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) {
                 $url = "https://denikn.cz/{$matches[1]}";
                 $meta = $this->content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';

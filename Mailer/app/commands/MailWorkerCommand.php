@@ -171,8 +171,8 @@ class MailWorkerCommand extends Command
                     $filteredCount = $originalCount - $jobsCount;
 
                     if ($filteredCount > 0) {
-                        $output->writeln(" * $filteredCount jobs of $originalCount were filtered for template <info>{$job->templateCode}</info>, <info>{$batch->id}</info>");
-                        $this->logger->info(" * $filteredCount jobs of $originalCount were filtered for template <info>{$job->templateCode}</info>, <info>{$batch->id}</info>");
+                        $output->writeln(" * $filteredCount jobs of $originalCount were filtered for template <info>{$templateCode}</info>, <info>{$batch->id}</info>");
+                        $this->logger->info(" * $filteredCount jobs of $originalCount were filtered for template <info>{$templateCode}</info>, <info>{$batch->id}</info>");
                     }
 
                     if (empty($jobs)) {
@@ -187,8 +187,8 @@ class MailWorkerCommand extends Command
                     $queueJobs = [];
                     $template = null;
 
-                    $output->writeln(" * Processing $jobsCount jobs of template <info>{$job->templateCode}</info>, batch <info>{$batch->id}</info>");
-                    $this->logger->info(" * Processing $jobsCount jobs of template <info>{$job->templateCode}</info>, batch <info>{$batch->id}</info>");
+                    $output->writeln(" * Processing $jobsCount jobs of template <info>{$templateCode}</info>, batch <info>{$batch->id}</info>");
+                    $this->logger->info(" * Processing $jobsCount jobs of template <info>{$templateCode}</info>, batch <info>{$batch->id}</info>");
                     foreach ($jobs as $i => $job) {
                         $queueJob = $this->mailJobQueueRepository->getJob($job->email, $batch->id);
                         $queueJobs[$i] = $queueJob;
@@ -208,7 +208,7 @@ class MailWorkerCommand extends Command
                     try {
                         $email = $email->setTemplate($template);
                         if ($sendAsBatch && $email->supportsBatch()) {
-                            $output->writeln("sending {$job->templateCode} (batch {$batch->id}) as a batch");
+                            $output->writeln("sending {$templateCode} (batch {$batch->id}) as a batch");
 
                             // TODO temporarily trying to catch all possible errors to debug https://gitlab.com/remp/remp/issues/502
                             // remove once it's fixed

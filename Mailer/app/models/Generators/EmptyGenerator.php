@@ -7,6 +7,8 @@ use Nette\Utils\ArrayHash;
 
 class EmptyGenerator implements IGenerator
 {
+    public $onSubmit;
+
     public function generateForm(Form $form)
     {
         $form->onSuccess[] = [$this, 'formSucceeded'];
