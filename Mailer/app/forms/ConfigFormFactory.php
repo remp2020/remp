@@ -59,17 +59,18 @@ class ConfigFormFactory
             foreach ($mailer->getConfigs() as $name => $option) {
                 $key = $mailer->getPrefix() . '_' . $name;
                 $config = $configs[$key];
+                $item = null;
 
                 if ($config['type'] === 'string') {
                     $item = $mailerContainer
                         ->addText($config['name'], $config['display_name'])
                         ->setOption('description', $config['description'])
                         ->setDefaultValue($config['value']);
+                }
 
-                    if ($option['required']) {
-                        $item->addConditionOn($defaultMailer, Form::EQUAL, $mailer->getAlias())
-                            ->setRequired("Field {$name} is required when mailer {$mailers[$mailer->getAlias()]} is selected");
-                    }
+                if ($item != null && $option['required']) {
+                    $item->addConditionOn($defaultMailer, Form::EQUAL, $mailer->getAlias())
+                        ->setRequired("Field {$name} is required when mailer {$mailers[$mailer->getAlias()]} is selected");
                 }
 
                 unset($configs[$config['name']]);

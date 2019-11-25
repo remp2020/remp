@@ -19,6 +19,15 @@ sniff-fix:
 	cd $(SUB_MAILER) && make sniff-fix
 	cd $(SUB_SSO) && make sniff-fix
 
+composer-install:
+	composer install -d $(SUB_BEAM) --no-progress
+	composer install -d $(SUB_CAMPAIGN) --no-progress
+	composer install -d $(SUB_MAILER) --no-progress
+	composer install -d $(SUB_SSO) --no-progress
+
+phpstan:
+	cd $(SUB_MAILER) && make phpstan
+
 lint:
 	cd $(SUB_BEAM) && make lint
 

@@ -169,12 +169,12 @@ class ProcessConversionStatsCommand extends Command
             foreach ($templates as $template) {
                 $progressBar->setMessage('Processing template <info>' . $template->id . '</info>', 'processing');
 
-                if (!isset($batchTemplatesConversions[$batchTemplate->mail_job_batch_id][$batchTemplate->mail_template->code])) {
+                if (!isset($nonBatchTemplatesConversions[$template->code])) {
                     $progressBar->advance();
                     continue;
                 }
 
-                $nonBatchTemplateConversions = $nonBatchTemplatesConversions[$batchTemplate->mail_template->code] ?? [];
+                $nonBatchTemplateConversions = $nonBatchTemplatesConversions[$template->code] ?? [];
                 $userData = $this->getUserData(array_keys($nonBatchTemplateConversions));
 
                 foreach ($nonBatchTemplateConversions as $userId => $time) {

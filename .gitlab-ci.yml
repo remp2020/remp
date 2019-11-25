@@ -16,11 +16,21 @@ syntax:7.3:
 
 sniffer:
   stage: test
-  image: php:7.2-cli
+  image: remp/php-ci:7.2.25
   tags:
     - docker
   script:
+    - make composer-install
     - make sniff
+
+phpstan:
+  stage: test
+  image: remp/php-ci:7.2.25
+  tags:
+    - docker
+  script:
+    - make composer-install
+    - make phpstan
 
 mailer/🇸🇰:
   stage: deploy
