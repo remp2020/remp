@@ -252,8 +252,8 @@ class Campaign extends Model
             ->pluck('campaign_id')
             ->unique()
             ->toArray();
-
-        Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode($activeCampaignIds));
+        
+        Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode(array_values($activeCampaignIds)));
 
         return collect($activeCampaignIds);
     }
