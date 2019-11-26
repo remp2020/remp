@@ -1,6 +1,7 @@
 <div class="table-responsive">
     {if !isset($tableSettings['displayNavigation']) || $tableSettings['displayNavigation'] === true}
     <div class="action-header m-0 palette-White bg clearfix">
+        <div id="dt-buttons-{$tableId|noescape}"></div>
         <div id="dt-search-{$tableId|noescape}" class="ah-search" style="display: none;">
             <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{$tableId}">
             <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
@@ -149,6 +150,32 @@
                 } );
             }
         });
+
+        {if isset($tableSettings['allowDownload']) && $tableSettings['allowDownload'] === true}
+        new $.fn.dataTable.Buttons(dataTable, {
+            buttons: [ {
+                extend: 'csvHtml5',
+                text: 'Download CSV',
+                className: 'btn palette-Cyan bg',
+                exportOptions: {
+                    format: {
+                        body: function (data, row, column, node) {
+                            var $dateItem = $(node).find('.datatable-date-render-item');
+
+                            if ($dateItem.length) {
+                                return $dateItem.attr('title');
+                            }
+
+                            return $(node).text().replace(/(\r\n|\n|\r)/gm,"");
+                        }
+                    }
+                }
+            } ]
+        });
+
+        dataTable.buttons().container()
+                .appendTo( $('#dt-buttons-{$tableId|noescape}') );
+        {/if}
 
         $.fn.dataTables.search(dataTable, 'dt-search-{$tableId|noescape}');
         $.fn.dataTables.navigation(dataTable, 'dt-nav-{$tableId|noescape}');
