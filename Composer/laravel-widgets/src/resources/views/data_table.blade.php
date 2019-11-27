@@ -2,6 +2,7 @@
 
     @if ($displaySearchAndPaging)
         <div class="action-header m-0 palette-White bg clearfix">
+            <div id="dt-buttons-{{ $tableId }}"></div>
             <div id="dt-search-{{ $tableId }}" class="ah-search" style="display: none;">
                 <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{{ $tableId }}">
                 <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
@@ -146,6 +147,36 @@
                 } );
             }
         });
+
+        @if ($allowDownload)
+        new $.fn.dataTable.Buttons(dataTable, {
+            buttons: [ {
+                extend: 'csvHtml5',
+                text: 'Download CSV',
+                className: 'btn palette-Cyan bg',
+                exportOptions: {
+                    format: {
+                        header: function (data) {
+                            var html = $.parseHTML(data);
+
+                            return html[0].data.replace(/(\r\n|\n|\r)/gm,"");
+                        },
+                        body: function (data, row, column, node) {
+                            var $dateItem = $(node).find('.datatable-date-render-item');
+
+                            if ($dateItem.length) {
+                                return $dateItem.attr('title');
+                            }
+                            return $(node).text().replace(/(\r\n|\n|\r)/gm,"");
+                        }
+                    }
+                }
+            } ]
+        });
+
+        dataTable.buttons().container()
+            .appendTo( $('#dt-buttons-{{ $tableId }}') );
+        @endif
 
         $.fn.dataTables.search(dataTable, 'dt-search-{{ $tableId }}');
         $.fn.dataTables.navigation(dataTable, 'dt-nav-{{ $tableId }}');

@@ -84,6 +84,7 @@
                     'selector' => '[name="conversion_to"]',
                 ],
             ],
+            'allowDownload' => true,
         ]) !!}
     </div>
 

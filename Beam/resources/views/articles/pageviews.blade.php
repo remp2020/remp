@@ -118,6 +118,7 @@
                     'selector' => '[name="published_to"]',
                 ],
             ],
+            'allowDownload' => true,
         ]) !!}
 
     </div>

@@ -61,6 +61,7 @@
                             'selector' => '[name="subscriber"]',
                         ],
                     ],
+                    'allowDownload' => true,
                 ]) !!}
 
             </div>

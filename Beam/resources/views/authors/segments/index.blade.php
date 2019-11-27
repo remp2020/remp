@@ -42,6 +42,7 @@
             ],
             'dataSource' => route('authorSegments.json'),
             'order' => [2, 'desc'],
+            'allowDownload' => true,
         ]) !!}
     </div>
 
