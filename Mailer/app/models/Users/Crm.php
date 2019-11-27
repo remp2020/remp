@@ -35,14 +35,17 @@ class Crm implements IUser
                     'page' => $page,
                 ],
             ]);
-            $result = Json::decode($response->getBody(), Json::FORCE_ARRAY);
-            $response = null;
-            return $result['users'];
         } catch (ConnectException $e) {
             throw new UserException("could not connect CRM user base: {$e->getMessage()}");
         } catch (ClientException $e) {
             Debugger::log("unable to get list of CRM users: " . $e->getResponse()->getBody()->getContents(), Debugger::WARNING);
             return [];
+        }
+
+        try {
+            $result = Json::decode($response->getBody(), Json::FORCE_ARRAY);
+            $response = null;
+            return $result['users'];
         } catch (JsonException $e) {
             Debugger::log("could not decode JSON response: {$response->getBody()->getContents()}", Debugger::WARNING);
             return [];

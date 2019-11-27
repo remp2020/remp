@@ -65,7 +65,6 @@ class DennikeGenerator implements IGenerator
         $this->articleLocker->setupLockLink('Pridajte sa k predplatiteľom', 'https://predplatne.dennikn.sk/ecko');
 
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
-        $content = $this->content;
 
         $post = $values->dennike_html;
         $lockedPost = $this->articleLocker->getLockedPost($post);
@@ -109,7 +108,7 @@ class DennikeGenerator implements IGenerator
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content) {
+            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) {
                 $url = "https://dennikn.sk/{$matches[1]}";
                 $meta = $this->content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#1F3F83;text-decoration:underline;">' . $meta->getTitle() . '</a>';

@@ -26,7 +26,7 @@ class FilterLoader
      * Registers new filter
      *
      * @param string $name
-     * @param callback $callback
+     * @param callable $callback
      */
     public function register($name, $callback)
     {

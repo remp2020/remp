@@ -13,6 +13,7 @@ final class SettingsPresenter extends BasePresenter
 
     public function __construct(MailerFactory $mailerFactory)
     {
+        parent::__construct();
         $this->mailerFactory = $mailerFactory;
     }
 
@@ -21,7 +22,7 @@ final class SettingsPresenter extends BasePresenter
         $availableMailers =  $this->mailerFactory->getAvailableMailers();
 
         $requiredFields = [];
-        array_walk($availableMailers, function ($mailer, $name) use (&$mailers, &$requiredFields) {
+        array_walk($availableMailers, function ($mailer, $name) use (&$requiredFields) {
             /** @var $mailer Mailer */
             $requiredFields[$name] = $mailer->getRequiredOptions();
         });

@@ -1,10 +1,17 @@
 <?php
 namespace Remp\MailerModule\Form\Rendering;
 
+use Nette\Forms\Controls\Button;
+use Nette\Forms\Controls\Checkbox;
+use Nette\Forms\Controls\CheckboxList;
+use Nette\Forms\Controls\MultiSelectBox;
+use Nette\Forms\Controls\RadioList;
+use Nette\Forms\Controls\SelectBox;
+use Nette\Forms\Controls\TextBase;
+use Nette\Forms\Controls\TextInput;
 use Nette\Forms\Form;
 use Nette\Forms\IControl;
 use Nette\Forms\Rendering\DefaultFormRenderer;
-use Nette\Forms\Controls;
 use Nette\Utils\Html;
 
 class MaterialRenderer extends DefaultFormRenderer
@@ -67,17 +74,17 @@ class MaterialRenderer extends DefaultFormRenderer
     public function render(Form $form, $mode = null)
     {
         foreach ($form->getControls() as $control) {
-            if ($control instanceof Controls\Button) {
+            if ($control instanceof Button) {
                 if (strpos($control->getControlPrototype()->getClass(), 'btn') === false) {
                     $control->getControlPrototype()->addClass(empty($usedPrimary) ? 'btn btn-info' : 'btn btn-default');
                     $usedPrimary = true;
                 }
-            } elseif ($control instanceof Controls\TextBase ||
-                $control instanceof Controls\SelectBox ||
-                $control instanceof Controls\MultiSelectBox) {
+            } elseif ($control instanceof TextBase ||
+                $control instanceof SelectBox ||
+                $control instanceof MultiSelectBox) {
                 $control->getControlPrototype()->addClass('form-control fg-input');
-            } elseif ($control instanceof Controls\CheckboxList ||
-                $control instanceof Controls\RadioList) {
+            } elseif ($control instanceof CheckboxList ||
+                $control instanceof RadioList) {
                 $control->getSeparatorPrototype()->setName('div')->addClass($control->getControlPrototype()->type);
             }
         }
@@ -86,7 +93,7 @@ class MaterialRenderer extends DefaultFormRenderer
 
     public function renderControl(\Nette\Forms\IControl $control)
     {
-        if ($control instanceof Nette\Forms\Controls\Checkbox) {
+        if ($control instanceof Checkbox) {
             $el = Html::el("div", [
                 'class' => 'toggle-switch',
                 'data-ts-color' => 'cyan',
@@ -108,7 +115,7 @@ class MaterialRenderer extends DefaultFormRenderer
     {
         $outer = $pair = $this->getWrapper('pair container');
 
-        $isTextInput = $control instanceof Controls\TextInput;
+        $isTextInput = $control instanceof TextInput;
         if ($isTextInput) {
             $inner = $this->getWrapper('pair inner-container');
             $pair->addHtml($inner);
