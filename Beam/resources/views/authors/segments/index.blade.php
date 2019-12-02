@@ -42,7 +42,7 @@
             ],
             'dataSource' => route('authorSegments.json'),
             'order' => [2, 'desc'],
-            'allowDownload' => true,
+            'exportColumns' => [0,1,2,3,4],
         ]) !!}
     </div>
 

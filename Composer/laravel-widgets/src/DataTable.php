@@ -59,7 +59,7 @@ class DataTable extends AbstractWidget
         'requestParams' => [], // extra request parameters attached to JSON dataSource request
         'refreshTriggers' => [], // external triggers that should execute datatable ajax reload
         'displaySearchAndPaging' => true, // display header with search & pagination
-        'allowDownload' => false,
+        'exportColumns' => [],
     ];
 
     /**
@@ -104,7 +104,7 @@ class DataTable extends AbstractWidget
             'requestParams' => $this->config['requestParams'],
             'refreshTriggers' => $this->config['refreshTriggers'],
             'displaySearchAndPaging' => $this->config['displaySearchAndPaging'],
-            'allowDownload' => $this->config['allowDownload'],
+            'exportColumns' => $this->config['exportColumns'],
         ]);
     }
 }

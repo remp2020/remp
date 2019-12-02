@@ -59,7 +59,7 @@
                             'selector' => '[name="subscriber"]',
                         ],
                     ],
-                    'allowDownload' => true,
+                    'exportColumns' => [0,1,2],
                 ]) !!}
 
             </div>
@@ -121,7 +121,7 @@
                             'selector' => '[name="subscriber"]',
                         ],
                     ],
-                    'allowDownload' => true,
+                    'exportColumns' => [0,1,2,3],
                 ]) !!}
 
             </div>

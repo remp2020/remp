@@ -1,28 +1,30 @@
 <div class="table-responsive">
-
     @if ($displaySearchAndPaging)
         <div class="action-header m-0 palette-White bg clearfix">
-            <div id="dt-buttons-{{ $tableId }}"></div>
             <div id="dt-search-{{ $tableId }}" class="ah-search" style="display: none;">
                 <input placeholder="Search" class="ahs-input b-0" type="text" id="dt-search-{{ $tableId }}">
                 <i class="ah-search-close zmdi zmdi-long-arrow-left" data-ma-action="ah-search-close"></i>
             </div>
 
-            <ul id="dt-nav-{{ $tableId }}" class="ah-actions actions a-alt">
-                <li><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
-                <li class="ah-length dropdown">
-                    <button class="btn palette-Cyan bg" data-toggle="dropdown">{{ $paging[1] }}</button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        @foreach($paging[0] as $pageCount)
-                            <li data-value="{{$pageCount}}"><a class="dropdown-item dropdown-item-button">{{$pageCount}}</a></li>
-                        @endforeach
-                    </ul>
-                </li>
+            <div class="ah-right">
+                <ul id="dt-nav-{{ $tableId }}" class="ah-actions actions a-alt">
+                    <li><button class="btn palette-Cyan bg ah-search-trigger" data-ma-action="ah-search-open"><i class="zmdi zmdi-search"></i></button></li>
+                    <li class="ah-length dropdown">
+                        <button class="btn palette-Cyan bg" data-toggle="dropdown">{{ $paging[1] }}</button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            @foreach($paging[0] as $pageCount)
+                                <li data-value="{{$pageCount}}"><a class="dropdown-item dropdown-item-button">{{$pageCount}}</a></li>
+                            @endforeach
+                        </ul>
+                    </li>
 
-                <li class="ah-pagination ah-prev"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-left"></i></button></li>
-                <li class="ah-pagination ah-curr"><button class="btn palette-Cyan bg disabled">1</button></li>
-                <li class="ah-pagination ah-next"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-right"></i></button></li>
-            </ul>
+                    <li class="ah-pagination ah-prev"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-left"></i></button></li>
+                    <li class="ah-pagination ah-curr"><button class="btn palette-Cyan bg disabled">1</button></li>
+                    <li class="ah-pagination ah-next"><button class="btn palette-Cyan bg"><i class="zmdi zmdi-chevron-right"></i></button></li>
+                </ul>
+
+                <div id="dt-buttons-{{ $tableId }}" class="ah-buttons"></div>
+            </div>
         </div>
     @endif
 
@@ -148,7 +150,7 @@
             }
         });
 
-        @if ($allowDownload)
+        @if (!empty($exportColumns))
         new $.fn.dataTable.Buttons(dataTable, {
             buttons: [ {
                 extend: 'csvHtml5',
@@ -158,7 +160,6 @@
                     format: {
                         header: function (data) {
                             var html = $.parseHTML(data);
-
                             return html[0].data.replace(/(\r\n|\n|\r)/gm,"");
                         },
                         body: function (data, row, column, node) {
@@ -169,7 +170,8 @@
                             }
                             return $(node).text().replace(/(\r\n|\n|\r)/gm,"");
                         }
-                    }
+                    },
+                    columns: {!! json_encode($exportColumns) !!}
                 }
             } ]
         });
