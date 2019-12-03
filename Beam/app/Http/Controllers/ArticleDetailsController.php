@@ -114,7 +114,7 @@ class ArticleDetailsController extends Controller
 
     private function itemTag($item): string
     {
-        return JournalHelpers::refererMediumFromPageviewRecord($item);
+        return $this->journalHelper->refererMediumFromPageviewRecord($item);
     }
 
     private function histogramFromSnapshots(Article $article, JournalInterval $journalInterval)
@@ -244,7 +244,7 @@ class ArticleDetailsController extends Controller
     {
         $getTag = function ($record) use ($groupBy) {
             if ($groupBy === 'derived_referer_medium') {
-                return JournalHelpers::refererMediumAlias($record->tags->$groupBy);
+                return $this->journalHelper->refererMediumLabel($record->tags->$groupBy);
             }
             return $record->tags->$groupBy;
         };
@@ -361,7 +361,7 @@ class ArticleDetailsController extends Controller
             $article->pageviews_all == 0 ? 0 : ($article->pageviews_subscribers / $article->pageviews_all) * 100;
 
         $mediums = $this->journalHelper->derivedRefererMediumGroups()->mapWithKeys(function ($item) {
-            return [$item => JournalHelpers::refererMediumAlias($item)];
+            return [$item => $this->journalHelper->refererMediumLabel($item)];
         });
 
         return response()->format([
@@ -410,7 +410,7 @@ class ArticleDetailsController extends Controller
         // since we do not want to distinguish between e.g. m.facebook.com and facebook.com, all should be categorized as one
         $aggregated = [];
         foreach ($records as $record) {
-            $derivedMedium = JournalHelpers::refererMediumAlias($record->tags->derived_referer_medium);
+            $derivedMedium = $this->journalHelper->refererMediumLabel($record->tags->derived_referer_medium);
             $derivedSource = $record->tags->derived_referer_source;
             $source = $record->tags->derived_referer_host_with_path;
             $count = $record->count;

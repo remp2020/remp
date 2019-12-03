@@ -241,12 +241,12 @@ class DashboardController extends Controller
 
     private function itemTag($item): string
     {
-        return JournalHelpers::refererMediumFromPageviewRecord($item);
+        return $this->journalHelper->refererMediumFromPageviewRecord($item);
     }
 
     private function getRefererMediumFromJournalRecord($record)
     {
-        return JournalHelpers::refererMediumAlias($record->tags->derived_referer_medium);
+        return $this->journalHelper->refererMediumLabel($record->tags->derived_referer_medium);
     }
 
     public function timeHistogram(Request $request)
