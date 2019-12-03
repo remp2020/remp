@@ -201,6 +201,7 @@ class JournalHelpers
             }
         }
 
+        // TODO: extract to seeders
         // Built-in labels
         switch ($medium) {
             case 'direct':
