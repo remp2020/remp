@@ -2,6 +2,7 @@
 
 namespace App\Helpers\Journal;
 
+use App\Model\RefererMediumLabel;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Remp\Journal\AggregateRequest;
@@ -11,6 +12,8 @@ use Remp\Journal\JournalContract;
 class JournalHelpers
 {
     private $journal;
+
+    private $cachedRefererMediumLabels;
 
     public function __construct(JournalContract $journal)
     {
@@ -186,8 +189,20 @@ class JournalHelpers
         return $timeIterator->subMinutes($intervalMinutes);
     }
 
-    public static function refererMediumAlias(string $medium): string
+    public function refererMediumLabel(string $medium, bool $cached = true): string
     {
+        if (!$cached || !$this->cachedRefererMediumLabels) {
+            $this->cachedRefererMediumLabels = RefererMediumLabel::all();
+        }
+
+        foreach ($this->cachedRefererMediumLabels as $row) {
+            if ($medium === $row->referer_medium) {
+                return $row->label;
+            }
+        }
+
+        // TODO: extract to seeders
+        // Built-in labels
         switch ($medium) {
             case 'direct':
                 return 'direct/IM';
@@ -204,9 +219,9 @@ class JournalHelpers
      *
      * @return string referer medium
      */
-    public static function refererMediumFromPageviewRecord($record): string
+    public function refererMediumFromPageviewRecord($record): string
     {
         $m = !empty($record->explicit_referer_medium) ? $record->explicit_referer_medium : $record->derived_referer_medium;
-        return JournalHelpers::refererMediumAlias($m);
+        return $this->refererMediumLabel($m);
     }
 }

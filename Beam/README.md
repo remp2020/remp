@@ -84,6 +84,13 @@ Note: *Timespent* tracking is not mandatory dashboard can utilize regular pagevi
 Dashboard allows you to display detail of each article with pageview-related chart containing histogram of visits
 split by traffic source medium (same as in the main dashboard) and also displays article-related events.
 
+###### Source medium labels
+
+Optionally, you can configure labels for source mediums of your pageviews. 
+Labels will be shown in dashboard traffic (and article detail traffic) instead of real tracked values.
+
+Currently, you can do it directly by editing database table `referer_medium_labels`.   
+
 ##### Accounts
 
 Accounts represent an access point to Beam data. Currently it's not utilized in any way, but in the future you'll be able
