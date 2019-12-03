@@ -4,6 +4,12 @@ require('datatables.net');
 require('datatables.net-rowgroup');
 require('datatables.net-responsive');
 
+require('datatables.net-buttons/js/dataTables.buttons.min');
+require('datatables.net-buttons/js/buttons.colVis.min');
+require('datatables.net-buttons/js/buttons.flash.min');
+require('datatables.net-buttons/js/buttons.html5.min');
+require('datatables.net-buttons/js/buttons.print.min');
+
 global.$ = global.jQuery = require('jquery');
 
 require('bootstrap');

@@ -61,6 +61,7 @@
                             'selector' => '[name="subscriber"]',
                         ],
                     ],
+                    'exportColumns' => [0,1,2],
                 ]) !!}
 
             </div>
