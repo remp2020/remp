@@ -23,10 +23,12 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapThree();
 
         // Global selector of current property token
-        View::composer('*', function ($view) {
-            $selectedProperty = resolve(SelectedProperty::class);
-            $view->with('accountPropertyTokens', $selectedProperty->selectInputData());
-        });
+        if (!config('beam.disable_token_filtering')) {
+            View::composer('*', function ($view) {
+                $selectedProperty = resolve(SelectedProperty::class);
+                $view->with('accountPropertyTokens', $selectedProperty->selectInputData());
+            });
+        }
     }
 
     /**
