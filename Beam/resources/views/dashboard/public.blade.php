@@ -38,7 +38,7 @@
                 timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}",
                 timeHistogramUrlNew: "{!! route('public.timeHistogramNew.json') !!}",
                 options: {!! json_encode($options) !!},
-                accountPropertyTokens: {!! json_encode($accountPropertyTokens) !!},
+                accountPropertyTokens: {!! json_encode($accountPropertyTokens ?? false) !!},
                 csrfToken: {!!'"' . csrf_token() . '"'!!},
                 conversionRateMultiplier: {!! $conversionRateMultiplier !!}
             }
