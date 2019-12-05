@@ -58,11 +58,16 @@ class DashboardController extends Controller
 
     private function dashboardView($template)
     {
-        return view($template, [
+        $data = [
             'options' => $this->options(),
-            'accountPropertyTokens' => $this->selectedProperty->selectInputData(),
             'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
-        ]);
+        ];
+
+        if (!config('beam.disable_token_filtering')) {
+            $data['accountPropertyTokens'] = $this->selectedProperty->selectInputData();
+        }
+
+        return view($template, $data);
     }
 
     public function options(): array

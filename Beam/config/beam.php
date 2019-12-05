@@ -23,5 +23,8 @@ return [
     | journal - (default for now) load data directly from Journal API (data represents total number of pageviews for specific intervals).
     |
     */
-    'pageview_graph_data_source' => env('PAGEVIEW_GRAPH_DATA_SOURCE', 'journal')
+    'pageview_graph_data_source' => env('PAGEVIEW_GRAPH_DATA_SOURCE', 'journal'),
+
+    // Temporarily disable property token filtering for debugging
+    'disable_token_filtering' => env('DISABLE_TOKEN_FILTERING', false)
 ];

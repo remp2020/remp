@@ -68,26 +68,28 @@
 <section id="main">
     <aside id="s-main-menu" class="sidebar">
 
-        <form method="post" action="{{ route('properties.switch') }}">
-            @csrf
-            <select name="token"
-                    class="token-select"
-                    onchange="javascript:this.form.submit()">
-                @foreach($accountPropertyTokens as $account)
-                    @if($account->name)
-                        <optgroup label="{{$account->name}}">
-                    @endif
+        @if(isset($accountPropertyTokens))
+            <form method="post" action="{{ route('properties.switch') }}">
+                @csrf
+                <select name="token"
+                        class="token-select"
+                        onchange="javascript:this.form.submit()">
+                    @foreach($accountPropertyTokens as $account)
+                        @if($account->name)
+                            <optgroup label="{{$account->name}}">
+                        @endif
 
-                    @foreach($account->tokens as $token)
-                        <option value="{{$token->uuid}}" {{$token->selected ? 'selected' : ''}}>{{$token->name}}</option>
+                        @foreach($account->tokens as $token)
+                            <option value="{{$token->uuid}}" {{$token->selected ? 'selected' : ''}}>{{$token->name}}</option>
+                        @endforeach
+
+                        @if($account->name)
+                            </optgroup>
+                        @endif
                     @endforeach
-
-                    @if($account->name)
-                        </optgroup>
-                    @endif
-                @endforeach
-            </select>
-        </form>
+                </select>
+            </form>
+        @endif
 
         <ul class="main-menu">
             <li {!! route_active(['dashboard']) !!}>
