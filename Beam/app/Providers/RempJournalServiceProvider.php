@@ -14,9 +14,11 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Remp\Journal\DummyTokenProvider;
 use Remp\Journal\Journal;
 use Remp\Journal\JournalContract;
 use Remp\Journal\JournalException;
+use Remp\Journal\TokenProvider;
 
 class RempJournalServiceProvider extends ServiceProvider
 {
@@ -60,24 +62,32 @@ class RempJournalServiceProvider extends ServiceProvider
         $handlerStack = HandlerStack::create(new CurlHandler());
         $handlerStack->push(Middleware::retry($decider));
 
+        if (config('beam.disable_token_filtering')) {
+            $this->app->bind(TokenProvider::class, DummyTokenProvider::class);
+        } else {
+            $this->app->bind(TokenProvider::class, SelectedProperty::class);
+        }
+
+        $tokenProvider = $this->app->make(TokenProvider::class);
+
         $this->app->when(AggregateArticlesViews::class)
             ->needs(JournalContract::class)
-            ->give(function (Application $app) use ($handlerStack) {
+            ->give(function (Application $app) use ($handlerStack, $tokenProvider) {
                 $client = new Client([
                     'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
                     'handler' => $handlerStack,
                 ]);
 
                 $redis = $app->make('redis')->connection()->client();
-                return new Journal($client, $redis, new SelectedProperty());
+                return new Journal($client, $redis, $tokenProvider);
             });
 
-        $this->app->bind(JournalContract::class, function (Application $app) {
+        $this->app->bind(JournalContract::class, function (Application $app) use ($tokenProvider) {
             $client = new Client([
                 'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
             ]);
             $redis = $app->make('redis')->connection()->client();
-            return new Journal($client, $redis, new SelectedProperty());
+            return new Journal($client, $redis, $tokenProvider);
         });
 
         $this->app->when(JournalProxyController::class)
