@@ -15,6 +15,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Pageviews graph in article details page loads data from Journal snapshots instead of directly quering Journal API by default. Option `PAGEVIEWS_DATA_SOURCE` added to `.env` file to allow switching to old behaviour. remp/remp#442
 - `rempConfig.tracker` configuration option `explicit_referer_medium` is deprecated and renamed to `refererMedium`. The old one is still accepted due to compatibility reasons.
 - Added support for referer medium renaming - one can specify label for each medium by adding a record to `referer_medium_labels` table. remp/remp#543
+- Updated layout footer with link to REMP website. remp/remp#522
+
+### [Campaign]
+
+- Updated layout footer with link to REMP website. remp/remp#522
+
+### [Mailer]
+
+- Updated layout footer with link to REMP website. remp/remp#522
+
+### [Sso]
+
+- Updated layout footer with link to REMP website. remp/remp#522
+
 
 ## [0.9.1]
 

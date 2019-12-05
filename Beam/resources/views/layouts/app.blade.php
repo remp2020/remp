@@ -186,7 +186,7 @@
     </section>
 
     <footer id="footer">
-        Copyright &copy; 2017 - {{ date('Y') }} REMP
+        <p>Thank you for using <a href="https://remp2020.com/" title="Readers’ Engagement and Monetization Platform | Open-source tools for publishers">REMP</a>, open-source software by Denník N.</p>
     </footer>
 </section>
 
