@@ -145,7 +145,7 @@ final class JobPresenter extends BasePresenter
             ])
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show job')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]))
-            ->setTableSetting('allowDownload', true);
+            ->setTableSetting('exportColumns', [0,1,2,3,4,5,6]);
 
         return $dataTable;
     }

@@ -83,7 +83,7 @@ final class TemplatePresenter extends BasePresenter
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit template')
             ->setRowAction('duplicate', 'palette-Cyan zmdi-copy', 'Duplicate template')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]))
-            ->setTableSetting('allowDownload', true);
+            ->setTableSetting('exportColumns', [0,1,2,3,4,5]);
 
         return $dataTable;
     }
