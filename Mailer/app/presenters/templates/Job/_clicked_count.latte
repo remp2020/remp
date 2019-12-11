@@ -1,6 +1,6 @@
 {foreach $job->related('mail_job_batch_templates') as $jobBatchTemplate}
     <div>
         {var $percent = $jobBatchTemplate->sent ? (100 * $jobBatchTemplate->clicked / $jobBatchTemplate->sent) : 0}
-        {$jobBatchTemplate->clicked} ({$percent|number:0}%)
+        {$jobBatchTemplate->clicked} <span class="percentage">({$percent|number:0}%)</span>
     </div>
 {/foreach}

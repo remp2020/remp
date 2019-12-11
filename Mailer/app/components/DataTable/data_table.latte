@@ -173,6 +173,8 @@
                             if ($dateItem.length) {
                                 return $dateItem.attr('title');
                             }
+
+                            $(node).find('.percentage').remove();
                             return $(node).text().replace(/(\r\n|\n|\r)/gm,"");
                         }
                     },
