@@ -162,10 +162,8 @@ class Banner extends Model
                 return 'mediumRectangleTemplate';
             case self::TEMPLATE_BAR:
                 return 'barTemplate';
-                break;
             case self::TEMPLATE_COLLAPSIBLE_BAR:
                 return 'collapsibleBarTemplate';
-                break;
             case self::TEMPLATE_SHORT_MESSAGE:
                 return 'shortMessageTemplate';
             case self::TEMPLATE_OVERLAY_RECTANGLE:
