@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Updated layout footer with link to REMP website. remp/remp#522
+- Fixed missing validation rules for collapsible bar banner template. remp/remp#558
 
 ### [Mailer]
 
