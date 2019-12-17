@@ -77,7 +77,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="main_text" class="fg-label">Main text</label>
-                                <input v-model="mainText" class="form-control fg-input" name="main_text" id="main_text" type="text" requried>
+                                <input v-model="mainText" class="form-control fg-input" name="main_text" id="main_text" type="text" required>
                             </div>
                             <div><small v-html="$parent.fieldParamsMessage"></small></div>
                         </div>
@@ -86,7 +86,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="button_text" class="fg-label">Button text</label>
-                                <input v-model="buttonText" class="form-control fg-input" name="button_text" id="button_text" type="text" requried>
+                                <input v-model="buttonText" class="form-control fg-input" name="button_text" id="button_text" type="text" required>
                             </div>
                         </div>
                     </div>
