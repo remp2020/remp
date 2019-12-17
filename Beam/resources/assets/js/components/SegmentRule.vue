@@ -1,5 +1,5 @@
 <template>
-    <div style="flex: 0 1 46%; margin: 0 8px; min-width: 320px;">
+    <div style="flex: 1 1 auto; margin: 0 8px; min-width: 320px;">
         <div class="card z-depth-2">
             <div class="card-body card-padding-sm">
                 <input :value="id" :name="'rules['+index+'][id]'" type="hidden" required>
