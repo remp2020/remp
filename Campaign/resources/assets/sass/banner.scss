@@ -70,6 +70,6 @@
     // e.g. putting 'ACUTE ACCENT' unicode char as a accent character on the following letter, therefore treating it as a normal letter accent.
 
     // However, we want to show this to user in text inputs (while designing banner), so he/she is aware this might cause problems in some browsers.
-    // Helvetica font displays 'ACUTE ACCENT' unicode character separately.
+    // Helvetica font displays 'ACUTE ACCENT' unicode character separately from the following letter.
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
 }
