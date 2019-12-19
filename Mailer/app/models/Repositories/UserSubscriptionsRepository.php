@@ -122,6 +122,26 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
+    public function unsubscribeEmail(ActiveRow $mailType, $email, $utmParams = [])
+    {
+        $actual = $this->getTable()->where([
+            'user_email' => $email,
+            'mail_type_id' => $mailType->id,
+            'subscribed' => true,
+        ])->limit(1)->fetch();
+
+        if (!$actual) {
+            return;
+        }
+
+        $this->update($actual, [
+                'subscribed' => false,
+                'updated_at' => new DateTime(),
+            ] + $utmParams);
+        
+        $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
+    }
+
     public function getAllSubscribersDataForMailTypes(array $mailTypeIds)
     {
         return $this->getTable()

@@ -4,17 +4,23 @@ namespace Remp\MailerModule\Hermes;
 
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository\LogsRepository;
+use Tomaj\Hermes\Emitter;
 use Tomaj\Hermes\Handler\HandlerInterface;
+use Tomaj\Hermes\Message;
 use Tomaj\Hermes\MessageInterface;
 
 class MailgunEventHandler implements HandlerInterface
 {
     private $logsRepository;
 
+    private $emitter;
+
     public function __construct(
-        LogsRepository $logsRepository
+        LogsRepository $logsRepository,
+        Emitter $emitter
     ) {
         $this->logsRepository = $logsRepository;
+        $this->emitter = $emitter;
     }
 
     public function handle(MessageInterface $message): bool
@@ -47,6 +53,10 @@ class MailgunEventHandler implements HandlerInterface
             $mailgunEvent => $date,
             'updated_at' => new DateTime(),
         ]);
+
+        if ($payload['event'] === 'dropped') {
+            $this->emitter->emit(new Message('email-dropped', ['email' => $log->email]));
+        }
 
         return true;
     }

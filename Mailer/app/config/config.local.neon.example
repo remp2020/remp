@@ -16,6 +16,10 @@ services:
             - setLockText("Exclusive content")
             - setupLockLink("Registration", "https://www.demosite.com/registration")
 
+    hermesWorker:
+        setup:
+            - add('email-dropped', Remp\MailerModule\Hermes\UnsubscribeDroppedHandler())
+
     # Setup loggers output
     commandsLogger:
         setup:
