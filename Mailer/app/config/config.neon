@@ -99,7 +99,7 @@ services:
 	hermesLogger:
 		class: Monolog\Logger('hermes-logger')
 		setup:
-			- pushProcessor(@hermesLogFilter::add(['password', 'token']))
+			- pushProcessor(@hermesLogFilter::add(['password', 'token', 'content']))
 
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
