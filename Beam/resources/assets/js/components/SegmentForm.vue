@@ -49,7 +49,7 @@
 
         </div>
 
-        <div class="col-md-7 col-md-offset-1">
+        <div class="col-md-8">
             <h4>
                 Display rules
                 <span v-on:click="addRule" class="btn btn-info waves-effect"><i class="zmdi zmdi-plus-square"></i> Add rule</span>
@@ -57,7 +57,7 @@
 
             <input type="hidden" name="removedRules[]" v-for="(id,i) in removedRules" v-model="removedRules[i]" />
 
-            <div class="row m-t-10">
+            <div style="display:flex; flex-wrap: wrap" class="m-t-10">
                 <segment-rule v-for="(rule, index) in rules"
                     :index="index"
                     :id="rule.id"

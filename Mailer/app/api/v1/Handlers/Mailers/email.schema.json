@@ -16,10 +16,7 @@
       "type": "string"
     },
     "params": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
+      "type": "object"
     },
     "context": {
       "type": "string"

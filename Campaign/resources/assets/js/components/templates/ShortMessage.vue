@@ -46,7 +46,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="text" class="fg-label">Text</label>
-                                <input v-model="text" class="form-control fg-input" name="text" id="text" type="text" requried>
+                                <input v-model="text" class="form-control fg-input remp-banner-text-input" name="text" id="text" type="text" required>
                             </div>
                             <div><small v-html="$parent.fieldParamsMessage"></small></div>
                         </div>

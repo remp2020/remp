@@ -1406,7 +1406,7 @@ Endpoint for sending single email without creating a job. It should be primarily
   "attachments": [ // optional
     {
       "file": "/path/to/file", // used to determine name of attachment and possibly content of attachment
-      "content": "-- content of attachment --" // if content is not provided, Mailer attempts to open file based on provided path in "file" property
+      "content": "-- base64 encoded content of attachment --" // if content is not provided, Mailer attempts to open file based on provided path in "file" property
     }   
   ],
   "schedule_at": "2019-09-23T08:50:03+00:00" // optional: RFC3339-formatted date when email should be sent; if not provided, email is scheduled to be sent immediately

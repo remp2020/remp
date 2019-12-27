@@ -29,7 +29,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
                             <div class="fg-line">
                                 <label for="html_text" class="fg-label">HTML Text</label>
-                                <textarea v-model="text" class="form-control fg-input" rows="6" name="text" cols="50" id="html_text"></textarea>
+                                <textarea v-model="text" class="form-control fg-input remp-banner-text-input" rows="6" name="text" cols="50" id="html_text"></textarea>
                             </div>
                         </div><!-- .input-group -->
 

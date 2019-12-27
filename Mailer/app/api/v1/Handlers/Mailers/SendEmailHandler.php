@@ -83,12 +83,13 @@ class SendEmailHandler extends BaseHandler
                 return new JsonApiResponse(Response::S200_OK, ['status' => 'ok', 'message' => "Email was not sent, provided context was already sent before."]);
             }
         }
-        foreach ($payload['attachments'] ?? [] as $attachment) {
+        foreach ($payload['attachments'] ?? [] as $i => $attachment) {
             if (!isset($attachment['content'])) {
                 $content = @file_get_contents($attachment['file']); // @ is escalated to exception
                 if ($content === false) {
                     return new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => "Attachment file [{$attachment['file']}] can't be read and content was not provided."]);
                 }
+                $payload['attachments'][$i]['content'] = base64_encode($content);
             }
         }
 

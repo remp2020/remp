@@ -10,6 +10,7 @@
     "node": ">=8.6"
   },
   "dependencies": {
+    "acorn": "^7.1.0",
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",
     "bootstrap": "^3.4.1",

@@ -37,7 +37,7 @@ class SendEmailHandler implements HandlerInterface
             ->setParams($payload['params'] ?? []);
 
         foreach ($payload['attachments'] ?? [] as $attachment) {
-            $email->addAttachment($attachment['file'], $attachment['content'] ?? null);
+            $email->addAttachment($attachment['file'], base64_decode($attachment['content']) ?? null);
         }
         if (isset($payload['context'])) {
             $email->setContext($payload['context']);

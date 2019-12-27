@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^17.3.0",
+    "acorn": "^7.1.0",
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",
     "axios": "^0.18.0",
