@@ -16,9 +16,13 @@ services:
             - setLockText("Exclusive content")
             - setupLockLink("Registration", "https://www.demosite.com/registration")
 
+    unsubscribeDroppedHandler:
+        class: Remp\MailerModule\Hermes\UnsubscribeDroppedHandler
+        setup:
+            - setThreshold(3) # number of dropped emails before unsubscribing user
     hermesWorker:
         setup:
-            - add('email-dropped', Remp\MailerModule\Hermes\UnsubscribeDroppedHandler())
+			- add('email-dropped', @unsubscribeDroppedHandler)
 
     # Setup loggers output
     commandsLogger:
