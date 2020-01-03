@@ -16,6 +16,7 @@
 
     .card-body {
         font-size: 22px;
+        overflow: scroll;
     }
 
     .error {
@@ -77,7 +78,7 @@
         <div class="card-body card-padding-sm text-center">
             <span v-for="(item, index) in values">
                 <br v-if="index!==0"/>
-                {{ item.value | round(precision) }}&nbsp;{{ item.unit }}
+                {{ item.value | round(precision) }} {{ item.unit }}
             </span>
         </div>
 

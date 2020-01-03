@@ -16,6 +16,7 @@
 
     .card-body {
         font-size: 22px;
+        overflow: scroll;
     }
 
     .error {
