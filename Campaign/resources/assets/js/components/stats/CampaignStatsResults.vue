@@ -171,6 +171,7 @@
 
     .card-table {
         margin-bottom: 0;
+        overflow: scroll;
     }
 
     .deleted-variant {
