@@ -4,7 +4,7 @@
 
         <transition name="fade">
             <div v-if="isToggled" class="m-l-5 m-b-5">
-                <ul class="tab-nav">
+                <ul class="tab-nav" style="overflow: hidden">
                     <li :class="selectedTab == 1 ? 'active' : ''">
                         <a @click="switchTab(1)" class="clickable">Quick ranges</a>
                     </li>
