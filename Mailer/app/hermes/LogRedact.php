@@ -2,7 +2,7 @@
 
 namespace Remp\MailerModule\Hermes;
 
-class LogFilter
+class LogRedact
 {
     public static function add($filters)
     {

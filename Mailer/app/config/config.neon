@@ -95,11 +95,11 @@ services:
 	mailProcessLogger:
 		class: Monolog\Logger('mail-process-logger')
 
-	hermesLogFilter: Remp\MailerModule\Hermes\LogFilter
+	hermesLogRedact: Remp\MailerModule\Hermes\LogRedact
 	hermesLogger:
 		class: Monolog\Logger('hermes-logger')
 		setup:
-			- pushProcessor(@hermesLogFilter::add(['password', 'token', 'content']))
+			- pushProcessor(@hermesLogRedact::add(['password', 'token', 'content']))
 
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
