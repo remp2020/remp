@@ -137,6 +137,9 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	if ctx.Payload.RempEventID != nil {
 		tags["remp_event_id"] = *ctx.Payload.RempEventID
 	}
+	if ctx.Payload.ArticleID != nil {
+		tags["article_id"] = *ctx.Payload.ArticleID
+	}
 	fields := map[string]interface{}{}
 	if ctx.Payload.Value != nil {
 		fields["value"] = *ctx.Payload.Value
