@@ -14,7 +14,8 @@
                     'locked_mail_layout_id': $('#' + {$control["dennikeTemplateForm"]['locked_mail_layout_id']->htmlId}).val(),
                     'mail_type_id': $('#' + {$control["dennikeTemplateForm"]['mail_type_id']->htmlId}).val(),
                     'from': $('#' + {$control["dennikeTemplateForm"]['from']->htmlId}).val(),
-                    'subject': $('#' + {$control["dennikeTemplateForm"]['subject']->htmlId}).val()
+                    'subject': $('#' + {$control["dennikeTemplateForm"]['subject']->htmlId}).val(),
+                    'article_id': $('#' + {$control["dennikeTemplateForm"]['article_id']->htmlId}).val()
                 },
                 success: function(data) {
                     previewFrame('#dennike-preview-full-frame', data['generatedHtml']);
@@ -105,6 +106,7 @@
                             {input text_content, value => $textContent}
                             {input locked_html_content, value => $lockedHtmlContent}
                             {input locked_text_content, value => $lockedTextContent}
+                            {input article_id, value => $articleId}
                         </div>
                     {/form}
                 </div>

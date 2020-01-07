@@ -79,6 +79,7 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('text_content');
         $form->addHidden('locked_html_content');
         $form->addHidden('locked_text_content');
+        $form->addHidden('article_id');
 
         if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 31) {
             $defaults = [
@@ -169,7 +170,12 @@ class NewsfilterTemplateFormFactory
                 $values['mail_type_id']
             );
 
-            $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS);
+            $jobContext = null;
+            if ($values['article_id']) {
+                $jobContext = 'newsletter.' . $values['article_id'];
+            }
+
+            $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS, $jobContext);
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
 

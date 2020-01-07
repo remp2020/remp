@@ -209,7 +209,8 @@ class NewsfilterGenerator implements IGenerator
             'lockedTextContent' => $output['lockedTextContent'],
             'newsfilterTitle' => $values->title,
             'from' => $values->from,
-            'render' => true
+            'render' => true,
+            'articleId' => $values->article_id,
         ];
 
         $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
@@ -240,6 +241,8 @@ class NewsfilterGenerator implements IGenerator
             ->setAttribute('rows', 20)
             ->setAttribute('class', 'form-control html-editor')
             ->getControlPrototype();
+
+        $form->addHidden('article_id');
 
         $form->addSubmit('send')
             ->getControlPrototype()
@@ -303,6 +306,8 @@ class NewsfilterGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'post_content'");
         }
         $output->newsfilter_html = $data->post_content;
+
+        $output->article_id = $data->ID;
 
         return $output;
     }
