@@ -116,7 +116,7 @@ func processSum(c *CommerceController, ao model.AggregateOptions) (app.SumCollec
 
 // Categories runs the categories action.
 func (c *CommerceController) Categories(ctx *app.CategoriesCommerceContext) error {
-	categories, err := c.CommerceStorage.Categories()
+	categories, err := c.CommerceStorage.Categories(nil)
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,11 @@ func (c *CommerceController) Categories(ctx *app.CategoriesCommerceContext) erro
 
 // Actions runs the action action. :)
 func (c *CommerceController) Actions(ctx *app.ActionsCommerceContext) error {
-	actions, err := c.CommerceStorage.Actions(ctx.Category)
+	actionsOptions := model.ActionsOptions{
+		Category: ctx.Category,
+	}
+
+	actions, err := c.CommerceStorage.Actions(actionsOptions)
 	if err != nil {
 		return err
 	}

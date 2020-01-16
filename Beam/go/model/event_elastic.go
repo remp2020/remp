@@ -160,14 +160,33 @@ func (eDB *EventElastic) List(options ListOptions) (EventRowCollection, error) {
 }
 
 // Categories lists all tracked categories.
-func (eDB *EventElastic) Categories() ([]string, error) {
-	// try to load from cache first
-	if ec := eDB.categoriesCached; len(ec) > 0 {
-		return ec, nil
+func (eDB *EventElastic) Categories(o *CategoriesOptions) ([]string, error) {
+	// try to load from cache first if no options are provided
+	if o == nil {
+		if ec := eDB.categoriesCached; len(ec) > 0 {
+			return ec, nil
+		}
 	}
 
 	// prepare aggregation
-	search := eDB.DB.Client.Search().Index("events").Type("_doc").Size(0)
+	search := eDB.DB.Client.Search().
+		Index("events").
+		Type("_doc").
+		Size(0)
+
+	var err error
+	// reuse AggregateOptions since it already provides filtering
+	if o != nil {
+		aggOptions := AggregateOptions{
+			FilterBy:  o.FilterBy,
+			TagsExist: o.TagsExist,
+		}
+		search, err = eDB.DB.addSearchFilters(search, "events", aggOptions)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	agg := elastic.NewTermsAggregation().Field("category.keyword")
 	search = search.Aggregation("buckets", agg)
 
@@ -196,20 +215,46 @@ func (eDB *EventElastic) Flags() []string {
 }
 
 // Actions lists all tracked actions under the given category.
-func (eDB *EventElastic) Actions(category string) ([]string, error) {
-	// try to load from cache first
-	if ac := eDB.actionsCached[category]; len(ac) > 0 {
-		return ac, nil
+func (eDB *EventElastic) Actions(o ActionsOptions) ([]string, error) {
+	// try to load from cache first (if no other options are specified)
+	if o.FilterBy == nil && o.TagsExist == nil {
+		if ac := eDB.actionsCached[o.Category]; len(ac) > 0 {
+			return ac, nil
+		}
 	}
 
 	// prepare aggregation
 	search := eDB.DB.Client.Search().Index("events").Type("_doc").Size(0)
+
+	// Filtering - reuse AggregateOptions since it already provides filtering
+	var err error
+	aggOptions := AggregateOptions{
+		FilterBy:  []*FilterBy{},
+		TagsExist: []*TagExists{},
+	}
+	if o.TagsExist != nil {
+		aggOptions.TagsExist = o.TagsExist
+	}
+	if o.FilterBy != nil {
+		aggOptions.FilterBy = o.FilterBy
+	}
+
+	// category is just special case of filtering that is always added
+	fb := &FilterBy{
+		Tag:     "category",
+		Inverse: false,
+		Values:  []string{o.Category},
+	}
+
+	aggOptions.FilterBy = append(aggOptions.FilterBy, fb)
+
+	search, err = eDB.DB.addSearchFilters(search, "events", aggOptions)
+	if err != nil {
+		return nil, err
+	}
+
 	agg := elastic.NewTermsAggregation().Field("action.keyword")
 	search = search.Aggregation("buckets", agg)
-
-	// set filter
-	filters := elastic.NewBoolQuery().Must(elastic.NewTermQuery("category", category))
-	search = search.Query(filters)
 
 	// get results
 	result, err := search.Do(eDB.DB.Context)
@@ -261,7 +306,7 @@ func (eDB *EventElastic) Cache() error {
 	// cache categories
 	oldc := eDB.categoriesCached
 	eDB.categoriesCached = []string{} // cache niled so Categories() loads categories from DB
-	cl, err := eDB.Categories()
+	cl, err := eDB.Categories(nil)
 	if err != nil {
 		return err
 	}
@@ -275,7 +320,10 @@ func (eDB *EventElastic) Cache() error {
 	olda := eDB.actionsCached
 	eDB.actionsCached = make(map[string][]string) // cache niled so Actions() loads actions from DB
 	for _, c := range cl {
-		cal, err := eDB.Actions(c)
+		ao := ActionsOptions{
+			Category: c,
+		}
+		cal, err := eDB.Actions(ao)
 		if err != nil {
 			return err
 		}

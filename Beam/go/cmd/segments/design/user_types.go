@@ -33,6 +33,7 @@ var EventOptionsPayload = Type("EventOptionsPayload", func() {
 	Description("Parameters to filter event counts")
 
 	Attribute("filter_by", ArrayOf(EventOptionsFilterBy), "Selection of data filtering type")
+	Attribute("exist", ArrayOf(EventOptionsExist), "Selection of fields that should be present")
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
 	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
@@ -40,6 +41,19 @@ var EventOptionsPayload = Type("EventOptionsPayload", func() {
 
 	Attribute("action", String, "Event action")
 	Attribute("category", String, "Event category")
+})
+
+var CategoryActionOptionsPayload = Type("CategoryActionOptionsPayload", func() {
+	Description("Parameters to filter events")
+
+	Attribute("conditions", CategoryActionConditions, "Condition definition")
+})
+
+var CategoryActionConditions = Type("CategoryActionConditions", func() {
+	Description("Select only categories having events of selected type")
+
+	Attribute("filter_by", ArrayOf(EventOptionsFilterBy), "Selection of data filtering type")
+	Attribute("exist", ArrayOf(EventOptionsExist), "Selection of fields that should be present")
 })
 
 var OptionsTimeHistogram = Type("OptionsTimeHistogram", func() {
@@ -68,6 +82,15 @@ var EventOptionsFilterBy = Type("EventOptionsFilterBy", func() {
 	Attribute("inverse", Boolean, "If true, condition will be inversed")
 
 	Required("tag", "values")
+})
+
+var EventOptionsExist = Type("EventOptionsExist", func() {
+	Description("Tag that has to be present in item")
+
+	Attribute("tag", String, "Tag to search for")
+	Attribute("inverse", Boolean, "If true, condition will be inversed")
+
+	Required("tag")
 })
 
 var ListPageviewOptionsPayload = Type("ListPageviewOptionsPayload", func() {

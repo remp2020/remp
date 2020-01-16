@@ -73,6 +73,14 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 		}
 	}
 
+	for _, te := range o.TagsExist {
+		if te.Inverse {
+			bq = bq.MustNot(elastic.NewExistsQuery(te.Tag))
+		} else {
+			bq = bq.Must(elastic.NewExistsQuery(te.Tag))
+		}
+	}
+
 	if o.Category != "" {
 		field, err := eDB.resolveKeyword(index, "category")
 		if err != nil {

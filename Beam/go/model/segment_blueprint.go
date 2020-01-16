@@ -54,9 +54,9 @@ type SegmentBlueprintTableCriterionParam struct {
 // can return categories and actions of given category.
 type PCEStorage interface {
 	// Categories lists all tracked categories.
-	Categories() ([]string, error)
+	Categories(options *CategoriesOptions) ([]string, error)
 	// Actions lists all tracked actions under the given category.
-	Actions(category string) ([]string, error)
+	Actions(options ActionsOptions) ([]string, error)
 }
 
 // Get returns all criteria / blueprint for creating new or editing segment.
@@ -97,7 +97,7 @@ func (sbdb *SegmentBlueprintDB) generateBlueprintData() (SegmentBlueprintTableCo
 
 // fillCriterionFromStorage creates & fills SegmentBlueprintTableCriterion from categories and actions of Pageview/Commerce storage.
 func (sbdb *SegmentBlueprintDB) fillCriterionFromStorage(storage PCEStorage, sbt *SegmentBlueprintTable) error {
-	categories, err := storage.Categories()
+	categories, err := storage.Categories(nil)
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,11 @@ func (sbdb *SegmentBlueprintDB) fillCriterionFromStorage(storage PCEStorage, sbt
 			Params: sbdb.buildParams(c),
 		}
 
-		actions, err := storage.Actions(c)
+		ao := ActionsOptions{
+			Category: c,
+		}
+
+		actions, err := storage.Actions(ao)
 		if err != nil {
 			return err
 		}

@@ -134,7 +134,7 @@ func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
 
 // Categories runs the categories action.
 func (c *PageviewController) Categories(ctx *app.CategoriesPageviewsContext) error {
-	categories, err := c.PageviewStorage.Categories()
+	categories, err := c.PageviewStorage.Categories(nil)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,11 @@ func (c *PageviewController) Categories(ctx *app.CategoriesPageviewsContext) err
 
 // Actions runs the action action. :)
 func (c *PageviewController) Actions(ctx *app.ActionsPageviewsContext) error {
-	actions, err := c.PageviewStorage.Actions(ctx.Category)
+	actionsOptions := model.ActionsOptions{
+		Category: ctx.Category,
+	}
+
+	actions, err := c.PageviewStorage.Actions(actionsOptions)
 	if err != nil {
 		return err
 	}

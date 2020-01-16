@@ -192,7 +192,7 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 }
 
 // Categories lists all available categories.
-func (cDB *CommerceElastic) Categories() ([]string, error) {
+func (cDB *CommerceElastic) Categories(o *CategoriesOptions) ([]string, error) {
 	return []string{
 		CategoryCommerce,
 	}, nil
@@ -204,8 +204,8 @@ func (cDB *CommerceElastic) Flags() []string {
 }
 
 // Actions lists all available actions under the given category.
-func (cDB *CommerceElastic) Actions(category string) ([]string, error) {
-	switch category {
+func (cDB *CommerceElastic) Actions(o ActionsOptions) ([]string, error) {
+	switch o.Category {
 	case CategoryCommerce:
 		return []string{
 			"checkout",
@@ -214,5 +214,5 @@ func (cDB *CommerceElastic) Actions(category string) ([]string, error) {
 			"refund",
 		}, nil
 	}
-	return nil, fmt.Errorf("unknown commerce category: %s", category)
+	return nil, fmt.Errorf("unknown commerce category: %s", o.Category)
 }

@@ -79,7 +79,18 @@ func (c *EventController) List(ctx *app.ListEventsContext) error {
 
 // Categories runs the categories action.
 func (c *EventController) Categories(ctx *app.CategoriesEventsContext) error {
-	categories, err := c.EventStorage.Categories()
+	categories, err := c.EventStorage.Categories(nil)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(categories)
+}
+
+// CategoriesPost runs the categories action.
+func (c *EventController) CategoriesPost(ctx *app.CategoriesPostEventsContext) error {
+	options := categoriesOptionsFromPayload(ctx.Payload)
+
+	categories, err := c.EventStorage.Categories(&options)
 	if err != nil {
 		return err
 	}
@@ -88,7 +99,29 @@ func (c *EventController) Categories(ctx *app.CategoriesEventsContext) error {
 
 // Actions runs the action action. :)
 func (c *EventController) Actions(ctx *app.ActionsEventsContext) error {
-	actions, err := c.EventStorage.Actions(ctx.Category)
+	actionsOptions := model.ActionsOptions{
+		Category: ctx.Category,
+	}
+
+	actions, err := c.EventStorage.Actions(actionsOptions)
+	if err != nil {
+		return err
+	}
+	return ctx.OK(actions)
+}
+
+// ActionsPost runs the action action. :)
+func (c *EventController) ActionsPost(ctx *app.ActionsPostEventsContext) error {
+	categoryOptions := categoriesOptionsFromPayload(ctx.Payload)
+
+	actionsOptions := model.ActionsOptions{
+		Category:  ctx.Category,
+		FilterBy:  categoryOptions.FilterBy,
+		TagsExist: categoryOptions.TagsExist,
+	}
+
+	actions, err := c.EventStorage.Actions(actionsOptions)
+
 	if err != nil {
 		return err
 	}
@@ -120,6 +153,17 @@ func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.A
 		o.FilterBy = append(o.FilterBy, fb)
 	}
 
+	for _, val := range payload.Exist {
+		te := &model.TagExists{
+			Tag:     val.Tag,
+			Inverse: false,
+		}
+		if val.Inverse != nil {
+			te.Inverse = *val.Inverse
+		}
+		o.TagsExist = append(o.TagsExist, te)
+	}
+
 	o.GroupBy = payload.GroupBy
 	if payload.TimeAfter != nil {
 		o.TimeAfter = *payload.TimeAfter
@@ -141,6 +185,36 @@ func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.A
 
 	if payload.Category != nil {
 		o.Category = *payload.Category
+	}
+
+	return o
+}
+
+// categoryActionOptionsFromPayload converts payload data to CategoriesOptions.
+func categoriesOptionsFromPayload(payload *app.CategoryActionOptionsPayload) model.CategoriesOptions {
+	var o model.CategoriesOptions
+
+	for _, val := range payload.Conditions.FilterBy {
+		fb := &model.FilterBy{
+			Tag:     val.Tag,
+			Values:  val.Values,
+			Inverse: false,
+		}
+		if val.Inverse != nil {
+			fb.Inverse = *val.Inverse
+		}
+		o.FilterBy = append(o.FilterBy, fb)
+	}
+
+	for _, val := range payload.Conditions.Exist {
+		te := &model.TagExists{
+			Tag:     val.Tag,
+			Inverse: false,
+		}
+		if val.Inverse != nil {
+			te.Inverse = *val.Inverse
+		}
+		o.TagsExist = append(o.TagsExist, te)
 	}
 
 	return o

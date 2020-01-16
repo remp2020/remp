@@ -259,6 +259,9 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 	if e.UserID != "" {
 		event.User.ID = &e.UserID
 	}
+	if e.ArticleID != "" {
+		event.ArticleID = &e.ArticleID
+	}
 	if e.URL != "" {
 		event.User.URL = &e.URL
 	}

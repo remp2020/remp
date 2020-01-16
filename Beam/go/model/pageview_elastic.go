@@ -402,7 +402,7 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 }
 
 // Categories lists all tracked categories.
-func (pDB *PageviewElastic) Categories() ([]string, error) {
+func (pDB *PageviewElastic) Categories(o *CategoriesOptions) ([]string, error) {
 	return []string{
 		CategoryPageview,
 	}, nil
@@ -416,14 +416,14 @@ func (pDB *PageviewElastic) Flags() []string {
 }
 
 // Actions lists all tracked actions under the given category.
-func (pDB *PageviewElastic) Actions(category string) ([]string, error) {
-	switch category {
+func (pDB *PageviewElastic) Actions(o ActionsOptions) ([]string, error) {
+	switch o.Category {
 	case CategoryPageview:
 		return []string{
 			ActionPageviewLoad,
 		}, nil
 	}
-	return nil, fmt.Errorf("unknown pageview category: %s", category)
+	return nil, fmt.Errorf("unknown pageview category: %s", o.Category)
 }
 
 // Users lists all tracked users.
