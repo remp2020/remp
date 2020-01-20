@@ -209,7 +209,6 @@ class BatchEmailGenerator
                     $additionalParams = $this->unreadArticlesResolver->getMailParameters($jobOptions['code'], $userId);
                     foreach ($additionalParams as $name => $value) {
                         $jobOptions['params'][$name] = $value;
-
                     }
                 } catch (UserUnreadArticlesResolveException $exception) {
                     // just log and continue to next user
