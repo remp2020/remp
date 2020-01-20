@@ -1,67 +1,103 @@
-FROM php:7.2-fpm
+FROM php:7.2.26-fpm
 
-ENV BUILD_DEPS libzip-dev g++ build-essential libsasl2-dev libssl-dev python-minimal
+ARG DOCKER_USER
+ARG DOCKER_USER_ID
+ARG DOCKER_GROUP_ID
 
-ENV RUN_DEPS libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev
+ENV BUILD_DEPS="libzip-dev gcc g++ make build-essential libsasl2-dev libssl-dev python-minimal"
+ENV RUN_DEPS="libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev gettext-base unzip"
 
-# INIT (single command so the intermediates are not stored)
+# Composer
+ENV COMPOSER_VERSION=1.9.2
+ENV COMPOSER_HOME="/composer"
+ENV PATH="/composer/vendor/bin:$PATH"
 
-RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
-    && pecl install xdebug && docker-php-ext-enable xdebug \
-    && docker-php-ext-configure intl \
-    && docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl sockets pcntl gd \
-    && apt-get purge \
+# NodeJS + Yarn
+ENV YARN_CACHE_FOLDER="/var/cache/yarn"
+ENV NODE_VERSION=10.18.1-1nodesource1
+ENV YARN_VERSION=1.21.1-1
+
+# Dockerize
+ENV DOCKERIZE_VERSION v0.6.1
+
+# Init (single command so the intermediates are not stored)
+
+RUN apt update && \
+    apt install -y \
+        ${BUILD_DEPS} \
+        ${RUN_DEPS} && \
+    pecl install xdebug && \
+    docker-php-ext-enable xdebug && \
+    docker-php-ext-configure intl && \
+    docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ && \
+    docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        bcmath \
+        mbstring \
+        iconv \
+        zip \
+        intl \
+        sockets \
+        pcntl \
+        gd && \
+    apt purge \
         -y --auto-remove \
         -o APT::AutoRemove::RecommendsImportant=false \
-        ${BUILD_DEPS}
+        ${BUILD_DEPS} && \
+    apt clean
 
-# PHP
+# Php
 
-ADD xdebug.ini /tmp/xdebug.ini
+ADD php/xdebug.ini /tmp/xdebug.ini
 
 RUN cat /tmp/xdebug.ini >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-ADD log.conf /usr/local/etc/php-fpm.d/zz-log.conf
+ADD php/www.conf /usr/local/etc/php-fpm.d/www.conf
+ADD php/log.conf /usr/local/etc/php-fpm.d/zz-log.conf
 
-# COMPOSER
+# Composer
 
-ENV COMPOSER_HOME /composer
+RUN curl -sS https://getcomposer.org/installer | \
+    php -- \
+        --install-dir=/usr/local/bin \
+        --filename=composer \
+        --version=${COMPOSER_VERSION}
 
-ENV PATH /composer/vendor/bin:$PATH
+# NodeJS + Yarn
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
+RUN rm -rf /var/lib/apt/lists/* && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+    apt update && \
+    apt install -y \
+        nodejs=${NODE_VERSION} \
+        yarn=${YARN_VERSION} && \
+    apt clean
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# User
 
-# NODEJS + YARN
+RUN useradd -d /home/user -u 1000 -m -s /bin/bash user && \
+    mkdir -p \
+        ${YARN_CACHE_FOLDER} \
+        ${COMPOSER_HOME}/cache && \
+    chown user:user \
+        /var/www/html \
+        ${YARN_CACHE_FOLDER} \
+        ${COMPOSER_HOME}/cache
 
-ENV PATH /root/.yarn/bin:$PATH
+ADD bin/fixUser .
 
-ENV YARN_CACHE_FOLDER /yarn
+RUN ./fixUser ${DOCKER_USER} user ${DOCKER_USER_ID} ${DOCKER_GROUP_ID}
 
-RUN rm -rf /var/lib/apt/lists/*
+# Dockerize run
 
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+RUN wget --quiet https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz && \
+    tar -C /usr/local/bin -xzvf dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz && \
+    rm dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz
 
-RUN apt-get install -y nodejs
+USER user
 
-RUN curl -sL https://yarnpkg.com/install.sh | bash -
+ADD php/remp.sh /remp.sh
 
-# VOLUME
-
-VOLUME /var/www/html
-
-RUN chmod 777 /var/www/html
-
-ADD remp.sh /root/remp.sh
-
-RUN chmod +x /root/remp.sh
-
-ENV DOCKERIZE_VERSION v0.6.0
-
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-
-CMD ["dockerize", "-timeout", "1m", "-wait-retry-interval", "10s", "-wait", "tcp://mysql:3306", "-wait", "tcp://redis:6379", "/root/remp.sh"]
+CMD ["dockerize", "-timeout", "1m", "-wait-retry-interval", "10s", "-wait", "tcp://mysql:3306", "-wait", "tcp://redis:6379", "/remp.sh"]

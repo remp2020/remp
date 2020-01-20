@@ -1,4 +1,4 @@
-version: "3"
+version: "3.7"
 
 services:
   nginx:
@@ -14,7 +14,7 @@ services:
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
-    #  - "/home/user/.cache/yarn:/yarn:rw"
+    #  - "/home/user/.cache/yarn:/var/cache/yarn:rw"
 
   mailer:
     environment:
@@ -23,7 +23,7 @@ services:
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
-    #  - "/home/user/.cache/yarn:/yarn:rw"
+    #  - "/home/user/.cache/yarn:/var/cache/yarn:rw"
 
   beam:
     environment:
@@ -32,7 +32,7 @@ services:
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
-    #  - "/home/user/.cache/yarn:/yarn:rw"
+    #  - "/home/user/.cache/yarn:/var/cache/yarn:rw"
 
   sso:
     environment:
@@ -41,4 +41,4 @@ services:
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
-    #  - "/home/user/.cache/yarn:/yarn:rw"
+    #  - "/home/user/.cache/yarn:/var/cache/yarn:rw"

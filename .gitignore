@@ -2,6 +2,7 @@
 .vscode
 .history
 .env
+.env.docker
 *.sublime-project
 *.sublime-workspace
 .metadata

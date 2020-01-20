@@ -57,23 +57,28 @@ with your own Mailer provider if you need it.
 ### Docker installation
 *(recommended for development or testing)*
 
-#### 1. Pre-building binaries of Go apps
+#### 1. .env.docker file setup
 
-There's a need for pre-building binaries of Go apps before you can run Docker compose. You don't need Go environment 
-to have set up, but you need Docker to build docker-ready tarballs properly.
+- First you need to prepare `.env.docker` file for `docker-compose`.
 
-```bash
-make docker-build
-```
+    ```bash
+    cp .env.docker.dist .env.docker
+    ```
+
+- Then you set correct values dor `DOCKER_USER`, `DOCKER_USER_ID` and `DOCKER_GROUP_ID` parameters in the fresh `.env.docker` file according to your host linux user.
+
+    You can see some inspiration on how to get user values in [install.sh](install.sh).
 
 #### 2. Docker-compose
 
 We've prepared `docker-compose.yml` in a way it's ready for development.
 ```bash
-docker-compose up
+docker-compose --env-file=.env.docker up
 ```
 
-> The appliance was tested with Docker CE 17.12.0 and Docker Compose 1.16.1.
+> The appliance was tested with Docker CE 19.03.5 and Docker Compose 1.25.1.
+
+> If you are on MacOS and don't have the latest Docker Compose, install them with commands `brew install docker-compose` and `brew link --overwrite docker-compose`.
 
 #### 3. First run
 
@@ -161,10 +166,10 @@ If you're unfamiliar with `docker-compose`, try running `docker-compose --help` 
 of Docker also supports its own `--help` switch. Feel free to explore it.
 
 Couple of neat commands:
-* `docker-compose down` to remove all containers, networks and volumes created by `docker-compose`
+* `docker-compose --env-file=.env.docker down` to remove all containers, networks and volumes created by `docker-compose`
 * `docker-compose ps` to list all services with their status
 * `docker-compose logs` to read services logs
-* `docker-compose build` to force rebuild of images
+* `docker-compose --env-file=.env.docker build` to force rebuild of images
 * `docker-compose exec campaign /bin/bash` to connect to `campaign` container
 * `docker images` to list all available docker images
 
