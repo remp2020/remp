@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+# Corrects UID and GID for container user according to host UID and GID if needed
+#
+# #1 Example: UID 1000 and GID 1000:
+#     ./fixUser test user 1000 1000
+# - 'user' has UID 1000 and GID 1000 by default - nothing will happen
+#
+# #2 Example: UID 501 (not exists in docker image) and GID 501 (not exists in docker image):
+#     ./fixUser test user 501 501
+# - 'user' UID will change to 501
+# - 'user' GID will change to 501
+#
+# #3 Example: UID 35 (exists in docker image as 'games') and GID 100 (exists in docker image as 'users'):
+#     ./fixUser test user 35 100
+# - 'games' UID will change to random free UID (1100-2000) to release UID 35
+# - 'user' UID will change to 35
+# - adds user 'user' to group 'users'
+
+HOST_USER=$1
+CONTAINER_USER_NAME=$2
+HOST_USER_ID=$3
+HOST_GROUP_ID=$4
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# User name which exists under hosts user id
+EXISTING_CONTAINER_USER_NAME=$(getent passwd ${HOST_USER_ID} | cut -d: -f1)
+EXISTING_CONTAINER_NEW_USER_ID=""
+# Group name which exists under hosts group id
+EXISTING_CONTAINER_GROUP_NAME=$(getent group ${HOST_GROUP_ID} | cut -d: -f1)
+# User ID of the container user
+CONTAINER_USER_ID=$(id -u ${CONTAINER_USER_NAME})
+# Group ID and group name of the container user
+CONTAINER_GROUP_ID=$(id -g ${CONTAINER_USER_NAME})
+CONTAINER_GROUP_NAME=$(getent group ${CONTAINER_GROUP_ID} | cut -d: -f1)
+FINAL_GROUP_NAME=${EXISTING_CONTAINER_GROUP_NAME}
+
+# Skip this script if the host user is root
+if [ "$HOST_USER" == "root" ]; then
+    exit 0
+fi
+
+# Final group name to be used will be container group if no other group exists with the host group ID
+if [ -z "${FINAL_GROUP_NAME}" ]; then
+    FINAL_GROUP_NAME=${CONTAINER_GROUP_NAME}
+fi
+
+# Generate new user ID to be used for existing container user
+while [ ! -z "$(getent passwd ${EXISTING_CONTAINER_NEW_USER_ID})" ]; do
+    EXISTING_CONTAINER_NEW_USER_ID=$(shuf -i 1100-2000 -n 1)
+done
+
+# Change user ID for container user if needed
+if [ "${EXISTING_CONTAINER_USER_NAME}" == "${CONTAINER_USER_NAME}" ] && [ ! "${CONTAINER_USER_ID}" == "${HOST_USER_ID}" ]; then
+    echo "Changing '${CONTAINER_USER_NAME}' user ID ${CONTAINER_USER_ID} to ${HOST_USER_ID}"
+    usermod -u ${HOST_USER_ID} "${CONTAINER_USER_NAME}"
+fi
+
+# Change user ID for existing container user and container user if needed
+if [ ! -z "${EXISTING_CONTAINER_USER_NAME}" ] && [ ! "${EXISTING_CONTAINER_USER_NAME}" == "${CONTAINER_USER_NAME}" ]; then
+    echo "Changing '${EXISTING_CONTAINER_USER_NAME}' user ID ${HOST_USER_ID} to ${EXISTING_CONTAINER_NEW_USER_ID}"
+    usermod -u ${EXISTING_CONTAINER_NEW_USER_ID} "${EXISTING_CONTAINER_USER_NAME}" 2>&1
+    echo "Changing '${CONTAINER_USER_NAME}' user ID ${CONTAINER_USER_ID} to ${HOST_USER_ID}"
+    usermod -u ${HOST_USER_ID} "${CONTAINER_USER_NAME}"
+fi
+
+# Change group ID for container group name if needed
+if [ "${FINAL_GROUP_NAME}" == "${CONTAINER_GROUP_NAME}" ] && [ ! "${CONTAINER_GROUP_ID}" == "${HOST_GROUP_ID}" ]; then
+    echo "Changing '${FINAL_GROUP_NAME}' group ID ${CONTAINER_GROUP_ID} to ${HOST_GROUP_ID}"
+    groupmod -g ${HOST_GROUP_ID} "${FINAL_GROUP_NAME}"
+    find / -group ${CONTAINER_GROUP_ID} -exec chgrp -h ${HOST_GROUP_ID} {} \;
+fi
+
+# Assign correct group for existing container user name if needed
+if [ ! "${FINAL_GROUP_NAME}" == "${CONTAINER_GROUP_NAME}" ]; then
+    echo "Adding user with UID ${HOST_USER_ID} (${CONTAINER_USER_NAME}) to group with GID ${HOST_GROUP_ID} (${FINAL_GROUP_NAME})"
+    usermod -a -G ${FINAL_GROUP_NAME} ${CONTAINER_USER_NAME} 2>&1
+fi
+
+echo "Setting up workdir permissions (${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME})"
+chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} ${PROJECT_ROOT}

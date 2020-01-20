@@ -1,5 +1,4 @@
 #!/bin/bash
-
 envsubst <.env.dist >.env
 
 cd ${GOAGEN_DIR}
