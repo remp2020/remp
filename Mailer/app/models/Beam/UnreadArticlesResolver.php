@@ -64,7 +64,7 @@ class UnreadArticlesResolver
      *
      * @throws UserUnreadArticlesResolveException
      */
-    private function hasValidParameters($templateCode, $userId): void
+    private function checkValidParameters($templateCode, $userId): void
     {
         // check enough parameters were resolved for template
         $requiredArticleCount = (int) $this->templates[$templateCode]->articlesCount;
@@ -84,7 +84,7 @@ class UnreadArticlesResolver
      */
     public function getMailParameters($templateCode, $userId): array
     {
-        $this->hasValidParameters($templateCode, $userId);
+        $this->checkValidParameters($templateCode, $userId);
 
         $params = [];
 
