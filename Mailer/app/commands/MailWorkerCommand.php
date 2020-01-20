@@ -278,7 +278,7 @@ class MailWorkerCommand extends Command
     private function cacheJobs($jobs, $batchId)
     {
         foreach ($jobs as $job) {
-            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId, $job->context);
+            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId, $job->context, $job->params ?? []);
         }
     }
 

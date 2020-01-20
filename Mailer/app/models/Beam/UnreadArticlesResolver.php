@@ -58,8 +58,34 @@ class UnreadArticlesResolver
         }
     }
 
+    /**
+     * @param $templateCode
+     * @param $userId
+     *
+     * @throws UserUnreadArticlesResolveException
+     */
+    private function checkValidParameters($templateCode, $userId): void
+    {
+        // check enough parameters were resolved for template
+        $requiredArticleCount = (int) $this->templates[$templateCode]->articlesCount;
+        $userArticleCount = count($this->results[$templateCode][$userId]);
+
+        if ($userArticleCount < $requiredArticleCount) {
+            throw new UserUnreadArticlesResolveException("Template $templateCode requires $requiredArticleCount unread articles, user #$userId has only $userArticleCount, unable to send personalized email.");
+        }
+    }
+
+    /**
+     * @param $templateCode
+     * @param $userId
+     *
+     * @return array
+     * @throws UserUnreadArticlesResolveException
+     */
     public function getMailParameters($templateCode, $userId): array
     {
+        $this->checkValidParameters($templateCode, $userId);
+
         $params = [];
 
         $headlineTitle = null;
