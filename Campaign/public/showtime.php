@@ -610,18 +610,9 @@ foreach ($campaignIds as $campaignId) {
     }
 
     // segment
-    foreach ($campaign->segments as $campaignSegment) {
-        $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
-
-        if ($userId) {
-            if (!$segmentAggregator->checkUser($campaignSegment, strval($userId))) {
-                continue 2;
-            }
-        } else {
-            if (!$segmentAggregator->checkBrowser($campaignSegment, strval($browserId))) {
-                continue 2;
-            }
-        }
+    $canSee = $showtime->canSegmentSeeTheCampaign($campaign, $segmentAggregator, $userId, $browserId);
+    if (!$canSee) {
+        continue;
     }
 
     $displayData[] = renderCampaign(
