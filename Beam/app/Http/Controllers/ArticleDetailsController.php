@@ -15,10 +15,13 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\ListRequest;
 
 class ArticleDetailsController extends Controller
 {
     private const ALLOWED_INTERVALS = 'today,7days,30days,all';
+
+    private const CATEGORY_ACTION_SEPARATOR = '::';
 
     private $journal;
 
@@ -161,8 +164,6 @@ class ArticleDetailsController extends Controller
             'events.*' => 'in:conversions,title_changes'
         ]);
 
-        $eventOptions = $request->get('events', []);
-
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $journalInterval = new JournalInterval($tz, $request->get('interval'), $article);
 
@@ -180,6 +181,7 @@ class ArticleDetailsController extends Controller
         $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
         $data['events'] = [];
 
+        $eventOptions = $request->get('events', []);
         if (in_array('conversions', $eventOptions, false)) {
             $conversions = $article->conversions()
                 ->whereBetween('paid_at', [$journalInterval->timeAfter->tz('UTC'), $journalInterval->timeBefore->tz('UTC')])
@@ -237,7 +239,60 @@ class ArticleDetailsController extends Controller
             }
         }
 
+        $externalEventTypes = $request->get('externalEvents', []);
+        $externalEvents = $this->loadExternalEvents($article, $journalInterval, $externalEventTypes);
+        $data['events'] += $externalEvents;
+
         return response()->json($data);
+    }
+
+    private function loadExternalEvents(Article $article, JournalInterval $journalInterval, $externalEventTypes): array
+    {
+        if (!$externalEventTypes) {
+            return [];
+        }
+
+        $categories = [];
+        $categoryActions = [];
+        foreach ($externalEventTypes as $type) {
+            [$category, $action] = explode(self::CATEGORY_ACTION_SEPARATOR, $type);
+            $categories[] = $category;
+            if (!array_key_exists($category, $categoryActions)) {
+                $categoryActions[$category] = [];
+            }
+            $categoryActions[$category][] = $action;
+        }
+
+        $r = ListRequest::from('events')
+            ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
+            ->addFilter('article_id', $article->external_id)
+            ->addFilter('category', ...$categories);
+        $response = $this->journal->list($r);
+
+        $tags = [];
+
+        $events = [];
+        foreach ($response[0]->events ?? [] as $event) {
+            if (!in_array($event->action, $categoryActions[$event->category], true)) {
+                // ATM Journal API doesn't provide way to simultaneously check for category and action on the same record,
+                // therefore check first category in the request and check action here
+                continue;
+            }
+            $title = $event->category . ':' . $event->action;
+            $tags[$title] = true;
+
+            $events[] = (object) [
+                'date' => Carbon::parse($event->system->time)->toIso8601ZuluString(),
+                'title' => $title,
+            ];
+        }
+
+        $colors = Colors::generalTagsToColors(array_keys($tags), true);
+        foreach ($events as $event) {
+            $event->color = $colors[$event->title];
+        }
+
+        return $events;
     }
 
     private function histogram(Article $article, JournalInterval $journalInterval, string $groupBy, callable $addConditions = null)
@@ -364,6 +419,14 @@ class ArticleDetailsController extends Controller
             return [$item => $this->journalHelper->refererMediumLabel($item)];
         });
 
+        $externalEvents = [];
+        foreach ($this->journalHelper->eventsCategoriesActionsForArticle($article) as $item) {
+            $externalEvents[] = (object) [
+                'text' => $item->category . ':' . $item->action,
+                'value' => $item->category . self::CATEGORY_ACTION_SEPARATOR . $item->action,
+            ];
+        }
+
         return response()->format([
             'html' => view('articles.show', [
                 'article' => $article,
@@ -376,6 +439,7 @@ class ArticleDetailsController extends Controller
                 'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
                 'snapshotsDataSource' => $this->pageviewGraphDataSource === 'snapshots',
+                'externalEvents' => $externalEvents,
             ]),
             'json' => new ArticleResource($article),
         ]);

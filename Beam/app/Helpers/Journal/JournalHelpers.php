@@ -2,11 +2,13 @@
 
 namespace App\Helpers\Journal;
 
+use App\Article;
 use App\Model\RefererMediumLabel;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
+use Remp\Journal\EventCategoryActionRequest;
 use Remp\Journal\JournalContract;
 
 class JournalHelpers
@@ -223,5 +225,28 @@ class JournalHelpers
     {
         $m = !empty($record->explicit_referer_medium) ? $record->explicit_referer_medium : $record->derived_referer_medium;
         return $this->refererMediumLabel($m);
+    }
+
+
+    /**
+     * Returns list of all categories and actions for article events
+     * @param Article $article
+     *
+     * @return array
+     */
+    public function eventsCategoriesActionsForArticle(Article $article): array
+    {
+        $r = AggregateRequest::from('events')
+            ->addFilter('article_id', $article->external_id)
+            ->addGroup('category', 'action');
+
+        $results = [];
+
+        foreach ($this->journal->count($r) as $item) {
+            if (!empty($item->tags->action) && !empty($item->tags->category)) {
+                $results[] = (object) $item->tags;
+            }
+        }
+        return $results;
     }
 }
