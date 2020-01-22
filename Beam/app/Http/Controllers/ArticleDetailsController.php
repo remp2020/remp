@@ -239,23 +239,23 @@ class ArticleDetailsController extends Controller
             }
         }
 
-        $externalEventTypes = $request->get('externalEvents', []);
-        $externalEvents = $this->loadExternalEvents($article, $journalInterval, $externalEventTypes);
+        $requestedExternalEvents = $request->get('externalEvents', []);
+        $externalEvents = $this->loadExternalEvents($article, $journalInterval, $requestedExternalEvents);
         $data['events'] += $externalEvents;
 
         return response()->json($data);
     }
 
-    private function loadExternalEvents(Article $article, JournalInterval $journalInterval, $externalEventTypes): array
+    private function loadExternalEvents(Article $article, JournalInterval $journalInterval, $requestedExternalEvents): array
     {
-        if (!$externalEventTypes) {
+        if (!$requestedExternalEvents) {
             return [];
         }
 
         $categories = [];
         $categoryActions = [];
-        foreach ($externalEventTypes as $type) {
-            [$category, $action] = explode(self::CATEGORY_ACTION_SEPARATOR, $type);
+        foreach ($requestedExternalEvents as $item) {
+            [$category, $action] = explode(self::CATEGORY_ACTION_SEPARATOR, $item);
             $categories[] = $category;
             if (!array_key_exists($category, $categoryActions)) {
                 $categoryActions[$category] = [];

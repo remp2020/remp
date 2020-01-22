@@ -177,7 +177,6 @@
 
 <script>
     import AnimatedInteger from './AnimatedInteger.vue'
-    import TimeHistogram from './TimeHistogram.vue'
     import Options from './Options.vue'
     import axios from 'axios'
     import DashboardGraph from "./DashboardGraph";
