@@ -420,7 +420,7 @@ class ArticleDetailsController extends Controller
         });
 
         $externalEvents = [];
-        foreach ($this->journalHelper->eventsCategoriesActionsForArticle($article) as $item) {
+        foreach ($this->journalHelper->eventsCategoriesActions($article) as $item) {
             $externalEvents[] = (object) [
                 'text' => $item->category . ':' . $item->action,
                 'value' => $item->category . self::CATEGORY_ACTION_SEPARATOR . $item->action,

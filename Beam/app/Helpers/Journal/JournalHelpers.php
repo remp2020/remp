@@ -8,7 +8,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
-use Remp\Journal\EventCategoryActionRequest;
 use Remp\Journal\JournalContract;
 
 class JournalHelpers
@@ -227,18 +226,19 @@ class JournalHelpers
         return $this->refererMediumLabel($m);
     }
 
-
     /**
-     * Returns list of all categories and actions for article events
-     * @param Article $article
+     * Returns list of all categories and actions for stored events
+     * @param Article|null $article if provided, load events data only for particular article
      *
-     * @return array
+     * @return array array of objects having category and action parameters
      */
-    public function eventsCategoriesActionsForArticle(Article $article): array
+    public function eventsCategoriesActions(?Article $article = null): array
     {
-        $r = AggregateRequest::from('events')
-            ->addFilter('article_id', $article->external_id)
-            ->addGroup('category', 'action');
+        $r = AggregateRequest::from('events')->addGroup('category', 'action');
+
+        if ($article !== null) {
+            $r->addFilter('article_id', $article->external_id);
+        }
 
         $results = [];
 

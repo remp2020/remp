@@ -19,7 +19,16 @@
             </div>
         </div>
 
-        <slot name="additional-settings"></slot>
+        <div class="col-md-12 settings-box">
+            <div v-if="externalEvents.length > 0" class="external-events-wrapper">
+                <select class="selectpicker bs-select-hidden" title="Select events" multiple="" v-model="selectedExternalEvents">
+                    <option v-for="option in externalEvents" :value="option">{{option.text}}</option>
+                </select>
+            </div>
+
+            <!-- Slot for settings such as token selector (for public dashboard) -->
+            <slot name="additional-settings"></slot>
+        </div>
 
         <div class="col-md-12">
             <div id="chartContainer">
@@ -89,6 +98,19 @@
 </template>
 
 <style scoped>
+
+    .settings-box {
+        display: flex;
+        align-items: center;
+        justify-content: right;
+        padding-right: 30px;
+    }
+
+    .external-events-wrapper {
+        display:inline-block;
+        width: 220px;
+    }
+
     #chartContainer {
         position: relative;
     }
@@ -184,6 +206,10 @@
         concurrents: {
             type: Number,
             required: true
+        },
+        externalEvents: {
+            type: Array,
+            default: () => [],
         }
     };
 

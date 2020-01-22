@@ -23,6 +23,8 @@ class DashboardController extends Controller
 {
     private const NUMBER_OF_ARTICLES = 30;
 
+    private const CATEGORY_ACTION_SEPARATOR = '::';
+
     private $journal;
 
     private $journalHelper;
@@ -66,6 +68,16 @@ class DashboardController extends Controller
         if (!config('beam.disable_token_filtering')) {
             $data['accountPropertyTokens'] = $this->selectedProperty->selectInputData();
         }
+
+        $externalEvents = [];
+        foreach ($this->journalHelper->eventsCategoriesActions() as $item) {
+            $externalEvents[] = (object) [
+                'text' => $item->category . ':' . $item->action,
+                'value' => $item->category . self::CATEGORY_ACTION_SEPARATOR . $item->action,
+            ];
+        }
+
+        $data['externalEvents'] = $externalEvents;
 
         return view($template, $data);
     }
