@@ -14,14 +14,18 @@ use App\Model\Config\ConversionRateConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\ListRequest;
 
 class DashboardController extends Controller
 {
     private const NUMBER_OF_ARTICLES = 30;
+
+    private const CATEGORY_ACTION_SEPARATOR = '::';
 
     private $journal;
 
@@ -66,6 +70,16 @@ class DashboardController extends Controller
         if (!config('beam.disable_token_filtering')) {
             $data['accountPropertyTokens'] = $this->selectedProperty->selectInputData();
         }
+
+        $externalEvents = [];
+        foreach ($this->journalHelper->eventsCategoriesActions() as $item) {
+            $externalEvents[] = (object) [
+                'text' => $item->category . ':' . $item->action,
+                'value' => $item->category . self::CATEGORY_ACTION_SEPARATOR . $item->action,
+            ];
+        }
+
+        $data['externalEvents'] = $externalEvents;
 
         return view($template, $data);
     }
@@ -235,6 +249,7 @@ class DashboardController extends Controller
             'intervalMinutes' => $intervalMinutes,
             'tags' => $orderedTags,
             'colors' => Colors::refererMediumTagsToColors($orderedTags),
+            'events' => $this->loadExternalEvents($journalInterval, $request->get('externalEvents', []))
         ];
 
         if ($interval === 'today') {
@@ -407,13 +422,16 @@ class DashboardController extends Controller
             $results = collect(array_values($results))->take($numberOfCurrentValues);
         }
 
+        $events = $this->loadExternalEvents(new JournalInterval($tz, $interval, null, ['today', '7days', '30days']), $request->get('externalEvents', []));
+
         $jsonResponse = [
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
             'tags' => $tags,
-            'colors' => Colors::refererMediumTagsToColors($tags)
+            'colors' => Colors::refererMediumTagsToColors($tags),
+            'events' => $events,
         ];
 
         if ($interval === 'today') {
@@ -435,6 +453,76 @@ class DashboardController extends Controller
         $journalRequest->addGroup('derived_referer_medium');
 
         return collect($this->journal->count($journalRequest));
+    }
+
+    private function loadExternalEvents(JournalInterval $journalInterval, $requestedExternalEvents): array
+    {
+        if (!$requestedExternalEvents) {
+            return [];
+        }
+
+        $categories = [];
+        $categoryActions = [];
+        foreach ($requestedExternalEvents as $item) {
+            [$category, $action] = explode(self::CATEGORY_ACTION_SEPARATOR, $item);
+            $categories[] = $category;
+            if (!array_key_exists($category, $categoryActions)) {
+                $categoryActions[$category] = [];
+            }
+            $categoryActions[$category][] = $action;
+        }
+
+        $r = ListRequest::from('events')
+            ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
+            ->addFilter('category', ...$categories);
+        $response = $this->journal->list($r);
+
+        $tags = [];
+
+        $articles = [];
+        $events = [];
+
+        foreach ($response[0]->events ?? [] as $event) {
+            if (!in_array($event->action, $categoryActions[$event->category], true)) {
+                // ATM Journal API doesn't provide way to simultaneously check for category and action on the same record,
+                // therefore check first category in the request and check action here
+                continue;
+            }
+            $title = $event->category . ':' . $event->action;
+            $tags[$title] = true;
+
+            $date = Carbon::parse($event->system->time);
+
+            $text = "<b>$title</b><br />" .
+                'At: ' . $date->copy()->tz($journalInterval->tz)->format('Y-m-d H:i');
+
+            if (isset($event->article_id)) {
+                $article = $articles[$event->article_id] ?? null;
+                if (!$article) {
+                    $article = Article::where('external_id', $event->article_id)->first();
+                }
+
+                if ($article) {
+                    $articles[$event->article_id] = $article;
+                    $url = route('articles.show', $article->id);
+                    $articleTitle = Str::limit($article->title, 50);
+                    $text .= '<br />Article: <a style="text-decoration: underline; color: #fff" href="'. $url .'">' . $articleTitle . '</b>';
+                }
+            }
+
+            $events[] = (object) [
+                'date' => $date->toIso8601ZuluString(),
+                'id' => $title,
+                'title' => $text,
+            ];
+        }
+
+        $colors = Colors::generalTagsToColors(array_keys($tags), true);
+        foreach ($events as $event) {
+            $event->color = $colors[$event->id];
+        }
+
+        return $events;
     }
 
     public function mostReadArticles(Request $request)

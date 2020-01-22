@@ -28,23 +28,18 @@ class Colors
         '#3b3eac'
     ];
 
-    public static function generalTagsToColors($tags): array
+    public static function generalTagsToColors($tags, $withKeys = false): array
     {
-        $colors = [
-            '#E63952',
-            '#00C7DF',
-            '#FFC34A',
-            '#DEDEDE',
-            '#CDE092',
-            '#3B40b6',
-        ];
-
-        $toReturn = [];
-
-        for ($i = 0, $iMax = count($tags); $i < $iMax; $i++) {
-            $toReturn[] = $colors[$i];
+        $i = 0;
+        $colors = [];
+        foreach ($tags as $tag) {
+            $colors[$tag] = self::$additionalColors[$i++];
         }
-        return $toReturn;
+        if ($withKeys) {
+            return $colors;
+        }
+
+        return array_values($colors);
     }
 
     public static function abTestVariantTagsToColors($tags): array

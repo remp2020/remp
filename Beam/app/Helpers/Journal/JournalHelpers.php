@@ -2,6 +2,7 @@
 
 namespace App\Helpers\Journal;
 
+use App\Article;
 use App\Model\RefererMediumLabel;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -223,5 +224,29 @@ class JournalHelpers
     {
         $m = !empty($record->explicit_referer_medium) ? $record->explicit_referer_medium : $record->derived_referer_medium;
         return $this->refererMediumLabel($m);
+    }
+
+    /**
+     * Returns list of all categories and actions for stored events
+     * @param Article|null $article if provided, load events data only for particular article
+     *
+     * @return array array of objects having category and action parameters
+     */
+    public function eventsCategoriesActions(?Article $article = null): array
+    {
+        $r = AggregateRequest::from('events')->addGroup('category', 'action');
+
+        if ($article !== null) {
+            $r->addFilter('article_id', $article->external_id);
+        }
+
+        $results = [];
+
+        foreach ($this->journal->count($r) as $item) {
+            if (!empty($item->tags->action) && !empty($item->tags->category)) {
+                $results[] = (object) $item->tags;
+            }
+        }
+        return $results;
     }
 }

@@ -139,11 +139,14 @@
                 :url="url"
                 :variants-url="variantsUrl"
                 :snapshots-data-source="{{$snapshotsDataSource ? 'true' : 'false'}}"
+                :external-events="externalEvents"
                 ref="histogram" >
         </article-details>
 
     </div>
     <script type="text/javascript">
+
+
         new Vue({
             el: "#article-vue-wrapper",
             components: {
@@ -158,7 +161,8 @@
             data: function() {
                 return {
                     url: "{!! route('articles.timeHistogram.json', $article->id) !!}",
-                    variantsUrl: "{!! route('articles.variantsHistogram.json', $article->id) !!}"
+                    variantsUrl: "{!! route('articles.variantsHistogram.json', $article->id) !!}",
+                    externalEvents: {!! json_encode($externalEvents) !!},
                 }
             }
         })
