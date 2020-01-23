@@ -1,6 +1,6 @@
-vendor
-node_modules
-.git
-.env
-.env.dist
-*.log
+**/vendor
+**/node_modules
+**/.git
+**/.env
+**/.env.example
+**/*.log
