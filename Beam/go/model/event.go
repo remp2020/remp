@@ -54,11 +54,11 @@ type EventStorage interface {
 	// List returns list of all events based on given EventOptions.
 	List(o ListOptions) (EventRowCollection, error)
 	// Categories lists all tracked categories.
-	Categories(o *CategoriesOptions) ([]string, error)
+	Categories() ([]string, error)
 	// Flags lists all available flags.
 	Flags() []string
 	// Actions lists all tracked actions under the given category.
-	Actions(o ActionsOptions) ([]string, error)
+	Actions(category string) ([]string, error)
 	// Users lists all tracked users.
 	Users() ([]string, error)
 	// Cache creates internal cache of available categories and actions so they're not polled repeatedly.

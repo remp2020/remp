@@ -18,25 +18,11 @@ type AggregateOptions struct {
 	Action         string
 	Step           string
 	FilterBy       []*FilterBy
-	TagsExist      []*TagExists
 	GroupBy        []string
 	TimeAfter      time.Time
 	TimeBefore     time.Time
 	TimeHistogram  *TimeHistogram
 	CountHistogram *CountHistogram
-}
-
-// CategoriesOptions allows filtering for categories
-type CategoriesOptions struct {
-	FilterBy  []*FilterBy
-	TagsExist []*TagExists
-}
-
-// ActionsOptions allows filtering for actions
-type ActionsOptions struct {
-	Category  string
-	FilterBy  []*FilterBy
-	TagsExist []*TagExists
 }
 
 // TimeHistogram is used to split response to time-based buckets.
@@ -55,12 +41,6 @@ type CountHistogram struct {
 type FilterBy struct {
 	Tag     string
 	Values  []string
-	Inverse bool
-}
-
-// TagExists checks for presence of tag
-type TagExists struct {
-	Tag     string
 	Inverse bool
 }
 
