@@ -229,24 +229,9 @@ var _ = Resource("events", func() {
 		Routing(GET("/categories"))
 		Response(OK, ArrayOf(String))
 	})
-	Action("categoriesPost", func() {
-		Description("List of all tracked categories")
-		Payload(CategoryActionOptionsPayload)
-		Routing(POST("/categories"))
-		Response(OK, ArrayOf(String))
-	})
 	Action("actions", func() {
 		Description("List of all tracked actions for given category")
 		Routing(GET("/categories/:category/actions"))
-		Params(func() {
-			Param("category", String, "Category under which the actions were tracked")
-		})
-		Response(OK, ArrayOf(String))
-	})
-	Action("actionsPost", func() {
-		Description("List of all tracked actions for given category")
-		Payload(CategoryActionOptionsPayload)
-		Routing(POST("/categories/:category/actions"))
 		Params(func() {
 			Param("category", String, "Category under which the actions were tracked")
 		})
