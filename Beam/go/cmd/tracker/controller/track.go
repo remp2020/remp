@@ -7,11 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/Shopify/sarama"
 	"github.com/avct/uasurfer"
 	"github.com/goadesign/goa"
+	"github.com/google/uuid"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
 	refererparser "github.com/snowplow-referer-parser/golang-referer-parser"

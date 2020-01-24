@@ -124,6 +124,14 @@
   revision = "553a641470496b2327abcac10b36396bd98e45c9"
 
 [[projects]]
+  digest = "1:ad92aa49f34cbc3546063c7eb2cabb55ee2278b72842eda80e2a20a8a06a8d73"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = ""
+  revision = "0cd6bf5da1e1c83f8b45653022c74f71af0538a4"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:0038a7f43b51c8b2a8cd03b5372e73f8eadfe156484c2ae8185ae836f8ebc2cd"
   name = "github.com/hashicorp/go-uuid"
   packages = ["."]
@@ -440,6 +448,7 @@
     "github.com/goadesign/goa/design/apidsl",
     "github.com/goadesign/goa/goatest",
     "github.com/goadesign/goa/middleware",
+    "github.com/google/uuid",
     "github.com/influxdata/influxdb/client/v2",
     "github.com/jmoiron/sqlx",
     "github.com/joho/godotenv",
