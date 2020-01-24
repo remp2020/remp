@@ -20,6 +20,12 @@ parameters:
 			segments_addr: @environmentConfig::get('REMP_PYTHIA_SEGMENTS_ADDR')
 		campaign:
 			web_addr: @environmentConfig::get('REMP_CAMPAIGN_ADDR')
+	preflight:
+		headers:
+			Access-Control-Allow-Headers:
+				- Authorization
+				- X-Requested-With
+				- Content-Type
 
 	errbit:
 		send_errors: false
@@ -169,7 +175,7 @@ services:
 	apiDecider:
 		class: Tomaj\NetteApi\ApiDecider
 		setup:
-			- enableGlobalPreflight()
+			- enableGlobalPreflight(Tomaj\NetteApi\Handlers\CorsPreflightHandler(Nette\Http\Response(), %preflight.headers%))
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'bulk-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\BulkSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
