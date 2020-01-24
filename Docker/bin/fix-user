@@ -3,16 +3,16 @@
 # Corrects UID and GID for container user according to host UID and GID if needed
 #
 # #1 Example: UID 1000 and GID 1000:
-#     ./fixUser test user 1000 1000
+#     ./fix-user test user 1000 1000
 # - 'user' has UID 1000 and GID 1000 by default - nothing will happen
 #
 # #2 Example: UID 501 (not exists in docker image) and GID 501 (not exists in docker image):
-#     ./fixUser test user 501 501
+#     ./fix-user test user 501 501
 # - 'user' UID will change to 501
 # - 'user' GID will change to 501
 #
 # #3 Example: UID 35 (exists in docker image as 'games') and GID 100 (exists in docker image as 'users'):
-#     ./fixUser test user 35 100
+#     ./fix-user test user 35 100
 # - 'games' UID will change to random free UID (1100-2000) to release UID 35
 # - 'user' UID will change to 35
 # - adds user 'user' to group 'users'
@@ -21,7 +21,7 @@ HOST_USER=$1
 CONTAINER_USER_NAME=$2
 HOST_USER_ID=$3
 HOST_GROUP_ID=$4
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 # User name which exists under hosts user id
 EXISTING_CONTAINER_USER_NAME=$(getent passwd ${HOST_USER_ID} | cut -d: -f1)
 EXISTING_CONTAINER_NEW_USER_ID=""
@@ -50,7 +50,7 @@ while [ ! -z "$(getent passwd ${EXISTING_CONTAINER_NEW_USER_ID})" ]; do
 done
 
 # Change user ID for container user if needed
-if [ "${EXISTING_CONTAINER_USER_NAME}" == "${CONTAINER_USER_NAME}" ] && [ ! "${CONTAINER_USER_ID}" == "${HOST_USER_ID}" ]; then
+if [ -z "${EXISTING_CONTAINER_USER_NAME}" ] && [ ! "${CONTAINER_USER_ID}" == "${HOST_USER_ID}" ]; then
     echo "Changing '${CONTAINER_USER_NAME}' user ID ${CONTAINER_USER_ID} to ${HOST_USER_ID}"
     usermod -u ${HOST_USER_ID} "${CONTAINER_USER_NAME}"
 fi
@@ -78,3 +78,9 @@ fi
 
 echo "Setting up workdir permissions (${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME})"
 chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} ${PROJECT_ROOT}
+if [ -d "/opt/phpstorm-coverage" ]; then
+    chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} /opt/phpstorm-coverage
+fi
+if [ -d "/etc/nginx" ]; then
+    chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} -R /etc/nginx
+fi

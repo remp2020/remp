@@ -86,9 +86,9 @@ RUN useradd -d /home/user -u 1000 -m -s /bin/bash user && \
         ${YARN_CACHE_FOLDER} \
         ${COMPOSER_HOME}/cache
 
-ADD bin/fixUser .
+ADD bin/fix-user .
 
-RUN ./fixUser ${DOCKER_USER} user ${DOCKER_USER_ID} ${DOCKER_GROUP_ID}
+RUN ./fix-user ${DOCKER_USER} user ${DOCKER_USER_ID} ${DOCKER_GROUP_ID}
 
 # Dockerize run
 
