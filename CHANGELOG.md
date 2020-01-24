@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for referer medium renaming - one can specify label for each medium by adding a record to `referer_medium_labels` table. remp/remp#543
 - Updated layout footer with link to REMP website. remp/remp#522
 - Fixed property naming validator issue checking unique constraint against account names, not property names.
+- Added article conversion/pageviews stats filtering based on selected property. GH-50
 
 ### [Campaign]
 
