@@ -106,8 +106,8 @@ class CampaignController extends Controller
             ->addColumn('segments', function (Campaign $campaign) use ($segments) {
                 $segmentNames = [];
 
-                $exclusiveIcon = '<i class="zmdi zmdi-eye-off"></i>';
-                $inclusiveIcon = '<i class="zmdi zmdi-check primary-color"></i>';
+                $exclusiveIcon = '<i class="zmdi zmdi-eye-off" title="User must not be member of segment to see the campaign."></i>';
+                $inclusiveIcon = '<i class="zmdi zmdi-eye primary-color" title="User needs to be member of segment to see the campaign."></i>';
 
                 foreach ($campaign->segments as $segment) {
                     $icon = $segment->inclusive ? $inclusiveIcon : $exclusiveIcon;
@@ -118,8 +118,6 @@ class CampaignController extends Controller
                         $segmentNames[] = "{$icon} <span title='{$segment->code}'>{$segment->code}</span></em>";
                     }
                 }
-
-                sort($segmentNames, SORT_STRING);
 
                 return $segmentNames;
             })
