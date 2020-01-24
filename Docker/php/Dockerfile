@@ -4,23 +4,50 @@ ARG DOCKER_USER
 ARG DOCKER_USER_ID
 ARG DOCKER_GROUP_ID
 
-ENV BUILD_DEPS="libzip-dev gcc g++ make build-essential libsasl2-dev libssl-dev python-minimal"
-ENV RUN_DEPS="libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev gettext-base unzip"
-
 # Composer
 ENV COMPOSER_VERSION=1.9.2
 ENV COMPOSER_HOME="/composer"
 ENV PATH="/composer/vendor/bin:$PATH"
 
 # NodeJS + Yarn
+ENV NODE_VERSION=10.18.1
+ENV NODE_PKG_RELEASE=1nodesource1
+ENV NPM_CONFIG_LOGLEVEL=info
 ENV YARN_CACHE_FOLDER="/var/cache/yarn"
-ENV NODE_VERSION=10.18.1-1nodesource1
-ENV YARN_VERSION=1.21.1-1
+ENV YARN_VERSION=1.21.1
+ENV YARN_PKG_RELEASE=1
+
+# Nginx
+ENV NGINX_VERSION=1.16.1
+ENV NGINX_NJS_VERSION=0.3.5
+ENV NGINX_PKG_RELEASE=1~buster
+
+# Packages
+ENV BUILD_DEPS="libzip-dev \
+                gcc \
+                make \
+                build-essential \
+                libsasl2-dev \
+                libssl-dev"
+ENV RUN_DEPS="libicu-dev \
+              g++ \
+              git \
+              wget \
+              vim \
+              curl \
+              less \
+              gnupg \
+              zlib1g-dev \
+              libpng-dev \
+              libjpeg-dev \
+              gettext-base \
+              unzip \
+              zip"
 
 # Dockerize
 ENV DOCKERIZE_VERSION v0.6.1
 
-# Init (single command so the intermediates are not stored)
+# Init+Php (single command so the intermediates are not stored)
 
 RUN apt update && \
     apt install -y \
@@ -71,9 +98,10 @@ RUN rm -rf /var/lib/apt/lists/* && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt update && \
     apt install -y \
-        nodejs=${NODE_VERSION} \
-        yarn=${YARN_VERSION} && \
-    apt clean
+        nodejs=${NODE_VERSION}-${NODE_PKG_RELEASE} \
+        yarn=${YARN_VERSION}-${YARN_PKG_RELEASE} && \
+    apt clean && \
+    rm -r /var/lib/apt/lists/*
 
 # User
 
