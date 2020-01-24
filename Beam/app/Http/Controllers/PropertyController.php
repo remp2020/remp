@@ -75,7 +75,7 @@ class PropertyController extends Controller
     public function store(Account $account, Request $request)
     {
         $this->validate($request, [
-            'name' => 'bail|required|unique:accounts|max:255',
+            'name' => 'bail|required|unique:properties|max:255',
         ]);
 
         $property = new Property();
@@ -122,7 +122,7 @@ class PropertyController extends Controller
     public function update(Account $account, Property $property, Request $request)
     {
         $this->validate($request, [
-            'name' => 'bail|required|unique:accounts|max:255',
+            'name' => 'bail|required|unique:properties|max:255',
         ]);
 
         $property->fill($request->all());
