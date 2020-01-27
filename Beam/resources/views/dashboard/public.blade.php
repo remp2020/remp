@@ -12,6 +12,7 @@
                 :time-histogram-url-new="timeHistogramUrlNew"
                 :account-property-tokens="accountPropertyTokens"
                 :csrf-token="csrfToken"
+                :external-events="externalEvents"
                 :conversion-rate-multiplier="conversionRateMultiplier">
         </dashboard-root>
     </div>
@@ -40,6 +41,7 @@
                 options: {!! json_encode($options) !!},
                 accountPropertyTokens: {!! json_encode($accountPropertyTokens ?? false) !!},
                 csrfToken: {!!'"' . csrf_token() . '"'!!},
+                externalEvents: {!! json_encode($externalEvents) !!},
                 conversionRateMultiplier: {!! $conversionRateMultiplier !!}
             }
         })

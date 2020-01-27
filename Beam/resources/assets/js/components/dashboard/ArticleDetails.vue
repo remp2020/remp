@@ -9,6 +9,7 @@
                 <page-loads-graph
                         :intervalGraph="!snapshotsDataSource"
                         :event-options="[{text: 'Conversions', value: 'conversions', checked: true}, {text: 'Title changes', value: 'title_changes', checked: false}]"
+                        :external-events="externalEvents"
                         :url="url">
                 </page-loads-graph>
             </div>
@@ -68,6 +69,10 @@
         snapshotsDataSource: {
             type: Boolean,
             default: false
+        },
+        externalEvents: {
+            type: Array,
+            default: () => [],
         }
     }
 

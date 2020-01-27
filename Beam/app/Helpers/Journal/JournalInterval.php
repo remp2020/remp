@@ -30,12 +30,16 @@ class JournalInterval
     public $timeBefore;
     public $intervalText;
     public $intervalMinutes;
+    public $tz;
+
 
     public function __construct(\DateTimeZone $tz, string $interval, Article $article = null, array $allowedIntervals = null)
     {
         if ($allowedIntervals && !in_array($interval, $allowedIntervals)) {
             throw new InvalidArgumentException("Parameter 'interval' must be one of the [" . implode(',', $allowedIntervals) . "] values, instead '$interval' provided");
         }
+
+        $this->tz = $tz;
 
         switch ($interval) {
             case 'today':

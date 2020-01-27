@@ -1,37 +1,34 @@
 <template>
     <div class="card">
         <div class="card-body">
-            <time-histogram ref="histogram"
+            <dashboard-graph ref="histogram"
                             :url="timeHistogramUrl"
                             :url-new="timeHistogramUrlNew"
-                            :concurrents="totalConcurrents">
+                            :concurrents="totalConcurrents"
+                            :external-events="externalEvents">
 
                 <!-- Selector for property tokens, required only in public dashboard -->
                 <template v-if="accountPropertyTokens" v-slot:additional-settings>
-                    <div class="row" style="margin: 0 20px">
-                        <div class="col-md-12">
-                            <form class="pull-right" style="width: 200px" method="post" :action="propertiesSwitchUrl">
-                                <input type="hidden" name="_token" :value="csrfToken" v-if="csrfToken">
-                                <select name="token" class="selectpicker" onchange="javascript:this.form.submit()">
-                                    <template v-for="account in accountPropertyTokens">
-                                        <optgroup v-if="account.name != null" :label="account.name">
-                                            <option v-for="token in account.tokens"
-                                                    :selected="token.selected"
-                                                    :value="token.uuid">{{token.name}}</option>
-                                        </optgroup>
-                                        <template v-else>
-                                            <option v-for="token in account.tokens"
-                                                    :selected="token.selected"
-                                                    :value="token.uuid">{{token.name}}</option>
-                                        </template>
+                        <form style="width: 200px; display: inline-block; margin-left: 20px" method="post" :action="propertiesSwitchUrl">
+                            <input type="hidden" name="_token" :value="csrfToken" v-if="csrfToken">
+                            <select name="token" class="selectpicker" onchange="javascript:this.form.submit()">
+                                <template v-for="account in accountPropertyTokens">
+                                    <optgroup v-if="account.name != null" :label="account.name">
+                                        <option v-for="token in account.tokens"
+                                                :selected="token.selected"
+                                                :value="token.uuid">{{token.name}}</option>
+                                    </optgroup>
+                                    <template v-else>
+                                        <option v-for="token in account.tokens"
+                                                :selected="token.selected"
+                                                :value="token.uuid">{{token.name}}</option>
                                     </template>
-                                </select>
-                            </form>
-                        </div>
-                    </div>
+                                </template>
+                            </select>
+                        </form>
                 </template>
 
-            </time-histogram>
+            </dashboard-graph>
 
             <div class="row" style="padding-top: 10px">
                 <div class="col-md-12">
@@ -180,9 +177,9 @@
 
 <script>
     import AnimatedInteger from './AnimatedInteger.vue'
-    import TimeHistogram from './TimeHistogram.vue'
     import Options from './Options.vue'
     import axios from 'axios'
+    import DashboardGraph from "./DashboardGraph";
 
     let props = {
         articlesUrl: {
@@ -214,6 +211,10 @@
         conversionRateMultiplier: {
             type: Number,
             required: false
+        },
+        externalEvents: {
+            type: Array,
+            default: () => [],
         }
     }
 
@@ -256,7 +257,7 @@
 
     export default {
         name: "dashboard-root",
-        components: { AnimatedInteger, TimeHistogram, Options },
+        components: {DashboardGraph, AnimatedInteger, Options },
         props: props,
         created() {
             document.addEventListener('visibilitychange', this.visibilityChanged)

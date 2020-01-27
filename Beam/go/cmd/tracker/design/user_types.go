@@ -79,6 +79,7 @@ var Event = Type("Event", func() {
 	Attribute("tags", HashOf(String, String), "Custom filtering tags")
 	Attribute("fields", HashOf(String, Any), "Additinal key-value data")
 	Attribute("remp_event_id", String, "ID of event")
+	Attribute("article_id", String, "ID of article this event is linked to. Events linked to the specific article can be later displayed at Beam dashboard timeline and at article detail timeline.")
 
 	Required("system", "category", "action")
 })

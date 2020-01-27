@@ -262,6 +262,9 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 	if e.URL != "" {
 		event.User.URL = &e.URL
 	}
+	if e.ArticleID != "" {
+		event.ArticleID = &e.ArticleID
+	}
 	if e.UserAgent != "" {
 		event.User.UserAgent = &e.UserAgent
 	}

@@ -30,6 +30,7 @@ type Event struct {
 	UserID    string    `json:"user_id"`
 	URL       string    `json:"url"`
 	UserAgent string    `json:"user_agent"`
+	ArticleID string    `json:"article_id"`
 
 	UtmSource   string `json:"utm_source"`
 	UtmCampaign string `json:"utm_campaign"`

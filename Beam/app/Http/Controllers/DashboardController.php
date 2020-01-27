@@ -14,10 +14,12 @@ use App\Model\Config\ConversionRateConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\ListRequest;
 
 class DashboardController extends Controller
 {
@@ -66,6 +68,16 @@ class DashboardController extends Controller
         if (!config('beam.disable_token_filtering')) {
             $data['accountPropertyTokens'] = $this->selectedProperty->selectInputData();
         }
+
+        $externalEvents = [];
+        foreach ($this->journalHelper->eventsCategoriesActions() as $item) {
+            $externalEvents[] = (object) [
+                'text' => $item->category . ':' . $item->action,
+                'value' => $item->category . JournalHelpers::CATEGORY_ACTION_SEPARATOR . $item->action,
+            ];
+        }
+
+        $data['externalEvents'] = $externalEvents;
 
         return view($template, $data);
     }
@@ -235,6 +247,7 @@ class DashboardController extends Controller
             'intervalMinutes' => $intervalMinutes,
             'tags' => $orderedTags,
             'colors' => Colors::refererMediumTagsToColors($orderedTags),
+            'events' => $this->loadExternalEvents($journalInterval, $request->get('externalEvents', []))
         ];
 
         if ($interval === 'today') {
@@ -407,13 +420,16 @@ class DashboardController extends Controller
             $results = collect(array_values($results))->take($numberOfCurrentValues);
         }
 
+        $events = $this->loadExternalEvents(new JournalInterval($tz, $interval, null, ['today', '7days', '30days']), $request->get('externalEvents', []));
+
         $jsonResponse = [
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
             'previousResults' => array_values($shadowResults),
             'previousResultsSummed' => array_values($shadowResultsSummed),
             'tags' => $tags,
-            'colors' => Colors::refererMediumTagsToColors($tags)
+            'colors' => Colors::refererMediumTagsToColors($tags),
+            'events' => $events,
         ];
 
         if ($interval === 'today') {
@@ -435,6 +451,52 @@ class DashboardController extends Controller
         $journalRequest->addGroup('derived_referer_medium');
 
         return collect($this->journal->count($journalRequest));
+    }
+
+    private function loadExternalEvents(JournalInterval $journalInterval, $requestedExternalEvents): array
+    {
+        $eventData = $this->journalHelper->loadEvents($journalInterval, $requestedExternalEvents);
+
+        $tags = [];
+        $articles = [];
+        $events = [];
+
+        foreach ($eventData as $eventItem) {
+            $title = $eventItem->category . ':' . $eventItem->action;
+            $tags[$title] = true;
+
+            $date = Carbon::parse($eventItem->system->time);
+
+            $text = "<b>$title</b><br />" .
+                'At: ' . $date->copy()->tz($journalInterval->tz)->format('Y-m-d H:i');
+
+            if (isset($eventItem->article_id)) {
+                $article = $articles[$eventItem->article_id] ?? null;
+                if (!$article) {
+                    $article = Article::where('external_id', $eventItem->article_id)->first();
+                }
+
+                if ($article) {
+                    $articles[$eventItem->article_id] = $article;
+                    $url = route('articles.show', $article->id);
+                    $articleTitle = Str::limit($article->title, 50);
+                    $text .= '<br />Article: <a style="text-decoration: underline; color: #fff" href="'. $url .'">' . $articleTitle . '</b>';
+                }
+            }
+
+            $events[] = (object) [
+                'date' => $date->toIso8601ZuluString(),
+                'id' => $title,
+                'title' => $text,
+            ];
+        }
+
+        $colors = Colors::generalTagsToColors(array_keys($tags), true);
+        foreach ($events as $event) {
+            $event->color = $colors[$event->id];
+        }
+
+        return $events;
     }
 
     public function mostReadArticles(Request $request)
