@@ -22,14 +22,14 @@
 
                 <div class="panel-group z-depth-1-top" id="accordion" role="tablist" aria-multiselectable="false">
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
+                        <div class="panel-heading" role="tab" id="headingCampaign">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" :class="{ green: highlightNameCollapse }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseCampaign" aria-expanded="true" aria-controls="collapseCampaign" :class="{ green: highlightNameCollapse }">
                                     Campaign name &amp; primary banner (required)
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        <div id="collapseCampaign" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingCampaign">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="row">
@@ -71,14 +71,14 @@
                     </div><!-- .panel (primary) -->
 
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingTwo">
+                        <div class="panel-heading" role="tab" id="headingTests">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" :class="{ green: highlightABTestingCollapse }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTests" aria-expanded="false" aria-controls="collapseTests" :class="{ green: highlightABTestingCollapse }">
                                     A/B test
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div id="collapseTests" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTests">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
                                 <ab-testing
                                     v-if="showABTestingComponent"
@@ -94,18 +94,18 @@
                     </div><!-- .panel (a/b testing) -->
 
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingThree">
+                        <div class="panel-heading" role="tab" id="headingUserProperties">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree" :class="{ green: highlightSegmentsCollapse }">
-                                    Segments - who will see the banner?
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseUserProperties" aria-expanded="false" aria-controls="collapseUserProperties" :class="{ green: highlightUserAttributesCollapse }">
+                                    User attributes
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        <div id="collapseUserProperties" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingUserProperties">
                             <div class="panel-body p-l-10 p-r-20">
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <p class="m-l-20">User needs to be member of all selected segments for campaign to be shown.</p>
+                                        <p class="m-l-20">User needs to be authenticated or not to see the campaign</p>
 
                                         <div class="input-group m-t-30">
                                             <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
@@ -127,57 +127,6 @@
                                                 </div>
                                             </div>
                                         </div><!-- .input-group -->
-
-                                        <div class="input-group">
-                                            <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
-                                            <div>
-                                                <div v-if="Object.keys(availableSegments).length" class="row">
-                                                    <div class="col-md-12">
-                                                        <select v-model="addedSegment" title="Select user segments" v-on:change="selectSegment" class="selectpicker" data-live-search="true" data-max-options="1">
-                                                            <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
-                                                                <option v-for="(obj,code) in list" v-bind:value="obj">
-                                                                    {{ obj.name }}
-                                                                </option>
-                                                            </optgroup>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div v-else class="panel panel-default">
-                                                    <div class="panel-body app-info p-10">
-                                                        <p>No segments are available for selection. This might be because you don't have any segment providers configured.</p>
-                                                        <p class="m-b-0 p-0">If you want to use segments, configure your environment to use existing Segment Providers or <a href="https://github.com/remp2020/remp/tree/master/Campaign#segment-integration">implement your own integration</a>.</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="row m-t-20 m-l-30" v-if="segments.length">
-                                            <div class="col-md-12">
-                                                <small>Active user segments</small>
-                                            </div>
-                                        </div>
-
-                                        <div v-for="(segment,i) in segments">
-                                            <input type="hidden" v-bind:name="'segments['+i+'][id]'" v-model="segment.id" />
-                                            <input type="hidden" v-bind:name="'segments['+i+'][code]'" v-model="segment.code" />
-                                            <input type="hidden" v-bind:name="'segments['+i+'][provider]'" v-model="segment.provider" />
-                                        </div>
-                                        <div v-for="(id,i) in removedSegments">
-                                            <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
-                                        </div>
-
-                                        <div class="row m-t-10 m-l-30">
-                                            <div class="col-md-12">
-                                                <div class="row m-b-10" v-for="(segment,i) in segments" style="line-height: 25px">
-                                                    <div class="col-md-12 text-left">
-                                                        {{ segmentMap[segment.code] }}
-                                                        <div class="pull-left m-r-20">
-                                                            <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment">&times;</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         <div class="input-group m-t-30">
                                             <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
@@ -206,6 +155,121 @@
                                 </div>
 
                             </div><!-- .panel-body -->
+                        </div>
+                    </div><!-- .panel (user state) -->
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingInclusiveSegments">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseInclusiveSegments" aria-expanded="false" aria-controls="collapseInclusiveSegments" :class="{ green: highlightSegmentsCollapse }">
+                                    Segments - who will see the banner?
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseInclusiveSegments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingInclusiveSegments">
+                            <div class="panel-body p-l-10 p-r-20">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <p class="m-l-20">
+                                            User <strong>needs to be member</strong> of at least one
+                                            of these segments in order to show the campaign:
+                                        </p>
+
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
+                                            <div>
+                                                <div v-if="Object.keys(availableSegments).length" class="row">
+                                                    <div class="col-md-12">
+                                                        <select v-model="addedSegment" title="Segments to see the campaign" v-on:change="setSegmentAsInclusive" class="selectpicker" data-live-search="true" data-max-options="1">
+                                                            <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
+                                                                <option v-for="(obj,code) in list" v-bind:value="obj">
+                                                                    {{ obj.name }}
+                                                                </option>
+                                                            </optgroup>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div v-else class="panel panel-default">
+                                                    <div class="panel-body app-info p-10">
+                                                        <p>No segments are available for selection. This might be because you don't have any segment providers configured.</p>
+                                                        <p class="m-b-0 p-0">If you want to use segments, configure your environment to use existing Segment Providers or <a href="https://github.com/remp2020/remp/tree/master/Campaign#segment-integration">implement your own integration</a>.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div v-for="(id,i) in removedSegments">
+                                            <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
+                                        </div>
+
+                                        <div class="row m-t-10 m-l-30">
+                                            <div class="col-md-12">
+                                                <div class="row m-b-10" v-for="(segment,i) in segments" v-if="segment.inclusive == undefined || segment.inclusive" style="line-height: 25px">
+                                                    <div class="col-md-12 text-left">
+                                                        {{ segmentMap[segment.code] }}
+                                                        <div class="pull-left m-r-20">
+                                                            <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment" style="font-size:1em">&times;</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-8" style="margin-top:15px">
+                                        <p class="m-l-20">
+                                            User <strong>cannot be member</strong> of at least one of
+                                            these segments in order to show the campaign:
+                                        </p>
+
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="zmdi zmdi-accounts-list"></i></span>
+                                            <div>
+                                                <div v-if="Object.keys(availableSegments).length" class="row">
+                                                    <div class="col-md-12">
+                                                        <select v-model="addedSegment" title="Segments that should not see the campaign" v-on:change="setSegmentAsExclusive" class="selectpicker" data-live-search="true" data-max-options="1">
+                                                            <optgroup v-for="(list,label) in availableSegments" v-bind:label="label">
+                                                                <option v-for="(obj,code) in list" v-bind:value="obj">
+                                                                    {{ obj.name }}
+                                                                </option>
+                                                            </optgroup>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div v-else class="panel panel-default">
+                                                    <div class="panel-body app-info p-10">
+                                                        <p>No segments are available for selection. This might be because you don't have any segment providers configured.</p>
+                                                        <p class="m-b-0 p-0">If you want to use segments, configure your environment to use existing Segment Providers or <a href="https://github.com/remp2020/remp/tree/master/Campaign#segment-integration">implement your own integration</a>.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div v-for="(id,i) in removedSegments">
+                                            <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
+                                        </div>
+
+                                        <div class="row m-t-10 m-l-30">
+                                            <div class="col-md-12">
+                                                <div class="row m-b-10" v-for="(segment,i) in segments" v-if="segment.inclusive != undefined && !segment.inclusive" style="line-height: 25px">
+                                                    <div class="col-md-12 text-left">
+                                                        {{ segmentMap[segment.code] }}
+                                                        <div class="pull-left m-r-20">
+                                                            <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment" style="font-size:1em">&times;</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- .panel-body -->
+                        </div>
+                        <div v-for="(segment,i) in segments">
+                            <input type="hidden" v-bind:name="'segments['+i+'][id]'" v-model="segment.id" />
+                            <input type="hidden" v-bind:name="'segments['+i+'][code]'" v-model="segment.code" />
+                            <input type="hidden" v-bind:name="'segments['+i+'][provider]'" v-model="segment.provider" />
+                            <input type="hidden" v-bind:name="'segments['+i+'][inclusive]'" v-model="segment.inclusive" />
                         </div>
                     </div><!-- .panel (segments) -->
 
@@ -255,16 +319,15 @@
                         </div>
                     </div><!-- .panel (segments) -->
 
-
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFour">
+                        <div class="panel-heading" role="tab" id="headingBannerRules">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour" :class="{ green: highlightBannerRulesCollapse }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseBannerRules" aria-expanded="false" aria-controls="collapseBannerRules" :class="{ green: highlightBannerRulesCollapse }">
                                     Banner rules - how often to display?
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+                        <div id="collapseBannerRules" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingBannerRules">
                             <div class="panel-body p-l-10 p-r-20">
 
                                 <pageview-rules :pageviewRules="pageviewRules"></pageview-rules>
@@ -282,14 +345,14 @@
                     </div><!-- .panel (banner rules) -->
 
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFive">
+                        <div class="panel-heading" role="tab" id="headingGeoTargeting">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive" :class="{ green: highlightCountriesCollapse }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseGeoTargeting" aria-expanded="false" aria-controls="collapseGeoTargeting" :class="{ green: highlightCountriesCollapse }">
                                     Geo targeting - which countries?
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+                        <div id="collapseGeoTargeting" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingGeoTargeting">
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="input-group m-t-20">
@@ -355,14 +418,14 @@
                     </div><!-- .panel (geo targeting) -->
 
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingSix">
+                        <div class="panel-heading" role="tab" id="headingDevicesTargeting">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix" :class="{ green: highlightDevicesCollapse }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDevicesTargeting" aria-expanded="false" aria-controls="collapseDevicesTargeting" :class="{ green: highlightDevicesCollapse }">
                                     Devices targeting (mobile/desktop)
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+                        <div id="collapseDevicesTargeting" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingDevicesTargeting">
                             <div class="panel-body p-l-10 p-r-20">
 
                                 <div class="input-group fg-float">
@@ -380,14 +443,14 @@
                     </div><!-- .panel (device targetting) -->
 
                     <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingSeven">
+                        <div class="panel-heading" role="tab" id="headingWhenToLaunch">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven" :class="{ green: isScheduled }">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWhenToLaunch" aria-expanded="false" aria-controls="collapseWhenToLaunch" :class="{ green: isScheduled }">
                                     When to launch
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
+                        <div id="collapseWhenToLaunch" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingWhenToLaunch">
                             <div class="panel-body p-l-10 p-r-20">
 
                                 <div>
@@ -655,7 +718,10 @@
                 return (this.name || this.bannerId);
             },
             highlightSegmentsCollapse: function () {
-                return (this.segments.length || this.signedIn);
+                return this.segments.length;
+            },
+            highlightUserAttributesCollapse: function() {
+                return this.signedIn || this.usingAdblock;
             },
             highlightWhereToCollapse: function () {
                 return (this.urlFilter !== 'everywhere' || this.refererFilter !== 'everywhere');
@@ -691,7 +757,7 @@
 
                 return false;
             },
-            selectSegment: function() {
+            selectSegment: function(isToInclude) {
                 if (typeof this.addedSegment === 'undefined') {
                     return;
                 }
@@ -700,7 +766,14 @@
                         return;
                     }
                 }
+                this.addedSegment.inclusive = isToInclude;
                 this.segments.push(this.addedSegment);
+            },
+            setSegmentAsInclusive: function() {
+                this.selectSegment(true);
+            },
+            setSegmentAsExclusive: function() {
+                this.selectSegment(false);
             },
             removeSegment: function(index) {
                 let toRemove = this.segments[index];
@@ -754,4 +827,3 @@
         }
     }
 </style>
-

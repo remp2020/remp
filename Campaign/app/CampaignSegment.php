@@ -12,6 +12,7 @@ class CampaignSegment extends Model
         'id',
         'code',
         'provider',
+        'inclusive',
         'campaign_id'
     ];
 
