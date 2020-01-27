@@ -788,9 +788,9 @@ class CampaignController extends Controller
                 }
             }
 
-            // segment
-            $canSee = $this->showtime->canSegmentSeeTheCampaign($campaign, $sa, $userId, $browserId);
-            if (!$canSee) {
+            // segment rules
+            $segmentRulesOk = $this->showtime->evaluateSegmentRules($campaign, $browserId, $userId);
+            if (!$segmentRulesOk) {
                 continue;
             }
 

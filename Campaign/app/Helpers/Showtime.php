@@ -15,9 +15,12 @@ class Showtime
 
     private $redis;
 
-    public function __construct(ClientInterface $redis)
+    private $segmentAggregator;
+
+    public function __construct(ClientInterface $redis, SegmentAggregator $segmentAggregator)
     {
         $this->redis = $redis;
+        $this->segmentAggregator = $segmentAggregator;
     }
 
     public function displayForUser(Banner $banner, string $userId, int $expiresInSeconds)
@@ -60,7 +63,8 @@ class Showtime
         return $this->loadOneTimeBanner($browserBannerKeys);
     }
 
-    public function canSegmentSeeTheCampaign(Campaign $campaign, SegmentAggregator $segmentAggregator, $userId, $browserId) {
+    public function evaluateSegmentRules(Campaign $campaign, $browserId, $userId = null)
+    {
         if ($campaign->segments->isEmpty()) {
             return true;
         }
@@ -69,20 +73,22 @@ class Showtime
             $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
 
             if ($userId) {
-                $belongsToSegment = $segmentAggregator->checkUser($campaignSegment, strval($userId));
+                $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, strval($userId));
             } else {
-                $belongsToSegment = $segmentAggregator->checkBrowser($campaignSegment, strval($browserId));
+                $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, strval($browserId));
             }
-            
-            return $this->canUserSeeTheCampaign($belongsToSegment, $campaignSegment->inclusive);
-        }
-    }
 
-    private function canUserSeeTheCampaign($userBelongsToSegment, $segmentIsInclusive) {
-        $canSeeTheCampaign =
-            ($segmentIsInclusive && $userBelongsToSegment) ||
-            (!$segmentIsInclusive && !$userBelongsToSegment);
-        return $canSeeTheCampaign;
+            // user is member of segment, that's excluded from campaign; halt execution
+            if ($belongsToSegment && !$campaignSegment->inclusive) {
+                return false;
+            }
+            // user is NOT member of segment, that's required for campaign; halt execution
+            if (!$belongsToSegment && $campaignSegment->inclusive) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function loadOneTimeBanner(array $bannerKeys): ?Banner

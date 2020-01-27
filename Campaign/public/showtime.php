@@ -336,12 +336,6 @@ $redis = new \Predis\Client([
     'password' => getenv('REDIS_PASSWORD') ?: null,
 ]);
 
-$showtime = new Showtime($redis);
-
-$positions = json_decode($redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY)) ?? [];
-$dimensions = json_decode($redis->get(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY)) ?? [];
-$alignments = json_decode($redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY)) ?? [];
-
 /** @var \App\Contracts\SegmentAggregator $segmentAggregator */
 $segmentAggregator = unserialize($redis->get(\App\Providers\AppServiceProvider::SEGMENT_AGGREGATOR_REDIS_KEY))();
 if (!$segmentAggregator) {
@@ -350,6 +344,12 @@ if (!$segmentAggregator) {
         'errors' => ['unable to get cached segment aggregator'],
     ], 500);
 }
+
+$showtime = new Showtime($redis, $segmentAggregator);
+
+$positions = json_decode($redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY)) ?? [];
+$dimensions = json_decode($redis->get(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY)) ?? [];
+$alignments = json_decode($redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY)) ?? [];
 
 if (isset($data->cache)) {
     $segmentAggregator->setProviderData($data->cache);
@@ -610,8 +610,8 @@ foreach ($campaignIds as $campaignId) {
     }
 
     // segment
-    $canSee = $showtime->canSegmentSeeTheCampaign($campaign, $segmentAggregator, $userId, $browserId);
-    if (!$canSee) {
+    $segmentRulesOk = $showtime->evaluateSegmentRules($campaign, $browserId, $userId);
+    if (!$segmentRulesOk) {
         continue;
     }
 
