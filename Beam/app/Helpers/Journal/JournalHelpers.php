@@ -12,6 +12,8 @@ use Remp\Journal\JournalContract;
 
 class JournalHelpers
 {
+    const CATEGORY_ACTION_SEPARATOR = '::';
+
     private $journal;
 
     private $cachedRefererMediumLabels;

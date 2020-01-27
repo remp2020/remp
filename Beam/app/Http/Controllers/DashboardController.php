@@ -25,8 +25,6 @@ class DashboardController extends Controller
 {
     private const NUMBER_OF_ARTICLES = 30;
 
-    private const CATEGORY_ACTION_SEPARATOR = '::';
-
     private $journal;
 
     private $journalHelper;
@@ -75,7 +73,7 @@ class DashboardController extends Controller
         foreach ($this->journalHelper->eventsCategoriesActions() as $item) {
             $externalEvents[] = (object) [
                 'text' => $item->category . ':' . $item->action,
-                'value' => $item->category . self::CATEGORY_ACTION_SEPARATOR . $item->action,
+                'value' => $item->category . JournalHelpers::CATEGORY_ACTION_SEPARATOR . $item->action,
             ];
         }
 
@@ -464,7 +462,7 @@ class DashboardController extends Controller
         $categories = [];
         $categoryActions = [];
         foreach ($requestedExternalEvents as $item) {
-            [$category, $action] = explode(self::CATEGORY_ACTION_SEPARATOR, $item);
+            [$category, $action] = explode(JournalHelpers::CATEGORY_ACTION_SEPARATOR, $item);
             $categories[] = $category;
             if (!array_key_exists($category, $categoryActions)) {
                 $categoryActions[$category] = [];

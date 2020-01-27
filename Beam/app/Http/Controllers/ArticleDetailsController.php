@@ -21,8 +21,6 @@ class ArticleDetailsController extends Controller
 {
     private const ALLOWED_INTERVALS = 'today,7days,30days,all';
 
-    private const CATEGORY_ACTION_SEPARATOR = '::';
-
     private $journal;
 
     private $journalHelper;
@@ -255,7 +253,7 @@ class ArticleDetailsController extends Controller
         $categories = [];
         $categoryActions = [];
         foreach ($requestedExternalEvents as $item) {
-            [$category, $action] = explode(self::CATEGORY_ACTION_SEPARATOR, $item);
+            [$category, $action] = explode(JournalHelpers::CATEGORY_ACTION_SEPARATOR, $item);
             $categories[] = $category;
             if (!array_key_exists($category, $categoryActions)) {
                 $categoryActions[$category] = [];
@@ -423,7 +421,7 @@ class ArticleDetailsController extends Controller
         foreach ($this->journalHelper->eventsCategoriesActions($article) as $item) {
             $externalEvents[] = (object) [
                 'text' => $item->category . ':' . $item->action,
-                'value' => $item->category . self::CATEGORY_ACTION_SEPARATOR . $item->action,
+                'value' => $item->category . JournalHelpers::CATEGORY_ACTION_SEPARATOR . $item->action,
             ];
         }
 
