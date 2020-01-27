@@ -455,53 +455,29 @@ class DashboardController extends Controller
 
     private function loadExternalEvents(JournalInterval $journalInterval, $requestedExternalEvents): array
     {
-        if (!$requestedExternalEvents) {
-            return [];
-        }
-
-        $categories = [];
-        $categoryActions = [];
-        foreach ($requestedExternalEvents as $item) {
-            [$category, $action] = explode(JournalHelpers::CATEGORY_ACTION_SEPARATOR, $item);
-            $categories[] = $category;
-            if (!array_key_exists($category, $categoryActions)) {
-                $categoryActions[$category] = [];
-            }
-            $categoryActions[$category][] = $action;
-        }
-
-        $r = ListRequest::from('events')
-            ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
-            ->addFilter('category', ...$categories);
-        $response = $this->journal->list($r);
+        $eventData = $this->journalHelper->loadEvents($journalInterval, $requestedExternalEvents);
 
         $tags = [];
-
         $articles = [];
         $events = [];
 
-        foreach ($response[0]->events ?? [] as $event) {
-            if (!in_array($event->action, $categoryActions[$event->category], true)) {
-                // ATM Journal API doesn't provide way to simultaneously check for category and action on the same record,
-                // therefore check first category in the request and check action here
-                continue;
-            }
-            $title = $event->category . ':' . $event->action;
+        foreach ($eventData as $eventItem) {
+            $title = $eventItem->category . ':' . $eventItem->action;
             $tags[$title] = true;
 
-            $date = Carbon::parse($event->system->time);
+            $date = Carbon::parse($eventItem->system->time);
 
             $text = "<b>$title</b><br />" .
                 'At: ' . $date->copy()->tz($journalInterval->tz)->format('Y-m-d H:i');
 
-            if (isset($event->article_id)) {
-                $article = $articles[$event->article_id] ?? null;
+            if (isset($eventItem->article_id)) {
+                $article = $articles[$eventItem->article_id] ?? null;
                 if (!$article) {
-                    $article = Article::where('external_id', $event->article_id)->first();
+                    $article = Article::where('external_id', $eventItem->article_id)->first();
                 }
 
                 if ($article) {
-                    $articles[$event->article_id] = $article;
+                    $articles[$eventItem->article_id] = $article;
                     $url = route('articles.show', $article->id);
                     $articleTitle = Str::limit($article->title, 50);
                     $text .= '<br />Article: <a style="text-decoration: underline; color: #fff" href="'. $url .'">' . $articleTitle . '</b>';

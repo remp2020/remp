@@ -246,48 +246,23 @@ class ArticleDetailsController extends Controller
 
     private function loadExternalEvents(Article $article, JournalInterval $journalInterval, $requestedExternalEvents): array
     {
-        if (!$requestedExternalEvents) {
-            return [];
-        }
-
-        $categories = [];
-        $categoryActions = [];
-        foreach ($requestedExternalEvents as $item) {
-            [$category, $action] = explode(JournalHelpers::CATEGORY_ACTION_SEPARATOR, $item);
-            $categories[] = $category;
-            if (!array_key_exists($category, $categoryActions)) {
-                $categoryActions[$category] = [];
-            }
-            $categoryActions[$category][] = $action;
-        }
-
-        $r = ListRequest::from('events')
-            ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
-            ->addFilter('article_id', $article->external_id)
-            ->addFilter('category', ...$categories);
-        $response = $this->journal->list($r);
+        $eventData = $this->journalHelper->loadEvents($journalInterval, $requestedExternalEvents, $article);
 
         $tags = [];
 
         $events = [];
-        foreach ($response[0]->events ?? [] as $event) {
-            if (!in_array($event->action, $categoryActions[$event->category], true)) {
-                // ATM Journal API doesn't provide way to simultaneously check for category and action on the same record,
-                // therefore check first category in the request and check action here
-                continue;
-            }
-            $title = $event->category . ':' . $event->action;
+        foreach ($eventData as $eventItem) {
+            $title = $eventItem->category . ':' . $eventItem->action;
             $tags[$title] = true;
-
             $events[] = (object) [
-                'date' => Carbon::parse($event->system->time)->toIso8601ZuluString(),
+                'date' => Carbon::parse($eventItem->system->time)->toIso8601ZuluString(),
                 'title' => $title,
             ];
         }
 
         $colors = Colors::generalTagsToColors(array_keys($tags), true);
         foreach ($events as $event) {
-            $event->color = $colors[$event->title];
+            $eventItem->color = $colors[$event->title];
         }
 
         return $events;
