@@ -32,6 +32,7 @@ class SendEmailHandler implements HandlerInterface
         }
 
         $email = $this->sender
+            ->reset()
             ->setTemplate($mailTemplate)
             ->addRecipient($payload['email'])
             ->setParams($payload['params'] ?? []);

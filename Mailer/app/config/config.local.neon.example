@@ -22,7 +22,7 @@ services:
             - setThreshold(3) # number of dropped emails before unsubscribing user
     hermesWorker:
         setup:
-			- add('email-dropped', @unsubscribeDroppedHandler)
+            - add('email-dropped', @unsubscribeDroppedHandler)
 
     # Setup loggers output
     commandsLogger:

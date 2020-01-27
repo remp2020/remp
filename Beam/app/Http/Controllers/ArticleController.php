@@ -13,14 +13,15 @@ use App\Http\Resources\ArticleResource;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\NewsletterCriterion;
 use App\Section;
-use Illuminate\Support\Carbon;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\TokenProvider;
 use Yajra\Datatables\Datatables;
 use Yajra\DataTables\EloquentDataTable;
 
@@ -32,11 +33,14 @@ class ArticleController extends Controller
 
     private $conversionRateConfig;
 
-    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig)
+    private $tokenProvider;
+
+    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig, TokenProvider $tokenProvider)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->conversionRateConfig = $conversionRateConfig;
+        $this->tokenProvider = $tokenProvider;
     }
 
     /**
@@ -101,6 +105,10 @@ class ArticleController extends Controller
         if ($request->input('conversion_to')) {
             $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
             $articlesQuery->where('paid_at', '<=', $conversionTo);
+        }
+        $token = $this->tokenProvider->getToken();
+        if ($token) {
+            $articlesQuery->where('property_uuid', '=', $token);
         }
 
         $articles = $articlesQuery->get();
@@ -230,6 +238,10 @@ class ArticleController extends Controller
         }
         if ($request->input('published_to')) {
             $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
+        }
+        $token = $this->tokenProvider->getToken();
+        if ($token) {
+            $articles->where('property_uuid', '=', $token);
         }
 
         return $datatables->of($articles)

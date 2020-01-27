@@ -13,7 +13,8 @@
                     'mail_layout_id': $('#' + {$control["newsfilterTemplateForm"]['mail_layout_id']->htmlId}).val(),
                     'locked_mail_layout_id': $('#' + {$control["newsfilterTemplateForm"]['locked_mail_layout_id']->htmlId}).val(),
                     'mail_type_id': $('#' + {$control["newsfilterTemplateForm"]['mail_type_id']->htmlId}).val(),
-                    'subject': $('#' + {$control["newsfilterTemplateForm"]['subject']->htmlId}).val()
+                    'subject': $('#' + {$control["newsfilterTemplateForm"]['subject']->htmlId}).val(),
+                    'article_id': $('#' + {$control["newsfilterTemplateForm"]['article_id']->htmlId}).val()
                 },
                 success: function(data) {
                     previewFrame('#newsfilter-preview-full-frame', data['generatedHtml']);
@@ -105,6 +106,7 @@
                             {input text_content, value => $textContent}
                             {input locked_html_content, value => $lockedHtmlContent}
                             {input locked_text_content, value => $lockedTextContent}
+                            {input article_id, value => $articleId}
                         </div>
                     {/form}
                 </div>
