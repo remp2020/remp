@@ -5,6 +5,7 @@ namespace App;
 use App\Helpers\Journal\JournalHelpers;
 use App\Model\ArticleTitle;
 use App\Model\Config\ConversionRateConfig;
+use App\Model\Tag;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -62,6 +63,11 @@ class Article extends Model
     public function sections()
     {
         return $this->belongsToMany(Section::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
     }
 
     public function conversions()

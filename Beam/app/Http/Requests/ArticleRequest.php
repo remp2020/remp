@@ -30,6 +30,7 @@ class ArticleRequest extends FormRequest
             'url' => "required|url",
             'authors' => 'array',
             'sections' => 'array',
+            'tags' => 'array',
             'image_url' => 'nullable|url',
             'published_at' => 'date',
 

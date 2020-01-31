@@ -12,6 +12,7 @@ use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\NewsletterCriterion;
+use App\Model\Tag;
 use App\Section;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
@@ -321,6 +322,14 @@ class ArticleController extends Controller
             $article->sections()->attach($section);
         }
 
+        $article->tags()->detach();
+        foreach ($request->get('tags', []) as $tagName) {
+            $tag = Tag::firstOrCreate([
+                'name' => $tagName,
+            ]);
+            $article->tags()->attach($tag);
+        }
+
         $article->authors()->detach();
         foreach ($request->get('authors', []) as $authorName) {
             $section = Author::firstOrCreate([
@@ -354,6 +363,14 @@ class ArticleController extends Controller
                     'name' => $sectionName,
                 ]);
                 $article->sections()->attach($section);
+            }
+
+            $article->tags()->detach();
+            foreach ($a['tags'] as $tagName) {
+                $tag = Tag::firstOrCreate([
+                    'name' => $tagName,
+                ]);
+                $article->tags()->attach($tag);
             }
 
             $article->authors()->detach();
@@ -415,7 +432,7 @@ class ArticleController extends Controller
                 }
             }
 
-            $article->load(['authors', 'sections']);
+            $article->load(['authors', 'sections', 'tags']);
             $articles[] = $article;
         }
 
