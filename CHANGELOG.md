@@ -20,7 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added (optional) `article_id` field to event parameters pushed to tracker. remp/remp#556
 - Fixed property naming validator issue checking unique constraint against account names, not property names.
 - Added article conversion/pageviews stats filtering based on selected property. GH-50
-- Added support for article tags. remp/remp#217
+- Added support for article tags (storing tags associated with articles, filtering in data tables). remp/remp#217
 
 ### [Campaign]
 
