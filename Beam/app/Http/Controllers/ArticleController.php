@@ -66,6 +66,7 @@ class ArticleController extends Controller
             'html' => view('articles.conversions', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'now - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
@@ -87,7 +88,7 @@ class ArticleController extends Controller
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
                 "avg(conversions.amount) as conversions_avg"
             ]))
-            ->with(['authors', 'sections'])
+            ->with(['authors', 'sections', 'tags'])
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
             ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at']);
 
@@ -211,8 +212,16 @@ class ArticleController extends Controller
                 $articleIds = $filterQuery->pluck('articles.id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
+            ->filterColumn('tags[, ].name', function (Builder $query, $value) {
+                $values = explode(",", $value);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
+                    ->whereIn('article_tag.tag_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
+            })
             ->rawColumns(['authors'])
-            ->make(true);
+            ->make();
     }
 
     public function pageviews(Request $request)
@@ -221,6 +230,7 @@ class ArticleController extends Controller
             'html' => view('articles.pageviews', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'now - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
             ]),
@@ -277,7 +287,7 @@ class ArticleController extends Controller
                 $query->where('articles.title', 'like', '%' . $value . '%');
             })
             ->filterColumn('authors', function (Builder $query, $value) {
-                $values = explode(",", $value);
+                $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
                     ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
                     ->whereIn('article_author.author_id', $values);
@@ -285,10 +295,18 @@ class ArticleController extends Controller
                 $query->whereIn('articles.id', $articleIds);
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
-                $values = explode(",", $value);
+                $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
                     ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
                     ->whereIn('article_section.section_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
+            })
+            ->filterColumn('tags[, ].name', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
+                    ->whereIn('article_tag.section_id', $values);
                 $articleIds = $filterQuery->pluck('articles.id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
