@@ -54,6 +54,30 @@
                                 </dd>
                             </dl>
                             <dl class="dl-horizontal">
+                                <dt>Sections</dt>
+                                <dd>
+                                    @if($article->sections->count() > 0)
+                                        @foreach ($article->sections as $section)
+                                            {{ $section->name }}@if(!$loop->last), @endif
+                                        @endforeach
+                                    @else
+                                        -
+                                    @endif
+                                </dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Tags</dt>
+                                <dd>
+                                    @if($article->tags->count() > 0)
+                                        @foreach ($article->tags as $tag)
+                                            {{ $tag->name }}@if(!$loop->last), @endif
+                                        @endforeach
+                                    @else
+                                        -
+                                    @endif
+                                </dd>
+                            </dl>
+                            <dl class="dl-horizontal">
                                 <dt>Published at</dt>
                                 <dd>
                                     <date-formatter date="{{$article->published_at}}"></date-formatter>
