@@ -380,6 +380,9 @@ curl -X POST \
             "sections": [
                 "Opinions" 
             ],
+            "tags": [
+                "Elections 2020" 
+            ],
             "published_at": "2018-06-05T06:03:05Z"
         }  
     ]
@@ -408,6 +411,9 @@ $payload = [
             ],
             "sections" => [
                 "Opinions"
+            ],
+            "tags" => [
+                "Elections 2020"
             ],
             "published_at" => "2018-06-05T06:03:05Z",
         ]
@@ -465,7 +471,14 @@ $response = file_get_contents("http://beam.remp.press/api/articles/upsert ", fal
                     "created_at": "2019-05-17 11:43:04",
                     "updated_at": "2019-05-17 11:43:04"
                 }
-            ]
+            ],
+            "tags": [
+                {
+                    "name": "Elections 2020",
+                    "created_at": "2019-05-17 11:43:04",
+                    "updated_at": "2019-05-17 11:43:04"
+                }
+            ],            
         }
     ]
 }

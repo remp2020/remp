@@ -46,6 +46,12 @@
                     'filter' => $sections,
                     'priority' => 4,
                 ],
+                'article.tags[, ].name' => [
+                    'header' => 'tags',
+                    'orderable' => false,
+                    'filter' => $tags,
+                    'priority' => 5,
+                ],
                 'amount' => [
                     'header' => 'amount',
                     'render' => 'number',

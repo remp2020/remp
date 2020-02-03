@@ -86,6 +86,12 @@ $factory->define(\App\Section::class, function (Faker\Generator $faker) {
     ];
 });
 
+$factory->define(\App\Model\Tag::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->domainWord,
+    ];
+});
+
 $factory->define(\App\Article::class, function (Faker\Generator $faker) {
     return [
         'external_id' => $faker->uuid,
