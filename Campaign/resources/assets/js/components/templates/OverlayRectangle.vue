@@ -85,7 +85,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="main_text" class="fg-label">Main text</label>
-                                <input v-model="mainText" class="form-control fg-input remp-banner-text-input" name="main_text" id="main_text" type="text" required>
+                                <input v-model="mainText" class="form-control fg-input remp-banner-text-input" name="main_text" id="main_text" type="text">
                             </div>
                             <div><small v-html="$parent.fieldParamsMessage"></small></div>
                         </div>
@@ -94,7 +94,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="button_text" class="fg-label">Button text</label>
-                                <input v-model="buttonText" class="form-control fg-input remp-banner-text-input" name="button_text" id="button_text" type="text" required>
+                                <input v-model="buttonText" class="form-control fg-input remp-banner-text-input" name="button_text" id="button_text" type="text">
                             </div>
                         </div>
                     </div>
@@ -110,6 +110,7 @@
     import vSelect from "remp/js/components/vSelect";
 
     let props = [
+        "_templateId",
         "_headerText",
         "_mainText",
         "_buttonText",
@@ -129,14 +130,21 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop] || this[prop.slice(1)];
             });
+
+            if (!this.templateId) {
+                this.mainText = "Limited time offer<br/>30% discount"
+                this.buttonText = "Visit offer"
+            }
+
             this.colorScheme = this.colorSchemeByBackground(this._backgroundColor) || this.colorScheme;
             this.dimensions = this.dimensionsByWidthHeight(this._width, this._height) || this.dimensions;
             this.emitValuesChanged();
         },
         data: () => ({
+            templateId: null,
             headerText: null,
-            mainText: "Limited time offer<br/>30% discount",
-            buttonText: "Visit offer",
+            mainText: null,
+            buttonText: null,
             width: null,
             height: null,
             imageLink: null,
