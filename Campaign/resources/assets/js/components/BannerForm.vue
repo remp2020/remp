@@ -34,6 +34,7 @@
             ></medium-rectangle-template>
 
             <overlay-rectangle-template v-if="template === 'overlay_rectangle'"
+               v-bind:_templateId="overlayRectangleTemplate.id"
                v-bind:_headerText="overlayRectangleTemplate.headerText"
                v-bind:_mainText="overlayRectangleTemplate.mainText"
                v-bind:_buttonText="overlayRectangleTemplate.buttonText"
