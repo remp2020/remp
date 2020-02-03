@@ -376,7 +376,7 @@ class ArticleController extends Controller
             $article = Article::upsert($a);
 
             $article->sections()->detach();
-            foreach ($a['sections'] as $sectionName) {
+            foreach ($a['sections'] ?? [] as $sectionName) {
                 $section = Section::firstOrCreate([
                     'name' => $sectionName,
                 ]);
@@ -384,7 +384,7 @@ class ArticleController extends Controller
             }
 
             $article->tags()->detach();
-            foreach ($a['tags'] as $tagName) {
+            foreach ($a['tags'] ?? [] as $tagName) {
                 $tag = Tag::firstOrCreate([
                     'name' => $tagName,
                 ]);
