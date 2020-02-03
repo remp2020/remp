@@ -306,7 +306,7 @@ class ArticleController extends Controller
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
                     ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
-                    ->whereIn('article_tag.section_id', $values);
+                    ->whereIn('article_tag.tag_id', $values);
                 $articleIds = $filterQuery->pluck('articles.id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
