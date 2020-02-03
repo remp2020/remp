@@ -37,7 +37,7 @@ class ConversionController extends Controller
     public function json(Request $request, Datatables $datatables)
     {
         $conversions = Conversion::select('conversions.*')
-            ->with(['article', 'article.authors', 'article.sections'])
+            ->with(['article', 'article.authors', 'article.sections', 'article.tags'])
             ->join('articles', 'articles.id', '=', 'conversions.article_id')
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id')
@@ -73,7 +73,7 @@ class ConversionController extends Controller
             })
             ->filterColumn('article.tags[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
-                $query->whereIn('article_tag.section_id', $values);
+                $query->whereIn('article_tag.tag_id', $values);
             })
             ->rawColumns(['actions'])
             ->make(true);

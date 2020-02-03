@@ -242,7 +242,7 @@ class ArticleController extends Controller
     {
         $articles = Article::selectRaw('articles.*,' .
             'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
-            ->with(['authors', 'sections']);
+            ->with(['authors', 'sections', 'tags']);
 
         if ($request->input('published_from')) {
             $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
@@ -356,7 +356,7 @@ class ArticleController extends Controller
             $article->authors()->attach($section);
         }
 
-        $article->load(['authors', 'sections']);
+        $article->load(['authors', 'sections', 'tags']);
 
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
