@@ -81,14 +81,25 @@ class NovydenikNewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        $defaults = [
-            'name' => 'Newsfilter ' . date('j.n.Y'),
-            'code' => 'nwsf_' . date('dmY'),
-            'mail_layout_id' => 2, // empty layout
-            'locked_mail_layout_id' => 2, // empty layout
-            'mail_type_id' => 6, // newsfilter,
-            'from' => 'Deník N <info@denikn.cz>',
-        ];
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 14) {
+            $defaults = [
+                'name' => 'Newsfilter Německo ' . date('j.n.Y'),
+                'code' => 'nwsf_de_' . date('dmY'),
+                'mail_layout_id' => 2, // empty layout
+                'locked_mail_layout_id' => 2, // empty layout
+                'mail_type_id' => 11, // nemecko,
+                'from' => 'Deník N <info@denikn.cz>',
+            ];
+        } else {
+            $defaults = [
+                'name' => 'Newsfilter ' . date('j.n.Y'),
+                'code' => 'nwsf_' . date('dmY'),
+                'mail_layout_id' => 2, // empty layout
+                'locked_mail_layout_id' => 2, // empty layout
+                'mail_type_id' => 6, // newsfilter,
+                'from' => 'Deník N <info@denikn.cz>',
+            ];
+        }
 
         $form->setDefaults($defaults);
 
