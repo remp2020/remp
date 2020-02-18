@@ -48,4 +48,6 @@ Route::middleware('auth.jwt')->group(function () {
     Route::resource('campaigns', 'CampaignController');
     Route::resource('schedule', 'ScheduleController')->only(['index', 'create', 'edit', 'update', 'destroy']);
     Route::resource('campaigns.schedule', 'ScheduleController');
+
+    Route::get('search', 'SearchController@search')->name('search');
 });

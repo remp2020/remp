@@ -4,10 +4,11 @@ namespace App;
 
 use App\Model\TableName;
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Segment extends Model
 {
-    use TableName;
+    use TableName, SearchableTrait;
 
     protected $casts = [
         'active' => 'boolean',
@@ -22,6 +23,25 @@ class Segment extends Model
         'code',
         'active',
         'segment_group_id'
+    ];
+
+    /**
+     * Searchable rules.
+     *
+     * @var array
+     */
+    protected $searchable = [
+        /**
+         * Columns and their priority in search results.
+         * Columns with higher values are more important.
+         * Columns with equal values have equal importance.
+         *
+         * @var array
+         */
+        'columns' => [
+            'segments.name' => 1,
+            'segments.code' => 1
+        ]
     ];
 
     public function rules()
