@@ -16,9 +16,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Log;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\JournalException;
 use Remp\Journal\ListRequest;
 
 class DashboardController extends Controller
@@ -70,13 +72,17 @@ class DashboardController extends Controller
         }
 
         $externalEvents = [];
-        foreach ($this->journalHelper->eventsCategoriesActions() as $item) {
-            $externalEvents[] = (object) [
-                'text' => $item->category . ':' . $item->action,
-                'value' => $item->category . JournalHelpers::CATEGORY_ACTION_SEPARATOR . $item->action,
-            ];
+        try {
+            foreach ($this->journalHelper->eventsCategoriesActions() as $item) {
+                $externalEvents[] = (object) [
+                    'text' => $item->category . ':' . $item->action,
+                    'value' => $item->category . JournalHelpers::CATEGORY_ACTION_SEPARATOR . $item->action,
+                ];
+            }
+        } catch (JournalException $journalException) {
+            // if Journal is down, do not crash, but allowed page to be rendered (so user can switch to other page)
+            Log::error($journalException->getMessage());
         }
-
         $data['externalEvents'] = $externalEvents;
 
         return view($template, $data);
