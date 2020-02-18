@@ -4,13 +4,14 @@ namespace App;
 
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
 use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Redis;
 
 class Campaign extends Model
 {
-    use PivotEventTrait;
+    use PivotEventTrait, SearchableTrait;
 
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
     const CAMPAIGN_TAG = 'campaign';
@@ -60,6 +61,29 @@ class Campaign extends Model
     ];
 
     protected $appends = ['active'];
+
+    /**
+     * Searchable rules.
+     *
+     * @var array
+     */
+    protected $searchable = [
+        /**
+         * Columns and their priority in search results.
+         * Columns with higher values are more important.
+         * Columns with equal values have equal importance.
+         *
+         * @var array
+         */
+        'columns' => [
+            'campaigns.name' => 1,
+            'banners.name' => 1,
+        ],
+        'joins' => [
+            'campaign_banners' => ['campaigns.id', 'campaign_banners.campaign_id'],
+            'banners' => ['banners.id', 'campaign_banners.banner_id'],
+        ]
+    ];
 
     protected static function boot()
     {
@@ -252,7 +276,7 @@ class Campaign extends Model
             ->pluck('campaign_id')
             ->unique()
             ->toArray();
-        
+
         Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode(array_values($activeCampaignIds)));
 
         return collect($activeCampaignIds);

@@ -62,6 +62,11 @@ if [ ! -f ".env" ]; then
             php artisan jwt:secret
         fi
 
+        php artisan list | grep "search:init" > /dev/null
+        if [ $? -eq "0" ]; then
+            php artisan search:init
+        fi
+
         # Update permissions for Laravel storage (cache) folder
         find storage -type f -exec chmod 664 {} \;
         find storage -type d -exec chmod 775 {} \;

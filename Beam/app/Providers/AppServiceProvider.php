@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Resources\SearchResource;
 use App\Model\Property\SelectedProperty;
 use App\Model\Config\ConversionRateConfig;
 use Illuminate\Pagination\Paginator;
@@ -29,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('accountPropertyTokens', $selectedProperty->selectInputData());
             });
         }
+
+        SearchResource::withoutWrapping();
     }
 
     /**

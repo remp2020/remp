@@ -10,18 +10,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Nicolaslopezj\Searchable\SearchableTrait;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 use Yadakhov\InsertOnDuplicateKey;
 
 class Article extends Model
 {
-    use InsertOnDuplicateKey;
+    use InsertOnDuplicateKey, SearchableTrait;
 
     private const DEFAULT_TITLE_VARIANT = 'default';
-    
+
     private const DEFAULT_IMAGE_VARIANT = 'default';
-    
+
     private $journal;
 
     private $journalHelpers;
@@ -49,6 +50,47 @@ class Article extends Model
         'created_at',
         'updated_at',
     ];
+
+    /**
+     * Searchable rules.
+     *
+     * @var array
+     */
+    protected $searchable = [
+        /**
+         * Columns and their priority in search results.
+         * Columns with higher values are more important.
+         * Columns with equal values have equal importance.
+         *
+         * @var array
+         */
+        'columns' => [
+            'articles.title' => 1,
+            'tags.name' => 1,
+            'sections.name' => 1
+        ],
+        'joins' => [
+            'article_tag' => ['articles.id', 'article_tag.article_id'],
+            'article_section' => ['articles.id', 'article_section.article_id'],
+            'tags' => ['tags.id', 'article_tag.tag_id'],
+            'sections' => ['sections.id', 'article_section.section_id'],
+        ]
+    ];
+
+    /**
+     * Index only id and title
+     *
+     * @return array
+     */
+    /*public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'tags' => $this->tags->pluck('name'),
+            'sections' => $this->sections->pluck('name')
+        ];
+    }*/
 
     public function property()
     {
