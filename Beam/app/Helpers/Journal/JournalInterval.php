@@ -91,7 +91,6 @@ class JournalInterval
             $windowSizeInMinutes = $rule[2];
             $windowSizeText = $rule[3];
 
-
             if ($endMinute === null || $articleAgeInMins < $endMinute) {
                 return [$windowSizeText, $windowSizeInMinutes];
             }

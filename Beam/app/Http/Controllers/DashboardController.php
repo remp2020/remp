@@ -139,7 +139,7 @@ class DashboardController extends Controller
 
         $tags = [];
         foreach ($currentData as $item) {
-            $tags[$this->itemTag($item)] = true;
+            $tags[$item->referer_medium] = true;
         }
 
         // Compute shadow values for today and 7-days intervals
@@ -175,7 +175,7 @@ class DashboardController extends Controller
 
                     $correctedDate = $correctedDate->toIso8601ZuluString();
 
-                    $currentTag = $this->itemTag($item);
+                    $currentTag = $item->referer_medium;
                     $tags[$currentTag] = true;
 
                     if (!array_key_exists($correctedDate, $shadowRecords)) {
@@ -212,9 +212,8 @@ class DashboardController extends Controller
             if (!array_key_exists($zuluTime, $results)) {
                 $results[$zuluTime] = array_merge($emptyValues, ['Date' => $zuluTime]);
             }
-            $tag = $this->itemTag($item);
-            $results[$zuluTime][$tag] += $item->count;
-            $totalCounts[$tag] += $item->count;
+            $results[$zuluTime][$item->referer_medium] += $item->count;
+            $totalCounts[$item->referer_medium] += $item->count;
         }
 
         // Save shadow results
@@ -261,11 +260,6 @@ class DashboardController extends Controller
         }
 
         return response()->json($jsonResponse);
-    }
-
-    private function itemTag($item): string
-    {
-        return $this->journalHelper->refererMediumFromPageviewRecord($item);
     }
 
     private function getRefererMediumFromJournalRecord($record)

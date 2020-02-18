@@ -11,7 +11,7 @@ class SnapshotHelpers
 {
     /**
      * Load concurrents histogram for given interval
-     * Concurrents counts are grouped by time, derived_referer_medium and explicit_referer_medium
+     * Concurrents counts are grouped by time, referer_medium
      * TODO: add caching
      *
      * @param JournalInterval $interval
@@ -33,10 +33,9 @@ class SnapshotHelpers
             }
         });
 
-        // TODO: `explicit_referer_medium` column is not used anymore, remove it from here after old pageviews data expire
-        $q = ArticleViewsSnapshot::select('time', 'derived_referer_medium', 'explicit_referer_medium', DB::raw('sum(count) as count'))
+        $q = ArticleViewsSnapshot::select('time', 'referer_medium', DB::raw('sum(count) as count'))
             ->whereIn('time', $timePoints->toInclude)
-            ->groupBy(['time', 'derived_referer_medium', 'explicit_referer_medium']);
+            ->groupBy(['time', 'referer_medium']);
 
         if ($externalArticleId) {
             $q->where('external_article_id', $externalArticleId);

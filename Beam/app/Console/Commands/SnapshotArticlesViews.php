@@ -59,19 +59,16 @@ class SnapshotArticlesViews extends Command
         foreach ($records as $record) {
             $token = $record->tags->token;
             $articleId = $record->tags->article_id;
-            $derivedRefererMedium = $record->tags->derived_referer_medium;
+            $refererMedium = $record->tags->derived_referer_medium;
 
             $items[] = [
                 'time' => $dbTime,
                 'property_token' => $token,
                 'external_article_id' => $articleId,
-                'derived_referer_medium' => $derivedRefererMedium,
-                'count' => $record->count,
-                'count_by_referer' => '{}', // Disabled at the moment
+                'referer_medium' => $refererMedium,
+                'count' => $record->count
             ];
         }
-
-        // TODO remove `explicit_referer_medium` and `count_by_referer` columns from table, not used anymore
 
         // Save
         ArticleViewsSnapshot::where('time', $dbTime)->delete();

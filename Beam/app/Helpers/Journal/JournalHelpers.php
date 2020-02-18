@@ -216,20 +216,6 @@ class JournalHelpers
     }
 
     /**
-     * Returns referer medium of given pageview record from Journal
-     * `explicit_referer_medium` value (optional) has priority over `derived_referer_medium` value (required)
-     *
-     * @param $record object
-     *
-     * @return string referer medium
-     */
-    public function refererMediumFromPageviewRecord($record): string
-    {
-        $m = !empty($record->explicit_referer_medium) ? $record->explicit_referer_medium : $record->derived_referer_medium;
-        return $this->refererMediumLabel($m);
-    }
-
-    /**
      * Returns list of all categories and actions for stored events
      * @param Article|null $article if provided, load events data only for particular article
      *

@@ -207,9 +207,7 @@ $factory->define(\App\Model\ArticleViewsSnapshot::class, function (Faker\Generat
         'time' => Carbon::now(),
         'property_token' => $faker->uuid,
         'external_article_id' => $faker->numberBetween(9999, 10000000),
-        'derived_referer_medium' => $refererMediums[array_rand($refererMediums)],
-        'explicit_referer_medium' => null,
-        'count' => $faker->numberBetween(1, 1000),
-        'count_by_referer' => '{}',
+        'referer_medium' => $refererMediums[array_rand($refererMediums)],
+        'count' => $faker->numberBetween(1, 1000)
     ];
 });

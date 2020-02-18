@@ -16,10 +16,8 @@ class ArticleViewsSnapshot extends Model
         'time',
         'property_token',
         'external_article_id',
-        'derived_referer_medium',
-        'explicit_referer_medium',
-        'count',
-        'count_by_referer'
+        'referer_medium',
+        'count'
     ];
 
     protected $casts = [
