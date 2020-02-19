@@ -113,13 +113,18 @@ class ArticleDetailsController extends Controller
         return response()->json($data);
     }
 
+    private function itemTag($item): string
+    {
+        return $this->journalHelper->refererMediumLabel($item->referer_medium);
+    }
+
     private function histogramFromSnapshots(Article $article, JournalInterval $journalInterval)
     {
         $records = $this->snapshotHelpers->concurrentsHistogram($journalInterval, $article->external_id, true);
 
         $tags = [];
         foreach ($records as $item) {
-            $tags[$item->referer_medium] = true;
+            $tags[$this->itemTag($item)] = true;
         }
 
         $tags = array_keys($tags);
@@ -135,7 +140,7 @@ class ArticleDetailsController extends Controller
             if (!array_key_exists($zuluTime, $results)) {
                 $results[$zuluTime] = array_merge($emptyValues, ['Date' => $zuluTime]);
             }
-            $results[$zuluTime][$item->referer_medium] += $item->count;
+            $results[$zuluTime][$this->itemTag($item)] += $item->count;
         }
 
         return [
