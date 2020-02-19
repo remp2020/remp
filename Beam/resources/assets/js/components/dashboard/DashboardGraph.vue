@@ -168,6 +168,7 @@
     }
 
     #chartContainer .preloader {
+        z-index: 2000;
         position: absolute;
         top: 50%;
         left: 50%;
