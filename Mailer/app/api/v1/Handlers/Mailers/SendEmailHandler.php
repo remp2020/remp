@@ -78,7 +78,7 @@ class SendEmailHandler extends BaseHandler
             return new JsonApiResponse(Response::S200_OK, ['status' => 'ok', 'message' => "Email was not sent, user is unsubscribed from the mail type."]);
         }
         if (isset($payload['context'])) {
-            $alreadySent = $this->logsRepository->alreadySentContext($mailTemplate->code, $payload['context']);
+            $alreadySent = $this->logsRepository->alreadySentContext($payload['context']);
             if ($alreadySent) {
                 return new JsonApiResponse(Response::S200_OK, ['status' => 'ok', 'message' => "Email was not sent, provided context was already sent before."]);
             }

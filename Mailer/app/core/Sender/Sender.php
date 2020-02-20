@@ -162,7 +162,7 @@ class Sender
         $this->setMessageHeaders($message, $senderId, $this->params);
 
         if ($this->context) {
-            $alreadySent = $this->logsRepository->alreadySentContext($this->template->code, $this->context);
+            $alreadySent = $this->logsRepository->alreadySentContext($this->context);
             if ($alreadySent) {
                 return 0;
             }
