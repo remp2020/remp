@@ -26,6 +26,9 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="REDIS_CLIENT" value="mock"/>
+        <env name="DB_DATABASE" value="remp_test"/>
+        <env name="DB_PASSWORD" value="secret"/>
+        <env name="DB_HOST" value="mysql"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="QUEUE_DRIVER" value="sync"/>
