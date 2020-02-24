@@ -28,6 +28,9 @@ composer-install:
 phpunit:
 	cd $(SUB_BEAM) && vendor/bin/phpunit
 
+copy-env:
+	cd $(SUB_BEAM) && cp .env.example .env
+
 phpstan:
 	cd $(SUB_MAILER) && make phpstan
 
