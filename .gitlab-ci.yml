@@ -10,7 +10,6 @@ composer:
     - docker
   script: 
     - make composer-install
-    - make copy-env
   cache:
     # The variable CI_COMMIT_REF_SLUG 
     # refers to the slug of the branch.
@@ -49,7 +48,6 @@ sniffer:
   tags:
     - docker
   script:
-    # - make composer-install
     - make sniff
 
 phpstan:
@@ -60,7 +58,6 @@ phpstan:
   tags:
     - docker
   script:
-    # - make composer-install
     - make phpstan
 
 tests:
@@ -71,6 +68,7 @@ tests:
   tags:
     - docker
   script:
+    - make copy-env    
     - make phpunit
   services:
     - name: mysql:5.7.21
