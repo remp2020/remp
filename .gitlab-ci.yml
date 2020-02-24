@@ -43,8 +43,8 @@ syntax:7.3:
 sniffer:
   stage: test
   image: remp/php-ci:7.2.25
-  dependencies:
-    - composer
+  # dependencies:
+    # - composer
   tags:
     - docker
   script:
@@ -54,8 +54,8 @@ sniffer:
 phpstan:
   stage: test
   image: remp/php-ci:7.2.25
-  dependencies:
-    - composer
+  # dependencies:
+    # - composer
   tags:
     - docker
   script:
