@@ -1,6 +1,20 @@
 stages:
+  - build
   - test
   - deploy
+
+composer:
+  image: remp/php-ci:7.2.25
+  stage: build
+  script: 
+    - make composer-install
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-composer
+    paths:
+      - Beam/vendor
+      - Campaign/vendor
+      - Sso/vendor
+      - Mailer/vendor
 
 cache:
   paths:
@@ -17,28 +31,33 @@ syntax:7.3:
 sniffer:
   stage: test
   image: remp/php-ci:7.2.25
+  dependencies:
+    - composer
   tags:
     - docker
   script:
-    - make composer-install
+    # - make composer-install
     - make sniff
 
 phpstan:
   stage: test
   image: remp/php-ci:7.2.25
+  dependencies:
+    - composer
   tags:
     - docker
   script:
-    - make composer-install
+    # - make composer-install
     - make phpstan
 
 tests:
   stage: test
   image: remp/php-ci:7.2.25
+  dependencies:
+    - composer
   tags:
     - docker
   script:
-    - make composer-install
     - make phpunit
   services:
     - name: mysql:5.7.21
