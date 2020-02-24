@@ -32,7 +32,7 @@ phpstan:
     - make composer-install
     - make phpstan
 
-phpunit:
+tests:
   stage: test
   image: remp/php-ci:7.2.25
   tags:
@@ -40,6 +40,12 @@ phpunit:
   script:
     - make composer-install
     - make phpunit
+  services:
+    - name: mysql:5.7.21
+      alias: mysql
+  variables:
+      MYSQL_DATABASE: remp_test
+      MYSQL_ROOT_PASSWORD: remp_test
 
 mailer/🇸🇰:
   stage: deploy
