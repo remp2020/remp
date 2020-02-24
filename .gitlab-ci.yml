@@ -17,6 +17,13 @@ composer:
       - Campaign/vendor
       - Sso/vendor
       - Mailer/vendor
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - Beam/vendor
+      - Campaign/vendor
+      - Sso/vendor
+      - Mailer/vendor
 
 cache:
   paths:
