@@ -6,6 +6,8 @@ stages:
 composer:
   image: remp/php-ci:7.2.25
   stage: build
+  tags:
+    - docker
   script: 
     - make composer-install
   cache:
