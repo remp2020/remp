@@ -32,6 +32,15 @@ phpstan:
     - make composer-install
     - make phpstan
 
+phpunit:
+  stage: test
+  image: remp/php-ci:7.2.25
+  tags:
+    - docker
+  script:
+    - make composer-install
+    - make phpunit
+
 mailer/🇸🇰:
   stage: deploy
   script:

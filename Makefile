@@ -25,6 +25,9 @@ composer-install:
 	composer install -d $(SUB_MAILER) --no-progress
 	composer install -d $(SUB_SSO) --no-progress
 
+phpunit:
+	cd $(SUB_BEAM) && vendor/bin/phpunit
+
 phpstan:
 	cd $(SUB_MAILER) && make phpstan
 
