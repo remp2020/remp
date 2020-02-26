@@ -39,7 +39,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added configuration for allowed preflight (`OPTIONS`) headers into configuration. You can configure them via `%preflight.headers` parameter - see [example use](Mailer/app/config/config.neon).
 - Fixed possible duplicate email for same context being sent, in case the emails were scheduled at the same time via `send-email` API.
 - Fixed and redesigned mailing list variants statistics to be sortable and filterable. remp/remp#593
-- Fixing attachment_size column type - changing to integer (from incorrectly assigned datetime).
+- Fixed attachment_size column type - changing to integer (from incorrectly assigned datetime).
 
 ### [Sso]
 
