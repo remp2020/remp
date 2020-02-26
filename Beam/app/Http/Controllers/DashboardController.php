@@ -13,6 +13,8 @@ use App\Model\Property\SelectedProperty;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -79,9 +81,9 @@ class DashboardController extends Controller
                     'value' => $item->category . JournalHelpers::CATEGORY_ACTION_SEPARATOR . $item->action,
                 ];
             }
-        } catch (JournalException $journalException) {
+        } catch (JournalException | ClientException | RequestException $exception) {
             // if Journal is down, do not crash, but allowed page to be rendered (so user can switch to other page)
-            Log::error($journalException->getMessage());
+            Log::error($exception->getMessage());
         }
         $data['externalEvents'] = $externalEvents;
 
