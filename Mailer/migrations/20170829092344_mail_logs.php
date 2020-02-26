@@ -18,7 +18,7 @@ class MailLogs extends AbstractMigration
             ->addColumn('hard_bounced_at', 'datetime', ['null' => true])
             ->addColumn('clicked_at', 'datetime', ['null' => true])
             ->addColumn('opened_at', 'datetime', ['null' => true])
-            ->addColumn('attachment_size', 'datetime', ['null' => true])
+            ->addColumn('attachment_size', 'integer', ['null' => true])
             ->addTimestamps()
 
             ->addForeignKey('mail_template_id', 'mail_templates', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
