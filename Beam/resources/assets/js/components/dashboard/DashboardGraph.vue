@@ -19,7 +19,16 @@
             </div>
         </div>
 
-        <slot name="additional-settings"></slot>
+        <div class="col-md-12 settings-box">
+            <div v-if="externalEvents.length > 0" class="external-events-wrapper">
+                <select class="selectpicker bs-select-hidden" title="Select events" multiple="" v-model="selectedExternalEvents">
+                    <option v-for="option in externalEvents" :value="option">{{option.text}}</option>
+                </select>
+            </div>
+
+            <!-- Slot for settings such as token selector (for public dashboard) -->
+            <slot name="additional-settings"></slot>
+        </div>
 
         <div class="col-md-12">
             <div id="chartContainer">
@@ -29,8 +38,23 @@
                     </svg>
                 </div>
 
-                <div ref="svg-container" style="height: 200px" id="article-chart">
-                    <svg style="z-index: 10" ref="svg"></svg>
+                <div class="events-legend-wrapper">
+                    <div v-if="eventLegend.data"
+                         v-show="eventLegend.visible"
+                         v-bind:style="eventLegend.style"
+                         @mouseleave="hideEventLegend">
+
+                        <div class="events-legend"
+                             v-for="event in eventLegend.data"
+                             v-html="event.title"
+                             v-bind:style="event.style">
+                        </div>
+                    </div>
+                </div>
+
+                <div ref="svg-container" id="article-chart">
+                    <svg style="z-index: 100" ref="svg"></svg>
+                    <div style="z-index: 101" @mouseenter="hideEventLegend" class="mouse-catch-block"></div>
                 </div>
 
                 <div id="legend-wrapper">
@@ -74,6 +98,34 @@
 </template>
 
 <style scoped>
+    #article-chart {
+        height: 200px;
+        position: relative;
+
+    }
+
+    #article-chart .mouse-catch-block {
+        position: absolute;
+        display: block;
+        bottom: -10px;
+        height: 10px;
+        width: 100%;
+        background-color: transparent;
+    }
+
+    .settings-box {
+        display: flex;
+        align-items: center;
+        justify-content: right;
+        padding-right: 30px;
+        padding-left: 30px;
+    }
+
+    .external-events-wrapper {
+        display:inline-block;
+        width: 220px;
+    }
+
     #chartContainer {
         position: relative;
     }
@@ -116,10 +168,36 @@
     }
 
     #chartContainer .preloader {
+        z-index: 2000;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%)
+    }
+
+    .events-legend-wrapper {
+        position: relative;
+        height: 0;
+    }
+
+    /* div to correctly wrap transformed .events-legend */
+    .events-legend-wrapper > div {
+        position: absolute;
+        z-index: 1000;
+        bottom:-21px;
+        width: auto;
+    }
+
+    .events-legend {
+        max-width: 220px;
+        opacity: 0.85;
+        color: #fff;
+        padding: 2px;
+        margin-top: 2px;
+        background-color: #00bdf1;
+        border-radius: 2px;
+        border: 2px solid #00bdf1;
+        transform: translate(-50%, 0px)
     }
 </style>
 
@@ -144,6 +222,10 @@
         concurrents: {
             type: Number,
             required: true
+        },
+        externalEvents: {
+            type: Array,
+            default: () => [],
         }
     };
 
@@ -153,16 +235,33 @@
         return d3.max(layer, function (d) { return d[1]; });
     }
 
-    let container, svg, dataG, oldDataG, oldDataLineG, x,y, colorScale, xAxis, vertical, mouseRect,
-        margin = {top: 20, right: 20, bottom: 20, left: 20},
-        loadDataTimer = null
-
     export default {
         components: {
             ButtonSwitcher, AnimatedInteger, Options
         },
-        name: 'article-chart',
+        name: 'dashboard-graph',
         props: props,
+        created() {
+            this.vars = {
+                container: null,
+                svg: null,
+                dataG: null,
+                oldDataG: null,
+                oldDataLineG: null,
+                colorScale: null,
+                xAxis: null,
+                vertical: null,
+                margin: {
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20
+                },
+                loadDataTimer: null,
+                mouseRect: null,
+                eventsG: null,
+            }
+        },
         data() {
             return {
                 data: null,
@@ -172,6 +271,12 @@
                 legendVisible: false,
                 highlightedRow: null,
                 legendLeft: '0px',
+                eventLegend: {
+                    visible: false,
+                    data: [],
+                    style: {}
+                },
+                selectedExternalEvents: [],
             };
         },
         computed: {
@@ -191,12 +296,15 @@
             },
             settings(value) {
                 this.reload()
-            }
+            },
+            selectedExternalEvents(values) {
+                this.reload()
+            },
         },
         mounted() {
             this.createGraph()
             this.loadData()
-            loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
+            this.vars.loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
             window.addEventListener('resize', debounce((e) => {
                 this.fillData()
             }, 100));
@@ -207,72 +315,121 @@
             }
         },
         methods: {
+            hideEventLegend() {
+                this.eventLegend.visible = false
+            },
             reload() {
-                clearInterval(loadDataTimer)
+                clearInterval(this.vars.loadDataTimer)
                 this.loadData()
-                loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
+                this.vars.loadDataTimer = setInterval(this.loadData, constants.REFRESH_DATA_TIMEOUT_MS)
             },
             createGraph(){
-                container = this.$refs["svg-container"]
-                let outerWidth = container.clientWidth,
-                    outerHeight = container.clientHeight,
-                    width = outerWidth - margin.left - margin.right,
-                    height = outerHeight - margin.top - margin.bottom
+                this.vars.container = this.$refs["svg-container"]
+                let outerWidth = this.vars.container.clientWidth,
+                    outerHeight = this.vars.container.clientHeight,
+                    width = outerWidth - this.vars.margin.left - this.vars.margin.right,
+                    height = outerHeight - this.vars.margin.top - this.vars.margin.bottom
 
-                svg = d3.select(this.$refs["svg"])
+                this.vars.svg = d3.select(this.$refs["svg"])
                     .attr("width", outerWidth)
                     .attr("height", outerHeight)
                     .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    .attr("transform", "translate(" + this.vars.margin.left + "," + this.vars.margin.top + ")");
 
-                oldDataG = svg.append("g").attr("class", "old-data-g")
-                dataG = svg.append("g").attr("class", "data-g")
+                this.vars.oldDataG = this.vars.svg.append("g").attr("class", "old-data-g")
+                this.vars.dataG = this.vars.svg.append("g").attr("class", "data-g")
                 // Line is last so it's going to be always visible
-                oldDataLineG = svg.append("g").attr("class", "data-line-g")
+                this.vars.oldDataLineG = this.vars.svg.append("g").attr("class", "data-line-g")
 
-                x = d3.scaleTime().range([0, width])
-                y = d3.scaleLinear().range([height, 0])
+                this.vars.x = d3.scaleTime().range([0, width])
+                this.vars.y = d3.scaleLinear().range([height, 0])
 
-                xAxis = d3.axisBottom(x).ticks(5)
+                this.vars.xAxis = d3.axisBottom(this.vars.x).ticks(5)
 
-                let gX = svg.append("g")
+                let gX = this.vars.svg.append("g")
                     .attr("transform", "translate(0," + height + ")")
                     .attr("class", "axis axis--x")
-                    .call(xAxis)
+                    .call(this.vars.xAxis)
+
+                this.vars.eventsG = this.vars.svg.append("g").attr("class", "events-g")
 
                 // Mouse events
-                let mouseG = svg.append("g")
+                let mouseG = this.vars.svg.append("g")
                     .attr("class", "mouse-over-effects");
 
-                vertical = mouseG.append("path")
+                this.vars.vertical = mouseG.append("path")
                     .attr("class", "mouse-line")
                     .attr("stroke", "black")
                     .attr("stroke-width", "1px")
 
                 let that = this
                 // append a rect to catch mouse movements on canvas
-                mouseRect = mouseG.append('svg:rect')
+                this.vars.mouseRect = mouseG.append('svg:rect')
                     .attr('width', width)
                     .attr('height', height)
                     .attr('fill', 'none')
                     .attr('pointer-events', 'all')
                     .on('mouseout', function() {
                         that.legendVisible = false
-                        vertical.style("opacity", "0");
+                        // that.eventLegend.visible = false
+                        that.vars.vertical.style("opacity", "0");
                     })
                     .on('mouseover', function() {
                         that.legendVisible = true
-                        vertical.style("opacity", "1");
+                        that.vars.vertical.style("opacity", "1");
                     })
                     .on('mousemove', function() {
                         if (that.data !== null) {
                             let mouse = d3.mouse(this);
-                            const xDate = x.invert(mouse[0])
+                            const xDate = that.vars.x.invert(mouse[0])
                             that.highlightRow(xDate, height)
+                            that.highlightEvent(xDate)
                         }
                     })
             },
+            highlightEvent(xDate) {
+                const xDateMillis = moment(xDate).valueOf()
+                const pxThresholdToShowLegend = 50
+
+                // get closest event (not using bisect, as there are only few events to search)
+                let selectedEvents = [], min = Number.MAX_SAFE_INTEGER
+                for (const event of this.data.events) {
+                    let diff = Math.abs(xDateMillis - moment(event.date).valueOf())
+                    if (diff < min) {
+                        min = diff
+                        selectedEvents = [event]
+                    } else if (diff === min) {
+                        selectedEvents.push(event)
+                    }
+                }
+
+                // show event only if it's close to x-position of the mouse
+                if (selectedEvents.length > 0 && Math.abs(this.vars.x(selectedEvents[0].date) - this.vars.x(xDate)) < pxThresholdToShowLegend) {
+                    this.eventLegend.visible = true
+                    this.eventLegend.style = {
+                        'left': (this.vars.x(selectedEvents[0].date) + this.vars.margin.left) + "px"
+                    }
+
+                    this.eventLegend.data = []
+
+                    for (const event of selectedEvents) {
+                        this.eventLegend.data.push({
+                            'title':  event.event.title,
+                            'style': {
+                                'background-color': event.event.color,
+                                'border-color': event.event.color,
+                            }
+                        })
+                    }
+                } else {
+                    this.eventLegend.visible = false
+                }
+            },
             highlightRow(xDate, height) {
+                if (!this.data.results || this.data.results.length === 0) {
+                    return
+                }
+
                 const bisectDate = d3.bisector(d => d.date).left;
                 const xDateMillis = moment(xDate).valueOf()
 
@@ -325,7 +482,7 @@
                 if (rowIndexPrevious !== undefined) {
                     previousRow = getSelectedRow(rowIndexPrevious, this.data.previousResults)
                     if (previousRow !== undefined) {
-                        verticalX = x(previousRow.date)
+                        verticalX = this.vars.x(previousRow.date)
                         selectedDate = previousRow.date
 
                         this.data.tags.forEach(function(tag) {
@@ -345,12 +502,12 @@
                             currentRow = undefined
 
                         } else {
-                            verticalX = x(currentRow.date)
+                            verticalX = this.vars.x(currentRow.date)
                             selectedDate = currentRow.date
 
-                            this.data.tags.forEach(function(tag) {
+                            this.data.tags.map(tag => {
                                 values[tag].current = currentRow[tag]
-                                values[tag].color = d3.color(colorScale(tag)).hex()
+                                values[tag].color = d3.color(this.vars.colorScale(tag)).hex()
                                 currentSum += currentRow[tag]
                             })
                         }
@@ -358,12 +515,12 @@
                 }
 
                 // After rows are selected, draw line and legend
-                vertical.attr("d", function() {
+                this.vars.vertical.attr("d", function() {
                     let d = "M" + verticalX + "," + height;
                     d += " " + verticalX + "," + 0;
                     return d;
                 })
-                this.legendLeft = (Math.round(verticalX) + margin.left) + "px"
+                this.legendLeft = (Math.round(verticalX) + this.vars.margin.left) + "px"
 
                 this.highlightedRow = {
                     startDate: selectedDate,
@@ -375,23 +532,24 @@
                 }
             },
             fillData() {
-                if (this.data === null){
+                if (this.data === null || this.data.results.length === 0){
                     return
                 }
                 let results = this.data.results,
                     previousResults = this.data.previousResultsSummed,
                     tags = this.data.tags,
-                    colors = this.data.colors
+                    colors = this.data.colors,
+                    events = this.data.events
 
-                let outerWidth = container.clientWidth,
-                    outerHeight = container.clientHeight,
-                    width = outerWidth - margin.left - margin.right,
-                    height = outerHeight - margin.top - margin.bottom
+                let outerWidth = this.vars.container.clientWidth,
+                    outerHeight = this.vars.container.clientHeight,
+                    width = outerWidth - this.vars.margin.left - this.vars.margin.right,
+                    height = outerHeight - this.vars.margin.top - this.vars.margin.bottom
 
-                svg.attr("width", outerWidth)
+                this.vars.svg.attr("width", outerWidth)
                     .attr("height", outerHeight)
 
-                mouseRect.attr("width", width)
+                this.vars.mouseRect.attr("width", width)
                     .attr("height", height)
 
                 let stack = d3.stack()
@@ -412,48 +570,49 @@
                     maxDate = this.maxDate
                 }
 
-                x.domain([results[0].date, maxDate])
+                this.vars.x.domain([results[0].date, maxDate])
                     .range([0, width])
-                y.domain([0, yMax])
+                this.vars.y.domain([0, yMax])
                     .range([height, 0])
 
-                colorScale = d3.scaleOrdinal()
+                this.vars.colorScale = d3.scaleOrdinal()
                     .domain(tags)
                     .range(colors);
 
                 // Remove original data if present
-                dataG.selectAll(".layer").remove();
-                dataG.selectAll(".layer-line").remove();
-                oldDataG.selectAll("path").remove();
-                oldDataLineG.selectAll("path").remove();
+                this.vars.dataG.selectAll(".layer").remove();
+                this.vars.dataG.selectAll(".layer-line").remove();
+                this.vars.oldDataG.selectAll("path").remove();
+                this.vars.oldDataLineG.selectAll("path").remove();
+                this.vars.eventsG.selectAll('.event').remove()
 
                 // Update axis
-                svg.select('.axis--x').transition().call(xAxis)
+                this.vars.svg.select('.axis--x').transition().call(this.vars.xAxis)
 
                 let area = d3.area()
                     .curve(d3.curveMonotoneX)
-                    .x((d, i) => x(d.data.date))
-                    .y0((d) => y(d[0]))
-                    .y1((d) => y(d[1]))
+                    .x((d, i) => this.vars.x(d.data.date))
+                    .y0((d) => this.vars.y(d[0]))
+                    .y1((d) => this.vars.y(d[1]))
 
                 let areaStroke = d3.line()
                     .curve(d3.curveMonotoneX)
-                    .x((d, i) => x(d.data.date))
-                    .y((d) => y(d[1]))
+                    .x((d, i) => this.vars.x(d.data.date))
+                    .y((d) => this.vars.y(d[1]))
 
                 let areaSimple = d3.area()
                     .curve(d3.curveMonotoneX)
-                    .x((d) => x(d.date))
-                    .y0(y(0))
-                    .y1((d) => y(d.value))
+                    .x((d) => this.vars.x(d.date))
+                    .y0(this.vars.y(0))
+                    .y1((d) => this.vars.y(d.value))
 
                 let areaSimpleStroke = d3.line()
                     .curve(d3.curveMonotoneX)
-                    .x((d) => x(d.date))
-                    .y((d) => y(d.value))
+                    .x((d) => this.vars.x(d.date))
+                    .y((d) => this.vars.y(d.value))
 
                 // Update data
-                dataG.selectAll(".layer")
+                this.vars.dataG.selectAll(".layer")
                     .data(layers)
                     .enter().append("g")
                     .attr("class", "layer")
@@ -461,7 +620,7 @@
                     .attr("d", area)
                     .attr("fill", (d, i) => colors[i])
 
-                dataG.selectAll(".layer-line")
+                this.vars.dataG.selectAll(".layer-line")
                     .data(layers)
                     .enter().append("g")
                     .attr("class", "layer-line")
@@ -472,13 +631,42 @@
                     .attr("shape-rendering", "geometricPrecision")
                     .attr("fill", "none")
 
+                let eventLayers = this.vars.eventsG.selectAll(".event")
+                    .data(events)
+                    .enter().append("g")
+                    .attr("class", "event")
+
+                eventLayers
+                    .append("path")
+                    .attr("d", item => {
+                        let xDate = this.vars.x(item.date)
+                        return "M" + xDate + "," + height + " " + xDate + "," + 0
+                    })
+                    .attr("stroke-dasharray", "6 4")
+                    .attr("stroke", item => item.event.color)
+
+                eventLayers
+                    .append("polygon")
+                    .attr("points", (item, i) => {
+                        let xDate = this.vars.x(item.date)
+                        // small triangle on top of dashed line
+                        let size = 5
+                        let points = [
+                            [xDate - size, 0],
+                            [xDate + size, 0],
+                            [xDate, size],
+                        ]
+                        return points.map((p) => p[0] + "," + p[1]).join(" ")
+                    })
+                    .attr("fill", item => item.event.color)
+
                 if (this.hasPrevious) {
-                    oldDataG.append("path")
+                    this.vars.oldDataG.append("path")
                         .datum(previousResults)
                         .attr("fill", "#f2f2f2")
                         .attr("d", areaSimple)
 
-                    oldDataLineG.append("path")
+                    this.vars.oldDataLineG.append("path")
                         .data([previousResults])
                         .attr("class", "line")
                         .attr("stroke", "#dedede")
@@ -493,7 +681,8 @@
                     .post(this.settings.newGraph ? this.urlNew : this.url, {
                         tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
                         interval: this.interval,
-                        settings: this.settings
+                        settings: this.settings,
+                        externalEvents: this.selectedExternalEvents.map(option => option.value),
                     })
                     .then(response => {
                         this.loading = false
@@ -501,6 +690,7 @@
                         const results = response.data.results
                         const previousResults = response.data.previousResults
                         const previousResultsSummed = response.data.previousResultsSummed
+                        const events = response.data.events
 
                         const parseDate = function (d) {
                             let dataObject = {
@@ -510,6 +700,13 @@
                                 dataObject[s] = +d[s];
                             })
                             return dataObject;
+                        }
+
+                        let parseEvents = function(event) {
+                            return {
+                                date: d3.isoParse(event.date),
+                                event: event
+                            }
                         }
 
                         this.data = {
@@ -523,6 +720,7 @@
                                     value: d.value
                                 }
                             )),
+                            events: events ? events.map(parseEvents) : [],
                             tags: tags,
                             colors: response.data.colors
                         }

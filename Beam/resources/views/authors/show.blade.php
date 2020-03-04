@@ -85,6 +85,12 @@
                         'filter' => $sections,
                         'priority' => 4,
                     ],
+                    'tags[, ].name' => [
+                        'header' => 'tags',
+                        'orderable' => false,
+                        'filter' => $tags,
+                        'priority' => 5,
+                    ],
                     'published_at' => [
                         'header' => 'published',
                         'render' => 'date',

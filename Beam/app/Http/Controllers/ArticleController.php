@@ -12,15 +12,17 @@ use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\NewsletterCriterion;
+use App\Model\Tag;
 use App\Section;
-use Illuminate\Support\Carbon;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\TokenProvider;
 use Yajra\Datatables\Datatables;
 use Yajra\DataTables\EloquentDataTable;
 
@@ -32,11 +34,14 @@ class ArticleController extends Controller
 
     private $conversionRateConfig;
 
-    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig)
+    private $tokenProvider;
+
+    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig, TokenProvider $tokenProvider)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->conversionRateConfig = $conversionRateConfig;
+        $this->tokenProvider = $tokenProvider;
     }
 
     /**
@@ -61,6 +66,7 @@ class ArticleController extends Controller
             'html' => view('articles.conversions', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'now - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
@@ -82,7 +88,7 @@ class ArticleController extends Controller
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
                 "avg(conversions.amount) as conversions_avg"
             ]))
-            ->with(['authors', 'sections'])
+            ->with(['authors', 'sections', 'tags'])
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
             ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at']);
 
@@ -101,6 +107,10 @@ class ArticleController extends Controller
         if ($request->input('conversion_to')) {
             $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
             $articlesQuery->where('paid_at', '<=', $conversionTo);
+        }
+        $token = $this->tokenProvider->getToken();
+        if ($token) {
+            $articlesQuery->where('property_uuid', '=', $token);
         }
 
         $articles = $articlesQuery->get();
@@ -202,8 +212,16 @@ class ArticleController extends Controller
                 $articleIds = $filterQuery->pluck('articles.id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
+            ->filterColumn('tags[, ].name', function (Builder $query, $value) {
+                $values = explode(",", $value);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
+                    ->whereIn('article_tag.tag_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
+            })
             ->rawColumns(['authors'])
-            ->make(true);
+            ->make();
     }
 
     public function pageviews(Request $request)
@@ -212,6 +230,7 @@ class ArticleController extends Controller
             'html' => view('articles.pageviews', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'now - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
             ]),
@@ -223,13 +242,17 @@ class ArticleController extends Controller
     {
         $articles = Article::selectRaw('articles.*,' .
             'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
-            ->with(['authors', 'sections']);
+            ->with(['authors', 'sections', 'tags']);
 
         if ($request->input('published_from')) {
             $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
         }
         if ($request->input('published_to')) {
             $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
+        }
+        $token = $this->tokenProvider->getToken();
+        if ($token) {
+            $articles->where('property_uuid', '=', $token);
         }
 
         return $datatables->of($articles)
@@ -264,7 +287,7 @@ class ArticleController extends Controller
                 $query->where('articles.title', 'like', '%' . $value . '%');
             })
             ->filterColumn('authors', function (Builder $query, $value) {
-                $values = explode(",", $value);
+                $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
                     ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
                     ->whereIn('article_author.author_id', $values);
@@ -272,10 +295,18 @@ class ArticleController extends Controller
                 $query->whereIn('articles.id', $articleIds);
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
-                $values = explode(",", $value);
+                $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
                     ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
                     ->whereIn('article_section.section_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
+            })
+            ->filterColumn('tags[, ].name', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $filterQuery = \DB::table('articles')
+                    ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
+                    ->whereIn('article_tag.tag_id', $values);
                 $articleIds = $filterQuery->pluck('articles.id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
@@ -309,6 +340,14 @@ class ArticleController extends Controller
             $article->sections()->attach($section);
         }
 
+        $article->tags()->detach();
+        foreach ($request->get('tags', []) as $tagName) {
+            $tag = Tag::firstOrCreate([
+                'name' => $tagName,
+            ]);
+            $article->tags()->attach($tag);
+        }
+
         $article->authors()->detach();
         foreach ($request->get('authors', []) as $authorName) {
             $section = Author::firstOrCreate([
@@ -317,7 +356,7 @@ class ArticleController extends Controller
             $article->authors()->attach($section);
         }
 
-        $article->load(['authors', 'sections']);
+        $article->load(['authors', 'sections', 'tags']);
 
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
@@ -337,11 +376,19 @@ class ArticleController extends Controller
             $article = Article::upsert($a);
 
             $article->sections()->detach();
-            foreach ($a['sections'] as $sectionName) {
+            foreach ($a['sections'] ?? [] as $sectionName) {
                 $section = Section::firstOrCreate([
                     'name' => $sectionName,
                 ]);
                 $article->sections()->attach($section);
+            }
+
+            $article->tags()->detach();
+            foreach ($a['tags'] ?? [] as $tagName) {
+                $tag = Tag::firstOrCreate([
+                    'name' => $tagName,
+                ]);
+                $article->tags()->attach($tag);
             }
 
             $article->authors()->detach();
@@ -403,7 +450,7 @@ class ArticleController extends Controller
                 }
             }
 
-            $article->load(['authors', 'sections']);
+            $article->load(['authors', 'sections', 'tags']);
             $articles[] = $article;
         }
 

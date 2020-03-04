@@ -83,7 +83,9 @@
                 </ul>
             </div>
         </div>
+    </div>
 
+    <div class="col-md-4">
         <div class="card">
             <div class="card-header">
                 <h2>Stats</h2>
@@ -125,41 +127,30 @@
                 </table>
             </div>
         </div>
-
-        {if $variants->count('*')}
-            <div class="card">
-                <div class="card-header">
-                    <h2>Variants</h2>
-                </div>
-                <div class="card-body">
-                    <table class="table table-responsive table-striped table-bordered">
-                        <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Code</th>
-                            <th>Subscribed</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr n:foreach="$variants as $variant">
-                            <td>{$variant->title}</td>
-                            <td>{$variant->code}</td>
-                            <td>{$variant->related('mail_user_subscriptions')->count('*')|number}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        {/if}
     </div>
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h2>Emails</h2>
-            </div>
+</div>
 
-            <div class="card-body">
-                {control dataTableTemplates}
+{var $hasVariantsTab = $list->related('mail_type_variants')->count('*')}
+
+<div class="row">
+    <div class="col-md-12">
+        <div role="tabpanel">
+            <ul class="tab-nav" role="tablist">
+                <li class="active"><a href="#templates" aria-controls="templates" role="tab" data-toggle="tab" aria-expanded="true">Emails</a></li>
+                <li n:if="$hasVariantsTab"><a href="#variants" aria-controls="variants" role="tab" data-toggle="tab">Variants</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="templates">
+                    <div class="card">
+                        <div class="card-body">
+                            {control dataTableTemplates}
+                        </div>
+                    </div>
+                </div>
+                <div n:if="$hasVariantsTab" role="tabpanel" class="tab-pane" id="variants">
+                    {control dataTableVariants}
+                </div>
             </div>
         </div>
     </div>

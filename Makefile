@@ -25,6 +25,20 @@ composer-install:
 	composer install -d $(SUB_MAILER) --no-progress
 	composer install -d $(SUB_SSO) --no-progress
 
+phpunit:
+	# Mailer test must run first, since they use migrations (which are later deleted by Laravel tests)
+	cd $(SUB_MAILER) && php bin/command.php migrate:migrate
+	cd $(SUB_MAILER) && vendor/bin/phpunit
+	# Beam and Campaign DBs are migrate automatically when running tests
+	cd $(SUB_BEAM) && vendor/bin/phpunit
+	cd $(SUB_CAMPAIGN) && vendor/bin/phpunit
+
+copy-env:
+	cd $(SUB_BEAM) && cp .env.example .env
+	cd $(SUB_CAMPAIGN) && cp .env.example .env
+	cd $(SUB_MAILER) && cp .env.test .env
+	cd $(SUB_MAILER) && cp app/config/config.local.neon.example app/config/config.local.neon
+
 phpstan:
 	cd $(SUB_MAILER) && make phpstan
 

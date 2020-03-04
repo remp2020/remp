@@ -15,12 +15,14 @@ class ArticleSeeder extends Seeder
         $properties = \App\Property::all();
 
         $sections = factory(\App\Section::class, 3)->create();
+        $tags = factory(\App\Model\Tag::class, 10)->create();
 
         /** @var \Illuminate\Database\Eloquent\Collection $articles */
         $articles = factory(\App\Article::class, 50)->create([
             'property_uuid' => $properties->random()->uuid,
-        ])->each(function (\App\Article $article) use ($sections) {
+        ])->each(function (\App\Article $article) use ($sections, $tags) {
             $article->sections()->save($sections[rand(0, count($sections)-1)]);
+            $article->tags()->save($tags[rand(0, count($tags)-1)]);
         });
 
         $authors = factory(\App\Author::class, 5)->create();

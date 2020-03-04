@@ -150,6 +150,10 @@ Following is list of available hosts. We advise you to add them to your
 
 > Note: If you use Docker Toolbox, the IP won't be `127.0.0.1`. Use `docker-machine ls` to get IP address of the machine.
 
+#### 6. Integration
+
+To integrate Beam and Campaign with your website you need to include javascript into your page. Consult part **javascript snippets** within READMEs - [Beam#javascript-snippet](Beam/README.md#javascript-snippet) and [Campaign#javascript-snippet](Campaign/README.md#javascript-snippet).
+
 ### Manual installation
 
 Please use `docker-compose.yml` and configuration/scripts within [Docker](./Docker) folder as a reference for manual

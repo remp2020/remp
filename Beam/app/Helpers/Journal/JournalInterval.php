@@ -30,12 +30,16 @@ class JournalInterval
     public $timeBefore;
     public $intervalText;
     public $intervalMinutes;
+    public $tz;
+
 
     public function __construct(\DateTimeZone $tz, string $interval, Article $article = null, array $allowedIntervals = null)
     {
         if ($allowedIntervals && !in_array($interval, $allowedIntervals)) {
             throw new InvalidArgumentException("Parameter 'interval' must be one of the [" . implode(',', $allowedIntervals) . "] values, instead '$interval' provided");
         }
+
+        $this->tz = $tz;
 
         switch ($interval) {
             case 'today':
@@ -86,7 +90,6 @@ class JournalInterval
             $endMinute = $rule[1];
             $windowSizeInMinutes = $rule[2];
             $windowSizeText = $rule[3];
-
 
             if ($endMinute === null || $articleAgeInMins < $endMinute) {
                 return [$windowSizeText, $windowSizeInMinutes];

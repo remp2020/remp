@@ -9,6 +9,7 @@ use App\ArticleTimespent;
 use App\Author;
 use App\Conversion;
 use App\Http\Resources\AuthorResource;
+use App\Model\Tag;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -39,6 +40,7 @@ class AuthorController extends Controller
             'html' => view('authors.show', [
                 'author' => $author,
                 'sections' => Section::all()->pluck('name', 'id'),
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'now - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
@@ -200,9 +202,10 @@ class AuthorController extends Controller
             'timespent_signed_in / pageviews_signed_in as avg_timespent_signed_in',
             'timespent_subscribers / pageviews_subscribers as avg_timespent_subscribers',
         ]))
-            ->with(['authors', 'sections'])
+            ->with(['authors', 'sections', 'tags'])
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
             ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
+            ->leftJoin('article_tag', 'articles.id', '=', 'article_tag.article_id')
             ->where([
                 'article_author.author_id' => $author->id
             ])
@@ -320,10 +323,18 @@ class AuthorController extends Controller
                 return $amounts ?? [0];
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
-                $values = explode(",", $value);
+                $values = explode(',', $value);
                 $filterQuery = \DB::table('sections')
                     ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
                     ->whereIn('article_section.author_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
+            })
+            ->filterColumn('tags[, ].name', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $filterQuery = \DB::table('tags')
+                    ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
+                    ->whereIn('article_tag.author_id', $values);
                 $articleIds = $filterQuery->pluck('articles.id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })

@@ -9,6 +9,7 @@ use App\Http\Request;
 use App\Http\Requests\ConversionRequest;
 use App\Http\Requests\ConversionUpsertRequest;
 use App\Http\Resources\ConversionResource;
+use App\Model\Tag;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -25,6 +26,7 @@ class ConversionController extends Controller
             'html' => view('conversions.index', [
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'conversionFrom' => $request->get('conversion_from', 'now - 30 days'),
                 'conversionTo' => $request->get('conversion_to', 'now'),
             ]),
@@ -35,10 +37,11 @@ class ConversionController extends Controller
     public function json(Request $request, Datatables $datatables)
     {
         $conversions = Conversion::select('conversions.*')
-            ->with(['article', 'article.authors', 'article.sections'])
+            ->with(['article', 'article.authors', 'article.sections', 'article.tags'])
             ->join('articles', 'articles.id', '=', 'conversions.article_id')
             ->join('article_author', 'articles.id', '=', 'article_author.article_id')
-            ->join('article_section', 'articles.id', '=', 'article_section.article_id');
+            ->join('article_section', 'articles.id', '=', 'article_section.article_id')
+            ->join('article_tag', 'articles.id', '=', 'article_tag.article_id');
 
 
         if ($request->input('conversion_from')) {
@@ -61,12 +64,16 @@ class ConversionController extends Controller
                 $query->where('articles.title', 'like', '%' . $value . '%');
             })
             ->filterColumn('article.authors[, ].name', function (Builder $query, $value) {
-                $values = explode(",", $value);
+                $values = explode(',', $value);
                 $query->whereIn('article_author.author_id', $values);
             })
             ->filterColumn('article.sections[, ].name', function (Builder $query, $value) {
-                $values = explode(",", $value);
+                $values = explode(',', $value);
                 $query->whereIn('article_section.section_id', $values);
+            })
+            ->filterColumn('article.tags[, ].name', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $query->whereIn('article_tag.tag_id', $values);
             })
             ->rawColumns(['actions'])
             ->make(true);

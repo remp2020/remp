@@ -10,6 +10,7 @@ use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\ListVariantsRepository;
 use Remp\MailerModule\Repository\MailTemplateStatsRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
@@ -39,6 +40,9 @@ final class ListPresenter extends BasePresenter
     /** @var ListFormFactory */
     private $listFormFactory;
 
+    /** @var ListVariantsRepository */
+    private $listVariantsRepository;
+
     /** @var IntlDateFormatter */
     private $dateFormatter;
 
@@ -53,6 +57,7 @@ final class ListPresenter extends BasePresenter
         BatchTemplatesRepository $batchTemplatesRepository,
         DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
+        ListVariantsRepository $listVariantsRepository,
         Emitter $emitter
     ) {
         parent::__construct();
@@ -66,6 +71,7 @@ final class ListPresenter extends BasePresenter
         $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->listFormFactory = $listFormFactory;
+        $this->listVariantsRepository = $listVariantsRepository;
         $this->emitter = $emitter;
     }
 
@@ -183,7 +189,6 @@ final class ListPresenter extends BasePresenter
         ];
 
         $this->template->list = $list;
-        $this->template->variants = $list->related('mail_type_variants')->order('sorting');
 
         $this->prepareDetailSubscribersGraphData($id);
     }
@@ -299,6 +304,56 @@ final class ListPresenter extends BasePresenter
                 $template->subject,
                 $opened,
                 $clicked,
+            ];
+        }
+        $this->presenter->sendJson($result);
+    }
+
+    public function createComponentDataTableVariants(IDataTableFactory $dataTableFactory)
+    {
+        $dataTable = $dataTableFactory->create();
+        $dataTable
+            ->setSourceUrl($this->link('variantsJsonData'))
+            ->setColSetting('title', [
+                'header' => 'Title',
+                'priority' => 1,
+            ])
+            ->setColSetting('code', [
+                'header' => 'Code',
+                'priority' => 1,
+            ])
+            ->setColSetting('count', [
+                'priority' => 1,
+            ])
+            ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
+            ->setTableSetting('order', Json::encode([[2, 'DESC']]));
+
+        return $dataTable;
+    }
+
+    public function renderVariantsJsonData()
+    {
+        $request = $this->request->getParameters();
+
+        $variantsCount = $this->listVariantsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'])
+            ->count('*');
+
+        $variants = $this->listVariantsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'], $request['length'], $request['start']);
+
+        $result = [
+            'recordsTotal' => $this->listVariantsRepository->totalCount(),
+            'recordsFiltered' => $variantsCount,
+            'data' => []
+        ];
+
+        /** @var ActiveRow $variant */
+        foreach ($variants as $variant) {
+            $result['data'][] = [
+                $variant->title,
+                "<code>{$variant->code}</code>",
+                $variant->count,
             ];
         }
         $this->presenter->sendJson($result);

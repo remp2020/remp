@@ -13,6 +13,7 @@
                 :time-histogram-url="timeHistogramUrl"
                 :time-histogram-url-new="timeHistogramUrlNew"
                 :conversion-rate-multiplier="conversionRateMultiplier"
+                :external-events="externalEvents"
                 :options="options">
         </dashboard-root>
     </div>
@@ -39,6 +40,7 @@
                 timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}",
                 timeHistogramUrlNew: "{!! route('dashboard.timeHistogramNew.json') !!}",
                 options: {!! json_encode($options) !!},
+                externalEvents: {!! json_encode($externalEvents) !!},
                 conversionRateMultiplier: {!! $conversionRateMultiplier !!}
             }
         })

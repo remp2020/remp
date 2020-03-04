@@ -15,6 +15,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\ListRequest;
 
 class ArticleDetailsController extends Controller
 {
@@ -114,7 +115,7 @@ class ArticleDetailsController extends Controller
 
     private function itemTag($item): string
     {
-        return $this->journalHelper->refererMediumFromPageviewRecord($item);
+        return $this->journalHelper->refererMediumLabel($item->referer_medium);
     }
 
     private function histogramFromSnapshots(Article $article, JournalInterval $journalInterval)
@@ -139,8 +140,7 @@ class ArticleDetailsController extends Controller
             if (!array_key_exists($zuluTime, $results)) {
                 $results[$zuluTime] = array_merge($emptyValues, ['Date' => $zuluTime]);
             }
-            $tag = $this->itemTag($item);
-            $results[$zuluTime][$tag] += $item->count;
+            $results[$zuluTime][$this->itemTag($item)] += $item->count;
         }
 
         return [
@@ -161,8 +161,6 @@ class ArticleDetailsController extends Controller
             'events.*' => 'in:conversions,title_changes'
         ]);
 
-        $eventOptions = $request->get('events', []);
-
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $journalInterval = new JournalInterval($tz, $request->get('interval'), $article);
 
@@ -180,6 +178,7 @@ class ArticleDetailsController extends Controller
         $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
         $data['events'] = [];
 
+        $eventOptions = $request->get('events', []);
         if (in_array('conversions', $eventOptions, false)) {
             $conversions = $article->conversions()
                 ->whereBetween('paid_at', [$journalInterval->timeAfter->tz('UTC'), $journalInterval->timeBefore->tz('UTC')])
@@ -237,7 +236,35 @@ class ArticleDetailsController extends Controller
             }
         }
 
+        $requestedExternalEvents = $request->get('externalEvents', []);
+        $externalEvents = $this->loadExternalEvents($article, $journalInterval, $requestedExternalEvents);
+        $data['events'] += $externalEvents;
+
         return response()->json($data);
+    }
+
+    private function loadExternalEvents(Article $article, JournalInterval $journalInterval, $requestedExternalEvents): array
+    {
+        $eventData = $this->journalHelper->loadEvents($journalInterval, $requestedExternalEvents, $article);
+
+        $tags = [];
+
+        $events = [];
+        foreach ($eventData as $eventItem) {
+            $title = $eventItem->category . ':' . $eventItem->action;
+            $tags[$title] = true;
+            $events[] = (object) [
+                'date' => Carbon::parse($eventItem->system->time)->toIso8601ZuluString(),
+                'title' => $title,
+            ];
+        }
+
+        $colors = Colors::generalTagsToColors(array_keys($tags), true);
+        foreach ($events as $event) {
+            $eventItem->color = $colors[$event->title];
+        }
+
+        return $events;
     }
 
     private function histogram(Article $article, JournalInterval $journalInterval, string $groupBy, callable $addConditions = null)
@@ -364,6 +391,14 @@ class ArticleDetailsController extends Controller
             return [$item => $this->journalHelper->refererMediumLabel($item)];
         });
 
+        $externalEvents = [];
+        foreach ($this->journalHelper->eventsCategoriesActions($article) as $item) {
+            $externalEvents[] = (object) [
+                'text' => $item->category . ':' . $item->action,
+                'value' => $item->category . JournalHelpers::CATEGORY_ACTION_SEPARATOR . $item->action,
+            ];
+        }
+
         return response()->format([
             'html' => view('articles.show', [
                 'article' => $article,
@@ -376,6 +411,7 @@ class ArticleDetailsController extends Controller
                 'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
                 'snapshotsDataSource' => $this->pageviewGraphDataSource === 'snapshots',
+                'externalEvents' => $externalEvents,
             ]),
             'json' => new ArticleResource($article),
         ]);

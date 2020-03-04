@@ -32,6 +32,22 @@ phpstan:
     - make composer-install
     - make phpstan
 
+tests:
+  stage: test
+  image: remp/php-ci:7.2.25
+  tags:
+    - docker
+  script:
+    - make composer-install
+    - make copy-env    
+    - make phpunit
+  services:
+    - name: mysql:5.7.21
+      alias: mysql
+  variables:
+      MYSQL_DATABASE: remp_test
+      MYSQL_ROOT_PASSWORD: secret
+
 mailer/🇸🇰:
   stage: deploy
   script:

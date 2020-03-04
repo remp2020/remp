@@ -81,6 +81,12 @@
                     'filter' => $sections,
                     'priority' => 3,
                 ],
+                'tags[, ].name' => [
+                    'header' => 'tags',
+                    'orderable' => false,
+                    'filter' => $tags,
+                    'priority' => 4,
+                ],
                 'published_at' => [
                     'searchable' => false,
                     'header' => 'published',

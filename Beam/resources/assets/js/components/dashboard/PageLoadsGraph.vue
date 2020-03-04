@@ -24,18 +24,23 @@
             </div>
         </div>
 
-        <div class="m-t-10" v-if="eventOptions">
+        <div class="m-t-10 events-box" v-if="eventOptions">
             <label class="checkbox checkbox-inline m-r-20" v-for="option in eventOptions">
                 <input :id="option.value" :value="option" type="checkbox" v-model="selectedEvents" />
                 <i class="input-helper"></i>{{option.text}}
             </label>
+            <div v-if="externalEvents.length > 0" class="external-events-wrapper">
+                <select class="selectpicker bs-select-hidden" title="Other events" multiple="" v-model="selectedExternalEvents">
+                    <option v-for="option in externalEvents" :value="option">{{option.text}}</option>
+                </select>
+            </div>
         </div>
 
         <div class="events-legend-wrapper">
             <div
-                v-if="eventLegend.data"
-                v-show="eventLegend.visible"
-                v-bind:style="eventLegend.style">
+                    v-if="eventLegend.data"
+                    v-show="eventLegend.visible"
+                    v-bind:style="eventLegend.style">
 
                 <div class="events-legend"
                      v-for="event in eventLegend.data"
@@ -49,7 +54,7 @@
         <div :id="svgContainerId" :ref="svgContainerId" style="height: 200px" class="article-chart">
             <svg style="z-index: 10" :id="svgId" :ref="svgId"></svg>
         </div>
-        
+
         <div class="legend-wrapper">
             <div v-if="highlightedRow" v-show="legend.visible" v-bind:style="{ left: legend.left }" class="article-graph-legend">
 
@@ -82,6 +87,16 @@
 </template>
 
 <style scoped>
+    .events-box {
+        display: flex;
+        align-items: center;
+    }
+
+    .external-events-wrapper {
+        display:inline-block;
+        width: 220px;
+    }
+
     .chartContainer {
         position: relative;
     }
@@ -181,6 +196,10 @@
         intervalGraph: {
             type: Boolean,
             default: true
+        },
+        externalEvents: {
+            type: Array,
+            default: () => [],
         }
     }
 
@@ -215,7 +234,8 @@
                     data: [],
                     style: {}
                 },
-                selectedEvents: []
+                selectedEvents: [],
+                selectedExternalEvents: [],
             };
         },
         watch: {
@@ -227,7 +247,10 @@
             },
             selectedEvents(values) {
                 this.reload()
-            }
+            },
+            selectedExternalEvents(values) {
+                this.reload()
+            },
         },
         computed: {
             svgContainerId() {
@@ -386,6 +409,10 @@
                 }
             },
             highlightRow(xDate, height) {
+                if (!this.data.results || this.data.results.length === 0) {
+                    return
+                }
+
                 let rowIndex = bisectDate(this.data.results, xDate);
 
                 let rowRight = this.data.results[rowIndex]
@@ -431,7 +458,7 @@
 
             },
             fillData() {
-                if (this.data === null){
+                if (this.data === null || this.data.results.length === 0){
                     return
                 }
                 let results = this.data.results,
@@ -580,7 +607,8 @@
                         params: Object.assign({
                             tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
                             interval: this.interval,
-                            events: this.selectedEvents.map(option => option.value)
+                            events: this.selectedEvents.map(option => option.value),
+                            externalEvents: this.selectedExternalEvents.map(option => option.value)
                         }, this.urlParams)
                     })
                     .then(response => {

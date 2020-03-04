@@ -161,6 +161,13 @@ class Sender
         $senderId = md5($recipient['email'] . microtime(true));
         $this->setMessageHeaders($message, $senderId, $this->params);
 
+        if ($this->context) {
+            $alreadySent = $this->logsRepository->alreadySentContext($this->context);
+            if ($alreadySent) {
+                return 0;
+            }
+        }
+
         $this->logsRepository->add(
             $recipient['email'],
             $this->template->subject,

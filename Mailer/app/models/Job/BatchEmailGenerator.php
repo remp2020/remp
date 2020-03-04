@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Job;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Remp\MailerModule\ActiveRow;
+use Remp\MailerModule\Beam\UserUnreadArticlesResolveException;
 use Remp\MailerModule\Beam\UnreadArticlesResolver;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\JobQueueRepository;
@@ -204,9 +205,15 @@ class BatchEmailGenerator
         $jobsCount = 0;
         foreach ($userJobOptions as $userId => $jobOptions) {
             if ($jobOptions['handler'] ?? null === self::BEAM_UNREAD_ARTICLES_RESOLVER) {
-                $additionalParams = $this->unreadArticlesResolver->getMailParameters($jobOptions['code'], $userId);
-                foreach ($additionalParams as $name => $value) {
-                    $jobOptions['params'][$name] = $value;
+                try {
+                    $additionalParams = $this->unreadArticlesResolver->getMailParameters($jobOptions['code'], $userId);
+                    foreach ($additionalParams as $name => $value) {
+                        $jobOptions['params'][$name] = $value;
+                    }
+                } catch (UserUnreadArticlesResolveException $exception) {
+                    // just log and continue to next user
+                    $this->logger->log(LogLevel::ERROR, $exception->getMessage());
+                    continue;
                 }
             }
 

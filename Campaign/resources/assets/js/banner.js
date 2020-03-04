@@ -35,6 +35,7 @@ window.remplib = window.remplib || {};
 
             if (banner.template === 'medium_rectangle') {
                 banner.mediumRectangleTemplate = {
+                    id: model['medium_rectangle_template']['id'] || null,
                     headerText: model['medium_rectangle_template']['header_text'] || "",
                     mainText: model['medium_rectangle_template']['main_text'] || "",
                     buttonText: model['medium_rectangle_template']['button_text'] || "",
@@ -49,6 +50,7 @@ window.remplib = window.remplib || {};
 
             if (banner.template === 'overlay_rectangle') {
                 banner.overlayRectangleTemplate = {
+                    id: model['overlay_rectangle_template']['id'] || null,
                     headerText: model['overlay_rectangle_template']['header_text'] || "",
                     mainText: model['overlay_rectangle_template']['main_text'] || "",
                     buttonText: model['overlay_rectangle_template']['button_text'] || "",
@@ -64,6 +66,7 @@ window.remplib = window.remplib || {};
 
             if (banner.template === 'bar') {
                 banner.barTemplate = {
+                    id: model['bar_template']['id'] || null,
                     mainText: model['bar_template']['main_text'] || "",
                     buttonText: model['bar_template']['button_text'] || "",
                     backgroundColor: model['bar_template']['background_color'] || null,
@@ -75,6 +78,7 @@ window.remplib = window.remplib || {};
 
             if (banner.template === 'collapsible_bar') {
                 banner.collapsibleBarTemplate = {
+                    id: model['collapsible_bar_template']['id'] || null,
                     mainText: model['collapsible_bar_template']['main_text'] || "",
                     headerText: model['collapsible_bar_template']['header_text'] || "",
                     collapseText: model['collapsible_bar_template']['collapse_text'] || "",
@@ -90,6 +94,7 @@ window.remplib = window.remplib || {};
 
             if (banner.template === 'html') {
                 banner.htmlTemplate = {
+                    id: model['html_template']['id'] || null,
                     backgroundColor: model['html_template']['background_color'] || null,
                     textColor: model['html_template']['text_color'] || null,
                     fontSize: model['html_template']['font_size'] || null,
@@ -102,6 +107,7 @@ window.remplib = window.remplib || {};
 
             if (banner.template === 'html_overlay') {
                 banner.htmlOverlayTemplate = {
+                    id: model['html_overlay_template']['id'] || null,
                     backgroundColor: model['html_overlay_template']['background_color'] || null,
                     textColor: model['html_overlay_template']['text_color'] || null,
                     fontSize: model['html_overlay_template']['font_size'] || null,
@@ -113,6 +119,7 @@ window.remplib = window.remplib || {};
 
             if (banner.template === 'short_message') {
                 banner.shortMessageTemplate = {
+                    id: model['short_message_template']['id'] || null,
                     backgroundColor: model['short_message_template']['background_color'] || null,
                     textColor: model['short_message_template']['text_color'] || null,
                     text: model['short_message_template']['text'] || null,

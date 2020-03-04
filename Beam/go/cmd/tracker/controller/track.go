@@ -10,6 +10,7 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/avct/uasurfer"
 	"github.com/goadesign/goa"
+	"github.com/google/uuid"
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
 	refererparser "github.com/snowplow-referer-parser/golang-referer-parser"
@@ -136,6 +137,12 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	}
 	if ctx.Payload.RempEventID != nil {
 		tags["remp_event_id"] = *ctx.Payload.RempEventID
+	} else {
+		// remp_event_id is required, if not provided, generate one
+		tags["remp_event_id"] = uuid.New().String()
+	}
+	if ctx.Payload.ArticleID != nil {
+		tags["article_id"] = *ctx.Payload.ArticleID
 	}
 	fields := map[string]interface{}{}
 	if ctx.Payload.Value != nil {

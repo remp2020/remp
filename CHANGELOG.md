@@ -15,19 +15,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Pageviews graph in article details page loads data from Journal snapshots instead of directly quering Journal API by default. Option `PAGEVIEWS_DATA_SOURCE` added to `.env` file to allow switching to old behaviour. remp/remp#442
 - `rempConfig.tracker` configuration option `explicit_referer_medium` is deprecated and renamed to `refererMedium`. The old one is still accepted due to compatibility reasons.
 - Added support for referer medium renaming - one can specify label for each medium by adding a record to `referer_medium_labels` table. remp/remp#543
-- Updated layout footer with link to REMP website. remp/remp#522
+- Updated layout footer with link to REMP website. remp/remp#522 HEAD
+- Added ability to display external events in article detail and dashboard. remp/remp#574
+- Added (optional) `article_id` field to event parameters pushed to tracker. remp/remp#556
+- Fixed property naming validator issue checking unique constraint against account names, not property names.
+- Added article conversion/pageviews stats filtering based on selected property. GH-50
+- Added support for article tags (storing tags associated with articles, filtering in data tables). remp/remp#217
 
 ### [Campaign]
 
 - Updated layout footer with link to REMP website. remp/remp#522
 - Fixed missing validation rules for collapsible bar banner template. remp/remp#558
+- Added support for campaign segment exclusion. User now need to match both inclusion and exclusion segment rules to see the campaign banner. GH-33
+- Overal rectangle banner button text and main text attributes are now optional. This is useful when e.g. only using picture inside the banner. remp/remp#582
 
 ### [Mailer]
 
 - **BREAKING**: Attachment parameter in `send-email` API is now required to be base64-encoded to support PDF (and other binary) attachments.
+- **BREAKING**: Context checking during email sending now only checks if user received an email with given context before; Mailer ignores `mail_template_code` being sent. In previous version, two different mail templates with same context could be sent to the same user. This version prevents such behavior. remp/crm#987
 - Updated layout footer with link to REMP website. remp/remp#522
 - Added possibility to filter hermes payload parameters in logs. Parameters `password` and `token` are already filtered by default. See `config.neon` for reference how to extend filtering with own parameters.
 - Added hermes handler to unsubscribe users from mail type if emails are dropped. You can enable the feature in `config.local.neon` (see example file for reference). remp/remp#566
+- Added configuration for allowed preflight (`OPTIONS`) headers into configuration. You can configure them via `%preflight.headers` parameter - see [example use](Mailer/app/config/config.neon).
+- Fixed possible duplicate email for same context being sent, in case the emails were scheduled at the same time via `send-email` API.
+- Fixed and redesigned mailing list variants statistics to be sortable and filterable. remp/remp#593
+- Fixed attachment_size column type - changing to integer (from incorrectly assigned datetime).
 
 ### [Sso]
 

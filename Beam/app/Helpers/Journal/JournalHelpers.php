@@ -2,15 +2,19 @@
 
 namespace App\Helpers\Journal;
 
+use App\Article;
 use App\Model\RefererMediumLabel;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\ListRequest;
 
 class JournalHelpers
 {
+    const CATEGORY_ACTION_SEPARATOR = '::';
+
     private $journal;
 
     private $cachedRefererMediumLabels;
@@ -212,16 +216,74 @@ class JournalHelpers
     }
 
     /**
-     * Returns referer medium of given pageview record from Journal
-     * `explicit_referer_medium` value (optional) has priority over `derived_referer_medium` value (required)
+     * Returns list of all categories and actions for stored events
+     * @param Article|null $article if provided, load events data only for particular article
      *
-     * @param $record object
-     *
-     * @return string referer medium
+     * @return array array of objects having category and action parameters
      */
-    public function refererMediumFromPageviewRecord($record): string
+    public function eventsCategoriesActions(?Article $article = null): array
     {
-        $m = !empty($record->explicit_referer_medium) ? $record->explicit_referer_medium : $record->derived_referer_medium;
-        return $this->refererMediumLabel($m);
+        $r = AggregateRequest::from('events')->addGroup('category', 'action');
+
+        if ($article !== null) {
+            $r->addFilter('article_id', $article->external_id);
+        }
+
+        $results = [];
+
+        foreach ($this->journal->count($r) as $item) {
+            if (!empty($item->tags->action) && !empty($item->tags->category)) {
+                $results[] = (object) $item->tags;
+            }
+        }
+        return $results;
+    }
+
+
+    /**
+     * @param JournalInterval $journalInterval load events only for particular interval
+     * @param string[]        $requestedCategoryActionEvents array of strings having format 'category::action'
+     * @param Article|null    $article if provided, load only events linked to particular article
+     *
+     * @return array List of events as provided by Journal API
+     */
+    public function loadEvents(JournalInterval $journalInterval, array $requestedCategoryActionEvents, ?Article $article = null): array
+    {
+        if (!$requestedCategoryActionEvents) {
+            return [];
+        }
+
+        $categories = [];
+        $categoryActions = [];
+        foreach ($requestedCategoryActionEvents as $item) {
+            [$category, $action] = explode(self::CATEGORY_ACTION_SEPARATOR, $item);
+            $categories[] = $category;
+            if (! array_key_exists($category, $categoryActions)) {
+                $categoryActions[$category] = [];
+            }
+            $categoryActions[$category][] = $action;
+        }
+
+        $r = ListRequest::from('events')
+            ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
+            ->addFilter('category', ...$categories);
+
+        if ($article) {
+            $r->addFilter('article_id', $article->external_id);
+        }
+
+        $response = $this->journal->list($r);
+
+        $events = [];
+
+        foreach ($response[0]->events ?? [] as $event) {
+            if (! in_array($event->action, $categoryActions[$event->category], true)) {
+                // ATM Journal API doesn't provide way to simultaneously check for category and action on the same record,
+                // therefore check first category in the request and check action here
+                continue;
+            }
+            $events[] = $event;
+        }
+        return $events;
     }
 }

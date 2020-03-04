@@ -105,13 +105,20 @@ class CampaignController extends Controller
             })
             ->addColumn('segments', function (Campaign $campaign) use ($segments) {
                 $segmentNames = [];
+
+                $exclusiveIcon = '<i class="zmdi zmdi-eye-off" title="User must not be member of segment to see the campaign."></i>';
+                $inclusiveIcon = '<i class="zmdi zmdi-eye primary-color" title="User needs to be member of segment to see the campaign."></i>';
+
                 foreach ($campaign->segments as $segment) {
+                    $icon = $segment->inclusive ? $inclusiveIcon : $exclusiveIcon;
+
                     if ($segments->get($segment->code)) {
-                        $segmentNames[] = "- <span title='{$segment->code}'>{$segments->get($segment->code)}</span></em>";
+                        $segmentNames[] = "{$icon} <span title='{$segment->code}'>{$segments->get($segment->code)}</span></em>";
                     } else {
-                        $segmentNames[] = "- <span title='{$segment->code}'>{$segment->code}</span></em>";
+                        $segmentNames[] = "{$icon} <span title='{$segment->code}'>{$segment->code}</span></em>";
                     }
                 }
+
                 return $segmentNames;
             })
             ->addColumn('countries', function (Campaign $campaign) {
@@ -781,19 +788,10 @@ class CampaignController extends Controller
                 }
             }
 
-            // segment
-            foreach ($campaign->segments as $campaignSegment) {
-                $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
-
-                if ($userId) {
-                    if (!$sa->checkUser($campaignSegment, strval($userId))) {
-                        continue 2;
-                    }
-                } else {
-                    if (!$sa->checkBrowser($campaignSegment, strval($browserId))) {
-                        continue 2;
-                    }
-                }
+            // segment rules
+            $segmentRulesOk = $this->showtime->evaluateSegmentRules($campaign, $browserId, $userId);
+            if (!$segmentRulesOk) {
+                continue;
             }
 
             // pageview rules
@@ -880,6 +878,7 @@ class CampaignController extends Controller
             $campaignSegment->code = $r['code'];
             $campaignSegment->provider = $r['provider'];
             $campaignSegment->campaign_id = $campaign->id;
+            $campaignSegment->inclusive = $r['inclusive'];
             $campaignSegment->save();
         }
 
