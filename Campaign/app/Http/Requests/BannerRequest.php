@@ -101,7 +101,7 @@ class BannerRequest extends FormRequest
                         'text_color' => 'string|required',
                         'button_background_color' => 'string|required',
                         'button_text_color' => 'string|required',
-                        'header_text' => 'string|required',
+                        'header_text' => 'string|nullable',
                         'collapse_text' => 'string|required',
                         'expand_text' => 'string|required',
                         'main_text' => 'string|required',

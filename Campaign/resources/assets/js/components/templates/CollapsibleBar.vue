@@ -68,7 +68,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="header_text" class="fg-label">Header text</label>
-                                <input v-model="headerText" class="form-control fg-input remp-banner-text-input" name="header_text" id="header_text" type="text" required>
+                                <input v-model="headerText" class="form-control fg-input remp-banner-text-input" name="header_text" id="header_text" type="text">
                             </div>
                         </div>
 
@@ -117,6 +117,7 @@
     import vSelect from "remp/js/components/vSelect.vue";
 
     let props = [
+        "_templateId",
         "_mainText",
         "_headerText",
         "_collapseText",
@@ -138,12 +139,17 @@
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop] || this[prop.slice(1)];
             });
+
+            if (!this.templateId) {
+                this.headerText = "Offer"
+            }
+
             this.colorScheme = this.colorSchemeByBackground(this._backgroundColor) || this.colorScheme;
             this.emitValuesChanged();
         },
         data: () => ({
             mainText: "Limited time offer<br/>30% discount",
-            headerText: "Offer",
+            headerText: null,
             collapseText: "Collapse",
             expandText: "Expand",
             buttonText: "Visit offer",

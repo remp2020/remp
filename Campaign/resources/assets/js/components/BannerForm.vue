@@ -70,6 +70,7 @@
             ></bar-template>
 
             <collapsible-bar-template v-if="template === 'collapsible_bar'"
+               v-bind:_templateId="collapsibleBarTemplate.id"
                v-bind:_mainText="collapsibleBarTemplate.mainText"
                v-bind:_buttonText="collapsibleBarTemplate.buttonText"
                v-bind:_headerText="collapsibleBarTemplate.headerText"

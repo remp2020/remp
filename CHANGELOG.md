@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed missing validation rules for collapsible bar banner template. remp/remp#558
 - Added support for campaign segment exclusion. User now need to match both inclusion and exclusion segment rules to see the campaign banner. GH-33
 - Overal rectangle banner button text and main text attributes are now optional. This is useful when e.g. only using picture inside the banner. remp/remp#582
+- Collapsible bar header text is now optional. remp/remp#597
 
 ### [Mailer]
 
