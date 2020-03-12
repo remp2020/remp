@@ -21,6 +21,7 @@
             ></html-template>
 
             <medium-rectangle-template v-if="template === 'medium_rectangle'"
+               v-bind:_templateId="mediumRectangleTemplate.id"
                v-bind:_headerText="mediumRectangleTemplate.headerText"
                v-bind:_mainText="mediumRectangleTemplate.mainText"
                v-bind:_buttonText="mediumRectangleTemplate.buttonText"
@@ -60,6 +61,7 @@
             ></html-overlay-template>
 
             <bar-template v-if="template === 'bar'"
+               v-bind:_templateId="barTemplate.id"
                v-bind:_mainText="barTemplate.mainText"
                v-bind:_buttonText="barTemplate.buttonText"
                v-bind:_backgroundColor="barTemplate.backgroundColor"

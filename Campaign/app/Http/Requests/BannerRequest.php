@@ -64,8 +64,8 @@ class BannerRequest extends FormRequest
                         'button_background_color' => 'string|required',
                         'button_text_color' => 'string|required',
                         'header_text' => 'string|nullable',
-                        'main_text' => 'string|required',
-                        'button_text' => 'string|required',
+                        'main_text' => 'string|nullable',
+                        'button_text' => 'string|nullable',
                         'width' => 'string|nullable',
                         'height' => 'string|nullable',
                     ]);
@@ -91,8 +91,8 @@ class BannerRequest extends FormRequest
                         'text_color' => 'string|required',
                         'button_background_color' => 'string|required',
                         'button_text_color' => 'string|required',
-                        'main_text' => 'string|required',
-                        'button_text' => 'string|required',
+                        'main_text' => 'string|nullable',
+                        'button_text' => 'string|nullable',
                     ]);
                     break;
                 case Banner::TEMPLATE_COLLAPSIBLE_BAR:
@@ -102,10 +102,10 @@ class BannerRequest extends FormRequest
                         'button_background_color' => 'string|required',
                         'button_text_color' => 'string|required',
                         'header_text' => 'string|nullable',
-                        'collapse_text' => 'string|required',
-                        'expand_text' => 'string|required',
-                        'main_text' => 'string|required',
-                        'button_text' => 'string|required',
+                        'collapse_text' => 'string|nullable',
+                        'expand_text' => 'string|nullable',
+                        'main_text' => 'string|nullable',
+                        'button_text' => 'string|nullable',
                         'initial_state' => 'string|required',
                     ]);
                     break;

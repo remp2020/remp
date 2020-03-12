@@ -76,7 +76,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="collapse_text" class="fg-label">Collapse text</label>
-                                <input v-model="collapseText" class="form-control fg-input remp-banner-text-input" name="collapse_text" id="collapse_text" type="text" required>
+                                <input v-model="collapseText" class="form-control fg-input remp-banner-text-input" name="collapse_text" id="collapse_text" type="text">
                             </div>
                         </div>
 
@@ -84,7 +84,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="expand_text" class="fg-label">Expand text</label>
-                                <input v-model="expandText" class="form-control fg-input remp-banner-text-input" name="expand_text" id="expand_text" type="text" required>
+                                <input v-model="expandText" class="form-control fg-input remp-banner-text-input" name="expand_text" id="expand_text" type="text">
                             </div>
                         </div>
 
@@ -92,7 +92,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="main_text" class="fg-label">Main text</label>
-                                <input v-model="mainText" class="form-control fg-input remp-banner-text-input" name="main_text" id="main_text" type="text" required>
+                                <input v-model="mainText" class="form-control fg-input remp-banner-text-input" name="main_text" id="main_text" type="text">
                             </div>
                             <div><small v-html="$parent.fieldParamsMessage"></small></div>
                         </div>
@@ -101,7 +101,7 @@
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
                             <div class="fg-line">
                                 <label for="button_text" class="fg-label">Button text</label>
-                                <input v-model="buttonText" class="form-control fg-input remp-banner-text-input" name="button_text" id="button_text" type="text" required>
+                                <input v-model="buttonText" class="form-control fg-input remp-banner-text-input" name="button_text" id="button_text" type="text">
                             </div>
                         </div>
                     </div>
@@ -141,18 +141,22 @@
             });
 
             if (!this.templateId) {
-                this.headerText = "Offer"
+                this.mainText = "Limited time offer<br/>30% discount";
+                this.headerText = "Offer";
+                this.collapseText = "Collapse";
+                this.expandText = "Expand";
+                this.buttonText = "Visit offer";
             }
 
             this.colorScheme = this.colorSchemeByBackground(this._backgroundColor) || this.colorScheme;
             this.emitValuesChanged();
         },
         data: () => ({
-            mainText: "Limited time offer<br/>30% discount",
+            mainText: null,
             headerText: null,
-            collapseText: "Collapse",
-            expandText: "Expand",
-            buttonText: "Visit offer",
+            collapseText: null,
+            expandText: null,
+            buttonText: null,
             colorScheme: "green",
             initialStateOptions: [
                 {
