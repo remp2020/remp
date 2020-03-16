@@ -5578,6 +5578,11 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^2.0.0"
     inherits "^2.0.1"
 
+rison@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/rison/-/rison-0.1.1.tgz#4dcc0557b241aff60e76178e7792135713f33120"
+  integrity sha1-TcwFV7JBr/YOdheOd5ITVxPzMSA=
+
 run-queue@^1.0.0, run-queue@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/run-queue/-/run-queue-1.0.3.tgz#e848396f057d223f24386924618e25694161ec47"
