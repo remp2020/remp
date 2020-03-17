@@ -553,4 +553,57 @@ class ArticleController extends Controller
         }
         return $usersReadArticles;
     }
+
+    public function topArticles(Request $request)
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'limit' => 'required|integer',
+        ]);
+
+        $timeFrom = new \DateTime($request->json('from'));
+        $limit = $request->json('limit');
+
+        return response()->json([
+            'status' => 'ok',
+            'data' => $this->getTopArticles($timeFrom, false, $limit)
+        ]);
+    }
+
+    public function topBlogs(Request $request)
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'limit' => 'required|integer',
+        ]);
+
+        $timeFrom = new \DateTime($request->json('from'));
+        $limit = $request->json('limit');
+
+        return response()->json([
+            'status' => 'ok',
+            'data' => $this->getTopArticles($timeFrom, true, $limit)
+        ]);
+    }
+
+    private function getTopArticles(\DateTime $from, $blogs = false, $limit = 10)
+    {
+        $blogSection = Section::find(1);
+
+        return $articles = DB::table('articles')
+            ->join('article_section', 'articles.id', '=', 'article_section.article_id')
+            ->join('article_pageviews', 'articles.id', '=', 'article_pageviews.article_id')
+            ->where('article_pageviews.time_from', '>=', $from)
+            ->where('article_section.section_id', $blogs ? '=' : '!=', $blogSection->id)
+            ->groupBy('articles.id')
+            ->select(
+                'articles.external_id as id',
+                'articles.title',
+                'articles.url',
+                DB::raw('SUM(article_pageviews.sum) as pageviews')
+            )
+            ->orderBy('pageviews', 'DESC')
+            ->limit($limit)
+            ->get();
+    }
 }
