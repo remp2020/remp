@@ -8,6 +8,7 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
+use App\Http\Requests\TopArticlesRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\Config\ConversionRateConfig;
@@ -554,47 +555,17 @@ class ArticleController extends Controller
         return $usersReadArticles;
     }
 
-    public function topArticles(Request $request)
+    public function topArticles(TopArticlesRequest $request)
     {
-        $request->validate([
-            'from' => 'required|date',
-            'limit' => 'required|integer',
-        ]);
-
         $timeFrom = new \DateTime($request->json('from'));
+        $sections = $request->json('sections');
         $limit = $request->json('limit');
 
-        return response()->json([
-            'status' => 'ok',
-            'data' => $this->getTopArticles($timeFrom, false, $limit)
-        ]);
-    }
-
-    public function topBlogs(Request $request)
-    {
-        $request->validate([
-            'from' => 'required|date',
-            'limit' => 'required|integer',
-        ]);
-
-        $timeFrom = new \DateTime($request->json('from'));
-        $limit = $request->json('limit');
-
-        return response()->json([
-            'status' => 'ok',
-            'data' => $this->getTopArticles($timeFrom, true, $limit)
-        ]);
-    }
-
-    private function getTopArticles(\DateTime $from, $blogs = false, $limit = 10)
-    {
-        $blogSection = Section::find(1);
-
-        return $articles = DB::table('articles')
+        $articles = DB::table('articles')
             ->join('article_section', 'articles.id', '=', 'article_section.article_id')
+            ->join('sections', 'article_section.section_id', '=', 'sections.id')
             ->join('article_pageviews', 'articles.id', '=', 'article_pageviews.article_id')
-            ->where('article_pageviews.time_from', '>=', $from)
-            ->where('article_section.section_id', $blogs ? '=' : '!=', $blogSection->id)
+            ->where('article_pageviews.time_from', '>=', $timeFrom)
             ->groupBy('articles.id')
             ->select(
                 'articles.external_id as id',
@@ -603,7 +574,15 @@ class ArticleController extends Controller
                 DB::raw('SUM(article_pageviews.sum) as pageviews')
             )
             ->orderBy('pageviews', 'DESC')
-            ->limit($limit)
-            ->get();
+            ->limit($limit);
+
+        if ($sections) {
+            $articles->whereIn('sections.name', $sections);
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'data' => $articles->get()
+        ]);
     }
 }
