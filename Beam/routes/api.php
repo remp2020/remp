@@ -25,7 +25,6 @@ Route::middleware('auth:api')->group(function() {
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
     Route::post('articles/top', 'ArticleController@topArticles')->name('articles.top');
-    Route::post('articles/blogs/top', 'ArticleController@topBlogs')->name('articles.blogs.top');
 
     Route::middleware('cors')->group(function() {
         Route::get('article/{article?}', 'ArticleDetailsController@show');
