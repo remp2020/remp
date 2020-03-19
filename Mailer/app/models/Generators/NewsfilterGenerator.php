@@ -234,7 +234,8 @@ class NewsfilterGenerator implements IGenerator
             ->setRequired("Field 'Editor' is required.");
 
         $form->addTextArea('summary', 'Summary')
-            ->setAttribute('rows', 3);
+            ->setAttribute('rows', 3)
+            ->setRequired(false);
 
         $form->addTextArea('newsfilter_html', 'HTML')
             ->setAttribute('rows', 20)
