@@ -27,9 +27,6 @@ parameters:
 				- X-Requested-With
 				- Content-Type
 
-	errbit:
-		send_errors: false
-
 extensions:
 	local_configs: Remp\MailerModule\Config\ConfigExtension
 	webpack: Oops\WebpackNetteAdapter\DI\WebpackExtension(true)

@@ -46,7 +46,6 @@
         "remp/journal": "*",
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
-        "tomaj/nette-errbit": "~3.0",
         "tomaj/nette-api": "^1.11",
         "tomaj/hermes": "^2.1.1",
         "monolog/monolog": "^1.13",
@@ -54,7 +53,8 @@
         "oops/webpack-nette-adapter": "^1.0",
         "embed/embed": "^3.3",
         "halaxa/json-machine": "^0.3",
-        "justinrainbow/json-schema": "^5.2"
+        "justinrainbow/json-schema": "^5.2",
+        "rootpd/nette-sentry": "^1.1"
     },
     "require-dev": {
         "nette/tester": "^1.6",
