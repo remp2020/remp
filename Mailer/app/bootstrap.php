@@ -16,7 +16,7 @@ if (getenv('FORCE_HTTPS') === 'true') {
     $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
     $_SERVER['SERVER_PORT'] = 443;
 }
-if ($environment == 'local') {
+if ($environment === 'local') {
     $configurator->setDebugMode(true);
 } else {
     $configurator->setDebugMode(false);
@@ -39,9 +39,4 @@ $configurator->createRobotLoader()
 $configurator->addConfig(__DIR__ . '/config/config.neon');
 $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
-$container = $configurator->createContainer();
-
-$errbitConfig = $container->parameters['errbit'];
-Tomaj\Errbit\ErrbitLogger::register($errbitConfig);
-
-return $container;
+return $configurator->createContainer();

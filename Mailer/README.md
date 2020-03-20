@@ -1899,3 +1899,20 @@ uses default Nette implementation and overrides custom REMP SSO implementation d
 
 From now on the authentication is not done by redirecting user to SSO but by using default sign in
 screen avaiable at http://mailer.remp.press/sign/in.
+
+### Error tracking
+
+Mailer comes with extension supporting tracking errors to Sentry. You can enable the tracking by setting following snippet to your `app/config/config.local.neon`:
+
+```neon
+extensions:
+    sentry: Rootpd\NetteSentry\DI\SentryExtension
+
+sentry:
+	dsn: https://0123456789abcdef0123456789abcdef@sentry.example.com/1
+	environment: development
+	user_fields:
+		- email
+```
+
+Please be aware, that the tracking works only if you have the debug mode disabled. By default the debug mode is enabled only when `ENV` is set to `local`. 
