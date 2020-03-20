@@ -48,7 +48,7 @@ class NewsfilterGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'editor', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'summary', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'summary', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
         ];
     }
@@ -235,7 +235,7 @@ class NewsfilterGenerator implements IGenerator
 
         $form->addTextArea('summary', 'Summary')
             ->setAttribute('rows', 3)
-            ->setRequired("Field 'Summary' is required.");
+            ->setRequired(false);
 
         $form->addTextArea('newsfilter_html', 'HTML')
             ->setAttribute('rows', 20)
