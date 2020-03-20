@@ -557,18 +557,16 @@ class ArticleController extends Controller
 
     public function topArticles(TopArticlesRequest $request)
     {
-        $timeFrom = new \DateTime($request->json('from'));
+        $timeFrom = Carbon::parse($request->json('from'));
         $sections = $request->json('sections');
         $limit = $request->json('limit');
 
         $articles = DB::table('articles')
-            ->join('article_section', 'articles.id', '=', 'article_section.article_id')
-            ->join('sections', 'article_section.section_id', '=', 'sections.id')
             ->join('article_pageviews', 'articles.id', '=', 'article_pageviews.article_id')
             ->where('article_pageviews.time_from', '>=', $timeFrom)
             ->groupBy('articles.id')
             ->select(
-                'articles.external_id as id',
+                'articles.external_id',
                 'articles.title',
                 'articles.url',
                 DB::raw('SUM(article_pageviews.sum) as pageviews')
@@ -577,7 +575,9 @@ class ArticleController extends Controller
             ->limit($limit);
 
         if ($sections) {
-            $articles->whereIn('sections.name', $sections);
+            $articles->join('article_section', 'articles.id', '=', 'article_section.article_id')
+                ->join('sections', 'article_section.section_id', '=', 'sections.id')
+                ->whereIn('sections.name', $sections);
         }
 
         return response()->json([
