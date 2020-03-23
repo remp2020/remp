@@ -62,3 +62,14 @@ syntax:
 
 docker-build:
 	cd $(SUB_BEAM) && make docker-build
+
+docker-go-base-build:
+	docker build --rm -t remp-go-base:latest Docker/go-base
+
+docker-env-update:
+	docker-compose --env-file=.env.docker up --no-deps --force-recreate --build -d beam
+	docker-compose --env-file=.env.docker up --no-deps --force-recreate --build -d campaign
+	docker-compose --env-file=.env.docker up --no-deps --force-recreate --build -d mailer
+	docker-compose --env-file=.env.docker up --no-deps --force-recreate --build -d sso
+	docker-compose --env-file=.env.docker up --no-deps --force-recreate --build -d beam_tracker
+	docker-compose --env-file=.env.docker up --no-deps --force-recreate --build -d beam_segments

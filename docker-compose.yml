@@ -63,7 +63,7 @@ services:
         DOCKER_GROUP_ID: ${DOCKER_GROUP_ID}
       context: ./Docker
       dockerfile: php/Dockerfile
-    command: php-fpm
+    command: "/usr/local/sbin/php-fpm --nodaemonize --fpm-config /usr/local/etc/php-fpm.conf"
     volumes:
       - ".:/var/www/html:cached"
 
@@ -81,6 +81,7 @@ services:
       - .env.docker
     environment:
       APP_NAME: "Campaign"
+      APP_URL: "${APP_URL_CAMPAIGN}"
       PHP_IDE_CONFIG: "serverName=campaign.remp.press"
       CACHE_DRIVER: "${CACHE_DRIVER_CAMPAIGN}"
       QUEUE_DRIVER: "${QUEUE_DRIVER_CAMPAIGN}"
@@ -152,8 +153,10 @@ services:
       - .env.docker
     environment:
       APP_NAME: "Sso"
+      APP_URL: "${APP_URL_SSO}"
       PHP_IDE_CONFIG: "serverName=sso.remp.press"
       CACHE_DRIVER: "${CACHE_DRIVER_SSO}"
+      QUEUE_DRIVER: "${QUEUE_DRIVER_SSO}"
       DB_DATABASE: "${DB_DATABASE_SSO}"
     domainname: "sso.remp.press"
     hostname: "sso"
@@ -185,6 +188,7 @@ services:
       - .env.docker
     environment:
       APP_NAME: "Beam"
+      APP_URL: "${APP_URL_BEAM}"
       PHP_IDE_CONFIG: "serverName=beam.remp.press"
       CACHE_DRIVER: "${CACHE_DRIVER_BEAM}"
       DB_DATABASE: "${DB_DATABASE_BEAM}"
@@ -231,7 +235,7 @@ services:
   beam_tracker:
     build:
       context: ./Beam/go
-      dockerfile: tracker.Dockerfile
+      dockerfile: cmd/tracker/Dockerfile
     env_file:
       - .env.docker
     environment:
@@ -248,7 +252,7 @@ services:
   beam_segments:
     build:
       context: ./Beam/go
-      dockerfile: segments.Dockerfile
+      dockerfile: cmd/segments/Dockerfile
     env_file:
       - .env.docker
     environment:

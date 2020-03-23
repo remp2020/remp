@@ -1,10 +1,38 @@
 #!/bin/bash
 
-cd ${APP_NAME}
+cd "/var/www/html/${APP_NAME}" || exit 1
+
+function setup_env() {
+    # Get all parameters from .env.dist
+    ALL_APP_ENV=$(cat .env.dist | grep -E -v "^#|APP_KEY|JWT_SECRET" | sed -e '/^$/d' | sed -e 's/\(.*\)=$.*/\1/g')
+    # create .env with values from main .env.docker file
+    # comment out empty values
+    # uncomment nonempty values
+    envsubst <.env.dist >.env
+    for env_name in ${ALL_APP_ENV}; do
+        envtmp='echo ${'$env_name'}'
+        env_value=$(eval $envtmp)
+
+        if [ -z "$env_value" ]; then
+            sed -i 's|^'$env_name'=|#'$env_name'=|' .env
+        fi
+    done
+}
+
+if [ -f ".env" ]; then
+    setup_env
+    if [ -f "artisan" ]; then
+        php artisan key:generate
+
+        php artisan list | grep "jwt:secret" >/dev/null
+        if [ $? -eq "0" ]; then
+            php artisan jwt:secret
+        fi
+    fi
+fi
 
 if [ ! -f ".env" ]; then
-    # create .env with default values
-    envsubst <.env.dist >.env
+    setup_env
 
     composer install
 
@@ -48,4 +76,4 @@ if [ ! -f ".env" ]; then
     fi
 fi
 
-php-fpm
+/usr/local/sbin/php-fpm --nodaemonize --fpm-config /usr/local/etc/php-fpm.conf

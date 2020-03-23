@@ -33,6 +33,14 @@ CONTAINER_USER_ID=$(id -u ${CONTAINER_USER_NAME})
 CONTAINER_GROUP_ID=$(id -g ${CONTAINER_USER_NAME})
 CONTAINER_GROUP_NAME=$(getent group ${CONTAINER_GROUP_ID} | cut -d: -f1)
 FINAL_GROUP_NAME=${EXISTING_CONTAINER_GROUP_NAME}
+SYSTEM_FOLDERS=" \
+    ${PROJECT_ROOT} \
+    ${COMPOSER_HOME}/cache \
+    /opt/phpstorm-coverage \
+    /run/secrets \
+    /var/run/php \
+    /var/log/nginx \
+    /etc/nginx"
 
 # Skip this script if the host user is root
 if [ "$HOST_USER" == "root" ]; then
@@ -76,11 +84,9 @@ if [ ! "${FINAL_GROUP_NAME}" == "${CONTAINER_GROUP_NAME}" ]; then
     usermod -a -G ${FINAL_GROUP_NAME} ${CONTAINER_USER_NAME} 2>&1
 fi
 
-echo "Setting up workdir permissions (${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME})"
-chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} ${PROJECT_ROOT}
-if [ -d "/opt/phpstorm-coverage" ]; then
-    chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} /opt/phpstorm-coverage
-fi
-if [ -d "/etc/nginx" ]; then
-    chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} -R /etc/nginx
-fi
+echo "Setting up system user permissions (${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME})"
+for folder in ${SYSTEM_FOLDERS}; do
+    if [ -d "$folder" ]; then
+        chown ${CONTAINER_USER_NAME}:${FINAL_GROUP_NAME} -R "$folder"
+    fi
+done

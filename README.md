@@ -69,6 +69,8 @@ with your own Mailer provider if you need it.
 
     You can see some inspiration on how to get user values in [install.sh](install.sh).
 
+> Or just run the script `./install.sh` and it will setup everything for you.
+
 #### 2. Docker-compose
 
 We've prepared `docker-compose.yml` in a way it's ready for development.
@@ -76,7 +78,7 @@ We've prepared `docker-compose.yml` in a way it's ready for development.
 docker-compose --env-file=.env.docker up
 ```
 
-> The appliance was tested with Docker CE 19.03.5 and Docker Compose 1.25.1.
+> The appliance was tested with Docker CE 19.03.8 and Docker Compose 1.25.4.
 
 > If you are on MacOS and don't have the latest Docker Compose, install them with commands `brew install docker-compose` and `brew link --overwrite docker-compose`.
 
@@ -171,6 +173,8 @@ of Docker also supports its own `--help` switch. Feel free to explore it.
 
 Couple of neat commands:
 * `docker-compose --env-file=.env.docker down` to remove all containers, networks and volumes created by `docker-compose`
+* `docker-compose stop` to stop all started containers
+* `docker-compose start` to start all stopped containers
 * `docker-compose ps` to list all services with their status
 * `docker-compose logs` to read services logs
 * `docker-compose --env-file=.env.docker build` to force rebuild of images
