@@ -81,7 +81,7 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 31) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 33) {
             $defaults = [
                 'name' => 'High Five ' . date('j.n.Y'),
                 'code' => 'high_five_' . date('dmY'),
@@ -90,7 +90,7 @@ class NewsfilterTemplateFormFactory
                 'mail_type_id' => 25, // high five
                 'from' => 'Kultúra Denník N <kultura@dennikn.sk>',
             ];
-        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 23) {
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 37) {
             $defaults = [
                 'name' => 'Športový newsfilter ' . date('j.n.Y'),
                 'code' => 'nwsf_sport_' . date('dmY'),
@@ -99,7 +99,7 @@ class NewsfilterTemplateFormFactory
                 'mail_type_id' => 20, // newsfilter sport,
                 'from' => 'Michal Červený Denník N <michal.cerveny@dennikn.sk>',
             ];
-        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 30) {
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 38) {
             $defaults = [
                 'name' => 'Svetový newsfilter ' . date('j.n.Y'),
                 'code' => 'nwsf_world_' . date('dmY'),
