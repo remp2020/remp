@@ -20,7 +20,7 @@ class NewsfilterGenerator implements IGenerator
 
     private $content;
 
-    private $linksColor = "#b00c28";
+    private $linksColor = "#1F3F83";
 
     private $embedParser;
 
@@ -65,10 +65,6 @@ class NewsfilterGenerator implements IGenerator
 
         $post = $values->newsfilter_html;
         $post = $this->parseOls($post);
-
-        if ($sourceTemplate->code === 'newsfilter-sport') {
-            $this->linksColor = '#00A251';
-        }
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
