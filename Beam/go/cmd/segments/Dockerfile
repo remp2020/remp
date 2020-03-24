@@ -1,17 +1,24 @@
-FROM alpine
+FROM remp-go-base:latest
 
-WORKDIR /bin
+# ----------------------------------------------------------------------------------------------------------------------
+# BASIC ENVIRONMENT VARIABLES
+# ----------------------------------------------------------------------------------------------------------------------
+ENV APP_EXECUTABLE="segments" \
+    FULL_SRC_FOLDER_APP="${FULL_SRC_FOLDER}/cmd/segments" \
+    GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen" \
+    DESIGN_PKG="${SRC_FOLDER}/cmd/segments/design"
+ENV PATH="${FULL_SRC_FOLDER_APP}:${PATH}"
 
-ADD segments.tar .
+# ----------------------------------------------------------------------------------------------------------------------
+# RUN
+# Run setup, variables and dockerize start
+# ----------------------------------------------------------------------------------------------------------------------
+WORKDIR ${FULL_SRC_FOLDER_APP}
 
-ADD .env.example .env
+EXPOSE 8082
 
-RUN apk add --no-cache openssl
+ADD entrypoint.sh /entrypoint.sh
 
-ENV DOCKERIZE_VERSION v0.6.1
-
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["dockerize", "-timeout", "1m", "-wait-retry-interval", "10s", "-wait", "tcp://elasticsearch:9200", "-wait", "tcp://mysql:3306", "segments"]
