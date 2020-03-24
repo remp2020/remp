@@ -7,11 +7,12 @@ class HermesRetry extends AbstractMigration
     public function change()
     {
         // probably the only feasible way how to change this without breaking running instances
-        $this->table("hermes_tasks")
-            ->rename("hermes_tasks_old")
-            ->update();
+        if (!$this->hasTable('hermes_tasks_old')) {
+            $this->table("hermes_tasks")
+                ->rename("hermes_tasks_old")
+                ->update();
 
-        $sql = <<<SQL
+            $sql = <<<SQL
 CREATE TABLE `hermes_tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `message_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -30,6 +31,7 @@ CREATE TABLE `hermes_tasks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 SQL;
 
-        $this->execute($sql);
+            $this->execute($sql);
+        }
     }
 }
