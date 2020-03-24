@@ -6,17 +6,19 @@ class InitialMigration extends AbstractMigration
 {
     public function change()
     {
-        $this->table('configs')
-            ->addColumn('name', 'string')
-            ->addColumn('display_name', 'string')
-            ->addColumn('value', 'text', ['null' => true])
-            ->addColumn('description', 'text', ['null' => true])
-            ->addColumn('type', 'string', ['default' => 'text'])
-            ->addColumn('sorting', 'integer', ['default' => 10])
-            ->addColumn('autoload', 'boolean', ['default' => true])
-            ->addColumn('locked', 'boolean', ['default' => false])
-            ->addTimestamps()
-            ->create();
+        if (!$this->hasTable('configs')) {
+            $this->table('configs')
+                ->addColumn('name', 'string')
+                ->addColumn('display_name', 'string')
+                ->addColumn('value', 'text', ['null' => true])
+                ->addColumn('description', 'text', ['null' => true])
+                ->addColumn('type', 'string', ['default' => 'text'])
+                ->addColumn('sorting', 'integer', ['default' => 10])
+                ->addColumn('autoload', 'boolean', ['default' => true])
+                ->addColumn('locked', 'boolean', ['default' => false])
+                ->addTimestamps()
+                ->create();
+        }
 
         $this->table('mail_type_categories')
             ->addColumn('title', 'string')
