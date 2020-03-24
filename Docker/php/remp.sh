@@ -47,7 +47,7 @@ if [ ! -f ".env" ]; then
     fi
 
     if [ -f "artisan" ]; then
-        php artisan migrate
+        php artisan migrate:fresh
         php artisan db:seed
         php artisan key:generate
         php artisan ide-helper:generate

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 rm -f Beam/.env
+rm -f Campaign/.env
 rm -f Mailer/.env
 rm -f Mailer/config/config.local.neon
 rm -f Sso/.env
@@ -12,6 +13,8 @@ fi
 sed -i 's/\(^DOCKER_USER=\).*/\1'$(id -u -n)'/g' .env.docker
 sed -i 's/\(^DOCKER_USER_ID=\).*/\1'$(id -u)'/g' .env.docker
 sed -i 's/\(^DOCKER_GROUP_ID=\).*/\1'$(id -g)'/g' .env.docker
+
+docker-compose --env-file=.env.docker down --volumes
 
 make docker-go-base-build
 
