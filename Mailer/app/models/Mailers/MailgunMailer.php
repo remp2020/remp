@@ -96,7 +96,7 @@ class MailgunMailer extends Mailer implements IMailer
 
         $mailVariables = Json::decode($message->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
         foreach ($mailVariables as $key => $val) {
-            $data["v:".$key] = $val;
+            $data["v:".$key] = (string) $val;
         }
 
         $this->mailer->messages()->send($this->option('domain'), $data);
