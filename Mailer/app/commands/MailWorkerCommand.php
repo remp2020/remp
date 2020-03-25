@@ -21,6 +21,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class MailWorkerCommand extends Command
 {
@@ -237,6 +239,7 @@ class MailWorkerCommand extends Command
                     } catch (SmtpException | Sender\MailerBatchException | \Exception $exception) {
                         $this->smtpErrors++;
                         $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
+                        Debugger::log($exception, ILogger::WARNING);
 
                         $this->logger->warning("Unable to send an email: " . $exception->getMessage(), [
                             'batch' => $sendAsBatch && $email->supportsBatch(),
