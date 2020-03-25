@@ -27,7 +27,8 @@ class MailgunEventHandler implements HandlerInterface
     {
         $payload = $message->getPayload();
         if (!isset($payload['mail_sender_id'])) {
-            throw new HermesException('unable to handle event: mail_sender_id is missing');
+            // email sent via mailgun and not sent via mailer (e.g. CMS)
+            return true;
         }
         if (!isset($payload['timestamp'])) {
             throw new HermesException('unable to handle event: timestamp is missing');
