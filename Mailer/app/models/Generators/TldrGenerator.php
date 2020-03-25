@@ -112,11 +112,11 @@ class TldrGenerator implements IGenerator
             '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content) {
                 $url = "https://dennikn.sk/{$matches[1]}";
                 $meta = $content->fetchUrlMeta($url);
-                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#1F3F83;text-decoration:none;">' . $meta->getTitle() . '</a>';
+                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#1F3F83;text-decoration:underline;">' . $meta->getTitle() . '</a>';
             },
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#1F3F83;text-decoration:none;">$2</a>',
+            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#1F3F83;text-decoration:underline;">$2</a>',
 
             // replace h2
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
