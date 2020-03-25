@@ -40,7 +40,7 @@
         "twig/twig": "^2.4",
         "mailgun/mailgun-php": "^3.0",
         "php-http/curl-client": "^1.7",
-        "guzzlehttp/psr7": "^1.4",
+        "guzzlehttp/psr7": "^1.6",
         "remp/nette-sso": "*",
         "remp/multi-armed-bandit": "*",
         "remp/journal": "*",
@@ -54,7 +54,8 @@
         "embed/embed": "^3.3",
         "halaxa/json-machine": "^0.3",
         "justinrainbow/json-schema": "^5.2",
-        "rootpd/nette-sentry": "^1.1"
+        "kriswallsmith/buzz": "^1.1",
+        "nyholm/psr7": "^1.2"
     },
     "require-dev": {
         "nette/tester": "^1.6",
