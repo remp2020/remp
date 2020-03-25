@@ -112,11 +112,11 @@ class NewsfilterGenerator implements IGenerator
             '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) {
                 $url = "https://dennikn.sk/{$matches[1]}";
                 $meta = $this->content->fetchUrlMeta($url);
-                return 'Čítajte viac: <a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:none;">' . $meta->getTitle() . '</a>';
+                return 'Čítajte viac: <a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $meta->getTitle() . '</a>';
             },
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:none;">$2</a>',
+            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">$2</a>',
 
             '/<h2.*?>\*<\/h2>/im' => '<div style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:center;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">*</div>',
 
