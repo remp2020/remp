@@ -172,6 +172,7 @@ If you're unfamiliar with `docker-compose`, try running `docker-compose --help` 
 of Docker also supports its own `--help` switch. Feel free to explore it.
 
 Couple of neat commands:
+* `docker-compose --env-file=.env.docker up --build --force-recreate --no-deps -d beam_segments` to recreate and restart `beam_segments` container
 * `docker-compose --env-file=.env.docker down` to remove all containers, networks and volumes created by `docker-compose`
 * `docker-compose stop` to stop all started containers
 * `docker-compose start` to start all stopped containers

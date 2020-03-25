@@ -1,4 +1,4 @@
-FROM php:7.2.28-fpm
+FROM php:7.2.29-fpm
 
 ARG DOCKER_USER
 ARG DOCKER_USER_ID
@@ -8,10 +8,10 @@ ARG DOCKER_GROUP_ID
 # VERSIONS AND BASIC ENVIRONMENT VARIABLES
 # ----------------------------------------------------------------------------------------------------------------------
 # Pecl
-ENV PECL_XDEBUG_VERSION=2.9.2
+ENV PECL_XDEBUG_VERSION=2.9.4
 
 # Composer
-ENV COMPOSER_VERSION=1.10.0 \
+ENV COMPOSER_VERSION=1.10.1 \
     COMPOSER_HOME="/composer" \
     PATH="/composer/vendor/bin:$PATH"
 
@@ -21,7 +21,7 @@ ENV NODESOURCE_VERSION=12.x \
     NODE_PKG_RELEASE=1nodesource1 \
     NPM_CONFIG_LOGLEVEL=info \
     YARN_CACHE_FOLDER="/var/cache/yarn" \
-    YARN_VERSION=1.22.0 \
+    YARN_VERSION=1.22.4 \
     YARN_PKG_RELEASE=1
 
 # Nginx
