@@ -74,7 +74,7 @@
                 ['name' => 'show', 'class' => 'zmdi-palette-Cyan zmdi-info-outline', 'title' => 'Show conversions'],
             ],
             'rowActionLink' => 'show',
-            'order' => [5, 'desc'],
+            'order' => [6, 'desc'],
             'requestParams' => [
                 'conversion_from' => '$(\'[name="conversion_from"]\').val()',
                 'conversion_to' => '$(\'[name="conversion_to"]\').val()',
