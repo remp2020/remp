@@ -567,8 +567,6 @@ class ArticleController extends Controller
             ->groupBy('articles.id')
             ->select(
                 'articles.external_id',
-                'articles.title',
-                'articles.url',
                 DB::raw('SUM(article_pageviews.sum) as pageviews')
             )
             ->orderBy('pageviews', 'DESC')
@@ -580,9 +578,6 @@ class ArticleController extends Controller
                 ->whereIn('sections.name', $sections);
         }
 
-        return response()->json([
-            'status' => 'ok',
-            'data' => $articles->get()
-        ]);
+        return response()->json($articles->get());
     }
 }
