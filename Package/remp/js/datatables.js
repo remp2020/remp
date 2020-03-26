@@ -1,3 +1,5 @@
+import rison from 'rison';
+
 $.extend( $.fn.dataTable.defaults, {
     'language': {
         "processing": '<div class="preloader pl-lg pls-teal">' +
@@ -9,7 +11,7 @@ $.extend( $.fn.dataTable.defaults, {
     'stateSave': true,
     'stateLoaded': function(settings, data) {
         // set filter state
-        if (data.search.search) {
+        if (data.hasOwnProperty('search') && data.search.search) {
             $('#dt-search-' + settings.sInstance).val(data.search.search);
             $('[data-ma-action="ah-search-open"]').trigger('click');
         }
@@ -27,7 +29,81 @@ $.extend( $.fn.dataTable.defaults, {
             }
         })
     },
+    stateSaveCallback: function (settings, data) {
+        const stateParameters = getRelevantStateParameters(data);
+        // encode current state to base64
+        const state = rison.encode(stateParameters);
+        // get hash part of the url
+        let hashParams = new URLSearchParams(window.location.hash.substring(1));
+        // add encoded state into hash part of url
+        hashParams.set($(this).attr('id') + '_state', state);
+        // update url hash and perform url decoding, because urlsearchparams.toString method encodes it automatically
+        window.location.hash = decodeURIComponent(hashParams.toString());
+    },
+    stateLoadCallback: function (settings) {
+        const hash = new URLSearchParams(window.location.hash.substring(1));
+        let state = hash.get($(this).attr('id') + '_state');
+
+        // check the current url to see if we've got a state to restore
+        if (!state) {
+            return null;
+        }
+
+        // if we got the state, decode it and add current timestamp
+        state = rison.decode(state);
+        state['time'] = Date.now();
+
+        // alter state by column search info retrieved from hash
+        if (state.hasOwnProperty('columnSearch')) {
+            state.columns = [];
+            for (let i = 0; i < state.columnSearch.columnCount; i++) {
+                if (state.columnSearch.hasOwnProperty(i)) {
+                    state.columns.push({search: {search: state.columnSearch[i]}});
+                    continue;
+                }
+                state.columns.push({});
+            }
+        }
+
+        return state;
+    }
 });
+
+function getRelevantStateParameters(state) {
+    const alwaysRelevantParameters = ['start', 'length', 'order'];
+    const filteredState = filterObjectByKeys(state, alwaysRelevantParameters);
+    let columnSearch = {};
+
+    // retrieve global search if any
+    if (state.search.search) {
+        filteredState.search = {search: state.search.search};
+    }
+
+    // retrieve column search
+    state.columns.forEach(function (columnObject, columnNumber) {
+        if (columnObject.search.search) {
+            columnSearch[columnNumber] = columnObject.search.search;
+        }
+    });
+    // form column search helper properties that will be used during state load
+    if ($.isEmptyObject(columnSearch) === false) {
+        columnSearch['columnCount'] = state.columns.length;
+        filteredState['columnSearch'] = columnSearch;
+    }
+
+    return filteredState;
+}
+
+function filterObjectByKeys(originalObject, allowedKeys) {
+    const filtered = Object.keys(originalObject)
+        .filter(key => allowedKeys.includes(key))
+        .reduce((obj, key) => {
+            obj[key] = originalObject[key];
+            return obj;
+        }, {});
+
+    return filtered;
+}
 
 $.fn.dataTables = {
     pagination: function (settings, navId) {

@@ -34,6 +34,7 @@
     "nette.ajax.js": "^2.3.0",
     "node-waves": "^0.7.6",
     "remp": "file:../Package/remp",
+    "rison": "^0.1.1",
     "salvattore": "^1.0.9",
     "vue": "^2.6.10",
     "vue-loader": "^13.7.3",

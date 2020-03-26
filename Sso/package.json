@@ -29,7 +29,8 @@
     "material-design-iconic-font": "^2.2.0",
     "moment": "^2.24.0",
     "node-waves": "^0.7.6",
-    "remp": "file:../Package/remp"
+    "remp": "file:../Package/remp",
+    "rison": "^0.1.1"
   },
   "devDependencies": {
     "axios": "^0.18.0",

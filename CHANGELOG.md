@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+- Datatables in all projects now store filters/ordering in URL hash, not in local storage. Previous solution was buggy and didn't allow users to share their filters with other users. GH-56
+
 ### [Beam]
 
 - Added support for conversion rate sorting in Conversions data table. remp/remp#306
