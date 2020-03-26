@@ -42,6 +42,7 @@
     "nouislider": "^13.1.4",
     "optimal-select": "^4.0.1",
     "remp": "file:../Package/remp",
+    "rison": "^0.1.1",
     "salvattore": "^1.0.9",
     "vue": "^2.6.10",
     "vue-loader": "^13.7.3",
