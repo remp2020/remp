@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possible duplicate email for same context being sent, in case the emails were scheduled at the same time via `send-email` API.
 - Fixed and redesigned mailing list variants statistics to be sortable and filterable. remp/remp#593
 - Fixed attachment_size column type - changing to integer (from incorrectly assigned datetime).
+- Added option to select events to handle when starting Hermes worker in case there's need to run separate workers for mission-critical event types.
 
 ### [Sso]
 
