@@ -140,7 +140,11 @@ class DennikeGenerator implements IGenerator
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
                 return str_replace('<br />', '', $matches[0]);
-            }
+            },
+
+            // remove new style of shortcodes
+            '/<div.*?class=".*?">/is' => '',
+            '/<\/div>/is' => '',
         ];
 
 
