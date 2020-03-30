@@ -685,15 +685,15 @@ $response = file_get_contents("http://beam.remp.press/api/articles/top", false, 
 [
     {
         "external_id": "1411843",
-        "pageviews": "274"
+        "pageviews": 274
     },
     {
         "external_id": "1443988",
-        "pageviews": "150"
+        "pageviews": 150
     },
     {
         "external_id": "1362607",
-        "pageviews": "45"
+        "pageviews": 45
     }
 ]
 ```
