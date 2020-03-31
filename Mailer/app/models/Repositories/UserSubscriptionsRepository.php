@@ -30,6 +30,11 @@ class UserSubscriptionsRepository extends Repository
         return parent::update($row, $data);
     }
 
+    public function findByUserId($userId)
+    {
+        return $this->getTable()->where(['user_id' => $userId])->fetchAll();
+    }
+
     public function findByEmail($email)
     {
         return $this->getTable()->where(['user_email' => $email])->fetchAll();
@@ -50,6 +55,11 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => false])->count('*') > 0;
     }
 
+    public function isUserUnsubscribed($userId, $mailTypeId)
+    {
+        return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailTypeId, 'subscribed' => false])->count('*') > 0;
+    }
+
     public function filterSubscribedEmails(array $emails, $typeId)
     {
         return $this->getTable()->where([
@@ -65,7 +75,7 @@ class UserSubscriptionsRepository extends Repository
             $variantId = $mailType->default_variant_id;
         }
 
-        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
+        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch(); // FIXME Should check also userId!
         if (!$actual) {
             $actual = $this->getTable()->insert([
                 'user_id' => $userId,
@@ -101,7 +111,7 @@ class UserSubscriptionsRepository extends Repository
 
     public function unsubscribeUser(ActiveRow $mailType, $userId, $email, $utmParams = [])
     {
-        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
+        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch(); // FIXME Should check also userId!
         if (!$actual) {
             $this->getTable()->insert([
                     'user_id' => $userId,
@@ -148,5 +158,20 @@ class UserSubscriptionsRepository extends Repository
             ->select('COUNT(*) AS count, mail_type_id, subscribed')
             ->where('mail_type_id', $mailTypeIds)
             ->group('mail_type_id, subscribed');
+    }
+
+    public function getUserSubscription(ActiveRow $mailType, $userId, $email)
+    {
+        return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailType->id, 'user_email' => $email])->limit(1)->fetch();
+    }
+
+    public function unsubscribeUserVariant(ActiveRow $userSubscription, $variantId, $utmParams = [], $emitEvent = true)
+    {
+        if ($userSubscription) {
+            $this->userSubscriptionVariantsRepository->removeSubscribedVariant($userSubscription, $variantId);
+            if ($this->userSubscriptionVariantsRepository->subscribedVariants($userSubscription)->count('*') == 0) {
+                $this->unSubscribeUser($userSubscription->mail_type, $userSubscription->user_id, $userSubscription->user_email, $utmParams);
+            }
+        }
     }
 }

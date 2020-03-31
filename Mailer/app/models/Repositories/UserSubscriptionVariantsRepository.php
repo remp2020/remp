@@ -19,7 +19,7 @@ class UserSubscriptionVariantsRepository extends Repository
     {
         return $this->getTable()
             ->where(['mail_user_subscription_id' => $userSubscriptions])
-            ->select('mail_user_subscription_variants.*, mail_type_variant.code');
+            ->select('mail_user_subscription_variants.*, mail_type_variant.code, mail_type_variant.title');
     }
 
     public function variantSubscribed(IRow $userSubscription, $variantId)
