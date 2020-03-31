@@ -8,7 +8,7 @@
 
 {ifset $addonParams['render']}
     {snippetArea addons}
-        {var params = [
+        {var $params = [
                 htmlContent => isset($htmlContent) ? $htmlContent,
                 textContent => isset($textContent) ? $textContent,
                 addonParams => isset($addonParams) ? $addonParams,
