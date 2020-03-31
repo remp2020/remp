@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Check if user is unsubscribed",
+  "$id": "POST /api/v1/users/is-user-unsubscribed",
+  "title": "Is user unsubscribed",
+  "examples": [{
+    "user_id": 1,
+    "mail_type_id": 1
+  }],
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "user_id",
+    "list_id"
+  ],
+  "properties": {
+    "user_id": {
+      "type": "integer"
+    },
+    "list_id": {
+      "type": "integer"
+    }
+  }
+}

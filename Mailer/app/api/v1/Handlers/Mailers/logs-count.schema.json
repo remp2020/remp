@@ -1,0 +1,165 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Returns count of logs.",
+  "$id": "POST /api/v1/mailers/logs-count-for-email",
+  "title": "Logs count",
+  "required": ["email"],
+  "examples": [
+    {},
+    {
+      "filter": {
+        "dropped_at": {},
+        "delivered_at": {
+          "to": "2020-04-08"
+        },
+        "spam_complained_at": {
+          "from": "2020-04-08"
+        },
+        "hard_bounced_at": {
+          "from": "2020-04-08",
+          "to": "2020-04-10"
+        }
+      },
+      "email": "test@test.com",
+      "mail_template_ids": [1,2,3]
+    },
+    {
+      "filter": ["delivered_at", "clicked_at", "opened_at"],
+      "email": "test@test.com",
+      "mail_template_ids": [1,2,3]
+    }
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "filter": {
+      "oneOf": [{
+        "type": "array",
+        "title": "Basic logs count filter",
+        "items": {
+          "enum": ["delivered_at", "clicked_at", "opened_at", "dropped_at", "spam_complained_at", "hard_bounced_at"]
+        }
+      },{
+        "type": "object",
+        "title": "Advanced logs count filter",
+        "properties": {
+          "delivered_at":
+          {
+            "title": "Delivered at filter",
+            "type": "object",
+            "properties": {
+              "from": {
+                "title": "From filter",
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "title": "To filter",
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "additionalProperties": false
+          },
+          "clicked_at":{
+            "type": "object",
+            "title": "Clicked at filter",
+            "properties": {
+              "from": {
+                "title": "From filter",
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "title": "To filter",
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "additionalProperties": false
+          },
+          "opened_at":{
+            "type": "object",
+            "title": "Opened at filter",
+            "properties": {
+              "from": {
+                "title": "From filter",
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "title": "To filter",
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "additionalProperties": false
+          },
+          "dropped_at":{
+            "type": "object",
+            "title": "Dropped at filter",
+            "properties": {
+              "from": {
+                "title": "From filter",
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "title": "To filter",
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "additionalProperties": false
+          },
+          "spam_complained_at":{
+            "type": "object",
+            "title": "Spam complained at filter",
+            "properties": {
+              "from": {
+                "title": "From filter",
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "title": "To filter",
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "additionalProperties": false
+          },
+          "hard_bounced_at":{
+            "type": "object",
+            "title": "Hard bounced at filter",
+            "properties": {
+              "from": {
+                "title": "From filter",
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "title": "To filter",
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }]
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "mail_template_ids": {
+      "type": "array",
+      "title": "Mail template ids",
+      "items": {
+        "type": "integer"
+      }
+    }
+  }
+}
