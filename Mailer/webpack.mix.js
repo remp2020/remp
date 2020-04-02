@@ -3,8 +3,11 @@ let publicPath = "www/assets/vendor/";
 
 mix
     .webpackConfig({
+        resolve: {
+            symlinks: false,
+        },
         watchOptions: {
-            ignored: /node_modules/,
+            ignored: [ /node_modules([\\]+|\/)+(?!remp)/ ]
         }
     })
     .options({

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## [Unreleased]
 
 - Datatables in all projects now store filters/ordering in URL hash, not in local storage. Previous solution was buggy and didn't allow users to share their filters with other users. GH-56
+- Javascript building now supports linking of shared `remp` package within the projects. You can now link the package with `yarn link --cwd ../Package/remp && yarn link remp` inside the app folder. Command `yarn watch` is able to watch for changes in the shared package. GH-63
 
 ### [Beam]
 
