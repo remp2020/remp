@@ -85,9 +85,12 @@ couple of settings you can configure:
     * *From.* Who should be used as a sender of email (e.g. `Support <support@example.com`).
     * *Subject.* Email subject.
     * *Text version.* Text version used as a fallback by email clients.
-    * *HTML version.* HTML (primary) version of email that people will see. HTML version is being previewed in the
+    * *HTML version.* HTML (primary) version of email that people will see. HTML version will show preview in the
     form for creation of new email.
     
+HTML version can be edited by codemirror editor (default) or wysiwyg editor. 
+Default editor can be changed using `.env` variable `TEMPLATE_EDITOR`. (options: `codemirror`, `wysiwig`)
+
 Text and HTML versions of *email* support [Twig syntax](https://twig.symfony.com/doc/2.x/templates.html) and you can use
 standard Twig features in your templates. Mailer is able to provide custom variables to your templates. These can
 originate from different sources:

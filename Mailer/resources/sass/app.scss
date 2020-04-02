@@ -8,7 +8,7 @@ $white: White;
 @import "~remp/sass/remp.scss";
 @import "~google-material-color/dist/palette";
 
-@import "html-editor";
+//@import "html-editor";
 
 .pg-item {
   &.green:nth-child(odd) {
@@ -50,4 +50,9 @@ $white: White;
     color: black;
     padding: 0.2em;
   }
+}
+
+.CodeMirror {
+  margin-top: 1.5rem;
+  height: auto;
 }

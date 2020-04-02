@@ -1,0 +1,376 @@
+<style>
+    .field_error {
+        display: block;
+        padding: 2px 5px;
+        color: white;
+        background-color: #f44336;
+    }
+</style>
+
+{*{form templateForm}*}
+{*    {include jsValidation, form => $form}*}
+{*    {include jsInit}*}
+{*    {input id}*}
+{*    <div class="panel-group" role="tablist" aria-multiselectable="true">*}
+{*        <div class="panel panel-collapse">*}
+{*            <div class="panel-heading active" role="tab" id="headingOne">*}
+{*                <h4 class="panel-title">*}
+{*                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">*}
+{*                        General*}
+{*                    </a>*}
+{*                </h4>*}
+{*            </div>*}
+{*            <div id="collapseOne" class="collapse in" role="tabpanel" aria-labelledby="headingOne" aria-expanded="true">*}
+{*                <div class="panel-body m-t-30">*}
+{*                    <div class="row">*}
+{*                        <div class="col-lg-6">*}
+{*                            <div class="form-group fg-float m-b-30">*}
+{*                                <div class="fg-line">*}
+{*                                    {input name, class => 'form-control fg-input'}*}
+{*                                    {label name, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                            </div>*}
+{*                            <div class="form-group fg-float m-b-30">*}
+{*                                <div class="fg-line">*}
+{*                                    {input code, class => 'form-control fg-input'}*}
+{*                                    {label code, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                                {if $form['code']->hasErrors()}*}
+{*                                    <span class="field_error">{$form['code']->error}</span>*}
+{*                                {/if}*}
+{*                            </div>*}
+{*                            <div class="form-group fg-float m-b-30">*}
+{*                                <div class="fg-line">*}
+{*                                    {input description, class => 'form-control fg-input'}*}
+{*                                    {label description, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                            </div>*}
+{*                            <div class="row">*}
+{*                                <div class="form-group col-lg-6 js-mail-layouts-templates" data-mail-layouts="{json_encode($layouts)}">*}
+{*                                    {label mail_layout_id /}*}
+{*                                    {input mail_layout_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}*}
+{*                                </div>*}
+{*                                <div class="form-group col-lg-6">*}
+{*                                    {label mail_type_id /}*}
+{*                                    {input mail_type_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}*}
+{*                                </div>*}
+{*                            </div>*}
+{*                        </div>*}
+{*                    </div>*}
+{*                </div>*}
+{*            </div>*}
+{*        </div>*}
+{*        <div class="panel panel-collapse">*}
+{*            <div class="panel-heading" role="tab" id="headingTwo">*}
+{*                <h4 class="panel-title">*}
+{*                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">*}
+{*                        Email content*}
+{*                    </a>*}
+{*                </h4>*}
+{*            </div>*}
+{*            <div id="collapseTwo" class="collapse in" role="tabpanel" aria-labelledby="headingTwo" aria-expanded="true"">*}
+{*                <div class="panel-body m-t-30">*}
+{*                    <div class="row ">*}
+{*                        <div class="form-group fg-float col-lg-3">*}
+{*                            <div class="fg-line">*}
+{*                                {input from, class => 'form-control fg-input'}*}
+{*                                {label from, class => 'fg-label' /}*}
+{*                            </div>*}
+{*                        </div>*}
+
+{*                        <div class="form-group fg-float col-lg-3">*}
+{*                            <div class="fg-line">*}
+{*                                {input subject, class => 'form-control fg-input'}*}
+{*                                {label subject, class => 'fg-label' /}*}
+{*                            </div>*}
+{*                        </div>*}
+{*                    </div>*}
+{*                    <div class="row">*}
+{*                        <div class="form-group fg-float col-lg-6">*}
+{*                            <div class="fg-line">*}
+{*                                {input mail_body_text, class => 'form-control fg-input auto-size'}*}
+{*                                {label mail_body_text, class => 'fg-label' /}*}
+{*                            </div>*}
+{*                        </div>*}
+{*                    </div>*}
+
+{*                    <div class="row">*}
+{*                        <div class="col-lg-6">*}
+{*                            <div class="form-group m-b-30">*}
+{*                                {label mail_body_html /}*}
+{*                                &nbsp; &nbsp; <button type="button" class="btn btn-info js-toggle-codemirror">Show/Hide HTML View</button>*}
+{*                                <div>&nbsp;</div>*}
+{*                                <div class="html-editor-container">*}
+{*                                    <div id="js-html-editor" class="html-editor-content"></div>*}
+{*                                </div>*}
+{*                                {input mail_body_html, class => 'form-control js-codemirror'}*}
+
+{*                            </div>*}
+{*                        </div>*}
+{*                        <div class="col-lg-6">*}
+{*                            <div id="js-mail-preview">*}
+{*                                <mail-preview></mail-preview>*}
+{*                            </div>*}
+{*                        </div>*}
+{*                    </div>*}
+{*                </div>*}
+{*            </div>*}
+{*        </div>*}
+{*    </div>*}
+
+{*    <div class="row">*}
+{*        <div class="fg-line">*}
+{*            {input save, class => 'btn btn-info waves-effect'}*}
+{*            {input save_close, class => 'btn btn-info waves-effect'}*}
+{*        </div>*}
+{*    </div>*}
+{*{/form}*}
+
+
+{*{form templateForm}*}
+{*    {include jsValidation, form => $form}*}
+{*    {include jsInit}*}
+{*    {input id}*}
+{*    <div class="panel-group" role="tablist" aria-multiselectable="true">*}
+{*        <div class="row">*}
+{*            <div class="panel panel-collapse col-lg-6">*}
+{*                <div class="panel-heading active" role="tab" id="headingOne">*}
+{*                    <h4 class="panel-title">*}
+{*                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">*}
+{*                            General*}
+{*                        </a>*}
+{*                    </h4>*}
+{*                </div>*}
+{*                <div id="collapseOne" class="collapse in" role="tabpanel" aria-labelledby="headingOne" aria-expanded="true">*}
+{*                    <div class="panel-body m-t-30">*}
+{*                        <div class="row">*}
+{*                            <div class="form-group fg-float col-lg-6 ">*}
+{*                                <div class="fg-line">*}
+{*                                    {input name, class => 'form-control fg-input'}*}
+{*                                    {label name, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                            </div>*}
+{*                            <div class="form-group fg-float col-lg-6">*}
+{*                                <div class="fg-line">*}
+{*                                    {input code, class => 'form-control fg-input'}*}
+{*                                    {label code, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                                {if $form['code']->hasErrors()}*}
+{*                                    <span class="field_error">{$form['code']->error}</span>*}
+{*                                {/if}*}
+{*                            </div>*}
+{*                        </div>*}
+{*                        <div class="form-group fg-float m-b-30">*}
+{*                            <div class="fg-line">*}
+{*                                {input description, class => 'form-control fg-input'}*}
+{*                                {label description, class => 'fg-label' /}*}
+{*                            </div>*}
+{*                        </div>*}
+{*                        <div class="form-group">*}
+{*                            {label mail_type_id /}*}
+{*                            {input mail_type_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}*}
+{*                        </div>*}
+{*                    </div>*}
+{*                </div>*}
+{*            </div>*}
+{*        </div>*}
+{*        <div class="panel panel-collapse m-b-30">*}
+{*            <div class="panel-heading active" role="tab" id="headingOne2">*}
+{*                <h4 class="panel-title">*}
+{*                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne2" aria-expanded="true" aria-controls="collapseOne2">*}
+{*                        Email content*}
+{*                    </a>*}
+{*                </h4>*}
+{*            </div>*}
+{*            <div id="collapseOne2" class="collapse in" role="tabpanel" aria-labelledby="headingOne2" aria-expanded="true">*}
+{*                <div class="panel-body m-t-30">*}
+{*                    <div class="row">*}
+{*                        <div class="col-lg-6">*}
+{*                            <div class="form-group fg-float m-b-30">*}
+{*                                <div class="fg-line">*}
+{*                                    {input from, class => 'form-control fg-input'}*}
+{*                                    {label from, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                            </div>*}
+{*                            <div class="form-group fg-float">*}
+{*                                <div class="fg-line">*}
+{*                                    {input subject, class => 'form-control fg-input'}*}
+{*                                    {label subject, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                            </div>*}
+{*                        </div>*}
+{*                        <div class="col-lg-6">*}
+{*                            <div class="form-group js-mail-layouts-templates" data-mail-layouts="{json_encode($layouts)}">*}
+{*                                {label mail_layout_id /}*}
+{*                                {input mail_layout_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}*}
+{*                            </div>*}
+{*                            <div class="form-group fg-float">*}
+{*                                <div class="fg-line">*}
+{*                                    {input mail_body_text, class => 'form-control fg-input auto-size'}*}
+{*                                    {label mail_body_text, class => 'fg-label' /}*}
+{*                                </div>*}
+{*                            </div>*}
+{*                        </div>*}
+{*                    </div>*}
+{*                    <div class="row">*}
+{*                        <div class="col-lg-6">*}
+{*                            <div class="form-group m-b-30">*}
+{*                                {label mail_body_html /}*}
+{*                                <button type="button" class="btn btn-info js-toggle-codemirror m-l-10 m-b-10">Show/Hide HTML View</button>*}
+
+{*                                <div class="html-editor-container">*}
+{*                                    <div id="js-html-editor" class="html-editor-content"></div>*}
+{*                                </div>*}
+{*                                {input mail_body_html, class => 'form-control js-codemirror'}*}
+{*                            </div>*}
+{*                        </div>*}
+{*                        <div class="col-lg-6">*}
+{*                            <div id="js-mail-preview">*}
+{*                                <mail-preview></mail-preview>*}
+{*                            </div>*}
+{*                        </div>*}
+{*                    </div>*}
+{*                </div>*}
+{*            </div>*}
+{*        </div>*}
+{*    </div>*}
+{*    <div class="form-group">rm*}
+{*        <div class="fg-line">*}
+{*            {input save, class => 'btn btn-info waves-effect'}*}
+{*            {input save_close, class => 'btn btn-info waves-effect'}*}
+{*        </div>*}
+{*    </div>*}
+{*{/form}*}
+
+
+{form templateForm}
+    {include jsValidation, form => $form}
+    {include jsInit}
+    {input id}
+
+    <div class="m-t-30">
+        <div class="row">
+        <div class="col-lg-6">
+        <div class="row">
+            <div class="form-group fg-float col-lg-6 ">
+                <div class="fg-line">
+                    {input name, class => 'form-control fg-input'}
+                    {label name, class => 'fg-label' /}
+                </div>
+            </div>
+            <div class="form-group fg-float col-lg-6">
+                <div class="fg-line">
+                    {input code, class => 'form-control fg-input'}
+                    {label code, class => 'fg-label' /}
+                </div>
+                {if $form['code']->hasErrors()}
+                    <span class="field_error">{$form['code']->error}</span>
+                {/if}
+            </div>
+        </div>
+        <div class="form-group fg-float m-b-30">
+            <div class="fg-line">
+                {input description, class => 'form-control fg-input'}
+                {label description, class => 'fg-label' /}
+            </div>
+        </div>
+        <div class="form-group">
+            {label mail_type_id /}
+            {input mail_type_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+        </div>
+        </div>
+    </div>
+
+    <div class="m-t-30">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group fg-float m-b-30">
+                    <div class="fg-line">
+                        {input from, class => 'form-control fg-input'}
+                        {label from, class => 'fg-label' /}
+                    </div>
+                </div>
+                <div class="form-group fg-float">
+                    <div class="fg-line">
+                        {input subject, class => 'form-control fg-input'}
+                        {label subject, class => 'fg-label' /}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group js-mail-layouts-templates" data-mail-layouts="{json_encode($layouts)}">
+                    {label mail_layout_id /}
+                    {input mail_layout_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+                </div>
+                <div class="form-group fg-float">
+                    <div class="fg-line">
+                        {input mail_body_text, class => 'form-control fg-input auto-size'}
+                        {label mail_body_text, class => 'fg-label' /}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group m-b-30">
+                    {label mail_body_html /}
+                    <button type="button" class="btn btn-info js-toggle-codemirror m-l-10 m-b-10">Show/Hide HTML View</button>
+
+                    <div class="html-editor-container">
+                        <div id="js-html-editor" class="html-editor-content"></div>
+                    </div>
+                    {input mail_body_html, class => 'form-control js-codemirror'}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div id="js-mail-preview">
+                    <mail-preview></mail-preview>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="fg-line">
+            {input save, class => 'btn btn-info waves-effect'}
+            {input save_close, class => 'btn btn-info waves-effect'}
+        </div>
+    </div>
+{/form}
+
+
+{define jsInit}
+    <script>
+        $(function() {
+            remplib.templateForm.init();
+        });
+    </script>
+{/define}
+{define jsValidation}
+    <script>
+         Nette.validators.RempMailerModuleFormsRulesFormRules_validateAdvancedEmail = function (element, args, value) {
+             const regexp = /^(.+) +<(.*)>$/i;
+             const email = value.match(regexp);
+             if (email !== null) {
+                 value = email[2];
+             }
+             return Nette.validateRule(element, ':email', args, { 'value': value });
+         };
+    </script>
+    <script n:if="$form->getErrors()">
+        $(function() {
+            let index = 0;
+            {foreach $form->getErrors() as $error}
+            index += 250;
+            window.setTimeout(function() {
+                $.notify({
+                    message: {$error}
+                }, {
+                    allow_dismiss: false,
+                    type: 'danger'
+                });
+            }, index);
+            {/foreach}
+        });
+    </script>
+{/define}

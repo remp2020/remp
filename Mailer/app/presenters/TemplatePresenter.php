@@ -218,6 +218,7 @@ final class TemplatePresenter extends BasePresenter
     {
         $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
         $this->template->layouts = $layouts;
+        $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
     }
 
     public function renderEdit($id)
@@ -230,6 +231,7 @@ final class TemplatePresenter extends BasePresenter
 
         $this->template->mailTemplate = $template;
         $this->template->layouts = $layouts;
+        $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
     }
 
     public function renderPreview($id, $type = 'html')

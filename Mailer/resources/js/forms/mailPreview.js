@@ -1,17 +1,19 @@
 import MailPreview from '../components/MailPreview.vue';
-import pell from 'pell'
-import beautify from 'js-beautify'
+import icons from "trumbowyg/dist/ui/icons.svg";
+import "trumbowyg/dist/ui/trumbowyg.css"
+import "trumbowyg/dist/trumbowyg.js";
+
+$.trumbowyg.svgPath = icons;
 
 window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
 
 (function() {
     'use strict';
     remplib.templateForm = {
-        events: {
-            htmlEditorChange: 'remp.html-editor.change',
-        },
+        textareaSelector: '.js-mail-body-html-input',
         codeMirror: (element) => {
-            return CodeMirror.fromTextArea( element, {
+            return CodeMirror( element, {
+                value: $(remplib.templateForm.textareaSelector).val(),
                 theme: 'base16-dark',
                 mode: 'htmlmixed',
                 indentUnit: 4,
@@ -40,105 +42,99 @@ window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
             });
         },
         htmlEditor: (element) => {
-            return pell.init({
-                element: element,
-                defaultParagraphSeparator: 'p',
-                actions: [
-                    {
-                        name: 'undo',
-                        icon: '&larr;',
-                        title: 'Undo',
-                        result: function result() {
-                            return pell.exec('undo');
-                        }
-                    },
-                    {
-                        name: 'redo',
-                        icon: '&rarr;',
-                        title: 'Redo',
-                        result: function result() {
-                            return pell.exec('redo');
-                        }
-                    },
-                    'link',
-                    'bold',
-                    'italic',
-                    'image',
-                    'paragraph',
-                    'olist',
-                    'ulist'
-                ],
-                onChange: function( html ) {
-                    $('.js-codemirror').textContent = html;
-                    // create and dispach custom event for easier binding with other parts of app
-                    const event = new CustomEvent(remplib.templateForm.events.htmlEditorChange, {detail: {content: html}});
-                    this.element.dispatchEvent(event);
-                }
+            return $(element).trumbowyg({
+                semanticKeepAttributes: true,
+                semantic: false,
+                autogrow: true,
             });
         },
-        syncEditorWithCodeMirror: (htmlEditor, codeMirror) => {
-            htmlEditor.addEventListener(remplib.templateForm.events.htmlEditorChange, function (e) {
-                codeMirror.doc.setValue(beautify.html(e.detail.content, {
-                    indent_size: 1,
-                    indent_char: '\t',
-                    indent_with_tabs: true,
-                    brace_style: 'collapse-preserve-inline'
-                }));
-            }, false);
+        editorChoice: () => {
+            return $('.js-editor-choice:checked').val();
         },
-        syncCodeMirrorWithEditor: (codeMirror, htmlEditor) => {
-            // codemirror automatically fires change event - @see https://codemirror.net/doc/manual.html#events
-            codeMirror.on('change', function( editor, change ) {
-                // ignore if update is made programmatically and not by user (avoid circular loop)
-                if ( change.origin === 'setValue' ) {
-                    return;
-                }
-                htmlEditor.content.innerHTML = editor.doc.getValue();
-            });
-        },
-        syncEditorWithPreview: (element, htmlEditor, mailLayoutSelect, layoutsHtmlTemplates) => {
+        previewInit: (element, mailLayoutSelect, layoutsHtmlTemplates, initialContent) => {
             const getLayoutValue = () => mailLayoutSelect[mailLayoutSelect.selectedIndex].value;
             const getLayoutTemplate = () => layoutsHtmlTemplates[getLayoutValue()];
             const vue = new Vue({
                 el: element,
                 data: function() {
                     return {
-                        "htmlContent": htmlEditor.content.innerHTML,
+                        "htmlContent": initialContent,
                         "htmlLayout": getLayoutTemplate(),
                     }
                 },
                 render: h => h(MailPreview),
             });
-            htmlEditor.addEventListener(remplib.templateForm.events.htmlEditorChange, function (e) {
-                vue.htmlContent = e.detail.content;
-                $('body').trigger('preview:change');
-            }, false);
             mailLayoutSelect.addEventListener('change', function(e) {
-                vue.htmlLayout = getLayoutTemplate()
+                vue.htmlLayout = getLayoutTemplate();
+                $('body').trigger('preview:change');
             });
-
             return vue;
         },
-        init: () => {
-            // initialise editor
-            const htmlEditor = remplib.templateForm.htmlEditor(document.getElementById('js-html-editor'));
-            htmlEditor.content.innerHTML = $('[name="mail_body_html"]').val(); // inital content;
-            // initialise codeMirror
-            const codeMirror = remplib.templateForm.codeMirror($('.js-codemirror')[0]);
-            remplib.templateForm.syncEditorWithCodeMirror(htmlEditor, codeMirror);
-            remplib.templateForm.syncCodeMirrorWithEditor(codeMirror, htmlEditor);
+        showHtmlEditor: (codeMirror, htmlEditor) => {
+            htmlEditor.data('trumbowyg').$box.show();
+            $(codeMirror.display.wrapper).hide();
+        },
+        showCodemirror: (codeMirror, htmlEditor) => {
+            htmlEditor.data('trumbowyg').$box.hide();
+            $(codeMirror.display.wrapper).show();
+        },
+        showCorrectEditor: (codeMirror, htmlEditor) => {
+            function chooseEditor(codeMirror, htmlEditor) {
+                if (remplib.templateForm.editorChoice() === 'editor')
+                    remplib.templateForm.showHtmlEditor(codeMirror, htmlEditor);
+                else {
+                    remplib.templateForm.showCodemirror(codeMirror, htmlEditor);
+                }
+            }
+            chooseEditor(codeMirror, htmlEditor);
 
-            remplib.templateForm.syncEditorWithPreview(
-                '#js-mail-preview',
-                htmlEditor,
-                $('[name="mail_layout_id"]')[0],
-                $('.js-mail-layouts-templates').data('mail-layouts'),
-            );
-            // simple show / hide prototype
-            $('.js-toggle-codemirror').on('click', () => {
-                $('.CodeMirror').toggle(0);
-            })
-        }
+            $('.js-editor-choice').on('change', function(e) {
+                e.stopPropagation();
+                chooseEditor(codeMirror, htmlEditor)
+            });
+        },
+        syncEditorWithPreview: (vue, htmlEditor) => {
+            htmlEditor.on('tbwchange', () => {
+                if (remplib.templateForm.editorChoice() !== 'editor') {
+                    return;
+                }
+                vue.htmlContent = htmlEditor.trumbowyg('html');
+                $('body').trigger('preview:change');
+            });
+        },
+        syncCodeMirrorWithPreview: (vue, codeMirror) => {
+            codeMirror.on('change', function( editor, change ) {
+                if (remplib.templateForm.editorChoice() !== 'code') {
+                    return;
+                }
+                // ignore if update is made programmatically and not by user (avoid circular loop)
+                if ( change.origin === 'setValue' ) {
+                    return;
+                }
+                vue.htmlContent = editor.doc.getValue();
+                $(remplib.templateForm.textareaSelector).val(editor.doc.getValue());
+                $('body').trigger('preview:change');
+            });
+        },
+        init: () => {
+            // initialize on tab change, prevents bugs with initialisation of invisible elements.
+            $('a[data-toggle="tab"]').one('shown.bs.tab', function (e) {
+                const target = $(e.target).attr("href") // activated tab
+                if (target === '#email') {
+                    const codeMirror = remplib.templateForm.codeMirror($('.js-codemirror')[0]);
+                    const htmlEditor = remplib.templateForm.htmlEditor('.js-html-editor');
+                    const vue = remplib.templateForm.previewInit(
+                        '#js-mail-preview',
+                        $('[name="mail_layout_id"]')[0],
+                        $('.js-mail-layouts-templates').data('mail-layouts'),
+                        $('.js-mail-body-html-input').val(),
+                    );
+                    remplib.templateForm.syncCodeMirrorWithPreview(vue, codeMirror);
+                    remplib.templateForm.syncEditorWithPreview(vue, htmlEditor);
+                    remplib.templateForm.showCorrectEditor(codeMirror, htmlEditor);
+                }
+            });
+         }
     }
 
 })();
