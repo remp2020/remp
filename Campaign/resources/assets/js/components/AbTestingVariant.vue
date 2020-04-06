@@ -21,7 +21,7 @@
         </td>
 
         <!-- proportion value -->
-        <td style="text-align: right; width: 90px;">
+        <td style="text-align: right; min-width: 90px;">
             <input type="number" min="0" max="100" class="ab-testing-input form-control" :class="['ab-testing-input-' + index]" :name="'variants[' + index + '][proportion]'" :value="variant.val" @change="$parent.handleInputUpdate($event, index)" :id="'ab-testing-input-' + index">&nbsp;&nbsp;%
         </td>
 
