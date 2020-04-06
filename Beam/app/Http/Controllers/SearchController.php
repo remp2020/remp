@@ -2,30 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Article;
-use App\Author;
 use App\Http\Requests\SearchRequest;
 use App\Http\Resources\SearchResource;
-use App\Segment;
+use App\Model\SearchAspects\ArticleSearchAspect;
+use App\Model\SearchAspects\AuthorSearchAspect;
+use App\Model\SearchAspects\SegmentSearchAspect;
+use Spatie\Searchable\Search;
 
 class SearchController extends Controller
 {
     public function search(SearchRequest $request)
     {
         $searchTerm = $request->query('term');
-        $maxResultCount = 5;
 
-        $searchResult['articles'] = Article::search($searchTerm)->with(['tags', 'sections'])->orderBy('published_at', 'DESC')->take($maxResultCount)->get();
+        $searchResults['articles'] = (new Search())->registerAspect(ArticleSearchAspect::class)->search($searchTerm)->pluck('searchable');
 
-        $searchResult['authors'] = Author::search($searchTerm)->get();
-        $searchResult['authors']->each(function ($author) {
-            $author->load('latestPublishedArticle');
-        });
-        $searchResult['authors'] = $searchResult['authors']->sortByDesc('latestPublishedArticle.0.published_at')->slice(0, $maxResultCount);
+        $searchResults['authors'] = (new Search())->registerAspect(AuthorSearchAspect::class)->search($searchTerm)->pluck('searchable');
+        $searchResults['authors'] = $searchResults['authors']->sortByDesc('latestPublishedArticle.0.published_at')->take(config('search.maxResultCount'));
 
-        $searchResult['segments'] = Segment::search($searchTerm)->orderBy('updated_at', 'DESC')->take($maxResultCount)->get();
+        $searchResults['segments'] = (new Search())->registerAspect(SegmentSearchAspect::class)->search($searchTerm)->pluck('searchable');
 
-        $searchCollection = collect($searchResult);
+        $searchCollection = collect($searchResults);
 
         return new SearchResource($searchCollection);
     }

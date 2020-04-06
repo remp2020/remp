@@ -41,6 +41,7 @@
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
         "remp/multi-armed-bandit": "*",
+        "spatie/laravel-searchable": "1.2.3",
         "tightenco/ziggy": "^0.6.9",
         "yajra/laravel-datatables-oracle": "^8.0"
     },
