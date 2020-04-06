@@ -5,13 +5,14 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Redis;
-use Nicolaslopezj\Searchable\SearchableTrait;
 use Predis\ClientInterface;
 use Ramsey\Uuid\Uuid;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Banner extends Model
+class Banner extends Model implements Searchable
 {
-    use Notifiable, SearchableTrait;
+    use Notifiable;
 
     const BANNER_TAG = 'banner';
 
@@ -50,23 +51,10 @@ class Banner extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
-    /**
-     * Searchable rules.
-     *
-     * @var array
-     */
-    protected $searchable = [
-        /**
-         * Columns and their priority in search results.
-         * Columns with higher values are more important.
-         * Columns with equal values have equal importance.
-         *
-         * @var array
-         */
-        'columns' => [
-            'banners.name' => 1,
-        ]
-    ];
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
+    }
 
     protected static function boot()
     {

@@ -3,12 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Nicolaslopezj\Searchable\SearchableTrait;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Author extends Model
+class Author extends Model implements Searchable
 {
-    use SearchableTrait;
-
     protected $fillable = [
         'name',
     ];
@@ -18,23 +17,10 @@ class Author extends Model
         'pivot',
     ];
 
-    /**
-     * Searchable rules.
-     *
-     * @var array
-     */
-    protected $searchable = [
-        /**
-         * Columns and their priority in search results.
-         * Columns with higher values are more important.
-         * Columns with equal values have equal importance.
-         *
-         * @var array
-         */
-        'columns' => [
-            'authors.name' => 1,
-        ]
-    ];
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
+    }
 
     public function articles()
     {

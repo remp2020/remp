@@ -4,14 +4,15 @@ namespace App;
 
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
-use Nicolaslopezj\Searchable\SearchableTrait;
 use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Redis;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Campaign extends Model
+class Campaign extends Model implements Searchable
 {
-    use PivotEventTrait, SearchableTrait;
+    use PivotEventTrait;
 
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
     const CAMPAIGN_TAG = 'campaign';
@@ -62,28 +63,10 @@ class Campaign extends Model
 
     protected $appends = ['active'];
 
-    /**
-     * Searchable rules.
-     *
-     * @var array
-     */
-    protected $searchable = [
-        /**
-         * Columns and their priority in search results.
-         * Columns with higher values are more important.
-         * Columns with equal values have equal importance.
-         *
-         * @var array
-         */
-        'columns' => [
-            'campaigns.name' => 1,
-            'banners.name' => 1,
-        ],
-        'joins' => [
-            'campaign_banners' => ['campaigns.id', 'campaign_banners.campaign_id'],
-            'banners' => ['banners.id', 'campaign_banners.banner_id'],
-        ]
-    ];
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
+    }
 
     protected static function boot()
     {
