@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+---
+
+## [0.10.0] - 2020-04-07
+
 - Datatables in all projects now store filters/ordering in URL hash, not in local storage. Previous solution was buggy and didn't allow users to share their filters with other users. GH-56
 - Javascript building now supports linking of shared `remp` package within the projects. You can now link the package with `yarn link --cwd ../Package/remp && yarn link remp` inside the app folder. Command `yarn watch` is able to watch for changes in the shared package. GH-63
 
@@ -25,6 +29,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added article conversion/pageviews stats filtering based on selected property. GH-50
 - Added support for article tags (storing tags associated with articles, filtering in data tables). remp/remp#217
 - Added top articles endpoint for listing top articles by time, sections. remp/web#1010
+- Fixed duplicate conversions if multiple sections/tags/authors were linked to article.
+- Fixed missing conversions if no section/tag/author was linked to article. remp/remp#586
 
 ### [Campaign]
 
@@ -52,6 +58,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Updated layout footer with link to REMP website. remp/remp#522
 
+---
 
 ## [0.9.1]
 
@@ -188,9 +195,11 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[0.10.0]: https://github.com/remp2020/remp/compare/0.9.1...0.10.0
+[0.9.0]: https://github.com/remp2020/remp/compare/0.8.0...0.9.1
 [0.8.0]: https://github.com/remp2020/remp/compare/0.7.0...0.8.0
 [0.8.1]: https://github.com/remp2020/remp/compare/0.8.0...0.8.1
 [0.8.2]: https://github.com/remp2020/remp/compare/0.8.1...0.8.2
 [0.9.0]: https://github.com/remp2020/remp/compare/0.8.2...0.9.0
 [0.9.1]: https://github.com/remp2020/remp/compare/0.9.0...0.9.1
-[Unreleased]: https://github.com/remp2020/remp/compare/0.9.1...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.10.0...master
