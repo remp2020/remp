@@ -602,6 +602,102 @@ $response = file_get_contents("http://beam.remp.press/api/conversions/upsert ", 
 }
 ```
 
+---
+
+##### POST `api/articles/top`
+
+Beam admin provides statistics about article performance. This endpoint return top articles by pageviews.
+You can filter articles by section and time of pageview.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
+	"limit": 3, // limit how many top articles this endpoint returns
+	"sections": [ // OPTIONAL; filters from which sections take articles
+		"Section title" // String; section title
+	]
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl --location --request POST 'http://beam.remp.press/api/articles/top' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+--data-raw '{
+	"from": "2020-03-15 14:41:58",
+	"limit": 3,
+	"sections": [
+		"Blog"
+	]
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+	"from" => "2020-03-15 14:41:58",
+	"limit" => 3,
+	"sections" => [
+		"Blog"
+	]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/articles/top", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "external_id": "1411843",
+        "pageviews": 274
+    },
+    {
+        "external_id": "1443988",
+        "pageviews": 150
+    },
+    {
+        "external_id": "1362607",
+        "pageviews": 45
+    }
+]
+```
+
 ### Scheduled events
 
 #### Laravel scheduler

@@ -8,6 +8,7 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
+use App\Http\Requests\TopArticlesRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\Config\ConversionRateConfig;
@@ -552,5 +553,78 @@ class ArticleController extends Controller
             }
         }
         return $usersReadArticles;
+    }
+
+    public function topArticles(TopArticlesRequest $request)
+    {
+        $sections = $request->json('sections');
+        $limit = $request->json('limit');
+
+        $timeFrom = Carbon::parse($request->json('from'));
+        $timeTo = (clone $timeFrom)->modify('+1 day');
+        $now = Carbon::now();
+
+        // do not split query if time_from -> now is less than day
+        if ($timeTo > $now) {
+            $results = $this->getTopArticles($timeFrom, $timeTo, $sections, $limit);
+            return response()->json($results);
+        }
+
+        // split query by days
+        $results = [];
+        while ($timeTo < $now) {
+            $articles = $this->getTopArticles($timeFrom, $timeTo, $sections, $limit * 2);
+            foreach ($articles as $article) {
+                if (!isset($results[$article->external_id])) {
+                    $results[$article->external_id] = $article;
+                    continue;
+                }
+
+                $results[$article->external_id]->pageviews += $article->pageviews;
+            }
+
+            $timeFrom->modify('+1 day');
+            $timeTo->modify('+1 day');
+            if ($timeTo > $now) {
+                $timeTo = $now;
+            }
+        }
+
+        usort($results, function ($a, $b) {
+            return $a->pageviews < $b->pageviews;
+        });
+
+        return response()->json(array_slice($results, 0, $limit));
+    }
+
+    private function getTopArticles($timeFrom, $timeTo, $sections, $limit)
+    {
+        $pageviews = DB::table('article_pageviews')
+            ->where('article_pageviews.time_from', '>=', $timeFrom)
+            ->where('article_pageviews.time_from', '<=', $timeTo)
+            ->groupBy('article_pageviews.article_id')
+            ->select(
+                'article_pageviews.article_id',
+                DB::raw('SUM(article_pageviews.sum) as pageviews')
+            )
+            ->orderBy('pageviews', 'DESC')
+            ->limit($limit);
+
+        if ($sections) {
+            $pageviews->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
+                ->join('sections', 'article_section.section_id', '=', 'sections.id')
+                ->whereIn('sections.name', $sections);
+        }
+
+        $data = DB::table('articles')
+            ->joinSub($pageviews, 'top_articles_by_pageviews', function ($join) {
+                $join->on('articles.id', '=', 'top_articles_by_pageviews.article_id');
+            })
+            ->select('articles.external_id', 'top_articles_by_pageviews.pageviews');
+
+        return $data->get()->map(function ($article) {
+            $article->pageviews = intval($article->pageviews);
+            return $article;
+        });
     }
 }
