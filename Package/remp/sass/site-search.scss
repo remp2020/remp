@@ -28,6 +28,24 @@ $white: #fff;
         padding: .33rem 0
     }
 
+    .colored_result_1 {
+        color: #00a5bb;
+    }
+
+    .colored_result_2 {
+        color: orange;
+    }
+
+    .colored_result_3 {
+        color: green;
+    }
+
+    .preloader {
+        position: absolute;
+        left: calc(100% / 2 - 25px);
+        visibility: hidden;
+    }
+
 
     ::-webkit-input-placeholder {
         color: $white;

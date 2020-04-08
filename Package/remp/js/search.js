@@ -29,8 +29,10 @@ $(document).ready(function() {
                     searchKeys.forEach(searchKey => {
                         //add search keys to displayKeys set (add() method adds only unique items into the set)
                         displayKeys.add(searchKey);
-                        //and add keys to the displayed results as well
-                        searchResult[searchKey] = `<em>${searchKey}:</em> ${searchResult[searchKey]}`;
+                        //distinguish different types by color
+                        if (searchKey !== 'name' && searchKey !== 'title') {
+                            searchResult[searchKey] = `<span class="colored_result_${keyOrder}"> ${searchResult[searchKey]}</span>`;
+                        }
                         if (keyOrder > 0) {
                             searchResult[searchKey] = ' | ' + searchResult[searchKey];
                         }
@@ -39,6 +41,7 @@ $(document).ready(function() {
                 });
 
                 this.options.display = Array.from(displayKeys);
+                $('.typeahead__field .preloader').css('visibility', 'hidden');
                 return data;
             },
             onClickBefore: function (node, a, item, event) {
@@ -47,6 +50,12 @@ $(document).ready(function() {
             },
             onSubmit: function (node, form, item, event) {
                 event.preventDefault();
+            },
+            onCancel: function () {
+                $('.typeahead__field .preloader').css('visibility', 'hidden');
+            },
+            onSendRequest: function () {
+                $('.typeahead__field .preloader').css('visibility', 'visible');
             }
         }
     });
@@ -57,4 +66,3 @@ function isSearchRelevantKey(key) {
 
     return !irrelevantKeys.includes(key);
 }
-
