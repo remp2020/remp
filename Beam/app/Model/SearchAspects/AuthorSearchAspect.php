@@ -11,7 +11,7 @@ class AuthorSearchAspect extends SearchAspect
     public function getResults(string $term): Collection
     {
         return Author::query()
-            ->where('name', 'LIKE', "{$term}%")
+            ->where('name', 'LIKE', "%{$term}%")
             ->with('latestPublishedArticle')
             ->get();
     }

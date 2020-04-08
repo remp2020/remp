@@ -24,7 +24,7 @@ class BannerSearchResource extends JsonResource
         return [
             'type' => 'banner',
             'name' => $this->name,
-            'search_result_url' => route('banners.show', $this)
+            'search_result_url' => route('banners.edit', $this)
         ];
     }
 }

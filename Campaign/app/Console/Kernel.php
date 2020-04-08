@@ -20,7 +20,6 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\CampaignsRefreshCache::class,
         Commands\AggregateCampaignStats::class,
-        Commands\SearchInit::class
     ];
 
     /**
