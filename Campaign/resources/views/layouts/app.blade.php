@@ -94,6 +94,11 @@
         <form class="p-relative">
             <div class="typeahead__container">
                 <div class="typeahead__field">
+                    <div class="preloader pl-lg">
+                        <svg class="pl-circular" viewBox="25 25 50 50">
+                            <circle class="plc-path" cx="50" cy="50" r="20"></circle>
+                        </svg>
+                    </div>
                     <input class="js-typeahead hs-input typeahead"
                            name="q"
                            autocomplete="off"
