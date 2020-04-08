@@ -9,7 +9,6 @@ $(document).ready(function() {
         cancelButton: false,
         loadingAnimation: true,
         emptyTemplate: "No results found for <strong>{{query}}</strong>",
-        group: "type",
         source: {
             ajax: {
                 url: '/search',
@@ -20,27 +19,62 @@ $(document).ready(function() {
         },
         callback: {
             onPopulateSource: function (node, data, group, path) {
-                let displayKeys = new Set();
-
                 data.forEach( searchResult => {
-                    let keyOrder = 0;
-                    //get relevant search keys from current searchResult
-                    const searchKeys = Object.keys(searchResult).filter(isSearchRelevantKey);
-                    searchKeys.forEach(searchKey => {
-                        //add search keys to displayKeys set (add() method adds only unique items into the set)
-                        displayKeys.add(searchKey);
-                        //distinguish different types by color
-                        if (searchKey !== 'name' && searchKey !== 'title') {
-                            searchResult[searchKey] = `<span class="colored_result_${keyOrder}"> ${searchResult[searchKey]}</span>`;
-                        }
-                        if (keyOrder > 0) {
-                            searchResult[searchKey] = ' | ' + searchResult[searchKey];
-                        }
-                        keyOrder++;
-                    });
+                    // TODO: applications should register icons and formatting themselves
+                    switch (searchResult['type']) {
+                        case 'article':
+                            searchResult['title'] = '<i class="zmdi zmdi-library"></i> ' + searchResult['title'];
+                            break;
+                        case 'author':
+                            searchResult['name'] = '<i class="zmdi zmdi-account-box"></i> ' + searchResult['name'];
+                            break;
+                        case 'segment':
+                            searchResult['name'] = '<i class="zmdi zmdi-accounts-list-alt"></i> ' + searchResult['name'];
+                            break;
+                        case 'campaign':
+                            searchResult['name'] = '<i class="zmdi zmdi-ticket-star"></i> ' + searchResult['name'];
+                            break;
+                        case 'banner':
+                            searchResult['name'] = '<i class="zmdi zmdi-collection-folder-image"></i> ' + searchResult['name'];
+                            break;
+                    }
+
+                    // format tags
+                    if (searchResult['tags']) {
+                        let tags = '';
+                        searchResult['tags'].forEach(tag => {
+                            tags += `<span class="label label-default palette-Blue-Grey-50 bg">${tag}</span> `;
+                        });
+                        searchResult['tags'] = tags;
+                    }
+
+                    // format sections
+                    if (searchResult['sections']) {
+                        let sections = '';
+                        searchResult['sections'].forEach(section => {
+                            sections += `<span class="label label-default palette-Deep-Orange-50 bg">${section}</span> `;
+                        });
+                        searchResult['sections'] = sections;
+                    }
+
+                    // format banners
+                    if (searchResult['banners']) {
+                        let banners = '';
+                        searchResult['banners'].forEach(section => {
+                            banners += `<span class="label label-default palette-Blue-Grey-50 bg">${section}</span> `;
+                        });
+                        searchResult['banners'] = banners;
+                    }
                 });
 
-                this.options.display = Array.from(displayKeys);
+                this.options.display = [
+                    'title',
+                    'name',
+                    'tags',
+                    'sections',
+                    'code',
+                    'banners',
+                ];
                 $('.typeahead__field .preloader').css('visibility', 'hidden');
                 return data;
             },
@@ -60,9 +94,3 @@ $(document).ready(function() {
         }
     });
 });
-
-function isSearchRelevantKey(key) {
-    const irrelevantKeys = ['type', 'search_result_url', 'group'];
-
-    return !irrelevantKeys.includes(key);
-}

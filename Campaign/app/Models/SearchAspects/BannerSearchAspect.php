@@ -11,7 +11,7 @@ class BannerSearchAspect extends SearchAspect
     public function getResults(string $term): Collection
     {
         return Banner::query()
-            ->where('name', 'LIKE', "{$term}%")
+            ->where('name', 'LIKE', "%{$term}%")
             ->orderBy('updated_at', 'DESC')
             ->take(config('search.maxResultCount'))
             ->get();

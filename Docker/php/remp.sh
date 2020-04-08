@@ -36,11 +36,6 @@ then
             php artisan jwt:secret
         fi
 
-        php artisan list | grep "search:init" > /dev/null
-        if [ $? -eq "0" ]; then
-            php artisan search:init
-        fi
-
         # Update permissions for Laravel storage (cache) folder
         chmod -R 777 storage
     elif [ -f "bin/command.php" ]

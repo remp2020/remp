@@ -25,19 +25,17 @@ $white: #fff;
     }
 
     .typeahead__list > li {
-        padding: .33rem 0
+        padding: 0.3rem;
+
+        .label {
+            vertical-align: middle;
+            margin-left: .1rem;
+        }
     }
 
-    .colored_result_1 {
-        color: #00a5bb;
-    }
-
-    .colored_result_2 {
-        color: orange;
-    }
-
-    .colored_result_3 {
-        color: green;
+    .typeahead__list > .typeahead__group:first-child {
+        border: none;
+        padding: 0;
     }
 
     .preloader {
@@ -45,7 +43,6 @@ $white: #fff;
         left: calc(100% / 2 - 25px);
         visibility: hidden;
     }
-
 
     ::-webkit-input-placeholder {
         color: $white;

@@ -25,7 +25,7 @@ class CampaignSearchResource extends JsonResource
             'type' => 'campaign',
             'name' => $this->name,
             'banners' => $this->when($this->banners->isNotEmpty(), $this->banners->pluck('name')),
-            'search_result_url' => route('campaigns.show', $this)
+            'search_result_url' => route('campaigns.edit', $this)
         ];
     }
 }
