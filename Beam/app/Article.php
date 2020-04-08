@@ -12,16 +12,18 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 use Yadakhov\InsertOnDuplicateKey;
 
-class Article extends Model
+class Article extends Model implements Searchable
 {
     use InsertOnDuplicateKey;
 
     private const DEFAULT_TITLE_VARIANT = 'default';
-    
+
     private const DEFAULT_IMAGE_VARIANT = 'default';
-    
+
     private $journal;
 
     private $journalHelpers;
@@ -49,6 +51,11 @@ class Article extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->title);
+    }
 
     public function property()
     {

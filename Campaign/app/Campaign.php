@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Redis;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Campaign extends Model
+class Campaign extends Model implements Searchable
 {
     use PivotEventTrait;
 
@@ -60,6 +62,11 @@ class Campaign extends Model
     ];
 
     protected $appends = ['active'];
+
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
+    }
 
     protected static function boot()
     {
@@ -252,7 +259,7 @@ class Campaign extends Model
             ->pluck('campaign_id')
             ->unique()
             ->toArray();
-        
+
         Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode(array_values($activeCampaignIds)));
 
         return collect($activeCampaignIds);

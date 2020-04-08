@@ -3,6 +3,10 @@ $primaryColorDark: #007c91;
 $primaryColorLight: #5ddef4;
 $highlightColor: #4caf50;
 
+$typeahead-font-size: 1.5rem;
+$typeahead-line-height: 1.5em;
+
+@import "~jquery-typeahead/src/jquery.typeahead";
 @import "~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css";
 @import "~google-material-color/dist/palette";
 @import "~nouislider/distribute/nouislider.min.css";
@@ -10,6 +14,7 @@ $highlightColor: #4caf50;
 @import "~remp/sass/template.scss";
 @import "~remp/sass/remp.scss";
 @import "~remp/sass/accordion.scss";
+@import "~remp/sass/site-search.scss";
 
 @import "banner";
 @import "template";

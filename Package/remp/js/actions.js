@@ -1,24 +1,24 @@
 $(document).ready(function () {
     $('body').on('click', '[data-ma-action]', function (e) {
         e.preventDefault();
-        
+
         var action = $(this).data('ma-action');
         var $this = $(this);
-        
+
         switch (action) {
-            
+
             /*-------------------------------------------
                 Mainmenu and Notifications open/close
             ---------------------------------------------*/
-            
+
             /* Open Sidebar */
             case 'sidebar-open':
-                
+
                 var target = $(this).data('ma-target');
 
                 $this.addClass('toggled');
                 $('#main').append('<div data-ma-action="sidebar-close" class="sidebar-backdrop animated fadeIn" />')
-                
+
                 if (target == 'main-menu') {
                     $('#s-main-menu').addClass('toggled');
                 }
@@ -27,57 +27,62 @@ $(document).ready(function () {
                 }
 
                 $('body').addClass('o-hidden');
-                
+
                 break;
-            
+
             /* Close Sidebar */
             case 'sidebar-close':
-                
+
                 $('[data-ma-action="sidebar-open"]').removeClass('toggled');
                 $('.sidebar').removeClass('toggled');
                 $('.sidebar-backdrop').remove();
                 $('body').removeClass('o-hidden');
-                
-                break;
-            
 
-            
+                break;
+
+
+
             /*----------------------------------
                 Header Search
             -----------------------------------*/
-            
+
             /* Clear Search */
             case 'search-clear':
-                
+
                 /* For mobile only */
                 $('.h-search').removeClass('toggled');
-        
+
                 /* For all */
                 $('.hs-input').val('');
                 $('.h-search').removeClass('focused');
-                
+
+                // triggers clear functions of typeahead after removal of input
+                if ($('.js-typeahead').length) {
+                    $('.js-typeahead').trigger('input');
+                }
+
                 break;
-            
+
             /* Open search */
             case 'search-open':
-                
+
                 $('.h-search').addClass('toggled');
                 $('.hs-input').focus();
-        
-                break;
-            
 
-            
+                break;
+
+
+
             /*----------------------------------
                 Main menu
             -----------------------------------*/
-            
+
             /* Toggle Sub menu */
             case 'submenu-toggle':
 
                 $this.next().slideToggle(200);
                 $this.parent().toggleClass('toggled');
-                
+
                 break;
 
 
@@ -117,5 +122,5 @@ $(document).ready(function () {
                 break;
 
         }
-    }); 
+    });
 });

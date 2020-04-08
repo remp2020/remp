@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use App\Contracts\SegmentAggregator;
+use App\Http\Resources\BannerSearchResource;
+use App\Http\Resources\CampaignSearchResource;
+use App\Http\Resources\SearchResource;
 use GeoIp2\Database\Reader;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
@@ -64,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Paginator::useBootstrapThree();
+
+        SearchResource::withoutWrapping();
     }
 
     public function bindObservers()
