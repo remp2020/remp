@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added early-version support for search in the top searchbox. Searchable are articles, authors, sections, tags and segments. GH-62
+
+### [Campaign]
+
+- Added early-version support for search in the top searchbox. Searchable are banners and campaigns. GH-62
+
 ---
 
 ## [0.10.0] - 2020-04-07

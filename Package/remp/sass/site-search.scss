@@ -1,0 +1,52 @@
+$logoWidth: 223px !default; // value hardcoded in template.scss
+$white: #fff;
+
+.site-search {
+    float: left;
+    overflow: visible;
+    width: calc(100% - #{$logoWidth});
+
+    .hs-input {
+        padding: 10px 20px 10px 50px;
+        border-radius: 2px;
+        background-color: rgba(255, 255, 255, 0.25);
+        border: none;
+    }
+
+    &.focused .hs-input {
+        background-color: $white;
+    }
+
+    .typeahead__container input {
+        font-size: 15px;
+    }
+    .typeahead__container.hint .typeahead__field input {
+        background: $white;
+    }
+
+    .typeahead__list > li {
+        padding: 0.3rem;
+
+        .label {
+            vertical-align: middle;
+            margin-left: .1rem;
+        }
+    }
+
+    .typeahead__list > .typeahead__group:first-child {
+        border: none;
+        padding: 0;
+    }
+
+    .preloader {
+        position: absolute;
+        left: calc(100% / 2 - 25px);
+        visibility: hidden;
+    }
+
+    ::-webkit-input-placeholder {
+        color: $white;
+        opacity: 1;
+    }
+}
+

@@ -3,8 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Author extends Model
+class Author extends Model implements Searchable
 {
     protected $fillable = [
         'name',
@@ -15,9 +17,19 @@ class Author extends Model
         'pivot',
     ];
 
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
+    }
+
     public function articles()
     {
         return $this->belongsToMany(Article::class);
+    }
+
+    public function latestPublishedArticle()
+    {
+        return $this->articles()->orderBy('published_at', 'DESC')->take(1);
     }
 
     public function conversions()

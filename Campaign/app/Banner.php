@@ -7,8 +7,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Redis;
 use Predis\ClientInterface;
 use Ramsey\Uuid\Uuid;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Banner extends Model
+class Banner extends Model implements Searchable
 {
     use Notifiable;
 
@@ -49,6 +51,10 @@ class Banner extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
+    }
 
     protected static function boot()
     {

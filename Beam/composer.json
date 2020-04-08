@@ -44,6 +44,7 @@
         "remp/laravel-widgets": "*",
         "simshaun/recurr": "^3.0",
         "snowplow/referer-parser": "dev-master",
+        "spatie/laravel-searchable": "1.2.3",
         "tightenco/ziggy": "^0.7.1",
         "yadakhov/insert-on-duplicate-key": "^1.2",
         "yajra/laravel-datatables-oracle": "^8.0"

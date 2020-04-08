@@ -90,13 +90,25 @@
         </div>
     </div>
 
-    <div class="media-body h-search">
+    <div class="media-body h-search site-search">
         <form class="p-relative">
-            <input type="text" class="hs-input" placeholder="Search for banners and campaigns">
-            <i class="zmdi zmdi-search hs-reset" data-ma-action="search-clear"></i>
+            <div class="typeahead__container">
+                <div class="typeahead__field">
+                    <div class="preloader pl-lg pls-teal">
+                        <svg class="pl-circular" viewBox="25 25 50 50">
+                            <circle class="plc-path" cx="50" cy="50" r="20"></circle>
+                        </svg>
+                    </div>
+                    <input class="js-typeahead hs-input typeahead"
+                           name="q"
+                           autocomplete="off"
+                           placeholder="Search for banners and campaigns">
+                    <i class="zmdi zmdi-search hs-reset" data-ma-action="search-clear"></i>
+                </div>
+            </div>
         </form>
     </div>
-
+    <div class="clearfix"></div>
 </header>
 
 <section id="main">

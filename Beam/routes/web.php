@@ -116,4 +116,6 @@ Route::middleware('auth.jwt')->group(function () {
         Route::get('googleanalyticsreporting/histogramJson', 'GoogleAnalyticsReportingController@timeHistogram')
             ->name('googleanalyticsreporting.timeHistogram.json');
     }
+
+    Route::get('search', 'SearchController@search')->name('search');
 });

@@ -4,8 +4,10 @@ namespace App;
 
 use App\Model\TableName;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Segment extends Model
+class Segment extends Model implements Searchable
 {
     use TableName;
 
@@ -23,6 +25,11 @@ class Segment extends Model
         'active',
         'segment_group_id'
     ];
+
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
+    }
 
     public function rules()
     {
