@@ -8,6 +8,7 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
+use App\Http\Requests\ArticleUpsertRequestV2;
 use App\Http\Requests\TopArticlesRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
@@ -398,6 +399,136 @@ class ArticleController extends Controller
                     'name' => $authorName,
                 ]);
                 $article->authors()->attach($section);
+            }
+
+            // Load existing titles
+            $existingArticleTitles = $article->articleTitles()
+                ->orderBy('updated_at')
+                ->get()
+                ->groupBy('variant');
+
+            $lastTitles = [];
+            foreach ($existingArticleTitles as $variant => $variantTitles) {
+                $lastTitles[$variant] = $variantTitles->last()->title;
+            }
+
+            // Saving titles
+            $newTitles = $a['titles'] ?? [];
+
+            $newTitleVariants = array_keys($newTitles);
+            $lastTitleVariants = array_keys($lastTitles);
+
+            // Titles that were not present in new titles, but were previously recorded
+            foreach (array_diff($lastTitleVariants, $newTitleVariants) as $variant) {
+                $lastTitle = $lastTitles[$variant];
+                if ($lastTitle !== null) {
+                    // title was deleted and it was not recorded yet
+                    $article->articleTitles()->create([
+                        'variant' => $variant,
+                        'title' => null // deleted flag
+                    ]);
+                }
+            }
+
+            // New titles, not previously recorded
+            foreach (array_diff($newTitleVariants, $lastTitleVariants) as $variant) {
+                $newTitle = html_entity_decode($newTitles[$variant], ENT_QUOTES);
+                $article->articleTitles()->create([
+                    'variant' => $variant,
+                    'title' => $newTitle
+                ]);
+            }
+
+            // Changed titles
+            foreach (array_intersect($newTitleVariants, $lastTitleVariants) as $variant) {
+                $lastTitle = $lastTitles[$variant];
+                $newTitle = html_entity_decode($newTitles[$variant], ENT_QUOTES);
+
+                if ($lastTitle !== $newTitle) {
+                    $article->articleTitles()->create([
+                        'variant' => $variant,
+                        'title' => $newTitle
+                    ]);
+                }
+            }
+
+            $article->load(['authors', 'sections', 'tags']);
+            $articles[] = $article;
+        }
+
+        return response()->format([
+            'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
+            'json' => ArticleResource::collection(collect($articles)),
+        ]);
+    }
+
+    public function upsertV2(ArticleUpsertRequestV2 $request)
+    {
+        $articles = [];
+        foreach ($request->get('articles', []) as $a) {
+            // When saving to DB, Eloquent strips timezone information,
+            // therefore convert to UTC
+            $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
+            $article = Article::upsert($a);
+
+            $article->sections()->detach();
+            foreach ($a['sections'] ?? [] as $section) {
+                $sectionObj = Section::where('external_id', $section['external_id'])->first();
+                if ($sectionObj) {
+                    $sectionObj->update($section);
+                    $article->sections()->attach($sectionObj);
+                    continue;
+                }
+
+                $sectionObj = Section::where('name', $section['name'])->first();
+                if ($sectionObj && $sectionObj->external_id === null) {
+                    $sectionObj->update($section);
+                    $article->sections()->attach($sectionObj);
+                    continue;
+                }
+
+                $sectionObj = Section::firstOrCreate($section);
+                $article->sections()->attach($sectionObj);
+            }
+
+            $article->tags()->detach();
+            foreach ($a['tags'] ?? [] as $tag) {
+                $tagObj = Tag::where('external_id', $tag['external_id'])->first();
+                if ($tagObj) {
+                    $tagObj->update($tag);
+                    $article->tags()->attach($tagObj);
+                    continue;
+                }
+
+                $tagObj = Tag::where('name', $tag['name'])->first();
+                if ($tagObj && $tagObj->external_id === null) {
+                    $tagObj->update($tag);
+                    $article->tags()->attach($tagObj);
+                    continue;
+                }
+
+                $tagObj = Tag::firstOrCreate($tag);
+                $article->tags()->attach($tagObj);
+            }
+
+            $article->authors()->detach();
+            foreach ($a['authors'] ?? [] as $author) {
+                $authorObj = Author::where('external_id', $author['external_id'])->first();
+                if ($authorObj) {
+                    $authorObj->update($author);
+                    $article->authors()->attach($authorObj);
+                    continue;
+                }
+
+                $authorObj = Author::where('name', $author['name'])->first();
+                if ($authorObj && $authorObj->external_id === null) {
+                    $authorObj->update($author);
+                    $article->authors()->attach($authorObj);
+                    continue;
+                }
+
+                $authorObj = Author::firstOrCreate($author);
+                $article->authors()->attach($authorObj);
             }
 
             // Load existing titles
