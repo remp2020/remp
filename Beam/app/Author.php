@@ -10,6 +10,7 @@ class Author extends Model implements Searchable
 {
     protected $fillable = [
         'name',
+        'external_id',
     ];
 
     protected $hidden = [

@@ -24,6 +24,9 @@ Route::middleware('auth:api')->group(function() {
     Route::post('articles/upsert', 'ArticleController@upsert')->name('articles.upsert');
     Route::post('conversions/upsert', 'ConversionController@upsert')->name('conversions.upsert');
 
+    // TODO: this is temporary solution - will be refactored in https://gitlab.com/remp/remp/-/issues/601
+    Route::post('v2/articles/upsert', 'ArticleController@upsertV2')->name('articles.upsertV2');
+
     Route::post('articles/top', 'ArticleController@topArticles')->name('articles.top');
 
     Route::middleware('cors')->group(function() {
