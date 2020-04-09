@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added top articles endpoint for listing top articles by time, sections. remp/web#1010
 - Fixed duplicate conversions if multiple sections/tags/authors were linked to article.
 - Fixed missing conversions if no section/tag/author was linked to article. remp/remp#586
+- Added articles upsert v2 api endpoint because of added `external_id` to `tags`, `authors` and `sections` tables. remp/remp#599
 
 ### [Campaign]
 

@@ -311,7 +311,7 @@ the error further.
 
 ---
 
-##### POST `/api/articles/upsert`
+##### POST `/api/articles/upsert` ([DEPRECATED - click here for v2](#post-apiv2articlesupsert))
 
 Your CMS should track all article-related changes to Beam so Beam knows about the article, who's the author and to which
 sections it belongs to. Once the article data is available to Beam, system starts to link various statistics that
@@ -486,6 +486,213 @@ $response = file_get_contents("http://beam.remp.press/api/articles/upsert ", fal
 
 Any create/update matching is based on the article's `external_id`. You're free to update the article as many times
 as you want.
+
+---
+
+##### POST `/api/v2/articles/upsert`
+
+Your CMS should track all article-related changes to Beam so Beam knows about the article, who's the author and to which sections it belongs to. Once the article data is available to Beam, system starts to link various statistics that you've tracked with your JS snippet for given article (e.g. pageviews, time spent, reading progress) and data related to Beam (e.g. A/B testing of titles).
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+    "articles": [
+        {
+            "external_id": "74565321", // String; Required; ID of article in your CMS,
+            "property_uuid": "7855a8d9-d445-4dc0-8414-dbd7dfd326f9", // String; Required; Beam property token, you can get it in Beam admin - Properties,
+            "title": "10 things you need to know", // String; Required; Primary title of the article,
+            "titles": { // Optional; If A/B test of titles is used, you can track the titles here
+                "A": "10 things you need to know", // Title of variant being tracked with key "A"
+                "B": "10 things everyone hides from you" // Title of variant being tracked with key "B"
+            },
+            "url": "http://example.com/74565321", // Public and valid URL of the article,
+            "authors": [ // Optional
+                {
+                    "external_id": "1", // String; Required; External id of the author
+                    "name": "Jon Snow" // String; Required; Name of the author
+                }
+            ],
+            "sections": [ // Optional
+                {
+                    "external_id": "1", // String; Required; External id of the section
+                    "name": "Opinions" // String; Required; Name of the section
+                }
+            ],
+            "tags": [ // Optional
+                {
+                    "external_id": "1", // String; Required; External id of the tag
+                    "name": "Elections 2020" // String; Required; Name of the tag
+                }
+            ],
+            "published_at": "2018-06-05T06:03:05Z" // RFC3339 formatted datetime
+        }  
+    ]
+}
+```
+
+##### *Examples:*
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X POST \
+  http://beam.remp.press/api/v2/articles/upsert \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "articles": [
+        {
+            "external_id": "74565321",
+            "property_uuid": "1a8feb16-3e30-4f9b-bf74-20037ea8505a", 
+            "title": "10 things you need to know",
+            "titles": {
+                "A": "10 things you need to know",
+                "B": "10 things everyone hides from you" 
+            },
+            "url": "http://example.com/74565321", 
+            "authors": [
+                {
+                    "external_id": "1",
+                    "name": "Jon Snow"
+                }
+            ],
+            "sections": [
+                {
+                    "external_id": "1",
+                    "name": "Opinions"
+                }
+            ],
+            "tags": [
+                {
+                    "external_id": "1",
+                    "name": "Elections 2020" 
+                }
+            ],
+            "published_at": "2018-06-05T06:03:05Z"
+        }  
+    ]
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+    "articles" => [
+        [
+            "external_id" => "74565321",
+            "property_uuid" => "1a8feb16-3e30-4f9b-bf74-20037ea8505a",
+            "title" => "10 things you need to know",
+            "titles" => [
+                "A" => "10 things you need to know",
+                "B" => "10 things everyone hides from you"
+            ],
+            "url" => "http://example.com/74565321",
+            "authors" => [
+                [
+                    "external_id" => "1",
+                    "name" => "Jon Snow"
+                ]
+            ],
+            "sections" => [
+                [
+                    "external_id" => "1",
+                    "name" => "Opinions"
+                ]
+            ],
+            "tags" => [
+                [
+                    "external_id" => "1",
+                    "name" => "Elections 2020" 
+                ]
+            ],
+            "published_at" => "2018-06-05T06:03:05Z",
+        ]
+    ]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/v2/articles/upsert ", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+{
+    "data": [
+        {
+            "id": 123902,
+            "external_id": "74565321",
+            "property_uuid": "1a8feb16-3e30-4f9b-bf74-20037ea8505a",
+            "title": "10 things you need to know",
+            "url": "http://example.com/74565321",
+            "image_url": null,
+            "published_at": "2018-06-05 06:03:05",
+            "pageviews_all": 0,
+            "pageviews_signed_in": 0,
+            "pageviews_subscribers": 0,
+            "timespent_all": 0,
+            "timespent_signed_in": 0,
+            "timespent_subscribers": 0,
+            "created_at": "2019-05-17 11:43:04",
+            "updated_at": "2019-05-17 11:43:04",
+            "authors": [
+                {
+                    "external_id": "1",
+                    "name": "Jon Snow",
+                    "created_at": "2019-05-17 11:43:04",
+                    "updated_at": "2019-05-17 11:43:04"
+                }
+            ],
+            "sections": [
+                {
+                    "external_id": "1",
+                    "name": "Opinions",
+                    "created_at": "2019-05-17 11:43:04",
+                    "updated_at": "2019-05-17 11:43:04"
+                }
+            ],
+            "tags": [
+                {
+                    "external_id": "1",
+                    "name": "Elections 2020",
+                    "created_at": "2019-05-17 11:43:04",
+                    "updated_at": "2019-05-17 11:43:04"
+                }
+            ],            
+        }
+    ]
+}
+```
+
+Any create/update matching is based on the article's `external_id`. You're free to update the article as many times as you want.
 
 ---
 

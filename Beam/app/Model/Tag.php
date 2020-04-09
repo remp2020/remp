@@ -9,6 +9,7 @@ class Tag extends Model
 {
     protected $fillable = [
         'name',
+        'external_id',
     ];
 
     protected $hidden = [
