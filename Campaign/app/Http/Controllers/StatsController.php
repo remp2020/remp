@@ -42,8 +42,8 @@ class StatsController extends Controller
 
     public function getStats(Campaign $campaign, Request $request)
     {
-        $from = Carbon::parse($request->get('from'), $request->input('tz'))->tz('UTC');
-        $to = Carbon::parse($request->get('to'), $request->input('tz'))->tz('UTC');
+        $from = Carbon::parse($request->get('from'), $request->input('tz'));
+        $to = Carbon::parse($request->get('to'), $request->input('tz'));
 
         // round values if interval is bigger than 1 hour
         if ($from->diffInMinutes($to) >= 3600) {
@@ -54,7 +54,9 @@ class StatsController extends Controller
             }
         }
 
-        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $from, $to);
+        $utcFrom = (clone $from)->tz('UTC');
+        $utcTo = (clone $to)->tz('UTC');
+        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $utcFrom, $utcTo);
         $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to);
 
         foreach ($variantsData as $uuid => $variantData) {
@@ -179,7 +181,7 @@ class StatsController extends Controller
         if ($diff > 31*24*3600) {
             return ['168h', 'week'];
         }
-        if ($diff > 2*24*3600) {
+        if ($diff > 4*24*3600) {
             return ['24h', 'day'];
         }
         if ($diff > 2*3600) {
