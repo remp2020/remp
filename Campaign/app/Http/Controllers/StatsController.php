@@ -184,7 +184,7 @@ class StatsController extends Controller
         if ($diff > 4*24*3600) {
             return ['24h', 'day'];
         }
-        if ($diff > 2*3600) {
+        if ($diff > 6*3600) {
             return ['3600s', 'hour'];
         }
         if ($diff > 1800) {
