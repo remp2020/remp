@@ -50,20 +50,21 @@
         props: props,
         watch: {
             chartData(newChartData) {
-                this.setChartData(newChartData.dataSets, newChartData.labels)
+                this.setChartData(newChartData.dataSets, newChartData.labels, newChartData.timeUnit)
             }
         },
         mounted() {
             if (this.chartData.hasOwnProperty("dataSets")) {
-                this.setChartData(this.chartData.dataSets, this.chartData.labels)
+                this.setChartData(this.chartData.dataSets, this.chartData.labels, this.chartData.timeUnit)
             }
         },
         methods: {
-            setChartData(dataSets, labels) {
+            setChartData(dataSets, labels, timeUnit) {
                 if (this.chart != null) {
                     this.chart.config.data = {
                         labels: labels,
-                        datasets: dataSets
+                        datasets: dataSets,
+                        timeUnit: timeUnit
                     };
                     this.chart.update();
                     return;
@@ -101,6 +102,7 @@
                                 type: 'time',
                                 distribution: 'series',
                                 time: {
+                                    unit: timeUnit,
                                     displayFormats: {
                                         minute: 'HH:mm',
                                         hour: 'HH:mm',
@@ -116,6 +118,10 @@
                             callbacks: {
                                 title: function(tooltipItem, chartData) {
                                     // we have only on x axis, we can use zero item directly
+
+                                    if (chartData.timeUnit === 'day' || chartData.timeUnit === 'week') {
+                                        return moment(tooltipItem[0].xLabel).format('LL');
+                                    }
                                     return moment(tooltipItem[0].xLabel).format('LLL');
                                 }
                             }

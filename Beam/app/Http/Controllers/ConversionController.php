@@ -27,7 +27,7 @@ class ConversionController extends Controller
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'tags' => Tag::all()->pluck('name', 'id'),
-                'conversionFrom' => $request->get('conversion_from', 'now - 30 days'),
+                'conversionFrom' => $request->get('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->get('conversion_to', 'now'),
             ]),
             'json' => ConversionResource::collection(Conversion::paginate()),
