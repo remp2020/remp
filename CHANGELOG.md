@@ -10,10 +10,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added early-version support for search in the top searchbox. Searchable are articles, authors, sections, tags and segments. GH-62
+- Quick range day filters now start from beginning of the day. remp/remp#605
 
 ### [Campaign]
 
 - Added early-version support for search in the top searchbox. Searchable are banners and campaigns. GH-62
+- Improved intervals in campaign stats charts. remp/remp#605
+- Quick range day filters now start from beginning of the day. remp/remp#605
 
 ---
 
