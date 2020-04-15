@@ -14,7 +14,7 @@ class VisitorController extends Controller
     public function devices(Request $request)
     {
         return response()->view('visitors.devices', [
-            'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
+            'visitedFrom' => $request->input('visited_from', 'today - 30 days'),
             'visitedTo' => $request->input('visited_to', 'now'),
             'subscriber' => $request->input('subscriber', "1"),
 
@@ -27,7 +27,7 @@ class VisitorController extends Controller
     public function sources(Request $request)
     {
         return response()->view('visitors.sources', [
-            'visitedFrom' => $request->input('visited_from', 'now - 30 days'),
+            'visitedFrom' => $request->input('visited_from', 'today - 30 days'),
             'visitedTo' => $request->input('visited_to', 'now'),
             'subscriber' => $request->input('subscriber', "1"),
 

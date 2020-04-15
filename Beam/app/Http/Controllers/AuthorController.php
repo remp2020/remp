@@ -25,9 +25,9 @@ class AuthorController extends Controller
         return response()->format([
             'html' => view('authors.index', [
                 'authors' => Author::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->input('published_from', 'now - 30 days'),
+                'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
-                'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
+                'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
             'json' => AuthorResource::collection(Author::paginate()),
@@ -41,9 +41,9 @@ class AuthorController extends Controller
                 'author' => $author,
                 'sections' => Section::all()->pluck('name', 'id'),
                 'tags' => Tag::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->input('published_from', 'now - 30 days'),
+                'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
-                'conversionFrom' => $request->input('conversion_from', 'now - 30 days'),
+                'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
             'json' => new AuthorResource($author),
