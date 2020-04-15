@@ -76,7 +76,8 @@
                     type: "bar",
                     data: {
                         labels: labels,
-                        datasets: dataSets
+                        datasets: dataSets,
+                        timeUnit: timeUnit
                     },
                     options: {
                         responsive: true,
