@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/goadesign/goa"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/model"
@@ -22,7 +24,11 @@ func NewEventController(service *goa.Service, es model.EventStorage) *EventContr
 
 // Count runs the count action
 func (c *EventController) Count(ctx *app.CountEventsContext) error {
-	acrc, err := processEventCount(c, aggregateOptionsFromEventsOptions(ctx.Payload))
+	o, err := aggregateOptionsFromEventsOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
+	acrc, err := processEventCount(c, o)
 	if err != nil {
 		return err
 	}
@@ -31,7 +37,10 @@ func (c *EventController) Count(ctx *app.CountEventsContext) error {
 
 // CountAction runs the count action, action and category has to be specified
 func (c *EventController) CountAction(ctx *app.CountActionEventsContext) error {
-	o := aggregateOptionsFromEventsOptions(ctx.Payload)
+	o, err := aggregateOptionsFromEventsOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
 	o.Action = ctx.Action
 	o.Category = ctx.Category
 	acrc, err := processEventCount(c, o)
@@ -60,7 +69,10 @@ func processEventCount(c *EventController, ao model.AggregateOptions) (app.Count
 
 // List runs the list action.
 func (c *EventController) List(ctx *app.ListEventsContext) error {
-	aggOptions := aggregateOptionsFromEventsOptions(ctx.Payload.Conditions)
+	aggOptions, err := aggregateOptionsFromEventsOptions(ctx.Payload.Conditions)
+	if err != nil {
+		return err
+	}
 	o := model.ListOptions{
 		AggregateOptions: aggOptions,
 		SelectFields:     ctx.Payload.SelectFields,
@@ -105,7 +117,7 @@ func (c *EventController) Users(ctx *app.UsersEventsContext) error {
 }
 
 // aggregateOptionsFromEventsOptions converts payload data to AggregateOptions.
-func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.AggregateOptions {
+func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) (model.AggregateOptions, error) {
 	var o model.AggregateOptions
 
 	for _, val := range payload.FilterBy {
@@ -132,7 +144,14 @@ func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.A
 		o.TimeHistogram = &model.TimeHistogram{
 			Interval: payload.TimeHistogram.Interval,
 			Offset:   payload.TimeHistogram.Offset,
-			TimeZone: payload.TimeHistogram.TimeZone,
+		}
+
+		if payload.TimeHistogram.TimeZone != nil {
+			location, err := time.LoadLocation(*payload.TimeHistogram.TimeZone)
+			if err != nil {
+				return o, err
+			}
+			o.TimeHistogram.TimeZone = location
 		}
 	}
 
@@ -144,5 +163,5 @@ func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.A
 		o.Category = *payload.Category
 	}
 
-	return o
+	return o, nil
 }
