@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added early-version support for search in the top searchbox. Searchable are articles, authors, sections, tags and segments. GH-62
+- Added support for timezone parameter in Journal aggregations. remp/remp#605
 - Quick range day filters now start from beginning of the day. remp/remp#605
 
 ### [Campaign]
