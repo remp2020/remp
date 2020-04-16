@@ -164,6 +164,7 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) mo
 		o.TimeHistogram = &model.TimeHistogram{
 			Interval: payload.TimeHistogram.Interval,
 			Offset:   payload.TimeHistogram.Offset,
+			TimeZone: payload.TimeHistogram.TimeZone,
 		}
 	}
 

@@ -132,6 +132,7 @@ func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) model.A
 		o.TimeHistogram = &model.TimeHistogram{
 			Interval: payload.TimeHistogram.Interval,
 			Offset:   payload.TimeHistogram.Offset,
+			TimeZone: payload.TimeHistogram.TimeZone,
 		}
 	}
 

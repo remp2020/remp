@@ -101,12 +101,15 @@ class StatsRequest implements StatsContract
         return $this;
     }
 
-    public function timeHistogram(string $interval) : StatsRequest
+    public function timeHistogram(string $interval, ?string $timeZone = null) : StatsRequest
     {
         $this->timeHistogram = [
             'interval' => $interval,
             'offset' => $this->timeOffset
         ];
+        if ($timeZone) {
+            $this->timeHistogram['time_zone'] = $timeZone;
+        }
 
         return $this;
     }

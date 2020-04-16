@@ -61,12 +61,15 @@ class AggregateRequest
         return $this;
     }
 
-    public function setTimeHistogram(string $interval, string $offset): AggregateRequest
+    public function setTimeHistogram(string $interval, string $offset, ?string $timeZone = null): AggregateRequest
     {
         $this->timeHistogram = [
             'interval' => $interval,
             'offset' => $offset
         ];
+        if ($timeZone) {
+            $this->timeHistogram['time_zone'] = $timeZone;
+        }
         return $this;
     }
 
