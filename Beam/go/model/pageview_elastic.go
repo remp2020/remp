@@ -57,10 +57,14 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 
 	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
+		tz := "UTC"
+		if options.TimeHistogram.TimeZone != nil {
+			tz = options.TimeHistogram.TimeZone.String()
+		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
-			TimeZone("UTC").
+			TimeZone(tz).
 			Offset(options.TimeHistogram.Offset)
 	}
 
@@ -116,10 +120,14 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 
 	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
+		tz := "UTC"
+		if options.TimeHistogram.TimeZone != nil {
+			tz = options.TimeHistogram.TimeZone.String()
+		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
-			TimeZone("UTC").
+			TimeZone(tz).
 			Offset(options.TimeHistogram.Offset)
 	}
 
@@ -165,10 +173,14 @@ func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, boo
 
 	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
+		tz := "UTC"
+		if options.TimeHistogram.TimeZone != nil {
+			tz = options.TimeHistogram.TimeZone.String()
+		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
-			TimeZone("UTC").
+			TimeZone(tz).
 			Offset(options.TimeHistogram.Offset)
 	}
 
@@ -224,10 +236,14 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 
 	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
+		tz := "UTC"
+		if options.TimeHistogram.TimeZone != nil {
+			tz = options.TimeHistogram.TimeZone.String()
+		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
-			TimeZone("UTC").
+			TimeZone(tz).
 			Offset(options.TimeHistogram.Offset)
 	}
 

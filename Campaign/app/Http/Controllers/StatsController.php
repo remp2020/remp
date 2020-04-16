@@ -42,22 +42,27 @@ class StatsController extends Controller
 
     public function getStats(Campaign $campaign, Request $request)
     {
-        $from = Carbon::parse($request->get('from'), $request->input('tz'))->tz('UTC');
-        $to = Carbon::parse($request->get('to'), $request->input('tz'))->tz('UTC');
+        $tz = $request->input('tz');
 
-        $from->minute(0)->second(0);
-        $nextTo = (clone $to)->minute(0)->second(0);
-        if ($nextTo->ne($to)) {
-            $to = $nextTo->addHour();
+        $from = Carbon::parse($request->get('from'), $tz);
+        $to = Carbon::parse($request->get('to'), $tz);
+
+        // round values if interval is bigger than 1 hour
+        if ($from->diffInMinutes($to) >= 3600) {
+            $from->minute(0)->second(0);
+            $nextTo = (clone $to)->minute(0)->second(0);
+            if ($nextTo->ne($to)) {
+                $to = $nextTo->addHour();
+            }
         }
 
-        $chartWidth = $request->get('chartWidth');
-
-        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $from, $to);
-        $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $chartWidth);
+        $utcFrom = (clone $from)->tz('UTC');
+        $utcTo = (clone $to)->tz('UTC');
+        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $utcFrom, $utcTo);
+        $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $tz);
 
         foreach ($variantsData as $uuid => $variantData) {
-            $variantsData[$uuid]['histogram'] = $this->getHistogramData([$uuid], $from, $to, $chartWidth);
+            $variantsData[$uuid]['histogram'] = $this->getHistogramData([$uuid], $from, $to, $tz);
         }
 
         // a/b test evaluation data
@@ -75,26 +80,19 @@ class StatsController extends Controller
         ];
     }
 
-    private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, $chartWidth)
+    private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, string $tz)
     {
-        if ($chartWidth == 0) {
-            return [
-                'dataSets' => [],
-                'labels' => [],
-            ];
-        }
-
         $parsedData = [];
         $labels = [];
 
-        $interval = $this->calcInterval($from, $to, $chartWidth);
+        [$interval, $chartJsTimeUnit] = $this->calcInterval($from, $to);
 
         foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
 
             $data = $this->stats->count()
                 ->forVariants($variantUuids)
-                ->timeHistogram($interval)
+                ->timeHistogram($interval, $tz)
                 ->from($from)
                 ->to($to);
 
@@ -128,6 +126,7 @@ class StatsController extends Controller
         return [
             'dataSets' => $dataSets,
             'labels' => $formattedLabels,
+            'timeUnit' => $chartJsTimeUnit
         ];
     }
 
@@ -177,13 +176,22 @@ class StatsController extends Controller
         ];
     }
 
-    private function calcInterval(Carbon $from, Carbon $to, $chartWidth)
+    private function calcInterval(Carbon $from, Carbon $to): array
     {
-        $numOfCols = (int)($chartWidth / 40);
-
         $diff = $to->diffInSeconds($from);
-        $interval = $diff / $numOfCols;
 
-        return (int)$interval . 's';
+        if ($diff > 31*24*3600) {
+            return ['168h', 'week'];
+        }
+        if ($diff > 4*24*3600) {
+            return ['24h', 'day'];
+        }
+        if ($diff > 6*3600) {
+            return ['3600s', 'hour'];
+        }
+        if ($diff > 1800) {
+            return ['900s', 'minute'];
+        }
+        return ['300s', 'minute'];
     }
 }

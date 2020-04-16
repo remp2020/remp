@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/goadesign/goa"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/model"
@@ -22,7 +24,11 @@ func NewCommerceController(service *goa.Service, cs model.CommerceStorage) *Comm
 
 // Count runs the count action.
 func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
-	acrc, err := processCount(c, aggregateOptionsFromCommerceOptions(ctx.Payload))
+	o, err := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
+	acrc, err := processCount(c, o)
 	if err != nil {
 		return err
 	}
@@ -31,7 +37,10 @@ func (c *CommerceController) Count(ctx *app.CountCommerceContext) error {
 
 // CountStep runs the count action with step parameter
 func (c *CommerceController) CountStep(ctx *app.CountStepCommerceContext) error {
-	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	o, err := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
 	o.Step = ctx.Step
 	acrc, err := processCount(c, o)
 	if err != nil {
@@ -59,7 +68,11 @@ func processCount(c *CommerceController, ao model.AggregateOptions) (app.CountCo
 
 // List runs the list action.
 func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
-	aggOptions := aggregateOptionsFromCommerceOptions(ctx.Payload.Conditions)
+	aggOptions, err := aggregateOptionsFromCommerceOptions(ctx.Payload.Conditions)
+	if err != nil {
+		return err
+	}
+
 	o := model.ListOptions{
 		AggregateOptions: aggOptions,
 		SelectFields:     ctx.Payload.SelectFields,
@@ -78,7 +91,10 @@ func (c *CommerceController) List(ctx *app.ListCommerceContext) error {
 
 // SumStep runs the sum action for particular step
 func (c *CommerceController) SumStep(ctx *app.SumStepCommerceContext) error {
-	o := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	o, err := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
 	o.Step = ctx.Step
 
 	asrc, err := processSum(c, o)
@@ -90,7 +106,11 @@ func (c *CommerceController) SumStep(ctx *app.SumStepCommerceContext) error {
 
 // Sum runs the sum action
 func (c *CommerceController) Sum(ctx *app.SumCommerceContext) error {
-	asrc, err := processSum(c, aggregateOptionsFromCommerceOptions(ctx.Payload))
+	o, err := aggregateOptionsFromCommerceOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
+	asrc, err := processSum(c, o)
 	if err != nil {
 		return err
 	}
@@ -133,7 +153,7 @@ func (c *CommerceController) Actions(ctx *app.ActionsCommerceContext) error {
 }
 
 // aggregateOptionsFromCommerceOptions converts payload data to AggregateOptions.
-func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) model.AggregateOptions {
+func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) (model.AggregateOptions, error) {
 	var o model.AggregateOptions
 
 	for _, val := range payload.FilterBy {
@@ -165,8 +185,15 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) mo
 			Interval: payload.TimeHistogram.Interval,
 			Offset:   payload.TimeHistogram.Offset,
 		}
+
+		if payload.TimeHistogram.TimeZone != nil {
+			location, err := time.LoadLocation(*payload.TimeHistogram.TimeZone)
+			if err != nil {
+				return o, err
+			}
+			o.TimeHistogram.TimeZone = location
+		}
 	}
 
-	return o
-
+	return o, nil
 }

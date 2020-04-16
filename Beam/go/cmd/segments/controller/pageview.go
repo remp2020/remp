@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/goadesign/goa"
 	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
 	"gitlab.com/remp/remp/Beam/go/model"
@@ -22,7 +24,10 @@ func NewPageviewController(service *goa.Service, ps model.PageviewStorage) *Page
 
 // Count runs the count action.
 func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
-	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
 	o.Action = ctx.Action
 
 	crc, ok, err := c.PageviewStorage.Count(o)
@@ -45,7 +50,10 @@ func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 
 // Sum runs the sum action.
 func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
-	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
 	o.Action = ctx.Action
 
 	src, ok, err := c.PageviewStorage.Sum(o)
@@ -68,7 +76,10 @@ func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
 
 // Avg runs the avg action.
 func (c *PageviewController) Avg(ctx *app.AvgPageviewsContext) error {
-	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
 	o.Action = ctx.Action
 
 	src, ok, err := c.PageviewStorage.Avg(o)
@@ -91,7 +102,10 @@ func (c *PageviewController) Avg(ctx *app.AvgPageviewsContext) error {
 
 // Unique runs the cardinality count action.
 func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
-	o := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+	if err != nil {
+		return err
+	}
 	o.Action = ctx.Action
 
 	src, ok, err := c.PageviewStorage.Unique(o, ctx.Item)
@@ -114,7 +128,10 @@ func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
 
 // List runs the list action.
 func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
-	aggOptions := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)
+	aggOptions, err := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)
+	if err != nil {
+		return err
+	}
 	o := model.ListPageviewsOptions{
 		AggregateOptions: aggOptions,
 		SelectFields:     ctx.Payload.SelectFields,
@@ -151,7 +168,7 @@ func (c *PageviewController) Actions(ctx *app.ActionsPageviewsContext) error {
 }
 
 // aggregateOptionsFromPageviewOptions converts payload data to AggregateOptions.
-func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) model.AggregateOptions {
+func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) (model.AggregateOptions, error) {
 	var o model.AggregateOptions
 
 	for _, val := range payload.FilterBy {
@@ -179,6 +196,14 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) mo
 			Interval: payload.TimeHistogram.Interval,
 			Offset:   payload.TimeHistogram.Offset,
 		}
+
+		if payload.TimeHistogram.TimeZone != nil {
+			location, err := time.LoadLocation(*payload.TimeHistogram.TimeZone)
+			if err != nil {
+				return o, err
+			}
+			o.TimeHistogram.TimeZone = location
+		}
 	}
 
 	if payload.CountHistogram != nil {
@@ -188,5 +213,5 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) mo
 		}
 	}
 
-	return o
+	return o, nil
 }

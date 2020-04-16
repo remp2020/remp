@@ -109,11 +109,25 @@ class StatsHelper
         return [$campaignData, $variantsData];
     }
 
+    /**
+     * @param Campaign    $campaign
+     * @param Carbon|null $from Expected time in UTC
+     * @param Carbon|null $to Expected time in UTC
+     *
+     * @return array
+     */
     public function campaignStats(Campaign $campaign, Carbon $from = null, Carbon $to = null)
     {
         return $this->variantsStats($campaign->variants_uuids, $from, $to);
     }
 
+    /**
+     * @param CampaignBanner $variant
+     * @param Carbon|null    $from Expected time in UTC
+     * @param Carbon|null    $to Expected time in UTC
+     *
+     * @return array
+     */
     public function variantStats(CampaignBanner $variant, Carbon $from = null, Carbon $to = null)
     {
         return $this->variantsStats([$variant->uuid], $from, $to);

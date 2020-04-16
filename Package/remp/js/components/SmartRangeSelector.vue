@@ -128,14 +128,14 @@
                 selectedTab: null,
                 quickSelection: [
                     [
-                        {name: 'Last 2 days', carbonFrom: 'now - 2 days', carbonTo: 'now', selected: false},
-                        {name: 'Last 7 days', carbonFrom: 'now - 7 days', carbonTo: 'now', selected: false},
-                        {name: 'Last 30 days', carbonFrom: 'now - 30 days', carbonTo: 'now', selected: false},
-                        {name: 'Last 60 days', carbonFrom: 'now - 60 days', carbonTo: 'now', selected: false},
-                        {name: 'Last 90 days', carbonFrom: 'now - 90 days', carbonTo: 'now', selected: false},
-                        {name: 'Last 6 months', carbonFrom: 'now - 6 months', carbonTo: 'now', selected: false},
-                        {name: 'Last year', carbonFrom: 'now - 1 year', carbonTo: 'now', selected: false},
-                        {name: 'Last 5 years', carbonFrom: 'now - 5 years', carbonTo: 'now', selected: false},
+                        {name: 'Last 2 days', carbonFrom: 'today - 2 days', carbonTo: 'now', selected: false},
+                        {name: 'Last 7 days', carbonFrom: 'today - 7 days', carbonTo: 'now', selected: false},
+                        {name: 'Last 30 days', carbonFrom: 'today - 30 days', carbonTo: 'now', selected: false},
+                        {name: 'Last 60 days', carbonFrom: 'today - 60 days', carbonTo: 'now', selected: false},
+                        {name: 'Last 90 days', carbonFrom: 'today - 90 days', carbonTo: 'now', selected: false},
+                        {name: 'Last 6 months', carbonFrom: 'today - 6 months', carbonTo: 'now', selected: false},
+                        {name: 'Last year', carbonFrom: 'today - 1 year', carbonTo: 'now', selected: false},
+                        {name: 'Last 5 years', carbonFrom: 'today - 5 years', carbonTo: 'now', selected: false},
                     ],
                     [
                         {name: 'Today', carbonFrom: 'today midnight', carbonTo: 'tomorrow midnight - 1 sec', selected: false},
