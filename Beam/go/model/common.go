@@ -29,7 +29,7 @@ type AggregateOptions struct {
 type TimeHistogram struct {
 	Interval string
 	Offset   string
-	TimeZone *string
+	TimeZone *time.Location
 }
 
 // CountHistogram is used to split count of matched results based on provided Field within specified Interval.

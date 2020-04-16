@@ -38,7 +38,7 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 	if options.TimeHistogram != nil {
 		tz := "UTC"
 		if options.TimeHistogram.TimeZone != nil {
-			tz = *options.TimeHistogram.TimeZone
+			tz = options.TimeHistogram.TimeZone.String()
 		}
 
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().

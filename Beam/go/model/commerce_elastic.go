@@ -31,7 +31,7 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 	if options.TimeHistogram != nil {
 		tz := "UTC"
 		if options.TimeHistogram.TimeZone != nil {
-			tz = *options.TimeHistogram.TimeZone
+			tz = options.TimeHistogram.TimeZone.String()
 		}
 
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
@@ -177,7 +177,7 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 	if options.TimeHistogram != nil {
 		tz := "UTC"
 		if options.TimeHistogram.TimeZone != nil {
-			tz = *options.TimeHistogram.TimeZone
+			tz = options.TimeHistogram.TimeZone.String()
 		}
 
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().

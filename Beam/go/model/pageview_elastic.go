@@ -59,7 +59,7 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 	if options.TimeHistogram != nil {
 		tz := "UTC"
 		if options.TimeHistogram.TimeZone != nil {
-			tz = *options.TimeHistogram.TimeZone
+			tz = options.TimeHistogram.TimeZone.String()
 		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
@@ -122,7 +122,7 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 	if options.TimeHistogram != nil {
 		tz := "UTC"
 		if options.TimeHistogram.TimeZone != nil {
-			tz = *options.TimeHistogram.TimeZone
+			tz = options.TimeHistogram.TimeZone.String()
 		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
@@ -175,7 +175,7 @@ func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, boo
 	if options.TimeHistogram != nil {
 		tz := "UTC"
 		if options.TimeHistogram.TimeZone != nil {
-			tz = *options.TimeHistogram.TimeZone
+			tz = options.TimeHistogram.TimeZone.String()
 		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
@@ -238,7 +238,7 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 	if options.TimeHistogram != nil {
 		tz := "UTC"
 		if options.TimeHistogram.TimeZone != nil {
-			tz = *options.TimeHistogram.TimeZone
+			tz = options.TimeHistogram.TimeZone.String()
 		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
