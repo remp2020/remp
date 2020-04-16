@@ -50,7 +50,36 @@
         props: props,
         watch: {
             chartData(newChartData) {
-                this.setChartData(newChartData.dataSets, newChartData.labels, newChartData.timeUnit)
+
+                let labels = newChartData.labels;
+                let dataSets = newChartData.dataSets;
+
+                // Fix of Chart.js bug of overlapping y-axis with first value on the x-axis
+                // Currently (2020/04), Chart.js doesn't support adding padding between data and axis
+                // Hacky solution is to insert dummy date fillers having 0 values at the beginning and end of data array,
+                // so the actual data is not hidden.
+                // See problem: https://stackoverflow.com/questions/30697292/chart-js-spacing-and-padding
+                if (labels.length > 1) {
+                    let firstDate = moment(labels[0]);
+                    let secondDate = moment(labels[1]);
+                    let intervalSecs = Math.abs(firstDate.diff(secondDate, "seconds"));
+
+                    // compute filler labels so they have same time distance from the actual data as data points between themselves
+                    let leftFiller = firstDate.subtract(intervalSecs, 's').utc().format();
+                    let rightFiller = moment(labels[labels.length-1]).add(intervalSecs, 's').utc().format();
+
+                    // add filler labels
+                    labels.unshift(leftFiller);
+                    labels.push(rightFiller);
+
+                    // add filler data
+                    for (const dataSet of dataSets) {
+                        dataSet.data.unshift(0);
+                        dataSet.data.push(0);
+                    }
+                }
+
+                this.setChartData(dataSets, labels, newChartData.timeUnit)
             }
         },
         mounted() {
@@ -64,8 +93,9 @@
                     this.chart.config.data = {
                         labels: labels,
                         datasets: dataSets,
-                        timeUnit: timeUnit
+                        timeUnit: timeUnit,
                     };
+                    this.chart.config.options.scales.xAxes[0].time.unit = timeUnit;
                     this.chart.update();
                     return;
                 }
@@ -77,7 +107,7 @@
                     data: {
                         labels: labels,
                         datasets: dataSets,
-                        timeUnit: timeUnit
+                        timeUnit: timeUnit,
                     },
                     options: {
                         responsive: true,
@@ -96,7 +126,7 @@
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    beginAtZero: true
+                                    beginAtZero: true,
                                 }
                             }],
                             xAxes: [{
@@ -119,7 +149,6 @@
                             callbacks: {
                                 title: function(tooltipItem, chartData) {
                                     // we have only on x axis, we can use zero item directly
-
                                     if (chartData.timeUnit === 'day' || chartData.timeUnit === 'week') {
                                         return moment(tooltipItem[0].xLabel).format('LL');
                                     }
