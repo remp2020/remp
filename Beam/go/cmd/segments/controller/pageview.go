@@ -178,6 +178,7 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) mo
 		o.TimeHistogram = &model.TimeHistogram{
 			Interval: payload.TimeHistogram.Interval,
 			Offset:   payload.TimeHistogram.Offset,
+			TimeZone: payload.TimeHistogram.TimeZone,
 		}
 	}
 

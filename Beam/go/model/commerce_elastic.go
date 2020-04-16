@@ -29,10 +29,15 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 
 	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
+		tz := "UTC"
+		if options.TimeHistogram.TimeZone != nil {
+			tz = *options.TimeHistogram.TimeZone
+		}
+
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
-			TimeZone("UTC").
+			TimeZone(tz).
 			Offset(options.TimeHistogram.Offset).
 			MinDocCount(0).
 			ExtendedBounds(options.TimeAfter, options.TimeBefore)
@@ -170,10 +175,15 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 
 	var dateHistogramAgg *elastic.DateHistogramAggregation
 	if options.TimeHistogram != nil {
+		tz := "UTC"
+		if options.TimeHistogram.TimeZone != nil {
+			tz = *options.TimeHistogram.TimeZone
+		}
+
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
 			Interval(options.TimeHistogram.Interval).
-			TimeZone("UTC").
+			TimeZone(tz).
 			Offset(options.TimeHistogram.Offset)
 	}
 
