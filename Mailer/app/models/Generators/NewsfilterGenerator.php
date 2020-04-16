@@ -122,7 +122,7 @@ class NewsfilterGenerator implements IGenerator
             // replace hrefs
             '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">$2</a>',
 
-            '/<h2.*?>\*<\/h2>/im' => '<div style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:center;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">*</div>',
+            '/<h2.*?>.*?\*.*?<\/h2>/im' => '<div style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:center;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">*</div>',
 
             // replace h2
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
