@@ -41,8 +41,10 @@ class UserRegisteredHandler extends BaseHandler
     {
         $lists = $this->listsRepository->all();
 
-        if (!empty($this->userSubscriptionsRepository->findByEmail($params['email']))) {
-            return new JsonApiResponse(200, ['status' => 'ok']);
+        $userSubscriptions = $this->userSubscriptionsRepository->findByEmail($params['email']);
+        $mappedSubscriptions = [];
+        foreach ($userSubscriptions as $userSubscription) {
+            $mappedSubscriptions[$userSubscription->mail_type_id] = $userSubscription->subscribed;
         }
 
         $userID = filter_var($params['user_id'], FILTER_VALIDATE_INT);
@@ -55,6 +57,11 @@ class UserRegisteredHandler extends BaseHandler
 
         /** @var ActiveRow $list */
         foreach ($lists as $list) {
+            if (isset($mappedSubscriptions[$list->id])) {
+                // user has already setting for this newsletter list
+                continue;
+            }
+
             if ($list->auto_subscribe) {
                 $this->userSubscriptionsRepository->subscribeUser($list, $userID, $params['email']);
             } else {
