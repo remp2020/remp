@@ -66,6 +66,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed and redesigned mailing list variants statistics to be sortable and filterable. remp/remp#593
 - Fixed attachment_size column type - changing to integer (from incorrectly assigned datetime).
 - Added option to select events to handle when starting Hermes worker in case there's need to run separate workers for mission-critical event types.
+- Fixed possibly incorrectly skipped newsletter subscription in user registered API handler. remp/crm#1159
 
 ### [Sso]
 
