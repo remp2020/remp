@@ -53,6 +53,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // Flag to force all generated URLs to be secure no matter the protocol of incoming request.
+    'force_https' => env('FORCE_HTTPS', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
