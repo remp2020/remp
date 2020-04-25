@@ -577,6 +577,7 @@ API call to get subscribed newsletter lists and their variants.
 
 ```json5
 {
+  //required
   "user_id": 1, // Integer; ID of user
   "email": "test@test.com", // String; Email to get preferences for
 
@@ -1186,8 +1187,7 @@ Optional parameter public_listing - Integer (1/0) - get only newsletter lists (m
 ```shell
 curl -X GET \
   http://mailer.remp.press/api/v1/mailers/mail-types?public_listing=1 \
-  -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/x-www-form-urlencoded'
+  -H 'Authorization: Bearer XXX'
 ```
 
 Response:
@@ -1298,8 +1298,7 @@ Get available categories of newsletters.
 ```shell
 curl -X GET \
   http://mailer.remp.press/api/v1/mailers/mail-type-categories \
-  -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/x-www-form-urlencoded'
+  -H 'Authorization: Bearer XXX'
 ```
 
 Response:
