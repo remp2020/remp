@@ -37,7 +37,14 @@ class IsUserUnsubscribedHandler extends BaseHandler
             return $this->getErrorResponse();
         }
 
-        $output = $this->userSubscriptionsRepository->isUserUnsubscribed($payload['user_id'], $payload['list_id']);
+// TODO change later when identification will be based only on user email or id
+
+        $output = $this->userSubscriptionsRepository->getTable()->where([
+            'user_id' => $payload['user_id'],
+            'email' => $payload['email'],
+            'mail_type_id' => $payload['list_id'],
+            'subscribed' => false
+            ])->count('*') > 0;
 
         return new JsonApiResponse(200, $output);
     }

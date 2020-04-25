@@ -24,14 +24,15 @@ class MailTypeCategoriesHandler extends BaseHandler
     {
         $categories = $this->categoriesRepository->all()->fetchAll();
 
-        $output = Arrays::map($categories, function (ActiveRow $row) {
-            return [
-                'id' => $row->id,
-                'title' => $row->title,
-                'sorting' => $row->sorting,
-                'show_title' => $row->show_title
-            ];
-        });
+        $output = [];
+        foreach ($categories as $category) {
+            $item = new \stdClass();
+            $item->id = $category->id;
+            $item->title = $category->title;
+            $item->sorting = $category->sorting;
+            $item->show_title = $category->show_title;
+            $output[] = $item;
+        }
 
         return new JsonApiResponse(200, $output);
     }

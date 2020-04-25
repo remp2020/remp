@@ -28,7 +28,7 @@ trait ParseLogFilterConditionsTrait
             if (is_array($value) && in_array($key, $availableColumns)) {
                 if (isset($value['from']) && isset($value['to'])) {
                     $from = DateTime::from($value['from']);
-                    $to = DateTime::from($value['to'])->setTime(23, 59, 59);
+                    $to = DateTime::from($value['to']);
 
                     $conditions["$key BETWEEN ? AND ?"] = [$from, $to];
                 } elseif (isset($value['from'])) {
@@ -36,7 +36,7 @@ trait ParseLogFilterConditionsTrait
 
                     $conditions["$key >="] = $from;
                 } elseif (isset($value['to'])) {
-                    $to = DateTime::from($value['to'])->setTime(23, 59, 59);
+                    $to = DateTime::from($value['to']);
 
                     $conditions["$key <="] = $to;
                 } else {
@@ -46,7 +46,8 @@ trait ParseLogFilterConditionsTrait
                 $conditions["$value NOT"] = null;
             } else {
                 $column = is_array($value) ? $key : $value;
-                throw new \Exception("Column $column is not allowed in log filter.");
+                throw new \Exception
+                ("Column $column is not allowed in log filter.");
             }
         }
 

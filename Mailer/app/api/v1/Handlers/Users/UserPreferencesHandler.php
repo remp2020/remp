@@ -74,11 +74,11 @@ class UserPreferencesHandler extends BaseHandler
                 ];
             }
 
-            $output[$row->mail_type_id] = [
+            $output[] = [
                 'id' => $row->mail_type_id,
                 'code' => $row->mail_type->code,
                 'title' => $row->mail_type->title,
-                'is_subscribed' => $row->subscribed,
+                'is_subscribed' => boolval($row->subscribed),
                 'variants' => $variants,
                 'updated_at' => $row->updated_at->format(DateTime::RFC3339),
             ];

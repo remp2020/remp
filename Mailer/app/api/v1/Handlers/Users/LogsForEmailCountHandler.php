@@ -1,6 +1,6 @@
 <?php
 
-namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
+namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\Traits\ParseLogFilterConditionsTrait;
@@ -9,7 +9,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class MailLogsForEmailCountHandler extends BaseHandler
+class LogsForEmailCountHandler extends BaseHandler
 {
     private $logsRepository;
 

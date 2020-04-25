@@ -11,11 +11,16 @@
   "additionalProperties": false,
   "required": [
     "user_id",
+    "email",
     "list_id"
   ],
   "properties": {
     "user_id": {
       "type": "integer"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
     },
     "list_id": {
       "type": "integer"

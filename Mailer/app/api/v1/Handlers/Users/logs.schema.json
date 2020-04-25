@@ -10,14 +10,14 @@
       "filter": {
         "dropped_at": {},
         "delivered_at": {
-          "to": "2020-04-08"
+          "to": "2020-04-07T13:33:44+02:00"
         },
         "spam_complained_at": {
-          "from": "2020-04-08"
+          "from": "2020-04-07T13:33:44+02:00"
         },
         "hard_bounced_at": {
-          "from": "2020-04-08",
-          "to": "2020-04-10"
+          "from": "2020-04-07T13:33:44+02:00",
+          "to": "2020-06-07T13:33:44+02:00"
         }
       },
       "page": 1,
@@ -58,12 +58,12 @@
               "from": {
                 "title": "From filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "to": {
                 "title": "To filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               }
             },
             "additionalProperties": false
@@ -75,12 +75,12 @@
               "from": {
                 "title": "From filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "to": {
                 "title": "To filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               }
             },
             "additionalProperties": false
@@ -92,12 +92,12 @@
               "from": {
                 "title": "From filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "to": {
                 "title": "To filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               }
             },
             "additionalProperties": false
@@ -109,12 +109,12 @@
               "from": {
                 "title": "From filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "to": {
                 "title": "To filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               }
             },
             "additionalProperties": false
@@ -126,12 +126,12 @@
               "from": {
                 "title": "From filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "to": {
                 "title": "To filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               }
             },
             "additionalProperties": false
@@ -143,12 +143,12 @@
               "from": {
                 "title": "From filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "to": {
                 "title": "To filter",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               }
             },
             "additionalProperties": false

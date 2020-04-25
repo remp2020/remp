@@ -522,7 +522,7 @@ Response:
 
 #### POST `/api/v1/users/is-user-unsubscribed`
 
-API call that checks if user unsubscribed given newsletter.
+API call that checks if user is unsubscribed from given newsletter list.
 
 ##### *Headers:*
 
@@ -534,7 +534,9 @@ API call that checks if user unsubscribed given newsletter.
 
 ```json5
 {
+  // required
   "user_id": 1, // Integer; ID of user
+  "email": "test@test.sk", // String; Email of user,
   "list_id": 1 // Integer; ID of newsletter
 }
 ```
@@ -548,6 +550,7 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{
 	"user_id": 123,
+    "email": "test@test.sk",
 	"list_id": 1
 }'
 ```
@@ -562,7 +565,7 @@ true
 
 #### POST `/api/v1/users/user-preferences`
 
-API call to get subscribed newsletters and their variants.
+API call to get subscribed newsletter lists and their variants.
 
 ##### *Headers:*
 
@@ -575,7 +578,7 @@ API call to get subscribed newsletters and their variants.
 ```json5
 {
   "user_id": 1, // Integer; ID of user
-  "email": "test@test.com", // String; Email from which was the newsletter subscribed
+  "email": "test@test.com", // String; Email to get preferences for
 
   // optional
   "subscribed": true // Boolean; Get only subscribed newsletters
@@ -598,20 +601,20 @@ curl -X POST \
 Response:
 
 ```json5
-{
-  "1": {
+[
+  {
     "id": 1,
     "code": "demo-weekly-newsletter",
     "title": "DEMO Weekly newsletter",
-    "is_subscribed": 1,
+    "is_subscribed": true,
     "variants": [],
     "updated_at": "2020-04-06T00:15:32+02:00"
   },
-  "2": {
+  {
     "id": 2,
     "code": "123",
     "title": "Test",
-    "is_subscribed": 1,
+    "is_subscribed": true,
     "variants": [
       {
         "id": 2,
@@ -621,7 +624,7 @@ Response:
     ],
     "updated_at": "2020-04-10T15:27:35+02:00"
   }
-}
+]
 ```
 
 ---
@@ -649,7 +652,7 @@ for that, please visit `/list/new` to create newsletter via web admin.
   "list_code": "alerts", // String; code of the newsletter list you're subscribing the user to
 
   // optional 
-  "variant_id": 1, // Integer;  ID of newsletter variant to subscribe
+  "variant_code": "123", // String;  Code of newsletter variant to subscribe
 }
 ```
 
@@ -990,7 +993,7 @@ Response:
 
 ---
 
-#### POST `/api/v1/mailers/logs-count-for-email`
+#### POST `/api/v1/users/logs-for-email-count`
 
 Returns number of logs based on given criteria
 
@@ -1005,15 +1008,15 @@ Returns number of logs based on given criteria
 ```json5
 {
   // required 
-  "filter": { // Object/Array; Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
-    "hard_bounced_at": {
-      "from": "2020-04-08", // String; Restrict results to specific from date, optional
-      "to": "2020-04-10" // String; Restrict results to specific to date, optional
-    }
-  },
+  "email": "test@test.com", // String; email
 
   // optional 
-  "email": "test@test.com", // String; email
+  "filter": { // Object/Array; Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
+    "hard_bounced_at": {
+      "from": "2020-04-07T13:33:44+02:00", // String - RFC 3339 format; Restrict results to specific from date, optional
+      "to": "2020-04-10T13:33:44+02:00" // String - RFC 3339 format; Restrict results to specific to date, optional
+    }
+  },
   "mail_template_ids": [1,2,3], // Array of integers; Ids of templates
 }
 ```
@@ -1026,27 +1029,25 @@ Returns number of logs based on given criteria
 }
 ```
 
-Restrictions inside filter are joined by OR condition. Therefore filter ```["dropped_at", "delivered_at"]``` means dropped_at OR delivered_at.
-
 ##### *Example:*
 
 ```shell
 curl -X POST \
-  http://mailer.remp.press/api/v1/mailers/logs-count \
+  http://mailer.remp.press/api/v1/users/logs-for-email-count \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/json' \
   -d '{
     "filter": {
         "dropped_at": {},
         "delivered_at": {
-          "to": "2020-04-08"
+          "to": "2020-04-07T13:33:44+02:00"
         },
         "spam_complained_at": {
-          "from": "2020-04-08"
+          "from": "2020-04-07T13:33:44+02:00"
         },
         "hard_bounced_at": {
-          "from": "2020-04-08",
-          "to": "2020-04-10"
+          "from": "2020-04-07T13:33:44+02:00",
+          "to": "2020-04-08T13:33:44+02:00"
         }
     },
     "email": "test@test.com",
@@ -1062,7 +1063,7 @@ Response:
 
 ---
 
-#### POST `/api/v1/mailers/logs-for-email`
+#### POST `/api/v1/users/logs-for-email`
 
 Returns mail logs based on given criteria
 
@@ -1078,11 +1079,12 @@ Returns mail logs based on given criteria
 {
   //required
   "email": "test@test.com", // String; email
+
   // optional 
   "filter": { // Object/Array; Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
     "hard_bounced_at": {
-      "from": "2020-04-08", // String; Restrict results to specific from date, optional
-      "to": "2020-04-10" // String; Restrict results to specific to date, optional
+      "from": "2020-04-07T13:33:44+02:00", // String - RFC 3339 format; Restrict results to specific from date, optional
+      "to": "2020-04-10T13:33:44+02:00" // String - RFC 3339 format; Restrict results to specific to date, optional
     }
   },
   "mail_template_ids": [1,2,3], // Array of integers; Ids of templates
@@ -1103,21 +1105,21 @@ Returns mail logs based on given criteria
 
 ```shell
 curl -X POST \
-  http://mailer.remp.press/api/v1/mailers/logs \
+  http://mailer.remp.press/api/v1/users/logs-for-email \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/json' \
   -d '{
     "filter": {
         "dropped_at": {},
         "delivered_at": {
-          "to": "2020-04-08"
+          "to": "2020-04-07T13:33:44+02:00"
         },
         "spam_complained_at": {
-          "from": "2020-04-08"
+          "from": "2020-04-07T13:33:44+02:00"
         },
         "hard_bounced_at": {
-          "from": "2020-04-08",
-          "to": "2020-04-10"
+          "from": "2020-04-07T13:33:44+02:00",
+          "to": "2020-04-10T13:33:44+02:00"
         }
     },
     "email": "test@test.com",
@@ -1130,8 +1132,8 @@ curl -X POST \
 Response:
 
 ```json5
-{
- "2": {
+[
+ {
     "id": 2,
     "email": "test@test.com",
     "subject": null,
@@ -1145,7 +1147,7 @@ Response:
     "attachment_size": null,
     "created_at": "2020-04-08T19:26:00+02:00"
   },
-  "4": {
+  {
     "id": 4,
     "email": "test@test.com",
     "subject": null,
@@ -1159,13 +1161,13 @@ Response:
     "attachment_size": null,
     "created_at": "2020-04-08T19:26:00+02:00"
   }
-}
+]
 ```
 
 ---
 
 
-#### POST `/api/v1/mailers/mail-types`
+#### GET `/api/v1/mailers/mail-types`
 
 Lists all available *newsletter lists* (mail types). *Code* of the newsletter is required when creating
 new *email* template via API.
@@ -1176,61 +1178,53 @@ new *email* template via API.
 | --- |---| --- | --- |
 | Authorization | Bearer *String* | yes | API token. |
 
-##### *Body:*
 
-```json5
-{
-  // optional
-  "public_listing": true // Boolean; Get only published newsletters
-}
-```
+Optional parameter public_listing - Integer (1/0) - get only newsletter lists (mail types) that should/shouldn't be available to be listed publicly
 
 ##### *Example:*
 
 ```shell
-curl -X POST \
-  http://mailer.remp.press/api/v1/mailers/mail-types \
+curl -X GET \
+  http://mailer.remp.press/api/v1/mailers/mail-types?public_listing=1 \
   -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "public_listing": true
-}'
+  -H 'Content-Type: application/x-www-form-urlencoded'
 ```
 
 Response:
 
 ```json5
 {
-  "2": {
-    "id": 2,
-    "code": "123",
-    "mail_type_category_id": 1,
-    "image_url": "",
-    "preview_url": "",
-    "title": "Test",
-    "description": "",
-    "locked": 0,
-    "is_multi_variant": 1,
-    "variants": {
-      "4": "Test 3",
-      "5": "Test 4"
+  "status": "ok",
+  "data": [
+    {
+      "id": 2,
+      "code": "123",
+      "image_url": "",
+      "preview_url": "",
+      "title": "Test",
+      "description": "",
+      "locked": 0,
+      "is_multi_variant": 1,
+      "variants": {
+        "4": "test2",
+        "5": "test4"
+      }
+    },
+    {
+      "id": 1,
+      "code": "demo-weekly-newsletter",
+      "image_url": null,
+      "preview_url": null,
+      "title": "DEMO Weekly newsletter",
+      "description": "Example mail list",
+      "locked": 0,
+      "is_multi_variant": 1,
+      "variants": {
+        "2": "test",
+        "3": "test2"
+      }
     }
-  },
-  "1": {
-    "id": 1,
-    "code": "demo-weekly-newsletter",
-    "mail_type_category_id": 1,
-    "image_url": null,
-    "preview_url": null,
-    "title": "DEMO Weekly newsletter",
-    "description": "Example mail list",
-    "locked": 0,
-    "is_multi_variant": 1,
-    "variants": {
-      "2": "Test 1",
-      "3": "Test 2"
-    }
-  }
+  ]
 }
 ```
 
@@ -1311,8 +1305,8 @@ curl -X GET \
 Response:
 
 ```json5
-{
-  "1": {
+[
+  {
     "id": 1,
     "title": "Newsletters",
     "sorting": 100,
@@ -1320,7 +1314,7 @@ Response:
     "updated_at": null,
     "show_title": 1
   },
-  "2": {
+  {
     "id": 2,
     "title": "System",
     "sorting": 999,
@@ -1328,7 +1322,7 @@ Response:
     "updated_at": null,
     "show_title": 1
   }
-}
+]
 ```
 
 ---

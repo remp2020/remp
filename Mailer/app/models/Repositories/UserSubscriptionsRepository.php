@@ -75,7 +75,7 @@ class UserSubscriptionsRepository extends Repository
             $variantId = $mailType->default_variant_id;
         }
 
-        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
+        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch(); // FIXME Should check also userId!
         if (!$actual) {
             $actual = $this->getTable()->insert([
                 'user_id' => $userId,
@@ -111,7 +111,7 @@ class UserSubscriptionsRepository extends Repository
 
     public function unsubscribeUser(ActiveRow $mailType, $userId, $email, $utmParams = [])
     {
-        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
+        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch(); // FIXME Should check also userId!
         if (!$actual) {
             $this->getTable()->insert([
                     'user_id' => $userId,
