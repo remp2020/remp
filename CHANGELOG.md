@@ -12,12 +12,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added early-version support for search in the top searchbox. Searchable are articles, authors, sections, tags and segments. GH-62
 - Added support for timezone parameter in Journal aggregations. remp/remp#605
 - Quick range day filters now start from beginning of the day. remp/remp#605
+- Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
 
 ### [Campaign]
 
 - Added early-version support for search in the top searchbox. Searchable are banners and campaigns. GH-62
 - Improved intervals in campaign stats charts. remp/remp#605
 - Quick range day filters now start from beginning of the day. remp/remp#605
+- Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
+
+### [Sso]
+- Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
 
 ---
 

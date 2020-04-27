@@ -185,6 +185,14 @@ for configuration options.
 We recommend to use self-hosted [Errbit](https://github.com/errbit/errbit) instance
 as it's compatible with Airbrake APIs and completely open-source.
 
+## Running behind proxy
+
+You might want to run your application on `https`, but internally use load balancers and forward requests to handlers via `http`.
+
+By default the applications determine protocol of generated URLs based on the incoming request protocol. In scenario described above this would cause `http` links to be generated on `https` page visit.
+
+To enforce `https` generation, you can use `FORCE_HTTPS` environment variable changing the behavior in all web applications. See `.env.example` files for configuration options.
+
 ## Known issues
 
 - PHP images are coming with preinstalled and always-on XDebug. We made the always-on choise for easier debugging and
