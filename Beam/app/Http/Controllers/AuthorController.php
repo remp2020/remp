@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\ArticleAuthor;
-use App\ArticlePageviews;
-use App\ArticleTimespent;
 use App\Author;
 use App\Conversion;
+use App\Http\Requests\TopAuthorsRequest;
 use App\Http\Resources\AuthorResource;
+use App\Model\Pageviews\TopSearch;
 use App\Model\Tag;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
@@ -345,5 +345,13 @@ class AuthorController extends Controller
             ->orderColumn('conversions_sum', 'conversions_sum $1')
             ->orderColumn('conversions_avg', 'conversions_avg $1')
             ->make(true);
+    }
+
+    public function topAuthors(TopAuthorsRequest $request, TopSearch $topSearch)
+    {
+        $limit = $request->json('limit');
+        $timeFrom = Carbon::parse($request->json('from'));
+
+        return response()->json($topSearch->topAuthors($timeFrom, $limit));
     }
 }
