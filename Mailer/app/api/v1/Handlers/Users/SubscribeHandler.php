@@ -50,13 +50,20 @@ class SubscribeHandler extends BaseHandler
         }
 
         try {
-            $email = $payload['email'];
-            $userID = $payload['user_id'];
-            $list = $this->getList($payload);
-            $variantID = $this->getVariantID($payload, $list);
+            $this->processUserSubscription($payload);
         } catch (InvalidApiInputParamException $e) {
             return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
         }
+
+        return new JsonApiResponse(200, ['status' => 'ok']);
+    }
+
+    protected function processUserSubscription($payload)
+    {
+        $email = $payload['email'];
+        $userID = $payload['user_id'];
+        $list = $this->getList($payload);
+        $variantID = $this->getVariantID($payload, $list);
 
         $this->userSubscriptionsRepository->subscribeUser(
             $list,
@@ -64,11 +71,7 @@ class SubscribeHandler extends BaseHandler
             $email,
             $variantID
         );
-
-        return new JsonApiResponse(200, ['status' => 'ok']);
     }
-
-
 
     /**
      * Validate and load list from $payload

@@ -30,8 +30,6 @@ class LogsRepository extends Repository
 
     public function allForEmail(string $email)
     {
-        // TODO column sorting does not exist
-//        return $this->getTable()->order('sorting ASC');
         return $this->getTable()->where('email', $email);
     }
 

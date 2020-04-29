@@ -9,7 +9,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class LogsForEmailCountHandler extends BaseHandler
+class LogsCountHandler extends BaseHandler
 {
     private $logsRepository;
 
@@ -38,16 +38,16 @@ class LogsForEmailCountHandler extends BaseHandler
             return $this->getErrorResponse();
         }
 
-        $output = $this->logsRepository->allForEmail($payload['email']);
+        $logs = $this->logsRepository->allForEmail($payload['email']);
 
-        if (isset($payload['filter'])) {
-            $output->where($this->parseConditions($payload['filter']));
+        foreach ($this->parseConditions($payload['filter'] ?? []) as $where) {
+            $logs->where(...$where);
         }
 
         if (isset($payload['mail_template_ids'])) {
-            $output->where('mail_template_id', $payload['mail_template_ids']);
+            $logs->where('mail_template_id', $payload['mail_template_ids']);
         }
 
-        return new JsonApiResponse(200, $output->count('*'));
+        return new JsonApiResponse(200, $logs->count('*'));
     }
 }

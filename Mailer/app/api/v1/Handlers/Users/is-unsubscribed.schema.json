@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "description": "Check if user is unsubscribed",
-  "$id": "POST /api/v1/users/is-user-unsubscribed",
+  "$id": "POST /api/v1/users/is-unsubscribed",
   "title": "Is user unsubscribed",
   "examples": [{
     "user_id": 1,

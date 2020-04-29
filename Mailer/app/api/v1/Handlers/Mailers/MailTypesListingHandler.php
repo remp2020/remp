@@ -2,7 +2,7 @@
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-use Nette\Utils\Arrays;
+use Nette\Http\Response;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repository\ListsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
@@ -24,7 +24,8 @@ class MailTypesListingHandler extends BaseHandler
     public function params()
     {
         return [
-            new InputParam(InputParam::TYPE_GET, 'public_listing')
+            new InputParam(InputParam::TYPE_GET, 'code', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_GET, 'public_listing', InputParam::OPTIONAL)
         ];
     }
 
@@ -32,8 +33,16 @@ class MailTypesListingHandler extends BaseHandler
     {
         $results = $this->listsRepository->all();
 
+        if (isset($params['code'])) {
+            $results->where(['code' => $params['code']]);
+        }
+
         if (isset($params['public_listing'])) {
-            $results->where(['public_listing' => boolval($params['public_listing'])]);
+            $publicListing = filter_var($params['public_listing'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($publicListing === null) {
+                return new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => 'Invalid value provided for param public_listing: ' . $params['public_listing']]);
+            }
+            $results->where(['public_listing' => $publicListing]);
         }
 
         $output = [];

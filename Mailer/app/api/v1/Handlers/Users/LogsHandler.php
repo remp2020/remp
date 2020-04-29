@@ -12,7 +12,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class LogsForEmailHandler extends BaseHandler
+class LogsHandler extends BaseHandler
 {
     private $logsRepository;
 
@@ -43,8 +43,8 @@ class LogsForEmailHandler extends BaseHandler
 
         $logs = $this->logsRepository->allForEmail($payload['email']);
 
-        if (isset($payload['filter'])) {
-            $logs->where($this->parseConditions($payload['filter']));
+        foreach ($this->parseConditions($payload['filter'] ?? []) as $where) {
+            $logs->where(...$where);
         }
 
         if (isset($payload['mail_template_ids'])) {
@@ -67,6 +67,7 @@ class LogsForEmailHandler extends BaseHandler
             $item->email = $log->email;
             $item->subject = $log->subject;
             $item->mail_template_id = $log->mail_template_id;
+            $item->sent_at = $this->formatDate($log->created_at);
             $item->delivered_at = $this->formatDate($log->delivered_at);
             $item->dropped_at = $this->formatDate($log->dropped_at);
             $item->spam_complained_at = $this->formatDate($log->spam_complained_at);
@@ -74,7 +75,6 @@ class LogsForEmailHandler extends BaseHandler
             $item->clicked_at = $this->formatDate($log->clicked_at);
             $item->opened_at = $this->formatDate($log->opened_at);
             $item->attachment_size = $log->attachment_size;
-            $item->created_at = $this->formatDate($log->created_at);
             $output[] = $item;
         }
 

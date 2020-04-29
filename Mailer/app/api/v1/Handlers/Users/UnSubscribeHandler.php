@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repository\ListsRepository;
+use Remp\MailerModule\Repository\ListVariantsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
@@ -15,15 +16,19 @@ class UnSubscribeHandler extends BaseHandler
 
     private $listsRepository;
 
+    private $listVariantsRepository;
+
     use JsonValidationTrait;
 
     public function __construct(
         UserSubscriptionsRepository $userSubscriptionsRepository,
-        ListsRepository $listsRepository
+        ListsRepository $listsRepository,
+        ListVariantsRepository $listVariantsRepository
     ) {
         parent::__construct();
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
         $this->listsRepository = $listsRepository;
+        $this->listVariantsRepository = $listVariantsRepository;
     }
 
     public function params()
@@ -53,13 +58,17 @@ class UnSubscribeHandler extends BaseHandler
         }
 
         if (isset($payload['variant_id'])) {
-            $userSubscription = $this->userSubscriptionsRepository->getUserSubscription($list, $payload['user_id'], $payload['email']);
+            $variant = $this->listVariantsRepository->findByIdAndMailTypeId($payload['variant_id'], $list->id);
+            if (!$variant) {
+                return new JsonApiResponse(404, ['status' => 'error', 'message' => 'variant not found']);
+            }
 
+            $userSubscription = $this->userSubscriptionsRepository->getUserSubscription($list, $payload['user_id'], $payload['email']);
             if (!$userSubscription) {
                 return new JsonApiResponse(200, ['status' => 'ok']);
             }
 
-            $this->userSubscriptionsRepository->unsubscribeUserVariant($userSubscription, $payload['variant_id'], $payload['utm_params'] ?? []);
+            $this->userSubscriptionsRepository->unsubscribeUserVariant($userSubscription, $variant, $payload['utm_params'] ?? []);
         } else {
             $this->userSubscriptionsRepository->unsubscribeUser($list, $payload['user_id'], $payload['email'], $payload['utm_params'] ?? []);
         }

@@ -2,6 +2,7 @@
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
+use Nette\Http\Response;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
@@ -43,11 +44,11 @@ class UserPreferencesHandler extends BaseHandler
             return $this->getErrorResponse();
         }
 
-//        $rows = $this->userSubscriptionsRepository->findByEmail($payload['email']); TODO use this once mailer uses email as a primary identifier
-
-        $rows = $this->userSubscriptionsRepository
-            ->getTable()
-            ->where(['user_id' => $payload['user_id'], 'user_email' => $payload['email']]);
+        $rows = $this->userSubscriptionsRepository->getTable()
+            ->where([
+                'user_id' => $payload['user_id'],
+                'user_email' => $payload['email'],
+            ]);
 
 
         if (isset($payload['subscribed'])) {
@@ -55,6 +56,12 @@ class UserPreferencesHandler extends BaseHandler
         }
 
         $rows = $rows->fetchAll();
+        if (!count($rows)) {
+            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+                'status' => 'error',
+                'message' => 'User with given ID/email has no subscription.',
+            ]);
+        }
 
         $output = [];
 
@@ -78,12 +85,12 @@ class UserPreferencesHandler extends BaseHandler
                 'id' => $row->mail_type_id,
                 'code' => $row->mail_type->code,
                 'title' => $row->mail_type->title,
-                'is_subscribed' => boolval($row->subscribed),
+                'is_subscribed' => (bool) $row->subscribed,
                 'variants' => $variants,
                 'updated_at' => $row->updated_at->format(DateTime::RFC3339),
             ];
         }
 
-        return new JsonApiResponse(200, $output);
+        return new JsonApiResponse(Response::S200_OK, $output);
     }
 }

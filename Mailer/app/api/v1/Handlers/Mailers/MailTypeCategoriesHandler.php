@@ -30,7 +30,7 @@ class MailTypeCategoriesHandler extends BaseHandler
             $item->id = $category->id;
             $item->title = $category->title;
             $item->sorting = $category->sorting;
-            $item->show_title = $category->show_title;
+            $item->show_title = (bool) $category->show_title;
             $output[] = $item;
         }
 
