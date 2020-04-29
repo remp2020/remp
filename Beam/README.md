@@ -905,6 +905,183 @@ $response = file_get_contents("http://beam.remp.press/api/articles/top", false, 
 ]
 ```
 
+---
+
+##### POST `api/authors/top`
+
+Beam admin provides statistics about author performance. This endpoint return top authors by pageviews.
+You can filter authors by time of pageview.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
+	"limit": 3, // limit how many top authors this endpoint returns
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl --location --request POST 'http://beam.remp.press/api/authors/top' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+--data-raw '{
+	"from": "2020-03-15 14:41:58",
+	"limit": 3
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+	"from" => "2020-03-15 14:41:58",
+	"limit" => 3,
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/authors/top", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "external_id": 100,
+        "name": "Veronika Folentová",
+        "pageviews": 23000
+    },
+    {
+        "external_id": 200,
+        "name": "Jana Čevelová",
+        "pageviews": 15000
+    },
+    {
+        "external_id": 300,
+        "name": "Miro Kern",
+        "pageviews": 10000
+    }
+]
+```
+
+---
+
+##### POST `api/tags/top`
+
+Beam admin provides statistics about tag performance. This endpoint return top post tags by pageviews.
+You can filter tags by time of pageview.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
+	"limit": 3, // limit how many top tags this endpoint returns
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl --location --request POST 'http://beam.remp.press/api/tags/top' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+--data-raw '{
+	"from": "2020-03-15 14:41:58",
+	"limit": 3
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+	"from" => "2020-03-15 14:41:58",
+	"limit" => 3,
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/tags/top", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "name": "ekonomika",
+        "pageviews": 4000
+    },
+    {
+        "name": "covid19",
+        "pageviews": 3000
+    },
+    {
+        "name": "brexit",
+        "pageviews": 2000
+    }
+]
+```
+
 ### Scheduled events
 
 #### Laravel scheduler
