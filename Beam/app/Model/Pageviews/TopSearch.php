@@ -71,7 +71,7 @@ class TopSearch
             });
         };
 
-        return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopAuthorsFunc);
+        return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopAuthorsFunc, 'name');
     }
 
     public function topPostTags($timeFrom, $limit)
