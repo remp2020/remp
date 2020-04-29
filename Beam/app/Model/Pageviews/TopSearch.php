@@ -108,19 +108,19 @@ class TopSearch
     }
 
     // split query by days (due to speed)
-    private function queryTopPageviewItemsByDays(Carbon $timeFrom, $limit, callable $func, $keyAttribute = 'external_id')
+    private function queryTopPageviewItemsByDays(Carbon $timeFrom, $limit, callable $queryFunction, $keyAttribute = 'external_id')
     {
         $timeTo = (clone $timeFrom)->modify('+1 day');
         $now = Carbon::now();
 
         // do not split query if time_from -> now is less than day
         if ($timeTo > $now) {
-            return $func($timeFrom, $now, $limit);
+            return $queryFunction($timeFrom, $now, $limit);
         }
 
         $results = [];
         while ($timeTo < $now) {
-            $items = $func($timeFrom, $timeTo, $limit * 2);
+            $items = $queryFunction($timeFrom, $timeTo, $limit * 2);
             foreach ($items as $item) {
                 if (!isset($results[$item->$keyAttribute])) {
                     $results[$item->$keyAttribute] = $item;
