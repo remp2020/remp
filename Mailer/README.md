@@ -520,7 +520,7 @@ Response:
 
 ---
 
-#### POST `/api/v1/users/is-user-unsubscribed`
+#### POST `/api/v1/users/is-unsubscribed`
 
 API call that checks if user is unsubscribed from given newsletter list.
 
@@ -545,7 +545,7 @@ API call that checks if user is unsubscribed from given newsletter list.
 
 ```shell
 curl -X POST \
-  http://mailer.remp.press/api/v1/users/is-user-unsubscribed \
+  http://mailer.remp.press/api/v1/users/is-unsubscribed \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -994,7 +994,7 @@ Response:
 
 ---
 
-#### POST `/api/v1/users/logs-for-email-count`
+#### POST `/api/v1/users/logs-count`
 
 Returns number of logs based on given criteria
 
@@ -1026,7 +1026,7 @@ Returns number of logs based on given criteria
 
 ```json5
 {
-  "filter": ["dropped_at", "delivered_at"] // Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
+  "filter": ["dropped_at", "delivered_at"] // Available filters are sent_at, delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
 }
 ```
 
@@ -1034,7 +1034,7 @@ Returns number of logs based on given criteria
 
 ```shell
 curl -X POST \
-  http://mailer.remp.press/api/v1/users/logs-for-email-count \
+  http://mailer.remp.press/api/v1/users/logs-count \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1064,7 +1064,7 @@ Response:
 
 ---
 
-#### POST `/api/v1/users/logs-for-email`
+#### POST `/api/v1/users/logs`
 
 Returns mail logs based on given criteria
 
@@ -1098,7 +1098,7 @@ Returns mail logs based on given criteria
 
 ```json5
 {
-  "filter": ["dropped_at", "delivered_at"] // Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
+  "filter": ["dropped_at", "delivered_at"] // Available filters are sent_at, delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
 }
 ```
 
@@ -1106,7 +1106,7 @@ Returns mail logs based on given criteria
 
 ```shell
 curl -X POST \
-  http://mailer.remp.press/api/v1/users/logs-for-email \
+  http://mailer.remp.press/api/v1/users/logs \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1139,28 +1139,28 @@ Response:
     "email": "test@test.com",
     "subject": null,
     "mail_template_id": 1,
+    "sent_at": "2020-04-08T19:26:00+02:00"
     "delivered_at": "2020-04-08T13:33:44+02:00",
     "dropped_at": "2020-04-08T19:28:36+02:00",
     "spam_complained_at": null,
     "hard_bounced_at": null,
     "clicked_at": null,
     "opened_at": null,
-    "attachment_size": null,
-    "created_at": "2020-04-08T19:26:00+02:00"
+    "attachment_size": null
   },
   {
     "id": 4,
     "email": "test@test.com",
     "subject": null,
     "mail_template_id": 2,
+    "sent_at": "2020-04-08T19:26:00+02:00"
     "delivered_at": null,
     "dropped_at": "2020-04-08T19:28:46+02:00",
     "spam_complained_at": null,
     "hard_bounced_at": null,
     "clicked_at": null,
     "opened_at": null,
-    "attachment_size": null,
-    "created_at": "2020-04-08T19:26:00+02:00"
+    "attachment_size": null
   }
 ]
 ```
@@ -1179,8 +1179,12 @@ new *email* template via API.
 | --- |---| --- | --- |
 | Authorization | Bearer *String* | yes | API token. |
 
+##### *Params:*
 
-Optional parameter public_listing - Integer (1/0) - get only newsletter lists (mail types) that should/shouldn't be available to be listed publicly
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| code | *String* | no | Filter only newsletter (mail type) with specific code. Returns array with either 0 or 1 element. |
+| public_listing | *Boolean* | no | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
 
 ##### *Example:*
 
@@ -1230,59 +1234,6 @@ Response:
 
 ---
 
-#### POST `/api/v1/mailers/mail-type-by-code`
-
-Find *newsletter* (mail type) by code.
-
-##### *Headers:*
-
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
-
-##### *Body:*
-
-```json5
-{
-  // required
-  "code": "123" // String; Code of newsletter
-}
-```
-
-##### *Example:*
-
-```shell
-curl -X POST \
-  http://mailer.remp.press/api/v1/mailers/mail-type-by-code \
-  -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "code": "123"
-}'
-```
-
-Response:
-
-```json5
-{
-  "id": 2,
-  "code": "123",
-  "mail_type_category_id": 1,
-  "image_url": "",
-  "preview_url": "",
-  "title": "Test",
-  "description": "Description",
-  "locked": 0,
-  "is_multi_variant": 1,
-  "variants": {
-    "4": "Test3",
-    "5": "Test4"
-  }
-}
-```
-
----
-
 #### GET `/api/v1/mailers/mail-type-categories`
 
 Get available categories of newsletters.
@@ -1309,17 +1260,13 @@ Response:
     "id": 1,
     "title": "Newsletters",
     "sorting": 100,
-    "created_at": "2020-03-25T14:33:15+01:00",
-    "updated_at": null,
-    "show_title": 1
+    "show_title": true
   },
   {
     "id": 2,
     "title": "System",
     "sorting": 999,
-    "created_at": "2020-03-25T14:33:15+01:00",
-    "updated_at": null,
-    "show_title": 1
+    "show_title": false
   }
 ]
 ```

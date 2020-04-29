@@ -8,47 +8,58 @@ trait ParseLogFilterConditionsTrait
 {
     /**
      * @param array $filter
-     * @return array
+     * @return array of conditions. Each element of array can be used in Nette's selection where($element...) call
      * @throws \Exception
      * @example
+     *
      * ["delivered_at", "clicked_at", "opened_at"....]
+     *
      * or
-     * ["delivered_at" => ["from" => "2020-01-01", "to" => "2020-04-05"], "clicked_at" => ["from" => "2020-01-01", "to" => "2020-04-05"]]
+     *
+     * [
+     *      "delivered_at" => [
+     *          "from" => "2020-01-01T00:00:00Z",
+     *          "to" => "2020-04-05T00:00:00Z",
+     *      ],
+     *      "clicked_at" => [
+     *          "from" => "2020-01-01T00:00:00Z",
+     *          "to" => "2020-04-05T00:00:00Z",
+     *      ],
+     * ]
      */
-    public function parseConditions(array $filter)
+    public function parseConditions(array $filter): array
     {
-
         $conditions = [];
 
-        $availableColumns = ["delivered_at", "clicked_at", "opened_at", "dropped_at", "spam_complained_at", "hard_bounced_at"];
-
-        // DB column can be either key in case of array input or value in case of object input
+        $availableColumns = [
+            "sent_at" => "created_at",
+            "delivered_at" => "delivered_at",
+            "clicked_at" => "clicked_at",
+            "opened_at" => "opened_at",
+            "dropped_at" => "dropped_at",
+            "spam_complained_at" => "spam_complained_at",
+            "hard_bounced_at" => "hard_bounced_at"
+        ];
 
         foreach ($filter as $key => $value) {
-            if (is_array($value) && in_array($key, $availableColumns)) {
-                if (isset($value['from']) && isset($value['to'])) {
-                    $from = DateTime::from($value['from']);
-                    $to = DateTime::from($value['to']);
-
-                    $conditions["$key BETWEEN ? AND ?"] = [$from, $to];
-                } elseif (isset($value['from'])) {
-                    $from = DateTime::from($value['from']);
-
-                    $conditions["$key >="] = $from;
-                } elseif (isset($value['to'])) {
-                    $to = DateTime::from($value['to']);
-
-                    $conditions["$key <="] = $to;
-                } else {
-                    $conditions["$key NOT"] = null;
-                }
-            } elseif (in_array($value, $availableColumns)) {
-                $conditions["$value NOT"] = null;
-            } else {
-                $column = is_array($value) ? $key : $value;
-                throw new \Exception
-                ("Column $column is not allowed in log filter.");
+            $field = is_array($value) ? $key : $value;
+            if (!array_key_exists($key, $availableColumns)) {
+                throw new \Exception("Property $field is not allowed in log filter.");
             }
+            $column = $availableColumns[$field];
+
+            if (is_array($value)) {
+                // key is column, value is date
+                if (isset($value['from'])) {
+                    $conditions[] = ["$column >= ?", DateTime::from($value['from'])];
+                }
+                if (isset($value['to'])) {
+                    $conditions[] = ["$column < ?", DateTime::from($value['to'])];
+                }
+                continue;
+            }
+
+            $conditions[] = ["$column IS NOT NULL"];
         }
 
         return $conditions;

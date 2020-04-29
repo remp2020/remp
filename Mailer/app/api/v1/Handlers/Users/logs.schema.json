@@ -39,123 +39,59 @@
   "additionalProperties": false,
   "properties": {
     "filter": {
-      "oneOf": [{
-        "type": "array",
-        "title": "Basic logs filter",
-        "items": {
-          "enum": ["delivered_at", "clicked_at", "opened_at", "dropped_at", "spam_complained_at", "hard_bounced_at"]
-        }
-      },{
-        "type": "object",
-        "title": "Advanced logs filter",
-        "description": "Apply filter on logs results",
-        "properties": {
-          "delivered_at":
-          {
-            "title": "Delivered at filter",
-            "type": "object",
-            "properties": {
-              "from": {
-                "title": "From filter",
-                "type": "string",
-                "format": "date-time"
-              },
-              "to": {
-                "title": "To filter",
-                "type": "string",
-                "format": "date-time"
-              }
-            },
-            "additionalProperties": false
-          },
-          "clicked_at":{
-            "type": "object",
-            "title": "Clicked at filter",
-            "properties": {
-              "from": {
-                "title": "From filter",
-                "type": "string",
-                "format": "date-time"
-              },
-              "to": {
-                "title": "To filter",
-                "type": "string",
-                "format": "date-time"
-              }
-            },
-            "additionalProperties": false
-          },
-          "opened_at":{
-            "type": "object",
-            "title": "Opened at filter",
-            "properties": {
-              "from": {
-                "title": "From filter",
-                "type": "string",
-                "format": "date-time"
-              },
-              "to": {
-                "title": "To filter",
-                "type": "string",
-                "format": "date-time"
-              }
-            },
-            "additionalProperties": false
-          },
-          "dropped_at":{
-            "type": "object",
-            "title": "Dropped at filter",
-            "properties": {
-              "from": {
-                "title": "From filter",
-                "type": "string",
-                "format": "date-time"
-              },
-              "to": {
-                "title": "To filter",
-                "type": "string",
-                "format": "date-time"
-              }
-            },
-            "additionalProperties": false
-          },
-          "spam_complained_at":{
-            "type": "object",
-            "title": "Spam complained at filter",
-            "properties": {
-              "from": {
-                "title": "From filter",
-                "type": "string",
-                "format": "date-time"
-              },
-              "to": {
-                "title": "To filter",
-                "type": "string",
-                "format": "date-time"
-              }
-            },
-            "additionalProperties": false
-          },
-          "hard_bounced_at":{
-            "type": "object",
-            "title": "Hard bounced at filter",
-            "properties": {
-              "from": {
-                "title": "From filter",
-                "type": "string",
-                "format": "date-time"
-              },
-              "to": {
-                "title": "To filter",
-                "type": "string",
-                "format": "date-time"
-              }
-            },
-            "additionalProperties": false
+      "oneOf": [
+        {
+          "type": "array",
+          "title": "Basic logs filter",
+          "items": {
+            "enum": [
+              "sent_at",
+              "delivered_at",
+              "clicked_at",
+              "opened_at",
+              "dropped_at",
+              "spam_complained_at",
+              "hard_bounced_at"
+            ]
           }
         },
-        "additionalProperties": false
-      }]
+        {
+          "type": "object",
+          "title": "Advanced logs filter",
+          "description": "Apply filter on logs results",
+          "properties": {
+            "sent_at": {
+              "title": "Sent at filter",
+              "$ref": "#/definitions/date-filter"
+            },
+            "delivered_at": {
+              "title": "Delivered at filter",
+              "$ref": "#/definitions/date-filter"
+            },
+            "clicked_at": {
+              "title": "Clicked at filter",
+              "$ref": "#/definitions/date-filter"
+            },
+            "opened_at": {
+              "title": "Opened at filter",
+              "$ref": "#/definitions/date-filter"
+            },
+            "dropped_at": {
+              "title": "Dropped at filter",
+              "$ref": "#/definitions/date-filter"
+            },
+            "spam_complained_at": {
+              "title": "Spam complained at filter",
+              "$ref": "#/definitions/date-filter"
+            },
+            "hard_bounced_at": {
+              "title": "Hard bounced at filter",
+              "$ref": "#/definitions/date-filter"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     },
     "limit": {
       "type": "integer"
@@ -173,6 +109,24 @@
       "items": {
         "type": "integer"
       }
+    }
+  },
+  "definitions": {
+    "date-filter": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "title": "From filter",
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "title": "To filter",
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }
