@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/  
+*/
 
 Route::middleware('auth:api')->group(function() {
     Route::apiResource('articles', 'ArticleController', [
@@ -28,6 +28,8 @@ Route::middleware('auth:api')->group(function() {
     Route::post('v2/articles/upsert', 'ArticleController@upsertV2')->name('articles.upsertV2');
 
     Route::post('articles/top', 'ArticleController@topArticles')->name('articles.top');
+    Route::post('authors/top', 'AuthorController@topAuthors')->name('authors.top');
+    Route::post('tags/top', 'TagController@topTags')->name('tags.top');
 
     Route::middleware('cors')->group(function() {
         Route::get('article/{article?}', 'ArticleDetailsController@show');
