@@ -37,6 +37,20 @@ $(document).ready(function() {
                         case 'banner':
                             searchResult['name'] = '<i class="zmdi zmdi-collection-folder-image"></i> ' + searchResult['name'];
                             break;
+
+                        // Mailer
+                        case 'email':
+                            searchResult['name'] = '<i class="zmdi zmdi-view-quilt"></i> ' + searchResult['name'];
+                            break;
+                        case 'layout':
+                            searchResult['name'] = '<i class="zmdi zmdi-widgets"></i> ' + searchResult['name'];
+                            break;
+                        case 'list':
+                            searchResult['title'] = '<i class="zmdi zmdi-arrow-split"></i> ' + searchResult['title'];
+                            break;
+                        case 'job':
+                            searchResult['name'] = '<i class="zmdi zmdi-refresh"></i> ' + searchResult['name'];
+                            break;
                     }
 
                     // format tags

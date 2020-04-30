@@ -163,4 +163,21 @@ class TemplatesRepository extends Repository
 
         return $selection;
     }
+
+    public function search(string $term, $limit = 5): array
+    {
+        $searchable = ['name'];
+        foreach ($searchable as $column) {
+            $where[$column . ' LIKE ?'] = '%' . $term . '%';
+        }
+
+        $results = $this->all()
+            ->select(implode(',', array_merge(['id'], $searchable)))
+            ->whereOr($where ?? [])
+            ->limit($limit)
+            ->fetchAssoc('id');
+
+        return $results ?? [];
+    }
+
 }

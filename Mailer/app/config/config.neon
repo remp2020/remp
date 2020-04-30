@@ -3,6 +3,7 @@ parameters:
 	timezone: @environmentConfig::get('TIMEZONE')
 	sso_addr: @environmentConfig::get('SSO_ADDR')
 	sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
+	max_result_count: @environmentConfig::get('SEARCH_MAX_RESULT_COUNT')
 	redis:
 		host: @environmentConfig::get('REDIS_HOST')
 		port: @environmentConfig::get('REDIS_PORT')
@@ -67,6 +68,7 @@ services:
 			- linkService(campaign, %remp.campaign.web_addr%, trending-up)
 			- linkService(mailer, /, email)
 			- setParam(locale, %locale%)
+			- setParam(max_result_count, %max_result_count%)
 
 	# Latte filters
 	filterLoader:

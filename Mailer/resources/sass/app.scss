@@ -8,6 +8,9 @@ $white: White;
 @import "~remp/sass/remp.scss";
 @import "~google-material-color/dist/palette";
 
+@import "~remp/sass/site-search.scss";
+
+
 .pg-item {
   &.green:nth-child(odd) {
     background-color: transparentize(#75a478, .90);

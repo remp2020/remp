@@ -30,6 +30,11 @@ class JobsRepository extends Repository
         $this->batchesRepository = $batchesRepository;
     }
 
+    public function all()
+    {
+        return $this->getTable()->order('mail_jobs.created_at DESC');
+    }
+
     public function add($segmentCode, $segmentProvider, $context = null, $mailTypeVariant = null)
     {
         $data = [
@@ -101,5 +106,21 @@ class JobsRepository extends Repository
             return false;
         }
         return true;
+    }
+
+    public function search(string $term, $limit = 5): array
+    {
+        $searchable = [':mail_job_batch_templates.mail_template.name'];
+        foreach ($searchable as $column) {
+            $where[$column . ' LIKE ?'] = '%' . $term . '%';
+        }
+
+        $results = $this->all()
+            ->select(implode(',', array_merge(['mail_jobs.id'], $searchable)))
+            ->whereOr($where ?? [])
+            ->limit($limit)
+            ->fetchAssoc('id');
+
+        return $results ?? [];
     }
 }
