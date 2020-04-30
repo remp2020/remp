@@ -48,13 +48,8 @@ class TopSearch
             $topAuthorsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
-                ->joinSub(DB::table('articles'), 'articles', function ($join) {
-                    $join->on('articles.id', '=', 'article_pageviews.article_id');
-                })
-                ->joinSub(DB::table('article_author'), 'article_author', function ($join) {
-                    $join->on('articles.id', '=', 'article_author.article_id');
-                })
-                ->groupBy('article_author.author_id')
+                ->join('article_author', 'article_pageviews.article_id', '=', 'article_author.article_id')
+                ->groupBy(['article_author.author_id'])
                 ->select('article_author.author_id', DB::raw('SUM(article_pageviews.sum) as pageviews'))
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
