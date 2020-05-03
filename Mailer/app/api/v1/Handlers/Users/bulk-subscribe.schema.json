@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Subscribe user",
+  "$id": "POST /api/v1/users/subscribe",
+  "title": "Bulk Subscribe",
+  "type": "object",
+  "required": [
+    "users"
+  ],
+  "properties": {
+    "users": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/user_subscription" }
+    }
+  },
+  "definitions": {
+    "user_subscription": {
+      "type": "object",
+      "required": [
+        "email",
+        "user_id",
+        "subscribe"
+      ],
+      "anyOf": [
+        {
+          "title": "Required list_id",
+          "required": [
+            "list_id"
+          ]
+        },
+        {
+          "title": "Required list_code",
+          "required": [
+            "list_code"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "user_id": {
+          "type": "integer"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "list_id": {
+          "type": "integer"
+        },
+        "list_code": {
+          "type": "string"
+        },
+        "variant_id": {
+          "type": "integer"
+        },
+        "subscribe": {
+          "type": "boolean"
+        },
+        "utm_params": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

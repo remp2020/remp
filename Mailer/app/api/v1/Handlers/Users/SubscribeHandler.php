@@ -3,9 +3,8 @@
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Nette\Database\Table\ActiveRow;
-use Nette\Utils\Json;
-use Nette\Utils\JsonException;
 use Remp\MailerModule\Api\InvalidApiInputParamException;
+use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\ListVariantsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
@@ -20,6 +19,8 @@ class SubscribeHandler extends BaseHandler
     private $listsRepository;
 
     private $listVariantsRepository;
+
+    use JsonValidationTrait;
 
     public function __construct(
         UserSubscriptionsRepository $userSubscriptionsRepository,
@@ -42,20 +43,27 @@ class SubscribeHandler extends BaseHandler
 
     public function handle($params)
     {
-        try {
-            $data = Json::decode($params['raw'], Json::FORCE_ARRAY);
-        } catch (JsonException $e) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Input data was not valid JSON.']);
+        $payload = $this->validateInput($params['raw'], __DIR__ . '/subscribe.schema.json');
+
+        if ($this->hasErrorResponse()) {
+            return $this->getErrorResponse();
         }
 
         try {
-            $email = $this->getUserEmail($data);
-            $userID = $this->getUserID($data);
-            $list = $this->getList($data);
-            $variantID = $this->getVariantID($data, $list);
+            $this->processUserSubscription($payload);
         } catch (InvalidApiInputParamException $e) {
             return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
         }
+
+        return new JsonApiResponse(200, ['status' => 'ok']);
+    }
+
+    protected function processUserSubscription($payload)
+    {
+        $email = $payload['email'];
+        $userID = $payload['user_id'];
+        $list = $this->getList($payload);
+        $variantID = $this->getVariantID($payload, $list);
 
         $this->userSubscriptionsRepository->subscribeUser(
             $list,
@@ -63,72 +71,21 @@ class SubscribeHandler extends BaseHandler
             $email,
             $variantID
         );
-
-        return new JsonApiResponse(200, ['status' => 'ok']);
     }
 
     /**
-     * Validate and load email from $params
+     * Validate and load list from $payload
      *
-     * @param $params
-     * @return string
-     * @throws InvalidApiInputParamException
-     */
-    protected function getUserEmail($params): string
-    {
-        if (!isset($params['email'])) {
-            throw new InvalidApiInputParamException('Required field missing: `email`.', 400);
-        }
-        return $params['email'];
-    }
-
-    /**
-     * Validate and load user_id from $params
-     *
-     * @param $params
-     * @return int - Returns user_id
-     * @throws InvalidApiInputParamException - Thrown if user_id is not valid (code 400).
-     */
-    protected function getUserID($params): int
-    {
-        if (!isset($params['user_id'])) {
-            throw new InvalidApiInputParamException('Required field missing: `user_id`.', 400);
-        }
-        $userID = filter_var($params['user_id'], FILTER_VALIDATE_INT);
-        if ($userID === false) {
-            throw new InvalidApiInputParamException(
-                "Parameter `user_id` must be integer. Got [{$params['user_id']}].",
-                400
-            );
-        }
-
-        return $userID;
-    }
-
-    /**
-     * Validate and load list from $params
-     *
-     * @param $params
+     * @param $payload
      * @return ActiveRow $list - Returns mail list entity.
      * @throws InvalidApiInputParamException - Thrown if list_id or list_code are invalid (code 400) or if list is not found (code 404).
      */
-    protected function getList($params): ActiveRow
+    protected function getList($payload): ActiveRow
     {
-        if (!isset($params['list_id']) && !isset($params['list_code'])) {
-            throw new InvalidApiInputParamException('Required field missing: `list_id` or `list_code`.', 400);
-        }
-
-        if (isset($params['list_code'])) {
-            $list = $this->listsRepository->findByCode($params['list_code'])->fetch();
+        if (isset($payload['list_code'])) {
+            $list = $this->listsRepository->findByCode($payload['list_code'])->fetch();
         } else {
-            $listID = filter_var($params['list_id'], FILTER_VALIDATE_INT);
-            if ($listID === false) {
-                throw new InvalidApiInputParamException(
-                    "Parameter 'list_id' must be integer. Got [{$params['list_id']}].",
-                    400
-                );
-            }
-            $list = $this->listsRepository->find($listID);
+            $list = $this->listsRepository->find($payload['list_id']);
         }
 
         if ($list === false) {
@@ -141,29 +98,21 @@ class SubscribeHandler extends BaseHandler
     /**
      * Validate and load variant
      *
-     * @param array $params
+     * @param array $payload
      * @param ActiveRow $list - Already validated $list. Used to provide default variant_id if none was provided and to validate relationship between provided variant and list.
      * @return null|int - Returns validated Variant ID. If no variant_id was provided, returns list's default variant id (can be null).
      * @throws InvalidApiInputParamException - Thrown if variant_id is invalid or doesn't belong to list (code 400) or if variant with given ID doesn't exist (code 404).
      */
-    protected function getVariantID(array $params, ActiveRow $list): ?int
+    protected function getVariantID(array $payload, ActiveRow $list): ?int
     {
-        if (!isset($params['variant_id'])) {
+        if (!isset($payload['variant_id'])) {
             return $list->default_variant_id;
         }
 
-        $variantID = filter_var($params['variant_id'], FILTER_VALIDATE_INT);
-        if ($variantID === false) {
-            throw new InvalidApiInputParamException(
-                "Parameter 'variant_id' must be integer. Got [{$params['variant_id']}].",
-                400
-            );
-        }
-
-        $variant = $this->listVariantsRepository->findByIdAndMailTypeId($variantID, $list->id);
+        $variant = $this->listVariantsRepository->findByIdAndMailTypeId($payload['variant_id'], $list->id);
         if ($variant === false) {
             throw new InvalidApiInputParamException(
-                "Variant with ID [{$variantID}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
+                "Variant with ID [{$payload['variant_id']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
                 404
             );
         }

@@ -43,7 +43,7 @@ class SendEmailHandler extends BaseHandler
         return [];
     }
 
-    public function handle($payload)
+    public function handle($params)
     {
         $request = file_get_contents("php://input");
         if (empty($request)) {

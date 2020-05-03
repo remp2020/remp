@@ -28,6 +28,11 @@ class LogsRepository extends Repository
         'suppress-unsubscribe' => 'hard_bounced_at',
     ];
 
+    public function allForEmail(string $email)
+    {
+        return $this->getTable()->where('email', $email);
+    }
+
     public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null, $context = null)
     {
         return $this->insert(
