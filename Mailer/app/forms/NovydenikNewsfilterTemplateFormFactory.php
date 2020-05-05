@@ -81,7 +81,16 @@ class NovydenikNewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 15) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 16) {
+            $defaults = [
+                'name' => 'Americký týdeník ' . date('j.n.Y'),
+                'code' => 'nwsf_amer_tydenik_' . date('dmY'),
+                'mail_layout_id' => 2, // empty layout
+                'locked_mail_layout_id' => 2, // empty layout
+                'mail_type_id' => 13, // Americký týdeník
+                'from' => 'Jana Ciglerová Deník N <jana.ciglerova@denikn.cz>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 15) {
             $defaults = [
                 'name' => 'Částečný součet ' . date('j.n.Y'),
                 'code' => 'nwsf_cs_' . date('dmY'),
