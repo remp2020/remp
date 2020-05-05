@@ -43,7 +43,7 @@ trait ParseLogFilterConditionsTrait
 
         foreach ($filter as $key => $value) {
             $field = is_array($value) ? $key : $value;
-            if (!array_key_exists($key, $availableColumns)) {
+            if (!array_key_exists($field, $availableColumns)) {
                 throw new \Exception("Property $field is not allowed in log filter.");
             }
             $column = $availableColumns[$field];
