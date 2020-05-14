@@ -108,7 +108,15 @@ class BannerController extends Controller
 
     public function copy(Banner $sourceBanner)
     {
-        $sourceBanner->load('htmlTemplate', 'mediumRectangleTemplate', 'barTemplate', 'shortMessageTemplate');
+        $sourceBanner->load(
+            'htmlTemplate',
+            'mediumRectangleTemplate',
+            'overlayRectangleTemplate',
+            'htmlOverlayTemplate',
+            'barTemplate',
+            'collapsibleBarTemplate',
+            'shortMessageTemplate'
+        );
         $banner = $sourceBanner->replicate();
 
         flash(sprintf('Form has been pre-filled with data from banner "%s"', $sourceBanner->name))->info();
