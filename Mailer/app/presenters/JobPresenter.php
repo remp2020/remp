@@ -234,9 +234,20 @@ final class JobPresenter extends BasePresenter
             Debugger::log($this->segmentAggregator->getErrors(), Debugger::WARNING);
         }
 
+        $batchUnsubscribeStats = [];
+        foreach ($job->related('mail_job_batch') as $batch) {
+            $batchUnsubscribeStats[$batch->id] = $this->userSubscriptionsRepository->getTable()
+                ->where([
+                    'utm_content' => (string) $batch->id,
+                    'subscribed' => false,
+                ])
+                ->count('*');
+        }
+
         $this->template->job = $job;
         $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
         $this->template->jobIsEditable = $this->jobsRepository->isEditable($job->id);
+        $this->template->batchUnsubscribeStats = $batchUnsubscribeStats;
     }
 
     public function renderEditJob($id)

@@ -101,7 +101,7 @@
                             <li n:if="!empty($batch->max_emails)" class="list-group-item"><strong>Max number of sent emails:</strong> {$batch->max_emails}</li>
                             <li class="list-group-item"><strong>Start at:</strong> {$batch->start_at}</li>
                             <li class="list-group-item"><strong>Number of sent mails:</strong> {$batch->sent_emails}</li>
-                            <li class="list-group-item"><strong>Number of unsubscribed:</strong> {$batch->related('mail_user_subscriptions', 'utm_content')->count('*')}</li>
+                            <li class="list-group-item"><strong>Number of unsubscribed:</strong> {$batchUnsubscribeStats[$batch->id] ?? 0}</li>
                             <li class="list-group-item"><strong>Number of errors:</strong> {$batch->errors_count}</li>
                             <li class="list-group-item"><strong>Started:</strong> {$batch->first_email_sent_at}</li>
                             <li class="list-group-item"><strong>Ended:</strong> {$batch->last_email_sent_at}</li>
