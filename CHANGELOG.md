@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added API endpoint `users/logs` to retrieve logs of emails sent to user. Various filter can apply, see [README.md](./Mailer/README.md) for more details. GH-64
 - Added JSON schema validation to `Subscribe` and `BulkSubscribe` APIs. GH-64
 - Added API endpoint `users/preferences` to read user's subscriptions to newsletters (mail types). GH-64
+- Improved speed of job detail page - unsubscribe stats could slow rendering a bit if job was sent to 6+-figure recipients. remp/remp#624
 
 ### [Beam]
 
