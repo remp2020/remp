@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Docker
+
+- **BREAKING**: Replaced `spotify/kafka` docker image with `wurstmeister/kafka` as original image was no longed maintained and new installations stopped working. remp/remp#638
+  
+  - In case you have existing installation in place using the docker compose, please run:
+    ```bash
+    docker-compose stop beam_tracker telegraf
+    docker-compose rm beam_tracker telegraf
+    docker-compose build beam_tracker telegraf
+    ```  
+
 ### [Mailer]
 
 - Added API endpoint `mailers/mail-type-categories` to list mail type categories. GH-64
