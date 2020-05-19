@@ -136,12 +136,25 @@ services:
       - "redis"
     restart: "unless-stopped"
 
+  zookeeper:
+    image: "wurstmeister/zookeeper"
+    hostname: "zookeeper"
+    ports:
+      - "2181:2181"
+
   kafka:
-    build: "./Docker/kafka"
+    image: "wurstmeister/kafka"
+    hostname: "kafka"
+    ports:
+      - "9092:9092"
+    depends_on:
+      - "zookeeper"
     environment:
-      ADVERTISED_HOST: "kafka"
-      ADVERTISED_PORT: "9092"
-      CREATE_TOPICS: "beam_events:1:1"
+      KAFKA_ADVERTISED_HOST_NAME: "kafka"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_CREATE_TOPICS: "beam_events:1:1"
+      KAFKA_BROKER_ID: "1001"
+      KAFKA_RESERVED_BROKER_MAX_ID: "1001"
     volumes:
       - "kafka-data:/data"
 
@@ -166,7 +179,7 @@ services:
   beam_tracker:
     build: "./Beam/go/cmd/tracker"
     depends_on:
-      - "kafka"
+      - "zookeeper"
     restart: "unless-stopped"
 
   beam_segments:
