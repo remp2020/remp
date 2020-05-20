@@ -43,6 +43,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Improved intervals in campaign stats charts. remp/remp#605
 - Quick range day filters now start from beginning of the day. remp/remp#605
 - Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
+- Fixed add new ab variant replaces last variant instead of adding new after last one. remp/remp#634
 
 ### [Sso]
 - Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
