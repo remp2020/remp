@@ -192,7 +192,7 @@
                 this.variants[i].proportion = this.variants[i].proportion-10;
 
                 // add empty variant before control group
-                this.variants.splice(i, 0, {
+                this.variants.splice(i + 1, 0, {
                     id: null,
                     variant: "Variant " + this.variantNumber,
                     proportion: 10,
