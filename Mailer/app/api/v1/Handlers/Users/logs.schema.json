@@ -24,13 +24,6 @@
       "limit": 3,
       "email": "test@test.com",
       "mail_template_ids": [1,2,3]
-    },
-    {
-      "filter": ["delivered_at", "clicked_at", "opened_at"],
-      "page": 1,
-      "limit": 100,
-      "email": "test@test.com",
-      "mail_template_ids": [1,2,3]
     }
   ],
   "dependencies": {
@@ -39,59 +32,40 @@
   "additionalProperties": false,
   "properties": {
     "filter": {
-      "oneOf": [
-        {
-          "type": "array",
-          "title": "Basic logs filter",
-          "items": {
-            "enum": [
-              "sent_at",
-              "delivered_at",
-              "clicked_at",
-              "opened_at",
-              "dropped_at",
-              "spam_complained_at",
-              "hard_bounced_at"
-            ]
-          }
+      "type": "object",
+      "title": "Advanced logs filter",
+      "description": "Apply filter on logs results",
+      "properties": {
+        "sent_at": {
+          "title": "Sent at filter",
+          "$ref": "#/definitions/date-filter"
         },
-        {
-          "type": "object",
-          "title": "Advanced logs filter",
-          "description": "Apply filter on logs results",
-          "properties": {
-            "sent_at": {
-              "title": "Sent at filter",
-              "$ref": "#/definitions/date-filter"
-            },
-            "delivered_at": {
-              "title": "Delivered at filter",
-              "$ref": "#/definitions/date-filter"
-            },
-            "clicked_at": {
-              "title": "Clicked at filter",
-              "$ref": "#/definitions/date-filter"
-            },
-            "opened_at": {
-              "title": "Opened at filter",
-              "$ref": "#/definitions/date-filter"
-            },
-            "dropped_at": {
-              "title": "Dropped at filter",
-              "$ref": "#/definitions/date-filter"
-            },
-            "spam_complained_at": {
-              "title": "Spam complained at filter",
-              "$ref": "#/definitions/date-filter"
-            },
-            "hard_bounced_at": {
-              "title": "Hard bounced at filter",
-              "$ref": "#/definitions/date-filter"
-            }
-          },
-          "additionalProperties": false
+        "delivered_at": {
+          "title": "Delivered at filter",
+          "$ref": "#/definitions/date-filter"
+        },
+        "clicked_at": {
+          "title": "Clicked at filter",
+          "$ref": "#/definitions/date-filter"
+        },
+        "opened_at": {
+          "title": "Opened at filter",
+          "$ref": "#/definitions/date-filter"
+        },
+        "dropped_at": {
+          "title": "Dropped at filter",
+          "$ref": "#/definitions/date-filter"
+        },
+        "spam_complained_at": {
+          "title": "Spam complained at filter",
+          "$ref": "#/definitions/date-filter"
+        },
+        "hard_bounced_at": {
+          "title": "Hard bounced at filter",
+          "$ref": "#/definitions/date-filter"
         }
-      ]
+      },
+      "additionalProperties": false
     },
     "limit": {
       "type": "integer"

@@ -9,7 +9,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
-class LogsCountHandler extends BaseHandler
+class LogsCountPerStatusHandler extends BaseHandler
 {
     private $logsRepository;
 
@@ -32,22 +32,30 @@ class LogsCountHandler extends BaseHandler
 
     public function handle($params)
     {
-        $payload = $this->validateInput($params['raw'], __DIR__ . '/logs-count.schema.json');
+        $payload = $this->validateInput($params['raw'], __DIR__ . '/logs-count-per-status.schema.json');
 
         if ($this->hasErrorResponse()) {
             return $this->getErrorResponse();
         }
 
         $logs = $this->logsRepository->allForEmail($payload['email']);
-
-        foreach ($this->parseConditions($payload['filter'] ?? []) as $where) {
-            $logs->where(...$where);
-        }
-
         if (isset($payload['mail_template_ids'])) {
             $logs->where('mail_template_id', $payload['mail_template_ids']);
         }
 
-        return new JsonApiResponse(200, $logs->count('*'));
+        $result = [];
+        foreach ($payload['filter'] as $key) {
+            $filter = array_filter([
+                'from' => $payload['from'] ?? null,
+                'to' => $payload['to'] ?? null,
+            ]);
+            $statusLogs = clone $logs;
+            foreach ($this->parseConditions($key, $filter) ?? [] as $condition) {
+                $statusLogs->where(...$condition);
+            }
+            $result[$key] = $statusLogs->count('*');
+        }
+
+        return new JsonApiResponse(200, $result);
     }
 }
