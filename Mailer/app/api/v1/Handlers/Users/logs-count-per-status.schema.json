@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Returns count of logs.",
+  "title": "Logs count",
+  "required": ["email", "filter"],
+  "examples": [
+    {
+      "filter": ["sent_at"],
+      "from": "2020-04-07T13:33:44+02:00",
+      "to": "2020-04-08T13:33:44+02:00",
+      "email": "test@test.com"
+    }
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "filter": {
+      "type": "array",
+      "items": {
+        "enum": ["sent_at", "delivered_at", "clicked_at", "opened_at", "dropped_at", "spam_complained_at", "hard_bounced_at"]
+      },
+      "additionalProperties": false
+    },
+    "from": {
+      "title": "From filter",
+      "type": "string",
+      "format": "date-time"
+    },
+    "to": {
+      "title": "To filter",
+      "type": "string",
+      "format": "date-time"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    }
+  }
+}

@@ -994,9 +994,9 @@ Response:
 
 ---
 
-#### POST `/api/v1/users/logs-count`
+#### POST `/api/v1/users/logs-count-per-status`
 
-Returns number of logs based on given criteria
+Returns number of emails matching the status based on given timeframe. Count is returned separately for each selected status.
 
 ##### *Headers:*
 
@@ -1010,23 +1010,11 @@ Returns number of logs based on given criteria
 {
   // required 
   "email": "test@test.com", // String; email
+  "filter": ["sent_at", "delivered_at"], 
 
   // optional 
-  "filter": { // Object/Array; Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
-    "hard_bounced_at": {
-      "from": "2020-04-07T13:33:44+02:00", // String - RFC 3339 format; Restrict results to specific from date, optional
-      "to": "2020-04-10T13:33:44+02:00" // String - RFC 3339 format; Restrict results to specific to date, optional
-    }
-  },
-  "mail_template_ids": [1,2,3], // Array of integers; Ids of templates
-}
-```
-
-##### *Filter can also be in format:*
-
-```json5
-{
-  "filter": ["dropped_at", "delivered_at"] // Available filters are sent_at, delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
+  "from": "2020-04-07T13:33:44+02:00", // String - RFC 3339 format; Restrict results to specific from date, optional
+  "to": "2020-04-10T13:33:44+02:00" // String - RFC 3339 format; Restrict results to specific to date, optional
 }
 ```
 
@@ -1034,32 +1022,24 @@ Returns number of logs based on given criteria
 
 ```shell
 curl -X POST \
-  http://mailer.remp.press/api/v1/users/logs-count \
+  http://mailer.remp.press/api/v1/users/logs-count-per-status \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/json' \
   -d '{
-    "filter": {
-        "dropped_at": {},
-        "delivered_at": {
-          "to": "2020-04-07T13:33:44+02:00"
-        },
-        "spam_complained_at": {
-          "from": "2020-04-07T13:33:44+02:00"
-        },
-        "hard_bounced_at": {
-          "from": "2020-04-07T13:33:44+02:00",
-          "to": "2020-04-08T13:33:44+02:00"
-        }
-    },
-    "email": "test@test.com",
-    "mail_template_ids": [1,2,3]
+    "email": "test@test.com", // String; email
+    "filter": ["sent_at", "delivered_at"], 
+    "from": "2020-04-07T13:33:44+02:00", // String - RFC 3339 format; Restrict results to specific from date, optional
+    "to": "2020-04-10T13:33:44+02:00" // String - RFC 3339 format; Restrict results to specific to date, optional
 }'
 ```
 
 Response:
 
 ```json5
-6
+{
+    "sent_at": 2,
+    "delivered_at": 2
+}
 ```
 
 ---
@@ -1082,7 +1062,7 @@ Returns mail logs based on given criteria
   "email": "test@test.com", // String; email
 
   // optional 
-  "filter": { // Object/Array; Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
+  "filter": { // Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
     "hard_bounced_at": {
       "from": "2020-04-07T13:33:44+02:00", // String - RFC 3339 format; Restrict results to specific from date, optional
       "to": "2020-04-10T13:33:44+02:00" // String - RFC 3339 format; Restrict results to specific to date, optional
@@ -1207,8 +1187,8 @@ Response:
       "preview_url": "",
       "title": "Test",
       "description": "",
-      "locked": 0,
-      "is_multi_variant": 1,
+      "locked": false,
+      "is_multi_variant": true,
       "variants": {
         "4": "test2",
         "5": "test4"
@@ -1221,8 +1201,8 @@ Response:
       "preview_url": null,
       "title": "DEMO Weekly newsletter",
       "description": "Example mail list",
-      "locked": 0,
-      "is_multi_variant": 1,
+      "locked": false,
+      "is_multi_variant": true,
       "variants": {
         "2": "test",
         "3": "test2"

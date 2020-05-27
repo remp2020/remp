@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added API endpoint `mailers/mail-type-categories` to list mail type categories. GH-64
 - Extended API endpoint `mailers/mail-types` to include additional data and filter via `public_listing` and `code` parameters. GH-64
 - Added API endpoint `users/is-unsubscribed` to check if user is explicitly unsubscribed from the newsletter. GH-64
-- Added API endpoint `users/logs-count` to get number of emails sent to user. Various filter can apply, see [README.md](./Mailer/README.md) for more details. GH-64
+- Added API endpoint `users/logs-count-per-status` to get number of emails sent to user per each status within provided timeframe. GH-64
 - Added API endpoint `users/logs` to retrieve logs of emails sent to user. Various filter can apply, see [README.md](./Mailer/README.md) for more details. GH-64
 - Added JSON schema validation to `Subscribe` and `BulkSubscribe` APIs. GH-64
 - Added API endpoint `users/preferences` to read user's subscriptions to newsletters (mail types). GH-64

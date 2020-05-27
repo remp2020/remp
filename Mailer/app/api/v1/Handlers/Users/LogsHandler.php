@@ -42,21 +42,20 @@ class LogsHandler extends BaseHandler
         }
 
         $logs = $this->logsRepository->allForEmail($payload['email']);
-
-        foreach ($this->parseConditions($payload['filter'] ?? []) as $where) {
-            $logs->where(...$where);
-        }
-
         if (isset($payload['mail_template_ids'])) {
             $logs->where('mail_template_id', $payload['mail_template_ids']);
         }
-
         if (isset($payload['page'])) {
             $logs->limit($payload['limit'], ($payload['page'] - 1) * $payload['limit']);
         }
-
         if (isset($payload['limit']) && !isset($payload['page'])) {
             $logs->limit($payload['limit']);
+        }
+
+        foreach ($payload['filter'] ?? [] as $key => $filter) {
+            foreach ($this->parseConditions($key, $filter) ?? [] as $condition) {
+                $logs->where(...$condition);
+            }
         }
 
         $output = [];

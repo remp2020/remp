@@ -12,22 +12,12 @@ trait ParseLogFilterConditionsTrait
      * @throws \Exception
      * @example
      *
-     * ["delivered_at", "clicked_at", "opened_at"....]
-     *
-     * or
-     *
      * [
-     *      "delivered_at" => [
-     *          "from" => "2020-01-01T00:00:00Z",
-     *          "to" => "2020-04-05T00:00:00Z",
-     *      ],
-     *      "clicked_at" => [
-     *          "from" => "2020-01-01T00:00:00Z",
-     *          "to" => "2020-04-05T00:00:00Z",
-     *      ],
-     * ]
+     *     "from" => "2020-01-01T00:00:00Z",
+     *     "to" => "2020-04-05T00:00:00Z",
+     * ],
      */
-    public function parseConditions(array $filter): array
+    public function parseConditions(string $field, $filter): array
     {
         $conditions = [];
 
@@ -41,27 +31,20 @@ trait ParseLogFilterConditionsTrait
             "hard_bounced_at" => "hard_bounced_at"
         ];
 
-        foreach ($filter as $key => $value) {
-            $field = is_array($value) ? $key : $value;
-            if (!array_key_exists($field, $availableColumns)) {
-                throw new \Exception("Property $field is not allowed in log filter.");
-            }
-            $column = $availableColumns[$field];
+        if (!array_key_exists($field, $availableColumns)) {
+            throw new \Exception("Property $field is not allowed in log filter.");
+        }
+        $column = $availableColumns[$field];
 
-            if (is_array($value)) {
-                // key is column, value is date
-                if (isset($value['from'])) {
-                    $conditions[] = ["$column >= ?", DateTime::from($value['from'])];
-                }
-                if (isset($value['to'])) {
-                    $conditions[] = ["$column < ?", DateTime::from($value['to'])];
-                }
-                continue;
-            }
-
-            $conditions[] = ["$column IS NOT NULL"];
+        // key is column, value is date
+        if (isset($filter['from'])) {
+            $conditions[] = ["$column >= ?", DateTime::from($filter['from'])];
+        }
+        if (isset($filter['to'])) {
+            $conditions[] = ["$column < ?", DateTime::from($filter['to'])];
         }
 
+        $conditions[] = ["$column IS NOT NULL"];
         return $conditions;
     }
 }
