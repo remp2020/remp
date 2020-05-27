@@ -436,6 +436,9 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 		if user.BrowserID != nil {
 			tags["browser_id"] = *user.BrowserID
 		}
+		if user.ProductID != nil {
+			tags["product_id"] = *user.ProductID
+		}
 		if user.RempSessionID != nil {
 			tags["remp_session_id"] = *user.RempSessionID
 		}

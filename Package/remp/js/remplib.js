@@ -8,6 +8,8 @@ export default {
 
     userSubscribed: null,
 
+    productId: null,
+
     browserId: null,
 
     rempSessionIDKey: "remp_session_id",
@@ -38,6 +40,10 @@ export default {
 
     isUserSubscriber: function() {
         return this.userSubscribed;
+    },
+
+    getProductId: function() {
+        return this.productId;
     },
 
     getBrowserId: function() {
