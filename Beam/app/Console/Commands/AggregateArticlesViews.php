@@ -39,8 +39,8 @@ class AggregateArticlesViews extends Command
         $this->line('');
 
         // TODO set this up depending finalized conditions
-        // First delete data older than 90 days
-        $dateThreshold = Carbon::today()->subDays(90)->toDateString();
+        // First delete data older than 30 days
+        $dateThreshold = Carbon::today()->subDays(30)->toDateString();
         ArticleAggregatedView::where('date', '<=', $dateThreshold)->delete();
 
         $dateFrom = $this->option('date-from');
