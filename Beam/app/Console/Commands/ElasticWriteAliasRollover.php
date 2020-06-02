@@ -10,7 +10,7 @@ class ElasticWriteAliasRollover extends Command
 {
     const COMMAND = 'service:elastic-write-alias-rollover';
 
-    protected $signature = self::COMMAND . ' {--host=} {--write-alias=} {--read-alias=}';
+    protected $signature = self::COMMAND . ' {--host=} {--write-alias=} {--read-alias=} {--auth=}';
 
     protected $description = 'Rollover write index and assign newly created index to read index';
 
@@ -39,17 +39,32 @@ class ElasticWriteAliasRollover extends Command
             $this->input->getOption('write-alias')
         ));
 
+
+        $options = [];
+        if ($this->input->getOption('auth')) {
+            $auth = $this->input->getOption('auth');
+            if (!str_contains($auth, ':')) {
+                $this->line("<error>ERROR</error> You need to provide <info>--auth</info> option with a name and a password (to Elastic instance) separated by ':', e.g. admin:password");
+                return;
+            }
+
+            [$user, $pass] = explode(':', $auth, 2);
+            $options = [
+                'auth' => [$user, $pass]
+            ];
+        }
+
         // execute rollover; https://www.elastic.co/guide/en/elasticsearch/reference/6.3/indices-rollover-index.html
         try {
-            $response = $client->post(sprintf("/%s/_rollover", $this->input->getOption('write-alias')), [
+            $response = $client->post(sprintf("/%s/_rollover", $this->input->getOption('write-alias')), array_merge([
                 'json' => [
                     'conditions' => [
                     'max_age' => '31d',
                     'max_size' => '4gb',
-//                        'max_docs' => 1, // condition for testing
+                        //'max_docs' => 1, // condition for testing
                     ],
                 ],
-            ]);
+            ], $options));
         } catch (ClientException $e) {
             $body = json_decode($e->getResponse()->getBody());
             dump($body);
@@ -71,7 +86,7 @@ class ElasticWriteAliasRollover extends Command
 
         // if rollover happened, add newly created index to the read alias (so it contains all the indices)
         try {
-            $client->post("/_aliases", [
+            $client->post("/_aliases", array_merge([
                 'json' => [
                     'actions' => [
                         'add' => [
@@ -80,7 +95,7 @@ class ElasticWriteAliasRollover extends Command
                         ],
                     ],
                 ],
-            ]);
+            ], $options));
         } catch (ClientException $e) {
             $body = json_decode($e->getResponse()->getBody());
             dump($body);
