@@ -171,8 +171,7 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <p class="m-l-20">
-                                            User <strong>needs to be member</strong> of at least one
-                                            of these segments in order to show the campaign:
+                                            User <strong>needs to be member</strong> of all selected segments in order to show the campaign:
                                         </p>
 
                                         <div class="input-group">
