@@ -532,54 +532,56 @@ class ArticleController extends Controller
                 $article->authors()->attach($authorObj);
             }
 
-            // Load existing titles
-            $existingArticleTitles = $article->articleTitles()
-                ->orderBy('updated_at')
-                ->get()
-                ->groupBy('variant');
+            if (isset($a['titles']) && is_array($a['titles'])) {
+                // Load existing titles
+                $existingArticleTitles = $article->articleTitles()
+                    ->orderBy('updated_at')
+                    ->get()
+                    ->groupBy('variant');
 
-            $lastTitles = [];
-            foreach ($existingArticleTitles as $variant => $variantTitles) {
-                $lastTitles[$variant] = $variantTitles->last()->title;
-            }
-
-            // Saving titles
-            $newTitles = $a['titles'] ?? [];
-
-            $newTitleVariants = array_keys($newTitles);
-            $lastTitleVariants = array_keys($lastTitles);
-
-            // Titles that were not present in new titles, but were previously recorded
-            foreach (array_diff($lastTitleVariants, $newTitleVariants) as $variant) {
-                $lastTitle = $lastTitles[$variant];
-                if ($lastTitle !== null) {
-                    // title was deleted and it was not recorded yet
-                    $article->articleTitles()->create([
-                        'variant' => $variant,
-                        'title' => null // deleted flag
-                    ]);
+                $lastTitles = [];
+                foreach ($existingArticleTitles as $variant => $variantTitles) {
+                    $lastTitles[$variant] = $variantTitles->last()->title;
                 }
-            }
 
-            // New titles, not previously recorded
-            foreach (array_diff($newTitleVariants, $lastTitleVariants) as $variant) {
-                $newTitle = html_entity_decode($newTitles[$variant], ENT_QUOTES);
-                $article->articleTitles()->create([
-                    'variant' => $variant,
-                    'title' => $newTitle
-                ]);
-            }
+                // Saving titles
+                $newTitles = $a['titles'];
 
-            // Changed titles
-            foreach (array_intersect($newTitleVariants, $lastTitleVariants) as $variant) {
-                $lastTitle = $lastTitles[$variant];
-                $newTitle = html_entity_decode($newTitles[$variant], ENT_QUOTES);
+                $newTitleVariants = array_keys($newTitles);
+                $lastTitleVariants = array_keys($lastTitles);
 
-                if ($lastTitle !== $newTitle) {
+                // Titles that were not present in new titles, but were previously recorded
+                foreach (array_diff($lastTitleVariants, $newTitleVariants) as $variant) {
+                    $lastTitle = $lastTitles[$variant];
+                    if ($lastTitle !== null) {
+                        // title was deleted and it was not recorded yet
+                        $article->articleTitles()->create([
+                            'variant' => $variant,
+                            'title' => null // deleted flag
+                        ]);
+                    }
+                }
+
+                // New titles, not previously recorded
+                foreach (array_diff($newTitleVariants, $lastTitleVariants) as $variant) {
+                    $newTitle = html_entity_decode($newTitles[$variant], ENT_QUOTES);
                     $article->articleTitles()->create([
                         'variant' => $variant,
                         'title' => $newTitle
                     ]);
+                }
+
+                // Changed titles
+                foreach (array_intersect($newTitleVariants, $lastTitleVariants) as $variant) {
+                    $lastTitle = $lastTitles[$variant];
+                    $newTitle = html_entity_decode($newTitles[$variant], ENT_QUOTES);
+
+                    if ($lastTitle !== $newTitle) {
+                        $article->articleTitles()->create([
+                            'variant' => $variant,
+                            'title' => $newTitle
+                        ]);
+                    }
                 }
             }
 
