@@ -72,17 +72,17 @@ class TopSearch
     public function topPostTags($timeFrom, $limit)
     {
         $getTopPostTagsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) {
-            $topAuthorsQuery = DB::table('article_pageviews')
+            $topTagsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
-                ->join('article_author', 'article_pageviews.article_id', '=', 'article_tag.article_id')
+                ->join('article_tag', 'article_pageviews.article_id', '=', 'article_tag.article_id')
                 ->groupBy(['article_tag.tag_id'])
                 ->select('article_tag.tag_id', DB::raw('SUM(article_pageviews.sum) as pageviews'))
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
 
             $data = DB::table('tags')
-                ->joinSub($topAuthorsQuery, 'top_tags', function ($join) {
+                ->joinSub($topTagsQuery, 'top_tags', function ($join) {
                     $join->on('tags.id', '=', 'top_tags.tag_id');
                 })
                 ->select('tags.name', 'top_tags.pageviews');
