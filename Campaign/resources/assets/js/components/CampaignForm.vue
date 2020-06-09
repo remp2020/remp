@@ -171,7 +171,7 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <p class="m-l-20">
-                                            User <strong>needs to be member</strong> of all selected segments in order to show the campaign:
+                                            User <strong>needs to be member of ALL</strong> of these segments in order to see the campaign:
                                         </p>
 
                                         <div class="input-group">
@@ -217,8 +217,7 @@
 
                                     <div class="col-md-8" style="margin-top:15px">
                                         <p class="m-l-20">
-                                            User <strong>cannot be member</strong> of at least one of
-                                            these segments in order to show the campaign:
+                                            User <strong>CANNOT be member of ANY</strong> of these segments in order to see the campaign:
                                         </p>
 
                                         <div class="input-group">
