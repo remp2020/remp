@@ -57,6 +57,7 @@ class MailTypesListingHandler extends BaseHandler
             $item->mail_type_category_id = $row->mail_type_category_id;
             $item->locked = (bool) $row->locked;
             $item->is_multi_variant = (bool) $row->is_multi_variant;
+            $item->sorting = $row->sorting;
             $item->variants = $row->related('mail_type_variants.mail_type_id')->order('sorting')->fetchPairs('id', 'title');
             $output[] = $item;
         }
