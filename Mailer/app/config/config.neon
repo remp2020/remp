@@ -193,6 +193,7 @@ services:
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-type-categories'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeCategoriesHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mail-type-upsert'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeUpsertHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'segments', 'list'), \Remp\MailerModule\Api\v1\Handlers\Segments\SegmentsListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 2, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 			- addApiHandler(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'send-email'), \Remp\MailerModule\Api\v1\Handlers\Mailers\SendEmailHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())

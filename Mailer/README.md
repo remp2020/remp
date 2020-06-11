@@ -1331,6 +1331,45 @@ Response:
 
 ---
 
+#### GET `/api/v1/mailers/mail-templates`
+
+Get available mail templates. Possible filtering by `mail_type_code` to get only emails belonging to specified newsletter lists.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Example:*
+
+```shell
+curl -X GET \
+  http://mailer.remp.press/api/v1/mailers/mail-templates \
+  -H 'Authorization: Bearer XXX'
+```
+
+Response:
+
+```json5
+[
+  {
+      "code": "email_1",
+      "name": "Welcome email",
+      "description": "Email sent after new registration",
+      "mail_type_code": "system"
+  },
+  {
+      "code": "email_2",
+      "name": "Reset password",
+      "description": "Email sent after new password was requested",
+      "mail_type_code": "system"
+  }
+]
+```
+
+---
+
 #### POST `/api/v1/mailers/templates`
 
 Creates new email template. Endpoint complements creation of template via web interface.
