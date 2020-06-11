@@ -622,7 +622,7 @@ class ArticleController extends Controller
         $readArticlesAfter = $readArticlesTimespan ? Misc::timespanInPast($readArticlesTimespan) : (clone $timeAfter)->subWeek();
         $timeBefore = Carbon::now();
 
-        foreach (array_chunk($request->user_ids, 500) as $userIdsChunk) {
+        foreach (array_chunk($request->user_ids, 100) as $userIdsChunk) {
             $usersReadArticles = $this->readArticlesForUsers($readArticlesAfter, $timeBefore, $userIdsChunk);
 
             // Save top articles per user
