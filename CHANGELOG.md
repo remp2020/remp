@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
 - Added new APIs `api/authors/top` and `api/tags/top` for retrieving top authors and tags per given time period. remp/web#366
 - Articles upsert v2 api endpoint - process article titles only if they are present in payload. remp/remp#646
+- Fixed remplib initialization which could use misidentification of user - `remplib.getUserId()` would return `null` even when the `userId` was correctly set in `rempConfig`. remp/remp#651
 
 ### [Campaign]
 
@@ -47,6 +48,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
 - Fixed add new ab variant replaces last variant instead of adding new after last one. remp/remp#634
 - Changed wording of hints in campaign's segment selection form. remp/remp#645
+- Fixed remplib initialization which could use misidentification of user - `remplib.getUserId()` would return `null` even when the `userId` was correctly set in `rempConfig`. remp/remp#651
 
 ### [Sso]
 - Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
