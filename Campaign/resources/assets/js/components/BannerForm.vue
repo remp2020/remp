@@ -144,6 +144,12 @@
                                 <div class="fg-line">
                                     <label for="js" class="fg-label">Custom JS</label>
                                     <textarea v-model="js" class="form-control fg-input" rows="6" name="js" cols="50" id="js"></textarea>
+                                    <small class="help-block">Custom JS is run as a function with single a function parameter <i>params</i>.
+                                        Object <i>params</i> contains several properties of the banner you can access.
+                                        <span data-toggle="tooltip"
+                                              data-original-title="properties: utmMedium, utmCampaign, utmContent, bannerVariant"
+                                              class="glyphicon glyphicon-question-sign"></span>
+                                    </small>
                                 </div>
                             </div><!-- .input-group -->
 
@@ -173,6 +179,20 @@
                                     <input v-for="cssInclude in cssIncludes" type="hidden" name="css_includes[]" :value="cssInclude">
                                 </div>
                                 <input v-else type="hidden" name="css_includes[]">
+                            </div><!-- .input-group -->
+
+                            <div class="input-group fg-float checkbox">
+                                <label class="m-l-15">
+                                    Track banner events manually
+                                    <input v-model="manualEventsTracking" value="1" name="manual_events_tracking" type="checkbox">
+                                    <i class="input-helper"></i>
+                                    <small class="help-block">
+                                        Banner events (show, click, close) are tracked back to Campaign tool automatically.
+                                        Enable if you need to manually control when events are fired.
+                                        To track events manually, use <i>remplib.tracker.trackEvent()</i> function.
+                                        See <a href="https://github.com/remp2020/remp/tree/master/Beam#js-tracking-interface">documentation</a> for further details.
+                                    </small>
+                                </label>
                             </div><!-- .input-group -->
 
                         </div>
@@ -355,6 +375,7 @@
                                         :js="js"
                                         :jsIncludes="jsIncludes"
                                         :cssIncludes="cssIncludes"
+                                        :manualEventsTracking="manualEventsTracking"
                                 ></banner-preview>
                             </div>
                         </div>
@@ -417,7 +438,8 @@
 
         "_js": String,
         "_jsIncludes": Array,
-        "_cssIncludes": Array
+        "_cssIncludes": Array,
+        "_manualEventsTracking": Boolean,
     };
 
     export default {
@@ -491,6 +513,7 @@
             js: null,
             jsIncludes: null,
             cssIncludes: null,
+            manualEventsTracking: null,
 
             fieldParamsMessage: "UTM params will be automatically appended to every link in this field.<br> If you want to add custom parameter to specific link: add data-param-* attribute. e.g.: data-param-foo=\"baz\""
         }),

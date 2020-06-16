@@ -30,7 +30,8 @@ window.remplib = window.remplib || {};
                 adminPreview: false,
                 js: model['js'] || null,
                 jsIncludes: model['js_includes'] || null,
-                cssIncludes: model['css_includes'] || null
+                cssIncludes: model['css_includes'] || null,
+                manualEventsTracking: model['manual_events_tracking'] || false
             };
 
             if (banner.template === 'medium_rectangle') {

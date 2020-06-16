@@ -71,13 +71,16 @@ var run = function() {
     }
 
     setTimeout(function() {
-        remplib.tracker.trackEvent("banner", "show", null, null, {
-            "utm_source": "remp_campaign",
-            "utm_medium": banner.displayType,
-            "utm_campaign": banner.campaignUuid,
-            "utm_content": banner.uuid,
-            "banner_variant": banner.variantUuid
-        });
+        if (!banner.manualEventsTracking) {
+            remplib.tracker.trackEvent("banner", "show", null, null, {
+                "utm_source": "remp_campaign",
+                "utm_medium": banner.displayType,
+                "utm_campaign": banner.campaignUuid,
+                "utm_content": banner.uuid,
+                "banner_variant": banner.variantUuid
+            });
+        }
+
         banner.show = true;
         if (banner.closeTimeout) {
             setTimeout(function() {
