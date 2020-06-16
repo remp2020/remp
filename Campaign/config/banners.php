@@ -32,6 +32,11 @@ return [
             'width' => '100%',
             'height' => 'auto',
         ],
+        'hidden' => [
+            'name' => 'Hidden (for tracking purposes)',
+            'width' => '0px',
+            'height' => '0px',
+        ]
     ],
     'positions' => [
         'top_left' => [
