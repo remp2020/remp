@@ -40,6 +40,7 @@ class BannerRequest extends FormRequest
             'offset_horizontal' => 'required|integer',
             'js_includes' => 'array',
             'css_includes' => 'array',
+            'manual_events_tracking' => 'boolean',
         ];
     }
 
@@ -133,6 +134,9 @@ class BannerRequest extends FormRequest
     public function all($keys = null)
     {
         $result = parent::all($keys);
+        if (!isset($result['manual_events_tracking'])) {
+            $result['manual_events_tracking'] = false;
+        }
         if (!isset($result['closeable'])) {
             $result['closeable'] = false;
         }

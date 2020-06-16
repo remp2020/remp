@@ -41,10 +41,12 @@ class Banner extends Model implements Searchable
         'js',
         'js_includes',
         'css_includes',
+        'manual_events_tracking',
     ];
 
     protected $casts = [
         'closeable' => 'boolean',
+        'manual_events_tracking' => 'boolean',
         'js_includes' => 'array',
         'css_includes' => 'array',
     ];

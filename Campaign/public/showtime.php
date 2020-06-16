@@ -203,7 +203,10 @@ var run = function() {
             event.banner_variant = banner.variantUuid; 
         }
         
-        remplib.tracker.trackEvent("banner", "show", null, null, event);
+        if (!banner.manualEventsTracking) {
+            remplib.tracker.trackEvent("banner", "show", null, null, event);    
+        }
+        
         banner.show = true;
         if (banner.closeTimeout) {
             setTimeout(function() {

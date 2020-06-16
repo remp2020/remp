@@ -231,6 +231,7 @@
         "js",
         "jsIncludes",
         "cssIncludes",
+        "manualEventsTracking",
     ];
 
     export default {
@@ -396,7 +397,7 @@
 				this.$parent.$emit('values-changed', [
                     {key: "show", val: false}
                 ]);
-                if (this.closeTracked) {
+                if (this.manualEventsTracking || this.closeTracked) {
                     return true;
                 }
                 this.trackEvent("banner", "close", null, null, {
@@ -409,7 +410,7 @@
                 this.closeTracked = true;
             },
             clicked: function(event, hideBanner = false) {
-                if (this.clickTracked) {
+                if (this.manualEventsTracking || this.clickTracked) {
                     return true;
                 }
                 this.trackEvent("banner", "click", null, null, {
@@ -444,16 +445,30 @@
                 return false;
             },
             runCustomJavascript: function (js) {
+                let that = this;
                 this.$nextTick(() => {
                     setTimeout(function() {
                         try {
-                            eval('(function() {' + js + '})()');
+                            // Evaluating JS code using Function with passed params object
+                            // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
+                            let body = 'function(params) { ' + js + ' }'
+                            let wrap = s => "{ return " + body + " };"
+                            let func = new Function(wrap(body));
+                            func.call(null).call(null, that.paramsForCustomJavascript());
                         } catch(err) {
                             console.warn("unable to execute custom banner JS:", js);
                             console.warn(err);
                         }
                     }, 0);
                 }, this)
+            },
+            paramsForCustomJavascript: function () {
+                return {
+                    "utmMedium": this.displayType,
+                    "utmCampaign": this.campaignUuid,
+                    "utmContent": this.uuid,
+                    "bannerVariant": this.variantUuid
+                }
             }
         }
     }
