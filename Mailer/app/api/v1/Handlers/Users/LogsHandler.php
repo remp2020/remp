@@ -65,7 +65,11 @@ class LogsHandler extends BaseHandler
             $item->id = $log->id;
             $item->email = $log->email;
             $item->subject = $log->subject;
-            $item->mail_template_id = $log->mail_template_id;
+            $item->mail_template = [
+                'id' => $log->mail_template_id,
+                'code' => $log->mail_template->code,
+                'name' => $log->mail_template->name,
+            ];
             $item->sent_at = $this->formatDate($log->created_at);
             $item->delivered_at = $this->formatDate($log->delivered_at);
             $item->dropped_at = $this->formatDate($log->dropped_at);

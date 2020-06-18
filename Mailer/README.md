@@ -1118,7 +1118,11 @@ Response:
     "id": 2,
     "email": "test@test.com",
     "subject": null,
-    "mail_template_id": 1,
+    "mail_template": {
+      "id": 1,
+      "code": "demo_email",
+      "name": "Demo email"
+    },
     "sent_at": "2020-04-08T19:26:00+02:00"
     "delivered_at": "2020-04-08T13:33:44+02:00",
     "dropped_at": "2020-04-08T19:28:36+02:00",
@@ -1132,7 +1136,11 @@ Response:
     "id": 4,
     "email": "test@test.com",
     "subject": null,
-    "mail_template_id": 2,
+    "mail_template": {
+      "id": 2,
+      "code": "example_email",
+      "name": "Example email"
+    },
     "sent_at": "2020-04-08T19:26:00+02:00"
     "delivered_at": null,
     "dropped_at": "2020-04-08T19:28:46+02:00",
