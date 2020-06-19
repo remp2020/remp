@@ -60,7 +60,7 @@ class LogsHandler extends BaseHandler
 
         $output = [];
 
-        foreach ($logs->order('created_at ASC')->fetchAll() as $log) {
+        foreach ($logs->order('created_at DESC')->fetchAll() as $log) {
             $item = new \stdClass();
             $item->id = $log->id;
             $item->email = $log->email;
