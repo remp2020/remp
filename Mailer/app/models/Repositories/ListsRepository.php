@@ -102,4 +102,19 @@ class ListsRepository extends Repository
     {
         return $this->getTable()->order('mail_type_category.sorting, mail_types.sorting');
     }
+
+    public function search(string $term, int $limit): array
+    {
+        foreach ($this->dataTableSearchable as $column) {
+            $where[$column . ' LIKE ?'] = '%' . $term . '%';
+        }
+
+        $results = $this->all()
+            ->select(implode(',', array_merge(['id'], $this->dataTableSearchable)))
+            ->whereOr($where ?? [])
+            ->limit($limit)
+            ->fetchAssoc('id');
+
+        return $results ?? [];
+    }
 }

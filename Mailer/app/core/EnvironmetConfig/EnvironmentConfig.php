@@ -26,7 +26,7 @@ class EnvironmentConfig
 
     public function get($key)
     {
-        return getenv($key);
+        return getenv($key) ?: null;
     }
 
     public function getDsn()
