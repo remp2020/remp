@@ -37,6 +37,20 @@ $(document).ready(function() {
                         case 'banner':
                             searchResult['name'] = '<i class="zmdi zmdi-collection-folder-image"></i> ' + searchResult['name'];
                             break;
+
+                        // Mailer
+                        case 'email':
+                            searchResult['name'] = '<span class="label label-default"><i class="zmdi zmdi-view-quilt"></i> email</span> ' + searchResult['name'];
+                            break;
+                        case 'layout':
+                            searchResult['name'] = '<span class="label label-default"><i class="zmdi zmdi-widgets"></i> layout</span> ' + searchResult['name'];
+                            break;
+                        case 'list':
+                            searchResult['title'] = '<span class="label label-default"><i class="zmdi zmdi-arrow-split"></i> list</span> ' + searchResult['title'];
+                            break;
+                        case 'job':
+                            searchResult['name'] = '<span class="label label-default"><i class="zmdi zmdi-refresh"></i> job</span> ' + searchResult['name'];
+                            break;
                     }
 
                     // format tags
@@ -60,10 +74,42 @@ $(document).ready(function() {
                     // format banners
                     if (searchResult['banners']) {
                         let banners = '';
-                        searchResult['banners'].forEach(section => {
-                            banners += `<span class="label label-default palette-Blue-Grey-50 bg">${section}</span> `;
+                        searchResult['banners'].forEach(banner => {
+                            banners += `<span class="label label-default palette-Blue-Grey-50 bg">${banner}</span> `;
                         });
                         searchResult['banners'] = banners;
+                    }
+
+                    // format statuses
+                    if (searchResult['statuses']) {
+                        let statuses = '';
+                        searchResult['statuses'].forEach(status => {
+                            statuses += `<span class="label label-default palette-Blue-Grey-50 bg">${status}</span> `;
+                        });
+                        searchResult['statuses'] = statuses;
+                    }
+
+                    // format codes
+                    if (searchResult['codes']) {
+                        let codes = '';
+                        searchResult['codes'].forEach(code => {
+                            codes += `<span class="label label-default palette-Blue-Grey-50 bg">${code}</span> `;
+                        });
+                        searchResult['codes'] = codes;
+                    }
+
+                    // format mail types
+                    if (searchResult['mail_types']) {
+                        let mail_types = '';
+                        searchResult['mail_types'].forEach(mail_type => {
+                            mail_types += `<span class="label label-default palette-Purple-50 bg">${mail_type}</span> `;
+                        });
+                        searchResult['mail_types'] = mail_types;
+                    }
+
+                    // format mail types
+                    if (searchResult['date']) {
+                        searchResult['date'] = `<span class="label label-default palette-Amber-50 bg">${moment.utc(searchResult['date']).local().format('LLL')}</span> `;
                     }
                 });
 
@@ -74,6 +120,10 @@ $(document).ready(function() {
                     'sections',
                     'code',
                     'banners',
+                    'statuses',
+                    'codes',
+                    'mail_types',
+                    'date',
                 ];
                 $('.typeahead__field .preloader').css('visibility', 'hidden');
                 return data;

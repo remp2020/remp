@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Docker
 
-- **BREAKING**: Replaced `spotify/kafka` docker image with `wurstmeister/kafka` as original image was no longed maintained and new installations stopped working. remp/remp#638
+- **BREAKING**: Replaced `spotify/kafka` docker image with `wurstmeister/kafka` as original image was no longer maintained and new installations stopped working. remp/remp#638
   
   - In case you have existing installation in place using the docker compose, please run:
     ```bash
@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added API endpoint `users/preferences` to read user's subscriptions to newsletters (mail types). GH-64
 - Improved speed of job detail page - unsubscribe stats could slow rendering a bit if job was sent to 6+-figure recipients. remp/remp#624
 - Added API endpoint `mailers/mail-templates` to list and filter available mail templates.
+- Added early-version support for search in the top searchbox. Searchable are emails (templates), layouts, jobs and newsletter lists. GH-69
 
 ### [Beam]
 
