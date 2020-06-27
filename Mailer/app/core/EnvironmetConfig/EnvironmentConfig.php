@@ -26,7 +26,11 @@ class EnvironmentConfig
 
     public function get($key)
     {
-        return getenv($key) ?: null;
+        $val = getenv($key);
+        if ($val === false || $val === '') {
+            return null;
+        }
+        return $val;
     }
 
     public function getDsn()
