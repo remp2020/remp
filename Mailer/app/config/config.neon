@@ -27,6 +27,7 @@ parameters:
 				- Authorization
 				- X-Requested-With
 				- Content-Type
+	template_editor: @environmentConfig::get('TEMPLATE_EDITOR')
 
 extensions:
 	local_configs: Remp\MailerModule\Config\ConfigExtension
@@ -69,6 +70,7 @@ services:
 			- linkService(mailer, /, email)
 			- setParam(locale, %locale%)
 			- setParam(max_result_count, %max_result_count%)
+			- setParam(template_editor, %template_editor%)
 
 	# Latte filters
 	filterLoader:

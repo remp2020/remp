@@ -9,5 +9,10 @@ $typeahead-line-height: 1.5em;
 @import "~animate.css/animate.css";
 @import "~node-waves/dist/waves.css";
 @import "~google-material-color/dist/palette.css";
-@import "~codemirror/lib/codemirror.css";
 @import "~jquery-typeahead/src/jquery.typeahead";
+
+@import "~codemirror/lib/codemirror.css";
+@import "~codemirror/theme/base16-dark.css";
+@import "~codemirror/addon/lint/lint.css";
+@import "~codemirror/addon/dialog/dialog.css";
+@import "~trumbowyg/dist/ui/sass/trumbowyg";

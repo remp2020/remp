@@ -10,7 +10,6 @@ $white: White;
 
 @import "~remp/sass/site-search.scss";
 
-
 .pg-item {
   &.green:nth-child(odd) {
     background-color: transparentize(#75a478, .90);
@@ -51,4 +50,9 @@ $white: White;
     color: black;
     padding: 0.2em;
   }
+}
+
+.CodeMirror {
+  margin-top: 1.5rem;
+  height: auto;
 }
