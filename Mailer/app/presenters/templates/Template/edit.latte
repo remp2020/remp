@@ -1,25 +1,54 @@
 {layout '../@layout.latte'}
 
-{block #content}
+{block content}
+    {include jsInit}
 
 <div class="c-header">
     <h2>Emails</h2>
 </div>
-<div class="card">
-    <div class="card-header">
-        <div class="row">
-            <div class="col-lg-4">
-                <h2 n:block="title">Edit email <small>{$mailTemplate->name}</small></h2>
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h2 n:block="title">Edit email <small>{$mailTemplate->name}</small></h2>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a n:href="Show $mailTemplate->id">
+                        <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> View</button>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body card-padding">
+                {include '@form.latte'}
             </div>
         </div>
+    </div>
 
-        <div class="actions">
-            <a n:href="Show $mailTemplate->id">
-                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> View</button>
-            </a>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                <h2>Preview</h2>
+            </div>
+            <div class="card-body card-padding">
+                <div id="js-mail-preview">
+                    <mail-preview></mail-preview>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="card-body card-padding">
-        {include '@form.latte'}
-    </div>
 </div>
+
+{/block}
+
+{define jsInit}
+    <script>
+        $(function() {
+            remplib.templateForm.init();
+        });
+    </script>
+{/define}

@@ -32,6 +32,9 @@
                 this.iframe.contentWindow.document.open('text/html', 'replace');
                 this.iframe.contentWindow.document.write(finalContent);
                 this.iframe.contentWindow.document.close();
+
+                // auto height iframe on content
+                this.iframe.style.height = (this.iframe.contentWindow.document.body.scrollHeight + 100) + 'px';
             }
         },
         mounted: function () {
@@ -49,7 +52,7 @@
 <style>
     .previewFrame {
         width: 100%;
-        height: 1400px;
+        height: 100%;
         border: none;
     }
 </style>

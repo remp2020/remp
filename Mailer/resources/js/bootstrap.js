@@ -23,6 +23,20 @@ require('jquery-placeholder');
 global.autosize = require('autosize');
 
 global.CodeMirror = require('codemirror');
+require('codemirror/addon/selection/active-line');
+require('codemirror/addon/fold/xml-fold');
+require('codemirror/addon/edit/matchbrackets');
+require('codemirror/addon/edit/closebrackets');
+require('codemirror/addon/edit/matchtags');
+require('codemirror/addon/edit/closetag');
+require('codemirror/addon/lint/lint');
+require('codemirror/addon/dialog/dialog');
+require('codemirror/addon/search/search');
+require('codemirror/addon/search/searchcursor');
+require('codemirror/addon/search/jump-to-line');
+require('codemirror/mode/xml/xml');
+require('codemirror/mode/javascript/javascript');
+require('codemirror/mode/css/css');
 require('codemirror/mode/htmlmixed/htmlmixed.js');
 
 global.Vue = require('vue');
