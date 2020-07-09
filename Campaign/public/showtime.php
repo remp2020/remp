@@ -337,6 +337,7 @@ $redis = new \Predis\Client([
     'host'   => getenv('REDIS_HOST'),
     'port'   => getenv('REDIS_PORT') ?: 6379,
     'password' => getenv('REDIS_PASSWORD') ?: null,
+    'database' => getenv('REDIS_DEFAULT_DATABASE') ?: 0,
 ]);
 
 /** @var \App\Contracts\SegmentAggregator $segmentAggregator */
