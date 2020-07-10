@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.11.1] - 2020-07-10
+
 ### [Beam]
 
 - Added environment variables to configure Redis databases in Laravel. remp/remp#671 
