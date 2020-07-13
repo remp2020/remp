@@ -38,9 +38,6 @@ class ListCreatedHandler implements HandlerInterface
         }
 
         $list = $this->listsRepository->find($payload['list_id']);
-        if (!$list->auto_subscribe) {
-            return true;
-        }
 
         $page = 1;
         while ($users = $this->userProvider->list([], $page)) {
