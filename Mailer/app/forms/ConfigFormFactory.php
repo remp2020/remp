@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Forms;
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
 use Remp\MailerModule\Config\Config;
+use Remp\MailerModule\Config\LocalConfig;
 use Remp\MailerModule\Mailer\Mailer;
 use Remp\MailerModule\Repository\ConfigsRepository;
 use Remp\MailerModule\Sender\MailerFactory;
@@ -19,14 +20,20 @@ class ConfigFormFactory
     /** @var MailerFactory */
     private $mailerFactory;
 
+    /** @var LocalConfig */
+    private $localConfig;
+
     public $onSuccess;
+
 
     public function __construct(
         ConfigsRepository $configsRepository,
-        MailerFactory $mailerFactory
+        MailerFactory $mailerFactory,
+        LocalConfig $localConfig
     ) {
         $this->configsRepository = $configsRepository;
         $this->mailerFactory = $mailerFactory;
+        $this->localConfig = $localConfig;
     }
 
     public function create()
@@ -38,6 +45,7 @@ class ConfigFormFactory
         $mailerContainer = $settings->addContainer('Mailer');
 
         $configs = $this->configsRepository->all()->fetchAssoc('name');
+        $overriddenConfigs = $this->getOverriddenConfigs($configs);
 
         $mailers = [];
         $availableMailers =  $this->mailerFactory->getAvailableMailers();
@@ -45,11 +53,15 @@ class ConfigFormFactory
             $mailers[$name] = get_class($mailer);
         });
 
+        $defaultMailerKey = 'default_mailer';
         $defaultMailer = $mailerContainer
-            ->addSelect('default_mailer', 'Default Mailer', $mailers)
-            ->setDefaultValue($configs['default_mailer']['value']);
+            ->addSelect($defaultMailerKey, 'Default Mailer', $mailers)
+            ->setDefaultValue($configs[$defaultMailerKey]['value'])
+            ->setOption('configOverridden', isset($overriddenConfigs[$defaultMailerKey])
+                ? "{$defaultMailerKey}: {$this->localConfig->value($defaultMailerKey)}"
+                : false);
 
-        unset($configs['default_mailer']);
+        unset($configs[$defaultMailerKey]); // remove to avoid double populating in internal section lower.
 
         /** @var $mailer Mailer */
         foreach ($this->mailerFactory->getAvailableMailers() as $mailer) {
@@ -59,12 +71,16 @@ class ConfigFormFactory
             foreach ($mailer->getConfigs() as $name => $option) {
                 $key = $mailer->getPrefix() . '_' . $name;
                 $config = $configs[$key];
+                $configOverridden = isset($overriddenConfigs[$key])
+                    ? "{$key}: {$this->localConfig->value($key)}"
+                    : false;
                 $item = null;
 
                 if ($config['type'] === 'string') {
                     $item = $mailerContainer
                         ->addText($config['name'], $config['display_name'])
                         ->setOption('description', $config['description'])
+                        ->setOption('configOverridden', $configOverridden)
                         ->setDefaultValue($config['value']);
                 }
 
@@ -134,5 +150,12 @@ class ConfigFormFactory
         }
 
         ($this->onSuccess)();
+    }
+
+    protected function getOverriddenConfigs(array $configs): array
+    {
+        return array_filter($configs, function ($key) {
+            return $this->localConfig->exists($key);
+        }, ARRAY_FILTER_USE_KEY);
     }
 }

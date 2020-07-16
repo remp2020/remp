@@ -21,6 +21,13 @@
                             {input $input, class => 'selectpicker'}
                         </div>
                     </div>
+                    {if $configOverridden = $input->getOption('configOverridden')}
+                        <div class="small text-warning">
+                            <i class="zmdi zmdi-alert-triangle"></i>
+                            Configuration is overridden by local config.
+                            <code>{$configOverridden}</code>
+                        </div>
+                    {/if}
                 </div>
             </div>
         </div>
