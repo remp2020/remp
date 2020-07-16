@@ -47,7 +47,7 @@
     "jquery": "3.2.1",
     "jquery-placeholder": "^2.3.1",
     "jquery-typeahead": "^2.11.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "material-design-iconic-font": "^2.2.0",
     "moment": "^2.24.0",
     "node-waves": "^0.7.6",
