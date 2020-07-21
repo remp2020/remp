@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Model\NewsletterCriterion;
+use App\Model\Config\ConfigNames;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AuthorSegmentsConfigurationRequest extends FormRequest
@@ -25,10 +25,10 @@ class AuthorSegmentsConfigurationRequest extends FormRequest
     public function rules()
     {
         return [
-            'min_views' => 'required|numeric|min:0',
-            'min_average_timespent' => 'required|numeric|min:0',
-            'min_ratio' => 'required|numeric|between:0,1',
-            'days_in_past' => 'required|numeric|between:1,90',
+            ConfigNames::AUTHOR_SEGMENTS_MIN_VIEWS => 'required|numeric|min:0',
+            ConfigNames::AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT => 'required|numeric|min:0',
+            ConfigNames::AUTHOR_SEGMENTS_MIN_RATIO => 'required|numeric|between:0,1',
+            ConfigNames::AUTHOR_SEGMENTS_DAYS_IN_PAST => 'required|numeric|between:1,90',
         ];
     }
 }

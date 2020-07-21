@@ -78,6 +78,16 @@ Please follow the upgrade steps:
 - Commands `pageviews:aggregate-load` and `pageviews:aggregate-timespent` do not show progress unless `--debug` parameter is specified.
 - [Segments]: Fixed possibility of missing aggregations if Elastic was not able to resolve values for a sub aggregation because there were no records within the sub-aggregation branch.
 - Fixed `remplib.js` generating `undefined` cookies when JS is run on a page with no query parameters. remp2020/remp#81
+- **BREAKING:** Field `locked` removed from `configs` table. remp/remp#494
+- **BREAKING:** Field `config_category_id` in `configs` table is mandatory and cannot be null anymore. remp/remp#494
+- Added new config category `Author Segments` and paired respective configs with this new category. remp/remp#494
+- Changed settings screen to contain configs grouped by categories in separate linkable tabs. remp/remp#494
+- Added configure button in `more options` modal that navigates to dashboard section of settings remp/remp#494
+- Removed components that are not used anymore, namely: form for author-segments config, methods `saveConfiguration` and `validateConfiguration` of `AuthorSegmentsController` remp/remp#494
+- Removed configs for author segments from config page that was accessible from authors segments page config button, only testing configs remained remp/remp#494
+- Added `more options` dropdown in Author segments index page, dropdown contains redirects to author segments config tab in settings page and to testing configuration (former authors segments config page) remp/remp#494
+- Added/ported validation of author segments configs to respective settings tab, code is prepared to handle validations for other config categories as well, see `SettingsController::update()` remp/remp#494
+- Added button into author segments config tab for testing of author segments config (redirects into testing page). remp/remp#494
 
 ### [Mailer]
 
