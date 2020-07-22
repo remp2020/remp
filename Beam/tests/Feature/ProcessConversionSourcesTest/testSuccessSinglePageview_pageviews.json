@@ -1,0 +1,28 @@
+[
+  {
+    "pageviews":[
+      {
+        "article":{
+          "id":"9",
+          "locked":false
+        },
+        "id":"a99b6c37-9ce8-495c-a47c-a5c67044daa0",
+        "system":{
+          "property_token":"dc48299e-55bd-4b7b-89ce-3e410380fe39",
+          "time":"2020-08-06T14:36:33Z"
+        },
+        "user":{
+          "browser_id":"6f3b2834-5bdf-41d2-a9e3-b3a12a588358",
+          "referer":"http:\/\/localhost:63342\/remp-sample-blog\/index.html?_ijt=kpug1k77p39icds5lv3bgeta46",
+          "derived_referer_host_with_path":"http:\/\/localhost:63342\/remp-sample-blog\/index.html",
+          "derived_referer_medium":"social",
+          "derived_referer_source":"facebook",
+          "remp_pageview_id":"a99b6c37-9ce8-495c-a47c-a5c67044daa0",
+          "remp_session_id":"session2",
+          "url":"http:\/\/localhost:63342\/remp-sample-blog\/single.html?_ijt=4vrl747pu6r74aa9c86papqcj2"
+        }
+      }
+    ],
+    "tags":{}
+  }
+]

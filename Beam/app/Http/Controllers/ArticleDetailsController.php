@@ -7,15 +7,12 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
 use App\Http\Resources\ArticleResource;
-use App\Model\ArticleViewsSnapshot;
+use App\Model\ConversionSource;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
-use DB;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
-use Remp\Journal\ListRequest;
 
 class ArticleDetailsController extends Controller
 {
@@ -466,12 +463,54 @@ class ArticleDetailsController extends Controller
             $aggregated[$derivedMedium][$key] += $count;
         }
 
+        // retrieve conversion sources and group their counts by type(first/last), url and medium as well (same url cases)
+        $conversionSourcesCounts = [];
+        $conversionSources = $article->conversionSources()
+            ->where('conversions.paid_at', '>=', $visitedFrom)
+            ->where('conversions.paid_at', '<', $visitedTo)
+            ->get();
+
+        foreach ($conversionSources as $conversionSource) {
+            $medium = $this->journalHelper->refererMediumLabel($conversionSource->referer_medium);
+            $source = empty($conversionSource->referer_source) ? $conversionSource->referer_host_with_path : $conversionSource->referer_source;
+            $type = $conversionSource->type;
+
+            if (!isset($conversionSourcesCounts[$medium][$source][$type])) {
+                $conversionSourcesCounts[$medium][$source][$type] = 0;
+            }
+            $conversionSourcesCounts[$medium][$source][$type]++;
+        }
+
         foreach ($aggregated as $medium => $mediumSources) {
             foreach ($mediumSources as $source => $count) {
                 $data->push([
                     'derived_referer_medium' => $medium,
                     'source' => $source,
+                    'first_conversion_source_count' => $conversionSourcesCounts[$medium][$source][ConversionSource::TYPE_SESSION_FIRST] ?? 0,
+                    'last_conversion_source_count' => $conversionSourcesCounts[$medium][$source][ConversionSource::TYPE_SESSION_LAST] ?? 0,
                     'visits_count' => $count,
+                ]);
+                if (isset($conversionSourcesCounts[$medium][$source][ConversionSource::TYPE_SESSION_FIRST])) {
+                    unset($conversionSourcesCounts[$medium][$source][ConversionSource::TYPE_SESSION_FIRST]);
+                }
+                if (isset($conversionSourcesCounts[$medium][$source][ConversionSource::TYPE_SESSION_LAST])) {
+                    unset($conversionSourcesCounts[$medium][$source][ConversionSource::TYPE_SESSION_LAST]);
+                }
+            }
+        }
+
+        // add also conversion sources that do not match witch article source
+        foreach ($conversionSourcesCounts as $medium => $mediumSources) {
+            foreach ($mediumSources as $source => $commerceCountByType) {
+                if (!isset($commerceCountByType[ConversionSource::TYPE_SESSION_FIRST]) && !isset($commerceCountByType[ConversionSource::TYPE_SESSION_LAST])) {
+                    continue;
+                }
+                $data->push([
+                    'derived_referer_medium' => $medium,
+                    'source' => $source,
+                    'first_conversion_source_count' => $commerceCountByType[ConversionSource::TYPE_SESSION_FIRST] ?? 0,
+                    'last_conversion_source_count' => $commerceCountByType[ConversionSource::TYPE_SESSION_LAST] ?? 0,
+                    'visits_count' => 0,
                 ]);
             }
         }

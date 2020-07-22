@@ -64,6 +64,10 @@ type Pageview struct {
 	WindowWidth     int       `json:"window_width"`
 	WindowHeight    int       `json:"window_height"`
 	Timespent       int       `json:"timespent"`
+
+	DerivedRefererMedium       string `json:"derived_referer_medium"`
+	DerivedRefererHostWithPath string `json:"derived_referer_host_with_path"`
+	DerivedRefererSource       string `json:"derived_referer_source"`
 }
 
 // PageviewRow represents one row of grouped list.

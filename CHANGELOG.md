@@ -34,6 +34,15 @@ If you're not sure if your database is in UTC, follow these steps to verify and 
 - [Segments]: Improved live caching of segments, avoiding queries that are not necessary to execute.
 - [Segments]: Explicitly closing open Elastic scrolls once we don't need them anymore, since they're expensive to maintain for Elastic.
 - Added explicit DB connection time zone to enforce UTC communication between application and database. remp/remp#809
+- Added command for processing of conversion sources that runs in batch mode or for specific conversion (`php artisan conversions:process-sources [--conversion_id]`). remp/remp#464
+  - Added new `conversion_sources` table. remp/remp#464
+  - Processing of conversion sources is also invoked in conversion upsert endpoint right after aggregation of conversion events. remp/remp#464
+- Calling of conversion events aggregation has been moved into separate job class. Another job class has been created for conversion sources command as well. remp/remp#464
+- Added new columns in `articles.show` view into referer stats section - `first conversion source count` and `last conversion source count`. remp/remp#464
+- [Segments]: Added new referer-based fields to the API responses (see Swagger for additional information):
+  - `derived_referer_host_with_path`
+  - `derived_referer_medium`
+  - `derived_referer_source`
 
 ### [Campaign]
 

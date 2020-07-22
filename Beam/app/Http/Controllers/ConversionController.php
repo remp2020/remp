@@ -4,19 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
-use App\Console\Commands\AggregateConversionEvents;
 use App\Conversion;
 use App\Http\Request;
 use App\Http\Requests\ConversionRequest;
 use App\Http\Requests\ConversionUpsertRequest;
 use App\Http\Resources\ConversionResource;
+use App\Jobs\ProcessConversionJob;
 use App\Model\Tag;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
-use Remp\LaravelHelpers\Resources\JsonResource;
 use Yajra\Datatables\Datatables;
 
 class ConversionController extends Controller
@@ -197,9 +195,7 @@ class ConversionController extends Controller
             $conversions[] = $conversion;
 
             if (!$conversion->events_aggregated) {
-                Artisan::queue(AggregateConversionEvents::COMMAND, [
-                    '--conversion_id' => $conversion->id
-                ]);
+                ProcessConversionJob::dispatch($conversion);
             }
         }
 

@@ -5,6 +5,7 @@ namespace App;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;
+use App\Model\ConversionSource;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -34,7 +35,8 @@ class Conversion extends Model
     ];
 
     protected $casts = [
-        'events_aggregated' => 'boolean'
+        'events_aggregated' => 'boolean',
+        'source_processed' => 'boolean',
     ];
 
     public function article()
@@ -57,6 +59,11 @@ class Conversion extends Model
         return $this->hasMany(ConversionGeneralEvent::class);
     }
 
+    public function conversionSources()
+    {
+        return $this->hasMany(ConversionSource::class);
+    }
+
     public function setArticleExternalIdAttribute($articleExternalId)
     {
         $article = Article::select()->where([
@@ -75,5 +82,13 @@ class Conversion extends Model
             return;
         }
         $this->attributes['paid_at'] = new Carbon($value);
+    }
+
+    public static function getAggregatedConversionsWithoutSource()
+    {
+        return Conversion::select()
+            ->where('events_aggregated', true)
+            ->where('source_processed', false)
+            ->get();
     }
 }

@@ -1,0 +1,26 @@
+[
+  {
+    "commerces":[
+      {
+        "id":"b2b725ee-9424-4e0a-a869-892a21c04993",
+        "step":"payment",
+        "payment": {
+          "transaction_id": "1234567890"
+        },
+        "system":{
+          "time":"2020-08-06T14:36:47Z"
+        },
+        "user":{
+          "id":"26",
+          "url":"http://localhost:63342/remp-sample-blog/index.html"
+        },
+        "article": {
+          "id": "article1"
+        }
+      }
+    ],
+    "tags":{
+      "browser_id":""
+    }
+  }
+]
