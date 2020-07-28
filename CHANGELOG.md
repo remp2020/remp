@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Docker
+
+- Added tzdata installation for remp_segments docker (required by golang).
+
 ## [0.11.1] - 2020-07-10
 
 ### [Beam]
