@@ -86,7 +86,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 remplib.userSubscribed = config.userSubscribed;
             }
             if (typeof config.browserId !== 'undefined' && config.browserId !== null) {
-                remplib.browserId = config.browser;
+                remplib.browserId = config.browserId;
             }
 
             if (typeof config.article === 'object') {

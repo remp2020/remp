@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added tzdata installation for remp_segments docker (required by golang).
 
+### [Beam]
+
+- Fixed ignored explicit `browserId` parameter in JS configuration. remp/remp#690
+
 ## [0.11.1] - 2020-07-10
 
 ### [Beam]
