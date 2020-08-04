@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed ignored explicit `browserId` parameter in JS configuration. remp/remp#690
 - Commands `pageviews:aggregate-load` and `pageviews:aggregate-timespent` do not show progress unless `--debug` parameter is specified.
 - [Segments]: Fixed possibility of missing aggregations if Elastic was not able to resolve values for a sub aggregation because there were no records within the sub-aggregation branch.
+- Fixed `remplib.js` generating `undefined` cookies when JS is run on a page with no query parameters. remp2020/remp#81
 
 ### [Mailer]
 
@@ -290,6 +291,7 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[0.11.1]: https://github.com/remp2020/remp/compare/0.10.0...0.11.1
 [0.10.0]: https://github.com/remp2020/remp/compare/0.9.1...0.10.0
 [0.9.0]: https://github.com/remp2020/remp/compare/0.8.0...0.9.1
 [0.8.0]: https://github.com/remp2020/remp/compare/0.7.0...0.8.0
