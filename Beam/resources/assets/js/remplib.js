@@ -91,8 +91,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.userSubscribed !== 'undefined' && config.userSubscribed !== null) {
                 remplib.userSubscribed = config.userSubscribed;
             }
-            if (typeof config.productId !== 'undefined' && config.productId !== null) {
-                remplib.productId = config.productId;
+            if (config.productIds instanceof Array) {
+                remplib.productIds = config.productIds;
             }
             if (typeof config.browserId !== 'undefined' && config.browserId !== null) {
                 remplib.browserId = config.browserId;

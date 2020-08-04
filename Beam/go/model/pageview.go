@@ -60,7 +60,7 @@ type Pageview struct {
 	Cookies      bool      `json:"cookies"`
 	SignedIn     bool      `json:"signed_in"`
 	Subscriber   bool      `json:"subscriber"`
-	ProductID    string    `json:"product_id"`
+	ProductIDs   []string  `json:"product_ids"`
 	WindowWidth  int       `json:"window_width"`
 	WindowHeight int       `json:"window_height"`
 	Timespent    int       `json:"timespent"`

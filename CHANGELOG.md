@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added caching of colors order in dashboard (order is first assigned according to predefined order and number of traffic per each referer medium). remp/remp#719
 - Added missing IE11 polyfill to support `Promise` in IE11. remp/remp#795
-- Added support to track ID of user's subscription type or product which allows access to content. remp/analytika#11
+- Added support to track IDs of user's subscription types or products which allow access to content. remp/analytika#11
 
 ### [Campaign]
 
