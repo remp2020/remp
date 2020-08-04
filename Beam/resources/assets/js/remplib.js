@@ -17,7 +17,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         social: null,
 
         campaign_id: null,
-
+ 
         _: [],
 
         article: {
@@ -654,6 +654,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         parseUriParams: function() {
             var query = window.location.search.substring(1);
+            
+            if (!query) return;
+            
             var vars = query.split('&');
 
             const now = new Date();
