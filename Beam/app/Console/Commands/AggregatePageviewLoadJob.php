@@ -82,12 +82,12 @@ class AggregatePageviewLoadJob extends Command
         $bar->setFormat('%message%: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
-        $processedUsers = 0;
+        $processedArticles = 0;
 
         foreach ($allChunks as $allChunk) {
-            $processedUsers += count($allChunk);
+            $processedArticles += count($allChunk);
 
-            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedUsers, count($all)));
+            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedArticles, count($all)));
             $bar->advance();
             $articles = Article::whereIn('external_id', array_keys($allChunk))->get();
             foreach ($articles as $article) {
