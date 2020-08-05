@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- Added ability to aggregate current hour pageviews data (switch `--current-hour` added to `pageviews:aggregate-load` command). Pageview data for articles are now refreshed every minute instead of every hour. remp/remp#663
 - Fixed ignored explicit `browserId` parameter in JS configuration. remp/remp#690
 
 ## [0.11.1] - 2020-07-10

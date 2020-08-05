@@ -13,15 +13,22 @@ class AggregatePageviewLoadJob extends Command
 {
     const COMMAND = 'pageviews:aggregate-load';
 
-    protected $signature = self::COMMAND . ' {--now=}';
+    protected $signature = self::COMMAND . ' {--now=} {--current-hour} ';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
-        $timeBefore = $now->minute(0)->second(0);
-        $timeAfter = (clone $timeBefore)->subHour();
+
+        $currentHour = $this->option('current-hour') ?? false;
+        if ($currentHour) {
+            $timeAfter = (clone $now)->minute(0)->second(0);
+            $timeBefore = (clone $timeAfter)->addHour();
+        } else {
+            $timeBefore = $now->minute(0)->second(0);
+            $timeAfter = (clone $timeBefore)->subHour();
+        }
 
         $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
