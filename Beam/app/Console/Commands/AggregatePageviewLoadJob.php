@@ -76,41 +76,39 @@ class AggregatePageviewLoadJob extends Command
             return;
         }
 
-        $bar = $this->output->createProgressBar(count($all));
-        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $allChunks =  array_chunk($all, 200, true);
+
+        $bar = $this->output->createProgressBar(count($allChunks));
+        $bar->setFormat('%message%: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
-        foreach ($all as $articleId => $count) {
-            $bar->setMessage(sprintf('Storing aggregated data for article <info>%s</info>', $articleId));
+        $processedUsers = 0;
 
-            $article = Article::select()->where([
-                'external_id' => $articleId,
-            ])->first();
+        foreach ($allChunks as $allChunk) {
+            $processedUsers += count($allChunk);
 
-            if (!$article) {
-                $bar->advance();
-                continue;
-            }
-
-            /** @var ArticlePageviews $ap */
-            $ap = ArticlePageviews::firstOrNew([
-                'article_id' => $article->id,
-                'time_from' => $timeAfter,
-                'time_to' => $timeBefore,
-            ]);
-
-            $ap->sum = $count;
-            $ap->signed_in = $signedIn[$articleId];
-            $ap->subscribers = $subscribers[$articleId];
-            $ap->save();
-
-            $article->pageviews_all = $article->pageviews()->sum('sum');
-            $article->pageviews_subscribers = $article->pageviews()->sum('subscribers');
-            $article->pageviews_signed_in = $article->pageviews()->sum('signed_in');
-            $article->save();
-
+            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedUsers, count($all)));
             $bar->advance();
+            $articles = Article::whereIn('external_id', array_keys($allChunk))->get();
+            foreach ($articles as $article) {
+                $ap = ArticlePageviews::firstOrNew([
+                    'article_id' => $article->id,
+                    'time_from' => $timeAfter,
+                    'time_to' => $timeBefore,
+                ]);
+
+                $ap->sum = $all[$articleId];
+                $ap->signed_in = $signedIn[$articleId];
+                $ap->subscribers = $subscribers[$articleId];
+                $ap->save();
+
+                $article->pageviews_all = $article->pageviews()->sum('sum');
+                $article->pageviews_subscribers = $article->pageviews()->sum('subscribers');
+                $article->pageviews_signed_in = $article->pageviews()->sum('signed_in');
+                $article->save();
+            }
         }
+
         $bar->finish();
         $this->line(' <info>OK!</info>');
     }
