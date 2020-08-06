@@ -1075,15 +1075,18 @@ $response = file_get_contents("http://beam.remp.press/api/tags/top", false, $con
 [
     {
         "name": "ekonomika",
-        "pageviews": 4000
+        "pageviews": 4000,
+        "external_id": "1"
     },
     {
         "name": "covid19",
-        "pageviews": 3000
+        "pageviews": 3000,
+        "external_id": "2"
     },
     {
         "name": "brexit",
-        "pageviews": 2000
+        "pageviews": 2000,
+        "external_id": "3"
     }
 ]
 ```
