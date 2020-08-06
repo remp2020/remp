@@ -926,6 +926,9 @@ You can filter authors by time of pageview.
 {
 	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
 	"limit": 3, // limit how many top authors this endpoint returns
+	"sections": [ // OPTIONAL; filters authors publishing articles only assigned given sections
+		"Section title" // String; section title
+	]
 }
 ```
 
@@ -1016,6 +1019,9 @@ You can filter tags by time of pageview.
 {
 	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
 	"limit": 3, // limit how many top tags this endpoint returns
+	"sections": [ // OPTIONAL; filters tags published in given sections
+		"Section title" // String; section title
+	]
 }
 ```
 

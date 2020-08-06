@@ -349,9 +349,10 @@ class AuthorController extends Controller
 
     public function topAuthors(TopAuthorsRequest $request, TopSearch $topSearch)
     {
+        $sections = $request->json('sections');
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
 
-        return response()->json($topSearch->topAuthors($timeFrom, $limit));
+        return response()->json($topSearch->topAuthors($timeFrom, $limit, $sections));
     }
 }

@@ -26,6 +26,8 @@ class TopTagsRequest extends FormRequest
         return [
             'from' => 'required|date',
             'limit' => 'required|integer',
+            'sections' => 'array',
+            'sections.*' => 'string',
         ];
     }
 }

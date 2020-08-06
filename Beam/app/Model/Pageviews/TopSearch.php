@@ -7,9 +7,9 @@ use Illuminate\Support\Carbon;
 
 class TopSearch
 {
-    public function topArticles($timeFrom, $limit, $sections)
+    public function topArticles($timeFrom, $limit, array $sectionNames = null)
     {
-        $getTopArticlesFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sections) {
+        $getTopArticlesFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionNames) {
             $pageviews = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -21,10 +21,10 @@ class TopSearch
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
 
-            if ($sections) {
+            if ($sectionNames) {
                 $pageviews->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
                     ->join('sections', 'article_section.section_id', '=', 'sections.id')
-                    ->whereIn('sections.name', $sections);
+                    ->whereIn('sections.name', $sectionNames);
             }
 
             $data = DB::table('articles')
@@ -42,9 +42,9 @@ class TopSearch
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopArticlesFunc);
     }
 
-    public function topAuthors($timeFrom, $limit)
+    public function topAuthors($timeFrom, $limit, array $sectionNames = null)
     {
-        $getTopAuthorsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) {
+        $getTopAuthorsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionNames) {
             $topAuthorsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -53,6 +53,12 @@ class TopSearch
                 ->select('article_author.author_id', DB::raw('SUM(article_pageviews.sum) as pageviews'))
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
+
+            if ($sectionNames) {
+                $topAuthorsQuery->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
+                    ->join('sections', 'article_section.section_id', '=', 'sections.id')
+                    ->whereIn('sections.name', $sectionNames);
+            }
 
             $data = DB::table('authors')
                 ->joinSub($topAuthorsQuery, 'top_authors', function ($join) {
@@ -69,9 +75,9 @@ class TopSearch
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopAuthorsFunc, 'name');
     }
 
-    public function topPostTags($timeFrom, $limit)
+    public function topPostTags($timeFrom, $limit, array $sectionNames = null)
     {
-        $getTopPostTagsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) {
+        $getTopPostTagsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionNames) {
             $topTagsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -81,11 +87,17 @@ class TopSearch
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
 
+            if ($sectionNames) {
+                $topTagsQuery->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
+                    ->join('sections', 'article_section.section_id', '=', 'sections.id')
+                    ->whereIn('sections.name', $sectionNames);
+            }
+
             $data = DB::table('tags')
                 ->joinSub($topTagsQuery, 'top_tags', function ($join) {
                     $join->on('tags.id', '=', 'top_tags.tag_id');
                 })
-                ->select('tags.name', 'top_tags.pageviews');
+                ->select('tags.name', 'tags.external_id', 'top_tags.pageviews');
 
             return $data->get()->map(function ($item) {
                 $item->pageviews = (int) $item->pageviews;
@@ -93,7 +105,7 @@ class TopSearch
             });
         };
 
-        // TODO: currently tags do not have external_id, using 'name' as key attribute
+        // TODO: currently tags may not have external_id, using 'name' as key attribute
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopPostTagsFunc, 'name');
     }
 
