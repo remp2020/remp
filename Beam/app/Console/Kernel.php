@@ -104,6 +104,11 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
 
+        $schedule->command(AggregatePageviewTimespentJob::COMMAND, ["--now='+1 hour'"])
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
+
         // Aggregates last full hour only once
         $schedule->command(AggregatePageviewLoadJob::COMMAND)
             ->hourlyAt(1) // 1 minute after, so we make sure previous hour is completed
@@ -111,10 +116,10 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND)
-            ->everyMinute()
+            ->hourlyAt(1) //
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
-
+        
         $schedule->command(ProcessPageviewSessions::COMMAND)
             ->everyFiveMinutes()
             ->withoutOverlapping()
