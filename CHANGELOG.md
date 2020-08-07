@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Pageviews data for articles are now refreshed every minute instead of every hour. remp/remp#663
 - Fixed ignored explicit `browserId` parameter in JS configuration. remp/remp#690
+- Commands `pageviews:aggregate-load` and `pageviews:aggregate-timespent` do not show progress unless `--debug` parameter is specified.
 
 ## [0.11.1] - 2020-07-10
 

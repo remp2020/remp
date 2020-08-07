@@ -4,21 +4,25 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\ArticlePageviews;
+use App\Helpers\DebugProxy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class AggregatePageviewLoadJob extends Command
 {
     const COMMAND = 'pageviews:aggregate-load';
 
-    protected $signature = self::COMMAND . ' {--now=}';
+    protected $signature = self::COMMAND . ' {--now=} {--debug}';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
+        $debug = $this->option('debug') ?? false;
+
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
 
         $timeBefore = $now->minute(0)->second(0);
@@ -30,7 +34,6 @@ class AggregatePageviewLoadJob extends Command
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'signed_in', 'subscriber');
-
         $records = collect($journalContract->count($request));
 
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
@@ -38,7 +41,8 @@ class AggregatePageviewLoadJob extends Command
             return;
         }
 
-        $bar = $this->output->createProgressBar(count($records));
+        /** @var ProgressBar $bar */
+        $bar = new DebugProxy($this->output->createProgressBar(count($records)), $debug);
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Processing pageviews');
 
@@ -70,7 +74,7 @@ class AggregatePageviewLoadJob extends Command
             $bar->advance();
         }
         $bar->finish();
-        $this->line(' <info>OK!</info>');
+        $this->line("\n<info>Pageviews loaded from Journal API</info>");
 
         if (count($all) === 0) {
             $this->line(sprintf('No data to store for articles, exiting.'));
@@ -79,7 +83,8 @@ class AggregatePageviewLoadJob extends Command
 
         $externalIdsChunks =  array_chunk(array_keys($all), 200);
 
-        $bar = $this->output->createProgressBar(count($externalIdsChunks));
+        /** @var ProgressBar $bar */
+        $bar = new DebugProxy($this->output->createProgressBar(count($externalIdsChunks)), $debug);
         $bar->setFormat('%message%: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
@@ -109,6 +114,6 @@ class AggregatePageviewLoadJob extends Command
         }
 
         $bar->finish();
-        $this->line(' <info>OK!</info>');
+        $this->line(" <info>OK!</info> (number of processed articles: $processedArticles)");
     }
 }
