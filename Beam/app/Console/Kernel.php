@@ -99,7 +99,7 @@ class Kernel extends ConsoleKernel
     private function aggregations(Schedule $schedule)
     {
         // Aggregates current hour (may not be completed yet)
-        $schedule->command(AggregatePageviewLoadJob::COMMAND, ['--current-hour'])
+        $schedule->command(AggregatePageviewLoadJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));

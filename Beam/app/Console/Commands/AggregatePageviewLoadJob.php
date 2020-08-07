@@ -13,7 +13,7 @@ class AggregatePageviewLoadJob extends Command
 {
     const COMMAND = 'pageviews:aggregate-load';
 
-    protected $signature = self::COMMAND . ' {--now=} {--current-hour} ';
+    protected $signature = self::COMMAND . ' {--now=}';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
@@ -21,14 +21,8 @@ class AggregatePageviewLoadJob extends Command
     {
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
 
-        $currentHour = $this->option('current-hour') ?? false;
-        if ($currentHour) {
-            $timeAfter = (clone $now)->minute(0)->second(0);
-            $timeBefore = (clone $timeAfter)->addHour();
-        } else {
-            $timeBefore = $now->minute(0)->second(0);
-            $timeAfter = (clone $timeBefore)->subHour();
-        }
+        $timeBefore = $now->minute(0)->second(0);
+        $timeAfter = (clone $timeBefore)->subHour();
 
         $this->line(sprintf("Fetching aggregated pageviews data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
@@ -79,24 +73,19 @@ class AggregatePageviewLoadJob extends Command
         $this->line(' <info>OK!</info>');
 
         if (count($all) === 0) {
-            $this->line(sprintf("No data to store for articles, exiting."));
+            $this->line(sprintf('No data to store for articles, exiting.'));
             return;
         }
 
-        $allChunks =  array_chunk($all, 200, true);
+        $externalIdsChunks =  array_chunk(array_keys($all), 200);
 
-        $bar = $this->output->createProgressBar(count($allChunks));
+        $bar = $this->output->createProgressBar(count($externalIdsChunks));
         $bar->setFormat('%message%: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
         $processedArticles = 0;
-
-        foreach ($allChunks as $allChunk) {
-            $processedArticles += count($allChunk);
-
-            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedArticles, count($all)));
-            $bar->advance();
-            $articles = Article::whereIn('external_id', array_keys($allChunk))->get();
+        foreach ($externalIdsChunks as $externalIdsChunk) {
+            $articles = Article::whereIn('external_id', $externalIdsChunk)->get();
             foreach ($articles as $article) {
                 $ap = ArticlePageviews::firstOrNew([
                     'article_id' => $article->id,
@@ -114,6 +103,9 @@ class AggregatePageviewLoadJob extends Command
                 $article->pageviews_signed_in = $article->pageviews()->sum('signed_in');
                 $article->save();
             }
+            $processedArticles += count($externalIdsChunk);
+            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedArticles, count($all)));
+            $bar->advance();
         }
 
         $bar->finish();
