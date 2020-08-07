@@ -93,9 +93,9 @@ class AggregatePageviewTimespentJob extends Command
                     'time_to' => $timeBefore,
                 ]);
 
-                $at->sum = $all[$articleId];
-                $at->signed_in = $signedIn[$articleId];
-                $at->subscribers = $subscribers[$articleId];
+                $at->sum = $all[$article->external_id];
+                $at->signed_in = $signedIn[$article->external_id];
+                $at->subscribers = $subscribers[$article->external_id];
                 $at->save();
 
                 $article->timespent_all = $article->timespent()->sum('sum');

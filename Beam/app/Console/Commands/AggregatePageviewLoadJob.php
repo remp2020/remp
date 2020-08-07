@@ -93,9 +93,9 @@ class AggregatePageviewLoadJob extends Command
                     'time_to' => $timeBefore,
                 ]);
 
-                $ap->sum = $all[$articleId];
-                $ap->signed_in = $signedIn[$articleId];
-                $ap->subscribers = $subscribers[$articleId];
+                $ap->sum = $all[$article->external_id];
+                $ap->signed_in = $signedIn[$article->external_id];
+                $ap->subscribers = $subscribers[$article->external_id];
                 $ap->save();
 
                 $article->pageviews_all = $article->pageviews()->sum('sum');
