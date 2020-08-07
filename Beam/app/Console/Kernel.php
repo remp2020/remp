@@ -39,24 +39,87 @@ class Kernel extends ConsoleKernel
             return;
         }
 
-        $schedule->command(SnapshotArticlesViews::COMMAND)
-            ->everyMinute()
-            ->appendOutputTo(storage_path('logs/snapshot_articles_views.log'));
+        // Related commands are put into private functions
+
+        $this->aggregations($schedule);
+        $this->concurrentsSnapshots($schedule);
+        $this->authorSegments($schedule);
+
+        // All other unrelated commands
 
         $schedule->command(SendNewslettersCommand::COMMAND)
             ->everyMinute()
             ->appendOutputTo(storage_path('logs/send_newsletters.log'));
 
-        $schedule->command(AggregatePageviewLoadJob::COMMAND)
-             ->everyMinute()
-             ->withoutOverlapping()
+        // Aggregate any conversion events that weren't aggregated before due to Segments API fail
+        // or other unexpected event
+        $schedule->command(AggregateConversionEvents::COMMAND)
+            ->dailyAt('3:30')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/aggregate_conversion_events.log'));
+    }
+
+    /**
+     * Snapshot of concurrents for dashboard + regular compression
+     * @param Schedule $schedule
+     */
+    private function concurrentsSnapshots(Schedule $schedule)
+    {
+        $schedule->command(SnapshotArticlesViews::COMMAND)
+            ->everyMinute()
+            ->appendOutputTo(storage_path('logs/snapshot_articles_views.log'));
+
+        $schedule->command(CompressSnapshots::COMMAND)
+            ->dailyAt('02:30')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/compress_snapshots.log'));
+    }
+
+    /**
+     * Author segments related aggregation and processing
+     * @param Schedule $schedule
+     */
+    private function authorSegments(Schedule $schedule)
+    {
+        $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
+            ->dailyAt('01:00')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/aggregate_article_views.log'));
+
+        $schedule->command(ComputeAuthorsSegments::COMMAND)
+            ->dailyAt('02:00')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/compute_author_segments.log'));
+    }
+
+    /**
+     * Pageviews, timespent and session pageviews aggregation and cleanups
+     * @param Schedule $schedule
+     */
+    private function aggregations(Schedule $schedule)
+    {
+        // Aggregates current hour (may not be completed yet)
+        $schedule->command(AggregatePageviewLoadJob::COMMAND, ["--now='+1 hour'"])
+            ->everyMinute()
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
 
-        $schedule->command(AggregatePageviewTimespentJob::COMMAND)
+        $schedule->command(AggregatePageviewTimespentJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
 
+        // Aggregates last full hour only once
+        $schedule->command(AggregatePageviewLoadJob::COMMAND)
+            ->hourlyAt(1) // 1 minute after, so we make sure previous hour is completed
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
+
+        $schedule->command(AggregatePageviewTimespentJob::COMMAND)
+            ->hourlyAt(1) //
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
+        
         $schedule->command(ProcessPageviewSessions::COMMAND)
             ->everyFiveMinutes()
             ->withoutOverlapping()
@@ -71,28 +134,6 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:20')
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/compress_aggregations.log'));
-
-        $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
-            ->dailyAt('01:00')
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/aggregate_article_views.log'));
-
-        $schedule->command(ComputeAuthorsSegments::COMMAND)
-            ->dailyAt('02:00')
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/compute_author_segments.log'));
-
-        $schedule->command(CompressSnapshots::COMMAND)
-            ->dailyAt('02:30')
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/compress_snapshots.log'));
-
-        // Aggregate any conversion events that weren't aggregated before due to Segments API fail
-        // or other unexpected event
-        $schedule->command(AggregateConversionEvents::COMMAND)
-            ->dailyAt('3:30')
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/aggregate_conversion_events.log'));
     }
 
     /**

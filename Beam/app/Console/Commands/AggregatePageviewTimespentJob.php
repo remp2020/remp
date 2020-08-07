@@ -76,39 +76,36 @@ class AggregatePageviewTimespentJob extends Command
             return;
         }
 
-        $bar = $this->output->createProgressBar(count($all));
-        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $externalIdsChunks =  array_chunk(array_keys($all), 200);
+
+        $bar = $this->output->createProgressBar(count($externalIdsChunks));
+        $bar->setFormat('%message%: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
-        foreach ($all as $articleId => $count) {
-            $bar->setMessage(sprintf('Storing aggregated data for article <info>%s</info>', $articleId));
+        $processedArticles = 0;
+        foreach ($externalIdsChunks as $externalIdsChunk) {
+            $articles = Article::whereIn('external_id', $externalIdsChunk)->get();
 
-            $article = Article::select()->where([
-                'external_id' => $articleId,
-            ])->first();
+            foreach ($articles as $article) {
+                $at = ArticleTimespent::firstOrNew([
+                    'article_id' => $article->id,
+                    'time_from' => $timeAfter,
+                    'time_to' => $timeBefore,
+                ]);
 
-            if (!$article) {
-                $bar->advance();
-                continue;
+                $at->sum = $all[$articleId];
+                $at->signed_in = $signedIn[$articleId];
+                $at->subscribers = $subscribers[$articleId];
+                $at->save();
+
+                $article->timespent_all = $article->timespent()->sum('sum');
+                $article->timespent_subscribers = $article->timespent()->sum('subscribers');
+                $article->timespent_signed_in = $article->timespent()->sum('signed_in');
+                $article->save();
             }
 
-            /** @var ArticleTimespent $at */
-            $at = ArticleTimespent::firstOrNew([
-                'article_id' => $article->id,
-                'time_from' => $timeAfter,
-                'time_to' => $timeBefore,
-            ]);
-
-            $at->sum = $count;
-            $at->signed_in = $signedIn[$articleId];
-            $at->subscribers = $subscribers[$articleId];
-            $at->save();
-
-            $article->timespent_all = $article->timespent()->sum('sum');
-            $article->timespent_subscribers = $article->timespent()->sum('subscribers');
-            $article->timespent_signed_in = $article->timespent()->sum('signed_in');
-            $article->save();
-
+            $processedArticles += count($externalIdsChunk);
+            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedArticles, count($all)));
             $bar->advance();
         }
         $bar->finish();

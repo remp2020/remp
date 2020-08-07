@@ -20,6 +20,7 @@ class AggregatePageviewLoadJob extends Command
     public function handle(JournalContract $journalContract)
     {
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
@@ -72,45 +73,41 @@ class AggregatePageviewLoadJob extends Command
         $this->line(' <info>OK!</info>');
 
         if (count($all) === 0) {
-            $this->line(sprintf("No data to store for articles, exiting."));
+            $this->line(sprintf('No data to store for articles, exiting.'));
             return;
         }
 
-        $bar = $this->output->createProgressBar(count($all));
-        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $externalIdsChunks =  array_chunk(array_keys($all), 200);
+
+        $bar = $this->output->createProgressBar(count($externalIdsChunks));
+        $bar->setFormat('%message%: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
-        foreach ($all as $articleId => $count) {
-            $bar->setMessage(sprintf('Storing aggregated data for article <info>%s</info>', $articleId));
+        $processedArticles = 0;
+        foreach ($externalIdsChunks as $externalIdsChunk) {
+            $articles = Article::whereIn('external_id', $externalIdsChunk)->get();
+            foreach ($articles as $article) {
+                $ap = ArticlePageviews::firstOrNew([
+                    'article_id' => $article->id,
+                    'time_from' => $timeAfter,
+                    'time_to' => $timeBefore,
+                ]);
 
-            $article = Article::select()->where([
-                'external_id' => $articleId,
-            ])->first();
+                $ap->sum = $all[$articleId];
+                $ap->signed_in = $signedIn[$articleId];
+                $ap->subscribers = $subscribers[$articleId];
+                $ap->save();
 
-            if (!$article) {
-                $bar->advance();
-                continue;
+                $article->pageviews_all = $article->pageviews()->sum('sum');
+                $article->pageviews_subscribers = $article->pageviews()->sum('subscribers');
+                $article->pageviews_signed_in = $article->pageviews()->sum('signed_in');
+                $article->save();
             }
-
-            /** @var ArticlePageviews $ap */
-            $ap = ArticlePageviews::firstOrNew([
-                'article_id' => $article->id,
-                'time_from' => $timeAfter,
-                'time_to' => $timeBefore,
-            ]);
-
-            $ap->sum = $count;
-            $ap->signed_in = $signedIn[$articleId];
-            $ap->subscribers = $subscribers[$articleId];
-            $ap->save();
-
-            $article->pageviews_all = $article->pageviews()->sum('sum');
-            $article->pageviews_subscribers = $article->pageviews()->sum('subscribers');
-            $article->pageviews_signed_in = $article->pageviews()->sum('signed_in');
-            $article->save();
-
+            $processedArticles += count($externalIdsChunk);
+            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedArticles, count($all)));
             $bar->advance();
         }
+
         $bar->finish();
         $this->line(' <info>OK!</info>');
     }
