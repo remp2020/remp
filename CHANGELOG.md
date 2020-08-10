@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **BREAKING**: Changed way of specifying `sections` parameter in `/api/articles/top` API endpoint. Now sections can be filtered either using `name` or `external_id` parameters (before, `name` parameter was used implicitely). remp/remp#691
+- Added ability to specify `sections` parameter in `/api/authors/top` and `/api/tags/top/` API endpoints via `name` or `external_id` parameters (in the same fashion as in case of `/api/articles/top`). remp/remp#691
 - Pageviews data for articles are now refreshed every minute instead of every hour. remp/remp#663
 - Fixed ignored explicit `browserId` parameter in JS configuration. remp/remp#690
 - Commands `pageviews:aggregate-load` and `pageviews:aggregate-timespent` do not show progress unless `--debug` parameter is specified.

@@ -3,14 +3,15 @@
 namespace App\Model\Pageviews;
 
 use DB;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 
 class TopSearch
 {
-    public function topArticles($timeFrom, $limit, $sections)
+    public function topArticles($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null)
     {
-        $getTopArticlesFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sections) {
-            $pageviews = DB::table('article_pageviews')
+        $getTopArticlesFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues) {
+            $pageviewsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
                 ->groupBy('article_pageviews.article_id')
@@ -21,14 +22,12 @@ class TopSearch
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
 
-            if ($sections) {
-                $pageviews->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
-                    ->join('sections', 'article_section.section_id', '=', 'sections.id')
-                    ->whereIn('sections.name', $sections);
+            if ($sectionValueType && $sectionValues) {
+                $this->addSectionsCondition($pageviewsQuery, $sectionValueType, $sectionValues);
             }
 
             $data = DB::table('articles')
-                ->joinSub($pageviews, 'top_articles_by_pageviews', function ($join) {
+                ->joinSub($pageviewsQuery, 'top_articles_by_pageviews', function ($join) {
                     $join->on('articles.id', '=', 'top_articles_by_pageviews.article_id');
                 })
                 ->select('articles.external_id', 'top_articles_by_pageviews.pageviews');
@@ -42,9 +41,9 @@ class TopSearch
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopArticlesFunc);
     }
 
-    public function topAuthors($timeFrom, $limit)
+    public function topAuthors($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null)
     {
-        $getTopAuthorsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) {
+        $getTopAuthorsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues) {
             $topAuthorsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -53,6 +52,10 @@ class TopSearch
                 ->select('article_author.author_id', DB::raw('SUM(article_pageviews.sum) as pageviews'))
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
+
+            if ($sectionValueType && $sectionValues) {
+                $this->addSectionsCondition($topAuthorsQuery, $sectionValueType, $sectionValues);
+            }
 
             $data = DB::table('authors')
                 ->joinSub($topAuthorsQuery, 'top_authors', function ($join) {
@@ -69,9 +72,9 @@ class TopSearch
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopAuthorsFunc, 'name');
     }
 
-    public function topPostTags($timeFrom, $limit)
+    public function topPostTags($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null)
     {
-        $getTopPostTagsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) {
+        $getTopPostTagsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues) {
             $topTagsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -81,11 +84,15 @@ class TopSearch
                 ->orderBy('pageviews', 'DESC')
                 ->limit($limit);
 
+            if ($sectionValueType && $sectionValues) {
+                $this->addSectionsCondition($topTagsQuery, $sectionValueType, $sectionValues);
+            }
+
             $data = DB::table('tags')
                 ->joinSub($topTagsQuery, 'top_tags', function ($join) {
                     $join->on('tags.id', '=', 'top_tags.tag_id');
                 })
-                ->select('tags.name', 'top_tags.pageviews');
+                ->select('tags.name', 'tags.external_id', 'top_tags.pageviews');
 
             return $data->get()->map(function ($item) {
                 $item->pageviews = (int) $item->pageviews;
@@ -93,8 +100,19 @@ class TopSearch
             });
         };
 
-        // TODO: currently tags do not have external_id, using 'name' as key attribute
+        // TODO: currently tags may not have external_id, using 'name' as key attribute
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopPostTagsFunc, 'name');
+    }
+
+    private function addSectionsCondition(Builder $articlePageviewsQuery, string $type, array $values)
+    {
+        if (!in_array($type, ['external_id', 'name'], true)) {
+            throw new \Exception("type '$type' is not one of 'external_id' or 'name' values");
+        }
+
+        $articlePageviewsQuery->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
+            ->join('sections', 'article_section.section_id', '=', 'sections.id')
+            ->whereIn('sections.' . $type, $values);
     }
 
     // split query by days (due to speed)

@@ -828,11 +828,12 @@ You can filter articles by section and time of pageview.
 
 ```json5
 {
-	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
+	"from": "2020-08-10T08:09:18+00:00", // RFC3339-based start time from which to take pageviews to this today 
 	"limit": 3, // limit how many top articles this endpoint returns
-	"sections": [ // OPTIONAL; filters from which sections take articles
-		"Section title" // String; section title
-	]
+	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
+		"external_id": ["Section external id"], // String; section external IDs 
+		"name": ["Section title"] // String; section external_id
+	}
 }
 ```
 
@@ -847,11 +848,11 @@ curl --location --request POST 'http://beam.remp.press/api/articles/top' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer XXX' \
 --data-raw '{
-	"from": "2020-03-15 14:41:58",
+	"from": "2020-08-10T08:09:18+00:00",
 	"limit": 3,
-	"sections": [
-		"Blog"
-	]
+	"sections": {
+		"external_id": ["1"]
+	}
 }'
 ```
 
@@ -862,7 +863,7 @@ curl --location --request POST 'http://beam.remp.press/api/articles/top' \
 
 ```php
 $payload = [
-	"from" => "2020-03-15 14:41:58",
+	"from" => "2020-08-10T08:09:18+00:00",
 	"limit" => 3,
 	"sections" => [
 		"Blog"
@@ -924,8 +925,12 @@ You can filter authors by time of pageview.
 
 ```json5
 {
-	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
+	"from": "2020-08-10T08:14:09+00:00", // RFC3339-based start datetime from which to take pageviews to this today 
 	"limit": 3, // limit how many top authors this endpoint returns
+	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
+		"external_id": ["Section external id"], // String; section external IDs 
+		"name": ["Section title"] // String; section external_id
+	}
 }
 ```
 
@@ -940,8 +945,11 @@ curl --location --request POST 'http://beam.remp.press/api/authors/top' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer XXX' \
 --data-raw '{
-	"from": "2020-03-15 14:41:58",
-	"limit": 3
+	"from": "2020-08-10T08:14:09+00:00",
+	"limit": 3,
+	"sections": {
+	    "external_id": ["22"]
+	}
 }'
 ```
 
@@ -952,7 +960,7 @@ curl --location --request POST 'http://beam.remp.press/api/authors/top' \
 
 ```php
 $payload = [
-	"from" => "2020-03-15 14:41:58",
+	"from" => "2020-08-10T08:14:09+00:00",
 	"limit" => 3,
 ];
 $jsonPayload = json_encode($payload);
@@ -979,18 +987,8 @@ $response = file_get_contents("http://beam.remp.press/api/authors/top", false, $
 [
     {
         "external_id": 100,
-        "name": "Veronika Folentová",
+        "name": "Example Author",
         "pageviews": 23000
-    },
-    {
-        "external_id": 200,
-        "name": "Jana Čevelová",
-        "pageviews": 15000
-    },
-    {
-        "external_id": 300,
-        "name": "Miro Kern",
-        "pageviews": 10000
     }
 ]
 ```
@@ -1014,8 +1012,12 @@ You can filter tags by time of pageview.
 
 ```json5
 {
-	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
+	"from": "2020-08-10T08:14:09+00:00", // RFC3339-based start datetime from which to take pageviews to this today 
 	"limit": 3, // limit how many top tags this endpoint returns
+	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
+		"external_id": ["Section external id"], // String; section external IDs 
+		"name": ["Section title"] // String; section external_id
+	}
 }
 ```
 
@@ -1030,7 +1032,7 @@ curl --location --request POST 'http://beam.remp.press/api/tags/top' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer XXX' \
 --data-raw '{
-	"from": "2020-03-15 14:41:58",
+	"from": "2020-08-10T08:14:09+00:00",
 	"limit": 3
 }'
 ```
@@ -1042,7 +1044,7 @@ curl --location --request POST 'http://beam.remp.press/api/tags/top' \
 
 ```php
 $payload = [
-	"from" => "2020-03-15 14:41:58",
+	"from" => "2020-08-10T08:14:09+00:00",
 	"limit" => 3,
 ];
 $jsonPayload = json_encode($payload);
@@ -1069,15 +1071,18 @@ $response = file_get_contents("http://beam.remp.press/api/tags/top", false, $con
 [
     {
         "name": "ekonomika",
-        "pageviews": 4000
+        "pageviews": 4000,
+        "external_id": "1"
     },
     {
         "name": "covid19",
-        "pageviews": 3000
+        "pageviews": 3000,
+        "external_id": "2"
     },
     {
         "name": "brexit",
-        "pageviews": 2000
+        "pageviews": 2000,
+        "external_id": "3"
     }
 ]
 ```

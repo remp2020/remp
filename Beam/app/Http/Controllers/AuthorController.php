@@ -6,7 +6,7 @@ use App\Article;
 use App\ArticleAuthor;
 use App\Author;
 use App\Conversion;
-use App\Http\Requests\TopAuthorsRequest;
+use App\Http\Requests\TopSearchRequest;
 use App\Http\Resources\AuthorResource;
 use App\Model\Pageviews\TopSearch;
 use App\Model\Tag;
@@ -347,11 +347,22 @@ class AuthorController extends Controller
             ->make(true);
     }
 
-    public function topAuthors(TopAuthorsRequest $request, TopSearch $topSearch)
+    public function topAuthors(TopSearchRequest $request, TopSearch $topSearch)
     {
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
 
-        return response()->json($topSearch->topAuthors($timeFrom, $limit));
+        $sections = $request->json('sections');
+        $sectionValueType = null;
+        $sectionValues = null;
+        if (isset($sections['external_id'])) {
+            $sectionValueType = 'external_id';
+            $sectionValues = $sections['external_id'];
+        } elseif (isset($sections['name'])) {
+            $sectionValueType = 'name';
+            $sectionValues = $sections['name'];
+        }
+
+        return response()->json($topSearch->topAuthors($timeFrom, $limit, $sectionValueType, $sectionValues));
     }
 }
