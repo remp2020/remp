@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **BREAKING**: Changed way of specifying `sections` parameter in `/api/articles/top` API endpoint. Now sections can be filtered either using `name` or `external_id` parameters (before, `name` parameter was used implicitely). remp/remp#691
+- Added ability to specify `sections` parameter in `/api/authors/top` and `/api/tags/top/` API endpoints via `name` or `external_id` parameters (in the same fashion as in case of `/api/articles/top`). remp/remp#691
 - Fixed ignored explicit `browserId` parameter in JS configuration. remp/remp#690
 
 ## [0.11.1] - 2020-07-10
