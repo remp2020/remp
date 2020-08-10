@@ -26,7 +26,7 @@ class TopAuthorsRequest extends FormRequest
         return [
             'from' => 'required|date',
             'limit' => 'required|integer',
-            'sections' => ['array', function($attr, $value, $fail) {
+            'sections' => ['array', function ($attr, $value, $fail) {
                 if (array_has($value, ['external_id', 'name'])) {
                     $fail("You can not have both 'external_id' and 'name' arrays specified");
                 }
