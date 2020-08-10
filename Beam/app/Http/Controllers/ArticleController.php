@@ -691,10 +691,20 @@ class ArticleController extends Controller
 
     public function topArticles(TopArticlesRequest $request, TopSearch $topSearch)
     {
-        $sections = $request->json('sections');
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
 
-        return response()->json($topSearch->topArticles($timeFrom, $limit, $sections));
+        $sections = $request->json('sections');
+        $sectionValueType = null;
+        $sectionValues = null;
+        if (isset($sections['name'])){
+            $sectionValueType = 'name';
+            $sectionValues = $sections['name'];
+        } elseif (isset($sections['external_id'])){
+            $sectionValueType = 'external_id';
+            $sectionValues = $sections['external_id'];
+        }
+
+        return response()->json($topSearch->topArticles($timeFrom, $limit, $sectionValueType, $sectionValues));
     }
 }

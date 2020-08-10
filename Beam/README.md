@@ -830,9 +830,10 @@ You can filter articles by section and time of pageview.
 {
 	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
 	"limit": 3, // limit how many top articles this endpoint returns
-	"sections": [ // OPTIONAL; filters from which sections take articles
-		"Section title" // String; section title
-	]
+	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
+		"external_id": ["Section external id"], // String; section external IDs 
+		"name": ["Section title"] // String; section external_id
+	}
 }
 ```
 
@@ -850,7 +851,7 @@ curl --location --request POST 'http://beam.remp.press/api/articles/top' \
 	"from": "2020-03-15 14:41:58",
 	"limit": 3,
 	"sections": [
-		"Blog"
+		"name": ["Blog"]
 	]
 }'
 ```
@@ -926,9 +927,10 @@ You can filter authors by time of pageview.
 {
 	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
 	"limit": 3, // limit how many top authors this endpoint returns
-	"sections": [ // OPTIONAL; filters authors publishing articles only assigned given sections
-		"Section title" // String; section title
-	]
+	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
+		"external_id": ["Section external id"], // String; section external IDs 
+		"name": ["Section title"] // String; section external_id
+	}
 }
 ```
 
@@ -944,7 +946,10 @@ curl --location --request POST 'http://beam.remp.press/api/authors/top' \
 --header 'Authorization: Bearer XXX' \
 --data-raw '{
 	"from": "2020-03-15 14:41:58",
-	"limit": 3
+	"limit": 3,
+	"sections": {
+	    "external_id": ["22"]
+	}
 }'
 ```
 
@@ -984,16 +989,6 @@ $response = file_get_contents("http://beam.remp.press/api/authors/top", false, $
         "external_id": 100,
         "name": "Veronika Folentová",
         "pageviews": 23000
-    },
-    {
-        "external_id": 200,
-        "name": "Jana Čevelová",
-        "pageviews": 15000
-    },
-    {
-        "external_id": 300,
-        "name": "Miro Kern",
-        "pageviews": 10000
     }
 ]
 ```
@@ -1019,9 +1014,10 @@ You can filter tags by time of pageview.
 {
 	"from": "2020-03-15 14:41:58", // start datetime from which to take pageviews to this today 
 	"limit": 3, // limit how many top tags this endpoint returns
-	"sections": [ // OPTIONAL; filters tags published in given sections
-		"Section title" // String; section title
-	]
+	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
+		"external_id": ["Section external id"], // String; section external IDs 
+		"name": ["Section title"] // String; section external_id
+	}
 }
 ```
 

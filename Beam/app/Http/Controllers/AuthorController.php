@@ -349,10 +349,20 @@ class AuthorController extends Controller
 
     public function topAuthors(TopAuthorsRequest $request, TopSearch $topSearch)
     {
-        $sections = $request->json('sections');
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
 
-        return response()->json($topSearch->topAuthors($timeFrom, $limit, $sections));
+        $sections = $request->json('sections');
+        $sectionValueType = null;
+        $sectionValues = null;
+        if (isset($sections['name'])){
+            $sectionValueType = 'name';
+            $sectionValues = $sections['name'];
+        } elseif (isset($sections['external_id'])){
+            $sectionValueType = 'external_id';
+            $sectionValues = $sections['external_id'];
+        }
+
+        return response()->json($topSearch->topAuthors($timeFrom, $limit, $sectionValueType, $sectionValues));
     }
 }

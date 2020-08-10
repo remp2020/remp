@@ -11,9 +11,19 @@ class TagController extends Controller
     public function topTags(TopTagsRequest $request, TopSearch $topSearch)
     {
         $limit = $request->json('limit');
-        $sections = $request->json('sections');
         $timeFrom = Carbon::parse($request->json('from'));
 
-        return response()->json($topSearch->topPostTags($timeFrom, $limit, $sections));
+        $sections = $request->json('sections');
+        $sectionValueType = null;
+        $sectionValues = null;
+        if (isset($sections['name'])){
+            $sectionValueType = 'name';
+            $sectionValues = $sections['name'];
+        } elseif (isset($sections['external_id'])){
+            $sectionValueType = 'external_id';
+            $sectionValues = $sections['external_id'];
+        }
+
+        return response()->json($topSearch->topPostTags($timeFrom, $limit, $sectionValueType, $sectionValues));
     }
 }

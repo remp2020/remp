@@ -26,8 +26,18 @@ class TopArticlesRequest extends FormRequest
         return [
             'from' => 'required|date',
             'limit' => 'required|integer',
-            'sections' => 'array',
-            'sections.*' => 'string',
+            'sections' => ['array', function($attr, $value, $fail) {
+                if (array_has($value, ['external_id', 'name'])) {
+                    $fail("You can not have both 'external_id' and 'name' arrays specified");
+                }
+                if (!array_key_exists('external_id', $value) && !array_key_exists('name', $value)) {
+                    $fail("You have to specify either 'external_id' or 'name' array");
+                }
+            }],
+            'sections.external_id' => 'array',
+            'sections.external_id.*' => 'string',
+            'sections.name' => 'array',
+            'sections.name.*' => 'string',
         ];
     }
 }
