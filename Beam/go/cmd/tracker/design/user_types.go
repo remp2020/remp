@@ -45,6 +45,7 @@ var Pageview = Type("Pageview", func() {
 	Attribute("article", Article)
 	Attribute("timespent", TimeSpent)
 	Attribute("progress", Progress)
+	Attribute("fields", HashOf(String, Any), "Additinal key-value data")
 
 	Required("system", "user", "action")
 })

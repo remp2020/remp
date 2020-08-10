@@ -1253,7 +1253,19 @@ var rempConfig = {
         
         // optional, allows to specify custom referer medium  
         // this value overrides implicit referer medium computed from Referer header by tracker 
-        refererMedium: "push_notification"
+        refererMedium: "push_notification",
+        
+        // optional, allows to add custom fields for pageview events
+        //
+        // Key represents variable name, value should be defined as callback returning string response.
+        // Following example will be persisted in ElasticSearch as "foo: bar" and "baz: XXX".
+        // If the value is not function, remplib validation will throw an error and won't proceed further.
+        pageviews: {
+            fields: {
+                foo: function() { return "bar" },
+                baz: function() { return "XXX" }
+            }       
+        } 
     },
 };
 remplib.tracker.init(rempConfig);
