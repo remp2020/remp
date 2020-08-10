@@ -4,22 +4,27 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\ArticlePageviews;
+use App\Helpers\DebugProxy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class AggregatePageviewLoadJob extends Command
 {
     const COMMAND = 'pageviews:aggregate-load';
 
-    protected $signature = self::COMMAND . ' {--now=}';
+    protected $signature = self::COMMAND . ' {--now=} {--debug}';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
+        $debug = $this->option('debug') ?? false;
+
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
@@ -29,7 +34,6 @@ class AggregatePageviewLoadJob extends Command
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
         $request->addGroup('article_id', 'signed_in', 'subscriber');
-
         $records = collect($journalContract->count($request));
 
         if (count($records) === 0 || (count($records) === 1 && !isset($records[0]->tags->article_id))) {
@@ -37,7 +41,8 @@ class AggregatePageviewLoadJob extends Command
             return;
         }
 
-        $bar = $this->output->createProgressBar(count($records));
+        /** @var ProgressBar $bar */
+        $bar = new DebugProxy($this->output->createProgressBar(count($records)), $debug);
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Processing pageviews');
 
@@ -69,49 +74,46 @@ class AggregatePageviewLoadJob extends Command
             $bar->advance();
         }
         $bar->finish();
-        $this->line(' <info>OK!</info>');
+        $this->line("\n<info>Pageviews loaded from Journal API</info>");
 
         if (count($all) === 0) {
-            $this->line(sprintf("No data to store for articles, exiting."));
+            $this->line(sprintf('No data to store for articles, exiting.'));
             return;
         }
 
-        $bar = $this->output->createProgressBar(count($all));
-        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $externalIdsChunks =  array_chunk(array_keys($all), 200);
+
+        /** @var ProgressBar $bar */
+        $bar = new DebugProxy($this->output->createProgressBar(count($externalIdsChunks)), $debug);
+        $bar->setFormat('%message%: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
-        foreach ($all as $articleId => $count) {
-            $bar->setMessage(sprintf('Storing aggregated data for article <info>%s</info>', $articleId));
+        $processedArticles = 0;
+        foreach ($externalIdsChunks as $externalIdsChunk) {
+            $articles = Article::whereIn('external_id', $externalIdsChunk)->get();
+            foreach ($articles as $article) {
+                $ap = ArticlePageviews::firstOrNew([
+                    'article_id' => $article->id,
+                    'time_from' => $timeAfter,
+                    'time_to' => $timeBefore,
+                ]);
 
-            $article = Article::select()->where([
-                'external_id' => $articleId,
-            ])->first();
+                $ap->sum = $all[$article->external_id];
+                $ap->signed_in = $signedIn[$article->external_id];
+                $ap->subscribers = $subscribers[$article->external_id];
+                $ap->save();
 
-            if (!$article) {
-                $bar->advance();
-                continue;
+                $article->pageviews_all = $article->pageviews()->sum('sum');
+                $article->pageviews_subscribers = $article->pageviews()->sum('subscribers');
+                $article->pageviews_signed_in = $article->pageviews()->sum('signed_in');
+                $article->save();
             }
-
-            /** @var ArticlePageviews $ap */
-            $ap = ArticlePageviews::firstOrNew([
-                'article_id' => $article->id,
-                'time_from' => $timeAfter,
-                'time_to' => $timeBefore,
-            ]);
-
-            $ap->sum = $count;
-            $ap->signed_in = $signedIn[$articleId];
-            $ap->subscribers = $subscribers[$articleId];
-            $ap->save();
-
-            $article->pageviews_all = $article->pageviews()->sum('sum');
-            $article->pageviews_subscribers = $article->pageviews()->sum('subscribers');
-            $article->pageviews_signed_in = $article->pageviews()->sum('signed_in');
-            $article->save();
-
+            $processedArticles += count($externalIdsChunk);
+            $bar->setMessage(sprintf('Storing aggregated data (<info>%s/%s</info> articles)', $processedArticles, count($all)));
             $bar->advance();
         }
+
         $bar->finish();
-        $this->line(' <info>OK!</info>');
+        $this->line(" <info>OK!</info> (number of processed articles: $processedArticles)");
     }
 }
