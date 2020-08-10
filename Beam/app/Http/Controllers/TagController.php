@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\TopTagsRequest;
+use App\Http\Requests\TopSearchRequest;
 use App\Model\Pageviews\TopSearch;
 use Illuminate\Support\Carbon;
 
 class TagController extends Controller
 {
-    public function topTags(TopTagsRequest $request, TopSearch $topSearch)
+    public function topTags(TopSearchRequest $request, TopSearch $topSearch)
     {
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
