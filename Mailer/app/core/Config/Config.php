@@ -44,22 +44,18 @@ class Config
 
         if (isset($this->items[$name])) {
             $item = $this->items[$name];
-            $value = $item->value;
-
-            if ($this->localConfig->exists($name)) {
-                $value = $this->localConfig->value($name);
-            }
+            $value = $this->localConfig->exists($name)
+                ? $this->localConfig->value($name)
+                : $item->value;
 
             return $this->formatValue($value, $item->type);
         }
 
         $item = $this->configsRepository->loadByName($name);
         if ($item) {
-            $value = $item->value;
-
-            if ($this->localConfig->exists($name)) {
-                $value = $this->localConfig->value($name);
-            }
+            $value = $this->localConfig->exists($name)
+                ? $this->localConfig->value($name)
+                : $item->value;
 
             return $this->formatValue($value, $item->type);
         }

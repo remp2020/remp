@@ -13,7 +13,7 @@ class ConfigExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         $builder->addDefinition($this->prefix('config_overrider'))
-            ->setClass(LocalConfig::class)
+            ->setType(LocalConfig::class)
             ->setArguments([$config])
             ->setAutowired(true);
     }
