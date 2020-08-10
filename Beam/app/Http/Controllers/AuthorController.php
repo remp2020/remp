@@ -355,12 +355,12 @@ class AuthorController extends Controller
         $sections = $request->json('sections');
         $sectionValueType = null;
         $sectionValues = null;
-        if (isset($sections['name'])) {
-            $sectionValueType = 'name';
-            $sectionValues = $sections['name'];
-        } elseif (isset($sections['external_id'])) {
+        if (isset($sections['external_id'])) {
             $sectionValueType = 'external_id';
             $sectionValues = $sections['external_id'];
+        } elseif (isset($sections['name'])) {
+            $sectionValueType = 'name';
+            $sectionValues = $sections['name'];
         }
 
         return response()->json($topSearch->topAuthors($timeFrom, $limit, $sectionValueType, $sectionValues));
