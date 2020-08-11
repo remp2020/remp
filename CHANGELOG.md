@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.12.0] - 2020-08-11
+
 ### Docker
 
 - Added tzdata installation for remp_segments docker (required by golang).
@@ -291,6 +293,7 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[0.12.0]: https://github.com/remp2020/remp/compare/0.11.1...0.12.0
 [0.11.1]: https://github.com/remp2020/remp/compare/0.10.0...0.11.1
 [0.10.0]: https://github.com/remp2020/remp/compare/0.9.1...0.10.0
 [0.9.0]: https://github.com/remp2020/remp/compare/0.8.0...0.9.1
