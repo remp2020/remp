@@ -225,12 +225,17 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 			}
 		} else {
 			sumAgg, ok := aggregations.Sum(targetAgg)
-			if !ok {
-				return nil
-			}
-
-			if sumAgg.Value != nil {
-				sumValue = *sumAgg.Value
+			if ok {
+				if sumAgg.Value != nil {
+					sumValue = *sumAgg.Value
+				}
+			} else {
+				// The aggregation was not resolved based on the all provided srcTags to group by.
+				// UnwrapAggregation uses "" as a placeholder value for the unresolved levels to make srcTags complete.
+				//
+				// Since elastic doesn't have the aggregate value available as a resolved aggregation,
+				// it should be save to use docCount available at the level we're currently at.
+				sumValue = float64(count)
 			}
 		}
 
