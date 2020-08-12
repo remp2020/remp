@@ -42,6 +42,7 @@ class StatsHelper
             'conversions' => 0,
         ];
 
+        $variantsData = [];
         foreach ($campaignBanners as $campaignBanner) {
             $variantsData[$campaignBanner->uuid] = $campaignData;
         }
@@ -75,13 +76,16 @@ class StatsHelper
 
         /** @var CampaignBannerStats $stat */
         foreach ($statsQuery->get() as $stat) {
-            $variantData = $variantsData[$stat->campaignBanner->uuid];
+            // Campaign banner may already be soft-deleted
+            $statCampaignBanner = $stat->campaignBanner()->withTrashed()->first();
+
+            $variantData = $variantsData[$statCampaignBanner->uuid];
             $variantData['click_count'] = (int) $stat->click_count;
             $variantData['show_count'] = (int) $stat->show_count;
             $variantData['payment_count'] = (int) $stat->payment_count;
             $variantData['purchase_count'] = (int) $stat->purchase_count;
 
-            $variantsData[$stat->campaignBanner->uuid] = StatsHelper::addCalculatedValues($variantData);
+            $variantsData[$statCampaignBanner->uuid] = StatsHelper::addCalculatedValues($variantData);
 
             $campaignData['click_count'] += $variantData['click_count'];
             $campaignData['show_count'] += $variantData['show_count'];
@@ -91,14 +95,17 @@ class StatsHelper
         $campaignData = StatsHelper::addCalculatedValues($campaignData);
 
         foreach ($purchaseStatsQuery->get() as $stat) {
-            if (!array_key_exists($stat->campaignBanner->uuid, $variantsData)) {
-                throw new \LogicException("Campaign banner {$stat->campaignBanner->uuid} has aggregated purchases without other aggregated attributes.");
+            // Campaign banner may already be soft-deleted
+            $statCampaignBanner = $stat->campaignBanner()->withTrashed()->first();
+
+            if (!array_key_exists($statCampaignBanner->uuid, $variantsData)) {
+                throw new \LogicException("Campaign banner {$statCampaignBanner->uuid} has aggregated purchases without other aggregated attributes.");
             }
 
-            if (!array_key_exists($stat->currency, $variantsData[$stat->campaignBanner->uuid]['purchase_sums'])) {
-                $variantsData[$stat->campaignBanner->uuid]['purchase_sums'][$stat->currency] = 0.0;
+            if (!array_key_exists($stat->currency, $variantsData[$statCampaignBanner->uuid]['purchase_sums'])) {
+                $variantsData[$statCampaignBanner->uuid]['purchase_sums'][$stat->currency] = 0.0;
             }
-            $variantsData[$stat->campaignBanner->uuid]['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
+            $variantsData[$statCampaignBanner->uuid]['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
 
             if (!array_key_exists($stat->currency, $campaignData['purchase_sums'])) {
                 $campaignData['purchase_sums'][$stat->currency] = 0.0;
