@@ -1,0 +1,60 @@
+{form snippetForm}
+    {input id}
+    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
+        {$error}<br>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input name, class => 'form-control fg-input'}
+                    {label name, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input code, class => 'form-control fg-input'}
+                    {label code, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input text, class => 'form-control fg-input auto-size'}
+                    {label text, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="form-group m-b-30">
+                {label html /}
+                {input html, class => 'form-control html-editor'}
+            </div>
+
+            <div class="fg-line">
+                {input save, class => 'btn btn-info waves-effect'}
+                {input save_close, class => 'btn btn-info waves-effect'}
+            </div>
+        </div>
+
+        <div class="col-sm-5 col-lg-offset-1">
+            <div id="mail-preview">
+                <mail-preview></mail-preview>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(function() {
+            let cm = $('.CodeMirror')[0].CodeMirror;
+            let vm = remplib.templateForm.bind(
+                '#mail-preview',
+                cm.getValue()
+            );
+            cm.on('change', function() {
+                vm.htmlContent = cm.getValue();
+            });
+        });
+    </script>
+{/form}

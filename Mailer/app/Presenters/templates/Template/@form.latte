@@ -97,7 +97,7 @@
                 </div>
 
                 <div class="form-group m-b-30">
-                    {input mail_body_html, class => 'form-control js-mail-body-html-input js-html-editor'}
+                    {input mail_body_html, class => 'form-control js-mail-body-html-input js-html-editor', data-snippets => json_encode($snippets) }
                 </div>
                 <div class="js-codemirror"></div>
             </div>

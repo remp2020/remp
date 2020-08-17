@@ -19,6 +19,7 @@ use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\SnippetRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
 final class TemplatePresenter extends BasePresenter
@@ -33,6 +34,8 @@ final class TemplatePresenter extends BasePresenter
 
     private $layoutsRepository;
 
+    private $snippetRepository;
+
     private $listsRepository;
 
     private $contentGenerator;
@@ -43,6 +46,7 @@ final class TemplatePresenter extends BasePresenter
         TemplateFormFactory $templateFormFactory,
         TemplateTestFormFactory $templateTestFormFactory,
         LayoutsRepository $layoutsRepository,
+        SnippetRepository $snippetRepository,
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator
     ) {
@@ -52,6 +56,7 @@ final class TemplatePresenter extends BasePresenter
         $this->templateFormFactory = $templateFormFactory;
         $this->templateTestFormFactory = $templateTestFormFactory;
         $this->layoutsRepository = $layoutsRepository;
+        $this->snippetRepository = $snippetRepository;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
     }
@@ -112,12 +117,15 @@ final class TemplatePresenter extends BasePresenter
             break;
         }
 
+        $query = $request['search']['value'];
+        $order = $request['columns'][$request['order'][0]['column']]['name'];
+        $orderDir = $request['order'][0]['dir'];
         $templatesCount = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds)
+            ->tableFilter($query, $order, $orderDir, $listIds)
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($query, $order, $orderDir, $listIds, (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -235,7 +243,10 @@ final class TemplatePresenter extends BasePresenter
     public function renderNew(): void
     {
         $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
+        $snippets = $this->snippetRepository->getTable()->fetchAssoc('id');
+
         $this->template->layouts = $layouts;
+        $this->template->snippets = $snippets;
         $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
     }
 
@@ -245,10 +256,12 @@ final class TemplatePresenter extends BasePresenter
         if (!$template) {
             throw new BadRequestException();
         }
-        $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
+        $layouts = $this->layoutsRepository->getTable()->fetchAssoc('id');
+        $snippets = $this->snippetRepository->getTable()->fetchAssoc('id');
 
         $this->template->mailTemplate = $template;
         $this->template->layouts = $layouts;
+        $this->template->snippets = $snippets;
         $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
     }
 
@@ -259,12 +272,11 @@ final class TemplatePresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $mailContent = $this->contentGenerator->render(new GeneratorInput($template));
-        if ($type == 'html') {
-            $this->template->content = $mailContent->html();
-        } else {
-            $this->template->content = "<pre>{$mailContent->text()}</pre>";
-        }
+        $snippets = $this->snippetRepository->getTable()->fetchPairs('code', 'html');
+        $mailContent = $this->contentGenerator->render(new GeneratorInput($template, ['snippets' => $snippets]));
+        $this->template->content = ($type === 'html')
+            ? $mailContent->html()
+            : "<pre>{$mailContent->text()}</pre>";
     }
 
     public function handleDuplicate($id): void

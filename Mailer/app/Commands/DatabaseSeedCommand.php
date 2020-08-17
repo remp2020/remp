@@ -77,34 +77,34 @@ class DatabaseSeedCommand extends Command
 
         $output->writeln('Generator templates:');
         $bestPerformingArticleHtml = <<<HTML
-<table cellpadding="10">        
-{% for url,item in items %}
-    <tr>
-        <td>
-            <table cellpadding="10" style="border-bottom: 2px solid #efe5e5;">
+            <table cellpadding="10">        
+            {% for url,item in items %}
                 <tr>
-                    <td colspan="2"><strong>{{ item.title }}</strong></td>
+                    <td>
+                        <table cellpadding="10" style="border-bottom: 2px solid #efe5e5;">
+                            <tr>
+                                <td colspan="2"><strong>{{ item.title }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><img style="max-height: 100px;" src="{{item.image}}"></td>
+                                <td>{{ item.description }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><a href="{{ url }}">{{ url }}</a></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
-                <tr>
-                    <td><img style="max-height: 100px;" src="{{item.image}}"></td>
-                    <td>{{ item.description }}</td>
-                </tr>
-                <tr>
-                    <td colspan="2"><a href="{{ url }}">{{ url }}</a></td>
-                </tr>
+            {% endfor %}
             </table>
-        </td>
-    </tr>
-{% endfor %}
-</table>
-HTML;
+            HTML;
         $bestPerformingArticleText = <<<TEXT
-{% for url,item in items %}
-{{ item.title }}
-{{ item.description }}
-{{ url}}
-{% endfor %}
-TEXT;
+            {% for url,item in items %}
+            {{ item.title }}
+            {{ item.description }}
+            {{ url}}
+            {% endfor %}
+            TEXT;
         $generatorTemplates = [
             [
                 'title' => 'Best performing articles',

@@ -244,6 +244,7 @@ services:
 	- Remp\MailerModule\Repositories\LogsRepository
 	- Remp\MailerModule\Repositories\LogConversionsRepository
 	- Remp\MailerModule\Repositories\LayoutsRepository
+	- Remp\MailerModule\Repositories\SnippetRepository
 	- Remp\MailerModule\Repositories\ListsRepository
 	- Remp\MailerModule\Repositories\ListCategoriesRepository
 	- Remp\MailerModule\Repositories\ListVariantsRepository
@@ -279,6 +280,7 @@ services:
 	- Remp\MailerModule\Forms\ConfigFormFactory
 	- Remp\MailerModule\Forms\ListFormFactory
 	- Remp\MailerModule\Forms\LayoutFormFactory
+	- Remp\MailerModule\Forms\SnippetFormFactory
 	- Remp\MailerModule\Forms\TemplateFormFactory
 	- Remp\MailerModule\Forms\TemplateTestFormFactory
 	- Remp\MailerModule\Forms\JobFormFactory
