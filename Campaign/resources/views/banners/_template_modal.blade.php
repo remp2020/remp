@@ -101,6 +101,20 @@
                         </div>
                     </div>
 
+                    <div class="col-md-4">
+                        <div class="card">
+                            <a href="{{ route('banners.create', ['template' => \App\Banner::TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE]) }}">
+                                <div class="card-header">
+                                    <h4 class="text-center">Overlay with two buttons and signature</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="preview">
+                                        <div class="preview overlay-two-buttons-signature"></div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

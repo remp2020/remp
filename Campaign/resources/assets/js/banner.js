@@ -65,6 +65,21 @@ window.remplib = window.remplib || {};
                 }
             }
 
+            if (banner.template === 'overlay_two_buttons_signature'){
+                banner.overlayTwoButtonsSignatureTemplate = {
+                    id: model['overlay_two_buttons_signature_template']['id'] || null,
+                    textBefore: model['overlay_two_buttons_signature_template']['text_before'] || null,
+                    textAfter: model['overlay_two_buttons_signature_template']['text_after'] || null,
+                    textBtnPrimary: model['overlay_two_buttons_signature_template']['text_btn_primary'] || "",
+                    textBtnPrimaryMinor: model['overlay_two_buttons_signature_template']['text_btn_primary_minor'] || null,
+                    textBtnSecondary: model['overlay_two_buttons_signature_template']['text_btn_secondary'] || null,
+                    textBtnSecondaryMinor: model['overlay_two_buttons_signature_template']['text_btn_secondary_minor'] || null,
+                    targetUrlSecondary: model['overlay_two_buttons_signature_template']['target_url_secondary'] || null,
+                    signatureImageUrl: model['overlay_two_buttons_signature_template']['signature_image_url'] || null,
+                    textSignature: model['overlay_two_buttons_signature_template']['text_signature'] || null,
+                }
+            }
+
             if (banner.template === 'bar') {
                 banner.barTemplate = {
                     id: model['bar_template']['id'] || null,

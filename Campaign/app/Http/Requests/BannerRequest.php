@@ -86,6 +86,19 @@ class BannerRequest extends FormRequest
                         'image_link' => 'string|nullable',
                     ]);
                     break;
+                case Banner::TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE:
+                    $templateValidator = Validator::make($this->all(), [
+                        'text_before' => 'string|nullable',
+                        'text_after' => 'string|nullable',
+                        'text_btn_primary' => 'string|required',
+                        'text_btn_primary_minor' => 'string|nullable',
+                        'text_btn_secondary' => 'string|nullable',
+                        'text_btn_secondary_minor' => 'string|nullable',
+                        'target_url_secondary' => 'string|nullable',
+                        'signature_image_url' => 'string|nullable',
+                        'text_signature' => 'string|nullable'
+                    ]);
+                    break;
                 case Banner::TEMPLATE_BAR:
                     $templateValidator = Validator::make($this->all(), [
                         'background_color' => 'string|required',
