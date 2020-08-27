@@ -23,6 +23,7 @@ class Banner extends Model implements Searchable
     const TEMPLATE_BAR = 'bar';
     const TEMPLATE_COLLAPSIBLE_BAR = 'collapsible_bar';
     const TEMPLATE_SHORT_MESSAGE = 'short_message';
+    const TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE = 'overlay_two_buttons_signature';
 
     protected $fillable = [
         'name',
@@ -140,6 +141,11 @@ class Banner extends Model implements Searchable
         return $this->hasOne(HtmlOverlayTemplate::class);
     }
 
+    public function overlayTwoButtonsSignatureTemplate()
+    {
+        return $this->hasOne(OverlayTwoButtonsSignatureTemplate::class);
+    }
+
     public function barTemplate()
     {
         return $this->hasOne(BarTemplate::class);
@@ -178,6 +184,8 @@ class Banner extends Model implements Searchable
                 return 'overlayRectangleTemplate';
             case self::TEMPLATE_HTML_OVERLAY:
                 return 'htmlOverlayTemplate';
+            case self::TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE:
+                return 'overlayTwoButtonsSignatureTemplate';
             default:
                 throw new \Exception('Unhandled banner template access: ' . $this->template);
         }

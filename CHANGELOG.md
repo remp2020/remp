@@ -97,6 +97,7 @@ We recommend two upgrade scenarios:
 - Added ability to access banner properties in custom JS code run in banner via newly added `params` object. remp/remp#636
 - Changed wording of hints in campaign's segment selection form. remp/remp#645
 - Fixed remplib initialization which could use misidentification of user - `remplib.getUserId()` would return `null` even when the `userId` was correctly set in `rempConfig`. remp/remp#651
+- Added new banner type – Overlay with Two Buttons and Signature. remp/remp#650
 
 ### [Sso]
 - Added `FORCE_HTTPS` environment variable to enforce HTTPS generation to URLs instead of determining protocol based on the request. This is useful in case you're running your application on `https`, but internally use proxy forwarding the request via `http`. remp/remp#619
