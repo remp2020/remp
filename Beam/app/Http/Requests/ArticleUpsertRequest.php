@@ -33,6 +33,7 @@ class ArticleUpsertRequest extends FormRequest
             'articles.*.tags' => 'array',
             'articles.*.image_url' => 'nullable|url',
             'articles.*.published_at' => 'date',
+            'articles.*.content_type' => 'string',
 
             'articles.*.authors.*' => 'string',
             'articles.*.sections.*' => 'string',

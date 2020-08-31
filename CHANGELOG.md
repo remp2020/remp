@@ -20,6 +20,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Commands `pageviews:aggregate-load` and `pageviews:aggregate-timespent` do not show progress unless `--debug` parameter is specified.
 - [Segments]: Fixed possibility of missing aggregations if Elastic was not able to resolve values for a sub aggregation because there were no records within the sub-aggregation branch.
 - Fixed `remplib.js` generating `undefined` cookies when JS is run on a page with no query parameters. remp2020/remp#81
+- Added `content_type` column to `articles` table. remp/remp#695
+- Added optional parameter `content_type` in `/api/v2/articles/upsert` API endpoint. remp/remp#695
+- Added optional parameter `content_type` in `/api/articles/top` API endpoint to filter articles by `content_type`. remp/remp#695
+- Added optional parameter `content_type` in `/api/authors/top` API endpoint to filter articles by `content_type`. remp/remp#695
+- Added optional parameter `content_type` in `/api/tags/top` API endpoint to filter articles by `content_type`. remp/remp#695
 
 ### [Mailer]
 
