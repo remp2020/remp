@@ -23,7 +23,8 @@ class TagController extends Controller
             $sectionValueType = 'name';
             $sectionValues = $sections['name'];
         }
+        $contentType = $request->json('content_type');
 
-        return response()->json($topSearch->topPostTags($timeFrom, $limit, $sectionValueType, $sectionValues));
+        return response()->json($topSearch->topPostTags($timeFrom, $limit, $sectionValueType, $sectionValues, $contentType));
     }
 }

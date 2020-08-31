@@ -376,6 +376,7 @@ class ArticleController extends Controller
             // When saving to DB, Eloquent strips timezone information,
             // therefore convert to UTC
             $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
+            $a['content_type'] = $a['content_type'] ?? Article::DEFAULT_CONTENT_TYPE;
             $article = Article::upsert($a);
 
             $article->sections()->detach();
@@ -470,6 +471,7 @@ class ArticleController extends Controller
             // When saving to DB, Eloquent strips timezone information,
             // therefore convert to UTC
             $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
+            $a['content_type'] = $a['content_type'] ?? Article::DEFAULT_CONTENT_TYPE;
             $article = Article::upsert($a);
 
             $article->sections()->detach();
@@ -704,7 +706,8 @@ class ArticleController extends Controller
             $sectionValueType = 'name';
             $sectionValues = $sections['name'];
         }
+        $contentType = $request->json('content_type');
 
-        return response()->json($topSearch->topArticles($timeFrom, $limit, $sectionValueType, $sectionValues));
+        return response()->json($topSearch->topArticles($timeFrom, $limit, $sectionValueType, $sectionValues, $contentType));
     }
 }

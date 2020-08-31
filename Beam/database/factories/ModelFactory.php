@@ -97,6 +97,7 @@ $factory->define(\App\Article::class, function (Faker\Generator $faker) {
         'external_id' => $faker->uuid,
         'title' => $faker->words(5, true),
         'url' => $faker->url,
+        'content_type' => 'article',
         'image_url' => $faker->imageUrl(),
         'published_at' => $faker->dateTimeBetween('-30 days', 'now')->format(DATE_RFC3339),
         'pageviews_all' => $faker->numberBetween(0, 20000),

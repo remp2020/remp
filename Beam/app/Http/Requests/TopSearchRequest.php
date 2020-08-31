@@ -38,6 +38,7 @@ class TopSearchRequest extends FormRequest
             'sections.external_id.*' => 'string',
             'sections.name' => 'array',
             'sections.name.*' => 'string',
+            'content_type' => 'string',
         ];
     }
 }
