@@ -22,8 +22,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsStorageKey: "campaigns",
 
-        pageviewCountStorageKey: "pageview_count",
-
         campaignsSessionStorageKey: "campaigns_session",
 
         showtimeExperiment: false,
@@ -51,7 +49,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "campaignsSeen": remplib.campaign.getCampaignsSeen(),
                     "campaignsBanners": remplib.campaign.getCampaignsBanners(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
-                    "pageviewCount": remplib.getFromStorage(remplib.campaign.pageviewCountStorageKey),
+                    "pageviewCounts": remplib.campaign.getCampaignsPageviewCounts(),
                     "userAgent": window.navigator.userAgent,
                     "usingAdblock": remplib.usingAdblock
                 }
@@ -73,6 +71,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     detail: result.providerData,
                 });
                 window.dispatchEvent(event);
+                remplib.campaign.incrementPageviewCountForCampaigns(result.campaignIds);
             },
         },
 
@@ -116,8 +115,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.cookieDomain === 'string') {
                 remplib.cookieDomain = config.cookieDomain;
             }
-
-            this.incrementPageviewCount();
 
             if (window.opener && window.location.hash === '#bannerPicker') {
                 remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
@@ -196,14 +193,57 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return null;
         },
 
-        incrementPageviewCount: function ()  {
-            var pageviewCount = remplib.getFromStorage(this.pageviewCountStorageKey);
+        incrementPageviewCountForCampaigns: function (campaignIds)  {
+            const now = new Date();
+            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
 
-            if (pageviewCount) {
-                remplib.setToStorage(this.pageviewCountStorageKey, pageviewCount+1);
-            } else {
-                remplib.setToStorage(this.pageviewCountStorageKey, 1);
+            if(typeof campaigns === "undefined" || campaigns === null) {
+                campaigns = {
+                    "version": 1,
+                    "createdAt": now,
+                    "updatedAt": now,
+                    "seen": [],
+                    "active": [],
+                }
             }
+
+            for (let k = 0; k < campaignIds.length; k++) {
+                let flag = false;
+
+                for (let i = 0, len = campaigns.active.length; i < len; i++) {
+                    if (campaigns.active[i].campaignId === campaignIds[k]) {
+                        campaigns.active[i].updatedAt = now;
+                        campaigns.active[i].count++;
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if (!flag) {
+                    campaigns.active.push({
+                        "campaignId": campaignIds[k],
+                        "createdAt": now,
+                        "updatedAt": now,
+                        "count": 1,
+                    });
+                }
+            }
+
+            localStorage.setItem(this.campaignsSessionStorageKey, JSON.stringify(campaigns));
+        },
+
+        getCampaignsPageviewCounts: function() {
+            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
+            if (typeof campaigns === "undefined" || campaigns === null) {
+                return {};
+            }
+
+            let pageviewCounts = {};
+            for (let i = 0, len = campaigns.active.length; i < len; i++) {
+                pageviewCounts[campaigns.active[i].campaignId] = campaigns.active[i].count;
+            }
+
+            return pageviewCounts;
         },
 
         // used to store campaign details, called from banner view
@@ -211,7 +251,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.storeCampaigns(campaignId, bannerId, variantId);
             this.storeCampaignsSession(campaignId);
         },
-
 
         // store persistent campaign details
         storeCampaigns: function(campaignId, bannerId, variantId) {
@@ -251,6 +290,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "createdAt": now,
                     "updatedAt": now,
                     "seen": [],
+                    "active": [],
                 }
             }
 

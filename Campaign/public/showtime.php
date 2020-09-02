@@ -129,7 +129,7 @@ var bannerJsonData = {$banner->toJson()};
     }
 
     $js .= <<<JS
-var isControlGroup = {$isControlGroup};
+var isControlGroup = {$isControlGroup}
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {
     scripts.push("{$bannerJs}");
@@ -373,6 +373,7 @@ if ($banner) {
         'success' => true,
         'errors' => [],
         'data' => $displayData,
+        'campaign_ids' => [],
         'providerData' => $segmentAggregator->getProviderData(),
     ]);
 }
@@ -382,6 +383,7 @@ if (count($campaignIds) == 0) {
     jsonp_response($callback, [
         'success' => true,
         'data' => [],
+        'campaign_ids' => [],
         'providerData' => $segmentAggregator->getProviderData(),
     ]);
 }
@@ -391,6 +393,8 @@ $displayData = [];
 $deviceDetector = new DeviceDetector($redis);
 $geoReader = new GeoReader();
 $request = new Request();
+
+$activeCampaignIds = [];
 
 // campaign resolution
 foreach ($campaignIds as $campaignId) {
@@ -504,34 +508,6 @@ foreach ($campaignIds as $campaignId) {
         }
     }
 
-    // pageview rules
-    $pageviewCount = $data->pageviewCount ?? null;
-    if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
-        foreach ($campaign->pageview_rules as $rule) {
-            if (!$rule['num'] || !$rule['rule']) {
-                continue;
-            }
-
-            switch ($rule['rule']) {
-                case Campaign::PAGEVIEW_RULE_EVERY:
-                    if ($pageviewCount % $rule['num'] !== 0) {
-                        continue 3;
-                    }
-                    break;
-                case Campaign::PAGEVIEW_RULE_SINCE:
-                    if ($pageviewCount < $rule['num']) {
-                        continue 3;
-                    }
-                    break;
-                case Campaign::PAGEVIEW_RULE_BEFORE:
-                    if ($pageviewCount >= $rule['num']) {
-                        continue 3;
-                    }
-                    break;
-            }
-        }
-    }
-
     // url filters
     if ($campaign->url_filter === Campaign::URL_FILTER_EXCEPT_AT) {
         foreach ($campaign->url_patterns as $urlPattern) {
@@ -619,6 +595,37 @@ foreach ($campaignIds as $campaignId) {
         continue;
     }
 
+    // Active campaign is campaign that targets selected user (previous rules were passed),
+    // but whether it displays or not depends on pageview counting rules (every n-th page, up to N pageviews).
+    // We need to track such campaigns on client-side too.
+    $activeCampaignIds[] = $campaign->id;
+
+    // pageview rules
+    $pageViewCounts = (array) $data->pageviewCounts;
+    $pageviewCount = $pageViewCounts[$campaignId] ?? null;
+    if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
+        // check display banner every n-th request
+        $displayBanner = $campaign->pageview_rules['display_banner'];
+        $displayBannerEvery = $campaign->pageview_rules['display_banner_every'];
+        if ($displayBanner === 'every' && $pageviewCount % $displayBannerEvery !== 0) {
+            continue;
+        }
+    }
+
+    // seen count rules
+    if ($data->campaignsSeen && $campaign->pageview_rules !== null) {
+        foreach ($data->campaignsSeen as $campaignSeen) {
+            if ($campaignSeen->campaignId === $campaign->uuid) {
+                $seenCount = $campaignSeen->count;
+                $displayTimes = $campaign->pageview_rules['display_times'];
+                $displayNTimes = $campaign->pageview_rules['display_n_times'];
+                if ($displayTimes && $seenCount >= $displayNTimes) {
+                    continue 2;
+                }
+            }
+        }
+    }
+
     $displayData[] = renderCampaign(
         $variant,
         $campaign,
@@ -632,6 +639,7 @@ if (empty($displayData)) {
     jsonp_response($callback, [
         'success' => true,
         'data' => [],
+        'campaignIds' => $activeCampaignIds,
         'providerData' => $segmentAggregator->getProviderData(),
     ]);
 }
@@ -640,5 +648,6 @@ jsonp_response($callback, [
     'success' => true,
     'errors' => [],
     'data' => $displayData,
+    'campaignIds' => $activeCampaignIds,
     'providerData' => $segmentAggregator->getProviderData(),
 ]);

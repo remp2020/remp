@@ -327,17 +327,7 @@
                         </div>
                         <div id="collapseBannerRules" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingBannerRules">
                             <div class="panel-body p-l-10 p-r-20">
-
-                                <pageview-rules :pageviewRules="pageviewRules"></pageview-rules>
-
-                                <div class="input-group fg-float m-t-30 checkbox">
-                                    <label class="m-l-15">
-                                        Display once per session
-                                        <input v-model="oncePerSession" value="1" name="once_per_session" type="checkbox">
-                                        <i class="input-helper"></i>
-                                    </label>
-                                </div>
-
+                                <pageview-rules :pageviewRules="pageviewRules" :oncePerSession="oncePerSession" @pageviewRulesModified="updatePageviewRules"></pageview-rules>
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (banner rules) -->
@@ -651,7 +641,7 @@
                 "removedSegments": [],
                 "segmentMap": null,
                 "eventTypes": null,
-                "pageviewRules": [],
+                "pageviewRules": {},
                 "availableCountries": null,
                 "countriesBlacklistOptions": null,
 
@@ -697,10 +687,9 @@
                 ];
             },
             pageviewRulesNotDefault: function () {
-                if (this.pageviewRules.length && this.pageviewRules[0].rule) {
+                if (this.pageviewRules.display_banner !== 'always' || this.pageviewRules.display_times) {
                     return true;
                 }
-
                 return false;
             },
             isScheduled: function () {
@@ -791,7 +780,12 @@
             },
             removeCountry: function(index) {
                 this.countries.splice(index, 1);
-            }
+            },
+            updatePageviewRules: function (pageviewRules) {
+                console.log('update pageview rules', pageviewRules);
+                this.pageviewRules = pageviewRules.rules;
+                this.oncePerSession = pageviewRules.oncePerSession;
+            },
         },
         watch: {
             bannerId: function () {
