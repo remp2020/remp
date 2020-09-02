@@ -300,7 +300,6 @@
             let jsIncludes = (this.jsIncludes) ? this.jsIncludes.filter(jsInclude => jsInclude) : [];
             if (jsIncludes && jsIncludes.length > 0) {
                 let loadedScriptsCount = 0;
-
                 jsIncludes.forEach((jsInclude) => {
                     lib.loadScript(jsInclude, () => {
                         loadedScriptsCount += 1;
@@ -479,8 +478,8 @@
                         try {
                             // Evaluating JS code using Function with passed params object
                             // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
-                            let body = 'function(params) { ' + js + ' }'
-                            let wrap = s => "{ return " + body + " };"
+                            let body = 'function(params) { ' + js + ' }';
+                            let wrap = s => "{ return " + body + " };";
                             let func = new Function(wrap(body));
                             func.call(null).call(null, that.paramsForCustomJavascript());
                         } catch(err) {

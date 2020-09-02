@@ -576,12 +576,14 @@ class CampaignController extends Controller
                     'success' => true,
                     'errors' => [],
                     'data' => [$renderedBanner],
+                    'campaignIds' => [],
                     'providerData' => $sa->getProviderData(),
                 ]);
         }
 
 
         $displayedCampaigns = [];
+        $activeCampaignIds = [];
 
         $campaignIds = json_decode(Redis::get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
         if (count($campaignIds) == 0) {
@@ -589,6 +591,7 @@ class CampaignController extends Controller
                 ->jsonp($r->get('callback'), [
                     'success' => true,
                     'data' => [],
+                    'campaignIds' => $campaignIds,
                     'providerData' => $sa->getProviderData(),
                 ]);
         }
@@ -794,34 +797,36 @@ class CampaignController extends Controller
                 continue;
             }
 
-            // pageview rules
-            $pageviewCount = $data->pageviewCount ?? null;
-            if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
-                foreach ($campaign->pageview_rules as $rule) {
-                    if (!$rule['num'] || !$rule['rule']) {
-                        continue;
-                    }
+            // Active campaign is campaign that targets selected user (previous rules were passed),
+            // but whether it displays or not depends on pageview counting rules (every n-th page, up to N pageviews).
+            // We need to track such campaigns on client-side too.
+            $activeCampaignIds[] = $campaign->id;
 
-                    switch ($rule['rule']) {
-                        case Campaign::PAGEVIEW_RULE_EVERY:
-                            if ($pageviewCount % $rule['num'] !== 0) {
-                                continue 3;
-                            }
-                            break;
-                        case Campaign::PAGEVIEW_RULE_SINCE:
-                            if ($pageviewCount < $rule['num']) {
-                                continue 3;
-                            }
-                            break;
-                        case Campaign::PAGEVIEW_RULE_BEFORE:
-                            if ($pageviewCount >= $rule['num']) {
-                                continue 3;
-                            }
-                            break;
-                    }
+            // pageview rules
+            $pageViewCounts = (array) $data->pageviewCounts;
+            $pageviewCount = $pageViewCounts[$campaignId] ?? null;
+            if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
+                // check display banner every n-th request
+                $displayBanner = $campaign->pageview_rules['display_banner'];
+                $displayBannerEvery = $campaign->pageview_rules['display_banner_every'];
+                if ($displayBanner === 'every' && $pageviewCount % $displayBannerEvery !== 0) {
+                    continue;
                 }
             }
 
+            // seen count rules
+            if ($data->campaignsSeen && $campaign->pageview_rules !== null) {
+                foreach ($data->campaignsSeen as $campaignSeen) {
+                    if ($campaignSeen->campaignId === $campaign->uuid) {
+                        $seenCount = $campaignSeen->count;
+                        $displayTimes = $campaign->pageview_rules['display_times'];
+                        $displayNTimes = $campaign->pageview_rules['display_n_times'];
+                        if ($displayTimes && $seenCount >= $displayNTimes) {
+                            continue 2;
+                        }
+                    }
+                }
+            }
 
             $displayedCampaigns[] = View::make('banners.preview', [
                 'banner' => $variant->banner,
@@ -839,6 +844,7 @@ class CampaignController extends Controller
                 ->jsonp($r->get('callback'), [
                     'success' => true,
                     'data' => [],
+                    'campaignIds' => $activeCampaignIds,
                     'providerData' => $sa->getProviderData(),
                 ]);
         }
@@ -848,6 +854,7 @@ class CampaignController extends Controller
                 'success' => true,
                 'errors' => [],
                 'data' => $displayedCampaigns,
+                'campaignIds' => $activeCampaignIds,
                 'providerData' => $sa->getProviderData(),
             ]);
     }

@@ -31,6 +31,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added handling for `UserNotFoundException` when confirming user in CRM. remp/remp#685
 - Added notification on the settings screen about settings overridden by local config file. remp/remp#519
 
+### [Campaign]
+
+- Fixed store pageview counts for campaign separately instead of globally. remp/remp#609
+- Refactor campaign form pageview rules to use only `every` rule. remp/remp#609
+- Added display N times and then stop rule to campaign form banner rules. remp/remp#609
+- **BREAKING** Added migration to convert old campaign pageview rules to new format. May pause campaigns with not convertable rules. remp/remp#609
+
 ## [0.11.1] - 2020-07-10
 
 ### [Beam]

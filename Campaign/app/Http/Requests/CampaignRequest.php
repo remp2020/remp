@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\VariantsProportionSum;
 
@@ -34,8 +33,10 @@ class CampaignRequest extends FormRequest
             'using_adblock' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
             'segments' => 'array',
-            'pageview_rules.*.num' => 'required_with:pageview_rules.*.rule',
-            'pageview_rules.*.rule' => 'required_with:pageview_rules.*.num',
+            'pageview_rules.display_banner' => 'required|string',
+            'pageview_rules.display_banner_every' => 'required|integer',
+            'pageview_rules.display_times' => 'required',
+            'pageview_rules.display_n_times' => 'required|integer',
             'devices.0' => 'required',
             'variants.*.proportion' => 'integer|required|min:0|max:100',
             'variants.*.control_group' => 'integer|required',
@@ -54,6 +55,24 @@ class CampaignRequest extends FormRequest
         if (!isset($data['using_adblock'])) {
             $data['using_adblock'] = null;
         }
+        if (!isset($data['pageview_rules']['display_times'])) {
+            $data['pageview_rules']['display_times'] = false;
+        }
+        $data['pageview_rules']['display_times'] = filter_var(
+            $data['pageview_rules']['display_times'],
+            FILTER_VALIDATE_BOOLEAN,
+            ['options' => ['default' => false]]
+        );
+        $data['pageview_rules']['display_banner_every'] = filter_var(
+            $data['pageview_rules']['display_banner_every'],
+            FILTER_VALIDATE_INT,
+            ['options' => ['default' => 2]]
+        );
+        $data['pageview_rules']['display_n_times'] = filter_var(
+            $data['pageview_rules']['display_n_times'],
+            FILTER_VALIDATE_INT,
+            ['options' => ['default' => 2]]
+        );
         $data['active'] = $this->getInputSource()->getBoolean('active', false);
         $data['once_per_session'] = $this->getInputSource()->getBoolean('once_per_session', false);
         return $data;
