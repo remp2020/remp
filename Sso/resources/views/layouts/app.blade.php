@@ -61,6 +61,9 @@
 
                     <ul class="dropdown-menu pull-right dm-icon">
                         <li>
+                            <a href="{{ route('settings.jwtwhitelist') }}"><i class="zmdi zmdi-accounts-list"></i> JWT Whitelist</a>
+                        </li>
+                        <li>
                             <a href="{{ route('auth.logout-web') }}"><i class="zmdi zmdi-time-restore"></i> Logout</a>
                         </li>
                     </ul>
