@@ -58,6 +58,7 @@ Please follow the upgrade steps:
 
 - Added handling for `UserNotFoundException` when confirming user in CRM. remp/remp#685
 - Added notification on the settings screen about settings overridden by local config file. remp/remp#519
+- nette/application upgraded to 2.4.16.
 
 ## [0.11.1] - 2020-07-10
 
