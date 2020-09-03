@@ -1,15 +1,15 @@
 package controller
 
 import (
+	"beam/cmd/segments/app"
+	"beam/model"
 	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 
+	uuid "github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
-	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
-	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 // Segment represents segment information stored in storage.

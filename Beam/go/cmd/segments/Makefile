@@ -1,7 +1,6 @@
 #! /usr/bin/make
 
-GOAGEN_DIR="../../vendor/github.com/goadesign/goa/goagen"
-DESIGN_PKG="gitlab.com/remp/remp/Beam/go/cmd/segments/design"
+DESIGN_PKG="beam/cmd/segments/design"
 
 TARGET_GOOS?=linux
 TARGET_GOARCH?=amd64
@@ -24,11 +23,9 @@ clean:
 
 gen:
 	set -e
-	cd $(GOAGEN_DIR) && go build
-	$(GOAGEN_DIR)/goagen app -d $(DESIGN_PKG)
-	$(GOAGEN_DIR)/goagen swagger -d $(DESIGN_PKG)
-	rm $(GOAGEN_DIR)/goagen
-	rm -fr goagen*
+	go get github.com/goadesign/goa/...@v1
+	goagen app -d=$(DESIGN_PKG)
+	goagen swagger -d=$(DESIGN_PKG)
 
 build-static: gen
 	CGO_ENABLED=0 GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build -a -installsuffix cgo -o segments$(TARGET_SUFFIX)

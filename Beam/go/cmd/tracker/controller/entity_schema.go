@@ -1,13 +1,13 @@
 package controller
 
 import (
+	"beam/cmd/tracker/app"
+	"beam/model"
 	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/pkg/errors"
-	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
-	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 // EntitySchema represents extendended entity schema definition with validation capability.

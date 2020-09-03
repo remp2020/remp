@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"beam/cmd/segments/app"
+	"beam/model"
 	"time"
 
 	"github.com/goadesign/goa"
-	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
-	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 // PageviewController implements the event resource.

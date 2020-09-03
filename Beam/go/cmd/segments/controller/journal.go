@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"beam/cmd/segments/app"
+	"beam/model"
+
 	"github.com/goadesign/goa"
-	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
-	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 // JournalController implements the journal resource.

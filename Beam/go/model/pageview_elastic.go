@@ -6,7 +6,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 )
 
@@ -37,11 +37,10 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 	extras := make(map[string]elastic.Aggregation)
 
 	search := pDB.DB.Client.Search().
-		Index(binding.Index).
-		Type("_doc").
+		Index(pDB.DB.resolveIndex(binding.Index)).
 		Size(0) // return no specific results
 
-	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
+	search, err = pDB.DB.addSearchFilters(search, pDB.DB.resolveIndex(binding.Index), options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -68,9 +67,14 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
+	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
+	}
+
+	if !aggregationAdded {
+		// allow to compute more than 10000 hits (default value) in case there is no aggregation
+		search.TrackTotalHits(true)
 	}
 
 	// get results
@@ -83,7 +87,7 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 		// extract simplified results (no aggregation)
 		return CountRowCollection{
 			CountRow{
-				Count: int(result.Hits.TotalHits),
+				Count: int(result.Hits.TotalHits.Value),
 			},
 		}, true, nil
 	}
@@ -109,11 +113,10 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 	extras[targetAgg] = elastic.NewSumAggregation().Field(binding.Field)
 
 	search := pDB.DB.Client.Search().
-		Index(binding.Index).
-		Type("_doc").
+		Index(pDB.DB.resolveIndex(binding.Index)).
 		Size(0) // return no specific results
 
-	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
+	search, err = pDB.DB.addSearchFilters(search, pDB.DB.resolveIndex(binding.Index), options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -131,9 +134,14 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
+	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
+	}
+
+	if !aggregationAdded {
+		// allow to compute more than 10000 hits (default value) in case there is no aggregation
+		search.TrackTotalHits(true)
 	}
 
 	// get results
@@ -162,11 +170,10 @@ func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, boo
 	extras[targetAgg] = elastic.NewAvgAggregation().Field(binding.Field)
 
 	search := pDB.DB.Client.Search().
-		Index(binding.Index).
-		Type("_doc").
+		Index(pDB.DB.resolveIndex(binding.Index)).
 		Size(0) // return no specific results
 
-	search, err = pDB.DB.addSearchFilters(search, binding.Index, options)
+	search, err = pDB.DB.addSearchFilters(search, pDB.DB.resolveIndex(binding.Index), options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -184,9 +191,14 @@ func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, boo
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
+	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
+	}
+
+	if !aggregationAdded {
+		// allow to compute more than 10000 hits (default value) in case there is no aggregation
+		search.TrackTotalHits(true)
 	}
 
 	// get results
@@ -225,11 +237,10 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 	extras[targetAgg] = elastic.NewCardinalityAggregation().Field(binding.Field)
 
 	search := pDB.DB.Client.Search().
-		Index(binding.Index).
-		Type("_doc").
+		Index(pDB.DB.resolveIndex(binding.Index)).
 		Size(0) // return no specific results
 
-	search, err := pDB.DB.addSearchFilters(search, binding.Index, options)
+	search, err := pDB.DB.addSearchFilters(search, pDB.DB.resolveIndex(binding.Index), options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -247,9 +258,14 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = pDB.DB.addGroupBy(search, binding.Index, options, extras, dateHistogramAgg)
+	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
+	}
+
+	if !aggregationAdded {
+		// allow to compute more than 10000 hits (default value) in case there is no aggregation
+		search.TrackTotalHits(true)
 	}
 
 	// get results
@@ -265,13 +281,14 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowCollection, error) {
 	var prc PageviewRowCollection
 
+	index := pDB.DB.resolveIndex("pageviews")
+
 	fsc := elastic.NewFetchSourceContext(true).Include(options.SelectFields...)
-	scroll := pDB.DB.Client.Scroll("pageviews").
-		Type("_doc").
+	scroll := pDB.DB.Client.Scroll(index).
 		Size(1000).
 		FetchSourceContext(fsc)
 
-	scroll, err := pDB.DB.addScrollFilters(scroll, "pageviews", options.AggregateOptions)
+	scroll, err := pDB.DB.addScrollFilters(scroll, index, options.AggregateOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -295,14 +312,14 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 		for _, hit := range results.Hits.Hits {
 			// populate pageview for collection
 			pv := &Pageview{}
-			if err := json.Unmarshal(*hit.Source, pv); err != nil {
+			if err := json.Unmarshal(hit.Source, pv); err != nil {
 				return nil, errors.Wrap(err, "error reading pageview record from elastic")
 			}
 			pv.ID = hit.Id
 
 			// extract raw pageview data to build tags map
 			rawPv := make(map[string]interface{})
-			if err := json.Unmarshal(*hit.Source, &rawPv); err != nil {
+			if err := json.Unmarshal(hit.Source, &rawPv); err != nil {
 				return nil, errors.Wrap(err, "error reading pageview record from elastic")
 			}
 
@@ -374,9 +391,10 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 }
 
 func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, error) {
+	index := pDB.DB.resolveIndex("pageviews_time_spent")
+
 	fsc := elastic.NewFetchSourceContext(true).Include("timespent", "remp_pageview_id")
-	scroll := pDB.DB.Client.Scroll("pageviews_time_spent").
-		Type("_doc").
+	scroll := pDB.DB.Client.Scroll(index).
 		Size(1000).
 		FetchSourceContext(fsc)
 
@@ -389,7 +407,7 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 	}
 	ao.FilterBy = append(ao.FilterBy, fb)
 
-	scroll, err := pDB.DB.addScrollFilters(scroll, "pageviews_time_spent", ao)
+	scroll, err := pDB.DB.addScrollFilters(scroll, index, ao)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +425,7 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 
 		for _, hit := range results.Hits.Hits {
 			pv := &Pageview{}
-			if err := json.Unmarshal(*hit.Source, pv); err != nil {
+			if err := json.Unmarshal(hit.Source, pv); err != nil {
 				return nil, errors.Wrap(err, "error reading timespent record from elastic")
 			}
 			timespentForPageviews[pv.ID] = pv.Timespent
@@ -445,7 +463,7 @@ func (pDB *PageviewElastic) Actions(category string) ([]string, error) {
 // Users lists all tracked users.
 func (pDB *PageviewElastic) Users() ([]string, error) {
 	// prepare aggregation
-	search := pDB.DB.Client.Search().Index("Pageviews").Type("_doc").Size(0)
+	search := pDB.DB.Client.Search().Index(pDB.DB.resolveIndex("pageviews")).Size(0)
 	agg := elastic.NewTermsAggregation().Field("user_id.keyword")
 	search = search.Aggregation("buckets", agg)
 

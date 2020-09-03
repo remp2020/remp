@@ -16,4 +16,6 @@ type Config struct {
 	ElasticPasswd string `envconfig:"elastic_passwd" required:"false"`
 
 	URLEdit string `envconfig:"url_edit" required:"true"`
+
+	IndexPrefix string `envconfig:"index_prefix" required:"false"`
 }
