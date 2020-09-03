@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.13.0] - 2020-09-03
+
 ### [Beam]
 
 - **BREAKING**: Application now requires Elasticsearch 7. remp/remp#616
@@ -35,7 +37,6 @@ Please follow the upgrade steps:
 - Added display N times and then stop rule to campaign form banner rules. remp/remp#609
 - **BREAKING** Added migration to convert old campaign pageview rules to new format. May pause campaigns with not convertable rules. remp/remp#609
 - Added new banner type – Overlay with Two Buttons and Signature. remp/remp#650
-
 
 ## [0.12.0] - 2020-08-11
 
@@ -323,6 +324,7 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[0.13.0]: https://github.com/remp2020/remp/compare/0.12.0...0.13.0
 [0.12.0]: https://github.com/remp2020/remp/compare/0.11.1...0.12.0
 [0.11.1]: https://github.com/remp2020/remp/compare/0.10.0...0.11.1
 [0.10.0]: https://github.com/remp2020/remp/compare/0.9.1...0.10.0
