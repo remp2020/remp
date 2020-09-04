@@ -107,11 +107,9 @@ class StatsController extends Controller
             $histogramData = $result[0];
 
             foreach ($histogramData->time_histogram as $histogramRow) {
-                $date = Carbon::parse($histogramRow->time);
-
+                $date = Carbon::parse($histogramRow->time)->setTimezone('UTC');
                 $parsedData[$type][$date->toRfc3339String()] = $histogramRow->value;
-
-                $labels[] = $date;
+                $labels[] = $date->toRfc3339String();
             }
         }
 

@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
 
+### [Campaign]
+
+- Fixed change of missing campaign statistics caused by invalid pairing of data with labels due to inconsistent timezone use. 
+
 ### [Mailer]
 
 - Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes remo/remp!390
