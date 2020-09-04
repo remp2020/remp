@@ -1270,7 +1270,7 @@ Response:
 Creates or updates mail type (newsletter list). Endpoint complements creation of newsletter list via web interface.
 
 If existing `id`/`code` is provided, API handler updates existing record, otherwise a record is created. 
-Field `id`has higher precedence in finding the existing record.
+Field `id` has higher precedence in finding the existing record.
 
 ##### *Headers:*
 
