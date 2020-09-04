@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
 
+### [Mailer]
+
+- Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes remo/remp!390
+- Upgraded nette/application to 2.4.16.
+
 ## [0.13.0] - 2020-09-03
 
 ### [Beam]
@@ -62,7 +67,6 @@ Please follow the upgrade steps:
 
 - Added handling for `UserNotFoundException` when confirming user in CRM. remp/remp#685
 - Added notification on the settings screen about settings overridden by local config file. remp/remp#519
-- nette/application upgraded to 2.4.16.
 
 ## [0.11.1] - 2020-07-10
 
