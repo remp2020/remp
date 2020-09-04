@@ -49,15 +49,29 @@
                v-bind:show="show"
             ></overlay-rectangle-template>
 
+            <overlay-two-buttons-signature-template v-if="template === 'overlay_two_buttons_signature'"
+                                                    v-bind:_templateId="overlayTwoButtonsSignatureTemplate.id"
+                                                    v-bind:_textBefore="overlayTwoButtonsSignatureTemplate.textBefore"
+                                                    v-bind:_textAfter="overlayTwoButtonsSignatureTemplate.textAfter"
+                                                    v-bind:_textBtnPrimary="overlayTwoButtonsSignatureTemplate.textBtnPrimary"
+                                                    v-bind:_textBtnPrimaryMinor="overlayTwoButtonsSignatureTemplate.textBtnPrimaryMinor"
+                                                    v-bind:_textBtnSecondary="overlayTwoButtonsSignatureTemplate.textBtnSecondary"
+                                                    v-bind:_textBtnSecondaryMinor="overlayTwoButtonsSignatureTemplate.textBtnSecondaryMinor"
+                                                    v-bind:_targetUrlSecondary="overlayTwoButtonsSignatureTemplate.targetUrlSecondary"
+                                                    v-bind:_signatureImageUrl="overlayTwoButtonsSignatureTemplate.signatureImageUrl"
+                                                    v-bind:_textSignature="overlayTwoButtonsSignatureTemplate.textSignature"
+                                                    v-bind:show="show"
+            ></overlay-two-buttons-signature-template>
+
             <html-overlay-template v-if="template === 'html_overlay'"
-                v-bind:_backgroundColor="htmlOverlayTemplate.backgroundColor"
-                v-bind:_text="htmlOverlayTemplate.text"
-                v-bind:_css="htmlOverlayTemplate.css"
-                v-bind:_textColor="htmlOverlayTemplate.textColor"
-                v-bind:_fontSize="htmlOverlayTemplate.fontSize"
-                v-bind:_textAlign="htmlOverlayTemplate.textAlign"
-                v-bind:alignmentOptions="alignmentOptions"
-                v-bind:show="show"
+                                   v-bind:_backgroundColor="htmlOverlayTemplate.backgroundColor"
+                                   v-bind:_text="htmlOverlayTemplate.text"
+                                   v-bind:_css="htmlOverlayTemplate.css"
+                                   v-bind:_textColor="htmlOverlayTemplate.textColor"
+                                   v-bind:_fontSize="htmlOverlayTemplate.fontSize"
+                                   v-bind:_textAlign="htmlOverlayTemplate.textAlign"
+                                   v-bind:alignmentOptions="alignmentOptions"
+                                   v-bind:show="show"
             ></html-overlay-template>
 
             <bar-template v-if="template === 'bar'"
@@ -361,6 +375,7 @@
                                         :htmlTemplate="htmlTemplate"
                                         :htmlOverlayTemplate="htmlOverlayTemplate"
                                         :shortMessageTemplate="shortMessageTemplate"
+                                        :overlayTwoButtonsSignatureTemplate="overlayTwoButtonsSignatureTemplate"
 
                                         :position="position"
                                         :offsetVertical="offsetVertical"
@@ -402,6 +417,7 @@
     import vSelect from "remp/js/components/vSelect";
     import FormValidator from "remp/js/components/FormValidator";
     import HtmlOverlayTemplate from "./templates/HtmlOverlay";
+    import OverlayTwoButtonsSignatureTemplate from "./templates/OverlayTwoButtonsSignature";
 
     const props = {
         "_name": String,
@@ -428,6 +444,7 @@
         "_htmlOverlayTemplate": Object,
         "_shortMessageTemplate": Object,
         "_overlayRectangleTemplate": Object,
+        "_overlayTwoButtonsSignatureTemplate": Object,
 
         "_alignmentOptions": Object,
         "_dimensionOptions": Object,
@@ -453,7 +470,8 @@
             BannerPreview,
             vSelect,
             FormValidator,
-            OverlayRectangleTemplate
+            OverlayRectangleTemplate,
+            OverlayTwoButtonsSignatureTemplate
         },
         name: 'banner-form',
         props: props,
@@ -491,6 +509,7 @@
             htmlOverlayTemplate: null,
             shortMessageTemplate: null,
             overlayRectangleTemplate: null,
+            overlayTwoButtonsSignatureTemplate: null,
 
             alignmentOptions: [],
             dimensionOptions: [],
@@ -519,7 +538,7 @@
         }),
         computed: {
             isOverlay: function() {
-                return this.overlayRectangleTemplate == null && this.htmlOverlayTemplate == null;
+                return this.overlayRectangleTemplate == null && this.htmlOverlayTemplate == null && this.overlayTwoButtonsSignatureTemplate == null;
             },
             jsIncludesStr: {
                 get: function () {

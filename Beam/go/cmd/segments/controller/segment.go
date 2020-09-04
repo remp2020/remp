@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"beam/cmd/segments/app"
+	"beam/model"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -8,8 +10,6 @@ import (
 
 	"github.com/goadesign/goa"
 	"github.com/pkg/errors"
-	"gitlab.com/remp/remp/Beam/go/cmd/segments/app"
-	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 // SegmentType represents type of segment (source of data used for segment)

@@ -6,30 +6,41 @@ import (
 	"math"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 )
 
 // ElasticDB represents data layer based on ElasticSearch.
 type ElasticDB struct {
-	Client  *elastic.Client
-	Debug   bool
-	Context context.Context
+	Client      *elastic.Client
+	Debug       bool
+	Context     context.Context
+	IndexPrefix string
 
 	fieldsCache map[string]map[string]string // fields cache represents list of all index (map key) fields (map values)
 }
 
 // NewElasticDB returns new instance of ElasticSearch DB implementation
-func NewElasticDB(ctx context.Context, client *elastic.Client, debug bool) *ElasticDB {
+func NewElasticDB(ctx context.Context, client *elastic.Client, indexPrefix string, debug bool) *ElasticDB {
 	edb := &ElasticDB{
-		Client:  client,
-		Debug:   debug,
-		Context: ctx,
+		Client:      client,
+		Debug:       debug,
+		Context:     ctx,
+		IndexPrefix: indexPrefix,
 	}
 	edb.fieldsCache = make(map[string]map[string]string)
 	return edb
+}
+
+func (eDB *ElasticDB) resolveIndex(index string) string {
+	if !strings.HasPrefix(index, eDB.IndexPrefix) {
+		return eDB.IndexPrefix + index
+	}
+
+	return index
 }
 
 func (eDB *ElasticDB) addSearchFilters(search *elastic.SearchService, index string, o AggregateOptions) (*elastic.SearchService, error) {
@@ -109,17 +120,21 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 
 // addGroupBy creates a standard (wrapped) aggregation. The results are fetchable
 // via countRowCollectionFromBuckets or sumRowCollectionFromBuckets.
+// If any aggregation is added, function returns true as a second return value
 func (eDB *ElasticDB) addGroupBy(search *elastic.SearchService, index string, o AggregateOptions,
-	extras map[string]elastic.Aggregation, dateHistogramAgg *elastic.DateHistogramAggregation) (*elastic.SearchService, error) {
+	extras map[string]elastic.Aggregation, dateHistogramAgg *elastic.DateHistogramAggregation) (*elastic.SearchService, bool, error) {
+
+	aggregationAdded := false
 
 	if len(o.GroupBy) > 0 || len(extras) > 0 || dateHistogramAgg != nil {
 		var err error
 		search, _, err = eDB.WrapAggregation(index, o.GroupBy, search, extras, dateHistogramAgg, nil)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
+		aggregationAdded = true
 	}
-	return search, nil
+	return search, aggregationAdded, nil
 }
 
 // countRowCollectionFromAggregations generates CountRowCollection based on query result aggregations.
@@ -127,7 +142,7 @@ func (eDB *ElasticDB) countRowCollectionFromAggregations(result *elastic.SearchR
 	var crc CountRowCollection
 	tags := make(map[string]string)
 
-	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits.Value, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 		crcTags := make(map[string]string)
 
 		var timeHistogram []TimeHistogramItem
@@ -195,7 +210,7 @@ func (eDB *ElasticDB) sumRowCollectionFromAggregations(result *elastic.SearchRes
 	var src SumRowCollection
 	tags := make(map[string]string)
 
-	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits.Value, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 
 		var timeHistogram []TimeHistogramItem
 		var sumValue float64
@@ -267,7 +282,7 @@ func (eDB *ElasticDB) avgRowCollectionFromAggregations(result *elastic.SearchRes
 	var src AvgRowCollection
 	tags := make(map[string]string)
 
-	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits.Value, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 
 		var timeHistogram []TimeHistogramItem
 		// in case of histogram, total avg value is 0 since it cannot be simply computed as average of averages
@@ -333,7 +348,7 @@ func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.Search
 	var src CountRowCollection
 	tags := make(map[string]string)
 
-	err := eDB.UnwrapAggregation(result.Hits.TotalHits, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
+	err := eDB.UnwrapAggregation(result.Hits.TotalHits.Value, result.Aggregations, options.GroupBy, tags, func(tags map[string]string, count int64, aggregations elastic.Aggregations) error {
 
 		var timeHistogram []TimeHistogramItem
 		// in case of histogram, total count will be 0 since we cannot compute distinc values from histogram buckets
@@ -526,6 +541,8 @@ func (eDB *ElasticDB) resolveZeroValue(index, field string) (interface{}, error)
 
 // cacheFieldMapping downloads and caches field mappings for specified index
 func (eDB *ElasticDB) cacheFieldMapping(index string) (map[string]string, error) {
+	index = eDB.resolveIndex(index)
+
 	result, err := eDB.Client.GetMapping().Index(index).Do(eDB.Context)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("unable to get field mappings for index: %s", index))

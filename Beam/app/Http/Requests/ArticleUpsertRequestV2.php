@@ -31,6 +31,7 @@ class ArticleUpsertRequestV2 extends FormRequest
             'articles.*.image_url' => 'nullable|url',
             'articles.*.published_at' => 'required|date',
             'articles.*.titles.*' => 'nullable|string',
+            'articles.*.content_type' => 'string',
 
             // authors
             'articles.*.authors' => 'array',

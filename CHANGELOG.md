@@ -7,6 +7,48 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
+
+### [Mailer]
+
+- Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes remo/remp!390
+- Upgraded nette/application to 2.4.16.
+
+## [0.13.0] - 2020-09-03
+
+### [Beam]
+
+- **BREAKING**: Application now requires Elasticsearch 7. remp/remp#616
+Please follow the upgrade steps:
+  - Rebuild or download new Tracker and Segments binaries (binaries available at https://github.com/remp2020/remp/releases).
+  - Omit `type_name` from Telegraf configuration (see `Docker/telegraf/telegraf.conf` docker configuration file for more details).
+  - If you use default docker appliance to run REMP, please run:
+    ```bash
+    docker-compose stop beam_tracker beam_segments elasticsearch
+    docker-compose build beam_tracker beam_segments elasticsearch
+    docker-compose up -d beam_tracker beam_segments elasticsearch
+    ```
+- Go dep dependencies management system replaced with go modules. remp/remp#616
+- Added ability to optionally specify (Elasticsearch) indexes prefix in `.env` for Tracker and Segments apps. remp/remp#616
+- Added support for Elasticsearch authentication (`auth` parameter) in `ElasticDataRetention` and `ElasticWriteAliasRollover` commands. remp/remp#616
+- Added `content_type` column to `articles` table. remp/remp#695
+- Added optional parameter `content_type` in `/api/v2/articles/upsert` API endpoint. remp/remp#695
+- Added optional parameter `content_type` in `/api/articles/top` API endpoint to filter articles by `content_type`. remp/remp#695
+- Added optional parameter `content_type` in `/api/authors/top` API endpoint to filter articles by `content_type`. remp/remp#695
+- Added optional parameter `content_type` in `/api/tags/top` API endpoint to filter articles by `content_type`. remp/remp#695
+
+### [Campaign]
+
+- Fixed store pageview counts for campaign separately instead of globally. remp/remp#609
+- Refactor campaign form pageview rules to use only `every` rule. remp/remp#609
+- Added display N times and then stop rule to campaign form banner rules. remp/remp#609
+- **BREAKING** Added migration to convert old campaign pageview rules to new format. May pause campaigns with not convertable rules. remp/remp#609
+- Added new banner type – Overlay with Two Buttons and Signature. remp/remp#650
+
+## [0.12.0] - 2020-08-11
+
 ### Docker
 
 - Added tzdata installation for remp_segments docker (required by golang).
@@ -291,6 +333,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[0.13.0]: https://github.com/remp2020/remp/compare/0.12.0...0.13.0
+[0.12.0]: https://github.com/remp2020/remp/compare/0.11.1...0.12.0
 [0.11.1]: https://github.com/remp2020/remp/compare/0.10.0...0.11.1
 [0.10.0]: https://github.com/remp2020/remp/compare/0.9.1...0.10.0
 [0.9.0]: https://github.com/remp2020/remp/compare/0.8.0...0.9.1

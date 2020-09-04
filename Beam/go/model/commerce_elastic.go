@@ -6,7 +6,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 )
 
@@ -15,14 +15,17 @@ type CommerceElastic struct {
 	DB *ElasticDB
 }
 
+func (cDB *CommerceElastic) getIndex() string {
+	return cDB.DB.resolveIndex("commerce")
+}
+
 // Count returns count of events based on the provided filter options.
 func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection, bool, error) {
 	search := cDB.DB.Client.Search().
-		Index("commerce").
-		Type("_doc").
+		Index(cDB.getIndex()).
 		Size(0) // return no specific results
 
-	search, err := cDB.DB.addSearchFilters(search, "commerce", options)
+	search, err := cDB.DB.addSearchFilters(search, cDB.getIndex(), options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -43,9 +46,14 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 			ExtendedBounds(options.TimeAfter, options.TimeBefore)
 	}
 
-	search, err = cDB.DB.addGroupBy(search, "commerce", options, nil, dateHistogramAgg)
+	search, aggregationAdded, err := cDB.DB.addGroupBy(search, cDB.getIndex(), options, nil, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
+	}
+
+	if !aggregationAdded {
+		// allow to compute more than 10000 hits (default value) in case there is no aggregation
+		search.TrackTotalHits(true)
 	}
 
 	// get results
@@ -58,7 +66,7 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 		// extract simplified results (no aggregation)
 		return CountRowCollection{
 			CountRow{
-				Count: int(result.Hits.TotalHits),
+				Count: int(result.Hits.TotalHits.Value),
 			},
 		}, true, nil
 	}
@@ -72,12 +80,11 @@ func (cDB *CommerceElastic) List(options ListOptions) (CommerceRowCollection, er
 	var crc CommerceRowCollection
 
 	fsc := elastic.NewFetchSourceContext(true).Include(options.SelectFields...)
-	scroll := cDB.DB.Client.Scroll("commerce").
-		Type("_doc").
+	scroll := cDB.DB.Client.Scroll(cDB.getIndex()).
 		Size(1000).
 		FetchSourceContext(fsc)
 
-	scroll, err := cDB.DB.addScrollFilters(scroll, "commerce", options.AggregateOptions)
+	scroll, err := cDB.DB.addScrollFilters(scroll, cDB.getIndex(), options.AggregateOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -98,15 +105,16 @@ func (cDB *CommerceElastic) List(options ListOptions) (CommerceRowCollection, er
 		// Send the hits to the hits channel
 		for _, hit := range results.Hits.Hits {
 			// populate commerce for collection
+
 			commerce := &Commerce{}
-			if err := json.Unmarshal(*hit.Source, commerce); err != nil {
+			if err := json.Unmarshal(hit.Source, commerce); err != nil {
 				return nil, errors.Wrap(err, "error reading commerce record from elastic")
 			}
 			commerce.ID = hit.Id
 
 			// extract raw event data to build tags map
 			rawCommerce := make(map[string]interface{})
-			if err := json.Unmarshal(*hit.Source, &rawCommerce); err != nil {
+			if err := json.Unmarshal(hit.Source, &rawCommerce); err != nil {
 				return nil, errors.Wrap(err, "error reading pageview record from elastic")
 			}
 
@@ -164,11 +172,10 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 	extras[targetAgg] = elastic.NewSumAggregation().Field("revenue")
 
 	search := cDB.DB.Client.Search().
-		Index("commerce").
-		Type("_doc").
+		Index(cDB.getIndex()).
 		Size(0) // return no specific results
 
-	search, err := cDB.DB.addSearchFilters(search, "commerce", options)
+	search, err := cDB.DB.addSearchFilters(search, cDB.getIndex(), options)
 	if err != nil {
 		return nil, false, err
 	}
@@ -187,9 +194,14 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 			Offset(options.TimeHistogram.Offset)
 	}
 
-	search, err = cDB.DB.addGroupBy(search, "commerce", options, extras, dateHistogramAgg)
+	search, aggregationAdded, err := cDB.DB.addGroupBy(search, cDB.getIndex(), options, extras, dateHistogramAgg)
 	if err != nil {
 		return nil, false, err
+	}
+
+	if !aggregationAdded {
+		// allow to compute more than 10000 hits (default value) in case there is no aggregation
+		search.TrackTotalHits(true)
 	}
 
 	// get results

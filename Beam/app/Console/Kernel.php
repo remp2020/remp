@@ -67,6 +67,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(SnapshotArticlesViews::COMMAND)
             ->everyMinute()
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/snapshot_articles_views.log'));
 
         $schedule->command(CompressSnapshots::COMMAND)

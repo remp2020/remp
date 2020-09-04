@@ -362,7 +362,8 @@ class AuthorController extends Controller
             $sectionValueType = 'name';
             $sectionValues = $sections['name'];
         }
+        $contentType = $request->json('content_type');
 
-        return response()->json($topSearch->topAuthors($timeFrom, $limit, $sectionValueType, $sectionValues));
+        return response()->json($topSearch->topAuthors($timeFrom, $limit, $sectionValueType, $sectionValues, $contentType));
     }
 }

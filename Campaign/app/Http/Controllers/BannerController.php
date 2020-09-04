@@ -113,6 +113,7 @@ class BannerController extends Controller
             'mediumRectangleTemplate',
             'overlayRectangleTemplate',
             'htmlOverlayTemplate',
+            'overlayTwoButtonsSignatureTemplate',
             'barTemplate',
             'collapsibleBarTemplate',
             'shortMessageTemplate'

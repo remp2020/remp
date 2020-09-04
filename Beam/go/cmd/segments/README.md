@@ -24,15 +24,11 @@ This tarball can be safely used within any Docker image, including `alpine` or `
 
 ### go
 
-If you have Go 1.8+ environment set up, you can run the build manually by running
+If you have Go 1.13+ environment set up, you can run the build manually by running
 
 ```bash
 make build
 ```
-
-As a dependency management tool we're using `github.com/golang/dep`. We also commit all dependencies into the
-repository, so you don't need to rely on our dependency tool of choice. However if you make a commit updating
-the dependency, please make sure to run also `dep ensure -update` to keep stuff consistent.
 
 ## Running
 
@@ -52,3 +48,4 @@ SEGMENTS_MYSQL_PASSWD|`secret`
 SEGMENTS_ELASTIC_ADDR|`http://elasticsearch:9200`
 SEGMENTS_ELASTIC_USER|`elastic`
 SEGMENTS_ELASTIC_PASSWD|`secret`
+SEGMENTS_INDEX_PREFIX|`test-`

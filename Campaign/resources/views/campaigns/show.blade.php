@@ -58,25 +58,26 @@
                         </ul>
                     </li>
 
+                    @if($campaign->pageview_rules !== null)
+                    <li class="list-group-item">
+                        <strong>Display banner:</strong>
+                        <ul>
+                            <li>
+                                Display banner: @if($campaign->pageview_rules['display_banner'] === 'every')Every {{ $campaign->pageview_rules['display_banner_every'] }} page views @else Always @endif
+                            </li>
+                            @if($campaign->pageview_rules['display_times'])
+                            <li>
+                                Display to user {{ $campaign->pageview_rules['display_n_times'] }} times, then stop.
+                            </li>
+                            @endif
+                        </ul>
+                    </li>
+                    @endif
+
                     <li class="list-group-item">
                         <strong>Display only once per session:</strong>
                         {{ @yesno($campaign->once_per_session) }}
                     </li>
-
-                    @if(count($campaign->pageview_rules))
-                    <li class="list-group-item">
-                        <strong>Pageview rules:</strong>
-                        <ul>
-                            @foreach($campaign->pageview_rules as $rule)
-                            <li>
-                                {{ ucfirst($rule['rule']) }}
-                                {{ ucfirst($rule['num']) }}
-                                request
-                            </li>
-                            @endforeach
-                        </ul>
-                    </li>
-                    @endif
 
                     @if($campaign->countriesWhitelist->count())
                         <li class="list-group-item">

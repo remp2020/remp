@@ -1,8 +1,11 @@
-//go:generate goagen bootstrap -d gitlab.com/remp/remp/Beam/go/cmd/tracker/design
+//go:generate goagen bootstrap -d beam/cmd/tracker/design
 
 package main
 
 import (
+	"beam/cmd/tracker/app"
+	"beam/cmd/tracker/controller"
+	"beam/model"
 	"context"
 	"log"
 	"net/http"
@@ -21,9 +24,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
-	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
-	"gitlab.com/remp/remp/Beam/go/cmd/tracker/controller"
-	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 func main() {

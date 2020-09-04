@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"beam/cmd/tracker/app"
+	"beam/model"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -14,8 +16,6 @@ import (
 	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
 	refererparser "github.com/snowplow-referer-parser/golang-referer-parser"
-	"gitlab.com/remp/remp/Beam/go/cmd/tracker/app"
-	"gitlab.com/remp/remp/Beam/go/model"
 )
 
 // TrackController implements the track resource.

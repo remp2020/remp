@@ -8,9 +8,9 @@ use Illuminate\Support\Carbon;
 
 class TopSearch
 {
-    public function topArticles($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null)
+    public function topArticles($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null, ?string $contentType = null)
     {
-        $getTopArticlesFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues) {
+        $getTopArticlesFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues, $contentType) {
             $pageviewsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -24,6 +24,9 @@ class TopSearch
 
             if ($sectionValueType && $sectionValues) {
                 $this->addSectionsCondition($pageviewsQuery, $sectionValueType, $sectionValues);
+            }
+            if ($contentType) {
+                $this->addContentTypeCondition($pageviewsQuery, $contentType);
             }
 
             $data = DB::table('articles')
@@ -41,9 +44,9 @@ class TopSearch
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopArticlesFunc);
     }
 
-    public function topAuthors($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null)
+    public function topAuthors($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null, ?string $contentType = null)
     {
-        $getTopAuthorsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues) {
+        $getTopAuthorsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues, $contentType) {
             $topAuthorsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -55,6 +58,9 @@ class TopSearch
 
             if ($sectionValueType && $sectionValues) {
                 $this->addSectionsCondition($topAuthorsQuery, $sectionValueType, $sectionValues);
+            }
+            if ($contentType) {
+                $this->addContentTypeCondition($topAuthorsQuery, $contentType);
             }
 
             $data = DB::table('authors')
@@ -72,9 +78,9 @@ class TopSearch
         return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopAuthorsFunc, 'name');
     }
 
-    public function topPostTags($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null)
+    public function topPostTags($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null, ?string $contentType = null)
     {
-        $getTopPostTagsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues) {
+        $getTopPostTagsFunc = function (Carbon $timeFrom, Carbon $timeTo, $limit) use ($sectionValueType, $sectionValues, $contentType) {
             $topTagsQuery = DB::table('article_pageviews')
                 ->where('article_pageviews.time_from', '>=', $timeFrom)
                 ->where('article_pageviews.time_from', '<=', $timeTo)
@@ -86,6 +92,9 @@ class TopSearch
 
             if ($sectionValueType && $sectionValues) {
                 $this->addSectionsCondition($topTagsQuery, $sectionValueType, $sectionValues);
+            }
+            if ($contentType) {
+                $this->addContentTypeCondition($topTagsQuery, $contentType);
             }
 
             $data = DB::table('tags')
@@ -113,6 +122,12 @@ class TopSearch
         $articlePageviewsQuery->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
             ->join('sections', 'article_section.section_id', '=', 'sections.id')
             ->whereIn('sections.' . $type, $values);
+    }
+
+    private function addContentTypeCondition(Builder $articlePageviewsQuery, string $contentType)
+    {
+        $articlePageviewsQuery->join('articles', 'article_pageviews.article_id', '=', 'articles.id')
+            ->where('articles.content_type', '=', $contentType);
     }
 
     // split query by days (due to speed)
