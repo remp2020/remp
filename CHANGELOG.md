@@ -11,9 +11,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
 
+### [Campaign]
+
+- Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628
+
 ### [Mailer]
 
-- Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes remo/remp!390
+- Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes. remp/remp!390
 - Upgraded nette/application to 2.4.16.
 
 ## [0.13.0] - 2020-09-03
