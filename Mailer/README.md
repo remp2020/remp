@@ -45,18 +45,18 @@ You can override any default config from
 Lists represent categories of emails (newsletters). Their primary (and only) use case is to group single emails within 
 a newsletter and manage subscriptions of users to these newsletters.
 
-When you create new newsletter, you can specify:
+When you create a new newsletter, you can specify:
 
 * *Name.* User-friendly name of the newsletter (e.g. "Weekly newsletter", "Breaking news", ...)
 * *Code.* Computer-friendly name of the newsletter (slug; e.g. "weekly_newsletter", "breaking_news", ...)
 * *Auto subscribe flag.* Flag indicating whether new users (reported by external CRM via API) should be automatically
 subscribed to the newsletter or not.
 * *Public flag.* Flag indicating whether the newsletter should be listed in the public listing available for end users.
-Mailer doesn't provide a user-facing frontend, so this flag is targetted primarily for the party implementing the frontend.
+Mailer doesn't provide a user-facing frontend, so this flag is targeted primarily for the party implementing the frontend.
 
 Any handling of subscription/unsubscription of end users from newsletters is handled via API. Publishers mostly want
 to have this included within the customer zone of their systems - designed consistently with the rest of their system.
-Therefore Mailer doesn't provide **any** user-facing frontend. 
+Therefore, Mailer doesn't provide **any** user-facing frontend. 
 
 To see the APIs to integration subscription management, see [Managing user subscription](#managing-user-subscriptions)
 section.
@@ -73,7 +73,7 @@ while doing so. As the names suggest:
     injected.
     
 * *Emails.* They represent actual content of the *email* (e.g. single edition of the weekly newsletter). Every *email* has
-couple of settings you can configure:
+a couple of settings you can configure:
 
     * *Name.* User-friendly name of the email. It's displayed only in the administration parts of the system.
     * *Code.* Computer-friendly name of the email (slug). Primarily being used when referencing single email that's being
@@ -88,7 +88,8 @@ couple of settings you can configure:
     * *HTML version.* HTML (primary) version of email that people will see. HTML version will show preview in the
     form for creation of new email.
     
-HTML version can be edited by CodeMirror editor (html, default) or Trumbowyg editor (WYSIWYG). Default editor can be changed using `.env` variable `TEMPLATE_EDITOR`. (options: `codemirror`, `wysiwyg`)
+HTML version can be edited by CodeMirror editor (html, default) or Trumbowyg editor (WYSIWYG). 
+Default editor can be changed using `.env` variable `TEMPLATE_EDITOR`. (options: `codemirror`, `wysiwyg`)
 
 Text and HTML versions of *email* support [Twig syntax](https://twig.symfony.com/doc/2.x/templates.html) and you can use
 standard Twig features in your templates. Mailer is able to provide custom variables to your templates. These can
@@ -121,7 +122,7 @@ statistics. This is useful when you want to run an A/B test on smaller *batch*, 
 When creating a *job*, you implicitly create also its first *batch*. The *job* has only one option shared across all batches:
 
 * *Segment.* Defines which [*segment* of users](#segment-integration) (needs integration) should receive the email. This does not relate to
-the *newsletter* subscribers in any way. *Segment* of users should simply state the set of users you're targetting. For
+the *newsletter* subscribers in any way. *Segment* of users should simply state the set of users you're targeting. For
 example *"people registered yesterday"* or *"people without a payment"*. It's configured on a *job* level and it's shared
 across all *batches*.
 
@@ -142,11 +143,11 @@ will receive necessary information about target group of users and prepares meta
 Once the metadata is ready and the *batch* is in the *processed* state, it will be picked up by sending daemon and
 actual emails will be sent via preconfigured Mailer (SMTP, Mailgun, ...).
 
-You can create and execute *jobs*/*batches* programatically by using provided API endpoints. 
+You can create and execute *jobs*/*batches* programmatically by using provided API endpoints. 
 
 ##### Generators
 
-Generators are single-purpose implementations that help to generate HTML/text content of *emails* programatically
+Generators are single-purpose implementations that help to generate HTML/text content of *emails* programmatically
 based on the provided input. That means that instead of manually preparing *email* content (HTML to send) every time
 you want to send an email, you can simplify the creation by implementing custom generator that can do the hard work
 for you.
@@ -162,8 +163,8 @@ variables used within generator template will always be provided (unless the imp
 
 ###### Implementing generator
 
-To create new generator, you need to implement [`Remp\MailerModule\Generators\IGenerator` interface](app/models/Generators/IGenerator.php). Methods are descibed
-below with references to `UrlParserGenerator`:
+To create a new generator, you need to implement [`Remp\MailerModule\Generators\IGenerator` interface](app/models/Generators/IGenerator.php).
+Methods are described below with references to `UrlParserGenerator`:
 
 * `generateForm(Form $form)`. Generators need a way how to get arbitrary input from user. This method should add new
 form elements into the `$form` instance and state the validation rules.
@@ -231,7 +232,7 @@ that helps to shape the final HTML of *email*.
     }
     ```
 
-* `getWidgets()`. Provides array of class names of widgets that might be rendered on the page after generator form
+* `getWidgets()`. Provides an array of class names of widgets that might be rendered on the page after generator form
 submission. As generator "only" generates HTML/text content of email, you might want to attach some extra behavior or
 controls to the success page - such as email preview or button to create and start *job*/*batch*.
 
@@ -251,7 +252,7 @@ controls to the success page - such as email preview or button to create and sta
     }
     ```
     
-* `apiParams()`. Provides array of input parameters that generator requires when used via API. These parameters should
+* `apiParams()`. Provides an array of input parameters that generator requires when used via API. These parameters should
 mirror fields added in `generateForm()` method. They are utilized when calling [Generate mail API]().
 
     ```php
@@ -281,7 +282,7 @@ to the parameters stated in `apiParams()`. This is a very specific use of an int
     * As the generator implementation can be very specific (for example couple of our generators expect text version
     of Wordpress post as one of the inputs), it's OK to tie API part of the generator to the caller.
     * CMS receives back data extracted from WP post in a form, that can be submitted to the Mailer's Generator form and
-    also an URL where these data can be submitted.
+    a URL where these data can be submitted.
     * CMS provides a link, that creates a hidden form, populates it with *preprocessed* data and submits it to the Mailer.
     
     The result is, that instead of someone manually copy-pasting data out of Wordpress to Mailer, one can simply "trigger"
@@ -361,7 +362,7 @@ All examples use `http://mailer.remp.press` as a base domain. Please change the 
 before executing the examples.
 
 All examples use `XXX` as a default value for authorization token, please replace it with the
-real token API token that can be acquired in the REMP SSO.
+real token API token which can be acquired in the REMP SSO.
 
 API responses can contain following HTTP codes:
 
@@ -372,7 +373,7 @@ API responses can contain following HTTP codes:
 | 403 Forbidden | The authorization failed (provided token was not valid) | 
 | 404 Not found | Referenced resource wasn't found | 
 
-If possible, the response includes `application/json` encoded payload with message explaining
+If possible, the response includes `application/json` encoded payload with a message explaining
 the error further.
 
 ---
@@ -634,8 +635,9 @@ Response:
 
 #### POST `/api/v1/users/subscribe`
 
-API call subscribes email address to the given newsletter. Newsletter has to already be created. As there's no API
-for that, please visit `/list/new` to create newsletter via web admin.
+API call subscribes email address to the given newsletter. Newsletter has tp be already created.
+Currently, there's no API endpoint for that and the newsletter needs to be created manually.
+Please visit `/list/new` to create a newsletter via web admin.
 
 ##### *Headers:*
 
@@ -688,7 +690,7 @@ Response:
 
 API call unsubscribes email address from the given newsletter.
 
-Endpoint accepts optional array of UTM parameters. Every link in email send by Mailer contain UTM parameters
+Endpoint accepts an optional array of UTM parameters. Every link in email send by Mailer contain UTM parameters
 referencing to the specific instance of sent email. If user unsubscribes via specific email, your frontend will also
 receive special UTM parameters, that can be passed to this API call. For instance link to unsubscribe from our daily
 newsletter might look like this:
@@ -764,7 +766,7 @@ Response:
 
 #### POST `/api/v1/users/bulk-subscribe`
 
-Bulk subscribe allows to subscribe and unsubscribe multiple users in one batch. For details about subscribe / unsubscribe see individual calls above.
+Bulk subscribe allows subscribing and unsubscribing multiple users in one batch. For details about subscribe / unsubscribe see individual calls above.
 
 ##### *Headers:*
 
@@ -925,7 +927,7 @@ Token is appended as a query parameter `token`, for example:
 https://predplatne.dennikn.sk/?token=206765522b71289504ae766389bf741x
 ```
 
-Your frontend application can read this token on visit and verify against this API whether it's still valid or not.
+Your frontend application can read this token on a visit and verify against this API whether it's still valid or not.
 If it's valid, you can automatically log user in based on the ID/email the endpoint provides. 
 
 ##### *Body:*
@@ -1076,7 +1078,7 @@ Returns mail logs based on given criteria
 }
 ```
 
-##### *Filter can also be in format:*
+##### *Filter can also be in a format:*
 
 ```json5
 {
@@ -1125,7 +1127,7 @@ Response:
       "code": "demo_email",
       "name": "Demo email"
     },
-    "sent_at": "2020-04-08T19:26:00+02:00"
+    "sent_at": "2020-04-08T19:26:00+02:00",
     "delivered_at": "2020-04-08T13:33:44+02:00",
     "dropped_at": "2020-04-08T19:28:36+02:00",
     "spam_complained_at": null,
@@ -1143,7 +1145,7 @@ Response:
       "code": "example_email",
       "name": "Example email"
     },
-    "sent_at": "2020-04-08T19:26:00+02:00"
+    "sent_at": "2020-04-08T19:26:00+02:00",
     "delivered_at": null,
     "dropped_at": "2020-04-08T19:28:46+02:00",
     "spam_complained_at": null,
@@ -1267,8 +1269,8 @@ Response:
 
 Creates or updates mail type (newsletter list). Endpoint complements creation of newsletter list via web interface.
 
-If existing `id`/`code` is provided, API handler updates existing record, otherwise new record is created. Field `id`
-has higher precedence in finding the existing record.
+If existing `id`/`code` is provided, API handler updates existing record, otherwise a record is created. 
+Field `id`has higher precedence in finding the existing record.
 
 ##### *Headers:*
 
@@ -1658,14 +1660,14 @@ Response:
 Transformed `data` can be then used as parameters of `/api/v1/mailers/generate-mail` endpoint.
 
 As of the writing of this description, not all generators are required to provide preprocessing of parameters.
-It's responsible of the caller to know whether the source template uses generator that can *preprocess* parameters.
-If the *preprocess* is called for generator not supporting it, *HTTP 400 Bad Request* is returned with error message.
+It's a responsibility of the caller to know whether the source template uses generator that can *preprocess* parameters.
+If the *preprocess* is called for a generator not supporting it, *HTTP 400 Bad Request* is returned with error message.
 
 ---
 
 #### POST `/api/v1/mailers/mailgun`
 
-Webhook endpoint for legacy Mailgun event reporting. We advise to use `v2` of this endpoint and new implementation
+Webhook endpoint for legacy Mailgun event reporting. We advise using `v2` of this endpoint and new implementation
 of webhooks on Mailgun.
 
 You can configure Mailgun webhooks in the Mailgun's [control panel](https://app.mailgun.com/app/webhooks). For more
@@ -1859,11 +1861,14 @@ There are three methods to implement:
 * `provider(): string`: Uniquely identifies segment provider among other segment providers.
 This is internally required to namespace segment names in case of same segment name being used in multiple
 segment sources.
+
     ```php
     return "my-provider"; 
     ```
+
 * `list(): array`: Returns list of all segments available for this provider. The structure
 of response is:
+
     ```php
     return [
         [
@@ -1878,15 +1883,20 @@ of response is:
         ],
     ];
     ``` 
+  
 * `users($segment): array`: Returns list of user IDs belonging to the segment.
-  * `$segment`: Identification of requested segment.
-    ```php
-    [
-        'provider' => String, // identification of segment provider 
-        'code' => String, // segment code
-    ]
-    ```
+
+  * `$segment`: Identification of requested segment. 
+ 
+  ```php
+  [
+      'provider' => String, // identification of segment provider 
+      'code' => String, // segment code
+  ]
+  ```
+    
   The response is than expected to be array of integers/strings representing user IDs:
+  
   ```php
   return [
       Integer,
@@ -1902,7 +1912,7 @@ example.
 
 ##### REMP CRM implementation
 
-See the [`Remp\MailerModule\Users\Segment`](app/models/Users/Segment.php) implementation to check how you can
+See the [`Remp\MailerModule\Segments\Crm`](app/models/Segments/Crm.php) implementation to check how you can
 initialize your class the dependencies, structure the request and process the result
 
 The constructor accept two parameters. They should come from `app/config/config.local.neon` file:
@@ -1925,7 +1935,7 @@ services:
 As segments are working only with user IDs, and some of them might not be valid or active anymore, Mailer
 requires an implementation that returns user information based on the ID.
 
-The implementation is required to implement [`Remp\MailerModule\Users\IUser`](app/models/Users/IUser.php)
+The implementation is required to implement [`Remp\MailerModule\Users\IUser`](app/models/Users/IUsers.php)
 interface.
 
 * `list($userIds, $page): array`: Returns the user information (primarily email address) for requested users based on
@@ -2004,7 +2014,7 @@ his/her email, Mailer needs to update that information too.
     
 * _Newsletter subscribe and unsubscribe_. Mailer doesn't provide frontend interface for subscribing
 and unsubscribing from newsletters - site owners tend to integrate this into their layout. Due to this
-Mailer provides APIs to subscribe and unsubscribe users from the newsletters
+Mailer provides APIs to subscribe and unsubscribe users from the newsletters.
 
   * [`/api/v1/users/subscribe`](#post-apiv1userssubscribe)
   * [`/api/v1/users/un-subscribe`](#post-apiv1usersun-subscribe)
@@ -2025,7 +2035,7 @@ You can select the default mailer on the settings page: http://mailer.remp.press
 
 You can add your own implementation of Mailer to the service of your choice.
 
-The implementation is required to extend [`Remp\MailerModule\Mailers\Mailer`](app/models/Users/Mailer.php)
+The implementation is required to extend [`Remp\MailerModule\Mailers\Mailer`](app/models/Mailers/Mailer.php)
 abstract class.
 
 * `protected $alias = String`: Class attribute for identification of implementation,
@@ -2035,7 +2045,7 @@ of options, that should be configurable via Mailer settings page
 * `supportsBatch(): bool`: Returns flag whether the implementation supports batch sending or each
 email should be sent individually
 * `transformTemplateParams($params)`: Mailer supports variable injection into the mail template by using `{{ variable }}`
-in the template. Some emailing services require to use specific variables in email template to support batch sending.
+in the template. Some emailing services require using specific variables in email template to support batch sending.
 Values for these variables are then usually provided in send API request and 3rd party service injects them right
 before sending.
 
@@ -2057,6 +2067,7 @@ before sending.
   ```
   
   And returns two arrays on output:
+  
   * Transformed params
   ```php
   [
@@ -2064,6 +2075,7 @@ before sending.
     "mail_sender_id": "%recipient.mail_sender_id",
   ]
   ```
+  
   * Key-value pairs
   ```php
   [
@@ -2147,7 +2159,7 @@ We recommend to use Systemd or Supervisord for handling them. Following are Syst
 This configures handler of all asynchronous events generated by application.
 
 Create systemd service definition in `/etc/systemd/system/remp-mailer-hermes-worker.service`. Alter the
-`ExecStart` line to reflect path to your installation.
+`ExecStart` line to reflect the path to your installation.
 
 ```
 # BEGIN remp-mailer-hermes-worker
@@ -2178,10 +2190,10 @@ sudo systemctl start remp-mailer-hermes-worker
 
 #### Mail sending (Mail worker)
 
-This configures handler responsible for actual sending of emails via configured mailer.
+This configures handler responsible for actual sending of emails via a configured mailer.
 
 Create systemd service definition in `/etc/systemd/system/remp-mailer-mail-worker.service`. Alter the
-`ExecStart` line to reflect path to your installation.
+`ExecStart` line to reflect the path to your installation.
 
 ```
 # BEGIN remp-mailer-mail-worker
@@ -2229,7 +2241,7 @@ Add following block to your crontab to execute the processing (alter the path ba
 #### Mail stats processing
 
 If the default mailer supports statistics (e.g. Mailgun) and the stats are being received, you can enable stats
-aggregation so they're displayed right in the job detail.
+aggregation, so they're displayed right in the job detail.
 
 ```
 * * * * * php /home/remp/workspace/remp/Mailer/bin/command.php mail:job-stats
@@ -2237,7 +2249,7 @@ aggregation so they're displayed right in the job detail.
 
 ### Authentication
 
-The default implementation authenticates via REMP SSO. However it is possible for Mailer
+The default implementation authenticates via REMP SSO. However, it is possible for Mailer
 to use external authentication without the need of having SSO installed.
 
 To replace REMP SSO with your custom authentication, you need to:
@@ -2286,8 +2298,8 @@ services:
 You can see that you override here two services with your own implementation. The third service
 uses default Nette implementation and overrides custom REMP SSO implementation defined in `config.neon`.
 
-From now on the authentication is not done by redirecting user to SSO but by using default sign in
-screen avaiable at http://mailer.remp.press/sign/in.
+From now on the authentication is not done by redirecting user to SSO but by using default sign in 
+screen available at http://mailer.remp.press/sign/in.
 
 ### Error tracking
 
@@ -2304,4 +2316,5 @@ sentry:
 		- email
 ```
 
-Please be aware, that the tracking works only if you have the debug mode disabled. By default the debug mode is enabled only when `ENV` is set to `local`. 
+Please be aware, that the tracking works only if you have debug mode disabled.
+By default, debug mode is enabled only when `ENV` is set to `local`. 
