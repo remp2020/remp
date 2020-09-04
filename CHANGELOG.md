@@ -7,13 +7,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Docker
+
+- Fixed Elasticsearch index initialization for new installations.
+
 ### [Beam]
 
 - Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
 
 ### [Campaign]
 
-- Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628
+- Fixed change of missing campaign statistics caused by invalid pairing of data with labels due to inconsistent timezone use.
+- Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628 
 
 ### [Mailer]
 
