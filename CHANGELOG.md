@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
+- Added `browser_id` to Commerce model to expose it in commerce-related responses of Segments API.
 
 ### [Campaign]
 

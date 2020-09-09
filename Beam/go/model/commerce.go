@@ -28,6 +28,7 @@ type Commerce struct {
 	Time        time.Time
 	Host        string
 	IP          string
+	BrowserID   string  `json:"browser_id"`
 	UserID      string  `json:"user_id"`
 	URL         string  `json:"url"`
 	UserAgent   string  `json:"user_agent"`

@@ -324,6 +324,9 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 	if c.IP != "" {
 		event.User.IPAddress = &c.IP
 	}
+	if c.BrowserID != "" {
+		event.User.BrowserID = &c.BrowserID
+	}
 	if c.UserID != "" {
 		event.User.ID = &c.UserID
 	}
