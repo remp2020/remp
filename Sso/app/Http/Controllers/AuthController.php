@@ -40,13 +40,21 @@ class AuthController extends Controller
             }
         }
 
-        // TODO: get providers from container; display login page if multiple, autoredirect if single
+        $providers = config('services.auth');
 
-        $redirectUrl = $urlHelper->appendQueryParams(route('auth.google'), [
-            'successUrl' => $successUrl,
-            'errorUrl' => $errorUrl,
-        ]);
-        return redirect($redirectUrl);
+        foreach($providers as $key => $provider) {
+
+            $providers[$key]['redirectUrl'] = $redirectUrl = $urlHelper->appendQueryParams(route('auth.'.$key), [
+                'successUrl' => $successUrl,
+                'errorUrl' => $errorUrl,
+            ]);
+
+            if($provider['is_default']) {
+                return redirect($providers[$key]['redirectUrl']);
+            }
+        }
+
+        return view('login_page', ['providers' => $providers]);
     }
 
     public function logout(\Tymon\JWTAuth\JWTAuth $auth)
