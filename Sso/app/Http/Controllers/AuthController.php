@@ -8,6 +8,7 @@ use App\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use JWTAuth;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -40,21 +41,41 @@ class AuthController extends Controller
             }
         }
 
-        $providers = config('services.auth');
+        $defaultProvider = config('auth.defaults.sso_provider');
 
-        foreach($providers as $key => $provider) {
+        // if there's only one provider, treat is as default
+        $providers = config('auth.sso_providers');
+        if (count($providers) === 1) {
+            $defaultProvider = array_key_first($providers);
+        }
 
-            $providers[$key]['redirectUrl'] = $redirectUrl = $urlHelper->appendQueryParams(route('auth.'.$key), [
+        // If the app has configured default provider, use it directly.
+        if ($defaultProvider) {
+            $redirectRoute = 'auth.' . $defaultProvider;
+            if (!Route::has($redirectRoute)) {
+                throw new \Exception("Unable to use provider [{$defaultProvider}], redirect route [{$redirectRoute}] is not defined");
+            }
+            $redirectUrl = $urlHelper->appendQueryParams(route($redirectRoute), [
                 'successUrl' => $successUrl,
                 'errorUrl' => $errorUrl,
             ]);
-
-            if($provider['is_default']) {
-                return redirect($providers[$key]['redirectUrl']);
-            }
+            return redirect($redirectUrl);
         }
 
-        return view('login_page', ['providers' => $providers]);
+        // Otherwise initialize all providers and let user choose.
+        $providerRedirects = [];
+        foreach ($providers as $key => $provider) {
+            $redirectRoute = 'auth.' . $key;
+            if (!Route::has($redirectRoute)) {
+                throw new \Exception("Unable to use provider [{$key}], redirect route [{$redirectRoute}] is not defined");
+            }
+            $providerRedirects[$key] = $urlHelper->appendQueryParams(route($redirectRoute), [
+                'successUrl' => $successUrl,
+                'errorUrl' => $errorUrl,
+            ]);
+        }
+
+        return view('auth.login', ['providerRedirects' => $providerRedirects]);
     }
 
     public function logout(\Tymon\JWTAuth\JWTAuth $auth)

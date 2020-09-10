@@ -35,18 +35,11 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
-    'auth' => [
-        'google' => [
-            'name' => 'Google',
-            'allow' => false,
-            'client_id' => env('GOOGLE_CLIENT_ID', 'your-github-app-id'),
-            'client_secret' => env('GOOGLE_CLIENT_SECRET', 'your-github-app-secret'),
-            'redirect' => env('GOOGLE_CALLBACK_URL', 'http://your-callback-url'),
-            'is_default' => true
-        ]
-        //here some custom client
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID', 'your-github-app-id'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET', 'your-github-app-secret'),
+        'redirect' => env('GOOGLE_CALLBACK_URL', 'http://your-callback-url'),
     ],
-
 
     'remp' => [
         'beam' => [

@@ -16,6 +16,7 @@ return [
     'defaults' => [
         'guard' => 'jwtx',
         'passwords' => null,
+        'sso_provider' => env('DEFAULT_SSO_PROVIDER'),
     ],
 
     /*
@@ -107,6 +108,25 @@ return [
             'table' => 'password_resets',
             'expire' => 60,
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | SSO Providers
+    |--------------------------------------------------------------------------
+    |
+    | You may specify multiple SSO providers and let user to choose one
+    | they prefer. Providers are defined as key-value array:
+    |
+    |   - key:   ID of SSO provider. Needs to be the same as one used in
+    |            services.php definition and available as `config("services.$key")`.
+    |   - value: Label of SSO provider used on login page.
+    |
+    */
+
+    'sso_providers' => [
+        'google' => 'Google',
+        // define additional providers in services.php and enable them here
     ],
 
 ];
