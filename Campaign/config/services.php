@@ -46,8 +46,6 @@ return [
     'remp' => [
         'beam' => [
             'web_addr' => env('REMP_BEAM_ADDR'),
-            'tracker_addr' => env('REMP_TRACKER_ADDR'),
-            'tracker_property_token' => env('REMP_TRACKER_ADDR'),
             'segments_addr' => env('REMP_SEGMENTS_ADDR'),
         ],
         'mailer' => [

@@ -19,7 +19,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed change of missing campaign statistics caused by invalid pairing of data with labels due to inconsistent timezone use.
-- Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628 
+- Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628
+- Removed redundant Tracker contract and related implementations. It was never used and necessary. Campaign should only consume Journal data, not produce them from backend. 
 
 ### [Mailer]
 

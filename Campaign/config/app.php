@@ -157,7 +157,6 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\CrmSegmentServiceProvider::class,
         App\Providers\BeamSegmentsServiceProvider::class,
-        App\Providers\BeamTrackerServiceProvider::class,
         App\Providers\PythiaSegmentsServiceProvider::class,
         App\Providers\StatsServiceProvider::class,
     ],
