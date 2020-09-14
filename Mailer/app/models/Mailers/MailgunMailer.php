@@ -79,7 +79,11 @@ class MailgunMailer extends Mailer implements IMailer
         }
 
         $tag = $message->getHeader('X-Mailer-Tag');
-        $clickTracking = $message->getHeader('X-Mailer-Click-Tracking');
+
+        $clickTracking = null;
+        if ($message->getHeader('X-Mailer-Click-Tracking') !== null) {
+            $clickTracking = $message->getHeader('X-Mailer-Click-Tracking');
+        }
 
         $data = [
             'from' => $from,
@@ -94,7 +98,7 @@ class MailgunMailer extends Mailer implements IMailer
         if ($tag) {
             $data['o:tag'] = $tag;
         }
-        if ($clickTracking) {
+        if ($clickTracking !== null) {
             $data['o:tracking-clicks'] = (bool) $clickTracking ? 'yes' : 'no';
         }
 
