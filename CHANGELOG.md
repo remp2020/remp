@@ -27,6 +27,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes. remp/remp!390
 - Upgraded nette/application to 2.4.16.
 
+### [Sso]
+
+- Added initial support for multiple providers. No real providers were actually added yet. remp2020/remp#87
+
 ## [0.13.0] - 2020-09-03
 
 ### [Beam]

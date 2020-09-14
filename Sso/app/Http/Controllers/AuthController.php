@@ -8,6 +8,7 @@ use App\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use JWTAuth;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -40,13 +41,41 @@ class AuthController extends Controller
             }
         }
 
-        // TODO: get providers from container; display login page if multiple, autoredirect if single
+        $defaultProvider = config('auth.defaults.sso_provider');
 
-        $redirectUrl = $urlHelper->appendQueryParams(route('auth.google'), [
-            'successUrl' => $successUrl,
-            'errorUrl' => $errorUrl,
-        ]);
-        return redirect($redirectUrl);
+        // if there's only one provider, treat is as default
+        $providers = config('auth.sso_providers');
+        if (count($providers) === 1) {
+            $defaultProvider = array_key_first($providers);
+        }
+
+        // If the app has configured default provider, use it directly.
+        if ($defaultProvider) {
+            $redirectRoute = 'auth.' . $defaultProvider;
+            if (!Route::has($redirectRoute)) {
+                throw new \Exception("Unable to use provider [{$defaultProvider}], redirect route [{$redirectRoute}] is not defined");
+            }
+            $redirectUrl = $urlHelper->appendQueryParams(route($redirectRoute), [
+                'successUrl' => $successUrl,
+                'errorUrl' => $errorUrl,
+            ]);
+            return redirect($redirectUrl);
+        }
+
+        // Otherwise initialize all providers and let user choose.
+        $providerRedirects = [];
+        foreach ($providers as $key => $provider) {
+            $redirectRoute = 'auth.' . $key;
+            if (!Route::has($redirectRoute)) {
+                throw new \Exception("Unable to use provider [{$key}], redirect route [{$redirectRoute}] is not defined");
+            }
+            $providerRedirects[$key] = $urlHelper->appendQueryParams(route($redirectRoute), [
+                'successUrl' => $successUrl,
+                'errorUrl' => $errorUrl,
+            ]);
+        }
+
+        return view('auth.login', ['providerRedirects' => $providerRedirects]);
     }
 
     public function logout(\Tymon\JWTAuth\JWTAuth $auth)

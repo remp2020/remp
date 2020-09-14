@@ -57,6 +57,26 @@ how to use them within the application.
 
 Note: The default configuration of all REMP tools has these libraries integrated and enabled.
 
+### Custom providers
+
+In case you want to implement your own SSO provider, you need to:
+
+- Enable the provider in `auth.sso_providers` configuration.
+  ```
+  'sso_providers' => [
+      'google' => 'Google',
+      // define additional providers in services.php and enable them here
+  ],
+  ```
+- Implement the provider in its own controller.
+- Configure redirect route (`auth.PROVIDER`) for the provider with the same key, as you used in the step before. If you used `google` as an SSO provider key, please make sure route `auth.google` is defined. User will be redirected to this route when she selects the provider.
+
+With multiple providers, SSO will behave as follows:
+
+- If there's only one SSO provider registered, SSO will treat it as default provider and redirect user to the provider's login page directly.
+- If there are multiple providers, SSO offers a login page with the selection of providers.
+- If there's `DEFAULT_SSO_PROVIDER` env variable set, SSO will always use this provider and ignore the rest.
+
 ## Auth endpoints
 
 In case you want to make a library for non-supported framework, you'll need to integrate it
