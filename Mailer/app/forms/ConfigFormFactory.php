@@ -123,6 +123,12 @@ class ConfigFormFactory
                         $othersContainer->addCheckbox($config['name'], $config['display_name'])
                             ->setDefaultValue($config['value']);
                         break;
+                    case Config::TYPE_INT:
+                        $othersContainer->addText($config['name'], $config['display_name'])
+                            ->setDefaultValue($config['value'])
+                            ->addCondition(Form::FILLED)
+                            ->addRule(Form::INTEGER);
+                        break;
                     default:
                         throw new \Exception('unhandled config type: ' . $config['type']);
                 endswitch;

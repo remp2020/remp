@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes. remp/remp!390
 - Upgraded nette/application to 2.4.16.
+- Added support for click tracking configuration on mail template level. dn-mofa#50
 
 ### [Sso]
 

@@ -44,6 +44,7 @@ class TemplatesRepository extends Repository
         $templateHtml,
         $layoutId,
         $typeId,
+        ?bool $clickTracking = null,
         $extras = null
     ) {
 
@@ -58,6 +59,7 @@ class TemplatesRepository extends Repository
             'from' => $from,
             'autologin' => true,
             'subject' => $subject,
+            'click_tracking' => $clickTracking,
             'mail_body_text' => $templateText,
             'mail_body_html' => $templateHtml,
             'mail_layout_id' => $layoutId,

@@ -329,6 +329,7 @@ class Sender
         ]));
         $message->setHeader('X-Mailer-Tag', $this->template->code);
         $message->setHeader('X-Mailer-Template-Params', Json::encode($templateParams));
+        $message->setHeader('X-Mailer-Click-Tracking', $this->template->click_tracking);
     }
 
     /**

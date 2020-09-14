@@ -79,6 +79,7 @@ class MailgunMailer extends Mailer implements IMailer
         }
 
         $tag = $message->getHeader('X-Mailer-Tag');
+        $clickTracking = $message->getHeader('X-Mailer-Click-Tracking');
 
         $data = [
             'from' => $from,
@@ -93,13 +94,16 @@ class MailgunMailer extends Mailer implements IMailer
         if ($tag) {
             $data['o:tag'] = $tag;
         }
+        if ($clickTracking) {
+            $data['o:tracking-clicks'] = (bool) $clickTracking ? 'yes' : 'no';
+        }
 
         $mailVariables = Json::decode($message->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
         foreach ($mailVariables as $key => $val) {
             $data["v:".$key] = (string) $val;
         }
 
-        $this->mailer->messages()->send($this->option('domain'), $data);
+        $response = $this->mailer->messages()->send($this->option('domain'), $data);
     }
 
     public function mailer()
