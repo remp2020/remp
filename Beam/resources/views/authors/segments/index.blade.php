@@ -11,7 +11,13 @@
         <div class="card-header">
             <h2>List of author segments <small></small></h2>
             <div class="actions">
-                <a href="{{ route('authorSegments.configuration') }}" class="btn palette-Cyan bg waves-effect">Configuration</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-info palette-Cyan bg waves-effect" data-toggle="dropdown" aria-expanded="false"><i class="zmdi zmdi-settings"></i> More options</a>
+                    <ul class="dropdown-menu">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ $authorSegmentsSettingsUrl }}">Configuration</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ route('authorSegments.testingConfiguration') }}">Test parameters</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 

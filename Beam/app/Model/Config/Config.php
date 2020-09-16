@@ -17,7 +17,6 @@ class Config extends Model
         'type',
         'sorting',
         'autoload',
-        'locked',
         'config_category_id'
     ];
 
@@ -43,11 +42,6 @@ class Config extends Model
     public function property()
     {
         return $this->belongsTo(Property::class);
-    }
-
-    public function scopeUnlocked(Builder $query)
-    {
-        return $query->where('locked', false);
     }
 
     public function scopeGlobal(Builder $query)

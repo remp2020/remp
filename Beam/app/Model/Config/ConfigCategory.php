@@ -2,12 +2,14 @@
 
 namespace App\Model\Config;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Http\Request;
+use App\Http\Requests\AuthorSegmentsConfigurationRequest;
 use Illuminate\Database\Eloquent\Model;
 
 class ConfigCategory extends Model
 {
     const CODE_DASHBOARD = 'dashboard';
+    const CODE_AUTHOR_SEGMENTS = 'author-segments';
 
     protected $fillable = [
         'code',
@@ -17,5 +19,19 @@ class ConfigCategory extends Model
     public function configs()
     {
         return $this->hasMany(Config::class);
+    }
+
+    public function getPairedRequestType(Request $request)
+    {
+        if ($this->code === self::CODE_AUTHOR_SEGMENTS) {
+            return new AuthorSegmentsConfigurationRequest($request->all());
+        }
+
+        return $request;
+    }
+
+    public static function getSettingsTabUrl(string $configCategoryCode)
+    {
+        return route('settings.index') . '#' . $configCategoryCode;
     }
 }

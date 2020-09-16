@@ -52,10 +52,8 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('author-segments', 'AuthorSegmentsController@index')->name('authorSegments.index');
     Route::get('author-segments/json', 'AuthorSegmentsController@json')->name('authorSegments.json');
-    Route::get('author-segments/configuration', 'AuthorSegmentsController@configuration')->name('authorSegments.configuration');
-    Route::post('author-segments/configuration', 'AuthorSegmentsController@saveConfiguration')->name('authorSegments.saveConfiguration');
+    Route::get('author-segments/test-parameters', 'AuthorSegmentsController@testingConfiguration')->name('authorSegments.testingConfiguration');
     Route::post('author-segments/compute', 'AuthorSegmentsController@compute')->name('authorSegments.compute');
-    Route::post('author-segments/validate-configuration', 'AuthorSegmentsController@validateConfiguration')->name('authorSegments.validateConfiguration');
     Route::post('author-segments/validate-test', 'AuthorSegmentsController@validateTest')->name('authorSegments.validateTest');
 
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
@@ -104,7 +102,7 @@ Route::middleware('auth.jwt')->group(function () {
     ]);
 
     Route::get('settings', 'SettingsController@index')->name('settings.index');
-    Route::post('settings', 'SettingsController@update')->name('settings.update');
+    Route::post('settings/{configCategory}', 'SettingsController@update')->name('settings.update');
 
     Route::post('entities/validate/{entity?}', 'EntitiesController@validateForm')->name('entities.validateForm');
     Route::get('entities/json', 'EntitiesController@json')->name('entities.json');
