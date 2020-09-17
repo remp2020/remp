@@ -44,10 +44,13 @@ tests:
   services:
     - name: mysql:5.7.21
       alias: mysql
+    - name: redis:3.2
+      alias: redis
   variables:
       MYSQL_DATABASE: remp_test
       MYSQL_ROOT_PASSWORD: secret
-
+      REDIS_PORT: 6379
+      
 mailer/🇸🇰:
   stage: deploy
   script:

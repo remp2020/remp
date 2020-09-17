@@ -132,11 +132,11 @@ export default {
      * Tries to retrieve key's value from localStorage
      * Side effect of this function is an extension of key's lifetime in the storage
      * @param key
-     * @param bypassThreshold
+     * @param bypassExpireThreshold ignore key's value expiration (given by cacheThreshold)
      * @param storeToCookie
      * @returns {*}
      */
-    getFromStorage: function(key, bypassThreshold, storeToCookie) {
+    getFromStorage: function(key, bypassExpireThreshold, storeToCookie) {
         let now = new Date();
         let data = localStorage.getItem(key);
         if (data === null) {
@@ -145,7 +145,7 @@ export default {
 
         let item = JSON.parse(data);
         let threshold = new Date(now.getTime() - this.cacheThreshold);
-        if (!bypassThreshold && (new Date(item.updatedAt)).getTime() < threshold.getTime()) {
+        if (!bypassExpireThreshold && (new Date(item.updatedAt)).getTime() < threshold.getTime()) {
             localStorage.removeItem(key);
             return null;
         }

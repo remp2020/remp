@@ -42,14 +42,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             jsonpParameter: "data",
             prepareData: function() {
                 return {
+                    "version": 1,
                     "userId": remplib.getUserId(),
                     "browserId": remplib.getBrowserId(),
                     "url": window.location.href,
                     "referer": document.referrer || null,
-                    "campaignsSeen": remplib.campaign.getCampaignsSeen(),
-                    "campaignsBanners": remplib.campaign.getCampaignsBanners(),
+                    "campaigns": remplib.campaign.getCampaignsForShowtime(),
+                    "campaignsSession": remplib.campaign.getCampaignsSessionsForShowtime(),
                     "cache": remplib.getFromStorage(remplib.segmentProviderCacheKey, true),
-                    "pageviewCounts": remplib.campaign.getCampaignsPageviewCounts(),
                     "userAgent": window.navigator.userAgent,
                     "usingAdblock": remplib.usingAdblock
                 }
@@ -71,7 +71,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     detail: result.providerData,
                 });
                 window.dispatchEvent(event);
-                remplib.campaign.incrementPageviewCountForCampaigns(result.campaignIds);
+                remplib.campaign.incrementPageviewCountForCampaigns(result.activeCampaignIds);
             },
         },
 
@@ -177,87 +177,37 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             remplib.loadScript(url + query + "callback=" + cb)
         },
 
-        getCampaignsSeen: function() {
-            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
-            if (typeof campaigns !== "undefined" && campaigns !== null && campaigns.seen) {
-                return campaigns.seen;
+        getCampaignsForShowtime: function() {
+            let campaigns = this.getCampaigns();
+            // remove unnecessary variables to save characters in GET request
+            for (let campaignId in campaigns.values) {
+                delete campaigns.values[campaignId].createdAt;
+                delete campaigns.values[campaignId].updatedAt;
             }
-            return null;
+            return campaigns.values;
         },
 
-        getCampaignsBanners: function() {
-            let campaigns = remplib.getFromStorage(this.campaignsStorageKey, true);
-            if (typeof campaigns !== "undefined" && campaigns !== null && campaigns.values) {
-                return campaigns.values;
+        getCampaignsSessionsForShowtime: function() {
+            const campaignsSession = this.getCampaignsSession();
+            // remove unnecessary variables to save characters in GET request
+            for (let campaignId in campaignsSession.values) {
+                delete campaignsSession.values[campaignId].createdAt;
+                delete campaignsSession.values[campaignId].updatedAt;
             }
-            return null;
+            return campaignsSession.values;
         },
 
-        incrementPageviewCountForCampaigns: function (campaignIds)  {
-            const now = new Date();
-            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
-
-            if(typeof campaigns === "undefined" || campaigns === null) {
-                campaigns = {
-                    "version": 1,
-                    "createdAt": now,
-                    "updatedAt": now,
-                    "seen": [],
-                    "active": [],
-                }
-            }
-
-            for (let k = 0; k < campaignIds.length; k++) {
-                let flag = false;
-
-                for (let i = 0, len = campaigns.active.length; i < len; i++) {
-                    if (campaigns.active[i].campaignId === campaignIds[k]) {
-                        campaigns.active[i].updatedAt = now;
-                        campaigns.active[i].count++;
-                        flag = true;
-                        break;
-                    }
-                }
-
-                if (!flag) {
-                    campaigns.active.push({
-                        "campaignId": campaignIds[k],
-                        "createdAt": now,
-                        "updatedAt": now,
-                        "count": 1,
-                    });
-                }
-            }
-
-            localStorage.setItem(this.campaignsSessionStorageKey, JSON.stringify(campaigns));
+        // store persistent and session campaign details, called from banner view (when banner is shown)
+        handleBannerDisplayed: function(campaignId, bannerId, variantId) {
+            this.storePersistentCampaignData(campaignId, bannerId, variantId);
+            this.storeSessionCampaignData(campaignId);
         },
 
-        getCampaignsPageviewCounts: function() {
-            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
-            if (typeof campaigns === "undefined" || campaigns === null) {
-                return {};
-            }
-
-            let pageviewCounts = {};
-            for (let i = 0, len = campaigns.active.length; i < len; i++) {
-                pageviewCounts[campaigns.active[i].campaignId] = campaigns.active[i].count;
-            }
-
-            return pageviewCounts;
-        },
-
-        // used to store campaign details, called from banner view
-        storeCampaignDetails: function(campaignId, bannerId, variantId) {
-            this.storeCampaigns(campaignId, bannerId, variantId);
-            this.storeCampaignsSession(campaignId);
-        },
-
-        // store persistent campaign details
-        storeCampaigns: function(campaignId, bannerId, variantId) {
-            const now = new Date();
+        getCampaigns: function() {
             let campaigns = remplib.getFromStorage(this.campaignsStorageKey, true);
 
             if (typeof campaigns === "undefined" ||  campaigns === null) {
+                const now = new Date();
                 campaigns = {
                     "version": 1,
                     "createdAt": now,
@@ -266,54 +216,97 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             }
 
+            // migrations from old versions, some values may be missing in users' local storage
             if (!campaigns.hasOwnProperty('values')) {
                 campaigns.values = {};
             }
 
-            // always set the new value in case user doesn't have all object properties cached
-            campaigns.values[campaignId] = {
-                "bannerId": bannerId,
-                "variantId": variantId,
-            };
+            return campaigns;
+        },
+
+        storePersistentCampaignData: function(campaignId, bannerId, variantId) {
+            let campaigns = this.getCampaigns();
+
+            const now = new Date();
+
+            if (!campaigns.values.hasOwnProperty(campaignId)) {
+                campaigns.values[campaignId] = {
+                    "bannerId": bannerId,
+                    "variantId": variantId,
+                    "seen": 0,
+                    "count": 0,
+                    "createdAt": now,
+                    "updatedAt": now,
+                }
+            }
+
+            // always set the new value in case user doesn't have all object properties saved
+            campaigns.values[campaignId].bannerId = bannerId;
+            campaigns.values[campaignId].variantId = variantId;
+            campaigns.values[campaignId].updatedAt = now;
+            campaigns.values[campaignId].seen++;
 
             localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
         },
 
-        // store session campaign details
-        storeCampaignsSession: function(campaignId) {
+        incrementPageviewCountForCampaigns: function (activeCampaignIds)  {
+            let campaigns = this.getCampaigns();
             const now = new Date();
-            let campaigns = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
 
-            if(typeof campaigns === "undefined" || campaigns === null) {
-                campaigns = {
+            for (const campaignId of activeCampaignIds) {
+                if (!campaigns.values.hasOwnProperty(campaignId)) {
+                    // bannerId and variantID will be added later in storeCampaigns()
+                    campaigns.values[campaignId] = {
+                        "seen": 0,
+                        "count": 0,
+                        "createdAt": now,
+                        "updatedAt": now,
+                    }
+                }
+
+                campaigns.values[campaignId].count++;
+                campaigns.values[campaignId].updatedAt = now;
+            }
+            localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
+        },
+
+        getCampaignsSession: function() {
+            let campaignsSession = remplib.getFromStorage(this.campaignsSessionStorageKey, false);
+
+            if(typeof campaignsSession === "undefined" || campaignsSession === null) {
+                const now = new Date();
+                campaignsSession = {
                     "version": 1,
                     "createdAt": now,
                     "updatedAt": now,
-                    "seen": [],
-                    "active": [],
+                    "values": {},
                 }
             }
-
-            let flag = false;
-            for (let i = 0, len = campaigns.seen.length; i < len; i++) {
-                if (campaigns.seen[i].campaignId === campaignId) {
-                    campaigns.seen[i].updatedAt = now;
-                    campaigns.seen[i].count++;
-                    flag = true;
-                    break;
-                }
+            // migrations from old versions, some values may be missing in users' local storage
+            if (!campaignsSession.hasOwnProperty('values')) {
+                campaignsSession.values = {};
             }
+            return campaignsSession;
+        },
 
-            if (!flag) {
-                campaigns.seen.push({
-                    "campaignId": campaignId,
+        storeSessionCampaignData: function(campaignId) {
+            let campaignsSession = this.getCampaignsSession();
+
+            const now = new Date();
+
+            if (!campaignsSession.values.hasOwnProperty(campaignId)) {
+                campaignsSession.values[campaignId] = {
+                    "seen": 0,
                     "createdAt": now,
                     "updatedAt": now,
-                    "count": 1,
-                });
+                }
             }
 
-            localStorage.setItem(this.campaignsSessionStorageKey, JSON.stringify(campaigns));
+            campaignsSession.values[campaignId].updatedAt = now;
+            campaignsSession.values[campaignId].seen++;
+            campaignsSession.updatedAt = new Date();
+
+            localStorage.setItem(this.campaignsSessionStorageKey, JSON.stringify(campaignsSession));
         },
     };
 

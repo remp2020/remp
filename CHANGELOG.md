@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- PHP CodeSniffer scripts (`phpcbf`, `phpcs`) updated to version 3.5.6 (now supporting PHP 7.3+).
+- Added Gitlab CI `test` stage dependency on `redis:3.2` version (tests now use real Redis instance).
+
 ### Docker
 
 - Fixed Elasticsearch index initialization for new installations.
@@ -19,6 +24,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed change of missing campaign statistics caused by invalid pairing of data with labels due to inconsistent timezone use.
+- Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628 
+- Fixed "how often to display" campaign rules, previously broken due to expiration of counter data in local storage. remp/remp#715 
 - Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628
 - Removed redundant Tracker contract and related implementations. It was never used and necessary. Campaign should only consume Journal data, not produce them from backend. 
 
