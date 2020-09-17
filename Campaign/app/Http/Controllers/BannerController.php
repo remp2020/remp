@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Banner;
-use App\Helpers\Showtime;
 use App\Http\Requests\BannerOneTimeDisplayRequest;
 use App\Http\Requests\BannerRequest;
 use App\Http\Resources\BannerResource;
+use App\Http\Showtime\Showtime;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;

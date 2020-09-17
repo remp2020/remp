@@ -87,7 +87,7 @@ var run = function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
-        remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, banner.variantUuid);
+        remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid);
     }, banner.displayDelay);
 };
 

@@ -3,10 +3,8 @@
 namespace App\Providers;
 
 use App\Contracts\SegmentAggregator;
-use App\Http\Resources\BannerSearchResource;
-use App\Http\Resources\CampaignSearchResource;
 use App\Http\Resources\SearchResource;
-use GeoIp2\Database\Reader;
+use App\Http\Showtime\LazyGeoReader;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
@@ -27,22 +25,22 @@ class AppServiceProvider extends ServiceProvider
         $positionsMap = new \App\Models\Position\Map(config('banners.positions'));
         $alignmentsMap = new \App\Models\Alignment\Map(config('banners.alignments'));
 
-        $this->app->bind(\App\Models\Dimension\Map::class, function ($app) use ($dimensionMap) {
+        $this->app->bind(\App\Models\Dimension\Map::class, function () use ($dimensionMap) {
             return $dimensionMap;
         });
-        $this->app->bind(\App\Models\Position\Map::class, function ($app) use ($positionsMap) {
+        $this->app->bind(\App\Models\Position\Map::class, function () use ($positionsMap) {
             return $positionsMap;
         });
-        $this->app->bind(\App\Models\Alignment\Map::class, function ($app) use ($alignmentsMap) {
+        $this->app->bind(\App\Models\Alignment\Map::class, function () use ($alignmentsMap) {
             return $alignmentsMap;
         });
         $this->app->bind(ClientInterface::class, function () {
             return Redis::connection()->client();
         });
-
-        $this->app->bind(Reader::class, function (Application $app) {
-            return new Reader(config("services.maxmind.database"));
+        $this->app->bind(LazyGeoReader::class, function () {
+            return new LazyGeoReader(config("services.maxmind.database"));
         });
+
 
         $this->bindObservers();
 

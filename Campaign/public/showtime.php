@@ -4,51 +4,23 @@ use Airbrake\MonologHandler;
 use App\Banner;
 use App\Campaign;
 use App\CampaignBanner;
-use App\Helpers\Showtime;
-use DeviceDetector\Cache\PSR6Bridge;
-use GeoIp2\Database\Reader;
-use Illuminate\Support\Collection;
+use App\Http\Showtime\LazyDeviceDetector;
+use App\Http\Showtime\LazyGeoReader;
+use App\Http\Showtime\Showtime;
+use App\Http\Showtime\ShowtimeResponse;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-header('Content-Type: application/javascript');
-
-$dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
-$dotenv->load();
-
-$logger = new Logger('showtime');
-try {
-    $enabledAirbrake = env('AIRBRAKE_ENABLED', env('APP_ENV') !== 'local');
-    if ($enabledAirbrake) {
-        $airbrake = new \Airbrake\Notifier([
-            'enabled' => true,
-            'projectId' => '_',
-            'projectKey' => env('AIRBRAKE_API_KEY', ''),
-            'host' => env('AIRBRAKE_API_HOST', 'api.airbrake.io'),
-            'environment' => env('APP_ENV', 'production'),
-        ]);
-
-        $logHandler = new MonologHandler($airbrake, Logger::WARNING);
-        $logger->setHandlers([$logHandler]);
-    }
-} catch (\Exception $e) {
-    $logger->warning("unable to register airbrake notifier: " . $e->getMessage());
-}
-
-$data = filter_input(INPUT_GET, 'data');
-$callback = filter_input(INPUT_GET, 'callback');
-
 /**
- * @param string $callback jsonp callback name
- * @param array $response response to be json-encoded and returned
- * @param int $statusCode http status code to be returned
+ * asset overrides Laravel's helper function to prevent usage of Laravel's app()
+ *
+ * @param $path
+ * @param null $secure
+ * @return string
  */
-function jsonp_response($callback, $response, $statusCode = 200) {
-    http_response_code($statusCode);
-    $params = json_encode($response);
-    echo "{$callback}({$params})";
-    exit;
+function asset($path, $secure = null) {
+    return '//' . $_SERVER['HTTP_HOST'] . '/' . trim($path, '/');
 }
 
 /**
@@ -61,74 +33,85 @@ function public_path($path = '') {
     return __DIR__ .($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
 }
 
-/**
- * asset overrides Laravel's helper function to prevent usage of Laravel's app()
- *
- * @param $path
- * @param null $secure
- * @return string
- */
-function asset($path, $secure = null) {
-    return "//" . $_SERVER['HTTP_HOST'] . "/" . trim($path, '/');
-}
+class PlainPhpShowtimeResponse implements ShowtimeResponse
+{
+    /**
+     * @param string $callback jsonp callback name
+     * @param array $response response to be json-encoded and returned
+     * @param int $statusCode http status code to be returned
+     */
+    private function jsonpResponse($callback, $response, $statusCode = 200) {
+        http_response_code($statusCode);
+        $params = json_encode($response);
+        echo "{$callback}({$params})";
+        exit;
+    }
 
-/**
- * render is responsible for rendering JS to be executed on client.
- *
- * @param CampaignBanner $variant
- * @param Campaign $campaign
- * @param $alignments
- * @param $dimensions
- * @param $positions
- * @return string
- * @throws Exception
- */
-function renderCampaign($variant, $campaign, $alignments, $dimensions, $positions) {
-    return renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->controlGroup, $alignments, $dimensions, $positions);
-}
+    public function error($callback, int $statusCode, array $errors)
+    {
+        $this->jsonpResponse($callback, [
+            'success' => false,
+            'errors' => $errors,
+        ], $statusCode);
+    }
 
-function renderBanner(Banner $banner, $alignments, $dimensions, $positions) {
-    return renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions);
-}
+    public function success(string $callback, $data, $activeCampaignUuids, $providerData)
+    {
+        $this->jsonpResponse($callback, [
+            'success' => true,
+            'errors' => [],
+            'data' => empty($data) ? [] : $data,
+            'activeCampaignIds' => $activeCampaignUuids,
+            'providerData' => $providerData,
+        ]);
+    }
 
-function renderInternal(
-    Banner $banner,
-    $variantUuid,
-    $campaignUuid,
-    $isControlGroup,
-    $alignments,
-    $dimensions,
-    $positions) {
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions): string {
+        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->controlGroup, $alignments, $dimensions, $positions);
+    }
 
-    $alignmentsJson = json_encode($alignments);
-    $dimensionsJson = json_encode($dimensions);
-    $positionsJson = json_encode($positions);
+    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions): string {
+        return $this->renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions);
+    }
 
-    $bannerJs = asset(mix('/js/banner.js', '/assets/lib'));
+    private function renderInternal(
+        Banner $banner,
+        $variantUuid,
+        $campaignUuid,
+        $isControlGroup,
+        $alignments,
+        $dimensions,
+        $positions) {
 
-    if (!$banner ){
-        $js = 'var bannerUuid = null;';
-    } else {
-        $js = "
+        $alignmentsJson = json_encode($alignments);
+        $dimensionsJson = json_encode($dimensions);
+        $positionsJson = json_encode($positions);
+
+        $bannerJs = asset(mix('/js/banner.js', '/assets/lib'));
+
+        if (!$banner ){
+            $js = 'var bannerUuid = null;';
+        } else {
+            $js = "
 var bannerUuid = '{$banner->uuid}';
 var bannerId = 'b-' + bannerUuid;
 var bannerJsonData = {$banner->toJson()};
 ";
-    }
+        }
 
-    if ($variantUuid) {
-        $js .= "var variantUuid = '{$variantUuid}';\n";
-    } else {
-        $js .= "var variantUuid = null;\n";
-    }
+        if ($variantUuid) {
+            $js .= "var variantUuid = '{$variantUuid}';\n";
+        } else {
+            $js .= "var variantUuid = null;\n";
+        }
 
-    if ($campaignUuid) {
-        $js .= "var campaignUuid = '{$campaignUuid}';\n";
-    } else {
-        $js .= "var campaignUuid = null;\n";
-    }
+        if ($campaignUuid) {
+            $js .= "var campaignUuid = '{$campaignUuid}';\n";
+        } else {
+            $js .= "var campaignUuid = null;\n";
+        }
 
-    $js .= <<<JS
+        $js .= <<<JS
 var isControlGroup = {$isControlGroup}
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {
@@ -215,7 +198,7 @@ var run = function() {
         }
         
         if (banner.campaignUuid && banner.variantUuid) {
-            remplib.campaign.storeCampaignDetails(banner.campaignUuid, banner.uuid, banner.variantUuid);    
+            remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid);    
         }
         
     }, banner.displayDelay);
@@ -235,101 +218,36 @@ for (i=0; i<styles.length; i++) {
 }
 JS;
 
-    return $js;
-}
-
-
-class GeoReader
-{
-    private $reader;
-
-    public function get()
-    {
-        if (!$this->reader) {
-            $this->reader = new Reader(realpath(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . getenv('MAXMIND_DATABASE')));
-        }
-        return $this->reader;
+        return $js;
     }
 }
 
-class DeviceDetector
-{
-    private $detector;
+header('Content-Type: application/javascript');
 
-    private $redis;
+$dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
+$dotenv->load();
 
-    public function __construct($redis)
-    {
-        $this->redis = $redis;
-    }
-
-    public function get($userAgent)
-    {
-        if (!$this->detector) {
-            $this->detector = new \DeviceDetector\DeviceDetector();
-            $this->detector->setCache(
-                new PSR6Bridge(
-                    new \Cache\Adapter\Predis\PredisCachePool($this->redis)
-                )
-            );
-
-            $this->detector->setUserAgent($userAgent);
-            $this->detector->parse();
-        }
-        return $this->detector;
-    }
-}
-
-class Request
-{
-    private $request;
-
-    public function get()
-    {
-        if (!$this->request) {
-            $this->request = \App\Http\Request::createFromGlobals();
-        }
-        return $this->request;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// ACTUAL SHOWTIME EXECUTION STEPS
-
-// validation
+$logger = new Logger('showtime');
 try {
-    $data = json_decode($data);
-} catch (\InvalidArgumentException $e) {
-    $logger->warning('could not decode JSON in Showtime', $data);
-    jsonp_response($callback, [
-            'success' => false,
-            'errors' => ['invalid data json provided'],
-        ], 400);
+    $enabledAirbrake = env('AIRBRAKE_ENABLED', env('APP_ENV') !== 'local');
+    if ($enabledAirbrake) {
+        $airbrake = new \Airbrake\Notifier([
+            'enabled' => true,
+            'projectId' => '_',
+            'projectKey' => env('AIRBRAKE_API_KEY', ''),
+            'host' => env('AIRBRAKE_API_HOST', 'api.airbrake.io'),
+            'environment' => env('APP_ENV', 'production'),
+        ]);
+
+        $logHandler = new MonologHandler($airbrake, Logger::WARNING);
+        $logger->setHandlers([$logHandler]);
+    }
+} catch (\Exception $e) {
+    $logger->warning('unable to register airbrake notifier: ' . $e->getMessage());
 }
 
-$url = $data->url ?? null;
-if (!$url) {
-    jsonp_response($callback, [
-            'success' => false,
-            'errors' => ['url is required and missing'],
-        ], 400);
-}
-
-$userId = null;
-if (isset($data->userId) || !empty($data->userId)) {
-    $userId = $data->userId;
-}
-
-$browserId = null;
-if (isset($data->browserId) || !empty($data->browserId)) {
-    $browserId = $data->browserId;
-}
-if (!$browserId) {
-    jsonp_response($callback, [
-            'success' => false,
-            'errors' => ['browserId is required and missing'],
-        ], 400);
-}
+$data = filter_input(INPUT_GET, 'data');
+$callback = filter_input(INPUT_GET, 'callback');
 
 // dependencies initialization
 $redis = new \Predis\Client([
@@ -340,314 +258,17 @@ $redis = new \Predis\Client([
     'database' => getenv('REDIS_DEFAULT_DATABASE') ?: 0,
 ]);
 
+$showtimeResponse = new PlainPhpShowtimeResponse();
+
 /** @var \App\Contracts\SegmentAggregator $segmentAggregator */
 $segmentAggregator = unserialize($redis->get(\App\Providers\AppServiceProvider::SEGMENT_AGGREGATOR_REDIS_KEY))();
 if (!$segmentAggregator) {
-    jsonp_response($callback, [
-        'success' => false,
-        'errors' => ['unable to get cached segment aggregator'],
-    ], 500);
+    $showtimeResponse->error($callback, 500, ['unable to get cached segment aggregator']);
 }
 
-$showtime = new Showtime($redis, $segmentAggregator);
+$deviceDetector = new LazyDeviceDetector($redis);
+$maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . getenv('MAXMIND_DATABASE');
+$geoReader = new LazyGeoReader($maxmindDbPath);
 
-$positions = json_decode($redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY)) ?? [];
-$dimensions = json_decode($redis->get(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY)) ?? [];
-$alignments = json_decode($redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY)) ?? [];
-
-if (isset($data->cache)) {
-    $segmentAggregator->setProviderData($data->cache);
-}
-
-// Try to load one-time banners (having precedence over campaigns)
-$banner = null;
-if ($userId) {
-    $banner = $showtime->loadOneTimeUserBanner($userId);
-}
-if (!$banner) {
-    $banner = $showtime->loadOneTimeBrowserBanner($browserId);
-}
-if ($banner) {
-    $displayData[] = renderBanner($banner, $alignments, $dimensions, $positions);
-    jsonp_response($callback, [
-        'success' => true,
-        'errors' => [],
-        'data' => $displayData,
-        'campaign_ids' => [],
-        'providerData' => $segmentAggregator->getProviderData(),
-    ]);
-}
-
-$campaignIds = json_decode($redis->get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
-if (count($campaignIds) == 0) {
-    jsonp_response($callback, [
-        'success' => true,
-        'data' => [],
-        'campaign_ids' => [],
-        'providerData' => $segmentAggregator->getProviderData(),
-    ]);
-}
-
-$displayData = [];
-
-$deviceDetector = new DeviceDetector($redis);
-$geoReader = new GeoReader();
-$request = new Request();
-
-$activeCampaignIds = [];
-
-// campaign resolution
-foreach ($campaignIds as $campaignId) {
-    /** @var Campaign $campaign */
-    $campaign = unserialize($redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
-    $running = false;
-
-    foreach ($campaign->schedules as $schedule) {
-        if ($schedule->isRunning()) {
-            $running = true;
-            break;
-        }
-    }
-    if (!$running) {
-        continue;
-    }
-
-    /** @var Collection $campaignBanners */
-    $campaignBanners = $campaign->campaignBanners->keyBy('uuid');
-
-    // banner
-    if ($campaignBanners->count() == 0) {
-        $logger->error("Active campaign [{$campaign->uuid}] has no banner set");
-        continue;
-    }
-
-    $bannerUuid = null;
-    $variantUuid = null;
-
-    // find variant previously displayed to user
-    $seenCampaignsBanners = $data->campaignsBanners ?? false;
-    if ($seenCampaignsBanners && isset($seenCampaignsBanners->{$campaign->uuid})) {
-        $bannerUuid = $seenCampaignsBanners->{$campaign->uuid}->bannerId ?? null;
-        $variantUuid = $seenCampaignsBanners->{$campaign->uuid}->variantId ?? null;
-    }
-
-    // fallback for older version of campaigns local storage data
-    // where decision was based on bannerUuid and not variantUuid (which was not present at all)
-    if ($bannerUuid && !$variantUuid) {
-        foreach ($campaignBanners as $campaignBanner) {
-            if (optional($campaignBanner->banner)->uuid === $bannerUuid) {
-                $variantUuid = $campaignBanner->uuid;
-                break;
-            }
-        }
-    }
-
-    /** @var CampaignBanner $seenVariant */
-    // unset seen variant if it was deleted
-    if (!($seenVariant = $campaignBanners->get($variantUuid))) {
-        $variantUuid = null;
-    }
-
-    // unset seen variant if its proportion is 0%
-    if ($seenVariant && $seenVariant->proportion === 0) {
-        $variantUuid = null;
-    }
-
-    // variant still not set, choose random variant
-    if ($variantUuid === null) {
-        $variantsMapping = $campaign->getVariantsProportionMapping();
-
-        $randVal = mt_rand(0, 100);
-        $currPercent = 0;
-
-        foreach ($variantsMapping as $uuid => $proportion) {
-            $currPercent = $currPercent + $proportion;
-            if ($currPercent >= $randVal) {
-                $variantUuid = $uuid;
-                break;
-            }
-        }
-    }
-
-    /** @var CampaignBanner $variant */
-    $variant = $campaignBanners->get($variantUuid);
-    if (!$variant) {
-        $logger->error("Unable to get CampaignBanner [{$variantUuid}] for campaign [{$campaign->uuid}]");
-        continue;
-    }
-
-    // check if campaign is set to be seen only once per session
-    // and check campaign UUID against list of campaigns seen by user
-    $campaignsSeen = $data->campaignsSeen ?? false;
-    if ($campaign->once_per_session && $campaignsSeen) {
-        $seen = false;
-        foreach ($campaignsSeen as $campaignSeen) {
-            if ($campaignSeen->campaignId === $campaign->uuid) {
-                $seen = true;
-                break;
-            }
-        }
-        if ($seen) {
-            continue;
-        }
-    }
-
-    // signed in state
-    if (isset($campaign->signed_in) && $campaign->signed_in !== boolval($userId)) {
-        continue;
-    }
-
-    // using adblock?
-    if ($campaign->using_adblock !== null) {
-        if (!isset($data->usingAdblock)) {
-            Log::error("Unable to load if user with ID [{$userId}] & browserId [{$browserId}] is using AdBlock.");
-            continue;
-        }
-        if ($campaign->using_adblock && !$data->usingAdblock || $campaign->using_adblock === false && $data->usingAdblock) {
-            continue;
-        }
-    }
-
-    // url filters
-    if ($campaign->url_filter === Campaign::URL_FILTER_EXCEPT_AT) {
-        foreach ($campaign->url_patterns as $urlPattern) {
-            if (strpos($data->url, $urlPattern) !== false) {
-                continue 2;
-            }
-        }
-    }
-    if ($campaign->url_filter === Campaign::URL_FILTER_ONLY_AT) {
-        $matched = false;
-        foreach ($campaign->url_patterns as $urlPattern) {
-            if (strpos($data->url, $urlPattern) !== false) {
-                $matched = true;
-            }
-        }
-        if (!$matched) {
-            continue;
-        }
-    }
-
-    // referer filters
-    if ($campaign->referer_filter === Campaign::URL_FILTER_EXCEPT_AT && $data->referer) {
-        foreach ($campaign->referer_patterns as $refererPattern) {
-            if (strpos($data->referer, $refererPattern) !== false) {
-                continue 2;
-            }
-        }
-    }
-    if ($campaign->referer_filter === Campaign::URL_FILTER_ONLY_AT) {
-        if (!$data->referer) {
-            continue;
-        }
-        $matched = false;
-        foreach ($campaign->referer_patterns as $refererPattern) {
-            if (strpos($data->referer, $refererPattern) !== false) {
-                $matched = true;
-            }
-        }
-        if (!$matched) {
-            continue;
-        }
-    }
-
-    // device rules
-    if (!isset($data->userAgent)) {
-        $logger->error("Unable to load user agent for userId [{$userId}]");
-    } else {
-        if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $deviceDetector->get($data->userAgent)->isMobile()) {
-            continue;
-        }
-
-        if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $deviceDetector->get($data->userAgent)->isDesktop()) {
-            continue;
-        }
-    }
-
-    // country rules
-    if (!$campaign->countries->isEmpty()) {
-        // load country ISO code based on IP
-        try {
-            $record = $geoReader->get()->country($request->get()->ip());
-            $countryCode = $record->country->isoCode;
-        } catch (\MaxMind\Db\Reader\InvalidDatabaseException | GeoIp2\Exception\AddressNotFoundException $e) {
-            $logger->error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
-            continue;
-        }
-        if (is_null($countryCode)) {
-            $logger->error("Unable to load country for campaign [{$campaign->uuid}] with country rules");
-            continue;
-        }
-
-        // check against white / black listed countries
-
-        if (!$campaign->countriesBlacklist->isEmpty() && $campaign->countriesBlacklist->contains('iso_code', $countryCode)) {
-            continue;
-        }
-        if (!$campaign->countriesWhitelist->isEmpty() && !$campaign->countriesWhitelist->contains('iso_code', $countryCode)) {
-            continue;
-        }
-    }
-
-    // segment
-    $segmentRulesOk = $showtime->evaluateSegmentRules($campaign, $browserId, $userId);
-    if (!$segmentRulesOk) {
-        continue;
-    }
-
-    // Active campaign is campaign that targets selected user (previous rules were passed),
-    // but whether it displays or not depends on pageview counting rules (every n-th page, up to N pageviews).
-    // We need to track such campaigns on client-side too.
-    $activeCampaignIds[] = $campaign->id;
-
-    // pageview rules
-    $pageViewCounts = (array) $data->pageviewCounts;
-    $pageviewCount = $pageViewCounts[$campaignId] ?? null;
-    if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
-        // check display banner every n-th request
-        $displayBanner = $campaign->pageview_rules['display_banner'];
-        $displayBannerEvery = $campaign->pageview_rules['display_banner_every'];
-        if ($displayBanner === 'every' && $pageviewCount % $displayBannerEvery !== 0) {
-            continue;
-        }
-    }
-
-    // seen count rules
-    if ($data->campaignsSeen && $campaign->pageview_rules !== null) {
-        foreach ($data->campaignsSeen as $campaignSeen) {
-            if ($campaignSeen->campaignId === $campaign->uuid) {
-                $seenCount = $campaignSeen->count;
-                $displayTimes = $campaign->pageview_rules['display_times'];
-                $displayNTimes = $campaign->pageview_rules['display_n_times'];
-                if ($displayTimes && $seenCount >= $displayNTimes) {
-                    continue 2;
-                }
-            }
-        }
-    }
-
-    $displayData[] = renderCampaign(
-        $variant,
-        $campaign,
-        $alignments,
-        $dimensions,
-        $positions
-    );
-}
-
-if (empty($displayData)) {
-    jsonp_response($callback, [
-        'success' => true,
-        'data' => [],
-        'campaignIds' => $activeCampaignIds,
-        'providerData' => $segmentAggregator->getProviderData(),
-    ]);
-}
-
-jsonp_response($callback, [
-    'success' => true,
-    'errors' => [],
-    'data' => $displayData,
-    'campaignIds' => $activeCampaignIds,
-    'providerData' => $segmentAggregator->getProviderData(),
-]);
+$showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger);
+$showtime->showtime($data, $callback, $showtimeResponse);
