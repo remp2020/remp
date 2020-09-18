@@ -121,6 +121,11 @@ class TemplateFormFactory implements IFormFactory
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }
 
+        if ($values['click_tracking'] === "") {
+            // handle null (default) selection
+            $values['click_tracking'] = null;
+        }
+
         try {
             if (!empty($values['id'])) {
                 $row = $this->templatesRepository->find($values['id']);
