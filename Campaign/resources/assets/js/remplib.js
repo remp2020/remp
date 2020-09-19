@@ -221,6 +221,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 campaigns.values = {};
             }
 
+            // migrations on campaigns values
+            for (let campaignId in campaigns.values) {
+                if (!campaigns.values[campaignId].hasOwnProperty('seen')) {
+                    campaigns.values[campaignId].seen = 0;
+                }
+                if (!campaigns.values[campaignId].hasOwnProperty('count')) {
+                    campaigns.values[campaignId].count = 0;
+                }
+            }
+
             return campaigns;
         },
 
@@ -285,6 +295,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             // migrations from old versions, some values may be missing in users' local storage
             if (!campaignsSession.hasOwnProperty('values')) {
                 campaignsSession.values = {};
+            }
+            // migrations on campaigns values
+            for (let campaignId in campaignsSession.values) {
+                if (!campaignsSession.values[campaignId].hasOwnProperty('seen')) {
+                    campaignsSession.values[campaignId].seen = 0;
+                }
             }
             return campaignsSession;
         },
