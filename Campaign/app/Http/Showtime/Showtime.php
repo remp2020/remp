@@ -392,7 +392,7 @@ class Showtime
                 return null;
             }
 
-            $displayBanner = $campaign->pageview_rules['display_banner'];
+            $displayBanner = $campaign->pageview_rules['display_banner'] ?? null;
             $displayBannerEvery = $campaign->pageview_rules['display_banner_every'] ?? 1;
             if ($displayBanner === 'every' && $pageviewCount % $displayBannerEvery !== 0) {
                 return null;
@@ -411,8 +411,7 @@ class Showtime
             }
 
             $displayTimes = $campaign->pageview_rules['display_times'] ?? null;
-            $displayNTimes = $campaign->pageview_rules['display_n_times'];
-            if ($displayTimes && $seenCount >= $displayNTimes) {
+            if ($displayTimes && $seenCount >= $campaign->pageview_rules['display_n_times']) {
                 return null;
             }
         }
