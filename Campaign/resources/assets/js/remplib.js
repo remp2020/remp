@@ -263,20 +263,23 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             let campaigns = this.getCampaigns();
             const now = new Date();
 
-            for (const campaignId of activeCampaignIds) {
-                if (!campaigns.values.hasOwnProperty(campaignId)) {
-                    // bannerId and variantID will be added later in storeCampaigns()
-                    campaigns.values[campaignId] = {
-                        "seen": 0,
-                        "count": 0,
-                        "createdAt": now,
-                        "updatedAt": now,
+            if (activeCampaignIds) {
+                for (const campaignId of activeCampaignIds) {
+                    if (!campaigns.values.hasOwnProperty(campaignId)) {
+                        // bannerId and variantID will be added later in storeCampaigns()
+                        campaigns.values[campaignId] = {
+                            "seen": 0,
+                            "count": 0,
+                            "createdAt": now,
+                            "updatedAt": now,
+                        }
                     }
-                }
 
-                campaigns.values[campaignId].count++;
-                campaigns.values[campaignId].updatedAt = now;
+                    campaigns.values[campaignId].count++;
+                    campaigns.values[campaignId].updatedAt = now;
+                }
             }
+
             localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
         },
 
