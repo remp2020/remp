@@ -6,17 +6,21 @@ use JsonSchema\Validator;
 use Nette\Http\Response;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Tomaj\Hermes\Emitter;
 use Tomaj\Hermes\Message;
 use Tomaj\NetteApi\Handlers\BaseHandler;
+use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tracy\Debugger;
 
 class SendEmailHandler extends BaseHandler
 {
+    use JsonValidationTrait;
+
     private $templatesRepository;
 
     private $userSubscriptionsRepository;
@@ -40,33 +44,16 @@ class SendEmailHandler extends BaseHandler
 
     public function params()
     {
-        return [];
+        return [
+            new InputParam(InputParam::TYPE_POST_RAW, 'raw')
+        ];
     }
 
     public function handle($params)
     {
-        $request = file_get_contents("php://input");
-        if (empty($request)) {
-            $response = new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => 'Empty request']);
-            return $response;
-        }
-        
-        try {
-            $payload = Json::decode($request, true);
-        } catch (JsonException $e) {
-            $response = new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => "Malformed JSON: " . $e->getMessage()]);
-            return $response;
-        }
-
-        $validator = $this->validateInput($request);
-        if (!$validator->isValid()) {
-            $data = ['status' => 'error', 'message' => 'Payload error', 'errors' => []];
-            foreach ($validator->getErrors() as $error) {
-                $data['errors'][] = "{$error['property']}: {$error['message']}";
-            }
-            Debugger::log("Cannot parse paywall content data - " . Json::encode($payload) . ' -> ' . implode(', ', $data['errors']));
-            $response = new JsonApiResponse(Response::S400_BAD_REQUEST, $data);
-            return $response;
+        $payload = $this->validateInput($params['raw'], __DIR__ . '/email.schema.json');
+        if ($this->hasErrorResponse()) {
+            return $this->getErrorResponse();
         }
 
         $mailTemplate = $this->templatesRepository->getByCode($payload['mail_template_code']);
@@ -108,14 +95,5 @@ class SendEmailHandler extends BaseHandler
         ], null, null, $executeAt));
 
         return new JsonApiResponse(Response::S202_ACCEPTED, ['status' => 'ok', 'message' => "Email was scheduled to be sent."]);
-    }
-
-    private function validateInput(string $input): Validator
-    {
-        $schema = Json::decode(file_get_contents(__DIR__ . '/email.schema.json'));
-        $data = Json::decode($input);
-        $validator = new Validator();
-        $validator->validate($data, (object) $schema);
-        return $validator;
     }
 }
