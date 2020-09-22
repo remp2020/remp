@@ -353,7 +353,7 @@ class ShowtimeTest extends TestCase
             ]
         ]);
 
-        $campaignsData = [$this->campaign->uuid => ['count' => 1]];
+        $campaignsData = [$this->campaign->uuid => ['count' => 1, 'seen' => 0]];
         $userData = $this->getUserData(null, null, null, true, $campaignsData);
         $activeCampaignUuids = [];
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
@@ -373,7 +373,7 @@ class ShowtimeTest extends TestCase
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->assertCount(1, $activeCampaignUuids); // campaign should still be counted as active
 
-        $campaignsData = [$this->campaign->uuid => ['count' => 3, 'seen' => 1]];
+        $campaignsData = [$this->campaign->uuid => ['count' => 3, 'seen' => 0]];
         $userData = $this->getUserData(null, null, null, true, $campaignsData);
         $activeCampaignUuids = [];
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
@@ -392,13 +392,13 @@ class ShowtimeTest extends TestCase
             ]
         ]);
 
-        $campaignsData = [$this->campaign->uuid => ['seen' => 1, 'count' => 1]];
+        $campaignsData = [$this->campaign->uuid => ['seen' => 1, 'count' => 0]];
         $userData = $this->getUserData(null, null, null, true, $campaignsData);
         $activeCampaignUuids = [];
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->assertCount(1, $activeCampaignUuids);
 
-        $campaignsData = [$this->campaign->uuid => ['seen' => 2, 'count' => 2]];
+        $campaignsData = [$this->campaign->uuid => ['seen' => 2, 'count' => 0]];
         $userData = $this->getUserData(null, null, null, true, $campaignsData);
         $activeCampaignUuids = [];
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));

@@ -401,7 +401,7 @@ class Showtime
 
         // seen count rules
         if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
-            $seenCount = $seenCampaign->count ?? null;
+            $seenCount = $seenCampaign->seen ?? null;
 
             if ($seenCount === null) {
                 // if campaign is recorder as seen but has no pageview count,
