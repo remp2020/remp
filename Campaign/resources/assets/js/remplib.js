@@ -221,6 +221,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 campaigns.values = {};
             }
 
+            // migrations on campaigns values
+            for (let campaignId in campaigns.values) {
+                if (!campaigns.values[campaignId].hasOwnProperty('seen')) {
+                    campaigns.values[campaignId].seen = 0;
+                }
+                if (!campaigns.values[campaignId].hasOwnProperty('count')) {
+                    campaigns.values[campaignId].count = 0;
+                }
+            }
+
             return campaigns;
         },
 
@@ -253,20 +263,23 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             let campaigns = this.getCampaigns();
             const now = new Date();
 
-            for (const campaignId of activeCampaignIds) {
-                if (!campaigns.values.hasOwnProperty(campaignId)) {
-                    // bannerId and variantID will be added later in storeCampaigns()
-                    campaigns.values[campaignId] = {
-                        "seen": 0,
-                        "count": 0,
-                        "createdAt": now,
-                        "updatedAt": now,
+            if (activeCampaignIds) {
+                for (const campaignId of activeCampaignIds) {
+                    if (!campaigns.values.hasOwnProperty(campaignId)) {
+                        // bannerId and variantID will be added later in storeCampaigns()
+                        campaigns.values[campaignId] = {
+                            "seen": 0,
+                            "count": 0,
+                            "createdAt": now,
+                            "updatedAt": now,
+                        }
                     }
-                }
 
-                campaigns.values[campaignId].count++;
-                campaigns.values[campaignId].updatedAt = now;
+                    campaigns.values[campaignId].count++;
+                    campaigns.values[campaignId].updatedAt = now;
+                }
             }
+
             localStorage.setItem(this.campaignsStorageKey, JSON.stringify(campaigns));
         },
 
@@ -285,6 +298,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             // migrations from old versions, some values may be missing in users' local storage
             if (!campaignsSession.hasOwnProperty('values')) {
                 campaignsSession.values = {};
+            }
+            // migrations on campaigns values
+            for (let campaignId in campaignsSession.values) {
+                if (!campaignsSession.values[campaignId].hasOwnProperty('seen')) {
+                    campaignsSession.values[campaignId].seen = 0;
+                }
             }
             return campaignsSession;
         },

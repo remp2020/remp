@@ -379,10 +379,20 @@ class Showtime
         // We need to track such campaigns on the client-side too.
         $activeCampaignUuids[] = $campaign->uuid;
 
+        $seenCampaign = $seenCampaigns->{$campaign->uuid} ?? null;
+
         // pageview rules - check display banner every n-th request
-        $pageviewCount = $seenCampaigns->{$campaign->uuid}->count ?? null;
-        if ($pageviewCount !== null && $campaign->pageview_rules !== null) {
-            $displayBanner = $campaign->pageview_rules['display_banner'];
+        if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
+            $pageviewCount =  $seenCampaign->count ?? null;
+
+            if ($pageviewCount === null) {
+                // if campaign is recorder as seen but has no pageview count,
+                // it means there is a probably old version or remplib cached on the client
+                // do not show campaign (browser should reload the library)
+                return null;
+            }
+
+            $displayBanner = $campaign->pageview_rules['display_banner'] ?? null;
             $displayBannerEvery = $campaign->pageview_rules['display_banner_every'] ?? 1;
             if ($displayBanner === 'every' && $pageviewCount % $displayBannerEvery !== 0) {
                 return null;
@@ -390,11 +400,18 @@ class Showtime
         }
 
         // seen count rules
-        $seenCount = $seenCampaigns->{$campaign->uuid}->seen ?? null;
-        if ($seenCount !== null && $campaign->pageview_rules !== null) {
+        if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
+            $seenCount = $seenCampaign->seen ?? null;
+
+            if ($seenCount === null) {
+                // if campaign is recorder as seen but has no pageview count,
+                // it means there is a probably old version or remplib cached on the client
+                // do not show campaign (browser should reload the library)
+                return null;
+            }
+
             $displayTimes = $campaign->pageview_rules['display_times'] ?? null;
-            $displayNTimes = $campaign->pageview_rules['display_n_times'];
-            if ($displayTimes && $seenCount >= $displayNTimes) {
+            if ($displayTimes && $seenCount >= $campaign->pageview_rules['display_n_times']) {
                 return null;
             }
         }
