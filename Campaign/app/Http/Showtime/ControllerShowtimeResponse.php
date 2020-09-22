@@ -25,7 +25,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
                 'success' => true,
                 'errors' => [],
                 'data' => $data,
-                'campaignIds' => $activeCampaignIds,
+                'activeCampaignIds' => $activeCampaignIds,
                 'providerData' => $providerData,
             ]);
     }
