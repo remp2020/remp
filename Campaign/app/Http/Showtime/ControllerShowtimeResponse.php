@@ -24,7 +24,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             ->jsonp($callback, [
                 'success' => true,
                 'errors' => [],
-                'data' => $data,
+                'data' => empty($data) ? [] : $data,
                 'activeCampaignIds' => $activeCampaignIds,
                 'providerData' => $providerData,
             ]);
