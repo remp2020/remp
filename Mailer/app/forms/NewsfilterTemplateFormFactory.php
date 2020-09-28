@@ -81,7 +81,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 44) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 47) {
+            $defaults = [
+                'name' => 'Súhrn grandslamových turnajov ' . date('j.n.Y'),
+                'code' => 'nwsf_grandslam_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 32, // Grandslamové turnaje
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 44) {
             $defaults = [
                 'name' => 'Euroligy ' . date('j.n.Y'),
                 'code' => 'nwsf_euroligy_' . date('dmY'),
