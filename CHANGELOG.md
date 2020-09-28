@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628
 - Removed redundant Tracker contract and related implementations. It was never used and necessary. Campaign should only consume Journal data, not produce them from backend. 
 - Increased campaigns backend stats fetch timeout to 5 seconds.
+- Fixed listing of banners over API (`/api/banners`).
 
 ### [Mailer]
 
