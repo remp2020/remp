@@ -83,7 +83,7 @@ class NewsfilterTemplateFormFactory
 
         if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 47) {
             $defaults = [
-                'name' => 'Súhrn grandslamových turnajov ' . date('j.n.Y'),
+                'name' => 'Grandslamové turnaje ' . date('j.n.Y'),
                 'code' => 'nwsf_grandslam_' . date('dmY'),
                 'mail_layout_id' => 33, // layout for subscribers
                 'locked_mail_layout_id' => 33, // layout for non-subscribers
