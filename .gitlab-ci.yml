@@ -16,7 +16,7 @@ syntax:7.3:
 
 sniffer:
   stage: test
-  image: remp/php-ci:7.2.25
+  image: remp/php-ci:7.3.15
   tags:
     - docker
   script:
@@ -25,7 +25,7 @@ sniffer:
 
 phpstan:
   stage: test
-  image: remp/php-ci:7.2.25
+  image: remp/php-ci:7.3.15
   tags:
     - docker
   script:
@@ -34,7 +34,7 @@ phpstan:
 
 tests:
   stage: test
-  image: remp/php-ci:7.2.25
+  image: remp/php-ci:7.3.15
   tags:
     - docker
   script:
