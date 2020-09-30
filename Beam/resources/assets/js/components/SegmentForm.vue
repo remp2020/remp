@@ -136,7 +136,7 @@
                         value: null
                     }],
                     flags: [{
-                        key: "article",
+                        key: "is_article",
                         value: null,
                     }],
                 });

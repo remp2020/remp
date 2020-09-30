@@ -81,6 +81,20 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 			bq = bq.MustNot(elastic.NewTermsQuery(field, interfaceSlice...))
 		} else {
 			bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
+
+		}
+	}
+
+	for _, ex := range o.Exist {
+		field, err := eDB.resolveKeyword(index, ex.Tag)
+		if err != nil {
+			return nil, err
+		}
+
+		if ex.Inverse {
+			bq = bq.MustNot(elastic.NewExistsQuery(field))
+		} else {
+			bq = bq.Must(elastic.NewExistsQuery(field))
 		}
 	}
 

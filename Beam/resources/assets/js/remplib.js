@@ -290,7 +290,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             for (let f of Object.keys(flags[ruleId])) {
                 // duplicating flag handling from track/pageviews API call
-                if (f === '_article') {
+                if (f === 'is_article') {
                     if (flags[ruleId][f] === '1' && !remplib.tracker.article) {
                         return false;
                     }

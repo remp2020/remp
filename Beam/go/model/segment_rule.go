@@ -177,6 +177,23 @@ func (sr *SegmentRule) options(now time.Time, o RuleOverrides) AggregateOptions 
 		options.Action = sr.EventAction
 	}
 
+	// Add conditions according to supported Flags
+	for _, def := range sr.Flags {
+		if def["key"] == "" || def["value"] == "" {
+			continue
+		}
+		switch def["key"] {
+		case FlagArticle:
+			if def["value"] == "1" {
+				options.Exist = append(options.Exist, &Exists{Tag: "article_id", Inverse: false})
+			}
+			if def["value"] == "0" {
+				options.Exist = append(options.Exist, &Exists{Tag: "article_id", Inverse: true})
+			}
+		}
+	}
+
+	// Add Fields conditions
 	for _, def := range sr.Fields {
 		if def["key"] == "" || def["value"] == "" {
 			continue
@@ -227,7 +244,7 @@ func (sr *SegmentRule) overridableFields() []string {
 	return fields
 }
 
-// flags returns map of used flags with values (e.g. "_article": "1")
+// flags returns map of used flags with values (e.g. "is_article": "1")
 func (sr *SegmentRule) flags() map[string]string {
 	flags := make(map[string]string)
 	for _, def := range sr.Flags {

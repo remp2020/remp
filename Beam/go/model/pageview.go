@@ -15,7 +15,7 @@ const (
 	TablePageviews          = "pageviews"
 	TableTimespent          = "pageviews_time_spent"
 	TableProgress           = "pageviews_progress"
-	FlagArticle             = "_article"
+	FlagArticle             = "is_article"
 )
 
 // PageviewOptions represent filter options for pageview-related calls.

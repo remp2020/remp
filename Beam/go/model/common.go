@@ -18,6 +18,7 @@ type AggregateOptions struct {
 	Action         string
 	Step           string
 	FilterBy       []*FilterBy
+	Exist          []*Exists
 	GroupBy        []string
 	TimeAfter      time.Time
 	TimeBefore     time.Time
@@ -42,6 +43,12 @@ type CountHistogram struct {
 type FilterBy struct {
 	Tag     string
 	Values  []string
+	Inverse bool
+}
+
+// Exists represents tag that has to be present in record.
+type Exists struct {
+	Tag     string
 	Inverse bool
 }
 
