@@ -16,8 +16,7 @@
     "illuminate/contracts": "^5.4",
     "illuminate/http": "^5.4",
     "illuminate/support": "^5.4",
-    "guzzlehttp/guzzle": "^6.2",
-    "psy/psysh": "^0.8"
+    "guzzlehttp/guzzle": "^6.2"
   },
   "require-dev": {
   },

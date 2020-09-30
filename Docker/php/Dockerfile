@@ -1,8 +1,8 @@
-FROM php:7.2-fpm
+FROM php:7.3-fpm
 
-ENV BUILD_DEPS libzip-dev g++ build-essential libsasl2-dev libssl-dev python-minimal
+ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev python-minimal
 
-ENV RUN_DEPS libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev
+ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev
 
 # INIT (single command so the intermediates are not stored)
 

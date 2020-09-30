@@ -30,34 +30,33 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
-        "fideloper/proxy": "^4.0",
-        "arrilot/laravel-widgets": "^3.7",
-        "doctrine/dbal": "~2.3",
+        "php": "^7.3",
+        "fideloper/proxy": "4.4.0",
+        "arrilot/laravel-widgets": "3.13.1",
         "laravel/framework": "5.7.*",
         "laravelcollective/html": "5.7.*",
-        "yajra/laravel-datatables-oracle": "^8.0",
-        "laracasts/flash": "^3.0",
-        "laravel/socialite": "^4.0",
+        "yajra/laravel-datatables-oracle": "v8.13.7",
+        "laracasts/flash": "3.2",
+        "laravel/socialite": "4.4.1",
         "tymon/jwt-auth": "^1.0",
-        "league/uri": "^5.0",
-        "recca0120/laravel-tracy": "^1.8",
-        "predis/predis": " ~1.0",
+        "league/uri": "^5.3",
+        "recca0120/laravel-tracy": "^1.11",
+        "predis/predis": " ~1.1",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
         "remp/laravel-helpers": "*",
-        "deployer/deployer": "^6.0",
-        "deployer/recipes": "^6.0",
-        "php-amqplib/php-amqplib": "^2.7",
+        "deployer/deployer": "^6.8",
+        "deployer/recipes": "^6.2",
+        "php-amqplib/php-amqplib": "^2.12",
         "kouz/laravel-airbrake": "^0.4",
-        "fzaninotto/faker": "~1.4"
+        "fzaninotto/faker": "~1.9"
     },
     "require-dev": {
-        "mockery/mockery": "^1.2",
-        "phpunit/phpunit": "^7.0",
-        "barryvdh/laravel-ide-helper": "^2.3",
-        "friendsofphp/php-cs-fixer": "^2.14",
-        "nunomaduro/collision": "^2.1"
+        "mockery/mockery": "^1.4",
+        "phpunit/phpunit": "9.3.11",
+        "barryvdh/laravel-ide-helper": "^2.8",
+        "friendsofphp/php-cs-fixer": "2.16.4",
+        "nunomaduro/collision": "^2.1.1"
     },
     "autoload": {
         "classmap": [

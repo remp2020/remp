@@ -7,6 +7,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- **BREAKING**: Minimal version for PHP is now 7.3. Version is enforced by Composer and any older version is not allowed anymore. Please upgrade your PHP accordingly.
+- Docker image now uses PHP 7.3.
+
+### [Beam]
+
+- Updated major portion of dependencies. Laravel was not updated yet.
+
+### [Sso]
+
+- Updated major portion of dependencies. Laravel was not updated yet.
+
 ## [0.14.0] - 2020-09-29
 
 ### Project
