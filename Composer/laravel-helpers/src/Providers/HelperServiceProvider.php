@@ -37,7 +37,7 @@ class HelperServiceProvider extends ServiceProvider
         });
 
         Blade::directive('json', function ($expression) {
-            return "\Psy\Util\Json::encode({$expression})";
+            return "\json_encode({$expression}, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES)";
         });
 
         Blade::directive('class', function ($expression) {
