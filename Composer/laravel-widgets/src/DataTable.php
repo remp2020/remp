@@ -3,7 +3,6 @@
 namespace Remp\Widgets;
 
 use Arrilot\Widgets\AbstractWidget;
-use Psy\Util\Json;
 
 /**
  * Class DataTable
@@ -87,7 +86,7 @@ class DataTable extends AbstractWidget
             ], $item);
         });
 
-        $tableId = md5(Json::encode([
+        $tableId = md5(json_encode([
             $this->config['dataSource'],
             $cols,
             $this->config['rowActions'],
