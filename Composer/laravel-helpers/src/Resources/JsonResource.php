@@ -32,4 +32,10 @@ class JsonResource extends Resource
             }
         }
     }
+
+    // Fix for https://github.com/laravel/framework/issues/29916, (currently on Laravel 5.7)
+    // TODO: upgrade laravel to newest version and remove implementation of this function
+    public function offsetExists($offset){
+        return is_array($this->resource) ? isset($this->resource[$offset]) : property_exists($this->resource, $offset);
+    }
 }
