@@ -110,7 +110,7 @@ class ProcessPageviewLoyalVisitors extends Command
             'event_action' => 'load',
             'operator' => '>=',
             'fields' => [],
-            'flags' => ['_article' => '1'],
+            'flags' => ['is_article' => '1'],
         ]);
 
         $this->line("Segment <info>{$segmentCode}</info> was created, you can use it to target your loyal audience");
