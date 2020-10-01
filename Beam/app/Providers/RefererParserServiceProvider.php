@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Snowplow\RefererParser\Config\YamlConfigReader;
 use Snowplow\RefererParser\Parser;
 
 class RefererParserServiceProvider extends ServiceProvider
@@ -17,8 +18,8 @@ class RefererParserServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(Parser::class, function ($app) {
-            $parser = new Parser();
-            return $parser;
+            $configReader = new YamlConfigReader(__DIR__ . '/../../vendor/snowplow/referer-parser/resources/referers.yml');
+            return new Parser($configReader);
         });
     }
 

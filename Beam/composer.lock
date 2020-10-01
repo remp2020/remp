@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7128b09d1cec22657f1e6c911ca0af47",
+    "content-hash": "bcdc2a3dc92f69e858b05fae7d91e25c",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -4293,34 +4293,34 @@
         },
         {
             "name": "recca0120/laravel-tracy",
-            "version": "v1.11.1",
+            "version": "1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/recca0120/laravel-tracy.git",
-                "reference": "9792a6f8d2a4597248682b591176ceefe0090c68"
+                "reference": "950965270efa631e8616531fa67e97e15346251f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/recca0120/laravel-tracy/zipball/9792a6f8d2a4597248682b591176ceefe0090c68",
-                "reference": "9792a6f8d2a4597248682b591176ceefe0090c68",
+                "url": "https://api.github.com/repos/recca0120/laravel-tracy/zipball/950965270efa631e8616531fa67e97e15346251f",
+                "reference": "950965270efa631e8616531fa67e97e15346251f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "^5.1|^6.0|^7.0",
-                "illuminate/database": "^5.1|^6.0|^7.0",
-                "illuminate/routing": "^5.1|^6.0|^7.0",
-                "illuminate/session": "^5.1|^6.0|^7.0",
-                "illuminate/support": "^5.1|^6.0|^7.0",
-                "illuminate/view": "^5.1|^6.0|^7.0",
+                "illuminate/contracts": "^5.1|^6.0",
+                "illuminate/database": "^5.1|^6.0",
+                "illuminate/routing": "^5.1|^6.0",
+                "illuminate/session": "^5.1|^6.0",
+                "illuminate/support": "^5.1|^6.0",
+                "illuminate/view": "^5.1|^6.0",
                 "php": ">=5.5.9",
                 "recca0120/terminal": "^1.0",
-                "tracy/tracy": "^2.4|^2.5|^2.6|^2.7"
+                "tracy/tracy": "^2.4|^2.5|^2.6"
             },
             "require-dev": {
                 "mockery/mockery": "^0.9.4|^1.0",
                 "nesbot/carbon": "^1.20|^2.0",
                 "phpunit/phpunit": "^4.8|^5.4|^6.1|^7.0|^8.0",
-                "vlucas/phpdotenv": "^4.1"
+                "vlucas/phpdotenv": "^3.3"
             },
             "type": "library",
             "extra": {
@@ -4360,7 +4360,7 @@
                 "tracy",
                 "webprofiler"
             ],
-            "time": "2020-05-05T14:41:52+00:00"
+            "time": "2019-12-02T14:32:42+00:00"
         },
         {
             "name": "recca0120/terminal",
@@ -4718,6 +4718,21 @@
             ],
             "description": "Snowplow Refer(r)er parser for PHP",
             "time": "2020-04-01T16:13:50+00:00"
+        },
+        {
+            "name": "snowplow/referer-parser-php",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/snowplow-referer-parser/php-referer-parser",
+                "reference": "master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Snowplow\\": "src/Snowplow"
+                }
+            }
         },
         {
             "name": "spatie/laravel-searchable",

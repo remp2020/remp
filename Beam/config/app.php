@@ -160,6 +160,7 @@ return [
         App\Providers\RempJournalServiceProvider::class,
         App\Providers\RempMailerServiceProvider::class,
         App\Providers\GoogleAnalyticsReportingServiceProvider::class,
+        App\Providers\RefererParserServiceProvider::class,
     ],
 
     /*
