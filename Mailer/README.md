@@ -1379,7 +1379,52 @@ Response:
   }
 ]
 ```
+---
 
+#### GET `/api/v1/mailers/templates`
+
+Gets list of available email templates.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| mail_type_codes | *String[]* | no | If provided, list only email templates for given mail_type codes. 
+| with_mail_types | *Boolean* | no | If true, each returned email template contains additional parameters about assigned mail_type.
+
+##### *Example:*
+
+```shell
+curl --location --request GET \
+'mailer.remp.press/api/v1/mailers/templates?mail_type_codes[]=onboarding&mail_type_codes[]=system&with_mail_types=true' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+```
+
+Response:
+
+```json5
+[
+    {
+        "code": "reset_password",
+        "name": "Password reset",
+        "mail_type_code": "system",
+        "mail_type": {
+            "code": "system",
+            "title": "System emails",
+            "description": "important notifications",
+            "sorting": 1
+        }
+    }
+]
+```
 ---
 
 #### POST `/api/v1/mailers/templates`
