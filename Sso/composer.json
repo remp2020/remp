@@ -40,7 +40,7 @@
         "laravel/socialite": "4.4.1",
         "tymon/jwt-auth": "^1.0",
         "league/uri": "^5.3",
-        "recca0120/laravel-tracy": "^1.11",
+        "recca0120/laravel-tracy": "~1.10.0",
         "predis/predis": " ~1.1",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
