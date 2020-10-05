@@ -22,7 +22,7 @@ class AggregatePageviewLoadJob extends Command
     public function handle(JournalContract $journalContract)
     {
         $debug = $this->option('debug') ?? false;
-        $articleId = $this->option('article_id') ?? false;
+        $articleId = $this->option('article_id') ?? null;
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
 
         $timeBefore = $now->minute(0)->second(0);
