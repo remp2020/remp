@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Updated major portion of dependencies. Laravel was not updated yet.
+- Added parameter `article_id` to `AggregatePageviewLoadJob` and `AggregatePageviewTimespentJob` commands.
 
 ### [Sso]
 

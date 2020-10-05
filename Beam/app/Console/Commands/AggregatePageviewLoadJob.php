@@ -15,14 +15,14 @@ class AggregatePageviewLoadJob extends Command
 {
     const COMMAND = 'pageviews:aggregate-load';
 
-    protected $signature = self::COMMAND . ' {--now=} {--debug}';
+    protected $signature = self::COMMAND . ' {--now=} {--debug} {--article_id=}';
 
     protected $description = 'Reads pageview/load data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
         $debug = $this->option('debug') ?? false;
-
+        $articleId = $this->option('article_id') ?? false;
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
 
         $timeBefore = $now->minute(0)->second(0);
@@ -33,6 +33,9 @@ class AggregatePageviewLoadJob extends Command
         $request = new AggregateRequest('pageviews', 'load');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
+        if ($articleId) {
+            $request->addFilter('article_id', $articleId);
+        }
         $request->addGroup('article_id', 'signed_in', 'subscriber');
         $records = collect($journalContract->count($request));
 

@@ -15,15 +15,16 @@ class AggregatePageviewTimespentJob extends Command
 {
     const COMMAND = 'pageviews:aggregate-timespent';
 
-    protected $signature = self::COMMAND . ' {--now=} {--debug}';
+    protected $signature = self::COMMAND . ' {--now=} {--debug} {--article_id=}';
 
     protected $description = 'Reads pageview/timespent data from journal and stores aggregated data';
 
     public function handle(JournalContract $journalContract)
     {
         $debug = $this->option('debug') ?? false;
-
+        $articleId = $this->option('article_id') ?? false;
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
+
         $timeBefore = $now->minute(0)->second(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
@@ -32,8 +33,10 @@ class AggregatePageviewTimespentJob extends Command
         $request = new AggregateRequest('pageviews', 'timespent');
         $request->setTimeAfter($timeAfter);
         $request->setTimeBefore($timeBefore);
+        if ($articleId) {
+            $request->addFilter('article_id', $articleId);
+        }
         $request->addGroup('article_id', 'signed_in', 'subscriber');
-
         $records = collect($journalContract->sum($request));
 
         if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
