@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "484adbe869437c724f8de0bf7c01a997",
+    "content-hash": "f8e917006b27e0281aefc7f239f380e1",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -6405,6 +6405,84 @@
                 }
             ],
             "time": "2020-09-08T12:29:20+00:00"
+        },
+        {
+            "name": "ukfast/laravel-health-check",
+            "version": "v1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ukfast/laravel-health-check.git",
+                "reference": "da258c4702d4399c28aa6e73e438339561b46b14"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ukfast/laravel-health-check/zipball/da258c4702d4399c28aa6e73e438339561b46b14",
+                "reference": "da258c4702d4399c28aa6e73e438339561b46b14",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/http": "^5.4|^6.0|^7.0|^8.0",
+                "illuminate/support": "^5.4|^6.0|^7.0|^8.0",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": ">=5.6.3",
+                "illuminate/database": "^5.4|^6.0|^7.0|^8.0",
+                "illuminate/log": "^5.4|^6.0|^7.0|^8.0",
+                "illuminate/redis": "^5.4|^6.0|^7.0|^8.0",
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "^3.0|^4.0|^5.0|^6.0",
+                "phpunit/phpunit": ">=5.0"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "Allows the http health check to function.",
+                "illuminate/database": "Allows the database health check to function.",
+                "illuminate/log": "Allows the log health check to function.",
+                "illuminate/redis": "Allows the redis health check to function."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "UKFast\\HealthCheck\\HealthCheckServiceProvider"
+                    ],
+                    "aliases": {
+                        "HealthCheck": "UKFast\\HealthCheck\\Facade\\HealthCheck"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\HealthCheck\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "George Kelly",
+                    "email": "george.kelly@ukfast.co.uk",
+                    "role": "Author & Maintainer"
+                },
+                {
+                    "name": "Tyler Woonton",
+                    "email": "tyler.woonton@ukfast.co.uk",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "A package for checking the health of your Laravel/Lumen applications.",
+            "keywords": [
+                "laravel",
+                "laravel-health-check",
+                "lumen",
+                "lumen-health-check",
+                "ukfast",
+                "ukfast-health-check"
+            ],
+            "time": "2020-10-03T22:52:14+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

@@ -195,3 +195,23 @@ is usable or not and no additional info.
 HTTP status codes are based on RFC 6750.
 
 * `404 Not Found`
+
+## Healthcheck
+
+Route `http://sso.remp.press/health` provides health check for database, Redis, storage and logging.
+
+Returns:
+
+- **200 OK** and JSON with list of services _(with status "OK")_.
+- **500 Internal Server Error** and JSON with description of problem. E.g.:
+
+    ```
+    {
+      "status":"PROBLEM",
+      "log":{
+        "status":"PROBLEM",
+        "message":"Could not write to log file",
+        "context": // error or thrown exception...
+      //...
+    }
+    ```

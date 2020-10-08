@@ -279,3 +279,6 @@ services:
 		class: Remp\MailerModule\Generators\EmbedParser
 	articleLocker:
 		class: Remp\MailerModule\Generators\ArticleLocker
+
+	# healtCheck - inject temp for storage check
+	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%)

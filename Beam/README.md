@@ -1671,3 +1671,23 @@ are met, Elasticsearch will create new index.
     
 Once configured and scheduled, rollovers will be happening automatically for you. When rollover happens, you need to
 create an alias for this rolled over index so also "reading" alias (e.g. `pageviews`) knows about it.
+
+## Healthcheck
+
+Route `http://beam.remp.press/health` provides health check for database, Redis, storage and logging.
+
+Returns:
+
+- **200 OK** and JSON with list of services _(with status "OK")_.
+- **500 Internal Server Error** and JSON with description of problem. E.g.:
+
+    ```
+    {
+      "status":"PROBLEM",
+      "log":{
+        "status":"PROBLEM",
+        "message":"Could not write to log file",
+        "context": // error or thrown exception...
+      //...
+    }
+    ```

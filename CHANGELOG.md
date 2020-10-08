@@ -16,10 +16,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Updated major portion of dependencies. Laravel was not updated yet.
 - Added parameter `article_id` to `AggregatePageviewLoadJob` and `AggregatePageviewTimespentJob` commands.
+- Added health check _(http://beam.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
+
+### [Campaign]
+
+- Added health check _(http://campaign.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
+
+### [Mailer]
+
+- Added method to use Redis `ping()` command within MailCache. remp/remp#735
+- Added health check _(http://mailer.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 
 ### [Sso]
 
 - Updated major portion of dependencies. Laravel was not updated yet.
+- Added health check _(http://sso.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 
 ## [0.14.0] - 2020-09-29
 
