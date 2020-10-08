@@ -41,6 +41,14 @@ class MailCache
     }
 
     /**
+     * @link https://redis.io/commands/ping
+     */
+    public function ping($message = null)
+    {
+        return $this->connect()->ping($message);
+    }
+
+    /**
      * Adds mail job to mail processing cache
      *
      * Note: all parameters in $params having name with suffix '_href_url' are treated as URLs that can be changed later by email sender.

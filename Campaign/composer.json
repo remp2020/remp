@@ -43,15 +43,16 @@
         "remp/multi-armed-bandit": "*",
         "spatie/laravel-searchable": "1.2.3",
         "tightenco/ziggy": "^0.6.9",
+        "ukfast/laravel-health-check": "^1.5",
         "yajra/laravel-datatables-oracle": "^8.0"
     },
     "require-dev": {
-        "mockery/mockery": "^1.2",
-        "phpunit/phpunit": "^7.0",
-        "friendsofphp/php-cs-fixer": "2.14",
         "barryvdh/laravel-ide-helper": "^2.3",
+        "friendsofphp/php-cs-fixer": "2.14",
+        "josiasmontag/laravel-redis-mock": "~1.2",
+        "mockery/mockery": "^1.2",
         "nunomaduro/collision": "^2.1",
-        "josiasmontag/laravel-redis-mock": "~1.2"
+        "phpunit/phpunit": "^7.0"
     },
     "autoload": {
         "classmap": [

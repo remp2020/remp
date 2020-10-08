@@ -383,6 +383,26 @@ Valid response with 202 HTTP code:
 }
 ```
 
+## Healthcheck
+
+Route `http://campaign.remp.press/health` provides health check for database, Redis, storage and logging.
+
+Returns:
+
+- **200 OK** and JSON with list of services _(with status "OK")_.
+- **500 Internal Server Error** and JSON with description of problem. E.g.:
+
+    ```
+    {
+      "status":"PROBLEM",
+      "log":{
+        "status":"PROBLEM",
+        "message":"Could not write to log file",
+        "context": // error or thrown exception...
+      //...
+    }
+    ```
+
 ## MaxMind - GeoIP2 Lite
 
 This product includes GeoLite2 data created by MaxMind, available from [http://www.maxmind.com](http://www.maxmind.com).

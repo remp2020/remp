@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f617c1ee5cb7dc9b838da309bb6d6bd",
+    "content-hash": "366548bb38a2096565162c1f61efc822",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -572,6 +572,7 @@
                 "phar",
                 "update"
             ],
+            "abandoned": true,
             "time": "2018-02-27T17:29:10+00:00"
         },
         {
@@ -629,6 +630,7 @@
                 "slack",
                 "yarn"
             ],
+            "abandoned": true,
             "time": "2019-06-27T06:47:18+00:00"
         },
         {
@@ -3836,12 +3838,12 @@
             "version": "v1.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nrk/predis.git",
+                "url": "https://github.com/predis/predis.git",
                 "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "url": "https://api.github.com/repos/predis/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "shasum": ""
             },
@@ -4557,7 +4559,8 @@
                 "remp"
             ],
             "transport-options": {
-                "symlink": false
+                "symlink": false,
+                "relative": true
             }
         },
         {
@@ -4610,7 +4613,8 @@
                 "sso"
             ],
             "transport-options": {
-                "symlink": false
+                "symlink": false,
+                "relative": true
             }
         },
         {
@@ -4659,7 +4663,8 @@
                 "widgets"
             ],
             "transport-options": {
-                "symlink": false
+                "symlink": false,
+                "relative": true
             }
         },
         {
@@ -4699,7 +4704,8 @@
                 "remp"
             ],
             "transport-options": {
-                "symlink": false
+                "symlink": false,
+                "relative": true
             }
         },
         {
@@ -6251,12 +6257,12 @@
             "version": "v0.6.9",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tightenco/ziggy.git",
+                "url": "https://github.com/tighten/ziggy.git",
                 "reference": "0f59b703236f6b19002bc28d1d3eafcbf479bd43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tightenco/ziggy/zipball/0f59b703236f6b19002bc28d1d3eafcbf479bd43",
+                "url": "https://api.github.com/repos/tighten/ziggy/zipball/0f59b703236f6b19002bc28d1d3eafcbf479bd43",
                 "reference": "0f59b703236f6b19002bc28d1d3eafcbf479bd43",
                 "shasum": ""
             },
@@ -6415,6 +6421,84 @@
                 "profiler"
             ],
             "time": "2019-11-02T20:12:14+00:00"
+        },
+        {
+            "name": "ukfast/laravel-health-check",
+            "version": "v1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ukfast/laravel-health-check.git",
+                "reference": "da258c4702d4399c28aa6e73e438339561b46b14"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ukfast/laravel-health-check/zipball/da258c4702d4399c28aa6e73e438339561b46b14",
+                "reference": "da258c4702d4399c28aa6e73e438339561b46b14",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/http": "^5.4|^6.0|^7.0|^8.0",
+                "illuminate/support": "^5.4|^6.0|^7.0|^8.0",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": ">=5.6.3",
+                "illuminate/database": "^5.4|^6.0|^7.0|^8.0",
+                "illuminate/log": "^5.4|^6.0|^7.0|^8.0",
+                "illuminate/redis": "^5.4|^6.0|^7.0|^8.0",
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "^3.0|^4.0|^5.0|^6.0",
+                "phpunit/phpunit": ">=5.0"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "Allows the http health check to function.",
+                "illuminate/database": "Allows the database health check to function.",
+                "illuminate/log": "Allows the log health check to function.",
+                "illuminate/redis": "Allows the redis health check to function."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "UKFast\\HealthCheck\\HealthCheckServiceProvider"
+                    ],
+                    "aliases": {
+                        "HealthCheck": "UKFast\\HealthCheck\\Facade\\HealthCheck"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\HealthCheck\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "George Kelly",
+                    "email": "george.kelly@ukfast.co.uk",
+                    "role": "Author & Maintainer"
+                },
+                {
+                    "name": "Tyler Woonton",
+                    "email": "tyler.woonton@ukfast.co.uk",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "A package for checking the health of your Laravel/Lumen applications.",
+            "keywords": [
+                "laravel",
+                "laravel-health-check",
+                "lumen",
+                "lumen-health-check",
+                "ukfast",
+                "ukfast-health-check"
+            ],
+            "time": "2020-10-03T22:52:14+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -8406,6 +8490,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2019-09-17T06:23:10+00:00"
         },
         {
@@ -9414,5 +9499,6 @@
         "php": "^7.1.3",
         "ext-json": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

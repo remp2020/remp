@@ -64,6 +64,7 @@
         "snowplow/referer-parser-php": "0.0.1",
         "spatie/laravel-searchable": "^1.2",
         "tightenco/ziggy": "^0.9",
+        "ukfast/laravel-health-check": "^1.5",
         "yadakhov/insert-on-duplicate-key": "^1.2",
         "yajra/laravel-datatables-oracle": "^8.0"
     },
