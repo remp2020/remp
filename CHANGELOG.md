@@ -16,15 +16,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Updated major portion of dependencies. Laravel was not updated yet.
 - Added parameter `article_id` to `AggregatePageviewLoadJob` and `AggregatePageviewTimespentJob` commands.
+- Fixed broken functionality of the segments flag `is_article` (available in pageview category). remp/remp#716
 - Added health check _(http://beam.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 - Added "Content Type" to article detail information.
 
 ### [Campaign]
 
+- Fixed listing of banners over API (`/api/banners`).
 - Added health check _(http://campaign.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 
 ### [Mailer]
 
+- Added parameter `with_mail_types` for `GET /api/v1/mailers/templates` endpoint, allowing to add details about mail_types assigned to templates. Documentation for the endpoint added. remp/crm#1450
 - Added method to use Redis `ping()` command within MailCache. remp/remp#735
 - Added health check _(http://mailer.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 
@@ -48,7 +51,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
 - Added `browser_id` to Commerce model to expose it in commerce-related responses of Segments API.
-- Fixed broken functionality of the segments flag `is_article` (available in pageview category). remp/remp#716
 
 ### [Campaign]
 
@@ -58,14 +60,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possibility of zero campaign stats. Bug appeared if campaign included banner with an already removed variant with some stats tracked. remp/remp#628
 - Removed redundant Tracker contract and related implementations. It was never used and necessary. Campaign should only consume Journal data, not produce them from backend. 
 - Increased campaigns backend stats fetch timeout to 5 seconds.
-- Fixed listing of banners over API (`/api/banners`).
 
 ### [Mailer]
 
 - Fixed README.md typos, incorrectly linked classes, wording changes, small grammar fixes. remp/remp!390
 - Upgraded nette/application to 2.4.16.
 - Added support for click tracking configuration on mail template level. dn-mofa#50
-- Added parameter `with_mail_types` for `GET /api/v1/mailers/templates` endpoint, allowing to add details about mail_types assigned to templates. Documentation for the endpoint added. remp/crm#1450
 
 ### [Sso]
 
