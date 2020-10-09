@@ -38,6 +38,10 @@
                                 <dd>{{$article->external_id}}</dd>
                             </dl>
                             <dl class="dl-horizontal">
+                                <dt>Content Type</dt>
+                                <dd>{{$article->content_type}}</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
                                 <dt>URL</dt>
                                 <dd><a href="{{$article->url}}">{{$article->url}}</a></dd>
                             </dl>

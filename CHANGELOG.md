@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Updated major portion of dependencies. Laravel was not updated yet.
 - Added parameter `article_id` to `AggregatePageviewLoadJob` and `AggregatePageviewTimespentJob` commands.
 - Added health check _(http://beam.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
+- Added "Content Type" to article detail information.
 
 ### [Campaign]
 
@@ -397,6 +398,7 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[0.14.0]: https://github.com/remp2020/remp/compare/0.13.0...0.14.0
 [0.13.0]: https://github.com/remp2020/remp/compare/0.12.0...0.13.0
 [0.12.0]: https://github.com/remp2020/remp/compare/0.11.1...0.12.0
 [0.11.1]: https://github.com/remp2020/remp/compare/0.10.0...0.11.1
