@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed broken functionality of the segments flag `is_article` (available in pageview category). remp/remp#716
 - Added health check _(http://beam.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 - Added "Content Type" to article detail information.
+- Fixed reseting `paid_at` column in `conversions` table on each row update. remp/remp#738
 
 ### [Campaign]
 
