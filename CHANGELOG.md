@@ -32,6 +32,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added method to use Redis `ping()` command within MailCache. remp/remp#735
 - Added health check _(http://mailer.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 - Added graceful shutdown to `MailWorkerCommand` (`worker:mail`) via `Tomaj\Hermes\Restart\RestartInterface`. remp/remp#736
+- **BREAKING**: Changed hermes restart implementation (handles restarts of hermes worker and mail worker). remp/remp#736
+  - Updated `tomaj/hermes` to version 3.0.0 which introduced `RedisRestart` implementation.
+  - Switched hermes restart setting from file restart to redis restart.
+  - File restart moved to `config.local.neon.example` as example configuration.
 
 ### [Sso]
 

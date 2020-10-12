@@ -131,7 +131,6 @@ class MailWorkerCommand extends Command
                 $now = (new \DateTime())->format(DATE_RFC3339);
                 $msg = "Exiting mail worker: restart instruction received '{$now}'.";
                 $output->write("\n<comment>{$msg}</comment>\n");
-                Debugger::log($msg, ILogger::INFO);
                 $this->logger->info($msg);
                 exit;
             }

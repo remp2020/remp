@@ -20,6 +20,9 @@ services:
         class: Remp\MailerModule\Hermes\UnsubscribeDroppedHandler
         setup:
             - setThreshold(3) # number of dropped emails before unsubscribing user
+
+    # restart hermes and mail worker with file (checks modification date; see SharedFileRestart implementation)
+    hermesRestart: Tomaj\Hermes\Restart\SharedFileRestart('/tmp/hermes_restart')
     hermesWorker:
         setup:
             - add('email-dropped', @unsubscribeDroppedHandler)

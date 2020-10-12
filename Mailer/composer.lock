@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ad650b9252895d1fd03c68701f67cf0",
+    "content-hash": "d0c7fd7846865e669d9a7c1418f91ac2",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -5209,39 +5209,36 @@
         },
         {
             "name": "tomaj/hermes",
-            "version": "2.2.2",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tomaj/hermes.git",
-                "reference": "61755115ffe194d2d1649be19b05279e37c75016"
+                "reference": "996839f27acaa726ec550ebe3f778ec7824bc698"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tomaj/hermes/zipball/61755115ffe194d2d1649be19b05279e37c75016",
-                "reference": "61755115ffe194d2d1649be19b05279e37c75016",
+                "url": "https://api.github.com/repos/tomaj/hermes/zipball/996839f27acaa726ec550ebe3f778ec7824bc698",
+                "reference": "996839f27acaa726ec550ebe3f778ec7824bc698",
                 "shasum": ""
             },
             "require": {
-                "php": ">= 7.1.0",
+                "php": ">= 7.2.0",
                 "psr/log": "^1.0",
-                "ramsey/uuid": "~3.0",
+                "ramsey/uuid": "^3 || ^4",
                 "tracy/tracy": "^2.0"
             },
             "require-dev": {
                 "aws/aws-sdk-php": "3.*",
                 "ext-redis": "*",
-                "ext-zmq": "*",
-                "jakub-onderka/php-parallel-lint": "^0.9.0",
                 "php-amqplib/php-amqplib": "^2.6.3",
-                "phpunit/phpunit": "~4.3",
+                "phpunit/phpunit": "^8 || ^9",
                 "predis/predis": "*",
-                "scrutinizer/ocular": "~1.1",
-                "squizlabs/php_codesniffer": "~2.2"
+                "scrutinizer/ocular": "1.6.0",
+                "squizlabs/php_codesniffer": "~3.5"
             },
             "suggest": {
                 "aws/aws-sdk-php": "Allow use Amazon SQS driver",
                 "ext-redis": "Allow use for redis driver with native redis php extension",
-                "ext-zmq": "Allow use for ZeroMQ driver with native zmq php extension",
                 "monolog/monolog": "Basic logger implements psr/logger",
                 "php-amqplib/php-amqplib": "Allow using rabbimq as driver",
                 "predis/predis": "Allow use for redis driver with php package Predis"
@@ -5270,7 +5267,7 @@
                 "event",
                 "workers"
             ],
-            "time": "2019-10-29T14:36:36+00:00"
+            "time": "2020-10-13T21:51:44+00:00"
         },
         {
             "name": "tomaj/nette-api",
@@ -6968,6 +6965,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2019-09-17T06:23:10+00:00"
         },
         {
