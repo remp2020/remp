@@ -1244,6 +1244,21 @@ var rempConfig = {
     
     // optional, controls where cookies (UTM parameters of visit) are stored
     cookieDomain: ".remp.press",
+
+    // optional, controls which type of storage should be used by default (`local_storage` or `cookie`)
+    // default is `local_storage`
+    storage: "local_storage", 
+
+    // optional, specifies how long to store specific keys in storage (in minutes)
+    storageExpiration: {
+        // default value (in minutes) for all storage keys if not overriden in `keys`
+        "default": 15,
+        // specific pairs of key name and life length in minutes
+        "keys": {
+            "browser_id": 1051200, // 2 years in minutes
+            "campaigns": 1051200
+        }
+    },
     
     // optional, article details if pageview is on the article
     article: {

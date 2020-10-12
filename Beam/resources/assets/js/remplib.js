@@ -145,6 +145,26 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 remplib.cookieDomain = config.cookieDomain;
             }
 
+            if (typeof config.storage === 'string') {
+                if (['cookie', 'local_storage'].indexOf(config.storage) === -1) {
+                    console.warn('Not supported storage type `' + config.storage + '` in configuration. Setting storage type to `local_storage`');
+                } else {
+                    remplib.storage = config.storage;
+                }
+            }
+
+            if (typeof config.storageExpiration === 'object') {
+                if (config.storageExpiration.default) {
+                    remplib.storageExpiration.default = config.storageExpiration.default;
+                }
+                if (config.storageExpiration.keys) {
+                    remplib.storageExpiration.keys = {
+                        ...remplib.storageExpiration.keys,
+                        ...config.storageExpiration.keys
+                    };
+                }
+            }
+
             this.parseUriParams();
 
             this.checkCookiesEnabled();
@@ -210,7 +230,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("cache")) {
                 return;
             }
-            let segmentProviderCache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
+            let segmentProviderCache = localStorage.getItem(remplib.segmentProviderCacheKey);
+            if (segmentProviderCache) {
+                segmentProviderCache = JSON.parse(segmentProviderCache);
+            }
             if (!segmentProviderCache) {
                 segmentProviderCache = {};
             }
@@ -249,11 +272,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         incrementSegmentRulesCache: function(event) {
-            let cache = remplib.getFromStorage(remplib.segmentProviderCacheKey, true);
+            let cache = localStorage.getItem(remplib.segmentProviderCacheKey);
+            if (cache) {
+                cache = JSON.parse(cache);
+            }
             if (!cache || !cache.hasOwnProperty(remplib.tracker.segmentProvider)) {
                 return;
             }
-            let eventRules = remplib.getFromStorage(remplib.tracker.eventRulesMapKey, true);
+            let eventRules = localStorage.getItem(remplib.tracker.eventRulesMapKey);
+            if (eventRules) {
+                eventRules = JSON.parse(eventRules);
+            }
             if (!eventRules) {
                 return;
             }
@@ -272,8 +301,13 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     continue;
                 }
 
-                const of = remplib.getFromStorage(remplib.tracker.overridableFieldsKey, true) || [];
-                if (!of.hasOwnProperty(ruleId)) {
+                let overridableFields = localStorage.getItem(remplib.tracker.overridableFieldsKey);
+                if (overridableFields) {
+                    overridableFields = JSON.parse(overridableFields);
+                } else {
+                    overridableFields = [];
+                }
+                if (!overridableFields.hasOwnProperty(ruleId)) {
                     console.warn("remplib: missing overridable fields for rule " + ruleId);
                     continue;
                 }
@@ -290,7 +324,13 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         // checks if all flags are matched against provided config
         validateFlags: function(ruleId) {
-            let flags = remplib.getFromStorage(remplib.tracker.flagsKey, true) || [];
+            let flags = localStorage.getItem(remplib.tracker.flagsKey);
+            if (flags) {
+                flags = JSON.parse(flags);
+            } else {
+                flags = [];
+            }
+
             if (!flags.hasOwnProperty(ruleId)) {
                 console.warn("remplib: missing flags for rule " + ruleId);
                 return false;
@@ -647,7 +687,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         getParam: function(key, includeStorage = false) {
             // retrieve storage value since it also extends value's lifetime in storage
-            let storageValue = remplib.getFromStorage(key, false, true)
+            let storageValue = remplib.getFromStorage(key);
 
             if (includeStorage && typeof this.uriParams[key] === 'undefined') {
                 return storageValue;
@@ -662,25 +702,18 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         parseUriParams: function() {
             var query = window.location.search.substring(1);
-            
-            if (!query) return;
+            if (!query) {
+                return;
+            }
             
             var vars = query.split('&');
-
-            const now = new Date();
 
             for (var i = 0; i < vars.length; i++) {
                 let pair = vars[i].split('=');
                 let key = decodeURIComponent(pair[0]);
                 this.uriParams[key] = decodeURIComponent(pair[1]);
 
-                let item = {
-                    "version": 1,
-                    "value": this.uriParams[key],
-                    "createdAt": now,
-                    "updatedAt": now,
-                };
-                remplib.setToStorage(key, item);
+                remplib.setToStorage(key, this.uriParams[key]);
             }
         },
 
