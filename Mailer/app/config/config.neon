@@ -82,11 +82,16 @@ services:
 		setup:
 			- addFilter(null, [@filterLoader, 'load'])
 
+	mailWorkerCommand:
+		class: Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger)
+		setup:
+			- setRestartInterface(@hermesRestart)
+
 	console:
 		class: Remp\MailerModule\Console\Application
 		setup:
 			- register(Remp\MailerModule\Commands\ProcessJobCommand())
-			- register(Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger))
+			- register(@mailWorkerCommand)
 			- register(Remp\MailerModule\Commands\DatabaseSeedCommand())
 			- register(Remp\MailerModule\Commands\DemoSeedCommand())
 			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())

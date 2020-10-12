@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added parameter `with_mail_types` for `GET /api/v1/mailers/templates` endpoint, allowing to add details about mail_types assigned to templates. Documentation for the endpoint added. remp/crm#1450
 - Added method to use Redis `ping()` command within MailCache. remp/remp#735
 - Added health check _(http://mailer.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
+- Added graceful shutdown to `MailWorkerCommand` (`worker:mail`) via `Tomaj\Hermes\Restart\RestartInterface`. remp/remp#736
 
 ### [Sso]
 
