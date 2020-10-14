@@ -5,8 +5,8 @@
 
                 <div class="panel-group z-depth-1-top">
                     <div class="panel">
-                        <div class="card-header">
-                            <h2 class="m-t-0">
+                        <div class="card-header clearfix">
+                            <h2 class="m-t-0 pull-left">
                                 <div v-if="action == 'edit'">
                                     Edit campaign
                                 </div>
@@ -16,6 +16,9 @@
 
                                 <small v-if="name">{{ name }}</small>
                             </h2>
+                            <a v-if="statsLink" :href="statsLink" class="btn btn-sm palette-Cyan bg waves-effect pull-right">
+                                <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -549,6 +552,7 @@
         "_urlPatterns",
         "_refererFilter",
         "_refererPatterns",
+        "_statsLink",
 
         "_banners",
         "_availableSegments",

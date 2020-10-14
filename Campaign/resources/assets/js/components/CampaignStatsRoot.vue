@@ -4,6 +4,7 @@
 
             <campaign-stats
                 :name="name"
+                :edit-link="editLink"
                 :data="campaignData"
                 :error="error"
                 :loading="loading"
@@ -59,6 +60,10 @@
             required: true
         },
         name: {
+            type: String,
+            required: true,
+        },
+        editLink: {
             type: String,
             required: true,
         },

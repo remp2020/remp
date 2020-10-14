@@ -10,7 +10,10 @@
         <div v-if="error" class="error" :title="error">!</div>
 
         <div class="card-header">
-            <h3 v-html="title"></h3>
+            <h3 v-html="title" class="pull-left"></h3>
+            <a v-if="editLink" :href="editLink" class="btn btn-sm palette-Cyan bg waves-effect pull-right">
+                <i class="zmdi zmdi-palette-Cyan zmdi-edit"></i>
+            </a>
         </div>
 
         <div class="card-body card-padding">
@@ -29,6 +32,10 @@
         title: {
             type: String,
             required: true
+        },
+        editLink: {
+            type: String,
+            required: false
         },
         height: {
             type: Number,

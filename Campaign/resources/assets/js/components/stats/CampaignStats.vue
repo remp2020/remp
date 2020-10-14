@@ -5,6 +5,7 @@
                 <chart
                     :name="'campaign-stats-chart'"
                     :title="name"
+                    :edit-link="editLink"
                     :height="500"
                     :loading="loading"
                     :error="error"
@@ -83,6 +84,10 @@
         },
         props: {
             name: {
+                type: String,
+                required: true
+            },
+            editLink: {
                 type: String,
                 required: true
             },

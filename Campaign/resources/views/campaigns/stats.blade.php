@@ -21,6 +21,7 @@
                 <campaign-stats-root
                         :url="url"
                         :name="name"
+                        :edit-link="editLink"
                         :variants="variants"
                         :variant-banner-links="variantBannerLinks"
                         :variant-banner-texts="variantBannerTexts"
@@ -64,6 +65,7 @@
                     return {
                         name: "<a href=\"{!! route('campaigns.show', ['campaign' => $campaign]) !!}\">{{ $campaign->name }}</a>",
                         url: "{!! route('campaigns.stats.data', $campaign->id) !!}",
+                        editLink: "{!! route('campaigns.edit', $campaign) !!}",
                         variants: {!! @json($variants) !!},
                         variantBannerLinks: {!! @json($variantBannerLinks) !!},
                         variantBannerTexts: {!! @json($variantBannerTexts) !!},
