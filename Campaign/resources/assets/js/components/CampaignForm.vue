@@ -17,7 +17,7 @@
                                 <small v-if="name">{{ name }}</small>
                             </h2>
                             <a v-if="statsLink" :href="statsLink" class="btn btn-sm palette-Cyan bg waves-effect pull-right">
-                                <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i>
+                                <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i>&nbsp;&nbsp;Stats
                             </a>
                         </div>
                     </div>
