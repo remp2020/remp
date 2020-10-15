@@ -8,8 +8,6 @@ use App\Contracts\SegmentException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
-use Psy\Util\Json;
 
 class Segment implements SegmentContract
 {
@@ -107,10 +105,10 @@ class Segment implements SegmentContract
             $params = [];
             $cso = $campaignSegment->getOverrides();
             if ($cso) {
-                $params['fields'] = Json::encode($cso);
+                $params['fields'] = json_encode($cso);
             }
             if ($this->cache) {
-                $params['cache'] = Json::encode($this->cache);
+                $params['cache'] = json_encode($this->cache);
             }
             $response = $this->client->get(sprintf($endpoint, $campaignSegment->code, $checkedId), [
                 'query' => $params,
@@ -149,7 +147,7 @@ class Segment implements SegmentContract
         try {
             $response = $this->client->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
                 'query' => [
-                    'fields' => Json::encode($campaignSegment->getOverrides())
+                    'fields' => json_encode($campaignSegment->getOverrides())
                 ],
             ]);
         } catch (ConnectException $e) {

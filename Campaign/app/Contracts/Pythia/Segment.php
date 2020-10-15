@@ -9,7 +9,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Psy\Util\Json;
 
 class Segment implements SegmentContract
 {
@@ -121,7 +120,7 @@ class Segment implements SegmentContract
         try {
             $response = $this->client->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
                 'query' => [
-                    'fields' => Json::encode($campaignSegment->getOverrides())
+                    'fields' => json_encode($campaignSegment->getOverrides())
                 ],
             ]);
         } catch (ConnectException $e) {

@@ -4,7 +4,6 @@ namespace App;
 
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
-use Psy\Util\Json;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Redis;
 use Spatie\Searchable\Searchable;
@@ -260,7 +259,7 @@ class Campaign extends Model implements Searchable
             ->unique()
             ->toArray();
 
-        Redis::set(self::ACTIVE_CAMPAIGN_IDS, Json::encode(array_values($activeCampaignIds)));
+        Redis::set(self::ACTIVE_CAMPAIGN_IDS, json_encode(array_values($activeCampaignIds)));
 
         return collect($activeCampaignIds);
     }
