@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.15.0] - 2020-10-15
+
 ### Project
 
 - **BREAKING**: Bumping minimal version of PHP to 7.3. Version is enforced by Composer and any older version is not allowed anymore. Please upgrade PHP accordingly.
