@@ -9,8 +9,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Project
 
-- **BREAKING**: Minimal version for PHP is now 7.3. Version is enforced by Composer and any older version is not allowed anymore. Please upgrade your PHP accordingly.
+- **BREAKING**: Bumping minimal version of PHP to 7.3. Version is enforced by Composer and any older version is not allowed anymore. Please upgrade PHP accordingly.
 - Docker image now uses PHP 7.3.
+- Go images now use 1.15.
 
 ### [Beam]
 
@@ -28,14 +29,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Changed hermes restart implementation (handles restarts of hermes worker and mail worker). Please update your deploy process to set the deploy time to Redis or fallback to previous file-based restart (see `config.local.neon.example` for reference). remp/remp#736
+  - Updated `tomaj/hermes` to version 3.0.0 which introduced `RedisRestart` implementation.
+  - Switched default Fermes restart setting from file restart to redis restart.
+  - File restart moved to `config.local.neon.example` as example configuration.
 - Added parameter `with_mail_types` for `GET /api/v1/mailers/templates` endpoint, allowing to add details about mail_types assigned to templates. Documentation for the endpoint added. remp/crm#1450
 - Added method to use Redis `ping()` command within MailCache. remp/remp#735
 - Added health check _(http://mailer.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 - Added graceful shutdown to `MailWorkerCommand` (`worker:mail`) via `Tomaj\Hermes\Restart\RestartInterface`. remp/remp#736
-- **BREAKING**: Changed hermes restart implementation (handles restarts of hermes worker and mail worker). remp/remp#736
-  - Updated `tomaj/hermes` to version 3.0.0 which introduced `RedisRestart` implementation.
-  - Switched hermes restart setting from file restart to redis restart.
-  - File restart moved to `config.local.neon.example` as example configuration.
+
 
 ### [Sso]
 
