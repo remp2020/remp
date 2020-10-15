@@ -21,6 +21,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tomaj\Hermes\Restart\RestartInterface;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -54,6 +55,12 @@ class MailWorkerCommand extends Command
 
     private $logger;
 
+    /** @var RestartInterface */
+    private $restart;
+
+    /** @var \DateTime */
+    private $startTime;
+
     public function __construct(
         LoggerInterface $logger,
         Sender $applicationMailer,
@@ -82,6 +89,14 @@ class MailWorkerCommand extends Command
     }
 
     /**
+     * Set implementation of RestartInterface which should handle graceful shutdowns.
+     */
+    public function setRestartInterface(RestartInterface $restart): void
+    {
+        $this->restart = $restart;
+    }
+
+    /**
      * Configure command
      */
     protected function configure()
@@ -99,6 +114,9 @@ class MailWorkerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // store when command was started
+        $this->startTime = new \DateTime();
+
         $sendAsBatch = $input->getOption('batch');
 
         $output->writeln('');
@@ -108,6 +126,15 @@ class MailWorkerCommand extends Command
         $output->write('Checking mail queues');
 
         while (true) {
+            // graceful shutdown check
+            if ($this->restart && $this->restart->shouldRestart($this->startTime)) {
+                $now = (new \DateTime())->format(DATE_RFC3339);
+                $msg = "Exiting mail worker: restart instruction received '{$now}'.";
+                $output->write("\n<comment>{$msg}</comment>\n");
+                $this->logger->info($msg);
+                exit;
+            }
+
             $batch = $this->mailJobBatchRepository->getBatchToSend();
             if (!$batch) {
                 sleep(30);

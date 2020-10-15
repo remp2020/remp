@@ -8,8 +8,6 @@ parameters:
 		host: @environmentConfig::get('REDIS_HOST')
 		port: @environmentConfig::get('REDIS_PORT')
 		db: @environmentConfig::get('REDIS_DB')
-	hermes:
-		restart_file_path: @environmentConfig::get('HERMES_RESTART_FILE_PATH')
 	remp:
 		beam:
 			web_addr: @environmentConfig::get('REMP_BEAM_ADDR')
@@ -82,11 +80,16 @@ services:
 		setup:
 			- addFilter(null, [@filterLoader, 'load'])
 
+	mailWorkerCommand:
+		class: Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger)
+		setup:
+			- setRestartInterface(@hermesRestart)
+
 	console:
 		class: Remp\MailerModule\Console\Application
 		setup:
 			- register(Remp\MailerModule\Commands\ProcessJobCommand())
-			- register(Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger))
+			- register(@mailWorkerCommand)
 			- register(Remp\MailerModule\Commands\DatabaseSeedCommand())
 			- register(Remp\MailerModule\Commands\DemoSeedCommand())
 			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
@@ -111,7 +114,8 @@ services:
 	dateFormatterFactory:
 		class: Remp\MailerModule\Formatters\DateFormatterFactory(%locale%, %timezone%)
 
-	hermesRestart: Tomaj\Hermes\Restart\SharedFileRestart(%hermes.restart_file_path%)
+	# restart hermes and mail worker through hermes_restart key in redis (override in local config with second string argument if you want to change key)
+	hermesRestart: Tomaj\Hermes\Restart\RedisRestart(@redisCache::client())
 	hermesDispatcher:
 		class: Tomaj\Hermes\Dispatcher(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger, @hermesRestart)
 	hermesEmitter:
