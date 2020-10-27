@@ -14,6 +14,14 @@ syntax:7.3:
   script:
     - make syntax
 
+syntax:7.4:
+  stage: test
+  image: php:7.4-cli
+  tags:
+    - docker
+  script:
+    - make syntax
+
 sniffer:
   stage: test
   image: remp/php-ci:7.3.15

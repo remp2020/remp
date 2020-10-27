@@ -9,7 +9,7 @@ then
 
     composer install
 
-    yarn install --no-bin-links
+    yarn install
     chmod -R u+x node_modules
 
     yarn link --cwd ../Package/remp
