@@ -69,3 +69,10 @@ local_configs:
     remp_mailermodule_mailer_smtpmailer_username: ''
     remp_mailermodule_mailer_smtpmailer_password: ''
     remp_mailermodule_mailer_smtpmailer_secure: ''
+
+
+# If running Mailer on Valet, please uncomment the following lines and adjust the full path to REMP/Mailer folder
+
+#webpack:
+#    build:
+#        directory: /FULL_PATH_TO_REMP_FOLDER/Mailer/www/assets/vendor
