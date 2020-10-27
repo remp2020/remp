@@ -7,17 +7,16 @@
     <title>{ifset title}{include title|stripHtml} | {/ifset} REMP</title>
 
     <!-- Vendor CSS -->
-    <link href="/assets/vendor/css/vendor.css" rel="stylesheet">
+    <link href="{webpack /css/vendor.css}" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/github-gist.min.css" rel="stylesheet">
 
     <!-- CSS -->
-    <link href="/assets/vendor/css/app.css" rel="stylesheet">
+    <link href="{webpack /css/app.css}" rel="stylesheet">
 
     <!-- SCRIPT -->
-    <script src="/assets/vendor/js/manifest.js"></script>
-    <script src="/assets/vendor/js/init.js"></script>
-    <script src="/assets/vendor/js/vendor.js"></script>
-    <script src="/assets/vendor/js/app.js"></script>
+    <script src="{webpack /js/manifest.js}"></script>
+    <script src="{webpack /js/vendor.js}"></script>
+    <script src="{webpack /js/app.js}"></script>
 </head>
 
 <body>
@@ -44,31 +43,26 @@
         <ul class="iew-download">
             <li>
                 <a href="http://www.google.com/chrome/">
-                    <img src="img/browsers/chrome.png" alt="">
                     <div>Chrome</div>
                 </a>
             </li>
             <li>
                 <a href="https://www.mozilla.org/en-US/firefox/new/">
-                    <img src="img/browsers/firefox.png" alt="">
                     <div>Firefox</div>
                 </a>
             </li>
             <li>
                 <a href="http://www.opera.com">
-                    <img src="img/browsers/opera.png" alt="">
                     <div>Opera</div>
                 </a>
             </li>
             <li>
                 <a href="https://www.apple.com/safari/">
-                    <img src="img/browsers/safari.png" alt="">
                     <div>Safari</div>
                 </a>
             </li>
             <li>
                 <a href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">
-                    <img src="img/browsers/ie.png" alt="">
                     <div>IE (New)</div>
                 </a>
             </li>

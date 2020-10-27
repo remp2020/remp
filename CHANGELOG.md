@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Fixed possible issue with asset location on Mac when Valet is used for development.
+
 ## [0.15.0] - 2020-10-15
 
 ### Project
@@ -39,7 +43,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added method to use Redis `ping()` command within MailCache. remp/remp#735
 - Added health check _(http://mailer.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 - Added graceful shutdown to `MailWorkerCommand` (`worker:mail`) via `Tomaj\Hermes\Restart\RestartInterface`. remp/remp#736
-
 
 ### [Sso]
 
