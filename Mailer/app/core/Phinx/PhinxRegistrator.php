@@ -45,7 +45,7 @@ class PhinxRegistrator
      */
     private function buildConfig()
     {
-        $env = getenv('ENV');
+        $env = $_ENV['ENV'];
 
         $configData = [
             'paths' => [

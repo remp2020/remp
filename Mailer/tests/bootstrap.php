@@ -1,9 +1,10 @@
 <?php
 
+use Dotenv\Dotenv;
+
 require __DIR__ . '/../vendor/autoload.php';
 
-$env = new Dotenv\Dotenv(__DIR__, '/../.env');
-$env->load();
+(DotEnv::createImmutable(__DIR__ . '/../'))->load();
 
 $environment = getenv('ENV');
 

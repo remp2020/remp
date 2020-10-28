@@ -134,11 +134,11 @@ class Sender
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
         $this->params = array_merge($this->params, $recipient['params'] ?? []);
 
-        if (getenv('UNSUBSCRIBE_URL')) {
-            $this->params['unsubscribe'] = str_replace(getenv('UNSUBSCRIBE_URL'), '%type%', $this->template->mail_type->code) . $this->params['autologin'];
+        if (isset($_ENV['UNSUBSCRIBE_URL'])) {
+            $this->params['unsubscribe'] = str_replace($_ENV['UNSUBSCRIBE_URL'], '%type%', $this->template->mail_type->code) . $this->params['autologin'];
         }
-        if (getenv('SETTINGS_URL')) {
-            $this->params['settings'] = getenv('SETTINGS_URL') . $this->params['autologin'];
+        if (isset($_ENV['SETTINGS_URL'])) {
+            $this->params['settings'] = $_ENV['SETTINGS_URL'] . $this->params['autologin'];
         }
 
         $mailer = $this->getMailer();
