@@ -84,7 +84,13 @@ services:
 		class: Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger)
 		setup:
 			- setRestartInterface(@hermesRestart)
-#		class: Remp\MailerModule\Console\Application
+
+	templateEngine:
+		class: Remp\MailerModule\ContentGenerator\Engine\EngineFactory
+		setup:
+		    - register('twig', \Remp\MailerModule\ContentGenerator\Engine\TwigEngine())
+		    - defaultEngine('twig')
+
 	console:
 		class: Symfony\Component\Console\Application
 		setup:
@@ -138,6 +144,11 @@ services:
 
 	segmentAgreggator:
 		class: Remp\MailerModule\Segment\Aggregator
+
+	contentGenerator:
+		class: Remp\MailerModule\ContentGenerator\ContentGenerator
+		setup:
+		    - register(Remp\MailerModule\ContentGenerator\Replace\AnchorUtmReplace())
 
 	mailFactory:
 		class: Remp\MailerModule\Sender\MailerFactory

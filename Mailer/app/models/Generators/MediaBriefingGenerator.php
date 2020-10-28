@@ -6,6 +6,7 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget;
+use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
@@ -25,18 +26,22 @@ class MediaBriefingGenerator implements IGenerator
 
     private $articleLocker;
 
+    private $engineFactory;
+
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
         EmbedParser $embedParser,
-        ArticleLocker $articleLocker
+        ArticleLocker $articleLocker,
+        EngineFactory  $engineFactory
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
         $this->embedParser = $embedParser;
         $this->articleLocker = $articleLocker;
+        $this->engineFactory = $engineFactory;
     }
 
     public function apiParams()
@@ -173,12 +178,6 @@ class MediaBriefingGenerator implements IGenerator
         $post = $imageHtml . $post;
         $lockedPost = $imageHtml . $lockedPost;
 
-        $loader = new \Twig_Loader_Array([
-            'html_template' => $sourceTemplate->content_html,
-            'text_template' => $sourceTemplate->content_text,
-        ]);
-        $twig = new \Twig_Environment($loader);
-
         $text = str_replace("<br />", "\r\n", $post);
         $lockedText = str_replace("<br />", "\r\n", $lockedPost);
 
@@ -206,13 +205,13 @@ class MediaBriefingGenerator implements IGenerator
             'text' => strip_tags($lockedText),
         ];
 
-
-        $output = [];
-        $output['htmlContent'] = $twig->render('html_template', $params);
-        $output['textContent'] = strip_tags($twig->render('text_template', $params));
-        $output['lockedHtmlContent'] = $twig->render('html_template', $lockedParams);
-        $output['lockedTextContent'] = strip_tags($twig->render('text_template', $lockedParams));
-        return $output;
+        $engine = $this->engineFactory->engine();
+        return [
+            'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
+            'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
+            'lockedHtmlContent' => $engine->render($sourceTemplate->content_html, $lockedParams),
+            'lockedTextContent' => strip_tags($engine->render($sourceTemplate->content_text, $lockedParams)),
+        ];
     }
 
     public function formSucceeded($form, $values)

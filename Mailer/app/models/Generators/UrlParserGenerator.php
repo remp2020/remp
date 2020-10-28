@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Generators;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
+use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -20,14 +21,18 @@ class UrlParserGenerator implements IGenerator
 
     private $transport;
 
+    private $engineFactory;
+
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
         TransportInterface $transport,
-        ContentInterface $content
+        ContentInterface $content,
+        EngineFactory $engineFactory
     ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->transport = $transport;
         $this->content = $content;
+        $this->engineFactory = $engineFactory;
     }
 
     public function generateForm(Form $form)
@@ -93,11 +98,6 @@ class UrlParserGenerator implements IGenerator
             }
         }
 
-        $loader = new \Twig_Loader_Array([
-            'html_template' => $sourceTemplate->content_html,
-            'text_template' => $sourceTemplate->content_text,
-        ]);
-        $twig = new \Twig_Environment($loader);
         $params = [
             'intro' => $values->intro,
             'footer' => $values->footer,
@@ -105,10 +105,11 @@ class UrlParserGenerator implements IGenerator
             'utm_campaign' => $values->utm_campaign,
         ];
 
-        $output = [];
-        $output['htmlContent'] = $twig->render('html_template', $params);
-        $output['textContent'] = $twig->render('text_template', $params);
-        return $output;
+        $engine = $this->engineFactory->engine();
+        return [
+            'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
+            'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
+        ];
     }
 
     public function getWidgets()

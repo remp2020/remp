@@ -6,6 +6,7 @@ use Nette\Application\Responses\JsonResponse;
 use Nette\Http\Session;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Forms\NewsfilterTemplateFormFactory;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
 use Remp\MailerModule\Repository\LayoutsRepository;
@@ -24,17 +25,21 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
 
     private $listsRepository;
 
+    private $contentGenerator;
+
     public function __construct(
         Session $session,
         LayoutsRepository $layoutsRepository,
         TemplatesRepository $templatesRepository,
-        ListsRepository $listsRepository
+        ListsRepository $listsRepository,
+        ContentGenerator $contentGenerator
     ) {
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->session = $session;
         $this->listsRepository = $listsRepository;
+        $this->contentGenerator = $contentGenerator;
     }
 
     public function identifier()
@@ -96,31 +101,27 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
                 'mail_type' => $mailType
             ]);
 
-            $mailContentGenerator = new ContentGenerator($mailTemplate, $mailLayout, null);
-            $generatedHtml = $mailContentGenerator->getHtmlBody([]);
-            $generatedText = $mailContentGenerator->getTextBody([]);
-
-            return [$generatedHtml, $generatedText];
+            return $this->contentGenerator->render(new GeneratorInput($mailTemplate));
         };
 
-        list($generatedHtml, $generatedText) = $generate($htmlContent, $textContent, $mailLayout, $mailType);
-        $this->template->generatedHtml = $generatedHtml;
-        $this->template->generatedText = $generatedText;
+        $mailContent = $generate($htmlContent, $textContent, $mailLayout, $mailType);
+        $this->template->generatedHtml = $mailContent->html();
+        $this->template->generatedText = $mailContent->text();
 
-        list($generatedLockedHtml, $generatedLockedText) = $generate($lockedHtmlContent, $lockedTextContent, $lockedMailLayout, $mailType);
-        $this->template->generatedLockedHtml = $generatedLockedHtml;
-        $this->template->generatedLockedText = $generatedLockedText;
+        $lockedMailContent = $generate($lockedHtmlContent, $lockedTextContent, $lockedMailLayout, $mailType);
+        $this->template->generatedLockedHtml = $lockedMailContent->html();
+        $this->template->generatedLockedText = $lockedMailContent->text();
 
         // Store data in session for full-screen preview
         $sessionSection = $this->session->getSection(MailGeneratorPresenter::SESSION_SECTION_CONTENT_PREVIEW);
-        $sessionSection->generatedHtml = $generatedHtml;
-        $sessionSection->generatedLockedHtml = $generatedLockedHtml;
+        $sessionSection->generatedHtml = $mailContent->html();
+        $sessionSection->generatedLockedHtml = $lockedMailContent->html();
 
         $response = new JsonResponse([
-            'generatedHtml' => $generatedHtml,
-            'generatedText' => $generatedText,
-            'generatedLockedHtml' => $generatedLockedHtml,
-            'generatedLockedText' => $generatedLockedText,
+            'generatedHtml' => $mailContent->html(),
+            'generatedText' => $mailContent->text(),
+            'generatedLockedHtml' => $lockedMailContent->html(),
+            'generatedLockedText' => $lockedMailContent->text(),
         ]);
         $this->getPresenter()->sendResponse($response);
     }

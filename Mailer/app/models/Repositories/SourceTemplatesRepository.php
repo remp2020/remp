@@ -2,6 +2,8 @@
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Caching\IStorage;
+use Nette\Database\Context;
 use Nette\Database\Table\Selection;
 use Remp\MailerModule\Repository;
 use Nette\Utils\DateTime;
@@ -39,21 +41,6 @@ class SourceTemplatesRepository extends Repository
     public function findLast()
     {
         return $this->getTable()->order('sorting DESC')->limit(1);
-    }
-
-    public function renderContent($sourceTemplate, $data)
-    {
-        $loader = new \Twig_Loader_Array([
-            'textTemplate' => $sourceTemplate->content_text,
-            'htmlTemplate' => $sourceTemplate->content_html,
-        ]);
-
-        $twig = new \Twig_Environment($loader);
-
-        return [
-            'text' => $twig->render('textTemplate', $data),
-            'html' => $twig->render('htmlTemplate', $data),
-        ];
     }
 
     /**

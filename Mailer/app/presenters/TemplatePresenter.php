@@ -8,6 +8,7 @@ use Nette\Utils\Json;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Components\ISendingStatsFactory;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Forms\TemplateFormFactory;
 use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repository\LayoutsRepository;
@@ -29,15 +30,17 @@ final class TemplatePresenter extends BasePresenter
 
     private $listsRepository;
 
+    private $contentGenerator;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
         TemplateFormFactory $templateFormFactory,
         TemplateTestFormFactory $templateTestFormFactory,
         LayoutsRepository $layoutsRepository,
-        ListsRepository $listsRepository
+        ListsRepository $listsRepository,
+        ContentGenerator $contentGenerator
     ) {
-
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
         $this->logsRepository = $logsRepository;
@@ -45,6 +48,7 @@ final class TemplatePresenter extends BasePresenter
         $this->templateTestFormFactory = $templateTestFormFactory;
         $this->layoutsRepository = $layoutsRepository;
         $this->listsRepository = $listsRepository;
+        $this->contentGenerator = $contentGenerator;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -241,11 +245,11 @@ final class TemplatePresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $mailContentGenerator = new ContentGenerator($template, $template->mail_layout, null);
+        $mailContent = $this->contentGenerator->render(new GeneratorInput($template));
         if ($type == 'html') {
-            $this->template->content = $mailContentGenerator->getHtmlBody([]);
+            $this->template->content = $mailContent->html();
         } else {
-            $this->template->content = "<pre>{$mailContentGenerator->getTextBody([])}</pre>";
+            $this->template->content = "<pre>{$mailContent->text()}</pre>";
         }
     }
 

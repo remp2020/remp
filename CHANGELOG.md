@@ -33,6 +33,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING** Updated [league/event](https://event.thephpleague.com/) from [version 2 to 3](https://event.thephpleague.com/3.0/upgrade-from-2-to-3/) - there is config change - please change `League\Event\Emitter` to `League\Event\EventDispatcher`
 - **BREAKING**: Removed `Remp\MailerModule\Console\Application` and keep only native Symfony Application. Change in config -> use `add` instead of `register`
+- **BREAKING**: Updated Twig library to version 3. Also introduced IEngine for templates rendering. More detail [here](https://symfony.com/blog/preparing-your-applications-for-twig-3)
+- **BREAKING**: Replaced `Remp\MailerModule\Replace\ReplaceInterface` with `Remp\MailerModule\ContentGenerator\GeneratorInput\IReplace`. Please see the example implementations and update your implementation accordingly.
 - Fixed possible issue with asset location on Mac when Valet is used for development.
 - Upgraded vlucas/phpdotenv from version 2 to 5 and removed usage of `getenv()` function.
 - Removed obsolete deploy script.

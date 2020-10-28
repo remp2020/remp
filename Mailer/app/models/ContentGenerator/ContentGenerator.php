@@ -2,60 +2,55 @@
 
 namespace Remp\MailerModule\ContentGenerator;
 
-use Remp\MailerModule\Replace\UtmReplace;
+use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
+use Remp\MailerModule\ContentGenerator\Replace\IReplace;
 use Nette\Database\IRow;
 use Nette\Utils\Strings;
-use Twig_Environment;
-use Twig_Loader_Array;
 
 class ContentGenerator
 {
-    private $mailTemplate;
-
-    private $mailLayout;
-
-    private $batchId;
-
-    private $links;
+    private $engineFactory;
 
     private $time;
 
-    private $utmReplace;
+    /** @var IReplace[] */
+    private $replaceList = [];
 
-    public function __construct(IRow $mailTemplate, IRow $mailLayout, $batchId, array $links = [])
+    public function __construct(EngineFactory $engineFactory)
     {
-        $this->mailTemplate = $mailTemplate;
-        $this->mailLayout = $mailLayout;
-        $this->batchId = $batchId;
-        $this->links = $links;
+        $this->engineFactory = $engineFactory;
+
         $this->time = new \DateTime();
-
-        $this->utmReplace = new UtmReplace($mailTemplate->mail_type->code, 'email', $mailTemplate->code, $batchId);
     }
 
-    public function getHtmlBody($params)
+    public function register(IReplace $replace)
     {
-        $bodyMessageText = $this->generateBody($this->mailTemplate->mail_body_html, $params);
-        $mail = $this->wrapLayout($this->mailTemplate, $bodyMessageText, $this->mailLayout->layout_html, $params);
-        $mail = $this->utmReplace->replace($mail);
-        return $mail;
+        $this->replaceList[] = $replace;
     }
 
-    public function getTextBody($params)
+    public function render(GeneratorInput $generatorInput): MailContent
     {
-        $bodyMessageText = $this->generateBody($this->mailTemplate->mail_body_text, $params);
-        $mail = $this->wrapLayout($this->mailTemplate, $bodyMessageText, $this->mailLayout->layout_text, $params);
-        $mail = $this->utmReplace->replace($mail);
-        return $mail;
+        $htmlBody = $this->generate($generatorInput->template()->mail_body_html, $generatorInput->params());
+        $html = $this->wrapLayout($generatorInput->template(), $htmlBody, $generatorInput->layout()->layout_html, $generatorInput->params());
+
+        $textBody = $this->generate($generatorInput->template()->mail_body_text, $generatorInput->params());
+        $text = $this->wrapLayout($generatorInput->template(), $textBody, $generatorInput->layout()->layout_text, $generatorInput->params());
+
+        foreach ($this->replaceList as $replace) {
+            $html = $replace->replace($html, $generatorInput);
+            $text = $replace->replace($text, $generatorInput);
+        }
+
+        return new MailContent($html, $text);
     }
 
-    public function getEmailParams(array $emailParams)
+    public function getEmailParams(GeneratorInput $generatorInput, array $emailParams)
     {
         $outputParams = [];
 
         foreach ($emailParams as $name => $value) {
-            if (Strings::endsWith($name, '_href_url')) {
-                $value = $this->utmReplace->replaceUrl($value);
+            foreach ($this->replaceList as $replace) {
+                $value = $replace->replace($value, $generatorInput);
             }
             $outputParams[$name] = $value;
         }
@@ -63,16 +58,11 @@ class ContentGenerator
         return $outputParams;
     }
 
-    private function generateBody($bodyTemplate, $params)
+    private function generate(string $bodyTemplate, array $params)
     {
-        $loader = new Twig_Loader_Array([
-            'my_template' => $bodyTemplate,
-        ]);
-        $twig = new Twig_Environment($loader);
-        $params['links'] = $this->links;
         $params['time'] = $this->time;
-        $bodyTemplate = $twig->render('my_template', $params);
-        return $bodyTemplate;
+
+        return $this->engineFactory->engine()->render($bodyTemplate, $params);
     }
 
     private function wrapLayout(IRow $template, $renderedTemplateContent, $layoutContent, $params)
@@ -80,19 +70,12 @@ class ContentGenerator
         if (!$layoutContent) {
             return $renderedTemplateContent;
         }
-        $loader = new Twig_Loader_Array([
-            'my_template' => $layoutContent,
-        ]);
-        $twig = new Twig_Environment($loader);
-
         $layoutParams = [
             'title' => $template->subject,
             'content' => $renderedTemplateContent,
-            'links' => $this->links,
             'time' => $this->time,
         ];
         $params = array_merge($layoutParams, $params);
-        $content = $twig->render('my_template', $params);
-        return $content;
+        return $this->engineFactory->engine()->render($layoutContent, $params);
     }
 }
