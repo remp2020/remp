@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
 use League\Event\EventDispatcher;
+use Exception;
 use Nette\DI\Container;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
@@ -58,7 +60,7 @@ class MailWorkerCommand extends Command
     /** @var RestartInterface */
     private $restart;
 
-    /** @var \DateTime */
+    /** @var DateTime */
     private $startTime;
 
     public function __construct(
@@ -90,6 +92,7 @@ class MailWorkerCommand extends Command
 
     /**
      * Set implementation of RestartInterface which should handle graceful shutdowns.
+     * @param RestartInterface $restart
      */
     public function setRestartInterface(RestartInterface $restart): void
     {
@@ -115,7 +118,7 @@ class MailWorkerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // store when command was started
-        $this->startTime = new \DateTime();
+        $this->startTime = new DateTime();
 
         $sendAsBatch = $input->getOption('batch');
 
@@ -128,11 +131,11 @@ class MailWorkerCommand extends Command
         while (true) {
             // graceful shutdown check
             if ($this->restart && $this->restart->shouldRestart($this->startTime)) {
-                $now = (new \DateTime())->format(DATE_RFC3339);
+                $now = (new DateTime())->format(DATE_RFC3339);
                 $msg = "Exiting mail worker: restart instruction received '{$now}'.";
                 $output->write("\n<comment>{$msg}</comment>\n");
                 $this->logger->info($msg);
-                exit;
+                return 0;
             }
 
             $batch = $this->mailJobBatchRepository->getBatchToSend();
@@ -229,7 +232,9 @@ class MailWorkerCommand extends Command
                         $output->writeln(" * sending <info>{$job->templateCode}</info> from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
                         $recipientParams = $job->params ? get_object_vars($job->params) : [];
                         $email->addRecipient($job->email, null, $recipientParams);
-                        $email->setContext($job->context);
+                        if ($job->context) {
+                            $email->setContext($job->context);
+                        }
                     }
 
                     $sentCount = 0;
@@ -263,7 +268,7 @@ class MailWorkerCommand extends Command
                         }
 
                         $this->smtpErrors = 0;
-                    } catch (SmtpException | Sender\MailerBatchException | \Exception $exception) {
+                    } catch (SmtpException | Sender\MailerBatchException | Exception $exception) {
                         $this->smtpErrors++;
                         $output->writeln("<error>Sending error: {$exception->getMessage()}</error>");
                         Debugger::log($exception, ILogger::WARNING);
@@ -283,7 +288,7 @@ class MailWorkerCommand extends Command
                         sleep(10);
                     }
 
-                    $first_email = new DateTime($batch->first_email_sent_at);
+                    $first_email = $batch->first_email_sent_at ? new DateTime($batch->first_email_sent_at) : null;
                     $now = new DateTime();
 
                     $this->mailJobBatchRepository->update($batch, [
@@ -303,12 +308,14 @@ class MailWorkerCommand extends Command
                 }
             }
         }
+
+        return 0;
     }
 
     private function cacheJobs($jobs, $batchId)
     {
         foreach ($jobs as $job) {
-            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId, $job->context, $job->params ?? []);
+            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId, $job->context, (array) ($job->params ?? []));
         }
     }
 

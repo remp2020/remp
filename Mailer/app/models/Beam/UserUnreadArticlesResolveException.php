@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Beam;
 
-class UserUnreadArticlesResolveException extends \Exception
+use Exception;
+
+class UserUnreadArticlesResolveException extends Exception
 {
 }

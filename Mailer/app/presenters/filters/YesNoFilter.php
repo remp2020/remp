@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Filters;
 
 class YesNoFilter
 {
-    public function process($string)
+    public function process(int $input): string
     {
-        return (boolean)$string ? 'Yes' : 'No';
+        return (boolean)$input ? 'Yes' : 'No';
     }
 }

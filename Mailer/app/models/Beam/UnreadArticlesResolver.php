@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Beam;
 
@@ -24,7 +25,7 @@ class UnreadArticlesResolver
         $this->content = $content;
     }
 
-    public function addToResolve($templateCode, $userId, $parameters): void
+    public function addToResolve(string $templateCode, int $userId, array $parameters): void
     {
         if (!array_key_exists($templateCode, $this->templates)) {
             $item = new \stdClass();
@@ -58,13 +59,7 @@ class UnreadArticlesResolver
         }
     }
 
-    /**
-     * @param $templateCode
-     * @param $userId
-     *
-     * @throws UserUnreadArticlesResolveException
-     */
-    private function checkValidParameters($templateCode, $userId): void
+    private function checkValidParameters(string $templateCode, int $userId): void
     {
         // check enough parameters were resolved for template
         $requiredArticleCount = (int) $this->templates[$templateCode]->articlesCount;
@@ -75,14 +70,7 @@ class UnreadArticlesResolver
         }
     }
 
-    /**
-     * @param $templateCode
-     * @param $userId
-     *
-     * @return array
-     * @throws UserUnreadArticlesResolveException
-     */
-    public function getMailParameters($templateCode, $userId): array
+    public function getMailParameters(string $templateCode, int $userId): array
     {
         $this->checkValidParameters($templateCode, $userId);
 

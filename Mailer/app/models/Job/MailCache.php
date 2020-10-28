@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Job;
 
@@ -18,14 +19,14 @@ class MailCache
 
     private $db;
 
-    public function __construct($host = '127.0.0.1', $port = 6379, $db = 0)
+    public function __construct(string $host = '127.0.0.1', int $port = 6379, int $db = 0)
     {
         $this->host = $host;
         $this->port = $port;
         $this->db = $db;
     }
 
-    private function connect()
+    private function connect(): Client
     {
         if (!$this->redis) {
             $this->redis = new Client([
@@ -42,8 +43,10 @@ class MailCache
 
     /**
      * @link https://redis.io/commands/ping
+     * @param string|null $message
+     * @return mixed
      */
-    public function ping($message = null)
+    public function ping(string $message = null)
     {
         return $this->connect()->ping($message);
     }
@@ -55,16 +58,16 @@ class MailCache
      * The URL destination itself will be kept, however, e.g. tracking parameters could be added, URL shortener used.
      * Example: https://dennikn.sk/1589603/ could be changed to https://dennikn.sk/1589603/?utm_source=email
      *
-     * @param       $userId
-     * @param       $email
-     * @param       $templateCode
-     * @param       $queueId
-     * @param       $context
+     * @param int $userId
+     * @param string $email
+     * @param string $templateCode
+     * @param int $queueId
+     * @param string|null $context
      * @param array $params contains array of key-value items that will replace variables in email and subject
      *
      * @return bool
      */
-    public function addJob($userId, $email, $templateCode, $queueId, $context, $params = []): bool
+    public function addJob(int $userId, string $email, string $templateCode, int $queueId, ?string $context = null, array $params = []): bool
     {
         $job = json_encode([
             'userId' => $userId,
@@ -81,50 +84,50 @@ class MailCache
         return (bool)$this->connect()->sadd(static::REDIS_KEY . $queueId, [$job]);
     }
 
-    public function getJob($queueId)
+    public function getJob(int $queueId): ?string
     {
         return $this->connect()->spop(static::REDIS_KEY . $queueId);
     }
 
-    public function getJobs($queueId, $count = 1): array
+    public function getJobs(int $queueId, int $count = 1): array
     {
         return (array) $this->connect()->spop(static::REDIS_KEY . $queueId, $count);
     }
 
-    public function hasJobs($queueId)
+    public function hasJobs(int $queueId): bool
     {
         return $this->connect()->scard(static::REDIS_KEY . $queueId) > 0;
     }
 
-    public function jobExists($job, $queueId)
+    public function jobExists(string $job, int $queueId): bool
     {
         return (bool)$this->connect()->sismember(static::REDIS_KEY . $queueId, $job);
     }
 
     // Mail queue
-    public function removeQueue($queueId)
+    public function removeQueue(int $queueId): bool
     {
         $res1 = $this->connect()->del([static::REDIS_KEY . $queueId]);
         $res2 = $this->connect()->zrem(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
         return $res1 && $res2;
     }
 
-    public function pauseQueue($queueId)
+    public function pauseQueue(int $queueId): int
     {
         return $this->connect()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => 0]);
     }
 
-    public function restartQueue($queueId, $priority)
+    public function restartQueue(int $queueId, int $priority): int
     {
         return $this->connect()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => $priority]);
     }
 
-    public function isQueueActive($queueId)
+    public function isQueueActive(int $queueId): bool
     {
         return $this->connect()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId) > 0;
     }
 
-    public function isQueueTopPriority($queueId)
+    public function isQueueTopPriority(int $queueId): bool
     {
         $selectedQueueScore = $this->connect()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
 

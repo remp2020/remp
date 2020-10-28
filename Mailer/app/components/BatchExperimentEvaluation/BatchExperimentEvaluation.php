@@ -1,16 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components;
 
 use Nette\Application\UI\Control;
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MultiArmedBandit\Lever;
 use Remp\MultiArmedBandit\Machine;
 
 class BatchExperimentEvaluation extends Control
 {
-    /** @var ActiveRow */
     private $batchesRepository;
 
     public function __construct(BatchesRepository $batchesRepository)
@@ -19,7 +19,7 @@ class BatchExperimentEvaluation extends Control
         $this->batchesRepository = $batchesRepository;
     }
 
-    public function render($batchId)
+    public function render($batchId): void
     {
         $batch = $this->batchesRepository->find($batchId);
         $jobBatchTemplates = $batch->related('mail_job_batch_templates');

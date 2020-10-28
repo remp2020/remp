@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components;
 
 use Nette\Application\UI\Control;
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
@@ -37,7 +38,7 @@ class SendingStats extends Control
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
-    public function addTemplate(ActiveRow $mailTemplate)
+    public function addTemplate(ActiveRow $mailTemplate): self
     {
         /** @var ActiveRow $jobBatchTemplate */
         foreach ($mailTemplate->related('mail_job_batch_templates') as $jobBatchTemplate) {
@@ -47,7 +48,7 @@ class SendingStats extends Control
         return $this;
     }
 
-    public function addBatch(ActiveRow $batch)
+    public function addBatch(ActiveRow $batch): self
     {
         /** @var ActiveRow $jobBatchTemplate */
         foreach ($batch->related('mail_job_batch_templates') as $jobBatchTemplate) {
@@ -57,23 +58,23 @@ class SendingStats extends Control
         return $this;
     }
 
-    public function addJobBatchTemplate(ActiveRow $jobBatchTemplate)
+    public function addJobBatchTemplate(ActiveRow $jobBatchTemplate): void
     {
         $this->jobBatchTemplates[] = $jobBatchTemplate;
         $this->templateIds[] = $jobBatchTemplate->mail_template_id;
     }
 
-    public function showTotal()
+    public function showTotal(): void
     {
         $this->showTotal = true;
     }
 
-    public function showConversions()
+    public function showConversions(): void
     {
         $this->showConversions = true;
     }
 
-    public function render()
+    public function render(): void
     {
         $total = 0;
         $stats = [

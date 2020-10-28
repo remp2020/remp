@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule;
 
+use Nette\Utils\DateTime;
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
-use Nette\Database\Table\IRow;
 use Remp\MailerModule\Repository\AuditLogRepository;
 
 class Repository
@@ -29,36 +30,27 @@ class Repository
         $this->cacheStorage = $cacheStorage;
     }
 
-    /**
-     * @return Selection
-     */
-    public function getTable()
+    public function getTable(): Selection
     {
         return new Selection($this->database, $this->database->getConventions(), $this->tableName, $this->cacheStorage);
     }
 
-    /**
-     * @return \Nette\Database\Table\ActiveRow
-     */
     public function find($id)
     {
         return $this->getTable()->where(['id' => $id])->fetch();
     }
 
-    /**
-     * @return \Nette\Database\Table\ActiveRow
-     */
-    public function findBy($column, $value)
+    public function findBy(string $column, string $value)
     {
         return $this->getTable()->where([$column => $value])->fetch();
     }
 
-    public function totalCount()
+    public function totalCount(): int
     {
         return $this->getTable()->count('*');
     }
 
-    public function getDatabase()
+    public function getDatabase(): Context
     {
         return $this->database;
     }
@@ -67,13 +59,13 @@ class Repository
      * Update updates provided record with given $data array and mutates the provided instance. Operation is logged
      * to audit log.
      *
-     * @param IRow $row
+     * @param ActiveRow $row
      * @param array $data values to update
      * @return bool
      *
      * @throws \Exception
      */
-    public function update(IRow &$row, $data)
+    public function update(ActiveRow &$row, array $data): bool
     {
         $oldValues = [];
         if ($row instanceof ActiveRow) {
@@ -113,10 +105,10 @@ class Repository
     /**
      * Delete deletes provided record from repository and mutates the provided instance. Operation is logged to audit log.
      *
-     * @param IRow $row
+     * @param ActiveRow $row
      * @return bool
      */
-    public function delete(IRow &$row)
+    public function delete(ActiveRow &$row): bool
     {
         $res = $this->getTable()->wherePrimary($row->getPrimary())->delete();
         $oldValues = [];
@@ -141,15 +133,15 @@ class Repository
     }
 
     /**
-     * Insert inserts data to the repository. If single IRow is returned, it attempts to log audit information.
+     * Insert inserts data to the repository. If single ActiveRow is returned, it attempts to log audit information.
      *
      * @param $data
-     * @return bool|int|IRow
+     * @return bool|int|ActiveRow
      */
-    public function insert($data)
+    public function insert(array $data)
     {
         $row = $this->getTable()->insert($data);
-        if (!$row instanceof IRow) {
+        if (!$row instanceof ActiveRow) {
             return $row;
         }
 
@@ -165,12 +157,12 @@ class Repository
         return $row;
     }
 
-    private function filterValues(array $values)
+    private function filterValues(array $values): array
     {
         foreach ($values as $i => $field) {
             if (is_bool($field)) {
                 $values[$i] = (int) $field;
-            } elseif ($field instanceof \DateTime) {
+            } elseif ($field instanceof DateTime) {
                 $values[$i] = $field->format('Y-m-d H:i:s');
             } elseif (!is_scalar($field)) {
                 unset($values[$i]);

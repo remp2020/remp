@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ruleset name="projekt-n">
+    <description>Coding standard for 'Projekt N' projects</description>
+
+    <!-- ARGUMENTS ############################################## -->
+    <arg name="encoding" value="UTF-8" />
+    <arg name="cache" value=".phpcs.cache" />
+    <!-- do not sniff migrations, assets and Tyzden's migration_scripts -->
+    <arg name="ignore" value="*/migrations/*" />
+
+
+    <!-- RULESET ################################################ -->
+    <!-- use PSR2 as base for rules -->
+    <rule ref="PSR2" />
+
+    <!-- enforce 'elseif' instead of 'else if' -->
+    <rule ref="PSR2.ControlStructures.ElseIfDeclaration.NotAllowed">
+        <type>error</type>
+    </rule>
+
+    <!-- we have too long lines, should be fixed in future -->
+    <rule ref="Generic.Files.LineLength">
+        <severity>0</severity>
+    </rule>
+</ruleset>

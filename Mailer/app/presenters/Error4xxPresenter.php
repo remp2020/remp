@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
 use Nette;
 use Remp\MailerModule\Components\IMissingConfigurationFactory;
+use Remp\MailerModule\Components\MissingConfiguration;
 use Remp\MailerModule\EnvironmentConfig;
 
 class Error4xxPresenter extends Nette\Application\UI\Presenter
@@ -11,7 +13,7 @@ class Error4xxPresenter extends Nette\Application\UI\Presenter
     /** @var EnvironmentConfig @inject */
     public $environmentConfig;
 
-    public function startup()
+    public function startup(): void
     {
         parent::startup();
 
@@ -20,7 +22,7 @@ class Error4xxPresenter extends Nette\Application\UI\Presenter
         }
     }
 
-    public function renderDefault(Nette\Application\BadRequestException $exception)
+    public function renderDefault(Nette\Application\BadRequestException $exception): void
     {
         $config = $this->context->getByType(EnvironmentConfig::class);
 
@@ -35,7 +37,7 @@ class Error4xxPresenter extends Nette\Application\UI\Presenter
 
     public function createComponentMissingConfiguration(
         IMissingConfigurationFactory $missingConfigurationFactory
-    ) {
+    ): MissingConfiguration {
         return $missingConfigurationFactory->create();
     }
 }

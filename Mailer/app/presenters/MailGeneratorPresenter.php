@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Nette\Application\UI\Form;
+use Remp\MailerModule\Components\GeneratorWidgets;
 use Remp\MailerModule\Components\IGeneratorWidgetsFactory;
 use Remp\MailerModule\Forms\MailGeneratorFormFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -27,18 +30,18 @@ final class MailGeneratorPresenter extends BasePresenter
         $this->generatorWidgetsFactory = $generatorWidgetsFactory;
     }
 
-    public function renderDefault()
+    public function renderDefault(): void
     {
         $this->template->last = $this->sourceTemplatesRepository->findLast()->fetch();
     }
 
-    public function renderPreview($isLocked)
+    public function renderPreview($isLocked): void
     {
         $section = $this->session->getSection(self::SESSION_SECTION_CONTENT_PREVIEW);
         $this->template->content = $isLocked ? $section->generatedLockedHtml : $section->generatedHtml;
     }
 
-    protected function createComponentMailGeneratorForm()
+    protected function createComponentMailGeneratorForm(): Form
     {
         $sourceTemplateId = $this->getSourceTemplateIdParameter();
 
@@ -52,21 +55,21 @@ final class MailGeneratorPresenter extends BasePresenter
         return $form;
     }
 
-    protected function createComponentGeneratorWidgets()
+    protected function createComponentGeneratorWidgets(): GeneratorWidgets
     {
         return $this->generatorWidgetsFactory->create($this->getSourceTemplateIdParameter());
     }
 
-    private function getSourceTemplateIdParameter()
+    private function getSourceTemplateIdParameter(): int
     {
         $sourceTemplateId = $this->request->getParameter('source_template_id');
         if (!$sourceTemplateId) {
             $sourceTemplateId = $this->request->getPost('source_template_id');
         }
-        return $sourceTemplateId;
+        return (int)$sourceTemplateId;
     }
 
-    public function handleSourceTemplateChange($sourceTemplateId)
+    public function handleSourceTemplateChange($sourceTemplateId): void
     {
         $this->template->range = $sourceTemplateId;
         $this->template->redraw = true;

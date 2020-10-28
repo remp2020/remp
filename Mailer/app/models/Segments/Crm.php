@@ -1,9 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace Remp\MailerModule\Segment;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\StreamInterface;
+use Remp\MailerModule\ActiveRow;
 
 class Crm implements ISegment
 {
@@ -17,7 +20,7 @@ class Crm implements ISegment
 
     private $token;
 
-    public function __construct($baseUrl, $token)
+    public function __construct(string $baseUrl, string $token)
     {
         $this->baseUrl = $baseUrl;
         $this->token = $token;
@@ -28,7 +31,7 @@ class Crm implements ISegment
         return static::PROVIDER_ALIAS;
     }
 
-    public function list()
+    public function list(): array
     {
         $response = $this->request(static::ENDPOINT_LIST);
 
@@ -50,7 +53,7 @@ class Crm implements ISegment
         return $segments;
     }
 
-    public function users($segment)
+    public function users(array $segment): array
     {
         $response = $this->request(static::ENDPOINT_USERS, ['code' => $segment['code']]);
 
@@ -67,7 +70,7 @@ class Crm implements ISegment
         return $userIds;
     }
 
-    private function request($url, $query = []): StreamInterface
+    private function request(string $url, array $query = []): StreamInterface
     {
         $client = new Client([
             'base_uri' => $this->baseUrl,

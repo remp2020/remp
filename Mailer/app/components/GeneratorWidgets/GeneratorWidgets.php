@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components;
 
@@ -15,7 +16,7 @@ class GeneratorWidgets extends BaseControl
     private $widgetsManager;
 
     public function __construct(
-        $sourceTemplateId,
+        int $sourceTemplateId,
         GeneratorWidgetsManager $widgetsManager,
         SourceTemplatesRepository $sourceTemplatesRepository
     ) {
@@ -26,7 +27,7 @@ class GeneratorWidgets extends BaseControl
         $this->widgetsManager = $widgetsManager;
     }
 
-    protected function attached($presenter)
+    protected function attached($presenter): void
     {
         parent::attached($presenter);
 
@@ -40,7 +41,7 @@ class GeneratorWidgets extends BaseControl
         }
     }
 
-    public function render($params)
+    public function render(array $params): void
     {
         $template = $this->sourceTemplatesRepository->find($this->sourceTemplateId);
         $widgets = $this->widgetsManager->getWidgets($template->generator);

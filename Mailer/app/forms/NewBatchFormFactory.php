@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
@@ -46,12 +48,12 @@ class NewBatchFormFactory
         $this->segmentAggregator = $segmentAggregator;
     }
 
-    public function create($jobId = null)
+    public function create(?int $jobId)
     {
         $form = new Form;
         $form->addProtection();
 
-        if (!$jobId) {
+        if ($jobId === null) {
             $segments = [];
             $segmentList = $this->segmentAggregator->list();
             array_walk($segmentList, function ($segment) use (&$segments) {
@@ -113,11 +115,11 @@ class NewBatchFormFactory
         return $form;
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
         if (!$values['job_id']) {
             $segment = explode('::', $values['segment_code']);
-            $values['job_id'] = $this->jobsRepository->add($segment[1], $segment[0]);
+            $values['job_id'] = $this->jobsRepository->add($segment[1], $segment[0])->id;
         }
 
         $batch = $this->batchesRepository->add(

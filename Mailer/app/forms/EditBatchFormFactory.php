@@ -1,11 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
+use Nette\Utils\DateTime;
 use Nette\Application\UI\Form;
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
@@ -43,7 +46,7 @@ class EditBatchFormFactory implements IFormFactory
         $this->batchTemplatesRepository = $batchTemplatesRepository;
     }
 
-    public function create(ActiveRow $batch)
+    public function create(ActiveRow $batch): Form
     {
         $form = new Form;
         $form->addProtection();
@@ -81,7 +84,7 @@ class EditBatchFormFactory implements IFormFactory
         return $form;
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
         $batch = $this->batchesRepository->find($values['id']);
 
@@ -93,7 +96,7 @@ class EditBatchFormFactory implements IFormFactory
         $this->batchesRepository->update($batch, array_filter([
             'method' => $values['method'],
             'max_emails' => $values['max_emails'],
-            'start_at' => new \DateTime($values['start_at']),
+            'start_at' => new DateTime($values['start_at']),
         ]));
 
         // decide if user wants to save or save and leave

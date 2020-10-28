@@ -1,17 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Database\Table\IRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
 class LogEventsRepository extends Repository
 {
-
     protected $tableName = 'mail_logs_events';
 
-    public function addLog(IRow $log, DateTime $eventTime, $type)
+    public function addLog(ActiveRow $log, DateTime $eventTime, $type)
     {
         return $this->insert([
             'mail_log_id' => $log->id,
@@ -21,7 +21,7 @@ class LogEventsRepository extends Repository
         ]);
     }
 
-    public function findByLogType($logId, $type)
+    public function findByLogType(int $logId, string $type)
     {
         return $this->getTable()->where([
             'mail_log_id' => $logId,
@@ -29,7 +29,7 @@ class LogEventsRepository extends Repository
         ])->fetch();
     }
 
-    public function latestEventTime(): \DateTime
+    public function latestEventTime(): DateTime
     {
         return $this->getTable()->max('event_at');
     }

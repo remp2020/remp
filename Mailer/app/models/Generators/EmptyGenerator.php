@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Generators;
 
@@ -9,31 +10,31 @@ class EmptyGenerator implements IGenerator
 {
     public $onSubmit;
 
-    public function generateForm(Form $form)
+    public function generateForm(Form $form): void
     {
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
     }
 
-    public function onSubmit(callable $onSubmit)
+    public function onSubmit(callable $onSubmit): void
     {
         $this->onSubmit = $onSubmit;
     }
 
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return [];
     }
 
-    public function apiParams()
+    public function apiParams(): array
     {
         return [];
     }
 
-    public function process($input)
+    public function process(array $input): array
     {
         return [];
     }

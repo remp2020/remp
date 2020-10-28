@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repository\ListsRepository;

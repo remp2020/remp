@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api;
 
-class InvalidApiInputParamException extends \Exception
-{
+use Exception;
 
+class InvalidApiInputParamException extends Exception
+{
 }

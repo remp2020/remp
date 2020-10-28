@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Database\Table\IRow;
+use Nette\Utils\DateTime;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository;
 use Remp\MailerModule\Selection;
 
@@ -17,12 +19,12 @@ class LayoutsRepository extends Repository
         return $this->getTable()->order('name ASC');
     }
 
-    public function add($name, $layoutText, $layoutHtml)
+    public function add(string $name, string $layoutText, string $layoutHtml)
     {
         $result = $this->insert([
             'name' => $name,
-            'created_at' => new \DateTime(),
-            'updated_at' => new \DateTime(),
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime(),
             'layout_html' => $layoutHtml,
             'layout_text' => $layoutText,
         ]);
@@ -34,21 +36,21 @@ class LayoutsRepository extends Repository
         return $result;
     }
 
-    public function update(IRow &$row, $data)
+    public function update(ActiveRow &$row, array $data): bool
     {
-        $params['updated_at'] = new \DateTime();
+        $params['updated_at'] = new DateTime();
         return parent::update($row, $data);
     }
 
     /**
-     * @param $query
-     * @param $order
-     * @param $orderDirection
-     * @param int $limit
-     * @param null $offset
+     * @param string $query
+     * @param string $order
+     * @param string $orderDirection
+     * @param int|null $limit
+     * @param int|null $offset
      * @return Selection
      */
-    public function tableFilter($query, $order, $orderDirection, $limit = -1, $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null)
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -63,7 +65,7 @@ class LayoutsRepository extends Repository
         }
 
 
-        if ($limit != -1) {
+        if ($limit != null) {
             $selection->limit($limit, $offset);
         }
 

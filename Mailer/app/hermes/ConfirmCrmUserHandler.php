@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Hermes;
 
@@ -50,7 +51,6 @@ class ConfirmCrmUserHandler implements HandlerInterface
             // we don't want to schedule retry if user doesn't exist but we still want to track this error
             return false;
         }
-
 
         return true;
     }

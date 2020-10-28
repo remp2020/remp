@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Filters;
 
@@ -15,7 +16,7 @@ class FilterLoader
      * @param string $helper
      * @return mixed
      */
-    public function load($helper)
+    public function load(string $helper)
     {
         if (isset($this->filters[$helper])) {
             return call_user_func_array($this->filters[$helper], array_slice(func_get_args(), 1));
@@ -28,7 +29,7 @@ class FilterLoader
      * @param string $name
      * @param callable $callback
      */
-    public function register($name, $callback)
+    public function register(string $name, callable $callback): void
     {
         $this->filters[Strings::lower($name)] = $callback;
     }

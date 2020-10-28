@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
-use Nette\Database\Table\ActiveRow;
+use Nette\Application\UI\Form;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\Json;
+use Remp\MailerModule\Components\DataTable;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\SourceTemplateFormFactory;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -24,7 +27,7 @@ final class GeneratorPresenter extends BasePresenter
         $this->sourceTemplateFormFactory = $sourceTemplateFormFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
@@ -49,7 +52,7 @@ final class GeneratorPresenter extends BasePresenter
         return $dataTable;
     }
 
-    public function renderDefaultJsonData()
+    public function renderDefaultJsonData(): void
     {
         $request = $this->request->getParameters();
 
@@ -58,7 +61,7 @@ final class GeneratorPresenter extends BasePresenter
             ->count('*');
 
         $sourceTemplates = $this->sourceTemplatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], intval($request['length']), intval($request['start']))
             ->fetchAll();
 
         $result = [
@@ -67,7 +70,7 @@ final class GeneratorPresenter extends BasePresenter
             'data' => []
         ];
 
-        /** @var ActiveRow $list */
+        /** @var ActiveRow $sourceTemplate */
         foreach ($sourceTemplates as $sourceTemplate) {
             $editUrl = $this->link('Edit', $sourceTemplate->id);
             $generateUrl = $this->link('Generate', $sourceTemplate->id);
@@ -85,7 +88,7 @@ final class GeneratorPresenter extends BasePresenter
         $this->presenter->sendJson($result);
     }
 
-    public function renderEdit($id)
+    public function renderEdit($id): void
     {
         $generator = $this->sourceTemplatesRepository->find($id);
         if (!$generator) {
@@ -94,18 +97,14 @@ final class GeneratorPresenter extends BasePresenter
         $this->template->generator = $generator;
     }
 
-    public function renderDefault()
-    {
-    }
-
-    public function renderGenerate($id)
+    public function renderGenerate($id): void
     {
         $this->redirect("MailGenerator:default", ['source_template_id' => $id]);
     }
 
-    public function createComponentMailSourceTemplateForm()
+    public function createComponentMailSourceTemplateForm(): Form
     {
-        $form = $this->sourceTemplateFormFactory->create(isset($this->params['id']) ? $this->params['id'] : null);
+        $form = $this->sourceTemplateFormFactory->create(isset($this->params['id']) ? intval($this->params['id']) : null);
         $this->sourceTemplateFormFactory->onUpdate = function ($form, $mailSourceTemplate, $buttonSubmitted) {
             $this->flashMessage('Source template was successfully updated');
             $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);

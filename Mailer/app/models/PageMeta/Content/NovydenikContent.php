@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\PageMeta;
 
@@ -17,12 +18,12 @@ class NovydenikContent implements ContentInterface
         $this->transport = $transport;
     }
 
-    public function fetchUrlMeta($url): ?Meta
+    public function fetchUrlMeta(string $url): ?Meta
     {
         $url = preg_replace('/\\?ref=(.*)/', '', $url);
         try {
             $content = $this->transport->getContent($url);
-            if (!$content) {
+            if ($content === null) {
                 return null;
             }
             $meta = $this->parseMeta($content);
@@ -35,22 +36,22 @@ class NovydenikContent implements ContentInterface
         return $meta;
     }
 
-    public function parseMeta($content)
+    public function parseMeta(string $content): Meta
     {
         preg_match_all('/<script id="schema" type="application\/ld\+json">(.*?)<\/script>/', $content, $matches);
 
         if (!$matches) {
-            return new Meta(false, false, false, false);
+            return new Meta();
         }
 
         try {
             $schema = Json::decode($matches[1][0]);
         } catch (JsonException $e) {
-            return new Meta(false, false, false, false);
+            return new Meta();
         }
 
         // author
-        $denniknAuthors = false;
+        $denniknAuthors = [];
         if (isset($schema->author) && !is_array($schema->author)) {
             $schema->author = [$schema->author];
         }
@@ -58,14 +59,14 @@ class NovydenikContent implements ContentInterface
             $denniknAuthors[] = Strings::upper($author->name);
         }
 
-        $title = $schema->headline ?? false;
-        $description = $schema->description ?? false;
+        $title = $schema->headline ?? null;
+        $description = $schema->description ?? null;
         $image = $this->processImage($schema->image->url ?? null);
 
         return new Meta($title, $description, $image, $denniknAuthors);
     }
 
-    private function processImage($imageUrl)
+    private function processImage(?string $imageUrl): string
     {
         if (!$imageUrl) {
             return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';

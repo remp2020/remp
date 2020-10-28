@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\PageMeta;
 
-class InvalidUrlException extends \Exception
+use Exception;
+
+class InvalidUrlException extends Exception
 {
 }

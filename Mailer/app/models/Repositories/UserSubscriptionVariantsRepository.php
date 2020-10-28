@@ -1,16 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
 use Remp\MailerModule\Repository;
-use Nette\Database\Table\IRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\DateTime;
 
 class UserSubscriptionVariantsRepository extends Repository
 {
     protected $tableName = 'mail_user_subscription_variants';
 
-    public function subscribedVariants(IRow $userSubscription)
+    public function subscribedVariants(ActiveRow $userSubscription)
     {
         return $this->getTable()->where(['mail_user_subscription_id' => $userSubscription->id]);
     }
@@ -22,7 +23,7 @@ class UserSubscriptionVariantsRepository extends Repository
             ->select('mail_user_subscription_variants.*, mail_type_variant.code, mail_type_variant.title');
     }
 
-    public function variantSubscribed(IRow $userSubscription, $variantId)
+    public function variantSubscribed(ActiveRow $userSubscription, $variantId)
     {
         return $this->getTable()->where([
             'mail_user_subscription_id' => $userSubscription->id,
@@ -30,14 +31,14 @@ class UserSubscriptionVariantsRepository extends Repository
         ])->count('*') > 0;
     }
 
-    public function removeSubscribedVariants(IRow $userSubscription)
+    public function removeSubscribedVariants(ActiveRow $userSubscription)
     {
         return $this->getTable()
             ->where(['mail_user_subscription_id' => $userSubscription->id])
             ->delete();
     }
 
-    public function removeSubscribedVariant(IRow $userSubscription, $variantId)
+    public function removeSubscribedVariant(ActiveRow $userSubscription, int $variantId)
     {
         return $this->getTable()->where([
             'mail_user_subscription_id' => $userSubscription->id,
@@ -45,7 +46,7 @@ class UserSubscriptionVariantsRepository extends Repository
         ])->delete();
     }
 
-    public function addVariantSubscription(IRow $userSubscription, $variantId)
+    public function addVariantSubscription(ActiveRow $userSubscription, int $variantId)
     {
         return $this->getTable()->insert([
             'mail_user_subscription_id' => $userSubscription->id,
@@ -54,7 +55,7 @@ class UserSubscriptionVariantsRepository extends Repository
         ]);
     }
 
-    public function variantsStats(IRow $mailType, DateTime $from, DateTime $to)
+    public function variantsStats(ActiveRow $mailType, DateTime $from, DateTime $to)
     {
         return $this->getTable()->where([
             'mail_user_subscription.subscribed' => 1,

@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Hermes;
 
 class LogRedact
 {
-    public static function add($filters)
+    public static function add(array $filters): callable
     {
         return function ($record) use ($filters) {
             foreach ($filters as $filter) {

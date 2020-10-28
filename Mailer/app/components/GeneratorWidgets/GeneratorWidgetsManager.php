@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components;
 
@@ -16,7 +17,7 @@ class GeneratorWidgetsManager
         return $this->widgets[$generator];
     }
 
-    public function getAllWidgets()
+    public function getAllWidgets(): array
     {
         return $this->widgets;
     }

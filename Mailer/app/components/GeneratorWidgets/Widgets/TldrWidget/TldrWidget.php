@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components\GeneratorWidgets\Widgets;
 
 use Nette\Application\Responses\JsonResponse;
+use Nette\Application\UI\Form;
 use Nette\Http\Session;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
@@ -42,12 +44,12 @@ class TldrWidget extends BaseControl implements IGeneratorWidget
         $this->contentGenerator = $contentGenerator;
     }
 
-    public function identifier()
+    public function identifier(): string
     {
         return "tldrwidget";
     }
 
-    public function render($params)
+    public function render($params): void
     {
         if (!isset($params['addonParams'])) {
             return;
@@ -61,7 +63,7 @@ class TldrWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentTldrTemplateForm(TldrTemplateFormFactory $tldrTemplateFormFactory)
+    public function createComponentTldrTemplateForm(TldrTemplateFormFactory $tldrTemplateFormFactory): Form
     {
         $form = $tldrTemplateFormFactory->create();
         $tldrTemplateFormFactory->onSave = function () {
@@ -72,7 +74,7 @@ class TldrWidget extends BaseControl implements IGeneratorWidget
         return $form;
     }
 
-    public function handleTldrPreview()
+    public function handleTldrPreview(): void
     {
         $request = $this->getPresenter()->getRequest();
 

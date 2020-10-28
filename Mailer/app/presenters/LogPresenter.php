@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Utils\Json;
+use Remp\MailerModule\Components\DataTable;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Repository\LogsRepository;
 
@@ -14,12 +16,11 @@ final class LogPresenter extends BasePresenter
     public function __construct(
         LogsRepository $logsRepository
     ) {
-
         parent::__construct();
         $this->logsRepository = $logsRepository;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
@@ -56,7 +57,7 @@ final class LogPresenter extends BasePresenter
         return $dataTable;
     }
 
-    public function renderDefaultJsonData()
+    public function renderDefaultJsonData(): void
     {
         $request = $this->request->getParameters();
 
@@ -65,7 +66,7 @@ final class LogPresenter extends BasePresenter
             ->count('*');
 
         $logs = $this->logsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], intval($request['length']), intval($request['start']))
             ->fetchAll();
 
         $result = [

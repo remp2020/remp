@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Hermes;
 
@@ -18,14 +19,14 @@ class HermesTasksQueue
 
     private $db;
 
-    public function __construct($host = '127.0.0.1', $port = 6379, $db = 0)
+    public function __construct(string $host = '127.0.0.1', int $port = 6379, int $db = 0)
     {
         $this->host = $host;
         $this->port = $port;
         $this->db = $db;
     }
 
-    private function connect()
+    private function connect(): Client
     {
         if (!$this->redis) {
             $this->redis = new Client([
@@ -42,12 +43,12 @@ class HermesTasksQueue
     }
 
     // Tasks
-    public function addTask(string $task, float $executeAt)
+    public function addTask(string $task, float $executeAt): bool
     {
         return $this->connect()->zadd(static::TASKS_KEY, [$task => $executeAt]) > 0;
     }
 
-    public function getTask()
+    public function getTask(): ?array
     {
         $task = $this->connect()->zrangebyscore(static::TASKS_KEY, 0, time(), [
             'LIMIT' => [
@@ -63,26 +64,26 @@ class HermesTasksQueue
             }
         }
 
-        return false;
+        return null;
     }
 
-    public function getAllTask()
+    public function getAllTask(): array
     {
         return $this->connect()->zrange(static::TASKS_KEY, 0, -1, ['withscores' => true]);
     }
 
     // Stats
-    public function incrementType($type)
+    public function incrementType(string $type): string
     {
         return $this->connect()->zincrby(static::STATS_KEY, 1, $type);
     }
 
-    public function decrementType($type)
+    public function decrementType(string $type): string
     {
         return $this->connect()->zincrby(static::STATS_KEY, -1, $type);
     }
 
-    public function getTypeCounts()
+    public function getTypeCounts(): array
     {
         return $this->connect()->zrange(static::STATS_KEY, 0, -1, ['withscores' => true]);
     }

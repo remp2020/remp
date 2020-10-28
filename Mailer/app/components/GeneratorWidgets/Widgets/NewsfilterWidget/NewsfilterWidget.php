@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components\GeneratorWidgets\Widgets;
 
 use Nette\Application\Responses\JsonResponse;
+use Nette\Application\UI\Form;
 use Nette\Http\Session;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
@@ -42,12 +44,12 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
         $this->contentGenerator = $contentGenerator;
     }
 
-    public function identifier()
+    public function identifier(): string
     {
         return "newsfilterwidget";
     }
 
-    public function render($params)
+    public function render($params): void
     {
         if (!isset($params['addonParams'])) {
             return;
@@ -61,7 +63,7 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentNewsfilterTemplateForm(NewsfilterTemplateFormFactory $newsfilterTemplateFormFactory)
+    public function createComponentNewsfilterTemplateForm(NewsfilterTemplateFormFactory $newsfilterTemplateFormFactory): Form
     {
         $form = $newsfilterTemplateFormFactory->create();
         $newsfilterTemplateFormFactory->onSave = function () {
@@ -72,7 +74,7 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
         return $form;
     }
 
-    public function handleNewsfilterPreview()
+    public function handleNewsfilterPreview(): void
     {
         $request = $this->getPresenter()->getRequest();
 

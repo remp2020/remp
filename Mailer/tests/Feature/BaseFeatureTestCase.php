@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -77,7 +78,7 @@ class BaseFeatureTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        $truncateTables = implode(' ', array_map(function ($repo){
+        $truncateTables = implode(' ', array_map(function ($repo) {
             $property = (new \ReflectionClass($repo))->getProperty('tableName');
             $property->setAccessible(true);
             return "TRUNCATE `{$property->getValue($repo)}`;";
@@ -103,9 +104,7 @@ SET FOREIGN_KEY_CHECKS=1;
 ";
         try {
             $db->exec($sql);
-        }
-        catch (PDOException $e)
-        {
+        } catch (PDOException $e) {
             echo $e->getMessage();
         }
     }
@@ -134,9 +133,9 @@ SET FOREIGN_KEY_CHECKS=1;
         return $this->layoutsRepository->add('layout', '', '');
     }
 
-    protected function createMailTypeWithCategory()
+    protected function createMailTypeWithCategory(string $categoryName = 'category', string $typeCode = 'code', string $typeName = 'name', bool $isPublic = true)
     {
-        $listCategory = $this->listCategoriesRepository->add('category', 100);
-        return $this->listsRepository->add($listCategory->id, 1, 'code', 'name', 1, true, false, true, 'XXX');
+        $listCategory = $this->listCategoriesRepository->add($categoryName, 100);
+        return $this->listsRepository->add($listCategory->id, 1, $typeCode, $typeName, 1, true, false, $isPublic, 'XXX');
     }
 }

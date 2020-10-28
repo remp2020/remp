@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Events;
 
@@ -14,7 +15,7 @@ class MailSentEvent
 
     private $time;
 
-    public function __construct($userId, $email, $templateCode, $batchId, $time)
+    public function __construct(int $userId, string $email, string $templateCode, int $batchId, int $time)
     {
         $this->userId = $userId;
         $this->email = $email;
@@ -23,27 +24,27 @@ class MailSentEvent
         $this->time = $time;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getTemplateCode()
+    public function getTemplateCode(): string
     {
         return $this->templateCode;
     }
 
-    public function getBatchId()
+    public function getBatchId(): int
     {
         return $this->batchId;
     }
 
-    public function getTime()
+    public function getTime(): int
     {
         return $this->time;
     }

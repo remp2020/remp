@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
@@ -49,7 +50,7 @@ class MailGeneratorHandler extends BaseHandler
         }
 
         try {
-            $output = $generator->process((object) $paramsProcessor->getValues());
+            $output = $generator->process($paramsProcessor->getValues());
             return new JsonApiResponse(200, ['status' => 'ok', 'data' => $output]);
         } catch (ProcessException $exception) {
             return new JsonApiResponse(400, [

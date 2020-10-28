@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\ILatteFactory;
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\IBatchExperimentEvaluationFactory;
 use Remp\MailerModule\Components\IDataTableFactory;
@@ -154,7 +155,7 @@ final class JobPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $listIds = null;
+        $listIds = [];
         foreach ($request['columns'] as $column) {
             if ($column['name'] !== 'batches') {
                 continue;
@@ -166,11 +167,11 @@ final class JobPresenter extends BasePresenter
         }
 
         $jobsCount = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, null, null)
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds)
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, $request['length'], $request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, intval($request['length']), intval($request['start']))
             ->fetchAll();
 
         $result = [
@@ -370,7 +371,7 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentNewBatchForm()
     {
-        $form = $this->newBatchFormFactory->create($this->params['id']);
+        $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? intval($this->params['id']) : null);
 
         $this->newBatchFormFactory->onSuccess = function ($job) {
             $this->flashMessage('Batch was added');

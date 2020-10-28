@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Auth;
 
@@ -14,13 +15,13 @@ class RemoteUser
 
     private $timeout;
 
-    public function __construct($ssoHost, $timeout = 10.0)
+    public function __construct(string $ssoHost, float $timeout = 10.0)
     {
         $this->ssoHost = $ssoHost;
         $this->timeout = $timeout;
     }
 
-    public function remoteLogin($email, $password)
+    public function remoteLogin(string $email, string $password): array
     {
         $client = new Client([
             'base_uri' => $this->ssoHost,
@@ -59,7 +60,7 @@ class RemoteUser
         return $data;
     }
 
-    public function userInfo($token)
+    public function userInfo(string $token): array
     {
         $client = new Client([
             'base_uri' => $this->ssoHost,

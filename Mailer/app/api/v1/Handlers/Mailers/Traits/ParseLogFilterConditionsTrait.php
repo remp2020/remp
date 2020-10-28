@@ -1,12 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers\Traits;
 
+use Exception;
 use Nette\Utils\DateTime;
 
 trait ParseLogFilterConditionsTrait
 {
     /**
+     * @param string $field
      * @param array $filter
      * @return array of conditions. Each element of array can be used in Nette's selection where($element...) call
      * @throws \Exception
@@ -17,7 +20,7 @@ trait ParseLogFilterConditionsTrait
      *     "to" => "2020-04-05T00:00:00Z",
      * ],
      */
-    public function parseConditions(string $field, $filter): array
+    protected function parseConditions(string $field, array $filter): array
     {
         $conditions = [];
 
@@ -32,7 +35,7 @@ trait ParseLogFilterConditionsTrait
         ];
 
         if (!array_key_exists($field, $availableColumns)) {
-            throw new \Exception("Property $field is not allowed in log filter.");
+            throw new Exception("Property $field is not allowed in log filter.");
         }
         $column = $availableColumns[$field];
 

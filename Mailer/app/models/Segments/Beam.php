@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Remp\MailerModule\Segment;
 
 use GuzzleHttp\Client;
@@ -25,7 +27,7 @@ class Beam implements ISegment
         return static::PROVIDER_ALIAS;
     }
 
-    public function list()
+    public function list(): array
     {
         $response = $this->request(static::ENDPOINT_LIST);
         $segments = [];
@@ -42,13 +44,13 @@ class Beam implements ISegment
         return $segments;
     }
 
-    public function users($segment)
+    public function users(array $segment): array
     {
         $response = $this->request(sprintf(static::ENDPOINT_USERS, $segment['code']));
         return $response;
     }
 
-    private function request($url, $query = [])
+    private function request(string $url, array $query = []): array
     {
         $client = new Client([
             'base_uri' => $this->baseUrl

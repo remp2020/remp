@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Mailer;
 
@@ -47,7 +48,7 @@ class MailgunMailer extends Mailer implements IMailer
         }
     }
 
-    public function send(Message $message)
+    public function send(Message $message): void
     {
         $this->initMailer();
 
@@ -112,18 +113,18 @@ class MailgunMailer extends Mailer implements IMailer
         $this->mailer->messages()->send($this->option('domain'), $data);
     }
 
-    public function mailer()
+    public function mailer(): Mailgun
     {
         $this->initMailer();
         return $this->mailer;
     }
 
-    public function option($key)
+    public function option(string $key): ?string
     {
         return isset($this->options[$key]['value']) ? $this->options[$key]['value'] : null;
     }
 
-    public function transformTemplateParams(array $params)
+    public function transformTemplateParams(array $params): array
     {
         $transformed = [];
         foreach ($params as $key => $value) {

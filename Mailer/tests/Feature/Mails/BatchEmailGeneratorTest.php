@@ -1,15 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Tests\Feature\Mails;
 
-use Psr\Log\NullLogger;
-use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Beam\UnreadArticlesResolver;
-use Remp\MailerModule\Job\BatchEmailGenerator;
 use Remp\MailerModule\Job\MailCache;
-use Remp\MailerModule\Repository\BatchesRepository;
-use Remp\MailerModule\Repository\JobQueueRepository;
-use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Segment\Aggregator;
 use Remp\MailerModule\User\IUser;
 use Tests\Feature\BaseFeatureTestCase;
@@ -78,7 +73,8 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
                 $mailType,
                 $item['id'],
                 $item['email'],
-                $i % 2 === 0 ? $mailTypeVariant1->id : $mailTypeVariant2->id);
+                $i % 2 === 0 ? $mailTypeVariant1->id : $mailTypeVariant2->id
+            );
         }
 
         // Test generator

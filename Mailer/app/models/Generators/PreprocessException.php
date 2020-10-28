@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-class PreprocessException extends \Exception
+use Exception;
+
+class PreprocessException extends Exception
 {
 }
