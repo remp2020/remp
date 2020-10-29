@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Upgraded vlucas/phpdotenv from version 2 to 5 and removed usage of `getenv()` function.
 - Removed obsolete deploy script.
 - Fixed Hermes worker `RedisDriver` not restarting if there are no new tasks to handle. remp/crm#1561
+- Refactored bootstrap file to follow new Nette skeleton structure.
 
 ## [0.15.0] - 2020-10-15
 

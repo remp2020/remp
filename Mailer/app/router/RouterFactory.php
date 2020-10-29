@@ -1,6 +1,6 @@
 <?php
 
-namespace Remp;
+namespace Remp\Router;
 
 use Nette;
 use Nette\Application\Routers\RouteList;
