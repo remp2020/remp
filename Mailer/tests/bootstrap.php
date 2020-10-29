@@ -6,7 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 (DotEnv::createImmutable(__DIR__ . '/../'))->load();
 
-$environment = getenv('ENV');
+$environment = $_ENV['ENV'];
 
 if (!$environment) {
     die("You have to specify environment ENV\n");
