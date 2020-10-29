@@ -43,8 +43,8 @@
             <p>Both Text and HTML contents support Twig syntax. Available variables to use are:</p>
             <ul>
                 <li><code>autologin: String</code>: Autologin token that can be appended as GET parameter in URL.</li>
-                <li n:if="getenv('UNSUBSCRIBE_URL')"><code>unsubscribe: String</code>: Full link to unsubscribe page (including autologin token).</li>
-                <li n:if="getenv('SETTINGS_URL')"><code>settings: String</code>: Full link to email settings page (including autologin token).</li>
+                <li n:if="$_ENV['UNSUBSCRIBE_URL']"><code>unsubscribe: String</code>: Full link to unsubscribe page (including autologin token).</li>
+                <li n:if="$_ENV['SETTINGS_URL']"><code>settings: String</code>: Full link to email settings page (including autologin token).</li>
             </ul>
         </div>
     </div>

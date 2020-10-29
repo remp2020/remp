@@ -26,7 +26,10 @@ class EnvironmentConfig
 
     public function get($key)
     {
-        $val = getenv($key);
+        if (!isset($_ENV[$key])) {
+            return null;
+        }
+        $val = $_ENV[$key];
         if ($val === false || $val === '') {
             return null;
         }

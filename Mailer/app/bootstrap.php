@@ -1,17 +1,18 @@
 <?php
 
+use Dotenv\Dotenv;
+
 require __DIR__ . '/../vendor/autoload.php';
 
-$env = new Dotenv\Dotenv(__DIR__ . '/../');
-$env->load();
+(Dotenv::createImmutable(__DIR__ . '/../'))->load();
 
 // attempt to fix access rights issues in writable folders caused by different web/cli users writing to logs
 umask(0);
 
 $configurator = new Nette\Configurator;
-$environment = getenv('ENV');
+$environment = $_ENV['ENV'];
 
-if (getenv('FORCE_HTTPS') === 'true') {
+if ($_ENV['FORCE_HTTPS'] === 'true') {
     $_SERVER['HTTPS'] = 'on';
     $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
     $_SERVER['SERVER_PORT'] = 443;
@@ -29,7 +30,7 @@ if (!isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SHELL'])) {
 
 $configurator->enableTracy(__DIR__ . '/../log');
 
-$configurator->setTimeZone(getenv('TIMEZONE'));
+$configurator->setTimeZone($_ENV['TIMEZONE']);
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 
 $configurator->createRobotLoader()

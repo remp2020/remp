@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Fixed possible issue with asset location on Mac when Valet is used for development.
+- Upgraded vlucas/phpdotenv from version 2 to 5 and removed usage of `getenv()` function
 
 ## [0.15.0] - 2020-10-15
 
