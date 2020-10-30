@@ -5,11 +5,14 @@ namespace Remp\MailerModule\Hermes;
 use Closure;
 use Remp\MailerModule\Repository\HermesTasksRepository;
 use Tomaj\Hermes\Driver\DriverInterface;
+use Tomaj\Hermes\Driver\RestartTrait;
 use Tomaj\Hermes\MessageInterface;
 use Tomaj\Hermes\MessageSerializer;
 
 class RedisDriver implements DriverInterface
 {
+    use RestartTrait;
+
     private $tasksRepository;
 
     private $tasksQueue;
@@ -44,6 +47,8 @@ class RedisDriver implements DriverInterface
     public function wait(Closure $callback): void
     {
         while (true) {
+            $this->checkRestart();
+
             $message = $this->tasksQueue->getTask();
             if ($message) {
                 $hermesMessage = $this->serializer->unserialize($message[0]);
