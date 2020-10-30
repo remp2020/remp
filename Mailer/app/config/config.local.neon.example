@@ -3,10 +3,10 @@ services:
     # This is a set that we recommend to use
     console:
         setup:
-            - register(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
-            - register(Remp\MailerModule\Commands\MailgunEventsCommand())
+            - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
+            - add(Remp\MailerModule\Commands\MailgunEventsCommand())
             # If you're using Beam, you can enable this command to pull conversions from there
-			# - register(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
+            # - add(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
 
     embedParser:
         setup:

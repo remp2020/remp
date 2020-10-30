@@ -84,19 +84,19 @@ services:
 		class: Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger)
 		setup:
 			- setRestartInterface(@hermesRestart)
-
+#		class: Remp\MailerModule\Console\Application
 	console:
-		class: Remp\MailerModule\Console\Application
+		class: Symfony\Component\Console\Application
 		setup:
-			- register(Remp\MailerModule\Commands\ProcessJobCommand())
-			- register(@mailWorkerCommand)
-			- register(Remp\MailerModule\Commands\DatabaseSeedCommand())
-			- register(Remp\MailerModule\Commands\DemoSeedCommand())
-			- register(Remp\MailerModule\Commands\ProcessJobStatsCommand())
-			- register(Remp\MailerModule\Commands\AggregateMailTemplateStatsCommand())
-			- register(Remp\MailerModule\Commands\HeartbeatCommand())
-			- register(Remp\MailerModule\Commands\MailTypeStatsCommand())
-			- register(@hermesWorker)
+			- add(Remp\MailerModule\Commands\ProcessJobCommand())
+			- add(@mailWorkerCommand)
+			- add(Remp\MailerModule\Commands\DatabaseSeedCommand())
+			- add(Remp\MailerModule\Commands\DemoSeedCommand())
+			- add(Remp\MailerModule\Commands\ProcessJobStatsCommand())
+			- add(Remp\MailerModule\Commands\AggregateMailTemplateStatsCommand())
+			- add(Remp\MailerModule\Commands\HeartbeatCommand())
+			- add(Remp\MailerModule\Commands\MailTypeStatsCommand())
+			- add(@hermesWorker)
 			- setCatchExceptions(true)
 
 	# Loggers
