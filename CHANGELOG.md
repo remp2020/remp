@@ -50,6 +50,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added method to use Redis `ping()` command within MailCache. remp/remp#735
 - Added health check _(http://mailer.remp.press/health)_ for database, Redis, storage and logging. remp/remp#735
 - Added graceful shutdown to `MailWorkerCommand` (`worker:mail`) via `Tomaj\Hermes\Restart\RestartInterface`. remp/remp#736
+- Add missing indexes to mail_logs table. remp/remp#750
 
 ### [Sso]
 
