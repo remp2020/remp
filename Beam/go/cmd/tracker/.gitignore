@@ -3,3 +3,4 @@ client/
 swagger/
 tool/
 tracker*
+data/bindata.go
