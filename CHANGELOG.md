@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Removed `--no-bin-links` switch from `Docker/php/remp.sh installation script. Bin symlinks are required after the latest changes in Yarn package commands.
 - Added PHP 7.4 syntax check to `.gitlab-ci.yml`.
 
+### [Campaign]
+
+- Allowed search and paging in dashboard schedules table. remp/remp#755
+
 ### [Mailer]
 
 - Fixed possible issue with asset location on Mac when Valet is used for development.

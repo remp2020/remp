@@ -46,7 +46,6 @@
                     ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop', 'title' => 'Stop schedule'],
                     ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete', 'title' => 'Delete schedule'],
                 ],
-                'displaySearchAndPaging' => false,
                 'refreshTriggers' => [
                     [
                     // refresh when campaign's active toggle is toggled
