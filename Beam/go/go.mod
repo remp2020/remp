@@ -10,6 +10,7 @@ require (
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598 // indirect
 	github.com/dimfeld/httptreemux v4.0.0+incompatible // indirect
 	github.com/dimfeld/httptreemux/v5 v5.2.1 // indirect
+	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/goadesign/goa v1.4.3
@@ -18,6 +19,7 @@ require (
 	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/imdario/mergo v0.3.11
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
 	github.com/influxdata/influxdb v1.3.0
 	github.com/jcmturner/gofork v1.0.0 // indirect
@@ -49,5 +51,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/jcmturner/gokrb5.v7 v7.3.0 // indirect
-	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

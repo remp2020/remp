@@ -1,8 +1,6 @@
 package controller
 
-import (
-	refererparser "github.com/snowplow-referer-parser/golang-referer-parser"
-)
+import "beam/cmd/tracker/refererparser"
 
 // RefererResolver extends behavior of snowplow RefererResult
 type RefererResolver struct {
