@@ -2,7 +2,7 @@
 
 namespace Remp\MailerModule\Commands;
 
-use League\Event\Emitter;
+use League\Event\EventDispatcher;
 use Nette\DI\Container;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
@@ -45,7 +45,7 @@ class MailWorkerCommand extends Command
 
     private $mailCache;
 
-    private $emitter;
+    private $eventDispatcher;
 
     private $isFirstLine = true;
 
@@ -71,7 +71,7 @@ class MailWorkerCommand extends Command
         TemplatesRepository $mailTemplatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
-        Emitter $emitter,
+        EventDispatcher $eventDispatcher,
         Container $container
     ) {
         parent::__construct();
@@ -83,7 +83,7 @@ class MailWorkerCommand extends Command
         $this->mailTemplateRepository = $mailTemplatesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailCache = $redis;
-        $this->emitter = $emitter;
+        $this->eventDispatcher = $eventDispatcher;
         $this->container = $container;
         $this->logger = $logger;
     }
@@ -259,7 +259,7 @@ class MailWorkerCommand extends Command
 
                         foreach ($jobs as $i => $job) {
                             $this->mailJobQueueRepository->delete($queueJobs[$i]);
-                            $this->emitter->emit(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
+                            $this->eventDispatcher->dispatch(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
                         }
 
                         $this->smtpErrors = 0;

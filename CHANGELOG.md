@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING** Updated [league/event](https://event.thephpleague.com/) from [version 2 to 3](https://event.thephpleague.com/3.0/upgrade-from-2-to-3/) - there is config change - please change `League\Event\Emitter` to `League\Event\EventDispatcher`
 - Fixed possible issue with asset location on Mac when Valet is used for development.
 - Upgraded vlucas/phpdotenv from version 2 to 5 and removed usage of `getenv()` function.
 - Removed obsolete deploy script.

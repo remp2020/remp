@@ -2,9 +2,7 @@
 
 namespace Remp\MailerModule\Events;
 
-use League\Event\AbstractEvent;
-
-class MailSentEvent extends AbstractEvent
+class MailSentEvent
 {
     private $userId;
 

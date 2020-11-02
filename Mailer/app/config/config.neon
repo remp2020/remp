@@ -133,8 +133,8 @@ services:
 			- add('send-email', Remp\MailerModule\Hermes\SendEmailHandler())
 #			- add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
 
-	eventEmitter:
-		class: League\Event\Emitter
+	eventDispatcher:
+		class: League\Event\EventDispatcher
 
 	segmentAgreggator:
 		class: Remp\MailerModule\Segment\Aggregator
