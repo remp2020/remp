@@ -59,7 +59,7 @@ database:
 			lazy: yes
 
 services:
-	router: Remp\RouterFactory::createRouter
+	router: Remp\Router\RouterFactory::createRouter
 	environmentConfig:
 		class: Remp\MailerModule\EnvironmentConfig
 		setup:

@@ -3,21 +3,28 @@
 
 use Nette\Database\DriverException;
 use Remp\MailerModule\PhinxRegistrator;
+use Remp\MailerModule\EnvironmentConfig;
+use Remp\MailerModule\Console\Application as RempConsoleApplication;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
-$container = require __DIR__ . '/../app/bootstrap.php';
+require __DIR__ . '/../app/Bootstrap.php';
+
+$container = Remp\Bootstrap::boot()
+    ->createContainer();
 
 $application = new Application("Mailer");
 $application->setCatchExceptions(false);
 
-$input = new \Symfony\Component\Console\Input\ArgvInput();
-$output = new \Symfony\Component\Console\Output\ConsoleOutput();
+$input = new ArgvInput();
+$output = new ConsoleOutput();
 
-$phinxRegistrator = new PhinxRegistrator($application, $container->getByType('Remp\MailerModule\EnvironmentConfig'));
+$phinxRegistrator = new PhinxRegistrator($application, $container->getByType(EnvironmentConfig::class));
 
 try {
     /** @var \Remp\MailerModule\Console\Application $consoleApplication */
-    $consoleApplication = $container->getByType('Remp\MailerModule\Console\Application');
+    $consoleApplication = $container->getByType(RempConsoleApplication::class);
     $commands = $consoleApplication->getCommands();
     foreach ($commands as $command) {
         $application->add($command);
