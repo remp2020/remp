@@ -2,16 +2,13 @@
 
 namespace Remp\MailerModule\Events;
 
-use League\Event\AbstractListener;
-use League\Event\EventInterface;
 use Nette\Utils\DateTime;
 use Psr\Log\LoggerAwareTrait;
 use Remp\MailerModule\Tracker\EventOptions;
 use Remp\MailerModule\Tracker\ITracker;
 use Remp\MailerModule\Tracker\User;
-use Tracy\Debugger;
 
-class MailSentHandler extends AbstractListener
+class MailSentEventHandler
 {
     use LoggerAwareTrait;
 
@@ -22,13 +19,8 @@ class MailSentHandler extends AbstractListener
         $this->tracker = $tracker;
     }
 
-    public function handle(EventInterface $event)
+    public function __invoke(MailSentEvent $event)
     {
-        if (!($event instanceof MailSentEvent)) {
-            Debugger::log('invalid instance provided for MailSentHandler: ' . get_class($event));
-            return false;
-        }
-
         $options = new EventOptions();
         $options->setUser(new User([
             'id' => $event->getUserId(),

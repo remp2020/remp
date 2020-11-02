@@ -52,10 +52,10 @@ services:
 #            - register(Remp\MailerModule\Segment\Pythia(%remp.pythia.segments_addr%))
 
 #    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
-#    eventEmitter:
-#        class: League\Event\Emitter
+#    eventDispatcher:
+#        class: League\Event\EventDispatcher
 #        setup:
-#            - addListener(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentHandler())
+#            - subscribeTo(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentEventHandler())
 
     # If you're using Beam and want to use ProcessConversionStatsCommand, enable this repository (it's a dependency)
 #    - Remp\MailerModule\Repository\BeamConversionsRepository
