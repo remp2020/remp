@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Removed `--no-bin-links` switch from `Docker/php/remp.sh installation script. Bin symlinks are required after the latest changes in Yarn package commands.
 - Added PHP 7.4 syntax check to `.gitlab-ci.yml`.
 
+### [Beam]
+
+- Added caching to Tracker preflight requests to limit number of OPTIONS calls. Cache is now set to 1 hour (3600 seconds) and it effectively adds `Access-Control-Max-Age: 3600` header to preflight responses.
+
 ### [Campaign]
 
 - Allowed search and paging in dashboard schedules table. remp/remp#755
