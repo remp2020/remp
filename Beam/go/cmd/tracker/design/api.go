@@ -17,6 +17,7 @@ var _ = API("beam", func() {
 	Origin("*", func() {
 		Methods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 		Headers("Content-Type")
+		MaxAge(3600)
 	})
 	ResponseTemplate(BadRequest, func() {
 		Description("Invalid request sent")
