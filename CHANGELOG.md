@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed Hermes worker `RedisDriver` not restarting if there are no new tasks to handle. remp/crm#1561
 - Refactored bootstrap file to follow new Nette skeleton structure.
 - Added missing `user_id` index to `mail_user_subscriptions` table.
+- Updated monolog/monolog from version 1 to 2
 
 ## [0.15.0] - 2020-10-15
 
