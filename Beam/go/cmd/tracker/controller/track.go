@@ -233,6 +233,11 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	}
 
 	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
+
+	for key, val := range ctx.Payload.Fields {
+		fields[key] = val
+	}
+
 	if err := c.pushInternal(measurement, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}

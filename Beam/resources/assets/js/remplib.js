@@ -62,6 +62,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         maxPageProgressAchieved: 0,
 
+        fields: {},
+
         initialized: false,
 
         init: function(config) {
@@ -190,6 +192,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         remplib.tracker.sendTrackedProgress(true)
                     });
                 }
+            }
+
+            if (typeof config.pageviews === 'object') {
+                this.validateFieldsCallback(config.pageviews.fields);
+                this.fields = config.pageviews.fields || {};
             }
 
             this.initialized = true;
@@ -367,6 +374,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             var params = {
                 "article": this.article,
                 "action": "load",
+                "fields": this.processFields()
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/pageview", params);
@@ -848,6 +856,24 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             params = this.addSystemUserParams(params);
             remplib.tracker.post(this.url + "/track/pageview", params);
             remplib.tracker.trackedProgress = [];
+        },
+
+        validateFieldsCallback: function(fields) {
+            for (let param in fields) {
+                if (fields.hasOwnProperty(param) && typeof (fields[param]) !== "function") {
+                    throw "remplib: configuration pageviews.fields invalid (callback required) for param: " + param
+                }
+            }
+        },
+
+        processFields: function() {
+            let fields = {};
+
+            for (let key in this.fields) {
+                fields[key] = this.fields[key]();
+            }
+
+            return fields;
         }
     };
 
