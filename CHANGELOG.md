@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Allowed search and paging in dashboard schedules table. remp/remp#755
+- Fixed possibility of banner close buttons being overlayed by Safari scrollbar. remp/remp#764
+- Extended banner close button area for easier manipulation on touch-based devices. remp/remp#764
 
 ### [Mailer]
 
@@ -433,6 +435,7 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[0.15.0]: https://github.com/remp2020/remp/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/remp2020/remp/compare/0.13.0...0.14.0
 [0.13.0]: https://github.com/remp2020/remp/compare/0.12.0...0.13.0
 [0.12.0]: https://github.com/remp2020/remp/compare/0.11.1...0.12.0
