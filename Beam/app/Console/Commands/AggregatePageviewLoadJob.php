@@ -93,7 +93,10 @@ class AggregatePageviewLoadJob extends Command
 
         $processedArticles = 0;
         foreach ($externalIdsChunks as $externalIdsChunk) {
-            $articles = Article::whereIn('external_id', $externalIdsChunk)->get();
+            $articles = Article::whereIn(
+                'external_id',
+                array_map('strval', $externalIdsChunk)
+            )->get();
             foreach ($articles as $article) {
                 $ap = ArticlePageviews::firstOrNew([
                     'article_id' => $article->id,

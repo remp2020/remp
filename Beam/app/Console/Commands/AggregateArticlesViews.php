@@ -286,7 +286,10 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
         $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $bar->setMessage('Storing aggregated data');
 
-        $articleIdMap = Article::whereIn('external_id', array_keys($articleIds))->pluck('id', 'external_id');
+        $articleIdMap = Article::whereIn(
+            'external_id',
+            array_map('strval', array_keys($articleIds))
+        )->pluck('id', 'external_id');
 
         $items = [];
         foreach ($data as $key => $articlesData) {
