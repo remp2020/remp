@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
@@ -11,7 +12,7 @@ class DennikNBestPerformingArticlesGeneratorTest extends TestCase
 {
     private $sourceTemplateRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $htmlContent = <<<TEMPLATE
 <table>        
@@ -413,15 +414,15 @@ HTML;
         $textOutput = $output['textContent'];
 
         $title = "Zuzana Kovačič Hanzelová: Dúfala som, že vydržím dlhšie";
-        self::assertContains($title, $htmlOutput);
-        self::assertContains($title, $textOutput);
+        self::assertStringContainsString($title, $htmlOutput);
+        self::assertStringContainsString($title, $textOutput);
 
         $description = "Doteraz som počúvala, že pracujem";
-        self::assertContains($description, $htmlOutput);
-        self::assertContains($description, $textOutput);
+        self::assertStringContainsString($description, $htmlOutput);
+        self::assertStringContainsString($description, $textOutput);
 
         $img = "https://img.projektn.sk/wp-static/2018/05/unnamed-file.jpg";
-        self::assertContains($img, $htmlOutput);
-        self::assertNotContains($img, $textOutput);
+        self::assertStringContainsString($img, $htmlOutput);
+        self::assertStringNotContainsString($img, $textOutput);
     }
 }

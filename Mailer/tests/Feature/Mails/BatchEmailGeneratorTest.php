@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Feature\Mails;
 
 use Psr\Log\NullLogger;
@@ -19,7 +20,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
     private $unreadArticlesGenerator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mailCache = $this->inject(MailCache::class);

@@ -10,7 +10,7 @@ class UtmReplaceTest extends TestCase
     /** @var UtmReplace */
     protected $utmReplace;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->utmReplace = new UtmReplace("demo-weekly-newsletter", "email", "impresa_mail_20190903103350", "");
     }

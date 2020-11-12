@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Feature;
 
 use Nette\Database\Context;
@@ -56,7 +57,7 @@ class BaseFeatureTestCase extends TestCase
     /** @var UserSubscriptionVariantsRepository */
     protected $userSubscriptionVariantsRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $GLOBALS['container'];
         $this->database = $this->inject(Context::class);
@@ -74,7 +75,7 @@ class BaseFeatureTestCase extends TestCase
         $this->userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
     }
 
-    protected function tearDown()/* The :void return type declaration that should be here would cause a BC issue */
+    protected function tearDown(): void
     {
         $truncateTables = implode(' ', array_map(function ($repo){
             $property = (new \ReflectionClass($repo))->getProperty('tableName');
