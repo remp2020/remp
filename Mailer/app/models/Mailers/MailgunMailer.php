@@ -34,11 +34,11 @@ class MailgunMailer extends Mailer implements IMailer
         ]
     ];
 
-    public function __construct(
-        Config $config,
-        ConfigsRepository $configsRepository
-    ) {
-        parent::__construct($config, $configsRepository);
+    private function initMailer()
+    {
+        if ($this->mailer) {
+            return $this->mailer;
+        }
 
         if ($endpoint = $this->option('endpoint')) {
             $this->mailer = Mailgun::create($this->option('api_key'), $endpoint);
@@ -49,6 +49,8 @@ class MailgunMailer extends Mailer implements IMailer
 
     public function send(Message $message)
     {
+        $this->initMailer();
+
         $from = null;
         foreach ($message->getFrom() as $email => $name) {
             $from = "$name <$email>";
@@ -107,11 +109,12 @@ class MailgunMailer extends Mailer implements IMailer
             $data["v:".$key] = (string) $val;
         }
 
-        $response = $this->mailer->messages()->send($this->option('domain'), $data);
+        $this->mailer->messages()->send($this->option('domain'), $data);
     }
 
     public function mailer()
     {
+        $this->initMailer();
         return $this->mailer;
     }
 
