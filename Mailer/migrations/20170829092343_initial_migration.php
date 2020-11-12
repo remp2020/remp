@@ -78,6 +78,7 @@ class InitialMigration extends AbstractMigration
             ->addForeignKey('mail_layout_id', 'mail_layouts', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->addForeignKey('mail_type_id', 'mail_types', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
             ->addForeignKey('copy_from', 'mail_templates', 'id', ['delete' => 'RESTRICT', 'update' => 'CASCADE'])
+            ->addIndex('code')
             ->addTimestamps()
             ->create();
 

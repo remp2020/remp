@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added missing `user_id` index to `mail_user_subscriptions` table.
 - Updated monolog/monolog from version 1 to 2
 - Updated mailgun/mailgun-php from version 2 to 3
+- Updated robmorgan/phinx to 0.12.
 
 ## [0.15.0] - 2020-10-15
 
