@@ -64,7 +64,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         initialized: false,
 
-        init: function(config) {
+        init: function(config, selfCheckFunc) {
+            if (selfCheckFunc !== undefined) {
+                selfCheckFunc("before tracker.init()");
+            }
+
             if (typeof config.token !== 'string') {
                 throw "remplib: configuration token invalid or missing: " + config.token
             }
@@ -190,6 +194,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                         remplib.tracker.sendTrackedProgress(true)
                     });
                 }
+            }
+
+            if (selfCheckFunc !== undefined) {
+                selfCheckFunc("after tracker.init()");
             }
 
             this.initialized = true;
