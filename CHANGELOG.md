@@ -11,7 +11,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Removed `--no-bin-links` switch from `Docker/php/remp.sh installation script. Bin symlinks are required after the latest changes in Yarn package commands.
 - Added PHP 7.4 syntax check to `.gitlab-ci.yml`.
-- Fixed initialization of REMP JS library (may have caused a bug when banner aimed to anonymous users was shown to a logged-in user). remp/crm#651
 
 ### [Beam]
 
@@ -23,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Allowed search and paging in dashboard schedules table. remp/remp#755
 - Fixed possibility of banner close buttons being overlayed by Safari scrollbar. remp/remp#764
 - Extended banner close button area for easier manipulation on touch-based devices. remp/remp#764
+- Fixed initialization of REMP JS library (may have caused a bug when banner aimed to anonymous users was shown to a logged-in user). remp/crm#651
 
 ### [Mailer]
 
