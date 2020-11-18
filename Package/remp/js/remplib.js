@@ -178,33 +178,12 @@ export default {
         document.cookie = key + "=" + expires + "; path=/"+ domain + ";";
     },
 
-    // jquery extend
+    // simplified jquery extend (without deep copy, not copying null values)
     extend: function () {
-        var options, name, src, copy, copyIsArray, clone,
+        var options, name, copy,
             target = arguments[0] || {},
             i = 1,
-            length = arguments.length,
-            deep = false;
-
-        // Handle a deep copy situation
-        if (typeof target === "boolean") {
-            deep = target;
-
-            // Skip the boolean and the target
-            target = arguments[i] || {};
-            i++;
-        }
-
-        // Handle case when target is a string or something (possible in deep copy)
-        if (typeof target !== "object" && !isFunction(target)) {
-            target = {};
-        }
-
-        // Extend jQuery itself if only one argument is passed
-        if (i === length) {
-            target = this;
-            i--;
-        }
+            length = arguments.length;
 
         for (; i < length; i++) {
 
@@ -220,27 +199,8 @@ export default {
                     if (name === "__proto__" || target === copy) {
                         continue;
                     }
-
-                    // Recurse if we're merging plain objects or arrays
-                    if (deep && copy && (jQuery.isPlainObject(copy) ||
-                        (copyIsArray = Array.isArray(copy)))) {
-                        src = target[name];
-
-                        // Ensure proper type for the source value
-                        if (copyIsArray && !Array.isArray(src)) {
-                            clone = [];
-                        } else if (!copyIsArray && !jQuery.isPlainObject(src)) {
-                            clone = {};
-                        } else {
-                            clone = src;
-                        }
-                        copyIsArray = false;
-
-                        // Never move original objects, clone them
-                        target[name] = jQuery.extend(deep, clone, copy);
-
-                        // Don't bring in undefined values
-                    } else if (copy !== undefined) {
+                    // Don't bring in undefined or null values
+                    if (copy !== undefined && copy !== null) {
                         target[name] = copy;
                     }
                 }

@@ -77,7 +77,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         /* JSONP END */
 
-        init: function(config) {
+        init: function(config, selfCheckFunc) {
+            if (selfCheckFunc !== undefined) {
+                selfCheckFunc("before campaign.init()");
+            }
+
             if (typeof config.campaign !== 'object') {
                 throw "remplib: configuration campaign invalid or missing: "+config.campaign
             }
@@ -118,6 +122,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (window.opener && window.location.hash === '#bannerPicker') {
                 remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
+            }
+
+            if (selfCheckFunc !== undefined) {
+                selfCheckFunc("after campaign.init()");
             }
 
             this.initialized = true;
