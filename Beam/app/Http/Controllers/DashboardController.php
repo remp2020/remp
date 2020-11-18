@@ -294,7 +294,7 @@ class DashboardController extends Controller
         $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
-        $journalRequest->setTimeHistogram($intervalText, '0h');
+        $journalRequest->setTimeHistogram($intervalText);
         $journalRequest->addGroup('derived_referer_medium');
         $currentRecords = collect($this->journal->count($journalRequest));
 
@@ -455,7 +455,7 @@ class DashboardController extends Controller
         $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
         $journalRequest->setTimeBefore($timeBefore);
-        $journalRequest->setTimeHistogram($interval, '0h');
+        $journalRequest->setTimeHistogram($interval);
         $journalRequest->addGroup('derived_referer_medium');
 
         return collect($this->journal->count($journalRequest));

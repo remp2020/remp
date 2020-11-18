@@ -46,10 +46,9 @@ var OptionsTimeHistogram = Type("OptionsTimeHistogram", func() {
 	Description("Values used to split results in time buckets")
 
 	Attribute("interval", String, "Interval of buckets")
-	Attribute("offset", String, "Offset of buckets")
 	Attribute("time_zone", String, "Timezone ID as specified in the IANA timezone database, such as`America/Los_Angeles`")
 
-	Required("interval", "offset")
+	Required("interval")
 })
 
 var OptionsCountHistogram = Type("OptionsCountHistogram", func() {

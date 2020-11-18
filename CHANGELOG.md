@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added caching to Tracker preflight requests to limit number of OPTIONS calls. Cache is now set to 1 hour (3600 seconds) and it effectively adds `Access-Control-Max-Age: 3600` header to preflight responses.
 - Fixed issue with slow pageview processing queries due to string/int type conflict in the query parameters. remp/remp#766
+- [Segments]: Fixed `search.max_buckets` Elastic issue when aggregating too big chunk of pageviews data. Changed internal implementation of Segments API, aggregation is now using Elastic composite aggregation and pagination. remp/remp#662 
+- [Segments]: Fixed return type of count histogram items. Float was changed to int as count can always return integers anyway. remp/remp#622
+- [Segments]: Removed `offset` parameter for histograms. Beam APIs haven't used it and composite index (new Elastic-7-friendly implementation) doesn't support it yet. remp/remp#622
 
 ### [Campaign]
 

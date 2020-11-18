@@ -183,7 +183,6 @@ func aggregateOptionsFromCommerceOptions(payload *app.CommerceOptionsPayload) (m
 	if payload.TimeHistogram != nil {
 		o.TimeHistogram = &model.TimeHistogram{
 			Interval: payload.TimeHistogram.Interval,
-			Offset:   payload.TimeHistogram.Offset,
 		}
 
 		if payload.TimeHistogram.TimeZone != nil {

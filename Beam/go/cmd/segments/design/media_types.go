@@ -314,7 +314,7 @@ var CountHistogram = MediaType("application/vnd.count.histogram+json", func() {
 	Description("Count histogram data")
 	Attributes(func() {
 		Attribute("bucket_key", Number)
-		Attribute("value", Number)
+		Attribute("value", Integer)
 	})
 	View("default", func() {
 		Attribute("bucket_key")

@@ -279,7 +279,7 @@ class ArticleDetailsController extends Controller
         $journalRequest = (new AggregateRequest('pageviews', 'load'))
             ->addFilter('article_id', $article->external_id)
             ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
-            ->setTimeHistogram($journalInterval->intervalText, '0h')
+            ->setTimeHistogram($journalInterval->intervalText)
             ->addGroup($groupBy);
 
         if ($addConditions) {

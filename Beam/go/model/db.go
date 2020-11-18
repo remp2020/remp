@@ -36,7 +36,7 @@ type TimeHistogramItem struct {
 // CountHistogramItem represents one row of count-based histogram results.
 type CountHistogramItem struct {
 	BucketKey float64
-	Value     float64
+	Value     int
 }
 
 // CountRow represents one row of grouped count.

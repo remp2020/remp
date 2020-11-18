@@ -67,10 +67,10 @@ class AggregatePageviewLoadJob extends Command
             $subscribers[$articleId] = $subscribers[$articleId] ?? 0;
 
             $all[$articleId] += $record->count;
-            if ($record->tags->signed_in === '1') {
+            if (filter_var($record->tags->signed_in, FILTER_VALIDATE_BOOLEAN) === true) {
                 $signedIn[$articleId] += $record->count;
             }
-            if ($record->tags->subscriber === '1') {
+            if (filter_var($record->tags->subscriber, FILTER_VALIDATE_BOOLEAN) === true) {
                 $subscribers[$articleId] += $record->count;
             }
 
