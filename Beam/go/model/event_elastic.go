@@ -46,9 +46,8 @@ func (eDB *EventElastic) Count(options AggregateOptions) (CountRowCollection, bo
 
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
-			Interval(options.TimeHistogram.Interval).
+			FixedInterval(options.TimeHistogram.Interval).
 			TimeZone(tz).
-			Offset(options.TimeHistogram.Offset).
 			MinDocCount(0).
 			ExtendedBounds(options.TimeAfter, options.TimeBefore)
 	}

@@ -29,7 +29,6 @@ type AggregateOptions struct {
 // TimeHistogram is used to split response to time-based buckets.
 type TimeHistogram struct {
 	Interval string
-	Offset   string
 	TimeZone *time.Location
 }
 

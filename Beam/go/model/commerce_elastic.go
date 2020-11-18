@@ -39,9 +39,8 @@ func (cDB *CommerceElastic) Count(options AggregateOptions) (CountRowCollection,
 
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
-			Interval(options.TimeHistogram.Interval).
+			FixedInterval(options.TimeHistogram.Interval).
 			TimeZone(tz).
-			Offset(options.TimeHistogram.Offset).
 			MinDocCount(0).
 			ExtendedBounds(options.TimeAfter, options.TimeBefore)
 	}
@@ -189,9 +188,8 @@ func (cDB *CommerceElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
-			Interval(options.TimeHistogram.Interval).
-			TimeZone(tz).
-			Offset(options.TimeHistogram.Offset)
+			FixedInterval(options.TimeHistogram.Interval).
+			TimeZone(tz)
 	}
 
 	search, aggregationAdded, err := cDB.DB.addGroupBy(search, cDB.getIndex(), options, extras, dateHistogramAgg)

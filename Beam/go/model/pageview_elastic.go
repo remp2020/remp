@@ -30,70 +30,67 @@ func (pDB *PageviewElastic) Count(options AggregateOptions) (CountRowCollection,
 		return nil, false, err
 	}
 
+	index := pDB.DB.resolveIndex(binding.Index)
+
 	// action is not being tracked within separate measurements and we would get no records back
 	// removing it before applying filter
 	options.Action = ""
 
-	extras := make(map[string]elastic.Aggregation)
+	var afterKey map[string]interface{}
+	var crc CountRowCollection
 
-	search := pDB.DB.Client.Search().
-		Index(pDB.DB.resolveIndex(binding.Index)).
-		Size(0) // return no specific results
+	for {
+		search := pDB.DB.Client.Search().
+			Index(index).
+			Size(0) // return no specific results
 
-	search, err = pDB.DB.addSearchFilters(search, pDB.DB.resolveIndex(binding.Index), options)
-	if err != nil {
-		return nil, false, err
-	}
-
-	var countHistogramAgg *elastic.HistogramAggregation
-	if options.CountHistogram != nil {
-		countHistogramAgg = elastic.NewHistogramAggregation().
-			Field(options.CountHistogram.Field).
-			Interval(options.CountHistogram.Interval)
-
-		extras[options.CountHistogram.Field] = countHistogramAgg
-	}
-
-	var dateHistogramAgg *elastic.DateHistogramAggregation
-	if options.TimeHistogram != nil {
-		tz := "UTC"
-		if options.TimeHistogram.TimeZone != nil {
-			tz = options.TimeHistogram.TimeZone.String()
+		search, err = pDB.DB.addSearchFilters(search, index, options)
+		if err != nil {
+			return nil, false, err
 		}
-		dateHistogramAgg = elastic.NewDateHistogramAggregation().
-			Field("time").
-			Interval(options.TimeHistogram.Interval).
-			TimeZone(tz).
-			Offset(options.TimeHistogram.Offset)
+
+		search, aggregationAdded, err := pDB.DB.addCompositeGroupBy(search, index, afterKey, options)
+		if err != nil {
+			return nil, false, err
+		}
+
+		if !aggregationAdded {
+			// allow to compute more than 10000 hits (default value) in case there is no aggregation
+			search.TrackTotalHits(true)
+		}
+
+		// get results
+		result, err := search.Do(pDB.DB.Context)
+		if err != nil {
+			return nil, false, err
+		}
+
+		if !aggregationAdded {
+			// extract and return simplified results (no aggregation, no pagination)
+			return CountRowCollection{
+				CountRow{
+					Count: int(result.Hits.TotalHits.Value),
+				},
+			}, true, nil
+		}
+
+		// get (paginated) aggregation results and append them to final results
+		aggResult, _ := result.Aggregations.Composite("buckets")
+		crcPage, err := pDB.DB.countRowCollectionFromCompositeBuckets(aggResult.Buckets, options)
+		if err != nil {
+			return nil, false, err
+		}
+		crc = append(crc, crcPage...)
+
+		if aggResult.AfterKey == nil {
+			// pagination is finished, exit
+			break
+		}
+
+		afterKey = aggResult.AfterKey
 	}
 
-	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)
-	if err != nil {
-		return nil, false, err
-	}
-
-	if !aggregationAdded {
-		// allow to compute more than 10000 hits (default value) in case there is no aggregation
-		search.TrackTotalHits(true)
-	}
-
-	// get results
-	result, err := search.Do(pDB.DB.Context)
-	if err != nil {
-		return nil, false, err
-	}
-
-	if len(options.GroupBy) == 0 && options.TimeHistogram == nil && options.CountHistogram == nil {
-		// extract simplified results (no aggregation)
-		return CountRowCollection{
-			CountRow{
-				Count: int(result.Hits.TotalHits.Value),
-			},
-		}, true, nil
-	}
-
-	// extract results
-	return pDB.DB.countRowCollectionFromAggregations(result, options)
+	return crc, true, nil
 }
 
 // Sum returns number of Pageviews matching the filter defined by AggregateOptions.
@@ -129,9 +126,8 @@ func (pDB *PageviewElastic) Sum(options AggregateOptions) (SumRowCollection, boo
 		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
-			Interval(options.TimeHistogram.Interval).
-			TimeZone(tz).
-			Offset(options.TimeHistogram.Offset)
+			FixedInterval(options.TimeHistogram.Interval).
+			TimeZone(tz)
 	}
 
 	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)
@@ -186,9 +182,8 @@ func (pDB *PageviewElastic) Avg(options AggregateOptions) (AvgRowCollection, boo
 		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
-			Interval(options.TimeHistogram.Interval).
-			TimeZone(tz).
-			Offset(options.TimeHistogram.Offset)
+			FixedInterval(options.TimeHistogram.Interval).
+			TimeZone(tz)
 	}
 
 	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)
@@ -253,9 +248,8 @@ func (pDB *PageviewElastic) Unique(options AggregateOptions, item string) (Count
 		}
 		dateHistogramAgg = elastic.NewDateHistogramAggregation().
 			Field("time").
-			Interval(options.TimeHistogram.Interval).
-			TimeZone(tz).
-			Offset(options.TimeHistogram.Offset)
+			FixedInterval(options.TimeHistogram.Interval).
+			TimeZone(tz)
 	}
 
 	search, aggregationAdded, err := pDB.DB.addGroupBy(search, pDB.DB.resolveIndex(binding.Index), options, extras, dateHistogramAgg)

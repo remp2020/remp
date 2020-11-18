@@ -194,7 +194,6 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) (m
 	if payload.TimeHistogram != nil {
 		o.TimeHistogram = &model.TimeHistogram{
 			Interval: payload.TimeHistogram.Interval,
-			Offset:   payload.TimeHistogram.Offset,
 		}
 
 		if payload.TimeHistogram.TimeZone != nil {
