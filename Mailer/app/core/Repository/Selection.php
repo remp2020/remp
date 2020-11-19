@@ -21,7 +21,7 @@ class Selection extends \Nette\Database\Table\Selection
      */
     public function createSelectionInstance($table = null)
     {
-        return new static($this->context, $this->conventions, $table ?: $this->name, $this->cache ? $this->cache->getStorage() : null);
+        return new self($this->context, $this->conventions, $table ?: $this->name, $this->cache ? $this->cache->getStorage() : null);
     }
 
     /**

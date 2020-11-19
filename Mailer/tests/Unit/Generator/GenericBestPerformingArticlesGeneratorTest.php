@@ -1,11 +1,10 @@
 <?php
+
 namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Generators\GenericBestPerformingArticlesGenerator;
-use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\PageMeta\GenericPageContent;
-use Remp\MailerModule\PageMeta\Meta;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
@@ -13,7 +12,7 @@ class GenericBestPerformingArticlesGeneratorTest extends TestCase
 {
     private $sourceTemplateRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $htmlContent = <<<TEMPLATE
 <table>        
@@ -21,7 +20,7 @@ class GenericBestPerformingArticlesGeneratorTest extends TestCase
     <tr>
         <td>{{ item.title }}</td>
         <td>{{ item.description }}</td>
-        <td><img src="{{item.image}}"></td>
+        <td><img src="{{ item.image }}"></td>
         <td>{{ url }}</td>
     </tr>
 {% endfor %}
@@ -84,19 +83,21 @@ HTML;
         $htmlOutput = $output['htmlContent'];
         $textOutput = $output['textContent'];
 
-        self::assertContains("here_is_title", $htmlOutput);
-        self::assertContains("here_is_title", $textOutput);
+        var_dump($textOutput);
 
-        self::assertContains("here_is_description", $htmlOutput);
-        self::assertContains("here_is_description", $textOutput);
+        self::assertStringContainsString("here_is_title", $htmlOutput);
+        self::assertStringContainsString("here_is_title", $textOutput);
 
-        self::assertContains('https://page.com/someimage.jpg', $htmlOutput);
-        self::assertNotContains('https://page.com/someimage.jpg', $textOutput);
+        self::assertStringContainsString("here_is_description", $htmlOutput);
+        self::assertStringContainsString("here_is_description", $textOutput);
 
-        self::assertNotContains('THIS_TEXT_WONT_BE_IN_EMAIL', $htmlOutput);
-        self::assertNotContains('THIS_TEXT_WONT_BE_IN_EMAIL', $textOutput);
+        self::assertStringContainsString('https://page.com/someimage.jpg', $htmlOutput);
+        self::assertStringNotContainsString('https://page.com/someimage.jpg', $textOutput);
 
-        self::assertNotContains('THIS_META_WONT_BE_IN_EMAIL', $htmlOutput);
-        self::assertNotContains('THIS_META_WONT_BE_IN_EMAIL', $textOutput);
+        self::assertStringNotContainsString('THIS_TEXT_WONT_BE_IN_EMAIL', $htmlOutput);
+        self::assertStringNotContainsString('THIS_TEXT_WONT_BE_IN_EMAIL', $textOutput);
+
+        self::assertStringNotContainsString('THIS_META_WONT_BE_IN_EMAIL', $htmlOutput);
+        self::assertStringNotContainsString('THIS_META_WONT_BE_IN_EMAIL', $textOutput);
     }
 }

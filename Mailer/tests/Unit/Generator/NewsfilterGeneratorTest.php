@@ -13,7 +13,7 @@ class NewsfilterGeneratorTest extends TestCase
 {
     private $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = new NewsfilterGenerator(
             $this->createMock(SourceTemplatesRepository::class),
@@ -69,7 +69,7 @@ EOD;
         self::assertEquals("Matej Sajfa Cifra: Mladí dnes chcú byť za pol roka slávni, mňa si v rádiu prvé štyri roky ani nevšimli", $output->title);
         self::assertEquals("Ria Gehrerová", $output->editor);
         self::assertEquals("http://localhost/dnwp/wordpress/1084435/matej-sajfa-cifra-mladi-dnes-chcu-byt-za-pol-roka-slavni-mna-si-v-radiu-prve-styri-roky-ani-nevsimli/", $output->url);
-        self::assertContains("Matej Cifra sa nedohodol s televíziami a tak", $output->summary);
-        self::assertContains("ako zarábajú slovenskí youtuberi", $output->newsfilter_html);
+        self::assertStringContainsString("Matej Cifra sa nedohodol s televíziami a tak", $output->summary);
+        self::assertStringContainsString("ako zarábajú slovenskí youtuberi", $output->newsfilter_html);
     }
 }
