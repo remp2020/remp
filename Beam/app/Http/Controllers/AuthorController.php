@@ -39,6 +39,7 @@ class AuthorController extends Controller
         return response()->format([
             'html' => view('authors.show', [
                 'author' => $author,
+                'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
@@ -192,6 +193,7 @@ class AuthorController extends Controller
             "articles.title",
             "articles.published_at",
             "articles.url",
+            "articles.content_type",
             "articles.pageviews_all",
             "articles.pageviews_signed_in",
             "articles.pageviews_subscribers",
@@ -321,6 +323,10 @@ class AuthorController extends Controller
                     $amounts[] = "{$c} {$currency}";
                 }
                 return $amounts ?? [0];
+            })
+            ->filterColumn('content_type', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $query->whereIn('articles.content_type', $values);
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);

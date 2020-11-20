@@ -34,6 +34,13 @@
                     'orderable' => false,
                     'priority' => 1,
                 ],
+                'content_type' => [
+                    'header' => 'Type',
+                    'orderable' => false,
+                    'filter' => $contentTypes,
+                    'priority' => 2,
+                    'visible' => count($contentTypes) > 1,
+                ],
                 'article.authors[, ].name' => [
                     'header' => 'authors',
                     'orderable' => false,

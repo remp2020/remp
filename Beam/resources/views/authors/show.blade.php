@@ -79,6 +79,13 @@
                         'render' => 'array',
                         'priority' => 3,
                     ],
+                    'content_type' => [
+                        'header' => 'Type',
+                        'orderable' => false,
+                        'filter' => $contentTypes,
+                        'priority' => 2,
+                        'visible' => count($contentTypes) > 1
+                    ],
                     'sections[, ].name' => [
                         'header' => 'sections',
                         'orderable' => false,
