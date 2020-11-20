@@ -7,6 +7,7 @@ use Nette\Database\Table\ActiveRow;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 
 class SendingStats extends Control
 {
@@ -14,7 +15,7 @@ class SendingStats extends Control
 
     private $templatesRepository;
 
-    private $batchesRepository;
+    private $userSubscriptionsRepository;
 
     private $templateIds = [];
 
@@ -27,13 +28,13 @@ class SendingStats extends Control
     public function __construct(
         LogsRepository $mailLogsRepository,
         TemplatesRepository $templatesRepository,
-        BatchesRepository $batchesRepository
+        UserSubscriptionsRepository $userSubscriptionsRepository
     ) {
         parent::__construct();
 
         $this->logsRepository = $mailLogsRepository;
         $this->templatesRepository = $templatesRepository;
-        $this->batchesRepository = $batchesRepository;
+        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
     public function addTemplate(ActiveRow $mailTemplate)
@@ -98,6 +99,7 @@ class SendingStats extends Control
                 ->where([
                     'utm_campaign' => $jobBatchTemplate->mail_template->code,
                     'utm_content' => $jobBatchTemplate->mail_job_batch_id,
+                    'subscribed' => false,
                 ])
                 ->count('*');
         }
@@ -111,6 +113,17 @@ class SendingStats extends Control
             $stats['converted']['value'] += $nonBatchTemplateStat->converted;
             $stats['dropped']['value'] += $nonBatchTemplateStat->dropped;
             $stats['spam_complained']['value'] += $nonBatchTemplateStat->spam_complained;
+
+            $templateCodes = $this->templatesRepository->getTable()
+                ->where(['id' => $this->templateIds])
+                ->fetchPairs('code', 'code');
+            $stats['unsubscribed']['value'] += $this->userSubscriptionsRepository->getTable()
+                ->where([
+                    'utm_campaign' => array_values($templateCodes),
+                    'utm_content' => null,
+                    'subscribed' => false,
+                ])
+                ->count('*');
         }
 
         foreach ($stats as $key => $stat) {
