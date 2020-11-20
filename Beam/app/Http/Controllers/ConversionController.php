@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Article;
 use App\Author;
 use App\Console\Commands\AggregateConversionEvents;
 use App\Conversion;
@@ -24,6 +25,7 @@ class ConversionController extends Controller
     {
         return response()->format([
             'html' => view('conversions.index', [
+                'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
                 'authors' => Author::all()->pluck('name', 'id'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'tags' => Tag::all()->pluck('name', 'id'),
@@ -36,7 +38,7 @@ class ConversionController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
-        $conversions = Conversion::select('conversions.*')
+        $conversions = Conversion::select('conversions.*', 'articles.content_type')
             ->with(['article', 'article.authors', 'article.sections', 'article.tags'])
             ->join('articles', 'articles.id', '=', 'conversions.article_id');
 
@@ -58,6 +60,10 @@ class ConversionController extends Controller
             })
             ->filterColumn('article.title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');
+            })
+            ->filterColumn('content_type', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $query->whereIn('articles.content_type', $values);
             })
             ->filterColumn('article.authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);

@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments]: Fixed `search.max_buckets` Elastic issue when aggregating too big chunk of pageviews data. Changed internal implementation of Segments API, aggregation is now using Elastic composite aggregation and pagination. remp/remp#662 
 - [Segments]: Fixed return type of count histogram items. Float was changed to int as count can always return integers anyway. remp/remp#622
 - [Segments]: Removed `offset` parameter for histograms. Beam APIs haven't used it and composite index (new Elastic-7-friendly implementation) doesn't support it yet. remp/remp#622
+- Added filter by content type to conversion, article pageviews, article conversions and author detail listing. remp/remp#769
 
 ### [Campaign]
 

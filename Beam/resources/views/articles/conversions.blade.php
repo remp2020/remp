@@ -69,6 +69,13 @@
                     'searchable' => false,
                     'className' => 'text-right',
                 ],
+                'content_type' => [
+                    'header' => 'Type',
+                    'orderable' => false,
+                    'filter' => $contentTypes,
+                    'priority' => 2,
+                    'visible' => count($contentTypes) > 1,
+                ],
                 'authors' => [
                     'header' => 'authors',
                     'orderable' => false,

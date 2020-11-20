@@ -68,6 +68,7 @@ class ArticleController extends Controller
         return response()->format([
             'html' => view('articles.conversions', [
                 'authors' => Author::all()->pluck('name', 'id'),
+                'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
@@ -85,6 +86,7 @@ class ArticleController extends Controller
                 "articles.id",
                 "articles.external_id",
                 "articles.title",
+                "articles.content_type",
                 "articles.url",
                 "articles.published_at",
                 "count(conversions.id) as conversions_count",
@@ -199,6 +201,10 @@ class ArticleController extends Controller
             ->filterColumn('title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');
             })
+            ->filterColumn('content_type', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $query->whereIn('articles.content_type', $values);
+            })
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $filterQuery = \DB::table('articles')
@@ -232,6 +238,7 @@ class ArticleController extends Controller
         return response()->format([
             'html' => view('articles.pageviews', [
                 'authors' => Author::all()->pluck('name', 'id'),
+                'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'tags' => Tag::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
@@ -288,6 +295,10 @@ class ArticleController extends Controller
             })
             ->filterColumn('title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');
+            })
+            ->filterColumn('content_type', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $query->whereIn('articles.content_type', $values);
             })
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(',', $value);
