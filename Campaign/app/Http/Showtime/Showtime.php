@@ -185,7 +185,7 @@ class Showtime
      */
     public function shouldDisplay(Campaign $campaign, $userData, array &$activeCampaignUuids): ?CampaignBanner
     {
-        $userId = $userData->userId;
+        $userId = $userData->userId ?? null;
         $browserId = $userData->browserId;
         $running = false;
 
