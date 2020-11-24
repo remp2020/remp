@@ -10,9 +10,17 @@ export default {
 
     browserId: null,
 
-    cacheThreshold: 15 * 60000, // 15 minutes
-
     rempSessionIDKey: "remp_session_id",
+
+    storage: "local_storage", // "cookie", "local_storage"
+
+    storageExpiration: {
+        "default": 15,
+        "keys": {
+            "browser_id": 1051200, // 2 years in minutes
+            "campaigns": 1051200,
+        }
+    },
 
     cookieDomain: null,
 
@@ -36,50 +44,27 @@ export default {
         }
 
         let storageKey = "browser_id";
-        let browserId = this.getFromStorage(storageKey, true, true);
+        let browserId = this.getFromStorage(storageKey);
         if (browserId) {
             return browserId;
-        }
-
-        // this section is added for historical reasons and migration of value
-        // it will be removed within next couple of weeks
-        let deprecatedStorageKey = "anon_id";
-        let anonId = this.getFromStorage(deprecatedStorageKey, true, true);
-        if (anonId) {
-            browserId = anonId;
-            this.removeFromStorage(deprecatedStorageKey);
         }
 
         if (!browserId) {
             browserId = remplib.uuidv4();
         }
 
-        let now = new Date();
-        let item = {
-            "version": 1,
-            "value": browserId,
-            "createdAt": now,
-            "updatedAt": now,
-        };
-        this.setToStorage(storageKey, item);
+        this.setToStorage(storageKey, browserId);
         return browserId;
     },
 
     getRempSessionID: function() {
         const storageKey = this.rempSessionIDKey;
-        let rempSessionID = this.getFromStorage(storageKey, false, true);
+        let rempSessionID = this.getFromStorage(storageKey);
         if (rempSessionID) {
             return rempSessionID;
         }
         rempSessionID = remplib.uuidv4();
-        const now = new Date();
-        let item = {
-            "version": 1,
-            "value": rempSessionID,
-            "createdAt": now,
-            "updatedAt": now,
-        };
-        this.setToStorage(storageKey, item);
+        this.setToStorage(storageKey, rempSessionID);
         return rempSessionID;
     },
 
@@ -109,73 +94,137 @@ export default {
         });
     },
 
-    setToStorage: function(key, item) {
-        localStorage.setItem(key, JSON.stringify(item));
+    setToStorage: function(key, value) {
+        let now = new Date();
+        let expireInMinutes = this.storageExpiration['default'];
+        if (this.storageExpiration['keys'][key]) {
+            expireInMinutes = this.storageExpiration['keys'][key];
+        }
+        let expireAt = new Date(now.getTime() + (expireInMinutes * 60000));
+        let serializedItem = JSON.stringify({
+            "version": 1,
+            "value": value,
+            "updatedAt": now
+        });
 
-        // clone value of item also to cookie
-        let value = item;
-        if (item.hasOwnProperty('value')) {
-            value = item.value;
+        if (this.storage === 'local_storage') {
+            localStorage.setItem(key, serializedItem);
         }
-        const now = new Date();
-        let cookieExp = new Date();
-        cookieExp.setTime(now.getTime() + this.cacheThreshold);
-        const expires = "; expires=" + cookieExp.toUTCString();
-        let domain = "";
-        if (this.cookieDomain !== null) {
-            domain = "; domain=" + this.cookieDomain;
-        }
-        document.cookie = key + "=" + value + expires + "; path=/"+ domain + ";";
+        this.storeCookie(key, value, expireAt);
     },
 
     /**
-     * Tries to retrieve key's value from localStorage
+     * Tries to retrieve key's value from storage (local/cookie)
      * Side effect of this function is an extension of key's lifetime in the storage
      * @param key
-     * @param bypassExpireThreshold ignore key's value expiration (given by cacheThreshold)
-     * @param storeToCookie
      * @returns {*}
      */
-    getFromStorage: function(key, bypassExpireThreshold, storeToCookie) {
+    getFromStorage: function(key) {
         let now = new Date();
+
+        let expireInMinutes = this.storageExpiration['default'];
+        if (this.storageExpiration['keys'][key]) {
+            expireInMinutes = this.storageExpiration['keys'][key];
+        }
+
+        let value = null;
+        if (this.storage === 'local_storage') {
+            value = this.getFromLocalStorage(key, now, expireInMinutes);
+            if (value) {
+                return value;
+            }
+        }
+
+        // universal fallback
+        value = this.getCookie(key);
+        if (value) {
+            let expireAt = new Date(now.getTime() + expireInMinutes * 60000);
+            this.storeCookie(key, value, expireAt);
+            return value;
+        }
+
+        // Migration from local storage to cookie (e.g. campaigns_session). We got here because we didn't find value
+        // in the cookie. It might be present in the local_storage.
+        if (this.storage === 'cookie') {
+            value = this.getFromLocalStorage(key, now, expireInMinutes);
+        }
+
+        return value;
+    },
+
+    getFromLocalStorage: function(key, now, expireInMinutes) {
         let data = localStorage.getItem(key);
-        if (data === null) {
+        if (!data) {
             return null;
         }
 
-        let item = JSON.parse(data);
-        let threshold = new Date(now.getTime() - this.cacheThreshold);
-        if (!bypassExpireThreshold && (new Date(item.updatedAt)).getTime() < threshold.getTime()) {
-            localStorage.removeItem(key);
+        let item = null;
+        try {
+            item = JSON.parse(data);
+            if (!item.hasOwnProperty("updatedAt") || !item.hasOwnProperty('version')) {
+                // This might not be our value, or it's just not migrated yet. Returning what we've found.
+                return data;
+            }
+        } catch (e) {
+            // There wasn't a JSON, definitely not our value. Returning what we've found.
+            return data;
+        }
+
+        let itemExpirationDate = new Date(new Date(item.updatedAt).getTime() + (expireInMinutes * 60000));
+        if (itemExpirationDate < now) {
+            this.removeFromStorage(key);
             return null;
         }
 
-        if (item.hasOwnProperty("updatedAt")) {
-            item.updatedAt = now;
-        }
-
-        if (storeToCookie) {
-            this.setToStorage(key, item);
-        } else {
-            localStorage.setItem(key, JSON.stringify(item));
-        }
-
+        let value = null;
         if (item.hasOwnProperty('value')) {
-            return item.value;
+            value = item.value;
+        } else if (item.hasOwnProperty('values')) {
+            // inconsistency failsave :(
+            value = item.values;
         }
-        return item;
+
+        if (typeof value === "object") {
+            // To be compatible with cookie storage, we only accept strings as values. This is backwards
+            // compatibility action to maintain existing objects.
+            value = JSON.stringify(value);
+        }
+
+        item.updatedAt = now;
+        localStorage.setItem(key, JSON.stringify(item));
+        return value;
     },
 
     removeFromStorage: function(key) {
         localStorage.removeItem(key);
+        this.removeCookie(key);
+    },
 
-        let cookieExp = new Date();
-        const expires = "; expires=" + cookieExp.toUTCString();
-        let domain = "";
-        if (this.cookieDomain !== null) {
-            domain = "; domain=" + this.cookieDomain;
+    getCookie: function(name) {
+        let result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+        if (!result) {
+            return null;
         }
-        document.cookie = key + "=" + expires + "; path=/"+ domain + ";";
+        return result[1];
+    },
+
+    storeCookie: function(name, value, expires) {
+        if (!value || value.length === 0) {
+            return;
+        }
+        document.cookie = [
+            name, '=', value,
+            '; expires=', expires.toUTCString(),
+            '; domain=', this.cookieDomain,
+            '; path=/;'
+        ].join('');
+    },
+
+    removeCookie: function(name) {
+        document.cookie = [
+            name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=',
+            this.cookieDomain
+        ].join('');
     },
 
     // simplified jquery extend (without deep copy, not copying null values)
