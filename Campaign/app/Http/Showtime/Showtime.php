@@ -280,7 +280,7 @@ class Showtime
         // using adblock?
         if ($campaign->using_adblock !== null) {
             if (!isset($userData->usingAdblock)) {
-                Log::error("Unable to load if user with ID [{$userId}] & browserId [{$browserId}] is using AdBlock.");
+                $this->logger->error("Unable to load if user with ID [{$userId}] & browserId [{$browserId}] is using AdBlock.");
                 return null;
             }
             if (($campaign->using_adblock && !$userData->usingAdblock) || ($campaign->using_adblock === false && $userData->usingAdblock)) {

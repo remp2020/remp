@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possibility of banner close buttons being overlayed by Safari scrollbar. remp/remp#764
 - Extended banner close button area for easier manipulation on touch-based devices. remp/remp#764
 - Fixed initialization of REMP JS library (may have caused a bug when banner aimed to anonymous users was shown to a logged-in user). remp/crm#651
+- Fixed invalid logger access in Showtime request causing fatal errors if user's adblock information was missing. remp/remp#774
 
 ### [Mailer]
 
