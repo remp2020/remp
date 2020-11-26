@@ -211,23 +211,19 @@ that helps to shape the final HTML of *email*.
                     $items[$url] = $meta;
                 }
             }
-    
-            $loader = new \Twig_Loader_Array([
-                'html_template' => $sourceTemplate->content_html,
-                'text_template' => $sourceTemplate->content_text,
-            ]);
-            $twig = new \Twig_Environment($loader);
+            
             $params = [
                 'intro' => $values->intro,
                 'footer' => $values->footer,
                 'items' => $items,
                 'utm_campaign' => $values->utm_campaign,
             ];
-    
-            $output = [];
-            $output['htmlContent'] = $twig->render('html_template', $params);
-            $output['textContent'] = $twig->render('text_template', $params);
-            return $output;
+  
+            $engine = $this->engineFactory->engine();
+            return [
+                'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
+                'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
+            ];
         }
     }
     ```

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Generators\GenericBestPerformingArticlesGenerator;
 use Remp\MailerModule\PageMeta\GenericPageContent;
 use Remp\MailerModule\PageMeta\TransportInterface;
@@ -11,6 +12,8 @@ use Remp\MailerModule\Repository\SourceTemplatesRepository;
 class GenericBestPerformingArticlesGeneratorTest extends TestCase
 {
     private $sourceTemplateRepository;
+
+    private $engineFactory;
 
     protected function setUp(): void
     {
@@ -43,6 +46,8 @@ TEMPLATE;
         $this->sourceTemplateRepository = $this->createConfiguredMock(SourceTemplatesRepository::class, [
             'find' => (object) $mailSourceTemplate
         ]);
+
+        $this->engineFactory = $GLOBALS['container']->getByType(EngineFactory::class);
     }
 
     public function testProcess()
@@ -72,7 +77,7 @@ HTML;
             }
         };
 
-        $generator = new GenericBestPerformingArticlesGenerator($this->sourceTemplateRepository, new GenericPageContent($transport));
+        $generator = new GenericBestPerformingArticlesGenerator($this->sourceTemplateRepository, new GenericPageContent($transport), $this->engineFactory);
 
         $testObj = new \stdClass();
         $testObj->source_template_id = 1;

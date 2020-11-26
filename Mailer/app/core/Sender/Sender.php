@@ -10,14 +10,14 @@ use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Auth\AutoLogin;
 use Remp\MailerModule\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
+use Remp\MailerModule\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Mailer\Mailer;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\Sender\MailerBatchException;
 use Remp\MailerModule\Sender\MailerFactory;
 use Remp\MailerModule\Sender\MailerNotExistsException;
-use Twig_Environment;
-use Twig_Loader_Array;
 
 class Sender
 {
@@ -54,16 +54,26 @@ class Sender
     /** @var LogsRepository */
     private $logsRepository;
 
+    /** @var EngineFactory  */
+    private $engineFactory;
+
+    /** @var ContentGenerator  */
+    private $contentGenerator;
+
     public function __construct(
         MailerFactory $mailerFactory,
         AutoLogin $autoLogin,
         UserSubscriptionsRepository $userSubscriptionsRepository,
-        LogsRepository $logsRepository
+        LogsRepository $logsRepository,
+        EngineFactory $engineFactory,
+        ContentGenerator $contentGenerator
     ) {
         $this->mailerFactory = $mailerFactory;
         $this->autoLogin = $autoLogin;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
         $this->logsRepository = $logsRepository;
+        $this->engineFactory = $engineFactory;
+        $this->contentGenerator = $contentGenerator;
     }
 
     public function addRecipient(string $email, string $name = null, array $params = [])
@@ -148,12 +158,13 @@ class Sender
         $message->setFrom($this->template->from);
         $message->setSubject($this->generateSubject($this->template->subject, $this->params));
 
-        $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
+        $mailContent = $this->contentGenerator->render(new GeneratorInput($this->template, $this->params, $this->batchId));
+
         if ($this->template->mail_body_text) {
-            $message->setBody($generator->getTextBody($this->params));
+            $message->setBody($mailContent->text());
         }
         if ($this->template->mail_body_html) {
-            $message->setHtmlBody($generator->getHtmlBody($this->params));
+            $message->setHtmlBody($mailContent->html());
         }
 
         $attachmentSize = $this->setMessageAttachments($message);
@@ -252,18 +263,19 @@ class Sender
 
         $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
 
-        $generator = new ContentGenerator($this->template, $this->template->layout, $this->batchId);
+        $generatorInput = new GeneratorInput($this->template, $transformedParams, $this->batchId);
 
         foreach ($templateParams as $email => $params) {
-            $templateParams[$email] = $generator->getEmailParams($params);
+            $templateParams[$email] = $this->contentGenerator->getEmailParams($generatorInput, $params);
         }
 
         if ($logger !== null) {
             $logger->info("Sender - email params generated for {$this->batchId}");
         }
 
+        $mailContent = $this->contentGenerator->render($generatorInput);
         if ($this->template->mail_body_text) {
-            $message->setBody($generator->getTextBody($transformedParams));
+            $message->setBody($mailContent->text());
         }
 
         if ($logger !== null) {
@@ -271,7 +283,7 @@ class Sender
         }
 
         if ($this->template->mail_body_html) {
-            $message->setHtmlBody($generator->getHtmlBody($transformedParams));
+            $message->setHtmlBody($mailContent->html());
         }
 
         if ($logger !== null) {
@@ -363,10 +375,6 @@ class Sender
 
     private function generateSubject($subjectTemplate, $params): string
     {
-        $loader = new Twig_Loader_Array([
-            'my_template' => $subjectTemplate,
-        ]);
-        $twig = new Twig_Environment($loader);
-        return $twig->render('my_template', $params);
+        return $this->engineFactory->engine()->render($subjectTemplate, $params);
     }
 }

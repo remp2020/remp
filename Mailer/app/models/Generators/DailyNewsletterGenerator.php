@@ -6,6 +6,7 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Validators;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
+use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
@@ -16,14 +17,18 @@ class DailyNewsletterGenerator implements IGenerator
 
     protected $content;
 
+    private $engineFactory;
+
     public $onSubmit;
 
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
-        ContentInterface $content
+        ContentInterface $content,
+        EngineFactory $engineFactory
     ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->content = $content;
+        $this->engineFactory = $engineFactory;
     }
 
     public function generateForm(Form $form)
@@ -69,16 +74,11 @@ class DailyNewsletterGenerator implements IGenerator
             'contents' => $posts,
         ];
 
-        $loader = new \Twig_Loader_Array([
-            'html_template' => $sourceTemplate->content_html,
-            'text_template' => $sourceTemplate->content_text,
-        ]);
-        $twig = new \Twig_Environment($loader);
-
-        $output = [];
-        $output['htmlContent'] = $twig->render('html_template', $params);
-        $output['textContent'] = $twig->render('text_template', $params);
-        return $output;
+        $engine = $this->engineFactory->engine();
+        return [
+            'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
+            'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
+        ];
     }
 
     public function getWidgets()

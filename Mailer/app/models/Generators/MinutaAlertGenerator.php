@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Generators;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
+use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\PageMeta\ContentInterface;
 use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
@@ -16,6 +17,8 @@ class MinutaAlertGenerator implements IGenerator
 
     protected $content;
 
+    private $engineFactory;
+
     public $onSubmit;
 
     private $transport;
@@ -23,11 +26,13 @@ class MinutaAlertGenerator implements IGenerator
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
         TransportInterface $transporter,
-        ContentInterface $content
+        ContentInterface $content,
+        EngineFactory $engineFactory
     ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->transport = $transporter;
         $this->content = $content;
+        $this->engineFactory = $engineFactory;
     }
 
     public function generateForm(Form $form)
@@ -75,16 +80,11 @@ class MinutaAlertGenerator implements IGenerator
             'post' => $post,
         ];
 
-        $loader = new \Twig_Loader_Array([
-            'html_template' => $sourceTemplate->content_html,
-            'text_template' => $sourceTemplate->content_text,
-        ]);
-        $twig = new \Twig_Environment($loader);
-
-        $output = [];
-        $output['htmlContent'] = $twig->render('html_template', $params);
-        $output['textContent'] = $twig->render('text_template', $params);
-        return $output;
+        $engine = $this->engineFactory->engine();
+        return [
+            'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
+            'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
+        ];
     }
 
     public function preprocessParameters($data): ?ArrayHash
