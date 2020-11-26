@@ -282,6 +282,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 return campaigns;
             }
 
+            if (typeof campaigns !== "object") {
+                console.warn("REMPLIB:", "unexpected type of campaigns:", campaigns);
+            }
+
             // migrations on campaigns values
             for (let campaignId in campaigns) {
                 if (!campaigns[campaignId].hasOwnProperty('seen')) {
