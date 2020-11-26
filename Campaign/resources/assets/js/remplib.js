@@ -187,11 +187,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (!campaigns.hasOwnProperty(cid)) {
                     continue;
                 }
-                delete campaigns[cid]['createdAt']; // no longer used
+
+                if (typeof campaigns[cid] === "undefined") {
+                    delete campaigns[cid];
+                    continue;
+                }
 
                 // cannot determine age, probably way too old to keep
                 if (!campaigns[cid].hasOwnProperty('updatedAt')) {
                     delete campaigns[cid];
+                    continue;
                 }
 
                 // delete everything without update in the last month
@@ -200,7 +205,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 let updatedAt = new Date(campaigns[cid]['updatedAt']);
                 if (updatedAt < threshold) {
                     delete campaigns[cid];
+                    continue;
                 }
+
+                delete campaigns[cid]['createdAt']; // field is no longer used
             }
             return campaigns;
         },
