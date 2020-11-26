@@ -145,7 +145,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             // clean anything that's already obsolete
-            this.cleanup();
+            let campaigns = this.getCampaigns();
+            campaigns = this.cleanup(campaigns);
+            if (campaigns) {
+                remplib.setToStorage(this.campaignsStorageKey, JSON.stringify(campaigns));
+            }
 
             if (selfCheckFunc !== undefined) {
                 selfCheckFunc("after campaign.init()");
@@ -173,9 +177,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             });
         },
 
-        cleanup: function() {
-            // clean obsolete campaigns
-            let campaigns = this.getCampaigns();
+        cleanup: function(campaigns) {
+            if (typeof campaigns !== "object") {
+                // data probably not migrated yet; indicate no cleanup with "null"
+                return null;
+            }
+
             for (let cid in campaigns) {
                 delete campaigns[cid]['createdAt']; // no longer used
 
@@ -192,7 +199,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     delete campaigns[cid];
                 }
             }
-            remplib.setToStorage(this.campaignsStorageKey, JSON.stringify(campaigns));
+            return campaigns;
         },
 
         run: function() {
@@ -257,7 +264,12 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         getCampaigns: function() {
-            let campaigns = JSON.parse(remplib.getFromStorage(this.campaignsStorageKey)) || {};
+            let campaigns = {};
+            try {
+                campaigns = JSON.parse(remplib.getFromStorage(this.campaignsStorageKey)) || {};
+            } catch (e) {
+                return campaigns;
+            }
 
             // migrations on campaigns values
             for (let campaignId in campaigns) {
@@ -293,6 +305,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             campaigns[campaignId].updatedAt = now;
             campaigns[campaignId].seen++;
 
+            campaigns = remplib.campaign.cleanup(campaigns);
             remplib.setToStorage(this.campaignsStorageKey, JSON.stringify(campaigns));
         },
 
