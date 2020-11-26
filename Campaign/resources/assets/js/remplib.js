@@ -184,6 +184,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             for (let cid in campaigns) {
+                if (!campaigns.hasOwnProperty(cid)) {
+                    continue;
+                }
                 delete campaigns[cid]['createdAt']; // no longer used
 
                 // cannot determine age, probably way too old to keep
