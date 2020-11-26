@@ -144,6 +144,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
             }
 
+            // clean anything that's already obsolete
+            this.cleanup();
+
             if (selfCheckFunc !== undefined) {
                 selfCheckFunc("after campaign.init()");
             }
@@ -168,6 +171,28 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     }
                 }, 50);
             });
+        },
+
+        cleanup: function() {
+            // clean obsolete campaigns
+            let campaigns = this.getCampaigns();
+            for (let cid in campaigns) {
+                delete campaigns[cid]['createdAt']; // no longer used
+
+                // cannot determine age, probably way too old to keep
+                if (!campaigns[cid].hasOwnProperty('updatedAt')) {
+                    delete campaigns[cid];
+                }
+
+                // delete everything without update in the last month
+                let threshold = new Date();
+                threshold.setMonth(threshold.getMonth()-1);
+                let updatedAt = new Date(campaigns[cid]['updatedAt']);
+                if (updatedAt < threshold) {
+                    delete campaigns[cid];
+                }
+            }
+            remplib.setToStorage(this.campaignsStorageKey, JSON.stringify(campaigns));
         },
 
         run: function() {
