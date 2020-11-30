@@ -92,7 +92,11 @@ class UnreadArticlesResolver
 
         foreach ($this->results[$templateCode][$userId] as $i => $url) {
             if (!array_key_exists($url, $this->articlesMeta)) {
-                $this->articlesMeta[$url] = $this->content->fetchUrlMeta($url);
+                $meta = $this->content->fetchUrlMeta($url);
+                if (!$meta) {
+                    throw new UserUnreadArticlesResolveException("Unable to fetch meta for url {$url} when resolving article parameters for userId: {$userId}, templateCode: {$templateCode}");
+                }
+                $this->articlesMeta[$url] = $meta;
             }
 
             $meta = $this->articlesMeta[$url];
