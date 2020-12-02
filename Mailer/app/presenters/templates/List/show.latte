@@ -15,6 +15,9 @@
             <a n:ifset="$list->image_url" href="{$list->image_url}">
                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-image-o"></i> List image</button>
             </a>
+            <a n:href="sentEmailsDetail $list->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-chart"></i> Sent emails</button>
+            </a>
         </div>
     </div>
     <div class="card-body card-padding">

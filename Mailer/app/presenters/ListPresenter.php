@@ -109,7 +109,8 @@ final class ListPresenter extends BasePresenter
             ])
             ->setAllColSetting('orderable', false)
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show list')
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit layout')
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit list')
+            ->setRowAction('sentEmailsDetail', 'palette-Cyan zmdi-chart', 'List stats')
             ->setTableSetting('displayNavigation', false)
             ->setTableSetting('rowGroup', 0);
 
@@ -131,10 +132,12 @@ final class ListPresenter extends BasePresenter
         foreach ($lists as $list) {
             $showUrl = $this->link('Show', $list->id);
             $editUrl = $this->link('Edit', $list->id);
+            $sentEmailsDetail = $this->link('sentEmailsDetail', $list->id);
             $result['data'][] = [
                 'actions' => [
                     'show' => $showUrl,
                     'edit' => $editUrl,
+                    'sentEmailsDetail' => $sentEmailsDetail,
                 ],
                 $list->type_category ? $list->type_category->title : null,
                 "<a href='{$showUrl}'>{$list->title}</a>",
