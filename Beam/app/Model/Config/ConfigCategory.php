@@ -10,6 +10,7 @@ class ConfigCategory extends Model
 {
     const CODE_DASHBOARD = 'dashboard';
     const CODE_AUTHOR_SEGMENTS = 'author-segments';
+    const CODE_SECTION_SEGMENTS = 'section-segments';
 
     protected $fillable = [
         'code',

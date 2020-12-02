@@ -30,12 +30,19 @@
                         <div role="tabpanel" class="tab-pane animated fadeIn {{$loop->index === 0 ? 'active' : ''}}" id="{{$configs[0]->configCategory->code}}">
                             <form method="post" action="{{ route('settings.update', ['configCategory' => $configs[0]->configCategory, 'redirect_url' => App\Model\Config\ConfigCategory::getSettingsTabUrl($configs[0]->configCategory->code)]) }}">
                                 {{ csrf_field() }}
+
                                 @if($configs[0]->configCategory->code === App\Model\Config\ConfigCategory::CODE_AUTHOR_SEGMENTS)
                                     <div class="well col">
                                         <p><i class="zmdi zmdi-info"></i> Before you configure author segments, you can test the parameters at the configuration testing page. When you are satisfied with the resulting segments, you can get back here and configure the final parameters for calculation.</p>
-                                        <a id="testing-link" class="btn btn-info waves-effect">Test Configuration</a>
+                                        <a href="{{ route('authorSegments.testingConfiguration') }}" id="author-testing-link" class="btn btn-info waves-effect">Test Configuration</a>
+                                    </div>
+                                @elseif($configs[0]->configCategory->code === App\Model\Config\ConfigCategory::CODE_SECTION_SEGMENTS)
+                                    <div class="well col">
+                                        <p><i class="zmdi zmdi-info"></i> Before you configure section segments, you can test the parameters at the configuration testing page. When you are satisfied with the resulting segments, you can get back here and configure the final parameters for calculation.</p>
+                                        <a href="{{ route('sectionSegments.testingConfiguration') }}" id="section-testing-link" class="btn btn-info waves-effect">Test Configuration</a>
                                     </div>
                                 @endif
+
                                 <div class="col-md-6">
                                     @foreach($configs as $config)
                                         <p class=" f-500 m-b-10"><span class="c-black">{{ $config->display_name ?? $config->name}}</span>
@@ -68,7 +75,6 @@
 @push('scripts')
     <script>
         $(document).ready(() => {
-            $('#testing-link').attr('href', route('authorSegments.testingConfiguration'));
             let url = location.href.replace(/\/$/, "");
 
             if (location.hash) {
