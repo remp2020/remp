@@ -47,6 +47,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Updated phpunit/phpunit from version 7 to 9.
 - Fixed incorrect _unsubscribed_ stats for emails sent directly to users (not via jobs). remp/remp#771
 - Fixed crash in `mail:process-job` command when article meta fetch fails. remp/remp#773  
+- Added graph of unsubscribed users in time to mail type detail. remp/remp#631
 
 ## [0.15.0] - 2020-10-15
 

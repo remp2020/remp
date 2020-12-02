@@ -174,4 +174,19 @@ class UserSubscriptionsRepository extends Repository
             $this->unSubscribeUser($userSubscription->mail_type, $userSubscription->user_id, $userSubscription->user_email, $utmParams);
         }
     }
+
+    public function getMailTypeGraphData($mailTypeId, \DateTime $from, \DateTime $to)
+    {
+        return $this->getTable()
+            ->select('
+                count(id) AS unsubscribed_users,
+                DATE(updated_at) AS label_date
+            ')
+            ->where('subscribed = 0')
+            ->where('mail_type_id = ?', $mailTypeId)
+            ->where('updated_at >= DATE(?)', $from)
+            ->where('updated_at <= DATE(?)', $to)
+            ->group('label_date')
+            ->order('label_date DESC');
+    }
 }

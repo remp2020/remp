@@ -14,6 +14,7 @@ use Remp\MailerModule\Repository\ListVariantsRepository;
 use Remp\MailerModule\Repository\MailTemplateStatsRepository;
 use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
+use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Tomaj\Hermes\Emitter;
 use DateTime;
 use DateInterval;
@@ -37,6 +38,8 @@ final class ListPresenter extends BasePresenter
     /** @var BatchTemplatesRepository */
     private $batchTemplatesRepository;
 
+    private $userSubscriptionsRepository;
+
     /** @var ListFormFactory */
     private $listFormFactory;
 
@@ -55,6 +58,7 @@ final class ListPresenter extends BasePresenter
         MailTypeStatsRepository $mailTypeStatsRepository,
         MailTemplateStatsRepository $mailTemplateStatsRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
+        UserSubscriptionsRepository $userSubscriptionsRepository,
         DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
         ListVariantsRepository $listVariantsRepository,
@@ -73,6 +77,7 @@ final class ListPresenter extends BasePresenter
         $this->listFormFactory = $listFormFactory;
         $this->listVariantsRepository = $listVariantsRepository;
         $this->emitter = $emitter;
+        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
     public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
@@ -436,6 +441,7 @@ final class ListPresenter extends BasePresenter
             $this->template->clickedDataSet = $data['clickedDataSet'];
             $this->template->openRateDataSet = $data['openRateDataSet'];
             $this->template->clickRateDataSet = $data['clickRateDataSet'];
+            $this->template->unsubscibedDataSet = $data['unsubscibedDataSet'];
         }
     }
 
@@ -539,6 +545,28 @@ final class ListPresenter extends BasePresenter
             }
         }
 
+        $unsubscibedDataSet = [
+            'label' => 'Unsubscribed users',
+            'data' => array_fill(0, $numOfGroups, 0),
+            'fill' => false,
+            'borderColor' => 'rgb(230,57,82)',
+            'lineTension' => 0.5
+        ];
+
+        $unsubscibedData = $this->userSubscriptionsRepository->getMailTypeGraphData($id, $from, $to)
+            ->fetchAll();
+        foreach ($unsubscibedData as $unsubscibedDataRow) {
+            $foundAt = array_search(
+                $unsubscibedDataRow->label_date->format($dateFormat),
+                $labels,
+                true
+            );
+
+            if ($foundAt !== false) {
+                $unsubscibedDataSet['data'][$foundAt] += $unsubscibedDataRow->unsubscribed_users;
+            }
+        }
+
         return [
             'labels' => $labels,
             'sentDataSet' => $sentDataSet,
@@ -547,6 +575,8 @@ final class ListPresenter extends BasePresenter
 
             'openRateDataSet' => $openRateDataSet,
             'clickRateDataSet' => $clickRateDataSet,
+
+            'unsubscibedDataSet' => $unsubscibedDataSet
         ];
     }
 
@@ -560,8 +590,10 @@ final class ListPresenter extends BasePresenter
         $this->template->clickedDataSet = $data['clickedDataSet'];
         $this->template->openRateDataSet = $data['openRateDataSet'];
         $this->template->clickRateDataSet = $data['clickRateDataSet'];
+        $this->template->unsubscibedDataSet = $data['unsubscibedDataSet'];
 
         $this->redrawControl('graph');
         $this->redrawControl('relativeGraph');
+        $this->redrawControl('unsubscribedGraph');
     }
 }

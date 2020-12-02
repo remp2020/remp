@@ -119,6 +119,49 @@
         </script>
     {/snippet}
 
+    {snippet unsubscribedGraph}
+        <div class="p-30">
+            <canvas id="mailer-dashboard-detail-statistics-graph-unsubscribed" width="1500" height="500"></canvas>
+        </div>
+
+        <script>
+            var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph-unsubscribed").getContext('2d');
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    "labels": {$labels},
+                    "datasets": [{$unsubscibedDataSet}]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                display: true
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: "top"
+                    },
+                    tooltips: {
+                        bodyFontSize: 14,
+                        callbacks: {
+                            label: function(tooltipItems, data) {
+                                return data.datasets[tooltipItems.datasetIndex].label+': '+tooltipItems.yLabel;
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+    {/snippet}
+
     <script>
         (function () {
             var $from = $('[name="from"]'),
@@ -150,6 +193,7 @@
 
                         $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
                         $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
+                        $('#snippet--unsubscribedGraph').html(data["snippets"]["snippet--unsubscribedGraph"]);
                     },
                     error: function () {
                         console.log('response error');
