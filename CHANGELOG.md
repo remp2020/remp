@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments]: Removed `offset` parameter for histograms. Beam APIs haven't used it and composite index (new Elastic-7-friendly implementation) doesn't support it yet. remp/remp#622
 - Added filter by content type to conversion, article pageviews, article conversions and author detail listing. remp/remp#769
 - Added ability to compute section stats segments using `ComputeSectionSegments` command + added configuration category and items for this feature + added test configuration screen which uses command to generate results and sends them to specified email address. remp/remp#424
+- Added run `ComputeSectionSegments` command to laravel console Kernel. remp/remp#424
 
 ### [Campaign]
 

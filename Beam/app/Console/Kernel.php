@@ -8,6 +8,7 @@ use App\Console\Commands\AggregatePageviewLoadJob;
 use App\Console\Commands\AggregatePageviewTimespentJob;
 use App\Console\Commands\CompressSnapshots;
 use App\Console\Commands\ComputeAuthorsSegments;
+use App\Console\Commands\ComputeSectionSegments;
 use App\Console\Commands\DeleteOldAggregations;
 use App\Console\Commands\ProcessPageviewSessions;
 use App\Console\Commands\SendNewslettersCommand;
@@ -91,6 +92,11 @@ class Kernel extends ConsoleKernel
             ->dailyAt('02:00')
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/compute_author_segments.log'));
+
+        $schedule->command(ComputeSectionSegments::COMMAND)
+            ->dailyAt('03:00')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/compute_section_segments.log'));
     }
 
     /**
