@@ -9,6 +9,11 @@ class ConfigNames
     const AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT = 'author_segments_min_average_timespent';
     const AUTHOR_SEGMENTS_DAYS_IN_PAST = 'author_segments_days_in_past';
 
+    const SECTION_SEGMENTS_MIN_RATIO = 'section_segments_min_ratio';
+    const SECTION_SEGMENTS_MIN_VIEWS = 'section_segments_min_views';
+    const SECTION_SEGMENTS_MIN_AVERAGE_TIMESPENT = 'section_segments_min_average_timespent';
+    const SECTION_SEGMENTS_DAYS_IN_PAST = 'section_segments_days_in_past';
+
     const CONVERSION_RATE_MULTIPLIER = 'conversion_rate_multiplier';
     const CONVERSION_RATE_DECIMAL_NUMBERS = 'conversion_rate_multiplier_decimals';
     const CONVERSIONS_COUNT_THRESHOLD_LOW =  'conversions_count_threshold_low';

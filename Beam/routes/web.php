@@ -56,6 +56,12 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('author-segments/compute', 'AuthorSegmentsController@compute')->name('authorSegments.compute');
     Route::post('author-segments/validate-test', 'AuthorSegmentsController@validateTest')->name('authorSegments.validateTest');
 
+    Route::get('section-segments', 'SectionSegmentsController@index')->name('sectionSegments.index');
+    Route::get('section-segments/json', 'SectionSegmentsController@json')->name('sectionSegments.json');
+    Route::get('section-segments/test-parameters', 'SectionSegmentsController@testingConfiguration')->name('sectionSegments.testingConfiguration');
+    Route::post('section-segments/compute', 'SectionSegmentsController@compute')->name('sectionSegments.compute');
+    Route::post('section-segments/validate-test', 'SectionSegmentsController@validateTest')->name('sectionSegments.validateTest');
+
     Route::get('authors/dtAuthors', 'AuthorController@dtAuthors')->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', 'AuthorController@dtArticles')->name('authors.dtArticles');
 

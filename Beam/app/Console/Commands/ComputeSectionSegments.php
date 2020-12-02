@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use App\ArticleAggregatedView;
-use App\Author;
-use App\Mail\AuthorSegmentsResult;
+use App\Mail\SectionSegmentsResult;
 use App\Model\Config\Config;
 use App\Model\Config\ConfigNames;
+use App\Section;
 use App\Segment;
 use App\SegmentBrowser;
 use App\SegmentGroup;
@@ -17,15 +17,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use PDO;
 
-class ComputeAuthorsSegments extends Command
+class ComputeSectionSegments extends Command
 {
-    const COMMAND = 'segments:compute-author-segments';
+    const COMMAND = 'segments:compute-section-segments';
 
     const ALL_CONFIGS = [
-        ConfigNames::AUTHOR_SEGMENTS_MIN_RATIO,
-        ConfigNames::AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT,
-        ConfigNames::AUTHOR_SEGMENTS_MIN_VIEWS,
-        ConfigNames::AUTHOR_SEGMENTS_DAYS_IN_PAST
+        ConfigNames::SECTION_SEGMENTS_MIN_RATIO,
+        ConfigNames::SECTION_SEGMENTS_MIN_AVERAGE_TIMESPENT,
+        ConfigNames::SECTION_SEGMENTS_MIN_VIEWS,
+        ConfigNames::SECTION_SEGMENTS_DAYS_IN_PAST
     ];
 
     private $minViews;
@@ -41,7 +41,7 @@ class ComputeAuthorsSegments extends Command
     {--min_average_timespent=} 
     {--min_ratio=}';
 
-    protected $description = "Generate authors' segments from aggregated pageviews and timespent data.";
+    protected $description = "Generate sections' segments from aggregated pageviews and timespent data.";
 
     public function handle()
     {
@@ -51,7 +51,7 @@ class ComputeAuthorsSegments extends Command
         DB::connection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 
         $this->line('');
-        $this->line('<info>***** Computing author segments *****</info>');
+        $this->line('<info>***** Computing section segments *****</info>');
         $this->line('');
 
         $email = $this->option('email');
@@ -65,23 +65,23 @@ class ComputeAuthorsSegments extends Command
             return 1;
         }
 
-        $this->minViews = Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_VIEWS);
-        $this->minAverageTimespent = Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_AVERAGE_TIMESPENT);
-        $this->minRatio = Config::loadByName(ConfigNames::AUTHOR_SEGMENTS_MIN_RATIO);
+        $this->minViews = Config::loadByName(ConfigNames::SECTION_SEGMENTS_MIN_VIEWS);
+        $this->minAverageTimespent = Config::loadByName(ConfigNames::SECTION_SEGMENTS_MIN_AVERAGE_TIMESPENT);
+        $this->minRatio = Config::loadByName(ConfigNames::SECTION_SEGMENTS_MIN_RATIO);
         $this->historyDays = $historyDays;
         $this->dateThreshold = Carbon::today()->subDays($historyDays);
 
         if ($email) {
             // Only compute segment statistics
-            $this->line('Generating authors segments statistics');
-            $this->computeAuthorSegments($email);
+            $this->line('Generating sections segments statistics');
+            $this->computeSectionSegments($email);
         } else {
             // Generate real segments
-            $this->line('Generating authors segments');
-            $this->recomputeBrowsersForAuthorSegments();
-            $this->recomputeUsersForAuthorSegments();
+            $this->line('Generating sections segments');
+            $this->recomputeBrowsersForSectionSegments();
+            $this->recomputeUsersForSectionSegments();
             $deletedSegments = self::deleteEmptySegments();
-            $this->line('Deleting empty author segments');
+            $this->line('Deleting empty section segments');
             if ($deletedSegments > 0) {
                 $this->line("Deleted $deletedSegments segments");
             }
@@ -94,7 +94,7 @@ class ComputeAuthorsSegments extends Command
     /**
      * @param $email
      */
-    private function computeAuthorSegments($email)
+    private function computeSectionSegments($email)
     {
         $minimalViews = $this->option('min_views') ?? $this->minViews;
         $minimalAverageTimespent = $this->option('min_average_timespent') ?? $this->minAverageTimespent;
@@ -108,20 +108,20 @@ class ComputeAuthorsSegments extends Command
         $this->line("running browsers query");
 
         $browsersSql = <<<SQL
-    SELECT T.author_id, authors.name, count(*) AS browser_count 
+    SELECT T.section_id, sections.name, count(*) AS browser_count 
     FROM
-      (SELECT browser_id, author_id, sum(pageviews) AS author_browser_views, avg(timespent) AS average_timespent
-      FROM article_aggregated_views C JOIN article_author A ON A.article_id = C.article_id
+      (SELECT browser_id, section_id, sum(pageviews) AS section_browser_views, avg(timespent) AS average_timespent
+      FROM article_aggregated_views C JOIN article_section A ON A.article_id = C.article_id
       WHERE timespent <= 3600
       AND date >= ?
-      GROUP BY browser_id, author_id
+      GROUP BY browser_id, section_id
       HAVING
-      author_browser_views >= ? AND
+      section_browser_views >= ? AND
       average_timespent >= ? AND
-      author_browser_views/(SELECT $columnDays FROM views_per_browser_mv WHERE browser_id = C.browser_id) >= ?
+      section_browser_views/(SELECT $columnDays FROM views_per_browser_mv WHERE browser_id = C.browser_id) >= ?
       ) T 
-    JOIN authors ON authors.id = T.author_id
-    GROUP BY author_id 
+    JOIN sections ON sections.id = T.section_id
+    GROUP BY section_id 
     ORDER BY browser_count DESC
 SQL;
         $resultsBrowsers = DB::select($browsersSql, [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
@@ -132,62 +132,62 @@ SQL;
             $obj->browser_count = $item->browser_count;
             $obj->user_count = 0;
 
-            $results[$item->author_id] = $obj;
+            $results[$item->section_id] = $obj;
         }
 
         $this->line("running users query");
 
         $usersSql = <<<SQL
-    SELECT T.author_id, authors.name, count(*) AS user_count 
+    SELECT T.section_id, sections.name, count(*) AS user_count 
     FROM
-        (SELECT user_id, author_id, sum(pageviews) AS author_user_views, avg(timespent) AS average_timespent
-        FROM article_aggregated_views C JOIN article_author A ON A.article_id = C.article_id
+        (SELECT user_id, section_id, sum(pageviews) AS section_user_views, avg(timespent) AS average_timespent
+        FROM article_aggregated_views C JOIN article_section A ON A.article_id = C.article_id
         WHERE timespent <= 3600
         AND user_id <> ''
         AND date >= ?
-        GROUP BY user_id, author_id
+        GROUP BY user_id, section_id
         HAVING
-        author_user_views >= ? AND
+        section_user_views >= ? AND
         average_timespent >= ? AND
-        author_user_views/(SELECT $columnDays FROM views_per_user_mv WHERE user_id = C.user_id) >= ?
-        ) T JOIN authors ON authors.id = T.author_id
-    GROUP BY author_id ORDER BY user_count DESC
+        section_user_views/(SELECT $columnDays FROM views_per_user_mv WHERE user_id = C.user_id) >= ?
+        ) T JOIN sections ON sections.id = T.section_id
+    GROUP BY section_id ORDER BY user_count DESC
 SQL;
         
         $resultsUsers = DB::select($usersSql, [$fromDay, $minimalViews, $minimalAverageTimespent, $minimalRatio]);
 
         foreach ($resultsUsers as $item) {
-            if (!array_key_exists($item->author_id, $results)) {
+            if (!array_key_exists($item->section_id, $results)) {
                 $obj = new \stdClass();
                 $obj->name = $item->name;
                 $obj->browser_count = 0;
                 $obj->user_count = 0;
-                $results[$item->author_id] = $obj;
+                $results[$item->section_id] = $obj;
             }
 
-            $results[$item->author_id]->user_count = $item->user_count;
+            $results[$item->section_id]->user_count = $item->user_count;
         }
 
         Mail::to($email)->send(
-            new AuthorSegmentsResult($results, $minimalViews, $minimalAverageTimespent, $minimalRatio, $this->historyDays)
+            new SectionSegmentsResult($results, $minimalViews, $minimalAverageTimespent, $minimalRatio, $this->historyDays)
         );
     }
 
-    private function recomputeUsersForAuthorSegments()
+    private function recomputeUsersForSectionSegments()
     {
         SegmentUser::whereHas('segment.segmentGroup', function ($q) {
-            $q->where('code', '=', SegmentGroup::CODE_AUTHORS_SEGMENTS);
+            $q->where('code', '=', SegmentGroup::CODE_SECTIONS_SEGMENTS);
         })->delete();
 
-        $authorUsers = $this->groupDataFor('user_id');
+        $sectionUsers = $this->groupDataFor('user_id');
 
         $this->line("Updating segments users");
 
-        foreach ($authorUsers as $authorId => $users) {
+        foreach ($sectionUsers as $sectionId => $users) {
             if (count($users) === 0) {
                 continue;
             }
-            $segment = $this->getOrCreateAuthorSegment($authorId);
+            $segment = $this->getOrCreateSectionSegment($sectionId);
 
             foreach (array_chunk($users, 100) as $usersChunk) {
                 $toInsert = collect($usersChunk)->map(function ($userId) use ($segment) {
@@ -203,22 +203,22 @@ SQL;
         }
     }
 
-    private function recomputeBrowsersForAuthorSegments()
+    private function recomputeBrowsersForSectionSegments()
     {
         SegmentBrowser::whereHas('segment.segmentGroup', function ($q) {
-            $q->where('code', '=', SegmentGroup::CODE_AUTHORS_SEGMENTS);
+            $q->where('code', '=', SegmentGroup::CODE_SECTIONS_SEGMENTS);
         })->delete();
 
-        $authorBrowsers = $this->groupDataFor('browser_id');
+        $sectionBrowsers = $this->groupDataFor('browser_id');
 
         $this->line("Updating segments browsers");
 
-        foreach ($authorBrowsers as $authorId => $browsers) {
+        foreach ($sectionBrowsers as $sectionId => $browsers) {
             if (count($browsers) === 0) {
                 continue;
             }
 
-            $segment = $this->getOrCreateAuthorSegment($authorId);
+            $segment = $this->getOrCreateSectionSegment($sectionId);
 
             foreach (array_chunk($browsers, 100) as $browsersChunk) {
                 $toInsert = collect($browsersChunk)->map(function ($browserId) use ($segment) {
@@ -266,15 +266,15 @@ SQL;
 
             $queryItems =  DB::table(ArticleAggregatedView::getTableName())->select(
                 $groupParameter,
-                'author_id',
+                'section_id',
                 DB::raw('sum(pageviews) as total_pageviews'),
                 DB::raw('avg(timespent) as average_timespent')
             )
-                ->join('article_author', 'article_author.article_id', '=', 'article_aggregated_views.article_id')
+                ->join('article_section', 'article_section.article_id', '=', 'article_aggregated_views.article_id')
                 ->whereNotNull($groupParameter)
                 ->where('date', '>=', $this->dateThreshold)
                 ->whereIn($groupParameter, $forItems)
-                ->groupBy([$groupParameter, 'author_id'])
+                ->groupBy([$groupParameter, 'section_id'])
                 ->havingRaw('avg(timespent) >= ?', [$this->minAverageTimespent])
                 ->cursor();
 
@@ -284,10 +284,10 @@ SQL;
                 }
                 $ratio = (int) $item->total_pageviews / $totalPageviews[$item->$groupParameter];
                 if ($ratio >= $this->minRatio && $item->total_pageviews >= $this->minViews) {
-                    if (!array_key_exists($item->author_id, $segments)) {
-                        $segments[$item->author_id] = [];
+                    if (!array_key_exists($item->section_id, $segments)) {
+                        $segments[$item->section_id] = [];
                     }
-                    $segments[$item->author_id][] = $item->$groupParameter;
+                    $segments[$item->section_id][] = $item->$groupParameter;
                 }
             }
         }
@@ -297,15 +297,15 @@ SQL;
         return $segments;
     }
 
-    private function getOrCreateAuthorSegment($authorId)
+    private function getOrCreateSectionSegment($sectionId)
     {
-        $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_AUTHORS_SEGMENTS])->first();
-        $author = Author::find($authorId);
+        $segmentGroup = SegmentGroup::where(['code' => SegmentGroup::CODE_SECTIONS_SEGMENTS])->first();
+        $section = Section::find($sectionId);
 
         return Segment::updateOrCreate([
-            'code' => 'author-' . $author->id
+            'code' => 'section-' . ($section ? $section->id : $sectionId)
         ], [
-            'name' => 'Author ' . $author->name,
+            'name' => 'Section ' . ($section ? $section->name : $sectionId),
             'active' => true,
             'segment_group_id' => $segmentGroup->id,
         ]);
@@ -325,7 +325,7 @@ SQL;
         return Segment::leftJoinSub($unionQuery, 't', function ($join) {
             $join->on('segments.id', '=', 't.segment_id');
         })->whereNull('t.segment_id')
-            ->where('segment_group_id', SegmentGroup::getByCode(SegmentGroup::CODE_AUTHORS_SEGMENTS)->id)
+            ->where('segment_group_id', SegmentGroup::getByCode(SegmentGroup::CODE_SECTIONS_SEGMENTS)->id)
             ->delete();
     }
 }
