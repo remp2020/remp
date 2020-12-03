@@ -36,13 +36,8 @@ class EmbedParser
 
     public function parse(string $link): ?string
     {
-        if (!isset($link[0]) && empty($link[0])) {
-            return null;
-        }
+        $link = trim($link);
 
-        $link = trim($link[0]);
-
-        // facebook
         if (preg_match('/^(?:(?:https?:)?\/\/)?(?:www\.)?facebook\.com\/[a-zA-Z0-9\.]+\/videos\/(?:[a-zA-Z0-9\.]+\/)?([0-9]+)/', $link)
             || preg_match('/youtu/', $link)
             || preg_match('/twitt/', $link)

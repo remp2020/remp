@@ -141,7 +141,9 @@ class DennikeGenerator implements IGenerator
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
 
             // parse embeds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => array($this->embedParser, "parse"),
+            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => function ($matches) {
+                return $this->embedParser->parse($matches[0]);
+            },
 
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
