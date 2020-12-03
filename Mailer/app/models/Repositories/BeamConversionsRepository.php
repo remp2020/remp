@@ -37,7 +37,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
             ->addSelect("step", "utm_campaign", "utm_content", "user_id", "token", "time")
             ->addFilter('step', 'purchase')
             ->addFilter('utm_campaign', ...$mailTemplateCodes)
-            ->addFilter('utm_content', ...$batchIds)
+            ->addFilter('utm_content', ...array_map('strval', $batchIds))
             ->addGroup('utm_campaign', 'utm_content');
 
         $result = $this->journal->list($request);
