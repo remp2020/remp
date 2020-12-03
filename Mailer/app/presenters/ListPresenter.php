@@ -503,7 +503,7 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData($id, $from, $to)->fetchAll();
+        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int)$id, $from, $to)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
