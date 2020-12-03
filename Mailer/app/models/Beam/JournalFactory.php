@@ -25,7 +25,7 @@ class JournalFactory
         }
     }
 
-    public function getClient(): ?Client
+    public function getClient(): ?Journal
     {
         return $this->client;
     }
