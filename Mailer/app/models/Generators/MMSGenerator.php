@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Generators;
 
@@ -8,7 +9,6 @@ use Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget;
 use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\PageMeta\ContentInterface;
-use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -22,8 +22,6 @@ class MMSGenerator implements IGenerator
 
     private $content;
 
-    private $transport;
-
     private $embedParser;
 
     private $articleLocker;
@@ -34,7 +32,6 @@ class MMSGenerator implements IGenerator
         SourceTemplatesRepository $mailSourceTemplateRepository,
         WordpressHelpers $helpers,
         ContentInterface $content,
-        TransportInterface $transport,
         EmbedParser $embedParser,
         ArticleLocker $articleLocker,
         EngineFactory $engineFactory
@@ -42,13 +39,12 @@ class MMSGenerator implements IGenerator
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
         $this->content = $content;
-        $this->transport = $transport;
         $this->embedParser = $embedParser;
         $this->articleLocker = $articleLocker;
         $this->engineFactory = $engineFactory;
     }
 
-    public function apiParams()
+    public function apiParams(): array
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
@@ -62,17 +58,17 @@ class MMSGenerator implements IGenerator
         ];
     }
 
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return [MMSWidget::class];
     }
 
-    public function process($values)
+    public function process(array $values): array
     {
-        $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
+        $sourceTemplate = $this->mailSourceTemplateRepository->find($values['source_template_id']);
         $content = $this->content;
 
-        $post = $values->mms_html;
+        $post = $values['mms_html'];
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
@@ -174,11 +170,11 @@ class MMSGenerator implements IGenerator
 
         $imageHtml = '';
 
-        if (isset($values->image_title) && isset($values->image_url)) {
-            $imageHtml = str_replace('$1', $values->image_url, $captionTemplate);
-            $imageHtml = str_replace('$2', $values->image_title, $imageHtml);
-        } else if (isset($values->image_url)) {
-            $imageHtml = str_replace('$1', $values->image_url, $imageTemplate);
+        if (isset($values['image_title']) && isset($values['image_url'])) {
+            $imageHtml = str_replace('$1', $values['image_url'], $captionTemplate);
+            $imageHtml = str_replace('$2', $values['image_title'], $imageHtml);
+        } elseif (isset($values['image_url'])) {
+            $imageHtml = str_replace('$1', $values['image_url'], $imageTemplate);
         }
 
         $post = $imageHtml . $post;
@@ -196,17 +192,17 @@ class MMSGenerator implements IGenerator
         $lockedText = preg_replace('/(\r\n|\r|\n)+/', "\n", $lockedText);
 
         $params = [
-            'title' => $values->title,
-            'sub_title' => $values->sub_title,
-            'url' => $values->url,
+            'title' => $values['title'],
+            'sub_title' => $values['sub_title'],
+            'url' => $values['url'],
             'html' => $post,
             'text' => $text,
         ];
 
         $lockedParams = [
-            'title' => $values->title,
-            'sub_title' => $values->sub_title,
-            'url' => $values->url,
+            'title' => $values['title'],
+            'sub_title' => $values['sub_title'],
+            'url' => $values['url'],
             'html' => $lockedPost,
             'text' => strip_tags($lockedText),
         ];
@@ -220,9 +216,9 @@ class MMSGenerator implements IGenerator
         ];
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
-        $output = $this->process($values);
+        $output = $this->process((array)$values);
 
         $addonParams = [
             'lockedHtmlContent' => $output['lockedHtmlContent'],
@@ -236,7 +232,7 @@ class MMSGenerator implements IGenerator
         $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
     }
 
-    public function generateForm(Form $form)
+    public function generateForm(Form $form): void
     {
         // disable CSRF protection as external sources could post the params here
         $form->offsetUnset(Form::PROTECTOR_ID);
@@ -268,7 +264,7 @@ class MMSGenerator implements IGenerator
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
-    public function onSubmit(callable $onSubmit)
+    public function onSubmit(callable $onSubmit): void
     {
         $this->onSubmit = $onSubmit;
     }

@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Crm;
 
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use Nette\Utils\Json;
@@ -11,9 +13,9 @@ class Client
 {
     private $client;
 
-    public function __construct($baseUrl, $token)
+    public function __construct(string $baseUrl, string $token)
     {
-        $this->client = new \GuzzleHttp\Client([
+        $this->client = new GuzzleClient([
             'base_uri' => $baseUrl,
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
@@ -21,7 +23,7 @@ class Client
         ]);
     }
 
-    public function confirmUser(string $email)
+    public function confirmUser(string $email): array
     {
         try {
             $response = $this->client->post('api/v1/users/confirm', [

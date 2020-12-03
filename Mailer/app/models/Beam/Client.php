@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Beam;
 
@@ -12,7 +13,7 @@ class Client
 {
     private $client;
 
-    public function __construct($baseUrl, $token)
+    public function __construct(?string $baseUrl, ?string $token)
     {
         if ($baseUrl) {
             $this->client = new \GuzzleHttp\Client([
@@ -25,8 +26,12 @@ class Client
         }
     }
 
-    public function unreadArticles($timespan, $articlesCount, array $criteria, array $userIds, array $ignoreAuthors = [])
+    public function unreadArticles($timespan, $articlesCount, array $criteria, array $userIds, array $ignoreAuthors = []): array
     {
+        if (!$this->client) {
+            throw new \Exception('Beam Client is not configured');
+        }
+
         try {
             $response = $this->client->post('api/articles/unread', [
                 RequestOptions::JSON => [

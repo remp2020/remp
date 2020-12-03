@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
+use Nette\Application\UI\Form;
+use Remp\MailerModule\Components\DataTable;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\LayoutFormFactory;
 use Remp\MailerModule\Repository\LayoutsRepository;
@@ -19,13 +22,12 @@ final class LayoutPresenter extends BasePresenter
         LayoutsRepository $layoutsRepository,
         LayoutFormFactory $layoutFormFactory
     ) {
-
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->layoutFormFactory = $layoutFormFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
@@ -42,7 +44,7 @@ final class LayoutPresenter extends BasePresenter
         return $dataTable;
     }
 
-    public function renderDefaultJsonData()
+    public function renderDefaultJsonData(): void
     {
         $request = $this->request->getParameters();
 
@@ -51,7 +53,7 @@ final class LayoutPresenter extends BasePresenter
                 ->count('*');
 
         $layouts = $this->layoutsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['length'], $request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], intval($request['length']), intval($request['start']))
             ->fetchAll();
 
         $result = [
@@ -73,7 +75,7 @@ final class LayoutPresenter extends BasePresenter
         $this->presenter->sendJson($result);
     }
 
-    public function renderEdit($id)
+    public function renderEdit($id): void
     {
         $layout = $this->layoutsRepository->find($id);
         if (!$layout) {
@@ -83,7 +85,7 @@ final class LayoutPresenter extends BasePresenter
         $this->template->layout = $layout;
     }
 
-    public function createComponentLayoutForm()
+    public function createComponentLayoutForm(): Form
     {
         $id = null;
         if (isset($this->params['id'])) {

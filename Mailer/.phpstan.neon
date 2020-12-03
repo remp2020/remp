@@ -1,6 +1,3 @@
 includes:
 	- vendor/phpstan/phpstan-nette/extension.neon
-
-parameters:
-    scanDirectories:
-        - app/
+	- vendor/phpstan/phpstan-nette/rules.neon

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
@@ -12,7 +13,7 @@ class GeneratorParamsProcessor
         $this->params = $params;
     }
 
-    public function getErrors()
+    public function getErrors(): array
     {
         $errors = [];
         foreach ($this->params as $param) {
@@ -23,7 +24,7 @@ class GeneratorParamsProcessor
         return $errors;
     }
 
-    public function getValues()
+    public function getValues(): array
     {
         $result = [];
         foreach ($this->params as $param) {

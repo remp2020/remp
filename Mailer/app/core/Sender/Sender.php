@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule;
 
-use Nette\Database\IRow;
 use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Auth\AutoLogin;
@@ -24,7 +25,7 @@ class Sender
     /** @var array */
     private $recipients = [];
 
-    /** @var \Nette\Database\Table\ActiveRow */
+    /** @var ActiveRow */
     private $template;
 
     /** @var int|null */
@@ -76,7 +77,7 @@ class Sender
         $this->contentGenerator = $contentGenerator;
     }
 
-    public function addRecipient(string $email, string $name = null, array $params = [])
+    public function addRecipient(string $email, string $name = null, array $params = []): self
     {
         $this->recipients[] = [
             'email' => $email,
@@ -87,49 +88,49 @@ class Sender
         return $this;
     }
 
-    public function addAttachment($name, $content = null)
+    public function addAttachment(string $name, $content = null): self
     {
         $this->attachments[$name] = $content;
 
         return $this;
     }
 
-    public function setTemplate(IRow $template)
+    public function setTemplate(ActiveRow $template): self
     {
         $this->template = $template;
 
         return $this;
     }
 
-    public function setJobId($jobId)
+    public function setJobId(int $jobId): self
     {
         $this->jobId = $jobId;
 
         return $this;
     }
 
-    public function setBatchId($batchId)
+    public function setBatchId(int $batchId): self
     {
         $this->batchId = $batchId;
 
         return $this;
     }
 
-    public function setParams(array $params)
+    public function setParams(array $params): self
     {
         $this->params = $params;
 
         return $this;
     }
 
-    public function setContext($context)
+    public function setContext(string $context): self
     {
         $this->context = $context;
 
         return $this;
     }
 
-    public function send($checkEmailSubscribed = true): int
+    public function send(bool $checkEmailSubscribed = true): int
     {
         if (count($this->recipients) > 1) {
             throw new MailerBatchException(sprintf("attempted to send batch via send() method: please use single recipient: %s", Json::encode($this->recipients)));
@@ -330,7 +331,7 @@ class Sender
         return $attachmentSize;
     }
 
-    private function setMessageHeaders(Message $message, $mailSenderId, $templateParams): void
+    private function setMessageHeaders(Message $message, $mailSenderId, ?array $templateParams): void
     {
         $message->setHeader('X-Mailer-Variables', Json::encode([
             'template' => $this->template->code,
@@ -347,15 +348,15 @@ class Sender
 
     /**
      * @param null|string $alias - If $alias is null, default mailer is returned.
-     * @return IMailer|Mailer
-     * @throws MailerNotExistsException
+     * @return Mailer
+     * @throws MailerNotExistsException|Config\ConfigNotExistsException
      */
-    public function getMailer($alias = null)
+    public function getMailer($alias = null): Mailer
     {
         return $this->mailerFactory->getMailer($alias);
     }
 
-    public function reset()
+    public function reset(): self
     {
         $this->recipients = [];
         $this->template = null;
@@ -373,7 +374,7 @@ class Sender
         return $this->getMailer()->supportsBatch();
     }
 
-    private function generateSubject($subjectTemplate, $params): string
+    private function generateSubject(string $subjectTemplate, array  $params): string
     {
         return $this->engineFactory->engine()->render($subjectTemplate, $params);
     }

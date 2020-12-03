@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use Nette\Database\Table\ActiveRow;
+use Nette\Utils\DateTime;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository\LayoutsRepository;
 use Remp\MailerModule\Repository\ListCategoriesRepository;
 use Remp\MailerModule\Repository\ListsRepository;
@@ -40,11 +42,6 @@ class DemoSeedCommand extends Command
             ->setDescription('Seed database with demo values');
     }
 
-    /**
-     * @param \Symfony\Component\Console\Input\InputInterface $input
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @return void
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('');
@@ -59,7 +56,7 @@ class DemoSeedCommand extends Command
             $category = $this->listCategoriesRepository->insert([
                 'title' => 'Newsletters',
                 'sorting' => 100,
-                'created_at' => new \DateTime(),
+                'created_at' => new DateTime(),
             ]);
         }
         $output->writeln('<info>OK!</info>');
@@ -143,5 +140,6 @@ HTML;
             );
         }
         $output->writeln('<info>OK!</info>');
+        return 0;
     }
 }

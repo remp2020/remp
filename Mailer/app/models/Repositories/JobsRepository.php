@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
+use Exception;
+use Nette\Utils\DateTime;
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
-use Nette\Database\Table\IRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Database\Table\Selection;
 use Remp\MailerModule\Repository;
 
@@ -22,8 +25,8 @@ class JobsRepository extends Repository
 
     public function __construct(
         Context $database,
-        IStorage $cacheStorage = null,
-        BatchesRepository $batchesRepository
+        BatchesRepository $batchesRepository,
+        IStorage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
 
@@ -35,15 +38,15 @@ class JobsRepository extends Repository
         return $this->getTable()->order('mail_jobs.created_at DESC');
     }
 
-    public function add($segmentCode, $segmentProvider, $context = null, $mailTypeVariant = null)
+    public function add(string $segmentCode, string $segmentProvider, ?string $context = null, ?ActiveRow $mailTypeVariant = null)
     {
         $data = [
             'segment_code' => $segmentCode,
             'segment_provider' => $segmentProvider,
             'context' => $context,
             'status' => static::STATUS_NEW,
-            'created_at' => new \DateTime(),
-            'updated_at' => new \DateTime(),
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime(),
             'mail_type_variant_id' => $mailTypeVariant ? $mailTypeVariant->id : null
         ];
 
@@ -51,14 +54,15 @@ class JobsRepository extends Repository
     }
 
     /**
-     * @param $query
-     * @param $order
-     * @param $orderDirection
-     * @param null $limit
-     * @param null $offset
+     * @param string $query
+     * @param string $order
+     * @param string $orderDirection
+     * @param array $listIds
+     * @param int|null $limit
+     * @param int|null $offset
      * @return Selection
      */
-    public function tableFilter($query, $order, $orderDirection, $listIds = null, $limit = null, $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, array $listIds = [], ?int $limit = null, ?int $offset = null)
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -85,13 +89,13 @@ class JobsRepository extends Repository
         return $selection;
     }
 
-    public function update(IRow &$row, $data)
+    public function update(ActiveRow &$row, array $data): bool
     {
         $this->getDatabase()->beginTransaction();
 
         if (!$this->isEditable($row->id)) {
             $this->getDatabase()->rollBack();
-            throw new \Exception("Job can't be updated. One or more Mail Job Batches were already started.");
+            throw new Exception("Job can't be updated. One or more Mail Job Batches were already started.");
         }
 
         $result = parent::update($row, $data);
@@ -100,7 +104,7 @@ class JobsRepository extends Repository
         return $result;
     }
 
-    public function isEditable($jobId)
+    public function isEditable(int $jobId): bool
     {
         if ($this->batchesRepository->notEditableBatches($jobId)->count() > 0) {
             return false;

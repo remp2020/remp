@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use DateTime;
+use DateInterval;
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository\LogsRepository;
 use Remp\MailerModule\Repository\MailTemplateStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
@@ -47,7 +49,7 @@ class AggregateMailTemplateStatsCommand extends Command
         } else {
             $today = (new DateTime())->setTime(0, 0);
         }
-        $yesterday = (clone $today)->sub(new \DateInterval('P1D'));
+        $yesterday = (clone $today)->sub(new DateInterval('P1D'));
 
         $output->writeln("Aggregating mail template stats from logs created from <info>{$yesterday->format(DATE_RFC3339)}</info> to <info>{$today->format(DATE_RFC3339)}</info>");
 
@@ -108,5 +110,7 @@ class AggregateMailTemplateStatsCommand extends Command
         } else {
             $output->writeln('<info>OK!</info> (no data)');
         }
+
+        return 0;
     }
 }

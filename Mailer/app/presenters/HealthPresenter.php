@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
@@ -38,7 +39,7 @@ final class HealthPresenter extends Presenter
         $this->tempDir = $tempDir;
     }
 
-    public function renderDefault()
+    public function renderDefault(): void
     {
         $result = [
             'status' => self::STATUS_OK,

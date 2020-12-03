@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Database\Table\IRow;
+use Nette\Utils\DateTime;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository;
 
 class ConfigsRepository extends Repository
@@ -22,8 +24,8 @@ class ConfigsRepository extends Repository
             'value' => $value,
             'description' => $description,
             'type' => $type,
-            'created_at' => new \DateTime(),
-            'updated_at' => new \DateTime(),
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime(),
         ]);
 
         if (is_numeric($result)) {
@@ -43,9 +45,9 @@ class ConfigsRepository extends Repository
         return $this->getTable()->where('name', $name)->fetch();
     }
 
-    public function update(IRow &$row, $data)
+    public function update(ActiveRow &$row, array $data): bool
     {
-        $data['updated_at'] = new \DateTime();
+        $data['updated_at'] = new DateTime();
         return parent::update($row, $data);
     }
 }

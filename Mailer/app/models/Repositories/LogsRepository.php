@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
@@ -33,14 +34,14 @@ class LogsRepository extends Repository
         return $this->getTable()->where('email', $email);
     }
 
-    public function add($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null, $context = null)
+    public function add(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null)
     {
         return $this->insert(
             $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize, $context)
         );
     }
 
-    public function getInsertData($email, $subject, $templateId, $jobId = null, $batchId = null, $mailSenderId = null, $attachmentSize = null, $context = null)
+    public function getInsertData(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null)
     {
         return [
             'email' => $email,
@@ -116,15 +117,15 @@ class LogsRepository extends Repository
     }
 
     /**
-     * @param $query
-     * @param $order
-     * @param $orderDirection
-     * @param null $limit
-     * @param null $offset
-     * @param null $templateId
+     * @param string $query
+     * @param string $order
+     * @param string $orderDirection
+     * @param int|null $limit
+     * @param int|null $offset
+     * @param int|null $templateId
      * @return Selection
      */
-    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null, $templateId = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null, ?int $templateId = null)
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));

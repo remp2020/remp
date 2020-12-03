@@ -1,16 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-use Nette\Utils\Arrays;
-use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository\ListCategoriesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class MailTypeCategoriesHandler extends BaseHandler
 {
-
     private $categoriesRepository;
 
     public function __construct(

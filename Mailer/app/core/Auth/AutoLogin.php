@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Auth;
 
-use Nette\Database\Table\IRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository\AutoLoginTokensRepository;
 
@@ -16,12 +17,12 @@ class AutoLogin
         $this->autoLoginTokensRepository = $autoLoginTokensRepository;
     }
 
-    public function getToken($token)
+    public function getToken($token): ActiveRow
     {
         return $this->autoLoginTokensRepository->findBy('token', $token);
     }
 
-    public function useToken(IRow $token)
+    public function useToken(ActiveRow $token): bool
     {
         return $this->autoLoginTokensRepository->update($token, ['used_count+=' => 1]);
     }

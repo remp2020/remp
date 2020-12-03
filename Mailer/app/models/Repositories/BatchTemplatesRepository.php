@@ -1,14 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
 class BatchTemplatesRepository extends Repository
 {
     protected $tableName = 'mail_job_batch_templates';
 
-    public function getDashboardGraphDataForTypes(\DateTime $from, \DateTime $to)
+    public function getDashboardGraphDataForTypes(DateTime $from, DateTime $to)
     {
         return $this->getTable()
             ->select('
@@ -29,14 +31,14 @@ class BatchTemplatesRepository extends Repository
             ->order('mail_job_batch.first_email_sent_at DESC');
     }
 
-    public function add($jobId, $batchId, $templateId, $weight = 100)
+    public function add(int $jobId, int $batchId, int $templateId, int $weight = 100)
     {
         $result = $this->insert([
             'mail_job_id' => $jobId,
             'mail_job_batch_id' => $batchId,
             'mail_template_id' => $templateId,
             'weight' => $weight,
-            'created_at' => new \DateTime(),
+            'created_at' => new DateTime(),
         ]);
 
         if (is_numeric($result)) {
@@ -46,18 +48,18 @@ class BatchTemplatesRepository extends Repository
         return $result;
     }
 
-    public function findByJobId($jobId)
+    public function findByJobId(int $jobId)
     {
         return $this->getTable()->where(['mail_job_id' => $jobId]);
     }
 
-    public function findByBatchId($batchId)
+    public function findByBatchId(int $batchId)
     {
         return $this->getTable()->where(['mail_job_batch_id' => $batchId]);
     }
 
-    public function deleteByBatchId($batchId)
+    public function deleteByBatchId(int $batchId): int
     {
-        $this->findByBatchId($batchId)->delete();
+        return $this->findByBatchId($batchId)->delete();
     }
 }

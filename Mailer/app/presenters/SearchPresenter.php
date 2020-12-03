@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
@@ -35,7 +36,7 @@ final class SearchPresenter extends BasePresenter
         $this->jobsRepository = $jobsRepository;
     }
 
-    public function actionDefault($term)
+    public function actionDefault($term): void
     {
         $limit =  (int) $this->environmentConfig->getParam('max_result_count', 5);
         $layouts = array_values($this->layoutsRepository->search($term, $limit));

@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Sender;
 
@@ -25,7 +27,7 @@ class TemplateTestFormFactory
         $this->sender = $sender;
     }
 
-    public function create($id)
+    public function create(int $id): Form
     {
         $form = new Form;
         $form->addProtection();
@@ -46,7 +48,7 @@ class TemplateTestFormFactory
         return $form;
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
         $template = $this->templateRepository->find($values['id']);
         $this->sender->setTemplate($template)

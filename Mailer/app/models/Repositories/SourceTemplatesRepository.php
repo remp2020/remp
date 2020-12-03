@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
@@ -33,7 +34,7 @@ class SourceTemplatesRepository extends Repository
         ]);
     }
 
-    public function exists($title)
+    public function exists(string $title): int
     {
         return $this->getTable()->where('title', $title)->count('*');
     }
@@ -43,16 +44,7 @@ class SourceTemplatesRepository extends Repository
         return $this->getTable()->order('sorting DESC')->limit(1);
     }
 
-    /**
-     * @param $query
-     * @param $order
-     * @param $orderDirection
-     * @param null $limit
-     * @param null $offset
-     *
-     * @return Selection
-     */
-    public function tableFilter($query, $order, $orderDirection, $limit = null, $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));

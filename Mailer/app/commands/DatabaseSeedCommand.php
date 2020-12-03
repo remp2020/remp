@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
@@ -34,11 +35,6 @@ class DatabaseSeedCommand extends Command
             ->setDescription('Seed database with required values');
     }
 
-    /**
-     * @param \Symfony\Component\Console\Input\InputInterface $input
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @return void
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('');
@@ -136,5 +132,6 @@ TEXT;
         }
 
         $output->writeln('<info>OK!</info>');
+        return 0;
     }
 }

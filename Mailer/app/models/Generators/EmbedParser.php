@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Generators;
 
@@ -8,19 +9,12 @@ class EmbedParser
 {
     private $videoLinkText;
 
-    /**
-     * @param string $videoLinkText
-     */
-    public function setVideoLinkText($videoLinkText = null)
+    public function setVideoLinkText(?string $videoLinkText = null): void
     {
         $this->videoLinkText = $videoLinkText;
     }
 
-    /**
-     * @param $url
-     * @return array|null
-     */
-    private function fetch($url)
+    private function fetch(string $url): ?array
     {
         $embed = Embed::create($url);
         $type = $embed->getType();
@@ -40,11 +34,7 @@ class EmbedParser
         ];
     }
 
-    /**
-     * @param $link
-     * @return string|null
-     */
-    public function parse($link)
+    public function parse(string $link): ?string
     {
         if (!isset($link[0]) && empty($link[0])) {
             return null;
@@ -65,14 +55,7 @@ class EmbedParser
         return null;
     }
 
-    /**
-     * @param $link
-     * @param $title
-     * @param null $image
-     * @param bool $isVideo
-     * @return string
-     */
-    public function createEmbedMarkup($link, $title, $image = null, $isVideo = false)
+    public function createEmbedMarkup(string $link, string $title, ?string $image = null, bool $isVideo = false): string
     {
         $html = "<br>";
 

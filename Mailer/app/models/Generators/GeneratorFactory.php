@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Generators;
 
 use Nette\DI\Container;
 use Remp\MailerModule\Components\GeneratorWidgetsManager;
-use Remp\MailerModule\Repository\SourceTemplatesRepository;
 
 class GeneratorFactory
 {
@@ -21,12 +21,11 @@ class GeneratorFactory
         Container $container,
         GeneratorWidgetsManager $generatorWidgetsManager
     ) {
-    
         $this->generatorWidgetsManager = $generatorWidgetsManager;
         $this->container = $container;
     }
 
-    public function registerGenerator($type, $label, IGenerator $generator)
+    public function registerGenerator(string $type, string $label, IGenerator $generator): void
     {
         $this->generators[$type] = $generator;
         $this->pairs[$type] = $label;
@@ -43,7 +42,7 @@ class GeneratorFactory
      * @return IGenerator
      * @throws \Exception
      */
-    public function get($type)
+    public function get(string $type): IGenerator
     {
         if (isset($this->generators[$type])) {
             return $this->generators[$type];
@@ -51,12 +50,12 @@ class GeneratorFactory
         throw new \Exception("Unknown generator type: {$type}");
     }
 
-    public function keys()
+    public function keys(): array
     {
         return array_keys($this->generators);
     }
 
-    public function pairs()
+    public function pairs(): array
     {
         return $this->pairs;
     }

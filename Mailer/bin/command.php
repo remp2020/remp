@@ -1,5 +1,5 @@
-#!/usr/bin/env php
 <?php
+declare(strict_types=1);
 
 use Nette\Database\DriverException;
 use Remp\MailerModule\PhinxRegistrator;

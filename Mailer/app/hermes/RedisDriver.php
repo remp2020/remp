@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Hermes;
 
@@ -50,7 +51,7 @@ class RedisDriver implements DriverInterface
             $this->checkRestart();
 
             $message = $this->tasksQueue->getTask();
-            if ($message) {
+            if ($message !== null) {
                 $hermesMessage = $this->serializer->unserialize($message[0]);
                 $this->tasksQueue->decrementType($hermesMessage->getType());
                 if ($hermesMessage->getExecuteAt() > time()) {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components;
 
@@ -12,18 +13,14 @@ class DataTable extends Control
     private $tableSettings = [];
     private $rowActions = [];
 
-    /**
-     * @param $sourceUrl
-     * @return $this
-     */
-    public function setSourceUrl($sourceUrl)
+    public function setSourceUrl(string $sourceUrl): self
     {
         $this->sourceUrl = $sourceUrl;
 
         return $this;
     }
 
-    public function getSourceUrl()
+    public function getSourceUrl(): string
     {
         if ($this->sourceUrl === null) {
             $presenter = $this->getPresenter();
@@ -33,12 +30,7 @@ class DataTable extends Control
         return $this->sourceUrl;
     }
 
-    /**
-     * @param $colName
-     * @param $colSetting
-     * @return $this
-     */
-    public function setColSetting($colName, $colSetting)
+    public function setColSetting(string $colName, array $colSetting): self
     {
         if (!array_key_exists('priority', $colSetting)) {
             throw new DataTableException('Missing "priority" item in DataTable configuration array for column: "' . $colName . '"');
@@ -48,12 +40,7 @@ class DataTable extends Control
         return $this;
     }
 
-    /**
-     * @param $colSettingName
-     * @param $colSettingValue
-     * @return $this
-     */
-    public function setAllColSetting($colSettingName, $colSettingValue = true)
+    public function setAllColSetting(string $colSettingName, bool $colSettingValue = true): self
     {
         foreach ($this->colSettings as $colName => $colSetting) {
             $this->colSettings[$colName][$colSettingName] = $colSettingValue;
@@ -62,25 +49,14 @@ class DataTable extends Control
         return $this;
     }
 
-    /**
-     * @param $tableSettingName
-     * @param $tableSetting
-     * @return $this
-     */
-    public function setTableSetting($tableSettingName, $tableSetting = true)
+    public function setTableSetting(string $tableSettingName, $tableSetting = null): self
     {
         $this->tableSettings[$tableSettingName] = $tableSetting;
 
         return $this;
     }
 
-    /**
-     * @param $actionName
-     * @param $actionClass
-     * @param $actionTitle
-     * @return $this
-     */
-    public function setRowAction($actionName, $actionClass, $actionTitle)
+    public function setRowAction(string $actionName, string $actionClass, string $actionTitle): self
     {
         $this->rowActions[] = [
             'name' => $actionName,
@@ -91,7 +67,7 @@ class DataTable extends Control
         return $this;
     }
 
-    public function render()
+    public function render(): void
     {
         $this->template->sourceUrl = $this->getSourceUrl();
         $this->template->colSettings = $this->colSettings;

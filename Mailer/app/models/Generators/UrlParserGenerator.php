@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Generators;
 
@@ -7,7 +8,6 @@ use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\PageMeta\ContentInterface;
-use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -19,23 +19,19 @@ class UrlParserGenerator implements IGenerator
 
     public $onSubmit;
 
-    private $transport;
-
     private $engineFactory;
 
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
-        TransportInterface $transport,
         ContentInterface $content,
         EngineFactory $engineFactory
     ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->transport = $transport;
         $this->content = $content;
         $this->engineFactory = $engineFactory;
     }
 
-    public function generateForm(Form $form)
+    public function generateForm(Form $form): void
     {
         $form->addTextArea('intro', 'Intro text')
             ->setAttribute('rows', 4)
@@ -58,22 +54,22 @@ class UrlParserGenerator implements IGenerator
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
-    public function onSubmit(callable $onSubmit)
+    public function onSubmit(callable $onSubmit): void
     {
         $this->onSubmit = $onSubmit;
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
         try {
-            $output = $this->process($values);
+            $output = $this->process((array)$values);
             $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
         } catch (InvalidUrlException $e) {
             $form->addError($e->getMessage());
         }
     }
 
-    public function apiParams()
+    public function apiParams(): array
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
@@ -84,12 +80,12 @@ class UrlParserGenerator implements IGenerator
         ];
     }
 
-    public function process($values)
+    public function process(array $values): array
     {
-        $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
+        $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
 
         $items = [];
-        $urls = explode("\n", trim($values->articles));
+        $urls = explode("\n", trim($values['articles']));
         foreach ($urls as $url) {
             $url = trim($url);
             $meta = $this->content->fetchUrlMeta($url);
@@ -99,10 +95,10 @@ class UrlParserGenerator implements IGenerator
         }
 
         $params = [
-            'intro' => $values->intro,
-            'footer' => $values->footer,
+            'intro' => $values['intro'],
+            'footer' => $values['footer'],
             'items' => $items,
-            'utm_campaign' => $values->utm_campaign,
+            'utm_campaign' => $values['utm_campaign'],
         ];
 
         $engine = $this->engineFactory->engine();
@@ -112,7 +108,7 @@ class UrlParserGenerator implements IGenerator
         ];
     }
 
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return [];
     }

@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Repository\LayoutsRepository;
 
 class LayoutFormFactory implements IFormFactory
@@ -23,10 +25,10 @@ class LayoutFormFactory implements IFormFactory
         $this->layoutsRepository = $layoutsRepository;
     }
 
-    public function create($id)
+    public function create(?int $id = null): Form
     {
         $defaults = [];
-        if (isset($id)) {
+        if ($id !== null) {
             $layout = $this->layoutsRepository->find($id);
             $defaults = $layout->toArray();
         }
@@ -60,7 +62,7 @@ class LayoutFormFactory implements IFormFactory
         return $form;
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
         // decide if user wants to save or save and leave
         $buttonSubmitted = self::FORM_ACTION_SAVE;
@@ -72,7 +74,7 @@ class LayoutFormFactory implements IFormFactory
 
         if (!empty($values['id'])) {
             $row = $this->layoutsRepository->find($values['id']);
-            $this->layoutsRepository->update($row, $values);
+            $this->layoutsRepository->update($row, (array) $values);
             ($this->onUpdate)($row, $buttonSubmitted);
         } else {
             $row = $this->layoutsRepository->add($values['name'], $values['layout_text'], $values['layout_html']);

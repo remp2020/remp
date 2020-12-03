@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\LogsRepository;
@@ -43,7 +44,7 @@ class ProcessJobStatsCommand extends Command
         $batchTemplates = $this->batchTemplatesRepository->getTable()->fetchAll();
         if (!count($batchTemplates)) {
             $output->writeln('<info>Nothing to do, exiting.</info>');
-            return;
+            return 0;
         }
 
         ProgressBar::setFormatDefinition(
@@ -77,5 +78,6 @@ class ProcessJobStatsCommand extends Command
         $output->writeln('');
         $output->writeln('Done');
         $output->writeln('');
+        return 0;
     }
 }

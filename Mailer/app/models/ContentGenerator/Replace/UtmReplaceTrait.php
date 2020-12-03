@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\ContentGenerator\Replace;
 
@@ -49,13 +50,13 @@ trait UtmReplaceTrait
                 if (strcasecmp($key, 'utm_source') === 0) {
                     $finalParams[] = "$key={$utmSource}";
                     $utmSourceAdded = true;
-                } else if (strcasecmp($key, 'utm_medium') === 0) {
+                } elseif (strcasecmp($key, 'utm_medium') === 0) {
                     $finalParams[] = "$key={$utmMedium}";
                     $utmMediumAdded = true;
-                } else if (strcasecmp($key, 'utm_campaign') === 0) {
+                } elseif (strcasecmp($key, 'utm_campaign') === 0) {
                     $finalParams[] = "$key={$utmCampaign}";
                     $utmCampaignAdded = true;
-                } else if (strcasecmp($key, 'utm_content') === 0) {
+                } elseif (strcasecmp($key, 'utm_content') === 0) {
                     $finalParams[] = "$key={$utmContent}";
                     $utmContentAdded = true;
                 } else {
@@ -80,5 +81,24 @@ trait UtmReplaceTrait
         }
 
         return $path . '?' . implode('&', $finalParams);
+    }
+
+    public function replace(string $content): string
+    {
+        $matches = [];
+        preg_match_all('/<a(.*?)href="([^"]*?)"(.*?)>/i', $content, $matches);
+
+        if (count($matches) > 0) {
+            foreach ($matches[2] as $idx => $hrefUrl) {
+                if (strpos($hrefUrl, 'http') === false) {
+                    continue;
+                }
+
+                $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $this->replaceUrl($hrefUrl), $matches[3][$idx]);
+                $content = str_replace($matches[0][$idx], $href, $content);
+            }
+        }
+
+        return $content;
     }
 }

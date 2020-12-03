@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Repository\BatchesRepository;
 use Remp\MailerModule\Repository\JobsRepository;
 use Remp\MailerModule\Repository\LayoutsRepository;
@@ -48,7 +50,7 @@ class NovydenikNewsfilterTemplateFormFactory
         $this->batchesRepository = $batchesRepository;
     }
 
-    public function create()
+    public function create(): Form
     {
         $form = new Form;
         $form->addProtection();
@@ -154,7 +156,7 @@ class NovydenikNewsfilterTemplateFormFactory
         return $code;
     }
 
-    public function formSucceeded(Form $form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
         $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values, $form) {
             $mailTemplate = $this->templatesRepository->add(

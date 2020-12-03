@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
 use Nette\Utils\DateTime;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository;
 
 class ListVariantsRepository extends Repository
@@ -11,7 +13,7 @@ class ListVariantsRepository extends Repository
 
     protected $dataTableSearchable = ['code', 'title'];
 
-    public function add($mailType, $title, $code, $sorting)
+    public function add(ActiveRow $mailType, string $title, string $code, int $sorting)
     {
         return $this->insert([
             'mail_type_id' => $mailType->id,
@@ -27,7 +29,7 @@ class ListVariantsRepository extends Repository
         return $this->getTable()->where(['id' => $id, 'mail_type_id' => $mailTypeID])->fetch();
     }
 
-    public function tableFilter($query, $order, $orderDirection, $listId = null, $limit = null, $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?array $listId = null, ?int $limit = null, ?int $offset = null)
     {
         $selection = $this->getTable()
             ->select('mail_type_variants.*, COUNT(:mail_user_subscription_variants.id) AS count')

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
@@ -14,7 +15,7 @@ class ListCategoriesRepository extends Repository
         return $this->getTable()->order('sorting ASC');
     }
 
-    public function add($title, $sorting)
+    public function add(string $title, int $sorting)
     {
         return $this->getTable()->insert([
             'title' => $title,

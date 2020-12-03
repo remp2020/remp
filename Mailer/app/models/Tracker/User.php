@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Tracker;
 
@@ -12,14 +13,14 @@ class User
 
     private $user_agent;
 
-    public function __construct($options = [])
+    public function __construct(array $options = [])
     {
         foreach ($options as $key => $val) {
             $this->{$key} = strval($val);
         }
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'id' => $this->id,

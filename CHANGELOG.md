@@ -37,6 +37,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Removed `Remp\MailerModule\Console\Application` and keep only native Symfony Application. Change in config -> use `add` instead of `register`
 - **BREAKING**: Updated Twig library to version 3. Also introduced IEngine for templates rendering. More detail [here](https://symfony.com/blog/preparing-your-applications-for-twig-3)
 - **BREAKING**: Replaced `Remp\MailerModule\Replace\ReplaceInterface` with `Remp\MailerModule\ContentGenerator\GeneratorInput\IReplace`. Please see the example implementations and update your implementation accordingly.
+- **BREAKING**: Added php types into most missing places (interfaces change). Please run `make phpstan` after update to check your custom changes.
+- **BREAKING**: Unified usage of ActiveRow, IRow and DateTime (interfaces change). Please run `make phpstan` after update to check your custom changes.
+- Added `declare(strict_types=1);` to all php files.
 - Fixed possible issue with asset location on Mac when Valet is used for development.
 - Upgraded vlucas/phpdotenv from version 2 to 5 and removed usage of `getenv()` function.
 - Removed obsolete deploy script.

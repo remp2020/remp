@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository\BatchTemplatesRepository;
 use Remp\MailerModule\Repository\IConversionsRepository;
@@ -210,6 +211,7 @@ class ProcessConversionStatsCommand extends Command
         $output->writeln('');
         $output->writeln('Done');
         $output->writeln('');
+        return 0;
     }
 
     private function getUserData($userIds)

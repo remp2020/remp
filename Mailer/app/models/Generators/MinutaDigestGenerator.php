@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Generators;
 
@@ -8,7 +9,6 @@ use Nette\Utils\Validators;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\InvalidUrlException;
 use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\PageMeta\ContentInterface;
-use Remp\MailerModule\PageMeta\TransportInterface;
 use Remp\MailerModule\Repository\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
 
@@ -20,38 +20,34 @@ class MinutaDigestGenerator implements IGenerator
 
     public $onSubmit;
 
-    private $transport;
-
     private $engineFactory;
 
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
-        TransportInterface $transporter,
         ContentInterface $content,
         EngineFactory $engineFactory
     ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->transport = $transporter;
         $this->content = $content;
         $this->engineFactory = $engineFactory;
     }
 
-    public function onSubmit(callable $onSubmit)
+    public function onSubmit(callable $onSubmit): void
     {
         $this->onSubmit = $onSubmit;
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
         try {
-            $output = $this->process($values);
+            $output = $this->process((array) $values);
             $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
         } catch (InvalidUrlException $e) {
             $form->addError($e->getMessage());
         }
     }
 
-    public function apiParams()
+    public function apiParams(): array
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
@@ -59,12 +55,12 @@ class MinutaDigestGenerator implements IGenerator
         ];
     }
 
-    public function process($values)
+    public function process(array $values): array
     {
-        $sourceTemplate = $this->sourceTemplatesRepository->find($values->source_template_id);
+        $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
 
         $posts = [];
-        $urls = explode("\n", $values->posts);
+        $urls = explode("\n", $values['posts']);
         foreach ($urls as $url) {
             $url = trim($url);
             if (Validators::isUrl($url)) {
@@ -83,7 +79,7 @@ class MinutaDigestGenerator implements IGenerator
         ];
     }
 
-    public function generateForm(Form $form)
+    public function generateForm(Form $form): void
     {
         $form->addTextArea('posts', 'List of posts')
             ->setAttribute('rows', 4)
@@ -94,7 +90,7 @@ class MinutaDigestGenerator implements IGenerator
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return [];
     }

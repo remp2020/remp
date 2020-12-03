@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\User;
 
@@ -15,7 +16,7 @@ class Crm implements IUser
 
     private $client;
 
-    public function __construct($baseUrl, $token)
+    public function __construct(string $baseUrl, string $token)
     {
         $this->client = new Client([
             'base_uri' => $baseUrl,
@@ -26,7 +27,7 @@ class Crm implements IUser
         ]);
     }
 
-    public function list(array $userIds, $page)
+    public function list(array $userIds, int $page): array
     {
         try {
             $response = $this->client->post(self::ENDPOINT_LIST, [

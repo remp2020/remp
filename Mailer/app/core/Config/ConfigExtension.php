@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Config;
 
@@ -6,7 +7,7 @@ use Nette\DI\CompilerExtension;
 
 class ConfigExtension extends CompilerExtension
 {
-    public function loadConfiguration()
+    public function loadConfiguration(): void
     {
         $config = $this->getConfig();
 

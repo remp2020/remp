@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\User;
 
-class UserException extends \Exception
-{
+use Exception;
 
+class UserException extends Exception
+{
 }

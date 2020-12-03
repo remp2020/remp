@@ -1,4 +1,4 @@
-FROM php:7.3-fpm
+FROM php:7.4-fpm
 
 ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev python-minimal
 
@@ -42,7 +42,7 @@ ENV YARN_CACHE_FOLDER /yarn
 
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
 RUN apt-get install -y nodejs
 

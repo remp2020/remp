@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
@@ -29,15 +30,15 @@ class BatchesRepository extends Repository
 
     protected $tableName = 'mail_job_batch';
 
-    public function add($jobId, $emailCount = null, $startAt = null, $method = 'random')
+    public function add(int $jobId, int $emailCount = null, string $startAt = null, string $method = 'random')
     {
         $result = $this->insert([
             'mail_job_id' => $jobId,
             'method' => $method,
             'max_emails' => $emailCount,
-            'start_at' => new \DateTime($startAt),
-            'created_at' => new \DateTime(),
-            'updated_at' => new \DateTime(),
+            'start_at' => $startAt ? new DateTime($startAt) : new DateTime(),
+            'created_at' => new DateTime(),
+            'updated_at' => new DateTime(),
         ]);
 
         if (is_numeric($result)) {
@@ -47,7 +48,7 @@ class BatchesRepository extends Repository
         return $result;
     }
 
-    public function addTemplate($batch, $template, $weight = 100)
+    public function addTemplate(ActiveRow $batch, ActiveRow $template, int $weight = 100)
     {
         $this->database->table('mail_job_batch_templates')->insert([
             'mail_job_id' => $batch->mail_job_id,
@@ -84,7 +85,7 @@ class BatchesRepository extends Repository
         return $batch->related('mail_job_batch_templates')->fetch()->mail_template->mail_type->priority;
     }
 
-    public function getInProgressBatches($limit)
+    public function getInProgressBatches(int $limit)
     {
         return $this->getTable()
             ->where([
@@ -99,7 +100,7 @@ class BatchesRepository extends Repository
             ->limit($limit);
     }
 
-    public function getLastDoneBatches($limit)
+    public function getLastDoneBatches(int $limit)
     {
         return $this->getTable()
             ->where([
@@ -111,7 +112,7 @@ class BatchesRepository extends Repository
             ->limit($limit);
     }
 
-    public function notEditableBatches($jobId)
+    public function notEditableBatches(int $jobId)
     {
         return $this->getTable()
             ->select('*')

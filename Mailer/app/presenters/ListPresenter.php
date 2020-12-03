@@ -1,10 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use DateTimeZone;
 use Nette\Application\BadRequestException;
-use Nette\Database\Table\ActiveRow;
+use Nette\Application\UI\Form;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\Json;
+use Remp\MailerModule\Components\DataTable;
 use Remp\MailerModule\Components\IDataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
@@ -16,7 +20,7 @@ use Remp\MailerModule\Repository\MailTypeStatsRepository;
 use Remp\MailerModule\Repository\TemplatesRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Tomaj\Hermes\Emitter;
-use DateTime;
+use Nette\Utils\DateTime;
 use DateInterval;
 use IntlDateFormatter;
 use Remp\MailerModule\Formatters\DateFormatterFactory;
@@ -80,7 +84,7 @@ final class ListPresenter extends BasePresenter
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
@@ -122,7 +126,7 @@ final class ListPresenter extends BasePresenter
         return $dataTable;
     }
 
-    public function renderDefaultJsonData()
+    public function renderDefaultJsonData(): void
     {
         $lists = $this->listsRepository->tableFilter();
         $listsCount = $lists->count('*');
@@ -157,7 +161,7 @@ final class ListPresenter extends BasePresenter
         $this->presenter->sendJson($result);
     }
 
-    public function renderShow($id)
+    public function renderShow($id): void
     {
         $list = $this->listsRepository->find($id);
         if (!$list) {
@@ -201,7 +205,7 @@ final class ListPresenter extends BasePresenter
         $this->prepareDetailSubscribersGraphData($id);
     }
 
-    public function prepareDetailSubscribersGraphData($id)
+    public function prepareDetailSubscribersGraphData($id): void
     {
         $labels = [];
         $numOfDays = 30;
@@ -241,7 +245,7 @@ final class ListPresenter extends BasePresenter
         $this->template->labels = $labels;
     }
 
-    public function renderEdit($id)
+    public function renderEdit($id): void
     {
         $list = $this->listsRepository->find($id);
         if (!$list) {
@@ -251,7 +255,7 @@ final class ListPresenter extends BasePresenter
         $this->template->list = $list;
     }
 
-    public function createComponentDataTableTemplates(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableTemplates(IDataTableFactory $dataTableFactory): DataTable
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
@@ -277,12 +281,12 @@ final class ListPresenter extends BasePresenter
         return $dataTable;
     }
 
-    public function renderTemplateJsonData()
+    public function renderTemplateJsonData(): void
     {
         $request = $this->request->getParameters();
 
         $templatesCount = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'], null, null)
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'])
             ->count('*');
 
         $templates = $this->templatesRepository
@@ -317,7 +321,7 @@ final class ListPresenter extends BasePresenter
         $this->presenter->sendJson($result);
     }
 
-    public function createComponentDataTableVariants(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableVariants(IDataTableFactory $dataTableFactory): DataTable
     {
         $dataTable = $dataTableFactory->create();
         $dataTable
@@ -339,7 +343,7 @@ final class ListPresenter extends BasePresenter
         return $dataTable;
     }
 
-    public function renderVariantsJsonData()
+    public function renderVariantsJsonData(): void
     {
         $request = $this->request->getParameters();
 
@@ -348,7 +352,7 @@ final class ListPresenter extends BasePresenter
             ->count('*');
 
         $variants = $this->listVariantsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'], $request['length'], $request['start']);
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'], intval($request['length']), intval($request['start']));
 
         $result = [
             'recordsTotal' => $this->listVariantsRepository->totalCount(),
@@ -367,7 +371,7 @@ final class ListPresenter extends BasePresenter
         $this->presenter->sendJson($result);
     }
 
-    public function createComponentListForm()
+    public function createComponentListForm(): Form
     {
         $id = null;
         if (isset($this->params['id'])) {
@@ -398,14 +402,14 @@ final class ListPresenter extends BasePresenter
         return $form;
     }
 
-    public function handleRenderSorting($categoryId, $sorting)
+    public function handleRenderSorting($categoryId, $sorting): void
     {
         // set sorting value
         $this['listForm']['sorting']->setValue($sorting);
 
         // handle newsletter list category change
         if ($this['listForm']['mail_type_category_id']->getValue() !== $categoryId) {
-            $lists = $this->listsRepository->findByCategory($categoryId);
+            $lists = $this->listsRepository->findByCategory(intval($categoryId));
             if ($listId = $this['listForm']['id']->getValue()) {
                 $lists = $lists->where('id != ?', $listId);
             }
@@ -419,7 +423,7 @@ final class ListPresenter extends BasePresenter
     }
 
 
-    public function renderSentEmailsDetail($id)
+    public function renderSentEmailsDetail($id): void
     {
         $mailType = $this->listsRepository->find($id);
 
@@ -448,11 +452,11 @@ final class ListPresenter extends BasePresenter
         }
     }
 
-    public function emailsDetailData($id, $from, $to, $groupBy, $tz)
+    public function emailsDetailData($id, $from, $to, $groupBy, $tz): array
     {
         $labels = [];
         if ($tz !== null) {
-            $tz = new \DateTimeZone($tz);
+            $tz = new DateTimeZone($tz);
         }
 
         $from = new DateTime($from, $tz);

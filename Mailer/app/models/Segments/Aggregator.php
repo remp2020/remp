@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Remp\MailerModule\Segment;
 
 class Aggregator implements ISegment
@@ -8,7 +10,7 @@ class Aggregator implements ISegment
 
     private $errors = [];
 
-    public function register(ISegment $provider)
+    public function register(ISegment $provider): void
     {
         $this->providers = array_merge($this->providers, [$provider->provider() => $provider]);
     }
@@ -22,7 +24,7 @@ class Aggregator implements ISegment
         throw new SegmentException("Aggregator cannot return provider value");
     }
 
-    public function list()
+    public function list(): array
     {
         $segments = [];
         foreach ($this->providers as $provider) {
@@ -35,17 +37,17 @@ class Aggregator implements ISegment
         return $segments;
     }
 
-    public function users($segment)
+    public function users(array $segment): array
     {
         return $this->providers[$segment['provider']]->users($segment);
     }
 
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return count($this->errors) > 0;
     }
 
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

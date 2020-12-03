@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Components;
 
@@ -23,7 +24,7 @@ class MissingConfiguration extends Control
         $this->mailerFactory = $mailerFactory;
     }
 
-    public function render()
+    public function render(): void
     {
         $defaultMailerSetting = $this->configsRepository->loadByName('default_mailer');
         $mailerConfigured = false;

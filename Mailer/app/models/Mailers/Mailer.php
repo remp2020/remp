@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Mailer;
 
@@ -30,12 +31,12 @@ abstract class Mailer implements IMailer
         $this->buildConfig();
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->alias;
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return $this->options;
     }
@@ -51,7 +52,7 @@ abstract class Mailer implements IMailer
         return $this->options[$config]['value'] ?? null;
     }
 
-    protected function buildConfig()
+    protected function buildConfig(): void
     {
         foreach ($this->options as $name => $definition) {
             $prefix = $this->getPrefix();
@@ -76,12 +77,12 @@ abstract class Mailer implements IMailer
         }
     }
 
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return str_replace('-', '_', Strings::webalize(get_called_class()));
     }
 
-    public function isConfigured()
+    public function isConfigured(): bool
     {
         foreach ($this->getRequiredOptions() as $option) {
             if (!isset($option['value'])) {
@@ -92,7 +93,7 @@ abstract class Mailer implements IMailer
         return true;
     }
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return array_filter($this->options, function ($option) {
             return $option['required'];
@@ -107,11 +108,10 @@ abstract class Mailer implements IMailer
      * Return value is ordered as [transformed params for twig,
      * altered params for mailer header X-Mailer-Template-Params]
      *
-     * @param $params
-     *
-     * @return mixed
+     * @param array $params
+     * @return array
      */
-    public function transformTemplateParams(array $params)
+    public function transformTemplateParams(array $params): array
     {
         return [$params, $params];
     }

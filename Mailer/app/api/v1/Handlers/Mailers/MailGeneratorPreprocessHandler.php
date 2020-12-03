@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
@@ -19,7 +20,6 @@ class MailGeneratorPreprocessHandler extends BaseHandler
         GeneratorFactory $generatorFactory,
         SourceTemplatesRepository $sourceTemplatesRepository
     ) {
-
         parent::__construct();
         $this->generatorFactory = $generatorFactory;
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;

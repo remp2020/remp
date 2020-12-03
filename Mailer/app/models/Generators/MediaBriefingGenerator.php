@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Generators;
 
@@ -44,7 +45,7 @@ class MediaBriefingGenerator implements IGenerator
         $this->engineFactory = $engineFactory;
     }
 
-    public function apiParams()
+    public function apiParams(): array
     {
         return [
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
@@ -58,17 +59,17 @@ class MediaBriefingGenerator implements IGenerator
         ];
     }
 
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return [MediaBriefingWidget::class];
     }
 
-    public function process($values)
+    public function process(array $values): array
     {
-        $sourceTemplate = $this->mailSourceTemplateRepository->find($values->source_template_id);
+        $sourceTemplate = $this->mailSourceTemplateRepository->find($values['source_template_id']);
         $content = $this->content;
 
-        $post = $values->mediabriefing_html;
+        $post = $values['mediabriefing_html'];
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
         list(
@@ -168,11 +169,11 @@ class MediaBriefingGenerator implements IGenerator
 
         $imageHtml = '';
 
-        if (isset($values->image_title) && isset($values->image_url)) {
-            $imageHtml = str_replace('$1', $values->image_url, $captionTemplate);
-            $imageHtml = str_replace('$2', $values->image_title, $imageHtml);
-        } elseif (isset($values->image_url)) {
-            $imageHtml = str_replace('$1', $values->image_url, $imageTemplate);
+        if (isset($values['image_title']) && isset($values['image_url'])) {
+            $imageHtml = str_replace('$1', $values['image_url'], $captionTemplate);
+            $imageHtml = str_replace('$2', $values['image_title'], $imageHtml);
+        } elseif (isset($values['image_url'])) {
+            $imageHtml = str_replace('$1', $values['image_url'], $imageTemplate);
         }
 
         $post = $imageHtml . $post;
@@ -190,17 +191,17 @@ class MediaBriefingGenerator implements IGenerator
         $lockedText = preg_replace('/(\r\n|\r|\n)+/', "\n", $lockedText);
 
         $params = [
-            'title' => $values->title,
-            'sub_title' => $values->sub_title,
-            'url' => $values->url,
+            'title' => $values['title'],
+            'sub_title' => $values['sub_title'],
+            'url' => $values['url'],
             'html' => $post,
             'text' => $text,
         ];
 
         $lockedParams = [
-            'title' => $values->title,
-            'sub_title' => $values->sub_title,
-            'url' => $values->url,
+            'title' => $values['title'],
+            'sub_title' => $values['sub_title'],
+            'url' => $values['url'],
             'html' => $lockedPost,
             'text' => strip_tags($lockedText),
         ];
@@ -214,9 +215,9 @@ class MediaBriefingGenerator implements IGenerator
         ];
     }
 
-    public function formSucceeded($form, $values)
+    public function formSucceeded(Form $form, ArrayHash $values): void
     {
-        $output = $this->process($values);
+        $output = $this->process((array) $values);
 
         $addonParams = [
             'lockedHtmlContent' => $output['lockedHtmlContent'],
@@ -230,7 +231,7 @@ class MediaBriefingGenerator implements IGenerator
         $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
     }
 
-    public function generateForm(Form $form)
+    public function generateForm(Form $form): void
     {
         // disable CSRF protection as external sources could post the params here
         $form->offsetUnset(Form::PROTECTOR_ID);
@@ -262,7 +263,7 @@ class MediaBriefingGenerator implements IGenerator
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
-    public function onSubmit(callable $onSubmit)
+    public function onSubmit(callable $onSubmit): void
     {
         $this->onSubmit = $onSubmit;
     }
@@ -273,7 +274,7 @@ class MediaBriefingGenerator implements IGenerator
      * @return ArrayHash with data to fill the form with
      * @throws \Remp\MailerModule\Api\v1\Handlers\Mailers\PreprocessException
      */
-    public function preprocessParameters($data): ArrayHash
+    public function preprocessParameters($data): ?ArrayHash
     {
         $output = new ArrayHash();
 

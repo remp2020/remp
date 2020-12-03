@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use Nette\Database\Table\ActiveRow;
+use Remp\MailerModule\ActiveRow;
 use Remp\MailerModule\Repository\ListsRepository;
 use Remp\MailerModule\Repository\UserSubscriptionsRepository;
 use Remp\MailerModule\User\IUser;
@@ -80,5 +81,7 @@ class SyncUserSubscriptionsCommand extends Command
             }
             $page++;
         }
+
+        return 0;
     }
 }

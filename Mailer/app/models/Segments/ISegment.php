@@ -1,6 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Segment;
+
+use Remp\MailerModule\ActiveRow;
 
 interface ISegment
 {
@@ -16,13 +19,13 @@ interface ISegment
      *
      * @return array
      */
-    public function list();
+    public function list(): array;
 
     /**
      * Users returns array of user IDs matching the provided segment.
      *
-     * @param $segment
-     * @return mixed
+     * @param array $segment
+     * @return array
      */
-    public function users($segment);
+    public function users(array $segment): array;
 }

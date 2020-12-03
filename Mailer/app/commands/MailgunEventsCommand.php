@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
+use DateInterval;
 use Mailgun\Model\Event\EventResponse;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Mailer\MailgunMailer;
@@ -50,9 +52,9 @@ class MailgunEventsCommand extends Command
         $output->writeln('<info>***** SYNCING MAILGUN EVENTS *****</info>');
         $output->writeln('');
 
-        $dateTo = (new \DateTime())
-            ->sub(new \DateInterval(sprintf("PT%dS", self::INTENTIONAL_DELAY_SECONDS)));
-        $dateFrom = (clone $dateTo)->sub(new \DateInterval(sprintf("PT%dS", $nowOffset)));
+        $dateTo = (new DateTime())
+            ->sub(new DateInterval(sprintf("PT%dS", self::INTENTIONAL_DELAY_SECONDS)));
+        $dateFrom = (clone $dateTo)->sub(new DateInterval(sprintf("PT%dS", $nowOffset)));
 
         $eventResponse = $this->getEvents($dateFrom, $dateTo);
         $latestEventTime = $dateFrom;
@@ -63,8 +65,8 @@ class MailgunEventsCommand extends Command
                 $output->writeln(sprintf("%s: all events processed, waiting for %d seconds before proceeding", new DateTime(), self::WAIT_SECONDS));
                 sleep(self::WAIT_SECONDS);
 
-                $dateTo = (new \DateTime())
-                    ->sub(new \DateInterval(sprintf("PT%dS", self::INTENTIONAL_DELAY_SECONDS)));
+                $dateTo = (new DateTime())
+                    ->sub(new DateInterval(sprintf("PT%dS", self::INTENTIONAL_DELAY_SECONDS)));
 
                 $eventResponse = $this->getEvents($latestEventTime, $dateTo);
                 continue;
@@ -109,10 +111,12 @@ class MailgunEventsCommand extends Command
             }
 
             $eventResponse = $this->mailgun->mailer()->events()->nextPage($eventResponse);
-        };
+        }
+
+        return 0;
     }
 
-    private function getEvents(\DateTime $begin, \DateTime $end): EventResponse
+    private function getEvents(DateTime $begin, DateTime $end): EventResponse
     {
         /** @var EventResponse $eventResponse */
         return $this->mailgun->mailer()->events()->get($this->mailgun->option('domain'), [

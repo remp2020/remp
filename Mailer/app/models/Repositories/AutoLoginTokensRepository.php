@@ -1,14 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 
 class AutoLoginTokensRepository extends Repository
 {
     protected $tableName = 'autologin_tokens';
 
-    public function getInsertData($token, $email, $validFrom, $validTo, $maxCount = 1)
+    public function getInsertData(string $token, string $email, DateTime $validFrom, DateTime $validTo, int $maxCount = 1)
     {
         return [
             'token' => $token,
@@ -17,7 +19,7 @@ class AutoLoginTokensRepository extends Repository
             'valid_to' => $validTo,
             'max_count' => $maxCount,
             'used_count' => 0,
-            'created_at' => new \DateTime(),
+            'created_at' => new DateTime(),
         ];
     }
 }

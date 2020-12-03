@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Remp\MailerModule\Repository;
 
-use Nette\Database\Table\IRow;
+use Remp\MailerModule\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Repository;
 use Remp\MailerModule\Selection;
@@ -19,18 +20,18 @@ class ListsRepository extends Repository
     }
 
     public function add(
-        $categoryId,
-        $priority,
-        $code,
-        $name,
-        $sorting,
-        $isAutoSubscribe,
-        $isLocked,
-        $isPublic,
-        $description,
-        $previewUrl = null,
-        $imageUrl = null,
-        $publicListing = true
+        int $categoryId,
+        int $priority,
+        string $code,
+        string $name,
+        int $sorting,
+        bool $isAutoSubscribe,
+        bool $isLocked,
+        bool $isPublic,
+        string $description,
+        ?string $previewUrl = null,
+        ?string $imageUrl = null,
+        bool $publicListing = true
     ) {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
@@ -56,14 +57,14 @@ class ListsRepository extends Repository
         return $result;
     }
 
-    public function update(IRow &$row, $data)
+    public function update(ActiveRow &$row, array $data): bool
     {
         unset($data['id']);
-        $data['updated_at'] = new \DateTime();
+        $data['updated_at'] = new DateTime();
         return parent::update($row, $data);
     }
 
-    public function updateSorting($newCategoryId, $newSorting, $oldCategoryId = null, $oldSorting = null)
+    public function updateSorting(int $newCategoryId, int $newSorting, ?int $oldCategoryId = null, ?int $oldSorting = null): void
     {
         if ($newSorting === $oldSorting) {
             return;
@@ -85,12 +86,12 @@ class ListsRepository extends Repository
         )->update(['sorting+=' => 1]);
     }
 
-    public function findByCode($code)
+    public function findByCode(string $code)
     {
         return $this->getTable()->where(['code' => $code]);
     }
 
-    public function findByCategory($categoryId)
+    public function findByCategory(int $categoryId)
     {
         return $this->getTable()->where(['mail_type_category_id' => $categoryId]);
     }
