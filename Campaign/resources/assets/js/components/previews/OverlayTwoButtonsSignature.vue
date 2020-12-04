@@ -175,14 +175,14 @@
                         <div class="text-before-buttons" v-html="$parent.injectVars(textBeforeMultiLine)"></div>
 
                         <div class="buttons sans-serif">
-                            <a class="btn btn-primary" v-bind:href="$parent.injectVars(targetUrl)" data-param-utm_keyword="btn-primary">
+                            <a class="btn btn-primary" v-bind:href="$parent.injectVars(targetUrl)" data-param-rtm_keyword="btn-primary">
                                 <span class="item title" v-html="$parent.injectVars(textBtnPrimary)"></span>
                                 <span class="item desc" v-if="hasTextBtnPrimaryMinor" v-html="$parent.injectVars(textBtnPrimaryMinor)"></span>
                             </a>
 
                             <div class="spacer" v-if="hasSecondaryButton">&nbsp;</div>
 
-                            <a class="btn btn-secondary" v-if="hasSecondaryButton" v-bind:href="$parent.injectVars(targetUrlSecondary)" data-param-utm_keyword="btn-secondary">
+                            <a class="btn btn-secondary" v-if="hasSecondaryButton" v-bind:href="$parent.injectVars(targetUrlSecondary)" data-param-rtm_keyword="btn-secondary">
                                 <span class="item title" v-html="$parent.injectVars(textBtnSecondary)"></span>
                                 <span class="item desc" v-if="hasTextBtnSecondaryMinor" v-html="$parent.injectVars(textBtnSecondaryMinor)"></span>
                             </a>

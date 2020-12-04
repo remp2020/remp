@@ -38,7 +38,7 @@ class CampaignSegment extends Model
     public function getOverrides()
     {
         return [
-            'utm_campaign' => $this->campaign->uuid,
+            'rtm_campaign' => $this->campaign->uuid,
         ];
     }
 }

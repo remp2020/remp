@@ -174,16 +174,16 @@ var run = function() {
 
     setTimeout(function() {
         var event = {
-            utm_source: "remp_campaign",
-            utm_medium: banner.displayType,
-            utm_content: banner.uuid
+            rtm_source: "remp_campaign",
+            rtm_medium: banner.displayType,
+            rtm_content: banner.uuid
         };
         
         if (banner.campaignUuid) {
-            event.utm_campaign = banner.campaignUuid; 
+            event.rtm_campaign = banner.campaignUuid; 
         }
         if (banner.variantUuid) {
-            event.banner_variant = banner.variantUuid; 
+            event.rtm_variant = banner.variantUuid; 
         }
         
         if (!banner.manualEventsTracking) {

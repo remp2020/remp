@@ -73,11 +73,11 @@ var run = function() {
     setTimeout(function() {
         if (!banner.manualEventsTracking) {
             remplib.tracker.trackEvent("banner", "show", null, null, {
-                "utm_source": "remp_campaign",
-                "utm_medium": banner.displayType,
-                "utm_campaign": banner.campaignUuid,
-                "utm_content": banner.uuid,
-                "banner_variant": banner.variantUuid
+                "rtm_source": "remp_campaign",
+                "rtm_medium": banner.displayType,
+                "rtm_campaign": banner.campaignUuid,
+                "rtm_content": banner.uuid,
+                "rtm_variant": banner.variantUuid
             });
         }
 
