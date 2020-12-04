@@ -43,7 +43,7 @@ class MailgunEventHandler implements HandlerInterface
             return false;
         }
 
-        $eventTimestamp = explode('.', $payload['timestamp'])[0];
+        $eventTimestamp = explode('.', (string) $payload['timestamp'])[0];
         $date = DateTime::from($eventTimestamp);
 
         $mailgunEvent = $this->logsRepository->mapEvent($payload['event'], $payload['reason']);
