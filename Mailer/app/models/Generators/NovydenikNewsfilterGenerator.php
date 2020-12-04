@@ -68,14 +68,14 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $post = $values['newsfilter_html'];
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
-        list(
+        [
             $captionTemplate,
             $captionWithLinkTemplate,
             $liTemplate,
             $hrTemplate,
             $spacerTemplate,
             $imageTemplate
-        ) = $this->getTemplates();
+        ] = $this->getTemplates();
 
 
         $rules = [

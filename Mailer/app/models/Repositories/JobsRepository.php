@@ -47,7 +47,7 @@ class JobsRepository extends Repository
             'status' => static::STATUS_NEW,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
-            'mail_type_variant_id' => $mailTypeVariant ? $mailTypeVariant->id : null
+            'mail_type_variant_id' => $mailTypeVariant->id ?? null
         ];
 
         return $this->insert($data);

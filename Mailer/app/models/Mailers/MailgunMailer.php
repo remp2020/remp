@@ -121,7 +121,7 @@ class MailgunMailer extends Mailer implements IMailer
 
     public function option(string $key): ?string
     {
-        return isset($this->options[$key]['value']) ? $this->options[$key]['value'] : null;
+        return $this->options[$key]['value'] ?? null;
     }
 
     public function transformTemplateParams(array $params): array

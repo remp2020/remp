@@ -82,7 +82,7 @@ class Config
     private function formatValue($value, $type = 'string')
     {
         if ($type == self::TYPE_INT) {
-            return intval($value);
+            return (int)$value;
         }
 
         return $value;

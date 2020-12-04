@@ -79,7 +79,7 @@ abstract class Mailer implements IMailer
 
     public function getPrefix(): string
     {
-        return str_replace('-', '_', Strings::webalize(get_called_class()));
+        return str_replace('-', '_', Strings::webalize(static::class));
     }
 
     public function isConfigured(): bool

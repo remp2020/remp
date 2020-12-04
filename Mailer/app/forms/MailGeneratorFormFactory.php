@@ -73,7 +73,7 @@ class MailGeneratorFormFactory
         }
 
         $form->setDefaults([
-            'source_template_id' => $template ? $template->id : null,
+            'source_template_id' => $template->id ?? null,
         ]);
         return $form;
     }

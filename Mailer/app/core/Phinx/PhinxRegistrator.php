@@ -5,6 +5,12 @@ namespace Remp\MailerModule;
 
 use Phinx\Config\Config;
 use Symfony\Component\Console\Application;
+use Phinx\Console\Command\Test;
+use Phinx\Console\Command\Status;
+use Phinx\Console\Command\Rollback;
+use Phinx\Console\Command\Migrate;
+use Phinx\Console\Command\Create;
+use Phinx\Console\Command\Init;
 
 class PhinxRegistrator
 {
@@ -13,12 +19,12 @@ class PhinxRegistrator
 
     /** @var array Define phinx commands with aliases */
     private $command = [
-        '\Phinx\Console\Command\Init' => 'migrate:init',
-        '\Phinx\Console\Command\Create' => 'migrate:create',
-        '\Phinx\Console\Command\Migrate' => 'migrate:migrate',
-        '\Phinx\Console\Command\Rollback' => 'migrate:rollback',
-        '\Phinx\Console\Command\Status' => 'migrate:status',
-        '\Phinx\Console\Command\Test' => 'migrate:test'
+        Init::class => 'migrate:init',
+        Create::class => 'migrate:create',
+        Migrate::class => 'migrate:migrate',
+        Rollback::class => 'migrate:rollback',
+        Status::class => 'migrate:status',
+        Test::class => 'migrate:test'
     ];
 
     /**

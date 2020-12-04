@@ -16,7 +16,7 @@ class User
     public function __construct(array $options = [])
     {
         foreach ($options as $key => $val) {
-            $this->{$key} = strval($val);
+            $this->{$key} = (string)$val;
         }
     }
 

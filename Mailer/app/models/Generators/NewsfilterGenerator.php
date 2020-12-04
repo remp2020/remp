@@ -74,14 +74,14 @@ class NewsfilterGenerator implements IGenerator
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
-        list(
+        [
             $captionTemplate,
             $captionWithLinkTemplate,
             $liTemplate,
             $hrTemplate,
             $spacerTemplate,
             $imageTemplate
-        ) = $this->getTemplates();
+        ] = $this->getTemplates();
 
 
         $rules = [

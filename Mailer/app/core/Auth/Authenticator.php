@@ -38,7 +38,7 @@ class Authenticator implements IAuthenticator
             exit();
         }
 
-        list($email, $password) = $credentials;
+        [$email, $password] = $credentials;
 
         $result = $this->remoteUser->remoteLogin($email, $password);
         if ($result['status'] == 'error') {

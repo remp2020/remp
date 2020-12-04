@@ -75,14 +75,14 @@ class DennikeGenerator implements IGenerator
         $post = $values['dennike_html'];
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
-        list(
+        [
             $captionTemplate,
             $captionWithLinkTemplate,
             $liTemplate,
             $hrTemplate,
             $spacerTemplate,
             $imageTemplate
-        ) = $this->getTemplates();
+        ] = $this->getTemplates();
 
         $rules = [
             // remove shortcodes
@@ -171,7 +171,7 @@ class DennikeGenerator implements IGenerator
         $lockedPost = $this->helpers->wpautop($lockedPost);
 
         // fix pees
-        list($post, $lockedPost) = preg_replace('/<p>/is', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", [$post, $lockedPost]);
+        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", [$post, $lockedPost]);
 
         $imageHtml = '';
 

@@ -61,7 +61,7 @@ final class GeneratorPresenter extends BasePresenter
             ->count('*');
 
         $sourceTemplates = $this->sourceTemplatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], intval($request['length']), intval($request['start']))
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -104,7 +104,7 @@ final class GeneratorPresenter extends BasePresenter
 
     public function createComponentMailSourceTemplateForm(): Form
     {
-        $form = $this->sourceTemplateFormFactory->create(isset($this->params['id']) ? intval($this->params['id']) : null);
+        $form = $this->sourceTemplateFormFactory->create(isset($this->params['id']) ? (int)$this->params['id'] : null);
         $this->sourceTemplateFormFactory->onUpdate = function ($form, $mailSourceTemplate, $buttonSubmitted) {
             $this->flashMessage('Source template was successfully updated');
             $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);

@@ -171,7 +171,7 @@ final class JobPresenter extends BasePresenter
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, intval($request['length']), intval($request['start']))
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -209,7 +209,7 @@ final class JobPresenter extends BasePresenter
                     'show' => $this->link('Show', $job->id),
                 ],
                 $job->created_at,
-                (isset($segments[$job->segment_code]) ? $segments[$job->segment_code] : 'Missing segment'),
+                ($segments[$job->segment_code] ?? 'Missing segment'),
                 $status,
                 $sentCount,
                 $openedCount,
@@ -371,7 +371,7 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentNewBatchForm()
     {
-        $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? intval($this->params['id']) : null);
+        $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? (int)$this->params['id'] : null);
 
         $this->newBatchFormFactory->onSuccess = function ($job) {
             $this->flashMessage('Batch was added');

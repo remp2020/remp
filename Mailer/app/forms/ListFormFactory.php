@@ -186,8 +186,8 @@ class ListFormFactory
         $this->listsRepository->updateSorting(
             $values['mail_type_category_id'],
             $values['sorting'],
-            $list ? $list->mail_type_category_id : null,
-            $list ? $list->sorting : null
+            $list->mail_type_category_id ?? null,
+            $list->sorting ?? null
         );
 
         unset($values['sorting_after']);
