@@ -233,7 +233,7 @@ submission. As generator "only" generates HTML/text content of email, you might 
 controls to the success page - such as email preview or button to create and start *job*/*batch*.
 
     As an example see return value of [NewsfilterGenerator](app/models/Generators/NewsfilterGenerator.php) and the
-    implementation of [NewsfilterWidget](app/components/GeneratorWidgets/Widgets/NewsfilterWidget/NewsfilterWidget.php)
+    implementation of [NewsfilterWidget](app/Components/GeneratorWidgets/Widgets/NewsfilterWidget/NewsfilterWidget.php)
     that previews provided HTML contents of email and renders extra form to provide data required to create *email*
     and *job*/*batch*.
     
@@ -2144,7 +2144,7 @@ an API handler to receive the stats and process them.
 
 Our Mailgun webhook implementation validates the request and marks the event to be processed later asynchronously.
 
-* API handler: [`Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler`](app/api/v2/Handlers/Mailers/MailgunEventsHandler.php):
+* API handler: [`Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler`](app/Api/v2/Handlers/Mailers/MailgunEventsHandler.php):
 Mind the event type in `HermesMessage` constructor. It has to be the same as you'll use in `config.local.neon` below.
 * Background event processing: [Remp\MailerModule\Hermes\MailgunEventHandler](app/hermes/MailgunEventHandler.php)
 
@@ -2172,7 +2172,7 @@ servers at the time of sending the newsletter.
 
 Our Mailgun events API implementation runs as daemon end fetches the new data every 15 seconds.
 
-* Daemon: [Remp\MailerModule\CommandsMailgunEventsCommand](app/commands/MailgunEventsCommand.php)
+* Daemon: [Remp\MailerModule\CommandsMailgunEventsCommand](app/Commands/MailgunEventsCommand.php)
 
 Your implementation then needs to be added also to the `config.local.neon` file:
 

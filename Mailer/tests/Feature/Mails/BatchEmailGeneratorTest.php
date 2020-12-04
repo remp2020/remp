@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Mails;
 
-use Remp\MailerModule\Beam\UnreadArticlesResolver;
-use Remp\MailerModule\Job\MailCache;
-use Remp\MailerModule\Segment\Aggregator;
-use Remp\MailerModule\User\IUser;
+use Remp\MailerModule\Models\Beam\UnreadArticlesResolver;
+use Remp\MailerModule\Models\Job\MailCache;
+use Remp\MailerModule\Models\Segment\Aggregator;
+use Remp\MailerModule\Models\Users\IUser;
 use Tests\Feature\BaseFeatureTestCase;
 
 class BatchEmailGeneratorTest extends BaseFeatureTestCase

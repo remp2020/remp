@@ -6,17 +6,17 @@ namespace Tests\Feature;
 use Nette\Database\Context;
 use PDOException;
 use PHPUnit\Framework\TestCase;
-use Remp\MailerModule\Repository\BatchesRepository;
-use Remp\MailerModule\Repository\BatchTemplatesRepository;
-use Remp\MailerModule\Repository\JobQueueRepository;
-use Remp\MailerModule\Repository\JobsRepository;
-use Remp\MailerModule\Repository\LayoutsRepository;
-use Remp\MailerModule\Repository\ListCategoriesRepository;
-use Remp\MailerModule\Repository\ListsRepository;
-use Remp\MailerModule\Repository\ListVariantsRepository;
-use Remp\MailerModule\Repository\TemplatesRepository;
-use Remp\MailerModule\Repository\UserSubscriptionsRepository;
-use Remp\MailerModule\Repository\UserSubscriptionVariantsRepository;
+use Remp\MailerModule\Repositories\BatchesRepository;
+use Remp\MailerModule\Repositories\BatchTemplatesRepository;
+use Remp\MailerModule\Repositories\JobQueueRepository;
+use Remp\MailerModule\Repositories\JobsRepository;
+use Remp\MailerModule\Repositories\LayoutsRepository;
+use Remp\MailerModule\Repositories\ListCategoriesRepository;
+use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\ListVariantsRepository;
+use Remp\MailerModule\Repositories\TemplatesRepository;
+use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
+use Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository;
 
 class BaseFeatureTestCase extends TestCase
 {

@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
-use Remp\MailerModule\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Generators\ArticleLocker;
-use Remp\MailerModule\Generators\EmbedParser;
-use Remp\MailerModule\Generators\NewsfilterGenerator;
-use Remp\MailerModule\Generators\WordpressHelpers;
-use Remp\MailerModule\PageMeta\ContentInterface;
-use Remp\MailerModule\Repository\SourceTemplatesRepository;
+use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
+use Remp\MailerModule\Models\Generators\ArticleLocker;
+use Remp\MailerModule\Models\Generators\EmbedParser;
+use Remp\MailerModule\Models\Generators\NewsfilterGenerator;
+use Remp\MailerModule\Models\Generators\WordpressHelpers;
+use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 class NewsfilterGeneratorTest extends TestCase
 {

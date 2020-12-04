@@ -1,16 +1,17 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Bootstrap.php';
+
 use Nette\Database\DriverException;
-use Remp\MailerModule\PhinxRegistrator;
-use Remp\MailerModule\EnvironmentConfig;
+use Remp\MailerModule\Models\PhinxRegistrator;
+use Remp\MailerModule\Models\EnvironmentConfig;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-require __DIR__ . '/../app/Bootstrap.php';
-
-$container = Remp\Bootstrap::boot()
+$container = Remp\MailerModule\Bootstrap::boot()
     ->createContainer();
 
 $input = new ArgvInput();

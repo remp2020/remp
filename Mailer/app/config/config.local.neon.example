@@ -41,15 +41,15 @@ services:
 
     # This is a reference IUser implementation.
     # You should make your own implementation against your CRM system and register it here.
-    - Remp\MailerModule\User\Dummy
+    - Remp\MailerModule\Models\Users\Dummy
 
     # To be able to send an email, you need to provide at least one ISegment implementation
     # You should make your own implementation against your CRM system and register it here.
     segmentAgreggator:
         setup:
-            - register(Remp\MailerModule\Segment\Dummy())
-#            - register(Remp\MailerModule\Segment\Beam(%remp.beam.segments_addr%))
-#            - register(Remp\MailerModule\Segment\Pythia(%remp.pythia.segments_addr%))
+            - register(Remp\MailerModule\Models\Segment\Dummy())
+#            - register(Remp\MailerModule\Models\Segment\Beam(%remp.beam.segments_addr%))
+#            - register(Remp\MailerModule\Models\Segment\Pythia(%remp.pythia.segments_addr%))
 
 #    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
 #    eventDispatcher:
@@ -58,7 +58,7 @@ services:
 #            - subscribeTo(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentEventHandler())
 
     # If you're using Beam and want to use ProcessConversionStatsCommand, enable this repository (it's a dependency)
-#    - Remp\MailerModule\Repository\BeamConversionsRepository
+#    - Remp\MailerModule\Repositories\BeamConversionsRepository
 
 # local_configs override DBs configs records.
 local_configs:

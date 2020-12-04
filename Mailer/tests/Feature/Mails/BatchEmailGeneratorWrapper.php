@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace Tests\Feature\Mails;
 
 use Psr\Log\NullLogger;
-use Remp\MailerModule\ActiveRow;
-use Remp\MailerModule\Beam\UnreadArticlesResolver;
-use Remp\MailerModule\Job\BatchEmailGenerator;
-use Remp\MailerModule\Job\MailCache;
-use Remp\MailerModule\Repository\BatchesRepository;
-use Remp\MailerModule\Repository\JobQueueRepository;
-use Remp\MailerModule\Repository\JobsRepository;
-use Remp\MailerModule\Segment\Aggregator;
-use Remp\MailerModule\User\IUser;
+use Remp\MailerModule\Repositories\ActiveRow;
+use Remp\MailerModule\Models\Beam\UnreadArticlesResolver;
+use Remp\MailerModule\Models\Job\BatchEmailGenerator;
+use Remp\MailerModule\Models\Job\MailCache;
+use Remp\MailerModule\Repositories\BatchesRepository;
+use Remp\MailerModule\Repositories\JobQueueRepository;
+use Remp\MailerModule\Repositories\JobsRepository;
+use Remp\MailerModule\Models\Segment\Aggregator;
+use Remp\MailerModule\Models\Users\IUser;
 
 class BatchEmailGeneratorWrapper extends BatchEmailGenerator
 {

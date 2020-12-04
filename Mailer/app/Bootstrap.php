@@ -1,12 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Remp;
+namespace Remp\MailerModule;
 
 use Dotenv\Dotenv;
 use Nette\Configurator;
-
-require __DIR__ . '/../vendor/autoload.php';
 
 final class Bootstrap
 {
