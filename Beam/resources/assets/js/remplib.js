@@ -44,6 +44,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentEnabled: false,
 
+        utmBackwardCompatiblityEnabled: true, // Deprecated, will be set to false in the future
+
         timeSpentInterval: 5, // seconds
 
         cookiesEnabled: null,
@@ -186,6 +188,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.tracker.timeSpent.interval === 'number') {
                     this.timeSpentInterval = config.tracker.timeSpent.interval;
                 }
+            }
+
+            if (typeof config.tracker.utmBackwardCompatiblityEnabled === 'boolean') {
+                this.utmBackwardCompatiblityEnabled = config.tracker.utmBackwardCompatiblityEnabled;
             }
 
             window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
@@ -651,6 +657,27 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         addSystemUserParams: function(params) {
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
+
+            // utm_ replaced with rtm_ (but utm_ support kept due to backwards compatibility reasons)
+            let source = null;
+            if (this.utmBackwardCompatiblityEnabled) {
+                source = {
+                    "rtm_source": this.getParam("rtm_source") ?? this.getParam("utm_source"),
+                    "rtm_medium": this.getParam("rtm_medium") ?? this.getParam("utm_medium"),
+                    "rtm_campaign": this.getParam("rtm_campaign") ?? this.getParam("utm_campaign"),
+                    "rtm_content": this.getParam("rtm_content") ?? this.getParam("utm_content"),
+                    "rtm_variant": this.getParam("rtm_variant") ?? this.getParam("banner_variant"),
+                };
+            } else {
+                source = {
+                    "rtm_source": this.getParam("rtm_source"),
+                    "rtm_medium": this.getParam("rtm_medium"),
+                    "rtm_campaign": this.getParam("rtm_campaign"),
+                    "rtm_content": this.getParam("rtm_content"),
+                    "rtm_variant": this.getParam("rtm_variant"),
+                };
+            }
+
             params["user"] = {
                 "id": remplib.getUserId(),
                 "browser_id": remplib.getBrowserId(),
@@ -663,13 +690,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "window_width": window.outerWidth || document.documentElement.clientWidth,
                 "cookies": remplib.tracker.cookiesEnabled,
                 "websockets": remplib.tracker.websocketsSupported,
-                "source": {
-                    "utm_source": this.getParam("utm_source"),
-                    "utm_medium": this.getParam("utm_medium"),
-                    "utm_campaign": this.getParam("utm_campaign"),
-                    "utm_content": this.getParam("utm_content"),
-                    "banner_variant": this.getParam("banner_variant"),
-                }
+                "source": source
             };
             params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
             params["user"][remplib.rempPageviewIDKey] = remplib.getRempPageviewID();
@@ -690,10 +711,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timespentParamsCleanup: function(params) {
             delete params.user.user_agent;
-            delete params.user.source.utm_source;
-            delete params.user.source.utm_medium;
-            delete params.user.source.utm_campaign;
-            delete params.user.source.utm_content;
+            delete params.user.source.rtm_source;
+            delete params.user.source.rtm_medium;
+            delete params.user.source.rtm_campaign;
+            delete params.user.source.rtm_content;
+            delete params.user.source.rtm_variant;
             return params;
         },
 

@@ -222,10 +222,11 @@ class AggregateConversionEvents extends Command
                         'locked' => isset($item->article->locked) ? filter_var($item->article->locked, FILTER_VALIDATE_BOOLEAN) : null,
                         'signed_in' => isset($item->user->id),
                         'timespent' => $item->user->timespent ?? null,
-                        'utm_campaign' => $item->user->source->utm_campaign ?? null,
-                        'utm_content' => $item->user->source->utm_content ?? null,
-                        'utm_medium' => $item->user->source->utm_medium ?? null,
-                        'utm_source' => $item->user->source->utm_source ?? null,
+                        // Background compatibility with utm_ -- will be removed
+                        'rtm_campaign' => $item->user->source->rtm_campaign ?? $item->user->source->utm_campaign ?? null,
+                        'rtm_content' => $item->user->source->rtm_content ?? $item->user->source->utm_content ?? null,
+                        'rtm_medium' => $item->user->source->rtm_medium ?? $item->user->source->utm_medium ?? null,
+                        'rtm_source' => $item->user->source->rtm_source ?? $item->user->source->utm_source ?? null,
                     ];
                 }
             }
@@ -265,10 +266,11 @@ class AggregateConversionEvents extends Command
                         'funnel_id' => $item->$step->funnel_id ?? null,
                         'amount' => $item->$step->revenue->amount ?? null,
                         'currency' => $item->$step->revenue->currency ?? null,
-                        'utm_campaign' => $item->source->utm_campaign ?? null,
-                        'utm_content' => $item->source->utm_content ?? null,
-                        'utm_medium' => $item->source->utm_medium ?? null,
-                        'utm_source' => $item->source->utm_source ?? null,
+                        // background compatibility with utm -- will be removed
+                        'rtm_campaign' => $item->source->rtm_campaign ?? $item->source->utm_campaign ?? null,
+                        'rtm_content' => $item->source->rtm_content ?? $item->source->utm_content ?? null,
+                        'rtm_medium' => $item->source->rtm_medium ?? $item->source->utm_medium ?? null,
+                        'rtm_source' => $item->source->rtm_source ?? $item->source->utm_source ?? null,
                         'conversion_id' => $conversion->id,
                         self::TEMP_PRODUCT_IDS_LABEL => $item->$step->product_ids ?? [] // this will be removed later
                     ];
@@ -317,10 +319,11 @@ class AggregateConversionEvents extends Command
                         'action' => $item->action ?? null,
                         'category' => $item->category ?? null,
                         'conversion_id' => $conversion->id,
-                        'utm_campaign' => $item->utm_campaign ?? null,
-                        'utm_content' => $item->utm_content ?? null,
-                        'utm_medium' => $item->utm_medium ?? null,
-                        'utm_source' => $item->utm_source ?? null,
+                        // Background compatibility with utm_ -- will be removed
+                        'rtm_campaign' => $item->rtm_campaign ?? $item->utm_campaign ?? null,
+                        'rtm_content' => $item->rtm_content ?? $item->utm_content ?? null,
+                        'rtm_medium' => $item->rtm_medium ?? $item->utm_medium ?? null,
+                        'rtm_source' => $item->rtm_source ?? $item->utm_source ?? null,
                     ];
                 }
             }
