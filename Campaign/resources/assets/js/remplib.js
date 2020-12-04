@@ -283,7 +283,15 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             if (typeof campaigns !== "object") {
-                console.warn("REMPLIB:", "unexpected type of campaigns:", campaigns);
+                try {
+                    // Due to the storage migration issues, the original value from localStorage could get into the cookie.
+                    // Instead of raw value, the cookie contained wrapper object used only in local_storage storage:
+                    //
+                    //  "{\"version\":1,\"createdAt\":\"2020-10-20T08:35:30.367Z\",\"updatedAt\":\"2020-10-20T08:35:30.367Z\",\"values\":{\"1da1b9e4-109f-496f-9337-f03c1f28a85d\":{\"seen\":0,\"count\":1,\"createdAt\":\"2020-10-20T08:35:30.367Z\",\"updatedAt\":\"2020-10-20T08:35:30.367Z\"}}}"
+                    campaigns = JSON.parse(campaigns)['values'];
+                } catch (e) {
+                    console.warn("REMPLIB:", "unexpected type of campaigns:", typeof campaigns, campaigns);
+                }
             }
 
             // migrations on campaigns values
