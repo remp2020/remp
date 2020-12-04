@@ -147,10 +147,14 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (typeof config.storage === 'string') {
                 if (['cookie', 'local_storage'].indexOf(config.storage) === -1) {
-                    console.warn('Not supported storage type `' + config.storage + '` in configuration. Setting storage type to `local_storage`');
+                    console.warn('remplib: storage type `' + config.storage + '` is not supported, falling back to `local_storage`');
                 } else {
                     remplib.storage = config.storage;
                 }
+            }
+            if (typeof window.localStorage !== 'object' || localStorage === null) {
+                console.warn('remplib: local storage is not available in this browser, falling back to `cookie`');
+                remplib.storage = 'cookie';
             }
 
             if (typeof config.storageExpiration === 'object') {
