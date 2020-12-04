@@ -148,7 +148,7 @@ final class ListPresenter extends BasePresenter
                     'edit' => $editUrl,
                     'sentEmailsDetail' => $sentEmailsDetail,
                 ],
-                $list->type_category ? $list->type_category->title : null,
+                $list->type_category->title ?? null,
                 "<a href='{$showUrl}'>{$list->title}</a>",
                 $list->code,
                 $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
@@ -347,12 +347,28 @@ final class ListPresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
+        $listId = $request['listId'] ? (int)$request['listId'] : null;
+        $length = $request['length'] ? (int)$request['length'] : null;
+        $start = $request['start'] ? (int)$request['start'] : null;
+
         $variantsCount = $this->listVariantsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'])
+            ->tableFilter(
+                $request['search']['value'],
+                $request['columns'][$request['order'][0]['column']]['name'],
+                $request['order'][0]['dir'],
+                $listId
+            )
             ->count('*');
 
         $variants = $this->listVariantsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'], intval($request['length']), intval($request['start']));
+            ->tableFilter(
+                $request['search']['value'],
+                $request['columns'][$request['order'][0]['column']]['name'],
+                $request['order'][0]['dir'],
+                $listId,
+                $length,
+                $start
+            );
 
         $result = [
             'recordsTotal' => $this->listVariantsRepository->totalCount(),
@@ -375,7 +391,7 @@ final class ListPresenter extends BasePresenter
     {
         $id = null;
         if (isset($this->params['id'])) {
-            $id = intval($this->params['id']);
+            $id = (int)$this->params['id'];
         }
 
         $form = $this->listFormFactory->create($id);
@@ -409,7 +425,7 @@ final class ListPresenter extends BasePresenter
 
         // handle newsletter list category change
         if ($this['listForm']['mail_type_category_id']->getValue() !== $categoryId) {
-            $lists = $this->listsRepository->findByCategory(intval($categoryId));
+            $lists = $this->listsRepository->findByCategory((int)$categoryId);
             if ($listId = $this['listForm']['id']->getValue()) {
                 $lists = $lists->where('id != ?', $listId);
             }
