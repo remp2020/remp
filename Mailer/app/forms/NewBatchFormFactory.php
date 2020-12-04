@@ -123,21 +123,21 @@ class NewBatchFormFactory
         }
 
         $batch = $this->batchesRepository->add(
-            $values['job_id'],
+            (int) $values['job_id'],
             !empty($values['email_count']) ? (int)$values['email_count'] : null,
             $values['start_at'],
             $values['method']
         );
 
         $this->batchTemplatesRepository->add(
-            $values['job_id'],
+            (int) $values['job_id'],
             $batch->id,
             $values['template_id']
         );
 
         if ($values['b_template_id'] !== null) {
             $this->batchTemplatesRepository->add(
-                $values['job_id'],
+                (int) $values['job_id'],
                 $batch->id,
                 $values['b_template_id']
             );
