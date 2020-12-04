@@ -208,7 +208,7 @@ class DennikeGenerator implements IGenerator
         $lockedParams = [
             'title' => $values['title'],
             'sub_title' => $values['sub_title'],
-            'author' => $values['>author'],
+            'author' => $values['author'],
             'url' => $values['url'],
             'html' => $lockedPost,
             'text' => strip_tags($lockedText),
