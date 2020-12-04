@@ -298,7 +298,7 @@ class Sender
         $insertLogsData = [];
         foreach ($templateParams as $email => $params) {
             $insertLogsData[] = $this->logsRepository->getInsertData(
-                $email,
+                (string) $email,
                 $this->template->subject,
                 $this->template->id,
                 $this->jobId,
