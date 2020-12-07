@@ -452,6 +452,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "funnel_id": funnelId
                 },
                 "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.generateCommerceSessionID(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -470,6 +471,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "source": source
                 },
                 "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.generateCommerceSessionID(),
             };
 
             params = this.addSystemUserParams(params);
@@ -491,6 +493,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 },
                 "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.getCommerceSessionID(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -513,6 +516,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "source": source
                 },
                 "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.getCommerceSessionID(),
             };
 
             params = this.addSystemUserParams(params);
@@ -534,6 +538,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 },
                 "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.getCommerceSessionID(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -556,6 +561,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "source": source
                 },
                 "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.getCommerceSessionID(),
             };
 
             params = this.addSystemUserParams(params);
@@ -577,6 +583,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "product_ids": productIds
                 },
                 "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.getCommerceSessionID(),
             };
             params = this.addSystemUserParams(params);
             this.post(this.url + "/track/commerce", params);
@@ -598,7 +605,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "user": {
                     "source": source
                 },
-                "remp_commerce_id": remplib.uuidv4()
+                "remp_commerce_id": remplib.uuidv4(),
+                "commerce_session_id": remplib.getCommerceSessionID(),
             };
             params = this.addSystemUserParams(params);
             params["user"]["source"] = source;

@@ -59,6 +59,7 @@ var Commerce = Type("Commerce", func() {
 		Enum("checkout", "payment", "purchase", "refund")
 	})
 	Attribute("remp_commerce_id", String, "ID of event")
+	Attribute("commerce_session_id", String, "ID of session for whole commerce process. Unique identifier should be generated on client-side when user starts commerce process at the checkout step and the client should track the same value for rest of commerce process.")
 	Attribute("checkout", CommerceCheckout, "Used when user enters the checkout process (reviews the cart)")
 	Attribute("payment", CommercePayment, "Used when user confirmed checkout and was redirected to the payment processor")
 	Attribute("purchase", CommercePayment, "Used when payment processor confirms the payment")

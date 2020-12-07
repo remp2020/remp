@@ -1181,6 +1181,10 @@ of payment life-cycle:
 * *Purchase*. The purchase was successful.
 * *Refund*. User requested the refund which was fulfilled.
 
+JS library provided by Beam is sending identifier `commerce_session_id` for every step and it's used to identify 
+unique payment process. To reach the data consistency between commerce events from JS library and CRM backend it's necessary
+to send this parameter.
+
 See the available endpoints with full JSON structure at `/swagger.json` path of running Tracker API.
 
 #### Javascript Snippet

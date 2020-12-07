@@ -9,7 +9,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
-- Fixed scenario in JS library when fallback `cookie` value expiration was not updated with the main `local_storage` expiration. 
+- Fixed scenario in JS library when fallback `cookie` value expiration was not updated with the main `local_storage` expiration.
+- [Tracker]: Added new parameter `commerce_session_id` to `track/commerce` endpoint of API tracker. remp/crm#1559
+- Added new identifier `commerce_session_id` into `remplib.js` to identify unique commerce process. remp/crm#1559 
 
 ## [0.16.0] - 2020-12-07
 
