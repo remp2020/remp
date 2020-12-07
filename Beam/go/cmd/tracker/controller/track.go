@@ -63,6 +63,10 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 		tags["remp_commerce_id"] = *ctx.Payload.RempCommerceID
 	}
 
+	if ctx.Payload.CommerceSessionID != nil {
+		tags["commerce_session_id"] = *ctx.Payload.CommerceSessionID
+	}
+
 	fields := map[string]interface{}{}
 
 	if ctx.Payload.Article != nil {

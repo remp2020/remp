@@ -12,6 +12,8 @@ export default {
 
     rempSessionIDKey: "remp_session_id",
 
+    commerceSessionIDKey: "commerce_session_id",
+
     storage: "local_storage", // "cookie", "local_storage"
 
     storageExpiration: {
@@ -74,6 +76,22 @@ export default {
         }
         this.rempPageviewID = remplib.uuidv4();
         return this.rempPageviewID;
+    },
+
+    getCommerceSessionID: function() {
+        let commerceSessionID = this.getFromStorage(this.commerceSessionIDKey);
+        if (commerceSessionID) {
+            return commerceSessionID;
+        }
+
+        throw "remplib: commerce_session_id not found. It has to be generated in the checkout step.";
+    },
+
+    generateCommerceSessionID: function() {
+        let commerceSessionIDKey = remplib.uuidv4();
+        this.setToStorage(this.commerceSessionIDKey, commerceSessionIDKey);
+
+        return commerceSessionIDKey;
     },
 
     uuidv4: function() {
