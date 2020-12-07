@@ -6,7 +6,6 @@ namespace Remp\MailerModule\Commands;
 use Exception;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Models\Job\BatchEmailGenerator;
-use Remp\MailerModule\Models\Job\JobProcess;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,8 +43,7 @@ class ProcessJobCommand extends Command
         ini_set('memory_limit', '256M');
         $output->writeln(sprintf('%s <info>Mail process job</info>', DateTime::from('now')));
 
-        $process = new JobProcess();
-        $pid = $process->pid();
+        $pid = getmypid();
 
         while ($batch = $this->batchesRepository->getBatchReady()) {
             try {
