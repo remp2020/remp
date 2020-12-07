@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.16.0] - 2020-12-07
+
 ### Project
 
 - Removed `--no-bin-links` switch from `Docker/php/remp.sh installation script. Bin symlinks are required after the latest changes in Yarn package commands.
