@@ -2181,7 +2181,7 @@ services:
 	# ...
 	console:
 		setup:
-			- register(Remp\MailerModule\Commands\MailgunEventsCommand())
+			- add(Remp\MailerModule\Commands\MailgunEventsCommand())
 ```
 
 Once it's ready, you can execute it by calling `php bin/command.php mailgun:events`. The name of the command
