@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed scenario in JS library when fallback `cookie` value expiration was not updated with the main `local_storage` expiration. 
+
 ## [0.16.0] - 2020-12-07
 
 ### Project

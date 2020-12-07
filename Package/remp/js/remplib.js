@@ -94,13 +94,15 @@ export default {
         });
     },
 
+    lifetimeInMinutes: function(key) {
+        if (this.storageExpiration['keys'][key]) {
+            return this.storageExpiration['keys'][key];
+        }
+        return this.storageExpiration['default'];
+    },
+
     setToStorage: function(key, value) {
         let now = new Date();
-        let expireInMinutes = this.storageExpiration['default'];
-        if (this.storageExpiration['keys'][key]) {
-            expireInMinutes = this.storageExpiration['keys'][key];
-        }
-        let expireAt = new Date(now.getTime() + (expireInMinutes * 60000));
         let serializedItem = JSON.stringify({
             "version": 1,
             "value": value,
@@ -110,6 +112,7 @@ export default {
         if (this.storage === 'local_storage') {
             localStorage.setItem(key, serializedItem);
         }
+        let expireAt = new Date(now.getTime() + (this.lifetimeInMinutes(key) * 60000));
         this.storeCookie(key, value, expireAt);
     },
 
@@ -190,8 +193,14 @@ export default {
             value = JSON.stringify(value);
         }
 
+        // SIDE-EFFECT: update "updatedAt" to extend local storage expiration
         item.updatedAt = now;
         localStorage.setItem(key, JSON.stringify(item));
+
+        // SIDE-EFFECT: update fallback cookie expiration
+        let expireAt = new Date(now.getTime() + (this.lifetimeInMinutes(key) * 60000));
+        this.storeCookie(key, value, expireAt);
+
         return value;
     },
 
