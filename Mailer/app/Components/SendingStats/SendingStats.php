@@ -98,8 +98,8 @@ class SendingStats extends Control
             $stats['unsubscribed']['value'] += $jobBatchTemplate->mail_template->mail_type
                 ->related('mail_user_subscriptions')
                 ->where([
-                    'utm_campaign' => $jobBatchTemplate->mail_template->code,
-                    'utm_content' => $jobBatchTemplate->mail_job_batch_id,
+                    'rtm_campaign' => $jobBatchTemplate->mail_template->code,
+                    'rtm_content' => $jobBatchTemplate->mail_job_batch_id,
                     'subscribed' => false,
                 ])
                 ->count('*');
@@ -120,8 +120,8 @@ class SendingStats extends Control
                 ->fetchPairs('code', 'code');
             $stats['unsubscribed']['value'] += $this->userSubscriptionsRepository->getTable()
                 ->where([
-                    'utm_campaign' => array_values($templateCodes),
-                    'utm_content' => null,
+                    'rtm_campaign' => array_values($templateCodes),
+                    'rtm_content' => null,
                     'subscribed' => false,
                 ])
                 ->count('*');

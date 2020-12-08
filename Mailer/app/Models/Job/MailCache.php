@@ -56,7 +56,7 @@ class MailCache
      *
      * Note: all parameters in $params having name with suffix '_href_url' are treated as URLs that can be changed later by email sender.
      * The URL destination itself will be kept, however, e.g. tracking parameters could be added, URL shortener used.
-     * Example: https://dennikn.sk/1589603/ could be changed to https://dennikn.sk/1589603/?utm_source=email
+     * Example: https://dennikn.sk/1589603/ could be changed to https://dennikn.sk/1589603/?rtm_source=email
      *
      * @param int $userId
      * @param string $email

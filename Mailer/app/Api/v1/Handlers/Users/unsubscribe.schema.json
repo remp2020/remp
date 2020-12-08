@@ -63,6 +63,25 @@
         }
       },
       "additionalProperties": false
+    },
+    "rtm_params": {
+      "title": "Rtm params",
+      "type": "object",
+      "properties": {
+        "rtm_source": {
+          "type": "string"
+        },
+        "rtm_medium": {
+          "type": "string"
+        },
+        "rtm_campaign": {
+          "type": "string"
+        },
+        "rtm_content": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

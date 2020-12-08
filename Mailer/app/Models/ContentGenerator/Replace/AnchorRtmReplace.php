@@ -4,9 +4,9 @@ namespace Remp\MailerModule\Models\ContentGenerator\Replace;
 
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
-class AnchorUtmReplace implements IReplace
+class AnchorRtmReplace implements IReplace
 {
-    use UtmReplaceTrait;
+    use RtmReplaceTrait;
 
     public function replace(string $content, GeneratorInput $generatorInput): string
     {

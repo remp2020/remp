@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
+use Nette\Utils\Strings;
 use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
@@ -58,23 +59,37 @@ class BulkSubscribeHandler extends SubscribeHandler
                 'list' => $list,
                 'variant_id' => $variantID,
                 'subscribe' => $item['subscribe'],
-                'utm_params' => $item['utm_params'] ?? [],
+                'rtm_params' => $this->getRtmParams($item),
             ];
         }
 
         foreach ($users as $user) {
-            $utmParams = $item['utm_params'] ?? [];
+            $rtmParams = $item['rtm_params'] ?? [];
 
             if ($user['subscribe'] === true) {
                 $this->userSubscriptionsRepository->subscribeUser($user['list'], $user['user_id'], $user['email'], $user['variant_id']);
             } else {
                 // if email doesn't exist, no need to unsubscribe
                 if (!empty($this->userSubscriptionsRepository->findByEmail($user['email']))) {
-                    $this->userSubscriptionsRepository->unsubscribeUser($user['list'], $user['user_id'], $user['email'], $utmParams);
+                    $this->userSubscriptionsRepository->unsubscribeUser($user['list'], $user['user_id'], $user['email'], $rtmParams);
                 }
             }
         }
 
         return new JsonApiResponse(200, ['status' => 'ok']);
+    }
+
+    // function that primary loads rtm parameters but fallbacks to utm if rtm are not present
+    private function getRtmParams($payload)
+    {
+        $rtmParams = [];
+        foreach ($payload['rtm_params'] ?? $payload['utm_params'] ?? [] as $key => $value) {
+            if (Strings::startsWith($key, 'utm_')) {
+                $rtmParams['rtm_' . substr($key, 4)] = $value;
+            } else {
+                $rtmParams[$key] = $value;
+            }
+        }
+        return $rtmParams;
     }
 }

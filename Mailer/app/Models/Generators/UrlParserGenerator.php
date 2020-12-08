@@ -48,7 +48,7 @@ class UrlParserGenerator implements IGenerator
             ->getControlPrototype()
             ->setAttribute('class', 'form-control html-editor');
 
-        $form->addText('utm_campaign', 'UTM campaign');
+        $form->addText('rtm_campaign', 'RTM campaign');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
@@ -74,7 +74,7 @@ class UrlParserGenerator implements IGenerator
             new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'articles', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'footer', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'utm_campaign', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'rtm_campaign', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'intro', InputParam::REQUIRED)
         ];
     }
@@ -97,7 +97,9 @@ class UrlParserGenerator implements IGenerator
             'intro' => $values['intro'],
             'footer' => $values['footer'],
             'items' => $items,
-            'utm_campaign' => $values['utm_campaign'],
+            'rtm_campaign' => $values->rtm_campaign,
+            // UTM Fallback -- will be removed
+            'utm_campaign' => $values->rtm_campaign,
         ];
 
         $engine = $this->engineFactory->engine();

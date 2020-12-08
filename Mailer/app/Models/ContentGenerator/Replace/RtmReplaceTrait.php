@@ -5,10 +5,10 @@ namespace Remp\MailerModule\Models\ContentGenerator\Replace;
 
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
-trait UtmReplaceTrait
+trait RtmReplaceTrait
 {
     /**
-     * Put UTM parameters into URL parameters
+     * Put RTM parameters into URL parameters
      * Function also respects MailGun Variables (e.g. %recipient.autologin%)
      *
      * @param string $hrefUrl
@@ -33,7 +33,7 @@ trait UtmReplaceTrait
         $params = explode('&', $matches[2] ?? '');
         $finalParams = [];
 
-        $utmSourceAdded = $utmMediumAdded = $utmCampaignAdded = $utmContentAdded = false;
+        $rtmSourceAdded = $rtmMediumAdded = $rtmCampaignAdded = $rtmContentAdded = false;
 
 
         foreach ($params as $param) {
@@ -47,18 +47,18 @@ trait UtmReplaceTrait
                 $key = $items[0];
                 $value = $items[1];
 
-                if (strcasecmp($key, 'utm_source') === 0) {
+                if (strcasecmp($key, 'rtm_source') === 0) {
                     $finalParams[] = "$key={$utmSource}";
-                    $utmSourceAdded = true;
-                } elseif (strcasecmp($key, 'utm_medium') === 0) {
+                    $rtmSourceAdded = true;
+                } else if (strcasecmp($key, 'rtm_medium') === 0) {
                     $finalParams[] = "$key={$utmMedium}";
-                    $utmMediumAdded = true;
-                } elseif (strcasecmp($key, 'utm_campaign') === 0) {
+                    $rtmMediumAdded = true;
+                } else if (strcasecmp($key, 'rtm_campaign') === 0) {
                     $finalParams[] = "$key={$utmCampaign}";
-                    $utmCampaignAdded = true;
-                } elseif (strcasecmp($key, 'utm_content') === 0) {
+                    $rtmCampaignAdded = true;
+                } else if (strcasecmp($key, 'rtm_content') === 0) {
                     $finalParams[] = "$key={$utmContent}";
-                    $utmContentAdded = true;
+                    $rtmContentAdded = true;
                 } else {
                     $finalParams[] = "$key=" . rawurlencode($value);
                 }
@@ -67,17 +67,17 @@ trait UtmReplaceTrait
             }
         }
 
-        if (!$utmSourceAdded) {
-            $finalParams[] = "utm_source={$utmSource}";
+        if (!$rtmSourceAdded) {
+            $finalParams[] = "rtm_source={$utmSource}";
         }
-        if (!$utmMediumAdded) {
-            $finalParams[] = "utm_medium={$utmMedium}";
+        if (!$rtmMediumAdded) {
+            $finalParams[] = "rtm_medium={$utmMedium}";
         }
-        if (!$utmCampaignAdded) {
-            $finalParams[] = "utm_campaign={$utmCampaign}";
+        if (!$rtmCampaignAdded) {
+            $finalParams[] = "rtm_campaign={$utmCampaign}";
         }
-        if (!$utmContentAdded) {
-            $finalParams[] = "utm_content={$utmContent}";
+        if (!$rtmContentAdded) {
+            $finalParams[] = "rtm_content={$utmContent}";
         }
 
         return $path . '?' . implode('&', $finalParams);

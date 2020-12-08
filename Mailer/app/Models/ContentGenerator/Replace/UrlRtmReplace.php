@@ -7,12 +7,12 @@ use Nette\InvalidArgumentException;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
 /**
- * UrlUtmReplace replaces (adds) UTM parameters if content contains only URL and nothing else.
- * This is handy if you need to work with UTM parameters in your email params and not just the content itself.
+ * UrlRtmReplace replaces (adds) RTM (REMP UTM) parameters if content contains only URL and nothing else.
+ * This is handy if you need to work with RTM parameters in your email params and not just the content itself.
  */
-class UrlUtmReplace implements IReplace
+class UrlRtmReplace implements IReplace
 {
-    use UtmReplaceTrait;
+    use RtmReplaceTrait;
 
     private $hostWhitelist = [];
 

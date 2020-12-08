@@ -58,6 +58,9 @@
         },
         "utm_params": {
           "type": "object"
+        },
+        "rtm_params": {
+          "type": "object"
         }
       }
     }
