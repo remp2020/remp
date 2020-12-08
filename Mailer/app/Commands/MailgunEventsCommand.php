@@ -31,7 +31,7 @@ class MailgunEventsCommand extends Command
         LogsRepository $logsRepository
     ) {
         parent::__construct();
-        $this->mailgun = $mailerFactory->getMailer('remp-mailgun');
+        $this->mailgun = $mailerFactory->getMailer(MailgunMailer::ALIAS);
         $this->logsRepository = $logsRepository;
     }
 
@@ -81,7 +81,7 @@ class MailgunEventsCommand extends Command
                     $latestEventTime = $date;
                 }
 
-                $eventTimestamp = explode('.', $event->getTimestamp())[0];
+                $eventTimestamp = explode('.', (string) $event->getTimestamp())[0];
                 $date = DateTime::from($eventTimestamp);
 
                 if (!isset($userVariables['mail_sender_id'])) {

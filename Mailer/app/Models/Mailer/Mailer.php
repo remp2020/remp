@@ -11,13 +11,13 @@ use Remp\MailerModule\Repositories\ConfigsRepository;
 
 abstract class Mailer implements IMailer
 {
+    public const ALIAS = null;
+
     /** @var ConfigsRepository */
     protected $configsRepository;
 
     /** @var Config */
     protected $config;
-
-    protected $alias;
 
     protected $options = [];
 
@@ -33,7 +33,7 @@ abstract class Mailer implements IMailer
 
     public function getAlias(): string
     {
-        return str_replace('-', '_', Strings::webalize($this->alias));
+        return str_replace('-', '_', Strings::webalize(static::ALIAS));
     }
 
     public function getConfigs(): array

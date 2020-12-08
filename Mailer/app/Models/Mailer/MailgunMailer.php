@@ -10,9 +10,9 @@ use Remp\MailerModule\Models\Sender\MailerBatchException;
 
 class MailgunMailer extends Mailer
 {
-    private $mailer;
+    public const ALIAS = 'remp_mailgun';
 
-    protected $alias = 'remp_mailgun';
+    private $mailer;
 
     protected $options = [
         'api_key' => [

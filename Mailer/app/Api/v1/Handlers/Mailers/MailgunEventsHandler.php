@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
 use Remp\MailerModule\Hermes\HermesMessage;
+use Remp\MailerModule\Models\Mailer\MailgunMailer;
 use Remp\MailerModule\Models\Sender;
 use Tomaj\Hermes\Emitter;
 use Tomaj\NetteApi\Handlers\BaseHandler;
@@ -37,7 +38,7 @@ class MailgunEventsHandler extends BaseHandler
 
     public function handle($params)
     {
-        $mailer = $this->sender->getMailer('remp-mailgun');
+        $mailer = $this->sender->getMailer(MailgunMailer::ALIAS);
 
         if (hash_hmac('sha256', $params['timestamp'] . $params['token'], $mailer->getConfig('api_key')) !== $params['signature']) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Wrong signature.']);

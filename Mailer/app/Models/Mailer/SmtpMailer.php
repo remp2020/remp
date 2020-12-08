@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Mailer;
 
-use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Repositories\ConfigsRepository;
@@ -11,9 +10,9 @@ use Nette\Mail\SmtpMailer as NetteSmtpMailer;
 
 class SmtpMailer extends Mailer
 {
-    private $mailer;
+    public const ALIAS = 'remp_smtp';
 
-    protected $alias = 'remp_smtp';
+    private $mailer;
 
     protected $options = [
         'host' => [
