@@ -9,11 +9,11 @@ use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Repositories\ConfigsRepository;
 use Nette\Mail\SmtpMailer as NetteSmtpMailer;
 
-class SmtpMailer extends Mailer implements IMailer
+class SmtpMailer extends Mailer
 {
     private $mailer;
 
-    protected $alias = 'remp-smtp';
+    protected $alias = 'remp_smtp';
 
     protected $options = [
         'host' => [

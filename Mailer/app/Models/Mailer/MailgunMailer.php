@@ -12,7 +12,7 @@ class MailgunMailer extends Mailer
 {
     private $mailer;
 
-    protected $alias = 'remp-mailgun';
+    protected $alias = 'remp_mailgun';
 
     protected $options = [
         'api_key' => [

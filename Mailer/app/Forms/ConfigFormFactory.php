@@ -71,7 +71,7 @@ class ConfigFormFactory
             $mailerContainer = $settings->addContainer($label[count($label)-1]);
 
             foreach ($mailer->getConfigs() as $name => $option) {
-                $key = $mailer->getPrefix() . '_' . $name;
+                $key = $mailer->getAlias() . '_' . $name;
                 $config = $configs[$key];
                 $configOverridden = isset($overriddenConfigs[$key])
                     ? "{$key}: {$this->localConfig->value($key)}"

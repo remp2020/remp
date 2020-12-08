@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Fixed issues with settings page caused by internal config names renaming. remp/crm#1616
+
 ### [Beam]
 
 - Fixed scenario in JS library when fallback `cookie` value expiration was not updated with the main `local_storage` expiration.

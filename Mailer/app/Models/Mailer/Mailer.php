@@ -33,7 +33,7 @@ abstract class Mailer implements IMailer
 
     public function getAlias(): string
     {
-        return $this->alias;
+        return str_replace('-', '_', Strings::webalize($this->alias));
     }
 
     public function getConfigs(): array
@@ -55,13 +55,13 @@ abstract class Mailer implements IMailer
     protected function buildConfig(): void
     {
         foreach ($this->options as $name => $definition) {
-            $prefix = $this->getPrefix();
+            $configName = $this->getAlias() . '_' . $name;
 
             try {
-                $this->options[$name]['value'] = $this->config->get($this->getAlias() . '_' . $name);
+                $this->options[$name]['value'] = $this->config->get($configName);
             } catch (ConfigNotExistsException $e) {
                 $this->configsRepository->add(
-                    $prefix . '_' . $name,
+                    $configName,
                     $definition['label'],
                     null,
                     $definition['description'] ?? null,
@@ -75,11 +75,6 @@ abstract class Mailer implements IMailer
                 ];
             }
         }
-    }
-
-    public function getPrefix(): string
-    {
-        return str_replace('-', '_', Strings::webalize(static::class));
     }
 
     public function isConfigured(): bool
