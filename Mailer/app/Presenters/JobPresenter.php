@@ -258,8 +258,7 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentEditJobForm()
     {
-        $jobId = $this->params['id'] ?? null;
-        $form = $this->jobFormFactory->create($jobId);
+        $form = $this->jobFormFactory->create((int) $this->params['id']);
         $this->jobFormFactory->onSuccess = function ($job) {
             $this->flashMessage('Job was updated');
             $this->redirect('Show', $job->id);
