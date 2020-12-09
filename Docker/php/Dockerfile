@@ -2,14 +2,14 @@ FROM php:7.4-fpm
 
 ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev python-minimal
 
-ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev
+ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev libonig-dev
 
 # INIT (single command so the intermediates are not stored)
 
 RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && docker-php-ext-configure intl \
-    && docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ \
+    && docker-php-ext-configure gd --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl sockets pcntl gd \
     && apt-get purge \
         -y --auto-remove \

@@ -73,6 +73,11 @@ We've prepared `docker-compose.yml` in a way it's ready for development.
 docker-compose up
 ```
 
+After pulling new code, if changes where made to `Docker/php/Dockerfile` or any `composer.lock` files run:
+```bash
+docker-compose up --build
+```
+
 > The appliance was tested with Docker CE 17.12.0 and Docker Compose 1.16.1.
 
 #### 3. First run
