@@ -167,15 +167,27 @@ class TemplatesRepository extends Repository
         return $selection;
     }
 
-    public function search(string $term, int $limit): Selection
+    public function search(string $term, int $limit): array
     {
         $searchable = ['code', 'name', 'subject', 'description'];
         foreach ($searchable as $column) {
-            $where[$column . ' LIKE ?'] = '%' . $term . '%';
+            $whereFast[$column . ' LIKE ?'] = $term . '%';
+            $whereWild[$column . ' LIKE ?'] = '%' . $term . '%';
         }
 
-        return $this->all()
-            ->whereOr($where ?? [])
-            ->limit($limit);
+        $resultsFast = $this->all()
+            ->whereOr($whereFast)
+            ->limit($limit)
+            ->fetchAll();
+        if (count($resultsFast) === $limit) {
+            return $resultsFast;
+        }
+
+        $resultsWild = $this->all()
+            ->whereOr($whereWild)
+            ->limit($limit - count($resultsFast))
+            ->fetchAll();
+
+        return array_merge($resultsFast, $resultsWild);
     }
 }

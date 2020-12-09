@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
@@ -10,16 +11,12 @@ use Remp\MailerModule\Repositories\TemplatesRepository;
 
 final class SearchPresenter extends BasePresenter
 {
-    /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var LayoutsRepository */
     private $layoutsRepository;
 
-    /** @var ListsRepository */
     private $listsRepository;
 
-    /** @var JobsRepository */
     private $jobsRepository;
 
     public function __construct(
@@ -43,7 +40,10 @@ final class SearchPresenter extends BasePresenter
         $lists = array_values($this->listsRepository->search($term, $limit));
 
         $emails = [];
+        $templateIds = [];
+
         foreach ($this->templatesRepository->search($term, $limit) as $mailTemplate) {
+            $templateIds[$mailTemplate->id] = $mailTemplate->id;
             $emails[] = [
                 'type' => 'email',
                 'search_result_url' => $this->link('Template:show', ['id' => $mailTemplate->id]),
@@ -53,7 +53,10 @@ final class SearchPresenter extends BasePresenter
             ];
         }
         $jobs = [];
-        foreach ($this->jobsRepository->search($term, $limit) as $job) {
+        $query = $this->jobsRepository->getTable()->where([
+            ':mail_job_batch_templates.mail_template_id' => array_values($templateIds),
+        ]);
+        foreach ($query as $job) {
             $templates = [];
             $mailTypes = [];
             foreach ($job->related('mail_job_batch_templates') as $mailJobBatchTemplate) {
