@@ -38,7 +38,7 @@ final class SearchPresenter extends BasePresenter
 
     public function actionDefault($term): void
     {
-        $limit =  (int) $this->environmentConfig->getParam('max_result_count', 5);
+        $limit =  (int) $this->environmentConfig->getParam('max_result_count', '5');
         $layouts = array_values($this->layoutsRepository->search($term, $limit));
         $lists = array_values($this->listsRepository->search($term, $limit));
 
