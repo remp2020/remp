@@ -186,6 +186,7 @@ class UserSubscriptionsRepository extends Repository
             ->where('mail_type_id = ?', $mailTypeId)
             ->where('updated_at >= DATE(?)', $from)
             ->where('updated_at <= DATE(?)', $to)
+            ->where('updated_at != created_at')
             ->group('label_date')
             ->order('label_date DESC');
     }
