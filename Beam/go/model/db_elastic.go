@@ -80,7 +80,7 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 		if f.Inverse {
 			bq = bq.MustNot(elastic.NewTermsQuery(field, interfaceSlice...))
 
-			// UTM parameters has been renamed to RTM
+			// UTM parameters have been renamed to RTM
 			// We still want to keep the backwards compatibility by translating UTM conditions to RTM
 			// However, filtering by utm_ is deprecated and will be removed in the future
 			if field == "banner_variant" {
@@ -93,7 +93,7 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 				bq = bq.MustNot(elastic.NewTermsQuery("utm_"+field[4:], interfaceSlice...))
 			}
 		} else {
-			// UTM parameters has been renamed to RTM
+			// UTM parameters have been renamed to RTM
 			// We still want to keep the backwards compatibility by translating UTM conditions to RTM (joined by OR operator)
 			// However, filtering by utm_ is deprecated and will be removed in the future
 			if field == "banner_variant" {
