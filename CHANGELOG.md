@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Important
+
+- **BREAKING**: Tracker and Journal/Segments Go apps now primarily use *rtm* parameters (our replacement for *utm* parameters, to avoid conflicts with other tracking applications).
+When deploying these apps, **you have to deploy Segments app first and Tracker app second**, since there is an internal change in how Tracker stores *rtm* parameters in underlying Elasticsearch storage. 
+
 ### Project
 
 - Fixed PHP 7.4 docker image build dependencies.
@@ -23,6 +28,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed scenario in JS library when fallback `cookie` value expiration was not updated with the main `local_storage` expiration.
 - [Tracker]: Added new parameter `commerce_session_id` to `track/commerce` endpoint of API tracker. remp/crm#1559
 - Added new identifier `commerce_session_id` into `remplib.js` to identify unique commerce process. remp/crm#1559 
+- [Segments]: UTM to RTM parameters transition. remp/remp#779
+- [Tracker]: UTM to RTM parameters transition. remp/remp#779
 
 ## [0.16.0] - 2020-12-07
 

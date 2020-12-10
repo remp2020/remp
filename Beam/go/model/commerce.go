@@ -22,24 +22,31 @@ type CommerceOptions struct {
 
 // Commerce represents commerce event data.
 type Commerce struct {
-	ID          string
-	Step        string
-	Token       string
-	Time        time.Time
-	Host        string
-	IP          string
-	BrowserID   string  `json:"browser_id"`
-	UserID      string  `json:"user_id"`
-	URL         string  `json:"url"`
-	UserAgent   string  `json:"user_agent"`
-	FunnelID    string  `json:"funnel_id"`
-	ProductIDs  string  `json:"product_ids"`
-	Revenue     float64 `json:"revenue"`
-	Currency    string  `json:"currency"`
-	UtmCampaign string  `json:"utm_campaign"`
-	UtmContent  string  `json:"utm_content"`
-	UtmMedium   string  `json:"utm_medium"`
-	UtmSource   string  `json:"utm_source"`
+	ID         string
+	Step       string
+	Token      string
+	Time       time.Time
+	Host       string
+	IP         string
+	BrowserID  string  `json:"browser_id"`
+	UserID     string  `json:"user_id"`
+	URL        string  `json:"url"`
+	UserAgent  string  `json:"user_agent"`
+	FunnelID   string  `json:"funnel_id"`
+	ProductIDs string  `json:"product_ids"`
+	Revenue    float64 `json:"revenue"`
+	Currency   string  `json:"currency"`
+
+	RtmCampaign string `json:"rtm_campaign"`
+	RtmContent  string `json:"rtm_content"`
+	RtmMedium   string `json:"rtm_medium"`
+	RtmSource   string `json:"rtm_source"`
+
+	// Deprecated, will be removed in favor of Rtm
+	UtmCampaign string `json:"utm_campaign"`
+	UtmContent  string `json:"utm_content"`
+	UtmMedium   string `json:"utm_medium"`
+	UtmSource   string `json:"utm_source"`
 }
 
 // CommerceRow represents one row of grouped list.

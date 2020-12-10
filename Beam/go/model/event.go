@@ -32,6 +32,12 @@ type Event struct {
 	UserAgent string    `json:"user_agent"`
 	ArticleID string    `json:"article_id"`
 
+	RtmSource   string `json:"rtm_source"`
+	RtmCampaign string `json:"rtm_campaign"`
+	RtmContent  string `json:"rtm_content"`
+	RtmMedium   string `json:"rtm_medium"`
+
+	// Deprecated, will be removed in favor of Rtm
 	UtmSource   string `json:"utm_source"`
 	UtmCampaign string `json:"utm_campaign"`
 	UtmContent  string `json:"utm_content"`

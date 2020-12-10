@@ -21,7 +21,7 @@ var User = Type("User", func() {
 	Attribute("ip_address", String, "IP address of client", func() {
 		Format("ip")
 	})
-	Attribute("source", Source, "UTM and social source metadata")
+	Attribute("source", Source, "RTM (REMP-like UTM) and social source metadata")
 	Attribute("remp_session_id", String, "ID of reader's session")
 	Attribute("remp_pageview_id", String, "ID of pageview")
 	Attribute("referer", String, "Value of HTTP referer header (if present)")
@@ -126,11 +126,18 @@ var Progress = Type("Progress", func() {
 var Source = Type("source", func() {
 	Description("User-source related data")
 
-	Attribute("utm_source", String, "Origin of user (e.g. remp_campaign)")
-	Attribute("utm_medium", String, "Medium through which the came (e.g. overlay, inline)")
-	Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
-	Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
-	Attribute("banner_variant", String, "Reference to specific banner variant (e.g. variant ID)")
+	Attribute("rtm_source", String, "Origin of user (e.g. remp_campaign)")
+	Attribute("rtm_medium", String, "Medium through which the came (e.g. overlay, inline)")
+	Attribute("rtm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
+	Attribute("rtm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
+	Attribute("rtm_variant", String, "Reference to specific banner variant (e.g. variant ID)")
+
+	// Deprecated, to be removed (replaced with rtm_)
+	Attribute("utm_source", String, "[DEPRECATED] Origin of user (e.g. remp_campaign). Deprecated, please use `rtm_source`")
+	Attribute("utm_medium", String, "[DEPRECATED] Medium through which the came (e.g. overlay, inline). Deprecated, please use `rtm_medium`")
+	Attribute("utm_campaign", String, "[DEPRECATED] Reference to specific campaign (e.g. campaign ID). Deprecated, please use `rtm_campaign`")
+	Attribute("utm_content", String, "[DEPRECATED] Reference to specific campaign mean (e.g. banner ID). Deprecated, please use `rtm_content`")
+	Attribute("banner_variant", String, "[DEPRECATED] Reference to specific banner variant (e.g. variant ID). . Deprecated, please use `rtm_variant`")
 })
 
 var CommerceCheckout = Type("CommerceCheckout", func() {

@@ -268,17 +268,37 @@ func (e *Event) ToMediaType() (*app.Event, error) {
 	if e.UserAgent != "" {
 		event.User.UserAgent = &e.UserAgent
 	}
-	if e.UtmSource != "" {
+
+	if e.RtmSource != "" {
+		event.RtmSource = &e.RtmSource
+		event.UtmSource = &e.RtmSource
+	} else if e.UtmSource != "" { // Deprecated, will be removed
 		event.UtmSource = &e.UtmSource
+		event.RtmSource = &e.UtmSource
 	}
-	if e.UtmCampaign != "" {
+
+	if e.RtmCampaign != "" {
+		event.RtmCampaign = &e.RtmCampaign
+		event.UtmCampaign = &e.RtmCampaign
+	} else if e.UtmCampaign != "" { // Deprecated, will be removed
 		event.UtmCampaign = &e.UtmCampaign
+		event.RtmCampaign = &e.UtmCampaign
 	}
-	if e.UtmMedium != "" {
+
+	if e.RtmMedium != "" {
+		event.RtmMedium = &e.RtmMedium
+		event.UtmMedium = &e.RtmMedium
+	} else if e.UtmMedium != "" { // Deprecated, will be removed
 		event.UtmMedium = &e.UtmMedium
+		event.RtmMedium = &e.UtmMedium
 	}
-	if e.UtmContent != "" {
+
+	if e.RtmContent != "" {
+		event.RtmContent = &e.RtmContent
+		event.UtmContent = &e.RtmContent
+	} else if e.UtmContent != "" { // Deprecated, will be removed
 		event.UtmContent = &e.UtmContent
+		event.RtmContent = &e.UtmContent
 	}
 	return event, nil
 }
@@ -337,18 +357,38 @@ func (c *Commerce) ToMediaType() (*app.Commerce, error) {
 		event.User.UserAgent = &c.UserAgent
 	}
 
-	// UTM
-	if c.UtmCampaign != "" {
+	// Note: During the deprecation period, API returns both utm_ and rtm_parameters
+
+	if c.RtmCampaign != "" {
+		event.Source.RtmCampaign = &c.RtmCampaign
+		event.Source.UtmCampaign = &c.RtmCampaign
+	} else if c.UtmCampaign != "" { // Deprecated, will be removed
 		event.Source.UtmCampaign = &c.UtmCampaign
+		event.Source.RtmCampaign = &c.UtmCampaign
 	}
-	if c.UtmContent != "" {
+
+	if c.RtmContent != "" {
+		event.Source.RtmContent = &c.RtmContent
+		event.Source.UtmContent = &c.RtmContent
+	} else if c.UtmContent != "" { // Deprecated, will be removed
 		event.Source.UtmContent = &c.UtmContent
+		event.Source.RtmContent = &c.UtmContent
 	}
-	if c.UtmMedium != "" {
+
+	if c.RtmMedium != "" {
+		event.Source.RtmMedium = &c.RtmMedium
+		event.Source.UtmMedium = &c.RtmMedium
+	} else if c.UtmMedium != "" { // Deprecated, will be removed
 		event.Source.UtmMedium = &c.UtmMedium
+		event.Source.RtmMedium = &c.UtmMedium
 	}
-	if c.UtmSource != "" {
+
+	if c.RtmSource != "" {
+		event.Source.RtmSource = &c.RtmSource
+		event.Source.UtmSource = &c.RtmSource
+	} else if c.UtmSource != "" { // Deprecated, will be removed
 		event.Source.UtmSource = &c.UtmSource
+		event.Source.RtmSource = &c.UtmSource
 	}
 
 	// Commerce details
@@ -442,17 +482,37 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	}
 
 	// optional tracked params
-	if p.UTMSource != "" {
+	// Note: During deprecation period, both RTM and UTM parameters are returned
+	if p.RtmSource != "" {
+		pageview.User.Source.RtmSource = &p.RtmSource
+		pageview.User.Source.UtmSource = &p.RtmSource
+	} else if p.UTMSource != "" { // Deprecated, will be removed
 		pageview.User.Source.UtmSource = &p.UTMSource
+		pageview.User.Source.RtmSource = &p.UTMSource
 	}
-	if p.UTMMedium != "" {
+
+	if p.RtmMedium != "" {
+		pageview.User.Source.RtmMedium = &p.RtmMedium
+		pageview.User.Source.UtmMedium = &p.RtmMedium
+	} else if p.UTMMedium != "" { // Deprecated, will be removed
 		pageview.User.Source.UtmMedium = &p.UTMMedium
+		pageview.User.Source.RtmMedium = &p.UTMMedium
 	}
-	if p.UTMCampaign != "" {
+
+	if p.RtmCampaign != "" {
+		pageview.User.Source.RtmCampaign = &p.RtmCampaign
+		pageview.User.Source.UtmCampaign = &p.RtmCampaign
+	} else if p.UTMCampaign != "" { // Deprecated, will be removed
 		pageview.User.Source.UtmCampaign = &p.UTMCampaign
+		pageview.User.Source.RtmCampaign = &p.UTMCampaign
 	}
-	if p.UTMContent != "" {
+
+	if p.RtmContent != "" {
+		pageview.User.Source.RtmContent = &p.RtmContent
+		pageview.User.Source.UtmContent = &p.RtmContent
+	} else if p.UTMContent != "" { // Deprecated, will be removed
 		pageview.User.Source.UtmContent = &p.UTMContent
+		pageview.User.Source.RtmContent = &p.UTMContent
 	}
 
 	if p.IP != "" {
