@@ -79,9 +79,50 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 
 		if f.Inverse {
 			bq = bq.MustNot(elastic.NewTermsQuery(field, interfaceSlice...))
-		} else {
-			bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
 
+			// UTM parameters have been renamed to RTM
+			// We still want to keep the backwards compatibility by translating UTM conditions to RTM
+			// However, filtering by utm_ is deprecated and will be removed in the future
+			if field == "banner_variant" {
+				bq = bq.MustNot(elastic.NewTermsQuery("rtm_"+field[7:], interfaceSlice...))
+			} else if field == "rtm_variant" {
+				bq = bq.MustNot(elastic.NewTermsQuery("banner_"+field[4:], interfaceSlice...))
+			} else if strings.HasPrefix(field, "utm_") {
+				bq = bq.MustNot(elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...))
+			} else if strings.HasPrefix(field, "rtm_") {
+				bq = bq.MustNot(elastic.NewTermsQuery("utm_"+field[4:], interfaceSlice...))
+			}
+		} else {
+			// UTM parameters have been renamed to RTM
+			// We still want to keep the backwards compatibility by translating UTM conditions to RTM (joined by OR operator)
+			// However, filtering by utm_ is deprecated and will be removed in the future
+			if field == "banner_variant" {
+				bannerVariantTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				rtmTerm := elastic.NewTermsQuery("rtm_"+field[7:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(bannerVariantTerm, rtmTerm)
+				bq = bq.Must(bqInner)
+			} else if field == "rtm_variant" {
+				rtmTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				bannerVariantTerm := elastic.NewTermsQuery("banner_"+field[4:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(bannerVariantTerm, rtmTerm)
+				bq = bq.Must(bqInner)
+			} else if strings.HasPrefix(field, "utm_") {
+				utmTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				rtmTerm := elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(utmTerm, rtmTerm) // Should for 2 terms = OR
+				bq = bq.Must(bqInner)
+			} else if strings.HasPrefix(field, "rtm_") {
+				rtmTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				utmTerm := elastic.NewTermsQuery("utm_"+field[4:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(utmTerm, rtmTerm)
+				bq = bq.Must(bqInner)
+			} else {
+				bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
+			}
 		}
 	}
 
