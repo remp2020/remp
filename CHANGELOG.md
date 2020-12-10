@@ -22,6 +22,7 @@ When deploying these apps, **you have to deploy Segments app first and Tracker a
 - Fixed main search issue due to the internal changes in the past release. remp/remp#786
 - Improved search speed of the main search bar. remp/remp#786
 - Fixed bug on job edit form causing error when loading the form.
+- Fixed conversion stats processing if there are no templates/batches to process.
 
 ### [Beam]
 
