@@ -363,25 +363,47 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 		}
 
 		if user.Source != nil {
-			if user.Source.UtmSource != nil {
-				tags["utm_source"] = *user.Source.UtmSource
+
+			// utm_ parameters parsing is deprecated and will be removed in the future
+
+			if user.Source.RtmSource != nil {
+				tags["rtm_source"] = *user.Source.RtmSource
+			} else if user.Source.UtmSource != nil { // deprecated, will be removed in the future
+				tags["rtm_source"] = *user.Source.UtmSource
 			}
-			if user.Source.UtmMedium != nil {
-				tags["utm_medium"] = *user.Source.UtmMedium
+
+			if user.Source.RtmMedium != nil {
+				tags["rtm_medium"] = *user.Source.RtmMedium
+
+				// Rewrite referer medium in case of email RTM medium
+				if *user.Source.RtmMedium == "email" {
+					tags["derived_referer_medium"] = "email"
+				}
+			} else if user.Source.UtmMedium != nil { // deprecated, will be removed in the future
+				tags["rtm_medium"] = *user.Source.UtmMedium
 
 				// Rewrite referer medium in case of email UTM
 				if *user.Source.UtmMedium == "email" {
 					tags["derived_referer_medium"] = "email"
 				}
 			}
-			if user.Source.UtmCampaign != nil {
-				tags["utm_campaign"] = *user.Source.UtmCampaign
+
+			if user.Source.RtmCampaign != nil {
+				tags["rtm_campaign"] = *user.Source.RtmCampaign
+			} else if user.Source.UtmCampaign != nil { // deprecated, will be removed in the future
+				tags["rtm_campaign"] = *user.Source.UtmCampaign
 			}
-			if user.Source.UtmContent != nil {
-				tags["utm_content"] = *user.Source.UtmContent
+
+			if user.Source.RtmContent != nil {
+				tags["rtm_content"] = *user.Source.RtmContent
+			} else if user.Source.UtmContent != nil { // deprecated, will be removed in the future
+				tags["rtm_content"] = *user.Source.UtmContent
 			}
-			if user.Source.BannerVariant != nil {
-				tags["banner_variant"] = *user.Source.BannerVariant
+
+			if user.Source.RtmVariant != nil {
+				tags["rtm_variant"] = *user.Source.RtmVariant
+			} else if user.Source.BannerVariant != nil { // deprecated, will be removed in the future
+				tags["rtm_variant"] = *user.Source.BannerVariant
 			}
 		}
 

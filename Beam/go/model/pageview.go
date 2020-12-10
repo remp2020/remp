@@ -36,10 +36,17 @@ type Pageview struct {
 	TitleVariant  string `json:"title_variant"`
 	ImageVariant  string `json:"image_variant"`
 	AuthorID      string `json:"author_id"`
-	UTMSource     string `json:"utm_source"`
-	UTMCampaign   string `json:"utm_campaign"`
-	UTMMedium     string `json:"utm_medium"`
-	UTMContent    string `json:"utm_content"`
+
+	RtmSource   string `json:"rtm_source"`
+	RtmCampaign string `json:"rtm_campaign"`
+	RtmMedium   string `json:"rtm_medium"`
+	RtmContent  string `json:"rtm_content"`
+
+	// UTM is deprecated, will be removed
+	UTMSource   string `json:"utm_source"`
+	UTMCampaign string `json:"utm_campaign"`
+	UTMMedium   string `json:"utm_medium"`
+	UTMContent  string `json:"utm_content"`
 
 	Token        string    `json:"token"`
 	Time         time.Time `json:"time"`

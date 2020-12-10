@@ -20,7 +20,7 @@ const (
 	FieldsParamDescription = `JSON-encoded object of overriden pairs, e.g.:
 
 	{
-		"utm_campaign": "custom-campaign-id",
+		"rtm_campaign": "custom-campaign-id",
 		// ...
 	}`
 )

@@ -277,6 +277,14 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("system", System)
 		Attribute("user", User)
 		Attribute("article_id", String)
+
+		// REMP's utm
+		Attribute("rtm_source", String)
+		Attribute("rtm_campaign", String)
+		Attribute("rtm_medium", String)
+		Attribute("rtm_content", String)
+
+		// Deprecated, will be removed (replaced with rtm_ parameters)
 		Attribute("utm_source", String)
 		Attribute("utm_campaign", String)
 		Attribute("utm_medium", String)
@@ -289,10 +297,18 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("system")
 		Attribute("user")
 		Attribute("article_id", String)
-		Attribute("utm_source")
-		Attribute("utm_campaign")
-		Attribute("utm_medium")
-		Attribute("utm_content")
+
+		// REMP's utm
+		Attribute("rtm_source", String)
+		Attribute("rtm_campaign", String)
+		Attribute("rtm_medium", String)
+		Attribute("rtm_content", String)
+
+		// deprecated
+		Attribute("utm_source", String)
+		Attribute("utm_campaign", String)
+		Attribute("utm_medium", String)
+		Attribute("utm_content", String)
 	})
 	Required("id", "system", "category", "action")
 })
@@ -335,7 +351,7 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("purchase", CommercePayment)
 		Attribute("refund", CommercePayment)
 
-		Attribute("source", Source, "UTM source metadata")
+		Attribute("source", Source, "RTM source metadata")
 		Attribute("article", Article)
 		Attribute("system", System)
 		Attribute("user", User)
@@ -386,7 +402,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("ip_address", String, "IP address of client", func() {
 			Format("ip")
 		})
-		Attribute("source", Source, "UTM source metadata")
+		Attribute("source", Source, "RTM source metadata")
 		Attribute("remp_session_id", String, "ID of reader's session")
 		Attribute("remp_pageview_id", String, "ID of pageview")
 		Attribute("referer", String, "Value of HTTP referer header (if present)")
@@ -442,12 +458,24 @@ var Article = MediaType("application/vnd.article+json", func() {
 
 var Source = MediaType("application/vnd.source+json", func() {
 	Attributes(func() {
-		Attribute("utm_source", String, "Origin of user (e.g. remp_campaign)")
-		Attribute("utm_medium", String, "Medium through which the came (e.g. overlay, inline)")
-		Attribute("utm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
-		Attribute("utm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
+		Attribute("rtm_source", String, "Origin of user (e.g. remp_campaign)")
+		Attribute("rtm_medium", String, "Medium through which the came (e.g. overlay, inline)")
+		Attribute("rtm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
+		Attribute("rtm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
+
+		// Deprecated, will be removed
+		Attribute("utm_source", String, "[DEPRECATED] Origin of user (e.g. remp_campaign). Deprecated, please use rtm_source.")
+		Attribute("utm_medium", String, "[DEPRECATED] Medium through which the came (e.g. overlay, inline). Deprecated, please use rtm_medium.")
+		Attribute("utm_campaign", String, "[DEPRECATED] Reference to specific campaign (e.g. campaign ID). Deprecated, please use rtm_campaign.")
+		Attribute("utm_content", String, "[DEPRECATED] Reference to specific campaign mean (e.g. banner ID). Deprecated, please use rtm_content.")
 	})
 	View("default", func() {
+		Attribute("rtm_source")
+		Attribute("rtm_medium")
+		Attribute("rtm_campaign")
+		Attribute("rtm_content")
+
+		// deprecated
 		Attribute("utm_source")
 		Attribute("utm_medium")
 		Attribute("utm_campaign")
