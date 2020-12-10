@@ -79,9 +79,26 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 
 		if f.Inverse {
 			bq = bq.MustNot(elastic.NewTermsQuery(field, interfaceSlice...))
-		} else {
-			bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
 
+			// UTM parameters has been renamed to RTM
+			// We still want to keep the backwards compatibility by translating UTM conditions to RTM (joined by OR operator)
+			// However, filtering by utm_ is deprecated and will be removed in the future
+			if strings.HasPrefix(field, "utm_") {
+				bq = bq.MustNot(elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...))
+			}
+		} else {
+			// UTM parameters has been renamed to RTM
+			// We still want to keep the backwards compatibility by translating UTM conditions to RTM (joined by OR operator)
+			// However, filtering by utm_ is deprecated and will be removed in the future
+			if strings.HasPrefix(field, "utm_") {
+				utmTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				rtmTerm := elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(utmTerm, rtmTerm) // Should for 2 terms = OR
+				bq = bq.Must(bqInner)
+			} else {
+				bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
+			}
 		}
 	}
 

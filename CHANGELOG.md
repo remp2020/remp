@@ -10,7 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Important
 
 - **BREAKING**: Tracker and Journal/Segments Go apps now primarily use *rtm* parameters (our replacement for *utm* parameters, to avoid conflicts with other tracking applications).
-When deploying these apps, **you have to deploy Segments app first and Tracker app second**, since there is an internal change in how Tracker stores *rtm* parameters in underlying Elasticsearch storage. 
+When deploying these apps, **you have to deploy Segments app first and Tracker app second**, since there is an internal change in how Tracker stores *rtm* parameters in underlying Elasticsearch storage.<br /> 
+- **BREAKING**: Segments Go app aggregations using `utm_` parameters (namely `utm_campaign`, `utm_content`, `utm_medium`, `utm_source` and `banner_variant`) has to be rewritten to use `rtm_` parameters (`rtm_campaign`, `rtm_content`, `rtm_medium`, `rtm_source` and `rtm_variant`). If one wants to aggregate old data (with `utm_` parameters) together with new data, it has to be done in two separate calls to Segments API (one with `utm_` and another one with `rtm_` aggregation parameters).
 
 ### Project
 
