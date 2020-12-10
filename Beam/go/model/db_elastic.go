@@ -83,17 +83,32 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 			// UTM parameters has been renamed to RTM
 			// We still want to keep the backwards compatibility by translating UTM conditions to RTM
 			// However, filtering by utm_ is deprecated and will be removed in the future
-			if strings.HasPrefix(field, "utm_") {
+			if field == "banner_variant" {
+				bq = bq.MustNot(elastic.NewTermsQuery("rtm_"+field[7:], interfaceSlice...))
+			} else if field == "rtm_variant" {
+				bq = bq.MustNot(elastic.NewTermsQuery("banner_"+field[4:], interfaceSlice...))
+			} else if strings.HasPrefix(field, "utm_") {
 				bq = bq.MustNot(elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...))
-			}
-			if strings.HasPrefix(field, "rtm_") {
+			} else if strings.HasPrefix(field, "rtm_") {
 				bq = bq.MustNot(elastic.NewTermsQuery("utm_"+field[4:], interfaceSlice...))
 			}
 		} else {
 			// UTM parameters has been renamed to RTM
 			// We still want to keep the backwards compatibility by translating UTM conditions to RTM (joined by OR operator)
 			// However, filtering by utm_ is deprecated and will be removed in the future
-			if strings.HasPrefix(field, "utm_") {
+			if field == "banner_variant" {
+				bannerVariantTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				rtmTerm := elastic.NewTermsQuery("rtm_"+field[7:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(bannerVariantTerm, rtmTerm)
+				bq = bq.Must(bqInner)
+			} else if field == "rtm_variant" {
+				rtmTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				bannerVariantTerm := elastic.NewTermsQuery("banner_"+field[4:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(bannerVariantTerm, rtmTerm)
+				bq = bq.Must(bqInner)
+			} else if strings.HasPrefix(field, "utm_") {
 				utmTerm := elastic.NewTermsQuery(field, interfaceSlice...)
 				rtmTerm := elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...)
 				bqInner := elastic.NewBoolQuery()
