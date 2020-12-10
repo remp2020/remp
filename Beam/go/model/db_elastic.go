@@ -81,10 +81,13 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 			bq = bq.MustNot(elastic.NewTermsQuery(field, interfaceSlice...))
 
 			// UTM parameters has been renamed to RTM
-			// We still want to keep the backwards compatibility by translating UTM conditions to RTM (joined by OR operator)
+			// We still want to keep the backwards compatibility by translating UTM conditions to RTM
 			// However, filtering by utm_ is deprecated and will be removed in the future
 			if strings.HasPrefix(field, "utm_") {
 				bq = bq.MustNot(elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...))
+			}
+			if strings.HasPrefix(field, "rtm_") {
+				bq = bq.MustNot(elastic.NewTermsQuery("utm_"+field[4:], interfaceSlice...))
 			}
 		} else {
 			// UTM parameters has been renamed to RTM
@@ -95,6 +98,12 @@ func (eDB *ElasticDB) boolQueryFromOptions(index string, o AggregateOptions) (*e
 				rtmTerm := elastic.NewTermsQuery("rtm_"+field[4:], interfaceSlice...)
 				bqInner := elastic.NewBoolQuery()
 				bqInner.Should(utmTerm, rtmTerm) // Should for 2 terms = OR
+				bq = bq.Must(bqInner)
+			} else if strings.HasPrefix(field, "rtm_") {
+				rtmTerm := elastic.NewTermsQuery(field, interfaceSlice...)
+				utmTerm := elastic.NewTermsQuery("utm_"+field[4:], interfaceSlice...)
+				bqInner := elastic.NewBoolQuery()
+				bqInner.Should(utmTerm, rtmTerm)
 				bq = bq.Must(bqInner)
 			} else {
 				bq = bq.Must(elastic.NewTermsQuery(field, interfaceSlice...))
