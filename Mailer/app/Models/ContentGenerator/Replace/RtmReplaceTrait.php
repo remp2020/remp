@@ -50,13 +50,13 @@ trait RtmReplaceTrait
                 if (strcasecmp($key, 'rtm_source') === 0) {
                     $finalParams[] = "$key={$utmSource}";
                     $rtmSourceAdded = true;
-                } else if (strcasecmp($key, 'rtm_medium') === 0) {
+                } elseif (strcasecmp($key, 'rtm_medium') === 0) {
                     $finalParams[] = "$key={$utmMedium}";
                     $rtmMediumAdded = true;
-                } else if (strcasecmp($key, 'rtm_campaign') === 0) {
+                } elseif (strcasecmp($key, 'rtm_campaign') === 0) {
                     $finalParams[] = "$key={$utmCampaign}";
                     $rtmCampaignAdded = true;
-                } else if (strcasecmp($key, 'rtm_content') === 0) {
+                } elseif (strcasecmp($key, 'rtm_content') === 0) {
                     $finalParams[] = "$key={$utmContent}";
                     $rtmContentAdded = true;
                 } else {
