@@ -64,11 +64,11 @@ services:
 local_configs:
 
     # Configuring usage of mailhog for local development
-    remp_mailermodule_mailer_smtpmailer_host: mailhog
-    remp_mailermodule_mailer_smtpmailer_port: 1025
-    remp_mailermodule_mailer_smtpmailer_username: ''
-    remp_mailermodule_mailer_smtpmailer_password: ''
-    remp_mailermodule_mailer_smtpmailer_secure: ''
+    remp_smtp_host: mailhog
+    remp_smtp_host_port: 1025
+    remp_smtp_host_username: ''
+    remp_smtp_host_password: ''
+    remp_smtp_host_secure: ''
 
 
 # If running Mailer on Valet, please uncomment the following lines and adjust the full path to REMP/Mailer folder
