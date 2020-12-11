@@ -12,7 +12,7 @@ use App\SegmentBrowser;
 use App\SegmentGroup;
 use App\SegmentUser;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use PDO;
@@ -45,7 +45,6 @@ class ComputeAuthorsSegments extends Command
 
     public function handle()
     {
-        ini_set('memory_limit', '512M');
         // Using Cursor on large number of results causing memory issues
         // https://github.com/laravel/framework/issues/14919
         DB::connection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);

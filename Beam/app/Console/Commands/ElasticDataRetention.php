@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Console\Command;
+use App\Console\Command;
 
 class ElasticDataRetention extends Command
 {

@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Segment;
 use App\SegmentGroup;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Illuminate\Support\Carbon;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
@@ -17,7 +17,6 @@ class ProcessPageviewLoyalVisitors extends Command
 
     public function handle(JournalContract $journalContract)
     {
-        ini_set('memory_limit', '-1');
         $days = $this->option('days') ?? 30;
 
         if (!$days) {

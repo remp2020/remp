@@ -10,7 +10,7 @@ use App\Model\ConversionCommerceEventProduct;
 use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Illuminate\Support\Collection;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
@@ -40,7 +40,6 @@ class AggregateConversionEvents extends Command
 
     public function handle()
     {
-        ini_set('memory_limit', '1G');
         $this->line('Aggregation of conversion events started');
         $conversionId = $this->option('conversion_id') ?? null;
 

@@ -9,7 +9,7 @@ use App\SessionDevice;
 use App\SessionReferer;
 use Carbon\Carbon;
 use Eloquent;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class CompressAggregations extends Command

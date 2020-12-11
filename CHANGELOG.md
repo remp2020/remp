@@ -33,6 +33,8 @@ When deploying these apps, **you have to deploy Segments app first and Tracker a
 - Added new identifier `commerce_session_id` into `remplib.js` to identify unique commerce process. remp/crm#1559 
 - [Segments]: UTM to RTM parameters transition. remp/remp#779
 - [Tracker]: UTM to RTM parameters transition. remp/remp#779
+- Removed statically set `memory_limit` configuration within some memory-extensive commands. remp/remp#788
+- Added support for configurable memory limit for each command via `COMMANDS_MEMORY_LIMITS` environment variable. See [`.env.example`](Beam/.env.example) for more information. remp/remp#788
 
 ## [0.16.0] - 2020-12-07
 

@@ -7,7 +7,7 @@ use App\ArticleAggregatedView;
 use App\ViewsPerBrowserMv;
 use App\ViewsPerUserMv;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;

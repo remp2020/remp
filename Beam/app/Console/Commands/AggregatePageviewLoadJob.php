@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Article;
 use App\ArticlePageviews;
 use App\Helpers\DebugProxy;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Illuminate\Support\Carbon;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\SessionDevice;
 use App\SessionReferer;
 use DeviceDetector\DeviceDetector;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Illuminate\Support\Carbon;
 use Remp\Journal\JournalContract;
 use Remp\Journal\ListRequest;

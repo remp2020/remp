@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Console\Command;
+use App\Console\Command;
 
 class ElasticWriteAliasRollover extends Command
 {
