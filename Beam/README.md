@@ -1346,7 +1346,7 @@ The expected value is always as follows (all are optional):
 ```
 
 _**Warning:** Previously, `utm_` prefix was used instead of `rtm_` (and `banner_variant` instead of `rtm_variant`), but was replaced to avoid collision with other tracking software. However, `utm_` parameters are still loaded if no `rtm_` parameters are found. This is deprecated behaviour and will be turned off in the future. 
-To turn it off manually, add the following setting: `rempConfig.tracker.utmBackwardCompatiblityEnabled = false`._
+To turn it off manually, add the following setting: `rempConfig.tracker.utmBackwardCompatibilityEnabled = false`._
   
 
 If the *source* is not provided, JS library tries to load the values from local storage which were stored last time

@@ -44,7 +44,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         timeSpentEnabled: false,
 
-        utmBackwardCompatiblityEnabled: true, // Deprecated, will be set to false in the future
+        utmBackwardCompatibilityEnabled: true, // Deprecated, will be set to false in the future
 
         timeSpentInterval: 5, // seconds
 
@@ -190,8 +190,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             }
 
-            if (typeof config.tracker.utmBackwardCompatiblityEnabled === 'boolean') {
-                this.utmBackwardCompatiblityEnabled = config.tracker.utmBackwardCompatiblityEnabled;
+            if (typeof config.tracker.utmBackwardCompatibilityEnabled === 'boolean') {
+                this.utmBackwardCompatibilityEnabled = config.tracker.utmBackwardCompatibilityEnabled;
             }
 
             window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
@@ -658,15 +658,16 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
 
-            // utm_ replaced with rtm_ (but utm_ support kept due to backwards compatibility reasons)
+            // utm_ replaced with rtm_ (but utm_ support kept due to the backward compatibility)
             let source = null;
-            if (this.utmBackwardCompatiblityEnabled) {
+
+            if (this.utmBackwardCompatibilityEnabled) {
                 source = {
-                    "rtm_source": this.getParam("rtm_source") ?? this.getParam("utm_source"),
-                    "rtm_medium": this.getParam("rtm_medium") ?? this.getParam("utm_medium"),
-                    "rtm_campaign": this.getParam("rtm_campaign") ?? this.getParam("utm_campaign"),
-                    "rtm_content": this.getParam("rtm_content") ?? this.getParam("utm_content"),
-                    "rtm_variant": this.getParam("rtm_variant") ?? this.getParam("banner_variant"),
+                    "rtm_source": this.getParam("rtm_source") !== null ? this.getParam("rtm_source") : this.getParam("utm_source"),
+                    "rtm_medium": this.getParam("rtm_medium") !== null ? this.getParam("rtm_medium") : this.getParam("utm_medium"),
+                    "rtm_campaign": this.getParam("rtm_campaign") !== null ? this.getParam("rtm_campaign") : this.getParam("utm_campaign"),
+                    "rtm_content": this.getParam("rtm_content") !== null ? this.getParam("rtm_content") : this.getParam("utm_content"),
+                    "rtm_variant": this.getParam("rtm_variant") !== null ? this.getParam("rtm_variant") : this.getParam("banner_variant"),
                 };
             } else {
                 source = {
