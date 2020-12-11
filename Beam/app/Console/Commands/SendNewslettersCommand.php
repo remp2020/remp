@@ -7,7 +7,7 @@ use App\Model\NewsletterCriterion;
 use App\Newsletter;
 use Carbon\Carbon;
 use DB;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Recurr\Transformer\ArrayTransformer;
 use Recurr\Transformer\ArrayTransformerConfig;
 use Recurr\Transformer\Constraint\AfterConstraint;

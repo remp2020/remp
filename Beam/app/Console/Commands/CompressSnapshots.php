@@ -6,7 +6,7 @@ use App\Helpers\Journal\JournalInterval;
 use App\Model\ArticleViewsSnapshot;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Command;
 
 class CompressSnapshots extends Command
 {

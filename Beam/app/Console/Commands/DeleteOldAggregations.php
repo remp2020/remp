@@ -6,7 +6,7 @@ use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Command;
 
 class DeleteOldAggregations extends Command
 {

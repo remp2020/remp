@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Helpers\Journal\JournalHelpers;
 use App\Model\ArticleViewsSnapshot;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Command;
 use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
 
