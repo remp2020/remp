@@ -59,7 +59,9 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown hm-profile">
                     <a data-toggle="dropdown" href="">
+                        {if $currentUser->isLoggedIn()}
                         <img src="https://www.gravatar.com/avatar/{md5(strtolower($currentUser->getIdentity()->data['email']))}?s=45&d=mm" alt="">
+                        {/if}
                     </a>
 
                     <ul class="dropdown-menu pull-right dm-icon">
