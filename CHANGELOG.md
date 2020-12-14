@@ -9,8 +9,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Important
 
-- **BREAKING**: All REMP applications (including Tracker and Journal/Segments Go apps) now primarily use *rtm* parameters (our replacement for *utm* parameters, to avoid conflicts with other tracking applications).
-When deploying this release, **you have to deploy the Segments/Journal app first and the Tracker app second**. Everything else (REMP PHP apps - Beam, Campaign, Mailer, SSO) **has to be deployed afterwards** (the order doesn't matter). The reason is that there is an internal change in how Tracker stores *rtm* parameters in underlying Elasticsearch storage.<br /> 
+- **BREAKING**: All REMP applications now primarily use *rtm* parameters (our replacement for *utm* parameters, to avoid conflicts with other tracking software).
+When deploying this release, **you have to deploy the Segments/Journal app first and the Tracker app second**. Everything else (Beam, Campaign, Mailer, SSO) **has to be deployed afterwards** (the order doesn't matter). This is due to the internal change in how Tracker stores *rtm* parameters in underlying Elasticsearch storage. 
 - **BREAKING**: Segments Go app aggregations using `utm_` parameters (namely `utm_campaign`, `utm_content`, `utm_medium`, `utm_source` and `banner_variant`) has to be rewritten to use `rtm_` parameters (`rtm_campaign`, `rtm_content`, `rtm_medium`, `rtm_source` and `rtm_variant`). If one wants to aggregate old data (with `utm_` parameters) together with new data, it has to be done in two separate calls to Segments API (one with `utm_` and another one with `rtm_` aggregation parameters).
 
 ### Project
