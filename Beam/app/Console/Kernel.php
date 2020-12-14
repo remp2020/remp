@@ -68,7 +68,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(SnapshotArticlesViews::COMMAND)
             ->everyMinute()
-            ->withoutOverlapping()
+            ->withoutOverlapping(5)
             ->appendOutputTo(storage_path('logs/snapshot_articles_views.log'));
 
         $schedule->command(CompressSnapshots::COMMAND)
@@ -108,12 +108,12 @@ class Kernel extends ConsoleKernel
         // Aggregates current hour (may not be completed yet)
         $schedule->command(AggregatePageviewLoadJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
-            ->withoutOverlapping()
+            ->withoutOverlapping(20)
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
-            ->withoutOverlapping()
+            ->withoutOverlapping(20)
             ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
 
         // Aggregates last full hour only once
